@@ -25,7 +25,11 @@ class ImageSuggestionApproved extends MessageAbstract
 
     protected function renderText(): string
     {
-        return sprintf('Approved image suggestion (%s) for dish: %s', $this->meta['suggestion_type'], $this->meta['dish_name']);
+        return sprintf(
+            'Approved image suggestion (%s) for dish: %s',
+            $this->meta['suggestion_type'],
+            $this->meta['dish_name'],
+        );
     }
 
     protected function renderHtml(): string

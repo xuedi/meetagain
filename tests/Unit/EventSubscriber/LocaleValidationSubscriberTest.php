@@ -78,8 +78,7 @@ class LocaleValidationSubscriberTest extends TestCase
         $event = $this->makeEvent($request);
 
         // Act
-        $this->makeSubscriber(isValid: true, isFilteredValid: false, defaultLocale: 'en')
-            ->onKernelRequest($event);
+        $this->makeSubscriber(isValid: true, isFilteredValid: false, defaultLocale: 'en')->onKernelRequest($event);
 
         // Assert
         $response = $event->getResponse();

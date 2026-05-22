@@ -9,6 +9,4 @@ use RuntimeException;
  * schema, or tag. Surfaces a configuration bug loudly instead of letting one
  * silently overwrite the other.
  */
-final class OpenApiCollisionException extends RuntimeException
-{
-}
+final class OpenApiCollisionException extends RuntimeException {}

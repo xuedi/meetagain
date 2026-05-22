@@ -120,7 +120,8 @@ readonly class WishlistService
             return 0;
         }
 
-        $qb = $this->eventRepo->createQueryBuilder('e')
+        $qb = $this->eventRepo
+            ->createQueryBuilder('e')
             ->select('COUNT(e.id)')
             ->where('e.start >= :since')
             ->andWhere('e.start < :now')

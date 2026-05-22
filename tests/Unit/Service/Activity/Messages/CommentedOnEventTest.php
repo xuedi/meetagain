@@ -69,7 +69,9 @@ class CommentedOnEventTest extends TestCase
     public function testCanCatchMissingEventId(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.commented_on_event"));
+        $this->expectExceptionObject(
+            new InvalidArgumentException("Missing 'event_id' in meta in core.commented_on_event"),
+        );
 
         $subject = new CommentedOnEvent();
         $subject->injectServices($this->router, $this->imageService, $this->translator, []);

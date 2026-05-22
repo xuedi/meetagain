@@ -35,11 +35,7 @@ class CronLogControllerTest extends WebTestCase
             (string) $crawler->filter('.tabs.is-boxed li.is-active a')->attr('href'),
             'Active tab should link to cron route',
         );
-        static::assertSame(
-            5,
-            $crawler->filter('.tabs.is-boxed li')->count(),
-            'Five logs tabs should be rendered',
-        );
+        static::assertSame(5, $crawler->filter('.tabs.is-boxed li')->count(), 'Five logs tabs should be rendered');
         static::assertGreaterThan(
             0,
             $crawler->filter('.box .level .level-left strong')->count(),
@@ -75,11 +71,12 @@ class CronLogControllerTest extends WebTestCase
             'Two dropdowns (status, range) should be rendered',
         );
         $items = $crawler->filter('.box .level .level-right .dropdown-item');
-        $itemTexts = $items->each(static fn ($node) => trim($node->text()));
-        $hasItemContaining = static fn (string $needle): bool => array_any(
-            $itemTexts,
-            static fn (string $text): bool => str_contains($text, $needle),
-        );
+        $itemTexts = $items->each(static fn($node) => trim($node->text()));
+        $hasItemContaining =
+            static fn(string $needle): bool => array_any($itemTexts, static fn(string $text): bool => str_contains(
+                $text,
+                $needle,
+            ));
         foreach (['All', 'All problems', 'Warnings', 'Errors', 'Exceptions'] as $expected) {
             static::assertTrue(
                 $hasItemContaining($expected),

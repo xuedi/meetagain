@@ -1,19 +1,20 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Controller\Admin\Support;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\SupportRequest;
 use App\Enum\SupportRequestStatus;
 use App\Repository\SupportRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -103,9 +104,10 @@ final class RequestsController extends AbstractSupportController implements Admi
 
         $actions = [];
         if ($request->isNew()) {
-            $actions[] = new AdminTopActionButton(
+            $actions[] = new AdminTopActionForm(
                 label: $this->translator->trans('admin_support.button_mark_read'),
                 target: $this->generateUrl('app_admin_support_mark_read', ['id' => $request->getId()]),
+                csrfTokenId: 'app_admin_support_mark_read' . $request->getId(),
                 icon: 'check',
                 variant: 'is-warning',
             );
@@ -126,9 +128,12 @@ final class RequestsController extends AbstractSupportController implements Admi
         ]);
     }
 
-    #[Route('/mark-read/{id}', name: 'app_admin_support_mark_read', requirements: ['id' => '\d+'])]
-    public function markRead(int $id): Response
+    #[Route('/mark-read/{id}', name: 'app_admin_support_mark_read', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function markRead(Request $request, int $id): Response
     {
+        if (!$this->isCsrfTokenValid('app_admin_support_mark_read' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
         $request = $this->supportRequestRepo->find($id);
         if ($request instanceof SupportRequest) {
             $request->setStatus(SupportRequestStatus::Read);

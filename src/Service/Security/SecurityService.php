@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Service\Security;
 
@@ -154,12 +152,7 @@ readonly class SecurityService implements CronTaskInterface
             $parts = [];
             foreach ($this->sortedProviders() as $provider) {
                 $report = $provider->scanRetrospective($from, $now);
-                $parts[] = sprintf(
-                    '%s: threat=%d (%s)',
-                    $report->providerKey,
-                    $report->threatLevel,
-                    $report->summary,
-                );
+                $parts[] = sprintf('%s: threat=%d (%s)', $report->providerKey, $report->threatLevel, $report->summary);
             }
 
             $this->appState->set(self::KEY_LAST_RETROSPECTIVE_RUN, (string) $now->getTimestamp());

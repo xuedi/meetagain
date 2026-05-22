@@ -211,7 +211,9 @@ final class PollController extends AbstractController
 
         try {
             $winner = $this->pollService->close($id);
-            $this->addFlash('success', $this->translator->trans('bookclub_poll.flash_closed', ['%title%' => $winner->getBook()->getTitle()]));
+            $this->addFlash('success', $this->translator->trans('bookclub_poll.flash_closed', [
+                '%title%' => $winner->getBook()->getTitle(),
+            ]));
             if ($poll !== null) {
                 $this->activityService->log(PollClosed::TYPE, $this->getAuthedUser(), [
                     'poll_id' => $id,

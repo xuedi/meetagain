@@ -40,7 +40,8 @@ class CommentRepository extends ServiceEntityRepository
      */
     public function findRecentAcrossEvents(int $limit, ?array $restrictToEventIds = null): array
     {
-        $qb = $this->createQueryBuilder('c')
+        $qb = $this
+            ->createQueryBuilder('c')
             ->leftJoin('c.user', 'u')
             ->addSelect('u')
             ->leftJoin('c.event', 'e')
@@ -52,8 +53,7 @@ class CommentRepository extends ServiceEntityRepository
             if ($restrictToEventIds === []) {
                 return [];
             }
-            $qb->andWhere('c.event IN (:eventIds)')
-                ->setParameter('eventIds', $restrictToEventIds);
+            $qb->andWhere('c.event IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
 
         return $qb->getQuery()->getResult();

@@ -128,7 +128,11 @@ final readonly class RedisCacheService
                 $rawHash = $this->arrayResult($this->redis->hGetAll($key));
                 $members = [];
                 foreach ($rawHash as $field => $fieldValue) {
-                    $members[] = sprintf('%s = %s', $this->stringify((string) $field), $this->stringify((string) $fieldValue));
+                    $members[] = sprintf(
+                        '%s = %s',
+                        $this->stringify((string) $field),
+                        $this->stringify((string) $fieldValue),
+                    );
                 }
                 $value = implode("\n", $members);
                 break;
@@ -152,7 +156,7 @@ final readonly class RedisCacheService
     {
         $remainder = $key;
         $colonPos = strpos($remainder, ':');
-        if ($colonPos !== false && $colonPos > 0 && $colonPos < strlen($remainder) - 1) {
+        if ($colonPos !== false && $colonPos > 0 && $colonPos < (strlen($remainder) - 1)) {
             $remainder = substr($remainder, $colonPos + 1);
         }
 
@@ -161,7 +165,7 @@ final readonly class RedisCacheService
             $remainder = substr($remainder, 0, $bracePos);
         }
 
-        $hit = strcspn($remainder, ":_.");
+        $hit = strcspn($remainder, ':_.');
         if ($hit === 0 || $hit === strlen($remainder)) {
             return $remainder;
         }

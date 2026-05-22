@@ -54,7 +54,7 @@ readonly class CommandService
 
     public function rebuildTheme(): string
     {
-        $output  = $this->execute(new RebuildThemeCommand());
+        $output = $this->execute(new RebuildThemeCommand());
         $output .= $this->run(['command' => 'asset-map:compile']);
         $output .= $this->clearCache();
         $output .= $this->run(['command' => 'cache:pool:clear', 'pools' => ['cache.cms_page_cache']]);

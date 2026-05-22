@@ -2,8 +2,8 @@
 
 namespace App\Entity\BlockType;
 
-use App\Enum\CmsBlock\CmsBlockType;
 use App\Entity\Image as ImageEntity;
+use App\Enum\CmsBlock\CmsBlockType;
 
 interface BlockType
 {

@@ -11,6 +11,7 @@ use Plugin\Bookclub\Service\SuggestionService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -69,9 +70,16 @@ final class SuggestionController extends AbstractController
         return $this->redirectToRoute('app_plugin_bookclub_suggestions');
     }
 
-    #[Route('/withdraw/{suggestionId}', name: 'app_plugin_bookclub_withdraw', methods: ['GET'])]
-    public function withdraw(int $suggestionId): Response
+    #[Route('/withdraw/{suggestionId}', name: 'app_plugin_bookclub_withdraw', methods: ['POST'])]
+    public function withdraw(Request $request, int $suggestionId): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'app_plugin_bookclub_withdraw' . $suggestionId,
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $user = $this->getAuthedUser();
         $suggestion = $this->suggestionService->get($suggestionId);
 

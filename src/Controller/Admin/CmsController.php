@@ -10,6 +10,7 @@ use App\Admin\Navigation\AdminLink;
 use App\Admin\Navigation\AdminNavigationConfig;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\Announcement;
@@ -21,6 +22,7 @@ use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Text;
 use App\Entity\BlockType\TrioCards;
 use App\Entity\Cms;
+use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
@@ -28,7 +30,6 @@ use App\Form\CmsType;
 use App\Repository\AnnouncementRepository;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
-use App\Entity\User;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
@@ -39,6 +40,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -52,7 +54,12 @@ final class CmsController extends AbstractController implements AdminNavigationI
         return new AdminNavigationConfig(
             section: 'admin_shell.section_content',
             links: [
-                new AdminLink(label: 'admin_shell.menu_cms', route: 'app_admin_cms', active: 'cms', role: 'ROLE_STEWARD'),
+                new AdminLink(
+                    label: 'admin_shell.menu_cms',
+                    route: 'app_admin_cms',
+                    active: 'cms',
+                    role: 'ROLE_STEWARD',
+                ),
             ],
             sectionPriority: 50,
         );
@@ -115,17 +122,14 @@ final class CmsController extends AbstractController implements AdminNavigationI
             )),
         ];
 
-        $adminTop = new AdminTop(
-            info: $info,
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_cms.button_add_page'),
-                    target: '#',
-                    icon: 'plus',
-                    toggleId: 'cms-add',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: $info, actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_cms.button_add_page'),
+                target: '#',
+                icon: 'plus',
+                toggleId: 'cms-add',
+            ),
+        ]);
 
         return $this->render('admin/cms/cms_list.html.twig', [
             'active' => 'cms',
@@ -166,7 +170,10 @@ final class CmsController extends AbstractController implements AdminNavigationI
             $this->em->flush();
 
             $user = $this->getAuthedUser();
-            $this->activityService->log(AdminCmsPageUpdated::TYPE, $user, ['cms_id' => $cms->getId(), 'cms_slug' => $cms->getSlug()]);
+            $this->activityService->log(AdminCmsPageUpdated::TYPE, $user, [
+                'cms_id' => $cms->getId(),
+                'cms_slug' => $cms->getSlug(),
+            ]);
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateCms, $cms->getId());
 
             return $this->redirectToRoute('app_admin_cms_edit', [
@@ -203,20 +210,23 @@ final class CmsController extends AbstractController implements AdminNavigationI
     private function buildEditTop(Cms $cms, ?Announcement $linkedAnnouncement, bool $isAdmin): AdminTop
     {
         $statusTag = $cms->isPublished()
-            ? sprintf(
-                '<span class="tag is-success is-medium">%s</span>',
-                htmlspecialchars($this->translator->trans('admin_cms.published'), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            )
-            : sprintf(
-                '<span class="tag is-light is-medium">%s</span>',
-                htmlspecialchars($this->translator->trans('admin_cms.draft'), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            );
+            ? sprintf('<span class="tag is-success is-medium">%s</span>', htmlspecialchars(
+                $this->translator->trans('admin_cms.published'),
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ))
+            : sprintf('<span class="tag is-light is-medium">%s</span>', htmlspecialchars(
+                $this->translator->trans('admin_cms.draft'),
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ));
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>/%s</strong>',
-                htmlspecialchars((string) $cms->getSlug(), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>/%s</strong>', htmlspecialchars(
+                (string) $cms->getSlug(),
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ))),
             new AdminTopInfoHtml($statusTag),
             new AdminTopInfoHtml(sprintf(
                 '<strong>%d</strong>&nbsp;%s',
@@ -235,13 +245,16 @@ final class CmsController extends AbstractController implements AdminNavigationI
             if ($linkedAnnouncement !== null) {
                 $actions[] = new AdminTopActionButton(
                     label: $this->translator->trans('admin_cms.button_open_announcement'),
-                    target: $this->generateUrl('app_admin_email_announcements_view', ['id' => $linkedAnnouncement->getId()]),
+                    target: $this->generateUrl('app_admin_email_announcements_view', [
+                        'id' => $linkedAnnouncement->getId(),
+                    ]),
                     icon: 'bullhorn',
                 );
             } else {
-                $actions[] = new AdminTopActionButton(
+                $actions[] = new AdminTopActionForm(
                     label: $this->translator->trans('admin_cms.button_create_announcement'),
                     target: $this->generateUrl('app_admin_email_announcements_from_cms', ['id' => $cms->getId()]),
+                    csrfTokenId: 'admin_email_announcements_from_cms' . $cms->getId(),
                     icon: 'bullhorn',
                 );
             }
@@ -267,10 +280,15 @@ final class CmsController extends AbstractController implements AdminNavigationI
         return $user;
     }
 
-    #[Route('/delete', name: 'app_admin_cms_delete', methods: ['GET'])]
+    #[Route('/delete', name: 'app_admin_cms_delete', methods: ['POST'])]
     public function cmsDelete(Request $request): Response
     {
-        $id = $request->query->get('id');
+        $id = (int) $request->request->get('id');
+
+        if (!$this->isCsrfTokenValid('admin_cms_delete' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $cmsPage = $this->repo->find($id);
         if ($cmsPage !== null) {
             $this->denyAccessUnlessGranted(PermissionAttribute::CMS_PAGE_DELETE, $cmsPage);
@@ -310,7 +328,10 @@ final class CmsController extends AbstractController implements AdminNavigationI
         $this->em->persist($newPage);
         $this->em->flush();
 
-        $this->activityService->log(AdminCmsPageCreated::TYPE, $user, ['cms_id' => $newPage->getId(), 'cms_slug' => $newPage->getSlug()]);
+        $this->activityService->log(AdminCmsPageCreated::TYPE, $user, [
+            'cms_id' => $newPage->getId(),
+            'cms_slug' => $newPage->getSlug(),
+        ]);
         $this->entityActionDispatcher->dispatch(EntityAction::CreateCms, $newPage->getId());
 
         return $this->redirectToRoute('app_admin_cms_edit', [

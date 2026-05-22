@@ -4,9 +4,9 @@ namespace App\Controller\Admin\Logs;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
-use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Repository\AccessDeniedLogRepository;
@@ -17,12 +17,15 @@ use Exception;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/logs/access-denied')]
-final class AccessDeniedLogController extends AbstractLogsController implements AdminNavigationInterface, AdminTabsInterface
+final class AccessDeniedLogController extends AbstractLogsController implements
+    AdminNavigationInterface,
+    AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';
 
@@ -85,9 +88,10 @@ final class AccessDeniedLogController extends AbstractLogsController implements 
 
         $actions = [];
         if ($totalCount > 0) {
-            $actions[] = new AdminTopActionButton(
+            $actions[] = new AdminTopActionForm(
                 label: $this->translator->trans('global.button_clear'),
                 target: $this->generateUrl('app_admin_access_denied_log_clear'),
+                csrfTokenId: 'admin_access_denied_log_clear',
                 icon: 'trash',
             );
         }
@@ -104,10 +108,14 @@ final class AccessDeniedLogController extends AbstractLogsController implements 
         ]);
     }
 
-    #[Route('/clear', name: 'app_admin_access_denied_log_clear')]
-    public function clear(): RedirectResponse
+    #[Route('/clear', name: 'app_admin_access_denied_log_clear', methods: ['POST'])]
+    public function clear(Request $request): RedirectResponse
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SECURITY_ACCESS_DENIED_READ);
+
+        if (!$this->isCsrfTokenValid('admin_access_denied_log_clear', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         $this->connection->executeStatement('DELETE FROM logs_access_denied');
 

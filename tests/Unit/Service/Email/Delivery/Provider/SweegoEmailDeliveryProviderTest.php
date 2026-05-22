@@ -22,8 +22,10 @@ class SweegoEmailDeliveryProviderTest extends TestCase
      * @param array<string, mixed> $expectedBodySubset
      */
     #[DataProvider('provideFilterToRequestBodyCases')]
-    public function testGetLogsBuildsRequestBodyFromFilter(EmailDeliveryLogFilter $filter, array $expectedBodySubset): void
-    {
+    public function testGetLogsBuildsRequestBodyFromFilter(
+        EmailDeliveryLogFilter $filter,
+        array $expectedBodySubset,
+    ): void {
         // Arrange
         $captured = ['url' => null, 'body' => null, 'headers' => null];
         $http = $this->httpClientReturning(['result' => [], 'nb_result_without_offset' => 0], $captured);
@@ -34,7 +36,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
 
         // Assert
         static::assertSame('https://api.sweego.io/logs/', $captured['url']);
-        $body = json_decode($captured['body'], true);
+        $body = json_decode((string) $captured['body'], true);
         static::assertIsArray($body);
         foreach ($expectedBodySubset as $key => $value) {
             static::assertArrayHasKey($key, $body);
@@ -110,8 +112,11 @@ class SweegoEmailDeliveryProviderTest extends TestCase
      * @param array<string, mixed> $rawRow
      */
     #[DataProvider('provideMissingFieldFallbackCases')]
-    public function testMapLogAppliesFallbacksForMissingFields(array $rawRow, string $expectedField, mixed $expectedValue): void
-    {
+    public function testMapLogAppliesFallbacksForMissingFields(
+        array $rawRow,
+        string $expectedField,
+        mixed $expectedValue,
+    ): void {
         // Arrange
         $http = $this->httpClientReturning(['result' => [$rawRow]]);
         $provider = new SweegoEmailDeliveryProvider($http, new NullLogger(), self::DSN);
@@ -182,11 +187,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
     public function testIsAvailableReturnsTrueWhenApiKeyPresent(): void
     {
         // Arrange
-        $provider = new SweegoEmailDeliveryProvider(
-            new MockHttpClient(),
-            new NullLogger(),
-            self::DSN,
-        );
+        $provider = new SweegoEmailDeliveryProvider(new MockHttpClient(), new NullLogger(), self::DSN);
 
         // Act / Assert
         static::assertTrue($provider->isAvailable());
@@ -282,30 +283,31 @@ class SweegoEmailDeliveryProviderTest extends TestCase
      */
     private function httpClientReturning(array $payload, ?array &$captured = null): HttpClientInterface
     {
-        return new MockHttpClient(
-            static function (string $method, string $url, array $options) use ($payload, &$captured): MockResponse {
-                if ($captured !== null) {
-                    $captured['url'] = $url;
-                    if (array_key_exists('body', $captured)) {
-                        $captured['body'] = $options['body'] ?? null;
-                    }
-                    $headers = [];
-                    foreach ($options['headers'] ?? [] as $line) {
-                        if (!is_string($line)) {
-                            continue;
-                        }
-                        $parts = explode(': ', $line, 2);
-                        if (count($parts) === 2) {
-                            $headers[$parts[0]][] = $parts[1];
-                        }
-                    }
-                    $captured['headers'] = $headers;
+        return new MockHttpClient(static function (string $method, string $url, array $options) use (
+            $payload,
+            &$captured,
+        ): MockResponse {
+            if ($captured !== null) {
+                $captured['url'] = $url;
+                if (array_key_exists('body', $captured)) {
+                    $captured['body'] = $options['body'] ?? null;
                 }
-                return new MockResponse((string) json_encode($payload), [
-                    'http_code' => 200,
-                    'response_headers' => ['Content-Type' => 'application/json'],
-                ]);
-            },
-        );
+                $headers = [];
+                foreach ($options['headers'] ?? [] as $line) {
+                    if (!is_string($line)) {
+                        continue;
+                    }
+                    $parts = explode(': ', $line, 2);
+                    if (count($parts) === 2) {
+                        $headers[$parts[0]][] = $parts[1];
+                    }
+                }
+                $captured['headers'] = $headers;
+            }
+            return new MockResponse((string) json_encode($payload), [
+                'http_code' => 200,
+                'response_headers' => ['Content-Type' => 'application/json'],
+            ]);
+        });
     }
 }

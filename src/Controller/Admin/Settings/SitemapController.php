@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Controller\Admin\Settings;
 
@@ -129,7 +127,7 @@ final class SitemapController extends AbstractSettingsController implements Admi
 
             if ($section === 'cms') {
                 $cmsId = isset($url->meta['cms_id']) ? (int) $url->meta['cms_id'] : null;
-                $page = $cmsId !== null ? ($cmsById[$cmsId] ?? null) : null;
+                $page = $cmsId !== null ? $cmsById[$cmsId] ?? null : null;
                 if ($page !== null && $locale !== '') {
                     $title = $page->getPageTitle($locale);
                     if ($title === null || $title === '') {
@@ -138,7 +136,7 @@ final class SitemapController extends AbstractSettingsController implements Admi
                 }
             } elseif ($section === 'events') {
                 $eventId = isset($url->meta['event_id']) ? (int) $url->meta['event_id'] : null;
-                $event = $eventId !== null ? ($eventsById[$eventId] ?? null) : null;
+                $event = $eventId !== null ? $eventsById[$eventId] ?? null : null;
                 if ($event !== null) {
                     if ($locale !== '' && $event->getTitle($locale) === '') {
                         $warnings[] = $missingTitle;
@@ -230,7 +228,7 @@ final class SitemapController extends AbstractSettingsController implements Admi
 
         if ($section === 'cms') {
             $cmsId = isset($url->meta['cms_id']) ? (int) $url->meta['cms_id'] : null;
-            $page = $cmsId !== null ? ($cmsById[$cmsId] ?? null) : null;
+            $page = $cmsId !== null ? $cmsById[$cmsId] ?? null : null;
             $title = $page !== null && $locale !== '' ? $page->getPageTitle($locale) : null;
             if ($title !== null && $title !== '') {
                 return $title;
@@ -243,7 +241,7 @@ final class SitemapController extends AbstractSettingsController implements Admi
 
         if ($section === 'events') {
             $eventId = isset($url->meta['event_id']) ? (int) $url->meta['event_id'] : null;
-            $event = $eventId !== null ? ($eventsById[$eventId] ?? null) : null;
+            $event = $eventId !== null ? $eventsById[$eventId] ?? null : null;
             if ($event !== null && $locale !== '') {
                 $title = $event->getTitle($locale);
                 if ($title !== '') {

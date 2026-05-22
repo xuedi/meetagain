@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Form;
 
@@ -148,7 +146,9 @@ class EventType extends AbstractType
                     'required' => false,
                 ]);
                 $builder->add("description-{$languageCode}", TextareaType::class, [
-                    'label' => $this->translator->trans('admin_event.form_label_description', ['%locale%' => $languageCode]),
+                    'label' => $this->translator->trans('admin_event.form_label_description', [
+                        '%locale%' => $languageCode,
+                    ]),
                     'data' => $translation?->getDescription() ?? '',
                     'mapped' => false,
                     'required' => false,

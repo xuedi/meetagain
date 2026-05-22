@@ -4,13 +4,13 @@ namespace App\Service\Event;
 
 use App\CronTaskInterface;
 use App\Entity\Event;
-use App\Enum\CmsBlock\CmsBlockType;
-use App\Enum\CronTaskStatus;
-use App\Enum\EventInterval;
-use App\Enum\EventStatus;
 use App\Entity\EventTranslation;
 use App\EntityActionDispatcher;
+use App\Enum\CmsBlock\CmsBlockType;
+use App\Enum\CronTaskStatus;
 use App\Enum\EntityAction;
+use App\Enum\EventInterval;
+use App\Enum\EventStatus;
 use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
 use App\Service\Cms\CmsService;

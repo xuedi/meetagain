@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Service\Notification\User;
 
@@ -14,7 +12,6 @@ readonly class ReviewNotificationProvider implements NotificationProviderInterfa
         private TranslatorInterface $translator,
     ) {}
 
-
     public function getNotifications(User $user): array
     {
         $count = $this->service->countForUser($user);
@@ -25,11 +22,7 @@ readonly class ReviewNotificationProvider implements NotificationProviderInterfa
         $label = $this->translator->trans('notification.review.pending_count', ['%count%' => $count]);
 
         return [
-            new NotificationItem(
-                label: $label,
-                icon: 'fa-check-double',
-                route: 'app_profile_review',
-            ),
+            new NotificationItem(label: $label, icon: 'fa-check-double', route: 'app_profile_review'),
         ];
     }
 }

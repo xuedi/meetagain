@@ -107,5 +107,4 @@ readonly class DinnerService
         $dinner->setReservationName($name !== '' ? $name : null);
         $this->em->flush();
     }
-
 }

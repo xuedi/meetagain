@@ -347,6 +347,7 @@ testAttackAll:
 [group('testing')]
 check: checkMago checkMagoAnalyze checkMagoGuard
     {{PHP}} composer validate --strict
+    {{PHP}} php bin/check-get-routes.php
     echo "All tests and checks passed successfully"
 
 # Check Mago (linter)

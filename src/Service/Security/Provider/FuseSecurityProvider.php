@@ -95,7 +95,9 @@ final class FuseSecurityProvider extends AbstractSecurityProvider
     #[Override]
     protected function buildReport(int $threatLevel, string $summary, array $details = []): ProviderReport
     {
-        $recommendation = $threatLevel >= 100 ? SecurityRecommendation::BlockShortCircuit : SecurityRecommendation::Handled;
+        $recommendation = $threatLevel >= 100
+            ? SecurityRecommendation::BlockShortCircuit
+            : SecurityRecommendation::Handled;
 
         return new ProviderReport(
             providerKey: $this->getKey(),

@@ -30,14 +30,14 @@ enum CmsBlockType: int
     public function getBlockClass(): string
     {
         return match ($this) {
-            self::Headline    => Headline::class,
-            self::Text        => Text::class,
-            self::Gallery     => Gallery::class,
-            self::Hero        => Hero::class,
+            self::Headline => Headline::class,
+            self::Text => Text::class,
+            self::Gallery => Gallery::class,
+            self::Hero => Hero::class,
             self::EventTeaser => EventTeaser::class,
-            self::TrioCards   => TrioCards::class,
-            self::FactsRow    => FactsRow::class,
-            default           => throw new LogicException(sprintf('CmsBlockType::%s is not yet implemented.', $this->name)),
+            self::TrioCards => TrioCards::class,
+            self::FactsRow => FactsRow::class,
+            default => throw new LogicException(sprintf('CmsBlockType::%s is not yet implemented.', $this->name)),
         };
     }
 

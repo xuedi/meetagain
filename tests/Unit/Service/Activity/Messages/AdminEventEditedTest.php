@@ -54,7 +54,9 @@ class AdminEventEditedTest extends TestCase
     public function testCanCatchMissingEventId(): void
     {
         // Arrange
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_edited"));
+        $this->expectExceptionObject(
+            new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_edited"),
+        );
 
         $subject = new AdminEventEdited();
         $subject->injectServices($this->router, $this->imageService, $this->translator, []);

@@ -113,5 +113,4 @@ class PublicPagesTest extends WebTestCase
             'Frontpage must override meta_description with the frontpage-specific value',
         );
     }
-
 }

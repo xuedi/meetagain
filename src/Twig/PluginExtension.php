@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Twig;
 
@@ -28,8 +26,7 @@ final class PluginExtension extends AbstractExtension
         private readonly iterable $plugins,
         private readonly PluginService $pluginService,
         private readonly Environment $twig,
-    ) {
-    }
+    ) {}
 
     #[Override]
     public function getFunctions(): array
@@ -42,7 +39,9 @@ final class PluginExtension extends AbstractExtension
             new TwigFunction('get_plugin_footer_links', $this->getPluginFooterLinks(...)),
             new TwigFunction('get_plugin_profile_dropdown_links', $this->getPluginProfileDropdownLinks(...)),
             new TwigFunction('get_plugin_profile_config_links', $this->getPluginProfileConfigLinks(...)),
-            new TwigFunction('get_plugin_navbar_pills_html', $this->getPluginNavbarPillsHtml(...), ['is_safe' => ['html']]),
+            new TwigFunction('get_plugin_navbar_pills_html', $this->getPluginNavbarPillsHtml(...), ['is_safe' => [
+                'html',
+            ]]),
             new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
             new TwigFunction('warm_event_list_item_tags', $this->warmEventListItemTags(...)),
             new TwigFunction('is_plugin_enabled', $this->isPluginEnabled(...)),

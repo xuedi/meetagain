@@ -7,6 +7,7 @@ use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Enum\ImageType;
@@ -19,6 +20,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -82,34 +84,34 @@ final class ImagesController extends AbstractSettingsController implements Admin
             ));
         }
 
-        $adminTop = new AdminTop(
-            info: $info,
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_system_images.button_regenerate_thumbnails'),
-                    target: $this->generateUrl('app_admin_regenerate_thumbnails'),
-                    icon: 'sync',
-                    variant: 'is-warning',
-                    confirm: $this->translator->trans('admin_system_images.confirm_regenerate_thumbnails'),
-                ),
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_system_images.button_cleanup_thumbnails'),
-                    target: $this->generateUrl('app_admin_cleanup_thumbnails'),
-                    icon: 'trash',
-                    variant: 'is-warning',
-                    confirm: $this->translator->trans('admin_system_images.confirm_cleanup_thumbnails'),
-                ),
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_system_images.button_sync_locations'),
-                    target: $this->generateUrl('app_admin_sync_image_locations'),
-                    icon: 'map-pin',
-                    variant: 'is-warning',
-                    confirm: $this->translator->trans('admin_system_images.confirm_sync_locations'),
-                ),
-                $this->buildLocationDropdown($locationFilter, $range, $since),
-                $this->buildRangeDropdown($range, $locationFilter),
-            ],
-        );
+        $adminTop = new AdminTop(info: $info, actions: [
+            new AdminTopActionForm(
+                label: $this->translator->trans('admin_system_images.button_regenerate_thumbnails'),
+                target: $this->generateUrl('app_admin_regenerate_thumbnails'),
+                csrfTokenId: 'admin_regenerate_thumbnails',
+                icon: 'sync',
+                variant: 'is-warning',
+                confirm: $this->translator->trans('admin_system_images.confirm_regenerate_thumbnails'),
+            ),
+            new AdminTopActionForm(
+                label: $this->translator->trans('admin_system_images.button_cleanup_thumbnails'),
+                target: $this->generateUrl('app_admin_cleanup_thumbnails'),
+                csrfTokenId: 'admin_cleanup_thumbnails',
+                icon: 'trash',
+                variant: 'is-warning',
+                confirm: $this->translator->trans('admin_system_images.confirm_cleanup_thumbnails'),
+            ),
+            new AdminTopActionForm(
+                label: $this->translator->trans('admin_system_images.button_sync_locations'),
+                target: $this->generateUrl('app_admin_sync_image_locations'),
+                csrfTokenId: 'admin_sync_image_locations',
+                icon: 'map-pin',
+                variant: 'is-warning',
+                confirm: $this->translator->trans('admin_system_images.confirm_sync_locations'),
+            ),
+            $this->buildLocationDropdown($locationFilter, $range, $since),
+            $this->buildRangeDropdown($range, $locationFilter),
+        ]);
 
         return $this->render('admin/system/images/index.html.twig', [
             'active' => 'system',
@@ -135,25 +137,20 @@ final class ImagesController extends AbstractSettingsController implements Admin
             $editLinks[$location->getId()] = $this->imageLocationService->resolveEditLink($location);
         }
 
-        $adminTop = new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>#%d</strong>',
-                    $image->getId(),
-                )),
-                new AdminTopInfoHtml(sprintf(
-                    '<span class="tag is-light">%s</span>',
-                    htmlspecialchars($image->getType()->name, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-                )),
-            ],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_back'),
-                    target: $this->generateUrl('app_admin_system_images'),
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf('<strong>#%d</strong>', $image->getId())),
+            new AdminTopInfoHtml(sprintf('<span class="tag is-light">%s</span>', htmlspecialchars(
+                $image->getType()->name,
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ))),
+        ], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('global.button_back'),
+                target: $this->generateUrl('app_admin_system_images'),
+                icon: 'arrow-left',
+            ),
+        ]);
 
         return $this->render('admin/system/images/show.html.twig', [
             'active' => 'system',
@@ -190,9 +187,13 @@ final class ImagesController extends AbstractSettingsController implements Admin
         return $this->redirectToRoute('app_admin_system_images_show', ['id' => $id]);
     }
 
-    #[Route('/regenerate_thumbnails', name: 'app_admin_regenerate_thumbnails', methods: ['GET'])]
-    public function regenerateThumbnails(): Response
+    #[Route('/regenerate_thumbnails', name: 'app_admin_regenerate_thumbnails', methods: ['POST'])]
+    public function regenerateThumbnails(Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('admin_regenerate_thumbnails', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $startTime = microtime(true);
         $cnt = $this->imageService->regenerateAllThumbnails();
         $executionTime = round(microtime(true) - $startTime, 2);
@@ -205,9 +206,13 @@ final class ImagesController extends AbstractSettingsController implements Admin
         return $this->redirectToRoute('app_admin_system_images');
     }
 
-    #[Route('/cleanup_thumbnails', name: 'app_admin_cleanup_thumbnails', methods: ['GET'])]
-    public function cleanupThumbnails(): Response
+    #[Route('/cleanup_thumbnails', name: 'app_admin_cleanup_thumbnails', methods: ['POST'])]
+    public function cleanupThumbnails(Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('admin_cleanup_thumbnails', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $startTime = microtime(true);
         $cnt = $this->imageService->deleteObsoleteThumbnails();
         $executionTime = round(microtime(true) - $startTime, 2);
@@ -220,9 +225,13 @@ final class ImagesController extends AbstractSettingsController implements Admin
         return $this->redirectToRoute('app_admin_system_images');
     }
 
-    #[Route('/sync_locations', name: 'app_admin_sync_image_locations', methods: ['GET'])]
-    public function syncLocations(): Response
+    #[Route('/sync_locations', name: 'app_admin_sync_image_locations', methods: ['POST'])]
+    public function syncLocations(Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('admin_sync_image_locations', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $this->imageLocationService->discover();
         $this->addFlash('success', $this->translator->trans('admin_system_images.flash_locations_synced'));
 
@@ -244,8 +253,11 @@ final class ImagesController extends AbstractSettingsController implements Admin
         return null;
     }
 
-    private function buildLocationDropdown(?ImageType $current, string $range, ?DateTimeImmutable $since): AdminTopActionDropdown
-    {
+    private function buildLocationDropdown(
+        ?ImageType $current,
+        string $range,
+        ?DateTimeImmutable $since,
+    ): AdminTopActionDropdown {
         $rangeParam = $range === self::DEFAULT_RANGE ? [] : ['range' => $range];
 
         $options = [
@@ -307,5 +319,4 @@ final class ImagesController extends AbstractSettingsController implements Admin
             icon: 'clock',
         );
     }
-
 }

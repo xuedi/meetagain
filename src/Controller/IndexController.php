@@ -7,7 +7,9 @@ use App\Service\Cms\CmsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+
 final class IndexController extends AbstractController
 {
     public function __construct(
@@ -20,9 +22,13 @@ final class IndexController extends AbstractController
         return $this->cms->handle($request->getLocale(), 'index', $this->getResponse());
     }
 
-    #[Route('/language/{locale}', name: 'app_default_language')]
+    #[Route('/language/{locale}', name: 'app_default_language', methods: ['POST'])]
     public function setLanguage(Request $request, EntityManagerInterface $entityManager, string $locale): Response
     {
+        if (!$this->isCsrfTokenValid('app_default_language' . $locale, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         // set session
         $session = $request->getSession();
         $session->set('_locale', $locale);

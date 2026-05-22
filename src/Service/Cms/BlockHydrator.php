@@ -15,7 +15,6 @@ readonly class BlockHydrator
         private HtmlSanitizerInterface $cmsContent,
     ) {}
 
-
     /**
      * Validates $data against the block type's field definitions, applies defaults
      * for optional missing fields, then calls fromJson() to build the block object.
@@ -24,10 +23,10 @@ readonly class BlockHydrator
      */
     public function hydrate(CmsBlockType $type, array $data, ?ImageEntity $image = null): BlockType
     {
-        $blockClass  = $type->getBlockClass();
+        $blockClass = $type->getBlockClass();
         $definitions = $blockClass::getFieldDefinitions();
-        $errors      = [];
-        $resolved    = [];
+        $errors = [];
+        $resolved = [];
 
         foreach ($definitions as $field) {
             if (!array_key_exists($field->name, $data)) {
@@ -40,9 +39,9 @@ readonly class BlockHydrator
             }
 
             $resolved[$field->name] = match ($field->type) {
-                FieldType::Boolean   => (bool) $data[$field->name],
+                FieldType::Boolean => (bool) $data[$field->name],
                 FieldType::ImageList => is_array($data[$field->name]) ? $data[$field->name] : [],
-                default              => (string) $data[$field->name],
+                default => (string) $data[$field->name],
             };
 
             if ($field->richText && is_string($resolved[$field->name])) {

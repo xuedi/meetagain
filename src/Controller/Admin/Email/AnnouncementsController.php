@@ -5,6 +5,7 @@ namespace App\Controller\Admin\Email;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Admin\Top\Infos\AdminTopInfoText;
@@ -21,12 +22,15 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/announcements')]
-final class AnnouncementsController extends AbstractEmailController implements AdminNavigationInterface, AdminTabsInterface
+final class AnnouncementsController extends AbstractEmailController implements
+    AdminNavigationInterface,
+    AdminTabsInterface
 {
     public function __construct(
         TranslatorInterface $translator,
@@ -42,16 +46,15 @@ final class AnnouncementsController extends AbstractEmailController implements A
     #[Route('', name: 'app_admin_email_announcements')]
     public function announcements(): Response
     {
-        $adminTop = new AdminTop(
-            info: [new AdminTopInfoText($this->translator->trans('admin_cms.announcements_list_intro'))],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_cms.announcement_new'),
-                    target: $this->generateUrl('app_admin_email_announcements_new'),
-                    icon: 'plus',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
+            'admin_cms.announcements_list_intro',
+        ))], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_cms.announcement_new'),
+                target: $this->generateUrl('app_admin_email_announcements_new'),
+                icon: 'plus',
+            ),
+        ]);
 
         return $this->render('admin/email/announcements/list.html.twig', [
             'active' => 'email',
@@ -81,24 +84,22 @@ final class AnnouncementsController extends AbstractEmailController implements A
             return $this->redirectToRoute('app_admin_email_announcements_view', ['id' => $announcement->getId()]);
         }
 
-        $adminTop = new AdminTop(
-            info: [new AdminTopInfoHtml(sprintf(
-                '<strong>%s</strong>',
-                htmlspecialchars($this->translator->trans('admin_cms.announcement_new'), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            ))],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_cms.button_create_cms_page'),
-                    target: $this->generateUrl('app_admin_cms'),
-                    icon: 'file-circle-plus',
-                ),
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_back'),
-                    target: $this->generateUrl('app_admin_email_announcements'),
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
+            $this->translator->trans('admin_cms.announcement_new'),
+            ENT_QUOTES | ENT_HTML5,
+            'UTF-8',
+        )))], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_cms.button_create_cms_page'),
+                target: $this->generateUrl('app_admin_cms'),
+                icon: 'file-circle-plus',
+            ),
+            new AdminTopActionButton(
+                label: $this->translator->trans('global.button_back'),
+                target: $this->generateUrl('app_admin_email_announcements'),
+                icon: 'arrow-left',
+            ),
+        ]);
 
         return $this->render('admin/email/announcements/new.html.twig', [
             'active' => 'email',
@@ -108,9 +109,16 @@ final class AnnouncementsController extends AbstractEmailController implements A
         ]);
     }
 
-    #[Route('/from-cms/{id}', name: 'app_admin_email_announcements_from_cms')]
-    public function announcementsFromCms(Cms $cmsPage): Response
+    #[Route('/from-cms/{id}', name: 'app_admin_email_announcements_from_cms', methods: ['POST'])]
+    public function announcementsFromCms(Request $request, Cms $cmsPage): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'admin_email_announcements_from_cms' . $cmsPage->getId(),
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $announcement = new Announcement();
         $announcement->setCmsPage($cmsPage);
         $announcement->setCreatedBy($this->getUser());
@@ -146,9 +154,16 @@ final class AnnouncementsController extends AbstractEmailController implements A
         ]);
     }
 
-    #[Route('/{id}/send', name: 'app_admin_email_announcements_send')]
-    public function announcementsSend(Announcement $announcement): Response
+    #[Route('/{id}/send', name: 'app_admin_email_announcements_send', methods: ['POST'])]
+    public function announcementsSend(Request $request, Announcement $announcement): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'admin_email_announcements_send' . $announcement->getId(),
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         if (!$announcement->isDraft()) {
             $this->addFlash('error', 'admin_cms.flash_error_already_sent');
 
@@ -157,14 +172,23 @@ final class AnnouncementsController extends AbstractEmailController implements A
 
         $recipientCount = $this->announcementService->send($announcement);
 
-        $this->addFlash('success', $this->translator->trans('admin_cms.flash_success_sent', ['%count%' => $recipientCount]));
+        $this->addFlash('success', $this->translator->trans('admin_cms.flash_success_sent', [
+            '%count%' => $recipientCount,
+        ]));
 
         return $this->redirectToRoute('app_admin_email_announcements_view', ['id' => $announcement->getId()]);
     }
 
-    #[Route('/{id}/delete', name: 'app_admin_email_announcements_delete')]
-    public function announcementsDelete(Announcement $announcement): Response
+    #[Route('/{id}/delete', name: 'app_admin_email_announcements_delete', methods: ['POST'])]
+    public function announcementsDelete(Request $request, Announcement $announcement): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'admin_email_announcements_delete' . $announcement->getId(),
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         if (!$announcement->isDraft()) {
             $this->addFlash('error', 'admin_cms.flash_error_cannot_delete_sent');
 
@@ -193,10 +217,11 @@ final class AnnouncementsController extends AbstractEmailController implements A
         $statusKey = $announcement->isDraft() ? 'admin_cms.draft' : 'admin_cms.sent';
 
         return [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%s</strong>',
-                htmlspecialchars($title, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
+                $title,
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ))),
             new AdminTopInfoHtml(sprintf(
                 '<span class="tag %s is-medium">%s</span>',
                 $statusVariant,
@@ -206,16 +231,17 @@ final class AnnouncementsController extends AbstractEmailController implements A
     }
 
     /**
-     * @return list<AdminTopActionButton>
+     * @return list<AdminTopActionButton|AdminTopActionForm>
      */
     private function buildViewActions(Announcement $announcement): array
     {
         $actions = [];
 
         if ($announcement->isDraft()) {
-            $actions[] = new AdminTopActionButton(
+            $actions[] = new AdminTopActionForm(
                 label: $this->translator->trans('global.button_delete'),
                 target: $this->generateUrl('app_admin_email_announcements_delete', ['id' => $announcement->getId()]),
+                csrfTokenId: 'admin_email_announcements_delete' . $announcement->getId(),
                 icon: 'trash',
                 variant: 'is-danger',
             );
@@ -228,9 +254,10 @@ final class AnnouncementsController extends AbstractEmailController implements A
             );
         }
         if ($announcement->isDraft()) {
-            $actions[] = new AdminTopActionButton(
+            $actions[] = new AdminTopActionForm(
                 label: $this->translator->trans('admin_cms.button_send_announcement'),
                 target: $this->generateUrl('app_admin_email_announcements_send', ['id' => $announcement->getId()]),
+                csrfTokenId: 'admin_email_announcements_send' . $announcement->getId(),
                 icon: 'paper-plane',
                 confirm: $this->translator->trans('admin_cms.confirm_send_announcement'),
             );

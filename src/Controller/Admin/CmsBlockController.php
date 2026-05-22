@@ -6,11 +6,10 @@ use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Entity\User;
 use App\EntityActionDispatcher;
-use App\Exception\BlockValidationException;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EntityAction;
 use App\Enum\ImageType;
+use App\Exception\BlockValidationException;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Form\EventUploadType;
 use App\Repository\CmsBlockRepository;
@@ -19,12 +18,14 @@ use App\Service\Cms\CmsBlockService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\File;
@@ -66,14 +67,20 @@ final class CmsBlockController extends AbstractController
         if ($cms->getSlug() !== null && $cms->getSlug() !== '') {
             $actions[] = new AdminTopActionButton(
                 label: $this->translator->trans('global.button_view'),
-                target: $this->generateUrl('app_catch_all', ['page' => $cms->getSlug(), '_locale' => $block->getLanguage()]),
+                target: $this->generateUrl('app_catch_all', [
+                    'page' => $cms->getSlug(),
+                    '_locale' => $block->getLanguage(),
+                ]),
                 icon: 'eye',
                 newTab: true,
             );
         }
         $actions[] = new AdminTopActionButton(
             label: $this->translator->trans('global.button_back'),
-            target: $this->generateUrl('app_admin_cms_edit', ['id' => $cms->getId(), 'locale' => $block->getLanguage()]),
+            target: $this->generateUrl('app_admin_cms_edit', [
+                'id' => $cms->getId(),
+                'locale' => $block->getLanguage(),
+            ]),
             icon: 'arrow-left',
         );
 
@@ -87,9 +94,16 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
-    #[Route('/block/{blockId}/image/toggle-side', name: 'app_admin_cms_block_image_toggle_side', methods: ['GET'])]
-    public function cmsBlockImageToggleSide(int $blockId): Response
+    #[Route('/block/{blockId}/image/toggle-side', name: 'app_admin_cms_block_image_toggle_side', methods: ['POST'])]
+    public function cmsBlockImageToggleSide(Request $request, int $blockId): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'app_admin_cms_block_image_toggle_side' . $blockId,
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $block = $this->blockRepo->find($blockId);
         if ($block === null) {
             throw $this->createNotFoundException('Block not found');
@@ -114,9 +128,16 @@ final class CmsBlockController extends AbstractController
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
 
-    #[Route('/block/{blockId}/image/remove', name: 'app_admin_cms_block_image_remove', methods: ['GET'])]
-    public function cmsBlockImageRemove(int $blockId): Response
+    #[Route('/block/{blockId}/image/remove', name: 'app_admin_cms_block_image_remove', methods: ['POST'])]
+    public function cmsBlockImageRemove(Request $request, int $blockId): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'admin_cms_block_image_remove' . $blockId,
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $block = $this->blockRepo->find($blockId);
         if ($block === null) {
             throw $this->createNotFoundException('Block not found');
@@ -171,12 +192,19 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
-    #[Route('/block/down', name: 'app_admin_cms_edit_block_down', methods: ['GET'])]
+    #[Route('/block/down', name: 'app_admin_cms_edit_block_down', methods: ['POST'])]
     public function cmsBlockMoveDown(Request $request): Response
     {
-        $pageId = (int) $request->query->get('id');
-        $blockId = (int) $request->query->get('blockId');
-        $locale = $request->query->get('locale');
+        $pageId = (int) $request->request->get('id');
+        $blockId = (int) $request->request->get('blockId');
+        $locale = (string) $request->request->get('locale');
+
+        if (!$this->isCsrfTokenValid(
+            'app_admin_cms_edit_block_down' . $blockId,
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         $this->blockService->moveBlockDown($pageId, $blockId, $locale);
 
@@ -186,12 +214,19 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
-    #[Route('/block/up', name: 'app_admin_cms_edit_block_up', methods: ['GET'])]
+    #[Route('/block/up', name: 'app_admin_cms_edit_block_up', methods: ['POST'])]
     public function cmsBlockMoveUp(Request $request): Response
     {
-        $pageId = (int) $request->query->get('id');
-        $blockId = (int) $request->query->get('blockId');
-        $locale = $request->query->get('locale');
+        $pageId = (int) $request->request->get('id');
+        $blockId = (int) $request->request->get('blockId');
+        $locale = (string) $request->request->get('locale');
+
+        if (!$this->isCsrfTokenValid(
+            'app_admin_cms_edit_block_up' . $blockId,
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         $this->blockService->moveBlockUp($pageId, $blockId, $locale);
 
@@ -216,18 +251,29 @@ final class CmsBlockController extends AbstractController
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
 
-    #[Route('/block/delete', name: 'app_admin_cms_block_delete', methods: ['GET'])]
+    #[Route('/block/delete', name: 'app_admin_cms_block_delete', methods: ['POST'])]
     public function cmsBlockDelete(Request $request): Response
     {
-        $this->blockService->deleteBlock((int) $request->query->get('blockId'));
+        $blockId = (int) $request->request->get('blockId');
+
+        if (!$this->isCsrfTokenValid('admin_cms_block_delete' . $blockId, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        $this->blockService->deleteBlock($blockId);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $request->query->get('id'),
-            'locale' => $request->query->get('locale'),
+            'id' => $request->request->get('id'),
+            'locale' => $request->request->get('locale'),
         ]);
     }
 
-    #[Route('/block/{blockId}/card/{slot}/image/modal', name: 'app_admin_cms_card_image_modal', methods: ['GET'], requirements: ['slot' => '[0-2]'])]
+    #[Route(
+        '/block/{blockId}/card/{slot}/image/modal',
+        name: 'app_admin_cms_card_image_modal',
+        methods: ['GET'],
+        requirements: ['slot' => '[0-2]'],
+    )]
     public function cmsCardImageModal(int $blockId, int $slot): Response
     {
         $form = $this->createForm(EventUploadType::class, null, [
@@ -242,7 +288,12 @@ final class CmsBlockController extends AbstractController
         ]));
     }
 
-    #[Route('/block/{blockId}/card/{slot}/image/upload', name: 'app_admin_cms_card_image_upload', methods: ['POST'], requirements: ['slot' => '[0-2]'])]
+    #[Route(
+        '/block/{blockId}/card/{slot}/image/upload',
+        name: 'app_admin_cms_card_image_upload',
+        methods: ['POST'],
+        requirements: ['slot' => '[0-2]'],
+    )]
     public function cmsCardImageUpload(Request $request, int $blockId, int $slot): Response
     {
         $block = $this->blockRepo->find($blockId);
@@ -266,7 +317,9 @@ final class CmsBlockController extends AbstractController
             if ($file instanceof UploadedFile) {
                 $violations = $this->validator->validate($file, $fileConstraint);
                 if (count($violations) > 0) {
-                    $this->addFlash('error', $this->translator->trans('admin_cms.flash_invalid_file', ['%error%' => (string) $violations->get(0)->getMessage()]));
+                    $this->addFlash('error', $this->translator->trans('admin_cms.flash_invalid_file', [
+                        '%error%' => (string) $violations->get(0)->getMessage(),
+                    ]));
                     return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
                 }
 
@@ -285,7 +338,11 @@ final class CmsBlockController extends AbstractController
                 $this->em->flush();
 
                 if ($oldCardImageId !== null) {
-                    $this->imageLocationService->removeLocation((int) $oldCardImageId, ImageType::CmsCardImage, $blockId);
+                    $this->imageLocationService->removeLocation(
+                        (int) $oldCardImageId,
+                        ImageType::CmsCardImage,
+                        $blockId,
+                    );
                 }
                 $this->imageLocationService->addLocation($image->getId(), ImageType::CmsCardImage, $blockId);
             }
@@ -296,9 +353,21 @@ final class CmsBlockController extends AbstractController
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
 
-    #[Route('/block/{blockId}/card/{slot}/image/remove', name: 'app_admin_cms_card_image_remove', methods: ['GET'], requirements: ['slot' => '[0-2]'])]
-    public function cmsCardImageRemove(int $blockId, int $slot): Response
+    #[Route(
+        '/block/{blockId}/card/{slot}/image/remove',
+        name: 'app_admin_cms_card_image_remove',
+        methods: ['POST'],
+        requirements: ['slot' => '[0-2]'],
+    )]
+    public function cmsCardImageRemove(Request $request, int $blockId, int $slot): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'admin_cms_card_image_remove' . $blockId . '_' . $slot,
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $block = $this->blockRepo->find($blockId);
         if ($block === null) {
             throw new RuntimeException('Could not find block');
@@ -389,9 +458,16 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
-    #[Route('/block/{blockId}/gallery/remove/{imageId}', name: 'app_admin_cms_gallery_remove', methods: ['GET'])]
-    public function cmsGalleryRemove(int $blockId, int $imageId): Response
+    #[Route('/block/{blockId}/gallery/remove/{imageId}', name: 'app_admin_cms_gallery_remove', methods: ['POST'])]
+    public function cmsGalleryRemove(Request $request, int $blockId, int $imageId): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'admin_cms_gallery_remove' . $blockId . '_' . $imageId,
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $block = $this->blockRepo->find($blockId);
         if ($block === null) {
             throw new RuntimeException('Could not find block');

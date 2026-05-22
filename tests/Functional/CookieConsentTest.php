@@ -18,11 +18,24 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CookieConsentTest extends WebTestCase
 {
+    /**
+     * Extract a CSRF token from the cookie banner rendered on the homepage.
+     * The banner includes data-token attributes for both accept and deny endpoints.
+     */
+    private function cookieToken(object $client, string $intention): string
+    {
+        $endpoint = $intention === 'cookie_accept' ? '/ajax/cookie/accept' : '/ajax/cookie/deny';
+        $crawler = $client->request('GET', '/en/');
+
+        return (string) $crawler->filter(sprintf('button.cookieTrigger[data-url="%s"]', $endpoint))->attr('data-token');
+    }
+
     public function testAcceptCookiesEndpointReturnsSuccess(): void
     {
         $client = static::createClient();
+        $token = $this->cookieToken($client, 'cookie_accept');
 
-        $client->request('GET', '/ajax/cookie/accept');
+        $client->request('POST', '/ajax/cookie/accept', ['_token' => $token]);
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -31,8 +44,9 @@ class CookieConsentTest extends WebTestCase
     public function testAcceptCookiesSetsCookies(): void
     {
         $client = static::createClient();
+        $token = $this->cookieToken($client, 'cookie_accept');
 
-        $client->request('GET', '/ajax/cookie/accept');
+        $client->request('POST', '/ajax/cookie/accept', ['_token' => $token]);
 
         $cookies = $client->getCookieJar();
         $consentCookie = $cookies->get(Consent::TYPE_COOKIES);
@@ -44,8 +58,9 @@ class CookieConsentTest extends WebTestCase
     public function testAcceptCookiesWithOsmConsentGranted(): void
     {
         $client = static::createClient();
+        $token = $this->cookieToken($client, 'cookie_accept');
 
-        $client->request('GET', '/ajax/cookie/accept?osmConsent=true');
+        $client->request('POST', '/ajax/cookie/accept', ['_token' => $token, 'osmConsent' => 'true']);
 
         $cookies = $client->getCookieJar();
         $osmCookie = $cookies->get(Consent::TYPE_OSM);
@@ -57,8 +72,9 @@ class CookieConsentTest extends WebTestCase
     public function testAcceptCookiesWithOsmConsentDenied(): void
     {
         $client = static::createClient();
+        $token = $this->cookieToken($client, 'cookie_accept');
 
-        $client->request('GET', '/ajax/cookie/accept?osmConsent=false');
+        $client->request('POST', '/ajax/cookie/accept', ['_token' => $token, 'osmConsent' => 'false']);
 
         $cookies = $client->getCookieJar();
         $osmCookie = $cookies->get(Consent::TYPE_OSM);
@@ -70,8 +86,9 @@ class CookieConsentTest extends WebTestCase
     public function testDenyCookiesEndpointReturnsSuccess(): void
     {
         $client = static::createClient();
+        $token = $this->cookieToken($client, 'cookie_deny');
 
-        $client->request('GET', '/ajax/cookie/deny');
+        $client->request('POST', '/ajax/cookie/deny', ['_token' => $token]);
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -81,13 +98,12 @@ class CookieConsentTest extends WebTestCase
     {
         $client = static::createClient();
 
-        // First accept cookies
-        $client->request('GET', '/ajax/cookie/accept?osmConsent=true');
+        $acceptToken = $this->cookieToken($client, 'cookie_accept');
+        $client->request('POST', '/ajax/cookie/accept', ['_token' => $acceptToken, 'osmConsent' => 'true']);
 
-        // Then deny them
-        $client->request('GET', '/ajax/cookie/deny');
+        $denyToken = $this->cookieToken($client, 'cookie_deny');
+        $client->request('POST', '/ajax/cookie/deny', ['_token' => $denyToken]);
 
-        // Check that cookies are cleared (expired)
         $response = $client->getResponse();
         $setCookieHeaders = $response->headers->all('set-cookie');
 
@@ -98,8 +114,9 @@ class CookieConsentTest extends WebTestCase
     public function testCookieConsentResponseIsJson(): void
     {
         $client = static::createClient();
+        $token = $this->cookieToken($client, 'cookie_accept');
 
-        $client->request('GET', '/ajax/cookie/accept');
+        $client->request('POST', '/ajax/cookie/accept', ['_token' => $token]);
 
         $response = $client->getResponse();
         static::assertJson($response->getContent());
@@ -113,7 +130,8 @@ class CookieConsentTest extends WebTestCase
         // In a real scenario, this would be the homepage with the cookie banner
 
         // Step 2: User clicks "Accept" with OSM consent checked
-        $client->request('GET', '/ajax/cookie/accept?osmConsent=true');
+        $token = $this->cookieToken($client, 'cookie_accept');
+        $client->request('POST', '/ajax/cookie/accept', ['_token' => $token, 'osmConsent' => 'true']);
         $this->assertResponseIsSuccessful();
 
         // Step 3: Verify cookies are set correctly
@@ -129,7 +147,8 @@ class CookieConsentTest extends WebTestCase
 
         // Step 4: Subsequent requests should include these cookies
         // (The client automatically sends cookies on subsequent requests)
-        $client->request('GET', '/ajax/cookie/accept');
+        $token2 = $this->cookieToken($client, 'cookie_accept');
+        $client->request('POST', '/ajax/cookie/accept', ['_token' => $token2]);
         $this->assertResponseIsSuccessful();
     }
 
@@ -138,7 +157,8 @@ class CookieConsentTest extends WebTestCase
         $client = static::createClient();
 
         // Step 1: User clicks "Deny"
-        $client->request('GET', '/ajax/cookie/deny');
+        $token = $this->cookieToken($client, 'cookie_deny');
+        $client->request('POST', '/ajax/cookie/deny', ['_token' => $token]);
         $this->assertResponseIsSuccessful();
 
         // Step 2: Verify response indicates cookies should be cleared

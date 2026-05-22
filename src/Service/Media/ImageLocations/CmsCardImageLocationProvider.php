@@ -19,10 +19,9 @@ final class CmsCardImageLocationProvider extends AbstractImageLocationProvider
 
     public function discoverImageIds(): array
     {
-        $rows = $this->connection->fetchAllAssociative(
-            'SELECT id, json FROM cms_block WHERE type = ?',
-            [CmsBlockType::TrioCards->value],
-        );
+        $rows = $this->connection->fetchAllAssociative('SELECT id, json FROM cms_block WHERE type = ?', [
+            CmsBlockType::TrioCards->value,
+        ]);
 
         $pairs = [];
         foreach ($rows as $row) {
@@ -30,7 +29,7 @@ final class CmsCardImageLocationProvider extends AbstractImageLocationProvider
             $json = json_decode((string) $row['json'], true) ?? [];
             foreach ($json['cards'] ?? [] as $card) {
                 $cardImage = $card['image'] ?? null;
-                $imageId = is_array($cardImage) ? ($cardImage['id'] ?? null) : null;
+                $imageId = is_array($cardImage) ? $cardImage['id'] ?? null : null;
                 if ($imageId !== null) {
                     $pairs[] = ['imageId' => (int) $imageId, 'locationId' => $blockId];
                 }

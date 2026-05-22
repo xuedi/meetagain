@@ -98,9 +98,7 @@ final readonly class BookclubSitemapPublisher implements SitemapPublisherInterfa
             }
 
             $createdAt = $book->getCreatedAt();
-            $lastmod = $createdAt !== null
-                ? new DateTimeImmutable($createdAt->format('Y-m-d'))
-                : null;
+            $lastmod = $createdAt !== null ? new DateTimeImmutable($createdAt->format('Y-m-d')) : null;
 
             $localeUrls = [];
             foreach ($locales as $locale) {

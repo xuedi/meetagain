@@ -79,7 +79,7 @@ class IncidentsControllerTest extends WebTestCase
 
         // Assert - no Clear button in the topbar
         $this->assertResponseIsSuccessful();
-        static::assertSame(0, $crawler->filter('.box .level-right a:contains("Clear")')->count());
+        static::assertSame(0, $crawler->filter('.box .level-right form button:contains("Clear")')->count());
 
         // Arrange - plant one incident
         $this->createIncident($em);
@@ -89,7 +89,7 @@ class IncidentsControllerTest extends WebTestCase
 
         // Assert - Clear button is rendered
         $this->assertResponseIsSuccessful();
-        static::assertGreaterThan(0, $crawler->filter('.box .level-right a:contains("Clear")')->count());
+        static::assertGreaterThan(0, $crawler->filter('.box .level-right form button:contains("Clear")')->count());
     }
 
     public function testShowReturns404ForMissingIncident(): void
@@ -126,10 +126,7 @@ class IncidentsControllerTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         $content = (string) $client->getResponse()->getContent();
-        static::assertStringNotContainsString(
-            '/admin/security/incidents/' . $incident->getId() . '/unblock',
-            $content,
-        );
+        static::assertStringNotContainsString('/admin/security/incidents/' . $incident->getId() . '/unblock', $content);
     }
 
     public function testClearWipesAllIncidentsAndRedirectsToList(): void
@@ -142,7 +139,9 @@ class IncidentsControllerTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $client->request('GET', '/en/admin/security/incidents/clear');
+        $crawler = $client->request('GET', '/en/admin/security/incidents');
+        $token = $crawler->filter('form[action*="/clear"] input[name="_token"]')->attr('value');
+        $client->request('POST', '/en/admin/security/incidents/clear', ['_token' => $token]);
 
         // Assert
         $this->assertResponseRedirects('/en/admin/security/incidents');
@@ -165,7 +164,13 @@ class IncidentsControllerTest extends WebTestCase
         $incident = $this->createIncident($em);
 
         // Act
-        $client->request('GET', '/en/admin/security/incidents/' . $incident->getId() . '/unblock');
+        $rawToken = 'test-csrf-unblock-' . $incident->getId();
+        $session = $client->getSession();
+        $session->set('_csrf/admin_security_incidents_unblock' . $incident->getId(), $rawToken);
+        $session->save();
+        $client->request('POST', '/en/admin/security/incidents/' . $incident->getId() . '/unblock', [
+            '_token' => $rawToken,
+        ]);
 
         // Assert
         $this->assertResponseRedirects('/en/admin/security/incidents/' . $incident->getId());

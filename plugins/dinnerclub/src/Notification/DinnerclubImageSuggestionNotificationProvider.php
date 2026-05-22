@@ -22,7 +22,6 @@ readonly class DinnerclubImageSuggestionNotificationProvider implements ReviewNo
         private Security $security,
     ) {}
 
-
     public function getIdentifier(): string
     {
         return 'dinnerclub.image_suggestion';

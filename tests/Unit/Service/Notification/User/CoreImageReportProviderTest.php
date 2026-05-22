@@ -114,11 +114,7 @@ class CoreImageReportProviderTest extends TestCase
         $security = $this->createStub(Security::class);
         $security->method('isGranted')->willReturn(true);
 
-        $provider = new CoreImageReportProvider(
-            $repo,
-            $this->createStub(EntityManagerInterface::class),
-            $security,
-        );
+        $provider = new CoreImageReportProvider($repo, $this->createStub(EntityManagerInterface::class), $security);
 
         // Assert
         $this->expectException(InvalidArgumentException::class);
@@ -136,11 +132,7 @@ class CoreImageReportProviderTest extends TestCase
         $security = $this->createStub(Security::class);
         $security->method('isGranted')->willReturn(true);
 
-        $provider = new CoreImageReportProvider(
-            $repo,
-            $this->createStub(EntityManagerInterface::class),
-            $security,
-        );
+        $provider = new CoreImageReportProvider($repo, $this->createStub(EntityManagerInterface::class), $security);
 
         // Assert
         $this->expectException(InvalidArgumentException::class);

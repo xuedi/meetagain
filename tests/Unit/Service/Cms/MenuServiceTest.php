@@ -53,17 +53,17 @@ class MenuServiceTest extends TestCase
         ];
         $capturedLocation = null;
         $cmsRepo = $this->createStub(CmsRepository::class);
-        $cmsRepo->method('findByMenuLocation')->willReturnCallback(
-            static function (MenuLocation $loc) use ($pages, &$capturedLocation): array {
+        $cmsRepo
+            ->method('findByMenuLocation')
+            ->willReturnCallback(static function (MenuLocation $loc) use ($pages, &$capturedLocation): array {
                 $capturedLocation = $loc;
                 return $pages;
-            },
-        );
+            });
 
         $filterService = $this->createStub(CmsFilterService::class);
-        $filterService->method('getCmsIdFilter')->willReturn(
-            $cmsIds === [] ? CmsFilterResult::noFilter() : new CmsFilterResult($cmsIds, true),
-        );
+        $filterService
+            ->method('getCmsIdFilter')
+            ->willReturn($cmsIds === [] ? CmsFilterResult::noFilter() : new CmsFilterResult($cmsIds, true));
 
         $service = $this->createService(cmsRepo: $cmsRepo, filterService: $filterService);
 
@@ -78,25 +78,46 @@ class MenuServiceTest extends TestCase
     public static function provideMenuLocationCases(): iterable
     {
         yield 'top resolves to TopBar, no filter returns all pages' => [
-            'top', MenuLocation::TopBar, [], ['/en/home', '/en/about'],
+            'top',
+            MenuLocation::TopBar,
+            [],
+            ['/en/home', '/en/about'],
         ];
         yield 'col1 resolves to BottomCol1' => [
-            'col1', MenuLocation::BottomCol1, [], ['/en/home', '/en/about'],
+            'col1',
+            MenuLocation::BottomCol1,
+            [],
+            ['/en/home', '/en/about'],
         ];
         yield 'col2 resolves to BottomCol2' => [
-            'col2', MenuLocation::BottomCol2, [], ['/en/home', '/en/about'],
+            'col2',
+            MenuLocation::BottomCol2,
+            [],
+            ['/en/home', '/en/about'],
         ];
         yield 'col3 resolves to BottomCol3' => [
-            'col3', MenuLocation::BottomCol3, [], ['/en/home', '/en/about'],
+            'col3',
+            MenuLocation::BottomCol3,
+            [],
+            ['/en/home', '/en/about'],
         ];
         yield 'col4 resolves to BottomCol4' => [
-            'col4', MenuLocation::BottomCol4, [], ['/en/home', '/en/about'],
+            'col4',
+            MenuLocation::BottomCol4,
+            [],
+            ['/en/home', '/en/about'],
         ];
         yield 'allowed-cms-ids filter narrows to a single page' => [
-            'top', MenuLocation::TopBar, [2], ['/en/about'],
+            'top',
+            MenuLocation::TopBar,
+            [2],
+            ['/en/about'],
         ];
         yield 'allowed-cms-ids filter excluding all returns empty list' => [
-            'top', MenuLocation::TopBar, [999], [],
+            'top',
+            MenuLocation::TopBar,
+            [999],
+            [],
         ];
     }
 
@@ -120,10 +141,8 @@ class MenuServiceTest extends TestCase
         static::assertEquals($first, $second);
     }
 
-    private function createService(
-        ?CmsRepository $cmsRepo = null,
-        ?CmsFilterService $filterService = null,
-    ): MenuService {
+    private function createService(?CmsRepository $cmsRepo = null, ?CmsFilterService $filterService = null): MenuService
+    {
         if ($filterService === null) {
             $filterService = $this->createStub(CmsFilterService::class);
             $filterService->method('getCmsIdFilter')->willReturn(CmsFilterResult::noFilter());

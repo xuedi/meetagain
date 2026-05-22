@@ -83,7 +83,11 @@ final class SelectionController extends AbstractController
         ]);
     }
 
-    #[Route('/choose-directly/{eventId}/{filmId}', name: 'app_plugin_filmclub_choose_directly_submit', methods: ['POST'])]
+    #[Route(
+        '/choose-directly/{eventId}/{filmId}',
+        name: 'app_plugin_filmclub_choose_directly_submit',
+        methods: ['POST'],
+    )]
     public function chooseDirectly(int $eventId, int $filmId, Request $request): Response
     {
         $event = $this->eventRepo->find($eventId);

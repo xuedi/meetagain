@@ -14,10 +14,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+
 final class MemberController extends AbstractController
 {
     public const string ROUTE_MEMBER = 'app_member';
@@ -105,17 +107,24 @@ final class MemberController extends AbstractController
         }
     }
 
-    #[Route('/members/toggleFollow/{id}', name: 'app_member_toggle_follow')]
+    #[Route('/members/toggleFollow/{id}', name: 'app_member_toggle_follow', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
-    public function toggleFollow(int $id): Response
+    public function toggleFollow(Request $request, int $id): Response
     {
+        if (!$this->isCsrfTokenValid('app_member_toggle_follow' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         return $this->service->toggleFollow($id, 'app_member_view');
     }
 
-    #[Route('/members/rotate-avatar/{id}', name: 'app_member_rotate_avatar')]
+    #[Route('/members/rotate-avatar/{id}', name: 'app_member_rotate_avatar', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
-    public function rotateProfileImage(int $id): Response
+    public function rotateProfileImage(Request $request, int $id): Response
     {
+        if (!$this->isCsrfTokenValid('app_member_rotate_avatar' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         $user = $this->repo->findOneBy(['id' => $id]);
         if ($user->getImage() !== null) {
@@ -125,10 +134,13 @@ final class MemberController extends AbstractController
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
 
-    #[Route('/members/remove-image/{id}', name: 'app_member_remove_avatar')]
+    #[Route('/members/remove-image/{id}', name: 'app_member_remove_avatar', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
-    public function removeProfileImage(EntityManagerInterface $em, int $id): Response
+    public function removeProfileImage(Request $request, EntityManagerInterface $em, int $id): Response
     {
+        if (!$this->isCsrfTokenValid('app_member_remove_avatar' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         $user = $this->repo->findOneBy(['id' => $id]);
         $oldImageId = $user->getImage()?->getId();
@@ -143,10 +155,13 @@ final class MemberController extends AbstractController
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
 
-    #[Route('/members/restrict/{id}', name: 'app_member_restrict')]
+    #[Route('/members/restrict/{id}', name: 'app_member_restrict', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
-    public function restrictUser(EntityManagerInterface $em, int $id): Response
+    public function restrictUser(Request $request, EntityManagerInterface $em, int $id): Response
     {
+        if (!$this->isCsrfTokenValid('app_member_restrict' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         $user = $this->repo->findOneBy(['id' => $id]);
         $user->setRestricted(!$user->isRestricted());
@@ -156,10 +171,13 @@ final class MemberController extends AbstractController
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
 
-    #[Route('/members/verify/{id}', name: 'app_member_verify')]
+    #[Route('/members/verify/{id}', name: 'app_member_verify', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
-    public function verifyUser(EntityManagerInterface $em, int $id): Response
+    public function verifyUser(Request $request, EntityManagerInterface $em, int $id): Response
     {
+        if (!$this->isCsrfTokenValid('app_member_verify' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         $user = $this->repo->findOneBy(['id' => $id]);
         $user->setVerified(!$user->isVerified());
@@ -169,10 +187,13 @@ final class MemberController extends AbstractController
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
 
-    #[Route('/members/takeover/{id}', name: 'app_member_takeover')]
+    #[Route('/members/takeover/{id}', name: 'app_member_takeover', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function takeoverUser(int $id): Response
+    public function takeoverUser(Request $request, int $id): Response
     {
+        if (!$this->isCsrfTokenValid('app_member_takeover' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         $user = $this->repo->findOneBy(['id' => $id]);
         $loginResponse = $this->security->login($user);

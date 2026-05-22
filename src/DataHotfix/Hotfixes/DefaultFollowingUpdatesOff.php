@@ -34,7 +34,7 @@ readonly class DefaultFollowingUpdatesOff implements DataHotfixInterface
             $settings->followingUpdates = false;
             $user->setNotificationSettings($settings);
 
-            if (++$i % self::BATCH_SIZE === 0) {
+            if ((++$i % self::BATCH_SIZE) === 0) {
                 $this->em->flush();
                 $this->em->clear();
             }

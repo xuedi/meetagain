@@ -6,8 +6,8 @@ use App\ExtendedFilesystem;
 use App\Service\System\HealthCheckService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 
 class HealthCheckServiceTest extends TestCase
 {
@@ -77,10 +77,6 @@ class HealthCheckServiceTest extends TestCase
         $fs->method('getDiskFreeSpace')->willReturn(50.0 * 1024 * 1024 * 1024);
         $fs->method('getDiskTotalSpace')->willReturn(100.0 * 1024 * 1024 * 1024);
 
-        return new HealthCheckService(
-            new TagAwareAdapter(new ArrayAdapter()),
-            $fs,
-            self::PROJECT_DIR,
-        );
+        return new HealthCheckService(new TagAwareAdapter(new ArrayAdapter()), $fs, self::PROJECT_DIR);
     }
 }

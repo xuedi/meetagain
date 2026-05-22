@@ -30,11 +30,7 @@ class UserServiceTest extends TestCase
 
     public function testResolveUserName(): void
     {
-        $this->userRepo
-            ->expects($this->once())
-            ->method('resolveUserName')
-            ->with(123)
-            ->willReturn('John Doe');
+        $this->userRepo->expects($this->once())->method('resolveUserName')->with(123)->willReturn('John Doe');
 
         static::assertSame('John Doe', $this->service->resolveUserName(123));
     }

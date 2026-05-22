@@ -193,7 +193,8 @@ readonly class TownHallService
 
     private function countAllPublishedEvents(): int
     {
-        return (int) $this->eventRepo->createQueryBuilder('e')
+        return (int) $this->eventRepo
+            ->createQueryBuilder('e')
             ->select('COUNT(e.id)')
             ->getQuery()
             ->getSingleScalarResult();

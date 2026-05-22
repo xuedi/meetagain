@@ -2,16 +2,16 @@
 
 namespace App\Service\Event;
 
+use App\Emails\Types\NotificationEventCanceledEmail;
 use App\Entity\Event;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
-use App\Enum\EventTimeFilter;
 use App\Enum\EventTileLocation;
+use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
 use App\Plugin;
 use App\Repository\EventRepository;
 use App\Service\Config\PluginService;
-use App\Emails\Types\NotificationEventCanceledEmail;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;

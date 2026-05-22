@@ -34,7 +34,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $this->blocklist = $this->createStub(BlocklistCheckerInterface::class);
 
         $this->translator = $this->createStub(TranslatorInterface::class);
-        $this->translator->method('trans')->willReturnCallback(static fn (string $id): string => $id);
+        $this->translator->method('trans')->willReturnCallback(static fn(string $id): string => $id);
 
         $this->host = $this->createStub(RequestHostResolver::class);
         $this->host->method('getSchemeAndHost')->willReturn('https://example.com');
@@ -44,19 +44,29 @@ class EventUpdateNotificationEmailTest extends TestCase
     {
         // Arrange
         $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->once())->method('enqueue')
+        $queue
+            ->expects($this->once())
+            ->method('enqueue')
             ->with(
                 $this->anything(),
                 $this->callback(static function (TemplatedEmail $email): bool {
                     $context = $email->getContext();
-                    return str_contains($context['changesHtml'], 'email_event_update.line_start')
-                        && !str_contains($context['changesHtml'], 'email_event_update.line_location');
+                    return (
+                        str_contains($context['changesHtml'], 'email_event_update.line_start')
+                        && !str_contains($context['changesHtml'], 'email_event_update.line_location')
+                    );
                 }),
                 EmailType::EventUpdateNotification,
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail(
+            $this->blocklist,
+            $queue,
+            $this->config,
+            $this->translator,
+            $this->host,
+        );
 
         // Act
         $email->send([
@@ -71,15 +81,26 @@ class EventUpdateNotificationEmailTest extends TestCase
     {
         // Arrange
         $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->once())->method('enqueue')
+        $queue
+            ->expects($this->once())
+            ->method('enqueue')
             ->with(
                 $this->anything(),
-                $this->callback(static fn(TemplatedEmail $email): bool => str_contains($email->getContext()['changesHtml'], 'email_event_update.line_location')),
+                $this->callback(static fn(TemplatedEmail $email): bool => str_contains(
+                    $email->getContext()['changesHtml'],
+                    'email_event_update.line_location',
+                )),
                 EmailType::EventUpdateNotification,
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail(
+            $this->blocklist,
+            $queue,
+            $this->config,
+            $this->translator,
+            $this->host,
+        );
 
         // Act
         $email->send([
@@ -94,15 +115,26 @@ class EventUpdateNotificationEmailTest extends TestCase
     {
         // Arrange
         $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->once())->method('enqueue')
+        $queue
+            ->expects($this->once())
+            ->method('enqueue')
             ->with(
                 $this->anything(),
-                $this->callback(static fn(TemplatedEmail $email): bool => str_contains($email->getContext()['changesHtml'], 'email_event_update.line_canceled')),
+                $this->callback(static fn(TemplatedEmail $email): bool => str_contains(
+                    $email->getContext()['changesHtml'],
+                    'email_event_update.line_canceled',
+                )),
                 EmailType::EventUpdateNotification,
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail(
+            $this->blocklist,
+            $queue,
+            $this->config,
+            $this->translator,
+            $this->host,
+        );
 
         // Act
         $email->send([
@@ -117,15 +149,26 @@ class EventUpdateNotificationEmailTest extends TestCase
     {
         // Arrange
         $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->once())->method('enqueue')
+        $queue
+            ->expects($this->once())
+            ->method('enqueue')
             ->with(
                 $this->anything(),
-                $this->callback(static fn(TemplatedEmail $email): bool => str_contains($email->getContext()['changesHtml'], 'email_event_update.line_uncanceled')),
+                $this->callback(static fn(TemplatedEmail $email): bool => str_contains(
+                    $email->getContext()['changesHtml'],
+                    'email_event_update.line_uncanceled',
+                )),
                 EmailType::EventUpdateNotification,
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail(
+            $this->blocklist,
+            $queue,
+            $this->config,
+            $this->translator,
+            $this->host,
+        );
 
         // Act
         $email->send([
@@ -142,7 +185,13 @@ class EventUpdateNotificationEmailTest extends TestCase
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->never())->method('enqueue');
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail(
+            $this->blocklist,
+            $queue,
+            $this->config,
+            $this->translator,
+            $this->host,
+        );
 
         // Act
         $email->send([
@@ -215,7 +264,9 @@ class EventUpdateNotificationEmailTest extends TestCase
     ): array {
         return [
             'start' => $start,
-            'startFormatted' => (new DateTimeImmutable())->setTimestamp($start)->format('Y-m-d H:i'),
+            'startFormatted' => new DateTimeImmutable()
+                ->setTimestamp($start)
+                ->format('Y-m-d H:i'),
             'locationId' => $locationId,
             'locationName' => $locationName,
             'canceled' => $canceled,

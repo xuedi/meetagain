@@ -22,7 +22,8 @@ class WallPostRepository extends ServiceEntityRepository
      */
     public function findRecent(int $limit, ?array $allowedIds = null): array
     {
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->leftJoin('p.author', 'a')
             ->addSelect('a')
             ->orderBy('p.createdAt', 'DESC')
@@ -44,7 +45,8 @@ class WallPostRepository extends ServiceEntityRepository
      */
     public function findPaginated(int $page, int $perPage, ?array $allowedIds = null): array
     {
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->leftJoin('p.author', 'a')
             ->addSelect('a')
             ->orderBy('p.createdAt', 'DESC')

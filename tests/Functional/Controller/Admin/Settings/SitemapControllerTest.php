@@ -25,9 +25,17 @@ final class SitemapControllerTest extends WebTestCase
         // every host regardless of plugin state.
         $this->assertResponseIsSuccessful();
         $rowCount = $crawler->filter('#filteredTable tbody tr')->count();
-        self::assertGreaterThan(0, $rowCount, 'Sitemap admin page should list at least static routes from the publisher chain');
+        self::assertGreaterThan(
+            0,
+            $rowCount,
+            'Sitemap admin page should list at least static routes from the publisher chain',
+        );
         $bodyText = $crawler->filter('body')->text();
-        self::assertStringContainsString('static', $bodyText, 'Static section badge from CoreSitemapPublisher should appear');
+        self::assertStringContainsString(
+            'static',
+            $bodyText,
+            'Static section badge from CoreSitemapPublisher should appear',
+        );
     }
 
     public function testSitemapSectionFilterNarrowsRows(): void
@@ -41,9 +49,9 @@ final class SitemapControllerTest extends WebTestCase
 
         // Assert: every visible row carries the static section label.
         $this->assertResponseIsSuccessful();
-        $sections = $crawler->filter('#filteredTable tbody tr td:first-child')->each(
-            static fn($node) => trim($node->text()),
-        );
+        $sections = $crawler->filter('#filteredTable tbody tr td:first-child')->each(static fn($node) => trim(
+            $node->text(),
+        ));
         self::assertNotEmpty($sections);
         foreach ($sections as $section) {
             self::assertSame('static', $section);

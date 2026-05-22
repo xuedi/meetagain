@@ -45,7 +45,7 @@ readonly class NormalizeNbspInEventDescriptions implements DataHotfixInterface
             $translation->setTeaser($newTeaser);
             $translation->setDescription($newDescription);
 
-            if (++$i % self::BATCH_SIZE === 0) {
+            if ((++$i % self::BATCH_SIZE) === 0) {
                 $this->em->flush();
                 $this->em->clear();
             }

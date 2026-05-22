@@ -21,11 +21,7 @@ final readonly class SectionsHtmlPresentRule implements EmailGuardRuleInterface
     public function evaluate(array $context): EmailGuardResult
     {
         if (!array_key_exists('sectionsHtml', $context) || $context['sectionsHtml'] === null) {
-            return EmailGuardResult::error(
-                $this->getName(),
-                "Context is missing 'sectionsHtml'.",
-                'sectionsHtml',
-            );
+            return EmailGuardResult::error($this->getName(), "Context is missing 'sectionsHtml'.", 'sectionsHtml');
         }
 
         return EmailGuardResult::pass($this->getName());

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Service\Config;
 
@@ -64,7 +62,13 @@ readonly class ConfigService
         return match ($type) {
             ImageType::ProfilePicture => [[400, 400], [350, 350], [100, 100], [80, 80], [50, 50]],
             ImageType::EventTeaser => [[1024, 768], [600, 400], [350, 263], [210, 140], [100, 100], [50, 50]], // included EventUpload
-            ImageType::EventUpload, ImageType::CmsGallery => [[1024, 768], [350, 263], [210, 140], [100, 100], [50, 50]],
+            ImageType::EventUpload, ImageType::CmsGallery => [
+                [1024, 768],
+                [350, 263],
+                [210, 140],
+                [100, 100],
+                [50, 50],
+            ],
             ImageType::CmsCardImage => [[600, 400], [350, 233], [300, 200], [100, 100], [50, 50]],
             ImageType::CmsBlock => [[432, 432], [350, 350], [100, 100], [80, 80], [50, 50]],
             ImageType::PluginDish => [[1024, 768], [600, 400], [400, 400], [350, 263], [100, 100], [50, 50]],

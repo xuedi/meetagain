@@ -11,24 +11,23 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NoteType extends AbstractType
 {
-    public function __construct(private readonly TranslatorInterface $translator) {}
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('body', TextareaType::class, [
-                'label' => $this->translator->trans('filmclub_note.label_body'),
-                'required' => true,
-                'attr' => ['rows' => 5],
-            ])
-            ->add('revealToGroup', CheckboxType::class, [
-                'label' => $this->translator->trans('filmclub_note.label_reveal'),
-                'required' => false,
-                'help' => $this->translator->trans('filmclub_note.help_reveal'),
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => $this->translator->trans('filmclub_note.button_save'),
-                'attr' => ['class' => 'button is-primary'],
-            ]);
+        $builder->add('body', TextareaType::class, [
+            'label' => $this->translator->trans('filmclub_note.label_body'),
+            'required' => true,
+            'attr' => ['rows' => 5],
+        ])->add('revealToGroup', CheckboxType::class, [
+            'label' => $this->translator->trans('filmclub_note.label_reveal'),
+            'required' => false,
+            'help' => $this->translator->trans('filmclub_note.help_reveal'),
+        ])->add('submit', SubmitType::class, [
+            'label' => $this->translator->trans('filmclub_note.button_save'),
+            'attr' => ['class' => 'button is-primary'],
+        ]);
     }
 }

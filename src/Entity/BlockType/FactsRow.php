@@ -23,11 +23,7 @@ class FactsRow implements BlockType
     #[Override]
     public static function getCapabilities(): BlockCapabilities
     {
-        return new BlockCapabilities(
-            image: ImageSupport::None,
-            supportsImageRight: false,
-            isGallery: false,
-        );
+        return new BlockCapabilities(image: ImageSupport::None, supportsImageRight: false, isGallery: false);
     }
 
     #[Override]
@@ -58,10 +54,7 @@ class FactsRow implements BlockType
             }
         }
 
-        return new self(
-            headline: trim((string) ($json['headline'] ?? '')),
-            facts: $facts,
-        );
+        return new self(headline: trim((string) ($json['headline'] ?? '')), facts: $facts);
     }
 
     #[Override]

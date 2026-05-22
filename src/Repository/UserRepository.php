@@ -35,11 +35,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return $this->userNameList;
         }
 
-        $result = $this
-            ->createQueryBuilder('u')
-            ->select('u.id', 'u.name')
-            ->getQuery()
-            ->getArrayResult();
+        $result = $this->createQueryBuilder('u')->select('u.id', 'u.name')->getQuery()->getArrayResult();
 
         $this->userNameList = array_column($result, 'name', 'id');
 
@@ -114,7 +110,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     #[Override]
     public function upgradePassword(
         PasswordAuthenticatedUserInterface $user,
-        #[\SensitiveParameter] string $newHashedPassword,
+        #[\SensitiveParameter]
+        string $newHashedPassword,
     ): void {
         if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
@@ -285,11 +282,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getAllUserChoice(): array
     {
-        $result = $this
-            ->createQueryBuilder('u')
-            ->select('u.id', 'u.name')
-            ->getQuery()
-            ->getArrayResult();
+        $result = $this->createQueryBuilder('u')->select('u.id', 'u.name')->getQuery()->getArrayResult();
 
         return array_column($result, 'id', 'name');
     }

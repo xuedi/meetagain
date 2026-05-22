@@ -85,7 +85,7 @@ class MembersPageTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/en/members/toggleFollow/1');
+        $client->request('POST', '/en/members/toggleFollow/1', ['_token' => '']);
 
         $this->assertResponseRedirects();
     }
@@ -96,7 +96,9 @@ class MembersPageTest extends WebTestCase
 
         $this->login($client, self::USER_EMAIL, self::USER_PASSWORD);
 
-        $client->request('GET', '/en/members/toggleFollow/1');
+        $crawler = $client->request('GET', '/en/members/view/1');
+        $token = $crawler->filter('form[action*="toggleFollow"] input[name="_token"]')->attr('value');
+        $client->request('POST', '/en/members/toggleFollow/1', ['_token' => $token]);
 
         $this->assertResponseRedirects();
     }
@@ -107,11 +109,9 @@ class MembersPageTest extends WebTestCase
 
         $this->login($client, self::USER_EMAIL, self::USER_PASSWORD);
 
-        // Rotate avatar - should be denied (403) or redirect
-        $client->request('GET', '/en/members/rotate-avatar/2');
-        // Either access denied (403) or redirect to access denied page
+        $client->request('POST', '/en/members/rotate-avatar/2', ['_token' => '']);
         static::assertTrue(
-            $client->getResponse()->getStatusCode() === 403 || $client->getResponse()->isRedirect(),
+            in_array($client->getResponse()->getStatusCode(), [400, 403], true) || $client->getResponse()->isRedirect(),
             'Manager action should be denied for regular users',
         );
     }

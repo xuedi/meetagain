@@ -43,9 +43,9 @@ class UserServiceTest extends TestCase
         $em->expects($this->once())->method('flush');
 
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects($this->once())
-            ->method('log')
-            ->with(AdminMemberPromoted::TYPE, $actor, ['user_id' => self::TARGET_ID]);
+        $activity->expects($this->once())->method('log')->with(AdminMemberPromoted::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+        ]);
 
         $target->expects($this->once())->method('setRole')->with(UserRole::Admin);
 
@@ -62,9 +62,9 @@ class UserServiceTest extends TestCase
         $target = $this->makeUser(self::TARGET_ID, UserRole::Admin);
 
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects($this->once())
-            ->method('log')
-            ->with(AdminMemberDemoted::TYPE, $actor, ['user_id' => self::TARGET_ID]);
+        $activity->expects($this->once())->method('log')->with(AdminMemberDemoted::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+        ]);
 
         $subject = $this->makeService(activityService: $activity);
 
@@ -134,9 +134,9 @@ class UserServiceTest extends TestCase
         $target->expects($this->once())->method('setVerified')->with(true);
 
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects($this->once())
-            ->method('log')
-            ->with(AdminMemberVerified::TYPE, $actor, ['user_id' => self::TARGET_ID]);
+        $activity->expects($this->once())->method('log')->with(AdminMemberVerified::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+        ]);
 
         $subject = $this->makeService(activityService: $activity);
 
@@ -156,9 +156,9 @@ class UserServiceTest extends TestCase
         $target->expects($this->once())->method('setVerified')->with(false);
 
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects($this->once())
-            ->method('log')
-            ->with(AdminMemberUnverified::TYPE, $actor, ['user_id' => self::TARGET_ID]);
+        $activity->expects($this->once())->method('log')->with(AdminMemberUnverified::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+        ]);
 
         $subject = $this->makeService(activityService: $activity);
 
@@ -178,9 +178,9 @@ class UserServiceTest extends TestCase
         $target->expects($this->once())->method('setRestricted')->with(true);
 
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects($this->once())
-            ->method('log')
-            ->with(AdminMemberRestricted::TYPE, $actor, ['user_id' => self::TARGET_ID]);
+        $activity->expects($this->once())->method('log')->with(AdminMemberRestricted::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+        ]);
 
         $subject = $this->makeService(activityService: $activity);
 
@@ -200,9 +200,9 @@ class UserServiceTest extends TestCase
         $target->expects($this->once())->method('setRestricted')->with(false);
 
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects($this->once())
-            ->method('log')
-            ->with(AdminMemberUnrestricted::TYPE, $actor, ['user_id' => self::TARGET_ID]);
+        $activity->expects($this->once())->method('log')->with(AdminMemberUnrestricted::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+        ]);
 
         $subject = $this->makeService(activityService: $activity);
 
@@ -221,14 +221,12 @@ class UserServiceTest extends TestCase
         $target->expects($this->once())->method('setStatus')->with(UserStatus::Active);
 
         $welcomeEmail = $this->createMock(WelcomeEmail::class);
-        $welcomeEmail->expects($this->once())
-            ->method('send')
-            ->with(['user' => $target]);
+        $welcomeEmail->expects($this->once())->method('send')->with(['user' => $target]);
 
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects($this->once())
-            ->method('log')
-            ->with(AdminMemberApproved::TYPE, $actor, ['user_id' => self::TARGET_ID]);
+        $activity->expects($this->once())->method('log')->with(AdminMemberApproved::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+        ]);
 
         $subject = $this->makeService(welcomeEmail: $welcomeEmail, activityService: $activity);
 
@@ -246,9 +244,9 @@ class UserServiceTest extends TestCase
         $welcomeEmail->expects($this->never())->method('send');
 
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects($this->once())
-            ->method('log')
-            ->with(AdminMemberDenied::TYPE, $actor, ['user_id' => self::TARGET_ID]);
+        $activity->expects($this->once())->method('log')->with(AdminMemberDenied::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+        ]);
 
         $subject = $this->makeService(welcomeEmail: $welcomeEmail, activityService: $activity);
 
@@ -263,13 +261,11 @@ class UserServiceTest extends TestCase
         $target = $this->makeUser(self::TARGET_ID, UserRole::User, UserStatus::Active);
 
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects($this->once())
-            ->method('log')
-            ->with(AdminMemberStatusChanged::TYPE, $actor, [
-                'user_id' => self::TARGET_ID,
-                'old' => UserStatus::Active->value,
-                'new' => UserStatus::Blocked->value,
-            ]);
+        $activity->expects($this->once())->method('log')->with(AdminMemberStatusChanged::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+            'old' => UserStatus::Active->value,
+            'new' => UserStatus::Blocked->value,
+        ]);
 
         $subject = $this->makeService(activityService: $activity);
 
@@ -321,18 +317,14 @@ class UserServiceTest extends TestCase
         $target->expects($this->once())->method('setStatus')->with(UserStatus::Deleted);
 
         $dispatcher = $this->createMock(EntityActionDispatcher::class);
-        $dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(EntityAction::DeleteUser, self::TARGET_ID);
+        $dispatcher->expects($this->once())->method('dispatch')->with(EntityAction::DeleteUser, self::TARGET_ID);
 
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects($this->once())
-            ->method('log')
-            ->with(AdminMemberStatusChanged::TYPE, $actor, [
-                'user_id' => self::TARGET_ID,
-                'old' => UserStatus::Active->value,
-                'new' => UserStatus::Deleted->value,
-            ]);
+        $activity->expects($this->once())->method('log')->with(AdminMemberStatusChanged::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+            'old' => UserStatus::Active->value,
+            'new' => UserStatus::Deleted->value,
+        ]);
 
         $subject = $this->makeService(dispatcher: $dispatcher, activityService: $activity);
 
@@ -372,13 +364,11 @@ class UserServiceTest extends TestCase
         $dispatcher->expects($this->never())->method('dispatch');
 
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects($this->once())
-            ->method('log')
-            ->with(AdminMemberStatusChanged::TYPE, $actor, [
-                'user_id' => self::TARGET_ID,
-                'old' => UserStatus::Deleted->value,
-                'new' => UserStatus::Active->value,
-            ]);
+        $activity->expects($this->once())->method('log')->with(AdminMemberStatusChanged::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+            'old' => UserStatus::Deleted->value,
+            'new' => UserStatus::Active->value,
+        ]);
 
         $subject = $this->makeService(dispatcher: $dispatcher, activityService: $activity);
 

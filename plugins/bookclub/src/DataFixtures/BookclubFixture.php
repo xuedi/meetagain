@@ -3,8 +3,8 @@
 namespace Plugin\Bookclub\DataFixtures;
 
 use App\DataFixtures\AbstractFixture;
-use App\Enum\ImageType;
 use App\Entity\User;
+use App\Enum\ImageType;
 use App\Repository\UserRepository;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;

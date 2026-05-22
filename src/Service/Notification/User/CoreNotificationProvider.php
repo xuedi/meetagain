@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Service\Notification\User;
 
@@ -19,7 +17,6 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
         private TranslatorInterface $translator,
     ) {}
 
-
     public function getNotifications(User $user): array
     {
         $items = [];
@@ -29,16 +26,17 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
 
         $staleEmails = $this->emailRepo->getStaleCount(60);
         if ($staleEmails > 0) {
-            $items[] = new NotificationItem(
-                label: $this->translator->trans('chrome.notification_stale_emails', ['%count%' => $staleEmails]),
-                icon: 'fa-envelope',
-            );
+            $items[] = new NotificationItem(label: $this->translator->trans('chrome.notification_stale_emails', [
+                '%count%' => $staleEmails,
+            ]), icon: 'fa-envelope');
         }
 
         $newSupportRequests = $this->supportRequestRepo->getNewCount();
         if ($newSupportRequests > 0) {
             $items[] = new NotificationItem(
-                label: $this->translator->trans('chrome.notification_new_support_requests', ['%count%' => $newSupportRequests]),
+                label: $this->translator->trans('chrome.notification_new_support_requests', [
+                    '%count%' => $newSupportRequests,
+                ]),
                 icon: 'fa-life-ring',
                 route: 'app_admin_support_list',
             );

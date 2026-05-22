@@ -59,8 +59,7 @@ final class MessageController extends AbstractController
                     $this->em->persist($msg);
                     $this->em->flush();
 
-                    $this->activityService->log(SendMessage::TYPE, $user, ['user_id' =>
-                        $conversationPartner->getId()]);
+                    $this->activityService->log(SendMessage::TYPE, $user, ['user_id' => $conversationPartner->getId()]);
                 }
             }
             // preRender then flush when no new messages

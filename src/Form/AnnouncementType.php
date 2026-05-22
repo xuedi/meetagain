@@ -25,7 +25,10 @@ class AnnouncementType extends AbstractType
         $builder->add('cmsPage', EntityType::class, [
             'class' => Cms::class,
             'label' => false,
-            'choice_label' => fn(Cms $cms) => $cms->getSlug() . ($cms->isPublished() ? '' : ' (' . $this->translator->trans('admin_cms.unpublished') . ')'),
+            'choice_label' => fn(Cms $cms) => (
+                $cms->getSlug()
+                . ($cms->isPublished() ? '' : ' (' . $this->translator->trans('admin_cms.unpublished') . ')')
+            ),
             'query_builder' => fn() => $this->cmsRepository->createQueryBuilder('c')->orderBy('c.slug', 'ASC'),
         ]);
     }

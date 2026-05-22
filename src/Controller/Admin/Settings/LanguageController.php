@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Controller\Admin\Settings;
 
@@ -23,6 +21,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -162,9 +161,16 @@ final class LanguageController extends AbstractSettingsController implements
         ]);
     }
 
-    #[Route('/{id}/toggle', name: 'app_admin_language_toggle', methods: ['GET'])]
-    public function toggle(Language $language): Response
+    #[Route('/{id}/toggle', name: 'app_admin_language_toggle', methods: ['POST'])]
+    public function toggle(Language $language, Request $request): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'app_admin_language_toggle' . $language->getId(),
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $language->setEnabled(!$language->isEnabled());
         $this->em->flush();
         $this->languageService->invalidateCache();

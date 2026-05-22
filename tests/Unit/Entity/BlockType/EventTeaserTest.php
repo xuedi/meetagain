@@ -16,8 +16,8 @@ class EventTeaserTest extends TestCase
     {
         // Arrange
         $json = [
-            'headline'   => 'Upcoming events',
-            'text'       => 'Join us soon',
+            'headline' => 'Upcoming events',
+            'text' => 'Join us soon',
             'eventCount' => '6',
             'imageRight' => true,
         ];
@@ -86,8 +86,8 @@ class EventTeaserTest extends TestCase
     {
         // Arrange
         $json = [
-            'headline'   => 'H',
-            'text'       => 'T',
+            'headline' => 'H',
+            'text' => 'T',
             'eventCount' => '7',
             'imageRight' => false,
         ];

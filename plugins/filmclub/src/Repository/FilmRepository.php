@@ -41,8 +41,7 @@ class FilmRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('f')
-            ->orderBy('f.title', 'ASC');
+        $qb = $this->createQueryBuilder('f')->orderBy('f.title', 'ASC');
 
         if ($allowedIds !== null) {
             $qb->where('f.id IN (:ids)')->setParameter('ids', $allowedIds);

@@ -328,8 +328,16 @@ final class ActivityNotificationServiceTest extends TestCase
         $userRepoStub->method('findOneBy')->willReturn($recipient);
 
         $skipRule = new class implements \App\Emails\EmailGuardRuleInterface {
-            public function getName(): string { return 'test-skip'; }
-            public function getCost(): \App\Emails\EmailGuardCost { return \App\Emails\EmailGuardCost::Free; }
+            public function getName(): string
+            {
+                return 'test-skip';
+            }
+
+            public function getCost(): \App\Emails\EmailGuardCost
+            {
+                return \App\Emails\EmailGuardCost::Free;
+            }
+
             public function evaluate(array $context): \App\Emails\EmailGuardResult
             {
                 return \App\Emails\EmailGuardResult::skip('test-skip', 'recently active');

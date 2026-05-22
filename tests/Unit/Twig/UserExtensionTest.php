@@ -28,9 +28,7 @@ class UserExtensionTest extends TestCase
 
     public function testGetUserNameDelegatesToUserService(): void
     {
-        $this->userServiceStub
-            ->method('resolveUserName')
-            ->willReturn('John Doe');
+        $this->userServiceStub->method('resolveUserName')->willReturn('John Doe');
 
         $result = $this->subject->getUserName(42);
 
@@ -39,9 +37,7 @@ class UserExtensionTest extends TestCase
 
     public function testGetUserNameHandlesUnknownUser(): void
     {
-        $this->userServiceStub
-            ->method('resolveUserName')
-            ->willReturn('[deleted]');
+        $this->userServiceStub->method('resolveUserName')->willReturn('[deleted]');
 
         $result = $this->subject->getUserName(999);
 

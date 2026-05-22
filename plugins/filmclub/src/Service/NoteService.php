@@ -48,18 +48,12 @@ readonly class NoteService
     /** @return FilmNote[] */
     public function getRevealedForFilm(Film $film): array
     {
-        return $this->noteRepo->findRevealedForFilm(
-            $film->getId(),
-            $this->groupFilter->getAllowedNoteIds(),
-        );
+        return $this->noteRepo->findRevealedForFilm($film->getId(), $this->groupFilter->getAllowedNoteIds());
     }
 
     /** @return FilmNote[] */
     public function getForUser(int $userId): array
     {
-        return $this->noteRepo->findBy(
-            ['userId' => $userId],
-            ['createdAt' => 'DESC'],
-        );
+        return $this->noteRepo->findBy(['userId' => $userId], ['createdAt' => 'DESC']);
     }
 }

@@ -79,7 +79,12 @@ final class BookController extends AbstractController
                     return $this->redirectToRoute('app_plugin_bookclub_book_add');
                 }
 
-                $this->addFlash('success', $this->translator->trans($isManager ? 'bookclub_book.flash_added' : 'bookclub_book.flash_submitted'));
+                $this->addFlash(
+                    'success',
+                    $this->translator->trans(
+                        $isManager ? 'bookclub_book.flash_added' : 'bookclub_book.flash_submitted',
+                    ),
+                );
 
                 return $this->redirectToRoute('app_plugin_bookclub_book_show', ['id' => $book->getId()]);
             } catch (RuntimeException $e) {

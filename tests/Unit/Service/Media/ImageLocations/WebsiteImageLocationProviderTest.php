@@ -55,9 +55,6 @@ class WebsiteImageLocationProviderTest extends TestCase
 
     private function createProvider(Connection $connection): WebsiteImageLocationProvider
     {
-        return new WebsiteImageLocationProvider(
-            $this->createStub(ImageLocationRepository::class),
-            $connection,
-        );
+        return new WebsiteImageLocationProvider($this->createStub(ImageLocationRepository::class), $connection);
     }
 }

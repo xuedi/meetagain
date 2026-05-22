@@ -4,9 +4,9 @@ namespace Tests\Unit\Service;
 
 use App\Entity\Event;
 use App\Entity\Image;
+use App\Entity\User;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
-use App\Entity\User;
 use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
 use App\Service\Config\ConfigService;
@@ -429,19 +429,29 @@ class ImageServiceTest extends TestCase
     public static function provideMimeTypeFallbackCases(): iterable
     {
         yield 'server mime present wins' => [
-            ['server' => 'image/png', 'client' => 'image/jpeg'], 'image/png', false,
+            ['server' => 'image/png', 'client' => 'image/jpeg'],
+            'image/png',
+            false,
         ];
         yield 'server null falls back to client' => [
-            ['server' => null, 'client' => 'image/jpeg'], 'image/jpeg', false,
+            ['server' => null, 'client' => 'image/jpeg'],
+            'image/jpeg',
+            false,
         ];
         yield 'server empty falls back to client' => [
-            ['server' => '', 'client' => 'image/jpeg'], 'image/jpeg', false,
+            ['server' => '', 'client' => 'image/jpeg'],
+            'image/jpeg',
+            false,
         ];
         yield 'client octet-stream is rejected' => [
-            ['server' => null, 'client' => 'application/octet-stream'], null, true,
+            ['server' => null, 'client' => 'application/octet-stream'],
+            null,
+            true,
         ];
         yield 'all empty throws' => [
-            ['server' => null, 'client' => ''], null, true,
+            ['server' => null, 'client' => ''],
+            null,
+            true,
         ];
     }
 
@@ -477,16 +487,24 @@ class ImageServiceTest extends TestCase
     public static function provideExtensionFallbackCases(): iterable
     {
         yield 'server guess wins' => [
-            ['server' => 'png', 'mime' => 'image/jpeg', 'client' => 'JPG'], 'png', false,
+            ['server' => 'png', 'mime' => 'image/jpeg', 'client' => 'JPG'],
+            'png',
+            false,
         ];
         yield 'server null falls back to mime registry' => [
-            ['server' => null, 'mime' => 'image/png', 'client' => 'something'], 'png', false,
+            ['server' => null, 'mime' => 'image/png', 'client' => 'something'],
+            'png',
+            false,
         ];
         yield 'server null and unknown mime falls back to client lowercased' => [
-            ['server' => null, 'mime' => 'application/x-totally-unknown', 'client' => 'XYZ'], 'xyz', false,
+            ['server' => null, 'mime' => 'application/x-totally-unknown', 'client' => 'XYZ'],
+            'xyz',
+            false,
         ];
         yield 'all empty throws' => [
-            ['server' => null, 'mime' => 'application/x-totally-unknown', 'client' => ''], null, true,
+            ['server' => null, 'mime' => 'application/x-totally-unknown', 'client' => ''],
+            null,
+            true,
         ];
     }
 
@@ -588,11 +606,7 @@ class ImageServiceTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('error');
 
-        $subject = $this->createService(
-            configService: $configService,
-            filesystemService: $fs,
-            logger: $logger,
-        );
+        $subject = $this->createService(configService: $configService, filesystemService: $fs, logger: $logger);
 
         // Act
         $created = $subject->createThumbnails($image);
@@ -628,11 +642,7 @@ class ImageServiceTest extends TestCase
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(false);
 
-        $subject = $this->createService(
-            imageRepo: $imageRepo,
-            configService: $configService,
-            filesystemService: $fs,
-        );
+        $subject = $this->createService(imageRepo: $imageRepo, configService: $configService, filesystemService: $fs);
 
         // Act
         $count = $subject->regenerateAllThumbnails();
@@ -657,11 +667,7 @@ class ImageServiceTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->never())->method('flush');
 
-        $subject = $this->createService(
-            entityManager: $em,
-            configService: $configService,
-            logger: $logger,
-        );
+        $subject = $this->createService(entityManager: $em, configService: $configService, logger: $logger);
 
         // Act / Assert - returns without throwing
         $subject->rotateThumbNail($image);

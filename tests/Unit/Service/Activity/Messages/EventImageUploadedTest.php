@@ -66,7 +66,9 @@ class EventImageUploadedTest extends TestCase
 
     public function testCanCatchMissingEventId(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.event_image_uploaded"));
+        $this->expectExceptionObject(
+            new InvalidArgumentException("Missing 'event_id' in meta in core.event_image_uploaded"),
+        );
 
         $subject = new EventImageUploaded();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['images' => 3]);
@@ -80,13 +82,18 @@ class EventImageUploadedTest extends TestCase
         );
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 'not-a-number', 'images' => 3]);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, [
+            'event_id' => 'not-a-number',
+            'images' => 3,
+        ]);
         $subject->validate();
     }
 
     public function testCanCatchMissingImages(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Missing 'images' in meta in core.event_image_uploaded"));
+        $this->expectExceptionObject(
+            new InvalidArgumentException("Missing 'images' in meta in core.event_image_uploaded"),
+        );
 
         $subject = new EventImageUploaded();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 42]);
@@ -100,7 +107,10 @@ class EventImageUploadedTest extends TestCase
         );
 
         $subject = new EventImageUploaded();
-        $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 42, 'images' => 'not-a-number']);
+        $subject->injectServices($this->router, $this->imageService, $this->translator, [
+            'event_id' => 42,
+            'images' => 'not-a-number',
+        ]);
         $subject->validate();
     }
 }

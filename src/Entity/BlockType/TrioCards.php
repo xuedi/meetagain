@@ -2,10 +2,10 @@
 
 namespace App\Entity\BlockType;
 
+use App\Entity\Image as ImageEntity;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\CmsBlock\FieldType;
 use App\Enum\CmsBlock\ImageSupport;
-use App\Entity\Image as ImageEntity;
 use Override;
 
 class TrioCards implements BlockType
@@ -29,11 +29,7 @@ class TrioCards implements BlockType
     #[Override]
     public static function getCapabilities(): BlockCapabilities
     {
-        return new BlockCapabilities(
-            image: ImageSupport::None,
-            supportsImageRight: false,
-            isGallery: false,
-        );
+        return new BlockCapabilities(image: ImageSupport::None, supportsImageRight: false, isGallery: false);
     }
 
     #[Override]
@@ -57,18 +53,15 @@ class TrioCards implements BlockType
                 : null;
 
             $cards[] = [
-                'image'       => $cardImage,
+                'image' => $cardImage,
                 'subHeadline' => (string) ($card['subHeadline'] ?? ''),
-                'text'        => (string) ($card['text'] ?? ''),
-                'buttonText'  => (string) ($card['buttonText'] ?? ''),
-                'buttonLink'  => (string) ($card['buttonLink'] ?? ''),
+                'text' => (string) ($card['text'] ?? ''),
+                'buttonText' => (string) ($card['buttonText'] ?? ''),
+                'buttonLink' => (string) ($card['buttonLink'] ?? ''),
             ];
         }
 
-        return new self(
-            headline: (string) ($json['headline'] ?? ''),
-            cards: $cards,
-        );
+        return new self(headline: (string) ($json['headline'] ?? ''), cards: $cards);
     }
 
     #[Override]

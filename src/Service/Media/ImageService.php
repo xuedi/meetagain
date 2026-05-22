@@ -4,9 +4,9 @@ namespace App\Service\Media;
 
 use App\Entity\Event;
 use App\Entity\Image;
+use App\Entity\User;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
-use App\Entity\User;
 use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
 use App\Service\Config\ConfigService;
@@ -141,16 +141,20 @@ readonly class ImageService
                 $imagick = new Imagick();
                 $imagick->readImage($thumbnail);
                 $imagick->rotateImage(new ImagickPixel('white'), 90);
-                // Use lossless WebP encoding for rotation to avoid generation loss
                 $imagick->setOption('webp:lossless', 'true');
                 $imagick->writeImage($thumbnail);
-                $image->setUpdatedAt(new DateTimeImmutable());
-                $this->entityManager->persist($image);
-                $this->entityManager->flush();
             } catch (ImagickException $e) {
                 $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));
             }
         }
+
+        // DQL UPDATE bypasses a Doctrine lazy-ghost case: persist+flush on a OneToOne proxy
+        // never read from before setUpdatedAt nulls every column.
+        $this->entityManager
+            ->createQuery('UPDATE App\Entity\Image i SET i.updatedAt = :now WHERE i.id = :id')
+            ->setParameter('now', new DateTimeImmutable())
+            ->setParameter('id', $image->getId())
+            ->execute();
     }
 
     public function getStatistics(): array

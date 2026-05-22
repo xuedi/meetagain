@@ -5,8 +5,10 @@ namespace App\Command;
 use App\Entity\User;
 use App\Service\Test\RouteDiscoverer;
 use DateTimeImmutable;
+use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector as BundleDoctrineDataCollector;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
+use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -15,8 +17,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\DataCollector\TimeDataCollector;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector as BundleDoctrineDataCollector;
-use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
 #[AsCommand(
@@ -46,8 +46,19 @@ class AppProfileQueriesCommand extends Command
             ->addOption('admin-only', null, InputOption::VALUE_NONE, 'Skip the anonymous pass')
             ->addOption('limit', null, InputOption::VALUE_REQUIRED, 'Cap the number of routes processed per pass')
             ->addOption('json', null, InputOption::VALUE_REQUIRED, 'Override JSON output path')
-            ->addOption('threshold', null, InputOption::VALUE_REQUIRED, 'In the console table, only show routes with at least N queries', 0)
-            ->addOption('dump-sql', null, InputOption::VALUE_REQUIRED, 'Dump grouped SQL for a single URL instead of running the sweep (investigation mode)');
+            ->addOption(
+                'threshold',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'In the console table, only show routes with at least N queries',
+                0,
+            )
+            ->addOption(
+                'dump-sql',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Dump grouped SQL for a single URL instead of running the sweep (investigation mode)',
+            );
     }
 
     #[Override]
@@ -66,7 +77,9 @@ class AppProfileQueriesCommand extends Command
         $limit = $input->getOption('limit');
         $limit = $limit === null ? null : max(1, (int) $limit);
         $threshold = max(0, (int) $input->getOption('threshold'));
-        $jsonPath = (string) ($input->getOption('json') ?? $this->kernelProjectDir . '/tests/reports/query-profile.json');
+        $jsonPath = (string) (
+            $input->getOption('json') ?? $this->kernelProjectDir . '/tests/reports/query-profile.json'
+        );
 
         $dumpUrl = $input->getOption('dump-sql');
         if ($dumpUrl !== null) {
@@ -96,7 +109,10 @@ class AppProfileQueriesCommand extends Command
         }
 
         if (!$anonymousOnly) {
-            $adminUrls = array_values(array_filter($urls, static fn(string $u): bool => str_contains($u, self::ADMIN_URL_PREFIX)));
+            $adminUrls = array_values(array_filter($urls, static fn(string $u): bool => str_contains(
+                $u,
+                self::ADMIN_URL_PREFIX,
+            )));
             if ($limit !== null) {
                 $adminUrls = array_slice($adminUrls, 0, $limit);
             }
@@ -152,8 +168,8 @@ class AppProfileQueriesCommand extends Command
         if ($db instanceof BundleDoctrineDataCollector) {
             foreach ($db->getGroupedQueries() as $connectionGroups) {
                 foreach ($connectionGroups as $row) {
-                    $sql = (string) preg_replace('/\s+/', ' ', (string) $row['sql']);
-                    $count = (int) ($row['count'] ?? 1);
+                    $sql = (string) preg_replace('/\s+/', ' ', $row['sql']);
+                    $count = (int) $row['count'];
                     $marker = $count > 1 ? sprintf('[x%-3d]', $count) : '       ';
                     $output->writeln(sprintf('%s %s', $marker, mb_substr($sql, 0, 220)));
                 }
@@ -251,7 +267,7 @@ class AppProfileQueriesCommand extends Command
     private function writeJson(string $path, array $results): void
     {
         $payload = [
-            'generated_at' => (new DateTimeImmutable())->format(DATE_ATOM),
+            'generated_at' => new DateTimeImmutable()->format(DATE_ATOM),
             'route_count' => count($results),
             'results' => $results,
         ];
@@ -278,8 +294,20 @@ class AppProfileQueriesCommand extends Command
         ));
         $output->writeln('---');
 
-        $this->renderTopSection($output, $results, $threshold, authenticated: false, header: 'TOP BY QUERY COUNT (anon):');
-        $this->renderTopSection($output, $results, $threshold, authenticated: true, header: 'TOP BY QUERY COUNT (admin):');
+        $this->renderTopSection(
+            $output,
+            $results,
+            $threshold,
+            authenticated: false,
+            header: 'TOP BY QUERY COUNT (anon):',
+        );
+        $this->renderTopSection(
+            $output,
+            $results,
+            $threshold,
+            authenticated: true,
+            header: 'TOP BY QUERY COUNT (admin):',
+        );
 
         if ($fiveXx !== []) {
             $output->writeln('');
@@ -294,13 +322,20 @@ class AppProfileQueriesCommand extends Command
     }
 
     /** @param list<array<string, mixed>> $results */
-    private function renderTopSection(OutputInterface $output, array $results, int $threshold, bool $authenticated, string $header): void
-    {
+    private function renderTopSection(
+        OutputInterface $output,
+        array $results,
+        int $threshold,
+        bool $authenticated,
+        string $header,
+    ): void {
         $rows = array_values(array_filter(
             $results,
-            static fn(array $r): bool => $r['authenticated'] === $authenticated
+            static fn(array $r): bool => (
+                $r['authenticated'] === $authenticated
                 && $r['flag'] === null
-                && (int) $r['query_count'] >= $threshold,
+                && (int) $r['query_count'] >= $threshold
+            ),
         ));
 
         if ($rows === []) {

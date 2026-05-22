@@ -41,7 +41,8 @@ class FilmWishlistEntryRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('w')
+        $qb = $this
+            ->createQueryBuilder('w')
             ->where('w.userId = :userId')
             ->setParameter('userId', $userId)
             ->orderBy('w.priorityCounter', 'DESC');
@@ -70,7 +71,8 @@ class FilmWishlistEntryRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('w')
+        $qb = $this
+            ->createQueryBuilder('w')
             ->select('IDENTITY(w.film) AS film_id')
             ->addSelect('COUNT(DISTINCT w.userId) AS wanter_count')
             ->addSelect('SUM(w.priorityCounter) AS total_priority')
@@ -97,7 +99,8 @@ class FilmWishlistEntryRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('w')
+        $qb = $this
+            ->createQueryBuilder('w')
             ->innerJoin('w.film', 'f')
             ->addSelect('f')
             ->orderBy('w.userId', 'ASC')
@@ -112,7 +115,8 @@ class FilmWishlistEntryRepository extends ServiceEntityRepository
 
     public function countWantersForFilm(int $filmId): int
     {
-        return (int) $this->createQueryBuilder('w')
+        return (int) $this
+            ->createQueryBuilder('w')
             ->select('COUNT(DISTINCT w.userId)')
             ->where('w.film = :filmId')
             ->setParameter('filmId', $filmId)
@@ -126,7 +130,9 @@ class FilmWishlistEntryRepository extends ServiceEntityRepository
             return;
         }
 
-        $qb = $this->getEntityManager()->createQueryBuilder()
+        $qb = $this
+            ->getEntityManager()
+            ->createQueryBuilder()
             ->update(FilmWishlistEntry::class, 'w')
             ->set('w.priorityCounter', 'w.priorityCounter + 1')
             ->where('w.film != :winnerFilmId')
@@ -145,7 +151,9 @@ class FilmWishlistEntryRepository extends ServiceEntityRepository
             return;
         }
 
-        $qb = $this->getEntityManager()->createQueryBuilder()
+        $qb = $this
+            ->getEntityManager()
+            ->createQueryBuilder()
             ->delete(FilmWishlistEntry::class, 'w')
             ->where('w.film = :filmId')
             ->setParameter('filmId', $filmId);

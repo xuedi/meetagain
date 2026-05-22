@@ -18,6 +18,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -82,9 +83,15 @@ final class ProfileController extends AbstractController
         );
     }
 
-    #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp')]
+    #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp', methods: ['POST'])]
     public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'app_profile_toggle_rsvp' . $event->getId(),
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
         if ($event->getStart() < new DateTimeImmutable()) { // does reload page for flashMessage to trigger
             $this->addFlash('error', 'events.flash_rsvp_past');
 

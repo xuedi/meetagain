@@ -380,8 +380,12 @@ readonly class DishService
         }
     }
 
-    public function addImageSuggestion(Dish $dish, Image $image, DishImageSuggestionType $type, int $userId): DishImageSuggestion
-    {
+    public function addImageSuggestion(
+        Dish $dish,
+        Image $image,
+        DishImageSuggestionType $type,
+        int $userId,
+    ): DishImageSuggestion {
         $suggestion = new DishImageSuggestion();
         $suggestion->setDish($dish);
         $suggestion->setImage($image);

@@ -48,8 +48,8 @@ final class PluginController extends AbstractController implements AdminNavigati
     {
         $plugins = $this->pluginService->getAdminList();
         $totalCount = count($plugins);
-        $installedCount = count(array_filter($plugins, static fn (array $p): bool => (bool) ($p['installed'] ?? false)));
-        $enabledCount = count(array_filter($plugins, static fn (array $p): bool => (bool) ($p['enabled'] ?? false)));
+        $installedCount = count(array_filter($plugins, static fn(array $p): bool => (bool) ($p['installed'] ?? false)));
+        $enabledCount = count(array_filter($plugins, static fn(array $p): bool => (bool) ($p['enabled'] ?? false)));
 
         $actions = [];
         if ($this->pluginSettingsService->hasAny()) {
@@ -60,26 +60,23 @@ final class PluginController extends AbstractController implements AdminNavigati
             );
         }
 
-        $adminTop = new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>%d</strong>&nbsp;%s',
-                    $totalCount,
-                    $this->translator->trans('admin_system_plugins.summary_available'),
-                )),
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>%d</strong>&nbsp;%s',
-                    $installedCount,
-                    $this->translator->trans('admin_system_plugins.summary_installed'),
-                )),
-                new AdminTopInfoHtml(sprintf(
-                    '<span class="tag is-success is-medium">%d&nbsp;%s</span>',
-                    $enabledCount,
-                    $this->translator->trans('admin_system_plugins.summary_enabled'),
-                )),
-            ],
-            actions: $actions,
-        );
+        $adminTop = new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                $totalCount,
+                $this->translator->trans('admin_system_plugins.summary_available'),
+            )),
+            new AdminTopInfoHtml(sprintf(
+                '<strong>%d</strong>&nbsp;%s',
+                $installedCount,
+                $this->translator->trans('admin_system_plugins.summary_installed'),
+            )),
+            new AdminTopInfoHtml(sprintf(
+                '<span class="tag is-success is-medium">%d&nbsp;%s</span>',
+                $enabledCount,
+                $this->translator->trans('admin_system_plugins.summary_enabled'),
+            )),
+        ], actions: $actions);
 
         return $this->render('admin/system/plugin_list.html.twig', [
             'plugins' => $plugins,
@@ -94,9 +91,13 @@ final class PluginController extends AbstractController implements AdminNavigati
         try {
             $this->pluginService->install($key);
             $this->commandService->executeSubprocessMigrations();
-            $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_installed', ['%plugin%' => $key]));
+            $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_installed', [
+                '%plugin%' => $key,
+            ]));
         } catch (\Throwable $e) {
-            $this->addFlash('error', $this->translator->trans('admin_system_plugins.flash_install_failed', ['%error%' => $e->getMessage()]));
+            $this->addFlash('error', $this->translator->trans('admin_system_plugins.flash_install_failed', [
+                '%error%' => $e->getMessage(),
+            ]));
         }
 
         return $this->redirectToRoute('app_admin_plugin');
@@ -106,7 +107,9 @@ final class PluginController extends AbstractController implements AdminNavigati
     public function uninstall(string $key): Response
     {
         $this->pluginService->uninstall($key);
-        $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_uninstalled', ['%plugin%' => $key]));
+        $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_uninstalled', [
+            '%plugin%' => $key,
+        ]));
 
         return $this->redirectToRoute('app_admin_plugin');
     }
@@ -115,7 +118,9 @@ final class PluginController extends AbstractController implements AdminNavigati
     public function enable(string $key): Response
     {
         $this->pluginService->enable($key);
-        $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_enabled', ['%plugin%' => $key]));
+        $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_enabled', [
+            '%plugin%' => $key,
+        ]));
 
         return $this->redirectToRoute('app_admin_plugin');
     }
@@ -124,7 +129,9 @@ final class PluginController extends AbstractController implements AdminNavigati
     public function disable(string $key): Response
     {
         $this->pluginService->disable($key);
-        $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_disabled', ['%plugin%' => $key]));
+        $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_disabled', [
+            '%plugin%' => $key,
+        ]));
 
         return $this->redirectToRoute('app_admin_plugin');
     }

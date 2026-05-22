@@ -33,11 +33,7 @@ class CmsEventTeaserExtensionTest extends TestCase
         $filterServiceStub->method('getEventIdFilter')->willReturn(EventFilterResult::emptyResult());
 
         $repoMock = $this->createMock(EventRepository::class);
-        $repoMock
-            ->expects($this->once())
-            ->method('getUpcomingEvents')
-            ->with(3, [])
-            ->willReturn([]);
+        $repoMock->expects($this->once())->method('getUpcomingEvents')->with(3, [])->willReturn([]);
 
         $subject = new CmsEventTeaserExtension($filterServiceStub, $repoMock);
 
@@ -57,11 +53,7 @@ class CmsEventTeaserExtensionTest extends TestCase
         $filterServiceStub->method('getEventIdFilter')->willReturn(EventFilterResult::noFilter());
 
         $repoMock = $this->createMock(EventRepository::class);
-        $repoMock
-            ->expects($this->once())
-            ->method('getUpcomingEvents')
-            ->with(3, null)
-            ->willReturn($events);
+        $repoMock->expects($this->once())->method('getUpcomingEvents')->with(3, null)->willReturn($events);
 
         $subject = new CmsEventTeaserExtension($filterServiceStub, $repoMock);
 
@@ -78,16 +70,10 @@ class CmsEventTeaserExtensionTest extends TestCase
         $events = [$this->createStub(Event::class)];
 
         $filterServiceStub = $this->createStub(EventFilterService::class);
-        $filterServiceStub
-            ->method('getEventIdFilter')
-            ->willReturn(new EventFilterResult([1, 2, 5, 8], true));
+        $filterServiceStub->method('getEventIdFilter')->willReturn(new EventFilterResult([1, 2, 5, 8], true));
 
         $repoMock = $this->createMock(EventRepository::class);
-        $repoMock
-            ->expects($this->once())
-            ->method('getUpcomingEvents')
-            ->with(3, [1, 2, 5, 8])
-            ->willReturn($events);
+        $repoMock->expects($this->once())->method('getUpcomingEvents')->with(3, [1, 2, 5, 8])->willReturn($events);
 
         $subject = new CmsEventTeaserExtension($filterServiceStub, $repoMock);
 
@@ -105,11 +91,7 @@ class CmsEventTeaserExtensionTest extends TestCase
         $filterServiceStub->method('getEventIdFilter')->willReturn(EventFilterResult::noFilter());
 
         $repoMock = $this->createMock(EventRepository::class);
-        $repoMock
-            ->expects($this->once())
-            ->method('getUpcomingEvents')
-            ->with(5, null)
-            ->willReturn([]);
+        $repoMock->expects($this->once())->method('getUpcomingEvents')->with(5, null)->willReturn([]);
 
         $subject = new CmsEventTeaserExtension($filterServiceStub, $repoMock);
 

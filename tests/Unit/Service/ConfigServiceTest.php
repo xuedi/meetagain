@@ -256,7 +256,14 @@ class ConfigServiceTest extends TestCase
 
         $cacheStub = $this->createStub(CacheInterface::class);
 
-        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class), fs: $this->createStub(ExtendedFilesystem::class));
+        $subject = new ConfigService(
+            repo: $configRepoStub,
+            em: $entityManagerMock,
+            cache: $cacheStub,
+            kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
+            fs: $this->createStub(ExtendedFilesystem::class),
+        );
 
         $subject->saveForm([
             'url' => 'example.com',
@@ -283,7 +290,14 @@ class ConfigServiceTest extends TestCase
 
         $cacheStub = $this->createStub(CacheInterface::class);
 
-        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class), fs: $this->createStub(ExtendedFilesystem::class));
+        $subject = new ConfigService(
+            repo: $configRepoStub,
+            em: $entityManagerMock,
+            cache: $cacheStub,
+            kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
+            fs: $this->createStub(ExtendedFilesystem::class),
+        );
 
         $subject->saveForm([
             'url' => 'new-example.com',
@@ -310,26 +324,28 @@ class ConfigServiceTest extends TestCase
 
     public static function booleanGetterProvider(): iterable
     {
-        yield 'isAutomaticRegistration default false'   => ['isAutomaticRegistration',   null,    false];
-        yield 'isAutomaticRegistration enabled'         => ['isAutomaticRegistration',   'true',  true];
-        yield 'isAutomaticRegistration disabled'        => ['isAutomaticRegistration',   'false', false];
-        yield 'isSendAdminNotification default true'    => ['isSendAdminNotification',   null,    true];
-        yield 'isSendAdminNotification disabled'        => ['isSendAdminNotification',   'false', false];
-        yield 'isEmailDeliverySyncEnabled default false'=> ['isEmailDeliverySyncEnabled', null,   false];
-        yield 'isEmailDeliverySyncEnabled enabled'      => ['isEmailDeliverySyncEnabled', 'true', true];
+        yield 'isAutomaticRegistration default false' => ['isAutomaticRegistration', null, false];
+        yield 'isAutomaticRegistration enabled' => ['isAutomaticRegistration', 'true', true];
+        yield 'isAutomaticRegistration disabled' => ['isAutomaticRegistration', 'false', false];
+        yield 'isSendAdminNotification default true' => ['isSendAdminNotification', null, true];
+        yield 'isSendAdminNotification disabled' => ['isSendAdminNotification', 'false', false];
+        yield 'isEmailDeliverySyncEnabled default false' => ['isEmailDeliverySyncEnabled', null, false];
+        yield 'isEmailDeliverySyncEnabled enabled' => ['isEmailDeliverySyncEnabled', 'true', true];
     }
 
     // ---- getSeoDescription ----
 
     #[DataProvider('seoDescriptionProvider')]
-    public function testGetSeoDescription(string $context, string $configKey, string $storedValue, string $expected): void
-    {
+    public function testGetSeoDescription(
+        string $context,
+        string $configKey,
+        string $storedValue,
+        string $expected,
+    ): void {
         // Arrange: only return a value when the correct config key is queried
-        $this->configRepoStub
-            ->method('findOneBy')
-            ->willReturnCallback(static fn(array $c) => $c['name'] === $configKey
-                ? new Config()->setValue($storedValue)
-                : null);
+        $this->configRepoStub->method('findOneBy')->willReturnCallback(static fn(array $c) => $c['name'] === $configKey
+            ? new Config()->setValue($storedValue)
+            : null);
 
         // Act & Assert
         static::assertSame($expected, $this->subject->getSeoDescription($context));
@@ -337,11 +353,31 @@ class ConfigServiceTest extends TestCase
 
     public static function seoDescriptionProvider(): iterable
     {
-        yield 'events context returns seo_description_events value'   => ['events',  'seo_description_events',  'All events', 'All events'];
-        yield 'members context returns seo_description_members value' => ['members', 'seo_description_members', 'All members', 'All members'];
-        yield 'default context returns seo_description_default value' => ['default', 'seo_description_default', 'Home', 'Home'];
-        yield 'unknown context falls back to seo_description_default' => ['unknown', 'seo_description_default', 'Home', 'Home'];
-        yield 'events context with no config returns empty string'    => ['events',  'nonexistent',             'anything', ''];
+        yield 'events context returns seo_description_events value' => [
+            'events',
+            'seo_description_events',
+            'All events',
+            'All events',
+        ];
+        yield 'members context returns seo_description_members value' => [
+            'members',
+            'seo_description_members',
+            'All members',
+            'All members',
+        ];
+        yield 'default context returns seo_description_default value' => [
+            'default',
+            'seo_description_default',
+            'Home',
+            'Home',
+        ];
+        yield 'unknown context falls back to seo_description_default' => [
+            'unknown',
+            'seo_description_default',
+            'Home',
+            'Home',
+        ];
+        yield 'events context with no config returns empty string' => ['events', 'nonexistent', 'anything', ''];
     }
 
     // ---- getDateFormat / getDateFormatFlatpickr ----
@@ -441,7 +477,14 @@ class ConfigServiceTest extends TestCase
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_some_feature');
 
-        $subject = new ConfigService(repo: $repoMock, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class), fs: $this->createStub(ExtendedFilesystem::class));
+        $subject = new ConfigService(
+            repo: $repoMock,
+            em: $emMock,
+            cache: $cacheMock,
+            kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
+            fs: $this->createStub(ExtendedFilesystem::class),
+        );
 
         // Act
         $result = $subject->toggleBoolean('some_feature');
@@ -466,7 +509,14 @@ class ConfigServiceTest extends TestCase
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_some_feature');
 
-        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class), fs: $this->createStub(ExtendedFilesystem::class));
+        $subject = new ConfigService(
+            repo: $repoStub,
+            em: $emMock,
+            cache: $cacheMock,
+            kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
+            fs: $this->createStub(ExtendedFilesystem::class),
+        );
 
         // Act
         $result = $subject->toggleBoolean('some_feature');
@@ -520,7 +570,7 @@ class ConfigServiceTest extends TestCase
         // Act
         $subject->saveSeoForm([
             'seoDescriptionDefault' => 'Default',
-            'seoDescriptionEvents'  => 'Events',
+            'seoDescriptionEvents' => 'Events',
             'seoDescriptionMembers' => 'Members',
         ]);
 
@@ -554,17 +604,29 @@ class ConfigServiceTest extends TestCase
         $repoStub->method('findOneBy')->willReturn(null);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist')->with(static::callback(
-            static fn(Config $c) => $c->getName() === 'new_key'
-                && $c->getValue() === 'hello'
-                && $c->getType() === ConfigType::String,
-        ));
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(
+                static fn(Config $c) => (
+                    $c->getName() === 'new_key'
+                    && $c->getValue() === 'hello'
+                    && $c->getType() === ConfigType::String
+                ),
+            ));
         $emMock->expects($this->once())->method('flush');
 
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_new_key');
 
-        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class), fs: $this->createStub(ExtendedFilesystem::class));
+        $subject = new ConfigService(
+            repo: $repoStub,
+            em: $emMock,
+            cache: $cacheMock,
+            kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
+            fs: $this->createStub(ExtendedFilesystem::class),
+        );
 
         // Act
         $subject->setString('new_key', 'hello');
@@ -584,7 +646,14 @@ class ConfigServiceTest extends TestCase
         $emMock->expects($this->once())->method('persist')->with($existing);
         $emMock->expects($this->once())->method('flush');
 
-        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $this->createStub(CacheInterface::class), kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class), fs: $this->createStub(ExtendedFilesystem::class));
+        $subject = new ConfigService(
+            repo: $repoStub,
+            em: $emMock,
+            cache: $this->createStub(CacheInterface::class),
+            kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
+            fs: $this->createStub(ExtendedFilesystem::class),
+        );
 
         // Act
         $subject->setString('existing_key', 'new_value');
@@ -600,17 +669,29 @@ class ConfigServiceTest extends TestCase
         $repoStub->method('findOneBy')->willReturn(null);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist')->with(static::callback(
-            static fn(Config $c) => $c->getName() === 'count_key'
-                && $c->getValue() === '7'
-                && $c->getType() === ConfigType::Integer,
-        ));
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(
+                static fn(Config $c) => (
+                    $c->getName() === 'count_key'
+                    && $c->getValue() === '7'
+                    && $c->getType() === ConfigType::Integer
+                ),
+            ));
         $emMock->expects($this->once())->method('flush');
 
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_count_key');
 
-        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class), fs: $this->createStub(ExtendedFilesystem::class));
+        $subject = new ConfigService(
+            repo: $repoStub,
+            em: $emMock,
+            cache: $cacheMock,
+            kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
+            fs: $this->createStub(ExtendedFilesystem::class),
+        );
 
         // Act
         $subject->setInt('count_key', 7);
@@ -630,7 +711,14 @@ class ConfigServiceTest extends TestCase
         $emMock->expects($this->once())->method('persist')->with($existing);
         $emMock->expects($this->once())->method('flush');
 
-        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $this->createStub(CacheInterface::class), kernel: $this->createStub(KernelInterface::class), appState: $this->createStub(AppStateService::class), fs: $this->createStub(ExtendedFilesystem::class));
+        $subject = new ConfigService(
+            repo: $repoStub,
+            em: $emMock,
+            cache: $this->createStub(CacheInterface::class),
+            kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
+            fs: $this->createStub(ExtendedFilesystem::class),
+        );
 
         // Act
         $subject->setInt('count_key', 99);
@@ -645,10 +733,7 @@ class ConfigServiceTest extends TestCase
     {
         // Arrange
         $repoMock = $this->createMock(ConfigRepository::class);
-        $repoMock->expects($this->once())
-            ->method('findBy')
-            ->with(['type' => ConfigType::Boolean])
-            ->willReturn([]);
+        $repoMock->expects($this->once())->method('findBy')->with(['type' => ConfigType::Boolean])->willReturn([]);
 
         $subject = new ConfigService(
             repo: $repoMock,

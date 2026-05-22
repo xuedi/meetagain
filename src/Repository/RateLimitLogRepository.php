@@ -22,10 +22,7 @@ class RateLimitLogRepository extends ServiceEntityRepository
      */
     public function getRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
     {
-        $qb = $this
-            ->createQueryBuilder('r')
-            ->orderBy('r.createdAt', 'DESC')
-            ->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('r')->orderBy('r.createdAt', 'DESC')->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->where('r.createdAt >= :since')->setParameter('since', $since);
@@ -52,23 +49,16 @@ class RateLimitLogRepository extends ServiceEntityRepository
 
         $rows = $qb->getQuery()->getArrayResult();
 
-        return array_map(
-            static fn(array $row): array => [
-                'number' => (int) $row['number'],
-                'limiter' => (string) $row['limiter'],
-                'ip' => (string) $row['ip'],
-            ],
-            $rows,
-        );
+        return array_map(static fn(array $row): array => [
+            'number' => (int) $row['number'],
+            'limiter' => (string) $row['limiter'],
+            'ip' => (string) $row['ip'],
+        ], $rows);
     }
 
     public function countAll(): int
     {
-        return (int) $this
-            ->createQueryBuilder('r')
-            ->select('COUNT(r.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        return (int) $this->createQueryBuilder('r')->select('COUNT(r.id)')->getQuery()->getSingleScalarResult();
     }
 
     public function countSince(DateTimeImmutable $since): int
@@ -92,10 +82,7 @@ class RateLimitLogRepository extends ServiceEntityRepository
         ?DateTimeImmutable $from = null,
         ?DateTimeImmutable $to = null,
     ): array {
-        $qb = $this
-            ->createQueryBuilder('r')
-            ->orderBy('r.createdAt', 'DESC')
-            ->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('r')->orderBy('r.createdAt', 'DESC')->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->andWhere('r.createdAt >= :since')->setParameter('since', $since);

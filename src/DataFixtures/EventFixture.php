@@ -4,9 +4,9 @@ namespace App\DataFixtures;
 
 use App\Entity\Comment;
 use App\Entity\Event;
+use App\Entity\EventTranslation;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
-use App\Entity\EventTranslation;
 use App\Enum\EventType;
 use App\Enum\ImageType;
 use App\Service\Media\ImageService;

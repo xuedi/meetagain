@@ -35,10 +35,15 @@
                     <a class="button" href="{{ path('app_admin_cms_block_edit', {'blockId': block.id}) }}">
                         {{ 'global.button_discard'|trans }}
                     </a>
-                    <a class="button is-danger"
-                       href="{{ path('app_admin_cms_block_delete', {'id': cms.id, 'blockId': block.id, 'locale': block.language}) }}">
-                        <span class="icon"><i class="fa fa-trash"></i></span>
-                    </a>
+                    <form method="post" action="{{ path('app_admin_cms_block_delete') }}" class="is-inline">
+                        <input type="hidden" name="blockId" value="{{ block.id }}">
+                        <input type="hidden" name="id" value="{{ cms.id }}">
+                        <input type="hidden" name="locale" value="{{ block.language }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('admin_cms_block_delete' ~ block.id) }}">
+                        <button type="submit" class="button is-danger">
+                            <span class="icon"><i class="fa fa-trash"></i></span>
+                        </button>
+                    </form>
                 </div>
             </form>
         </div>
@@ -52,18 +57,22 @@
                     'id': block.id,
                     'image': blockImage,
                     'removeImageUrl': removeImageUrl,
+                    'removeImageCsrfToken': 'admin_cms_block_image_remove' ~ block.id,
                     'showWhenEmpty': true,
                 } %}
                 {% if toggleSideUrl %}
-                    <a class="button is-small is-fullwidth mt-2" href="{{ toggleSideUrl }}">
-                        {% if imageOnRight %}
-                            <span class="icon"><i class="fa fa-arrow-left"></i></span>
-                            <span>{{ 'admin_cms.button_move_left' | trans }}</span>
-                        {% else %}
-                            <span class="icon"><i class="fa fa-arrow-right"></i></span>
-                            <span>{{ 'admin_cms.button_move_right' | trans }}</span>
-                        {% endif %}
-                    </a>
+                    <form method="post" action="{{ toggleSideUrl }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('app_admin_cms_block_image_toggle_side' ~ block.id) }}">
+                        <button type="submit" class="button is-small is-fullwidth mt-2">
+                            {% if imageOnRight %}
+                                <span class="icon"><i class="fa fa-arrow-left"></i></span>
+                                <span>{{ 'admin_cms.button_move_left' | trans }}</span>
+                            {% else %}
+                                <span class="icon"><i class="fa fa-arrow-right"></i></span>
+                                <span>{{ 'admin_cms.button_move_right' | trans }}</span>
+                            {% endif %}
+                        </button>
+                    </form>
                 {% endif %}
                 {% if blockImage is null %}
                     <p class="help has-text-grey mt-2">{{ 'admin_cms.no_image_help' | trans }}</p>

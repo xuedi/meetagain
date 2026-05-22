@@ -40,7 +40,13 @@ final class SecurityAssertStateCommand extends Command
         $this
             ->addArgument('expectations', InputArgument::REQUIRED, 'Path to expectations JSON file')
             ->addOption('scenario', null, InputOption::VALUE_REQUIRED, 'Scenario name for the verdict file', 'scenario')
-            ->addOption('output-dir', null, InputOption::VALUE_REQUIRED, 'Where to write the verdict JSON', 'tests/reports/attack');
+            ->addOption(
+                'output-dir',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Where to write the verdict JSON',
+                'tests/reports/attack',
+            );
     }
 
     #[Override]
@@ -60,7 +66,9 @@ final class SecurityAssertStateCommand extends Command
         }
 
         $expectations = is_array($payload['expectations'] ?? null) ? $payload['expectations'] : [];
-        $scenario = is_string($payload['scenario'] ?? null) ? $payload['scenario'] : (string) $input->getOption('scenario');
+        $scenario = is_string($payload['scenario'] ?? null)
+            ? $payload['scenario']
+            : (string) $input->getOption('scenario');
 
         $verdicts = [];
         $allPassed = true;
@@ -89,7 +97,7 @@ final class SecurityAssertStateCommand extends Command
             'scenario' => $scenario,
             'allPassed' => $allPassed,
             'verdicts' => $verdicts,
-            'evaluatedAt' => (new DateTimeImmutable())->format(DATE_ATOM),
+            'evaluatedAt' => new DateTimeImmutable()->format(DATE_ATOM),
         ];
         try {
             file_put_contents($verdictPath, json_encode($payloadOut, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));
@@ -99,7 +107,9 @@ final class SecurityAssertStateCommand extends Command
         }
 
         $output->writeln('');
-        $output->writeln($allPassed ? '<info>All expectations passed.</info>' : '<error>One or more expectations failed.</error>');
+        $output->writeln(
+            $allPassed ? '<info>All expectations passed.</info>' : '<error>One or more expectations failed.</error>',
+        );
         $output->writeln(sprintf('Verdict written to %s', $verdictPath));
 
         return $allPassed ? Command::SUCCESS : Command::FAILURE;
@@ -161,7 +171,12 @@ final class SecurityAssertStateCommand extends Command
         return [
             'kind' => 'sessionBlocked',
             'passed' => $actual === $expected,
-            'detail' => sprintf('sessionId=%s expected=%s actual=%s', $sessionId, $this->bool($expected), $this->bool($actual)),
+            'detail' => sprintf(
+                'sessionId=%s expected=%s actual=%s',
+                $sessionId,
+                $this->bool($expected),
+                $this->bool($actual),
+            ),
             'expected' => $expected,
             'actual' => $actual,
         ];
@@ -255,9 +270,9 @@ final class SecurityAssertStateCommand extends Command
     {
         $duration = is_string($raw) ? $raw : 'PT5M';
         try {
-            return (new DateTimeImmutable())->sub(new DateInterval($duration));
+            return new DateTimeImmutable()->sub(new DateInterval($duration));
         } catch (\Exception) {
-            return (new DateTimeImmutable())->sub(new DateInterval('PT5M'));
+            return new DateTimeImmutable()->sub(new DateInterval('PT5M'));
         }
     }
 

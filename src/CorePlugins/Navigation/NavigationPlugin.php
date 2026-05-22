@@ -33,7 +33,11 @@ readonly class NavigationPlugin implements Plugin
         $locale = $this->requestStack->getCurrentRequest()?->getLocale() ?? 'en';
 
         $links = [
-            new Link(slug: $this->router->generate('app_event', ['_locale' => $locale]), name: 'chrome.menu_events', priority: 100),
+            new Link(
+                slug: $this->router->generate('app_event', ['_locale' => $locale]),
+                name: 'chrome.menu_events',
+                priority: 100,
+            ),
             new Link(
                 slug: $this->router->generate('app_member', ['_locale' => $locale, 'page' => 1]),
                 name: 'chrome.menu_members',
@@ -62,36 +66,25 @@ readonly class NavigationPlugin implements Plugin
         return null;
     }
 
-    public function loadPostExtendFixtures(OutputInterface $output): void
-    {
-    }
+    public function loadPostExtendFixtures(OutputInterface $output): void {}
 
-    public function preFixtures(OutputInterface $output): void
-    {
-    }
+    public function preFixtures(OutputInterface $output): void {}
 
-    public function postFixtures(OutputInterface $output): void
-    {
-    }
+    public function postFixtures(OutputInterface $output): void {}
 
     public function getFooterAbout(): ?string
     {
         return null;
     }
 
-    public function runCronTasks(OutputInterface $output): void
-    {
-    }
+    public function runCronTasks(OutputInterface $output): void {}
 
     public function getEventListItemTags(int $eventId): array
     {
         return [];
     }
 
-    public function warmCache(WarmCacheType $type, array $ids): void
-    {
-    }
-
+    public function warmCache(WarmCacheType $type, array $ids): void {}
 
     public function getStylesheets(): array
     {

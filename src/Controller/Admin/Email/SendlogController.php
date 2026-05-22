@@ -7,6 +7,7 @@ use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\EmailQueue;
@@ -21,6 +22,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -81,8 +83,14 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         ];
         if ($recipient !== null) {
             $actions[] = new AdminTopActionButton(
-                label: $this->translator->trans('admin_email_sendlog.remove_recipient_filter', ['%email%' => $recipient]),
-                target: $this->generateUrl('app_admin_email_sendlog', $this->preserveParams($range, $template?->value, null)),
+                label: $this->translator->trans('admin_email_sendlog.remove_recipient_filter', [
+                    '%email%' => $recipient,
+                ]),
+                target: $this->generateUrl('app_admin_email_sendlog', $this->preserveParams(
+                    $range,
+                    $template?->value,
+                    null,
+                )),
                 icon: 'xmark',
             );
         }
@@ -115,10 +123,7 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         $templateType = $email->getTemplate();
         if ($templateType !== null) {
             try {
-                $content = $this->templateService->getTemplateContent(
-                    $templateType,
-                    $email->getLang() ?? 'en',
-                );
+                $content = $this->templateService->getTemplateContent($templateType, $email->getLang() ?? 'en');
                 $context = $email->getContext();
                 $renderedSubject = $this->templateService->renderContent($content['subject'], $context);
                 $renderedBody = $this->templateService->renderContent($content['body'], $context);
@@ -127,10 +132,7 @@ final class SendlogController extends AbstractEmailController implements AdminNa
             }
         }
 
-        $adminTop = new AdminTop(
-            info: $this->buildShowInfo($email),
-            actions: $this->buildShowActions($email),
-        );
+        $adminTop = new AdminTop(info: $this->buildShowInfo($email), actions: $this->buildShowActions($email));
 
         return $this->render('admin/email/sendlog/show.html.twig', [
             'active' => 'email',
@@ -143,9 +145,21 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         ]);
     }
 
-    #[Route('/{id}/clear-cap', name: 'app_admin_email_sendlog_clear_cap', requirements: ['id' => '\d+'])]
-    public function clearCap(EmailQueue $email): Response
+    #[Route(
+        '/{id}/clear-cap',
+        name: 'app_admin_email_sendlog_clear_cap',
+        requirements: ['id' => '\d+'],
+        methods: ['POST'],
+    )]
+    public function clearCap(EmailQueue $email, Request $request): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'app_admin_email_sendlog_clear_cap' . $email->getId(),
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $email->setMaxSendBy(null);
         $email->setStatus(EmailQueueStatus::Pending);
         $email->setErrorMessage(null);
@@ -234,7 +248,11 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         foreach (EmailType::cases() as $type) {
             $options[] = new AdminTopActionDropdownOption(
                 label: $this->humanizeTemplate($type->value),
-                target: $this->generateUrl('app_admin_email_sendlog', $this->preserveParams($range, $type->value, $recipient)),
+                target: $this->generateUrl('app_admin_email_sendlog', $this->preserveParams(
+                    $range,
+                    $type->value,
+                    $recipient,
+                )),
                 isActive: $current === $type,
                 count: $this->emailQueueRepo->countFiltered($since, $type, $recipient),
             );
@@ -245,24 +263,27 @@ final class SendlogController extends AbstractEmailController implements AdminNa
             : $this->humanizeTemplate($current->value);
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_email_sendlog.template_filter_label'),
-                $label,
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_email_sendlog.template_filter_label'), $label),
             options: $options,
             icon: 'envelope',
         );
     }
 
-    private function buildRangeDropdown(string $current, ?EmailType $template, ?string $recipient): AdminTopActionDropdown
-    {
+    private function buildRangeDropdown(
+        string $current,
+        ?EmailType $template,
+        ?string $recipient,
+    ): AdminTopActionDropdown {
         $options = [];
         foreach (self::RANGE_OFFSETS as $key => $offset) {
             $optionSince = $offset !== null ? new DateTimeImmutable($offset) : null;
             $options[] = new AdminTopActionDropdownOption(
                 label: $this->translator->trans('admin_logs.range_' . $key),
-                target: $this->generateUrl('app_admin_email_sendlog', $this->preserveParams($key, $template?->value, $recipient)),
+                target: $this->generateUrl('app_admin_email_sendlog', $this->preserveParams(
+                    $key,
+                    $template?->value,
+                    $recipient,
+                )),
                 isActive: $key === $current,
                 count: $this->emailQueueRepo->countFiltered($optionSince, $template, $recipient),
             );
@@ -317,10 +338,7 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         };
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%s</strong>',
-                $email->getCreatedAt()?->format('Y-m-d H:i:s') ?? '',
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', $email->getCreatedAt()?->format('Y-m-d H:i:s') ?? '')),
             new AdminTopInfoHtml(sprintf(
                 '<span class="tag %s is-medium">%s</span>',
                 $statusVariant,
@@ -328,10 +346,11 @@ final class SendlogController extends AbstractEmailController implements AdminNa
             )),
         ];
         if ($email->getRecipient() !== null) {
-            $info[] = new AdminTopInfoHtml(sprintf(
-                '<span class="has-text-grey">%s</span>',
-                htmlspecialchars($email->getRecipient(), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            ));
+            $info[] = new AdminTopInfoHtml(sprintf('<span class="has-text-grey">%s</span>', htmlspecialchars(
+                $email->getRecipient(),
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            )));
         }
 
         return $info;
@@ -344,15 +363,17 @@ final class SendlogController extends AbstractEmailController implements AdminNa
     {
         $actions = [];
 
-        $isCapBlocked = $email->getStatus() === EmailQueueStatus::Late
-            || ($email->getMaxSendBy() !== null
-                && $email->getStatus() === EmailQueueStatus::Pending
-                && $email->getMaxSendBy() < new DateTimeImmutable());
+        $isCapBlocked =
+            $email->getStatus() === EmailQueueStatus::Late
+            || $email->getMaxSendBy() !== null
+            && $email->getStatus() === EmailQueueStatus::Pending
+            && $email->getMaxSendBy() < new DateTimeImmutable();
 
         if ($isCapBlocked) {
-            $actions[] = new AdminTopActionButton(
+            $actions[] = new AdminTopActionForm(
                 label: $this->translator->trans('admin_email_sendlog.button_clear_cap_retry'),
                 target: $this->generateUrl('app_admin_email_sendlog_clear_cap', ['id' => $email->getId()]),
+                csrfTokenId: 'app_admin_email_sendlog_clear_cap' . $email->getId(),
                 icon: 'redo',
                 variant: 'is-warning',
             );

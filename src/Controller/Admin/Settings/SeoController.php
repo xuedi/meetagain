@@ -4,7 +4,7 @@ namespace App\Controller\Admin\Settings;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
-use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Form\SeoSettingsType;
@@ -12,6 +12,7 @@ use App\Service\Config\ConfigService;
 use App\Service\Seo\IndexNowService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -40,18 +41,18 @@ final class SeoController extends AbstractSettingsController implements AdminNav
             return $this->redirectToRoute('app_admin_system_seo');
         }
 
-        $adminTop = new AdminTop(
-            info: [new AdminTopInfoText($this->translator->trans('admin_system_seo.intro'))],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_system_seo.button_submit_indexnow'),
-                    target: $this->generateUrl('app_admin_system_seo_indexnow_submit'),
-                    icon: 'paper-plane',
-                    variant: 'is-warning',
-                    confirm: $this->translator->trans('admin_system_seo.confirm_submit_indexnow'),
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
+            'admin_system_seo.intro',
+        ))], actions: [
+            new AdminTopActionForm(
+                label: $this->translator->trans('admin_system_seo.button_submit_indexnow'),
+                target: $this->generateUrl('app_admin_system_seo_indexnow_submit'),
+                csrfTokenId: 'admin_system_seo_indexnow_submit',
+                icon: 'paper-plane',
+                variant: 'is-warning',
+                confirm: $this->translator->trans('admin_system_seo.confirm_submit_indexnow'),
+            ),
+        ]);
 
         return $this->render('admin/system/seo/index.html.twig', [
             'active' => 'system',
@@ -63,17 +64,25 @@ final class SeoController extends AbstractSettingsController implements AdminNav
         ]);
     }
 
-    #[Route('/seo/indexnow-submit', name: 'app_admin_system_seo_indexnow_submit', methods: ['GET'])]
-    public function indexNowSubmit(): Response
+    #[Route('/seo/indexnow-submit', name: 'app_admin_system_seo_indexnow_submit', methods: ['POST'])]
+    public function indexNowSubmit(Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('admin_system_seo_indexnow_submit', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $result = $this->indexNowService->submit();
         $status = $result['status'];
 
         if ($status === 200 || $status === 202) {
             $this->indexNowService->recordSubmission();
-            $this->addFlash('success', $this->translator->trans('admin_system_seo.flash_indexnow_submitted', ['%status%' => $status]));
+            $this->addFlash('success', $this->translator->trans('admin_system_seo.flash_indexnow_submitted', [
+                '%status%' => $status,
+            ]));
         } else {
-            $this->addFlash('error', $this->translator->trans('admin_system_seo.flash_indexnow_failed', ['%status%' => $status]));
+            $this->addFlash('error', $this->translator->trans('admin_system_seo.flash_indexnow_failed', [
+                '%status%' => $status,
+            ]));
         }
 
         return $this->redirectToRoute('app_admin_system_seo');

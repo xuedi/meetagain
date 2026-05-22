@@ -46,9 +46,7 @@ final class ImportController extends AbstractSettingsController implements Admin
             }
         }
 
-        $adminTop = new AdminTop(
-            info: [new AdminTopInfoText($this->translator->trans('admin_system_import.help'))],
-        );
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_system_import.help'))]);
 
         return $this->render('admin/system/import/index.html.twig', [
             'active' => 'system',

@@ -5,24 +5,24 @@ namespace App\Controller;
 use App\Activity\ActivityService;
 use App\Activity\Messages\Registered;
 use App\Activity\Messages\RegistrationEmailConfirmed;
+use App\Emails\Types\VerificationRequestEmail;
+use App\Emails\Types\WelcomeEmail;
 use App\Entity\Session\Consent;
 use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\ConsentType;
 use App\Enum\EntityAction;
+use App\Enum\SecurityEventType;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Form\NewPasswordType;
 use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
-use App\Emails\Types\VerificationRequestEmail;
-use App\Emails\Types\WelcomeEmail;
 use App\Repository\EmailBlocklistRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Member\CaptchaService;
 use App\Service\Member\ConsentService;
 use App\Service\Member\PasswordResetService;
-use App\Enum\SecurityEventType;
 use App\Service\Security\SecurityService;
 use DateTime;
 use DateTimeImmutable;
@@ -37,6 +37,7 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
+
 final class SecurityController extends AbstractController
 {
     public const string LOGIN_ROUTE = 'app_login';
@@ -243,7 +244,6 @@ final class SecurityController extends AbstractController
 
                 return $this->render('security/reset_email_send.html.twig');
             }
-
         }
 
         $this->captchaService->reset();

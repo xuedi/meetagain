@@ -31,14 +31,20 @@ class BlockedUnblockedUserTest extends TestCase
 
     public function testBlockedUserGetType(): void
     {
-        static::assertSame('core.blocked_user', (new BlockedUser())->getType());
+        static::assertSame('core.blocked_user', new BlockedUser()->getType());
     }
 
     public function testBlockedUserRenderText(): void
     {
         // Arrange
         $subject = new BlockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 7], [7 => 'Alice']);
+        $subject->injectServices(
+            $this->router,
+            $this->imageRenderer,
+            $this->translator,
+            ['user_id' => 7],
+            [7 => 'Alice'],
+        );
 
         // Act + Assert
         static::assertSame('profile_social.activity_blocked_user', $subject->render());
@@ -48,7 +54,13 @@ class BlockedUnblockedUserTest extends TestCase
     {
         // Arrange
         $subject = new BlockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 7], [7 => 'Alice<']);
+        $subject->injectServices(
+            $this->router,
+            $this->imageRenderer,
+            $this->translator,
+            ['user_id' => 7],
+            [7 => 'Alice<'],
+        );
 
         // Act + Assert
         static::assertSame('profile_social.activity_blocked_user', $subject->render(true));
@@ -88,14 +100,20 @@ class BlockedUnblockedUserTest extends TestCase
 
     public function testUnblockedUserGetType(): void
     {
-        static::assertSame('core.unblocked_user', (new UnblockedUser())->getType());
+        static::assertSame('core.unblocked_user', new UnblockedUser()->getType());
     }
 
     public function testUnblockedUserRenderText(): void
     {
         // Arrange
         $subject = new UnblockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 3], [3 => 'Bob']);
+        $subject->injectServices(
+            $this->router,
+            $this->imageRenderer,
+            $this->translator,
+            ['user_id' => 3],
+            [3 => 'Bob'],
+        );
 
         // Act + Assert
         static::assertSame('profile_social.activity_unblocked_user', $subject->render());
@@ -105,7 +123,13 @@ class BlockedUnblockedUserTest extends TestCase
     {
         // Arrange
         $subject = new UnblockedUser();
-        $subject->injectServices($this->router, $this->imageRenderer, $this->translator, ['user_id' => 3], [3 => 'Bob>']);
+        $subject->injectServices(
+            $this->router,
+            $this->imageRenderer,
+            $this->translator,
+            ['user_id' => 3],
+            [3 => 'Bob>'],
+        );
 
         // Act + Assert
         static::assertSame('profile_social.activity_unblocked_user', $subject->render(true));
@@ -126,7 +150,7 @@ class BlockedUnblockedUserTest extends TestCase
 
     public function testRegistrationEmailResentGetType(): void
     {
-        static::assertSame('core.registration_email_resent', (new RegistrationEmailResent())->getType());
+        static::assertSame('core.registration_email_resent', new RegistrationEmailResent()->getType());
     }
 
     public function testRegistrationEmailResentRender(): void
@@ -146,7 +170,7 @@ class BlockedUnblockedUserTest extends TestCase
 
     public function testUnknownActivityMessageGetType(): void
     {
-        static::assertSame('foo.bar', (new UnknownActivityMessage('foo.bar'))->getType());
+        static::assertSame('foo.bar', new UnknownActivityMessage('foo.bar')->getType());
     }
 
     public function testUnknownActivityMessageRenderWithNamespaceAndAction(): void

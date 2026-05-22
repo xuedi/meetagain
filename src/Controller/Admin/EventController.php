@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
@@ -12,6 +10,8 @@ use App\Admin\Navigation\AdminLink;
 use App\Admin\Navigation\AdminNavigationConfig;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\Actions\AdminTopActionDropdown;
+use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Emails\Types\EventUpdateNotificationEmail;
@@ -40,8 +40,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use App\Admin\Top\Actions\AdminTopActionDropdown;
-use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -98,10 +96,12 @@ final class EventController extends AbstractController implements AdminNavigatio
             $scheduleFilter = 'all';
         }
 
-        $events = array_values(array_filter(
-            $allEvents,
-            fn (Event $e) => $this->matchesFilters($e, $hideAuto, $typeFilter, $scheduleFilter),
-        ));
+        $events = array_values(array_filter($allEvents, fn(Event $e) => $this->matchesFilters(
+            $e,
+            $hideAuto,
+            $typeFilter,
+            $scheduleFilter,
+        )));
 
         $canceledCount = 0;
         foreach ($events as $event) {
@@ -174,8 +174,12 @@ final class EventController extends AbstractController implements AdminNavigatio
     /**
      * @return array<string, int|string|bool> URL params preserving every active filter except $exclude.
      */
-    private function preserveFiltersExcept(string $exclude, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): array
-    {
+    private function preserveFiltersExcept(
+        string $exclude,
+        bool $hideAuto,
+        ?int $typeFilter,
+        string $scheduleFilter,
+    ): array {
         $p = [];
         if ($exclude !== 'hide_auto' && $hideAuto) {
             $p['hide_auto'] = 1;
@@ -209,20 +213,28 @@ final class EventController extends AbstractController implements AdminNavigatio
     /**
      * @param array<Event> $allEvents
      */
-    private function buildTypeDropdown(array $allEvents, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
-    {
-        $countAll = count(array_filter(
-            $allEvents,
-            fn (Event $e) => $this->matchesFilters($e, $hideAuto, null, $scheduleFilter),
-        ));
+    private function buildTypeDropdown(
+        array $allEvents,
+        bool $hideAuto,
+        ?int $typeFilter,
+        string $scheduleFilter,
+    ): AdminTopActionDropdown {
+        $countAll = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters(
+            $e,
+            $hideAuto,
+            null,
+            $scheduleFilter,
+        )));
 
         $options = [
             new AdminTopActionDropdownOption(
                 label: $this->translator->trans('admin_event.filter_type_any'),
-                target: $this->generateUrl(
-                    'app_admin_event',
-                    $this->preserveFiltersExcept('type', $hideAuto, $typeFilter, $scheduleFilter),
-                ),
+                target: $this->generateUrl('app_admin_event', $this->preserveFiltersExcept(
+                    'type',
+                    $hideAuto,
+                    $typeFilter,
+                    $scheduleFilter,
+                )),
                 isActive: $typeFilter === null,
                 count: $countAll,
             ),
@@ -230,10 +242,12 @@ final class EventController extends AbstractController implements AdminNavigatio
 
         $activeLabel = $this->translator->trans('admin_event.filter_type_any');
         foreach (EventTypeEnum::cases() as $case) {
-            $count = count(array_filter(
-                $allEvents,
-                fn (Event $e) => $this->matchesFilters($e, $hideAuto, $case->value, $scheduleFilter),
-            ));
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters(
+                $e,
+                $hideAuto,
+                $case->value,
+                $scheduleFilter,
+            )));
             $params = $this->preserveFiltersExcept('type', $hideAuto, $typeFilter, $scheduleFilter);
             $params['type'] = $case->value;
             $label = $this->translator->trans('admin_event.filter_type_' . strtolower($case->name));
@@ -250,11 +264,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_event.filter_type_label'),
-                $activeLabel,
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_event.filter_type_label'), $activeLabel),
             options: $options,
             icon: 'tag',
         );
@@ -263,16 +273,22 @@ final class EventController extends AbstractController implements AdminNavigatio
     /**
      * @param array<Event> $allEvents
      */
-    private function buildScheduleDropdown(array $allEvents, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
-    {
+    private function buildScheduleDropdown(
+        array $allEvents,
+        bool $hideAuto,
+        ?int $typeFilter,
+        string $scheduleFilter,
+    ): AdminTopActionDropdown {
         $values = ['all', 'onetime', 'series'];
         $options = [];
         $activeLabel = '';
         foreach ($values as $value) {
-            $count = count(array_filter(
-                $allEvents,
-                fn (Event $e) => $this->matchesFilters($e, $hideAuto, $typeFilter, $value),
-            ));
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters(
+                $e,
+                $hideAuto,
+                $typeFilter,
+                $value,
+            )));
             $params = $this->preserveFiltersExcept('schedule', $hideAuto, $typeFilter, $scheduleFilter);
             if ($value !== 'all') {
                 $params['schedule'] = $value;
@@ -291,11 +307,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_event.filter_schedule_label'),
-                $activeLabel,
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_event.filter_schedule_label'), $activeLabel),
             options: $options,
             icon: 'calendar',
         );
@@ -395,7 +407,9 @@ final class EventController extends AbstractController implements AdminNavigatio
 
             if ($form->get('allFollowing')->getData() === true) {
                 $cnt = $this->eventService->updateRecurringEvents($event);
-                $this->addFlash('success', $this->translator->trans('admin_event.flash_saved_with_followup', ['%count%' => $cnt]));
+                $this->addFlash('success', $this->translator->trans('admin_event.flash_saved_with_followup', [
+                    '%count%' => $cnt,
+                ]));
             } else {
                 $this->addFlash('success', $this->translator->trans('admin_event.flash_saved'));
             }
@@ -407,21 +421,19 @@ final class EventController extends AbstractController implements AdminNavigatio
             'active' => 'event',
             'event' => $event,
             'form' => $form,
-            'adminTop' => new AdminTop(
-                actions: [
-                    new AdminTopActionButton(
-                        label: $this->translator->trans('global.button_view'),
-                        target: $this->generateUrl('app_event_details', ['id' => $event->getId()]),
-                        icon: 'eye',
-                        newTab: true,
-                    ),
-                    new AdminTopActionButton(
-                        label: $this->translator->trans('global.button_back'),
-                        target: $this->generateUrl('app_admin_event'),
-                        icon: 'arrow-left',
-                    ),
-                ],
-            ),
+            'adminTop' => new AdminTop(actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_view'),
+                    target: $this->generateUrl('app_event_details', ['id' => $event->getId()]),
+                    icon: 'eye',
+                    newTab: true,
+                ),
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_back'),
+                    target: $this->generateUrl('app_admin_event'),
+                    icon: 'arrow-left',
+                ),
+            ]),
             'notifiableAttendeeCount' => $this->countNotifiableAttendees($event),
         ]);
     }
@@ -517,7 +529,9 @@ final class EventController extends AbstractController implements AdminNavigatio
         $this->eventService->cancelEvent($event);
         $this->activityService->log(AdminEventCancelled::TYPE, $user, ['event_id' => $event->getId()]);
         if ($rsvpCount > 0) {
-            $this->addFlash('success', $this->translator->trans('admin_event.flash_canceled', ['%count%' => $rsvpCount]));
+            $this->addFlash('success', $this->translator->trans('admin_event.flash_canceled', [
+                '%count%' => $rsvpCount,
+            ]));
         }
 
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
@@ -605,15 +619,13 @@ final class EventController extends AbstractController implements AdminNavigatio
 
     private function buildBackOnlyTop(): AdminTop
     {
-        return new AdminTop(
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_back'),
-                    target: $this->generateUrl('app_admin_event'),
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+        return new AdminTop(actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('global.button_back'),
+                target: $this->generateUrl('app_admin_event'),
+                icon: 'arrow-left',
+            ),
+        ]);
     }
 
     private function getAuthedUser(): User

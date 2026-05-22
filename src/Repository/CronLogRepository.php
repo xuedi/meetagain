@@ -24,18 +24,14 @@ class CronLogRepository extends ServiceEntityRepository
      */
     public function findRecent(int $limit = 200, ?DateTimeImmutable $since = null, ?array $statuses = null): array
     {
-        $qb = $this->createQueryBuilder('c')
-            ->orderBy('c.runAt', 'DESC')
-            ->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('c')->orderBy('c.runAt', 'DESC')->setMaxResults($limit);
 
         if ($since !== null) {
-            $qb->andWhere('c.runAt >= :since')
-                ->setParameter('since', $since);
+            $qb->andWhere('c.runAt >= :since')->setParameter('since', $since);
         }
 
         if ($statuses !== null && $statuses !== []) {
-            $qb->andWhere('c.status IN (:statuses)')
-                ->setParameter('statuses', $statuses);
+            $qb->andWhere('c.status IN (:statuses)')->setParameter('statuses', $statuses);
         }
 
         return $qb->getQuery()->getResult();
@@ -43,7 +39,8 @@ class CronLogRepository extends ServiceEntityRepository
 
     public function countProblems(): int
     {
-        return (int) $this->createQueryBuilder('c')
+        return (int) $this
+            ->createQueryBuilder('c')
             ->select('COUNT(c.id)')
             ->where('c.status != :ok')
             ->setParameter('ok', CronTaskStatus::ok->value)
@@ -71,7 +68,8 @@ class CronLogRepository extends ServiceEntityRepository
 
     public function findMostRecent(): ?CronLog
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->orderBy('c.runAt', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
@@ -80,15 +78,13 @@ class CronLogRepository extends ServiceEntityRepository
 
     public function countAll(): int
     {
-        return (int) $this->createQueryBuilder('c')
-            ->select('COUNT(c.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        return (int) $this->createQueryBuilder('c')->select('COUNT(c.id)')->getQuery()->getSingleScalarResult();
     }
 
     public function deleteOlderThan(DateTimeImmutable $cutoff): int
     {
-        return $this->createQueryBuilder('c')
+        return $this
+            ->createQueryBuilder('c')
             ->delete()
             ->where('c.runAt < :cutoff')
             ->setParameter('cutoff', $cutoff)

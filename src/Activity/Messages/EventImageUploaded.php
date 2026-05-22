@@ -28,10 +28,15 @@ class EventImageUploaded extends MessageAbstract
         $eventId = $this->meta['event_id'];
         $eventName = $this->eventNames[$eventId] ?? null;
         if ($eventName === null) {
-            return $this->translator->trans('profile_social.activity_event_images_uploaded_deleted', ['%count%' => $this->meta['images']]);
+            return $this->translator->trans('profile_social.activity_event_images_uploaded_deleted', [
+                '%count%' => $this->meta['images'],
+            ]);
         }
 
-        return $this->translator->trans('profile_social.activity_event_images_uploaded', ['%event%' => $eventName, '%count%' => $this->meta['images']]);
+        return $this->translator->trans('profile_social.activity_event_images_uploaded', [
+            '%event%' => $eventName,
+            '%count%' => $this->meta['images'],
+        ]);
     }
 
     protected function renderHtml(): string
@@ -39,11 +44,20 @@ class EventImageUploaded extends MessageAbstract
         $eventId = $this->meta['event_id'];
         $eventName = $this->eventNames[$eventId] ?? null;
         if ($eventName === null) {
-            return $this->translator->trans('profile_social.activity_event_images_uploaded_deleted', ['%count%' => $this->meta['images']]);
+            return $this->translator->trans('profile_social.activity_event_images_uploaded_deleted', [
+                '%count%' => $this->meta['images'],
+            ]);
         }
 
-        $link = sprintf('<a href="%s">%s</a>', $this->router->generate('app_event_details', ['id' => $eventId]), $this->escapeHtml($eventName));
+        $link = sprintf(
+            '<a href="%s">%s</a>',
+            $this->router->generate('app_event_details', ['id' => $eventId]),
+            $this->escapeHtml($eventName),
+        );
 
-        return $this->translator->trans('profile_social.activity_event_images_uploaded', ['%event%' => $link, '%count%' => $this->meta['images']]);
+        return $this->translator->trans('profile_social.activity_event_images_uploaded', [
+            '%event%' => $link,
+            '%count%' => $this->meta['images'],
+        ]);
     }
 }

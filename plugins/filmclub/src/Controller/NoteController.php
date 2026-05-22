@@ -45,10 +45,11 @@ final class NoteController extends AbstractController
         $user = $this->getAuthedUser();
         $existingNote = $this->noteService->getNoteForUser($user->getId(), $film);
 
-        $data = $existingNote !== null ? [
-            'body' => $existingNote->getBody(),
-            'revealToGroup' => $existingNote->isRevealToGroup(),
-        ] : [];
+        $data = $existingNote !== null
+            ? [
+                'body' => $existingNote->getBody(),
+                'revealToGroup' => $existingNote->isRevealToGroup(),
+            ] : [];
 
         $form = $this->createForm(NoteType::class, $data);
         $form->handleRequest($request);

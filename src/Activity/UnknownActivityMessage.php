@@ -10,7 +10,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[Autoconfigure(autowire: false)]
 class UnknownActivityMessage implements MessageInterface
 {
-    public function __construct(private readonly string $type) {}
+    public function __construct(
+        private readonly string $type,
+    ) {}
 
     public function injectServices(
         RouterInterface $router,
@@ -31,7 +33,7 @@ class UnknownActivityMessage implements MessageInterface
     public function render(bool $asHtml = false): string
     {
         $parts = explode('.', $this->type, 2);
-        $namespace = $parts[0] ;
+        $namespace = $parts[0];
         $action = $parts[1] ?? '';
 
         return $action !== ''

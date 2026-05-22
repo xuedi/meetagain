@@ -2,10 +2,10 @@
 
 namespace App\Entity\BlockType;
 
+use App\Entity\Image as ImageEntity;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\CmsBlock\FieldType;
 use App\Enum\CmsBlock\ImageSupport;
-use App\Entity\Image as ImageEntity;
 use Override;
 
 class EventTeaser implements BlockType
@@ -34,7 +34,12 @@ class EventTeaser implements BlockType
         return [
             new FieldDefinition('headline', FieldType::String),
             new FieldDefinition('text', FieldType::Text),
-            new FieldDefinition('eventCount', FieldType::String, required: false, default: (string) self::DEFAULT_EVENT_COUNT),
+            new FieldDefinition(
+                'eventCount',
+                FieldType::String,
+                required: false,
+                default: (string) self::DEFAULT_EVENT_COUNT,
+            ),
             new FieldDefinition('imageRight', FieldType::Boolean, required: false, default: false),
         ];
     }
@@ -45,13 +50,7 @@ class EventTeaser implements BlockType
         $eventCount = (int) ($json['eventCount'] ?? self::DEFAULT_EVENT_COUNT);
         $eventCount = max(self::MIN_EVENT_COUNT, min(self::MAX_EVENT_COUNT, $eventCount));
 
-        return new self(
-            $json['headline'],
-            $json['text'],
-            $eventCount,
-            (bool) ($json['imageRight'] ?? false),
-            $image,
-        );
+        return new self($json['headline'], $json['text'], $eventCount, (bool) ($json['imageRight'] ?? false), $image);
     }
 
     #[Override]

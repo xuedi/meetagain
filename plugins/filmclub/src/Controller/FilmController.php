@@ -148,7 +148,12 @@ final class FilmController extends AbstractController
         }
     }
 
-    #[Route('/{id}/edit', name: 'app_plugin_filmclub_film_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    #[Route(
+        '/{id}/edit',
+        name: 'app_plugin_filmclub_film_edit',
+        methods: ['GET', 'POST'],
+        requirements: ['id' => '\d+'],
+    )]
     #[IsGranted('ROLE_USER')]
     public function edit(int $id, Request $request): Response
     {

@@ -60,10 +60,8 @@ class Kernel implements Plugin
 
         if ($user !== null && method_exists($user, 'getId')) {
             if ($selection !== null) {
-                $isWishlisted = $this->wishlistRepo->findByUserAndFilm(
-                    $user->getId(),
-                    $selection->getFilm()->getId(),
-                ) !== null;
+                $isWishlisted =
+                    $this->wishlistRepo->findByUserAndFilm($user->getId(), $selection->getFilm()->getId()) !== null;
             }
 
             if ($activePoll !== null) {
@@ -72,8 +70,7 @@ class Kernel implements Plugin
 
             if (method_exists($user, 'getRoles')) {
                 $roles = $user->getRoles();
-                $canCreatePoll = in_array('ROLE_ORGANIZER', $roles, true)
-                    || in_array('ROLE_STEWARD', $roles, true);
+                $canCreatePoll = in_array('ROLE_ORGANIZER', $roles, true) || in_array('ROLE_STEWARD', $roles, true);
             }
 
             if ($canCreatePoll) {

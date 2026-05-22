@@ -3,13 +3,13 @@
 namespace App\Service\Admin;
 
 use App\CronTaskInterface;
+use App\Emails\Types\AdminNotificationEmail;
 use App\Enum\CronTaskStatus;
 use App\Repository\UserRepository;
-use App\ValueObject\CronTaskResult;
 use App\Service\Config\ConfigService;
-use App\Emails\Types\AdminNotificationEmail;
 use App\Service\Notification\Admin\AdminNotificationProviderInterface;
 use App\Service\Notification\Admin\AdminNotificationSection;
+use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -171,7 +171,9 @@ readonly class AdminNotificationService implements CronTaskInterface
                 beta: INF,
             );
         } catch (InvalidArgumentException $e) {
-            $this->logger->debug('Cache write failure for admin notification tracking - non-critical', ['exception' => $e]);
+            $this->logger->debug('Cache write failure for admin notification tracking - non-critical', [
+                'exception' => $e,
+            ]);
         }
     }
 }

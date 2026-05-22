@@ -22,15 +22,17 @@ class ImageLocationRepository extends ServiceEntityRepository
      */
     public function findPairsByType(ImageType $type): array
     {
-        $rows = $this->getEntityManager()->getConnection()->fetchAllAssociative(
-            'SELECT image_id, location_id FROM image_location WHERE location_type = ?',
-            [$type->value],
-        );
+        $rows = $this
+            ->getEntityManager()
+            ->getConnection()
+            ->fetchAllAssociative('SELECT image_id, location_id FROM image_location WHERE location_type = ?', [
+                $type->value,
+            ]);
 
-        return array_map(
-            static fn(array $r) => ['imageId' => (int) $r['image_id'], 'locationId' => (int) $r['location_id']],
-            $rows,
-        );
+        return array_map(static fn(array $r) => [
+            'imageId' => (int) $r['image_id'],
+            'locationId' => (int) $r['location_id'],
+        ], $rows);
     }
 
     /**
@@ -46,10 +48,11 @@ class ImageLocationRepository extends ServiceEntityRepository
 
         $conn = $this->getEntityManager()->getConnection();
         foreach ($pairs as $pair) {
-            $conn->executeStatement(
-                'DELETE FROM image_location WHERE location_type = ? AND image_id = ? AND location_id = ?',
-                [$type->value, $pair['imageId'], $pair['locationId']],
-            );
+            $conn->executeStatement('DELETE FROM image_location WHERE location_type = ? AND image_id = ? AND location_id = ?', [
+                $type->value,
+                $pair['imageId'],
+                $pair['locationId'],
+            ]);
         }
     }
 
@@ -67,10 +70,11 @@ class ImageLocationRepository extends ServiceEntityRepository
 
         $conn = $this->getEntityManager()->getConnection();
         foreach ($pairs as $pair) {
-            $conn->executeStatement(
-                'INSERT IGNORE INTO image_location (image_id, location_type, location_id) VALUES (?, ?, ?)',
-                [$pair['imageId'], $type->value, $pair['locationId']],
-            );
+            $conn->executeStatement('INSERT IGNORE INTO image_location (image_id, location_type, location_id) VALUES (?, ?, ?)', [
+                $pair['imageId'],
+                $type->value,
+                $pair['locationId'],
+            ]);
         }
     }
 
@@ -81,9 +85,10 @@ class ImageLocationRepository extends ServiceEntityRepository
      */
     public function countPerImageId(): array
     {
-        $rows = $this->getEntityManager()->getConnection()->fetchAllAssociative(
-            'SELECT image_id, COUNT(*) AS cnt FROM image_location GROUP BY image_id',
-        );
+        $rows = $this
+            ->getEntityManager()
+            ->getConnection()
+            ->fetchAllAssociative('SELECT image_id, COUNT(*) AS cnt FROM image_location GROUP BY image_id');
 
         $result = [];
         foreach ($rows as $row) {
@@ -98,7 +103,8 @@ class ImageLocationRepository extends ServiceEntityRepository
      */
     public function findByImageId(int $imageId): array
     {
-        return $this->createQueryBuilder('il')
+        return $this
+            ->createQueryBuilder('il')
             ->where('il.image = :imageId')
             ->setParameter('imageId', $imageId)
             ->getQuery()

@@ -22,10 +22,7 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
      */
     public function getRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
     {
-        $qb = $this
-            ->createQueryBuilder('a')
-            ->orderBy('a.createdAt', 'DESC')
-            ->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('a')->orderBy('a.createdAt', 'DESC')->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->where('a.createdAt >= :since')->setParameter('since', $since);
@@ -52,19 +49,15 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
 
         $rows = $qb->getQuery()->getArrayResult();
 
-        return array_map(
-            static fn(array $row): array => ['number' => (int) $row['number'], 'url' => (string) $row['url']],
-            $rows,
-        );
+        return array_map(static fn(array $row): array => [
+            'number' => (int) $row['number'],
+            'url' => (string) $row['url'],
+        ], $rows);
     }
 
     public function countAll(): int
     {
-        return (int) $this
-            ->createQueryBuilder('a')
-            ->select('COUNT(a.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        return (int) $this->createQueryBuilder('a')->select('COUNT(a.id)')->getQuery()->getSingleScalarResult();
     }
 
     public function countSince(DateTimeImmutable $since): int
@@ -133,10 +126,7 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
         ?DateTimeImmutable $from = null,
         ?DateTimeImmutable $to = null,
     ): array {
-        $qb = $this
-            ->createQueryBuilder('a')
-            ->orderBy('a.createdAt', 'DESC')
-            ->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('a')->orderBy('a.createdAt', 'DESC')->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->andWhere('a.createdAt >= :since')->setParameter('since', $since);

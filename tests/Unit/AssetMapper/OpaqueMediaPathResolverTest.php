@@ -33,7 +33,7 @@ class OpaqueMediaPathResolverTest extends TestCase
         $logicalPath = 'images/logo.png';
 
         // Act
-        $first  = $this->resolver->resolvePublicPath($logicalPath);
+        $first = $this->resolver->resolvePublicPath($logicalPath);
         $second = $this->resolver->resolvePublicPath($logicalPath);
 
         // Assert: same input always produces the same URL

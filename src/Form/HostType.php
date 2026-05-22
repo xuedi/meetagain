@@ -18,20 +18,18 @@ class HostType extends AbstractType
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('name', TextType::class, [
-                'label' => 'admin_host.form_label_name',
-                'constraints' => [
-                    new NotBlank(),
-                    new Length(max: 16),
-                ],
-            ])
-            ->add('user', EntityType::class, [
-                'label' => 'admin_host.form_label_user',
-                'class' => User::class,
-                'choice_label' => 'name',
-                'required' => false,
-            ]);
+        $builder->add('name', TextType::class, [
+            'label' => 'admin_host.form_label_name',
+            'constraints' => [
+                new NotBlank(),
+                new Length(max: 16),
+            ],
+        ])->add('user', EntityType::class, [
+            'label' => 'admin_host.form_label_user',
+            'class' => User::class,
+            'choice_label' => 'name',
+            'required' => false,
+        ]);
     }
 
     #[Override]

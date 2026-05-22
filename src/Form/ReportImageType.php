@@ -20,19 +20,17 @@ class ReportImageType extends AbstractType
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('reported', ChoiceType::class, [
-                'label' => $this->translator->trans('report.label_reason'),
-                'choices' => ImageReportReason::getChoices($this->translator),
-            ])
-            ->add('remarks', TextareaType::class, [
-                'label' => $this->translator->trans('report.label_remarks'),
-                'required' => false,
-                'attr' => [
-                    'rows' => 4,
-                    'placeholder' => $this->translator->trans('report.placeholder_remarks'),
-                ],
-            ]);
+        $builder->add('reported', ChoiceType::class, [
+            'label' => $this->translator->trans('report.label_reason'),
+            'choices' => ImageReportReason::getChoices($this->translator),
+        ])->add('remarks', TextareaType::class, [
+            'label' => $this->translator->trans('report.label_remarks'),
+            'required' => false,
+            'attr' => [
+                'rows' => 4,
+                'placeholder' => $this->translator->trans('report.placeholder_remarks'),
+            ],
+        ]);
     }
 
     #[Override]

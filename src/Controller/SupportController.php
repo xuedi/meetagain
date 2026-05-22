@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
+use App\Emails\Types\SupportNotificationEmail;
 use App\Entity\SupportRequest;
 use App\Entity\User;
+use App\Enum\SecurityEventType;
 use App\Enum\SupportRequestStatus;
 use App\Form\SupportRequestType;
-use App\Emails\Types\SupportNotificationEmail;
 use App\Service\Member\CaptchaService;
-use App\Enum\SecurityEventType;
 use App\Service\Security\SecurityService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
+
 final class SupportController extends AbstractController
 {
     public function __construct(

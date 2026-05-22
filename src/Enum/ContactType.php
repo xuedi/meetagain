@@ -15,11 +15,11 @@ enum ContactType: string
     {
         return match ($this) {
             self::General => 'support.contact_type_general',
-            self::Bug     => 'support.contact_type_bug',
+            self::Bug => 'support.contact_type_bug',
             self::Feature => 'support.contact_type_feature',
-            self::Legal   => 'support.contact_type_legal',
+            self::Legal => 'support.contact_type_legal',
             self::Billing => 'support.contact_type_billing',
-            self::Other   => 'support.contact_type_other',
+            self::Other => 'support.contact_type_other',
         };
     }
 }

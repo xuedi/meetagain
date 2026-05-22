@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Service;
 
@@ -104,9 +102,7 @@ class AppStateServiceTest extends TestCase
         // Arrange
         $entry = new AppState('mutated_key', 'old_value', new DateTimeImmutable());
         $updated = new AppState('mutated_key', 'new_value', new DateTimeImmutable());
-        $this->repository
-            ->method('findByKey')
-            ->willReturnOnConsecutiveCalls($entry, $entry, $updated);
+        $this->repository->method('findByKey')->willReturnOnConsecutiveCalls($entry, $entry, $updated);
 
         /** @var EntityManagerInterface&MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);
@@ -127,9 +123,7 @@ class AppStateServiceTest extends TestCase
     {
         // Arrange
         $entry = new AppState('rm_key', 'value', new DateTimeImmutable());
-        $this->repository
-            ->method('findByKey')
-            ->willReturnOnConsecutiveCalls($entry, $entry, null);
+        $this->repository->method('findByKey')->willReturnOnConsecutiveCalls($entry, $entry, null);
 
         /** @var EntityManagerInterface&MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);

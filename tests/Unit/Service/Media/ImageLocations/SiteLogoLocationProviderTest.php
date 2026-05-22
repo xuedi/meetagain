@@ -55,9 +55,6 @@ class SiteLogoLocationProviderTest extends TestCase
 
     private function createProvider(Connection $connection): SiteLogoLocationProvider
     {
-        return new SiteLogoLocationProvider(
-            $this->createStub(ImageLocationRepository::class),
-            $connection,
-        );
+        return new SiteLogoLocationProvider($this->createStub(ImageLocationRepository::class), $connection);
     }
 }

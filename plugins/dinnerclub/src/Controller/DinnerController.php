@@ -82,7 +82,9 @@ final class DinnerController extends AbstractController
             $this->dinnerService->addCourse($dinner, $name);
         }
 
-        return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', ['eventId' => $dinner->getEvent()->getId()]);
+        return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', [
+            'eventId' => $dinner->getEvent()->getId(),
+        ]);
     }
 
     #[Route('/course/edit/{courseId}', name: 'app_plugin_dinnerclub_dinner_course_edit', methods: ['POST'])]
@@ -98,7 +100,9 @@ final class DinnerController extends AbstractController
             $this->dinnerService->updateCourse($course, $name);
         }
 
-        return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', ['eventId' => $course->getDinner()->getEvent()->getId()]);
+        return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', [
+            'eventId' => $course->getDinner()->getEvent()->getId(),
+        ]);
     }
 
     #[Route('/course/delete/{courseId}', name: 'app_plugin_dinnerclub_dinner_course_delete', methods: ['POST'])]
@@ -131,7 +135,9 @@ final class DinnerController extends AbstractController
 
         $this->dinnerService->addDishToCourse($course, $dish);
 
-        return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', ['eventId' => $course->getDinner()->getEvent()->getId()]);
+        return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', [
+            'eventId' => $course->getDinner()->getEvent()->getId(),
+        ]);
     }
 
     #[Route('/item/delete/{itemId}', name: 'app_plugin_dinnerclub_dinner_item_delete', methods: ['POST'])]
@@ -159,7 +165,9 @@ final class DinnerController extends AbstractController
         $name = trim((string) $request->request->get('reservation_name', ''));
         $this->dinnerService->updateReservationName($dinner, $name);
 
-        return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', ['eventId' => $dinner->getEvent()->getId()]);
+        return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', [
+            'eventId' => $dinner->getEvent()->getId(),
+        ]);
     }
 
     #[Route('/price/{dinnerId}', name: 'app_plugin_dinnerclub_dinner_price', methods: ['POST'])]
@@ -175,7 +183,8 @@ final class DinnerController extends AbstractController
 
         $this->dinnerService->updatePricePerPerson($dinner, $price);
 
-        return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', ['eventId' => $dinner->getEvent()->getId()]);
+        return $this->redirectToRoute('app_plugin_dinnerclub_dinner_manage', [
+            'eventId' => $dinner->getEvent()->getId(),
+        ]);
     }
-
 }

@@ -23,9 +23,10 @@
                             <div class="is-relative mb-2">
                                 <img src="/images/thumbnails/{{ card.image.hash }}_300x200.webp"
                                      alt="" class="img-fluid-block">
-                                <a href="{{ path('app_admin_cms_card_image_remove', {'blockId': blockId, 'slot': i}) }}"
-                                   class="delete is-small has-background-danger overlay-controls"
-                                   title="Remove"></a>
+                                <form method="post" action="{{ path('app_admin_cms_card_image_remove', {'blockId': blockId, 'slot': i}) }}" class="is-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_cms_card_image_remove' ~ blockId ~ '_' ~ i) }}">
+                                    <button type="submit" class="delete is-small has-background-danger overlay-controls" title="Remove"></button>
+                                </form>
                             </div>
                             <a href="#"
                                class="button is-small is-fullwidth modalTrigger"

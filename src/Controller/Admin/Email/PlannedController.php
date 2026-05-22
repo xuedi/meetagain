@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Controller\Admin\Email;
 
@@ -164,9 +162,18 @@ final class PlannedController extends AbstractEmailController implements AdminNa
         }
         $filteredRows = match ($outcomeFilter) {
             'all' => $rows,
-            'pass' => array_values(array_filter($rows, static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Pass)),
-            'skip' => array_values(array_filter($rows, static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Skip)),
-            'error' => array_values(array_filter($rows, static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Error)),
+            'pass' => array_values(array_filter(
+                $rows,
+                static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Pass,
+            )),
+            'skip' => array_values(array_filter(
+                $rows,
+                static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Skip,
+            )),
+            'error' => array_values(array_filter(
+                $rows,
+                static fn(array $r): bool => $r['outcome'] === EmailGuardOutcome::Error,
+            )),
         };
 
         $results = $previewContext !== null ? $this->guardEvaluator->evaluateAll($email, $previewContext) : [];

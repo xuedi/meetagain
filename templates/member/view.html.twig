@@ -18,16 +18,18 @@
                         <h1 class="title is-3 is-inline">{{ userDetails.name }}</h1>
                         {% if userDetails.id != currentUser.id %}
                             {% if not isBlocked %}
-                                {% set followLink = path('app_member_toggle_follow', {'id': userDetails.id}) %}
-                                {% if isFollow %}
-                                    <a href="{{ followLink }}" class="button is-danger is-small ml-4 mt-1">
-                                        <span class="icon"><i class="fa fa-minus"></i></span><span>{{ 'member.button_unfollow'|trans }}</span>
-                                    </a>
-                                {% else %}
-                                    <a href="{{ followLink }}" class="button is-success is-small ml-4 mt-1">
-                                        <span class="icon"><i class="fa fa-plus"></i></span><span>{{ 'member.button_follow'|trans }}</span>
-                                    </a>
-                                {% endif %}
+                                <form method="post" action="{{ path('app_member_toggle_follow', {'id': userDetails.id}) }}" class="is-inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('app_member_toggle_follow' ~ userDetails.id) }}">
+                                    {% if isFollow %}
+                                        <button type="submit" class="button is-danger is-small ml-4 mt-1">
+                                            <span class="icon"><i class="fa fa-minus"></i></span><span>{{ 'member.button_unfollow'|trans }}</span>
+                                        </button>
+                                    {% else %}
+                                        <button type="submit" class="button is-success is-small ml-4 mt-1">
+                                            <span class="icon"><i class="fa fa-plus"></i></span><span>{{ 'member.button_follow'|trans }}</span>
+                                        </button>
+                                    {% endif %}
+                                </form>
                             {% endif %}
 
                             {# Block/Unblock button #}
@@ -68,43 +70,48 @@
 
                         <nav class="panel">
                             <p class="panel-heading p-2">{{ 'member.admin_panel_heading'|trans }}</p>
-                            <a class="panel-block" href="{{ path('app_member_rotate_avatar', {'id': userDetails.id}) }}">
-                                <span class="panel-icon">
-                                    <i class="fas fa-rotate-right"></i>
-                                </span>
-                                {{ 'member.admin_action_rotate_avatar'|trans }}
-                            </a>
-                            <a class="panel-block" href="{{ path('app_member_remove_avatar', {'id': userDetails.id}) }}">
-                                <span class="panel-icon">
-                                    <i class="fas fa-trash"></i>
-                                </span>
-                                {{ 'member.admin_action_remove_avatar'|trans }}
-                            </a>
-                            <a class="panel-block" href="{{ path('app_member_restrict', {'id': userDetails.id}) }}">
-                                <span class="panel-icon">
-                                    <i class="fas fa-ban {% if userDetails.restricted %}has-text-danger{% endif %}"></i>
-                                </span>
-                                {{ 'member.admin_action_restrict_user'|trans }}
-                                {% if userDetails.restricted %}
-                                    <span class="panel-icon is-pulled-right"><i class="fas fa-check"></i></span>
-                                {% endif %}
-                            </a>
-                            <a class="panel-block" href="{{ path('app_member_verify', {'id': userDetails.id}) }}">
-                                <span class="panel-icon">
-                                    <i class="fa-regular fa-user-check {% if userDetails.verified %}has-text-success{% endif %}"></i>
-                                </span>
-                                {{ 'member.admin_action_verify_user'|trans }}
-                                {% if userDetails.verified %}
-                                    <span class="panel-icon is-pulled-right"><i class="fas fa-check"></i></span>
-                                {% endif %}
-                            </a>
+                            <form method="post" action="{{ path('app_member_rotate_avatar', {'id': userDetails.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('app_member_rotate_avatar' ~ userDetails.id) }}">
+                                <button type="submit" class="panel-block button-as-panel-block">
+                                    <span class="panel-icon"><i class="fas fa-rotate-right"></i></span>
+                                    {{ 'member.admin_action_rotate_avatar'|trans }}
+                                </button>
+                            </form>
+                            <form method="post" action="{{ path('app_member_remove_avatar', {'id': userDetails.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('app_member_remove_avatar' ~ userDetails.id) }}">
+                                <button type="submit" class="panel-block button-as-panel-block">
+                                    <span class="panel-icon"><i class="fas fa-trash"></i></span>
+                                    {{ 'member.admin_action_remove_avatar'|trans }}
+                                </button>
+                            </form>
+                            <form method="post" action="{{ path('app_member_restrict', {'id': userDetails.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('app_member_restrict' ~ userDetails.id) }}">
+                                <button type="submit" class="panel-block button-as-panel-block">
+                                    <span class="panel-icon"><i class="fas fa-ban {% if userDetails.restricted %}has-text-danger{% endif %}"></i></span>
+                                    {{ 'member.admin_action_restrict_user'|trans }}
+                                    {% if userDetails.restricted %}
+                                        <span class="panel-icon is-pulled-right"><i class="fas fa-check"></i></span>
+                                    {% endif %}
+                                </button>
+                            </form>
+                            <form method="post" action="{{ path('app_member_verify', {'id': userDetails.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('app_member_verify' ~ userDetails.id) }}">
+                                <button type="submit" class="panel-block button-as-panel-block">
+                                    <span class="panel-icon"><i class="fa-regular fa-user-check {% if userDetails.verified %}has-text-success{% endif %}"></i></span>
+                                    {{ 'member.admin_action_verify_user'|trans }}
+                                    {% if userDetails.verified %}
+                                        <span class="panel-icon is-pulled-right"><i class="fas fa-check"></i></span>
+                                    {% endif %}
+                                </button>
+                            </form>
                             {% if is_granted('ROLE_ADMIN') %}
-                            <a class="panel-block" href="{{ path('app_member_takeover', {'id': userDetails.id}) }}">
-                                <span class="panel-icon">
-                                    <i class="fas fa-person-walking-dashed-line-arrow-right"></i>
-                                </span>
-                                {{ 'member.admin_action_takeover_user'|trans }}
-                            </a>
+                            <form method="post" action="{{ path('app_member_takeover', {'id': userDetails.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('app_member_takeover' ~ userDetails.id) }}">
+                                <button type="submit" class="panel-block button-as-panel-block">
+                                    <span class="panel-icon"><i class="fas fa-person-walking-dashed-line-arrow-right"></i></span>
+                                    {{ 'member.admin_action_takeover_user'|trans }}
+                                </button>
+                            </form>
                             {% endif %}
                         </nav>
                     </div>

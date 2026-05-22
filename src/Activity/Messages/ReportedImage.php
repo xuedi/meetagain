@@ -34,7 +34,10 @@ class ReportedImage extends MessageAbstract
         $reasonName = ImageReportReason::from($this->meta['reason'])->name;
         $text = $this->translator->trans('profile_social.activity_reported_image', ['%reason%' => $reasonName]);
         if (isset($this->meta['remarks']) && $this->meta['remarks'] !== '') {
-            $text = $this->translator->trans('profile_social.activity_reported_image_remarks', ['%message%' => $text, '%remarks%' => $this->meta['remarks']]);
+            $text = $this->translator->trans('profile_social.activity_reported_image_remarks', [
+                '%message%' => $text,
+                '%remarks%' => $this->meta['remarks'],
+            ]);
         }
 
         return $text;
@@ -43,9 +46,14 @@ class ReportedImage extends MessageAbstract
     protected function renderHtml(): string
     {
         $reasonName = ImageReportReason::from($this->meta['reason'])->name;
-        $text = $this->translator->trans('profile_social.activity_reported_image', ['%reason%' => '<b>' . $this->escapeHtml($reasonName) . '</b>']);
+        $text = $this->translator->trans('profile_social.activity_reported_image', [
+            '%reason%' => '<b>' . $this->escapeHtml($reasonName) . '</b>',
+        ]);
         if (isset($this->meta['remarks']) && $this->meta['remarks'] !== '') {
-            $text = $this->translator->trans('profile_social.activity_reported_image_remarks', ['%message%' => $text, '%remarks%' => $this->escapeHtml($this->meta['remarks'])]);
+            $text = $this->translator->trans('profile_social.activity_reported_image_remarks', [
+                '%message%' => $text,
+                '%remarks%' => $this->escapeHtml($this->meta['remarks']),
+            ]);
         }
 
         return $text;

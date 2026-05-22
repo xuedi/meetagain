@@ -42,7 +42,8 @@ class FilmPollRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->where('p.status = :status')
             ->setParameter('status', PollStatus::Active)
             ->orderBy('p.endDate', 'ASC');
@@ -57,7 +58,8 @@ class FilmPollRepository extends ServiceEntityRepository
     /** @return FilmPoll[] */
     public function findExpiredActive(): array
     {
-        return $this->createQueryBuilder('p')
+        return $this
+            ->createQueryBuilder('p')
             ->where('p.status = :status AND p.endDate < :now')
             ->setParameter('status', PollStatus::Active)
             ->setParameter('now', new \DateTimeImmutable())
@@ -71,7 +73,8 @@ class FilmPollRepository extends ServiceEntityRepository
             return null;
         }
 
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->where('p.event = :eventId AND p.status = :status')
             ->setParameter('eventId', $eventId)
             ->setParameter('status', PollStatus::Active)
@@ -91,7 +94,8 @@ class FilmPollRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->where('p.status = :status')
             ->setParameter('status', PollStatus::Closed)
             ->orderBy('p.closedAt', 'DESC');

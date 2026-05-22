@@ -69,16 +69,13 @@ final class PluginSettingsController extends AbstractController implements Admin
             }
         }
 
-        $adminTop = new AdminTop(
-            info: [],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_back'),
-                    target: $this->generateUrl('app_admin_plugin'),
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('global.button_back'),
+                target: $this->generateUrl('app_admin_plugin'),
+                icon: 'arrow-left',
+            ),
+        ]);
 
         return $this->render('admin/system/plugin_settings/index.html.twig', [
             'providers' => $providers,

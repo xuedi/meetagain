@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit\Emails\Types;
 
@@ -26,9 +24,9 @@ use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTypesTest extends TestCase
@@ -55,12 +53,35 @@ class EmailTypesTest extends TestCase
             'AdminNotification' => new AdminNotificationEmail($this->blocklist, $this->queue, $this->config),
             'Announcement' => new AnnouncementEmail($this->blocklist, $this->queue, $this->config, $this->host),
             'EventReminder' => new EventReminderEmail($this->blocklist, $this->queue, $this->config, $eventRepo, $em),
-            'EventUpdateNotification' => new EventUpdateNotificationEmail($this->blocklist, $this->queue, $this->config, $this->createStub(TranslatorInterface::class), $this->host),
-            'NotificationEventCanceled' => new NotificationEventCanceledEmail($this->blocklist, $this->queue, $this->config, $this->host),
-            'NotificationMessage' => new NotificationMessageEmail($this->blocklist, $this->queue, $this->config, new \Symfony\Component\Clock\MockClock(), $this->host),
+            'EventUpdateNotification' => new EventUpdateNotificationEmail(
+                $this->blocklist,
+                $this->queue,
+                $this->config,
+                $this->createStub(TranslatorInterface::class),
+                $this->host,
+            ),
+            'NotificationEventCanceled' => new NotificationEventCanceledEmail(
+                $this->blocklist,
+                $this->queue,
+                $this->config,
+                $this->host,
+            ),
+            'NotificationMessage' => new NotificationMessageEmail(
+                $this->blocklist,
+                $this->queue,
+                $this->config,
+                new \Symfony\Component\Clock\MockClock(),
+                $this->host,
+            ),
             'PasswordReset' => new PasswordResetEmail($this->blocklist, $this->queue, $this->config, $this->host),
             'RsvpAggregated' => new RsvpAggregatedEmail($this->blocklist, $this->queue, $this->config, $eventRepo, $em),
-            'SupportNotification' => new SupportNotificationEmail($this->blocklist, $this->queue, $this->config, $this->createStub(UserRepository::class), $this->createStub(LoggerInterface::class)),
+            'SupportNotification' => new SupportNotificationEmail(
+                $this->blocklist,
+                $this->queue,
+                $this->config,
+                $this->createStub(UserRepository::class),
+                $this->createStub(LoggerInterface::class),
+            ),
             'UpcomingDigest' => new UpcomingDigestEmail(
                 $this->blocklist,
                 $this->queue,
@@ -70,7 +91,12 @@ class EmailTypesTest extends TestCase
                 $this->createStub(AppStateService::class),
                 [],
             ),
-            'VerificationRequest' => new VerificationRequestEmail($this->blocklist, $this->queue, $this->config, $this->host),
+            'VerificationRequest' => new VerificationRequestEmail(
+                $this->blocklist,
+                $this->queue,
+                $this->config,
+                $this->host,
+            ),
             'Welcome' => new WelcomeEmail($this->blocklist, $this->queue, $this->config, $this->host),
         ];
     }
@@ -151,7 +177,13 @@ class EmailTypesTest extends TestCase
     public function testSupportNotificationGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        new SupportNotificationEmail($this->blocklist, $this->queue, $this->config, $this->createStub(UserRepository::class), $this->createStub(LoggerInterface::class))->guardCheck([]);
+        new SupportNotificationEmail(
+            $this->blocklist,
+            $this->queue,
+            $this->config,
+            $this->createStub(UserRepository::class),
+            $this->createStub(LoggerInterface::class),
+        )->guardCheck([]);
     }
 
     public function testVerificationRequestGuardCheckThrowsOnEmptyContext(): void

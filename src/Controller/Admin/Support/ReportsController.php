@@ -1,12 +1,11 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Controller\Admin\Support;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\ImageReport;
@@ -14,7 +13,9 @@ use App\Enum\ImageReportStatus;
 use App\Repository\ImageReportRepository;
 use App\Service\Media\ImageLocationService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -106,9 +107,10 @@ final class ReportsController extends AbstractSupportController implements Admin
 
         $actions = [];
         if ($report->isOpen()) {
-            $actions[] = new AdminTopActionButton(
+            $actions[] = new AdminTopActionForm(
                 label: $this->translator->trans('admin_support.button_mark_resolved'),
                 target: $this->generateUrl('app_admin_support_report_resolve', ['id' => $report->getId()]),
+                csrfTokenId: 'app_admin_support_report_resolve' . $report->getId(),
                 icon: 'check',
                 variant: 'is-warning',
             );
@@ -137,9 +139,20 @@ final class ReportsController extends AbstractSupportController implements Admin
         ]);
     }
 
-    #[Route('/resolve/{id}', name: 'app_admin_support_report_resolve', requirements: ['id' => '\d+'])]
-    public function resolve(int $id): Response
+    #[Route(
+        '/resolve/{id}',
+        name: 'app_admin_support_report_resolve',
+        requirements: ['id' => '\d+'],
+        methods: ['POST'],
+    )]
+    public function resolve(Request $request, int $id): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'app_admin_support_report_resolve' . $id,
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
         $report = $this->imageReportRepo->find($id);
         if ($report instanceof ImageReport) {
             $report->setStatus(ImageReportStatus::Resolved);

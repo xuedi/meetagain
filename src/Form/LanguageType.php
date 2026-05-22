@@ -26,10 +26,7 @@ class LanguageType extends AbstractType
             'constraints' => [
                 new NotBlank(),
                 new Length(exactly: 2),
-                new Regex(
-                    pattern: '/^[a-z]{2}$/',
-                    message: 'admin_system_language.validator_code_pattern',
-                ),
+                new Regex(pattern: '/^[a-z]{2}$/', message: 'admin_system_language.validator_code_pattern'),
             ],
             'disabled' => $options['is_edit'],
             'attr' => ['maxlength' => 2],
@@ -49,7 +46,11 @@ class LanguageType extends AbstractType
             'required' => false,
             'label' => 'admin_system_language.heading_tile_image',
             'constraints' => [
-                new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: 'shared.form_image_upload_mime_error'),
+                new File(
+                    maxSize: '5000k',
+                    mimeTypes: ['image/*'],
+                    mimeTypesMessage: 'shared.form_image_upload_mime_error',
+                ),
             ],
         ]);
     }

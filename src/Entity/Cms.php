@@ -222,9 +222,7 @@ class Cms
 
     public function getLanguages(): array
     {
-        return array_values(array_unique(
-            $this->blocks->map(static fn(CmsBlock $b) => $b->getLanguage())->toArray()
-        ));
+        return array_values(array_unique($this->blocks->map(static fn(CmsBlock $b) => $b->getLanguage())->toArray()));
     }
 
     public function getLanguageFilteredBlockJsonList(string $language): Collection

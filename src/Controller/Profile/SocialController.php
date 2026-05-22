@@ -6,7 +6,9 @@ use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Repository\UserRepository;
 use App\Service\Member\FriendshipService;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -38,9 +40,16 @@ final class SocialController extends AbstractController
         return $this->social('friends');
     }
 
-    #[Route('/profile/social/toggleFollow/{id}/', name: 'app_profile_social_toggle_follow')]
-    public function toggleFollow(int $id): Response
+    #[Route('/profile/social/toggleFollow/{id}/', name: 'app_profile_social_toggle_follow', methods: ['POST'])]
+    public function toggleFollow(Request $request, int $id): Response
     {
+        if (!$this->isCsrfTokenValid(
+            'app_profile_social_toggle_follow' . $id,
+            (string) $request->request->get('_token'),
+        )) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         return $this->service->toggleFollow($id, 'app_profile_social');
     }
 }

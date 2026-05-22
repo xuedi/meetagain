@@ -128,9 +128,20 @@ final class DashboardScopeFilterServiceTest extends TestCase
                 private int $priority,
             ) {}
 
-            public function getPriority(): int { return $this->priority; }
-            public function getEventIdFilter(): ?array { return $this->eventIds; }
-            public function getUserIdFilter(): ?array { return $this->userIds; }
+            public function getPriority(): int
+            {
+                return $this->priority;
+            }
+
+            public function getEventIdFilter(): ?array
+            {
+                return $this->eventIds;
+            }
+
+            public function getUserIdFilter(): ?array
+            {
+                return $this->userIds;
+            }
         };
     }
 }

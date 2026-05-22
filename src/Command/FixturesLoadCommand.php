@@ -57,7 +57,7 @@ class FixturesLoadCommand extends Command
 
         if ($fixtures === []) {
             if ($output->isVerbose() === false) {
-                $groupText = ($groups === []) ? 'all groups' : implode(', ', $groups);
+                $groupText = $groups === [] ? 'all groups' : implode(', ', $groups);
                 $output->writeln(sprintf('No fixtures found for %s. Skipping.', $groupText));
             }
             return Command::SUCCESS;

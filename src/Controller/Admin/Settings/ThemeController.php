@@ -114,16 +114,15 @@ final class ThemeController extends AbstractSettingsController implements AdminN
             $currentLogo = $this->imageRepository->find($currentLogoId);
         }
 
-        $adminTop = new AdminTop(
-            info: [new AdminTopInfoText($this->translator->trans('admin_system_theme.intro'))],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('admin_system_theme.button_gallery'),
-                    target: $this->generateUrl('app_admin_system_gallery'),
-                    icon: 'palette',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
+            'admin_system_theme.intro',
+        ))], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_system_theme.button_gallery'),
+                target: $this->generateUrl('app_admin_system_gallery'),
+                icon: 'palette',
+            ),
+        ]);
 
         return $this->render('admin/system/theme/index.html.twig', [
             'active' => 'system',
@@ -162,10 +161,9 @@ final class ThemeController extends AbstractSettingsController implements AdminN
             icon: 'arrow-left',
         );
 
-        $adminTop = new AdminTop(
-            info: [new AdminTopInfoText($this->translator->trans('admin_system_gallery.page_title'))],
-            actions: $actions,
-        );
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
+            'admin_system_gallery.page_title',
+        ))], actions: $actions);
 
         return $this->render('admin/system/theme/gallery/index.html.twig', [
             'active' => 'system',
@@ -192,7 +190,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
             if ($page !== '' && $section['key'] !== $page) {
                 continue;
             }
-            $isOnly = ($category !== '' && $page !== '');
+            $isOnly = $category !== '' && $page !== '';
             $isFirstInCategory = !isset($seenCategories[$section['category']]);
             $seenCategories[$section['category']] = true;
 
@@ -204,11 +202,15 @@ final class ThemeController extends AbstractSettingsController implements AdminN
                     id: 'g-' . $section['key'],
                     left: [
                         new AdminSectionTextItem(
-                            text: $this->translator->trans('admin_system_gallery.section_' . $section['key'] . '_title'),
+                            text: $this->translator->trans(
+                                'admin_system_gallery.section_' . $section['key'] . '_title',
+                            ),
                             extraClass: 'has-text-weight-semibold',
                         ),
                         new AdminSectionTextItem(
-                            text: $this->translator->trans('admin_system_gallery.section_' . $section['key'] . '_caption'),
+                            text: $this->translator->trans(
+                                'admin_system_gallery.section_' . $section['key'] . '_caption',
+                            ),
                             extraClass: 'has-text-grey is-size-7 ml-3',
                         ),
                     ],
@@ -265,11 +267,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
             : $this->translator->trans('admin_system_gallery.category_' . $current);
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_system_gallery.category_label'),
-                $currentLabel,
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_system_gallery.category_label'), $currentLabel),
             options: $options,
             icon: 'layer-group',
         );
@@ -312,11 +310,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
             : $this->translator->trans('admin_system_gallery.section_' . $current . '_title');
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_system_gallery.subpage_label'),
-                $currentLabel,
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_system_gallery.subpage_label'), $currentLabel),
             options: $options,
             icon: 'list',
         );
@@ -344,91 +338,69 @@ final class ThemeController extends AbstractSettingsController implements AdminN
                 icon: 'list',
                 isActive: true,
             ),
-            new AdminTab(
-                label: $this->translator->trans('admin_system_gallery.demo_tab_b'),
-                target: '#',
-                icon: 'cog',
-            ),
+            new AdminTab(label: $this->translator->trans('admin_system_gallery.demo_tab_b'), target: '#', icon: 'cog'),
         ]);
     }
 
     private function buildDemoListAdminTop(): AdminTop
     {
-        return new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>1284</strong>&nbsp;%s',
-                    htmlspecialchars(
-                        $this->translator->trans('admin_system_gallery.demo_info_total'),
-                        ENT_QUOTES,
+        return new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf('<strong>1284</strong>&nbsp;%s', htmlspecialchars(
+                $this->translator->trans('admin_system_gallery.demo_info_total'),
+                ENT_QUOTES,
+            ))),
+            new AdminTopInfoHtml(sprintf('<strong>42</strong>&nbsp;%s', htmlspecialchars(
+                $this->translator->trans('admin_system_gallery.demo_info_in_range'),
+                ENT_QUOTES,
+            ))),
+            new AdminTopInfoHtml(sprintf('<span class="tag is-warning is-medium"><strong>3</strong>&nbsp;%s</span>', htmlspecialchars(
+                $this->translator->trans('admin_system_gallery.demo_info_open'),
+                ENT_QUOTES,
+            ))),
+        ], actions: [
+            new AdminTopActionDropdown(
+                label: $this->translator->trans('admin_system_gallery.demo_filter_label'),
+                options: [
+                    new AdminTopActionDropdownOption(
+                        label: $this->translator->trans('admin_system_gallery.demo_filter_all'),
+                        target: '#',
+                        isActive: true,
                     ),
-                )),
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>42</strong>&nbsp;%s',
-                    htmlspecialchars(
-                        $this->translator->trans('admin_system_gallery.demo_info_in_range'),
-                        ENT_QUOTES,
+                    new AdminTopActionDropdownOption(
+                        label: $this->translator->trans('admin_system_gallery.demo_filter_open'),
+                        target: '#',
+                        count: 3,
                     ),
-                )),
-                new AdminTopInfoHtml(sprintf(
-                    '<span class="tag is-warning is-medium"><strong>3</strong>&nbsp;%s</span>',
-                    htmlspecialchars(
-                        $this->translator->trans('admin_system_gallery.demo_info_open'),
-                        ENT_QUOTES,
+                    new AdminTopActionDropdownOption(
+                        label: $this->translator->trans('admin_system_gallery.demo_filter_closed'),
+                        target: '#',
+                        count: 39,
                     ),
-                )),
-            ],
-            actions: [
-                new AdminTopActionDropdown(
-                    label: $this->translator->trans('admin_system_gallery.demo_filter_label'),
-                    options: [
-                        new AdminTopActionDropdownOption(
-                            label: $this->translator->trans('admin_system_gallery.demo_filter_all'),
-                            target: '#',
-                            isActive: true,
-                        ),
-                        new AdminTopActionDropdownOption(
-                            label: $this->translator->trans('admin_system_gallery.demo_filter_open'),
-                            target: '#',
-                            count: 3,
-                        ),
-                        new AdminTopActionDropdownOption(
-                            label: $this->translator->trans('admin_system_gallery.demo_filter_closed'),
-                            target: '#',
-                            count: 39,
-                        ),
-                    ],
-                    icon: 'filter',
-                ),
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_back'),
-                    target: '#',
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+                ],
+                icon: 'filter',
+            ),
+            new AdminTopActionButton(
+                label: $this->translator->trans('global.button_back'),
+                target: '#',
+                icon: 'arrow-left',
+            ),
+        ]);
     }
 
     private function buildDemoDetailAdminTop(): AdminTop
     {
-        return new AdminTop(
-            info: [
-                new AdminTopInfoHtml(sprintf(
-                    '<strong>2026-05-02 14:23</strong>&nbsp;<span class="tag is-light">%s</span>',
-                    htmlspecialchars(
-                        $this->translator->trans('admin_system_gallery.demo_info_type'),
-                        ENT_QUOTES,
-                    ),
-                )),
-            ],
-            actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_back'),
-                    target: '#',
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+        return new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf('<strong>2026-05-02 14:23</strong>&nbsp;<span class="tag is-light">%s</span>', htmlspecialchars(
+                $this->translator->trans('admin_system_gallery.demo_info_type'),
+                ENT_QUOTES,
+            ))),
+        ], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('global.button_back'),
+                target: '#',
+                icon: 'arrow-left',
+            ),
+        ]);
     }
 
     private function requireUser(): User

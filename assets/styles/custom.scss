@@ -156,6 +156,29 @@ details.activities-load-more {
 .card-preview-min  { min-height: 80px; }
 .card-preview-img  { max-height: 40px; margin-bottom: 0.25rem; }
 
+.button-as-icon {
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    cursor: pointer;
+    font-size: inherit;
+    line-height: 1;
+}
+.button-as-icon:hover { color: #3e8ed0; }
+
+.button-as-panel-block {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    color: inherit;
+    font-size: inherit;
+    font-family: inherit;
+    padding: 0;
+}
+
 // Admin charts: canvas fills its wrapper (each dashboard chart partial wraps the
 // <canvas> in a div with explicit height/max-height, so we no longer need a global cap).
 .chart-container   { width: 100%; height: 100%; }

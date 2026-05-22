@@ -22,7 +22,6 @@ readonly class DinnerclubSuggestionNotificationProvider implements ReviewNotific
         private Security $security,
     ) {}
 
-
     public function getIdentifier(): string
     {
         return 'dinnerclub.dish_suggestion';

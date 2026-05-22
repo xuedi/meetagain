@@ -63,7 +63,8 @@
 
                                     {% include '_components/toggle.html.twig' with {
                                         'link': path('app_admin_system_boolean', {'name': item.name}),
-                                        'status': item.getBoolean
+                                        'status': item.getBoolean,
+                                        'csrfTokenId': 'app_admin_system_boolean' ~ item.name,
                                     } %}
 
                                 {% endif %}

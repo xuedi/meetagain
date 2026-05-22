@@ -6,7 +6,9 @@ use Symfony\Component\AssetMapper\AssetMapperInterface;
 
 final readonly class MediaMap
 {
-    public function __construct(private AssetMapperInterface $assetMapper) {}
+    public function __construct(
+        private AssetMapperInterface $assetMapper,
+    ) {}
 
     /** @return array<string, string> hash => logicalPath */
     public function build(): array

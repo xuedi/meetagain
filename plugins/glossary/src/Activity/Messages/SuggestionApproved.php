@@ -29,6 +29,9 @@ class SuggestionApproved extends MessageAbstract
 
     protected function renderHtml(): string
     {
-        return sprintf('Applied suggestion to glossary entry: <strong>%s</strong>', $this->escapeHtml($this->meta['term']));
+        return sprintf(
+            'Applied suggestion to glossary entry: <strong>%s</strong>',
+            $this->escapeHtml($this->meta['term']),
+        );
     }
 }

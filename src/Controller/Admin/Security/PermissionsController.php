@@ -17,7 +17,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN')]
-final class PermissionsController extends AbstractSecurityController implements AdminNavigationInterface, AdminTabsInterface
+final class PermissionsController extends AbstractSecurityController implements
+    AdminNavigationInterface,
+    AdminTabsInterface
 {
     public function __construct(
         TranslatorInterface $translator,
@@ -51,25 +53,21 @@ final class PermissionsController extends AbstractSecurityController implements 
                     id: 'perm-section-' . $index,
                     left: [
                         new AdminSectionTextItem($roleId),
-                        new AdminSectionTextItem(
-                            $this->translator->trans($hintKey),
-                            'has-text-grey is-size-7 ml-3',
-                        ),
+                        new AdminSectionTextItem($this->translator->trans($hintKey), 'has-text-grey is-size-7 ml-3'),
                     ],
                     right: [
-                        new AdminSectionTextItem(
-                            $this->translator->trans('admin_security_permissions.routes_count', ['%count%' => count($entries)]),
-                            'has-text-grey is-size-7 mr-3 is-nowrap',
-                        ),
+                        new AdminSectionTextItem($this->translator->trans('admin_security_permissions.routes_count', [
+                            '%count%' => count($entries),
+                        ]), 'has-text-grey is-size-7 mr-3 is-nowrap'),
                     ],
                     openByDefault: false,
                 ),
             ];
         }
 
-        $adminTop = new AdminTop(
-            info: [new AdminTopInfoText($this->translator->trans('admin_security_permissions.help'))],
-        );
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
+            'admin_security_permissions.help',
+        ))]);
 
         return $this->render('admin/security/permissions/index.html.twig', [
             'active' => 'security',

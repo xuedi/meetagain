@@ -15,16 +15,18 @@ final readonly class PluginSettingsService
     /**
      * @param iterable<PluginSettingsProviderInterface> $providers
      */
-    public function __construct(
-        #[AutowireIterator(PluginSettingsProviderInterface::class)]
-        iterable $providers,
-    ) {
-        $materialised = $providers instanceof Traversable ? iterator_to_array($providers, false) : array_values($providers);
+    public function __construct(#[AutowireIterator(PluginSettingsProviderInterface::class)] iterable $providers)
+    {
+        $materialised = $providers instanceof Traversable
+            ? iterator_to_array($providers, false)
+            : array_values($providers);
 
         usort(
             $materialised,
-            static fn (PluginSettingsProviderInterface $a, PluginSettingsProviderInterface $b): int
-                => $b->getPriority() <=> $a->getPriority(),
+            static fn(
+                PluginSettingsProviderInterface $a,
+                PluginSettingsProviderInterface $b,
+            ): int => $b->getPriority() <=> $a->getPriority(),
         );
 
         $keyed = [];

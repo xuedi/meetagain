@@ -22,17 +22,23 @@
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.triggerToggleBlock') || []).forEach((trigger) => {
         trigger.addEventListener('click', event => {
+            const btn = event.target.closest('button[data-url]');
+            if (!btn) return;
             event.preventDefault();
 
-            let url = event.target.getAttribute('href');
-            maFetch(url, true, 'POST').then(response => {
-                const toggleBlock = event.target.parentNode;
-                const links = toggleBlock.querySelectorAll('a');
-                links.forEach(link => {
-                    if (link.dataset.type === 'yes') {
-                        link.classList.toggle('is-success', response.newStatus);
+            const url = btn.dataset.url;
+            const token = btn.dataset.csrfToken;
+            const formData = new FormData();
+            formData.append('_token', token);
+
+            maFetch(url, true, formData).then(response => {
+                const toggleBlock = btn.parentNode;
+                const buttons = toggleBlock.querySelectorAll('button');
+                buttons.forEach(b => {
+                    if (b.dataset.type === 'yes') {
+                        b.classList.toggle('is-success', response.newStatus);
                     } else {
-                        link.classList.toggle('is-danger', !response.newStatus);
+                        b.classList.toggle('is-danger', !response.newStatus);
                     }
                 });
             });

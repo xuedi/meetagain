@@ -22,9 +22,9 @@ final class EventTeaserLocationProvider extends AbstractImageLocationProvider
             'SELECT preview_image_id AS image_id, id AS location_id FROM event WHERE preview_image_id IS NOT NULL',
         );
 
-        return array_map(
-            static fn(array $r) => ['imageId' => (int) $r['image_id'], 'locationId' => (int) $r['location_id']],
-            $rows,
-        );
+        return array_map(static fn(array $r) => [
+            'imageId' => (int) $r['image_id'],
+            'locationId' => (int) $r['location_id'],
+        ], $rows);
     }
 }

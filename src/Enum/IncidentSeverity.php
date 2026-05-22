@@ -12,9 +12,9 @@ enum IncidentSeverity: string
     public function label(): string
     {
         return match ($this) {
-            self::Low      => 'admin_security.severity_low',
-            self::Medium   => 'admin_security.severity_medium',
-            self::High     => 'admin_security.severity_high',
+            self::Low => 'admin_security.severity_low',
+            self::Medium => 'admin_security.severity_medium',
+            self::High => 'admin_security.severity_high',
             self::Critical => 'admin_security.severity_critical',
         };
     }
@@ -22,9 +22,9 @@ enum IncidentSeverity: string
     public function tagClass(): string
     {
         return match ($this) {
-            self::Low      => 'is-light',
-            self::Medium   => 'is-warning',
-            self::High     => 'is-danger',
+            self::Low => 'is-light',
+            self::Medium => 'is-warning',
+            self::High => 'is-danger',
             self::Critical => 'is-danger',
         };
     }

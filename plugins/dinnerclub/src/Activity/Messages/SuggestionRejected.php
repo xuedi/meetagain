@@ -29,6 +29,9 @@ class SuggestionRejected extends MessageAbstract
 
     protected function renderHtml(): string
     {
-        return sprintf('Rejected suggestion for dish: <strong>%s</strong>', $this->escapeHtml($this->meta['dish_name']));
+        return sprintf(
+            'Rejected suggestion for dish: <strong>%s</strong>',
+            $this->escapeHtml($this->meta['dish_name']),
+        );
     }
 }

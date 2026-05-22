@@ -124,16 +124,17 @@ class LanguageExtensionTest extends TestCase
         $request->method('getSchemeAndHttpHost')->willReturn('https://meetagain.local');
         $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
 
-        $this->languageServiceStub
-            ->method('getAltLangList')
-            ->willReturn(['de' => '/de/events', 'zh' => '/zh/events']);
+        $this->languageServiceStub->method('getAltLangList')->willReturn(['de' => '/de/events', 'zh' => '/zh/events']);
 
         $result = $this->subject->getLanguageSwitcherOptions();
 
-        static::assertSame([
-            'de' => 'https://meetagain.local/de/events',
-            'zh' => 'https://meetagain.local/zh/events',
-        ], $result);
+        static::assertSame(
+            [
+                'de' => 'https://meetagain.local/de/events',
+                'zh' => 'https://meetagain.local/zh/events',
+            ],
+            $result,
+        );
     }
 
     public function testGetAlternativeLanguageCodesStaysOnSameHost(): void
@@ -144,16 +145,17 @@ class LanguageExtensionTest extends TestCase
         $request->method('getSchemeAndHttpHost')->willReturn('https://weiqi.example.org');
         $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
 
-        $this->languageServiceStub
-            ->method('getAltLangList')
-            ->willReturn(['en' => '/en/events', 'de' => '/de/events']);
+        $this->languageServiceStub->method('getAltLangList')->willReturn(['en' => '/en/events', 'de' => '/de/events']);
 
         $result = $this->subject->getLanguageSwitcherOptions();
 
-        static::assertSame([
-            'en' => 'https://weiqi.example.org/en/events',
-            'de' => 'https://weiqi.example.org/de/events',
-        ], $result);
+        static::assertSame(
+            [
+                'en' => 'https://weiqi.example.org/en/events',
+                'de' => 'https://weiqi.example.org/de/events',
+            ],
+            $result,
+        );
     }
 
     public function testGetAlternativeLanguageCodesReturnsEmptyForProfiler(): void
@@ -180,9 +182,7 @@ class LanguageExtensionTest extends TestCase
     public function testRouteExistsReturnsTrueWhenRouteCanBeGenerated(): void
     {
         // Arrange
-        $this->routerStub
-            ->method('generate')
-            ->willReturn('/some/path');
+        $this->routerStub->method('generate')->willReturn('/some/path');
 
         // Act
         $result = $this->subject->routeExists('some_route');
@@ -220,9 +220,7 @@ class LanguageExtensionTest extends TestCase
         // Arrange
         $request = $this->createStub(Request::class);
         $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
-        $this->canonicalUrlServiceStub
-            ->method('getCanonicalUrl')
-            ->willReturn('https://meetagain.local/en/events');
+        $this->canonicalUrlServiceStub->method('getCanonicalUrl')->willReturn('https://meetagain.local/en/events');
 
         // Act
         $result = $this->subject->getCanonicalUrl();
@@ -269,9 +267,7 @@ class LanguageExtensionTest extends TestCase
     public function testGetMetaDescriptionFallsBackToSystemConfigWhenNoProviderValue(): void
     {
         // Arrange
-        $this->configServiceStub
-            ->method('getSeoDescription')
-            ->willReturn('System events description');
+        $this->configServiceStub->method('getSeoDescription')->willReturn('System events description');
 
         // Act
         $result = $this->subject->getMetaDescription('events');

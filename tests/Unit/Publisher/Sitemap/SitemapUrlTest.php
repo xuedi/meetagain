@@ -30,7 +30,10 @@ class SitemapUrlTest extends TestCase
         self::assertSame($lastmod, $url->lastmod);
         self::assertSame('daily', $url->changefreq);
         self::assertSame(0.8, $url->priority);
-        self::assertSame(['en' => 'https://example.com/en/page', 'de' => 'https://example.com/de/page'], $url->alternates);
+        self::assertSame(
+            ['en' => 'https://example.com/en/page', 'de' => 'https://example.com/de/page'],
+            $url->alternates,
+        );
         self::assertSame('cms', $url->section);
         self::assertSame('en', $url->locale);
         self::assertSame(['cms_id' => 42, 'slug' => 'about'], $url->meta);

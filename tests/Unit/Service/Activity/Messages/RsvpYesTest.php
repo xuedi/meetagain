@@ -76,7 +76,9 @@ class RsvpYesTest extends TestCase
 
     public function testCanCatchNonNumericEventId(): void
     {
-        $this->expectExceptionObject(new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.rsvp_yes'"));
+        $this->expectExceptionObject(
+            new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.rsvp_yes'"),
+        );
 
         $subject = new RsvpYes();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 'not-a-number']);

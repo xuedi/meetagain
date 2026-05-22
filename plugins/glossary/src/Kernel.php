@@ -25,9 +25,7 @@ class Kernel implements Plugin
         return null;
     }
 
-    public function loadPostExtendFixtures(OutputInterface $output): void
-    {
-    }
+    public function loadPostExtendFixtures(OutputInterface $output): void {}
 
     public function preFixtures(OutputInterface $output): void
     {
@@ -49,10 +47,7 @@ class Kernel implements Plugin
         return [];
     }
 
-    public function warmCache(WarmCacheType $type, array $ids): void
-    {
-    }
-
+    public function warmCache(WarmCacheType $type, array $ids): void {}
 
     public function getStylesheets(): array
     {

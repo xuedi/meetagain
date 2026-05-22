@@ -29,14 +29,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-// Cookie consent: confirm via ajax and reload
+// Cookie consent: confirm via ajax POST and reload
 document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.cookieTrigger') || []).forEach((el) => {
         el.addEventListener('click', (event) => {
             const osmConsent = document.getElementById('osm_consent_checkbox');
-            const base = event.currentTarget.dataset.url;
-            const url = base + '?osmConsent=' + (osmConsent && osmConsent.checked);
-            maFetch(url).then(() => location.reload()).catch(() => location.reload());
+            const url = event.currentTarget.dataset.url;
+            const token = event.currentTarget.dataset.token;
+            const body = new FormData();
+            body.append('osmConsent', String(osmConsent && osmConsent.checked));
+            body.append('_token', token);
+            maFetch(url, false, body).then(() => location.reload()).catch(() => location.reload());
         });
     });
 });

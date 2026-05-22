@@ -24,10 +24,11 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use RuntimeException;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -76,12 +77,20 @@ final class ImageUploadController extends AbstractController
         return new Response($this->renderView('image/modal_content.html.twig', $templateVars));
     }
 
-    #[Route('/image/{entity}/{id}/select/{newImage}', name: 'app_replace_image_select', requirements: [
-        'entity' => 'user|cmsBlock',
-        'id' => '\d+',
-    ])]
-    public function select(string $entity, int $id, int $newImage): Response
+    #[Route(
+        '/image/{entity}/{id}/select/{newImage}',
+        name: 'app_replace_image_select',
+        requirements: [
+            'entity' => 'user|cmsBlock',
+            'id' => '\d+',
+        ],
+        methods: ['POST'],
+    )]
+    public function select(Request $request, string $entity, int $id, int $newImage): Response
     {
+        if (!$this->isCsrfTokenValid('app_replace_image_select' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
         $entityName = $entity;
         $data = $this->prepare($entityName, $id);
         $entity = $data['entity'];
@@ -191,10 +200,13 @@ final class ImageUploadController extends AbstractController
         '/image/rotate/{entity}/{id}',
         name: 'app_image_rotate',
         requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'],
-        methods: ['GET'],
+        methods: ['POST'],
     )]
-    public function rotate(string $entity, int $id): Response
+    public function rotate(Request $request, string $entity, int $id): Response
     {
+        if (!$this->isCsrfTokenValid('app_image_rotate' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
         $image = $this->prepare($entity, $id)['image'];
         if ($image !== null) {
             $this->imageService->rotateThumbNail($image);
@@ -292,10 +304,7 @@ final class ImageUploadController extends AbstractController
         return match ($entity) {
             'user' => $this->redirectToRoute('app_profile'),
             'cmsBlock' => $this->redirectToRoute('app_admin_cms_edit', [
-                'id' => $this->cmsBlockRepo
-                    ->findOneBy(['id' => $id])
-                    ->getPage()
-                    ->getId(),
+                'id' => $this->cmsBlockRepo->findOneBy(['id' => $id])->getPage()->getId(),
             ]),
             default => throw new RuntimeException('Invalid entity'),
         };

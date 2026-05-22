@@ -32,7 +32,7 @@ class SiteLogoResolverTest extends TestCase
         $this->configServiceStub->method('getSiteLogoId')->willReturn(99);
 
         $resolver = new SiteLogoResolver(
-            providers:[$filter],
+            providers: [$filter],
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,
@@ -55,7 +55,7 @@ class SiteLogoResolverTest extends TestCase
         $this->imageRepositoryStub->method('find')->willReturn($image);
 
         $resolver = new SiteLogoResolver(
-            providers:[$filter],
+            providers: [$filter],
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,
@@ -73,7 +73,7 @@ class SiteLogoResolverTest extends TestCase
         $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
 
         $resolver = new SiteLogoResolver(
-            providers:[$filter],
+            providers: [$filter],
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,
@@ -91,7 +91,7 @@ class SiteLogoResolverTest extends TestCase
         $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
 
         $resolver = new SiteLogoResolver(
-            providers:[$filter],
+            providers: [$filter],
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,
@@ -107,7 +107,7 @@ class SiteLogoResolverTest extends TestCase
         $this->imageRepositoryStub->method('find')->willReturn(null);
 
         $resolver = new SiteLogoResolver(
-            providers:[],
+            providers: [],
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,

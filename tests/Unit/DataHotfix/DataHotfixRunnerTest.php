@@ -70,10 +70,15 @@ class DataHotfixRunnerTest extends TestCase
         $hotfix = new RecordingHotfix('c_throws', new ArrayObject(), new RuntimeException('boom'));
         $appState = $this->makeAppStateSpy();
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects(static::once())->method('error')
-            ->with('Data hotfix failed', static::callback(
-                static fn(array $context) => $context['identifier'] === 'c_throws' && isset($context['exception']),
-            ));
+        $logger
+            ->expects(static::once())
+            ->method('error')
+            ->with(
+                'Data hotfix failed',
+                static::callback(
+                    static fn(array $context) => $context['identifier'] === 'c_throws' && isset($context['exception']),
+                ),
+            );
 
         $runner = new DataHotfixRunner(
             [$hotfix],
@@ -148,10 +153,12 @@ class DataHotfixRunnerTest extends TestCase
 
         $service = $this->createStub(AppStateService::class);
         $service->method('get')->willReturnCallback(static fn(string $key): ?string => $store[$key] ?? null);
-        $service->method('set')->willReturnCallback(static function (string $key, string $value) use (&$store, &$written): void {
-            $store[$key] = $value;
-            $written[$key] = $value;
-        });
+        $service
+            ->method('set')
+            ->willReturnCallback(static function (string $key, string $value) use (&$store, &$written): void {
+                $store[$key] = $value;
+                $written[$key] = $value;
+            });
 
         return ['service' => $service, 'written' => &$written];
     }

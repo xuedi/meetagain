@@ -113,8 +113,10 @@ class PermissionGatewayTest extends TestCase
         // Arrange
         $user = new User();
         $captured = null;
-        $checker = new class ($captured) implements PermissionCheckerInterface {
-            public function __construct(public ?PermissionContext &$captured) {}
+        $checker = new class($captured) implements PermissionCheckerInterface {
+            public function __construct(
+                public ?PermissionContext &$captured,
+            ) {}
 
             #[Override]
             public function supports(string $attribute, mixed $subject): bool
@@ -188,8 +190,10 @@ class PermissionGatewayTest extends TestCase
     {
         // Arrange
         $captured = null;
-        $checker = new class ($captured) implements PermissionCheckerInterface {
-            public function __construct(public ?PermissionContext &$captured) {}
+        $checker = new class($captured) implements PermissionCheckerInterface {
+            public function __construct(
+                public ?PermissionContext &$captured,
+            ) {}
 
             #[Override]
             public function supports(string $attribute, mixed $subject): bool
@@ -236,7 +240,7 @@ class PermissionGatewayTest extends TestCase
 
     private function fixedChecker(bool $supports, ?bool $decision): PermissionCheckerInterface
     {
-        return new class ($supports, $decision) implements PermissionCheckerInterface {
+        return new class($supports, $decision) implements PermissionCheckerInterface {
             public function __construct(
                 private readonly bool $supportsResult,
                 private readonly ?bool $decision,
