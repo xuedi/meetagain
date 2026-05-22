@@ -41,9 +41,7 @@ class AdminCmsPageDeletedTest extends TestCase
     public function testCanCatchMissingCmsId(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'cms_id' in meta in core.admin_cms_page_deleted"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_id' in meta in core.admin_cms_page_deleted"));
 
         $subject = new AdminCmsPageDeleted();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['cms_slug' => 'old-page']);
@@ -55,9 +53,7 @@ class AdminCmsPageDeletedTest extends TestCase
     public function testCanCatchMissingCmsSlug(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'cms_slug' in meta in core.admin_cms_page_deleted"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_slug' in meta in core.admin_cms_page_deleted"));
 
         $subject = new AdminCmsPageDeleted();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['cms_id' => 5]);

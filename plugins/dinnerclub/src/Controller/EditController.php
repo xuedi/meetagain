@@ -73,12 +73,7 @@ final class EditController extends AbstractController
                 ]);
             }
 
-            $this->addFlash(
-                'success',
-                $this->translator->trans(
-                    $isManager ? 'dinnerclub.flash_translation_updated' : 'dinnerclub.flash_suggestion_submitted',
-                ),
-            );
+            $this->addFlash('success', $this->translator->trans($isManager ? 'dinnerclub.flash_translation_updated' : 'dinnerclub.flash_suggestion_submitted'));
 
             return $this->redirectToRoute('plugin_dinnerclub_edit', ['id' => $id, 'lang' => $lang]);
         }

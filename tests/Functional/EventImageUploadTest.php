@@ -86,11 +86,7 @@ class EventImageUploadTest extends WebTestCase
             'type' => ImageType::EventUpload,
         ]);
 
-        static::assertGreaterThan(
-            $imageCountBefore,
-            $imageCountAfter,
-            'A new image should be created in the database after upload',
-        );
+        static::assertGreaterThan($imageCountBefore, $imageCountAfter, 'A new image should be created in the database after upload');
 
         // Step 7: Verify the image is linked to the event
         $newImage = $em->getRepository(Image::class)->findOneBy([

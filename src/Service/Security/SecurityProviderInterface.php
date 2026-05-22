@@ -19,14 +19,7 @@ interface SecurityProviderInterface
     /**
      * @param array<string, mixed> $context
      */
-    public function observe(
-        SecurityEventType $type,
-        Request $request,
-        array $context,
-        string $sessionId,
-        string $ip,
-        bool $readOnly = false,
-    ): ProviderReport;
+    public function observe(SecurityEventType $type, Request $request, array $context, string $sessionId, string $ip, bool $readOnly = false): ProviderReport;
 
     public function scanRetrospective(DateTimeImmutable $from, DateTimeImmutable $to): ProviderReport;
 }

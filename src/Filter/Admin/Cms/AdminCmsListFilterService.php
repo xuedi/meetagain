@@ -98,13 +98,7 @@ readonly class AdminCmsListFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort(
-            $filters,
-            static fn(
-                AdminCmsListFilterInterface $a,
-                AdminCmsListFilterInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($filters, static fn(AdminCmsListFilterInterface $a, AdminCmsListFilterInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $filters;
     }

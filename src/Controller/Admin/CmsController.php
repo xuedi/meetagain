@@ -54,12 +54,7 @@ final class CmsController extends AbstractController implements AdminNavigationI
         return new AdminNavigationConfig(
             section: 'admin_shell.section_content',
             links: [
-                new AdminLink(
-                    label: 'admin_shell.menu_cms',
-                    route: 'app_admin_cms',
-                    active: 'cms',
-                    role: 'ROLE_STEWARD',
-                ),
+                new AdminLink(label: 'admin_shell.menu_cms', route: 'app_admin_cms', active: 'cms', role: 'ROLE_STEWARD'),
             ],
             sectionPriority: 50,
         );
@@ -105,16 +100,8 @@ final class CmsController extends AbstractController implements AdminNavigationI
         }
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($cmsPages),
-                $this->translator->trans('admin_cms.summary_total'),
-            )),
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $publishedCount,
-                $this->translator->trans('admin_cms.summary_published'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($cmsPages), $this->translator->trans('admin_cms.summary_total'))),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $publishedCount, $this->translator->trans('admin_cms.summary_published'))),
             new AdminTopInfoHtml(sprintf(
                 '<strong>%d</strong>&nbsp;%s',
                 count($cmsIdsWithAnnouncements),
@@ -123,12 +110,7 @@ final class CmsController extends AbstractController implements AdminNavigationI
         ];
 
         $adminTop = new AdminTop(info: $info, actions: [
-            new AdminTopActionButton(
-                label: $this->translator->trans('admin_cms.button_add_page'),
-                target: '#',
-                icon: 'plus',
-                toggleId: 'cms-add',
-            ),
+            new AdminTopActionButton(label: $this->translator->trans('admin_cms.button_add_page'), target: '#', icon: 'plus', toggleId: 'cms-add'),
         ]);
 
         return $this->render('admin/cms/cms_list.html.twig', [
@@ -141,13 +123,7 @@ final class CmsController extends AbstractController implements AdminNavigationI
         ]);
     }
 
-    #[Route(
-        '/{id}/edit/{locale}',
-        name: 'app_admin_cms_edit',
-        requirements: ['locale' => '[^/]+'],
-        defaults: ['locale' => null],
-        methods: ['GET', 'POST'],
-    )]
+    #[Route('/{id}/edit/{locale}', name: 'app_admin_cms_edit', requirements: ['locale' => '[^/]+'], defaults: ['locale' => null], methods: ['GET', 'POST'])]
     public function cmsEdit(Request $request, Cms $cms, ?string $locale = null): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::CMS_PAGE_UPDATE, $cms);
@@ -222,22 +198,10 @@ final class CmsController extends AbstractController implements AdminNavigationI
             ));
 
         $info = [
-            new AdminTopInfoHtml(sprintf('<strong>/%s</strong>', htmlspecialchars(
-                (string) $cms->getSlug(),
-                ENT_QUOTES | ENT_HTML5,
-                'UTF-8',
-            ))),
+            new AdminTopInfoHtml(sprintf('<strong>/%s</strong>', htmlspecialchars((string) $cms->getSlug(), ENT_QUOTES | ENT_HTML5, 'UTF-8'))),
             new AdminTopInfoHtml($statusTag),
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($cms->getBlocks()),
-                $this->translator->trans('admin_cms.summary_blocks'),
-            )),
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($cms->getLanguages()),
-                $this->translator->trans('admin_cms.summary_languages'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($cms->getBlocks()), $this->translator->trans('admin_cms.summary_blocks'))),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($cms->getLanguages()), $this->translator->trans('admin_cms.summary_languages'))),
         ];
 
         $actions = [];
@@ -272,9 +236,7 @@ final class CmsController extends AbstractController implements AdminNavigationI
     {
         $user = $this->getUser();
         if (!$user instanceof User) {
-            throw new AuthenticationCredentialsNotFoundException(
-                'Should never happen, see: config/packages/security.yaml',
-            );
+            throw new AuthenticationCredentialsNotFoundException('Should never happen, see: config/packages/security.yaml');
         }
 
         return $user;

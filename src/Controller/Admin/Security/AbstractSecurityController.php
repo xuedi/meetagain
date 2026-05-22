@@ -21,12 +21,7 @@ abstract class AbstractSecurityController extends AbstractController
         return new AdminNavigationConfig(
             section: 'admin_shell.section_system',
             links: [
-                new AdminLink(
-                    label: 'admin_shell.menu_security',
-                    route: 'app_admin_security_incidents',
-                    active: 'security',
-                    role: 'ROLE_ADMIN',
-                ),
+                new AdminLink(label: 'admin_shell.menu_security', route: 'app_admin_security_incidents', active: 'security', role: 'ROLE_ADMIN'),
             ],
             sectionPriority: 100,
         );

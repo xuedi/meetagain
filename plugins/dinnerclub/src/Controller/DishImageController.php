@@ -67,12 +67,7 @@ final class DishImageController extends AbstractController
             ])));
         }
 
-        $suggestion = $this->dishService->addImageSuggestion(
-            $dish,
-            $image,
-            DishImageSuggestionType::AddImage,
-            $user->getId(),
-        );
+        $suggestion = $this->dishService->addImageSuggestion($dish, $image, DishImageSuggestionType::AddImage, $user->getId());
         $this->activityService->log(ImageSuggestionCreated::TYPE, $user, [
             'dish_id' => $id,
             'dish_name' => $this->getDishName($dish),
@@ -120,12 +115,7 @@ final class DishImageController extends AbstractController
             ])));
         }
 
-        $suggestion = $this->dishService->addImageSuggestion(
-            $dish,
-            $image,
-            DishImageSuggestionType::SetPreview,
-            $user->getId(),
-        );
+        $suggestion = $this->dishService->addImageSuggestion($dish, $image, DishImageSuggestionType::SetPreview, $user->getId());
         $this->activityService->log(ImageSuggestionCreated::TYPE, $user, [
             'dish_id' => $dishId,
             'dish_name' => $this->getDishName($dish),
@@ -141,10 +131,7 @@ final class DishImageController extends AbstractController
     #[IsGranted('ROLE_ORGANIZER')]
     public function delete(Request $request, int $dishImageId): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'plugin_dinnerclub_image_delete' . $dishImageId,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('plugin_dinnerclub_image_delete' . $dishImageId, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 

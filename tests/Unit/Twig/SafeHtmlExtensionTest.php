@@ -143,62 +143,18 @@ class SafeHtmlExtensionTest extends TestCase
         static::assertStringNotContainsStringIgnoringCase('<object', $result, "object tag in output for: {$input}");
         static::assertStringNotContainsStringIgnoringCase('<embed', $result, "embed tag in output for: {$input}");
         static::assertStringNotContainsStringIgnoringCase('<form', $result, "form tag in output for: {$input}");
-        static::assertStringNotContainsStringIgnoringCase(
-            ' onclick=',
-            $result,
-            "onclick attribute in output for: {$input}",
-        );
-        static::assertStringNotContainsStringIgnoringCase(
-            ' onload=',
-            $result,
-            "onload attribute in output for: {$input}",
-        );
-        static::assertStringNotContainsStringIgnoringCase(
-            ' onerror=',
-            $result,
-            "onerror attribute in output for: {$input}",
-        );
-        static::assertStringNotContainsStringIgnoringCase(
-            ' onmouseover=',
-            $result,
-            "onmouseover attribute in output for: {$input}",
-        );
-        static::assertStringNotContainsStringIgnoringCase(
-            ' onfocus=',
-            $result,
-            "onfocus attribute in output for: {$input}",
-        );
-        static::assertStringNotContainsStringIgnoringCase(
-            ' ontouchstart=',
-            $result,
-            "ontouchstart attribute in output for: {$input}",
-        );
-        static::assertStringNotContainsStringIgnoringCase(
-            ' onkeyup=',
-            $result,
-            "onkeyup attribute in output for: {$input}",
-        );
+        static::assertStringNotContainsStringIgnoringCase(' onclick=', $result, "onclick attribute in output for: {$input}");
+        static::assertStringNotContainsStringIgnoringCase(' onload=', $result, "onload attribute in output for: {$input}");
+        static::assertStringNotContainsStringIgnoringCase(' onerror=', $result, "onerror attribute in output for: {$input}");
+        static::assertStringNotContainsStringIgnoringCase(' onmouseover=', $result, "onmouseover attribute in output for: {$input}");
+        static::assertStringNotContainsStringIgnoringCase(' onfocus=', $result, "onfocus attribute in output for: {$input}");
+        static::assertStringNotContainsStringIgnoringCase(' ontouchstart=', $result, "ontouchstart attribute in output for: {$input}");
+        static::assertStringNotContainsStringIgnoringCase(' onkeyup=', $result, "onkeyup attribute in output for: {$input}");
         // javascript: and vbscript: are only dangerous inside HTML attribute values
-        static::assertStringNotContainsStringIgnoringCase(
-            'href="javascript:',
-            $result,
-            "javascript: href in output for: {$input}",
-        );
-        static::assertStringNotContainsStringIgnoringCase(
-            "href='javascript:",
-            $result,
-            "javascript: href in output for: {$input}",
-        );
-        static::assertStringNotContainsStringIgnoringCase(
-            'src="javascript:',
-            $result,
-            "javascript: src in output for: {$input}",
-        );
-        static::assertStringNotContainsStringIgnoringCase(
-            'href="vbscript:',
-            $result,
-            "vbscript: href in output for: {$input}",
-        );
+        static::assertStringNotContainsStringIgnoringCase('href="javascript:', $result, "javascript: href in output for: {$input}");
+        static::assertStringNotContainsStringIgnoringCase("href='javascript:", $result, "javascript: href in output for: {$input}");
+        static::assertStringNotContainsStringIgnoringCase('src="javascript:', $result, "javascript: src in output for: {$input}");
+        static::assertStringNotContainsStringIgnoringCase('href="vbscript:', $result, "vbscript: href in output for: {$input}");
 
         static::assertSame($expectedOutput, $result);
     }

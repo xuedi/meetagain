@@ -11,20 +11,13 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class MediaController extends AbstractController
 {
-    #[Route(
-        '/media/{hash}.{ext}',
-        name: 'media_serve',
-        requirements: ['hash' => '[a-f0-9]{16}', 'ext' => '[a-z0-9]+'],
-        methods: ['GET'],
-    )]
+    #[Route('/media/{hash}.{ext}', name: 'media_serve', requirements: ['hash' => '[a-f0-9]{16}', 'ext' => '[a-z0-9]+'], methods: ['GET'])]
     public function serve(string $hash, string $ext, MediaMap $mediaMap, AssetMapperInterface $assetMapper): Response
     {
         $map = $mediaMap->build();
         $logicalPath = $map[$hash] ?? throw new NotFoundHttpException("Unknown media hash: {$hash}");
 
-        $asset = $assetMapper->getAsset($logicalPath) ?? throw new NotFoundHttpException(
-            "Asset disappeared: {$logicalPath}",
-        );
+        $asset = $assetMapper->getAsset($logicalPath) ?? throw new NotFoundHttpException("Asset disappeared: {$logicalPath}");
 
         if ($asset->content !== null) {
             return new Response($asset->content, 200, [

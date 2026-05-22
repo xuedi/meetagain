@@ -203,14 +203,8 @@ readonly class ImportService
      * @param array<string, User> $userEmailMap
      * @param array<string, int> $counts
      */
-    private function importEvents(
-        array $eventsData,
-        array $locationRefMap,
-        array $userEmailMap,
-        User $systemUser,
-        string $tempDir,
-        array &$counts,
-    ): void {
+    private function importEvents(array $eventsData, array $locationRefMap, array $userEmailMap, User $systemUser, string $tempDir, array &$counts): void
+    {
         foreach ($eventsData as $eventData) {
             $locationRef = $eventData['location_ref'] ?? null;
             $location = $locationRef !== null ? $locationRefMap[(int) $locationRef] ?? null : null;
@@ -243,9 +237,7 @@ readonly class ImportService
             }
 
             $creatorEmail = (string) ($eventData['creator_email'] ?? '');
-            $creator =
-                $userEmailMap[$creatorEmail] ?? $this->userRepository->findOneBy(['email' => $creatorEmail])
-                    ?? $systemUser;
+            $creator = $userEmailMap[$creatorEmail] ?? $this->userRepository->findOneBy(['email' => $creatorEmail]) ?? $systemUser;
             $event->setUser($creator);
 
             foreach ($eventData['titles'] ?? [] as $lang => $title) {

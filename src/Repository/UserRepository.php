@@ -108,11 +108,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * Used to upgrade (rehash) the user's password automatically over time.
      */
     #[Override]
-    public function upgradePassword(
-        PasswordAuthenticatedUserInterface $user,
-        #[\SensitiveParameter]
-        string $newHashedPassword,
-    ): void {
+    public function upgradePassword(PasswordAuthenticatedUserInterface $user, #[\SensitiveParameter] string $newHashedPassword): void
+    {
         if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
         }
@@ -132,13 +129,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         }
 
         return $this
-            ->buildActiveMembersQuery(
-                excludeIds: [],
-                restrictToUserIds: $restrictToUserIds,
-                excludeSystemUser: false,
-                limit: $limit,
-                offset: $offset,
-            )
+            ->buildActiveMembersQuery(excludeIds: [], restrictToUserIds: $restrictToUserIds, excludeSystemUser: false, limit: $limit, offset: $offset)
             ->getQuery()
             ->getResult();
     }
@@ -147,24 +138,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * @param int[] $excludeIds User IDs to exclude from results (e.g., blocked users)
      * @param array<int>|null $restrictToUserIds Optional user ID filter
      */
-    public function findActiveMembers(
-        int $limit = 500,
-        int $offset = 0,
-        array $excludeIds = [],
-        ?array $restrictToUserIds = null,
-    ): array {
+    public function findActiveMembers(int $limit = 500, int $offset = 0, array $excludeIds = [], ?array $restrictToUserIds = null): array
+    {
         if ($restrictToUserIds === []) {
             return []; // Empty filter = no results
         }
 
         return $this
-            ->buildActiveMembersQuery(
-                excludeIds: $excludeIds,
-                restrictToUserIds: $restrictToUserIds,
-                excludeSystemUser: false,
-                limit: $limit,
-                offset: $offset,
-            )
+            ->buildActiveMembersQuery(excludeIds: $excludeIds, restrictToUserIds: $restrictToUserIds, excludeSystemUser: false, limit: $limit, offset: $offset)
             ->getQuery()
             ->getResult();
     }
@@ -178,11 +159,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return 0; // Empty filter = no results
         }
 
-        $qb = $this->buildActiveMembersQuery(
-            excludeIds: [],
-            restrictToUserIds: $restrictToUserIds,
-            excludeSystemUser: false,
-        );
+        $qb = $this->buildActiveMembersQuery(excludeIds: [], restrictToUserIds: $restrictToUserIds, excludeSystemUser: false);
 
         $qb->select('COUNT(u.id)');
 
@@ -199,11 +176,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return 0; // Empty filter = no results
         }
 
-        $qb = $this->buildActiveMembersQuery(
-            excludeIds: $excludeIds,
-            restrictToUserIds: $restrictToUserIds,
-            excludeSystemUser: true,
-        );
+        $qb = $this->buildActiveMembersQuery(excludeIds: $excludeIds, restrictToUserIds: $restrictToUserIds, excludeSystemUser: true);
 
         $qb->select('COUNT(u.id)');
 
@@ -292,12 +265,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getStatusBreakdown(): array
     {
-        $result = $this
-            ->createQueryBuilder('u')
-            ->select('u.status, COUNT(u.id) as cnt')
-            ->groupBy('u.status')
-            ->getQuery()
-            ->getResult();
+        $result = $this->createQueryBuilder('u')->select('u.status, COUNT(u.id) as cnt')->groupBy('u.status')->getQuery()->getResult();
 
         $breakdown = [];
         foreach (UserStatus::cases() as $status) {
@@ -342,11 +310,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return 0;
         }
 
-        $qb = $this
-            ->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->where('u.createdAt >= :since')
-            ->setParameter('since', $since);
+        $qb = $this->createQueryBuilder('u')->select('COUNT(u.id)')->where('u.createdAt >= :since')->setParameter('since', $since);
 
         if ($restrictToUserIds !== null) {
             $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);
@@ -359,11 +323,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * @param array<int>|null $restrictToUserIds
      * @return array<User>
      */
-    public function findActiveCreatedSince(
-        DateTimeImmutable $since,
-        int $limit,
-        ?array $restrictToUserIds = null,
-    ): array {
+    public function findActiveCreatedSince(DateTimeImmutable $since, int $limit, ?array $restrictToUserIds = null): array
+    {
         if ($restrictToUserIds === []) {
             return [];
         }
@@ -546,12 +507,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return []; // Empty filter = no results
         }
 
-        $qb = $this
-            ->createQueryBuilder('u')
-            ->select('u, i')
-            ->leftJoin('u.image', 'i')
-            ->orderBy('u.status', 'ASC')
-            ->addOrderBy('u.createdAt', 'DESC');
+        $qb = $this->createQueryBuilder('u')->select('u, i')->leftJoin('u.image', 'i')->orderBy('u.status', 'ASC')->addOrderBy('u.createdAt', 'DESC');
 
         if ($restrictToUserIds !== null) {
             $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);

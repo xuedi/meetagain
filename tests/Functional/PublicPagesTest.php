@@ -86,11 +86,7 @@ class PublicPagesTest extends WebTestCase
 
         // Assert
         static::assertSame(1, substr_count($content, '<h1'), 'Frontpage must have exactly one <h1>');
-        static::assertMatchesRegularExpression(
-            '#<a [^>]*href="/en/"[^>]*hreflang="en"#',
-            $content,
-            'English language link must carry hreflang="en"',
-        );
+        static::assertMatchesRegularExpression('#<a [^>]*href="/en/"[^>]*hreflang="en"#', $content, 'English language link must carry hreflang="en"');
     }
 
     public function testFrontpageEmitsWebSiteJsonLdAndCustomMetaDescription(): void

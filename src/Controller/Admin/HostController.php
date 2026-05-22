@@ -42,12 +42,7 @@ final class HostController extends AbstractController implements AdminNavigation
         return new AdminNavigationConfig(
             section: 'admin_shell.section_content',
             links: [
-                new AdminLink(
-                    label: 'admin_shell.menu_host',
-                    route: 'app_admin_host',
-                    active: 'host',
-                    role: 'ROLE_ORGANIZER',
-                ),
+                new AdminLink(label: 'admin_shell.menu_host', route: 'app_admin_host', active: 'host', role: 'ROLE_ORGANIZER'),
             ],
             sectionPriority: 50,
         );
@@ -60,11 +55,7 @@ final class HostController extends AbstractController implements AdminNavigation
         $hosts = $this->repo->findAllForAdmin($filterResult->getHostIds());
 
         $adminTop = new AdminTop(info: [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($hosts),
-                $this->translator->trans('admin_host.summary_total'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($hosts), $this->translator->trans('admin_host.summary_total'))),
         ], actions: [
             new AdminTopActionButton(
                 label: $this->translator->trans('admin_host.page_title_create'),

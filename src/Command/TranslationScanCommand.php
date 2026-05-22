@@ -12,10 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Finder\Finder;
 
-#[AsCommand(
-    name: 'app:translation:scan',
-    description: 'Scan templates and PHP for usages of one or more translation keys',
-)]
+#[AsCommand(name: 'app:translation:scan', description: 'Scan templates and PHP for usages of one or more translation keys')]
 class TranslationScanCommand extends Command
 {
     private const string ARG_KEYS = 'keys';

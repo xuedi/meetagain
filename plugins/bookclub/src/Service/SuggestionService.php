@@ -24,10 +24,7 @@ readonly class SuggestionService
 
     public function suggest(Book $book, int $userId): BookSuggestion
     {
-        foreach ($this->suggestionRepo->findUserPendingSuggestions(
-            $userId,
-            $this->groupFilter->getAllowedSuggestionIds(),
-        ) as $pending) {
+        foreach ($this->suggestionRepo->findUserPendingSuggestions($userId, $this->groupFilter->getAllowedSuggestionIds()) as $pending) {
             if ($pending->getBook()->getId() !== $book->getId()) {
                 continue;
             }
@@ -75,10 +72,7 @@ readonly class SuggestionService
     /** @return BookSuggestion[] */
     public function getUserPendingSuggestions(int $userId): array
     {
-        return $this->suggestionRepo->findUserPendingSuggestions(
-            $userId,
-            $this->groupFilter->getAllowedSuggestionIds(),
-        );
+        return $this->suggestionRepo->findUserPendingSuggestions($userId, $this->groupFilter->getAllowedSuggestionIds());
     }
 
     /** @return BookSuggestion[] */
@@ -92,10 +86,7 @@ readonly class SuggestionService
     {
         $suggestions = $this->getPendingSuggestions();
 
-        usort(
-            $suggestions,
-            fn(BookSuggestion $a, BookSuggestion $b) => $this->calculatePriority($b) <=> $this->calculatePriority($a),
-        );
+        usort($suggestions, fn(BookSuggestion $a, BookSuggestion $b) => $this->calculatePriority($b) <=> $this->calculatePriority($a));
 
         return $suggestions;
     }

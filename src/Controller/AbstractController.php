@@ -24,9 +24,7 @@ abstract class AbstractController extends AbstractSymfonyController
     {
         $user = $this->getUser();
         if (!$user instanceof User) {
-            throw new AuthenticationCredentialsNotFoundException(
-                'Should never happen, see: config/packages/security.yaml',
-            );
+            throw new AuthenticationCredentialsNotFoundException('Should never happen, see: config/packages/security.yaml');
         }
 
         return $user;

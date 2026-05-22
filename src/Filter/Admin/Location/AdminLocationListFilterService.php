@@ -98,13 +98,7 @@ readonly class AdminLocationListFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort(
-            $filters,
-            static fn(
-                AdminLocationListFilterInterface $a,
-                AdminLocationListFilterInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($filters, static fn(AdminLocationListFilterInterface $a, AdminLocationListFilterInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $filters;
     }

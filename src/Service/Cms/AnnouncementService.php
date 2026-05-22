@@ -75,9 +75,7 @@ readonly class AnnouncementService
     {
         $subscribers = $this->userRepo->findAnnouncementSubscribers();
 
-        return array_filter($subscribers, static fn(User $user) => $user->getNotificationSettings()->isActive(
-            'announcements',
-        ));
+        return array_filter($subscribers, static fn(User $user) => $user->getNotificationSettings()->isActive('announcements'));
     }
 
     private function generateLinkHash(): string
@@ -100,9 +98,7 @@ readonly class AnnouncementService
 
             match ($block->getType()) {
                 CmsBlockType::Text => $contentParts[] = '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
-                CmsBlockType::Gallery => $contentParts[] = $this->renderGalleryBlock(
-                    GalleryType::fromJson($block->getJson()),
-                ),
+                CmsBlockType::Gallery => $contentParts[] = $this->renderGalleryBlock(GalleryType::fromJson($block->getJson())),
                 default => null,
             };
         }
@@ -133,9 +129,7 @@ readonly class AnnouncementService
         $linkHash = $announcement->getLinkHash() ?? 'preview-' . $announcement->getId();
         $cmsPage = $announcement->getCmsPage();
 
-        $renderedContent = $cmsPage instanceof Cms
-            ? $this->renderContent($cmsPage, $locale)
-            : ['title' => null, 'content' => ''];
+        $renderedContent = $cmsPage instanceof Cms ? $this->renderContent($cmsPage, $locale) : ['title' => null, 'content' => ''];
 
         return [
             'title' => $renderedContent['title'],
@@ -151,9 +145,7 @@ readonly class AnnouncementService
     {
         $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement);
         if (!$dbTemplate instanceof EmailTemplate) {
-            throw new RuntimeException(
-                'Announcement email template not found in database. Run app:email-templates:seed command.',
-            );
+            throw new RuntimeException('Announcement email template not found in database. Run app:email-templates:seed command.');
         }
 
         $context = $this->getPreviewContext($announcement, $locale);

@@ -88,9 +88,7 @@ class EmailDeliveryStatusSyncServiceTest extends TestCase
 
         $provider = $this->createStub(EmailDeliveryProviderInterface::class);
         $provider->method('isAvailable')->willReturn(true);
-        $provider->method('getLogByMessageId')->willReturnCallback(static fn(string $id) => $id === 'tx-1'
-            ? self::makeLog('delivered')
-            : null);
+        $provider->method('getLogByMessageId')->willReturnCallback(static fn(string $id) => $id === 'tx-1' ? self::makeLog('delivered') : null);
 
         $repo = $this->createStub(EmailQueueRepository::class);
         $repo->method('findWithProviderMessageIdAndNoStatus')->willReturn([$email1, $email2]);

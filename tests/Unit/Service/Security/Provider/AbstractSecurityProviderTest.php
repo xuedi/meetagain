@@ -24,14 +24,7 @@ class AbstractSecurityProviderTest extends TestCase
         $provider->processEventShouldFail = true;
 
         // Act
-        $report = $provider->observe(
-            SecurityEventType::NotFound,
-            Request::create('/'),
-            [],
-            'sess',
-            '1.2.3.4',
-            readOnly: true,
-        );
+        $report = $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], 'sess', '1.2.3.4', readOnly: true);
 
         // Assert
         static::assertSame(0, $report->threatLevel);
@@ -129,10 +122,7 @@ class AbstractSecurityProviderTest extends TestCase
         ];
 
         // Act
-        $report = $provider->scanRetrospective(
-            new DateTimeImmutable('2026-05-01'),
-            new DateTimeImmutable('2026-05-12'),
-        );
+        $report = $provider->scanRetrospective(new DateTimeImmutable('2026-05-01'), new DateTimeImmutable('2026-05-12'));
 
         // Assert
         static::assertSame(7, $report->threatLevel);
@@ -257,13 +247,8 @@ class FakeSecurityProvider extends AbstractSecurityProvider
     }
 
     #[Override]
-    protected function processEvent(
-        SecurityEventType $type,
-        Request $request,
-        array $context,
-        string $ip,
-        array $state,
-    ): array {
+    protected function processEvent(SecurityEventType $type, Request $request, array $context, string $ip, array $state): array
+    {
         if ($this->processEventShouldFail) {
             throw new RuntimeException('processEvent should not have been invoked');
         }

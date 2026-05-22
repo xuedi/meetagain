@@ -22,10 +22,8 @@ class SweegoEmailDeliveryProviderTest extends TestCase
      * @param array<string, mixed> $expectedBodySubset
      */
     #[DataProvider('provideFilterToRequestBodyCases')]
-    public function testGetLogsBuildsRequestBodyFromFilter(
-        EmailDeliveryLogFilter $filter,
-        array $expectedBodySubset,
-    ): void {
+    public function testGetLogsBuildsRequestBodyFromFilter(EmailDeliveryLogFilter $filter, array $expectedBodySubset): void
+    {
         // Arrange
         $captured = ['url' => null, 'body' => null, 'headers' => null];
         $http = $this->httpClientReturning(['result' => [], 'nb_result_without_offset' => 0], $captured);
@@ -112,11 +110,8 @@ class SweegoEmailDeliveryProviderTest extends TestCase
      * @param array<string, mixed> $rawRow
      */
     #[DataProvider('provideMissingFieldFallbackCases')]
-    public function testMapLogAppliesFallbacksForMissingFields(
-        array $rawRow,
-        string $expectedField,
-        mixed $expectedValue,
-    ): void {
+    public function testMapLogAppliesFallbacksForMissingFields(array $rawRow, string $expectedField, mixed $expectedValue): void
+    {
         // Arrange
         $http = $this->httpClientReturning(['result' => [$rawRow]]);
         $provider = new SweegoEmailDeliveryProvider($http, new NullLogger(), self::DSN);
@@ -283,10 +278,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
      */
     private function httpClientReturning(array $payload, ?array &$captured = null): HttpClientInterface
     {
-        return new MockHttpClient(static function (string $method, string $url, array $options) use (
-            $payload,
-            &$captured,
-        ): MockResponse {
+        return new MockHttpClient(static function (string $method, string $url, array $options) use ($payload, &$captured): MockResponse {
             if ($captured !== null) {
                 $captured['url'] = $url;
                 if (array_key_exists('body', $captured)) {

@@ -35,10 +35,7 @@ class PermissionsControllerTest extends WebTestCase
 
         // Assert
         static::assertSame(301, $client->getResponse()->getStatusCode());
-        static::assertStringContainsString(
-            '/admin/security/permissions',
-            (string) $client->getResponse()->headers->get('Location'),
-        );
+        static::assertStringContainsString('/admin/security/permissions', (string) $client->getResponse()->headers->get('Location'));
     }
 
     private function loginAsAdmin(KernelBrowser $client): void

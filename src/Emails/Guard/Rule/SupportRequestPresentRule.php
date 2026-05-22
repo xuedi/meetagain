@@ -22,11 +22,7 @@ final readonly class SupportRequestPresentRule implements EmailGuardRuleInterfac
     public function evaluate(array $context): EmailGuardResult
     {
         if (!array_key_exists('request', $context) || !$context['request'] instanceof SupportRequest) {
-            return EmailGuardResult::error(
-                $this->getName(),
-                "Context is missing the 'request' key, or it is not a SupportRequest instance.",
-                'request',
-            );
+            return EmailGuardResult::error($this->getName(), "Context is missing the 'request' key, or it is not a SupportRequest instance.", 'request');
         }
 
         return EmailGuardResult::pass($this->getName());

@@ -41,10 +41,7 @@ final readonly class RecipientNotRecentlyActiveRule implements EmailGuardRuleInt
         $threshold = $this->clock->now()->sub($this->window);
         $lastLogin = $user->getLastLogin();
         if ($lastLogin !== null && $lastLogin > $threshold) {
-            return EmailGuardResult::skip(
-                $this->getName(),
-                'User logged in within the configured recent-activity window.',
-            );
+            return EmailGuardResult::skip($this->getName(), 'User logged in within the configured recent-activity window.');
         }
 
         return EmailGuardResult::pass($this->getName());

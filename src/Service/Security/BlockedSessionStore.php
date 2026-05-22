@@ -22,11 +22,8 @@ readonly class BlockedSessionStore
     /**
      * @param array<string, mixed> $reportSnapshot
      */
-    public function blockSession(
-        string $sessionId,
-        array $reportSnapshot,
-        int $ttlSeconds = self::DEFAULT_TTL_SECONDS,
-    ): void {
+    public function blockSession(string $sessionId, array $reportSnapshot, int $ttlSeconds = self::DEFAULT_TTL_SECONDS): void
+    {
         $this->writeBlock($this->sessionKey($sessionId), $reportSnapshot, $ttlSeconds);
         $this->addToIndex(self::SESSION_INDEX_KEY, $sessionId, $ttlSeconds);
     }

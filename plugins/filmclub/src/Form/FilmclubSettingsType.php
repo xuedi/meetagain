@@ -26,17 +26,14 @@ class FilmclubSettingsType extends AbstractType
             'placeholder' => $this->translator->trans('filmclub_settings.adapter_none'),
             'required' => false,
             'expanded' => true,
-            'choice_label' => fn(ExternalSource $e) => $this->translator->trans('filmclub_settings.adapter_'
-            . $e->value),
+            'choice_label' => fn(ExternalSource $e) => $this->translator->trans('filmclub_settings.adapter_' . $e->value),
         ])->add('tmdbKey', PasswordType::class, [
             'label' => 'filmclub_settings.tmdb_key_label',
             'mapped' => false,
             'required' => false,
             'always_empty' => true,
             'attr' => [
-                'placeholder' => $options['tmdb_key_set']
-                    ? $this->translator->trans('filmclub_settings.key_already_set')
-                    : '',
+                'placeholder' => $options['tmdb_key_set'] ? $this->translator->trans('filmclub_settings.key_already_set') : '',
                 'autocomplete' => 'off',
             ],
         ])->add('clearTmdbKey', CheckboxType::class, [
@@ -49,9 +46,7 @@ class FilmclubSettingsType extends AbstractType
             'required' => false,
             'always_empty' => true,
             'attr' => [
-                'placeholder' => $options['omdb_key_set']
-                    ? $this->translator->trans('filmclub_settings.key_already_set')
-                    : '',
+                'placeholder' => $options['omdb_key_set'] ? $this->translator->trans('filmclub_settings.key_already_set') : '',
                 'autocomplete' => 'off',
             ],
         ])->add('clearOmdbKey', CheckboxType::class, [

@@ -27,13 +27,7 @@ final readonly class SitemapService
     {
         $publishers = iterator_to_array($this->publishers, false);
 
-        usort(
-            $publishers,
-            static fn(
-                SitemapPublisherInterface $a,
-                SitemapPublisherInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($publishers, static fn(SitemapPublisherInterface $a, SitemapPublisherInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         $urls = [];
         foreach ($publishers as $publisher) {
@@ -94,11 +88,7 @@ final readonly class SitemapService
         }
 
         foreach ($url->alternates as $locale => $href) {
-            $parts[] = sprintf(
-                '    <xhtml:link rel="alternate" hreflang="%s" href="%s"/>',
-                self::escape($locale),
-                self::escape($href),
-            );
+            $parts[] = sprintf('    <xhtml:link rel="alternate" hreflang="%s" href="%s"/>', self::escape($locale), self::escape($href));
         }
 
         $parts[] = '  </url>';

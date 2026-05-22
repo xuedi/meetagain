@@ -28,9 +28,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/email/announcements')]
-final class AnnouncementsController extends AbstractEmailController implements
-    AdminNavigationInterface,
-    AdminTabsInterface
+final class AnnouncementsController extends AbstractEmailController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(
         TranslatorInterface $translator,
@@ -46,9 +44,7 @@ final class AnnouncementsController extends AbstractEmailController implements
     #[Route('', name: 'app_admin_email_announcements')]
     public function announcements(): Response
     {
-        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
-            'admin_cms.announcements_list_intro',
-        ))], actions: [
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_cms.announcements_list_intro'))], actions: [
             new AdminTopActionButton(
                 label: $this->translator->trans('admin_cms.announcement_new'),
                 target: $this->generateUrl('app_admin_email_announcements_new'),
@@ -112,10 +108,7 @@ final class AnnouncementsController extends AbstractEmailController implements
     #[Route('/from-cms/{id}', name: 'app_admin_email_announcements_from_cms', methods: ['POST'])]
     public function announcementsFromCms(Request $request, Cms $cmsPage): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'admin_email_announcements_from_cms' . $cmsPage->getId(),
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('admin_email_announcements_from_cms' . $cmsPage->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
@@ -139,10 +132,7 @@ final class AnnouncementsController extends AbstractEmailController implements
         $locale = $request->query->get('locale', $this->languageService->getAdminFilteredEnabledCodes()[0]);
         $preview = $this->announcementService->renderPreview($announcement, $locale);
 
-        $adminTop = new AdminTop(
-            info: $this->buildViewInfo($announcement),
-            actions: $this->buildViewActions($announcement),
-        );
+        $adminTop = new AdminTop(info: $this->buildViewInfo($announcement), actions: $this->buildViewActions($announcement));
 
         return $this->render('admin/email/announcements/view.html.twig', [
             'active' => 'email',
@@ -157,10 +147,7 @@ final class AnnouncementsController extends AbstractEmailController implements
     #[Route('/{id}/send', name: 'app_admin_email_announcements_send', methods: ['POST'])]
     public function announcementsSend(Request $request, Announcement $announcement): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'admin_email_announcements_send' . $announcement->getId(),
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('admin_email_announcements_send' . $announcement->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
@@ -182,10 +169,7 @@ final class AnnouncementsController extends AbstractEmailController implements
     #[Route('/{id}/delete', name: 'app_admin_email_announcements_delete', methods: ['POST'])]
     public function announcementsDelete(Request $request, Announcement $announcement): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'admin_email_announcements_delete' . $announcement->getId(),
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('admin_email_announcements_delete' . $announcement->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
@@ -209,19 +193,13 @@ final class AnnouncementsController extends AbstractEmailController implements
      */
     private function buildViewInfo(Announcement $announcement): array
     {
-        $title = $announcement->getCmsPage() !== null
-            ? (string) $announcement->getCmsPage()->getSlug()
-            : 'Announcement #' . $announcement->getId();
+        $title = $announcement->getCmsPage() !== null ? (string) $announcement->getCmsPage()->getSlug() : 'Announcement #' . $announcement->getId();
 
         $statusVariant = $announcement->isDraft() ? 'is-warning' : 'is-success';
         $statusKey = $announcement->isDraft() ? 'admin_cms.draft' : 'admin_cms.sent';
 
         return [
-            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
-                $title,
-                ENT_QUOTES | ENT_HTML5,
-                'UTF-8',
-            ))),
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars($title, ENT_QUOTES | ENT_HTML5, 'UTF-8'))),
             new AdminTopInfoHtml(sprintf(
                 '<span class="tag %s is-medium">%s</span>',
                 $statusVariant,

@@ -57,10 +57,7 @@ class CmsServiceTest extends TestCase
         $slug = 'non-existent-page';
 
         $cmsFilterServiceMock = $this->createMock(CmsFilterService::class);
-        $cmsFilterServiceMock
-            ->expects($this->once())
-            ->method('getCmsIdFilter')
-            ->willReturn(CmsFilterResult::noFilter());
+        $cmsFilterServiceMock->expects($this->once())->method('getCmsIdFilter')->willReturn(CmsFilterResult::noFilter());
 
         $cmsRepoMock = $this->createMock(CmsRepository::class);
         $cmsRepoMock->expects($this->once())->method('findPublishedBySlug')->with($slug, null)->willReturn(null);
@@ -97,18 +94,11 @@ class CmsServiceTest extends TestCase
         $expectedContent = '204 page content';
 
         $cmsMock = $this->createMock(Cms::class);
-        $cmsMock
-            ->expects($this->once())
-            ->method('getLanguageFilteredBlockJsonList')
-            ->with($locale)
-            ->willReturn(new ArrayCollection());
+        $cmsMock->expects($this->once())->method('getLanguageFilteredBlockJsonList')->with($locale)->willReturn(new ArrayCollection());
         $cmsMock->method('getId')->willReturn(11);
 
         $cmsFilterServiceMock = $this->createMock(CmsFilterService::class);
-        $cmsFilterServiceMock
-            ->expects($this->once())
-            ->method('getCmsIdFilter')
-            ->willReturn(CmsFilterResult::noFilter());
+        $cmsFilterServiceMock->expects($this->once())->method('getCmsIdFilter')->willReturn(CmsFilterResult::noFilter());
 
         $cmsRepoMock = $this->createMock(CmsRepository::class);
         $cmsRepoMock->expects($this->once())->method('findPublishedBySlug')->with($slug, null)->willReturn($cmsMock);
@@ -160,25 +150,15 @@ class CmsServiceTest extends TestCase
         $blocks = new ArrayCollection(['block1', 'block2']);
 
         $cmsMock = $this->createMock(Cms::class);
-        $cmsMock
-            ->expects($this->once())
-            ->method('getLanguageFilteredBlockJsonList')
-            ->with($locale)
-            ->willReturn($blocks);
+        $cmsMock->expects($this->once())->method('getLanguageFilteredBlockJsonList')->with($locale)->willReturn($blocks);
         $cmsMock->expects($this->once())->method('getPageTitle')->with($locale)->willReturn($pageTitle);
         $cmsMock->method('getId')->willReturn(123);
 
         $cmsFilterServiceMock = $this->createMock(CmsFilterService::class);
-        $cmsFilterServiceMock
-            ->expects($this->once())
-            ->method('getCmsIdFilter')
-            ->willReturn(CmsFilterResult::noFilter());
+        $cmsFilterServiceMock->expects($this->once())->method('getCmsIdFilter')->willReturn(CmsFilterResult::noFilter());
 
         $eventFilterServiceMock = $this->createMock(EventFilterService::class);
-        $eventFilterServiceMock
-            ->expects($this->once())
-            ->method('getEventIdFilter')
-            ->willReturn(new EventFilterResult(null, false));
+        $eventFilterServiceMock->expects($this->once())->method('getEventIdFilter')->willReturn(new EventFilterResult(null, false));
 
         $cmsRepoMock = $this->createMock(CmsRepository::class);
         $cmsRepoMock->expects($this->once())->method('findPublishedBySlug')->with($slug, null)->willReturn($cmsMock);
@@ -188,12 +168,7 @@ class CmsServiceTest extends TestCase
         $twigMock
             ->expects($this->exactly(2))
             ->method('render')
-            ->willReturnCallback(static function (string $name, array $context) use (
-                $blocks,
-                $pageTitle,
-                $renderedBody,
-                $expectedContent,
-            ): string {
+            ->willReturnCallback(static function (string $name, array $context) use ($blocks, $pageTitle, $renderedBody, $expectedContent): string {
                 if ($name === 'cms/_blocks.html.twig') {
                     static::assertSame(['blocks' => $blocks], $context);
                     return $renderedBody;
@@ -210,10 +185,7 @@ class CmsServiceTest extends TestCase
         $cacheMock
             ->expects($this->exactly(2))
             ->method('get')
-            ->willReturnCallback(static function (string $key, callable $callback, ?float $beta = null) use (
-                &$capturedKey,
-                &$capturedTags,
-            ): string {
+            ->willReturnCallback(static function (string $key, callable $callback, ?float $beta = null) use (&$capturedKey, &$capturedTags): string {
                 $capturedKey = $key;
                 $item = new class implements ItemInterface {
                     /** @var list<string> */
@@ -325,11 +297,7 @@ class CmsServiceTest extends TestCase
         $twigMock
             ->expects($this->exactly(2))
             ->method('render')
-            ->willReturnCallback(static function (string $name, array $context) use (
-                $blocks,
-                $renderedBody,
-                $expectedContent,
-            ): string {
+            ->willReturnCallback(static function (string $name, array $context) use ($blocks, $renderedBody, $expectedContent): string {
                 if ($name === 'cms/_blocks.html.twig') {
                     static::assertSame(['blocks' => $blocks], $context);
                     return $renderedBody;
@@ -447,9 +415,7 @@ class CmsServiceTest extends TestCase
         $cacheStub = $this->createStub(TagAwareCacheInterface::class);
         $cacheStub
             ->method('get')
-            ->willReturnCallback(static function (string $key, callable $callback, ?float $beta = null) use (
-                &$capturedKeys,
-            ): string {
+            ->willReturnCallback(static function (string $key, callable $callback, ?float $beta = null) use (&$capturedKeys): string {
                 $capturedKeys[] = $key;
                 return $callback(self::createCacheItem());
             });

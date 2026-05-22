@@ -18,9 +18,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/security/blocked')]
-final class BlockedSessionsController extends AbstractSecurityController implements
-    AdminNavigationInterface,
-    AdminTabsInterface
+final class BlockedSessionsController extends AbstractSecurityController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(
         TranslatorInterface $translator,
@@ -53,11 +51,7 @@ final class BlockedSessionsController extends AbstractSecurityController impleme
         }
 
         $adminTop = new AdminTop(info: [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($entries),
-                $this->translator->trans('admin_security.summary_blocked_total'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($entries), $this->translator->trans('admin_security.summary_blocked_total'))),
         ], actions: $actions);
 
         return $this->render('admin/security/blocked_sessions.html.twig', [

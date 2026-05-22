@@ -33,11 +33,8 @@ class CronIntervalCheckServiceTest extends TestCase
     }
 
     #[DataProvider('gapProvider')]
-    public function testGapClassification(
-        string $previousRunAt,
-        CronTaskStatus $expected,
-        string $expectedMessagePart,
-    ): void {
+    public function testGapClassification(string $previousRunAt, CronTaskStatus $expected, string $expectedMessagePart): void
+    {
         // Arrange
         $previousLog = new CronLog(new DateTimeImmutable($previousRunAt), CronTaskStatus::ok, 0, []);
 

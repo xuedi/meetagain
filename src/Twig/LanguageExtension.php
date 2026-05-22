@@ -75,11 +75,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
 
     public function getCurrentLocale(): string
     {
-        return (
-            $this->requestStack->getCurrentRequest()?->getLocale() ?? throw new RuntimeException(
-                'Could not get current locale',
-            )
-        );
+        return $this->requestStack->getCurrentRequest()?->getLocale() ?? throw new RuntimeException('Could not get current locale');
     }
 
     public function getLanguageSwitcherOptions(): array

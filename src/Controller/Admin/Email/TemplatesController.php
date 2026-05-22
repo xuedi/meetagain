@@ -81,10 +81,7 @@ final class TemplatesController extends AbstractEmailController implements Admin
                     id: 'email-section-' . $identifier,
                     left: [
                         new AdminSectionTextItem($this->translator->trans($identifier)),
-                        new AdminSectionTextItem(
-                            $this->translator->trans($emailType->getTriggerLabel()),
-                            'has-text-grey is-size-7 ml-3',
-                        ),
+                        new AdminSectionTextItem($this->translator->trans($emailType->getTriggerLabel()), 'has-text-grey is-size-7 ml-3'),
                     ],
                     right: $right,
                     openByDefault: false,
@@ -145,11 +142,7 @@ final class TemplatesController extends AbstractEmailController implements Admin
         }
 
         $adminTop = new AdminTop(info: [
-            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
-                (string) $template->getIdentifier(),
-                ENT_QUOTES | ENT_HTML5,
-                'UTF-8',
-            ))),
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars((string) $template->getIdentifier(), ENT_QUOTES | ENT_HTML5, 'UTF-8'))),
         ], actions: [
             new AdminTopActionForm(
                 label: $this->translator->trans('admin_email_templates.button_reset'),
@@ -191,11 +184,7 @@ final class TemplatesController extends AbstractEmailController implements Admin
         $renderedBody = $this->templateService->renderContent($template->getBody($language), $mockContext);
 
         $adminTop = new AdminTop(info: [
-            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
-                (string) $template->getIdentifier(),
-                ENT_QUOTES | ENT_HTML5,
-                'UTF-8',
-            ))),
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars((string) $template->getIdentifier(), ENT_QUOTES | ENT_HTML5, 'UTF-8'))),
             new AdminTopInfoText($this->translator->trans('admin_email_templates.preview_mock_notice')),
         ], actions: [
             new AdminTopActionButton(
@@ -221,10 +210,7 @@ final class TemplatesController extends AbstractEmailController implements Admin
     #[Route('/{id}/reset', name: 'app_admin_email_templates_reset', methods: ['POST'])]
     public function templatesReset(Request $request, EmailTemplate $template): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'admin_email_templates_reset' . $template->getId(),
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('admin_email_templates_reset' . $template->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 

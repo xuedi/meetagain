@@ -36,12 +36,7 @@ final class MemberController extends AbstractController implements AdminNavigati
         return new AdminNavigationConfig(
             section: 'admin_shell.section_content',
             links: [
-                new AdminLink(
-                    label: 'admin_shell.menu_member',
-                    route: 'app_admin_member',
-                    active: 'member',
-                    role: 'ROLE_STEWARD',
-                ),
+                new AdminLink(label: 'admin_shell.menu_member', route: 'app_admin_member', active: 'member', role: 'ROLE_STEWARD'),
             ],
             sectionPriority: 50,
         );
@@ -51,9 +46,7 @@ final class MemberController extends AbstractController implements AdminNavigati
     {
         $user = $this->getUser();
         if (!$user instanceof User) {
-            throw new AuthenticationCredentialsNotFoundException(
-                'Should never happen, see: config/packages/security.yaml',
-            );
+            throw new AuthenticationCredentialsNotFoundException('Should never happen, see: config/packages/security.yaml');
         }
 
         return $user;
@@ -145,10 +138,7 @@ final class MemberController extends AbstractController implements AdminNavigati
             throw new BadRequestHttpException('Invalid flag.');
         }
 
-        if (!$this->isCsrfTokenValid(
-            'member_toggle_' . $user->getId() . '_' . $flag,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('member_toggle_' . $user->getId() . '_' . $flag, (string) $request->request->get('_token'))) {
             return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
         }
 
@@ -179,10 +169,7 @@ final class MemberController extends AbstractController implements AdminNavigati
             throw new BadRequestHttpException('Invalid status.');
         }
 
-        if (!$this->isCsrfTokenValid(
-            'member_set_status_' . $user->getId(),
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('member_set_status_' . $user->getId(), (string) $request->request->get('_token'))) {
             return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
         }
 

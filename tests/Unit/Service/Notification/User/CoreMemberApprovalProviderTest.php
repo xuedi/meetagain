@@ -25,11 +25,8 @@ class CoreMemberApprovalProviderTest extends TestCase
         return $user;
     }
 
-    private function makeProvider(
-        array $pendingUsers = [],
-        bool $isAdmin = true,
-        ?User $findResult = null,
-    ): CoreMemberApprovalProvider {
+    private function makeProvider(array $pendingUsers = [], bool $isAdmin = true, ?User $findResult = null): CoreMemberApprovalProvider
+    {
         $repo = $this->createStub(UserRepository::class);
         $repo->method('findByStatus')->willReturn($pendingUsers);
         $repo->method('find')->willReturn($findResult);
@@ -37,11 +34,7 @@ class CoreMemberApprovalProviderTest extends TestCase
         $security = $this->createStub(Security::class);
         $security->method('isGranted')->willReturn($isAdmin);
 
-        return new CoreMemberApprovalProvider(
-            userRepo: $repo,
-            userService: $this->createStub(UserService::class),
-            security: $security,
-        );
+        return new CoreMemberApprovalProvider(userRepo: $repo, userService: $this->createStub(UserService::class), security: $security);
     }
 
     public function testGetReviewItemsReturnsOneItemPerPendingUser(): void
@@ -133,10 +126,7 @@ class CoreMemberApprovalProviderTest extends TestCase
         $userRepo->method('find')->willReturn($pending);
 
         $userService = $this->createMock(UserService::class);
-        $userService
-            ->expects($this->once())
-            ->method('transitionStatus')
-            ->with(static::isInstanceOf(User::class), $pending, UserStatus::Active);
+        $userService->expects($this->once())->method('transitionStatus')->with(static::isInstanceOf(User::class), $pending, UserStatus::Active);
 
         $security = $this->createStub(Security::class);
         $security->method('isGranted')->willReturn(true);
@@ -173,10 +163,7 @@ class CoreMemberApprovalProviderTest extends TestCase
         $userRepo->method('find')->willReturn($pending);
 
         $userService = $this->createMock(UserService::class);
-        $userService
-            ->expects($this->once())
-            ->method('transitionStatus')
-            ->with(static::isInstanceOf(User::class), $pending, UserStatus::Denied);
+        $userService->expects($this->once())->method('transitionStatus')->with(static::isInstanceOf(User::class), $pending, UserStatus::Denied);
 
         $security = $this->createStub(Security::class);
         $security->method('isGranted')->willReturn(true);

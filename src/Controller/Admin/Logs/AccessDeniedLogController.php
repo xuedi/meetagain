@@ -23,9 +23,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/logs/access-denied')]
-final class AccessDeniedLogController extends AbstractLogsController implements
-    AdminNavigationInterface,
-    AdminTabsInterface
+final class AccessDeniedLogController extends AbstractLogsController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';
 
@@ -67,11 +65,7 @@ final class AccessDeniedLogController extends AbstractLogsController implements
         $rangeCount = $since !== null ? $this->accessDeniedLogRepo->countSince($since) : $totalCount;
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_logs.summary_total_access_denied'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_logs.summary_total_access_denied'))),
         ];
         if ($rangeCount === 0) {
             $info[] = new AdminTopInfoHtml(sprintf(
@@ -79,11 +73,7 @@ final class AccessDeniedLogController extends AbstractLogsController implements
                 $this->translator->trans('admin_logs.summary_no_access_denied_in_range'),
             ));
         } else {
-            $info[] = new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $rangeCount,
-                $this->translator->trans('admin_logs.summary_in_range'),
-            ));
+            $info[] = new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $rangeCount, $this->translator->trans('admin_logs.summary_in_range')));
         }
 
         $actions = [];
@@ -147,11 +137,7 @@ final class AccessDeniedLogController extends AbstractLogsController implements
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_logs.range_label'),
-                $this->translator->trans('admin_logs.range_' . $current),
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_logs.range_label'), $this->translator->trans('admin_logs.range_' . $current)),
             options: $options,
             icon: 'clock',
         );

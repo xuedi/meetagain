@@ -10,11 +10,8 @@ use Symfony\Component\HttpFoundation\Request;
 class LoadtestBypassTest extends TestCase
 {
     #[DataProvider('provideIsActiveCases')]
-    public function testIsActiveCombinesEnvironmentAndHeader(
-        ?Request $request,
-        string $environment,
-        bool $expected,
-    ): void {
+    public function testIsActiveCombinesEnvironmentAndHeader(?Request $request, string $environment, bool $expected): void
+    {
         static::assertSame($expected, LoadtestBypass::isActive($request, $environment));
     }
 

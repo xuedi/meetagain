@@ -42,12 +42,7 @@ final class LocationController extends AbstractController implements AdminNaviga
         return new AdminNavigationConfig(
             section: 'admin_shell.section_content',
             links: [
-                new AdminLink(
-                    label: 'admin_shell.menu_location',
-                    route: 'app_admin_location',
-                    active: 'location',
-                    role: 'ROLE_ORGANIZER',
-                ),
+                new AdminLink(label: 'admin_shell.menu_location', route: 'app_admin_location', active: 'location', role: 'ROLE_ORGANIZER'),
             ],
             sectionPriority: 50,
         );
@@ -60,11 +55,7 @@ final class LocationController extends AbstractController implements AdminNaviga
         $locations = $this->repo->findAllForAdmin($filterResult->getLocationIds());
 
         $adminTop = new AdminTop(info: [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($locations),
-                $this->translator->trans('admin_location.summary_total'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($locations), $this->translator->trans('admin_location.summary_total'))),
         ], actions: [
             new AdminTopActionButton(
                 label: $this->translator->trans('admin_location.page_title_create'),
@@ -116,10 +107,7 @@ final class LocationController extends AbstractController implements AdminNaviga
     #[Route('/{id}/delete', name: 'app_admin_location_delete', methods: ['POST'])]
     public function delete(Request $request, Location $location, EntityManagerInterface $entityManager): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'admin_location_delete' . $location->getId(),
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('admin_location_delete' . $location->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 

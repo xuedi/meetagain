@@ -96,10 +96,7 @@ readonly class LanguageService
     {
         $allowedCodes = array_flip($this->getFilteredEnabledCodes());
 
-        return array_values(array_filter(
-            $this->getEnabledLanguages(),
-            static fn(Language $language): bool => isset($allowedCodes[$language->getCode()]),
-        ));
+        return array_values(array_filter($this->getEnabledLanguages(), static fn(Language $language): bool => isset($allowedCodes[$language->getCode()])));
     }
 
     public function findByCode(string $code): ?Language

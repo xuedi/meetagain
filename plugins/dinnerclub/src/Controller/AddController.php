@@ -50,10 +50,7 @@ final class AddController extends AbstractController
                 'dish_name' => $dishName,
             ]);
 
-            $this->addFlash(
-                'success',
-                $this->translator->trans($isManager ? 'dinnerclub.flash_added' : 'dinnerclub.flash_submitted'),
-            );
+            $this->addFlash('success', $this->translator->trans($isManager ? 'dinnerclub.flash_added' : 'dinnerclub.flash_submitted'));
 
             return $this->redirectToRoute('app_plugin_dinnerclub');
         }

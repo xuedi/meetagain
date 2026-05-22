@@ -25,11 +25,7 @@ class ImageSuggestionRejected extends MessageAbstract
 
     protected function renderText(): string
     {
-        return sprintf(
-            'Rejected image suggestion (%s) for dish: %s',
-            $this->meta['suggestion_type'],
-            $this->meta['dish_name'],
-        );
+        return sprintf('Rejected image suggestion (%s) for dish: %s', $this->meta['suggestion_type'], $this->meta['dish_name']);
     }
 
     protected function renderHtml(): string

@@ -86,10 +86,7 @@ final class ProfileController extends AbstractController
     #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp', methods: ['POST'])]
     public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'app_profile_toggle_rsvp' . $event->getId(),
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('app_profile_toggle_rsvp' . $event->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
         if ($event->getStart() < new DateTimeImmutable()) { // does reload page for flashMessage to trigger

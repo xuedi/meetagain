@@ -47,12 +47,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
 
     public function getTop100(?DateTimeImmutable $since = null): array
     {
-        $qb = $this
-            ->createQueryBuilder('n')
-            ->select('COUNT(n.id) as number', 'n.url')
-            ->groupBy('n.url')
-            ->orderBy('number', 'DESC')
-            ->setMaxResults(100);
+        $qb = $this->createQueryBuilder('n')->select('COUNT(n.id) as number', 'n.url')->groupBy('n.url')->orderBy('number', 'DESC')->setMaxResults(100);
 
         if ($since !== null) {
             $qb->where('n.createdAt >= :since')->setParameter('since', $since);
@@ -90,12 +85,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
 
     public function findMostRecent(): ?NotFoundLog
     {
-        return $this
-            ->createQueryBuilder('n')
-            ->orderBy('n.createdAt', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->createQueryBuilder('n')->orderBy('n.createdAt', 'DESC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
     }
 
     /**

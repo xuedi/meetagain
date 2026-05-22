@@ -58,11 +58,7 @@ final class EmailTypeBlocklistTest extends TestCase
 
     public function testAdminNotificationSkipsBlockedRecipient(): void
     {
-        $email = new AdminNotificationEmail(
-            $this->blockingChecker,
-            $this->createStub(EmailQueueInterface::class),
-            $this->config,
-        );
+        $email = new AdminNotificationEmail($this->blockingChecker, $this->createStub(EmailQueueInterface::class), $this->config);
 
         static::assertFalse($email->guardCheck([
             'user' => $this->userWithEmail('blocked@example.com'),
@@ -72,12 +68,7 @@ final class EmailTypeBlocklistTest extends TestCase
 
     public function testAnnouncementSkipsBlockedRecipient(): void
     {
-        $email = new AnnouncementEmail(
-            $this->blockingChecker,
-            $this->createStub(EmailQueueInterface::class),
-            $this->config,
-            $this->host,
-        );
+        $email = new AnnouncementEmail($this->blockingChecker, $this->createStub(EmailQueueInterface::class), $this->config, $this->host);
 
         static::assertFalse($email->guardCheck([
             'user' => $this->userWithEmail('blocked@example.com', settings: new NotificationSettings([
@@ -126,12 +117,7 @@ final class EmailTypeBlocklistTest extends TestCase
 
     public function testNotificationEventCanceledSkipsBlockedRecipient(): void
     {
-        $email = new NotificationEventCanceledEmail(
-            $this->blockingChecker,
-            $this->createStub(EmailQueueInterface::class),
-            $this->config,
-            $this->host,
-        );
+        $email = new NotificationEventCanceledEmail($this->blockingChecker, $this->createStub(EmailQueueInterface::class), $this->config, $this->host);
 
         static::assertFalse($email->guardCheck([
             'user' => $this->userWithEmail('blocked@example.com'),
@@ -157,12 +143,7 @@ final class EmailTypeBlocklistTest extends TestCase
 
     public function testPasswordResetSkipsBlockedRecipient(): void
     {
-        $email = new PasswordResetEmail(
-            $this->blockingChecker,
-            $this->createStub(EmailQueueInterface::class),
-            $this->config,
-            $this->host,
-        );
+        $email = new PasswordResetEmail($this->blockingChecker, $this->createStub(EmailQueueInterface::class), $this->config, $this->host);
 
         static::assertFalse($email->guardCheck([
             'user' => $this->userWithEmail('blocked@example.com'),
@@ -226,12 +207,7 @@ final class EmailTypeBlocklistTest extends TestCase
 
     public function testVerificationRequestSkipsBlockedRecipient(): void
     {
-        $email = new VerificationRequestEmail(
-            $this->blockingChecker,
-            $this->createStub(EmailQueueInterface::class),
-            $this->config,
-            $this->host,
-        );
+        $email = new VerificationRequestEmail($this->blockingChecker, $this->createStub(EmailQueueInterface::class), $this->config, $this->host);
 
         static::assertFalse($email->guardCheck([
             'user' => $this->userWithEmail('blocked@example.com'),
@@ -240,12 +216,7 @@ final class EmailTypeBlocklistTest extends TestCase
 
     public function testWelcomeSkipsBlockedRecipient(): void
     {
-        $email = new WelcomeEmail(
-            $this->blockingChecker,
-            $this->createStub(EmailQueueInterface::class),
-            $this->config,
-            $this->host,
-        );
+        $email = new WelcomeEmail($this->blockingChecker, $this->createStub(EmailQueueInterface::class), $this->config, $this->host);
 
         static::assertFalse($email->guardCheck([
             'user' => $this->userWithEmail('blocked@example.com'),
@@ -258,9 +229,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $user->method('getEmail')->willReturn($email);
         $user->method('isNotification')->willReturn(true);
         $user->method('getLastLogin')->willReturn(new DateTime('-24 hours'));
-        $user->method('getNotificationSettings')->willReturn(
-            $settings ?? new NotificationSettings(['receivedMessage' => true]),
-        );
+        $user->method('getNotificationSettings')->willReturn($settings ?? new NotificationSettings(['receivedMessage' => true]));
 
         return $user;
     }

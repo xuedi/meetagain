@@ -22,9 +22,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN'), Route('/admin/system/cache')]
-final class RedisCacheController extends AbstractSettingsController implements
-    AdminNavigationInterface,
-    AdminTabsInterface
+final class RedisCacheController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(
         TranslatorInterface $translator,
@@ -52,11 +50,7 @@ final class RedisCacheController extends AbstractSettingsController implements
         $totalKeys = array_sum($prefixes);
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalKeys,
-                $this->translator->trans('admin_system_cache.summary_total'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalKeys, $this->translator->trans('admin_system_cache.summary_total'))),
         ];
         if ($prefix !== null) {
             $info[] = new AdminTopInfoHtml(sprintf(
@@ -129,30 +123,16 @@ final class RedisCacheController extends AbstractSettingsController implements
         $adminTop = new AdminTop(
             info: $entry !== null
                 ? [
-                    new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
-                        $entry['key'],
-                        ENT_QUOTES,
-                        'UTF-8',
-                    ))),
-                    new AdminTopInfoHtml(sprintf('<span class="tag is-light is-medium">%s</span>', htmlspecialchars(
-                        $entry['type'],
-                        ENT_QUOTES,
-                        'UTF-8',
-                    ))),
-                    new AdminTopInfoHtml(sprintf(
-                        '<span class="has-text-grey">%s</span>',
-                        $this->formatTtl($entry['ttl']),
-                    )),
+                    new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars($entry['key'], ENT_QUOTES, 'UTF-8'))),
+                    new AdminTopInfoHtml(sprintf('<span class="tag is-light is-medium">%s</span>', htmlspecialchars($entry['type'], ENT_QUOTES, 'UTF-8'))),
+                    new AdminTopInfoHtml(sprintf('<span class="has-text-grey">%s</span>', $this->formatTtl($entry['ttl']))),
                     new AdminTopInfoHtml(sprintf(
                         '<span class="has-text-grey">%s %s</span>',
                         $this->formatBytes($entry['size']),
                         $this->translator->trans('admin_system_cache.label_size'),
                     )),
                 ]
-                : [new AdminTopInfoHtml(sprintf(
-                    '<span class="has-text-danger">%s</span>',
-                    $this->translator->trans('admin_system_cache.flash_key_missing'),
-                ))],
+                : [new AdminTopInfoHtml(sprintf('<span class="has-text-danger">%s</span>', $this->translator->trans('admin_system_cache.flash_key_missing')))],
             actions: [
                 new AdminTopActionButton(
                     label: $this->translator->trans('global.button_back'),

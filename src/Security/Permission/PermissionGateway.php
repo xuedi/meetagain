@@ -29,13 +29,8 @@ final class PermissionGateway implements VoterInterface
     ) {}
 
     #[Override]
-    public function vote(
-        #[\SensitiveParameter]
-        TokenInterface $token,
-        mixed $subject,
-        array $attributes,
-        ?Vote $vote = null,
-    ): int {
+    public function vote(#[\SensitiveParameter] TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
+    {
         $context = null;
         $result = self::ACCESS_ABSTAIN;
 
@@ -82,10 +77,6 @@ final class PermissionGateway implements VoterInterface
     {
         $user = $token->getUser();
 
-        return new PermissionContext(
-            actor: $user instanceof User ? $user : null,
-            subject: $subject,
-            isAdmin: $this->security->isGranted('ROLE_ADMIN'),
-        );
+        return new PermissionContext(actor: $user instanceof User ? $user : null, subject: $subject, isAdmin: $this->security->isGranted('ROLE_ADMIN'));
     }
 }

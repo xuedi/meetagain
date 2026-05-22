@@ -55,11 +55,7 @@ class FriendshipServiceTest extends TestCase
         $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
 
         $routerMock = $this->createMock(RouterInterface::class);
-        $routerMock
-            ->expects($this->once())
-            ->method('generate')
-            ->with($returnRoute, ['_locale' => $locale, 'id' => $userId])
-            ->willReturn($generatedRoute);
+        $routerMock->expects($this->once())->method('generate')->with($returnRoute, ['_locale' => $locale, 'id' => $userId])->willReturn($generatedRoute);
 
         $blockRepoStub = $this->createStub(UserBlockRepository::class);
         $blockRepoStub->method('isBlockedEitherWay')->willReturn(false);
@@ -119,11 +115,7 @@ class FriendshipServiceTest extends TestCase
         $requestStackStub->method('getCurrentRequest')->willReturn($requestStub);
 
         $routerMock = $this->createMock(RouterInterface::class);
-        $routerMock
-            ->expects($this->once())
-            ->method('generate')
-            ->with($returnRoute, ['_locale' => $locale, 'id' => $userId])
-            ->willReturn($generatedRoute);
+        $routerMock->expects($this->once())->method('generate')->with($returnRoute, ['_locale' => $locale, 'id' => $userId])->willReturn($generatedRoute);
 
         $blockRepoStub = $this->createStub(UserBlockRepository::class);
         $blockRepoStub->method('isBlockedEitherWay')->willReturn(false);

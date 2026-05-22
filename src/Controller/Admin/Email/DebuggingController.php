@@ -57,9 +57,7 @@ final class DebuggingController extends AbstractEmailController implements Admin
 
         $context = $this->resolveMockContext($currentType);
 
-        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
-            'admin_email_debugging.intro',
-        ))], actions: [
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_email_debugging.intro'))], actions: [
             $this->buildTypeDropdown($currentType, $currentLanguage),
             $this->buildLanguageDropdown($currentLanguage, $currentType, $languages),
         ]);
@@ -144,11 +142,7 @@ final class DebuggingController extends AbstractEmailController implements Admin
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_email_debugging.field_email_type') . ':',
-                $this->humanize($current->value),
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_email_debugging.field_email_type') . ':', $this->humanize($current->value)),
             options: $options,
             icon: 'envelope',
         );

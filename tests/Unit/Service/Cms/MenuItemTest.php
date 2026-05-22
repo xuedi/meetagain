@@ -24,11 +24,8 @@ class MenuItemTest extends TestCase
      * @param array{slug: ?string, linkName: ?string, locale: string} $cmsData
      */
     #[DataProvider('provideFromCmsCases')]
-    public function testFromCmsBuildsLocalisedSlugAndFallsBackToSlugForName(
-        array $cmsData,
-        string $expectedSlug,
-        string $expectedName,
-    ): void {
+    public function testFromCmsBuildsLocalisedSlugAndFallsBackToSlugForName(array $cmsData, string $expectedSlug, string $expectedName): void
+    {
         // Arrange
         $cms = $this->createStub(Cms::class);
         $cms->method('getSlug')->willReturn($cmsData['slug']);

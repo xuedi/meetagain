@@ -47,10 +47,7 @@ class FactsRowTest extends TestCase
     {
         // Arrange
         $json = [
-            'facts' => array_map(
-                static fn(int $i): array => ['icon' => 'fa fa-' . $i, 'label' => 'Fact ' . $i],
-                range(1, 9),
-            ),
+            'facts' => array_map(static fn(int $i): array => ['icon' => 'fa fa-' . $i, 'label' => 'Fact ' . $i], range(1, 9)),
         ];
 
         // Act

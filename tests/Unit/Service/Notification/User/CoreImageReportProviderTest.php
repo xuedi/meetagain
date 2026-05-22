@@ -39,11 +39,7 @@ class CoreImageReportProviderTest extends TestCase
         $security = $this->createStub(Security::class);
         $security->method('isGranted')->willReturn($isAdmin);
 
-        return new CoreImageReportProvider(
-            imageReportRepo: $repo,
-            em: $this->createStub(EntityManagerInterface::class),
-            security: $security,
-        );
+        return new CoreImageReportProvider(imageReportRepo: $repo, em: $this->createStub(EntityManagerInterface::class), security: $security);
     }
 
     public function testGetReviewItemsReturnsOneItemPerOpenReport(): void

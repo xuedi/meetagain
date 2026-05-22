@@ -47,13 +47,7 @@ final class SecuritySeedBlocksCommand extends Command
         for ($i = 0; $i < $count; ++$i) {
             $provider = self::PROVIDERS[$random->getInt(0, count(self::PROVIDERS) - 1)];
             $threat = $random->getInt(40, 99);
-            $ip = sprintf(
-                '%d.%d.%d.%d',
-                $random->getInt(1, 223),
-                $random->getInt(0, 255),
-                $random->getInt(0, 255),
-                $random->getInt(1, 254),
-            );
+            $ip = sprintf('%d.%d.%d.%d', $random->getInt(1, 223), $random->getInt(0, 255), $random->getInt(0, 255), $random->getInt(1, 254));
             $sessionId = bin2hex($random->getBytes(13));
 
             $incident = new Incident();

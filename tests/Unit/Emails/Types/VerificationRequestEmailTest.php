@@ -46,12 +46,7 @@ class VerificationRequestEmailTest extends TestCase
         $user->method('getRegcode')->willReturn('TOKEN123');
         $user->method('getName')->willReturn('Alice');
 
-        $email = new VerificationRequestEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
-            $queue,
-            $config,
-            $host,
-        );
+        $email = new VerificationRequestEmail($this->createStub(BlocklistCheckerInterface::class), $queue, $config, $host);
 
         // Act
         $email->send(['user' => $user]);

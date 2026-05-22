@@ -36,11 +36,7 @@ final readonly class UserHasGroupEventsThisWeekRule implements EmailGuardRuleInt
     {
         $user = $context['user'] ?? null;
         if (!$user instanceof User) {
-            return EmailGuardResult::error(
-                $this->getName(),
-                "Context is missing the 'user' key, or it is not a User instance.",
-                'user',
-            );
+            return EmailGuardResult::error($this->getName(), "Context is missing the 'user' key, or it is not a User instance.", 'user');
         }
         $weekStart = $context['weekStart'] ?? null;
         $weekEnd = $context['weekEnd'] ?? null;
@@ -61,10 +57,7 @@ final readonly class UserHasGroupEventsThisWeekRule implements EmailGuardRuleInt
         }
 
         if ($events === []) {
-            return EmailGuardResult::skip(
-                $this->getName(),
-                'No events this week match this user (filtered out by group/digest filters or already RSVP\'d).',
-            );
+            return EmailGuardResult::skip($this->getName(), 'No events this week match this user (filtered out by group/digest filters or already RSVP\'d).');
         }
 
         return EmailGuardResult::pass($this->getName());

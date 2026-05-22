@@ -77,21 +77,14 @@ final class CronLogController extends AbstractLogsController implements AdminNav
         $problemCount = $this->cronLogRepository->countProblems();
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_logs.summary_total'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_logs.summary_total'))),
             $problemCount > 0
                 ? new AdminTopInfoHtml(sprintf(
                     '<span class="tag is-danger is-medium">%d&nbsp;%s</span>',
                     $problemCount,
                     $this->translator->trans('admin_logs.summary_problems'),
                 ))
-                : new AdminTopInfoHtml(sprintf(
-                    '<span class="tag is-success is-medium">%s</span>',
-                    $this->translator->trans('admin_logs.summary_all_ok'),
-                )),
+                : new AdminTopInfoHtml(sprintf('<span class="tag is-success is-medium">%s</span>', $this->translator->trans('admin_logs.summary_all_ok'))),
         ];
 
         $statusDropdown = $this->buildStatusDropdown($status, $range, $since);
@@ -140,22 +133,10 @@ final class CronLogController extends AbstractLogsController implements AdminNav
 
         $statusValue = $cronLog->getStatus()->value;
         $statusTag = match ($statusValue) {
-            'ok' => sprintf(
-                '<span class="tag is-success is-medium">%s</span>',
-                $this->translator->trans('admin_logs.status_ok'),
-            ),
-            'warning' => sprintf(
-                '<span class="tag is-warning is-medium">%s</span>',
-                $this->translator->trans('admin_logs.status_warning'),
-            ),
-            'error' => sprintf(
-                '<span class="tag is-danger is-medium">%s</span>',
-                $this->translator->trans('admin_logs.status_error'),
-            ),
-            default => sprintf(
-                '<span class="tag is-danger is-dark is-medium">%s</span>',
-                $this->translator->trans('admin_logs.status_exception'),
-            ),
+            'ok' => sprintf('<span class="tag is-success is-medium">%s</span>', $this->translator->trans('admin_logs.status_ok')),
+            'warning' => sprintf('<span class="tag is-warning is-medium">%s</span>', $this->translator->trans('admin_logs.status_warning')),
+            'error' => sprintf('<span class="tag is-danger is-medium">%s</span>', $this->translator->trans('admin_logs.status_error')),
+            default => sprintf('<span class="tag is-danger is-dark is-medium">%s</span>', $this->translator->trans('admin_logs.status_exception')),
         };
 
         $adminTop = new AdminTop(info: [
@@ -167,11 +148,7 @@ final class CronLogController extends AbstractLogsController implements AdminNav
                 $this->translator->trans('admin_logs.duration_ms_total'),
             )),
         ], actions: [
-            new AdminTopActionButton(
-                label: $this->translator->trans('admin_logs.back'),
-                target: $this->generateUrl('app_admin_cron_log'),
-                icon: 'arrow-left',
-            ),
+            new AdminTopActionButton(label: $this->translator->trans('admin_logs.back'), target: $this->generateUrl('app_admin_cron_log'), icon: 'arrow-left'),
         ]);
 
         return $this->render('admin/logs/logs_cron_show.html.twig', [
@@ -182,11 +159,8 @@ final class CronLogController extends AbstractLogsController implements AdminNav
         ]);
     }
 
-    private function buildStatusDropdown(
-        string $current,
-        string $range,
-        ?DateTimeImmutable $since,
-    ): AdminTopActionDropdown {
+    private function buildStatusDropdown(string $current, string $range, ?DateTimeImmutable $since): AdminTopActionDropdown
+    {
         $options = [];
         foreach (array_keys(self::STATUS_FILTERS) as $key) {
             $params = [];
@@ -241,11 +215,7 @@ final class CronLogController extends AbstractLogsController implements AdminNav
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_logs.range_label'),
-                $this->translator->trans('admin_logs.range_' . $current),
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_logs.range_label'), $this->translator->trans('admin_logs.range_' . $current)),
             options: $options,
             icon: 'clock',
         );

@@ -59,11 +59,7 @@ readonly class BookService
         $this->em->flush();
 
         if ($book->getCoverImage() !== null) {
-            $this->imageLocationService->addLocation(
-                $book->getCoverImage()->getId(),
-                ImageType::PluginBookclubCover,
-                $book->getId(),
-            );
+            $this->imageLocationService->addLocation($book->getCoverImage()->getId(), ImageType::PluginBookclubCover, $book->getId());
         }
 
         $this->dispatcher->dispatch(EntityAction::CreateBook, $book->getId());
@@ -71,14 +67,8 @@ readonly class BookService
         return $book;
     }
 
-    public function createManual(
-        string $isbn,
-        string $title,
-        ?string $author,
-        ?string $description,
-        int $userId,
-        bool $isManager,
-    ): Book {
+    public function createManual(string $isbn, string $title, ?string $author, ?string $description, int $userId, bool $isManager): Book
+    {
         $normalizedIsbn = preg_replace('/[^0-9X]/', '', strtoupper($isbn)) ?? $isbn;
 
         $existing = $this->bookRepo->findByIsbn($normalizedIsbn);

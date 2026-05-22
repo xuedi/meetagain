@@ -51,14 +51,8 @@ class EventRepository extends ServiceEntityRepository
 
         $cutoff = new DateTime()->modify('-' . self::IN_PROGRESS_GRACE_HOURS . ' hours');
         match ($time) {
-            EventTimeFilter::Past => $qb->andWhere('COALESCE(e.stop, e.start) < :cutoff')->setParameter(
-                'cutoff',
-                $cutoff,
-            ),
-            EventTimeFilter::Future => $qb->andWhere('COALESCE(e.stop, e.start) >= :cutoff')->setParameter(
-                'cutoff',
-                $cutoff,
-            ),
+            EventTimeFilter::Past => $qb->andWhere('COALESCE(e.stop, e.start) < :cutoff')->setParameter('cutoff', $cutoff),
+            EventTimeFilter::Future => $qb->andWhere('COALESCE(e.stop, e.start) >= :cutoff')->setParameter('cutoff', $cutoff),
             EventTimeFilter::All => null,
         };
 
@@ -91,11 +85,8 @@ class EventRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return array<Event>
      */
-    public function findUpcomingEventsWithinRange(
-        DateTimeInterface $start,
-        DateTimeInterface $end,
-        ?array $restrictToEventIds = null,
-    ): array {
+    public function findUpcomingEventsWithinRange(DateTimeInterface $start, DateTimeInterface $end, ?array $restrictToEventIds = null): array
+    {
         $qb = $this
             ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
@@ -224,12 +215,7 @@ class EventRepository extends ServiceEntityRepository
 
     public function getEventNameList(string $language): array
     {
-        $events = $this
-            ->createQueryBuilder('e')
-            ->leftJoin('e.translations', 't')
-            ->addSelect('t')
-            ->getQuery()
-            ->getResult();
+        $events = $this->createQueryBuilder('e')->leftJoin('e.translations', 't')->addSelect('t')->getQuery()->getResult();
 
         $list = [];
         foreach ($events as $event) {
@@ -543,11 +529,8 @@ class EventRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToEventIds
      * @return array<Event>
      */
-    public function findUpcomingWithLowRsvp(
-        int $daysAhead = 14,
-        int $minYes = 3,
-        ?array $restrictToEventIds = null,
-    ): array {
+    public function findUpcomingWithLowRsvp(int $daysAhead = 14, int $minYes = 3, ?array $restrictToEventIds = null): array
+    {
         if ($restrictToEventIds === []) {
             return [];
         }
@@ -583,12 +566,7 @@ class EventRepository extends ServiceEntityRepository
      */
     public function findAllForAdmin(?array $restrictToEventIds = null): array
     {
-        $qb = $this
-            ->createQueryBuilder('e')
-            ->leftJoin('e.translations', 't')
-            ->addSelect('t')
-            ->leftJoin('e.location', 'l')
-            ->addSelect('l');
+        $qb = $this->createQueryBuilder('e')->leftJoin('e.translations', 't')->addSelect('t')->leftJoin('e.location', 'l')->addSelect('l');
 
         // Apply event ID filter if provided
         if ($restrictToEventIds !== null) {
@@ -716,13 +694,8 @@ class EventRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToEventIds null = no restriction, [] = empty result
      * @return array{items: Event[], total: int}
      */
-    public function findPublicUpcoming(
-        DateTimeInterface $from,
-        ?DateTimeInterface $to,
-        int $limit,
-        int $offset,
-        ?array $restrictToEventIds,
-    ): array {
+    public function findPublicUpcoming(DateTimeInterface $from, ?DateTimeInterface $to, int $limit, int $offset, ?array $restrictToEventIds): array
+    {
         if ($restrictToEventIds === []) {
             return ['items' => [], 'total' => 0];
         }

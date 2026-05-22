@@ -132,10 +132,7 @@ readonly class EventFilterService
     {
         $filters = iterator_to_array($this->filters);
 
-        usort(
-            $filters,
-            static fn(EventFilterInterface $a, EventFilterInterface $b): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($filters, static fn(EventFilterInterface $a, EventFilterInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $filters;
     }

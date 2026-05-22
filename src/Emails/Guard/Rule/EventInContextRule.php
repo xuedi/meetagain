@@ -22,11 +22,7 @@ final readonly class EventInContextRule implements EmailGuardRuleInterface
     public function evaluate(array $context): EmailGuardResult
     {
         if (!array_key_exists('event', $context) || !$context['event'] instanceof Event) {
-            return EmailGuardResult::error(
-                $this->getName(),
-                "Context is missing the 'event' key, or it is not an Event instance.",
-                'event',
-            );
+            return EmailGuardResult::error($this->getName(), "Context is missing the 'event' key, or it is not an Event instance.", 'event');
         }
 
         return EmailGuardResult::pass($this->getName());

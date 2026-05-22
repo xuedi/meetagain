@@ -69,9 +69,7 @@ readonly class FriendshipService
     {
         $user = $this->security->getUser();
         if (!$user instanceof User) {
-            throw new AuthenticationCredentialsNotFoundException(
-                'Should never happen, see: config/packages/security.yaml',
-            );
+            throw new AuthenticationCredentialsNotFoundException('Should never happen, see: config/packages/security.yaml');
         }
 
         return $user;

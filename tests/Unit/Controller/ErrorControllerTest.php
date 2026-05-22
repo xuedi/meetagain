@@ -31,13 +31,7 @@ final class ErrorControllerTest extends TestCase
             ->method('render')
             ->with(
                 'error/404.html.twig',
-                static::callback(
-                    static fn(array $context) => (
-                        $context['_locale'] === 'de'
-                        && is_string($context['message'])
-                        && $context['message'] !== ''
-                    ),
-                ),
+                static::callback(static fn(array $context) => $context['_locale'] === 'de' && is_string($context['message']) && $context['message'] !== ''),
             )
             ->willReturn('<html>404</html>');
 
@@ -138,9 +132,7 @@ final class ErrorControllerTest extends TestCase
 
         $capturedContext = null;
         $twig = $this->createMock(Environment::class);
-        $twig->method('render')->willReturnCallback(static function (string $template, array $context) use (
-            &$capturedContext,
-        ) {
+        $twig->method('render')->willReturnCallback(static function (string $template, array $context) use (&$capturedContext) {
             $capturedContext = $context;
             return '';
         });

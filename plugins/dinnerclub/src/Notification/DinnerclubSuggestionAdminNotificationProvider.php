@@ -23,11 +23,9 @@ readonly class DinnerclubSuggestionAdminNotificationProvider implements AdminNot
         $items = [];
 
         foreach ($this->dishRepository->findWithSuggestions() as $dish) {
-            $items[] = new AdminNotificationItem(
-                label: $this->getDishName($dish),
-                route: 'plugin_dinnerclub_suggestion_view',
-                routeParams: ['id' => $dish->getId()],
-            );
+            $items[] = new AdminNotificationItem(label: $this->getDishName($dish), route: 'plugin_dinnerclub_suggestion_view', routeParams: [
+                'id' => $dish->getId(),
+            ]);
         }
 
         return $items;

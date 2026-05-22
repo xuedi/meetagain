@@ -16,10 +16,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-#[AsCommand(
-    name: 'app:event:add-fixture',
-    description: 'Add random RSVPs, comments and plugin fixtures to extended recurring events',
-)]
+#[AsCommand(name: 'app:event:add-fixture', description: 'Add random RSVPs, comments and plugin fixtures to extended recurring events')]
 class EventAddFixtureCommand extends Command
 {
     private const array SAMPLE_COMMENTS = [
@@ -58,20 +55,8 @@ class EventAddFixtureCommand extends Command
     {
         $this->addOption('min-rsvps', null, InputOption::VALUE_REQUIRED, 'Minimum number of RSVPs per event', '2');
         $this->addOption('max-rsvps', null, InputOption::VALUE_REQUIRED, 'Maximum number of RSVPs per event', '5');
-        $this->addOption(
-            'min-comments',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Minimum number of comments per event',
-            '1',
-        );
-        $this->addOption(
-            'max-comments',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'Maximum number of comments per event',
-            '4',
-        );
+        $this->addOption('min-comments', null, InputOption::VALUE_REQUIRED, 'Minimum number of comments per event', '1');
+        $this->addOption('max-comments', null, InputOption::VALUE_REQUIRED, 'Maximum number of comments per event', '4');
     }
 
     #[Override]
@@ -83,9 +68,7 @@ class EventAddFixtureCommand extends Command
         $maxComments = (int) $input->getOption('max-comments');
 
         // Find all recurring events (events that have a parent)
-        $recurringEvents = $this->em
-            ->createQuery('SELECT e FROM App\Entity\Event e WHERE e.recurringOf IS NOT NULL')
-            ->getResult();
+        $recurringEvents = $this->em->createQuery('SELECT e FROM App\Entity\Event e WHERE e.recurringOf IS NOT NULL')->getResult();
 
         if ($recurringEvents === []) {
             $output->writeln('<comment>No recurring events found to enhance.</comment>');

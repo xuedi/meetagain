@@ -89,9 +89,7 @@ class ConfigServiceTest extends TestCase
         $written = null;
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('getFileContents')->willReturn(self::SCSS_FIXTURE);
-        $fs->method('putFileContents')->willReturnCallback(static function (string $_path, string $data) use (
-            &$written,
-        ): bool {
+        $fs->method('putFileContents')->willReturnCallback(static function (string $_path, string $data) use (&$written): bool {
             $written = $data;
             return true;
         });
@@ -119,9 +117,7 @@ class ConfigServiceTest extends TestCase
         $written = null;
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('getFileContents')->willReturn(self::SCSS_FIXTURE);
-        $fs->method('putFileContents')->willReturnCallback(static function (string $_path, string $data) use (
-            &$written,
-        ): bool {
+        $fs->method('putFileContents')->willReturnCallback(static function (string $_path, string $data) use (&$written): bool {
             $written = $data;
             return true;
         });

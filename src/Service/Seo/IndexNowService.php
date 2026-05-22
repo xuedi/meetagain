@@ -64,11 +64,7 @@ readonly class IndexNowService
         ];
 
         foreach ($staticRoutes as $route) {
-            $urls[] = $this->urlGenerator->generate(
-                $route['route'],
-                ['_locale' => $defaultLocale, ...$route['params']],
-                UrlGeneratorInterface::ABSOLUTE_URL,
-            );
+            $urls[] = $this->urlGenerator->generate($route['route'], ['_locale' => $defaultLocale, ...$route['params']], UrlGeneratorInterface::ABSOLUTE_URL);
         }
 
         foreach ($this->cmsRepository->findPublished() as $page) {
@@ -77,11 +73,7 @@ readonly class IndexNowService
                 continue;
             }
 
-            $urls[] = $this->urlGenerator->generate(
-                'app_catch_all',
-                ['_locale' => $defaultLocale, 'page' => $slug],
-                UrlGeneratorInterface::ABSOLUTE_URL,
-            );
+            $urls[] = $this->urlGenerator->generate('app_catch_all', ['_locale' => $defaultLocale, 'page' => $slug], UrlGeneratorInterface::ABSOLUTE_URL);
         }
 
         foreach ($this->eventRepository->findForSitemap() as $event) {
@@ -90,11 +82,7 @@ readonly class IndexNowService
                 continue;
             }
 
-            $urls[] = $this->urlGenerator->generate(
-                'app_event_details',
-                ['_locale' => $defaultLocale, 'id' => $id],
-                UrlGeneratorInterface::ABSOLUTE_URL,
-            );
+            $urls[] = $this->urlGenerator->generate('app_event_details', ['_locale' => $defaultLocale, 'id' => $id], UrlGeneratorInterface::ABSOLUTE_URL);
         }
 
         return $urls;
@@ -158,9 +146,6 @@ readonly class IndexNowService
 
     public function recordSubmission(): void
     {
-        $this->appStateService->set(
-            self::STATE_KEY_LAST_SUBMIT,
-            new DateTimeImmutable('now')->format(DateTimeImmutable::ATOM),
-        );
+        $this->appStateService->set(self::STATE_KEY_LAST_SUBMIT, new DateTimeImmutable('now')->format(DateTimeImmutable::ATOM));
     }
 }

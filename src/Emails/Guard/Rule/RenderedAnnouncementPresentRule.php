@@ -22,11 +22,7 @@ final readonly class RenderedAnnouncementPresentRule implements EmailGuardRuleIn
     {
         foreach (['renderedContent', 'announcementUrl'] as $key) {
             if (!array_key_exists($key, $context) || $context[$key] === null) {
-                return EmailGuardResult::error(
-                    $this->getName(),
-                    "Context is missing 'renderedContent' and/or 'announcementUrl'.",
-                    $key,
-                );
+                return EmailGuardResult::error($this->getName(), "Context is missing 'renderedContent' and/or 'announcementUrl'.", $key);
             }
         }
 

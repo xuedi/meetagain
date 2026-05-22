@@ -35,11 +35,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
         // Load the preview image once and reuse it for all events
         $imageFile = __DIR__ . '/Event/preview_wednesday_meetup.jpg';
         $uploadedImage = new UploadedFile($imageFile, 'preview_wednesday_meetup.jpg');
-        $previewImage = $this->imageService->upload(
-            $uploadedImage,
-            $this->getRefUser(UserFixture::ADMIN),
-            ImageType::EventTeaser,
-        );
+        $previewImage = $this->imageService->upload($uploadedImage, $this->getRefUser(UserFixture::ADMIN), ImageType::EventTeaser);
         $this->imageService->createThumbnails($previewImage, ImageType::EventTeaser);
 
         foreach ($this->getData() as $data) {

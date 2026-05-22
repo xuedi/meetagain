@@ -18,9 +18,7 @@ final class CmsBlockLocationProvider extends AbstractImageLocationProvider
 
     public function discoverImageIds(): array
     {
-        $rows = $this->connection->fetchAllAssociative(
-            'SELECT image_id, id AS location_id FROM cms_block WHERE image_id IS NOT NULL',
-        );
+        $rows = $this->connection->fetchAllAssociative('SELECT image_id, id AS location_id FROM cms_block WHERE image_id IS NOT NULL');
 
         return array_map(static fn(array $r) => [
             'imageId' => (int) $r['image_id'],

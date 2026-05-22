@@ -19,10 +19,7 @@ use Symfony\Component\HttpKernel\DataCollector\TimeDataCollector;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 
-#[AsCommand(
-    name: 'app:profile:queries',
-    description: 'Profile every discoverable GET route and report query counts to identify caching candidates.',
-)]
+#[AsCommand(name: 'app:profile:queries', description: 'Profile every discoverable GET route and report query counts to identify caching candidates.')]
 class AppProfileQueriesCommand extends Command
 {
     private const string ADMIN_EMAIL = 'admin@example.org';
@@ -46,19 +43,8 @@ class AppProfileQueriesCommand extends Command
             ->addOption('admin-only', null, InputOption::VALUE_NONE, 'Skip the anonymous pass')
             ->addOption('limit', null, InputOption::VALUE_REQUIRED, 'Cap the number of routes processed per pass')
             ->addOption('json', null, InputOption::VALUE_REQUIRED, 'Override JSON output path')
-            ->addOption(
-                'threshold',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'In the console table, only show routes with at least N queries',
-                0,
-            )
-            ->addOption(
-                'dump-sql',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Dump grouped SQL for a single URL instead of running the sweep (investigation mode)',
-            );
+            ->addOption('threshold', null, InputOption::VALUE_REQUIRED, 'In the console table, only show routes with at least N queries', 0)
+            ->addOption('dump-sql', null, InputOption::VALUE_REQUIRED, 'Dump grouped SQL for a single URL instead of running the sweep (investigation mode)');
     }
 
     #[Override]
@@ -77,9 +63,7 @@ class AppProfileQueriesCommand extends Command
         $limit = $input->getOption('limit');
         $limit = $limit === null ? null : max(1, (int) $limit);
         $threshold = max(0, (int) $input->getOption('threshold'));
-        $jsonPath = (string) (
-            $input->getOption('json') ?? $this->kernelProjectDir . '/tests/reports/query-profile.json'
-        );
+        $jsonPath = (string) ($input->getOption('json') ?? $this->kernelProjectDir . '/tests/reports/query-profile.json');
 
         $dumpUrl = $input->getOption('dump-sql');
         if ($dumpUrl !== null) {
@@ -109,10 +93,7 @@ class AppProfileQueriesCommand extends Command
         }
 
         if (!$anonymousOnly) {
-            $adminUrls = array_values(array_filter($urls, static fn(string $u): bool => str_contains(
-                $u,
-                self::ADMIN_URL_PREFIX,
-            )));
+            $adminUrls = array_values(array_filter($urls, static fn(string $u): bool => str_contains($u, self::ADMIN_URL_PREFIX)));
             if ($limit !== null) {
                 $adminUrls = array_slice($adminUrls, 0, $limit);
             }
@@ -286,28 +267,11 @@ class AppProfileQueriesCommand extends Command
         $fiveXx = array_values(array_filter($results, static fn(array $r): bool => $r['flag'] === '5xx'));
         $redirects = array_values(array_filter($results, static fn(array $r): bool => $r['flag'] === 'redirect'));
 
-        $output->writeln(sprintf(
-            'QUERY-PROFILE: %d routes, %d with 5xx, %d redirects',
-            count($results),
-            count($fiveXx),
-            count($redirects),
-        ));
+        $output->writeln(sprintf('QUERY-PROFILE: %d routes, %d with 5xx, %d redirects', count($results), count($fiveXx), count($redirects)));
         $output->writeln('---');
 
-        $this->renderTopSection(
-            $output,
-            $results,
-            $threshold,
-            authenticated: false,
-            header: 'TOP BY QUERY COUNT (anon):',
-        );
-        $this->renderTopSection(
-            $output,
-            $results,
-            $threshold,
-            authenticated: true,
-            header: 'TOP BY QUERY COUNT (admin):',
-        );
+        $this->renderTopSection($output, $results, $threshold, authenticated: false, header: 'TOP BY QUERY COUNT (anon):');
+        $this->renderTopSection($output, $results, $threshold, authenticated: true, header: 'TOP BY QUERY COUNT (admin):');
 
         if ($fiveXx !== []) {
             $output->writeln('');
@@ -322,20 +286,11 @@ class AppProfileQueriesCommand extends Command
     }
 
     /** @param list<array<string, mixed>> $results */
-    private function renderTopSection(
-        OutputInterface $output,
-        array $results,
-        int $threshold,
-        bool $authenticated,
-        string $header,
-    ): void {
+    private function renderTopSection(OutputInterface $output, array $results, int $threshold, bool $authenticated, string $header): void
+    {
         $rows = array_values(array_filter(
             $results,
-            static fn(array $r): bool => (
-                $r['authenticated'] === $authenticated
-                && $r['flag'] === null
-                && (int) $r['query_count'] >= $threshold
-            ),
+            static fn(array $r): bool => $r['authenticated'] === $authenticated && $r['flag'] === null && (int) $r['query_count'] >= $threshold,
         ));
 
         if ($rows === []) {
@@ -344,12 +299,7 @@ class AppProfileQueriesCommand extends Command
 
         $output->writeln($header);
         foreach ($rows as $row) {
-            $output->writeln(sprintf(
-                '   %3d q / %6.1f ms   %s',
-                (int) $row['query_count'],
-                (float) $row['duration_ms'],
-                $row['url'],
-            ));
+            $output->writeln(sprintf('   %3d q / %6.1f ms   %s', (int) $row['query_count'], (float) $row['duration_ms'], $row['url']));
         }
     }
 }

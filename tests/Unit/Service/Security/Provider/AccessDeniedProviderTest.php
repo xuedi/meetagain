@@ -25,13 +25,7 @@ class AccessDeniedProviderTest extends TestCase
         // Act - 5 access-denied events stay in lenient zone
         $report = null;
         for ($i = 0; $i < 5; ++$i) {
-            $report = $provider->observe(
-                SecurityEventType::AccessDenied,
-                Request::create('/page-' . $i),
-                ['reason' => 'voter'],
-                'sess',
-                '1.2.3.4',
-            );
+            $report = $provider->observe(SecurityEventType::AccessDenied, Request::create('/page-' . $i), ['reason' => 'voter'], 'sess', '1.2.3.4');
         }
 
         // Assert
@@ -47,13 +41,7 @@ class AccessDeniedProviderTest extends TestCase
         // Act - 15 hits across 8+ distinct paths trips the script detector
         $report = null;
         for ($i = 0; $i < 15; ++$i) {
-            $report = $provider->observe(
-                SecurityEventType::AccessDenied,
-                Request::create('/path-' . $i),
-                ['reason' => 'voter'],
-                'sess',
-                '1.2.3.4',
-            );
+            $report = $provider->observe(SecurityEventType::AccessDenied, Request::create('/path-' . $i), ['reason' => 'voter'], 'sess', '1.2.3.4');
         }
 
         // Assert
@@ -67,20 +55,8 @@ class AccessDeniedProviderTest extends TestCase
         $provider = $this->buildProvider();
 
         // Act
-        $reportNoCsrf = $provider->observe(
-            SecurityEventType::AccessDenied,
-            Request::create('/x'),
-            ['reason' => 'voter'],
-            'sess-a',
-            '1.1.1.1',
-        );
-        $reportWithCsrf = $provider->observe(
-            SecurityEventType::AccessDenied,
-            Request::create('/x'),
-            ['reason' => 'csrf'],
-            'sess-b',
-            '2.2.2.2',
-        );
+        $reportNoCsrf = $provider->observe(SecurityEventType::AccessDenied, Request::create('/x'), ['reason' => 'voter'], 'sess-a', '1.1.1.1');
+        $reportWithCsrf = $provider->observe(SecurityEventType::AccessDenied, Request::create('/x'), ['reason' => 'csrf'], 'sess-b', '2.2.2.2');
 
         // Assert
         static::assertGreaterThan($reportNoCsrf->threatLevel, $reportWithCsrf->threatLevel);

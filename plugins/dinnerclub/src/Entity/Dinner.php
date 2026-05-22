@@ -32,12 +32,7 @@ class Dinner
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $reservationName = null;
 
-    #[ORM\OneToMany(
-        targetEntity: DinnerCourse::class,
-        mappedBy: 'dinner',
-        cascade: ['persist', 'remove'],
-        orphanRemoval: true,
-    )]
+    #[ORM\OneToMany(targetEntity: DinnerCourse::class, mappedBy: 'dinner', cascade: ['persist', 'remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['sortOrder' => 'ASC'])]
     private Collection $courses;
 

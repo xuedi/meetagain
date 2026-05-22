@@ -71,8 +71,7 @@ final class MessageController extends AbstractController
         }
 
         // Check if current user has blocked the partner (for showing block/unblock button)
-        $hasBlockedPartner =
-            $conversationPartner !== null && $this->blockingService->hasBlocked($user, $conversationPartner);
+        $hasBlockedPartner = $conversationPartner !== null && $this->blockingService->hasBlocked($user, $conversationPartner);
 
         // Get excluded user IDs for filtering conversations list
         $excludeUserIds = $this->blockingService->getExcludedUserIds($user);

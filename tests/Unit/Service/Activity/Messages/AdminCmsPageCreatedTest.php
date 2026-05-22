@@ -41,9 +41,7 @@ class AdminCmsPageCreatedTest extends TestCase
     public function testCanCatchMissingCmsId(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'cms_id' in meta in core.admin_cms_page_created"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_id' in meta in core.admin_cms_page_created"));
 
         $subject = new AdminCmsPageCreated();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['cms_slug' => 'about']);
@@ -55,9 +53,7 @@ class AdminCmsPageCreatedTest extends TestCase
     public function testCanCatchMissingCmsSlug(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'cms_slug' in meta in core.admin_cms_page_created"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'cms_slug' in meta in core.admin_cms_page_created"));
 
         $subject = new AdminCmsPageCreated();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['cms_id' => 5]);

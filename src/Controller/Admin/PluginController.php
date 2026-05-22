@@ -32,12 +32,7 @@ final class PluginController extends AbstractController implements AdminNavigati
         return new AdminNavigationConfig(
             section: 'admin_shell.section_system',
             links: [
-                new AdminLink(
-                    label: 'admin_shell.menu_plugin',
-                    route: 'app_admin_plugin',
-                    active: 'plugin',
-                    role: 'ROLE_ADMIN',
-                ),
+                new AdminLink(label: 'admin_shell.menu_plugin', route: 'app_admin_plugin', active: 'plugin', role: 'ROLE_ADMIN'),
             ],
             sectionPriority: 100,
         );
@@ -61,16 +56,8 @@ final class PluginController extends AbstractController implements AdminNavigati
         }
 
         $adminTop = new AdminTop(info: [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_system_plugins.summary_available'),
-            )),
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $installedCount,
-                $this->translator->trans('admin_system_plugins.summary_installed'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_system_plugins.summary_available'))),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $installedCount, $this->translator->trans('admin_system_plugins.summary_installed'))),
             new AdminTopInfoHtml(sprintf(
                 '<span class="tag is-success is-medium">%d&nbsp;%s</span>',
                 $enabledCount,

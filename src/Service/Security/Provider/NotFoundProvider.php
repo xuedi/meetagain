@@ -70,13 +70,8 @@ final class NotFoundProvider extends AbstractSecurityProvider
     }
 
     #[Override]
-    protected function processEvent(
-        SecurityEventType $type,
-        Request $request,
-        array $context,
-        string $ip,
-        array $state,
-    ): array {
+    protected function processEvent(SecurityEventType $type, Request $request, array $context, string $ip, array $state): array
+    {
         $path = $request->getPathInfo();
         $isApi = str_starts_with($path, '/api/');
 
@@ -112,12 +107,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
             $probeWeight = $probeHits * (100 / self::BLOCK_AT_PROBES);
             $assetWeight = $assetHits * (100 / self::BLOCK_AT_ASSET_HITS);
             $threatLevel = (int) min(100, $probeWeight + $assetWeight);
-            $summary = sprintf(
-                '%d probe 404s, %d asset 404s (distinct paths: %d)',
-                $probeHits,
-                $assetHits,
-                $distinctPaths,
-            );
+            $summary = sprintf('%d probe 404s, %d asset 404s (distinct paths: %d)', $probeHits, $assetHits, $distinctPaths);
         } elseif ($isApi) {
             ++$apiHits;
             if ($distinctPaths <= 3 && $apiHits <= 2000) {
@@ -140,12 +130,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
             $probeWeight = $probeHits * (100 / self::BLOCK_AT_PROBES);
             $assetWeight = (int) ($state['assetHits'] ?? 0) * (100 / self::BLOCK_AT_ASSET_HITS);
             $threatLevel = (int) min(100, $base + $probeWeight + $assetWeight);
-            $summary = sprintf(
-                '%d probe 404s, %d asset 404s (distinct paths: %d)',
-                $probeHits,
-                $assetHits,
-                $distinctPaths,
-            );
+            $summary = sprintf('%d probe 404s, %d asset 404s (distinct paths: %d)', $probeHits, $assetHits, $distinctPaths);
         }
 
         $previousThreat = (int) ($state['threatLevel'] ?? 0);
@@ -227,12 +212,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
         }
 
         $threatLevel = (int) min(100, ($suspiciousHits + count($uniqueIps)) / 100);
-        $summary = sprintf(
-            '%d 404s in window, %d unique IPs, %d suspicious-pattern hits',
-            count($rows),
-            count($uniqueIps),
-            $suspiciousHits,
-        );
+        $summary = sprintf('%d 404s in window, %d unique IPs, %d suspicious-pattern hits', count($rows), count($uniqueIps), $suspiciousHits);
 
         return [
             'threatLevel' => $threatLevel,

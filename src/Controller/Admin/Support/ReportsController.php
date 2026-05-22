@@ -35,11 +35,7 @@ final class ReportsController extends AbstractSupportController implements Admin
     #[Route('', name: 'app_admin_support_reports')]
     public function list(): Response
     {
-        $reports = $this->imageReportRepo
-            ->createQueryBuilder('ir')
-            ->orderBy('ir.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+        $reports = $this->imageReportRepo->createQueryBuilder('ir')->orderBy('ir.createdAt', 'DESC')->getQuery()->getResult();
 
         $openCount = 0;
         foreach ($reports as $report) {
@@ -52,11 +48,7 @@ final class ReportsController extends AbstractSupportController implements Admin
         $totalCount = count($reports);
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_support.summary_total_reports'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_support.summary_total_reports'))),
         ];
         $info[] = $openCount > 0
             ? new AdminTopInfoHtml(sprintf(
@@ -64,10 +56,7 @@ final class ReportsController extends AbstractSupportController implements Admin
                 $openCount,
                 $this->translator->trans('admin_support.summary_open_reports'),
             ))
-            : new AdminTopInfoHtml(sprintf(
-                '<span class="tag is-success is-medium">%s</span>',
-                $this->translator->trans('admin_support.summary_all_resolved'),
-            ));
+            : new AdminTopInfoHtml(sprintf('<span class="tag is-success is-medium">%s</span>', $this->translator->trans('admin_support.summary_all_resolved')));
 
         $adminTop = new AdminTop(info: $info);
 
@@ -139,18 +128,10 @@ final class ReportsController extends AbstractSupportController implements Admin
         ]);
     }
 
-    #[Route(
-        '/resolve/{id}',
-        name: 'app_admin_support_report_resolve',
-        requirements: ['id' => '\d+'],
-        methods: ['POST'],
-    )]
+    #[Route('/resolve/{id}', name: 'app_admin_support_report_resolve', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function resolve(Request $request, int $id): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'app_admin_support_report_resolve' . $id,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('app_admin_support_report_resolve' . $id, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
         $report = $this->imageReportRepo->find($id);

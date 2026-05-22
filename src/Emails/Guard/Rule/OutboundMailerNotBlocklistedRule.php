@@ -28,10 +28,7 @@ final readonly class OutboundMailerNotBlocklistedRule implements EmailGuardRuleI
     public function evaluate(array $context): EmailGuardResult
     {
         if ($this->blocklist->isBlocked($this->config->getMailerAddress()->getAddress())) {
-            return EmailGuardResult::skip(
-                $this->getName(),
-                'Outbound mailer address is on the global email blocklist.',
-            );
+            return EmailGuardResult::skip($this->getName(), 'Outbound mailer address is on the global email blocklist.');
         }
 
         return EmailGuardResult::pass($this->getName());

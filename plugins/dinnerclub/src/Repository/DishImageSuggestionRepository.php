@@ -36,11 +36,7 @@ class DishImageSuggestionRepository extends ServiceEntityRepository
     /** @return Dish[] */
     public function findDishesWithPendingSuggestions(): array
     {
-        $rows = $this
-            ->createQueryBuilder('s')
-            ->select('DISTINCT IDENTITY(s.dish) as dish_id')
-            ->getQuery()
-            ->getScalarResult();
+        $rows = $this->createQueryBuilder('s')->select('DISTINCT IDENTITY(s.dish) as dish_id')->getQuery()->getScalarResult();
 
         if ($rows === []) {
             return [];

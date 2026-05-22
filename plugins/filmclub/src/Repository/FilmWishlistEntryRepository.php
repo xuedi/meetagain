@@ -41,11 +41,7 @@ class FilmWishlistEntryRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this
-            ->createQueryBuilder('w')
-            ->where('w.userId = :userId')
-            ->setParameter('userId', $userId)
-            ->orderBy('w.priorityCounter', 'DESC');
+        $qb = $this->createQueryBuilder('w')->where('w.userId = :userId')->setParameter('userId', $userId)->orderBy('w.priorityCounter', 'DESC');
 
         if ($allowedIds !== null) {
             $qb->andWhere('w.id IN (:ids)')->setParameter('ids', $allowedIds);
@@ -99,12 +95,7 @@ class FilmWishlistEntryRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this
-            ->createQueryBuilder('w')
-            ->innerJoin('w.film', 'f')
-            ->addSelect('f')
-            ->orderBy('w.userId', 'ASC')
-            ->addOrderBy('w.priorityCounter', 'DESC');
+        $qb = $this->createQueryBuilder('w')->innerJoin('w.film', 'f')->addSelect('f')->orderBy('w.userId', 'ASC')->addOrderBy('w.priorityCounter', 'DESC');
 
         if ($allowedIds !== null) {
             $qb->where('w.id IN (:ids)')->setParameter('ids', $allowedIds);

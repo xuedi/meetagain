@@ -97,10 +97,7 @@ final class CmsBlockController extends AbstractController
     #[Route('/block/{blockId}/image/toggle-side', name: 'app_admin_cms_block_image_toggle_side', methods: ['POST'])]
     public function cmsBlockImageToggleSide(Request $request, int $blockId): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'app_admin_cms_block_image_toggle_side' . $blockId,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('app_admin_cms_block_image_toggle_side' . $blockId, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
@@ -131,10 +128,7 @@ final class CmsBlockController extends AbstractController
     #[Route('/block/{blockId}/image/remove', name: 'app_admin_cms_block_image_remove', methods: ['POST'])]
     public function cmsBlockImageRemove(Request $request, int $blockId): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'admin_cms_block_image_remove' . $blockId,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('admin_cms_block_image_remove' . $blockId, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
@@ -199,10 +193,7 @@ final class CmsBlockController extends AbstractController
         $blockId = (int) $request->request->get('blockId');
         $locale = (string) $request->request->get('locale');
 
-        if (!$this->isCsrfTokenValid(
-            'app_admin_cms_edit_block_down' . $blockId,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('app_admin_cms_edit_block_down' . $blockId, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
@@ -221,10 +212,7 @@ final class CmsBlockController extends AbstractController
         $blockId = (int) $request->request->get('blockId');
         $locale = (string) $request->request->get('locale');
 
-        if (!$this->isCsrfTokenValid(
-            'app_admin_cms_edit_block_up' . $blockId,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('app_admin_cms_edit_block_up' . $blockId, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
@@ -268,12 +256,7 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
-    #[Route(
-        '/block/{blockId}/card/{slot}/image/modal',
-        name: 'app_admin_cms_card_image_modal',
-        methods: ['GET'],
-        requirements: ['slot' => '[0-2]'],
-    )]
+    #[Route('/block/{blockId}/card/{slot}/image/modal', name: 'app_admin_cms_card_image_modal', methods: ['GET'], requirements: ['slot' => '[0-2]'])]
     public function cmsCardImageModal(int $blockId, int $slot): Response
     {
         $form = $this->createForm(EventUploadType::class, null, [
@@ -288,12 +271,7 @@ final class CmsBlockController extends AbstractController
         ]));
     }
 
-    #[Route(
-        '/block/{blockId}/card/{slot}/image/upload',
-        name: 'app_admin_cms_card_image_upload',
-        methods: ['POST'],
-        requirements: ['slot' => '[0-2]'],
-    )]
+    #[Route('/block/{blockId}/card/{slot}/image/upload', name: 'app_admin_cms_card_image_upload', methods: ['POST'], requirements: ['slot' => '[0-2]'])]
     public function cmsCardImageUpload(Request $request, int $blockId, int $slot): Response
     {
         $block = $this->blockRepo->find($blockId);
@@ -338,11 +316,7 @@ final class CmsBlockController extends AbstractController
                 $this->em->flush();
 
                 if ($oldCardImageId !== null) {
-                    $this->imageLocationService->removeLocation(
-                        (int) $oldCardImageId,
-                        ImageType::CmsCardImage,
-                        $blockId,
-                    );
+                    $this->imageLocationService->removeLocation((int) $oldCardImageId, ImageType::CmsCardImage, $blockId);
                 }
                 $this->imageLocationService->addLocation($image->getId(), ImageType::CmsCardImage, $blockId);
             }
@@ -353,18 +327,10 @@ final class CmsBlockController extends AbstractController
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
 
-    #[Route(
-        '/block/{blockId}/card/{slot}/image/remove',
-        name: 'app_admin_cms_card_image_remove',
-        methods: ['POST'],
-        requirements: ['slot' => '[0-2]'],
-    )]
+    #[Route('/block/{blockId}/card/{slot}/image/remove', name: 'app_admin_cms_card_image_remove', methods: ['POST'], requirements: ['slot' => '[0-2]'])]
     public function cmsCardImageRemove(Request $request, int $blockId, int $slot): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'admin_cms_card_image_remove' . $blockId . '_' . $slot,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('admin_cms_card_image_remove' . $blockId . '_' . $slot, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
@@ -461,10 +427,7 @@ final class CmsBlockController extends AbstractController
     #[Route('/block/{blockId}/gallery/remove/{imageId}', name: 'app_admin_cms_gallery_remove', methods: ['POST'])]
     public function cmsGalleryRemove(Request $request, int $blockId, int $imageId): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'admin_cms_gallery_remove' . $blockId . '_' . $imageId,
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('admin_cms_gallery_remove' . $blockId . '_' . $imageId, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
@@ -474,10 +437,7 @@ final class CmsBlockController extends AbstractController
         }
 
         $json = $block->getJson();
-        $json['images'] = array_values(array_filter(
-            $json['images'] ?? [],
-            static fn(array $item) => $item['id'] !== $imageId,
-        ));
+        $json['images'] = array_values(array_filter($json['images'] ?? [], static fn(array $item) => $item['id'] !== $imageId));
         $block->setJson($json);
         $this->em->persist($block);
         $this->em->flush();

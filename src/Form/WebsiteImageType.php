@@ -19,11 +19,7 @@ class WebsiteImageType extends AbstractType
             'required' => false,
             'label' => 'admin_system_config.field_website_image_label',
             'constraints' => [
-                new File(
-                    maxSize: '5000k',
-                    mimeTypes: ['image/*'],
-                    mimeTypesMessage: 'shared.form_image_upload_mime_error',
-                ),
+                new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: 'shared.form_image_upload_mime_error'),
             ],
         ]);
     }

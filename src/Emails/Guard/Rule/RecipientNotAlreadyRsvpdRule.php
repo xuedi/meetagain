@@ -24,19 +24,11 @@ final readonly class RecipientNotAlreadyRsvpdRule implements EmailGuardRuleInter
     {
         $user = $context['user'] ?? null;
         if (!$user instanceof User) {
-            return EmailGuardResult::error(
-                $this->getName(),
-                "Context is missing the 'user' key, or it is not a User instance.",
-                'user',
-            );
+            return EmailGuardResult::error($this->getName(), "Context is missing the 'user' key, or it is not a User instance.", 'user');
         }
         $event = $context['event'] ?? null;
         if (!$event instanceof Event) {
-            return EmailGuardResult::error(
-                $this->getName(),
-                "Context is missing the 'event' key, or it is not an Event instance.",
-                'event',
-            );
+            return EmailGuardResult::error($this->getName(), "Context is missing the 'event' key, or it is not an Event instance.", 'event');
         }
 
         if ($event->hasRsvp($user)) {

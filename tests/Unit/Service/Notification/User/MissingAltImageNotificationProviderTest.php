@@ -20,11 +20,7 @@ class MissingAltImageNotificationProviderTest extends TestCase
         $imageRepo = $this->createMock(ImageRepository::class);
         $imageRepo->expects($this->never())->method('findHighUsageMissingAlt');
 
-        $provider = new MissingAltImageNotificationProvider(
-            $imageRepo,
-            $security,
-            $this->createStub(TranslatorInterface::class),
-        );
+        $provider = new MissingAltImageNotificationProvider($imageRepo, $security, $this->createStub(TranslatorInterface::class));
 
         // Act / Assert
         static::assertSame([], $provider->getNotifications($this->createStub(User::class)));
@@ -39,11 +35,7 @@ class MissingAltImageNotificationProviderTest extends TestCase
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findHighUsageMissingAlt')->willReturn([]);
 
-        $provider = new MissingAltImageNotificationProvider(
-            $imageRepo,
-            $security,
-            $this->createStub(TranslatorInterface::class),
-        );
+        $provider = new MissingAltImageNotificationProvider($imageRepo, $security, $this->createStub(TranslatorInterface::class));
 
         // Act / Assert
         static::assertSame([], $provider->getNotifications($this->createStub(User::class)));
@@ -64,11 +56,7 @@ class MissingAltImageNotificationProviderTest extends TestCase
             ]);
 
         $translator = $this->createStub(TranslatorInterface::class);
-        $translator
-            ->method('trans')
-            ->willReturnCallback(
-                static fn(string $key, array $params) => $key . ':' . $params['%id%'] . ':' . $params['%count%'],
-            );
+        $translator->method('trans')->willReturnCallback(static fn(string $key, array $params) => $key . ':' . $params['%id%'] . ':' . $params['%count%']);
 
         $provider = new MissingAltImageNotificationProvider($imageRepo, $security, $translator);
 

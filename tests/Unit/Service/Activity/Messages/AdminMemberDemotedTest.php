@@ -29,13 +29,7 @@ class AdminMemberDemotedTest extends TestCase
         $userId = 42;
         $userName = 'JohnDoe';
         $subject = new AdminMemberDemoted();
-        $subject->injectServices(
-            $this->router,
-            $this->imageService,
-            $this->translator,
-            ['user_id' => $userId],
-            [$userId => $userName],
-        );
+        $subject->injectServices($this->router, $this->imageService, $this->translator, ['user_id' => $userId], [$userId => $userName]);
 
         // Act & Assert
         static::assertInstanceOf(MessageInterface::class, $subject->validate());

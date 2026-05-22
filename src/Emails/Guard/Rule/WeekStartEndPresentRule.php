@@ -22,11 +22,7 @@ final readonly class WeekStartEndPresentRule implements EmailGuardRuleInterface
     {
         foreach (['weekStart', 'weekEnd'] as $key) {
             if (!array_key_exists($key, $context) || $context[$key] === null) {
-                return EmailGuardResult::error(
-                    $this->getName(),
-                    "Context is missing 'weekStart' and/or 'weekEnd'.",
-                    $key,
-                );
+                return EmailGuardResult::error($this->getName(), "Context is missing 'weekStart' and/or 'weekEnd'.", $key);
             }
         }
 

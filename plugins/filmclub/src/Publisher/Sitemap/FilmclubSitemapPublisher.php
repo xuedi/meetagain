@@ -58,11 +58,7 @@ final readonly class FilmclubSitemapPublisher implements SitemapPublisherInterfa
     {
         $localeUrls = [];
         foreach ($locales as $locale) {
-            $localeUrls[$locale] = $this->urlGenerator->generate(
-                'app_filmclub_filmlist',
-                ['_locale' => $locale],
-                UrlGeneratorInterface::ABSOLUTE_URL,
-            );
+            $localeUrls[$locale] = $this->urlGenerator->generate('app_filmclub_filmlist', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL);
         }
 
         $urls = [];

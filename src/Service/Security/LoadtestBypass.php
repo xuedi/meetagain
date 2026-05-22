@@ -50,12 +50,7 @@ final class LoadtestBypass
 
     public static function accepted(): RateLimit
     {
-        return new RateLimit(
-            availableTokens: PHP_INT_MAX,
-            retryAfter: new DateTimeImmutable('@0'),
-            accepted: true,
-            limit: PHP_INT_MAX,
-        );
+        return new RateLimit(availableTokens: PHP_INT_MAX, retryAfter: new DateTimeImmutable('@0'), accepted: true, limit: PHP_INT_MAX);
     }
 }
 

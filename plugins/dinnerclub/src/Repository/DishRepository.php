@@ -85,11 +85,6 @@ class DishRepository extends ServiceEntityRepository
             return [];
         }
 
-        return $this
-            ->createQueryBuilder('d')
-            ->where('d.id IN (:ids)')
-            ->setParameter('ids', $ids)
-            ->getQuery()
-            ->getResult();
+        return $this->createQueryBuilder('d')->where('d.id IN (:ids)')->setParameter('ids', $ids)->getQuery()->getResult();
     }
 }

@@ -14,10 +14,7 @@ class CmsEventTeaserExtensionTest extends TestCase
     public function testRegistersCmsUpcomingEventsTwigFunction(): void
     {
         // Arrange
-        $subject = new CmsEventTeaserExtension(
-            $this->createStub(EventFilterService::class),
-            $this->createStub(EventRepository::class),
-        );
+        $subject = new CmsEventTeaserExtension($this->createStub(EventFilterService::class), $this->createStub(EventRepository::class));
 
         // Act
         $names = array_map(static fn($f) => $f->getName(), $subject->getFunctions());

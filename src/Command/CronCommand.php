@@ -61,12 +61,7 @@ class CronCommand extends LoggedCommand
             'duration_ms' => $entry['duration_ms'],
         ], $timed);
 
-        $log = new CronLog(
-            runAt: new DateTimeImmutable(),
-            status: $aggregated,
-            durationMs: $totalDurationMs,
-            tasks: $tasks,
-        );
+        $log = new CronLog(runAt: new DateTimeImmutable(), status: $aggregated, durationMs: $totalDurationMs, tasks: $tasks);
         $this->em->persist($log);
         $this->em->flush();
 

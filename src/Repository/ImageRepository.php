@@ -22,12 +22,7 @@ class ImageRepository extends ServiceEntityRepository
 
     public function getReportedCount(): int
     {
-        return (int) $this
-            ->createQueryBuilder('i')
-            ->select('COUNT(i.id)')
-            ->where('i.reported IS NOT NULL')
-            ->getQuery()
-            ->getSingleScalarResult();
+        return (int) $this->createQueryBuilder('i')->select('COUNT(i.id)')->where('i.reported IS NOT NULL')->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -49,11 +44,7 @@ class ImageRepository extends ServiceEntityRepository
      */
     public function getStorageStats(DateTimeImmutable $weekStart, DateTimeImmutable $weekEnd): array
     {
-        $total = $this
-            ->createQueryBuilder('i')
-            ->select('COUNT(i.id) as cnt, COALESCE(SUM(i.size), 0) as totalSize')
-            ->getQuery()
-            ->getSingleResult();
+        $total = $this->createQueryBuilder('i')->select('COUNT(i.id) as cnt, COALESCE(SUM(i.size), 0) as totalSize')->getQuery()->getSingleResult();
 
         $weekCount = (int) $this
             ->createQueryBuilder('i')

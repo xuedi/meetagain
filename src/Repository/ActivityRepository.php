@@ -48,12 +48,7 @@ class ActivityRepository extends ServiceEntityRepository
 
     public function findMostRecent(): ?Activity
     {
-        return $this
-            ->createQueryBuilder('a')
-            ->orderBy('a.createdAt', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->createQueryBuilder('a')->orderBy('a.createdAt', 'DESC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
     }
 
     /**
@@ -187,11 +182,8 @@ class ActivityRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToUserIds
      * @return array{yes: int, no: int, total: int}
      */
-    public function getRsvpStats(
-        DateTimeImmutable $start,
-        DateTimeImmutable $end,
-        ?array $restrictToUserIds = null,
-    ): array {
+    public function getRsvpStats(DateTimeImmutable $start, DateTimeImmutable $end, ?array $restrictToUserIds = null): array
+    {
         if ($restrictToUserIds === []) {
             return ['yes' => 0, 'no' => 0, 'total' => 0];
         }
@@ -212,11 +204,8 @@ class ActivityRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToUserIds
      * @return array<string, int> Day name => login count
      */
-    public function getLoginTrend(
-        DateTimeImmutable $start,
-        DateTimeImmutable $end,
-        ?array $restrictToUserIds = null,
-    ): array {
+    public function getLoginTrend(DateTimeImmutable $start, DateTimeImmutable $end, ?array $restrictToUserIds = null): array
+    {
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         $trend = array_fill_keys($days, 0);
 
@@ -254,11 +243,8 @@ class ActivityRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToUserIds
      * @return array<string, int>
      */
-    public function getRsvpYesTrend(
-        DateTimeImmutable $start,
-        DateTimeImmutable $end,
-        ?array $restrictToUserIds = null,
-    ): array {
+    public function getRsvpYesTrend(DateTimeImmutable $start, DateTimeImmutable $end, ?array $restrictToUserIds = null): array
+    {
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         $trend = array_fill_keys($days, 0);
 
@@ -296,11 +282,8 @@ class ActivityRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToUserIds
      * @return array{labels: list<string>, logins: list<int>, rsvps: list<int>, newMembers: list<int>}
      */
-    public function getActivityTrend(
-        DateTimeImmutable $start,
-        DateTimeImmutable $end,
-        ?array $restrictToUserIds = null,
-    ): array {
+    public function getActivityTrend(DateTimeImmutable $start, DateTimeImmutable $end, ?array $restrictToUserIds = null): array
+    {
         $labels = [];
         $cursor = $start;
         while ($cursor <= $end) {
@@ -360,12 +343,8 @@ class ActivityRepository extends ServiceEntityRepository
     /**
      * @param array<int>|null $restrictToUserIds
      */
-    private function countByType(
-        string $type,
-        DateTimeImmutable $start,
-        DateTimeImmutable $end,
-        ?array $restrictToUserIds,
-    ): int {
+    private function countByType(string $type, DateTimeImmutable $start, DateTimeImmutable $end, ?array $restrictToUserIds): int
+    {
         $qb = $this
             ->createQueryBuilder('a')
             ->select('COUNT(a.id)')
@@ -388,13 +367,8 @@ class ActivityRepository extends ServiceEntityRepository
      * @param array<string, int> $emptyByDay
      * @return array<string, int>
      */
-    private function countByDay(
-        string $type,
-        DateTimeImmutable $start,
-        DateTimeImmutable $end,
-        ?array $restrictToUserIds,
-        array $emptyByDay,
-    ): array {
+    private function countByDay(string $type, DateTimeImmutable $start, DateTimeImmutable $end, ?array $restrictToUserIds, array $emptyByDay): array
+    {
         $qb = $this
             ->getEntityManager()
             ->createQueryBuilder()

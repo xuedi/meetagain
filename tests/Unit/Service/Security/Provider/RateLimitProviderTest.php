@@ -22,13 +22,7 @@ class RateLimitProviderTest extends TestCase
         $provider = new RateLimitProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
 
         // Act
-        $report = $provider->observe(
-            SecurityEventType::RateLimit,
-            new Request(),
-            ['limiter' => 'login_throttling'],
-            'sess',
-            '1.2.3.4',
-        );
+        $report = $provider->observe(SecurityEventType::RateLimit, new Request(), ['limiter' => 'login_throttling'], 'sess', '1.2.3.4');
 
         // Assert
         static::assertSame(SecurityRecommendation::Block, $report->recommendation);
@@ -45,13 +39,7 @@ class RateLimitProviderTest extends TestCase
         // Act - 20 hits on support never block
         $report = null;
         for ($i = 0; $i < 20; ++$i) {
-            $report = $provider->observe(
-                SecurityEventType::RateLimit,
-                new Request(),
-                ['limiter' => 'support'],
-                'sess',
-                '1.2.3.4',
-            );
+            $report = $provider->observe(SecurityEventType::RateLimit, new Request(), ['limiter' => 'support'], 'sess', '1.2.3.4');
         }
 
         // Assert
@@ -70,13 +58,7 @@ class RateLimitProviderTest extends TestCase
         // Act
         $reports = [];
         for ($i = 0; $i < 12; ++$i) {
-            $reports[] = $provider->observe(
-                SecurityEventType::RateLimit,
-                new Request(),
-                ['limiter' => 'api_default'],
-                'sess',
-                '1.2.3.4',
-            );
+            $reports[] = $provider->observe(SecurityEventType::RateLimit, new Request(), ['limiter' => 'api_default'], 'sess', '1.2.3.4');
         }
 
         // Assert - by the tenth call, threat level is at 100

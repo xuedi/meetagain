@@ -36,12 +36,7 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
      */
     public function getTop100(?DateTimeImmutable $since = null): array
     {
-        $qb = $this
-            ->createQueryBuilder('a')
-            ->select('COUNT(a.id) AS number', 'a.url')
-            ->groupBy('a.url')
-            ->orderBy('number', 'DESC')
-            ->setMaxResults(100);
+        $qb = $this->createQueryBuilder('a')->select('COUNT(a.id) AS number', 'a.url')->groupBy('a.url')->orderBy('number', 'DESC')->setMaxResults(100);
 
         if ($since !== null) {
             $qb->where('a.createdAt >= :since')->setParameter('since', $since);

@@ -17,9 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_ADMIN')]
-final class PermissionsController extends AbstractSecurityController implements
-    AdminNavigationInterface,
-    AdminTabsInterface
+final class PermissionsController extends AbstractSecurityController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(
         TranslatorInterface $translator,
@@ -42,9 +40,7 @@ final class PermissionsController extends AbstractSecurityController implements
                 continue;
             }
             $entries = $groups[$roleId];
-            $hintKey = $roleId === 'Anonymous'
-                ? 'admin_security_permissions.anon_no_auth'
-                : 'admin_security_permissions.anon_min_role';
+            $hintKey = $roleId === 'Anonymous' ? 'admin_security_permissions.anon_no_auth' : 'admin_security_permissions.anon_min_role';
 
             $sections[] = [
                 'role' => $roleId,
@@ -65,9 +61,7 @@ final class PermissionsController extends AbstractSecurityController implements
             ];
         }
 
-        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
-            'admin_security_permissions.help',
-        ))]);
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_security_permissions.help'))]);
 
         return $this->render('admin/security/permissions/index.html.twig', [
             'active' => 'security',

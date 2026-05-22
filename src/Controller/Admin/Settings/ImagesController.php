@@ -70,11 +70,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         $usageCounts = $this->imageLocationRepository->countPerImageId();
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalCount,
-                $this->translator->trans('admin_system_images.summary_total'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_system_images.summary_total'))),
         ];
         if ($since !== null || $locationFilter !== null) {
             $info[] = new AdminTopInfoHtml(sprintf(
@@ -139,11 +135,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
 
         $adminTop = new AdminTop(info: [
             new AdminTopInfoHtml(sprintf('<strong>#%d</strong>', $image->getId())),
-            new AdminTopInfoHtml(sprintf('<span class="tag is-light">%s</span>', htmlspecialchars(
-                $image->getType()->name,
-                ENT_QUOTES | ENT_HTML5,
-                'UTF-8',
-            ))),
+            new AdminTopInfoHtml(sprintf('<span class="tag is-light">%s</span>', htmlspecialchars($image->getType()->name, ENT_QUOTES | ENT_HTML5, 'UTF-8'))),
         ], actions: [
             new AdminTopActionButton(
                 label: $this->translator->trans('global.button_back'),
@@ -253,11 +245,8 @@ final class ImagesController extends AbstractSettingsController implements Admin
         return null;
     }
 
-    private function buildLocationDropdown(
-        ?ImageType $current,
-        string $range,
-        ?DateTimeImmutable $since,
-    ): AdminTopActionDropdown {
+    private function buildLocationDropdown(?ImageType $current, string $range, ?DateTimeImmutable $since): AdminTopActionDropdown
+    {
         $rangeParam = $range === self::DEFAULT_RANGE ? [] : ['range' => $range];
 
         $options = [
@@ -281,9 +270,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
             label: sprintf(
                 '%s %s',
                 $this->translator->trans('admin_system_images.location_filter_label'),
-                $current === null
-                    ? $this->translator->trans('admin_system_images.location_filter_all')
-                    : $current->name,
+                $current === null ? $this->translator->trans('admin_system_images.location_filter_all') : $current->name,
             ),
             options: $options,
             icon: 'map-pin',
@@ -303,9 +290,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
                 label: $this->translator->trans('admin_system_images.range_' . $key),
                 target: $this->generateUrl('app_admin_system_images', $params),
                 isActive: $key === $current,
-                count: $key === self::DEFAULT_RANGE
-                    ? null
-                    : $this->imageRepository->countFiltered($location, $optionSince),
+                count: $key === self::DEFAULT_RANGE ? null : $this->imageRepository->countFiltered($location, $optionSince),
             );
         }
 

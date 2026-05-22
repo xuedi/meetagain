@@ -37,11 +37,7 @@ class CommentedOnEventTest extends TestCase
         $eventNames = [$eventId => $eventName];
 
         $router = $this->createMock(RouterInterface::class);
-        $router
-            ->expects($this->once())
-            ->method('generate')
-            ->with('app_event_details', ['id' => $eventId])
-            ->willReturn($eventUrl);
+        $router->expects($this->once())->method('generate')->with('app_event_details', ['id' => $eventId])->willReturn($eventUrl);
 
         $subject = new CommentedOnEvent();
         $subject->injectServices($router, $this->imageService, $this->translator, $meta, [], $eventNames);
@@ -69,9 +65,7 @@ class CommentedOnEventTest extends TestCase
     public function testCanCatchMissingEventId(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'event_id' in meta in core.commented_on_event"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.commented_on_event"));
 
         $subject = new CommentedOnEvent();
         $subject->injectServices($this->router, $this->imageService, $this->translator, []);
@@ -83,9 +77,7 @@ class CommentedOnEventTest extends TestCase
     public function testCanCatchNonNumericEventId(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.commented_on_event'"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.commented_on_event'"));
 
         $subject = new CommentedOnEvent();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 'not-a-number']);

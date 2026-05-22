@@ -60,13 +60,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail(
-            $this->blocklist,
-            $queue,
-            $this->config,
-            $this->translator,
-            $this->host,
-        );
+        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -94,13 +88,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail(
-            $this->blocklist,
-            $queue,
-            $this->config,
-            $this->translator,
-            $this->host,
-        );
+        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -128,13 +116,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail(
-            $this->blocklist,
-            $queue,
-            $this->config,
-            $this->translator,
-            $this->host,
-        );
+        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -162,13 +144,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail(
-            $this->blocklist,
-            $queue,
-            $this->config,
-            $this->translator,
-            $this->host,
-        );
+        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -185,13 +161,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->never())->method('enqueue');
 
-        $email = new EventUpdateNotificationEmail(
-            $this->blocklist,
-            $queue,
-            $this->config,
-            $this->translator,
-            $this->host,
-        );
+        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -256,12 +226,8 @@ class EventUpdateNotificationEmailTest extends TestCase
     /**
      * @return array{start: int, startFormatted: string, locationId: ?int, locationName: string, canceled: bool}
      */
-    private function snapshot(
-        int $start = 1_700_000_000,
-        ?int $locationId = 7,
-        string $locationName = 'Main Hall',
-        bool $canceled = false,
-    ): array {
+    private function snapshot(int $start = 1_700_000_000, ?int $locationId = 7, string $locationName = 'Main Hall', bool $canceled = false): array
+    {
         return [
             'start' => $start,
             'startFormatted' => new DateTimeImmutable()

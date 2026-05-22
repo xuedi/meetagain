@@ -22,9 +22,7 @@ class ReviewNotificationProviderTest extends TestCase
     private function makeTranslator(): TranslatorInterface
     {
         $mock = $this->createStub(TranslatorInterface::class);
-        $mock->method('trans')->willReturnCallback(
-            static fn(string $id, array $params) => $params['%count%'] . ' items pending',
-        );
+        $mock->method('trans')->willReturnCallback(static fn(string $id, array $params) => $params['%count%'] . ' items pending');
 
         return $mock;
     }

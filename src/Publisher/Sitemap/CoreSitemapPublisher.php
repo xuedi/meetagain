@@ -265,9 +265,7 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
                 continue;
             }
             foreach ($filterResult as $eventId => $locales) {
-                $result[$eventId] = isset($result[$eventId])
-                    ? array_values(array_intersect($result[$eventId], $locales))
-                    : $locales;
+                $result[$eventId] = isset($result[$eventId]) ? array_values(array_intersect($result[$eventId], $locales)) : $locales;
             }
         }
 

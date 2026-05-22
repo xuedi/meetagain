@@ -33,16 +33,8 @@ readonly class NavigationPlugin implements Plugin
         $locale = $this->requestStack->getCurrentRequest()?->getLocale() ?? 'en';
 
         $links = [
-            new Link(
-                slug: $this->router->generate('app_event', ['_locale' => $locale]),
-                name: 'chrome.menu_events',
-                priority: 100,
-            ),
-            new Link(
-                slug: $this->router->generate('app_member', ['_locale' => $locale, 'page' => 1]),
-                name: 'chrome.menu_members',
-                priority: 200,
-            ),
+            new Link(slug: $this->router->generate('app_event', ['_locale' => $locale]), name: 'chrome.menu_events', priority: 100),
+            new Link(slug: $this->router->generate('app_member', ['_locale' => $locale, 'page' => 1]), name: 'chrome.menu_members', priority: 200),
         ];
 
         if ($this->security->isGranted('ROLE_ORGANIZER')) {
@@ -51,11 +43,7 @@ readonly class NavigationPlugin implements Plugin
 
         $user = $this->security->getUser();
         if ($user instanceof User && $this->townHallAccess->canAccess($user)) {
-            $links[] = new Link(
-                slug: $this->router->generate('app_townhall', ['_locale' => $locale]),
-                name: 'chrome.menu_town_hall',
-                priority: 150,
-            );
+            $links[] = new Link(slug: $this->router->generate('app_townhall', ['_locale' => $locale]), name: 'chrome.menu_town_hall', priority: 150);
         }
 
         return LinkCollection::empty()->withNavLinks($links);

@@ -46,12 +46,7 @@ class UpdatedProfilePictureTest extends TestCase
                 [1, '50x50', $newImageHtml],
             ]);
 
-        $subject = new UpdatedProfilePicture()->injectServices(
-            $this->router,
-            $this->imageRenderer,
-            $this->translator,
-            $meta,
-        );
+        $subject = new UpdatedProfilePicture()->injectServices($this->router, $this->imageRenderer, $this->translator, $meta);
 
         // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());

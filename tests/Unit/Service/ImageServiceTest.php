@@ -59,11 +59,7 @@ class ImageServiceTest extends TestCase
 
         // Arrange: mock image repository to return existing image
         $imageRepoMock = $this->createMock(ImageRepository::class);
-        $imageRepoMock
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['hash' => $hash])
-            ->willReturn($existingImage);
+        $imageRepoMock->expects($this->once())->method('findOneBy')->with(['hash' => $hash])->willReturn($existingImage);
 
         // Arrange: mock entity manager to verify persist
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
@@ -130,11 +126,7 @@ class ImageServiceTest extends TestCase
                 ),
             ));
 
-        $subject = $this->createService(
-            imageRepo: $imageRepoMock,
-            entityManager: $entityManagerMock,
-            filesystemService: $filesystemMock,
-        );
+        $subject = $this->createService(imageRepo: $imageRepoMock, entityManager: $entityManagerMock, filesystemService: $filesystemMock);
 
         // Act: upload new image
         $result = $subject->upload($uploadedFile, $user, $type);
@@ -215,10 +207,7 @@ class ImageServiceTest extends TestCase
     {
         // Arrange: mock config service to return thumbnail size list
         $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock
-            ->expects($this->once())
-            ->method('getThumbnailSizeList')
-            ->willReturn(['100x100' => 0, '200x200' => 0]);
+        $configServiceMock->expects($this->once())->method('getThumbnailSizeList')->willReturn(['100x100' => 0, '200x200' => 0]);
         $configServiceMock
             ->expects($this->exactly(2))
             ->method('getThumbnailSizes')
@@ -330,11 +319,7 @@ class ImageServiceTest extends TestCase
                 return false;
             });
 
-        $subject = $this->createService(
-            imageRepo: $imageRepoMock,
-            configService: $configServiceMock,
-            filesystemService: $filesystemMock,
-        );
+        $subject = $this->createService(imageRepo: $imageRepoMock, configService: $configServiceMock, filesystemService: $filesystemMock);
 
         // Act: get obsolete thumbnails
         $result = $subject->getObsoleteThumbnails();

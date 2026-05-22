@@ -36,22 +36,14 @@ readonly class CronIntervalCheckService implements CronTaskInterface
         $gapSeconds = $this->clock->now()->getTimestamp() - $previous->getRunAt()->getTimestamp();
 
         if ($gapSeconds > self::ERROR_THRESHOLD_SECONDS) {
-            $message = sprintf(
-                'late cron: previous run was %ds ago (error threshold: %ds)',
-                $gapSeconds,
-                self::ERROR_THRESHOLD_SECONDS,
-            );
+            $message = sprintf('late cron: previous run was %ds ago (error threshold: %ds)', $gapSeconds, self::ERROR_THRESHOLD_SECONDS);
             $output->writeln('CronIntervalCheckService: ' . $message);
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::error, $message);
         }
 
         if ($gapSeconds > self::WARNING_THRESHOLD_SECONDS) {
-            $message = sprintf(
-                'late cron: previous run was %ds ago (warning threshold: %ds)',
-                $gapSeconds,
-                self::WARNING_THRESHOLD_SECONDS,
-            );
+            $message = sprintf('late cron: previous run was %ds ago (warning threshold: %ds)', $gapSeconds, self::WARNING_THRESHOLD_SECONDS);
             $output->writeln('CronIntervalCheckService: ' . $message);
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::warning, $message);

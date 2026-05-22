@@ -9,10 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(
-    name: 'app:test:coverage-report',
-    description: 'Parse coverage report and display statistics in machine-readable format',
-)]
+#[AsCommand(name: 'app:test:coverage-report', description: 'Parse coverage report and display statistics in machine-readable format')]
 class TestCoverageReportCommand extends Command
 {
     public function __construct(
@@ -26,13 +23,7 @@ class TestCoverageReportCommand extends Command
     {
         $this
             ->addOption('threshold', null, InputOption::VALUE_REQUIRED, 'Show only files below N% coverage', '100')
-            ->addOption(
-                'sort',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Sort by: coverage (default) or uncovered',
-                'coverage',
-            )
+            ->addOption('sort', null, InputOption::VALUE_REQUIRED, 'Sort by: coverage (default) or uncovered', 'coverage')
             ->addOption('detailed', null, InputOption::VALUE_NONE, 'Show detailed method-level coverage');
     }
 
@@ -142,13 +133,7 @@ class TestCoverageReportCommand extends Command
             $output->writeln('NEEDS ATTENTION:');
             foreach ($needsWork as $file) {
                 $impact = $file['uncovered'] > 50 ? 'HIGH' : ($file['uncovered'] > 20 ? 'MED' : 'LOW');
-                $output->writeln(sprintf(
-                    '  %3d%% %s (%d uncov) - %s',
-                    $file['percentage'],
-                    $file['name'],
-                    $file['uncovered'],
-                    $impact,
-                ));
+                $output->writeln(sprintf('  %3d%% %s (%d uncov) - %s', $file['percentage'], $file['name'], $file['uncovered'], $impact));
             }
         }
 

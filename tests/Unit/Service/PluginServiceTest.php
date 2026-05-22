@@ -25,10 +25,7 @@ class PluginServiceTest extends TestCase
 
         $this->configFile = $configDir . '/plugins.php';
         $this->envConfigFile = $configDir . '/plugins_test.php';
-        file_put_contents(
-            $this->envConfigFile,
-            '<?php declare(strict_types=1); return ["plugin1" => true, "plugin2" => false];',
-        );
+        file_put_contents($this->envConfigFile, '<?php declare(strict_types=1); return ["plugin1" => true, "plugin2" => false];');
     }
 
     protected function tearDown(): void
@@ -128,13 +125,7 @@ class PluginServiceTest extends TestCase
         $filterStub = $this->createStub(PluginListFilterInterface::class);
         $filterStub->method('filterActivePlugins')->willReturn([]);
 
-        $subject = new PluginService(
-            $this->createStub(CommandService::class),
-            $fsStub,
-            $this->tempDir,
-            'test',
-            [$filterStub],
-        );
+        $subject = new PluginService($this->createStub(CommandService::class), $fsStub, $this->tempDir, 'test', [$filterStub]);
 
         // Act: get globally active list — filters must NOT be applied
         $result = $subject->getGloballyActiveList();
@@ -162,13 +153,7 @@ class PluginServiceTest extends TestCase
         $filter = $this->createMock(PluginListFilterInterface::class);
         $filter->expects($this->once())->method('filterActivePlugins')->with(['plugin1'])->willReturn([]);
 
-        $subject = new PluginService(
-            $this->createStub(CommandService::class),
-            $fsStub,
-            $this->tempDir,
-            'test',
-            [$filter],
-        );
+        $subject = new PluginService($this->createStub(CommandService::class), $fsStub, $this->tempDir, 'test', [$filter]);
 
         // Act
         $result = $subject->getActiveList();
@@ -187,13 +172,7 @@ class PluginServiceTest extends TestCase
         $filterStub = $this->createStub(PluginListFilterInterface::class);
         $filterStub->method('filterActivePlugins')->willReturn(null);
 
-        $subject = new PluginService(
-            $this->createStub(CommandService::class),
-            $fsStub,
-            $this->tempDir,
-            'test',
-            [$filterStub],
-        );
+        $subject = new PluginService($this->createStub(CommandService::class), $fsStub, $this->tempDir, 'test', [$filterStub]);
 
         // Act
         $result = $subject->getActiveList();

@@ -113,12 +113,7 @@ class UserCheckerTest extends TestCase
         $msgRepoMock = $this->createMock(MessageRepository::class);
         $msgRepoMock->expects($this->once())->method('hasNewMessages')->willReturn(true);
 
-        $subject = $this->createSubject(
-            activityService: $activityServiceMock,
-            em: $emMock,
-            requestStack: $requestStackStub,
-            msgRepo: $msgRepoMock,
-        );
+        $subject = $this->createSubject(activityService: $activityServiceMock, em: $emMock, requestStack: $requestStackStub, msgRepo: $msgRepoMock);
 
         // Act: check post-auth
         $subject->checkPostAuth($this->createStub(User::class));

@@ -24,13 +24,7 @@ class NotFoundProviderTest extends TestCase
         // Act - hammer the same /api/foo path many times
         $report = null;
         for ($i = 0; $i < 50; ++$i) {
-            $report = $provider->observe(
-                SecurityEventType::NotFound,
-                Request::create('/api/foo'),
-                [],
-                'sess',
-                '1.2.3.4',
-            );
+            $report = $provider->observe(SecurityEventType::NotFound, Request::create('/api/foo'), [], 'sess', '1.2.3.4');
         }
 
         // Assert - lenient: never blocks
@@ -48,13 +42,7 @@ class NotFoundProviderTest extends TestCase
         // Act - 30 distinct probe URLs (no api/ prefix)
         $report = null;
         for ($i = 0; $i < 30; ++$i) {
-            $report = $provider->observe(
-                SecurityEventType::NotFound,
-                Request::create('/random-path-' . $i),
-                [],
-                'sess',
-                '1.2.3.4',
-            );
+            $report = $provider->observe(SecurityEventType::NotFound, Request::create('/random-path-' . $i), [], 'sess', '1.2.3.4');
         }
 
         // Assert
@@ -71,20 +59,8 @@ class NotFoundProviderTest extends TestCase
         $provider = new NotFoundProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
 
         // Act - probing /.env adds the suspicious-pattern boost
-        $reportSuspicious = $provider->observe(
-            SecurityEventType::NotFound,
-            Request::create('/.env'),
-            [],
-            'sess-a',
-            '1.1.1.1',
-        );
-        $reportPlain = $provider->observe(
-            SecurityEventType::NotFound,
-            Request::create('/whatever'),
-            [],
-            'sess-b',
-            '2.2.2.2',
-        );
+        $reportSuspicious = $provider->observe(SecurityEventType::NotFound, Request::create('/.env'), [], 'sess-a', '1.1.1.1');
+        $reportPlain = $provider->observe(SecurityEventType::NotFound, Request::create('/whatever'), [], 'sess-b', '2.2.2.2');
 
         // Assert
         static::assertGreaterThan($reportPlain->threatLevel, $reportSuspicious->threatLevel);
@@ -100,13 +76,7 @@ class NotFoundProviderTest extends TestCase
         // Act - 40 distinct asset 404s (stale browser cache after a redeploy)
         $report = null;
         for ($i = 0; $i < 40; ++$i) {
-            $report = $provider->observe(
-                SecurityEventType::NotFound,
-                Request::create('/assets/app-staleHash' . $i . '.js'),
-                [],
-                'sess',
-                '1.2.3.4',
-            );
+            $report = $provider->observe(SecurityEventType::NotFound, Request::create('/assets/app-staleHash' . $i . '.js'), [], 'sess', '1.2.3.4');
         }
 
         // Assert - 40 asset 404s = 40/300 * 100 ≈ 13 threat, well below block threshold
@@ -125,13 +95,7 @@ class NotFoundProviderTest extends TestCase
         // Act - scanner hammering /assets/* at scale
         $report = null;
         for ($i = 0; $i < 300; ++$i) {
-            $report = $provider->observe(
-                SecurityEventType::NotFound,
-                Request::create('/assets/scan-' . $i . '.js'),
-                [],
-                'sess',
-                '1.2.3.4',
-            );
+            $report = $provider->observe(SecurityEventType::NotFound, Request::create('/assets/scan-' . $i . '.js'), [], 'sess', '1.2.3.4');
         }
 
         // Assert
@@ -150,22 +114,10 @@ class NotFoundProviderTest extends TestCase
         // Act - 15 regular probes (50 threat) + 150 asset 404s (50 threat) = 100, blocks
         $report = null;
         for ($i = 0; $i < 15; ++$i) {
-            $report = $provider->observe(
-                SecurityEventType::NotFound,
-                Request::create('/probe-' . $i),
-                [],
-                'sess',
-                '1.2.3.4',
-            );
+            $report = $provider->observe(SecurityEventType::NotFound, Request::create('/probe-' . $i), [], 'sess', '1.2.3.4');
         }
         for ($i = 0; $i < 150; ++$i) {
-            $report = $provider->observe(
-                SecurityEventType::NotFound,
-                Request::create('/assets/file-' . $i . '.js'),
-                [],
-                'sess',
-                '1.2.3.4',
-            );
+            $report = $provider->observe(SecurityEventType::NotFound, Request::create('/assets/file-' . $i . '.js'), [], 'sess', '1.2.3.4');
         }
 
         // Assert

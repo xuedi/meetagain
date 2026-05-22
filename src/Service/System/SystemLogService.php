@@ -78,10 +78,7 @@ readonly class SystemLogService
         $files = $this->fs->glob($this->logsDir . '/' . $this->environment . '-*.log');
 
         if ($files !== []) {
-            usort(
-                $files,
-                fn($a, $b) => ($this->fs->getFileModifiedTime($b) ?: 0) <=> ($this->fs->getFileModifiedTime($a) ?: 0),
-            );
+            usort($files, fn($a, $b) => ($this->fs->getFileModifiedTime($b) ?: 0) <=> ($this->fs->getFileModifiedTime($a) ?: 0));
             return $files[0];
         }
 
@@ -147,11 +144,7 @@ readonly class SystemLogService
      */
     public function countByLevels(array $entries, array $levels): int
     {
-        return count(array_filter($entries, static fn(LogEntry $entry): bool => in_array(
-            strtoupper($entry->getLevel()),
-            $levels,
-            true,
-        )));
+        return count(array_filter($entries, static fn(LogEntry $entry): bool => in_array(strtoupper($entry->getLevel()), $levels, true)));
     }
 
     /**

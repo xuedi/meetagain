@@ -23,11 +23,7 @@ final class ThemeControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertGreaterThan(
-            15,
-            $crawler->filter('.admin-section')->count(),
-            'All gallery sections should render',
-        );
+        static::assertGreaterThan(15, $crawler->filter('.admin-section')->count(), 'All gallery sections should render');
     }
 
     public function testGalleryFilterByCategoryHidesOtherCategories(): void
@@ -71,11 +67,7 @@ final class ThemeControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertGreaterThan(
-            15,
-            $crawler->filter('.admin-section')->count(),
-            'Full gallery should render on unknown category',
-        );
+        static::assertGreaterThan(15, $crawler->filter('.admin-section')->count(), 'Full gallery should render on unknown category');
     }
 
     public function testGalleryFallsBackForUnknownPageWithinCategory(): void

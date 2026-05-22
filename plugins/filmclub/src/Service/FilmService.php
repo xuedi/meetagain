@@ -54,11 +54,7 @@ readonly class FilmService
                 $film->setPosterImage($poster);
                 $this->em->persist($film);
                 $this->em->flush();
-                $this->imageLocationService->addLocation(
-                    $poster->getId(),
-                    ImageType::PluginFilmclubPoster,
-                    $film->getId(),
-                );
+                $this->imageLocationService->addLocation($poster->getId(), ImageType::PluginFilmclubPoster, $film->getId());
             }
         }
 
@@ -67,14 +63,8 @@ readonly class FilmService
         return $film;
     }
 
-    public function createManual(
-        string $title,
-        ?int $year,
-        ?int $runtime,
-        ?string $description,
-        array $genres,
-        int $userId,
-    ): Film {
+    public function createManual(string $title, ?int $year, ?int $runtime, ?string $description, array $genres, int $userId): Film
+    {
         $film = new Film();
         $film->setTitle($title);
         $film->setYear($year);
@@ -114,18 +104,10 @@ readonly class FilmService
 
         if ($newPoster !== null) {
             if ($previousPosterId !== null && $previousPosterId !== $newPoster->getId()) {
-                $this->imageLocationService->removeLocation(
-                    $previousPosterId,
-                    ImageType::PluginFilmclubPoster,
-                    $film->getId(),
-                );
+                $this->imageLocationService->removeLocation($previousPosterId, ImageType::PluginFilmclubPoster, $film->getId());
             }
 
-            $this->imageLocationService->addLocation(
-                $newPoster->getId(),
-                ImageType::PluginFilmclubPoster,
-                $film->getId(),
-            );
+            $this->imageLocationService->addLocation($newPoster->getId(), ImageType::PluginFilmclubPoster, $film->getId());
         }
 
         $this->dispatcher->dispatch(EntityAction::UpdateFilm, $film->getId());

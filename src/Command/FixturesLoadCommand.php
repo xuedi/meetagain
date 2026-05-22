@@ -21,31 +21,11 @@ class FixturesLoadCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption(
-                'append',
-                null,
-                InputOption::VALUE_NONE,
-                'Append the data fixtures instead of deleting all data from the database first.',
-            )
-            ->addOption(
-                'group',
-                null,
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
-                'Only load fixtures that belong to this group',
-            )
+            ->addOption('append', null, InputOption::VALUE_NONE, 'Append the data fixtures instead of deleting all data from the database first.')
+            ->addOption('group', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'Only load fixtures that belong to this group')
             ->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
-            ->addOption(
-                'purge-exclusions',
-                null,
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
-                'List of database tables to ignore while purging',
-            )
-            ->addOption(
-                'purge-with-truncate',
-                null,
-                InputOption::VALUE_NONE,
-                'Purge data by using a database-level TRUNCATE statement',
-            );
+            ->addOption('purge-exclusions', null, InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED, 'List of database tables to ignore while purging')
+            ->addOption('purge-with-truncate', null, InputOption::VALUE_NONE, 'Purge data by using a database-level TRUNCATE statement');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

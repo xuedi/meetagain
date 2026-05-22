@@ -46,11 +46,7 @@ readonly class MenuService
         $idHash = $allowedCmsIds !== null ? md5(implode(',', $allowedCmsIds)) : 'all';
         $cacheKey = sprintf('menu_%s_%s_%s', $type, $locale, $idHash);
 
-        return $this->cache->get($cacheKey, function (ItemInterface $item) use (
-            $menuLocation,
-            $allowedCmsIds,
-            $locale,
-        ): array {
+        return $this->cache->get($cacheKey, function (ItemInterface $item) use ($menuLocation, $allowedCmsIds, $locale): array {
             $item->expiresAfter(self::CACHE_TTL);
             $item->tag(['cms_menu']);
 

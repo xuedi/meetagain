@@ -66,10 +66,7 @@ class IndexNowServiceTest extends TestCase
         // Arrange
         $appStateMock = $this->createMock(AppStateService::class);
         $appStateMock->method('get')->willReturn(null);
-        $appStateMock
-            ->expects($this->once())
-            ->method('set')
-            ->with('seo_indexnow_key', static::matchesRegularExpression('/^[a-f0-9]{32}$/'));
+        $appStateMock->expects($this->once())->method('set')->with('seo_indexnow_key', static::matchesRegularExpression('/^[a-f0-9]{32}$/'));
 
         $service = $this->makeService(appStateService: $appStateMock);
 
@@ -135,11 +132,7 @@ class IndexNowServiceTest extends TestCase
                 default => 'https://example.com/unknown',
             });
 
-        $service = $this->makeService(
-            urlGenerator: $urlGeneratorStub,
-            eventRepository: $eventRepositoryStub,
-            cmsRepository: $cmsRepositoryStub,
-        );
+        $service = $this->makeService(urlGenerator: $urlGeneratorStub, eventRepository: $eventRepositoryStub, cmsRepository: $cmsRepositoryStub);
 
         // Act
         $urls = $service->getUrlList();
@@ -168,11 +161,7 @@ class IndexNowServiceTest extends TestCase
         $urlGeneratorStub = $this->createStub(UrlGeneratorInterface::class);
         $urlGeneratorStub->method('generate')->willReturn('https://example.com/page');
 
-        $service = $this->makeService(
-            urlGenerator: $urlGeneratorStub,
-            eventRepository: $eventRepositoryStub,
-            cmsRepository: $cmsRepositoryStub,
-        );
+        $service = $this->makeService(urlGenerator: $urlGeneratorStub, eventRepository: $eventRepositoryStub, cmsRepository: $cmsRepositoryStub);
 
         // Act
         $urls = $service->getUrlList();
@@ -196,11 +185,7 @@ class IndexNowServiceTest extends TestCase
         $urlGeneratorStub = $this->createStub(UrlGeneratorInterface::class);
         $urlGeneratorStub->method('generate')->willReturn('https://example.com/page');
 
-        $service = $this->makeService(
-            urlGenerator: $urlGeneratorStub,
-            eventRepository: $eventRepositoryStub,
-            cmsRepository: $cmsRepositoryStub,
-        );
+        $service = $this->makeService(urlGenerator: $urlGeneratorStub, eventRepository: $eventRepositoryStub, cmsRepository: $cmsRepositoryStub);
 
         // Act
         $urls = $service->getUrlList();
@@ -304,10 +289,7 @@ class IndexNowServiceTest extends TestCase
         $appStateMock
             ->expects($this->once())
             ->method('set')
-            ->with(
-                'seo_indexnow_last_submit',
-                static::matchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/'),
-            );
+            ->with('seo_indexnow_last_submit', static::matchesRegularExpression('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/'));
 
         $service = $this->makeService(appStateService: $appStateMock);
 

@@ -69,21 +69,12 @@ final class EventController extends AbstractController
         $allowedEventIds = $filterResult->getEventIds();
 
         $providedFeatured = $this->getProvidedFeaturedEvents();
-        $hasFeatured = $providedFeatured !== null
-            ? $providedFeatured !== []
-            : $this->repo->findFeatured($allowedEventIds) !== [];
+        $hasFeatured = $providedFeatured !== null ? $providedFeatured !== [] : $this->repo->findFeatured($allowedEventIds) !== [];
 
         return $this->render(
             'events/index.html.twig',
             [
-                'structuredList' => $this->eventService->getFilteredList(
-                    $time,
-                    $sort,
-                    $type,
-                    $rsvp,
-                    $this->getUser(),
-                    $allowedEventIds,
-                ),
+                'structuredList' => $this->eventService->getFilteredList($time, $sort, $type, $rsvp, $this->getUser(), $allowedEventIds),
                 'filter' => $form,
                 'hasFeatured' => $hasFeatured,
             ],
@@ -139,9 +130,7 @@ final class EventController extends AbstractController
             [
                 'commentForm' => $form,
                 'pluginTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::Sidebar) : [],
-                'pluginBottomSidebarTiles' => $id
-                    ? $this->eventService->getPluginEventTiles($id, EventTileLocation::BottomSidebar)
-                    : [],
+                'pluginBottomSidebarTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::BottomSidebar) : [],
                 'comments' => $this->comments->findByEventWithUser($id),
                 'event' => $event,
                 'user' => $this->getUser() instanceof UserInterface ? $this->getAuthedUser() : null,
@@ -149,19 +138,11 @@ final class EventController extends AbstractController
                 'breadcrumbs' => [
                     [
                         'label' => 'Home',
-                        'url' => $this->generateUrl(
-                            'app_default',
-                            ['_locale' => $locale],
-                            UrlGeneratorInterface::ABSOLUTE_URL,
-                        ),
+                        'url' => $this->generateUrl('app_default', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL),
                     ],
                     [
                         'label' => 'Events',
-                        'url' => $this->generateUrl(
-                            'app_event',
-                            ['_locale' => $locale],
-                            UrlGeneratorInterface::ABSOLUTE_URL,
-                        ),
+                        'url' => $this->generateUrl('app_event', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL),
                     ],
                     ['label' => $event->getTitle($locale)],
                 ],
@@ -206,13 +187,7 @@ final class EventController extends AbstractController
         $providers = iterator_to_array($this->featuredEventProviders);
 
         // Sort by priority (highest first)
-        usort(
-            $providers,
-            static fn(
-                FeaturedEventProviderInterface $a,
-                FeaturedEventProviderInterface $b,
-            ): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($providers, static fn(FeaturedEventProviderInterface $a, FeaturedEventProviderInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         foreach ($providers as $provider) {
             if (!$provider->shouldProvide()) {
@@ -229,10 +204,7 @@ final class EventController extends AbstractController
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp', methods: ['POST'])]
     public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em): Response
     {
-        if (!$this->isCsrfTokenValid(
-            'app_event_toggle_rsvp' . $event->getId(),
-            (string) $request->request->get('_token'),
-        )) {
+        if (!$this->isCsrfTokenValid('app_event_toggle_rsvp' . $event->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
         if ($event->isCanceled()) {
@@ -262,12 +234,7 @@ final class EventController extends AbstractController
     }
 
     #[IsGranted('ROLE_USER')]
-    #[Route(
-        '/event/{event}/deleteComment/{id}',
-        name: 'app_event_delete_comment',
-        requirements: ['id' => '\d+'],
-        methods: ['POST'],
-    )]
+    #[Route('/event/{event}/deleteComment/{id}', name: 'app_event_delete_comment', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function deleteComment(Request $request, Event $event, EntityManagerInterface $em, ?int $id = null): Response
     {
         if (!$this->isCsrfTokenValid('app_event_delete_comment' . $id, (string) $request->request->get('_token'))) {

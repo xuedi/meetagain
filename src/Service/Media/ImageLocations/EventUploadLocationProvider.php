@@ -18,9 +18,7 @@ final class EventUploadLocationProvider extends AbstractImageLocationProvider
 
     public function discoverImageIds(): array
     {
-        $rows = $this->connection->fetchAllAssociative(
-            'SELECT id AS image_id, event_id AS location_id FROM image WHERE event_id IS NOT NULL',
-        );
+        $rows = $this->connection->fetchAllAssociative('SELECT id AS image_id, event_id AS location_id FROM image WHERE event_id IS NOT NULL');
 
         return array_map(static fn(array $r) => [
             'imageId' => (int) $r['image_id'],

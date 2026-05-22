@@ -14,10 +14,6 @@ readonly class MenuItem
 
     public static function fromCms(Cms $cms, string $locale): self
     {
-        return new self(
-            slug: '/' . $locale . '/' . $cms->getSlug(),
-            name: $cms->getLinkName($locale) ?? $cms->getSlug() ?? '',
-            priority: 0.0,
-        );
+        return new self(slug: '/' . $locale . '/' . $cms->getSlug(), name: $cms->getLinkName($locale) ?? $cms->getSlug() ?? '', priority: 0.0);
     }
 }

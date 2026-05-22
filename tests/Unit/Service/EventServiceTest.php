@@ -73,19 +73,11 @@ class EventServiceTest extends TestCase
     }
 
     #[DataProvider('filteredListDataProvider')]
-    public function testGetFilteredListAppliesCorrectCriteria(
-        EventTimeFilter $time,
-        EventSortFilter $sort,
-        EventType $types,
-        EventRsvpFilter $rsvp,
-    ): void {
+    public function testGetFilteredListAppliesCorrectCriteria(EventTimeFilter $time, EventSortFilter $sort, EventType $types, EventRsvpFilter $rsvp): void
+    {
         // Arrange: mock repository to verify call and return empty array
         $repoMock = $this->createMock(EventRepository::class);
-        $repoMock
-            ->expects($this->once())
-            ->method('findByFilters')
-            ->with($time, $sort, $types, null, $rsvp)
-            ->willReturn([]);
+        $repoMock->expects($this->once())->method('findByFilters')->with($time, $sort, $types, null, $rsvp)->willReturn([]);
 
         $subject = new EventService(
             repo: $repoMock,

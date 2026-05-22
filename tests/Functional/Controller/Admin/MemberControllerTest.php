@@ -28,21 +28,9 @@ class MemberControllerTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
-        static::assertSame(
-            0,
-            $crawler->filter('input[name="user[name]"]')->count(),
-            'Name field should not be editable',
-        );
-        static::assertSame(
-            0,
-            $crawler->filter('textarea[name="user[bio]"]')->count(),
-            'Bio field should not be editable',
-        );
-        static::assertGreaterThan(
-            0,
-            $crawler->filter('form[action*="set-role"]')->count(),
-            'Role action form should exist',
-        );
+        static::assertSame(0, $crawler->filter('input[name="user[name]"]')->count(), 'Name field should not be editable');
+        static::assertSame(0, $crawler->filter('textarea[name="user[bio]"]')->count(), 'Bio field should not be editable');
+        static::assertGreaterThan(0, $crawler->filter('form[action*="set-role"]')->count(), 'Role action form should exist');
     }
 
     public function testSetRolePromotesUserToAdmin(): void
@@ -178,11 +166,7 @@ class MemberControllerTest extends WebTestCase
         $this->assertResponseRedirects();
         $em->clear();
         $reloaded = $em->getRepository(User::class)->find($target->getId());
-        static::assertSame(
-            UserStatus::Active,
-            $reloaded->getStatus(),
-            'Status must not change on disallowed transition',
-        );
+        static::assertSame(UserStatus::Active, $reloaded->getStatus(), 'Status must not change on disallowed transition');
     }
 
     private function loginAsAdmin(KernelBrowser $client): void

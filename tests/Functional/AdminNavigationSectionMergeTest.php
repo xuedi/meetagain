@@ -39,9 +39,7 @@ class AdminNavigationSectionMergeTest extends WebTestCase
         $this->assertResponseIsSuccessful();
 
         // Assert - count sidebar section headings with text "System"
-        $systemHeadings = $crawler
-            ->filter('aside.menu p.menu-label')
-            ->reduce(static fn($node): bool => trim($node->text()) === 'System');
+        $systemHeadings = $crawler->filter('aside.menu p.menu-label')->reduce(static fn($node): bool => trim($node->text()) === 'System');
 
         static::assertCount(
             1,
@@ -66,9 +64,7 @@ class AdminNavigationSectionMergeTest extends WebTestCase
 
         // Assert - the "Content" section heading must never appear twice. A plugin may move
         // its links into a different section, so the heading may also be absent.
-        $contentHeadings = $crawler
-            ->filter('aside.menu p.menu-label')
-            ->reduce(static fn($node): bool => trim($node->text()) === 'Content');
+        $contentHeadings = $crawler->filter('aside.menu p.menu-label')->reduce(static fn($node): bool => trim($node->text()) === 'Content');
 
         static::assertLessThanOrEqual(
             1,

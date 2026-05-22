@@ -114,9 +114,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
             $currentLogo = $this->imageRepository->find($currentLogoId);
         }
 
-        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
-            'admin_system_theme.intro',
-        ))], actions: [
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_system_theme.intro'))], actions: [
             new AdminTopActionButton(
                 label: $this->translator->trans('admin_system_theme.button_gallery'),
                 target: $this->generateUrl('app_admin_system_gallery'),
@@ -161,9 +159,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
             icon: 'arrow-left',
         );
 
-        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
-            'admin_system_gallery.page_title',
-        ))], actions: $actions);
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_system_gallery.page_title'))], actions: $actions);
 
         return $this->render('admin/system/theme/gallery/index.html.twig', [
             'active' => 'system',
@@ -202,15 +198,11 @@ final class ThemeController extends AbstractSettingsController implements AdminN
                     id: 'g-' . $section['key'],
                     left: [
                         new AdminSectionTextItem(
-                            text: $this->translator->trans(
-                                'admin_system_gallery.section_' . $section['key'] . '_title',
-                            ),
+                            text: $this->translator->trans('admin_system_gallery.section_' . $section['key'] . '_title'),
                             extraClass: 'has-text-weight-semibold',
                         ),
                         new AdminSectionTextItem(
-                            text: $this->translator->trans(
-                                'admin_system_gallery.section_' . $section['key'] . '_caption',
-                            ),
+                            text: $this->translator->trans('admin_system_gallery.section_' . $section['key'] . '_caption'),
                             extraClass: 'has-text-grey is-size-7 ml-3',
                         ),
                     ],
@@ -247,11 +239,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
         $allLabel = $this->translator->trans('admin_system_gallery.category_all');
 
         $options = [
-            new AdminTopActionDropdownOption(
-                label: $allLabel,
-                target: $this->generateUrl('app_admin_system_gallery'),
-                isActive: $current === '',
-            ),
+            new AdminTopActionDropdownOption(label: $allLabel, target: $this->generateUrl('app_admin_system_gallery'), isActive: $current === ''),
         ];
         foreach (self::CATEGORIES as $cat) {
             $options[] = new AdminTopActionDropdownOption(
@@ -262,9 +250,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
             );
         }
 
-        $currentLabel = $current === ''
-            ? $allLabel
-            : $this->translator->trans('admin_system_gallery.category_' . $current);
+        $currentLabel = $current === '' ? $allLabel : $this->translator->trans('admin_system_gallery.category_' . $current);
 
         return new AdminTopActionDropdown(
             label: sprintf('%s %s', $this->translator->trans('admin_system_gallery.category_label'), $currentLabel),
@@ -305,9 +291,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
             );
         }
 
-        $currentLabel = $current === ''
-            ? $allLabel
-            : $this->translator->trans('admin_system_gallery.section_' . $current . '_title');
+        $currentLabel = $current === '' ? $allLabel : $this->translator->trans('admin_system_gallery.section_' . $current . '_title');
 
         return new AdminTopActionDropdown(
             label: sprintf('%s %s', $this->translator->trans('admin_system_gallery.subpage_label'), $currentLabel),
@@ -332,12 +316,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
     private function buildDemoAdminTabs(): AdminTabs
     {
         return new AdminTabs([
-            new AdminTab(
-                label: $this->translator->trans('admin_system_gallery.demo_tab_a'),
-                target: '#',
-                icon: 'list',
-                isActive: true,
-            ),
+            new AdminTab(label: $this->translator->trans('admin_system_gallery.demo_tab_a'), target: '#', icon: 'list', isActive: true),
             new AdminTab(label: $this->translator->trans('admin_system_gallery.demo_tab_b'), target: '#', icon: 'cog'),
         ]);
     }
@@ -361,29 +340,13 @@ final class ThemeController extends AbstractSettingsController implements AdminN
             new AdminTopActionDropdown(
                 label: $this->translator->trans('admin_system_gallery.demo_filter_label'),
                 options: [
-                    new AdminTopActionDropdownOption(
-                        label: $this->translator->trans('admin_system_gallery.demo_filter_all'),
-                        target: '#',
-                        isActive: true,
-                    ),
-                    new AdminTopActionDropdownOption(
-                        label: $this->translator->trans('admin_system_gallery.demo_filter_open'),
-                        target: '#',
-                        count: 3,
-                    ),
-                    new AdminTopActionDropdownOption(
-                        label: $this->translator->trans('admin_system_gallery.demo_filter_closed'),
-                        target: '#',
-                        count: 39,
-                    ),
+                    new AdminTopActionDropdownOption(label: $this->translator->trans('admin_system_gallery.demo_filter_all'), target: '#', isActive: true),
+                    new AdminTopActionDropdownOption(label: $this->translator->trans('admin_system_gallery.demo_filter_open'), target: '#', count: 3),
+                    new AdminTopActionDropdownOption(label: $this->translator->trans('admin_system_gallery.demo_filter_closed'), target: '#', count: 39),
                 ],
                 icon: 'filter',
             ),
-            new AdminTopActionButton(
-                label: $this->translator->trans('global.button_back'),
-                target: '#',
-                icon: 'arrow-left',
-            ),
+            new AdminTopActionButton(label: $this->translator->trans('global.button_back'), target: '#', icon: 'arrow-left'),
         ]);
     }
 
@@ -395,11 +358,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
                 ENT_QUOTES,
             ))),
         ], actions: [
-            new AdminTopActionButton(
-                label: $this->translator->trans('global.button_back'),
-                target: '#',
-                icon: 'arrow-left',
-            ),
+            new AdminTopActionButton(label: $this->translator->trans('global.button_back'), target: '#', icon: 'arrow-left'),
         ]);
     }
 

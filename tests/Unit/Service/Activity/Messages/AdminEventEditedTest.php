@@ -54,9 +54,7 @@ class AdminEventEditedTest extends TestCase
     public function testCanCatchMissingEventId(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_edited"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Missing 'event_id' in meta in core.admin_event_edited"));
 
         $subject = new AdminEventEdited();
         $subject->injectServices($this->router, $this->imageService, $this->translator, []);
@@ -68,9 +66,7 @@ class AdminEventEditedTest extends TestCase
     public function testCanCatchNonNumericEventId(): void
     {
         // Arrange
-        $this->expectExceptionObject(
-            new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.admin_event_edited'"),
-        );
+        $this->expectExceptionObject(new InvalidArgumentException("Value 'event_id' has to be numeric in 'core.admin_event_edited'"));
 
         $subject = new AdminEventEdited();
         $subject->injectServices($this->router, $this->imageService, $this->translator, ['event_id' => 'not-a-number']);

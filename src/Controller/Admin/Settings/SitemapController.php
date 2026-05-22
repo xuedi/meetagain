@@ -69,11 +69,7 @@ final class SitemapController extends AbstractSettingsController implements Admi
         );
 
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($allUrls),
-                $this->translator->trans('admin_system_sitemap.summary_urls'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($allUrls), $this->translator->trans('admin_system_sitemap.summary_urls'))),
         ];
         if ($localeFilter !== '' || $sectionFilter !== '' || $warningsOnly) {
             $info[] = new AdminTopInfoHtml(sprintf(
@@ -310,13 +306,8 @@ final class SitemapController extends AbstractSettingsController implements Admi
     /**
      * @param list<string> $sections
      */
-    private function buildSectionDropdown(
-        string $current,
-        string $locale,
-        bool $warnings,
-        array $allUrls,
-        array $sections,
-    ): AdminTopActionDropdown {
+    private function buildSectionDropdown(string $current, string $locale, bool $warnings, array $allUrls, array $sections): AdminTopActionDropdown
+    {
         $base = $this->buildBaseParams($locale, '', $warnings);
 
         $options = [
@@ -347,9 +338,7 @@ final class SitemapController extends AbstractSettingsController implements Admi
             label: sprintf(
                 '%s %s',
                 $this->translator->trans('admin_system_sitemap.section_filter_label'),
-                $current === ''
-                    ? $this->translator->trans('admin_system_sitemap.section_filter_all')
-                    : $this->labelForSection($current),
+                $current === '' ? $this->translator->trans('admin_system_sitemap.section_filter_all') : $this->labelForSection($current),
             ),
             options: $options,
             icon: 'layer-group',
@@ -370,13 +359,8 @@ final class SitemapController extends AbstractSettingsController implements Admi
     /**
      * @param list<string> $locales
      */
-    private function buildLocaleDropdown(
-        string $current,
-        string $section,
-        bool $warnings,
-        array $allUrls,
-        array $locales,
-    ): AdminTopActionDropdown {
+    private function buildLocaleDropdown(string $current, string $section, bool $warnings, array $allUrls, array $locales): AdminTopActionDropdown
+    {
         $base = $this->buildBaseParams('', $section, $warnings);
 
         $options = [
@@ -407,9 +391,7 @@ final class SitemapController extends AbstractSettingsController implements Admi
             label: sprintf(
                 '%s %s',
                 $this->translator->trans('admin_system_sitemap.locale_filter_label'),
-                $current === ''
-                    ? $this->translator->trans('admin_system_sitemap.locale_filter_all')
-                    : strtoupper($current),
+                $current === '' ? $this->translator->trans('admin_system_sitemap.locale_filter_all') : strtoupper($current),
             ),
             options: $options,
             icon: 'language',
@@ -421,9 +403,7 @@ final class SitemapController extends AbstractSettingsController implements Admi
         $params = $this->buildBaseParams($locale, $section, !$current);
 
         return new AdminTopActionButton(
-            label: $this->translator->trans(
-                $current ? 'admin_system_sitemap.button_hide_warnings' : 'admin_system_sitemap.button_show_warnings',
-            ),
+            label: $this->translator->trans($current ? 'admin_system_sitemap.button_hide_warnings' : 'admin_system_sitemap.button_show_warnings'),
             target: $this->generateUrl('app_admin_system_sitemap', $params),
             icon: $current ? 'filter-circle-xmark' : 'filter',
             variant: $current ? 'is-warning' : null,

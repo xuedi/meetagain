@@ -43,13 +43,7 @@ class MessageRepositoryTest extends KernelTestCase
     {
         // Arrange
         $now = new DateTimeImmutable(self::FIXED_NOW);
-        $msg = $this->seedMessage(
-            $this->sender,
-            $this->partner,
-            $now->modify('-2 minutes'),
-            'hello world',
-            deleted: false,
-        );
+        $msg = $this->seedMessage($this->sender, $this->partner, $now->modify('-2 minutes'), 'hello world', deleted: false);
 
         $lookupId = $msg->getId();
         $lookupSender = $this->sender;
@@ -100,13 +94,8 @@ class MessageRepositoryTest extends KernelTestCase
         ];
     }
 
-    private function seedMessage(
-        User $sender,
-        User $receiver,
-        DateTimeImmutable $createdAt,
-        string $content,
-        bool $deleted,
-    ): Message {
+    private function seedMessage(User $sender, User $receiver, DateTimeImmutable $createdAt, string $content, bool $deleted): Message
+    {
         $msg = new Message();
         $msg->setSender($sender);
         $msg->setReceiver($receiver);

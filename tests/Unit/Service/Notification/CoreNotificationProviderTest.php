@@ -13,11 +13,8 @@ use Symfony\Component\Translation\IdentityTranslator;
 
 class CoreNotificationProviderTest extends TestCase
 {
-    private function createProvider(
-        int $staleEmails = 0,
-        int $newSupportRequests = 0,
-        bool $isAdmin = true,
-    ): CoreNotificationProvider {
+    private function createProvider(int $staleEmails = 0, int $newSupportRequests = 0, bool $isAdmin = true): CoreNotificationProvider
+    {
         $emailRepoStub = $this->createStub(EmailQueueRepository::class);
         $emailRepoStub->method('getStaleCount')->willReturn($staleEmails);
 
@@ -36,19 +33,10 @@ class CoreNotificationProviderTest extends TestCase
     }
 
     #[DataProvider('getNotificationsProvider')]
-    public function testGetNotifications(
-        bool $isAdmin,
-        int $staleEmails,
-        int $newSupportRequests,
-        int $expectedCount,
-        array $expectedLabelFragments,
-    ): void {
+    public function testGetNotifications(bool $isAdmin, int $staleEmails, int $newSupportRequests, int $expectedCount, array $expectedLabelFragments): void
+    {
         // Arrange
-        $provider = $this->createProvider(
-            staleEmails: $staleEmails,
-            newSupportRequests: $newSupportRequests,
-            isAdmin: $isAdmin,
-        );
+        $provider = $this->createProvider(staleEmails: $staleEmails, newSupportRequests: $newSupportRequests, isAdmin: $isAdmin);
 
         // Act
         $result = $provider->getNotifications($this->createStub(User::class));
