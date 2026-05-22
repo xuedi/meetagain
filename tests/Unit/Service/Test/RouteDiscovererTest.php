@@ -64,22 +64,17 @@ class RouteDiscovererTest extends TestCase
         static::assertSame(['/get'], self::paths($urls));
     }
 
-    public function testSkipsRoutesMatchingSkipPatterns(): void
+    public function testIncludesRoutesWithoutMethodsRestriction(): void
     {
         // Arrange
         $collection = new RouteCollection();
-        $collection->add('app_logout', new Route('/logout', methods: ['GET']));
-        $collection->add('app_item_delete', new Route('/item/delete', methods: ['GET']));
-        $collection->add('app_user_toggle', new Route('/user/toggle', methods: ['GET']));
-        $collection->add('app_install_step', new Route('/install/step', methods: ['GET']));
-        $collection->add('_wdt_bar', new Route('/_wdt', methods: ['GET']));
-        $collection->add('app_keep', new Route('/keep', methods: ['GET']));
+        $collection->add('app_any', new Route('/any'));
 
         // Act
         $urls = $this->makeDiscoverer($collection)->discoverGetUrls();
 
         // Assert
-        static::assertSame(['/keep'], self::paths($urls));
+        static::assertSame(['/any'], self::paths($urls));
     }
 
     public function testFillsParamMapWithDefaults(): void

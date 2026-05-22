@@ -68,10 +68,9 @@ final class MemberController extends AbstractController
     }
 
     #[Route('/members/view/{id}', name: 'app_member_view')]
-    public function view(int $id, Request $request): Response
+    public function view(int $id): Response
     {
         if (!$this->getUser() instanceof UserInterface) {
-            $request->getSession()->set('redirectUrl', $request->getRequestUri());
             return $this->redirectToRoute('app_login');
         }
 
