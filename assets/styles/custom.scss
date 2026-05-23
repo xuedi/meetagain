@@ -176,8 +176,24 @@ details.activities-load-more {
     color: inherit;
     font-size: inherit;
     font-family: inherit;
-    padding: 0;
 }
+
+// When a <form> wraps a single .panel-block button (needed for CSRF POST),
+// it would otherwise break Bulma's panel layout: every button becomes the only
+// child of its form, so .panel-block:not(:last-child) never matches and the
+// inter-row borders + final rounded corner are lost. display:contents folds
+// the form out of layout; we then restore the border manually between form
+// siblings, except for the last form in the panel.
+nav.panel > form { display: contents; }
+nav.panel > form:not(:last-of-type) > .panel-block {
+    border-bottom: var(--bulma-panel-item-border);
+}
+
+// Horizontal admin action bar on the member view: each action button is wrapped
+// in its own <form> for CSRF, but .buttons (display: flex) expects buttons as
+// direct children to wrap and gap correctly. Folding the forms out of layout
+// lets the buttons themselves become the flex items.
+.member-admin-bar .buttons > form { display: contents; }
 
 // Admin charts: canvas fills its wrapper (each dashboard chart partial wraps the
 // <canvas> in a div with explicit height/max-height, so we no longer need a global cap).
