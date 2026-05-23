@@ -31,10 +31,4 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
     {
         return substr(hash('sha256', self::SECRET_SALT . '|' . $logicalPath), 0, self::HASH_LENGTH);
     }
-
-    /** Public path of the compiled global JS bundle under /media/. */
-    public static function appBundlePath(): string
-    {
-        return '/media/' . self::hashLogicalPath('js/app-bundle') . '.js';
-    }
 }
