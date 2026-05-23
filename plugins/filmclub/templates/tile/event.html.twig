@@ -10,9 +10,9 @@
         <a href="{{ path('app_plugin_filmclub_film_show', {id: selection.film.id}) }}">{{ selection.film.title }}</a>
     </p>
     {% if is_granted('ROLE_USER') and not isWishlisted %}
-    <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_add', {filmId: selection.film.id}) }}" style="display: inline">
-        <button type="submit" class="button is-small is-text is-size-7">{{ 'filmclub_tile.button_add_wishlist'|trans }}</button>
-    </form>
+    <a href="{{ path('app_plugin_filmclub_wishlist_add', {filmId: selection.film.id}) }}"
+       class="button is-small is-text is-size-7"
+       data-post>{{ 'filmclub_tile.button_add_wishlist'|trans }}</a>
     {% endif %}
 </div>
 {% elseif activePoll %}

@@ -15,7 +15,7 @@
         - rotate         (bool, optional)          — show rotate button; default: false
         - label          (string, optional)        — upload button label; default: 'Change Image'
         - removeImageUrl (string|null, optional)   — URL for the remove-image action; shows × button when set
-    Depends on: _components/image.html.twig, assets/js/modal.js (.modalTrigger, .fileRotateTrigger)
+    Depends on: _components/image.html.twig, assets/js/modal.js (.modalTrigger), assets/js/post-link.js (rotate)
 #}
 {% if image is not null or (showWhenEmpty is defined and showWhenEmpty) %}
     {% set modalUrl = path('app_image_modal', {'entity': entity, 'id': id}) %}
@@ -36,8 +36,9 @@
                 <span>{{ label }}</span>
             </a>
             {% if rotate %}
-                <a class="button is-link fileRotateTrigger"
+                <a class="button is-link"
                    href="{{ path('app_image_rotate', {'entity': entity, 'id': id}) }}"
+                   data-post
                    data-csrf-token="{{ csrf_token('app_image_rotate' ~ id) }}">
                     <span class="icon">
                         <i class="fa fa-rotate-right"></i>

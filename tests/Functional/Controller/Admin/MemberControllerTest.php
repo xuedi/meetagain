@@ -30,7 +30,7 @@ class MemberControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         static::assertSame(0, $crawler->filter('input[name="user[name]"]')->count(), 'Name field should not be editable');
         static::assertSame(0, $crawler->filter('textarea[name="user[bio]"]')->count(), 'Bio field should not be editable');
-        static::assertGreaterThan(0, $crawler->filter('form[action*="set-role"]')->count(), 'Role action form should exist');
+        static::assertGreaterThan(0, $crawler->filter('a[data-post][href*="set-role"]')->count(), 'Role action link should exist');
     }
 
     public function testSetRolePromotesUserToAdmin(): void
@@ -201,17 +201,17 @@ class MemberControllerTest extends WebTestCase
         $crawler = $client->request('GET', '/en/admin/member/edit/' . $userId);
         $this->assertResponseIsSuccessful();
 
-        $forms = $crawler
-            ->filter('form')
-            ->reduce(static function ($form) use ($actionFragment): bool {
-                $action = (string) $form->attr('action');
-                return str_contains($action, $actionFragment);
+        $links = $crawler
+            ->filter('a[data-post]')
+            ->reduce(static function ($link) use ($actionFragment): bool {
+                $href = (string) $link->attr('href');
+                return str_contains($href, $actionFragment);
             });
-        static::assertGreaterThan(0, $forms->count(), "Form with action containing '{$actionFragment}' should exist");
+        static::assertGreaterThan(0, $links->count(), "data-post link with href containing '{$actionFragment}' should exist");
 
-        $token = $forms->first()->filter('input[name="_token"]')->attr('value');
-        static::assertNotEmpty($token, 'CSRF token should be present in the form');
+        $token = (string) $links->first()->attr('data-csrf-token');
+        static::assertNotEmpty($token, 'CSRF token should be present on the data-post link');
 
-        return (string) $token;
+        return $token;
     }
 }

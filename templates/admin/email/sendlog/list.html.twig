@@ -9,13 +9,12 @@
 
         {% if providerAvailable %}
             <div class="mb-4">
-                <form method="post" action="{{ path('app_admin_email_sendlog_sync') }}">
-                    <input type="hidden" name="_token" value="{{ csrf_token('sync') }}">
-                    <button type="submit" class="button is-small is-info">
-                        <span class="icon"><i class="fa fa-refresh"></i></span>
-                        <span>{{ 'admin_email_sendlog.button_sync'|trans }}</span>
-                    </button>
-                </form>
+                <a href="{{ path('app_admin_email_sendlog_sync') }}"
+                   class="button is-small is-info"
+                   data-post>
+                    <span class="icon"><i class="fa fa-refresh"></i></span>
+                    <span>{{ 'admin_email_sendlog.button_sync'|trans }}</span>
+                </a>
             </div>
         {% endif %}
 

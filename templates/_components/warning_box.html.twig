@@ -1,21 +1,21 @@
 {#
-    Warning Box — Collapsible confirmation panel for destructive admin actions
+    Warning Box -- Collapsible confirmation panel for destructive admin actions
 
     Renders a hidden Bulma message element that can be revealed by a toggleTrigger elsewhere
-    on the page. Supports danger (red) and warning (orange) variants. An optional confirmation
-    button with a trash icon links to the action URL. When csrfToken is provided the button
-    is rendered as a POST form; otherwise it renders as a plain <a> link.
+    on the page. Supports danger (red) and warning (orange) variants. When buttonUrl is set,
+    renders a data-post confirmation anchor with a trash icon (handled by assets/js/post-link.js);
+    csrfToken is appended only when the target route validates the token server-side.
 
     Parameters:
-        - id          (string, required)        — unique element ID used by toggleTrigger
-        - title       (string, required)        — header text of the message box
-        - content     (string, required)        — body HTML; rendered raw
-        - type        (string, optional)        — 'danger' (default) or 'warning'
-        - buttonUrl   (string, optional)        — action URL; shows button when set
-        - buttonLabel (string, optional)        — label for the confirmation button
-        - csrfToken   (string, optional)        — when set, renders a POST form with this token ID instead of <a>
-        - showButton  (bool, optional)          — override button visibility; default true when buttonUrl set
-    Depends on: assets/js/toggles.js (.toggleTrigger)
+        - id          (string, required)        -- unique element ID used by toggleTrigger
+        - title       (string, required)        -- header text of the message box
+        - content     (string, required)        -- body HTML; rendered raw
+        - type        (string, optional)        -- 'danger' (default) or 'warning'
+        - buttonUrl   (string, optional)        -- action URL; shows button when set
+        - buttonLabel (string, optional)        -- label for the confirmation button
+        - csrfToken   (string, optional)        -- when set, the button POSTs via data-post with this token ID
+        - showButton  (bool, optional)          -- override button visibility; default true when buttonUrl set
+    Depends on: assets/js/toggles.js (.toggleTrigger), assets/js/post-link.js (a[data-post])
 #}
 <article class="message is-{{ type|default('danger') }} is-hidden" id="{{ id }}">
     <div class="message-header">
@@ -26,20 +26,13 @@
         {{ content|raw }}
         {% if (showButton is not defined and buttonUrl is defined) or (showButton is defined and showButton) %}
             <div class="has-text-right mt-3">
-                {% if csrfToken is defined and csrfToken is not null %}
-                    <form method="post" action="{{ buttonUrl }}" class="is-inline">
-                        <input type="hidden" name="_token" value="{{ csrf_token(csrfToken) }}">
-                        <button type="submit" class="button">
-                            <span class="icon"><i class="fa fa-trash"></i></span>
-                            <span>{{ buttonLabel }}</span>
-                        </button>
-                    </form>
-                {% else %}
-                    <a class="button" href="{{ buttonUrl }}">
-                        <span class="icon"><i class="fa fa-trash"></i></span>
-                        <span>{{ buttonLabel }}</span>
-                    </a>
-                {% endif %}
+                <a class="button"
+                   href="{{ buttonUrl }}"
+                   data-post
+                   {%- if csrfToken is defined and csrfToken is not null %} data-csrf-token="{{ csrf_token(csrfToken) }}"{% endif %}>
+                    <span class="icon"><i class="fa fa-trash"></i></span>
+                    <span>{{ buttonLabel }}</span>
+                </a>
             </div>
         {% endif %}
     </div>

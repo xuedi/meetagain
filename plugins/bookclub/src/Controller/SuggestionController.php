@@ -60,7 +60,7 @@ final class SuggestionController extends AbstractController
             $this->addFlash('error', $e->getMessage());
         }
 
-        if ($request->request->get('redirect') === 'book') {
+        if ($request->query->get('redirect') === 'book') {
             return $this->redirectToRoute('app_plugin_bookclub_book_show', ['id' => $bookId]);
         }
 

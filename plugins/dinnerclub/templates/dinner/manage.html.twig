@@ -21,9 +21,9 @@
             {% if not dinner %}
 
                 <p class="has-text-grey mb-4">{{ 'dinnerclub_dinner.empty'|trans }}</p>
-                <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_create', {eventId: event.id}) }}">
-                    <button type="submit" class="button">{{ 'dinnerclub_dinner.button_create'|trans }}</button>
-                </form>
+                <a href="{{ path('app_plugin_dinnerclub_dinner_create', {eventId: event.id}) }}"
+                   class="button"
+                   data-post>{{ 'dinnerclub_dinner.button_create'|trans }}</a>
 
             {% else %}
 
@@ -41,25 +41,23 @@
                             <div class="is-flex is-align-items-center mb-2" style="gap: 0.5rem;">
                                 <p class="has-text-weight-semibold is-size-7 is-uppercase mb-0"
                                    style="letter-spacing: 0.08em;">{{ course.name }}</p>
-                                <form method="post"
-                                      action="{{ path('app_plugin_dinnerclub_dinner_course_delete', {courseId: course.id}) }}">
-                                    <button type="submit" class="button is-ghost p-0"
-                                            style="height: auto; font-size: 0.65rem; color: #aaa; vertical-align: baseline;">
-                                        {{ 'dinnerclub_dinner.button_remove'|trans }}
-                                    </button>
-                                </form>
+                                <a href="{{ path('app_plugin_dinnerclub_dinner_course_delete', {courseId: course.id}) }}"
+                                   class="button is-ghost p-0"
+                                   data-post
+                                   style="height: auto; font-size: 0.65rem; color: #aaa; vertical-align: baseline;">
+                                    {{ 'dinnerclub_dinner.button_remove'|trans }}
+                                </a>
                             </div>
 
                             {% for item in course.items %}
                                 <div class="is-flex is-align-items-center mb-1" style="gap: 0.5rem;">
                                     <span class="is-size-7">{{ item.dish.getTranslatedName(app.locale) ?: item.dish.getTranslatedName('en') }}</span>
-                                    <form method="post"
-                                          action="{{ path('app_plugin_dinnerclub_dinner_item_delete', {itemId: item.id}) }}">
-                                        <button type="submit" class="button is-ghost p-0"
-                                                style="height: auto; font-size: 0.65rem; color: #aaa; vertical-align: baseline;">
-                                            {{ 'dinnerclub_dinner.button_remove'|trans }}
-                                        </button>
-                                    </form>
+                                    <a href="{{ path('app_plugin_dinnerclub_dinner_item_delete', {itemId: item.id}) }}"
+                                       class="button is-ghost p-0"
+                                       data-post
+                                       style="height: auto; font-size: 0.65rem; color: #aaa; vertical-align: baseline;">
+                                        {{ 'dinnerclub_dinner.button_remove'|trans }}
+                                    </a>
                                 </div>
                             {% else %}
                                 <p class="has-text-grey is-size-7">{{ 'dinnerclub_dinner.empty_dishes'|trans }}</p>
@@ -204,10 +202,9 @@
 
                     <hr>
 
-                    <form method="post"
-                          action="{{ path('app_plugin_dinnerclub_dinner_delete', {dinnerId: dinner.id}) }}">
-                        <button type="submit" class="button is-small is-danger">{{ 'dinnerclub_dinner.button_delete'|trans }}</button>
-                    </form>
+                    <a href="{{ path('app_plugin_dinnerclub_dinner_delete', {dinnerId: dinner.id}) }}"
+                       class="button is-small is-danger"
+                       data-post>{{ 'dinnerclub_dinner.button_delete'|trans }}</a>
 
                 </div>
 

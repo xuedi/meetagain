@@ -8,8 +8,6 @@
  *   2. Modal close — dismisses via the .modal-close button or .modal-background click.
  *   3. File upload (.fileUploadTrigger) — sends the selected file via FormData POST
  *      and reloads. Uses event delegation to support dynamically injected modal content.
- *   4. File select/rotate (.fileSelectTrigger / .fileRotateTrigger) — fires the action
- *      URL via GET and reloads. Also delegated for modal content.
  *
  * Loaded in:  templates/base.html.twig (all pages)
  * Used by:    templates/_components/image_upload.html.twig,
@@ -76,15 +74,3 @@ document.addEventListener('change', function (event) {
         .catch(() => location.reload());
 });
 
-// File actions: delegated — select/rotate via POST with CSRF token and reload (works on dynamically injected modal content)
-document.addEventListener('click', function (event) {
-    const trigger = event.target.closest('.fileSelectTrigger, .fileRotateTrigger');
-    if (!trigger) return;
-    event.preventDefault();
-    const url = trigger.getAttribute('href');
-    if (!url) return;
-    const token = trigger.dataset.csrfToken || '';
-    const formData = new FormData();
-    formData.append('_token', token);
-    maFetch(url, false, formData).then(() => location.reload());
-});
