@@ -242,7 +242,6 @@ member:
     admin_action_remove_avatar: 'Remove image'
     admin_action_restrict_user: 'Restrict user'
     admin_action_verify_user: 'Verify user'
-    admin_action_takeover_user: 'Takeover user'
 profile:
     page_title: 'Profile'
     section_info: 'Info'

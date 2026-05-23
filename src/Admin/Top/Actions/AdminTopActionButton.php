@@ -14,6 +14,8 @@ final readonly class AdminTopActionButton implements AdminTopActionInterface
         public ?string $confirm = null,
         public ?string $toggleId = null,
         public bool $newTab = false,
+        public bool $post = false,
+        public ?string $csrfTokenId = null,
     ) {}
 
     public function getTemplate(): string
