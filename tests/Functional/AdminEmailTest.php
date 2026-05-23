@@ -120,7 +120,7 @@ class AdminEmailTest extends WebTestCase
 
         // Act: reset to default - extract CSRF token from the Reset button form on the edit page
         $editCrawler = $client->getCrawler();
-        $token = $editCrawler->filter('form[action*="/reset"] input[name="_token"]')->attr('value');
+        $token = $editCrawler->filter('a[href*="/reset"][data-post]')->attr('data-csrf-token');
         $client->request('POST', '/en/admin/email/templates/' . $template->getId() . '/reset', ['_token' => $token]);
 
         // Assert

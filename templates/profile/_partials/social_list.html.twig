@@ -19,12 +19,12 @@
                 <a href="{{ path('app_member_view', {'id': user.id}) }}" class="has-text-dark">{{ user.name }}</a>
             </td>
             <td class="has-text-right">
-                <form method="post" action="{{ path('app_profile_social_toggle_follow', {'id': user.id}) }}" class="is-inline">
-                    <input type="hidden" name="_token" value="{{ csrf_token('app_profile_social_toggle_follow' ~ user.id) }}">
-                    <button type="submit" class="button is-small {{ buttonColor }}">
-                        <span class="icon"><i class="fa fa-plus"></i></span><span>{{ buttonTitle }}</span>
-                    </button>
-                </form>
+                <a href="{{ path('app_profile_social_toggle_follow', {'id': user.id}) }}"
+                   class="button is-small {{ buttonColor }}"
+                   data-post
+                   data-csrf-token="{{ csrf_token('app_profile_social_toggle_follow' ~ user.id) }}">
+                    <span class="icon"><i class="fa fa-plus"></i></span><span>{{ buttonTitle }}</span>
+                </a>
             </td>
         </tr>
     {% endfor %}

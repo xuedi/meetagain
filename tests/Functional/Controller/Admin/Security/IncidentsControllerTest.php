@@ -89,7 +89,7 @@ class IncidentsControllerTest extends WebTestCase
 
         // Assert - Clear button is rendered
         $this->assertResponseIsSuccessful();
-        static::assertGreaterThan(0, $crawler->filter('.box .level-right form button:contains("Clear")')->count());
+        static::assertGreaterThan(0, $crawler->filter('.box .level-right a[data-post][href*="/clear"]')->count());
     }
 
     public function testShowReturns404ForMissingIncident(): void
@@ -140,7 +140,7 @@ class IncidentsControllerTest extends WebTestCase
 
         // Act
         $crawler = $client->request('GET', '/en/admin/security/incidents');
-        $token = $crawler->filter('form[action*="/clear"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('a[href*="/clear"][data-post]')->attr('data-csrf-token');
         $client->request('POST', '/en/admin/security/incidents/clear', ['_token' => $token]);
 
         // Assert

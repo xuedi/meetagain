@@ -64,14 +64,14 @@
                                         <span class="icon"><i class="fa-solid fa-pen"></i></span>
                                         <span>{{ 'dinnerclub_lists.button_edit'|trans }}</span>
                                     </a>
-                                    <form method="post" action="{{ path('plugin_dinnerclub_lists_delete', {'id': list.id}) }}" class="is-inline card-footer-item">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('plugin_dinnerclub_lists_delete' ~ list.id) }}">
-                                        <button type="submit" class="button-as-icon has-text-danger"
-                                                onclick="return confirm({{ 'dinnerclub_lists.confirm_delete'|trans|json_encode|e('html_attr') }});">
-                                            <span class="icon"><i class="fa-solid fa-trash"></i></span>
-                                            <span>{{ 'dinnerclub_lists.button_delete'|trans }}</span>
-                                        </button>
-                                    </form>
+                                    <a href="{{ path('plugin_dinnerclub_lists_delete', {'id': list.id}) }}"
+                                       class="button-as-icon has-text-danger card-footer-item"
+                                       data-post
+                                       data-csrf-token="{{ csrf_token('plugin_dinnerclub_lists_delete' ~ list.id) }}"
+                                       data-confirm="{{ 'dinnerclub_lists.confirm_delete'|trans }}">
+                                        <span class="icon"><i class="fa-solid fa-trash"></i></span>
+                                        <span>{{ 'dinnerclub_lists.button_delete'|trans }}</span>
+                                    </a>
                                 </footer>
                             </div>
                         </div>

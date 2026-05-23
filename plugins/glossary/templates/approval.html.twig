@@ -24,18 +24,18 @@
                                 {{ 'glossary.label_created_at'|trans }}: <b>{{ editItem.createdAt | time_diff }}</b><br>
                             </p>
                             <div class="has-text-right">
-                                <form method="post" action="{{ path('app_plugin_glossary_approval_approve', {id: editItem.id}) }}" class="is-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_glossary_approval_approve' ~ editItem.id) }}">
-                                    <button type="submit" class="button is-success">
-                                        <i class="fas fa-check"></i>
-                                    </button>
-                                </form>
-                                <form method="post" action="{{ path('app_plugin_glossary_approval_deny', {id: editItem.id}) }}" class="is-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_glossary_approval_deny' ~ editItem.id) }}">
-                                    <button type="submit" class="button is-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
+                                <a href="{{ path('app_plugin_glossary_approval_approve', {id: editItem.id}) }}"
+                                   class="button is-success"
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('app_plugin_glossary_approval_approve' ~ editItem.id) }}">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                <a href="{{ path('app_plugin_glossary_approval_deny', {id: editItem.id}) }}"
+                                   class="button is-danger"
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('admin_glossary_approval_deny' ~ editItem.id) }}">
+                                    <i class="fas fa-trash"></i>
+                                </a>
                             </div>
                         </div>
 

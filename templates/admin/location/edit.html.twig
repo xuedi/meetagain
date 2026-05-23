@@ -23,13 +23,13 @@
                 {{ warningContent }}
                 {% if events_using_location|length == 0 %}
                     <div class="has-text-right mt-3">
-                        <form method="post" action="{{ path('app_admin_location_delete', {'id': location.id}) }}" class="is-inline">
-                            <input type="hidden" name="_token" value="{{ csrf_token('admin_location_delete' ~ location.id) }}">
-                            <button type="submit" class="button">
-                                <span class="icon"><i class="fa fa-trash"></i></span>
-                                <span>{{ 'admin_location.warning_delete_button'|trans }}</span>
-                            </button>
-                        </form>
+                        <a href="{{ path('app_admin_location_delete', {'id': location.id}) }}"
+                           class="button"
+                           data-post
+                           data-csrf-token="{{ csrf_token('admin_location_delete' ~ location.id) }}">
+                            <span class="icon"><i class="fa fa-trash"></i></span>
+                            <span>{{ 'admin_location.warning_delete_button'|trans }}</span>
+                        </a>
                     </div>
                 {% endif %}
             {% endset %}

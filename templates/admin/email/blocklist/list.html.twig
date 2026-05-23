@@ -35,12 +35,12 @@
                     </td>
                     <td>{{ entry.addedAt|date('Y-m-d H:i:s') }}</td>
                     <td>
-                        <form method="post" action="{{ path('app_admin_email_blocklist_delete', {'id': entry.id}) }}" class="is-inline">
-                            <input type="hidden" name="_token" value="{{ csrf_token('admin_email_blocklist_delete' ~ entry.id) }}">
-                            <button type="submit" class="button-as-icon">
-                                <span class="icon"><i class="fa fa-trash"></i></span>
-                            </button>
-                        </form>
+                        <a href="{{ path('app_admin_email_blocklist_delete', {'id': entry.id}) }}"
+                           class="button-as-icon"
+                           data-post
+                           data-csrf-token="{{ csrf_token('admin_email_blocklist_delete' ~ entry.id) }}">
+                            <span class="icon"><i class="fa fa-trash"></i></span>
+                        </a>
                     </td>
                 </tr>
             {% else %}

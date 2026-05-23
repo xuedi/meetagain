@@ -31,8 +31,8 @@
 {% else %}
     {% if is_granted('ROLE_ORGANIZER') %}
         <p class="has-text-grey is-size-7">{{ 'dinnerclub_tile.hint_no_dinner'|trans }}</p>
-        <form method="post" action="{{ path('app_plugin_dinnerclub_dinner_create', {eventId: eventId}) }}" class="mt-2">
-            <button type="submit" class="button is-small">{{ 'dinnerclub_tile.button_create'|trans }}</button>
-        </form>
+        <a href="{{ path('app_plugin_dinnerclub_dinner_create', {eventId: eventId}) }}"
+           class="button is-small mt-2"
+           data-post>{{ 'dinnerclub_tile.button_create'|trans }}</a>
     {% endif %}
 {% endif %}
