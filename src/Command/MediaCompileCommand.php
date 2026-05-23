@@ -28,6 +28,7 @@ final class MediaCompileCommand extends Command
         'js/cookie-consent.js',
         'js/modal.js',
         'js/block-user.js',
+        'js/post-link.js',
     ];
 
     public function __construct(
