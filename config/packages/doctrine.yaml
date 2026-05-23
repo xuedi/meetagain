@@ -31,8 +31,11 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            # Use the same database as dev for functional tests
-            # dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+            # `.env.test` points at the base dbname (no _test). The suffix below
+            # appends `_test` always, and the paratest TEST_TOKEN per worker:
+            #   single-process phpunit -> meetAgain_test
+            #   paratest worker N      -> meetAgain_testN
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
 
 when@prod:
     doctrine:
