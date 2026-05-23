@@ -13,112 +13,111 @@
                     </div>
                 </div>
 
-                <div class="column is-6">
-                    <div class="mb-4">
-                        <h1 class="title is-3 is-inline">{{ userDetails.name }}</h1>
+                <div class="column is-8">
+                    <div class="level mb-4 is-mobile">
+                        <div class="level-left">
+                            <h1 class="title is-3 mb-0">{{ userDetails.name }}</h1>
+                        </div>
                         {% if userDetails.id != currentUser.id %}
-                            {% if not isBlocked %}
-                                <form method="post" action="{{ path('app_member_toggle_follow', {'id': userDetails.id}) }}" class="is-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('app_member_toggle_follow' ~ userDetails.id) }}">
-                                    {% if isFollow %}
-                                        <button type="submit" class="button is-danger is-small ml-4 mt-1">
-                                            <span class="icon"><i class="fa fa-minus"></i></span><span>{{ 'member.button_unfollow'|trans }}</span>
-                                        </button>
-                                    {% else %}
-                                        <button type="submit" class="button is-success is-small ml-4 mt-1">
-                                            <span class="icon"><i class="fa fa-plus"></i></span><span>{{ 'member.button_follow'|trans }}</span>
-                                        </button>
+                            <div class="level-right">
+                                <div class="buttons are-small mb-0">
+                                    {% if not isBlocked %}
+                                        <form method="post" action="{{ path('app_member_toggle_follow', {'id': userDetails.id}) }}">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('app_member_toggle_follow' ~ userDetails.id) }}">
+                                            <button type="submit" class="button is-light is-small">
+                                                <span class="icon"><i class="fa fa-{{ isFollow ? 'minus' : 'plus' }}"></i></span>
+                                                <span>{{ (isFollow ? 'member.button_unfollow' : 'member.button_follow')|trans }}</span>
+                                            </button>
+                                        </form>
                                     {% endif %}
-                                </form>
-                            {% endif %}
 
-                            {# Block/Unblock button #}
-                            {% if isBlocked %}
-                                <form action="{{ path('app_profile_unblock_user', {'id': userDetails.id}) }}" method="post" class="is-inline">
-                                    <button type="submit" class="button is-warning is-small ml-2 mt-1">
-                                        <span class="icon"><i class="fa fa-unlock"></i></span><span>{{ 'member.button_unblock'|trans }}</span>
-                                    </button>
-                                </form>
-                            {% else %}
-                                <form action="{{ path('app_profile_block_user', {'id': userDetails.id}) }}" method="post" class="is-inline"
-                                      onsubmit="return confirm('{{ 'member.button_block_confirm'|trans|e('js') }}')">
-                                    <button type="submit" class="button is-dark is-small ml-2 mt-1">
-                                        <span class="icon"><i class="fa fa-ban"></i></span><span>{{ 'member.button_block'|trans }}</span>
-                                    </button>
-                                </form>
-                            {% endif %}
-                        {% else %}
-                            <div class="button is-warning is-small ml-4 mt-1">
-                                <span class="icon"><i class="fa fa-circle-exclamation"></i></span><span>{{ 'member.button_follow_self_hint'|trans }}</span>
+                                    {% if isBlocked %}
+                                        <form action="{{ path('app_profile_unblock_user', {'id': userDetails.id}) }}" method="post">
+                                            <button type="submit" class="button is-light is-small">
+                                                <span class="icon"><i class="fa fa-unlock"></i></span>
+                                                <span>{{ 'member.button_unblock'|trans }}</span>
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form action="{{ path('app_profile_block_user', {'id': userDetails.id}) }}" method="post"
+                                              onsubmit="return confirm('{{ 'member.button_block_confirm'|trans|e('js') }}')">
+                                            <button type="submit" class="button is-light is-small">
+                                                <span class="icon"><i class="fa fa-ban"></i></span>
+                                                <span>{{ 'member.button_block'|trans }}</span>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+
+                                    {% if not isBlocked %}
+                                        <a href="{{ path('app_profile_messages', {'id': userDetails.id}) }}" class="button is-light is-small">
+                                            <span class="icon"><i class="fa fa-envelope"></i></span>
+                                            <span>{{ 'member.button_message'|trans }}</span>
+                                        </a>
+                                    {% endif %}
+
+                                    {{ get_member_view_actions(currentUser, userDetails) }}
+                                </div>
                             </div>
                         {% endif %}
                     </div>
 
                     <p>{{ userDetails.bio }}</p>
 
-                    {% if userDetails.id != currentUser.id and not isBlocked %}
-                        <a href="{{ path('app_profile_messages', {'id': userDetails.id}) }}" class="button is-small mt-4">
-                            <span class="icon"><i class="fa fa-envelope"></i></span><span>{{ 'member.button_message'|trans }}</span>
-                        </a>
-                    {% endif %}
+                    {{ get_member_view_sections(currentUser, userDetails) }}
                 </div>
 
+            </div>
 
-
-                {% if is_granted('ROLE_ORGANIZER') %}
-                    <div class="column is-2">
-
-                        <nav class="panel">
-                            <p class="panel-heading p-2">{{ 'member.admin_panel_heading'|trans }}</p>
-                            <form method="post" action="{{ path('app_member_rotate_avatar', {'id': userDetails.id}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('app_member_rotate_avatar' ~ userDetails.id) }}">
-                                <button type="submit" class="panel-block button-as-panel-block">
-                                    <span class="panel-icon"><i class="fas fa-rotate-right"></i></span>
-                                    {{ 'member.admin_action_rotate_avatar'|trans }}
-                                </button>
-                            </form>
-                            <form method="post" action="{{ path('app_member_remove_avatar', {'id': userDetails.id}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('app_member_remove_avatar' ~ userDetails.id) }}">
-                                <button type="submit" class="panel-block button-as-panel-block">
-                                    <span class="panel-icon"><i class="fas fa-trash"></i></span>
-                                    {{ 'member.admin_action_remove_avatar'|trans }}
-                                </button>
-                            </form>
-                            <form method="post" action="{{ path('app_member_restrict', {'id': userDetails.id}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('app_member_restrict' ~ userDetails.id) }}">
-                                <button type="submit" class="panel-block button-as-panel-block">
-                                    <span class="panel-icon"><i class="fas fa-ban {% if userDetails.restricted %}has-text-danger{% endif %}"></i></span>
-                                    {{ 'member.admin_action_restrict_user'|trans }}
-                                    {% if userDetails.restricted %}
-                                        <span class="panel-icon is-pulled-right"><i class="fas fa-check"></i></span>
-                                    {% endif %}
-                                </button>
-                            </form>
-                            <form method="post" action="{{ path('app_member_verify', {'id': userDetails.id}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('app_member_verify' ~ userDetails.id) }}">
-                                <button type="submit" class="panel-block button-as-panel-block">
-                                    <span class="panel-icon"><i class="fa-regular fa-user-check {% if userDetails.verified %}has-text-success{% endif %}"></i></span>
-                                    {{ 'member.admin_action_verify_user'|trans }}
-                                    {% if userDetails.verified %}
-                                        <span class="panel-icon is-pulled-right"><i class="fas fa-check"></i></span>
-                                    {% endif %}
-                                </button>
-                            </form>
-                            {% if is_granted('ROLE_ADMIN') %}
+            {% if is_granted('ROLE_ORGANIZER') %}
+                <div class="box mt-5 member-admin-bar">
+                    <p class="heading mb-3">{{ 'member.admin_panel_heading'|trans }}</p>
+                    <div class="buttons">
+                        <form method="post" action="{{ path('app_member_rotate_avatar', {'id': userDetails.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('app_member_rotate_avatar' ~ userDetails.id) }}">
+                            <button type="submit" class="button is-small">
+                                <span class="icon"><i class="fas fa-rotate-right"></i></span>
+                                <span>{{ 'member.admin_action_rotate_avatar'|trans }}</span>
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('app_member_remove_avatar', {'id': userDetails.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('app_member_remove_avatar' ~ userDetails.id) }}">
+                            <button type="submit" class="button is-small">
+                                <span class="icon"><i class="fas fa-trash"></i></span>
+                                <span>{{ 'member.admin_action_remove_avatar'|trans }}</span>
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('app_member_restrict', {'id': userDetails.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('app_member_restrict' ~ userDetails.id) }}">
+                            <button type="submit" class="button is-small">
+                                <span class="icon"><i class="fas fa-ban {% if userDetails.restricted %}has-text-danger{% endif %}"></i></span>
+                                <span>{{ 'member.admin_action_restrict_user'|trans }}</span>
+                                {% if userDetails.restricted %}
+                                    <span class="icon"><i class="fas fa-check"></i></span>
+                                {% endif %}
+                            </button>
+                        </form>
+                        <form method="post" action="{{ path('app_member_verify', {'id': userDetails.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('app_member_verify' ~ userDetails.id) }}">
+                            <button type="submit" class="button is-small">
+                                <span class="icon"><i class="fa-regular fa-user-check {% if userDetails.verified %}has-text-success{% endif %}"></i></span>
+                                <span>{{ 'member.admin_action_verify_user'|trans }}</span>
+                                {% if userDetails.verified %}
+                                    <span class="icon"><i class="fas fa-check"></i></span>
+                                {% endif %}
+                            </button>
+                        </form>
+                        {% if is_granted('ROLE_ADMIN') %}
                             <form method="post" action="{{ path('app_member_takeover', {'id': userDetails.id}) }}">
                                 <input type="hidden" name="_token" value="{{ csrf_token('app_member_takeover' ~ userDetails.id) }}">
-                                <button type="submit" class="panel-block button-as-panel-block">
-                                    <span class="panel-icon"><i class="fas fa-person-walking-dashed-line-arrow-right"></i></span>
-                                    {{ 'member.admin_action_takeover_user'|trans }}
+                                <button type="submit" class="button is-small">
+                                    <span class="icon"><i class="fas fa-person-walking-dashed-line-arrow-right"></i></span>
+                                    <span>{{ 'member.admin_action_takeover_user'|trans }}</span>
                                 </button>
                             </form>
-                            {% endif %}
-                        </nav>
+                        {% endif %}
                     </div>
-
-                {% endif %}
-
-            </div>
+                </div>
+            {% endif %}
 
         </div>
     </section>
