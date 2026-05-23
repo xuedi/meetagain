@@ -252,6 +252,7 @@ testSetup:
     {{PHP}} php bin/console app:plugin:pre-fixtures --env=test
     {{PHP}} php bin/console app:fixtures:load --env=test -q --append --group=plugin
     {{PHP}} php bin/console app:plugin:post-fixtures --env=test
+    ./bin/test-db-clone.sh
     touch tests/config/.test-db.lock
 
 # Run unit tests
@@ -264,7 +265,8 @@ testUnit +parameter='':
 # Run functional tests
 [group('testing')]
 testFunctional +parameter='':
-    @{{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=functional --no-coverage --log-junit tests/reports/junit.xml {{parameter}}
+    @{{PHP}} php bin/console cache:warmup --env=test --quiet
+    @{{PHP}} sh -c 'vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=functional --processes=$(nproc) --no-coverage --log-junit tests/reports/junit.xml {{parameter}}'
     @echo
     @echo
 

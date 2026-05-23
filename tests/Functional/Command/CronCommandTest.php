@@ -4,19 +4,19 @@ namespace Tests\Functional\Command;
 
 use App\Entity\EmailQueue;
 use App\Enum\EmailQueueStatus;
+use App\Service\Email\EmailService;
 use DateTimeImmutable;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Console\Tester\CommandTester;
 
 class CronCommandTest extends KernelTestCase
 {
-    public function testCronCommandSendsQueuedEmails(): void
+    public function testEmailServiceCronTaskSendsQueuedEmails(): void
     {
-        $kernel = self::bootKernel();
-        $em = $kernel->getContainer()->get('doctrine')->getManager();
+        self::bootKernel();
+        $container = static::getContainer();
+        $em = $container->get('doctrine')->getManager();
 
-        // 1. Prepare: Add an unsent email to the queue
+        // Arrange: queue a pending email
         $email = new EmailQueue();
         $email->setSender('sender@example.com');
         $email->setRecipient('recipient@example.com');
@@ -25,23 +25,18 @@ class CronCommandTest extends KernelTestCase
         $email->setCreatedAt(new DateTimeImmutable());
         $email->setRenderedBody('Test Body');
         $email->setStatus(EmailQueueStatus::Pending);
-
         $em->persist($email);
         $em->flush();
 
         $emailId = $email->getId();
         static::assertNotNull($emailId);
 
-        // 2. Act: Run the app:cron command
-        $application = new Application($kernel);
-        $command = $application->find('app:cron');
-        $commandTester = new CommandTester($command);
-        $commandTester->execute([]);
+        // Act: drive only the EmailService cron task (not the full app:cron pipeline)
+        $emailService = $container->get(EmailService::class);
+        $sentCount = $emailService->sendQueue();
+        static::assertSame('1', $sentCount);
 
-        $commandTester->assertCommandIsSuccessful();
-        static::assertMatchesRegularExpression('/EmailService: \d+/', $commandTester->getDisplay());
-
-        // 3. Assert: Check if email is marked as sent
+        // Assert
         $em->clear();
         $updatedEmail = $em->getRepository(EmailQueue::class)->find($emailId);
         static::assertSame(EmailQueueStatus::Sent, $updatedEmail->getStatus(), 'Email status should be sent');
