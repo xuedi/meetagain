@@ -27,6 +27,7 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 | `DataHotfixInterface`                         | Ship a one-off data repair that runs once per DB     | `getIdentifier()`, `execute()`        |
 | `SecurityProviderInterface`                   | Participate in live security event detection         | `observe()`, `scanRetrospective()`    |
 | `PluginSettingsProviderInterface`             | Add a settings section to `/admin/plugin/settings`   | `getKey()`, `getFormType()`, `loadData()`, `save()` |
+| `ProfileConfigPrivacyToggleProviderInterface` | Add a toggle row to `/profile/config` -> "privacy"   | `getToggle()`                         |
 
 ---
 

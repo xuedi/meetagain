@@ -73,6 +73,18 @@
                                 } %}
                             </div>
                         </div>
+                        {% for toggle in get_profile_config_privacy_toggles(user) %}
+                            <div class="field is-grouped">
+                                <div class="control is-expanded">{{ toggle.labelKey|trans }}</div>
+                                <div class="control">
+                                    {% include '_components/toggle.html.twig' with {
+                                        'link': toggle.toggleUrl,
+                                        'status': toggle.currentState,
+                                        'csrfTokenId': toggle.csrfTokenId,
+                                    } %}
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
 
                 </div>
