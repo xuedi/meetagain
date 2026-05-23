@@ -81,12 +81,12 @@
                             <span>{{ 'bookclub_book.button_my_notes'|trans }}</span>
                         </a>
                         {% if book.approved %}
-                            <form action="{{ path('app_plugin_bookclub_suggest', {bookId: book.id}) }}" method="post" style="display: inline;">
-                                <button type="submit" class="button is-info">
-                                    <span class="icon"><i class="fas fa-lightbulb"></i></span>
-                                    <span>{{ 'bookclub_book.button_suggest_poll'|trans }}</span>
-                                </button>
-                            </form>
+                            <a href="{{ path('app_plugin_bookclub_suggest', {bookId: book.id, redirect: 'book'}) }}"
+                               class="button is-info"
+                               data-post>
+                                <span class="icon"><i class="fas fa-lightbulb"></i></span>
+                                <span>{{ 'bookclub_book.button_suggest_poll'|trans }}</span>
+                            </a>
                         {% endif %}
                     {% endif %}
                 </div>

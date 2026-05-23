@@ -94,7 +94,7 @@ class EventsPageTest extends WebTestCase
         $this->login($client, self::USER_EMAIL, self::USER_PASSWORD);
 
         $crawler = $client->request('GET', '/en/event/1');
-        $token = $crawler->filter('form[action*="toggleRsvp"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('a[href*="toggleRsvp"]')->attr('data-csrf-token');
         $client->request('POST', '/en/event/toggleRsvp/1/', ['_token' => $token]);
 
         $this->assertResponseRedirects();

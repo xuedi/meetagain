@@ -61,19 +61,19 @@
         {% if is_granted('ROLE_USER') %}
         <div class="mt-4">
             {% if isWishlisted %}
-            <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_remove', {filmId: film.id}) }}" style="display: inline">
-                <button type="submit" class="button is-small">
-                    <span class="icon"><i class="fa fa-heart-broken"></i></span>
-                    <span>{{ 'filmclub_wishlist.button_remove'|trans }}</span>
-                </button>
-            </form>
+            <a href="{{ path('app_plugin_filmclub_wishlist_remove', {filmId: film.id}) }}"
+               class="button is-small"
+               data-post>
+                <span class="icon"><i class="fa fa-heart-broken"></i></span>
+                <span>{{ 'filmclub_wishlist.button_remove'|trans }}</span>
+            </a>
             {% else %}
-            <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_add', {filmId: film.id}) }}" style="display: inline">
-                <button type="submit" class="button is-small">
-                    <span class="icon"><i class="fa fa-heart"></i></span>
-                    <span>{{ 'filmclub_wishlist.button_add'|trans }}</span>
-                </button>
-            </form>
+            <a href="{{ path('app_plugin_filmclub_wishlist_add', {filmId: film.id}) }}"
+               class="button is-small"
+               data-post>
+                <span class="icon"><i class="fa fa-heart"></i></span>
+                <span>{{ 'filmclub_wishlist.button_add'|trans }}</span>
+            </a>
             {% endif %}
 
             <a href="{{ path('app_plugin_filmclub_note_edit', {filmId: film.id}) }}" class="button is-small">

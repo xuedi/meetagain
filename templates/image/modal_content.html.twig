@@ -4,7 +4,8 @@
     <div class="mb-5">
         {% for galleryItem in selectableGallery %}
             <a href="{{ galleryItem.link }}"
-               class="image-item fileSelectTrigger"
+               class="image-item"
+               data-post
                data-csrf-token="{{ csrf_token('app_replace_image_select' ~ id) }}">
                 {% include '_components/image.html.twig' with {'image': galleryItem.image, 'size': '80x80'} %}
             </a>

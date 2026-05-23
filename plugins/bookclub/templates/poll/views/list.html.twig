@@ -24,17 +24,17 @@
                 <td>{{ suggestion.resubmitCount }}</td>
                 <td>{{ get_user_name(suggestion.suggestedBy) }}</td>
                 <td>
-                    <form action="{{ path('app_plugin_bookclub_poll_vote', {suggestionId: suggestion.id}) }}" method="post">
-                        <button type="submit" class="button is-primary is-small">
-                            {% if userVote and userVote.suggestion.id == suggestion.id %}
-                                <span class="icon"><i class="fas fa-check"></i></span>
-                                <span>{{ 'bookclub_poll_views.button_voted'|trans }}</span>
-                            {% else %}
-                                <span class="icon"><i class="fas fa-vote-yea"></i></span>
-                                <span>{{ 'bookclub_poll_views.button_vote'|trans }}</span>
-                            {% endif %}
-                        </button>
-                    </form>
+                    <a href="{{ path('app_plugin_bookclub_poll_vote', {suggestionId: suggestion.id}) }}"
+                       class="button is-primary is-small"
+                       data-post>
+                        {% if userVote and userVote.suggestion.id == suggestion.id %}
+                            <span class="icon"><i class="fas fa-check"></i></span>
+                            <span>{{ 'bookclub_poll_views.button_voted'|trans }}</span>
+                        {% else %}
+                            <span class="icon"><i class="fas fa-vote-yea"></i></span>
+                            <span>{{ 'bookclub_poll_views.button_vote'|trans }}</span>
+                        {% endif %}
+                    </a>
                 </td>
             </tr>
         {% endfor %}

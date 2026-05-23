@@ -32,9 +32,9 @@
                         {% if currentSelection.book.author %}
                             <p class="has-text-grey is-size-7">{{ currentSelection.book.author }}</p>
                         {% endif %}
-                        <form action="{{ path('app_plugin_bookclub_unselect', {selectionId: currentSelection.id}) }}" method="post" class="mt-3">
-                            <button type="submit" class="button is-small is-warning">{{ 'bookclub_manage.button_remove_selection'|trans }}</button>
-                        </form>
+                        <a href="{{ path('app_plugin_bookclub_unselect', {selectionId: currentSelection.id}) }}"
+                           class="button is-small is-warning mt-3"
+                           data-post>{{ 'bookclub_manage.button_remove_selection'|trans }}</a>
                     </div>
                 {% else %}
                     <h2 class="title is-5">{{ 'bookclub_manage.heading_choose_manual'|trans }}</h2>
@@ -77,12 +77,12 @@
                             {% endif %}
 
                             {% if not currentSelection %}
-                                <form action="{{ path('app_plugin_bookclub_select_winner', {eventId: event.id}) }}" method="post" class="mt-2">
-                                    <button type="submit" class="button is-small is-success">
-                                        <span class="icon"><i class="fas fa-check"></i></span>
-                                        <span>{{ 'bookclub_manage.button_select_winner'|trans }}</span>
-                                    </button>
-                                </form>
+                                <a href="{{ path('app_plugin_bookclub_select_winner', {eventId: event.id}) }}"
+                                   class="button is-small is-success mt-2"
+                                   data-post>
+                                    <span class="icon"><i class="fas fa-check"></i></span>
+                                    <span>{{ 'bookclub_manage.button_select_winner'|trans }}</span>
+                                </a>
                             {% endif %}
                         </div>
                     {% endif %}

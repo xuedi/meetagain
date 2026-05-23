@@ -38,11 +38,11 @@
                 </a>
             </td>
             <td>
-                <form method="POST" action="{{ path('app_plugin_filmclub_manage_select_film', {eventId: event.id, filmId: film.id}) }}" style="display: inline">
-                    <button type="submit" class="button is-small">
-                        {{ 'filmclub_manage.button_select'|trans }}
-                    </button>
-                </form>
+                <a href="{{ path('app_plugin_filmclub_manage_select_film', {eventId: event.id, filmId: film.id}) }}"
+                   class="button is-small"
+                   data-post>
+                    {{ 'filmclub_manage.button_select'|trans }}
+                </a>
             </td>
         </tr>
         {% endfor %}

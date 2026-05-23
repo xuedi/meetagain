@@ -40,11 +40,11 @@
                 {% endif %}
             </td>
             <td>
-                <form method="POST" action="{{ path('app_plugin_filmclub_wishlist_remove', {filmId: entry.film.id}) }}" style="display: inline">
-                    <button type="submit" class="button is-small">
-                        {{ 'filmclub_wishlist.button_remove'|trans }}
-                    </button>
-                </form>
+                <a href="{{ path('app_plugin_filmclub_wishlist_remove', {filmId: entry.film.id}) }}"
+                   class="button is-small"
+                   data-post>
+                    {{ 'filmclub_wishlist.button_remove'|trans }}
+                </a>
             </td>
         </tr>
         {% endfor %}

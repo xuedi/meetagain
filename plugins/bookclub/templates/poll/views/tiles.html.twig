@@ -17,17 +17,17 @@
                     </p>
                 </div>
                 <footer class="card-footer">
-                    <form action="{{ path('app_plugin_bookclub_poll_vote', {suggestionId: suggestion.id}) }}" method="post" class="card-footer-item">
-                        <button type="submit" class="button is-primary is-fullwidth">
-                            {% if userVote and userVote.suggestion.id == suggestion.id %}
-                                <span class="icon"><i class="fas fa-check"></i></span>
-                                <span>{{ 'bookclub_poll_views.button_voted'|trans }}</span>
-                            {% else %}
-                                <span class="icon"><i class="fas fa-vote-yea"></i></span>
-                                <span>{{ 'bookclub_poll_views.button_vote'|trans }}</span>
-                            {% endif %}
-                        </button>
-                    </form>
+                    <a href="{{ path('app_plugin_bookclub_poll_vote', {suggestionId: suggestion.id}) }}"
+                       class="button is-primary is-fullwidth card-footer-item"
+                       data-post>
+                        {% if userVote and userVote.suggestion.id == suggestion.id %}
+                            <span class="icon"><i class="fas fa-check"></i></span>
+                            <span>{{ 'bookclub_poll_views.button_voted'|trans }}</span>
+                        {% else %}
+                            <span class="icon"><i class="fas fa-vote-yea"></i></span>
+                            <span>{{ 'bookclub_poll_views.button_vote'|trans }}</span>
+                        {% endif %}
+                    </a>
                 </footer>
             </div>
         </div>

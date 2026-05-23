@@ -30,11 +30,11 @@
                     {% if film.year %}<p class="is-size-7 has-text-grey">{{ film.year }}</p>{% endif %}
                 </div>
             </div>
-            <form method="POST" action="{{ path('app_plugin_filmclub_choose_directly_submit', {eventId: event.id, filmId: film.id}) }}" class="mt-2">
-                <button type="submit" class="button is-primary is-small is-fullwidth">
-                    {{ 'filmclub_tile.button_choose_directly'|trans }}
-                </button>
-            </form>
+            <a href="{{ path('app_plugin_filmclub_choose_directly_submit', {eventId: event.id, filmId: film.id}) }}"
+               class="button is-primary is-small is-fullwidth mt-2"
+               data-post>
+                {{ 'filmclub_tile.button_choose_directly'|trans }}
+            </a>
         </div>
     </div>
     {% endfor %}

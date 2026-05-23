@@ -25,15 +25,15 @@
                                 {{ 'glossary.label_created_at'|trans }}: <b>{{ editItem.createdAt | time_diff }}</b><br>
                             </p>
                             <div class="has-text-right">
-                                <form method="post" action="{{ path('app_plugin_glossary_delete', {id: editItem.id}) }}" class="is-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_glossary_delete' ~ editItem.id) }}">
-                                    <button type="submit" class="button is-danger">
-                                        <span class="icon">
-                                            <i class="fas fa-trash"></i>
-                                        </span>
-                                        <span>{{ 'glossary.button_delete_yes'|trans }}</span>
-                                    </button>
-                                </form>
+                                <a href="{{ path('app_plugin_glossary_delete', {id: editItem.id}) }}"
+                                   class="button is-danger"
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('admin_glossary_delete' ~ editItem.id) }}">
+                                    <span class="icon">
+                                        <i class="fas fa-trash"></i>
+                                    </span>
+                                    <span>{{ 'glossary.button_delete_yes'|trans }}</span>
+                                </a>
                             </div>
 
                         </div>

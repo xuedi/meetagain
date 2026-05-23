@@ -63,12 +63,12 @@
                                     </td>
                                     <td class="has-text-right">
                                         {% if suggestion.id in userSuggestionIds %}
-                                            <form method="post" action="{{ path('app_plugin_bookclub_withdraw', {suggestionId: suggestion.id}) }}" class="is-inline">
-                                                <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_bookclub_withdraw' ~ suggestion.id) }}">
-                                                <button type="submit" class="button is-ghost p-0">
-                                                    <span class="icon"><i class="fa fa-trash"></i></span>
-                                                </button>
-                                            </form>
+                                            <a href="{{ path('app_plugin_bookclub_withdraw', {suggestionId: suggestion.id}) }}"
+                                               class="button is-ghost p-0"
+                                               data-post
+                                               data-csrf-token="{{ csrf_token('app_plugin_bookclub_withdraw' ~ suggestion.id) }}">
+                                                <span class="icon"><i class="fa fa-trash"></i></span>
+                                            </a>
                                         {% endif %}
                                     </td>
                                 </tr>
@@ -98,11 +98,11 @@
                         <h3 class="title is-5">{{ 'bookclub_suggestion.heading_suggest_box'|trans }}</h3>
                         <p class="mb-3">{{ 'bookclub_suggestion.suggest_intro'|trans }}</p>
                         {% for book in books %}
-                            <form action="{{ path('app_plugin_bookclub_suggest', {bookId: book.id}) }}" method="post" class="mb-2">
-                                <button type="submit" class="button is-small is-fullwidth is-outlined">
-                                    {{ book.title }}
-                                </button>
-                            </form>
+                            <a href="{{ path('app_plugin_bookclub_suggest', {bookId: book.id}) }}"
+                               class="button is-small is-fullwidth is-outlined mb-2"
+                               data-post>
+                                {{ book.title }}
+                            </a>
                         {% endfor %}
                     </div>
                 {% endif %}

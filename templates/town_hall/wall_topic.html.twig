@@ -25,10 +25,10 @@
                     </div>
 
                     {% if post.author and app.user and post.author.id == app.user.id %}
-                        <form method="post" action="{{ path('app_townhall_wall_delete', { _locale: app.request.locale, postId: post.id }) }}" style="display:inline">
-                            <input type="hidden" name="_token" value="{{ csrf_token('town_hall_wall_delete_' ~ post.id) }}">
-                            <button class="button is-small is-light is-danger" type="submit">{{ 'town_hall.wall_delete'|trans }}</button>
-                        </form>
+                        <a href="{{ path('app_townhall_wall_delete', { _locale: app.request.locale, postId: post.id }) }}"
+                           class="button is-small is-light is-danger"
+                           data-post
+                           data-csrf-token="{{ csrf_token('town_hall_wall_delete_' ~ post.id) }}">{{ 'town_hall.wall_delete'|trans }}</a>
                     {% endif %}
                 </article>
 

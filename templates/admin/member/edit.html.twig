@@ -148,22 +148,22 @@
                         <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'admin_member.section_role'|trans }}</legend>
 
                         {% if user.role.value != 'ADMIN' %}
-                            <form method="post" action="{{ path('app_admin_member_set_role', {id: user.id, role: 'admin'}) }}" class="mb-2">
-                                <input type="hidden" name="_token" value="{{ csrf_token('member_set_role_' ~ user.id) }}">
-                                <button type="submit" class="button is-primary is-fullwidth">
-                                    <span class="icon"><i class="fa fa-arrow-up"></i></span>
-                                    <span>{{ 'admin_member.button_promote_admin'|trans }}</span>
-                                </button>
-                            </form>
+                            <a href="{{ path('app_admin_member_set_role', {id: user.id, role: 'admin'}) }}"
+                               class="button is-primary is-fullwidth mb-2"
+                               data-post
+                               data-csrf-token="{{ csrf_token('member_set_role_' ~ user.id) }}">
+                                <span class="icon"><i class="fa fa-arrow-up"></i></span>
+                                <span>{{ 'admin_member.button_promote_admin'|trans }}</span>
+                            </a>
                         {% endif %}
                         {% if user.role.value != 'USER' %}
-                            <form method="post" action="{{ path('app_admin_member_set_role', {id: user.id, role: 'user'}) }}">
-                                <input type="hidden" name="_token" value="{{ csrf_token('member_set_role_' ~ user.id) }}">
-                                <button type="submit" class="button is-light is-fullwidth">
-                                    <span class="icon"><i class="fa fa-arrow-down"></i></span>
-                                    <span>{{ 'admin_member.button_demote_user'|trans }}</span>
-                                </button>
-                            </form>
+                            <a href="{{ path('app_admin_member_set_role', {id: user.id, role: 'user'}) }}"
+                               class="button is-light is-fullwidth"
+                               data-post
+                               data-csrf-token="{{ csrf_token('member_set_role_' ~ user.id) }}">
+                                <span class="icon"><i class="fa fa-arrow-down"></i></span>
+                                <span>{{ 'admin_member.button_demote_user'|trans }}</span>
+                            </a>
                         {% endif %}
                     </fieldset>
 
@@ -171,43 +171,43 @@
                     <fieldset class="mt-4 p-4">
                         <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'admin_member.section_flags'|trans }}</legend>
 
-                        <form method="post" action="{{ path('app_admin_member_toggle_flag', {id: user.id, flag: 'verified'}) }}" class="mb-2">
-                            <input type="hidden" name="_token" value="{{ csrf_token('member_toggle_' ~ user.id ~ '_verified') }}">
-                            <button type="submit" class="button is-light is-fullwidth">
-                                <span class="icon"><i class="fa fa-{{ user.verified ? 'times' : 'check' }}"></i></span>
-                                <span>{{ user.verified ? 'admin_member.button_mark_unverified'|trans : 'admin_member.button_mark_verified'|trans }}</span>
-                            </button>
-                        </form>
+                        <a href="{{ path('app_admin_member_toggle_flag', {id: user.id, flag: 'verified'}) }}"
+                           class="button is-light is-fullwidth mb-2"
+                           data-post
+                           data-csrf-token="{{ csrf_token('member_toggle_' ~ user.id ~ '_verified') }}">
+                            <span class="icon"><i class="fa fa-{{ user.verified ? 'times' : 'check' }}"></i></span>
+                            <span>{{ user.verified ? 'admin_member.button_mark_unverified'|trans : 'admin_member.button_mark_verified'|trans }}</span>
+                        </a>
 
-                        <form method="post" action="{{ path('app_admin_member_toggle_flag', {id: user.id, flag: 'restricted'}) }}">
-                            <input type="hidden" name="_token" value="{{ csrf_token('member_toggle_' ~ user.id ~ '_restricted') }}">
-                            <button type="submit" class="button is-light is-fullwidth">
-                                <span class="icon"><i class="fa fa-{{ user.restricted ? 'unlock' : 'lock' }}"></i></span>
-                                <span>{{ user.restricted ? 'admin_member.button_mark_unrestricted'|trans : 'admin_member.button_mark_restricted'|trans }}</span>
-                            </button>
-                        </form>
+                        <a href="{{ path('app_admin_member_toggle_flag', {id: user.id, flag: 'restricted'}) }}"
+                           class="button is-light is-fullwidth"
+                           data-post
+                           data-csrf-token="{{ csrf_token('member_toggle_' ~ user.id ~ '_restricted') }}">
+                            <span class="icon"><i class="fa fa-{{ user.restricted ? 'unlock' : 'lock' }}"></i></span>
+                            <span>{{ user.restricted ? 'admin_member.button_mark_unrestricted'|trans : 'admin_member.button_mark_restricted'|trans }}</span>
+                        </a>
                     </fieldset>
 
                     {# Status section (positive transitions) #}
                     {% if user.status.value == 1 or user.status.value in [0, 1] %}
                         <fieldset class="mt-4 p-4">
                             {% if user.status.value == 1 %}
-                                <form method="post" action="{{ path('app_admin_member_set_status', {id: user.id, status: 2}) }}" class="mb-2">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('member_set_status_' ~ user.id) }}">
-                                    <button type="submit" class="button is-primary is-fullwidth">
-                                        <span class="icon"><i class="fa fa-check"></i></span>
-                                        <span>{{ 'admin_member.button_status_approve'|trans }}</span>
-                                    </button>
-                                </form>
+                                <a href="{{ path('app_admin_member_set_status', {id: user.id, status: 2}) }}"
+                                   class="button is-primary is-fullwidth mb-2"
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('member_set_status_' ~ user.id) }}">
+                                    <span class="icon"><i class="fa fa-check"></i></span>
+                                    <span>{{ 'admin_member.button_status_approve'|trans }}</span>
+                                </a>
                             {% endif %}
                             {% if user.status.value in [0, 1] %}
-                                <form method="post" action="{{ path('app_admin_member_set_status', {id: user.id, status: 5}) }}">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('member_set_status_' ~ user.id) }}">
-                                    <button type="submit" class="button is-light is-fullwidth">
-                                        <span class="icon"><i class="fa fa-times"></i></span>
-                                        <span>{{ 'admin_member.button_status_deny'|trans }}</span>
-                                    </button>
-                                </form>
+                                <a href="{{ path('app_admin_member_set_status', {id: user.id, status: 5}) }}"
+                                   class="button is-light is-fullwidth"
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('member_set_status_' ~ user.id) }}">
+                                    <span class="icon"><i class="fa fa-times"></i></span>
+                                    <span>{{ 'admin_member.button_status_deny'|trans }}</span>
+                                </a>
                             {% endif %}
                         </fieldset>
                     {% endif %}
@@ -217,22 +217,22 @@
                         <legend class="px-2 has-text-danger has-text-weight-semibold is-size-7">{{ 'admin_member.section_danger_zone'|trans }}</legend>
 
                         {% if user.status.value == 2 %}
-                            <form method="post" action="{{ path('app_admin_member_set_status', {id: user.id, status: 3}) }}" class="mb-2">
-                                <input type="hidden" name="_token" value="{{ csrf_token('member_set_status_' ~ user.id) }}">
-                                <button type="submit" class="button is-light is-fullwidth">
-                                    <span class="icon"><i class="fa fa-ban"></i></span>
-                                    <span>{{ 'admin_member.button_status_block'|trans }}</span>
-                                </button>
-                            </form>
+                            <a href="{{ path('app_admin_member_set_status', {id: user.id, status: 3}) }}"
+                               class="button is-light is-fullwidth mb-2"
+                               data-post
+                               data-csrf-token="{{ csrf_token('member_set_status_' ~ user.id) }}">
+                                <span class="icon"><i class="fa fa-ban"></i></span>
+                                <span>{{ 'admin_member.button_status_block'|trans }}</span>
+                            </a>
                         {% endif %}
                         {% if user.status.value == 3 %}
-                            <form method="post" action="{{ path('app_admin_member_set_status', {id: user.id, status: 2}) }}" class="mb-2">
-                                <input type="hidden" name="_token" value="{{ csrf_token('member_set_status_' ~ user.id) }}">
-                                <button type="submit" class="button is-light is-fullwidth">
-                                    <span class="icon"><i class="fa fa-undo"></i></span>
-                                    <span>{{ 'admin_member.button_status_unblock'|trans }}</span>
-                                </button>
-                            </form>
+                            <a href="{{ path('app_admin_member_set_status', {id: user.id, status: 2}) }}"
+                               class="button is-light is-fullwidth mb-2"
+                               data-post
+                               data-csrf-token="{{ csrf_token('member_set_status_' ~ user.id) }}">
+                                <span class="icon"><i class="fa fa-undo"></i></span>
+                                <span>{{ 'admin_member.button_status_unblock'|trans }}</span>
+                            </a>
                         {% endif %}
 
                         <a class="button is-light is-fullwidth toggleTrigger" data-id="member-delete-warning">
@@ -255,13 +255,13 @@
                 <div class="message-body has-text-black has-background-white">
                     <p>{{ 'admin_member.warning_delete_content'|trans }}</p>
                     <div class="has-text-right mt-3">
-                        <form method="post" action="{{ path('app_admin_member_delete', {'id': user.id}) }}" class="is-inline">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                            <button type="submit" class="button">
-                                <span class="icon"><i class="fa fa-trash"></i></span>
-                                <span>{{ 'admin_member.warning_delete_button'|trans }}</span>
-                            </button>
-                        </form>
+                        <a href="{{ path('app_admin_member_delete', {'id': user.id}) }}"
+                           class="button"
+                           data-post
+                           data-csrf-token="{{ csrf_token('delete' ~ user.id) }}">
+                            <span class="icon"><i class="fa fa-trash"></i></span>
+                            <span>{{ 'admin_member.warning_delete_button'|trans }}</span>
+                        </a>
                     </div>
                 </div>
             </article>

@@ -41,14 +41,14 @@
                                     </span>
                                 </a>
                                 #}
-                                <form method="post" action="{{ path('app_event_delete_comment', {'id': comment.id, 'event': event.id}) }}" class="level-item is-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('app_event_delete_comment' ~ comment.id) }}">
-                                    <button type="submit" class="button is-ghost p-0">
-                                        <span class="icon is-small">
-                                            <i class="fas fa-trash" aria-hidden="true"></i>
-                                        </span>
-                                    </button>
-                                </form>
+                                <a href="{{ path('app_event_delete_comment', {'id': comment.id, 'event': event.id}) }}"
+                                   class="level-item button is-ghost p-0"
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('app_event_delete_comment' ~ comment.id) }}">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                    </span>
+                                </a>
                             {% else %}
                                 <a class="level-item replyButton" data-comment="{{ comment.content }}">
                                     <span class="icon is-small">
