@@ -11,7 +11,6 @@ use App\Service\Media\ImageService;
 use App\Service\Member\BlockingService;
 use App\Service\Member\FriendshipService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -29,7 +28,6 @@ final class MemberController extends AbstractController
         private readonly UserRepository $repo,
         private readonly FriendshipService $service,
         private readonly ImageService $imageService,
-        private readonly Security $security,
         private readonly BlockingService $blockingService,
         private readonly MemberFilterService $memberFilterService,
         private readonly ImageLocationService $imageLocationService,
@@ -184,19 +182,5 @@ final class MemberController extends AbstractController
         $em->flush();
 
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
-    }
-
-    #[Route('/members/takeover/{id}', name: 'app_member_takeover', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
-    public function takeoverUser(Request $request, int $id): Response
-    {
-        if (!$this->isCsrfTokenValid('app_member_takeover' . $id, (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
-
-        $user = $this->repo->findOneBy(['id' => $id]);
-        $loginResponse = $this->security->login($user);
-
-        return $loginResponse ?? $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
 }

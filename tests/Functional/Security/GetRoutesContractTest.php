@@ -91,7 +91,6 @@ class GetRoutesContractTest extends WebTestCase
         yield 'member remove avatar' => ['/en/members/remove-image/1'];
         yield 'member restrict' => ['/en/members/restrict/1'];
         yield 'member verify' => ['/en/members/verify/1'];
-        yield 'member takeover' => ['/en/members/takeover/1'];
         yield 'bookclub withdraw' => ['/en/bookclub/withdraw/1'];
         yield 'glossary delete' => ['/en/glossary/delete/1'];
         yield 'glossary approval approve' => ['/en/glossary/approval/approve/1'];
