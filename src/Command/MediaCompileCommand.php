@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\AssetMapper\AppBundle;
 use App\AssetMapper\OpaqueMediaPathResolver;
 use MatthiasMullie\Minify\JS;
 use Override;
@@ -15,24 +16,9 @@ use Symfony\Component\Filesystem\Filesystem;
 #[AsCommand(name: 'app:media:compile', description: 'Flatten compiled assets into public/media/ and bundle global JS')]
 final class MediaCompileCommand extends Command
 {
-    /**
-     * Global JS bundle — loaded on every page via base.html.twig in prod.
-     * Order is significant: ma-fetch must be first (others depend on maFetch).
-     * Matches the per-file load order used in dev.
-     */
-    private const array GLOBAL_JS_BUNDLE = [
-        'js/ma-fetch.js',
-        'js/notifications.js',
-        'js/navbar.js',
-        'js/toggles.js',
-        'js/cookie-consent.js',
-        'js/modal.js',
-        'js/block-user.js',
-        'js/post-link.js',
-    ];
-
     public function __construct(
         private readonly AssetMapperInterface $assetMapper,
+        private readonly AppBundle $appBundle,
         private readonly string $kernelProjectDir,
     ) {
         parent::__construct();
@@ -81,7 +67,7 @@ final class MediaCompileCommand extends Command
     {
         $minifier = new JS();
 
-        foreach (self::GLOBAL_JS_BUNDLE as $logicalPath) {
+        foreach (AppBundle::SOURCES as $logicalPath) {
             $asset = $this->assetMapper->getAsset($logicalPath);
             if ($asset === null) {
                 throw new \RuntimeException("Global JS bundle: asset '{$logicalPath}' not found in AssetMapper.");
@@ -90,7 +76,7 @@ final class MediaCompileCommand extends Command
             $minifier->add($content);
         }
 
-        $filename = basename(OpaqueMediaPathResolver::appBundlePath());
+        $filename = $this->appBundle->filename();
         file_put_contents("{$target}/{$filename}", $minifier->minify());
         $output->writeln("Wrote global JS bundle to public/media/{$filename}");
     }

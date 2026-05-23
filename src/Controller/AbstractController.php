@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\AssetMapper\OpaqueMediaPathResolver;
+use App\AssetMapper\AppBundle;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as AbstractSymfonyController;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -17,6 +17,7 @@ abstract class AbstractController extends AbstractSymfonyController
     {
         return array_merge(parent::getSubscribedServices(), [
             AssetMapperInterface::class,
+            AppBundle::class,
         ]);
     }
 
@@ -60,8 +61,9 @@ abstract class AbstractController extends AbstractSymfonyController
             $links[] = $link;
         }
 
-        // app.js bundle is compiled by MediaCompileCommand — not AssetMapper-managed, use static path
-        $links[] = new Link(href: OpaqueMediaPathResolver::appBundlePath())->withAttribute('as', 'script');
+        // app.js bundle is compiled by MediaCompileCommand — not AssetMapper-managed, use content-hashed path
+        $appBundle = $this->container->get(AppBundle::class);
+        $links[] = new Link(href: $appBundle->url())->withAttribute('as', 'script');
 
         return $links !== [] ? $this->sendEarlyHints($links) : new Response();
     }
