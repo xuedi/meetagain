@@ -106,15 +106,6 @@
                                 <span class="icon"><i class="fas fa-check"></i></span>
                             {% endif %}
                         </a>
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <a href="{{ path('app_member_takeover', {'id': userDetails.id}) }}"
-                               class="button is-small"
-                               data-post
-                               data-csrf-token="{{ csrf_token('app_member_takeover' ~ userDetails.id) }}">
-                                <span class="icon"><i class="fas fa-person-walking-dashed-line-arrow-right"></i></span>
-                                <span>{{ 'member.admin_action_takeover_user'|trans }}</span>
-                            </a>
-                        {% endif %}
                     </div>
                 </div>
             {% endif %}
