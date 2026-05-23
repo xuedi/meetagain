@@ -15,15 +15,17 @@ class UserExtensionTest extends TestCase
     protected function setUp(): void
     {
         $this->userServiceStub = $this->createStub(UserService::class);
-        $this->subject = new UserExtension($this->userServiceStub);
+        $this->subject = new UserExtension($this->userServiceStub, [], []);
     }
 
-    public function testGetFunctionsReturnsGetUserNameFunction(): void
+    public function testGetFunctionsReturnsRegisteredTwigFunctions(): void
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(1, $functions);
-        static::assertSame('get_user_name', $functions[0]->getName());
+        $names = array_map(static fn($f): string => $f->getName(), $functions);
+        static::assertContains('get_user_name', $names);
+        static::assertContains('get_member_view_actions', $names);
+        static::assertContains('get_member_view_sections', $names);
     }
 
     public function testGetUserNameDelegatesToUserService(): void
