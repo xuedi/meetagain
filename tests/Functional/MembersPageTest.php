@@ -97,7 +97,7 @@ class MembersPageTest extends WebTestCase
         $this->login($client, self::USER_EMAIL, self::USER_PASSWORD);
 
         $crawler = $client->request('GET', '/en/members/view/1');
-        $token = $crawler->filter('form[action*="toggleFollow"] input[name="_token"]')->attr('value');
+        $token = $crawler->filter('a[href*="toggleFollow"]')->attr('data-csrf-token');
         $client->request('POST', '/en/members/toggleFollow/1', ['_token' => $token]);
 
         $this->assertResponseRedirects();
