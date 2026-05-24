@@ -1,0 +1,97 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+    <div class="container">
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="notification is-{{ type }}">{{ message|trans }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <h2 class="subtitle">{{ 'ranking_admin_rank_definition.page_title'|trans }} - {{ config.archetype.label|trans }}</h2>
+
+        {% if presets|length > 0 %}
+            <form method="post"
+                  action="{{ path('app_plugin_ranking_admin_definitions_load_preset') }}"
+                  class="field has-addons mb-4"
+                  data-ranking-preset-form
+                  data-ranking-current-count="{{ definitions|length }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('ranking_preset_load') }}">
+                <div class="control">
+                    <div class="select">
+                        <select name="preset" data-ranking-preset-select>
+                            {% for preset in presets %}
+                                <option value="{{ preset.key }}"
+                                        data-preset-count="{{ preset.entries|length }}"
+                                        data-preset-name="{{ preset.displayNameKey|trans }}">
+                                    {{ preset.displayNameKey|trans }} ({{ preset.entries|length }})
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="control">
+                    <button type="submit" class="button is-primary">
+                        <span class="icon"><i class="fa fa-upload"></i></span>
+                        <span>{{ 'ranking_admin_rank_definition.button_load_preset'|trans }}</span>
+                    </button>
+                </div>
+            </form>
+        {% endif %}
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>{{ 'ranking_admin_rank_definition.col_position'|trans }}</th>
+                    <th>{{ 'ranking_admin_rank_definition.col_label'|trans }}</th>
+                    <th>{{ 'ranking_admin_rank_definition.col_color'|trans }}</th>
+                    <th>
+                        <a href="{{ path('app_plugin_ranking_admin_definitions_new') }}">
+                            <span class="icon"><i class="fa fa-plus"></i></span>
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for definition in definitions %}
+                    <tr>
+                        <td>{{ definition.position }}</td>
+                        <td>
+                            {% if definition.labelKey is not null %}
+                                {{ definition.labelKey|trans }}
+                            {% else %}
+                                {{ definition.label }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if definition.colorHex is not null %}
+                                <span class="tag" style="background-color: {{ definition.colorHex }}; min-width: 3em;">&nbsp;</span>
+                                <code>{{ definition.colorHex }}</code>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ path('app_plugin_ranking_admin_definitions_edit', {'id': definition.id}) }}">
+                                <span class="icon"><i class="fa fa-edit"></i></span>
+                            </a>
+                            <a href="#"
+                               data-post="{{ path('app_plugin_ranking_admin_definitions_delete', {'id': definition.id}) }}"
+                               data-csrf="{{ csrf_token('ranking_definition_delete_' ~ definition.id) }}">
+                                <span class="icon"><i class="fa fa-trash"></i></span>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="has-text-grey">{{ 'global.no_results'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}

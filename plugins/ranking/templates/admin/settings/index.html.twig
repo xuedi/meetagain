@@ -1,0 +1,49 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+    <div class="container">
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="notification is-{{ type }}">{{ message|trans }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <h1 class="title">{{ 'ranking_admin_settings.page_title'|trans }}</h1>
+
+        <div class="box">
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="field">
+                <button type="submit" class="button is-primary">{{ 'global.button_save'|trans }}</button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+
+        <div class="box mt-5" style="border: 1px solid #f14668;">
+            <h2 class="subtitle has-text-danger">{{ 'ranking_admin_settings.danger_zone_title'|trans }}</h2>
+            <p class="content">{{ 'ranking_admin_settings.danger_zone_intro'|trans }}</p>
+
+            <form method="post" action="{{ path('app_plugin_ranking_admin_reset') }}" data-ranking-reset-form>
+                <input type="hidden" name="_token" value="{{ csrf_token('ranking_admin_reset') }}">
+                <div class="field">
+                    <label class="label">{{ 'ranking_admin_settings.danger_zone_confirm_label'|trans }}</label>
+                    <div class="control">
+                        <input type="text" name="confirm_name" class="input"
+                               autocomplete="off"
+                               placeholder="{{ groupName }}"
+                               data-ranking-reset-expected="{{ groupName }}"
+                               required>
+                    </div>
+                </div>
+                <div class="field">
+                    <button type="submit" class="button is-danger">
+                        {{ 'ranking_admin_settings.danger_zone_button'|trans }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

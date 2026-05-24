@@ -1,0 +1,14 @@
+framework:
+    rate_limiter:
+        ranking_self_edit:
+            policy: 'fixed_window'
+            limit: 1
+            interval: '1 minute'
+
+when@test:
+    framework:
+        rate_limiter:
+            ranking_self_edit:
+                policy: 'fixed_window'
+                limit: 999999
+                interval: '1 minute'

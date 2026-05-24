@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <h1 class="title">{{ 'ranking_my_rank.page_title'|trans }}</h1>
+
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="notification is-{{ type }}">{{ message|trans }}</div>
+                {% endfor %}
+            {% endfor %}
+
+            {{ form_start(form) }}
+            {{ form_widget(form) }}
+            <div class="field">
+                <button type="submit" class="button is-primary">{{ 'ranking_my_rank.button_save'|trans }}</button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </section>
+{% endblock %}

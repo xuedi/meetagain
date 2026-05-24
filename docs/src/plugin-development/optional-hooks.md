@@ -404,6 +404,26 @@ See [Permissions](permissions.md) for the full guide.
 
 ## Content
 
+### UserBadgeProviderInterface
+
+**Purpose:** Contribute one or more small badges (icon + title + Bulma color class) shown
+next to a user's name on profile and member-list views.
+
+Plugins implement this when they have a per-user state worth surfacing visually - account
+verification status, member rank, role-of-the-month, contributor tier. Each implementation
+auto-registers via `#[AutoconfigureTag]` on the interface and returns a list of
+`App\Entity\UserBadge` for a given user ID. Return `[]` when the plugin has nothing to
+display for that user.
+
+The interface is intentionally read-only: badge providers never write. Compute the badge
+state from your plugin's own tables (or the core repos) and return the immutable value
+objects.
+
+**Examples in the wild:**
+- `App\Service\Member\VerifiedBadgeProvider` - the green-check verified badge.
+- `Plugin\Ranking\Publisher\Badge\RankBadgeProvider` (bundled ranking plugin) - shows a
+  member's current rank (Elo number, belt color, division name) on profile views.
+
 ### EventFilterFormContributorInterface
 
 **Purpose:** Add custom fields to the event filter form.

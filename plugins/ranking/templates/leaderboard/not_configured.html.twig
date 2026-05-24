@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <h1 class="title">{{ 'ranking_leaderboard.page_title'|trans }}</h1>
+
+            <div class="notification is-info is-light">
+                <p>{{ 'ranking_leaderboard.not_configured_intro'|trans }}</p>
+                {% if isAdmin %}
+                    <p class="mt-3">
+                        <a href="{{ path('app_plugin_ranking_admin_settings') }}" class="button is-primary">
+                            <span class="icon"><i class="fa fa-cog"></i></span>
+                            <span>{{ 'ranking_leaderboard.not_configured_button'|trans }}</span>
+                        </a>
+                    </p>
+                {% else %}
+                    <p class="mt-3 has-text-grey">{{ 'ranking_leaderboard.not_configured_hint_member'|trans }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

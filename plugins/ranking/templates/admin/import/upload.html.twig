@@ -1,0 +1,44 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+    <div class="container">
+        <h1 class="title">{{ 'ranking_admin_import.page_title'|trans }}</h1>
+        <p class="mb-4">{{ 'ranking_admin_import.intro'|trans }}</p>
+
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="notification is-{{ type }}">{{ message|trans }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <form method="post" enctype="multipart/form-data" class="box">
+            <input type="hidden" name="_token" value="{{ csrf_token('ranking_csv_import') }}">
+            <div class="field">
+                <label class="label">{{ 'ranking_admin_import.form_file'|trans }}</label>
+                <div class="control">
+                    <input type="file" name="csv" accept=".csv,text/csv" required>
+                </div>
+            </div>
+            <div class="field">
+                <button type="submit" class="button is-primary">
+                    {{ 'ranking_admin_import.button_upload'|trans }}
+                </button>
+            </div>
+        </form>
+
+        {% if report is not null %}
+            <div class="box mt-4">
+                <h2 class="subtitle">{{ 'ranking_admin_import.report_title'|trans }}</h2>
+                <p>{{ 'ranking_admin_import.report_imported'|trans({'%count%': report.importedCount}) }}</p>
+                <p>{{ 'ranking_admin_import.report_errors'|trans({'%count%': report.errorCount}) }}</p>
+                {% if report.errors|length > 0 %}
+                    <ul>
+                        {% for err in report.errors %}
+                            <li>Row {{ err.rowNumber }}: {{ err.message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

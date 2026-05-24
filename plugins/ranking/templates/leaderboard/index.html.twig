@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <h1 class="title">{{ 'ranking_leaderboard.page_title'|trans }}</h1>
+
+            <form method="get" class="field mb-4">
+                <div class="control">
+                    <input type="text" name="q" value="{{ search }}"
+                           placeholder="{{ 'ranking_leaderboard.search_placeholder'|trans }}"
+                           class="input">
+                </div>
+            </form>
+
+            {% if ranks|length == 0 %}
+                <p class="has-text-grey">{{ 'ranking_leaderboard.empty'|trans }}</p>
+            {% else %}
+                <table class="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>{{ 'ranking_leaderboard.col_member'|trans }}</th>
+                            <th>
+                                {% if config.archetype.isNumeric %}
+                                    {{ 'ranking_leaderboard.col_value'|trans }}
+                                {% else %}
+                                    {{ 'ranking_leaderboard.col_rank'|trans }}
+                                {% endif %}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rank in ranks %}
+                            <tr>
+                                <td>{{ userNames[rank.userId] ?? '#' ~ rank.userId }}</td>
+                                <td>
+                                    {% if config.archetype.isNumeric %}
+                                        {{ rank.numericValue }}
+                                    {% elseif rank.rankDefinitionId is not null and definitionsById[rank.rankDefinitionId] is defined %}
+                                        {% set d = definitionsById[rank.rankDefinitionId] %}
+                                        {% if d.colorHex is not null %}
+                                            <span class="tag" style="background-color: {{ d.colorHex }}; min-width: 1.5em;">&nbsp;</span>
+                                        {% endif %}
+                                        {% if d.labelKey is not null %}{{ d.labelKey|trans }}{% else %}{{ d.label }}{% endif %}
+                                    {% else %}
+                                        <span class="has-text-grey">{{ 'ranking.rank_no_longer_defined'|trans }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
