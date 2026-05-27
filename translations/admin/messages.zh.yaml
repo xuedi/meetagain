@@ -276,6 +276,7 @@ admin_location:
     form_label_postcode: '邮编'
     form_label_longitude: '经度'
     form_label_latitude: '纬度'
+    swap_lat_lng: '交换经纬度'
     flash_updated: '会场更新成功'
     flash_deleted: '会场删除成功'
     flash_created: '会场创建成功'

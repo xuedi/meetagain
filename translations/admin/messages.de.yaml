@@ -276,6 +276,7 @@ admin_location:
     form_label_postcode: 'Postleitzahl'
     form_label_longitude: 'Längengrad'
     form_label_latitude: 'Breitengrad'
+    swap_lat_lng: 'Breiten- und Längengrad tauschen'
     flash_updated: 'Veranstaltungsort erfolgreich aktualisiert'
     flash_deleted: 'Veranstaltungsort erfolgreich gelöscht'
     flash_created: 'Veranstaltungsort erfolgreich erstellt'

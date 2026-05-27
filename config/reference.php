@@ -1538,6 +1538,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * @psalm-type SymfonycastsSassConfig = array{
  *     root_sass?: list<scalar|Param|null>,
  *     binary?: scalar|Param|null, // The Sass binary to use // Default: null
+ *     search_for_binary?: scalar|Param|null, // Whether to search for the Sass binary in the system PATH // Default: true
  *     sass_options?: array{
  *         style?: "compressed"|"expanded"|Param, // The style of the generated CSS: compressed or expanded. // Default: "expanded"
  *         charset?: bool|Param, // Whether to include the charset declaration in the generated Sass.

@@ -1,5 +1,15 @@
 {% extends 'admin/base.html.twig' %}
 
+{% set has_map = location.latitude is not null and location.longitude is not null and show_osm() %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% if has_map %}
+        <script src="{{ asset('js/vendor/leaflet.js') }}"></script>
+        <script src="{{ asset('js/osm-map.js') }}" defer></script>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <div class="container">
 
@@ -61,11 +71,20 @@
             </div>
 
             <div class="column is-4">
-                <div class="columns">
-                    <div class="column is-6">
+                <div class="columns is-vcentered is-mobile">
+                    <div class="column is-5">
                         {{ form_row(form.longitude) }}
                     </div>
-                    <div class="column is-6">
+                    <div class="column is-2 has-text-centered">
+                        <button type="button"
+                                id="swap-lat-lng"
+                                class="button is-small is-light"
+                                title="{{ 'admin_location.swap_lat_lng'|trans }}"
+                                aria-label="{{ 'admin_location.swap_lat_lng'|trans }}">
+                            <span class="icon"><i class="fa fa-exchange"></i></span>
+                        </button>
+                    </div>
+                    <div class="column is-5">
                         {{ form_row(form.latitude) }}
                     </div>
                 </div>
@@ -76,6 +95,14 @@
 
                 {% if form.user is defined %}
                     {{ form_row(form.user) }}
+                {% endif %}
+
+                {% if has_map %}
+                    <div class="mt-3" id="osm-map"
+                         data-lat="{{ location.latitude }}"
+                         data-lng="{{ location.longitude }}"
+                         data-marker-icon="{{ asset('images/leaflet/marker-icon.png') }}"
+                         data-marker-shadow="{{ asset('images/leaflet/marker-shadow.png') }}"></div>
                 {% endif %}
 
                 {% if location.id %}
@@ -99,4 +126,20 @@
 
         {{ form_end(form) }}
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const swapBtn = document.getElementById('swap-lat-lng');
+            const lngInput = document.getElementById('{{ form.longitude.vars.id }}');
+            const latInput = document.getElementById('{{ form.latitude.vars.id }}');
+            if (!swapBtn || !lngInput || !latInput) {
+                return;
+            }
+            swapBtn.addEventListener('click', function () {
+                const tmp = lngInput.value;
+                lngInput.value = latInput.value;
+                latInput.value = tmp;
+            });
+        });
+    </script>
 {% endblock %}
