@@ -12,6 +12,7 @@
 {% block javascripts %}
     {% if event.hasMap and show_osm() %}
         <script src="{{ asset('js/vendor/leaflet.js') }}" ></script>
+        <script src="{{ asset('js/osm-map.js') }}" defer></script>
     {% endif %}
     {% if is_granted('ROLE_USER') and event.images|length > 0 %}
         <script src="{{ asset('js/vendor/fancybox.umd.js') }}" ></script>

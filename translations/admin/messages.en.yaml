@@ -276,6 +276,7 @@ admin_location:
     form_label_postcode: 'Postcode'
     form_label_longitude: 'Longitude'
     form_label_latitude: 'Latitude'
+    swap_lat_lng: 'Swap latitude and longitude'
     flash_updated: 'Venue updated successfully'
     flash_deleted: 'Venue deleted successfully'
     flash_created: 'Venue created successfully'
