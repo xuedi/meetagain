@@ -177,6 +177,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->config,
             $this->createStub(UserRepository::class),
             $this->createStub(LoggerInterface::class),
+            $this->createStub(TranslatorInterface::class),
         );
 
         static::assertFalse($email->guardCheck([

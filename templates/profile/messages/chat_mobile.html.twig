@@ -70,7 +70,7 @@
                         </a>
                     {% endif %}
                     <br>
-                    <span class="breakText">{{ message.content }}</span>
+                    {% include 'profile/messages/_message_body.html.twig' with {'content': message.content} only %}
                 </div>
             {% endfor %}
         </div>

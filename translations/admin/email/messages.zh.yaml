@@ -37,6 +37,7 @@ admin_email_templates:
     trigger_notification_event_canceled: '活动取消时'
     trigger_announcement: '由管理员发送'
     trigger_support_notification: '收到支持请求时'
+    trigger_support_response: '管理员回复访客请求时'
     trigger_admin_notification: '管理员触发时'
     trigger_event_reminder: '活动前 5 小时内'
     trigger_upcoming_events: '周日 12:00'

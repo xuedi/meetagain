@@ -100,7 +100,7 @@
                                                     </a>
                                                 {% endif %}
                                                 <br>
-                                                <span class="breakText">{{ message.content }}</span>
+                                                {% include 'profile/messages/_message_body.html.twig' with {'content': message.content} only %}
                                             </div>
                                         </div>
                                         <div class="level-item">
@@ -121,7 +121,7 @@
                                                     <small class="has-text-grey ml-1 edited-marker">{{ 'profile_messages.edited_marker'|trans }}</small>
                                                 {% endif %}
                                                 <br>
-                                                <span class="breakText">{{ message.content }}</span>
+                                                {% include 'profile/messages/_message_body.html.twig' with {'content': message.content} only %}
                                             </div>
                                         </div>
                                         {% if message.wasRead == false %}

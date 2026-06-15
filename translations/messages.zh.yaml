@@ -381,6 +381,7 @@ profile_messages:
     edit_empty: '消息内容不能为空。'
     edit_too_long: '消息内容过长。'
     edit_no_change: '没有要保存的更改。'
+    system_support_question: '通过支持表单提问：'
 profile_notifications:
     page_title: '通知'
     empty_state: '暂无新通知'
@@ -433,6 +434,9 @@ support:
     contact_type_billing: '账单问题'
     contact_type_other: '其他'
     button_send: '发送'
+    confirm_title: '谢谢 - 我们已收到您的请求'
+    confirm_body: '您的消息已发送。我们会尽快回复您，通常在 2 个工作日内。'
+    confirm_back: '返回首页'
 report:
     page_title_image: 'Report Image'
     page_title_success: 'Report Submitted'

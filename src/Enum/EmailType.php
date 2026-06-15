@@ -12,6 +12,7 @@ enum EmailType: string
     case NotificationEventCanceled = 'notification_event_canceled';
     case Announcement = 'announcement';
     case SupportNotification = 'support_notification';
+    case SupportResponse = 'support_response';
     case AdminNotification = 'admin_notification';
     case EventReminder = 'event_reminder';
     case UpcomingEvents = 'upcoming_events';

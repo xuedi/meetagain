@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Enum\ContactType;
+use App\Enum\SupportReplyChannel;
 use App\Enum\SupportRequestStatus;
 use App\Repository\SupportRequestRepository;
 use DateTimeImmutable;
@@ -37,6 +38,16 @@ class SupportRequest
 
     #[ORM\Column(length: 45, nullable: true)]
     private ?string $ipAddress = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $respondedBy = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $response = null;
+
+    #[ORM\Column(length: 10, enumType: SupportReplyChannel::class, nullable: true)]
+    private ?SupportReplyChannel $replyChannel = null;
 
     public function getId(): ?int
     {
@@ -127,6 +138,42 @@ class SupportRequest
         return $this;
     }
 
+    public function getRespondedBy(): ?User
+    {
+        return $this->respondedBy;
+    }
+
+    public function setRespondedBy(?User $respondedBy): static
+    {
+        $this->respondedBy = $respondedBy;
+
+        return $this;
+    }
+
+    public function getResponse(): ?string
+    {
+        return $this->response;
+    }
+
+    public function setResponse(?string $response): static
+    {
+        $this->response = $response;
+
+        return $this;
+    }
+
+    public function getReplyChannel(): ?SupportReplyChannel
+    {
+        return $this->replyChannel;
+    }
+
+    public function setReplyChannel(?SupportReplyChannel $replyChannel): static
+    {
+        $this->replyChannel = $replyChannel;
+
+        return $this;
+    }
+
     public function isNew(): bool
     {
         return $this->status === SupportRequestStatus::New;
@@ -135,5 +182,10 @@ class SupportRequest
     public function isRead(): bool
     {
         return $this->status === SupportRequestStatus::Read;
+    }
+
+    public function isReplied(): bool
+    {
+        return $this->status === SupportRequestStatus::Replied;
     }
 }
