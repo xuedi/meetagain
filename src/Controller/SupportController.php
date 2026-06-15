@@ -9,6 +9,7 @@ use App\Enum\SecurityEventType;
 use App\Enum\SupportRequestStatus;
 use App\Form\SupportRequestType;
 use App\Service\Member\CaptchaService;
+use App\Service\Security\ContentSanitizer;
 use App\Service\Security\SecurityService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,6 +28,7 @@ final class SupportController extends AbstractController
         #[Autowire(service: 'limiter.support')]
         private readonly RateLimiterFactoryInterface $supportLimiter,
         private readonly SecurityService $securityService,
+        private readonly ContentSanitizer $contentSanitizer,
     ) {}
 
     #[Route('/support', name: 'app_support_redirect')]
@@ -70,10 +72,10 @@ final class SupportController extends AbstractController
 
             if ($form->getErrors(true)->count() === 0) {
                 $supportRequest = new SupportRequest();
-                $supportRequest->setName($user instanceof User ? (string) $user->getName() : (string) $form->get('name')->getData());
+                $supportRequest->setName($this->contentSanitizer->toPlainText($user instanceof User ? (string) $user->getName() : (string) $form->get('name')->getData()));
                 $supportRequest->setEmail($user instanceof User ? (string) $user->getEmail() : (string) $form->get('email')->getData());
                 $supportRequest->setContactType($form->get('contactType')->getData());
-                $supportRequest->setMessage((string) $form->get('message')->getData());
+                $supportRequest->setMessage($this->contentSanitizer->escape((string) $form->get('message')->getData()));
                 $supportRequest->setCreatedAt(new DateTimeImmutable());
                 $supportRequest->setStatus(SupportRequestStatus::New);
                 $supportRequest->setIpAddress($request->getClientIp());

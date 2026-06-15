@@ -33,7 +33,7 @@
                         </tr>
                         <tr>
                             <th>{{ 'admin_support.col_message'|trans }}</th>
-                            <td>{{ request.message|nl2br }}</td>
+                            <td>{{ request.message|safe_message }}</td>
                         </tr>
                         <tr>
                             <th>{{ 'admin_support.col_status'|trans }}</th>
@@ -58,7 +58,7 @@
                     <div class="field">
                         <label class="label">{{ 'admin_support.reply_label'|trans }}</label>
                         <div class="control">
-                            <textarea class="textarea" rows="6" readonly>{{ request.response }}</textarea>
+                            <div class="box">{{ request.response|safe_message }}</div>
                         </div>
                     </div>
                 {% else %}
