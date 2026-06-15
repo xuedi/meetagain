@@ -19,6 +19,7 @@ use App\Enum\SupportRequestStatus;
 use App\Form\SupportReplyType;
 use App\Repository\SupportRequestRepository;
 use App\Repository\UserRepository;
+use App\Service\Security\ContentSanitizer;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,6 +39,7 @@ final class RequestsController extends AbstractSupportController implements Admi
         private readonly EntityManagerInterface $em,
         private readonly SupportResponseEmail $supportResponseEmail,
         private readonly ActivityService $activityService,
+        private readonly ContentSanitizer $contentSanitizer,
     ) {
         parent::__construct($translator, 'requests');
     }
@@ -170,7 +172,7 @@ final class RequestsController extends AbstractSupportController implements Admi
             return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
         }
 
-        $response = (string) $form->get('response')->getData();
+        $response = $this->contentSanitizer->basic((string) $form->get('response')->getData());
         $this->supportResponseEmail->send(['request' => $request, 'response' => $response]);
         $this->markRequestReplied($request, $response, SupportReplyChannel::Email);
         $this->addFlash('success', 'admin_support.flash_reply_email_sent');
@@ -208,7 +210,7 @@ final class RequestsController extends AbstractSupportController implements Admi
             throw $this->createAccessDeniedException();
         }
 
-        $response = (string) $form->get('response')->getData();
+        $response = $this->contentSanitizer->basic((string) $form->get('response')->getData());
 
         // The first admin to respond owns the conversation; later replies (from any admin) are
         // attributed to that admin so all support correspondence stays in one user-admin thread.

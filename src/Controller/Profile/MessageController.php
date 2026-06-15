@@ -10,6 +10,7 @@ use App\Form\CommentType;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\Member\BlockingService;
+use App\Service\Security\ContentSanitizer;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Bundle\TimeBundle\DateTimeFormatter;
@@ -29,6 +30,7 @@ final class MessageController extends AbstractController
         private readonly UserRepository $userRepo,
         private readonly BlockingService $blockingService,
         private readonly DateTimeFormatter $dateTimeFormatter,
+        private readonly ContentSanitizer $contentSanitizer,
     ) {}
 
     #[Route('/profile/messages/{id}', name: 'app_profile_messages', methods: ['GET', 'POST'])]
@@ -54,7 +56,7 @@ final class MessageController extends AbstractController
                     $msg->setSender($this->getAuthedUser());
                     $msg->setReceiver($conversationPartner);
                     $msg->setCreatedAt(new DateTimeImmutable());
-                    $msg->setContent($form->getData()['comment']);
+                    $msg->setContent($this->contentSanitizer->toPlainText((string) $form->getData()['comment']));
 
                     $this->em->persist($msg);
                     $this->em->flush();
@@ -108,12 +110,13 @@ final class MessageController extends AbstractController
         if (mb_strlen($trimmed) > 5000) {
             return new JsonResponse(['error' => 'profile_messages.edit_too_long'], 400);
         }
-        if ($trimmed === $message->getContent()) {
+        $sanitized = $this->contentSanitizer->toPlainText($trimmed);
+        if ($sanitized === $message->getContent()) {
             return new JsonResponse(['error' => 'profile_messages.edit_no_change'], 400);
         }
 
         $editedAt = new DateTimeImmutable();
-        $message->setContent($trimmed);
+        $message->setContent($sanitized);
         $message->setEditedAt($editedAt);
         $this->em->flush();
 

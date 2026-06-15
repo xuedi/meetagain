@@ -2,7 +2,7 @@
 {% set marker = constant('App\\Entity\\Message::SUPPORT_QUESTION_MARKER') %}
 {% if content starts with marker %}
     <span class="has-text-warning-dark has-text-weight-semibold">{{ 'profile_messages.system_support_question'|trans }}</span><br>
-    <span class="breakText">{{ content|slice(marker|length) }}</span>
+    <span class="breakText">{{ content|slice(marker|length)|safe_message }}</span>
 {% else %}
-    <span class="breakText">{{ content }}</span>
+    <span class="breakText">{{ content|safe_message }}</span>
 {% endif %}

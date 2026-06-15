@@ -72,9 +72,9 @@ class SupportRequestReplyTest extends WebTestCase
         $client->submit($form);
         $crawler = $client->request('GET', '/en/admin/support/' . $id);
 
-        // Assert - the stored response is shown read-only and no reply form remains
+        // Assert - the stored response is shown in the locked view and no reply form remains
         static::assertStringContainsString('First and only answer.', $crawler->html());
-        static::assertStringContainsString('readonly', $crawler->html());
+        static::assertStringContainsString('Response sent', $crawler->html());
         static::assertCount(0, $crawler->selectButton('Send response'));
         static::assertStringNotContainsString('/reply-email', $crawler->html());
 

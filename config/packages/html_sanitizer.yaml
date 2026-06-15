@@ -49,3 +49,15 @@ framework:
                     # Code
                     code: []
                     pre: []
+            # Inline emphasis only - tool-generated message/support content (no links, no attributes).
+            message.content:
+                allow_safe_elements: false
+                allow_elements:
+                    strong: []
+                    b: []
+                    em: []
+                    i: []
+                    br: []
+            # Keep the visible text of any safe element; callers strip the tags to get plain text.
+            message.plain:
+                allow_safe_elements: true
