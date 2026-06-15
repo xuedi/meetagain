@@ -199,6 +199,8 @@ Error: Error
 'support.validator_email_format': 'Please enter a valid email address.'
 'support.validator_message_blank': 'Please enter a message.'
 'support.validator_message_max': 'Message cannot be longer than {{ limit }} characters.'
+'admin_support.validator_response_blank': 'Please enter a response.'
+'admin_support.validator_response_max': 'Response cannot be longer than {{ limit }} characters.'
 
 # Shared + admin_system_language - phase 38 (validator-domain keys reused across forms)
 'shared.form_image_upload_mime_error': 'Please upload a valid image.'

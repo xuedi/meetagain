@@ -6,4 +6,5 @@ enum SupportRequestStatus: string
 {
     case New = 'new';
     case Read = 'read';
+    case Replied = 'replied';
 }

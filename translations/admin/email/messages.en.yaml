@@ -37,6 +37,7 @@ admin_email_templates:
     trigger_notification_event_canceled: 'when event is canceled'
     trigger_announcement: 'sent by admin'
     trigger_support_notification: 'on support request'
+    trigger_support_response: 'admin replies to a guest request'
     trigger_admin_notification: 'on admin signal'
     trigger_event_reminder: 'up to 5h before event'
     trigger_upcoming_events: 'Sunday 12:00'

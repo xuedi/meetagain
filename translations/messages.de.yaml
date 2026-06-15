@@ -381,6 +381,7 @@ profile_messages:
     edit_empty: 'Der Nachrichtentext darf nicht leer sein.'
     edit_too_long: 'Der Nachrichtentext ist zu lang.'
     edit_no_change: 'Keine Änderungen zu speichern.'
+    system_support_question: 'Über das Support-Formular gefragt:'
 profile_notifications:
     page_title: 'Benachrichtigungen'
     empty_state: 'Keine neuen Benachrichtigungen'
@@ -433,6 +434,9 @@ support:
     contact_type_billing: 'Frage zur Abrechnung'
     contact_type_other: 'Sonstiges'
     button_send: 'Senden'
+    confirm_title: 'Danke - wir haben deine Anfrage erhalten'
+    confirm_body: 'Deine Nachricht wurde gesendet. Wir melden uns so schnell wie möglich, in der Regel innerhalb von 2 Werktagen.'
+    confirm_back: 'Zurück zur Startseite'
 report:
     page_title_image: 'Bild melden'
     page_title_success: 'Meldung eingereicht'

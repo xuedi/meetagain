@@ -199,6 +199,8 @@ Error: Fehler
 'support.validator_email_format': 'Bitte gib eine gültige E-Mail-Adresse ein.'
 'support.validator_message_blank': 'Bitte gib eine Nachricht ein.'
 'support.validator_message_max': 'Die Nachricht darf nicht länger als {{ limit }} Zeichen sein.'
+'admin_support.validator_response_blank': 'Bitte gib eine Antwort ein.'
+'admin_support.validator_response_max': 'Die Antwort darf nicht länger als {{ limit }} Zeichen sein.'
 
 # Shared + admin_system_language - phase 38 (validator-domain keys reused across forms)
 'shared.form_image_upload_mime_error': 'Bitte laden Sie ein gültiges Bild hoch.'

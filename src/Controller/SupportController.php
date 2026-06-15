@@ -83,14 +83,15 @@ final class SupportController extends AbstractController
 
                 $this->supportNotificationEmail->send(['request' => $supportRequest]);
 
-                $this->addFlash('success', 'support.flash_message_sent');
-
-                return $this->redirectToRoute('app_contact');
+                // Intentionally not a PRG redirect: the confirmation state carries no live form,
+                // so a browser refresh cannot replay the submission.
+                return $this->render('support/index.html.twig', ['submitted' => true]);
             }
         }
 
         $this->captchaService->reset();
         return $this->render('support/index.html.twig', [
+            'submitted' => false,
             'form' => $form,
             'captcha' => $this->captchaService->generate(),
             'refreshCount' => $this->captchaService->getRefreshCount(),

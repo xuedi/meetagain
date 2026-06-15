@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SupportNotificationEmailTest extends TestCase
 {
@@ -51,12 +52,16 @@ class SupportNotificationEmailTest extends TestCase
 
         $request = $this->makeRequest();
 
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator->method('trans')->willReturn('General inquiry');
+
         $emailType = new SupportNotificationEmail(
             $this->createStub(BlocklistCheckerInterface::class),
             $queue,
             $config,
             $userRepo,
             $this->createStub(LoggerInterface::class),
+            $translator,
         );
 
         // Act
@@ -66,6 +71,7 @@ class SupportNotificationEmailTest extends TestCase
         static::assertCount(2, $enqueuedEmails);
         static::assertSame('admin1@example.com', $enqueuedEmails[0]->getTo()[0]->getAddress());
         static::assertSame('admin2@example.com', $enqueuedEmails[1]->getTo()[0]->getAddress());
+        static::assertSame('General inquiry', $enqueuedEmails[0]->getContext()['contactType']);
     }
 
     public function testSendLogsWarningAndEnqueuesNothingWhenNoAdmins(): void
@@ -85,7 +91,7 @@ class SupportNotificationEmailTest extends TestCase
 
         $request = $this->makeRequest();
 
-        $emailType = new SupportNotificationEmail($this->createStub(BlocklistCheckerInterface::class), $queue, $config, $userRepo, $logger);
+        $emailType = new SupportNotificationEmail($this->createStub(BlocklistCheckerInterface::class), $queue, $config, $userRepo, $logger, $this->createStub(TranslatorInterface::class));
 
         // Act
         $emailType->send(['request' => $request]);

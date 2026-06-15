@@ -11,6 +11,12 @@ class Message
 {
     public const int EDIT_WINDOW_MINUTES = 10;
 
+    /**
+     * Leading sentinel on a message imported from a support request. The chat view strips it and
+     * renders the following line as a system note rather than user-typed text.
+     */
+    public const string SUPPORT_QUESTION_MARKER = '[[support-question]]';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

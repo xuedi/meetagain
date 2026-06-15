@@ -30,6 +30,8 @@ Error: 错误
 'support.validator_email_format': '请输入有效的电子邮件地址。'
 'support.validator_message_blank': '请输入消息内容。'
 'support.validator_message_max': '消息不能超过 {{ limit }} 个字符。'
+'admin_support.validator_response_blank': '请输入回复内容。'
+'admin_support.validator_response_max': '回复不能超过 {{ limit }} 个字符。'
 
 # Shared + admin_system_language - phase 38 (validator-domain keys reused across forms)
 'shared.form_image_upload_mime_error': '请上传有效的图片。'
