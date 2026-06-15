@@ -7,44 +7,76 @@
         {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
         {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
-        <table class="table is-fullwidth">
-            <tbody>
-                <tr>
-                    <th>{{ 'admin_support.label_id'|trans }}</th>
-                    <td><code>{{ request.id }}</code></td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_support.col_date'|trans }}</th>
-                    <td>{{ request.createdAt|date('Y-m-d H:i:s') }}</td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_support.col_type'|trans }}</th>
-                    <td><span class="tag is-light">{{ request.contactType.label() }}</span></td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_support.col_name'|trans }}</th>
-                    <td>{{ request.name }}</td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_support.col_email'|trans }}</th>
-                    <td><a href="mailto:{{ request.email }}">{{ request.email }}</a></td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_support.col_message'|trans }}</th>
-                    <td>{{ request.message|nl2br }}</td>
-                </tr>
-                <tr>
-                    <th>{{ 'admin_support.col_status'|trans }}</th>
-                    <td>
-                        {% if request.isNew() %}
-                            <span class="tag is-warning">{{ 'admin_support.status_new'|trans }}</span>
-                        {% else %}
-                            <span class="tag is-light">{{ 'admin_support.status_read'|trans }}</span>
-                        {% endif %}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="columns">
+            <div class="column">
+                <table class="table is-fullwidth">
+                    <tbody>
+                        <tr>
+                            <th>{{ 'admin_support.label_id'|trans }}</th>
+                            <td><code>{{ request.id }}</code></td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_support.col_date'|trans }}</th>
+                            <td>{{ request.createdAt|date('Y-m-d H:i:s') }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_support.col_type'|trans }}</th>
+                            <td><span class="tag is-light">{{ request.contactType.label()|trans }}</span></td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_support.col_name'|trans }}</th>
+                            <td>{{ request.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_support.col_email'|trans }}</th>
+                            <td><a href="mailto:{{ request.email }}">{{ request.email }}</a></td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_support.col_message'|trans }}</th>
+                            <td>{{ request.message|nl2br }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_support.col_status'|trans }}</th>
+                            <td>
+                                {% if request.isNew() %}
+                                    <span class="tag is-warning">{{ 'admin_support.status_new'|trans }}</span>
+                                {% elseif request.isReplied() %}
+                                    <span class="tag is-success">{{ 'admin_support.status_replied'|trans }}</span>
+                                {% else %}
+                                    <span class="tag is-light">{{ 'admin_support.status_read'|trans }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="column">
+                {% if request.isReplied() %}
+                    <h2 class="title is-6">{{ 'admin_support.replied_heading'|trans }}</h2>
+                    <p class="has-text-grey mb-4">{{ 'admin_support.replied_note'|trans({'%channel%': request.replyChannel.label()|trans}) }}</p>
+                    <div class="field">
+                        <label class="label">{{ 'admin_support.reply_label'|trans }}</label>
+                        <div class="control">
+                            <textarea class="textarea" rows="6" readonly>{{ request.response }}</textarea>
+                        </div>
+                    </div>
+                {% else %}
+                    {% if replyMode == 'message' %}
+                        <h2 class="title is-6">{{ 'admin_support.reply_message_heading'|trans }}</h2>
+                        <p class="has-text-grey mb-4">{{ 'admin_support.reply_message_note'|trans }}</p>
+                        {{ form_start(replyForm, {'action': path('app_admin_support_reply_message', {'id': request.id})}) }}
+                    {% else %}
+                        <h2 class="title is-6">{{ 'admin_support.reply_email_heading'|trans }}</h2>
+                        <p class="has-text-grey mb-4">{{ 'admin_support.reply_email_note'|trans }}</p>
+                        {{ form_start(replyForm, {'action': path('app_admin_support_reply_email', {'id': request.id})}) }}
+                    {% endif %}
+                    {{ form_row(replyForm.response) }}
+                    <button class="button is-primary mt-2">{{ 'admin_support.button_reply_send'|trans }}</button>
+                    {{ form_end(replyForm) }}
+                {% endif %}
+            </div>
+        </div>
 
     </div>
 

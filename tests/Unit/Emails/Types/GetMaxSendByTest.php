@@ -262,6 +262,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(ConfigService::class),
             $this->createStub(UserRepository::class),
             $this->createStub(LoggerInterface::class),
+            $this->createStub(TranslatorInterface::class),
         );
 
         static::assertNull($email->getMaxSendBy([], new DateTimeImmutable(self::NOW)));

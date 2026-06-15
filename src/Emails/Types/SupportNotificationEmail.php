@@ -13,6 +13,7 @@ use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class SupportNotificationEmail extends EmailAbstract
 {
@@ -22,6 +23,7 @@ readonly class SupportNotificationEmail extends EmailAbstract
         private ConfigService $config,
         private UserRepository $userRepository,
         private LoggerInterface $logger,
+        private TranslatorInterface $translator,
     ) {
         parent::__construct($blocklist);
     }
@@ -76,7 +78,7 @@ readonly class SupportNotificationEmail extends EmailAbstract
             $email->to((string) $admin->getEmail());
             $email->locale('en');
             $email->context([
-                'contactType' => $request->getContactType()->label(),
+                'contactType' => $this->translator->trans($request->getContactType()->label(), [], null, 'en'),
                 'name' => $request->getName(),
                 'email' => $request->getEmail(),
                 'message' => $request->getMessage(),

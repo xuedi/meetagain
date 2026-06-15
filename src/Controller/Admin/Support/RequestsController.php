@@ -4,13 +4,22 @@ namespace App\Controller\Admin\Support;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
+use App\Activity\ActivityService;
+use App\Activity\Messages\SendMessage;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
+use App\Emails\Types\SupportResponseEmail;
+use App\Entity\Message;
 use App\Entity\SupportRequest;
+use App\Entity\User;
+use App\Enum\SupportReplyChannel;
 use App\Enum\SupportRequestStatus;
+use App\Form\SupportReplyType;
 use App\Repository\SupportRequestRepository;
+use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +34,10 @@ final class RequestsController extends AbstractSupportController implements Admi
     public function __construct(
         TranslatorInterface $translator,
         private readonly SupportRequestRepository $supportRequestRepo,
+        private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $em,
+        private readonly SupportResponseEmail $supportResponseEmail,
+        private readonly ActivityService $activityService,
     ) {
         parent::__construct($translator, 'requests');
     }
@@ -74,13 +86,16 @@ final class RequestsController extends AbstractSupportController implements Admi
             throw $this->createNotFoundException();
         }
 
-        $statusVariant = $request->isNew() ? 'is-warning' : 'is-light';
-        $statusKey = $request->isNew() ? 'admin_support.status_new' : 'admin_support.status_read';
+        [$statusVariant, $statusKey] = match (true) {
+            $request->isNew() => ['is-warning', 'admin_support.status_new'],
+            $request->isReplied() => ['is-success', 'admin_support.status_replied'],
+            default => ['is-light', 'admin_support.status_read'],
+        };
 
         $info = [
             new AdminTopInfoHtml(sprintf('<strong>%s</strong>', $request->getCreatedAt()->format('Y-m-d H:i:s'))),
             new AdminTopInfoHtml(sprintf('<span class="tag is-light is-medium">%s</span>', htmlspecialchars(
-                $request->getContactType()->label(),
+                $this->translator->trans($request->getContactType()->label()),
                 ENT_QUOTES | ENT_HTML5,
                 'UTF-8',
             ))),
@@ -109,11 +124,16 @@ final class RequestsController extends AbstractSupportController implements Admi
 
         $adminTop = new AdminTop(info: $info, actions: $actions);
 
+        $matchedUser = $this->userRepository->findOneBy(['email' => $request->getEmail()]);
+        $replyMode = $matchedUser instanceof User ? 'message' : 'email';
+
         return $this->render('admin/support/request_show.html.twig', [
             'active' => 'support',
             'request' => $request,
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
+            'replyMode' => $replyMode,
+            'replyForm' => $this->createForm(SupportReplyType::class),
         ]);
     }
 
@@ -125,11 +145,120 @@ final class RequestsController extends AbstractSupportController implements Admi
         }
         $request = $this->supportRequestRepo->find($id);
         if ($request instanceof SupportRequest) {
-            $request->setStatus(SupportRequestStatus::Read);
-            $this->em->persist($request);
-            $this->em->flush();
+            $this->markRequestRead($request);
         }
 
         return $this->redirectToRoute('app_admin_support_list');
+    }
+
+    #[Route('/{id}/reply-email', name: 'app_admin_support_reply_email', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function replyEmail(Request $httpRequest, int $id): Response
+    {
+        $request = $this->supportRequestRepo->find($id);
+        if (!$request instanceof SupportRequest) {
+            throw $this->createNotFoundException();
+        }
+        if ($request->isReplied()) {
+            $this->addFlash('error', 'admin_support.flash_reply_already');
+            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+        }
+
+        $form = $this->createForm(SupportReplyType::class);
+        $form->handleRequest($httpRequest);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            $this->addFlash('error', 'admin_support.flash_reply_invalid');
+            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+        }
+
+        $response = (string) $form->get('response')->getData();
+        $this->supportResponseEmail->send(['request' => $request, 'response' => $response]);
+        $this->markRequestReplied($request, $response, SupportReplyChannel::Email);
+        $this->addFlash('success', 'admin_support.flash_reply_email_sent');
+
+        return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+    }
+
+    #[Route('/{id}/reply-message', name: 'app_admin_support_reply_message', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function replyMessage(Request $httpRequest, int $id): Response
+    {
+        $request = $this->supportRequestRepo->find($id);
+        if (!$request instanceof SupportRequest) {
+            throw $this->createNotFoundException();
+        }
+        if ($request->isReplied()) {
+            $this->addFlash('error', 'admin_support.flash_reply_already');
+            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+        }
+
+        $receiver = $this->userRepository->findOneBy(['email' => $request->getEmail()]);
+        if (!$receiver instanceof User) {
+            $this->addFlash('error', 'admin_support.flash_reply_no_user');
+            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+        }
+
+        $form = $this->createForm(SupportReplyType::class);
+        $form->handleRequest($httpRequest);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            $this->addFlash('error', 'admin_support.flash_reply_invalid');
+            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+        }
+
+        $actingAdmin = $this->getUser();
+        if (!$actingAdmin instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $response = (string) $form->get('response')->getData();
+
+        // The first admin to respond owns the conversation; later replies (from any admin) are
+        // attributed to that admin so all support correspondence stays in one user-admin thread.
+        $owner = $request->getRespondedBy();
+        $isFirstResponse = !$owner instanceof User;
+        if ($isFirstResponse) {
+            $owner = $actingAdmin;
+
+            $question = new Message();
+            $question->setDeleted(false);
+            $question->setWasRead(true);
+            $question->setSender($receiver);
+            $question->setReceiver($owner);
+            $question->setCreatedAt($request->getCreatedAt());
+            $question->setContent(Message::SUPPORT_QUESTION_MARKER . $request->getMessage());
+            $this->em->persist($question);
+        }
+
+        $answer = new Message();
+        $answer->setDeleted(false);
+        $answer->setWasRead(false);
+        $answer->setSender($owner);
+        $answer->setReceiver($receiver);
+        $answer->setCreatedAt(new DateTimeImmutable());
+        $answer->setContent($response);
+        $this->em->persist($answer);
+
+        $request->setRespondedBy($owner);
+        $this->markRequestReplied($request, $response, SupportReplyChannel::Message);
+
+        $this->activityService->log(SendMessage::TYPE, $owner, ['user_id' => $receiver->getId()]);
+
+        $this->addFlash('success', 'admin_support.flash_reply_message_sent');
+
+        return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+    }
+
+    private function markRequestRead(SupportRequest $request): void
+    {
+        $request->setStatus(SupportRequestStatus::Read);
+        $this->em->persist($request);
+        $this->em->flush();
+    }
+
+    private function markRequestReplied(SupportRequest $request, string $response, SupportReplyChannel $channel): void
+    {
+        $request->setStatus(SupportRequestStatus::Replied);
+        $request->setResponse($response);
+        $request->setReplyChannel($channel);
+        $this->em->persist($request);
+        $this->em->flush();
     }
 }

@@ -22,7 +22,7 @@
             {% for request in requests %}
                 <tr>
                     <td class="is-nowrap">{{ request.createdAt|date('Y-m-d H:i:s') }}</td>
-                    <td><span class="tag is-light">{{ request.contactType.label() }}</span></td>
+                    <td><span class="tag is-light">{{ request.contactType.label()|trans }}</span></td>
                     <td>
                         {% if request.isNew() %}<strong>{% endif %}
                         {{ request.name }}
@@ -32,6 +32,8 @@
                     <td>
                         {% if request.isNew() %}
                             <span class="tag is-warning">{{ 'admin_support.status_new'|trans }}</span>
+                        {% elseif request.isReplied() %}
+                            <span class="tag is-success">{{ 'admin_support.status_replied'|trans }}</span>
                         {% else %}
                             <span class="tag is-light">{{ 'admin_support.status_read'|trans }}</span>
                         {% endif %}

@@ -12,38 +12,44 @@
 
                     <h1 class="title is-5">{{ 'chrome.nav_contact' | trans }}</h1>
 
-                    {{ form_start(form) }}
-                    {{ form_row(form.contactType) }}
-                    {{ form_row(form.name, app.user ? {'attr': {'readonly': true, 'class': 'input has-text-grey'}} : {}) }}
-                    {{ form_row(form.email, app.user ? {'attr': {'readonly': true, 'class': 'input has-text-grey'}} : {}) }}
-                    {{ form_row(form.message) }}
+                    {% if submitted %}
+                        <h2 class="subtitle is-6 mt-4">{{ 'support.confirm_title'|trans }}</h2>
+                        <p>{{ 'support.confirm_body'|trans }}</p>
+                        <a class="button is-primary mt-4" href="{{ path('app_frontpage') }}">{{ 'support.confirm_back'|trans }}</a>
+                    {% else %}
+                        {{ form_start(form) }}
+                        {{ form_row(form.contactType) }}
+                        {{ form_row(form.name, app.user ? {'attr': {'readonly': true, 'class': 'input has-text-grey'}} : {}) }}
+                        {{ form_row(form.email, app.user ? {'attr': {'readonly': true, 'class': 'input has-text-grey'}} : {}) }}
+                        {{ form_row(form.message) }}
 
-                    {% if not app.user %}
-                        <div class="field">
-                            <label class="label">{{ 'support.label_captcha'|trans }}</label>
-                            <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
-                                <img src="data:image/png;base64, {{ captcha }}" alt="captcha">
-                                <div class="control is-flex-grow-1">
-                                    {{ form_widget(form.captcha) }}
+                        {% if not app.user %}
+                            <div class="field">
+                                <label class="label">{{ 'support.label_captcha'|trans }}</label>
+                                <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
+                                    <img src="data:image/png;base64, {{ captcha }}" alt="captcha">
+                                    <div class="control is-flex-grow-1">
+                                        {{ form_widget(form.captcha) }}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <p class="is-size-7 has-text-grey mt-2">{{ 'security.captcha_limit_text'|trans }}</p>
-                        <div data-captcha-counter data-url="{{ path('app_ajax_get_captcha_count') }}">
-                            <p class="mb-4 is-size-7 has-text-grey">
-                                {{ 'security.captcha_tries_pre'|trans }} <strong id="refreshCount">{{ refreshCount }}</strong> {{ 'security.captcha_tries_mid'|trans }} <strong id="refreshTime">{{ refreshTime }}</strong> {{ 'security.captcha_tries_post'|trans }}
-                            </p>
-                        </div>
-                    {% else %}
-                        {{ form_widget(form.captcha, {'attr': {'style': 'display:none'}}) }}
+                            <p class="is-size-7 has-text-grey mt-2">{{ 'security.captcha_limit_text'|trans }}</p>
+                            <div data-captcha-counter data-url="{{ path('app_ajax_get_captcha_count') }}">
+                                <p class="mb-4 is-size-7 has-text-grey">
+                                    {{ 'security.captcha_tries_pre'|trans }} <strong id="refreshCount">{{ refreshCount }}</strong> {{ 'security.captcha_tries_mid'|trans }} <strong id="refreshTime">{{ refreshTime }}</strong> {{ 'security.captcha_tries_post'|trans }}
+                                </p>
+                            </div>
+                        {% else %}
+                            {{ form_widget(form.captcha, {'attr': {'style': 'display:none'}}) }}
+                        {% endif %}
+
+                        {{ form_widget(form) }}
+                        <button class="button is-primary mt-2">{{ 'support.button_send'|trans }}</button>
+                        {{ form_end(form) }}
+
+                        <p class="is-size-7 has-text-grey mt-4">{{ 'support.response_time'|trans }}</p>
                     {% endif %}
-
-                    {{ form_widget(form) }}
-                    <button class="button is-primary mt-2">{{ 'support.button_send'|trans }}</button>
-                    {{ form_end(form) }}
-
-                    <p class="is-size-7 has-text-grey mt-4">{{ 'support.response_time'|trans }}</p>
 
                 </div>
 
@@ -66,7 +72,7 @@
 {% endblock %}
 
 {% block javascripts %}
-{% if not app.user %}
+{% if not app.user and not submitted %}
     <script src="{{ asset('js/captcha-counter.js') }}" defer></script>
 {% endif %}
 {% endblock %}

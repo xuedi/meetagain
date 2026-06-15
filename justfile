@@ -4,9 +4,9 @@
 set dotenv-load
 
 DOCKER := "docker-compose --env-file .env.dist -f docker/docker-compose.yml"
-PHP := DOCKER + " exec -e XDEBUG_MODE=off php"
-PHP_COVERAGE := DOCKER + " exec -e XDEBUG_MODE=coverage php"
-DB := DOCKER + " exec mariadb"
+PHP := DOCKER + " exec -T -e XDEBUG_MODE=off php"
+PHP_COVERAGE := DOCKER + " exec -T -e XDEBUG_MODE=coverage php"
+DB := DOCKER + " exec -T mariadb"
 JUST := just_executable() + " --justfile=" + justfile()
 
 # Show commands

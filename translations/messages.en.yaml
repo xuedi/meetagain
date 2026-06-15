@@ -381,6 +381,7 @@ profile_messages:
     edit_empty: 'Message text cannot be empty.'
     edit_too_long: 'Message text is too long.'
     edit_no_change: 'No changes to save.'
+    system_support_question: 'Via Support form asked:'
 profile_notifications:
     page_title: 'Notifications'
     empty_state: 'No new notifications'
@@ -433,6 +434,9 @@ support:
     contact_type_billing: 'Billing question'
     contact_type_other: 'Other'
     button_send: 'Send'
+    confirm_title: 'Thank you - we received your request'
+    confirm_body: 'Your message has been sent. We will get back to you as soon as we can, usually within 2 working days.'
+    confirm_back: 'Back to homepage'
 report:
     page_title_image: 'Report Image'
     page_title_success: 'Report Submitted'
