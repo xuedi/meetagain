@@ -250,6 +250,42 @@ class IndexNowServiceTest extends TestCase
         static::assertSame('example.com', $result['host']);
     }
 
+    public function testSubmitUrlsBuildsKeyLocationFromGivenHostAndSubmitsGivenUrls(): void
+    {
+        // Arrange
+        $appStateStub = $this->createStub(AppStateService::class);
+        $appStateStub->method('get')->willReturn('abc123def456abc1');
+
+        $responseStub = $this->createStub(ResponseInterface::class);
+        $responseStub->method('getStatusCode')->willReturn(200);
+
+        $httpClientMock = $this->createMock(HttpClientInterface::class);
+        $httpClientMock
+            ->expects($this->once())
+            ->method('request')
+            ->with(
+                'POST',
+                'https://api.indexnow.org/IndexNow',
+                static::callback(
+                    static fn(array $options): bool => (
+                        $options['json']['host'] === 'other.example.org'
+                        && $options['json']['keyLocation'] === 'https://other.example.org/abc123def456abc1.txt'
+                        && $options['json']['urlList'] === ['https://other.example.org/en/']
+                    ),
+                ),
+            )
+            ->willReturn($responseStub);
+
+        $service = $this->makeService(appStateService: $appStateStub, httpClient: $httpClientMock);
+
+        // Act
+        $result = $service->submitUrls('other.example.org', ['https://other.example.org/en/']);
+
+        // Assert
+        static::assertSame(200, $result['status']);
+        static::assertSame('other.example.org', $result['host']);
+    }
+
     public function testGetLastSubmittedAtReturnsNullWhenNeverSubmitted(): void
     {
         // Arrange
