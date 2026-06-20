@@ -93,14 +93,28 @@ readonly class IndexNowService
      */
     public function submit(): array
     {
-        $key = $this->getOrCreateKey();
         $host = parse_url($this->configService->getHost(), PHP_URL_HOST) ?? $this->configService->getHost();
+
+        return $this->submitUrls($host, $this->getUrlList());
+    }
+
+    /**
+     * Submit an explicit URL list to IndexNow for a given host. The key file is served by this app
+     * on every host it answers, so the shared key validates against any of them; only the payload
+     * `host` and `keyLocation` change per host.
+     *
+     * @param array<string> $urls
+     * @return array{status: int, host: string}
+     */
+    public function submitUrls(string $host, array $urls): array
+    {
+        $key = $this->getOrCreateKey();
 
         $payload = [
             'host' => $host,
             'key' => $key,
-            'keyLocation' => rtrim($this->configService->getHost(), '/') . '/' . $key . '.txt',
-            'urlList' => $this->getUrlList(),
+            'keyLocation' => 'https://' . $host . '/' . $key . '.txt',
+            'urlList' => $urls,
         ];
 
         $response = $this->httpClient->request('POST', self::INDEXNOW_ENDPOINT, [
