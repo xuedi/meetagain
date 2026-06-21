@@ -78,7 +78,9 @@ jobs:
           --health-retries=5
 
     env:
-      DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain_test
+      # Base dbname only - doctrine.yaml's when@test block appends `_test%TEST_TOKEN%`,
+      # so the effective DB is meetAgain_test (phpunit) / meetAgain_testN (paratest workers).
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain
       REDIS_URL: redis://127.0.0.1:6379
 
     steps:
@@ -124,6 +126,17 @@ jobs:
           php bin/console app:plugin:pre-fixtures
           php bin/console app:fixtures:load --no-interaction --append --group=plugin
           php bin/console app:plugin:post-fixtures
+
+      # Smoke tests run under paratest --processes=4, which sets TEST_TOKEN per worker
+      # so each connects to meetAgain_testN. Clone the canonical meetAgain_test (with its
+      # fixtures already loaded) into the four worker DBs, mirroring bin/test-db-clone.sh.
+      - name: Clone test database for paratest workers
+        run: |
+          mysqldump -h127.0.0.1 -uroot -proot --no-tablespaces --single-transaction --quick meetAgain_test > /tmp/test-template.sql
+          for i in 1 2 3 4; do
+            mysql -h127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS meetAgain_test${i} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+            mysql -h127.0.0.1 -uroot -proot "meetAgain_test${i}" < /tmp/test-template.sql
+          done
 
       - name: Run functional tests
         run: vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=functional --no-coverage
