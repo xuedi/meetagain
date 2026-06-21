@@ -3,6 +3,9 @@
   "extends": [
     "config:best-practices"
   ],
+  "dependencyDashboard": false,
+  "minimumReleaseAge": "3 days",
+  "rebaseWhen": "behind-base-branch",
   "packageRules": [
     {
       "matchManagers": ["dockerfile", "docker-compose"],
