@@ -132,7 +132,7 @@ jobs:
       # fixtures already loaded) into the four worker DBs, mirroring bin/test-db-clone.sh.
       - name: Clone test database for paratest workers
         run: |
-          mysqldump -h127.0.0.1 -uroot -proot --no-tablespaces --single-transaction --quick meetAgain_test > /tmp/test-template.sql
+          mysqldump -h127.0.0.1 -uroot -proot --no-tablespaces --single-transaction --quick --set-gtid-purged=OFF meetAgain_test > /tmp/test-template.sql
           for i in 1 2 3 4; do
             mysql -h127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS meetAgain_test${i} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
             mysql -h127.0.0.1 -uroot -proot "meetAgain_test${i}" < /tmp/test-template.sql
