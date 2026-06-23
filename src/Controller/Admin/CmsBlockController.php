@@ -175,15 +175,17 @@ final class CmsBlockController extends AbstractController
         $blockType = CmsBlockType::from((int) $request->request->get('blockType'));
 
         try {
-            $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
+            $block = $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
         } catch (BlockValidationException $e) {
             $this->addFlash('error', $this->translator->trans('admin_cms.flash_block_validation_error'));
+
+            return $this->redirectToRoute('app_admin_cms_edit', [
+                'id' => $id,
+                'locale' => $locale,
+            ]);
         }
 
-        return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $id,
-            'locale' => $locale,
-        ]);
+        return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $block->getId()]);
     }
 
     #[Route('/block/down', name: 'app_admin_cms_edit_block_down', methods: ['POST'])]
