@@ -44,6 +44,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[IsGranted('ROLE_STEWARD'), Route('/admin/cms')]
@@ -72,6 +73,7 @@ final class CmsController extends AbstractController implements AdminNavigationI
         private readonly ActivityService $activityService,
         private readonly Security $security,
         private readonly TranslatorInterface $translator,
+        private readonly ValidatorInterface $validator,
     ) {}
 
     #[Route('', name: 'app_admin_cms')]
@@ -286,6 +288,12 @@ final class CmsController extends AbstractController implements AdminNavigationI
         $newPage->setLocked(false);
         $newPage->setCreatedBy($user);
         $newPage->setCreatedAt(new DateTimeImmutable());
+
+        if ($this->validator->validate($newPage)->count() > 0) {
+            $this->addFlash('error', 'admin_cms.flash_slug_reserved');
+
+            return $this->redirectToRoute('app_admin_cms');
+        }
 
         $this->em->persist($newPage);
         $this->em->flush();
