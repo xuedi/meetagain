@@ -67,6 +67,7 @@ admin_cms:
     summary_blocks: 'Blöcke'
     summary_languages: 'Sprachen'
     button_add_page: 'Seite hinzufügen'
+    flash_slug_reserved: 'Dieser Slug ist reserviert und kann nicht für eine Seite verwendet werden.'
     announcement_cms_page: 'CMS-Seite'
     announcement_content: 'Inhalt'
     announcement_content_help: 'Der Inhalt wird von der ausgewählten CMS-Seite übernommen.'

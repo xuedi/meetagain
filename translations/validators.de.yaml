@@ -209,3 +209,6 @@ Error: Fehler
 
 # Profile messages namespace - message edit window
 'profile_messages.validator_content_max': 'Der Nachrichtentext darf nicht länger als {{ limit }} Zeichen sein.'
+
+# Admin CMS namespace - reserved slug guard
+'admin_cms.validator_slug_reserved': 'Dieser Slug ist reserviert und kann nicht für eine Seite verwendet werden.'

@@ -4,12 +4,14 @@ namespace App\Entity;
 
 use App\Entity\BlockType\Text as TextType;
 use App\Enum\CmsBlock\CmsBlockType;
+use App\Validator\Constraints\ReservedSlug;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
+#[ReservedSlug]
 class Cms
 {
     #[ORM\Id]
