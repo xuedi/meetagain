@@ -117,4 +117,8 @@
 
 {% block javascripts %}
     <script src="{{ asset('js/admin/cms-facts-row-editor.js') }}" defer></script>
+    {% if newBlocks|filter(blockType => blockType.hasRichText())|length > 0 %}
+        <script src="{{ asset('js/vendor/quill.min.js') }}"></script>
+        <script src="{{ asset('js/admin/quill-editor.js') }}" defer></script>
+    {% endif %}
 {% endblock %}
