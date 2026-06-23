@@ -160,4 +160,40 @@ class CmsRepository extends ServiceEntityRepository
             return $this->createQueryBuilder('c')->select('c.id')->where('c.locked = true')->getQuery()->getSingleColumnResult();
         });
     }
+
+    /**
+     * @return array<string>
+     */
+    public function findLockedSlugs(): array
+    {
+        return $this->cache->get('cms_locked_slugs', function (ItemInterface $item): array {
+            $item->expiresAfter(self::CACHE_TTL);
+
+            return $this
+                ->createQueryBuilder('c')
+                ->select('c.slug')
+                ->where('c.locked = true')
+                ->andWhere('c.slug IS NOT NULL')
+                ->getQuery()
+                ->getSingleColumnResult();
+        });
+    }
+
+    /**
+     * Reads the persisted slug straight from the database by id. A scalar query
+     * is used deliberately so an unflushed in-memory slug change on the managed
+     * entity does not mask the originally stored value.
+     */
+    public function findSlugById(int $id): ?string
+    {
+        $rows = $this
+            ->createQueryBuilder('c')
+            ->select('c.slug')
+            ->where('c.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        return $rows[0] ?? null;
+    }
 }

@@ -40,3 +40,6 @@ Error: 错误
 
 # Profile messages namespace - message edit window
 'profile_messages.validator_content_max': '消息内容不能超过 {limit} 个字符。'
+
+# Admin CMS namespace - reserved slug guard
+'admin_cms.validator_slug_reserved': '该别名为保留别名，不能用于页面。'
