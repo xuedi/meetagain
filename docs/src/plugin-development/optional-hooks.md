@@ -14,6 +14,7 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 | `EventFilterInterface`                        | Control which events are visible                     | `getEventIdFilter()`                  |
 | `MenuFilterInterface`                         | Filter or modify navigation links                    | `filterMenuLinks()`                   |
 | `CmsFilterInterface`                          | Control which CMS pages are visible                  | `getCmsPageSlugs()`                   |
+| `ReservedSlugProviderInterface`               | Reserve slugs the CMS editor must refuse to assign   | `getReservedSlugs()`                  |
 | `MemberFilterInterface`                       | Filter which members appear in lists                 | `getUserIds()`                        |
 | `EventFilterFormContributorInterface`         | Add fields to the event filter form                  | `addFields()`                         |
 | `NotificationProviderInterface`               | Add informational items to the notification bell     | `getNotifications()`                  |
@@ -264,6 +265,36 @@ readonly class CmsContextFilter implements CmsFilterInterface
         // Return slugs of pages that SHOULD be visible.
         // Empty array = no filtering.
         return $this->getVisiblePageSlugs();
+    }
+}
+```
+
+---
+
+### ReservedSlugProviderInterface
+
+**Purpose:** Reserve URL slugs so the CMS editor refuses to assign them to a page. Useful when your plugin
+registers a fixed route (e.g. `/pricing`) that takes precedence over the CMS catch-all: without reserving the
+slug, an editor could save a `pricing` page that silently never renders because your route wins.
+
+**File:** `src/Cms/ReservedSlug/ReservedSlugProviderInterface.php`
+
+**Tag:** auto-applied by `#[AutoconfigureTag]` on the interface - just implement it, no attribute needed.
+
+**When called:** When the CMS editor validates a page slug on save. All providers' results are unioned: a slug
+any provider returns is reserved.
+
+```php
+namespace Plugin\YourPlugin\Cms\ReservedSlug;
+
+use App\Cms\ReservedSlug\ReservedSlugProviderInterface;
+
+final readonly class MyRouteSlugProvider implements ReservedSlugProviderInterface
+{
+    public function getReservedSlugs(): iterable
+    {
+        // Slugs your plugin's fixed routes claim. Keep in sync with your routes.
+        return ['pricing', 'features'];
     }
 }
 ```

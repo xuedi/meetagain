@@ -27,7 +27,7 @@ class CmsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('slug', TextType::class, [
-            'label' => false, // TODO: add SLUG restrains
+            'label' => false,
         ])->add('published', ChoiceType::class, [
             'label' => false,
             'choices' => [
