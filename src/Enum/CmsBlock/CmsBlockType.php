@@ -51,4 +51,15 @@ enum CmsBlockType: int
     {
         return $this->getBlockClass()::getFieldDefinitions();
     }
+
+    public function hasRichText(): bool
+    {
+        foreach ($this->getFieldDefinitions() as $field) {
+            if ($field->richText) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

@@ -173,6 +173,8 @@ admin_cms:
     field_menu_locations: '菜单位置'
     flash_invalid_file: '无效文件：%error%'
     flash_block_validation_error: '块无法保存。'
+    block_delete_title: '删除此区块'
+    block_delete_warning: '此区块及其附带的任何图片都将被永久删除。此操作无法撤销。'
 admin_email:
     tab_templates: '模板'
     tab_sendlog: '发送日志'

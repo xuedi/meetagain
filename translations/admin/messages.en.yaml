@@ -173,6 +173,8 @@ admin_cms:
     field_menu_locations: 'Menu Locations'
     flash_invalid_file: 'Invalid file: %error%'
     flash_block_validation_error: 'Block could not be saved.'
+    block_delete_title: 'Delete this block'
+    block_delete_warning: 'This block and any image attached to it will be permanently removed. This cannot be undone.'
 admin_email:
     tab_templates: 'Templates'
     tab_sendlog: 'Send log'
