@@ -71,6 +71,7 @@ class EventType extends AbstractType
             ->add('recurringRule', EnumType::class, [
                 'class' => EventInterval::class,
                 'label' => $this->translator->trans('admin_event.form_label_recurring'),
+                'choices' => EventInterval::getChoices($this->translator),
                 'placeholder' => $this->translator->trans('admin_event.form_placeholder_non_recurring'),
                 'required' => false,
                 'expanded' => false,
