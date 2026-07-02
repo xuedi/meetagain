@@ -20,13 +20,19 @@
 
                 <div class="columns">
                     <div class="column is-4">
-                        {{ form_row(form.recurringRule) }}
+                        {{ form_row(form.seriesRule) }}
                     </div>
                     <div class="column is-4">
                         {{ form_row(form.type) }}
                     </div>
                     <div class="column is-4">
                         {{ form_row(form.location) }}
+                    </div>
+                </div>
+
+                <div class="columns is-hidden" id="series-name-wrapper">
+                    <div class="column is-8">
+                        {{ form_row(form.seriesName) }}
                     </div>
                 </div>
             </div>
@@ -47,4 +53,18 @@
 
         {{ form_end(form) }}
     </div>
+
+    <script type="text/javascript">
+
+        document.addEventListener('DOMContentLoaded', function () {
+            let ruleSelect = document.getElementById('{{ form.seriesRule.vars.id }}');
+            let wrapper = document.getElementById('series-name-wrapper');
+            let toggle = function () {
+                wrapper.classList.toggle('is-hidden', ruleSelect.value === '');
+            };
+            toggle();
+            ruleSelect.addEventListener('change', toggle);
+        });
+
+    </script>
 {% endblock %}
