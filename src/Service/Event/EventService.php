@@ -12,7 +12,11 @@ use App\Enum\EventType;
 use App\Plugin;
 use App\Repository\EventRepository;
 use App\Service\Config\PluginService;
+use App\ValueObject\RealignmentPlan;
+use App\ValueObject\RealignmentResult;
+use App\ValueObject\ScheduleChange;
 use DateTime;
+use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -45,9 +49,19 @@ readonly class EventService
         return $this->structureList($result);
     }
 
-    public function updateRecurringEvents(Event $event): int
+    public function updateRecurringEvents(Event $event, ?DateTimeInterface $syncFrom = null): int
     {
-        return $this->recurringEventService->updateRecurringEvents($event);
+        return $this->recurringEventService->updateRecurringEvents($event, $syncFrom);
+    }
+
+    public function planRealignment(Event $anchor, ScheduleChange $change): RealignmentPlan
+    {
+        return $this->recurringEventService->planRealignment($anchor, $change);
+    }
+
+    public function executeRealignment(RealignmentPlan $plan): RealignmentResult
+    {
+        return $this->recurringEventService->executeRealignment($plan);
     }
 
     public function cancelEvent(Event $event): void

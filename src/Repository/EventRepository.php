@@ -438,6 +438,20 @@ class EventRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
+    public function findNewestAutoChild(int $parentEventId): ?Event
+    {
+        return $this
+            ->createQueryBuilder('e')
+            ->where('e.recurringOf = :parentId')
+            ->andWhere('e.status != :locked')
+            ->setParameter('parentId', $parentEventId)
+            ->setParameter('locked', EventStatus::Locked->value)
+            ->orderBy('e.start', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /**
      * Get the ID of the next upcoming event.
      *

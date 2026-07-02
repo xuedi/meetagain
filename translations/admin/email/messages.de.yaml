@@ -42,6 +42,7 @@ admin_email_templates:
     trigger_event_reminder: 'bis zu 5 Std. vor dem Event'
     trigger_upcoming_events: 'Sonntag 12:00'
     trigger_event_update_notification: 'wenn Admin Beginn, Ort oder Absage eines Events ändert'
+    trigger_series_rescheduled: 'Terminserie verschoben - Zusagen entfernt'
 admin_email_sendlog:
     col_subject: 'Betreff'
     page_title: 'E-Mail-Sendeprotokoll'

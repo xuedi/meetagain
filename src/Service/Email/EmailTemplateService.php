@@ -30,6 +30,7 @@ readonly class EmailTemplateService
             EmailType::EventReminder->value => 'Reminder: {{eventTitle}} is today',
             EmailType::UpcomingEvents->value => 'Upcoming events this week',
             EmailType::EventUpdateNotification->value => 'Update to event: {{eventTitle}}',
+            EmailType::SeriesRescheduled->value => 'Series rescheduled: {{eventTitle}}',
         ],
         'de' => [
             EmailType::VerificationRequest->value => 'Bitte bestätige deine E-Mail',
@@ -45,6 +46,7 @@ readonly class EmailTemplateService
             EmailType::EventReminder->value => 'Erinnerung: {{eventTitle}} ist heute',
             EmailType::UpcomingEvents->value => 'Deine Veranstaltungen diese Woche',
             EmailType::EventUpdateNotification->value => 'Änderung an Veranstaltung: {{eventTitle}}',
+            EmailType::SeriesRescheduled->value => 'Terminserie verschoben: {{eventTitle}}',
         ],
         'zh' => [
             EmailType::VerificationRequest->value => '请确认您的邮箱',
@@ -60,6 +62,7 @@ readonly class EmailTemplateService
             EmailType::EventReminder->value => '提醒：{{eventTitle}} 就在今天',
             EmailType::UpcomingEvents->value => '本周即将举行的活动',
             EmailType::EventUpdateNotification->value => '活动有变更：{{eventTitle}}',
+            EmailType::SeriesRescheduled->value => '系列活动时间调整：{{eventTitle}}',
         ],
     ];
 
@@ -146,6 +149,16 @@ readonly class EmailTemplateService
             'lang',
             'greeting',
         ],
+        EmailType::SeriesRescheduled->value => [
+            'username',
+            'eventTitle',
+            'eventId',
+            'host',
+            'lang',
+            'greeting',
+            'removedDatesHtml',
+            'newStart',
+        ],
     ];
 
     public function __construct(
@@ -203,73 +216,16 @@ readonly class EmailTemplateService
     {
         $subjects = self::SUBJECTS[$language] ?? self::SUBJECTS[self::DEFAULT_LANGUAGE];
 
-        return [
-            EmailType::VerificationRequest->value => [
-                'subject' => $subjects[EmailType::VerificationRequest->value],
-                'body' => $this->loadTemplateBody(EmailType::VerificationRequest, $language),
-                'variables' => self::VARIABLES[EmailType::VerificationRequest->value],
-            ],
-            EmailType::Welcome->value => [
-                'subject' => $subjects[EmailType::Welcome->value],
-                'body' => $this->loadTemplateBody(EmailType::Welcome, $language),
-                'variables' => self::VARIABLES[EmailType::Welcome->value],
-            ],
-            EmailType::PasswordResetRequest->value => [
-                'subject' => $subjects[EmailType::PasswordResetRequest->value],
-                'body' => $this->loadTemplateBody(EmailType::PasswordResetRequest, $language),
-                'variables' => self::VARIABLES[EmailType::PasswordResetRequest->value],
-            ],
-            EmailType::NotificationMessage->value => [
-                'subject' => $subjects[EmailType::NotificationMessage->value],
-                'body' => $this->loadTemplateBody(EmailType::NotificationMessage, $language),
-                'variables' => self::VARIABLES[EmailType::NotificationMessage->value],
-            ],
-            EmailType::NotificationRsvpAggregated->value => [
-                'subject' => $subjects[EmailType::NotificationRsvpAggregated->value],
-                'body' => $this->loadTemplateBody(EmailType::NotificationRsvpAggregated, $language),
-                'variables' => self::VARIABLES[EmailType::NotificationRsvpAggregated->value],
-            ],
-            EmailType::NotificationEventCanceled->value => [
-                'subject' => $subjects[EmailType::NotificationEventCanceled->value],
-                'body' => $this->loadTemplateBody(EmailType::NotificationEventCanceled, $language),
-                'variables' => self::VARIABLES[EmailType::NotificationEventCanceled->value],
-            ],
-            EmailType::Announcement->value => [
-                'subject' => $subjects[EmailType::Announcement->value],
-                'body' => $this->loadTemplateBody(EmailType::Announcement, $language),
-                'variables' => self::VARIABLES[EmailType::Announcement->value],
-            ],
-            EmailType::SupportNotification->value => [
-                'subject' => $subjects[EmailType::SupportNotification->value],
-                'body' => $this->loadTemplateBody(EmailType::SupportNotification, $language),
-                'variables' => self::VARIABLES[EmailType::SupportNotification->value],
-            ],
-            EmailType::SupportResponse->value => [
-                'subject' => $subjects[EmailType::SupportResponse->value],
-                'body' => $this->loadTemplateBody(EmailType::SupportResponse, $language),
-                'variables' => self::VARIABLES[EmailType::SupportResponse->value],
-            ],
-            EmailType::AdminNotification->value => [
-                'subject' => $subjects[EmailType::AdminNotification->value],
-                'body' => $this->loadTemplateBody(EmailType::AdminNotification, $language),
-                'variables' => self::VARIABLES[EmailType::AdminNotification->value],
-            ],
-            EmailType::EventReminder->value => [
-                'subject' => $subjects[EmailType::EventReminder->value],
-                'body' => $this->loadTemplateBody(EmailType::EventReminder, $language),
-                'variables' => self::VARIABLES[EmailType::EventReminder->value],
-            ],
-            EmailType::UpcomingEvents->value => [
-                'subject' => $subjects[EmailType::UpcomingEvents->value],
-                'body' => $this->loadTemplateBody(EmailType::UpcomingEvents, $language),
-                'variables' => self::VARIABLES[EmailType::UpcomingEvents->value],
-            ],
-            EmailType::EventUpdateNotification->value => [
-                'subject' => $subjects[EmailType::EventUpdateNotification->value],
-                'body' => $this->loadTemplateBody(EmailType::EventUpdateNotification, $language),
-                'variables' => self::VARIABLES[EmailType::EventUpdateNotification->value],
-            ],
-        ];
+        $templates = [];
+        foreach (self::VARIABLES as $type => $variables) {
+            $templates[$type] = [
+                'subject' => $subjects[$type],
+                'body' => $this->loadTemplateBody(EmailType::from($type), $language),
+                'variables' => $variables,
+            ];
+        }
+
+        return $templates;
     }
 
     private function loadTemplateBody(EmailType $type, string $language = self::DEFAULT_LANGUAGE): string
