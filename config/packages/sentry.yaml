@@ -6,6 +6,8 @@ sentry:
             - 'Symfony\Component\ErrorHandler\Error\FatalError'
             - 'Symfony\Component\Debug\Exception\FatalErrorException'
             - 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'
+            - 'Symfony\Component\Security\Core\Exception\AccessDeniedException'
+            - 'Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException'
         traces_sample_rate: 1.0
     register_error_listener: true
     register_error_handler: false
