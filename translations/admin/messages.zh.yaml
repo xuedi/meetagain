@@ -544,6 +544,10 @@ admin_security:
     empty_incidents: '暂无实时封禁记录。'
     empty_rate_limiting: '暂无限速事件。'
     empty_blocked: '当前无任何封禁。'
+    empty_access_denied: '暂无拒绝访问事件记录。'
+    button_violation_log: '违规日志'
+    summary_total_access_denied: '拒绝访问事件'
+    summary_no_access_denied_in_range: '范围内无事件'
 admin_security_permissions:
     help: '按所需最低角色分组列出每个管理路由。角色要求来自 PermissionAttribute 常量和 IsGranted 属性。'
     anon_no_auth: '无需认证即可访问。'

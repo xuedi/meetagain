@@ -6,6 +6,7 @@ use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Section\AdminCollapsibleSection;
 use App\Admin\Section\Items\AdminSectionTextItem;
 use App\Admin\Tabs\AdminTabsInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Security\Permission\Attribute\PermissionAttribute;
@@ -61,7 +62,16 @@ final class PermissionsController extends AbstractSecurityController implements 
             ];
         }
 
-        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_security_permissions.help'))]);
+        $adminTop = new AdminTop(
+            info: [new AdminTopInfoText($this->translator->trans('admin_security_permissions.help'))],
+            actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('admin_security.button_violation_log'),
+                    target: $this->generateUrl('app_admin_security_permissions_violations'),
+                    icon: 'ban',
+                ),
+            ],
+        );
 
         return $this->render('admin/security/permissions/index.html.twig', [
             'active' => 'security',
