@@ -10,7 +10,6 @@
             <thead>
             <tr>
                 <th>{{ 'admin_event.col_title'|trans }}</th>
-                <th>{{ 'admin_event.col_created_at'|trans }}</th>
                 <th>{{ 'admin_event.col_event_time'|trans }}</th>
                 <th>{{ 'admin_event.col_recurring'|trans }}</th>
                 <th>{{ 'admin_event.col_location'|trans }}</th>
@@ -33,13 +32,15 @@
                 <tr class="{{ textColor }} {% if event.id == nextEvent and not event.canceled %}has-background-warning-light{% endif %}">
                     {% set title = event.title(app.locale) %}
                     <td title="{{ title }}">{{ title|length > 20 ? title|slice(0, 20) ~ '...' : title }}</td>
-                    <td>{{ event.createdAt|date('Y-m-d') }}</td>
-                    <td>{{ event.start|date('Y-m-d') }}</td>
+                    <td>{{ event.start|date('Y-m-d H:i') }}</td>
                     <td>
                         {% if event.recurringOf is not null %}
-                            {{ 'admin_event.recurring_auto'|trans }}
+                            {% set parentRule = parentRules[event.recurringOf] ?? null %}
+                            {{ parentRule ? parentRule.label()|trans : 'admin_event.recurring_auto'|trans }}
+                        {% elseif event.recurringRule is null %}
+                            {{ 'admin_event.recurring_no'|trans }}
                         {% else %}
-                            {% if event.recurringRule is null %}{{ 'admin_event.recurring_no'|trans }}{% else %}{{ event.recurringRule.name|trans }}{% endif %}
+                            {{ event.recurringRule.label()|trans }}
                         {% endif %}
                     </td>
                     {% set locationName = event.location ? event.location.name : '-' %}

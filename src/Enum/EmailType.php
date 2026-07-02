@@ -17,4 +17,5 @@ enum EmailType: string
     case EventReminder = 'event_reminder';
     case UpcomingEvents = 'upcoming_events';
     case EventUpdateNotification = 'event_update_notification';
+    case SeriesRescheduled = 'series_rescheduled';
 }

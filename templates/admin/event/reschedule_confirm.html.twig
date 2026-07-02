@@ -1,0 +1,98 @@
+{% extends 'admin/base.html.twig' %}
+
+{% macro hidden_fields(data, prefix) %}
+    {% for key, value in data %}
+        {% set name = prefix ? prefix ~ '[' ~ key ~ ']' : key %}
+        {% if value is iterable %}
+            {{ _self.hidden_fields(value, name) }}
+        {% else %}
+            <input type="hidden" name="{{ name }}" value="{{ value }}">
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <article class="message is-warning">
+            <div class="message-header">
+                <p>{{ 'admin_event.reschedule_intro_title'|trans }}</p>
+            </div>
+            <div class="message-body">
+                {{ 'admin_event.reschedule_intro_content'|trans|raw }}
+                <p>{{ 'admin_event.reschedule_note_topup'|trans }}</p>
+                {% if pendingImageDropped %}
+                    <p>{{ 'admin_event.reschedule_note_image_dropped'|trans }}</p>
+                {% endif %}
+            </div>
+        </article>
+
+        <div class="columns">
+            <div class="column is-6">
+                <h2 class="title is-5">{{ 'admin_event.reschedule_old_schedule'|trans }}</h2>
+                <p>
+                    <strong>{{ 'admin_event.reschedule_label_rule'|trans }}:</strong>
+                    {{ change.oldRule ? change.oldRule.label()|trans : '-' }}<br>
+                    <strong>{{ 'admin_event.reschedule_label_start'|trans }}:</strong>
+                    {{ change.oldStart|date('Y-m-d H:i') }}
+                </p>
+            </div>
+            <div class="column is-6">
+                <h2 class="title is-5">{{ 'admin_event.reschedule_new_schedule'|trans }}</h2>
+                <p>
+                    <strong>{{ 'admin_event.reschedule_label_rule'|trans }}:</strong>
+                    {{ change.newRule ? change.newRule.label()|trans : '-' }}<br>
+                    <strong>{{ 'admin_event.reschedule_label_start'|trans }}:</strong>
+                    {{ change.newStart|date('Y-m-d H:i') }}
+                </p>
+            </div>
+        </div>
+
+        <table class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>{{ 'admin_event.reschedule_col_current'|trans }}</th>
+                <th>{{ 'admin_event.reschedule_col_new'|trans }}</th>
+                <th>{{ 'admin_event.reschedule_col_rsvp'|trans }}</th>
+                <th>{{ 'admin_event.reschedule_col_outcome'|trans }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in plan.items %}
+                <tr>
+                    <td>{{ item.currentStart|date('Y-m-d H:i') }}</td>
+                    <td>{{ item.newStart ? item.newStart|date('Y-m-d H:i') : '-' }}</td>
+                    <td>{{ item.rsvpCount }}</td>
+                    <td>
+                        <span class="tag {{ item.outcome.value == 'moved' ? 'is-warning' : 'is-light' }}">
+                            {{ item.outcome.label()|trans }}
+                        </span>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="field is-grouped">
+            <div class="control">
+                <form method="post" action="{{ path('app_admin_event_edit', {'id': event.id}) }}">
+                    {{ _self.hidden_fields(payload, '') }}
+                    <input type="hidden" name="reschedule_confirm" value="1">
+                    <button type="submit" class="button is-danger">{{ 'admin_event.reschedule_button_confirm'|trans }}</button>
+                </form>
+            </div>
+            <div class="control">
+                <form method="post" action="{{ path('app_admin_event_edit', {'id': event.id}) }}">
+                    {{ _self.hidden_fields(payload, '') }}
+                    <input type="hidden" name="reschedule_cancel" value="1">
+                    <button type="submit" class="button is-light">{{ 'admin_event.reschedule_button_cancel'|trans }}</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

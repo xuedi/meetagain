@@ -1,0 +1,24 @@
+<h1>Hallo {{username}}!</h1>
+
+<p>
+    Die Terminserie <b>{{eventTitle}}</b> wurde auf einen neuen Zeitplan verschoben, beginnend am <b>{{newStart}}</b>.
+</p>
+
+<p>
+    Da du dich für konkrete Termine angemeldet hattest, wurden deine Zusagen für die folgenden Termine entfernt:
+</p>
+
+{{removedDatesHtml}}
+
+<p>
+    Wenn dir die neuen Termine passen, kannst du dich <a href="{{host}}/{{lang}}/event/{{eventId}}">hier erneut anmelden</a>.
+</p>
+<p>
+    Wenn du diese Benachrichtigungen nicht mehr erhalten möchtest, kannst du<br>
+    sie in deinen <a href="{{host}}/{{lang}}/profile/config/">Einstellungen</a> deaktivieren.
+</p>
+
+<p>
+    Viele Grüße,<br>
+    {{greeting}}
+</p>
