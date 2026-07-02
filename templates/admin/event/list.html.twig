@@ -21,37 +21,30 @@
             </thead>
             <tbody>
             {% for event in events %}
-                {% set textColor = '' %}
-                {% if event.canceled %}
-                    {% set textColor = 'has-background-danger-light' %}
-                {% elseif event.recurringOf is not null %}
-                    {% set textColor = 'has-text-grey-light' %}
-                {% elseif event.recurringRule is not null %}
-                    {% set textColor = 'has-background-info-light' %}
-                {% endif %}
-                <tr class="{{ textColor }} {% if event.id == nextEvent and not event.canceled %}has-background-warning-light{% endif %}">
+                <tr>
                     {% set title = event.title(app.locale) %}
                     <td title="{{ title }}">{{ title|length > 20 ? title|slice(0, 20) ~ '...' : title }}</td>
-                    <td>{{ event.start|date('Y-m-d H:i') }}</td>
                     <td>
-                        {% if event.recurringOf is not null %}
-                            {% set parentRule = parentRules[event.recurringOf] ?? null %}
-                            {{ parentRule ? parentRule.label()|trans : 'admin_event.recurring_auto'|trans }}
-                        {% elseif event.recurringRule is null %}
-                            {{ 'admin_event.recurring_no'|trans }}
-                        {% else %}
-                            {{ event.recurringRule.label()|trans }}
+                        {{ event.start|date('Y-m-d H:i') }}
+                        {% if event.id == nextEvent and not event.canceled %}
+                            <span class="icon has-text-link" title="{{ 'admin_event.next_event'|trans }}"><i class="fa fa-arrow-left"></i></span>
                         {% endif %}
+                    </td>
+                    <td title="{{ event.series ? event.series.name : '' }}">
+                        {{ (event.series is null ? 'admin_event.recurring_no' : 'admin_event.recurring_yes')|trans }}
                     </td>
                     {% set locationName = event.location ? event.location.name : '-' %}
                     <td title="{{ locationName }}">{{ locationName|length > 20 ? locationName|slice(0, 20) ~ '...' : locationName }}</td>
                     <td>
-                        {% if event.status.value == 'locked' %}
+                        {% if event.canceled %}
+                            <span class="icon has-text-danger" title="{{ 'events.tag_canceled'|trans }}"><i class="fa fa-ban"></i></span>
+                        {% elseif event.status.value == 'locked' %}
                             <span class="icon has-text-warning" title="{{ 'events.status_locked'|trans }}"><i class="fa fa-lock"></i></span>
-                        {% elseif event.status.value == 'published' %}
-                            <span class="icon has-text-success" title="{{ 'events.status_published'|trans }}"><i class="fa fa-eye"></i></span>
-                        {% else %}
+                        {% elseif event.status.value == 'draft' %}
                             <span class="icon has-text-grey-light" title="{{ 'events.status_draft'|trans }}"><i class="fa fa-eye-slash"></i></span>
+                        {% endif %}
+                        {% if event.series is not null and event.initial %}
+                            <span class="icon has-text-info" title="{{ 'admin_event.manually_edited'|trans }}"><i class="fa fa-user-pen"></i></span>
                         {% endif %}
                     </td>
                     <td>{{ rsvpCounts[event.id] ?? 0 }}</td>
@@ -68,24 +61,6 @@
             {% endfor %}
             </tbody>
         </table>
-
-        <div class="mt-4 has-text-centered">
-            <span class="tag has-background-info-light">
-                <span>{{ 'admin_event.legend_recurring_events'|trans }}</span>
-            </span>
-            <span class="tag is-white">
-                <span class="">{{ 'admin_event.legend_one_time_events'|trans }}</span>
-            </span>
-            <span class="tag has-text-grey-light is-white">
-                <span>{{ 'admin_event.legend_auto_generated'|trans }}</span>
-            </span>
-            <span class="tag has-background-warning-light">
-                <span>{{ 'admin_event.legend_next_event'|trans }}</span>
-            </span>
-            <span class="tag has-background-danger-light">
-                <span>{{ 'admin_event.legend_canceled_events'|trans }}</span>
-            </span>
-        </div>
 
     </div>
 

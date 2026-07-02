@@ -2,48 +2,51 @@
 
 {% block content %}
 
-    {% include '_components/warning_box.html.twig' with {
-        'id': 'event-delete-warning',
-        'title': 'admin_event.warning_delete_title'|trans,
-        'content': 'admin_event.warning_delete_content'|trans,
-        'buttonLabel': 'admin_event.warning_delete_button'|trans,
-        'buttonUrl': path('app_admin_event_delete', {'id': event.id}),
-        'type': 'danger'
-    } %}
-
-    {% include '_components/warning_box.html.twig' with {
-        'id': 'event-cancel-warning',
-        'title': 'admin_event.warning_cancel_title'|trans,
-        'content': 'admin_event.warning_cancel_content'|trans,
-        'buttonLabel': 'admin_event.warning_cancel_button'|trans,
-        'buttonUrl': path('app_admin_event_cancel', {'id': event.id}),
-        'type': 'warning'
-    } %}
-
-    {% include '_components/warning_box.html.twig' with {
-        'id': 'event-uncancel-warning',
-        'title': 'admin_event.warning_uncancel_title'|trans,
-        'content': 'admin_event.warning_uncancel_content'|trans,
-        'buttonLabel': 'admin_event.warning_uncancel_button'|trans,
-        'buttonUrl': path('app_admin_event_uncancel', {'id': event.id}),
-        'type': 'warning'
-    } %}
-
     <div class="container">
 
         {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
+        {% include '_components/warning_box.html.twig' with {
+            'id': 'event-delete-warning',
+            'title': 'admin_event.warning_delete_title'|trans,
+            'content': 'admin_event.warning_delete_content'|trans,
+            'buttonLabel': 'admin_event.warning_delete_button'|trans,
+            'buttonUrl': path('app_admin_event_delete', {'id': event.id}),
+            'type': 'danger'
+        } %}
+
+        {% include '_components/warning_box.html.twig' with {
+            'id': 'event-cancel-warning',
+            'title': 'admin_event.warning_cancel_title'|trans,
+            'content': 'admin_event.warning_cancel_content'|trans,
+            'buttonLabel': 'admin_event.warning_cancel_button'|trans,
+            'buttonUrl': path('app_admin_event_cancel', {'id': event.id}),
+            'type': 'warning'
+        } %}
+
+        {% include '_components/warning_box.html.twig' with {
+            'id': 'event-uncancel-warning',
+            'title': 'admin_event.warning_uncancel_title'|trans,
+            'content': 'admin_event.warning_uncancel_content'|trans,
+            'buttonLabel': 'admin_event.warning_uncancel_button'|trans,
+            'buttonUrl': path('app_admin_event_uncancel', {'id': event.id}),
+            'type': 'warning'
+        } %}
+
         {{ form_start(form) }}
 
         <div class="columns">
-            <div class="column is-3">
+            <div class="column is-2">
                 {{ form_row(form.start) }}
             </div>
-            <div class="column is-3">
+            <div class="column is-2">
                 {{ form_row(form.stop) }}
             </div>
             <div class="column is-2">
-                {{ form_row(form.recurringRule) }}
+                {{ form_row(form.seriesRule) }}
+            </div>
+            <div class="column is-2 {% if event.series is null %}is-hidden{% endif %}" id="series-name-wrapper">
+                {{ form_row(form.seriesName) }}
             </div>
             <div class="column is-2">
                 {{ form_row(form.location) }}
@@ -174,6 +177,18 @@
     <script src="{{ asset('js/admin/quill-editor.js') }}" defer></script>
 
     <script type="text/javascript">
+
+        {% if event.series is null %}
+        document.addEventListener('DOMContentLoaded', function () {
+            let ruleSelect = document.getElementById('{{ form.seriesRule.vars.id }}');
+            let wrapper = document.getElementById('series-name-wrapper');
+            let toggle = function () {
+                wrapper.classList.toggle('is-hidden', ruleSelect.value === '');
+            };
+            toggle();
+            ruleSelect.addEventListener('change', toggle);
+        });
+        {% endif %}
 
         document.addEventListener('DOMContentLoaded', function () {
             let buttons = document.getElementsByClassName('translation-button');

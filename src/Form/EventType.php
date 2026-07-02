@@ -68,7 +68,7 @@ class EventType extends AbstractType
             ->add('stop', DateTimeType::class, [
                 'widget' => 'single_text',
             ])
-            ->add('recurringRule', EnumType::class, [
+            ->add('seriesRule', EnumType::class, [
                 'class' => EventInterval::class,
                 'label' => $this->translator->trans('admin_event.form_label_recurring'),
                 'choices' => EventInterval::getChoices($this->translator),
@@ -76,7 +76,15 @@ class EventType extends AbstractType
                 'required' => false,
                 'expanded' => false,
                 'multiple' => false,
-                'disabled' => $event?->getRecurringOf() !== null,
+                'mapped' => false,
+                'data' => $event?->getSeries()?->getRule(),
+            ])
+            ->add('seriesName', TextType::class, [
+                'label' => $this->translator->trans('admin_event.form_label_series_name'),
+                'required' => false,
+                'mapped' => false,
+                'data' => $event?->getSeries()?->getName(),
+                'attr' => ['placeholder' => $this->translator->trans('admin_event.form_placeholder_series_name')],
             ])
             ->add('type', EnumType::class, [
                 'class' => EventTypeEnum::class,

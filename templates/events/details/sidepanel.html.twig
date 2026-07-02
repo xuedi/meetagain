@@ -9,8 +9,8 @@
     <strong>{{ event.start|date('d. F Y') }}</strong>
     <p>
         {{ event.start|date('H:i') }} to {{ event.stop|date('H:i') }}<br>
-        {% if event.recurringRule is defined and event.recurringRule.name is defined %}
-            {{ 'events.label_recurring'|trans }} {{ event.recurringRule.name }}
+        {% if event.series and event.series.rule %}
+            {{ 'events.label_recurring'|trans }} {{ event.series.rule.label()|trans }}
         {% endif %}
     </p>
 </div>

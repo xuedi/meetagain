@@ -11,7 +11,7 @@ final readonly class RealignmentPlan
      * @param list<RealignmentItem> $items
      */
     public function __construct(
-        public ?int $parentEventId,
+        public ?int $seriesId,
         public int $anchorEventId,
         public ?EventInterval $rule,
         public array $items,

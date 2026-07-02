@@ -67,8 +67,8 @@ class EventAddFixtureCommand extends Command
         $minComments = (int) $input->getOption('min-comments');
         $maxComments = (int) $input->getOption('max-comments');
 
-        // Find all recurring events (events that have a parent)
-        $recurringEvents = $this->em->createQuery('SELECT e FROM App\Entity\Event e WHERE e.recurringOf IS NOT NULL')->getResult();
+        // Find all auto-generated series members
+        $recurringEvents = $this->em->createQuery('SELECT e FROM App\Entity\Event e WHERE e.series IS NOT NULL AND e.initial = false')->getResult();
 
         if ($recurringEvents === []) {
             $output->writeln('<comment>No recurring events found to enhance.</comment>');

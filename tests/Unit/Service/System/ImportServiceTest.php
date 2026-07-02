@@ -2,8 +2,11 @@
 
 namespace Tests\Unit\Service\System;
 
+use App\Entity\Event;
+use App\Entity\EventSeries;
 use App\Entity\Image;
 use App\Entity\User;
+use App\Enum\EventInterval;
 use App\Enum\ImageType;
 use App\ExtendedFilesystem;
 use App\Repository\LocationRepository;
@@ -170,6 +173,127 @@ class ImportServiceTest extends TestCase
         static::assertSame(['/root/a.txt', '/root/sub/b.txt'], $deletedFiles);
         // Subdir removed before root
         static::assertSame(['/root/sub', '/root'], $removedDirs);
+    }
+
+    public function testImportEventsSynthesizesSeriesFromLegacyRecurringRule(): void
+    {
+        // Arrange
+        [$service, $persisted] = $this->buildCapturingService();
+
+        $eventsData = [
+            [
+                'start' => '2030-01-01 10:00',
+                'titles' => ['en' => 'My Legacy Event', 'de' => 'Mein Alt-Event'],
+                'recurring_rule' => 'Weekly',
+            ],
+        ];
+
+        // Act
+        $this->invokeImportEvents($service, $eventsData, []);
+
+        // Assert: exactly one series synthesized, named after the en title
+        $series = array_values(array_filter($persisted(), static fn(object $entity): bool => $entity instanceof EventSeries));
+        static::assertCount(1, $series);
+        static::assertSame('My Legacy Event', $series[0]->getName());
+        static::assertSame(EventInterval::Weekly, $series[0]->getRule());
+
+        $events = array_values(array_filter($persisted(), static fn(object $entity): bool => $entity instanceof Event));
+        static::assertCount(1, $events);
+        static::assertSame($series[0], $events[0]->getSeries());
+    }
+
+    public function testImportEventsAttachesSeriesByRef(): void
+    {
+        // Arrange
+        [$service, $persisted] = $this->buildCapturingService();
+        $seriesRefMap = $this->invokeImportSeries($service, [
+            ['ref' => 1, 'name' => 'Series A', 'rule' => 'Monthly'],
+            ['ref' => 2, 'name' => 'Series B', 'rule' => null],
+        ]);
+
+        $eventsData = [
+            [
+                'start' => '2030-01-01 10:00',
+                'titles' => ['en' => 'Member Event'],
+                'series_ref' => 2,
+            ],
+        ];
+
+        // Act
+        $this->invokeImportEvents($service, $eventsData, $seriesRefMap);
+
+        // Assert: member attached by ref, closed series keeps a null rule
+        static::assertSame(EventInterval::Monthly, $seriesRefMap[1]->getRule());
+        static::assertNull($seriesRefMap[2]->getRule());
+        static::assertSame('Series B', $seriesRefMap[2]->getName());
+
+        $events = array_values(array_filter($persisted(), static fn(object $entity): bool => $entity instanceof Event));
+        static::assertCount(1, $events);
+        static::assertSame($seriesRefMap[2], $events[0]->getSeries());
+    }
+
+    public function testImportEventsWithoutSeriesDataStaysSeriesless(): void
+    {
+        // Arrange
+        [$service, $persisted] = $this->buildCapturingService();
+
+        $eventsData = [
+            [
+                'start' => '2030-01-01 10:00',
+                'titles' => ['en' => 'One-Time Event'],
+            ],
+        ];
+
+        // Act
+        $this->invokeImportEvents($service, $eventsData, []);
+
+        // Assert
+        static::assertCount(0, array_filter($persisted(), static fn(object $entity): bool => $entity instanceof EventSeries));
+        $events = array_values(array_filter($persisted(), static fn(object $entity): bool => $entity instanceof Event));
+        static::assertCount(1, $events);
+        static::assertNull($events[0]->getSeries());
+    }
+
+    /**
+     * @return array{ImportService, callable(): array<object>}
+     */
+    private function buildCapturingService(): array
+    {
+        $persisted = [];
+
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist')->willReturnCallback(static function (object $entity) use (&$persisted): void {
+            $persisted[] = $entity;
+        });
+
+        $service = $this->buildService($this->createStub(ExtendedFilesystem::class), $em);
+
+        return [$service, static function () use (&$persisted): array {
+            return $persisted;
+        }];
+    }
+
+    /**
+     * @param array<array<string, mixed>> $seriesData
+     * @return array<int, EventSeries>
+     */
+    private function invokeImportSeries(ImportService $service, array $seriesData): array
+    {
+        $method = new ReflectionMethod($service, 'importSeries');
+
+        return $method->invoke($service, $seriesData);
+    }
+
+    /**
+     * @param array<array<string, mixed>> $eventsData
+     * @param array<int, EventSeries> $seriesRefMap
+     */
+    private function invokeImportEvents(ImportService $service, array $eventsData, array $seriesRefMap): void
+    {
+        $counts = ['eventsCreated' => 0];
+        $method = new ReflectionMethod($service, 'importEvents');
+        $args = [$eventsData, [], $seriesRefMap, [], new User(), '/tmp', &$counts];
+        $method->invokeArgs($service, $args);
     }
 
     private function buildService(ExtendedFilesystem $fs, ?EntityManagerInterface $em = null): ImportService
