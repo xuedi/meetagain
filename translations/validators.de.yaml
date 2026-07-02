@@ -212,3 +212,6 @@ Error: Fehler
 
 # Admin CMS namespace - reserved slug guard
 'admin_cms.validator_slug_reserved': 'Dieser Slug ist reserviert und kann nicht für eine Seite verwendet werden.'
+
+# Admin event namespace - series creation
+'admin_event.validator_series_name_required': 'Bitte einen Namen für die Serie eingeben.'

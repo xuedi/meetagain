@@ -19,6 +19,7 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Tests\Unit\Stubs\EventSeriesStub;
 use Tests\Unit\Stubs\EventStub;
 use Tests\Unit\Stubs\UserStub;
 
@@ -249,12 +250,12 @@ class EventServiceTest extends TestCase
         static::assertSame(0, $subject->updateRecurringEvents($event));
     }
 
-    public function testUpdateRecurringEventsWithParentReturnsCount(): void
+    public function testUpdateRecurringEventsWithSeriesMemberReturnsCount(): void
     {
-        // Arrange: create parent event with recurring rule
+        // Arrange: create a series member
         $parent = new EventStub()
             ->setId(1)
-            ->setRecurringRule(EventInterval::Weekly);
+            ->setSeries(new EventSeriesStub()->setId(9)->setRule(EventInterval::Weekly));
         $parent->setStart(new DateTime('2025-01-01 10:00:00'));
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);
@@ -305,12 +306,12 @@ class EventServiceTest extends TestCase
         static::assertTrue($event->isCanceled());
     }
 
-    public function testUpdateRecurringEventsWithChildUpdatesParent(): void
+    public function testUpdateRecurringEventsWithAutoMemberDelegates(): void
     {
-        // Arrange: create child event with parent reference
+        // Arrange: create an auto-generated series member
         $child = new EventStub()
             ->setId(2)
-            ->setRecurringOf(1)
+            ->setSeries(new EventSeriesStub()->setId(9)->setRule(EventInterval::Weekly))
             ->setStart(new DateTime('+1 week'));
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);
@@ -329,12 +330,12 @@ class EventServiceTest extends TestCase
         static::assertSame(1, $subject->updateRecurringEvents($child));
     }
 
-    public function testUpdateRecurringEventsWithDeletedParentReturnsZero(): void
+    public function testUpdateRecurringEventsWithClosedSeriesReturnsZero(): void
     {
-        // Arrange: create child event with deleted parent reference
+        // Arrange: create a member of a closed series
         $child = new EventStub()
             ->setId(2)
-            ->setRecurringOf(1)
+            ->setSeries(new EventSeriesStub()->setId(9)->setRule(null))
             ->setStart(new DateTime('+1 week'));
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);

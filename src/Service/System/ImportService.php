@@ -8,6 +8,7 @@ use App\Entity\CmsLinkName;
 use App\Entity\CmsMenuLocation;
 use App\Entity\CmsTitle;
 use App\Entity\Event;
+use App\Entity\EventSeries;
 use App\Entity\EventTranslation;
 use App\Entity\Image;
 use App\Entity\Location;
@@ -79,7 +80,8 @@ readonly class ImportService
 
             $locationRefMap = $this->importLocations($data['locations'] ?? [], $systemUser, $counts);
             $userEmailMap = $this->importUsers($data['users'] ?? [], $tempDir, $systemUser, $counts);
-            $this->importEvents($data['events'] ?? [], $locationRefMap, $userEmailMap, $systemUser, $tempDir, $counts);
+            $seriesRefMap = $this->importSeries($data['series'] ?? []);
+            $this->importEvents($data['events'] ?? [], $locationRefMap, $seriesRefMap, $userEmailMap, $systemUser, $tempDir, $counts);
             $this->importCmsPages($data['cms_pages'] ?? [], $tempDir, $systemUser, $counts);
 
             $this->em->flush();
@@ -198,12 +200,37 @@ readonly class ImportService
     }
 
     /**
+     * @param array<array<string, mixed>> $seriesData
+     * @return array<int, EventSeries> ref => EventSeries
+     */
+    private function importSeries(array $seriesData): array
+    {
+        $refMap = [];
+
+        foreach ($seriesData as $data) {
+            $name = (string) ($data['name'] ?? '');
+            $rule = isset($data['rule']) && $data['rule'] !== '' ? $this->findEventIntervalByName((string) $data['rule']) : null;
+
+            $series = new EventSeries();
+            $series->setName($name !== '' ? $name : 'Imported series');
+            $series->setRule($rule);
+            $series->setCreatedAt(new DateTimeImmutable());
+
+            $this->em->persist($series);
+            $refMap[(int) $data['ref']] = $series;
+        }
+
+        return $refMap;
+    }
+
+    /**
      * @param array<array<string, mixed>> $eventsData
      * @param array<int, Location> $locationRefMap
+     * @param array<int, EventSeries> $seriesRefMap
      * @param array<string, User> $userEmailMap
      * @param array<string, int> $counts
      */
-    private function importEvents(array $eventsData, array $locationRefMap, array $userEmailMap, User $systemUser, string $tempDir, array &$counts): void
+    private function importEvents(array $eventsData, array $locationRefMap, array $seriesRefMap, array $userEmailMap, User $systemUser, string $tempDir, array &$counts): void
     {
         foreach ($eventsData as $eventData) {
             $locationRef = $eventData['location_ref'] ?? null;
@@ -232,8 +259,12 @@ readonly class ImportService
                 $event->setType($this->findEventTypeByName((string) $eventData['type']));
             }
 
-            if (isset($eventData['recurring_rule']) && $eventData['recurring_rule'] !== '') {
-                $event->setRecurringRule($this->findEventIntervalByName((string) $eventData['recurring_rule']));
+            $seriesRef = $eventData['series_ref'] ?? null;
+            if ($seriesRef !== null && isset($seriesRefMap[(int) $seriesRef])) {
+                $event->setSeries($seriesRefMap[(int) $seriesRef]);
+            } elseif (isset($eventData['recurring_rule']) && $eventData['recurring_rule'] !== '') {
+                // pre-1.1 exports carried the rule on the event - synthesize a series for it
+                $event->setSeries($this->createLegacySeries($eventData));
             }
 
             $creatorEmail = (string) ($eventData['creator_email'] ?? '');
@@ -378,6 +409,24 @@ readonly class ImportService
         $this->em->persist($image);
 
         return $image;
+    }
+
+    /**
+     * @param array<string, mixed> $eventData
+     */
+    private function createLegacySeries(array $eventData): EventSeries
+    {
+        $titles = $eventData['titles'] ?? [];
+        $name = (string) ($titles['en'] ?? (reset($titles) ?: 'Imported series'));
+
+        $series = new EventSeries();
+        $series->setName($name !== '' ? $name : 'Imported series');
+        $series->setRule($this->findEventIntervalByName((string) $eventData['recurring_rule']));
+        $series->setCreatedAt(new DateTimeImmutable());
+
+        $this->em->persist($series);
+
+        return $series;
     }
 
     private function createFallbackLocation(User $user): Location

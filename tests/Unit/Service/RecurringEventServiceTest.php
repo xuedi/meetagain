@@ -11,6 +11,7 @@ use App\Enum\EventStatus;
 use App\Enum\RealignmentOutcome;
 use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
+use App\Repository\EventSeriesRepository;
 use App\Service\Cms\CmsService;
 use App\Service\Event\RecurringEventService;
 use App\ValueObject\RealignmentItem;
@@ -23,12 +24,23 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tests\Unit\Stubs\EventSeriesStub;
 use Tests\Unit\Stubs\EventStub;
 use Tests\Unit\Stubs\UserStub;
 
 class RecurringEventServiceTest extends TestCase
 {
     // ---- helpers ----
+
+    private function makeSeries(int $id, ?EventInterval $rule): EventSeriesStub
+    {
+        $series = new EventSeriesStub();
+        $series->setId($id);
+        $series->setName('Test Series');
+        $series->setRule($rule);
+
+        return $series;
+    }
 
     private function makeEvent(int $id, EventStatus $status = EventStatus::Published): EventStub
     {
@@ -40,10 +52,11 @@ class RecurringEventServiceTest extends TestCase
         return $event;
     }
 
-    private function createService(EventRepository $repo, EntityManagerInterface $em): RecurringEventService
+    private function createService(EventRepository $repo, EntityManagerInterface $em, ?EventSeriesRepository $seriesRepo = null): RecurringEventService
     {
         return new RecurringEventService(
             repo: $repo,
+            seriesRepo: $seriesRepo ?? $this->createStub(EventSeriesRepository::class),
             em: $em,
             entityActionDispatcher: $this->createStub(EntityActionDispatcher::class),
             cmsBlockRepository: $this->createStub(CmsBlockRepository::class),
@@ -56,9 +69,9 @@ class RecurringEventServiceTest extends TestCase
     public function testRunCronTaskReturnsOkResult(): void
     {
         // Arrange
-        $repo = $this->createStub(EventRepository::class);
-        $repo->method('findAllRecurring')->willReturn([]);
-        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
+        $seriesRepo = $this->createStub(EventSeriesRepository::class);
+        $seriesRepo->method('findOpen')->willReturn([]);
+        $service = $this->createService($this->createStub(EventRepository::class), $this->createStub(EntityManagerInterface::class), $seriesRepo);
 
         // Act
         $result = $service->runCronTask($this->createStub(OutputInterface::class));
@@ -72,11 +85,10 @@ class RecurringEventServiceTest extends TestCase
     // ---- updateRecurringEvents: early-return cases (data provider) ----
 
     #[DataProvider('updateRecurringEventsReturnsZeroProvider')]
-    public function testUpdateRecurringEventsReturnsZero(EventStub $event, ?EventStub $parentFromRepo): void
+    public function testUpdateRecurringEventsReturnsZero(EventStub $event): void
     {
         // Arrange
         $repo = $this->createStub(EventRepository::class);
-        $repo->method('findOneBy')->willReturn($parentFromRepo);
         $repo->method('findFollowUpEvents')->willReturn([]);
 
         $em = $this->createStub(EntityManagerInterface::class);
@@ -91,40 +103,29 @@ class RecurringEventServiceTest extends TestCase
 
     public static function updateRecurringEventsReturnsZeroProvider(): iterable
     {
-        $noParentNoRule = new EventStub();
-        $noParentNoRule->setId(1);
-        $noParentNoRule->setStart(new DateTime('2025-06-01 19:00'));
-        yield 'no recurring rule and no recurringOf → returns 0' => [
-            'event' => $noParentNoRule,
-            'parentFromRepo' => null,
+        $noSeries = new EventStub();
+        $noSeries->setId(1);
+        $noSeries->setStart(new DateTime('2025-06-01 19:00'));
+        yield 'event without a series → returns 0' => [
+            'event' => $noSeries,
         ];
 
-        $parentZeroChildren = new EventStub();
-        $parentZeroChildren->setId(2);
-        $parentZeroChildren->setStart(new DateTime('2025-06-01 19:00'));
-        $parentZeroChildren->setRecurringRule(EventInterval::Weekly);
-        yield 'parent with zero children → returns 0' => [
-            'event' => $parentZeroChildren,
-            'parentFromRepo' => null,
-        ];
-
-        $child = new EventStub();
-        $child->setId(10);
-        $child->setStart(new DateTime('2025-06-01 19:00'));
-        $child->setRecurringOf(99);
-        yield 'child with parent not found in DB → returns 0' => [
-            'event' => $child,
-            'parentFromRepo' => null,
+        $memberWithoutFollowUps = new EventStub();
+        $memberWithoutFollowUps->setId(2);
+        $memberWithoutFollowUps->setStart(new DateTime('2025-06-01 19:00'));
+        $memberWithoutFollowUps->setSeries(new EventSeriesStub()->setId(9)->setRule(EventInterval::Weekly));
+        yield 'series member with zero follow-ups → returns 0' => [
+            'event' => $memberWithoutFollowUps,
         ];
     }
 
-    // ---- updateRecurringEvents: parent with unlocked children → counts and persists ----
+    // ---- updateRecurringEvents: member with unlocked follow-ups → counts and persists ----
 
-    public function testUpdateRecurringEventsParentWithTwoUnlockedChildrenReturnsTwo(): void
+    public function testUpdateRecurringEventsMemberWithTwoUnlockedFollowUpsReturnsTwo(): void
     {
         // Arrange
-        $parent = $this->makeEvent(1);
-        $parent->setRecurringRule(EventInterval::Weekly);
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
         $child1 = $this->makeEvent(2);
         $child2 = $this->makeEvent(3);
@@ -139,17 +140,17 @@ class RecurringEventServiceTest extends TestCase
         $service = $this->createService($repo, $em);
 
         // Act
-        $result = $service->updateRecurringEvents($parent);
+        $result = $service->updateRecurringEvents($anchor);
 
         // Assert
         static::assertSame(2, $result);
     }
 
-    public function testUpdateRecurringEventsLockedChildIsSkipped(): void
+    public function testUpdateRecurringEventsLockedFollowUpIsSkipped(): void
     {
         // Arrange
-        $parent = $this->makeEvent(1);
-        $parent->setRecurringRule(EventInterval::Monthly);
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Monthly));
 
         $lockedChild = $this->makeEvent(2, EventStatus::Locked);
 
@@ -163,17 +164,17 @@ class RecurringEventServiceTest extends TestCase
         $service = $this->createService($repo, $em);
 
         // Act
-        $result = $service->updateRecurringEvents($parent);
+        $result = $service->updateRecurringEvents($anchor);
 
         // Assert
         static::assertSame(0, $result);
     }
 
-    public function testUpdateRecurringEventsMixedChildrenSkipsLockedReturnsTwoUpdated(): void
+    public function testUpdateRecurringEventsMixedFollowUpsSkipsLockedReturnsTwoUpdated(): void
     {
         // Arrange
-        $parent = $this->makeEvent(1);
-        $parent->setRecurringRule(EventInterval::Weekly);
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
         $lockedChild = $this->makeEvent(2, EventStatus::Locked);
         $unlocked1 = $this->makeEvent(3);
@@ -189,56 +190,76 @@ class RecurringEventServiceTest extends TestCase
         $service = $this->createService($repo, $em);
 
         // Act
-        $result = $service->updateRecurringEvents($parent);
+        $result = $service->updateRecurringEvents($anchor);
 
         // Assert
         static::assertSame(2, $result);
     }
 
-    // ---- updateRecurringEvents: event is a child, parent found ----
+    // ---- updateRecurringEvents: lookup keyed on the series ----
 
-    public function testUpdateRecurringEventsChildEventUsesParentForFollowUpLookup(): void
+    public function testUpdateRecurringEventsUsesSeriesIdForFollowUpLookup(): void
     {
         // Arrange
-        $parentEvent = $this->makeEvent(1);
-        $parentEvent->setRecurringRule(EventInterval::Monthly);
-
-        $childEvent = $this->makeEvent(10);
-        $childEvent->setRecurringOf(1);
+        $member = $this->makeEvent(10);
+        $member->setSeries($this->makeSeries(42, EventInterval::Monthly));
 
         $followUp1 = $this->makeEvent(11);
         $followUp2 = $this->makeEvent(12);
 
         $repo = $this->createMock(EventRepository::class);
-        $repo->expects($this->once())->method('findOneBy')->with(['id' => 1])->willReturn($parentEvent);
-        $repo->expects($this->once())->method('findFollowUpEvents')->with(1, $childEvent->getStart())->willReturn([$followUp1, $followUp2]);
+        $repo->expects($this->once())->method('findFollowUpEvents')->with(42, $member->getStart())->willReturn([$followUp1, $followUp2]);
 
         $em = $this->createStub(EntityManagerInterface::class);
         $service = $this->createService($repo, $em);
 
         // Act
-        $result = $service->updateRecurringEvents($childEvent);
+        $result = $service->updateRecurringEvents($member);
 
         // Assert
         static::assertSame(2, $result);
     }
 
+    public function testUpdateRecurringEventsExcludesTheAnchorItself(): void
+    {
+        // Arrange: the series-keyed query can return the anchor among the follow-ups
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
+
+        $child = $this->makeEvent(2);
+
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$anchor, $child]);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())->method('persist')->with($child);
+        $em->expects($this->once())->method('flush');
+
+        $service = $this->createService($repo, $em);
+
+        // Act
+        $result = $service->updateRecurringEvents($anchor);
+
+        // Assert
+        static::assertSame(1, $result);
+    }
+
     // ---- updateRecurringEvents: translation propagation ----
 
-    public function testUpdateRecurringEventsPropagatesTranslationsToChildren(): void
+    public function testUpdateRecurringEventsPropagatesTranslationsToFollowUps(): void
     {
-        // Arrange: parent event with one translation
-        $parent = $this->makeEvent(1);
-        $parent->setRecurringRule(EventInterval::Weekly);
+        // Arrange: anchor event with one translation
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
         $translation = new EventTranslation();
         $translation->setLanguage('en');
-        $translation->setTitle('Parent Title');
-        $translation->setTeaser('Parent Teaser');
-        $translation->setDescription('Parent Description');
-        $parent->addTranslation($translation);
+        $translation->setTitle('Anchor Title');
+        $translation->setTeaser('Anchor Teaser');
+        $translation->setDescription('Anchor Description');
+        $anchor->addTranslation($translation);
 
-        // Arrange: child with no existing translation for 'en'
+        // Arrange: follow-up with no existing translation for 'en'
         $child = $this->makeEvent(2);
 
         $repo = $this->createStub(EventRepository::class);
@@ -248,14 +269,14 @@ class RecurringEventServiceTest extends TestCase
         $service = $this->createService($repo, $em);
 
         // Act
-        $service->updateRecurringEvents($parent);
+        $service->updateRecurringEvents($anchor);
 
-        // Assert: child now has the 'en' translation with propagated fields
+        // Assert: follow-up now has the 'en' translation with propagated fields
         $childTranslation = $child->findTranslation('en');
         static::assertNotNull($childTranslation);
-        static::assertSame('Parent Title', $childTranslation->getTitle());
-        static::assertSame('Parent Teaser', $childTranslation->getTeaser());
-        static::assertSame('Parent Description', $childTranslation->getDescription());
+        static::assertSame('Anchor Title', $childTranslation->getTitle());
+        static::assertSame('Anchor Teaser', $childTranslation->getTeaser());
+        static::assertSame('Anchor Description', $childTranslation->getDescription());
     }
 
     // ---- planRealignment ----
@@ -286,8 +307,8 @@ class RecurringEventServiceTest extends TestCase
     public function testPlanRealignmentWeeklyShiftMapsChildrenOntoNewPattern(): void
     {
         // Arrange
-        $parent = $this->makeFutureEvent(1, '2030-01-02 19:00', '2030-01-02 22:00');
-        $parent->setRecurringRule(EventInterval::Weekly);
+        $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00', '2030-01-02 22:00');
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
         $child1 = $this->makeFutureEvent(2, '2030-01-09 19:00', '2030-01-09 22:00');
         $child2 = $this->makeFutureEvent(3, '2030-01-16 19:00', '2030-01-16 22:00');
@@ -298,10 +319,10 @@ class RecurringEventServiceTest extends TestCase
         $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
 
         // Act
-        $plan = $service->planRealignment($parent, $this->makeWeeklyChange());
+        $plan = $service->planRealignment($anchor, $this->makeWeeklyChange());
 
         // Assert
-        static::assertSame(1, $plan->parentEventId);
+        static::assertSame(9, $plan->seriesId);
         static::assertSame(EventInterval::Weekly, $plan->rule);
         static::assertCount(2, $plan->items);
         static::assertSame('2030-01-19 20:00', $plan->items[0]->newStart->format('Y-m-d H:i'));
@@ -316,8 +337,8 @@ class RecurringEventServiceTest extends TestCase
     public function testPlanRealignmentRuleChangeToMonthlyMapsAllChildrenBeyondOldSpacing(): void
     {
         // Arrange
-        $parent = $this->makeFutureEvent(1, '2030-01-02 19:00');
-        $parent->setRecurringRule(EventInterval::Weekly);
+        $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00');
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
         $child1 = $this->makeFutureEvent(2, '2030-01-09 19:00');
         $child2 = $this->makeFutureEvent(3, '2030-01-16 19:00');
@@ -336,7 +357,7 @@ class RecurringEventServiceTest extends TestCase
         );
 
         // Act
-        $plan = $service->planRealignment($parent, $change);
+        $plan = $service->planRealignment($anchor, $change);
 
         // Assert: nothing dropped, monthly occurrences continue past the old weekly spacing
         static::assertCount(2, $plan->items);
@@ -348,8 +369,8 @@ class RecurringEventServiceTest extends TestCase
     public function testPlanRealignmentLockedChildKeepsDateAndDoesNotConsumeOccurrenceSlot(): void
     {
         // Arrange
-        $parent = $this->makeFutureEvent(1, '2030-01-02 19:00', '2030-01-02 22:00');
-        $parent->setRecurringRule(EventInterval::Weekly);
+        $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00', '2030-01-02 22:00');
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
         $lockedChild = $this->makeFutureEvent(2, '2030-01-09 19:00', '2030-01-09 22:00', EventStatus::Locked);
         $realignable = $this->makeFutureEvent(3, '2030-01-16 19:00', '2030-01-16 22:00');
@@ -359,7 +380,7 @@ class RecurringEventServiceTest extends TestCase
         $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
 
         // Act
-        $plan = $service->planRealignment($parent, $this->makeWeeklyChange());
+        $plan = $service->planRealignment($anchor, $this->makeWeeklyChange());
 
         // Assert: the realignable child takes the occurrence the locked one would have taken
         static::assertSame(RealignmentOutcome::SkippedLocked, $plan->items[0]->outcome);
@@ -372,8 +393,8 @@ class RecurringEventServiceTest extends TestCase
     public function testPlanRealignmentCanceledChildIsSkipped(): void
     {
         // Arrange
-        $parent = $this->makeFutureEvent(1, '2030-01-02 19:00');
-        $parent->setRecurringRule(EventInterval::Weekly);
+        $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00');
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
         $canceledChild = $this->makeFutureEvent(2, '2030-01-09 19:00');
         $canceledChild->setCanceled(true);
@@ -383,7 +404,7 @@ class RecurringEventServiceTest extends TestCase
         $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
 
         // Act
-        $plan = $service->planRealignment($parent, $this->makeWeeklyChange());
+        $plan = $service->planRealignment($anchor, $this->makeWeeklyChange());
 
         // Assert
         static::assertSame(RealignmentOutcome::SkippedCanceled, $plan->items[0]->outcome);
@@ -394,8 +415,8 @@ class RecurringEventServiceTest extends TestCase
     public function testPlanRealignmentChildAlreadyOnPatternIsDateUnchanged(): void
     {
         // Arrange: anchor keeps its start, one child sits on the pattern, one is off by a day
-        $parent = $this->makeFutureEvent(1, '2030-01-05 19:00');
-        $parent->setRecurringRule(EventInterval::Weekly);
+        $anchor = $this->makeFutureEvent(1, '2030-01-05 19:00');
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
         $onPattern = $this->makeFutureEvent(2, '2030-01-12 19:00');
         $offPattern = $this->makeFutureEvent(3, '2030-01-18 19:00');
@@ -414,7 +435,7 @@ class RecurringEventServiceTest extends TestCase
         );
 
         // Act
-        $plan = $service->planRealignment($parent, $change);
+        $plan = $service->planRealignment($anchor, $change);
 
         // Assert
         static::assertSame(RealignmentOutcome::DateUnchanged, $plan->items[0]->outcome);
@@ -425,8 +446,8 @@ class RecurringEventServiceTest extends TestCase
     public function testPlanRealignmentCollectsChildrenFromOldStart(): void
     {
         // Arrange: anchor moves later; a child between old and new start must stay included
-        $parent = $this->makeFutureEvent(1, '2030-01-02 19:00');
-        $parent->setRecurringRule(EventInterval::Weekly);
+        $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00');
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
         $betweenChild = $this->makeFutureEvent(2, '2030-01-09 19:00');
 
@@ -434,12 +455,12 @@ class RecurringEventServiceTest extends TestCase
         $repo
             ->expects($this->once())
             ->method('findFollowUpEvents')
-            ->with(1, self::callback(static fn(DateTimeImmutable $bound): bool => $bound->format('Y-m-d H:i') === '2030-01-02 19:00'))
+            ->with(9, self::callback(static fn(DateTimeImmutable $bound): bool => $bound->format('Y-m-d H:i') === '2030-01-02 19:00'))
             ->willReturn([$betweenChild]);
         $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
 
         // Act
-        $plan = $service->planRealignment($parent, $this->makeWeeklyChange());
+        $plan = $service->planRealignment($anchor, $this->makeWeeklyChange());
 
         // Assert
         static::assertCount(1, $plan->items);
@@ -449,8 +470,8 @@ class RecurringEventServiceTest extends TestCase
     public function testPlanRealignmentExcludesPastChildren(): void
     {
         // Arrange
-        $parent = $this->makeFutureEvent(1, '2020-01-02 19:00');
-        $parent->setRecurringRule(EventInterval::Weekly);
+        $anchor = $this->makeFutureEvent(1, '2020-01-02 19:00');
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
         $pastChild = $this->makeFutureEvent(2, '2020-01-09 19:00');
         $futureChild = $this->makeFutureEvent(3, '2030-01-16 19:00');
@@ -460,23 +481,36 @@ class RecurringEventServiceTest extends TestCase
         $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
 
         // Act
-        $plan = $service->planRealignment($parent, $this->makeWeeklyChange());
+        $plan = $service->planRealignment($anchor, $this->makeWeeklyChange());
 
         // Assert
         static::assertCount(1, $plan->items);
         static::assertSame(3, $plan->items[0]->eventId);
     }
 
-    public function testPlanRealignmentWithoutRuleReturnsEmptyPlan(): void
+    public function testPlanRealignmentWithoutSeriesReturnsEmptyPlan(): void
     {
-        // Arrange: child anchor whose parent no longer carries a rule
-        $parent = $this->makeFutureEvent(1, '2030-01-02 19:00');
-        $child = $this->makeFutureEvent(2, '2030-01-09 19:00');
-        $child->setRecurringOf(1);
+        // Arrange
+        $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00');
 
-        $repo = $this->createStub(EventRepository::class);
-        $repo->method('findOneBy')->willReturn($parent);
-        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
+        $service = $this->createService($this->createStub(EventRepository::class), $this->createStub(EntityManagerInterface::class));
+
+        // Act
+        $plan = $service->planRealignment($anchor, $this->makeWeeklyChange());
+
+        // Assert
+        static::assertTrue($plan->isEmpty());
+        static::assertNull($plan->seriesId);
+        static::assertNull($plan->rule);
+    }
+
+    public function testPlanRealignmentOnClosedSeriesReturnsEmptyPlan(): void
+    {
+        // Arrange: anchor belongs to a closed series (rule = null) and no rule change is submitted
+        $anchor = $this->makeFutureEvent(2, '2030-01-09 19:00');
+        $anchor->setSeries($this->makeSeries(9, null));
+
+        $service = $this->createService($this->createStub(EventRepository::class), $this->createStub(EntityManagerInterface::class));
 
         $change = new ScheduleChange(
             oldStart: new DateTimeImmutable('2030-01-09 19:00'),
@@ -488,10 +522,71 @@ class RecurringEventServiceTest extends TestCase
         );
 
         // Act
-        $plan = $service->planRealignment($child, $change);
+        $plan = $service->planRealignment($anchor, $change);
 
         // Assert
         static::assertTrue($plan->isEmpty());
+        static::assertNull($plan->seriesId);
+        static::assertNull($plan->rule);
+    }
+
+    public function testPlanRealignmentResolvesRuleFromSeriesWhenChangeCarriesNone(): void
+    {
+        // Arrange: the change carries no rule at all - the series rule applies
+        $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00');
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
+
+        $child = $this->makeFutureEvent(2, '2030-01-09 19:00');
+
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$child]);
+        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
+
+        $change = new ScheduleChange(
+            oldStart: new DateTimeImmutable('2030-01-02 19:00'),
+            oldStop: null,
+            oldRule: null,
+            newStart: new DateTimeImmutable('2030-01-03 19:00'),
+            newStop: null,
+            newRule: null,
+        );
+
+        // Act
+        $plan = $service->planRealignment($anchor, $change);
+
+        // Assert
+        static::assertSame(EventInterval::Weekly, $plan->rule);
+        static::assertSame(9, $plan->seriesId);
+        static::assertCount(1, $plan->items);
+    }
+
+    public function testPlanRealignmentRuleChangeToNonRecurringReturnsEmptyPlan(): void
+    {
+        // Arrange: closing the series - members keep their dates, nothing realigns
+        $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00');
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
+
+        $child = $this->makeFutureEvent(2, '2030-01-09 19:00');
+
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$child]);
+        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
+
+        $change = new ScheduleChange(
+            oldStart: new DateTimeImmutable('2030-01-02 19:00'),
+            oldStop: null,
+            oldRule: EventInterval::Weekly,
+            newStart: new DateTimeImmutable('2030-01-02 19:00'),
+            newStop: null,
+            newRule: null,
+        );
+
+        // Act
+        $plan = $service->planRealignment($anchor, $change);
+
+        // Assert
+        static::assertTrue($plan->isEmpty());
+        static::assertNull($plan->rule);
     }
 
     // ---- executeRealignment ----
@@ -526,7 +621,7 @@ class RecurringEventServiceTest extends TestCase
             rsvpCount: 1,
             outcome: RealignmentOutcome::DateUnchanged,
         );
-        $plan = new RealignmentPlan(1, 1, EventInterval::Weekly, [$movedItem, $unchangedItem]);
+        $plan = new RealignmentPlan(9, 1, EventInterval::Weekly, [$movedItem, $unchangedItem]);
 
         $repo = $this->createMock(EventRepository::class);
         $repo->expects($this->once())->method('find')->with(2)->willReturn($movedChild);
@@ -568,12 +663,14 @@ class RecurringEventServiceTest extends TestCase
     /**
      * @return array{RecurringEventService, callable(): array<Event>}
      */
-    private function createExtensionService(EventStub $parent, ?EventStub $template): array
+    private function createExtensionService(EventSeriesStub $series, ?EventStub $template): array
     {
+        $seriesRepo = $this->createStub(EventSeriesRepository::class);
+        $seriesRepo->method('findOpen')->willReturn([$series]);
+        $seriesRepo->method('find')->willReturn($series);
+
         $repo = $this->createStub(EventRepository::class);
-        $repo->method('findAllRecurring')->willReturn([$parent]);
-        $repo->method('find')->willReturn($parent);
-        $repo->method('findNewestAutoChild')->willReturn($template);
+        $repo->method('findNewestSeriesMember')->willReturn($template);
 
         $created = [];
         $em = $this->createStub(EntityManagerInterface::class);
@@ -584,22 +681,22 @@ class RecurringEventServiceTest extends TestCase
             }
         });
 
-        return [$this->createService($repo, $em), static function () use (&$created): array {
+        return [$this->createService($repo, $em, $seriesRepo), static function () use (&$created): array {
             return $created;
         }];
     }
 
-    public function testExtendRecurringEventsSourcesScheduleAndContentFromNewestChild(): void
+    public function testExtendRecurringEventsSourcesScheduleAndContentFromNewestMember(): void
     {
-        // Arrange: parent is stale, the newest auto child carries the current time and content
-        $parent = $this->makeFutureEvent(1, 'yesterday 19:00', 'yesterday 22:00');
-        $parent->setRecurringRule(EventInterval::Weekly);
-        $parent->addTranslation($this->makeTranslation('Old Title'));
+        // Arrange: the newest non-locked member carries the current time, content, and creator
+        $series = $this->makeSeries(9, EventInterval::Weekly);
 
+        $creator = new UserStub()->setId(77);
         $template = $this->makeFutureEvent(5, 'tomorrow 20:30', 'tomorrow 23:00');
+        $template->setUser($creator);
         $template->addTranslation($this->makeTranslation('New Title'));
 
-        [$service, $createdEvents] = $this->createExtensionService($parent, $template);
+        [$service, $createdEvents] = $this->createExtensionService($series, $template);
 
         // Act
         $count = $service->extentRecurringEvents();
@@ -614,19 +711,21 @@ class RecurringEventServiceTest extends TestCase
             static::assertSame('20:30', $event->getStart()->format('H:i'));
             static::assertSame('23:00', $event->getStop()->format('H:i'));
             static::assertSame('New Title', $event->getTitle('en'));
-            static::assertSame(1, $event->getRecurringOf());
-            static::assertNull($event->getRecurringRule());
+            static::assertSame($series, $event->getSeries());
+            static::assertSame($creator, $event->getUser());
+            static::assertFalse($event->isInitial());
         }
     }
 
-    public function testExtendRecurringEventsFallsBackToParentWhenNoAutoChildExists(): void
+    public function testExtendRecurringEventsUsesTheOnlyMemberAsTemplate(): void
     {
-        // Arrange
-        $parent = $this->makeFutureEvent(1, 'yesterday 19:00', 'yesterday 22:00');
-        $parent->setRecurringRule(EventInterval::Weekly);
-        $parent->addTranslation($this->makeTranslation('Old Title'));
+        // Arrange: a fresh series where the manually created first event is the only member
+        $series = $this->makeSeries(9, EventInterval::Weekly);
 
-        [$service, $createdEvents] = $this->createExtensionService($parent, null);
+        $template = $this->makeFutureEvent(1, 'yesterday 19:00', 'yesterday 22:00');
+        $template->addTranslation($this->makeTranslation('Old Title'));
+
+        [$service, $createdEvents] = $this->createExtensionService($series, $template);
 
         // Act
         $count = $service->extentRecurringEvents();
@@ -642,20 +741,35 @@ class RecurringEventServiceTest extends TestCase
         }
     }
 
-    public function testUpdateRecurringEventsUpdatesExistingChildTranslation(): void
+    public function testExtendRecurringEventsSkipsSeriesWithoutUsableTemplate(): void
     {
-        // Arrange: parent event with 'de' translation
-        $parent = $this->makeEvent(1);
-        $parent->setRecurringRule(EventInterval::Monthly);
+        // Arrange: every member is locked - findNewestSeriesMember finds nothing
+        $series = $this->makeSeries(9, EventInterval::Weekly);
 
-        $parentTranslation = new EventTranslation();
-        $parentTranslation->setLanguage('de');
-        $parentTranslation->setTitle('Neuer Titel');
-        $parentTranslation->setTeaser('Neuer Teaser');
-        $parentTranslation->setDescription('Neue Beschreibung');
-        $parent->addTranslation($parentTranslation);
+        [$service, $createdEvents] = $this->createExtensionService($series, null);
 
-        // Arrange: child already has a 'de' translation with old data
+        // Act
+        $count = $service->extentRecurringEvents();
+
+        // Assert
+        static::assertSame(0, $count);
+        static::assertCount(0, $createdEvents());
+    }
+
+    public function testUpdateRecurringEventsUpdatesExistingFollowUpTranslation(): void
+    {
+        // Arrange: anchor event with 'de' translation
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Monthly));
+
+        $anchorTranslation = new EventTranslation();
+        $anchorTranslation->setLanguage('de');
+        $anchorTranslation->setTitle('Neuer Titel');
+        $anchorTranslation->setTeaser('Neuer Teaser');
+        $anchorTranslation->setDescription('Neue Beschreibung');
+        $anchor->addTranslation($anchorTranslation);
+
+        // Arrange: follow-up already has a 'de' translation with old data
         $child = $this->makeEvent(2);
         $existingTranslation = new EventTranslation();
         $existingTranslation->setLanguage('de');
@@ -671,9 +785,9 @@ class RecurringEventServiceTest extends TestCase
         $service = $this->createService($repo, $em);
 
         // Act
-        $service->updateRecurringEvents($parent);
+        $service->updateRecurringEvents($anchor);
 
-        // Assert: existing child translation is updated in-place
+        // Assert: existing follow-up translation is updated in-place
         $childTranslation = $child->findTranslation('de');
         static::assertNotNull($childTranslation);
         static::assertSame('Neuer Titel', $childTranslation->getTitle());

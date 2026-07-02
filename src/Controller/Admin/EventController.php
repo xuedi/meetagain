@@ -17,6 +17,7 @@ use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Emails\Types\EventUpdateNotificationEmail;
 use App\Emails\Types\SeriesRescheduledEmail;
 use App\Entity\Event;
+use App\Entity\EventSeries;
 use App\Entity\EventTranslation;
 use App\Entity\Host;
 use App\Entity\Image;
@@ -24,6 +25,7 @@ use App\Entity\Location;
 use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
+use App\Enum\EventInterval;
 use App\Enum\EventType as EventTypeEnum;
 use App\Enum\ImageType;
 use App\Filter\Admin\Event\AdminEventListFilterService;
@@ -40,6 +42,8 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -52,6 +56,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[IsGranted('ROLE_ORGANIZER'), Route('/admin/events')]
 final class EventController extends AbstractController implements AdminNavigationInterface
 {
+    private const string DEFAULT_RANGE = 'all';
+
+    /** @var array<string, string|null> Forward window applied to the event start; null means no limit. */
+    private const array RANGE_OFFSETS = [
+        'all' => null,
+        '1y' => '+1 year',
+        '1m' => '+1 month',
+        '1w' => '+1 week',
+    ];
+
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
@@ -87,14 +101,18 @@ final class EventController extends AbstractController implements AdminNavigatio
         $eventIds = $filterResult->getEventIds();
         $allEvents = $this->repo->findAllForAdmin($eventIds);
 
-        $hideAuto = $request->query->getBoolean('hide_auto');
+        $range = $request->query->getString('range', self::DEFAULT_RANGE);
+        if (!array_key_exists($range, self::RANGE_OFFSETS)) {
+            $range = self::DEFAULT_RANGE;
+        }
+        $until = $this->rangeUntil($range);
         $typeFilter = $request->query->getInt('type') ?: null;
         $scheduleFilter = $request->query->getString('schedule');
         if (!in_array($scheduleFilter, ['onetime', 'series'], true)) {
             $scheduleFilter = 'all';
         }
 
-        $events = array_values(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $hideAuto, $typeFilter, $scheduleFilter)));
+        $events = array_values(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, $typeFilter, $scheduleFilter)));
 
         $canceledCount = 0;
         foreach ($events as $event) {
@@ -123,9 +141,9 @@ final class EventController extends AbstractController implements AdminNavigatio
         }
 
         $actions = [
-            $this->buildHideAutoToggle($hideAuto, $typeFilter, $scheduleFilter),
-            $this->buildTypeDropdown($allEvents, $hideAuto, $typeFilter, $scheduleFilter),
-            $this->buildScheduleDropdown($allEvents, $hideAuto, $typeFilter, $scheduleFilter),
+            $this->buildRangeDropdown($allEvents, $range, $typeFilter, $scheduleFilter),
+            $this->buildTypeDropdown($allEvents, $until, $range, $typeFilter, $scheduleFilter),
+            $this->buildScheduleDropdown($allEvents, $until, $range, $typeFilter, $scheduleFilter),
             new AdminTopActionButton(
                 label: $this->translator->trans('admin_event.page_title_new'),
                 target: $this->generateUrl('app_admin_event_add'),
@@ -133,35 +151,27 @@ final class EventController extends AbstractController implements AdminNavigatio
             ),
         ];
 
-        $parentRules = [];
-        foreach ($allEvents as $event) {
-            if ($event->getRecurringRule() !== null) {
-                $parentRules[$event->getId()] = $event->getRecurringRule();
-            }
-        }
-
         return $this->render('admin/event/list.html.twig', [
             'nextEvent' => $this->repo->getNextEventId($eventIds),
             'events' => $events,
             'rsvpCounts' => $this->repo->getRsvpCounts($eventIds),
-            'parentRules' => $parentRules,
             'active' => 'event',
             'adminTop' => new AdminTop(info: $info, actions: $actions),
         ]);
     }
 
-    private function matchesFilters(Event $e, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): bool
+    private function matchesFilters(Event $e, ?DateTimeImmutable $until, ?int $typeFilter, string $scheduleFilter): bool
     {
-        if ($hideAuto && $e->getRecurringOf() !== null) {
+        if ($until !== null && $e->getStart() > $until) {
             return false;
         }
         if ($typeFilter !== null && $e->getType()?->value !== $typeFilter) {
             return false;
         }
-        if ($scheduleFilter === 'onetime' && ($e->getRecurringOf() !== null || $e->getRecurringRule() !== null)) {
+        if ($scheduleFilter === 'onetime' && $e->getSeries() !== null) {
             return false;
         }
-        if ($scheduleFilter === 'series' && $e->getRecurringOf() === null && $e->getRecurringRule() === null) {
+        if ($scheduleFilter === 'series' && $e->getSeries() === null) {
             return false;
         }
 
@@ -171,11 +181,11 @@ final class EventController extends AbstractController implements AdminNavigatio
     /**
      * @return array<string, int|string|bool> URL params preserving every active filter except $exclude.
      */
-    private function preserveFiltersExcept(string $exclude, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): array
+    private function preserveFiltersExcept(string $exclude, string $range, ?int $typeFilter, string $scheduleFilter): array
     {
         $p = [];
-        if ($exclude !== 'hide_auto' && $hideAuto) {
-            $p['hide_auto'] = 1;
+        if ($exclude !== 'range' && $range !== self::DEFAULT_RANGE) {
+            $p['range'] = $range;
         }
         if ($exclude !== 'type' && $typeFilter !== null) {
             $p['type'] = $typeFilter;
@@ -187,31 +197,58 @@ final class EventController extends AbstractController implements AdminNavigatio
         return $p;
     }
 
-    private function buildHideAutoToggle(bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionButton
+    private function rangeUntil(string $range): ?DateTimeImmutable
     {
-        $params = $this->preserveFiltersExcept('hide_auto', $hideAuto, $typeFilter, $scheduleFilter);
-        if (!$hideAuto) {
-            $params['hide_auto'] = 1;
+        $offset = self::RANGE_OFFSETS[$range] ?? null;
+
+        return $offset !== null ? new DateTimeImmutable($offset) : null;
+    }
+
+    /**
+     * @param array<Event> $allEvents
+     */
+    private function buildRangeDropdown(array $allEvents, string $range, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
+    {
+        $options = [];
+        $activeLabel = '';
+        foreach (array_keys(self::RANGE_OFFSETS) as $key) {
+            $optionUntil = $this->rangeUntil($key);
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $optionUntil, $typeFilter, $scheduleFilter)));
+            $params = $this->preserveFiltersExcept('range', $range, $typeFilter, $scheduleFilter);
+            if ($key !== self::DEFAULT_RANGE) {
+                $params['range'] = $key;
+            }
+            $label = $this->translator->trans('admin_event.filter_range_' . $key);
+            $isActive = $range === $key;
+            if ($isActive) {
+                $activeLabel = $label;
+            }
+            $options[] = new AdminTopActionDropdownOption(
+                label: $label,
+                target: $this->generateUrl('app_admin_event', $params),
+                isActive: $isActive,
+                count: $count,
+            );
         }
 
-        return new AdminTopActionButton(
-            label: $this->translator->trans($hideAuto ? 'admin_event.button_show_auto' : 'admin_event.button_hide_auto'),
-            target: $this->generateUrl('app_admin_event', $params),
-            icon: $hideAuto ? 'eye' : 'eye-slash',
+        return new AdminTopActionDropdown(
+            label: sprintf('%s %s', $this->translator->trans('admin_event.filter_range_label'), $activeLabel),
+            options: $options,
+            icon: 'clock',
         );
     }
 
     /**
      * @param array<Event> $allEvents
      */
-    private function buildTypeDropdown(array $allEvents, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
+    private function buildTypeDropdown(array $allEvents, ?DateTimeImmutable $until, string $range, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
     {
-        $countAll = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $hideAuto, null, $scheduleFilter)));
+        $countAll = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, null, $scheduleFilter)));
 
         $options = [
             new AdminTopActionDropdownOption(
                 label: $this->translator->trans('admin_event.filter_type_any'),
-                target: $this->generateUrl('app_admin_event', $this->preserveFiltersExcept('type', $hideAuto, $typeFilter, $scheduleFilter)),
+                target: $this->generateUrl('app_admin_event', $this->preserveFiltersExcept('type', $range, $typeFilter, $scheduleFilter)),
                 isActive: $typeFilter === null,
                 count: $countAll,
             ),
@@ -219,8 +256,8 @@ final class EventController extends AbstractController implements AdminNavigatio
 
         $activeLabel = $this->translator->trans('admin_event.filter_type_any');
         foreach (EventTypeEnum::cases() as $case) {
-            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $hideAuto, $case->value, $scheduleFilter)));
-            $params = $this->preserveFiltersExcept('type', $hideAuto, $typeFilter, $scheduleFilter);
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, $case->value, $scheduleFilter)));
+            $params = $this->preserveFiltersExcept('type', $range, $typeFilter, $scheduleFilter);
             $params['type'] = $case->value;
             $label = $this->translator->trans('admin_event.filter_type_' . strtolower($case->name));
             $isActive = $typeFilter === $case->value;
@@ -245,14 +282,14 @@ final class EventController extends AbstractController implements AdminNavigatio
     /**
      * @param array<Event> $allEvents
      */
-    private function buildScheduleDropdown(array $allEvents, bool $hideAuto, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
+    private function buildScheduleDropdown(array $allEvents, ?DateTimeImmutable $until, string $range, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
     {
         $values = ['all', 'onetime', 'series'];
         $options = [];
         $activeLabel = '';
         foreach ($values as $value) {
-            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $hideAuto, $typeFilter, $value)));
-            $params = $this->preserveFiltersExcept('schedule', $hideAuto, $typeFilter, $scheduleFilter);
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, $typeFilter, $value)));
+            $params = $this->preserveFiltersExcept('schedule', $range, $typeFilter, $scheduleFilter);
             if ($value !== 'all') {
                 $params['schedule'] = $value;
             }
@@ -297,12 +334,23 @@ final class EventController extends AbstractController implements AdminNavigatio
         $beforeSnapshot = $this->captureEventSnapshot($event);
         $oldStart = DateTimeImmutable::createFromInterface($event->getStart());
         $oldStop = $event->getStop() !== null ? DateTimeImmutable::createFromInterface($event->getStop()) : null;
-        $oldRule = $event->getRecurringRule();
+        $oldRule = $event->getSeries()?->getRule();
 
         // TODO: simplify with vanilla symfony components now the cascading flush effect is fixed
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid() && !$request->request->has('reschedule_cancel')) {
             $user = $this->getAuthedUser();
+
+            $isSeries = $event->getSeries() !== null;
+            $newRule = $form->get('seriesRule')->getData();
+            $seriesName = trim((string) $form->get('seriesName')->getData());
+            $ruleChanged = $oldRule !== $newRule;
+
+            if (!$isSeries && !$this->validateSeriesName($form)) {
+                $this->entityManager->refresh($event);
+
+                return $this->renderEditPage($event, $form);
+            }
 
             $change = new ScheduleChange(
                 oldStart: $oldStart,
@@ -310,14 +358,14 @@ final class EventController extends AbstractController implements AdminNavigatio
                 oldRule: $oldRule,
                 newStart: DateTimeImmutable::createFromInterface($event->getStart()),
                 newStop: $event->getStop() !== null ? DateTimeImmutable::createFromInterface($event->getStop()) : null,
-                newRule: $event->getRecurringRule(),
+                newRule: $newRule,
             );
-            $isSeries = $event->getRecurringRule() !== null || $event->getRecurringOf() !== null;
             $wantsRealign = $form->get('allFollowing')->getData() === true && $isSeries && $change->isChanged();
+            $ruleChangeForcesConfirm = $isSeries && $ruleChanged;
 
-            if ($wantsRealign && !$request->request->has('reschedule_confirm')) {
+            if (($wantsRealign || $ruleChangeForcesConfirm) && !$request->request->has('reschedule_confirm')) {
                 $plan = $this->eventService->planRealignment($event, $change);
-                if (!$plan->isEmpty()) {
+                if (!$plan->isEmpty() || $ruleChangeForcesConfirm) {
                     $pendingImageDropped = $form->get('image')->getData() instanceof UploadedFile;
                     $this->entityManager->refresh($event);
 
@@ -326,15 +374,9 @@ final class EventController extends AbstractController implements AdminNavigatio
                         'event' => $event,
                         'plan' => $plan,
                         'change' => $change,
+                        'seriesClosing' => $isSeries && $newRule === null,
                         'payload' => $request->request->all(),
                         'pendingImageDropped' => $pendingImageDropped,
-                        'adminTop' => new AdminTop(actions: [
-                            new AdminTopActionButton(
-                                label: $this->translator->trans('global.button_back'),
-                                target: $this->generateUrl('app_admin_event_edit', ['id' => $event->getId()]),
-                                icon: 'arrow-left',
-                            ),
-                        ]),
                     ]);
                 }
             }
@@ -342,6 +384,19 @@ final class EventController extends AbstractController implements AdminNavigatio
             // overwrite basic data
             $event->setInitial(true);
             $event->setUser($user);
+
+            // series updates: rename freely, rule changes only arrive here confirmed
+            if ($isSeries) {
+                $series = $event->getSeries();
+                if ($seriesName !== '') {
+                    $series->setName($seriesName);
+                }
+                if ($ruleChanged) {
+                    $series->setRule($newRule);
+                }
+            } elseif ($newRule instanceof EventInterval) {
+                $event->setSeries($this->createSeries($seriesName, $newRule));
+            }
 
             // manually hydrate location (unmapped field)
             $locationData = $form->get('location')->getData();
@@ -406,29 +461,34 @@ final class EventController extends AbstractController implements AdminNavigatio
                 $this->imageLocationService->addLocation($image->getId(), ImageType::EventTeaser, $event->getId());
             }
 
+            $syncCount = 0;
             if ($form->get('allFollowing')->getData() === true) {
                 $syncCount = $this->eventService->updateRecurringEvents($event, $oldStart);
-                if ($wantsRealign) {
-                    $result = $this->eventService->executeRealignment($this->eventService->planRealignment($event, $change));
-                    foreach ($result->removedAttendees as $userId => $removed) {
-                        if ($userId === $user->getId()) {
-                            continue;
-                        }
-                        $this->seriesRescheduledEmail->send([
-                            'user' => $removed['user'],
-                            'event' => $event,
-                            'removedDates' => $removed['dates'],
-                        ]);
+            }
+
+            // a confirmed rule change realigns even without the allFollowing checkbox;
+            // closing the series (rule change to null) never realigns
+            $executesRealign = $wantsRealign || ($isSeries && $ruleChanged && $newRule !== null);
+            if ($executesRealign) {
+                $result = $this->eventService->executeRealignment($this->eventService->planRealignment($event, $change));
+                foreach ($result->removedAttendees as $userId => $removed) {
+                    if ($userId === $user->getId()) {
+                        continue;
                     }
-                    $this->addFlash('success', $this->translator->trans('admin_event.flash_saved_with_reschedule', [
-                        '%updated%' => $syncCount,
-                        '%moved%' => $result->movedCount,
-                    ]));
-                } else {
-                    $this->addFlash('success', $this->translator->trans('admin_event.flash_saved_with_followup', [
-                        '%count%' => $syncCount,
-                    ]));
+                    $this->seriesRescheduledEmail->send([
+                        'user' => $removed['user'],
+                        'event' => $event,
+                        'removedDates' => $removed['dates'],
+                    ]);
                 }
+                $this->addFlash('success', $this->translator->trans('admin_event.flash_saved_with_reschedule', [
+                    '%updated%' => $syncCount,
+                    '%moved%' => $result->movedCount,
+                ]));
+            } elseif ($form->get('allFollowing')->getData() === true) {
+                $this->addFlash('success', $this->translator->trans('admin_event.flash_saved_with_followup', [
+                    '%count%' => $syncCount,
+                ]));
             } else {
                 $this->addFlash('success', $this->translator->trans('admin_event.flash_saved'));
             }
@@ -440,6 +500,11 @@ final class EventController extends AbstractController implements AdminNavigatio
             $this->entityManager->refresh($event);
         }
 
+        return $this->renderEditPage($event, $form);
+    }
+
+    private function renderEditPage(Event $event, FormInterface $form): Response
+    {
         return $this->render('admin/event/edit.html.twig', [
             'active' => 'event',
             'event' => $event,
@@ -596,7 +661,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         $form->remove('featured');
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && $this->validateSeriesName($form)) {
             $user = $this->getAuthedUser();
 
             $event->setCreatedAt(new DateTimeImmutable());
@@ -604,6 +669,11 @@ final class EventController extends AbstractController implements AdminNavigatio
             $event->setInitial(true);
             $event->setFeatured(false);
             $event->setUser($user);
+
+            $seriesRule = $form->get('seriesRule')->getData();
+            if ($seriesRule instanceof EventInterval) {
+                $event->setSeries($this->createSeries(trim((string) $form->get('seriesName')->getData()), $seriesRule));
+            }
 
             // manually hydrate location (unmapped field)
             $locationData = $form->get('location')->getData();
@@ -645,6 +715,32 @@ final class EventController extends AbstractController implements AdminNavigatio
         return new AdminTop(actions: [
             new AdminTopActionButton(label: $this->translator->trans('global.button_back'), target: $this->generateUrl('app_admin_event'), icon: 'arrow-left'),
         ]);
+    }
+
+    private function validateSeriesName(FormInterface $form): bool
+    {
+        if (!$form->get('seriesRule')->getData() instanceof EventInterval) {
+            return true;
+        }
+        if (trim((string) $form->get('seriesName')->getData()) !== '') {
+            return true;
+        }
+        $form->get('seriesName')->addError(new FormError(
+            $this->translator->trans('admin_event.validator_series_name_required', [], 'validators'),
+        ));
+
+        return false;
+    }
+
+    private function createSeries(string $name, EventInterval $rule): EventSeries
+    {
+        $series = new EventSeries();
+        $series->setName($name);
+        $series->setRule($rule);
+        $series->setCreatedAt(new DateTimeImmutable());
+        $this->entityManager->persist($series);
+
+        return $series;
     }
 
     private function getAuthedUser(): User

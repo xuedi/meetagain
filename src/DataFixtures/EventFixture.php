@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Comment;
 use App\Entity\Event;
+use App\Entity\EventSeries;
 use App\Entity\EventTranslation;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
@@ -45,8 +46,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
             $event->setFeatured($data['featured'] ?? false);
             $event->setStart($data['start']);
             $event->setStop($data['stop']);
-            $event->setRecurringOf($data['recurringOf'] ?? null);
-            $event->setRecurringRule($data['recurringRule'] ?? null);
+            $event->setSeries($this->createSeries($manager, $data));
             $event->setUser($data['createdBy']);
             $event->setLocation($data['location']);
             $event->setCreatedAt(new DateTimeImmutable());
@@ -98,6 +98,22 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
             LocationFixture::class,
             HostFixture::class,
         ];
+    }
+
+    private function createSeries(ObjectManager $manager, array $data): ?EventSeries
+    {
+        $rule = $data['recurringRule'] ?? null;
+        if ($rule === null) {
+            return null;
+        }
+
+        $series = new EventSeries();
+        $series->setName($data['content']['en']['title'] ?? $data['name']);
+        $series->setRule($rule);
+        $series->setCreatedAt(new DateTimeImmutable());
+        $manager->persist($series);
+
+        return $series;
     }
 
     private function getData(): array

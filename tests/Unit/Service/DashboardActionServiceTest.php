@@ -109,11 +109,11 @@ class DashboardActionServiceTest extends TestCase
         static::assertCount(1, $result);
     }
 
-    public function testGetRecurringEventsCountReturnsCount(): void
+    public function testGetSeriesCountReturnsCount(): void
     {
-        $this->eventRepoStub->method('getRecurringCount')->willReturn(7);
+        $this->eventRepoStub->method('getSeriesCount')->willReturn(7);
 
-        $result = $this->subject->getRecurringEventsCount();
+        $result = $this->subject->getSeriesCount();
 
         static::assertSame(7, $result);
     }

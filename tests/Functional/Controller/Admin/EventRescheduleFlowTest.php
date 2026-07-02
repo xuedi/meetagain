@@ -4,11 +4,14 @@ namespace Tests\Functional\Controller\Admin;
 
 use App\DataFixtures\EventFixture;
 use App\Entity\Event;
+use App\Entity\EventSeries;
 use App\Entity\EventTranslation;
 use App\Entity\User;
+use App\Enum\EventInterval;
 use App\Service\Event\RecurringEventService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use RRule\RRule;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Crawler;
@@ -102,6 +105,95 @@ class EventRescheduleFlowTest extends WebTestCase
         static::assertCount(1, $child->getRsvp());
     }
 
+    public function testRuleChangeWithoutAllFollowingStillRendersInterstitialAndConfirmRealigns(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+        [$parentId, $childId] = $this->prepareSeriesWithRsvpdChild($client);
+
+        // Act: change only the rule, allFollowing stays unticked
+        $crawler = $this->submitRuleChange($client, $parentId, (string) EventInterval::Monthly->value);
+
+        // Assert: interstitial renders anyway, nothing flushed
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('article.message.is-warning');
+        $this->assertSelectorTextContains('button.is-danger', 'Reschedule series');
+
+        $em = $this->getEntityManager($client);
+        $em->clear();
+        $parent = $em->getRepository(Event::class)->find($parentId);
+        static::assertSame(EventInterval::Weekly, $parent->getSeries()->getRule());
+
+        // Act: confirm
+        $confirmForm = $crawler->selectButton('Reschedule series')->form();
+        $client->submit($confirmForm);
+
+        // Assert: series rule updated and followers realigned onto the monthly pattern
+        $this->assertResponseRedirects('/en/admin/events/' . $parentId . '/edit');
+        $em->clear();
+        $parent = $em->getRepository(Event::class)->find($parentId);
+        static::assertSame(EventInterval::Monthly, $parent->getSeries()->getRule());
+
+        $rrule = new RRule([
+            'freq' => RRule::MONTHLY,
+            'interval' => 1,
+            'dtstart' => $parent->getStart()->format('Y-m-d'),
+            'count' => 2,
+        ]);
+        $occurrence = $rrule->getOccurrences()[1];
+        $expectedChildStart = (clone $parent->getStart())->setDate(
+            (int) $occurrence->format('Y'),
+            (int) $occurrence->format('m'),
+            (int) $occurrence->format('d'),
+        );
+        $child = $em->getRepository(Event::class)->find($childId);
+        static::assertSame($expectedChildStart->format('Y-m-d H:i'), $child->getStart()->format('Y-m-d H:i'));
+    }
+
+    public function testRuleChangeToNonRecurringClosesSeriesAndKeepsMemberDates(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+        [$parentId, $childId] = $this->prepareSeriesWithRsvpdChild($client);
+        $em = $this->getEntityManager($client);
+        $childStartBefore = $em->getRepository(Event::class)->find($childId)->getStart()->format('Y-m-d H:i');
+
+        // Act: switch the rule to NonRecurring (empty placeholder)
+        $crawler = $this->submitRuleChange($client, $parentId, '');
+
+        // Assert: interstitial renders with the closure note
+        $this->assertResponseIsSuccessful();
+        static::assertStringContainsString('You are ending the recurrence', (string) $client->getResponse()->getContent());
+
+        // Act: confirm
+        $confirmForm = $crawler->selectButton('Reschedule series')->form();
+        $client->submit($confirmForm);
+
+        // Assert: series closed, members keep their dates and RSVPs
+        $this->assertResponseRedirects('/en/admin/events/' . $parentId . '/edit');
+        $em->clear();
+        $parent = $em->getRepository(Event::class)->find($parentId);
+        static::assertInstanceOf(EventSeries::class, $parent->getSeries());
+        static::assertNull($parent->getSeries()->getRule());
+
+        $child = $em->getRepository(Event::class)->find($childId);
+        static::assertSame($childStartBefore, $child->getStart()->format('Y-m-d H:i'));
+        static::assertCount(1, $child->getRsvp());
+    }
+
+    private function submitRuleChange(KernelBrowser $client, int $parentId, string $seriesRule): Crawler
+    {
+        $crawler = $client->request('GET', '/en/admin/events/' . $parentId . '/edit');
+        $this->assertResponseIsSuccessful();
+
+        $form = $crawler->selectButton('Save')->form();
+        $form['event[seriesRule]'] = $seriesRule;
+
+        return $client->submit($form);
+    }
+
     private function submitScheduleChange(KernelBrowser $client, int $parentId, DateTime $newStart): Crawler
     {
         $crawler = $client->request('GET', '/en/admin/events/' . $parentId . '/edit');
@@ -127,7 +219,7 @@ class EventRescheduleFlowTest extends WebTestCase
         $em->clear();
 
         $parent = $this->getEventByTitle($client, EventFixture::WEEKLY_GO_STUDY);
-        $children = $em->getRepository(Event::class)->findBy(['recurringOf' => $parent->getId()], ['start' => 'ASC']);
+        $children = $em->getRepository(Event::class)->findBy(['series' => $parent->getSeries(), 'initial' => false], ['start' => 'ASC']);
         $futureChild = null;
         foreach ($children as $child) {
             if ($child->getStart() <= new DateTime()) {

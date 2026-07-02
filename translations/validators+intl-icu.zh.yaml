@@ -43,3 +43,6 @@ Error: 错误
 
 # Admin CMS namespace - reserved slug guard
 'admin_cms.validator_slug_reserved': '该别名为保留别名，不能用于页面。'
+
+# Admin event namespace - series creation
+'admin_event.validator_series_name_required': '请输入系列名称。'

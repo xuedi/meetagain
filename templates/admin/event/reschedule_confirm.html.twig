@@ -15,20 +15,29 @@
 
     <div class="container">
 
-        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
-
         <article class="message is-warning">
             <div class="message-header">
                 <p>{{ 'admin_event.reschedule_intro_title'|trans }}</p>
             </div>
             <div class="message-body">
                 {{ 'admin_event.reschedule_intro_content'|trans|raw }}
-                <p>{{ 'admin_event.reschedule_note_topup'|trans }}</p>
+                {% if seriesClosing %}
+                    <p><strong>{{ 'admin_event.reschedule_note_series_closed'|trans }}</strong></p>
+                {% else %}
+                    <p>{{ 'admin_event.reschedule_note_topup'|trans }}</p>
+                {% endif %}
                 {% if pendingImageDropped %}
                     <p>{{ 'admin_event.reschedule_note_image_dropped'|trans }}</p>
                 {% endif %}
             </div>
         </article>
+
+        {% if event.series %}
+            <p class="mb-4">
+                <strong>{{ 'admin_event.form_label_series_name'|trans }}:</strong>
+                {{ event.series.name }}
+            </p>
+        {% endif %}
 
         <div class="columns">
             <div class="column is-6">
