@@ -15,6 +15,7 @@ use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Emails\Types\EventUpdateNotificationEmail;
+use App\Emails\Types\SeriesRescheduledEmail;
 use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\Entity\Host;
@@ -34,6 +35,7 @@ use App\Service\Config\LanguageService;
 use App\Service\Event\EventService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
+use App\ValueObject\ScheduleChange;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -74,6 +76,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         private readonly ImageLocationService $imageLocationService,
         private readonly TranslatorInterface $translator,
         private readonly EventUpdateNotificationEmail $eventUpdateNotificationEmail,
+        private readonly SeriesRescheduledEmail $seriesRescheduledEmail,
         private readonly HtmlSanitizerInterface $cmsContent,
     ) {}
 
@@ -130,10 +133,18 @@ final class EventController extends AbstractController implements AdminNavigatio
             ),
         ];
 
+        $parentRules = [];
+        foreach ($allEvents as $event) {
+            if ($event->getRecurringRule() !== null) {
+                $parentRules[$event->getId()] = $event->getRecurringRule();
+            }
+        }
+
         return $this->render('admin/event/list.html.twig', [
             'nextEvent' => $this->repo->getNextEventId($eventIds),
             'events' => $events,
             'rsvpCounts' => $this->repo->getRsvpCounts($eventIds),
+            'parentRules' => $parentRules,
             'active' => 'event',
             'adminTop' => new AdminTop(info: $info, actions: $actions),
         ]);
@@ -284,11 +295,49 @@ final class EventController extends AbstractController implements AdminNavigatio
         }
 
         $beforeSnapshot = $this->captureEventSnapshot($event);
+        $oldStart = DateTimeImmutable::createFromInterface($event->getStart());
+        $oldStop = $event->getStop() !== null ? DateTimeImmutable::createFromInterface($event->getStop()) : null;
+        $oldRule = $event->getRecurringRule();
 
         // TODO: simplify with vanilla symfony components now the cascading flush effect is fixed
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid() && !$request->request->has('reschedule_cancel')) {
             $user = $this->getAuthedUser();
+
+            $change = new ScheduleChange(
+                oldStart: $oldStart,
+                oldStop: $oldStop,
+                oldRule: $oldRule,
+                newStart: DateTimeImmutable::createFromInterface($event->getStart()),
+                newStop: $event->getStop() !== null ? DateTimeImmutable::createFromInterface($event->getStop()) : null,
+                newRule: $event->getRecurringRule(),
+            );
+            $isSeries = $event->getRecurringRule() !== null || $event->getRecurringOf() !== null;
+            $wantsRealign = $form->get('allFollowing')->getData() === true && $isSeries && $change->isChanged();
+
+            if ($wantsRealign && !$request->request->has('reschedule_confirm')) {
+                $plan = $this->eventService->planRealignment($event, $change);
+                if (!$plan->isEmpty()) {
+                    $pendingImageDropped = $form->get('image')->getData() instanceof UploadedFile;
+                    $this->entityManager->refresh($event);
+
+                    return $this->render('admin/event/reschedule_confirm.html.twig', [
+                        'active' => 'event',
+                        'event' => $event,
+                        'plan' => $plan,
+                        'change' => $change,
+                        'payload' => $request->request->all(),
+                        'pendingImageDropped' => $pendingImageDropped,
+                        'adminTop' => new AdminTop(actions: [
+                            new AdminTopActionButton(
+                                label: $this->translator->trans('global.button_back'),
+                                target: $this->generateUrl('app_admin_event_edit', ['id' => $event->getId()]),
+                                icon: 'arrow-left',
+                            ),
+                        ]),
+                    ]);
+                }
+            }
 
             // overwrite basic data
             $event->setInitial(true);
@@ -358,15 +407,37 @@ final class EventController extends AbstractController implements AdminNavigatio
             }
 
             if ($form->get('allFollowing')->getData() === true) {
-                $cnt = $this->eventService->updateRecurringEvents($event);
-                $this->addFlash('success', $this->translator->trans('admin_event.flash_saved_with_followup', [
-                    '%count%' => $cnt,
-                ]));
+                $syncCount = $this->eventService->updateRecurringEvents($event, $oldStart);
+                if ($wantsRealign) {
+                    $result = $this->eventService->executeRealignment($this->eventService->planRealignment($event, $change));
+                    foreach ($result->removedAttendees as $userId => $removed) {
+                        if ($userId === $user->getId()) {
+                            continue;
+                        }
+                        $this->seriesRescheduledEmail->send([
+                            'user' => $removed['user'],
+                            'event' => $event,
+                            'removedDates' => $removed['dates'],
+                        ]);
+                    }
+                    $this->addFlash('success', $this->translator->trans('admin_event.flash_saved_with_reschedule', [
+                        '%updated%' => $syncCount,
+                        '%moved%' => $result->movedCount,
+                    ]));
+                } else {
+                    $this->addFlash('success', $this->translator->trans('admin_event.flash_saved_with_followup', [
+                        '%count%' => $syncCount,
+                    ]));
+                }
             } else {
                 $this->addFlash('success', $this->translator->trans('admin_event.flash_saved'));
             }
 
             return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
+        }
+
+        if ($form->isSubmitted() && $request->request->has('reschedule_cancel')) {
+            $this->entityManager->refresh($event);
         }
 
         return $this->render('admin/event/edit.html.twig', [

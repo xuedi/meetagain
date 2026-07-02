@@ -1,0 +1,24 @@
+<h1>您好 {{username}}！</h1>
+
+<p>
+    系列活动 <b>{{eventTitle}}</b> 已调整为新的时间安排，从 <b>{{newStart}}</b> 开始。
+</p>
+
+<p>
+    由于您报名的是特定日期，您在以下日期的报名已被移除：
+</p>
+
+{{removedDatesHtml}}
+
+<p>
+    如果新的日期适合您，请<a href="{{host}}/{{lang}}/event/{{eventId}}">点击这里重新报名</a>。
+</p>
+<p>
+    如果您不想收到此类通知，可以在<br>
+    <a href="{{host}}/{{lang}}/profile/config/">设置</a>中关闭。
+</p>
+
+<p>
+    祝好，<br>
+    {{greeting}}
+</p>

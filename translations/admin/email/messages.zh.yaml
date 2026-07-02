@@ -42,6 +42,7 @@ admin_email_templates:
     trigger_event_reminder: '活动前 5 小时内'
     trigger_upcoming_events: '周日 12:00'
     trigger_event_update_notification: '管理员修改活动开始时间、地点或取消状态时'
+    trigger_series_rescheduled: '系列活动时间调整 - 报名已移除'
 admin_email_sendlog:
     col_subject: '主题'
     page_title: '邮件发送日志'

@@ -1,0 +1,24 @@
+<h1>Hello {{username}}!</h1>
+
+<p>
+    The recurring series <b>{{eventTitle}}</b> has moved to a new schedule starting <b>{{newStart}}</b>.
+</p>
+
+<p>
+    Because you signed up for specific dates, your RSVPs for the following dates were removed:
+</p>
+
+{{removedDatesHtml}}
+
+<p>
+    If the new dates work for you, please <a href="{{host}}/{{lang}}/event/{{eventId}}">RSVP again here</a>.
+</p>
+<p>
+    If you don't like to receive this notification, you can<br>
+    switch them off in your <a href="{{host}}/{{lang}}/profile/config/">settings</a>
+</p>
+
+<p>
+    Cheers,<br>
+    {{greeting}}
+</p>
