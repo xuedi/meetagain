@@ -59,9 +59,9 @@ readonly class DashboardActionService
         return $this->eventRepo->getPastEventsWithoutPhotos($limit, $scope?->eventIds());
     }
 
-    public function getRecurringEventsCount(?DashboardScope $scope = null): int
+    public function getSeriesCount(?DashboardScope $scope = null): int
     {
-        return $this->eventRepo->getRecurringCount($scope?->eventIds());
+        return $this->eventRepo->getSeriesCount($scope?->eventIds());
     }
 
     public function getUnverifiedCount(): int

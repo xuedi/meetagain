@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Enum\EventInterval;
 use App\Enum\EventStatus;
 use App\Enum\EventType;
 use DateTimeImmutable;
@@ -30,11 +29,9 @@ class Event
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?DateTimeInterface $stop = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $recurringOf = null;
-
-    #[ORM\Column(type: 'integer', nullable: true, enumType: EventInterval::class)]
-    private ?EventInterval $recurringRule = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    private ?EventSeries $series = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -143,26 +140,14 @@ class Event
         return $this;
     }
 
-    public function getRecurringOf(): ?int
+    public function getSeries(): ?EventSeries
     {
-        return $this->recurringOf;
+        return $this->series;
     }
 
-    public function setRecurringOf(?int $recurringOf): static
+    public function setSeries(?EventSeries $series): static
     {
-        $this->recurringOf = $recurringOf;
-
-        return $this;
-    }
-
-    public function getRecurringRule(): ?EventInterval
-    {
-        return $this->recurringRule;
-    }
-
-    public function setRecurringRule(?EventInterval $recurringRule): static
-    {
-        $this->recurringRule = $recurringRule;
+        $this->series = $series;
 
         return $this;
     }

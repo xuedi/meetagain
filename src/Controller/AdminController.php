@@ -117,7 +117,7 @@ final class AdminController extends AbstractController
         ], highlight: true);
         $statsRows[] = new TileRow([
             $this->translator->trans('admin_shell.dashboard_stats_recurring'),
-            $this->dashboardAction->getRecurringEventsCount(),
+            $this->dashboardAction->getSeriesCount(),
             '',
         ]);
         $sideTiles[] = new TableTile(
@@ -246,7 +246,7 @@ final class AdminController extends AbstractController
         if ($isOrganizer) {
             $sideTiles[] = new CounterTile(
                 title: 'admin_shell.dashboard_stats_recurring',
-                value: $this->dashboardAction->getRecurringEventsCount($scope),
+                value: $this->dashboardAction->getSeriesCount($scope),
                 icon: 'sync-alt',
             );
         }

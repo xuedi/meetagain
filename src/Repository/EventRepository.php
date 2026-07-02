@@ -405,32 +405,17 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array<Event>
-     */
-    public function findAllRecurring(): array
-    {
-        return $this
-            ->createQueryBuilder('e')
-            ->leftJoin('e.translations', 't')
-            ->addSelect('t')
-            ->where('e.recurringRule IS NOT NULL')
-            ->orderBy('e.start', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
      * @return array<int, Event>
      */
-    public function findFollowUpEvents(int $parentEventId, DateTimeInterface $greaterThan): array
+    public function findFollowUpEvents(int $seriesId, DateTimeInterface $greaterThan): array
     {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $query = $qb
             ->select('e')
             ->from(Event::class, 'e')
-            ->where('e.recurringOf = :parentEvent')
+            ->where('e.series = :seriesId')
             ->andWhere('e.start > :greaterThan')
-            ->setParameter('parentEvent', $parentEventId)
+            ->setParameter('seriesId', $seriesId)
             ->setParameter('greaterThan', $greaterThan)
             ->orderBy('e.start', 'ASC')
             ->getQuery();
@@ -438,13 +423,13 @@ class EventRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
-    public function findNewestAutoChild(int $parentEventId): ?Event
+    public function findNewestSeriesMember(int $seriesId): ?Event
     {
         return $this
             ->createQueryBuilder('e')
-            ->where('e.recurringOf = :parentId')
+            ->where('e.series = :seriesId')
             ->andWhere('e.status != :locked')
-            ->setParameter('parentId', $parentEventId)
+            ->setParameter('seriesId', $seriesId)
             ->setParameter('locked', EventStatus::Locked->value)
             ->orderBy('e.start', 'DESC')
             ->setMaxResults(1)
@@ -521,13 +506,13 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      */
-    public function getRecurringCount(?array $restrictToEventIds = null): int
+    public function getSeriesCount(?array $restrictToEventIds = null): int
     {
         if ($restrictToEventIds === []) {
             return 0;
         }
 
-        $qb = $this->createQueryBuilder('e')->select('COUNT(e.id)')->where('e.recurringRule IS NOT NULL');
+        $qb = $this->createQueryBuilder('e')->select('COUNT(DISTINCT e.series)')->where('e.series IS NOT NULL');
 
         if ($restrictToEventIds !== null) {
             $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
@@ -580,7 +565,14 @@ class EventRepository extends ServiceEntityRepository
      */
     public function findAllForAdmin(?array $restrictToEventIds = null): array
     {
-        $qb = $this->createQueryBuilder('e')->leftJoin('e.translations', 't')->addSelect('t')->leftJoin('e.location', 'l')->addSelect('l');
+        $qb = $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->leftJoin('e.location', 'l')
+            ->addSelect('l')
+            ->leftJoin('e.series', 's')
+            ->addSelect('s');
 
         // Apply event ID filter if provided
         if ($restrictToEventIds !== null) {
