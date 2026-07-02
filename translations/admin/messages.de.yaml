@@ -544,6 +544,10 @@ admin_security:
     empty_incidents: 'Noch keine Live-Sperren erfasst.'
     empty_rate_limiting: 'Keine Rate-Limit-Ereignisse.'
     empty_blocked: 'Aktuell ist nichts gesperrt.'
+    empty_access_denied: 'Keine Zugriffsverweigerungen erfasst.'
+    button_violation_log: 'Verstoßprotokoll'
+    summary_total_access_denied: 'Zugriffsverweigerungen'
+    summary_no_access_denied_in_range: 'keine Ereignisse im Zeitraum'
 admin_security_permissions:
     help: 'Listet jede Admin-Route gruppiert nach erforderlicher Mindestrolle. Rollenanforderungen stammen aus PermissionAttribute-Konstanten und IsGranted-Attributen.'
     anon_no_auth: 'Erreichbar ohne Authentifizierung.'

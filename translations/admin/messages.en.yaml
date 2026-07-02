@@ -544,6 +544,10 @@ admin_security:
     empty_incidents: 'No live blocks recorded yet.'
     empty_rate_limiting: 'No rate-limit events recorded.'
     empty_blocked: 'Nothing currently blocked.'
+    empty_access_denied: 'No access-denied events recorded.'
+    button_violation_log: 'Violation log'
+    summary_total_access_denied: 'access-denied events'
+    summary_no_access_denied_in_range: 'no events in range'
 admin_security_permissions:
     help: 'Lists every admin route grouped by minimum required role. Role floors come from PermissionAttribute constants and IsGranted attributes.'
     anon_no_auth: 'Reachable without authentication.'
