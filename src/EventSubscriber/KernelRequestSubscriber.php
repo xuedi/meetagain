@@ -3,7 +3,6 @@
 namespace App\EventSubscriber;
 
 use App\Controller\SecurityController;
-use App\Entity\Session\Consent;
 use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -51,12 +50,6 @@ readonly class KernelRequestSubscriber implements EventSubscriberInterface
         $isJumpBackEligible = $this->isJumpBackEligible($request->attributes->get('_route'), $request->getPathInfo());
         if ($request->getMethod() === 'GET' && $isJumpBackEligible) {
             $request->getSession()->set('redirectUrl', $request->getRequestUri());
-        }
-
-        $consentSession = $request->getSession()->get('consent_accepted');
-        if ($consentSession === null) {
-            $consent = Consent::createByCookies($request->cookies);
-            $request->getSession()->set('consent', $consent);
         }
     }
 

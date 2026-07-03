@@ -57,8 +57,9 @@ final class AjaxController extends AbstractController
         $consent->save($request->getSession());
 
         $response = new JsonResponse('Saved preferences', Response::HTTP_OK);
-        $response->headers->clearCookie(Consent::TYPE_COOKIES);
-        $response->headers->clearCookie(Consent::TYPE_OSM);
+        foreach ($consent->getHtmlCookies() as $cookie) {
+            $response->headers->setCookie($cookie);
+        }
 
         return $response;
     }

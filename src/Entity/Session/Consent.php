@@ -48,7 +48,7 @@ class Consent implements JsonSerializable
 
     public function getHtmlCookies(): array
     {
-        $cookieExpires = new DateTime('+1 year');
+        $cookieExpires = new DateTime('+6 months');
 
         return [
             new Cookie(name: self::TYPE_OSM, value: $this->getOsm()->value, expire: $cookieExpires, httpOnly: false),
