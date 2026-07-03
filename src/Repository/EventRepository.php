@@ -445,12 +445,12 @@ class EventRepository extends ServiceEntityRepository
     public function getNextEventId(?array $restrictToEventIds = null): ?int
     {
         $now = new DateTime();
-        $now->setTime(0, 0, 0);
         foreach ($this->findAllForAdmin($restrictToEventIds) as $event) {
-            /** @var DateTime $start */
-            $start = clone $event->getStart();
-            $start->setTime(0, 0);
-            if ($start > $now) { // first bigger than today
+            // An event stays the "next" one until its end time passes, so a same-day
+            // or currently-running event keeps the marker until it is actually over.
+            // Events without an explicit end are treated as ending at their start.
+            $end = $event->getStop() ?? $event->getStart();
+            if ($end > $now) {
                 return $event->getId();
             }
         }
