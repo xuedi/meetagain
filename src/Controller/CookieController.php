@@ -33,14 +33,10 @@ final class CookieController extends AbstractController
 
             $response = $this->redirectToRoute('app_cookie');
 
-            if ($consent->getCookies() === ConsentType::Granted) {
-                foreach ($consent->getHtmlCookies() as $cookie) {
-                    $response->headers->setCookie($cookie);
-                }
-            }
-            if ($consent->getCookies() !== ConsentType::Granted) {
-                $response->headers->clearCookie(Consent::TYPE_COOKIES);
-                $response->headers->clearCookie(Consent::TYPE_OSM);
+            // Always persist the choice as functional preference cookies - a rejection included.
+            // The banner reads these client-side; clearing them on deny reopened it in a loop.
+            foreach ($consent->getHtmlCookies() as $cookie) {
+                $response->headers->setCookie($cookie);
             }
 
             return $response;

@@ -94,21 +94,27 @@ class CookieConsentTest extends WebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
     }
 
-    public function testDenyCookiesClearsCookies(): void
+    public function testDenyCookiesPersistsDeniedPreference(): void
     {
         $client = static::createClient();
 
+        // Accept first so the consent cookies exist as 'granted'...
         $acceptToken = $this->cookieToken($client, 'cookie_accept');
         $client->request('POST', '/ajax/cookie/accept', ['_token' => $acceptToken, 'osmConsent' => 'true']);
 
+        // ...then deny. The preference must be persisted as 'denied', not deleted - otherwise the
+        // client-side banner (which keys off the cookie's presence) reopens on reload (the reject loop).
         $denyToken = $this->cookieToken($client, 'cookie_deny');
         $client->request('POST', '/ajax/cookie/deny', ['_token' => $denyToken]);
 
-        $response = $client->getResponse();
-        $setCookieHeaders = $response->headers->all('set-cookie');
+        $cookies = $client->getCookieJar();
+        $consentCookie = $cookies->get(Consent::TYPE_COOKIES);
+        $osmCookie = $cookies->get(Consent::TYPE_OSM);
 
-        // The deny endpoint should clear the cookies
-        static::assertNotEmpty($setCookieHeaders, 'Response should contain Set-Cookie headers to clear cookies');
+        static::assertNotNull($consentCookie, 'Deny must persist a functional consent cookie, not delete it');
+        static::assertSame('denied', $consentCookie->getValue());
+        static::assertNotNull($osmCookie);
+        static::assertSame('denied', $osmCookie->getValue());
     }
 
     public function testCookieConsentResponseIsJson(): void
@@ -156,15 +162,20 @@ class CookieConsentTest extends WebTestCase
     {
         $client = static::createClient();
 
-        // Step 1: User clicks "Deny"
+        // Step 1: User clicks "Deny" without a prior choice
         $token = $this->cookieToken($client, 'cookie_deny');
         $client->request('POST', '/ajax/cookie/deny', ['_token' => $token]);
         $this->assertResponseIsSuccessful();
 
-        // Step 2: Verify response indicates cookies should be cleared
+        // Step 2: Response is the saved-preferences JSON
         $response = $client->getResponse();
         static::assertJson($response->getContent());
         static::assertStringContainsString('Saved preferences', $response->getContent());
+
+        // Step 3: The rejection is stored as a functional cookie so the banner stays closed on reload
+        $consentCookie = $client->getCookieJar()->get(Consent::TYPE_COOKIES);
+        static::assertNotNull($consentCookie);
+        static::assertSame('denied', $consentCookie->getValue());
     }
 
     public function testCookiePageLoads(): void
@@ -219,6 +230,11 @@ class CookieConsentTest extends WebTestCase
         $client->submit($form);
 
         $this->assertResponseRedirects('/en/cookie/');
+
+        // Deny on the manage page persists 'denied' too, so the banner does not reopen.
+        $consentCookie = $client->getCookieJar()->get(Consent::TYPE_COOKIES);
+        static::assertNotNull($consentCookie);
+        static::assertSame('denied', $consentCookie->getValue());
     }
 
     public function testBannerFormActionPointsToCookiePage(): void
