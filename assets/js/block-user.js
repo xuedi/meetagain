@@ -4,7 +4,9 @@
  * Three related user-blocking interactions used on profile and messaging pages:
  *   1. Ajax yes/no toggle (.triggerToggleBlock) — fires the action URL and updates
  *      the button pair styling (is-success / is-danger) without reloading. Used in
- *      the shared _components/toggle.html.twig component.
+ *      the shared _components/toggle.html.twig component. After the server responds it
+ *      dispatches a bubbling `ma:toggled` CustomEvent (detail = the JSON response) so
+ *      page scripts can react to the new state.
  *   2. Ajax unblock (.ajax-unblock) — prompts for confirmation, fires a POST, then
  *      removes the user's table row from the DOM.
  *   3. Ajax block form (.ajax-block-form) — intercepts form submission, prompts for
@@ -41,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         b.classList.toggle('is-danger', !response.newStatus);
                     }
                 });
+                toggleBlock.dispatchEvent(new CustomEvent('ma:toggled', { bubbles: true, detail: response }));
             });
         });
     });

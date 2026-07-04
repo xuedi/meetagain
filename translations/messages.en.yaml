@@ -17,6 +17,7 @@ chrome:
     footer_col_platform: 'Platform'
     footer_col_social: 'Social'
     footer_col_legal: 'Legal'
+    footer_attributions: 'Image credits'
     nav_contact: 'Contact'
     burger_logged_in_label: 'Logged in: %name%'
     burger_admin_section: 'Admin'
@@ -452,6 +453,13 @@ report:
     reason_copyright: 'Copyright'
     reason_inappropriate: 'Inappropriate'
     reason_irrelevant: 'Irrelevant'
+attribution_status:
+    pending: 'Attribution pending'
+attributions:
+    page_title: 'Image credits'
+    heading: 'Image credits'
+    intro: 'Attributions for images used on this site whose licenses require crediting the author.'
+    empty: 'No image credits have been recorded yet.'
 cookie:
     page_title: 'Cookie Settings'
     meta_description: 'Manage your cookie preferences for this site. Control which optional features are enabled.'

@@ -75,7 +75,7 @@ class ConfigServiceTest extends TestCase
         ];
         yield 'site logo' => [
             ImageType::SiteLogo,
-            [[400, 400], [350, 350], [100, 100]],
+            [[400, 400], [350, 350], [100, 100], [50, 50]],
         ];
     }
 

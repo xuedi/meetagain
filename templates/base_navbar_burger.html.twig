@@ -41,6 +41,9 @@
                                 <li><a href="{{ menu.slug }}">{{ menu.name }}</a></li>
                             {% endif %}
                         {% endfor %}
+                        {% if has_image_attributions() %}
+                            <li><a href="{{ path('app_attributions') }}">{{ 'chrome.footer_attributions' | trans }}</a></li>
+                        {% endif %}
                     </ul>
                 </aside>
             </details>

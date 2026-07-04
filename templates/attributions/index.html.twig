@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'attributions.page_title'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <h1 class="title">{{ 'attributions.heading'|trans }}</h1>
+            <p class="subtitle is-6">{{ 'attributions.intro'|trans }}</p>
+
+            {% if images is empty %}
+                <p class="has-text-grey">{{ 'attributions.empty'|trans }}</p>
+            {% else %}
+                <div class="columns is-multiline mt-3">
+                    {% for image in images %}
+                        <div class="column is-one-quarter-desktop is-half-tablet">
+                            {% include '_components/attribution_card.html.twig' with {'image': image} %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

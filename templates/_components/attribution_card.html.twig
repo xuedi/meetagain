@@ -1,0 +1,22 @@
+{#
+    Attribution Card - one attributed image with its credit text beside it.
+
+    Renders a single Bulma box with the image thumbnail on the left and its
+    attribution credit to the right. Exists as a component so the public
+    attributions page and any future credit listing share one card layout.
+
+    Used in:    templates/attributions/index.html.twig
+    Parameters:
+        - image (App\Entity\Image, required) - attributed image; uses hash, alt, attribution
+    Depends on: _components/image.html.twig
+#}
+<div class="box is-full-height">
+    <article class="media">
+        <figure class="media-left">
+            {% include '_components/image.html.twig' with {'image': image, 'size': '50x50'} %}
+        </figure>
+        <div class="media-content">
+            <p class="is-size-7">{{ image.attribution }}</p>
+        </div>
+    </article>
+</div>

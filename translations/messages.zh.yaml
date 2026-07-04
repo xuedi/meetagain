@@ -17,6 +17,7 @@ chrome:
     footer_col_platform: '平台'
     footer_col_social: '社交'
     footer_col_legal: '法律'
+    footer_attributions: '图片来源'
     nav_contact: '联系'
     burger_logged_in_label: '已登录：%name%'
     burger_admin_section: '管理'
@@ -452,6 +453,13 @@ report:
     reason_copyright: '版权'
     reason_inappropriate: '不恰当'
     reason_irrelevant: 'Irrelevant'
+attribution_status:
+    pending: '待署名'
+attributions:
+    page_title: '图片来源'
+    heading: '图片来源'
+    intro: '本网站所用图片的署名信息，这些图片的许可协议要求注明作者。'
+    empty: '尚未记录任何图片来源。'
 cookie:
     page_title: '网站Cookie'
     meta_description: '管理您的Cookie偏好设置。控制哪些可选功能已启用。'
