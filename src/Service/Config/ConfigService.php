@@ -74,8 +74,8 @@ readonly class ConfigService
             ImageType::PluginDish => [[1024, 768], [600, 400], [400, 400], [350, 263], [100, 100], [50, 50]],
             ImageType::LanguageTile => [[600, 400], [350, 233], [300, 200], [100, 100], [50, 50]],
             ImageType::PluginBookclubCover => [[400, 500], [350, 438], [200, 250], [100, 100], [50, 50]],
-            ImageType::SiteLogo => [[400, 400], [350, 350], [100, 100]],
-            ImageType::WebsiteImage => [[1200, 630], [350, 184], [100, 100]],
+            ImageType::SiteLogo => [[400, 400], [350, 350], [100, 100], [50, 50]],
+            ImageType::WebsiteImage => [[1200, 630], [350, 184], [100, 100], [50, 50]],
             default => throw new RuntimeException(sprintf(
                 'No thumbnail sizes registered for image type "%s". Plugin-owned types must be supplied via ImageThumbnailSizeProviderInterface.',
                 $type->name,

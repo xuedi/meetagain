@@ -157,6 +157,76 @@ class ImageRepository extends ServiceEntityRepository
     }
 
     /**
+     * Images carrying an attribution credit (attribution set and not flagged as "no credit needed").
+     *
+     * @param array<int>|null $restrictToIds null = no restriction, [] = block all
+     * @return Image[]
+     */
+    public function findAttributed(?array $restrictToIds = null): array
+    {
+        if ($restrictToIds === []) {
+            return [];
+        }
+
+        $qb = $this
+            ->createQueryBuilder('i')
+            ->where('i.attribution IS NOT NULL')
+            ->andWhere("i.attribution != ''")
+            ->andWhere('i.attributionNotRequired = false')
+            ->orderBy('i.createdAt', 'DESC');
+
+        if ($restrictToIds !== null) {
+            $qb->andWhere('i.id IN (:ids)')->setParameter('ids', $restrictToIds);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @param array<int>|null $restrictToIds null = no restriction, [] = block all
+     */
+    public function hasAttributed(?array $restrictToIds = null): bool
+    {
+        if ($restrictToIds === []) {
+            return false;
+        }
+
+        $qb = $this
+            ->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->where('i.attribution IS NOT NULL')
+            ->andWhere("i.attribution != ''")
+            ->andWhere('i.attributionNotRequired = false');
+
+        if ($restrictToIds !== null) {
+            $qb->andWhere('i.id IN (:ids)')->setParameter('ids', $restrictToIds);
+        }
+
+        return ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
+    }
+
+    /**
+     * @param array<int> $eventIds
+     * @return array<int>
+     */
+    public function findImageIdsForEvents(array $eventIds): array
+    {
+        if ($eventIds === []) {
+            return [];
+        }
+
+        $rows = $this
+            ->createQueryBuilder('i')
+            ->select('i.id')
+            ->where('i.event IN (:eventIds)')
+            ->setParameter('eventIds', $eventIds)
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_map(static fn(array $r): int => (int) $r['id'], $rows);
+    }
+
+    /**
      * @return Image[]
      */
     public function findFiltered(?ImageType $type, ?DateTimeImmutable $since): array
