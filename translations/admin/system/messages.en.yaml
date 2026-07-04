@@ -108,6 +108,12 @@ admin_system_images:
     flash_thumbnails_regenerated: 'Regenerated thumbnails for %count% images in %seconds% seconds'
     flash_thumbnails_cleaned: 'Deleted %count% obsolete thumbnail in %seconds% seconds'
     flash_locations_synced: 'Image location index has been synchronised.'
+    col_attribution: 'Attribution'
+    label_attribution: 'Attribution'
+    placeholder_attribution: 'e.g. Photo by Jane Doe on Unsplash, CC-BY 4.0'
+    label_attribution_not_required: 'Does not need attribution'
+    button_save_attribution: 'Save'
+    flash_attribution_saved: 'Attribution updated.'
 admin_system_seo:
     intro: 'Per-page meta descriptions and IndexNow ping for search-engine indexing.'
     confirm_submit_indexnow: 'Submit all public URLs to IndexNow now?'

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Twig;
 
 use App\Service\Config\ConfigService;
+use App\Service\Media\ImageAttributionService;
 use App\Service\Media\SiteLogoResolver;
 use App\Twig\ConfigExtension;
 use PHPUnit\Framework\MockObject\Stub;
@@ -12,20 +13,22 @@ class ConfigExtensionTest extends TestCase
 {
     private Stub&ConfigService $configServiceStub;
     private Stub&SiteLogoResolver $siteLogoResolverStub;
+    private Stub&ImageAttributionService $imageAttributionServiceStub;
     private ConfigExtension $subject;
 
     protected function setUp(): void
     {
         $this->configServiceStub = $this->createStub(ConfigService::class);
         $this->siteLogoResolverStub = $this->createStub(SiteLogoResolver::class);
-        $this->subject = new ConfigExtension($this->configServiceStub, $this->siteLogoResolverStub);
+        $this->imageAttributionServiceStub = $this->createStub(ImageAttributionService::class);
+        $this->subject = new ConfigExtension($this->configServiceStub, $this->siteLogoResolverStub, $this->imageAttributionServiceStub);
     }
 
     public function testGetFunctionsReturnsExpectedFunctions(): void
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(6, $functions);
+        static::assertCount(7, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('is_show_frontpage', $functionNames);
@@ -34,6 +37,17 @@ class ConfigExtensionTest extends TestCase
         static::assertContains('get_date_format_flatpickr', $functionNames);
         static::assertContains('get_footer_column_title', $functionNames);
         static::assertContains('site_logo_url', $functionNames);
+        static::assertContains('has_image_attributions', $functionNames);
+    }
+
+    public function testHasImageAttributionsDelegatesToService(): void
+    {
+        $this->imageAttributionServiceStub->method('hasAny')->willReturn(true);
+
+        $functions = $this->subject->getFunctions();
+        $fn = $this->findFunction($functions, 'has_image_attributions');
+
+        static::assertTrue($fn->getCallable()());
     }
 
     public function testIsShowTownHallDelegatesToConfigService(): void

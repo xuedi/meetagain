@@ -11,7 +11,7 @@ readonly class FilmclubThumbnailSizeProvider implements ImageThumbnailSizeProvid
     public function getThumbnailSizes(ImageType $type): ?array
     {
         return match ($type) {
-            ImageType::PluginFilmclubPoster => [[400, 600], [200, 300], [100, 150]],
+            ImageType::PluginFilmclubPoster => [[400, 600], [200, 300], [100, 150], [50, 50]],
             default => null,
         };
     }

@@ -75,6 +75,33 @@
                                 </form>
                             </td>
                         </tr>
+                        <tr{% if image.attributionStatus.name == 'Pending' %} class="has-background-warning-light"{% endif %}>
+                            <th>{{ 'admin_system_images.label_attribution'|trans }}</th>
+                            <td>
+                                <form method="post" action="{{ path('app_admin_system_images_update_attribution', {id: image.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('image_update_attribution_' ~ image.id) }}">
+                                    <div class="field">
+                                        <div class="control">
+                                            <input type="text" name="attribution" maxlength="500" class="input is-small" value="{{ image.attribution|default('') }}" placeholder="{{ 'admin_system_images.placeholder_attribution'|trans }}">
+                                        </div>
+                                    </div>
+                                    <div class="field is-grouped is-justify-content-space-between is-align-items-center">
+                                        <div class="control">
+                                            <label class="checkbox is-size-7">
+                                                <input type="checkbox" name="attribution_not_required" value="1"{{ image.attributionNotRequired ? ' checked' }}>
+                                                {{ 'admin_system_images.label_attribution_not_required'|trans }}
+                                            </label>
+                                        </div>
+                                        <div class="control">
+                                            <button type="submit" class="button is-small">
+                                                <span class="icon"><i class="fa fa-save"></i></span>
+                                                <span>{{ 'admin_system_images.button_save_attribution'|trans }}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
                         <tr>
                             <th>{{ 'admin_system_images.label_reported'|trans }}</th>
                             <td>

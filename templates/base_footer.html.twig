@@ -73,6 +73,11 @@
                             </li>
                         {% endif %}
                     {% endfor %}
+                    {% if has_image_attributions() %}
+                        <li>
+                            <a class="is-size-5-mobile" href="{{ path('app_attributions') }}">{{ 'chrome.footer_attributions' | trans }}</a>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

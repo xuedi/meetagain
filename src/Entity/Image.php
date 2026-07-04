@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\AttributionStatus;
 use App\Enum\ImageReportReason;
 use App\Enum\ImageType;
 use DateTimeImmutable;
@@ -30,6 +31,12 @@ class Image
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $alt = null;
+
+    #[ORM\Column(length: 500, nullable: true)]
+    private ?string $attribution = null;
+
+    #[ORM\Column(options: ['default' => false])]
+    private bool $attributionNotRequired = false;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -113,6 +120,43 @@ class Image
         $this->alt = $alt;
 
         return $this;
+    }
+
+    public function getAttribution(): ?string
+    {
+        return $this->attribution;
+    }
+
+    public function setAttribution(?string $attribution): static
+    {
+        $this->attribution = $attribution;
+
+        return $this;
+    }
+
+    public function isAttributionNotRequired(): bool
+    {
+        return $this->attributionNotRequired;
+    }
+
+    public function setAttributionNotRequired(bool $attributionNotRequired): static
+    {
+        $this->attributionNotRequired = $attributionNotRequired;
+
+        return $this;
+    }
+
+    public function getAttributionStatus(): AttributionStatus
+    {
+        if ($this->attributionNotRequired) {
+            return AttributionStatus::NotRequired;
+        }
+
+        if ($this->attribution !== null && $this->attribution !== '') {
+            return AttributionStatus::Provided;
+        }
+
+        return AttributionStatus::Pending;
     }
 
     public function getUploader(): ?User

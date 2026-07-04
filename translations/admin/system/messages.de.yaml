@@ -108,6 +108,12 @@ admin_system_images:
     flash_thumbnails_regenerated: 'Vorschaubilder für %count% Bilder in %seconds% Sekunden neu generiert'
     flash_thumbnails_cleaned: '%count% veraltetes Vorschaubild in %seconds% Sekunden gelöscht'
     flash_locations_synced: 'Bildortindex wurde synchronisiert.'
+    col_attribution: 'Bildnachweis'
+    label_attribution: 'Bildnachweis'
+    placeholder_attribution: 'z.B. Foto von Jane Doe auf Unsplash, CC-BY 4.0'
+    label_attribution_not_required: 'Benötigt keinen Bildnachweis'
+    button_save_attribution: 'Speichern'
+    flash_attribution_saved: 'Bildnachweis aktualisiert.'
 admin_system_seo:
     intro: 'Seitenweite Meta-Beschreibungen und IndexNow-Ping für die Suchmaschinen-Indexierung.'
     confirm_submit_indexnow: 'Alle öffentlichen URLs jetzt an IndexNow senden?'

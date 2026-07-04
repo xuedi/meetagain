@@ -179,6 +179,31 @@ final class ImagesController extends AbstractSettingsController implements Admin
         return $this->redirectToRoute('app_admin_system_images_show', ['id' => $id]);
     }
 
+    #[Route('/{id}/attribution', name: 'app_admin_system_images_update_attribution', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function updateAttribution(int $id, Request $request): Response
+    {
+        $image = $this->imageRepository->find($id);
+        if ($image === null) {
+            throw $this->createNotFoundException('Image not found');
+        }
+
+        if (!$this->isCsrfTokenValid('image_update_attribution_' . $id, (string) $request->request->get('_token'))) {
+            return $this->redirectToRoute('app_admin_system_images_show', ['id' => $id]);
+        }
+
+        $attribution = trim((string) $request->request->get('attribution', ''));
+        $attribution = mb_substr($attribution, 0, 500);
+
+        $image->setAttribution($attribution === '' ? null : $attribution);
+        $image->setAttributionNotRequired($request->request->getBoolean('attribution_not_required'));
+        $image->setUpdatedAt(new DateTimeImmutable());
+        $this->entityManager->flush();
+
+        $this->addFlash('success', $this->translator->trans('admin_system_images.flash_attribution_saved'));
+
+        return $this->redirectToRoute('app_admin_system_images_show', ['id' => $id]);
+    }
+
     #[Route('/regenerate_thumbnails', name: 'app_admin_regenerate_thumbnails', methods: ['POST'])]
     public function regenerateThumbnails(Request $request): Response
     {
