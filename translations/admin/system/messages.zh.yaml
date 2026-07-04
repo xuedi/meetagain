@@ -108,6 +108,12 @@ admin_system_images:
     flash_thumbnails_regenerated: '已在%seconds%秒内为%count%张图片重新生成缩略图'
     flash_thumbnails_cleaned: '已在%seconds%秒内删除%count%个过时缩略图'
     flash_locations_synced: '图片位置索引已同步。'
+    col_attribution: '署名'
+    label_attribution: '署名'
+    placeholder_attribution: '例如：照片由 Jane Doe 提供，来自 Unsplash，CC-BY 4.0'
+    label_attribution_not_required: '无需署名'
+    button_save_attribution: '保存'
+    flash_attribution_saved: '署名已更新。'
 admin_system_seo:
     intro: '各页面元描述以及供搜索引擎索引的 IndexNow 推送。'
     confirm_submit_indexnow: '立即将所有公开 URL 提交到 IndexNow？'

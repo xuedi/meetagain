@@ -7,28 +7,29 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 
 ## Capabilities at a glance
 
-| Interface                                     | When to use it                                       | Key method                            |
-|-----------------------------------------------|------------------------------------------------------|---------------------------------------|
-| `Plugin` (base interface)                     | Serve CSS/JS assets from your plugin                 | `getStylesheets()`, `getJavascripts()` |
-| `AdminNavigationInterface`                    | Add sections and links to the admin sidebar          | `getAdminNavigation()`                |
-| `EventFilterInterface`                        | Control which events are visible                     | `getEventIdFilter()`                  |
-| `MenuFilterInterface`                         | Filter or modify navigation links                    | `filterMenuLinks()`                   |
-| `CmsFilterInterface`                          | Control which CMS pages are visible                  | `getCmsPageSlugs()`                   |
-| `ReservedSlugProviderInterface`               | Reserve slugs the CMS editor must refuse to assign   | `getReservedSlugs()`                  |
-| `MemberFilterInterface`                       | Filter which members appear in lists                 | `getUserIds()`                        |
-| `EventFilterFormContributorInterface`         | Add fields to the event filter form                  | `addFields()`                         |
-| `NotificationProviderInterface`               | Add informational items to the notification bell     | `getNotifications()`                  |
-| `ReviewNotificationProviderInterface`         | Add approve/deny items to the review page            | `getReviewItems()`, `approveItem()`, `denyItem()` |
-| `EntityActionInterface`                       | React to core entity lifecycle events                | `handleEntityAction()`                |
-| `ActivityMetaEnricherInterface`               | Enrich metadata on all activity types                | `enrich()`                            |
-| `MessageInterface`                            | Define a new activity type with display rendering    | `getType()`, `validate()`, `render()` |
-| `SitemapPublisherInterface`                   | Contribute URLs to `/sitemap.xml`                    | `getPriority()`, `getSitemapUrls()`   |
-| `SitemapEventVisibilityFilterInterface`       | Suppress event URLs on specific tenants              | `shouldEmitEvents()`                  |
-| `FollowerEventNotificationFilterInterface`    | Drop follower-RSVP email recipients per event        | `isFollowerAllowed()`                 |
-| `DataHotfixInterface`                         | Ship a one-off data repair that runs once per DB     | `getIdentifier()`, `execute()`        |
-| `SecurityProviderInterface`                   | Participate in live security event detection         | `observe()`, `scanRetrospective()`    |
+| Interface                                     | When to use it                                       | Key method                                          |
+|-----------------------------------------------|------------------------------------------------------|-----------------------------------------------------|
+| `Plugin` (base interface)                     | Serve CSS/JS assets from your plugin                 | `getStylesheets()`, `getJavascripts()`              |
+| `AdminNavigationInterface`                    | Add sections and links to the admin sidebar          | `getAdminNavigation()`                              |
+| `EventFilterInterface`                        | Control which events are visible                     | `getEventIdFilter()`                                |
+| `MenuFilterInterface`                         | Filter or modify navigation links                    | `filterMenuLinks()`                                 |
+| `CmsFilterInterface`                          | Control which CMS pages are visible                  | `getCmsPageSlugs()`                                 |
+| `ReservedSlugProviderInterface`               | Reserve slugs the CMS editor must refuse to assign   | `getReservedSlugs()`                                |
+| `MemberFilterInterface`                       | Filter which members appear in lists                 | `getUserIds()`                                      |
+| `EventFilterFormContributorInterface`         | Add fields to the event filter form                  | `addFields()`                                       |
+| `NotificationProviderInterface`               | Add informational items to the notification bell     | `getNotifications()`                                |
+| `ReviewNotificationProviderInterface`         | Add approve/deny items to the review page            | `getReviewItems()`, `approveItem()`, `denyItem()`   |
+| `EntityActionInterface`                       | React to core entity lifecycle events                | `handleEntityAction()`                              |
+| `ActivityMetaEnricherInterface`               | Enrich metadata on all activity types                | `enrich()`                                          |
+| `MessageInterface`                            | Define a new activity type with display rendering    | `getType()`, `validate()`, `render()`               |
+| `SitemapPublisherInterface`                   | Contribute URLs to `/sitemap.xml`                    | `getPriority()`, `getSitemapUrls()`                 |
+| `SitemapEventVisibilityFilterInterface`       | Suppress event URLs on specific tenants              | `shouldEmitEvents()`                                |
+| `FollowerEventNotificationFilterInterface`    | Drop follower-RSVP email recipients per event        | `isFollowerAllowed()`                               |
+| `ImageAttributionFilterInterface`             | Narrow which attributed images `/attributions` shows | `getVisibleImageIdFilter()`                         |
+| `DataHotfixInterface`                         | Ship a one-off data repair that runs once per DB     | `getIdentifier()`, `execute()`                      |
+| `SecurityProviderInterface`                   | Participate in live security event detection         | `observe()`, `scanRetrospective()`                  |
 | `PluginSettingsProviderInterface`             | Add a settings section to `/admin/plugin/settings`   | `getKey()`, `getFormType()`, `loadData()`, `save()` |
-| `ProfileConfigPrivacyToggleProviderInterface` | Add a toggle row to `/profile/config` -> "privacy"   | `getToggle()`                         |
+| `ProfileConfigPrivacyToggleProviderInterface` | Add a toggle row to `/profile/config` -> "privacy"   | `getToggle()`                                       |
 
 ---
 
@@ -68,10 +69,10 @@ public function getJavascripts(): array
 
 ### How paths resolve
 
-| What you return | File on disk | Logical asset path | `asset()` output |
-|---|---|---|---|
+| What you return       | File on disk                                     | Logical asset path                        | `asset()` output                                         |
+|-----------------------|--------------------------------------------------|-------------------------------------------|----------------------------------------------------------|
 | `styles/myplugin.css` | `plugins/your-plugin/assets/styles/myplugin.css` | `plugins/your-plugin/styles/myplugin.css` | `/assets/plugins/your-plugin/styles/myplugin-{hash}.css` |
-| `js/myplugin.js` | `plugins/your-plugin/assets/js/myplugin.js` | `plugins/your-plugin/js/myplugin.js` | `/assets/plugins/your-plugin/js/myplugin-{hash}.js` |
+| `js/myplugin.js`      | `plugins/your-plugin/assets/js/myplugin.js`      | `plugins/your-plugin/js/myplugin.js`      | `/assets/plugins/your-plugin/js/myplugin-{hash}.js`      |
 
 The `PluginExtension` Twig service prefixes your paths with `plugins/your-plugin/` automatically.
 The base template wraps each path in `{{ asset(...) }}` — you never call `asset()` yourself from `Kernel.php`.
@@ -475,7 +476,8 @@ readonly class CategoryFilterContributor implements EventFilterFormContributorIn
 
 ### NotificationProviderInterface
 
-**Purpose:** Contribute informational items to the notification bell - items that link to a page but need no approve/deny action (e.g. open polls, unread messages).
+**Purpose:** Contribute informational items to the notification bell - items that link to a page but need no
+approve/deny action (e.g. open polls, unread messages).
 
 **File:** `src/Service/Notification/User/NotificationProviderInterface.php`
 
@@ -571,6 +573,7 @@ readonly class MyReviewProvider implements ReviewNotificationProviderInterface
 ```
 
 **Key rules:**
+
 - `getIdentifier()` is embedded in form action URLs - never change it once deployed
 - Both `approveItem()` and `denyItem()` must check authorisation themselves and throw `AccessDeniedException` if denied
 - `itemId` is always cast to/from string; use `(int) $itemId` to recover the DB id
@@ -782,11 +785,14 @@ $this->myPluginEmail->send(['user' => $user, ...]);
 ```
 
 For **scheduled emails** (cron-driven), implement `ScheduledEmailInterface` additionally:
+
 - `getDueContexts(DateTimeImmutable $now): DueContext[]` — return what is due now; return `[]` to skip
 - `markContextSent(DueContext $context): void` — persist the "sent" state after processing
-- `getPlannedItems(DateTimeImmutable $from, DateTimeImmutable $to): ScheduledMailItem[]` — shown on `/admin/email/planned`
+- `getPlannedItems(DateTimeImmutable $from, DateTimeImmutable $to): ScheduledMailItem[]` — shown on
+  `/admin/email/planned`
 
-`SendScheduledEmailsService` picks up all `ScheduledEmailInterface` implementations automatically via `#[AutowireIterator]`.
+`SendScheduledEmailsService` picks up all `ScheduledEmailInterface` implementations automatically via
+`#[AutowireIterator]`.
 
 !!! note
 Plugin email identifiers must not collide with core `EmailType` enum values. If your email type

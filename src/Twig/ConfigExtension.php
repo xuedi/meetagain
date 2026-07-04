@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Service\Config\ConfigService;
+use App\Service\Media\ImageAttributionService;
 use App\Service\Media\SiteLogoResolver;
 use Override;
 use Twig\Extension\AbstractExtension;
@@ -13,6 +14,7 @@ final class ConfigExtension extends AbstractExtension
     public function __construct(
         private readonly ConfigService $configService,
         private readonly SiteLogoResolver $siteLogoResolver,
+        private readonly ImageAttributionService $imageAttributionService,
     ) {}
 
     #[Override]
@@ -25,6 +27,7 @@ final class ConfigExtension extends AbstractExtension
             new TwigFunction('get_date_format_flatpickr', $this->configService->getDateFormatFlatpickr(...)),
             new TwigFunction('get_footer_column_title', $this->configService->getFooterColumnTitle(...)),
             new TwigFunction('site_logo_url', $this->siteLogoResolver->resolveUrl(...)),
+            new TwigFunction('has_image_attributions', $this->imageAttributionService->hasAny(...)),
         ];
     }
 }
