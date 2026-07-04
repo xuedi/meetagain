@@ -87,7 +87,6 @@ final class ImagesController extends AbstractSettingsController implements Admin
                 csrfTokenId: 'admin_regenerate_thumbnails',
                 icon: 'sync',
                 variant: 'is-warning',
-                confirm: $this->translator->trans('admin_system_images.confirm_regenerate_thumbnails'),
             ),
             new AdminTopActionForm(
                 label: $this->translator->trans('admin_system_images.button_cleanup_thumbnails'),
@@ -95,7 +94,6 @@ final class ImagesController extends AbstractSettingsController implements Admin
                 csrfTokenId: 'admin_cleanup_thumbnails',
                 icon: 'trash',
                 variant: 'is-warning',
-                confirm: $this->translator->trans('admin_system_images.confirm_cleanup_thumbnails'),
             ),
             new AdminTopActionForm(
                 label: $this->translator->trans('admin_system_images.button_sync_locations'),
@@ -103,7 +101,6 @@ final class ImagesController extends AbstractSettingsController implements Admin
                 csrfTokenId: 'admin_sync_image_locations',
                 icon: 'map-pin',
                 variant: 'is-warning',
-                confirm: $this->translator->trans('admin_system_images.confirm_sync_locations'),
             ),
             $this->buildLocationDropdown($locationFilter, $range, $since),
             $this->buildRangeDropdown($range, $locationFilter),
