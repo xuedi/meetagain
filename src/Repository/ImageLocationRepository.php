@@ -36,6 +36,34 @@ class ImageLocationRepository extends ServiceEntityRepository
     }
 
     /**
+     * Returns the distinct image IDs stored at a given location for any of the given types.
+     * Resolves images owned directly by an entity, where that entity's own ID is stored as the
+     * location_id (as opposed to images owned indirectly through other content).
+     *
+     * @param list<ImageType> $types
+     * @return array<int>
+     */
+    public function findImageIdsByTypesAndLocationId(array $types, int $locationId): array
+    {
+        if ($types === []) {
+            return [];
+        }
+
+        $typeValues = array_map(static fn(ImageType $type) => $type->value, $types);
+        $placeholders = implode(', ', array_fill(0, count($typeValues), '?'));
+
+        $rows = $this
+            ->getEntityManager()
+            ->getConnection()
+            ->fetchFirstColumn(
+                "SELECT DISTINCT image_id FROM image_location WHERE location_id = ? AND location_type IN ({$placeholders})",
+                array_merge([$locationId], $typeValues),
+            );
+
+        return array_map('intval', $rows);
+    }
+
+    /**
      * Bulk-delete rows matching the given type and (imageId, locationId) pairs.
      *
      * @param array<array{imageId: int, locationId: int}> $pairs
