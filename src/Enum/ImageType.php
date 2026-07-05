@@ -40,7 +40,7 @@ enum ImageType: int
     {
         $choices = [];
         foreach (self::cases() as $case) {
-            $choices[$case->value] = $translator->trans('image_type_' . strtolower($case->name));
+            $choices[$case->value] = $translator->trans('image_type.' . strtolower($case->name));
         }
 
         return $choices;
