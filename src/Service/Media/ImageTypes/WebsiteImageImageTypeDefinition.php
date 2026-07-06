@@ -1,14 +1,20 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Media\ImageLocations;
+namespace App\Service\Media\ImageTypes;
 
+use App\Entity\Image;
 use App\Enum\ImageType;
 
-final class WebsiteImageLocationProvider extends AbstractImageLocationProvider
+final class WebsiteImageImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function getType(): ImageType
     {
         return ImageType::WebsiteImage;
+    }
+
+    protected function sizes(): array
+    {
+        return [[1200, 630], [350, 184]];
     }
 
     public function getEditLink(int $locationId): ?array
@@ -30,5 +36,19 @@ final class WebsiteImageLocationProvider extends AbstractImageLocationProvider
         }
 
         return [['imageId' => $imageId, 'locationId' => 0]];
+    }
+
+    public function locate(Image $image): ?array
+    {
+        $row = $this->connection->fetchAssociative("SELECT value FROM config WHERE name = 'website_image_id' LIMIT 1");
+        if ($row === false || (int) $row['value'] <= 0 || (int) $row['value'] !== $image->getId()) {
+            return null;
+        }
+
+        return [
+            'label' => 'Website image',
+            'route' => 'app_admin_system_config',
+            'params' => [],
+        ];
     }
 }
