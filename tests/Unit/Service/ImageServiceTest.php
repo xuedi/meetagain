@@ -9,7 +9,7 @@ use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
 use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
-use App\Service\Config\ConfigService;
+use App\Service\Media\ImageTypes\ImageTypeRegistry;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
@@ -27,14 +27,14 @@ class ImageServiceTest extends TestCase
     private function createService(
         ?ImageRepository $imageRepo = null,
         ?EntityManagerInterface $entityManager = null,
-        ?ConfigService $configService = null,
+        ?ImageTypeRegistry $imageTypeRegistry = null,
         ?ExtendedFilesystem $filesystemService = null,
         ?LoggerInterface $logger = null,
     ): ImageService {
         return new ImageService(
             $imageRepo ?? $this->createStub(ImageRepository::class),
             $entityManager ?? $this->createStub(EntityManagerInterface::class),
-            $configService ?? $this->createStub(ConfigService::class),
+            $imageTypeRegistry ?? $this->createStub(ImageTypeRegistry::class),
             $filesystemService ?? $this->createStub(ExtendedFilesystem::class),
             $logger ?? $this->createStub(LoggerInterface::class),
             $this->kernelProjectDir,
@@ -149,7 +149,7 @@ class ImageServiceTest extends TestCase
             ->setConstructorArgs([
                 $this->createStub(ImageRepository::class),
                 $this->createStub(EntityManagerInterface::class),
-                $this->createStub(ConfigService::class),
+                $this->createStub(ImageTypeRegistry::class),
                 $this->createStub(ExtendedFilesystem::class),
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
@@ -182,7 +182,7 @@ class ImageServiceTest extends TestCase
             ->setConstructorArgs([
                 $this->createStub(ImageRepository::class),
                 $this->createStub(EntityManagerInterface::class),
-                $this->createStub(ConfigService::class),
+                $this->createStub(ImageTypeRegistry::class),
                 $this->createStub(ExtendedFilesystem::class),
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
@@ -206,9 +206,9 @@ class ImageServiceTest extends TestCase
     public function testGetStatistics(): void
     {
         // Arrange: mock config service to return thumbnail size list
-        $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock->expects($this->once())->method('getThumbnailSizeList')->willReturn(['100x100' => 0, '200x200' => 0]);
-        $configServiceMock
+        $imageTypeRegistryMock = $this->createMock(ImageTypeRegistry::class);
+        $imageTypeRegistryMock->expects($this->once())->method('getThumbnailSizeList')->willReturn(['100x100' => 0, '200x200' => 0]);
+        $imageTypeRegistryMock
             ->expects($this->exactly(2))
             ->method('getThumbnailSizes')
             ->willReturnMap([
@@ -241,7 +241,7 @@ class ImageServiceTest extends TestCase
             ->setConstructorArgs([
                 $imageRepoMock,
                 $this->createStub(EntityManagerInterface::class),
-                $configServiceMock,
+                $imageTypeRegistryMock,
                 $filesystemMock,
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
@@ -301,8 +301,8 @@ class ImageServiceTest extends TestCase
         // Arrange: mock config service to check if thumbnail size is valid
         // Note: isValidThumbnailSize is only called for hashes that exist in the file list
         // hash3 is not in the list, so we only get 3 calls (hash1_100x100, hash2_200x200, hash1_300x300)
-        $configServiceMock = $this->createMock(ConfigService::class);
-        $configServiceMock
+        $imageTypeRegistryMock = $this->createMock(ImageTypeRegistry::class);
+        $imageTypeRegistryMock
             ->expects($this->exactly(3))
             ->method('isValidThumbnailSize')
             ->willReturnCallback(static function (ImageType $type, int $width, int $height) {
@@ -319,7 +319,7 @@ class ImageServiceTest extends TestCase
                 return false;
             });
 
-        $subject = $this->createService(imageRepo: $imageRepoMock, configService: $configServiceMock, filesystemService: $filesystemMock);
+        $subject = $this->createService(imageRepo: $imageRepoMock, imageTypeRegistry: $imageTypeRegistryMock, filesystemService: $filesystemMock);
 
         // Act: get obsolete thumbnails
         $result = $subject->getObsoleteThumbnails();
@@ -341,7 +341,7 @@ class ImageServiceTest extends TestCase
             ->setConstructorArgs([
                 $this->createStub(ImageRepository::class),
                 $this->createStub(EntityManagerInterface::class),
-                $this->createStub(ConfigService::class),
+                $this->createStub(ImageTypeRegistry::class),
                 $filesystemMock,
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
@@ -499,9 +499,9 @@ class ImageServiceTest extends TestCase
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findOneBy')->willReturn(null);
 
-        $configService = $this->createStub(ConfigService::class);
-        $configService->method('getThumbnailSizes')->willReturn([]);
-        $configService->method('getFitMode')->willReturn(ImageFitMode::Fit);
+        $imageTypeRegistry = $this->createStub(ImageTypeRegistry::class);
+        $imageTypeRegistry->method('getThumbnailSizes')->willReturn([]);
+        $imageTypeRegistry->method('getFitMode')->willReturn(ImageFitMode::Fit);
 
         $nextId = 100;
         $em = $this->createStub(EntityManagerInterface::class);
@@ -534,7 +534,7 @@ class ImageServiceTest extends TestCase
         $subject = new ImageService(
             $imageRepo,
             $em,
-            $configService,
+            $imageTypeRegistry,
             $this->createStub(ExtendedFilesystem::class),
             $this->createStub(LoggerInterface::class),
             $this->kernelProjectDir,
@@ -551,9 +551,9 @@ class ImageServiceTest extends TestCase
     public function testCreateThumbnailsSkipsAlreadyExistingTargets(): void
     {
         // Arrange - file already exists for every requested size → 0 created, no Imagick attempt
-        $configService = $this->createStub(ConfigService::class);
-        $configService->method('getThumbnailSizes')->willReturn([[100, 100], [200, 200]]);
-        $configService->method('getFitMode')->willReturn(ImageFitMode::Fit);
+        $imageTypeRegistry = $this->createStub(ImageTypeRegistry::class);
+        $imageTypeRegistry->method('getThumbnailSizes')->willReturn([[100, 100], [200, 200]]);
+        $imageTypeRegistry->method('getFitMode')->willReturn(ImageFitMode::Fit);
 
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(true);
@@ -563,7 +563,7 @@ class ImageServiceTest extends TestCase
         $image->method('getExtension')->willReturn('jpg');
         $image->method('getType')->willReturn(ImageType::ProfilePicture);
 
-        $subject = $this->createService(configService: $configService, filesystemService: $fs);
+        $subject = $this->createService(imageTypeRegistry: $imageTypeRegistry, filesystemService: $fs);
 
         // Act
         $created = $subject->createThumbnails($image);
@@ -576,9 +576,9 @@ class ImageServiceTest extends TestCase
     public function testCreateThumbnailsCatchesImagickErrorsForEitherFitMode(ImageFitMode $fitMode): void
     {
         // Arrange - source file does not exist → Imagick throws → caught and logged
-        $configService = $this->createStub(ConfigService::class);
-        $configService->method('getThumbnailSizes')->willReturn([[50, 50]]);
-        $configService->method('getFitMode')->willReturn($fitMode);
+        $imageTypeRegistry = $this->createStub(ImageTypeRegistry::class);
+        $imageTypeRegistry->method('getThumbnailSizes')->willReturn([[50, 50]]);
+        $imageTypeRegistry->method('getFitMode')->willReturn($fitMode);
 
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(false);
@@ -591,7 +591,7 @@ class ImageServiceTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('error');
 
-        $subject = $this->createService(configService: $configService, filesystemService: $fs, logger: $logger);
+        $subject = $this->createService(imageTypeRegistry: $imageTypeRegistry, filesystemService: $fs, logger: $logger);
 
         // Act
         $created = $subject->createThumbnails($image);
@@ -620,14 +620,14 @@ class ImageServiceTest extends TestCase
         $imageRepo = $this->createMock(ImageRepository::class);
         $imageRepo->expects($this->once())->method('findAll')->willReturn($images);
 
-        $configService = $this->createStub(ConfigService::class);
-        $configService->method('getThumbnailSizes')->willReturn([[10, 10]]);
-        $configService->method('getFitMode')->willReturn(ImageFitMode::Fit);
+        $imageTypeRegistry = $this->createStub(ImageTypeRegistry::class);
+        $imageTypeRegistry->method('getThumbnailSizes')->willReturn([[10, 10]]);
+        $imageTypeRegistry->method('getFitMode')->willReturn(ImageFitMode::Fit);
 
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(false);
 
-        $subject = $this->createService(imageRepo: $imageRepo, configService: $configService, filesystemService: $fs);
+        $subject = $this->createService(imageRepo: $imageRepo, imageTypeRegistry: $imageTypeRegistry, filesystemService: $fs);
 
         // Act
         $count = $subject->regenerateAllThumbnails();
@@ -639,8 +639,8 @@ class ImageServiceTest extends TestCase
     public function testRotateThumbNailCatchesImagickErrors(): void
     {
         // Arrange - thumbnail path does not exist → Imagick throws → caught and logged
-        $configService = $this->createStub(ConfigService::class);
-        $configService->method('getThumbnailSizes')->willReturn([[10, 10], [20, 20]]);
+        $imageTypeRegistry = $this->createStub(ImageTypeRegistry::class);
+        $imageTypeRegistry->method('getThumbnailSizes')->willReturn([[10, 10], [20, 20]]);
 
         $image = $this->createStub(Image::class);
         $image->method('getHash')->willReturn('rotate_hash');
@@ -652,7 +652,7 @@ class ImageServiceTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->never())->method('flush');
 
-        $subject = $this->createService(entityManager: $em, configService: $configService, logger: $logger);
+        $subject = $this->createService(entityManager: $em, imageTypeRegistry: $imageTypeRegistry, logger: $logger);
 
         // Act / Assert - returns without throwing
         $subject->rotateThumbNail($image);

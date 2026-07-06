@@ -4,13 +4,11 @@ namespace Tests\Unit\Service;
 
 use App\Entity\Config;
 use App\Enum\ConfigType;
-use App\Enum\ImageType;
 use App\ExtendedFilesystem;
 use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use Doctrine\ORM\EntityManagerInterface;
-use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -43,91 +41,6 @@ class ConfigServiceTest extends TestCase
             appState: $this->createStub(AppStateService::class),
             fs: $this->createStub(ExtendedFilesystem::class),
         );
-    }
-
-    #[DataProvider('thumbnailSizeProvider')]
-    public function testGetThumbnailSizes(ImageType $imageType, array $expected): void
-    {
-        static::assertSame($expected, $this->subject->getThumbnailSizes($imageType));
-    }
-
-    public static function thumbnailSizeProvider(): Generator
-    {
-        yield 'profile picture' => [
-            ImageType::ProfilePicture,
-            [[400, 400], [350, 350], [100, 100], [80, 80], [50, 50]],
-        ];
-        yield 'event teaser' => [
-            ImageType::EventTeaser,
-            [[1024, 768], [600, 400], [350, 263], [210, 140], [100, 100], [50, 50]],
-        ];
-        yield 'event upload' => [
-            ImageType::EventUpload,
-            [[1024, 768], [350, 263], [210, 140], [100, 100], [50, 50]],
-        ];
-        yield 'cms block' => [
-            ImageType::CmsBlock,
-            [[432, 432], [350, 350], [100, 100], [80, 80], [50, 50]],
-        ];
-        yield 'plugin dish' => [
-            ImageType::PluginDish,
-            [[1024, 768], [600, 400], [400, 400], [350, 263], [100, 100], [50, 50]],
-        ];
-        yield 'site logo' => [
-            ImageType::SiteLogo,
-            [[400, 400], [350, 350], [100, 100], [50, 50]],
-        ];
-    }
-
-    public function testGetThumbnailSizeList(): void
-    {
-        $expected = [
-            '1024x768' => 0,
-            '1200x630' => 0,
-            '600x400' => 0,
-            '432x432' => 0,
-            '400x500' => 0,
-            '400x400' => 0,
-            '350x438' => 0,
-            '350x350' => 0,
-            '350x263' => 0,
-            '350x184' => 0,
-            '350x233' => 0,
-            '300x200' => 0,
-            '210x140' => 0,
-            '200x250' => 0,
-            '100x100' => 0,
-            '80x80' => 0,
-            '50x50' => 0,
-        ];
-
-        static::assertSame($expected, $this->subject->getThumbnailSizeList());
-    }
-
-    #[DataProvider('thumbnailSizeValidationProvider')]
-    public function testIsValidThumbnailSize(ImageType $imageType, int $width, int $height, bool $expected): void
-    {
-        static::assertSame($expected, $this->subject->isValidThumbnailSize($imageType, $width, $height));
-    }
-
-    public static function thumbnailSizeValidationProvider(): Generator
-    {
-        yield 'profile picture 400x400 valid' => [ImageType::ProfilePicture, 400, 400, true];
-        yield 'profile picture 80x80 valid' => [ImageType::ProfilePicture, 80, 80, true];
-        yield 'profile picture 50x50 valid' => [ImageType::ProfilePicture, 50, 50, true];
-        yield 'profile picture 1024x768 invalid' => [ImageType::ProfilePicture, 1024, 768, false];
-        yield 'profile picture random size invalid' => [ImageType::ProfilePicture, 128000, 51200, false];
-        yield 'event teaser 600x400 valid' => [ImageType::EventTeaser, 600, 400, true];
-        yield 'event teaser 400x400 invalid' => [ImageType::EventTeaser, 400, 400, false];
-        yield 'event upload 210x140 valid' => [ImageType::EventUpload, 210, 140, true];
-        yield 'event upload 600x400 invalid' => [ImageType::EventUpload, 600, 400, false];
-        yield 'cms block 432x432 valid' => [ImageType::CmsBlock, 432, 432, true];
-        yield 'cms block 80x80 valid' => [ImageType::CmsBlock, 80, 80, true];
-        yield 'cms block 400x400 invalid' => [ImageType::CmsBlock, 400, 400, false];
-        yield 'plugin dish 600x400 valid' => [ImageType::PluginDish, 600, 400, true];
-        yield 'plugin dish 100x100 valid' => [ImageType::PluginDish, 100, 100, true];
-        yield 'plugin dish 50x50 valid' => [ImageType::PluginDish, 50, 50, true];
-        yield 'plugin dish 80x80 invalid' => [ImageType::PluginDish, 80, 80, false];
     }
 
     public function testGetHostReturnsDefaultWhenNotConfigured(): void

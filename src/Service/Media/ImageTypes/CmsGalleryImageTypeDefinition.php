@@ -1,15 +1,33 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Media\ImageLocations;
+namespace App\Service\Media\ImageTypes;
 
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\ImageType;
+use App\Repository\CmsBlockRepository;
+use App\Repository\ImageLocationRepository;
+use Doctrine\DBAL\Connection;
 
-final class CmsGalleryLocationProvider extends AbstractImageLocationProvider
+final class CmsGalleryImageTypeDefinition extends AbstractImageTypeDefinition
 {
+    use ResolvesCmsBlockLocation;
+
+    public function __construct(
+        ImageLocationRepository $repo,
+        Connection $connection,
+        private readonly CmsBlockRepository $cmsBlockRepository,
+    ) {
+        parent::__construct($repo, $connection);
+    }
+
     public function getType(): ImageType
     {
         return ImageType::CmsGallery;
+    }
+
+    protected function sizes(): array
+    {
+        return [[1024, 768], [350, 263], [210, 140]];
     }
 
     public function getEditLink(int $locationId): ?array
@@ -36,5 +54,10 @@ final class CmsGalleryLocationProvider extends AbstractImageLocationProvider
         }
 
         return $pairs;
+    }
+
+    protected function cmsBlockRepository(): CmsBlockRepository
+    {
+        return $this->cmsBlockRepository;
     }
 }
