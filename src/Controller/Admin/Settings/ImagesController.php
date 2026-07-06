@@ -13,9 +13,9 @@ use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Enum\ImageType;
 use App\Repository\ImageLocationRepository;
 use App\Repository\ImageRepository;
-use App\Service\Config\ConfigService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
+use App\Service\Media\ImageTypes\ImageTypeRegistry;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -45,7 +45,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         private readonly ImageRepository $imageRepository,
         private readonly ImageLocationRepository $imageLocationRepository,
         private readonly ImageLocationService $imageLocationService,
-        private readonly ConfigService $configService,
+        private readonly ImageTypeRegistry $imageTypeRegistry,
         private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct($translator, 'images');
@@ -146,7 +146,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
             'image' => $image,
             'locations' => $locations,
             'editLinks' => $editLinks,
-            'previewSize' => $this->configService->getAdminPreviewSize($image->getType()),
+            'previewSize' => $this->imageTypeRegistry->getAdminPreviewSize($image->getType()),
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);

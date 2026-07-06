@@ -9,7 +9,7 @@ use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
 use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
-use App\Service\Config\ConfigService;
+use App\Service\Media\ImageTypes\ImageTypeRegistry;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
@@ -25,7 +25,7 @@ readonly class ImageService
     public function __construct(
         private ImageRepository $imageRepo,
         private EntityManagerInterface $entityManager,
-        private ConfigService $configService,
+        private ImageTypeRegistry $imageTypeRegistry,
         private ExtendedFilesystem $filesystem,
         private LoggerInterface $logger,
         private string $kernelProjectDir,
@@ -91,8 +91,8 @@ readonly class ImageService
         $cnt = 0;
         $source = $this->getSourceFile($image);
         $imageType ??= $image->getType();
-        $sizes = $this->configService->getThumbnailSizes($imageType);
-        $fitMode = $this->configService->getFitMode($imageType);
+        $sizes = $this->imageTypeRegistry->getThumbnailSizes($imageType);
+        $fitMode = $this->imageTypeRegistry->getFitMode($imageType);
         foreach ($sizes as [$width, $height]) {
             $target = $this->getThumbnailFile($image, $width, $height);
             if ($this->filesystem->fileExists($target)) {
@@ -133,7 +133,7 @@ readonly class ImageService
 
     public function rotateThumbNail(Image $image): void
     {
-        $sizes = $this->configService->getThumbnailSizes($image->getType());
+        $sizes = $this->imageTypeRegistry->getThumbnailSizes($image->getType());
         foreach ($sizes as [$width, $height]) {
             $thumbnail = $this->getThumbnailFile($image, $width, $height);
 
@@ -160,7 +160,7 @@ readonly class ImageService
     public function getStatistics(): array
     {
         $thumpFileList = [];
-        $sizeListCount = $this->configService->getThumbnailSizeList();
+        $sizeListCount = $this->imageTypeRegistry->getThumbnailSizeList();
         foreach ($this->filesystem->scanDirectory($this->getThumbnailDir()) as $file) {
             if (str_starts_with((string) $file, '.')) {
                 continue;
@@ -174,7 +174,7 @@ readonly class ImageService
         $missingThumbnailsCount = 0;
         foreach ($this->imageRepo->getFileList() as $hash => $type) {
             $imageTypes[$type->name] = ($imageTypes[$type->name] ?? 0) + 1;
-            foreach ($this->configService->getThumbnailSizes($type) as [$width, $height]) {
+            foreach ($this->imageTypeRegistry->getThumbnailSizes($type) as [$width, $height]) {
                 $expected = $this->getThumbnailFileByHash($hash, $width, $height, true);
                 if (!isset($thumpFileList[$expected])) {
                     ++$missingThumbnailsCount;
@@ -208,7 +208,7 @@ readonly class ImageService
                 $list[] = $file;
                 continue;
             }
-            if (!$this->configService->isValidThumbnailSize($imageList[$hash], (int) $width, (int) $height)) {
+            if (!$this->imageTypeRegistry->isValidThumbnailSize($imageList[$hash], (int) $width, (int) $height)) {
                 $list[] = $file;
             }
         }

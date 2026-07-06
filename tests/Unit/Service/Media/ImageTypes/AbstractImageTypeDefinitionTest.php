@@ -1,24 +1,34 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Unit\Service\ImageLocations;
+namespace Tests\Unit\Service\Media\ImageTypes;
 
+use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
 use App\Repository\ImageLocationRepository;
-use App\Service\Media\ImageLocations\AbstractImageLocationProvider;
+use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Minimal concrete implementation for testing AbstractImageLocationProvider::sync().
+ * Minimal concrete definition for exercising the shared abstract behaviour.
  */
-class TestLocationProvider extends AbstractImageLocationProvider
+class TestImageTypeDefinition extends AbstractImageTypeDefinition
 {
+    /** @var array<array{imageId: int, locationId: int}> */
     public array $discovered = [];
+
+    /** @var array<int, array{0: int, 1: int}> */
+    public array $rawSizes = [[400, 400]];
 
     public function getType(): ImageType
     {
         return ImageType::EventTeaser;
+    }
+
+    protected function sizes(): array
+    {
+        return $this->rawSizes;
     }
 
     public function getEditLink(int $locationId): ?array
@@ -32,14 +42,47 @@ class TestLocationProvider extends AbstractImageLocationProvider
     }
 }
 
-class AbstractImageLocationProviderTest extends TestCase
+class AbstractImageTypeDefinitionTest extends TestCase
 {
-    private function makeProvider(ImageLocationRepository $repo): TestLocationProvider
+    private function makeDefinition(?ImageLocationRepository $repo = null): TestImageTypeDefinition
     {
-        return new TestLocationProvider(repo: $repo, connection: $this->createStub(Connection::class));
+        return new TestImageTypeDefinition(
+            repo: $repo ?? $this->createStub(ImageLocationRepository::class),
+            connection: $this->createStub(Connection::class),
+        );
     }
 
-    // ---- sync(): DataProvider for insert/delete/no-op scenarios ----
+    // ---- thumbnailSizes(): universal merge ----
+
+    public function testThumbnailSizesAppendsUniversalReportAndMicroSizes(): void
+    {
+        $definition = $this->makeDefinition();
+        $definition->rawSizes = [[400, 400], [350, 350]];
+
+        static::assertSame([[400, 400], [350, 350], [100, 100], [50, 50]], $definition->thumbnailSizes());
+    }
+
+    public function testThumbnailSizesDeduplicatesWhenDefinitionAlreadyListsUniversalSizes(): void
+    {
+        $definition = $this->makeDefinition();
+        $definition->rawSizes = [[350, 350], [100, 100]];
+
+        static::assertSame([[350, 350], [100, 100], [50, 50]], $definition->thumbnailSizes());
+    }
+
+    // ---- fitMode() / locate(): defaults ----
+
+    public function testFitModeDefaultsToCrop(): void
+    {
+        static::assertSame(ImageFitMode::Crop, $this->makeDefinition()->fitMode());
+    }
+
+    public function testLocateDefaultsToNull(): void
+    {
+        static::assertNull($this->makeDefinition()->locate($this->createStub(\App\Entity\Image::class)));
+    }
+
+    // ---- sync(): insert/delete/no-op ----
 
     #[DataProvider('syncProvider')]
     public function testSync(array $currentPairs, array $discoveredPairs, array $expectedToInsert, array $expectedToDelete): void
@@ -62,37 +105,37 @@ class AbstractImageLocationProviderTest extends TestCase
             $repoMock->expects($this->never())->method('deleteByTypeAndPairs');
         }
 
-        $provider = $this->makeProvider($repoMock);
-        $provider->discovered = $discoveredPairs;
+        $definition = $this->makeDefinition($repoMock);
+        $definition->discovered = $discoveredPairs;
 
         // Act
-        $provider->sync();
+        $definition->sync();
     }
 
     public static function syncProvider(): iterable
     {
-        yield 'empty discovered, empty current → no inserts, no deletes' => [
+        yield 'empty discovered, empty current -> no inserts, no deletes' => [
             'currentPairs' => [],
             'discoveredPairs' => [],
             'expectedToInsert' => [],
             'expectedToDelete' => [],
         ];
 
-        yield 'new pair discovered → insert called' => [
+        yield 'new pair discovered -> insert called' => [
             'currentPairs' => [],
             'discoveredPairs' => [['imageId' => 1, 'locationId' => 10]],
             'expectedToInsert' => [['imageId' => 1, 'locationId' => 10]],
             'expectedToDelete' => [],
         ];
 
-        yield 'existing pair still discovered → no change' => [
+        yield 'existing pair still discovered -> no change' => [
             'currentPairs' => [['imageId' => 1, 'locationId' => 10]],
             'discoveredPairs' => [['imageId' => 1, 'locationId' => 10]],
             'expectedToInsert' => [],
             'expectedToDelete' => [],
         ];
 
-        yield 'pair in DB but not discovered → delete called' => [
+        yield 'pair in DB but not discovered -> delete called' => [
             'currentPairs' => [['imageId' => 2, 'locationId' => 20]],
             'discoveredPairs' => [],
             'expectedToInsert' => [],
