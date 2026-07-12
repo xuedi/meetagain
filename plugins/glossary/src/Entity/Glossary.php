@@ -161,7 +161,7 @@ class Glossary
 
     public function getSuggestions(): array
     {
-        if ($this->suggestion === []) {
+        if (($this->suggestion ?? []) === []) {
             return [];
         }
         $suggestions = [];

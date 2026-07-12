@@ -131,14 +131,6 @@ readonly class GlossaryService
         $this->em->flush();
     }
 
-    /**
-     * @deprecated Use create() with $autoApprove parameter instead
-     */
-    public function createNew(Glossary $glossary, int $userId, bool $isManager): void
-    {
-        $this->create($glossary, $userId, $isManager);
-    }
-
     public function applySuggestion(int $id, string $hash): int
     {
         $item = $this->repo->findOneBy(['id' => $id]);
