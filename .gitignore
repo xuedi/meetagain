@@ -37,7 +37,3 @@ tmp/
 ###< symfonycasts/sass-bundle ###
 
 /assets/styles/_config.scss
-
-###> league/oauth2-server-bundle ###
-/plugins/multisite/var/oauth2/*.pem
-###< league/oauth2-server-bundle ###
