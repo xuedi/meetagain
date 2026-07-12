@@ -18,7 +18,6 @@ final class RobotsController extends AbstractController
             'User-agent: *',
             'Disallow: /api/v1/admin/',
             'Disallow: /api/v1/me/',
-            'Disallow: /api/oauth/',
             'Disallow: /api/openapi.json',
             'Disallow: /api/openapi.yaml',
             '',
