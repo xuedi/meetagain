@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Service\Admin;
 
-use App\Publisher\PluginSettings\PluginSettingsProviderInterface;
+use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
 use App\Service\Admin\PluginSettingsService;
 use LogicException;
 use PHPUnit\Framework\TestCase;
@@ -70,9 +70,9 @@ class PluginSettingsServiceTest extends TestCase
         ]);
     }
 
-    private function makeProvider(string $key, int $priority = 0): PluginSettingsProviderInterface
+    private function makeProvider(string $key, int $priority = 0): PluginSettingsDescriptorInterface
     {
-        return new class($key, $priority) implements PluginSettingsProviderInterface {
+        return new class($key, $priority) implements PluginSettingsDescriptorInterface {
             public function __construct(
                 private readonly string $key,
                 private readonly int $priority,
@@ -93,17 +93,17 @@ class PluginSettingsServiceTest extends TestCase
                 return 'TestFormType';
             }
 
-            public function loadData(): object
-            {
-                return new \stdClass();
-            }
-
-            public function getFormOptions(): array
+            public function getFormOptions(object $data): array
             {
                 return [];
             }
 
-            public function save(object $data, FormInterface $form): void {}
+            public function createDefault(): object
+            {
+                return new \stdClass();
+            }
+
+            public function applyForm(object $data, FormInterface $form): void {}
 
             public function getPriority(): int
             {

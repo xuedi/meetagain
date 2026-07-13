@@ -28,7 +28,7 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 | `ImageAttributionFilterInterface`             | Narrow which attributed images `/attributions` shows | `getVisibleImageIdFilter()`                         |
 | `DataHotfixInterface`                         | Ship a one-off data repair that runs once per DB     | `getIdentifier()`, `execute()`                      |
 | `SecurityProviderInterface`                   | Participate in live security event detection         | `observe()`, `scanRetrospective()`                  |
-| `PluginSettingsProviderInterface`             | Add a settings section to `/admin/plugin/settings`   | `getKey()`, `getFormType()`, `loadData()`, `save()` |
+| `PluginSettingsDescriptorInterface`           | Add a settings section to `/admin/plugin/settings`   | `getFormType()`, `createDefault()`, `applyForm()`   |
 | `ProfileConfigPrivacyToggleProviderInterface` | Add a toggle row to `/profile/config` -> "privacy"   | `getToggle()`                                       |
 
 ---
@@ -948,8 +948,13 @@ threat levels are recorded but not acted on.
 ## Plugin settings page
 
 Offer a configuration UI to operators without shipping your own admin chrome.
-Core renders all registered providers as framed fieldsets on a single page at
+Core renders every registered descriptor as a framed fieldset on a single page at
 `/admin/plugin/settings`, reached from a "Settings" button on `/admin/plugin`.
+
+You define your settings surface **once** as a descriptor. Core renders and persists
+it at the global scope for free. The same descriptor can also be rendered per override
+scope when a host plugin supplies one (see "Dual-scope settings" below), with no extra
+work on your side.
 
 ### When to implement
 
@@ -959,33 +964,56 @@ Core renders all registered providers as framed fieldsets on a single page at
 
 ### What you implement
 
+A **data object** implementing `PluginSettingsData`, a Symfony **FormType** for it, and
+a **descriptor**:
+
 ```php
-final class MyPluginSettingsProvider implements PluginSettingsProviderInterface
+final class MyPluginSettingsDescriptor implements PluginSettingsDescriptorInterface
 {
     public function getKey(): string { return 'my_plugin'; }
     public function getTitleKey(): string { return 'my_plugin_settings.page_title'; }
     public function getFormType(): string { return MyPluginSettingsType::class; }
-    public function loadData(): object { /* fetch entity / DTO */ }
-    public function getFormOptions(): array { return []; }
-    public function save(object $data, FormInterface $form): void { /* persist */ }
+    public function getFormOptions(object $data): array { return []; }
+    public function createDefault(): object { return new MyPluginSettings(); }
+    public function applyForm(object $data, FormInterface $form): void { /* map unmapped fields */ }
     public function getPriority(): int { return 0; }
 }
 ```
 
-`getKey()` must be unique across plugins; the form submit posts to
-`/admin/plugin/settings?provider=<key>` and the controller dispatches the bound
-data back to the matching provider's `save()`.
+`getKey()` must be unique across plugins; it routes the form submit and selects the store.
 
-`getFormOptions()` lets you pass options derived from the loaded data (e.g.
-`'tmdb_key_set' => $data->getEncryptedTmdbKey() !== null`). Memoise the result of
-`loadData()` on the provider instance so `getFormOptions()` can reuse it without
-hitting the repository twice.
+`createDefault()` returns a fresh data object carrying your **neutral defaults** - the shape
+a plugin has before any operator touches the page.
 
-`save()` receives both the bound data object and the `FormInterface` so providers
-can read unmapped form fields (a common pattern when a password field never round-trips
-the stored value back into the form).
+`getFormOptions()` derives extra `createForm()` options from the bound data (e.g.
+`'api_key_set' => $data->getEncryptedKey() !== null`).
+
+`applyForm()` maps non-mapped form fields onto the data object before persistence (a common
+pattern when a password field never round-trips the stored value into the form). The descriptor
+never touches the database - persistence is the store's job.
 
 `getPriority()` controls display order on the page (higher first).
 
-See `plugins/filmclub/src/Publisher/PluginSettings/FilmclubSettingsProvider.php`
-for a working reference implementation.
+The descriptor does not persist anything itself: `GenericPluginSettingsStore` saves your data
+object to a shared JSON table automatically. Provide your own `PluginSettingsStoreInterface`
+only when the record needs a shape the JSON table cannot give it - own columns, a foreign key,
+or an encrypted secret. See
+`plugins/filmclub/src/Publisher/PluginSettings/FilmclubSettingsDescriptor.php` (descriptor) and
+`FilmclubSettingsStore.php` (custom store keeping an entity + encrypted key) for a working
+reference.
+
+### Reading the effective value
+
+Inject `PluginSettingsResolver` and call `resolve('my_plugin')` to get the effective data object
+for the current request. Memoise it in a thin service if you read it often (see
+`plugins/glossary/src/Service/GlossaryConfigService.php`).
+
+### Dual-scope settings
+
+The global scope is all a standalone plugin needs. A **host plugin** can layer an override scope
+on top: it implements `PluginSettingsScopeProviderInterface` to name the active scope for a request
+(an opaque id), and a `PluginSettingsStoreInterface` that persists one record per scope. When such
+a host is present, `resolve()` returns the override record if the active scope has one, else the
+global record, else your neutral default - all transparent to your plugin, because it reads the
+same resolver either way. The override-scope machinery lives entirely in the host plugin; core
+registers no scope provider, so an install without such a host always resolves to the global record.

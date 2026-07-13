@@ -2,18 +2,16 @@
 
 namespace Plugin\Filmclub\Publisher\PluginSettings;
 
-use App\Publisher\PluginSettings\PluginSettingsProviderInterface;
+use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
 use Plugin\Filmclub\Entity\FilmclubSettings;
 use Plugin\Filmclub\Form\FilmclubSettingsType;
 use Plugin\Filmclub\Service\FilmclubSettingsService;
 use Symfony\Component\Form\FormInterface;
 
-final class FilmclubSettingsProvider implements PluginSettingsProviderInterface
+final readonly class FilmclubSettingsDescriptor implements PluginSettingsDescriptorInterface
 {
-    private ?FilmclubSettings $cached = null;
-
     public function __construct(
-        private readonly FilmclubSettingsService $settingsService,
+        private FilmclubSettingsService $settingsService,
     ) {}
 
     public function getKey(): string
@@ -31,14 +29,9 @@ final class FilmclubSettingsProvider implements PluginSettingsProviderInterface
         return FilmclubSettingsType::class;
     }
 
-    public function loadData(): object
+    public function getFormOptions(object $data): array
     {
-        return $this->cached ??= $this->settingsService->getOrCreateGlobal();
-    }
-
-    public function getFormOptions(): array
-    {
-        $data = $this->loadData();
+        \assert($data instanceof FilmclubSettings);
 
         return [
             'tmdb_key_set' => $data->getEncryptedTmdbKey() !== null,
@@ -46,7 +39,12 @@ final class FilmclubSettingsProvider implements PluginSettingsProviderInterface
         ];
     }
 
-    public function save(object $data, FormInterface $form): void
+    public function createDefault(): object
+    {
+        return new FilmclubSettings();
+    }
+
+    public function applyForm(object $data, FormInterface $form): void
     {
         \assert($data instanceof FilmclubSettings);
 
@@ -66,8 +64,6 @@ final class FilmclubSettingsProvider implements PluginSettingsProviderInterface
         } elseif ($omdbKey !== null && $omdbKey !== '') {
             $data->setEncryptedOmdbKey($this->settingsService->encryptKey($omdbKey));
         }
-
-        $this->settingsService->save($data);
     }
 
     public function getPriority(): int

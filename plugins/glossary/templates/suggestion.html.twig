@@ -18,7 +18,7 @@
                         {% for suggestion in editItem.suggestions %}
                             {% set value = suggestion.value %}
                             {% if suggestion.field.value == categoryFieldValue %}
-                                {% set value = categoryNames[suggestion.value]|trans %}
+                                {% set value = config.getCategoryMap()[suggestion.value]|default(suggestion.value) %}
                             {% endif %}
                         <div class="box">
                             <p>

@@ -5,7 +5,6 @@ namespace Plugin\Glossary\Controller;
 use App\Activity\ActivityService;
 use App\Entity\User;
 use Plugin\Glossary\Activity\Messages\SuggestionCreated;
-use Plugin\Glossary\Entity\Category;
 use Plugin\Glossary\Entity\SuggestionField;
 use Plugin\Glossary\Form\GlossaryType;
 use Plugin\Glossary\Service\GlossaryService;
@@ -63,7 +62,6 @@ final class EditController extends AbstractGlossaryController
 
         return $this->renderList('@Glossary/edit.html.twig', [
             'categoryFieldValue' => SuggestionField::Category->value,
-            'categoryNames' => Category::getNames(),
             'editItem' => $this->service->get($id),
             'form' => $form,
         ]);

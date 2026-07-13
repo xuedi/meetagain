@@ -17,7 +17,7 @@ class Glossary
     #[ORM\Column(length: 255)]
     private ?string $phrase = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $pinyin = null;
 
     #[ORM\Column]
@@ -29,8 +29,8 @@ class Glossary
     #[ORM\Column]
     private bool $approved = false;
 
-    #[ORM\Column(enumType: Category::class)]
-    private ?Category $category = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $category = null;
 
     #[ORM\Column(nullable: true)]
     private ?array $suggestion = null;
@@ -108,12 +108,12 @@ class Glossary
         return $this;
     }
 
-    public function getCategory(): ?Category
+    public function getCategory(): ?int
     {
         return $this->category;
     }
 
-    public function setCategory(?Category $category): static
+    public function setCategory(?int $category): static
     {
         $this->category = $category;
 
