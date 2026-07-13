@@ -4,7 +4,6 @@ namespace Plugin\Glossary\Controller;
 
 use App\Activity\ActivityService;
 use Plugin\Glossary\Activity\Messages\SuggestionApproved;
-use Plugin\Glossary\Entity\Category;
 use Plugin\Glossary\Entity\SuggestionField;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,7 +28,6 @@ final class SuggestionController extends AbstractGlossaryController
     {
         return $this->renderList('@Glossary/suggestion.html.twig', [
             'categoryFieldValue' => SuggestionField::Category->value,
-            'categoryNames' => Category::getNames(),
             'editItem' => $this->service->get($id),
         ]);
     }

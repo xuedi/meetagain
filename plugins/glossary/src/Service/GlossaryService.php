@@ -2,12 +2,14 @@
 
 namespace Plugin\Glossary\Service;
 
+use App\EntityActionDispatcher;
+use App\Enum\EntityAction;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Plugin\Glossary\Entity\Category;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Entity\Suggestion;
 use Plugin\Glossary\Entity\SuggestionField;
+use Plugin\Glossary\Filter\GlossaryFilterService;
 use Plugin\Glossary\Repository\GlossaryRepository;
 use RuntimeException;
 
@@ -16,11 +18,17 @@ readonly class GlossaryService
     public function __construct(
         private EntityManagerInterface $em,
         private GlossaryRepository $repo,
+        private GlossaryFilterService $filter,
+        private EntityActionDispatcher $dispatcher,
     ) {}
 
     public function approveNew(int $id): void
     {
-        $item = $this->repo->findOneBy(['id' => $id]);
+        $item = $this->get($id);
+        if ($item === null) {
+            return;
+        }
+
         $item->setApproved(true);
         $this->em->persist($item);
         $this->em->flush();
@@ -28,21 +36,29 @@ readonly class GlossaryService
 
     public function deleteNew(int $id): void
     {
-        $item = $this->repo->findOneBy(['id' => $id]);
+        $item = $this->get($id);
+        if ($item === null) {
+            return;
+        }
         if ($item->getApproved()) {
             throw new RuntimeException('Cannot delete approved item');
         }
 
         $this->em->remove($item);
         $this->em->flush();
+        $this->dispatcher->dispatch(EntityAction::DeleteGlossary, $id);
     }
 
     public function delete(int $id): void
     {
-        $item = $this->repo->findOneBy(['id' => $id]);
+        $item = $this->get($id);
+        if ($item === null) {
+            return;
+        }
 
         $this->em->remove($item);
         $this->em->flush();
+        $this->dispatcher->dispatch(EntityAction::DeleteGlossary, $id);
     }
 
     /**
@@ -50,7 +66,7 @@ readonly class GlossaryService
      */
     public function update(Glossary $newGlossary, int $id): void
     {
-        $current = $this->repo->findOneBy(['id' => $id]);
+        $current = $this->get($id);
         if ($current === null) {
             return;
         }
@@ -69,7 +85,7 @@ readonly class GlossaryService
      */
     public function generateSuggestions(Glossary $newGlossary, int $id, int $userId): void
     {
-        $current = $this->repo->findOneBy(['id' => $id]);
+        $current = $this->get($id);
         if ($current === null) {
             return;
         }
@@ -90,7 +106,7 @@ readonly class GlossaryService
                 createdBy: $userId,
                 createdAt: $timestamp,
                 field: SuggestionField::Pinyin,
-                value: $newGlossary->getPinyin(),
+                value: (string) $newGlossary->getPinyin(),
             ));
         }
 
@@ -99,7 +115,7 @@ readonly class GlossaryService
                 createdBy: $userId,
                 createdAt: $timestamp,
                 field: SuggestionField::Category,
-                value: (string) $newGlossary->getCategory()?->value,
+                value: (string) $newGlossary->getCategory(),
             ));
         }
 
@@ -129,11 +145,13 @@ readonly class GlossaryService
 
         $this->em->persist($glossary);
         $this->em->flush();
+
+        $this->dispatcher->dispatch(EntityAction::CreateGlossary, (int) $glossary->getId());
     }
 
     public function applySuggestion(int $id, string $hash): int
     {
-        $item = $this->repo->findOneBy(['id' => $id]);
+        $item = $this->get($id);
         if ($item === null) {
             throw new RuntimeException('Item not found');
         }
@@ -144,10 +162,10 @@ readonly class GlossaryService
                 $item->setPhrase($suggestion->value);
                 break;
             case SuggestionField::Pinyin:
-                $item->setPinyin($suggestion->value);
+                $item->setPinyin($suggestion->value === '' ? null : $suggestion->value);
                 break;
             case SuggestionField::Category:
-                $item->setCategory(Category::from((int) $suggestion->value));
+                $item->setCategory($suggestion->value === '' ? null : (int) $suggestion->value);
                 break;
             case SuggestionField::Explanation:
                 $item->setExplanation($suggestion->value);
@@ -162,7 +180,7 @@ readonly class GlossaryService
 
     public function denySuggestion(int $id, string $hash): int
     {
-        $item = $this->repo->findOneBy(['id' => $id]);
+        $item = $this->get($id);
         if ($item === null) {
             throw new RuntimeException('Item not found');
         }
@@ -176,12 +194,13 @@ readonly class GlossaryService
 
     public function get(int $id): ?Glossary
     {
-        return $this->repo->findOneBy(['id' => $id]);
+        return $this->repo->findOneAllowed($id, $this->filter->getAllowedGlossaryIds());
     }
 
+    /** @return Glossary[] */
     public function getList(): array
     {
-        return $this->repo->findBy([], ['phrase' => 'ASC']);
+        return $this->repo->findAllowed($this->filter->getAllowedGlossaryIds(), ['phrase' => 'ASC']);
     }
 
     public function detach(Glossary $newGlossary): void

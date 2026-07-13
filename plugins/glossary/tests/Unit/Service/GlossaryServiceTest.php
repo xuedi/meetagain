@@ -2,10 +2,11 @@
 
 namespace Plugin\Glossary\Tests\Unit\Service;
 
+use App\EntityActionDispatcher;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
-use Plugin\Glossary\Entity\Category;
 use Plugin\Glossary\Entity\Glossary;
+use Plugin\Glossary\Filter\GlossaryFilterService;
 use Plugin\Glossary\Repository\GlossaryRepository;
 use Plugin\Glossary\Service\GlossaryService;
 use ReflectionProperty;
@@ -19,7 +20,7 @@ class GlossaryServiceTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('persist');
         $em->expects(self::once())->method('flush');
-        $service = new GlossaryService($em, $this->createStub(GlossaryRepository::class));
+        $service = $this->makeService($em, $this->createStub(GlossaryRepository::class));
         $glossary = (new Glossary())->setPhrase('你好');
 
         // Act
@@ -35,7 +36,7 @@ class GlossaryServiceTest extends TestCase
     {
         // Arrange
         $em = $this->createStub(EntityManagerInterface::class);
-        $service = new GlossaryService($em, $this->createStub(GlossaryRepository::class));
+        $service = $this->makeService($em, $this->createStub(GlossaryRepository::class));
         $glossary = (new Glossary())->setPhrase('你好');
 
         // Act
@@ -52,7 +53,7 @@ class GlossaryServiceTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('persist')->with($item);
         $em->expects(self::once())->method('flush');
-        $service = new GlossaryService($em, $this->repoReturning($item));
+        $service = $this->makeService($em, $this->repoReturning($item));
 
         // Act
         $service->approveNew(1);
@@ -67,7 +68,7 @@ class GlossaryServiceTest extends TestCase
         $item = (new Glossary())->setApproved(true);
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::never())->method('remove');
-        $service = new GlossaryService($em, $this->repoReturning($item));
+        $service = $this->makeService($em, $this->repoReturning($item));
 
         // Assert
         $this->expectException(RuntimeException::class);
@@ -83,7 +84,7 @@ class GlossaryServiceTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('remove')->with($item);
         $em->expects(self::once())->method('flush');
-        $service = new GlossaryService($em, $this->repoReturning($item));
+        $service = $this->makeService($em, $this->repoReturning($item));
 
         // Act
         $service->deleteNew(1);
@@ -98,7 +99,7 @@ class GlossaryServiceTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('remove')->with($item);
         $em->expects(self::once())->method('flush');
-        $service = new GlossaryService($em, $this->repoReturning($item));
+        $service = $this->makeService($em, $this->repoReturning($item));
 
         // Act
         $service->delete(1);
@@ -113,15 +114,15 @@ class GlossaryServiceTest extends TestCase
             ->setPhrase('old')
             ->setPinyin('lǎo')
             ->setExplanation('same')
-            ->setCategory(Category::Greeting);
+            ->setCategory(0);
         $em = $this->createStub(EntityManagerInterface::class);
-        $service = new GlossaryService($em, $this->repoReturning($current));
+        $service = $this->makeService($em, $this->repoReturning($current));
 
         $submitted = (new Glossary())
             ->setPhrase('new')
             ->setPinyin('lǎo')
             ->setExplanation('same')
-            ->setCategory(Category::Greeting);
+            ->setCategory(0);
 
         // Act
         $service->generateSuggestions($submitted, id: 1, userId: 5);
@@ -140,15 +141,15 @@ class GlossaryServiceTest extends TestCase
             ->setPhrase('same')
             ->setPinyin('same')
             ->setExplanation('same')
-            ->setCategory(Category::Greeting);
+            ->setCategory(0);
         $em = $this->createStub(EntityManagerInterface::class);
-        $service = new GlossaryService($em, $this->repoReturning($current));
+        $service = $this->makeService($em, $this->repoReturning($current));
 
         $submitted = (new Glossary())
             ->setPhrase('same')
             ->setPinyin('same')
             ->setExplanation('same')
-            ->setCategory(Category::Greeting);
+            ->setCategory(0);
 
         // Act
         $service->generateSuggestions($submitted, id: 1, userId: 5);
@@ -170,7 +171,7 @@ class GlossaryServiceTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('persist')->with($item);
         $em->expects(self::once())->method('flush');
-        $service = new GlossaryService($em, $this->repoReturning($item));
+        $service = $this->makeService($em, $this->repoReturning($item));
 
         // Act
         $remaining = $service->applySuggestion(1, $phraseHash);
@@ -180,10 +181,18 @@ class GlossaryServiceTest extends TestCase
         self::assertSame(1, $remaining);
     }
 
+    private function makeService(EntityManagerInterface $em, GlossaryRepository $repo): GlossaryService
+    {
+        $filter = $this->createStub(GlossaryFilterService::class);
+        $filter->method('getAllowedGlossaryIds')->willReturn(null);
+
+        return new GlossaryService($em, $repo, $filter, $this->createStub(EntityActionDispatcher::class));
+    }
+
     private function repoReturning(?Glossary $item): GlossaryRepository
     {
         $repo = $this->createStub(GlossaryRepository::class);
-        $repo->method('findOneBy')->willReturn($item);
+        $repo->method('findOneAllowed')->willReturn($item);
 
         return $repo;
     }

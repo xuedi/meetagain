@@ -31,4 +31,6 @@ enum EntityAction: string
     case DeleteFilm = 'delete_film';
     case CreateWallPost = 'create_wall_post';
     case DeleteWallPost = 'delete_wall_post';
+    case CreateGlossary = 'create_glossary';
+    case DeleteGlossary = 'delete_glossary';
 }

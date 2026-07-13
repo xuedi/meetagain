@@ -5,7 +5,6 @@ namespace Plugin\Glossary\Tests\Unit\Entity;
 use DateTimeImmutable;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Plugin\Glossary\Entity\Category;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Entity\SuggestionField;
 use ReflectionProperty;
@@ -22,7 +21,7 @@ class GlossaryTest extends TestCase
         $glossary->setPhrase('干嘛')
             ->setPinyin('gàn má')
             ->setExplanation('how is it going?')
-            ->setCategory(Category::Greeting)
+            ->setCategory(0)
             ->setApproved(true)
             ->setCreatedBy(2)
             ->setCreatedAt($createdAt);
@@ -31,7 +30,7 @@ class GlossaryTest extends TestCase
         self::assertSame('干嘛', $glossary->getPhrase());
         self::assertSame('gàn má', $glossary->getPinyin());
         self::assertSame('how is it going?', $glossary->getExplanation());
-        self::assertSame(Category::Greeting, $glossary->getCategory());
+        self::assertSame(0, $glossary->getCategory());
         self::assertTrue($glossary->getApproved());
         self::assertSame(2, $glossary->getCreatedBy());
         self::assertSame($createdAt, $glossary->getCreatedAt());
