@@ -3,15 +3,25 @@
 namespace Plugin\Glossary\Controller;
 
 use App\Entity\User;
+use Plugin\Glossary\Service\GlossaryConfigService;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as AbstractSymfonyController;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
+use Symfony\Contracts\Service\Attribute\Required;
 
 abstract class AbstractGlossaryController extends AbstractSymfonyController
 {
+    protected GlossaryConfigService $configService;
+
     public function __construct(
         protected GlossaryService $service,
     ) {}
+
+    #[Required]
+    public function setGlossaryConfigService(GlossaryConfigService $configService): void
+    {
+        $this->configService = $configService;
+    }
 
     protected function getAuthedUser(): User
     {
@@ -27,6 +37,7 @@ abstract class AbstractGlossaryController extends AbstractSymfonyController
     {
         return $this->render($template, [
             'list' => $this->service->getList(),
+            'config' => $this->configService->getConfig(),
             ...$parameter,
         ]);
     }
