@@ -143,18 +143,20 @@
 {%- endblock checkbox_widget %}
 
 {%- block collection_widget -%}
-    {%- set prototype_markup = (allow_add and prototype is defined) ? form_row(prototype) : '' -%}
+    {%- set prototype_markup = (allow_add and prototype is defined) ? form_row(prototype, {label: false}) : '' -%}
     <div class="js-collection"
          {% if allow_add %}data-prototype="{{ prototype_markup|e('html_attr') }}" data-prototype-name="{{ prototype.vars.name|default('__name__') }}"{% endif %}
          data-allow-delete="{{ allow_delete ? '1' : '0' }}">
         <div class="js-collection-items">
             {%- for child in form -%}
-                <div class="js-collection-item">
-                    <div class="js-collection-fields">{{- form_row(child) -}}</div>
+                <div class="field has-addons js-collection-item">
+                    <div class="control is-expanded js-collection-fields">{{- form_row(child, {label: false}) -}}</div>
                     {%- if allow_delete -%}
-                        <button type="button" class="button is-small is-danger is-light js-collection-remove">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <div class="control">
+                            <button type="button" class="button is-danger is-light js-collection-remove">
+                                <span class="icon"><i class="fas fa-trash"></i></span>
+                            </button>
+                        </div>
                     {%- endif -%}
                 </div>
             {%- endfor -%}
