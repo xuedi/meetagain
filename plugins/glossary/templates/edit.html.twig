@@ -18,9 +18,9 @@
 
                             {{ form_start(form) }}
                             {{ form_row(form.phrase) }}
-                            {{ form_row(form.pinyin) }}
+                            {% if form.pinyin is defined %}{{ form_row(form.pinyin) }}{% endif %}
                             {{ form_row(form.explanation) }}
-                            {{ form_row(form.category) }}
+                            {% if form.category is defined %}{{ form_row(form.category) }}{% endif %}
                             <div class="has-text-right mt-6">
                                 <a href="{{ path('app_plugin_glossary') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
                                 {% if is_granted('ROLE_ORGANIZER') %}
@@ -39,7 +39,7 @@
                         {% for suggestion in editItem.suggestions %}
                             {% set value = suggestion.value %}
                             {% if suggestion.field.value == categoryFieldValue %}
-                                {% set value = categoryNames[suggestion.value]|trans %}
+                                {% set value = config.getCategoryMap()[suggestion.value]|default(suggestion.value) %}
                             {% endif %}
                             <div class="box has-background-info-light">
                                 <p>

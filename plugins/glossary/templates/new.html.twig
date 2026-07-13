@@ -18,9 +18,9 @@
 
                             {{ form_start(form) }}
                             {{ form_row(form.phrase) }}
-                            {{ form_row(form.pinyin) }}
+                            {% if form.pinyin is defined %}{{ form_row(form.pinyin) }}{% endif %}
                             {{ form_row(form.explanation) }}
-                            {{ form_row(form.category) }}
+                            {% if form.category is defined %}{{ form_row(form.category) }}{% endif %}
                             <div class="has-text-right mt-6">
                                 <a href="{{ path('app_plugin_glossary') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
                                 <button type="submit" class="button is-link">{{ 'glossary.button_suggest_new'|trans }}</button>

@@ -6,7 +6,8 @@ use App\Admin\Navigation\AdminNavigationConfig;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
-use App\Publisher\PluginSettings\PluginSettingsProviderInterface;
+use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
+use App\Publisher\PluginSettings\PluginSettingsResolver;
 use App\Service\Admin\PluginSettingsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -21,6 +22,7 @@ final class PluginSettingsController extends AbstractController implements Admin
 {
     public function __construct(
         private readonly PluginSettingsService $pluginSettingsService,
+        private readonly PluginSettingsResolver $resolver,
         private readonly TranslatorInterface $translator,
     ) {}
 
@@ -36,34 +38,35 @@ final class PluginSettingsController extends AbstractController implements Admin
             throw $this->createNotFoundException();
         }
 
-        $providers = $this->pluginSettingsService->getProviders();
+        $descriptors = $this->pluginSettingsService->getProviders();
 
         if ($request->isMethod('POST')) {
             $key = $request->query->get('provider', '');
-            $provider = $this->pluginSettingsService->getProvider($key);
-            if ($provider === null) {
+            $descriptor = $this->pluginSettingsService->getProvider($key);
+            if ($descriptor === null) {
                 throw $this->createNotFoundException();
             }
 
-            $data = $provider->loadData();
-            $form = $this->buildForm($provider, $data);
+            $data = $this->loadGlobal($descriptor);
+            $form = $this->buildForm($descriptor, $data);
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                $provider->save($data, $form);
+                $descriptor->applyForm($data, $form);
+                $this->resolver->resolveStore($key, null)?->save($key, $data, null);
                 $this->addFlash('success', 'admin_system_plugin_settings.flash_saved');
 
                 return $this->redirectToRoute('app_admin_plugin_settings');
             }
 
             $forms = [];
-            foreach ($providers as $providerKey => $other) {
-                $forms[$providerKey] = $providerKey === $key ? $form->createView() : $this->buildForm($other, $other->loadData())->createView();
+            foreach ($descriptors as $descriptorKey => $other) {
+                $forms[$descriptorKey] = $descriptorKey === $key ? $form->createView() : $this->buildForm($other, $this->loadGlobal($other))->createView();
             }
         } else {
             $forms = [];
-            foreach ($providers as $providerKey => $provider) {
-                $forms[$providerKey] = $this->buildForm($provider, $provider->loadData())->createView();
+            foreach ($descriptors as $descriptorKey => $descriptor) {
+                $forms[$descriptorKey] = $this->buildForm($descriptor, $this->loadGlobal($descriptor))->createView();
             }
         }
 
@@ -72,15 +75,22 @@ final class PluginSettingsController extends AbstractController implements Admin
         ]);
 
         return $this->render('admin/system/plugin_settings/index.html.twig', [
-            'providers' => $providers,
+            'providers' => $descriptors,
             'forms' => $forms,
             'adminTop' => $adminTop,
             'active' => 'plugin',
         ]);
     }
 
-    private function buildForm(PluginSettingsProviderInterface $provider, object $data): FormInterface
+    private function loadGlobal(PluginSettingsDescriptorInterface $descriptor): object
     {
-        return $this->createForm($provider->getFormType(), $data, $provider->getFormOptions());
+        $key = $descriptor->getKey();
+
+        return $this->resolver->resolveStore($key, null)?->load($key, null) ?? $descriptor->createDefault();
+    }
+
+    private function buildForm(PluginSettingsDescriptorInterface $descriptor, object $data): FormInterface
+    {
+        return $this->createForm($descriptor->getFormType(), $data, $descriptor->getFormOptions($data));
     }
 }

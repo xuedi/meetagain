@@ -142,6 +142,31 @@
     {{- form_label(form, null, { widget: parent() }) -}}
 {%- endblock checkbox_widget %}
 
+{%- block collection_widget -%}
+    {%- set prototype_markup = (allow_add and prototype is defined) ? form_row(prototype) : '' -%}
+    <div class="js-collection"
+         {% if allow_add %}data-prototype="{{ prototype_markup|e('html_attr') }}" data-prototype-name="{{ prototype.vars.name|default('__name__') }}"{% endif %}
+         data-allow-delete="{{ allow_delete ? '1' : '0' }}">
+        <div class="js-collection-items">
+            {%- for child in form -%}
+                <div class="js-collection-item">
+                    <div class="js-collection-fields">{{- form_row(child) -}}</div>
+                    {%- if allow_delete -%}
+                        <button type="button" class="button is-small is-danger is-light js-collection-remove">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    {%- endif -%}
+                </div>
+            {%- endfor -%}
+        </div>
+        {%- if allow_add -%}
+            <button type="button" class="button is-small js-collection-add">
+                <i class="fas fa-plus"></i>&nbsp;{{ 'global.button_add'|trans }}
+            </button>
+        {%- endif -%}
+    </div>
+{%- endblock collection_widget -%}
+
 {% block radio_widget -%}
     {{- form_label(form, null, { widget: parent() }) -}}
 {%- endblock radio_widget %}

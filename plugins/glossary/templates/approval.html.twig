@@ -16,10 +16,10 @@
                         <h2 class="title is-5">{{ 'glossary.heading_waiting_approval'|trans }}</h2>
                         <div class="box">
                             <p class="mb-5">
-                                {{ 'glossary.label_phrase'|trans }}: <b>{{ editItem.phrase }}</b><br>
-                                {{ 'glossary.label_pinyin'|trans }}: <b>{{ editItem.pinyin }}</b><br>
-                                {{ 'glossary.label_explanation'|trans }}: <b>{{ editItem.explanation }}</b><br>
-                                {{ 'glossary.label_category'|trans }}: <b>{{ editItem.category.name }}</b><br>
+                                {{ config.primaryLabel ?? ('glossary.label_phrase'|trans) }}: <b>{{ editItem.phrase }}</b><br>
+                                {% if config.secondaryEnabled %}{{ config.secondaryLabel ?? ('glossary.label_pinyin'|trans) }}: <b>{{ editItem.pinyin }}</b><br>{% endif %}
+                                {{ config.definitionLabel ?? ('glossary.label_explanation'|trans) }}: <b>{{ editItem.explanation }}</b><br>
+                                {% if config.hasCategories %}{{ 'glossary.label_category'|trans }}: <b>{{ config.getCategoryLabel(editItem.category)|default('') }}</b><br>{% endif %}
                                 {{ 'glossary.label_created_by'|trans }}: <b>{{ get_user_name(editItem.createdBy) }}</b><br>
                                 {{ 'glossary.label_created_at'|trans }}: <b>{{ editItem.createdAt | time_diff }}</b><br>
                             </p>

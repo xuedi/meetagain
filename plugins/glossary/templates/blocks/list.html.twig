@@ -3,13 +3,17 @@
     {% set maxLength = 60 %}
 {% endif %}
 
+{% set primaryLabel = config.primaryLabel ?? ('glossary_blocks.col_phrase'|trans) %}
+{% set secondaryLabel = config.secondaryLabel ?? ('glossary.label_pinyin'|trans) %}
+{% set definitionLabel = config.definitionLabel ?? ('glossary_blocks.col_explanation'|trans) %}
+
 <table id="filteredTable" class="table is-fullwidth">
     <thead>
     <tr>
-        <th>{{ 'glossary_blocks.col_phrase'|trans }}</th>
-        <th>{{ 'glossary_blocks.col_pinyin'|trans }}</th>
-        <th>{{ 'glossary_blocks.col_explanation'|trans }}</th>
-        <th>{{ 'glossary_blocks.col_category'|trans }}</th>
+        <th>{{ primaryLabel }}</th>
+        {% if config.secondaryEnabled %}<th>{{ secondaryLabel }}</th>{% endif %}
+        <th>{{ definitionLabel }}</th>
+        {% if config.hasCategories %}<th>{{ 'glossary_blocks.col_category'|trans }}</th>{% endif %}
         {% if is_granted('ROLE_USER') %}
             <th>
                 <a href="{{ path('app_plugin_glossary_new') }}">
@@ -27,9 +31,9 @@
             {% if item.approved == false or item.suggestions is not empty %}
             <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
                 <td>{{ item.phrase }}</td>
-                <td>{{ item.pinyin }}</td>
+                {% if config.secondaryEnabled %}<td>{{ item.pinyin }}</td>{% endif %}
                 <td>{{ item.getExplanationShortened(maxLength)|nl2br }}</td>
-                <td>{{ item.category.name }}</td>
+                {% if config.hasCategories %}<td>{{ config.getCategoryLabel(item.category)|default('') }}</td>{% endif %}
                 <td>
                     {% if item.approved == false %}
                     <a class="has-text-success" href="{{ path('app_plugin_glossary_approval_list', {id: item.id}) }}">
@@ -53,9 +57,9 @@
             {% if item.approved == true and item.suggestions is empty %}
                 <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
                     <td>{{ item.phrase }}</td>
-                    <td>{{ item.pinyin }}</td>
+                    {% if config.secondaryEnabled %}<td>{{ item.pinyin }}</td>{% endif %}
                     <td>{{ item.getExplanationShortened(maxLength)|nl2br }}</td>
-                    <td>{{ item.category.name }}</td>
+                    {% if config.hasCategories %}<td>{{ config.getCategoryLabel(item.category)|default('') }}</td>{% endif %}
                     <td>
                         <a href="{{ path('app_plugin_glossary_edit', {id: item.id}) }}">
                             <i class="fas fa-edit"></i>
@@ -74,9 +78,9 @@
             {% if item.approved == true %}
             <tr class="{% if editItem is defined and editItem.id == item.id %}has-background-light{% endif %}">
                 <td>{{ item.phrase }}</td>
-                <td>{{ item.pinyin }}</td>
+                {% if config.secondaryEnabled %}<td>{{ item.pinyin }}</td>{% endif %}
                 <td>{{ item.getExplanationShortened(maxLength)|nl2br }}</td>
-                <td>{{ item.category.name }}</td>
+                {% if config.hasCategories %}<td>{{ config.getCategoryLabel(item.category)|default('') }}</td>{% endif %}
                 {% if is_granted('ROLE_USER') %}
                     <td>
                         <a href="{{ path('app_plugin_glossary_edit', {id: item.id}) }}">
