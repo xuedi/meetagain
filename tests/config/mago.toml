@@ -4,11 +4,13 @@ php-version = "8.4"
 
 [source]
 paths = [
-    "plugins/bookclub/src/**/*.php",
-    "plugins/dinnerclub/src/**/*.php",
-    "plugins/filmclub/src/**/*.php",
+    "plugins/books/src/**/*.php",
+    "plugins/dishes/src/**/*.php",
+    "plugins/films/src/**/*.php",
     "plugins/glossary/src/**/*.php",
     "plugins/karaoke/src/**/*.php",
+    "plugins/voting/src/**/*.php",
+    "plugins/wishlist/src/**/*.php",
     "src/",
     "tests/",
 ]

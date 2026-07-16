@@ -1,0 +1,67 @@
+{% extends '@Books/base_books.html.twig' %}
+
+{% block title %}{{ book.title }}{% endblock %}
+
+{% block books_body %}
+<div class="columns">
+    <div class="column is-4-tablet is-12-mobile">
+        {% if book.coverImage %}
+        <figure class="image" style="border: 1px solid #e0e0e0">
+            {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '400x500', 'alt': book.title} %}
+        </figure>
+        {% else %}
+        <figure class="image is-2by3">
+            <div class="box has-text-centered has-text-grey" style="height: 100%; display:flex; align-items:center; justify-content:center">
+                <span>{{ 'books_book.no_cover'|trans }}</span>
+            </div>
+        </figure>
+        {% endif %}
+    </div>
+    <div class="column">
+        <h1 class="title">{{ book.title }}</h1>
+        {% if book.author %}
+        <p class="subtitle has-text-grey">{{ book.author }}</p>
+        {% endif %}
+
+        <table class="table is-narrow">
+            <tr>
+                <th>{{ 'books_book.col_isbn'|trans }}</th>
+                <td>{{ book.isbn }}</td>
+            </tr>
+            {% if book.publishedYear %}
+            <tr>
+                <th>{{ 'books_book.col_published_year'|trans }}</th>
+                <td>{{ book.publishedYear }}</td>
+            </tr>
+            {% endif %}
+            {% if book.pageCount %}
+            <tr>
+                <th>{{ 'books_book.col_page_count'|trans }}</th>
+                <td>{{ book.pageCount }}</td>
+            </tr>
+            {% endif %}
+        </table>
+
+        {% if book.description %}
+        <p class="mt-3">{{ book.description }}</p>
+        {% endif %}
+
+        {% if is_granted('ROLE_STEWARD') %}
+        <div class="mt-4 buttons">
+            <a href="{{ path('app_plugin_books_book_edit', {id: book.id}) }}" class="button is-small">
+                <span class="icon"><i class="fa fa-edit"></i></span>
+                <span>{{ 'books_book.button_edit'|trans }}</span>
+            </a>
+            <a href="{{ path('app_plugin_books_book_delete', {id: book.id}) }}"
+               class="button is-small is-danger is-light"
+               data-post
+               data-csrf-token="{{ csrf_token('app_plugin_books_book_delete' ~ book.id) }}"
+               data-confirm="{{ 'books_book.confirm_delete'|trans }}">
+                <span class="icon"><i class="fa fa-trash"></i></span>
+                <span>{{ 'books_book.button_delete'|trans }}</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

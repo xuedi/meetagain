@@ -1,0 +1,66 @@
+{% extends '@Voting/base_voting.html.twig' %}
+
+{% block title %}{{ 'voting_poll.page_title_results'|trans }}{% endblock %}
+
+{% block voting_body %}
+<h1 class="title">{{ 'voting_poll.page_title_results'|trans }}</h1>
+
+<p class="mb-4 has-text-grey">
+    {% if poll.status.value == 1 %}
+    {{ 'voting_poll.poll_closes_on'|trans({'%date%': poll.endDate|date('Y-m-d')}) }}
+    {% else %}
+    {{ 'voting_poll.poll_closed_on'|trans({'%date%': poll.closedAt|date('Y-m-d')}) }}
+    {% endif %}
+</p>
+
+{% if poll.winningItemId %}
+<div class="notification">
+    <p class="mb-2"><strong>{{ 'voting_poll.winner_label'|trans }}</strong></p>
+    {{ item_list_cell(poll.itemType, poll.winningItemId) }}
+</div>
+{% elseif poll.status.value != 1 and poll.tiedItemIds is not empty %}
+<div class="notification is-warning">
+    {{ 'voting_poll.awaiting_disambiguation'|trans }}
+    {% if is_granted('ROLE_ORGANIZER') %}
+    <a href="{{ path('app_voting_poll_close', {id: poll.id}) }}" class="button is-small is-warning ml-2">
+        {{ 'voting_poll.button_disambiguate'|trans }}
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% set maxVotes = voteCounts is not empty ? max(voteCounts) : 0 %}
+
+<table class="table is-fullwidth">
+    <thead>
+        <tr>
+            <th>{{ 'voting_poll.col_candidate'|trans }}</th>
+            <th>{{ 'voting_poll.col_votes'|trans }}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for itemId in poll.optionItemIds %}
+        {% set voteCount = voteCounts[itemId] ?? 0 %}
+        <tr{% if poll.winningItemId == itemId %} style="font-weight: bold"{% endif %}>
+            <td>
+                {{ item_list_cell(poll.itemType, itemId) }}
+                {% if itemId in userVotedItemIds %}
+                <span class="tag is-light ml-1">{{ 'voting_poll.your_vote'|trans }}</span>
+                {% endif %}
+            </td>
+            <td>{{ voteCount }}</td>
+            <td>
+                {% if maxVotes > 0 %}
+                <progress class="progress" value="{{ voteCount }}" max="{{ maxVotes }}" style="background: #e8e8e8; color: #555"></progress>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if poll.status.value == 1 %}
+<a href="{{ path('app_voting_poll_vote', {id: poll.id}) }}" class="button">{{ 'voting_poll.button_vote'|trans }}</a>
+{% endif %}
+{% endblock %}

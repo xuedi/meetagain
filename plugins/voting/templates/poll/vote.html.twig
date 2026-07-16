@@ -1,0 +1,28 @@
+{% extends '@Voting/base_voting.html.twig' %}
+
+{% block title %}{{ 'voting_poll.page_title_vote'|trans }}{% endblock %}
+
+{% block voting_body %}
+<h1 class="title">{{ 'voting_poll.page_title_vote'|trans }}</h1>
+
+<p class="has-text-grey mb-4">
+    {{ 'voting_poll.poll_closes_on'|trans({'%date%': poll.endDate|date('Y-m-d')}) }}
+</p>
+
+<form method="POST" action="{{ path('app_voting_poll_vote', {id: poll.id}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('voting_poll_vote' ~ poll.id) }}">
+
+    {% for itemId in poll.optionItemIds %}
+    <div class="box mb-3">
+        <label class="{{ singleChoice ? 'radio' : 'checkbox' }}" style="display: flex; align-items: center; gap: 1rem; cursor: pointer">
+            <input type="{{ singleChoice ? 'radio' : 'checkbox' }}" name="items[]" value="{{ itemId }}"
+                {{ itemId in userVotedItemIds ? 'checked' : '' }}>
+            <div>{{ item_list_cell(poll.itemType, itemId) }}</div>
+        </label>
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="button is-primary">{{ 'voting_poll.button_cast_votes'|trans }}</button>
+    <a href="{{ path('app_voting_poll_show', {id: poll.id}) }}" class="button ml-2">{{ 'voting_poll.button_view_results'|trans }}</a>
+</form>
+{% endblock %}

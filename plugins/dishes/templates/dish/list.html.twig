@@ -1,0 +1,21 @@
+{% extends '@Dishes/base_dishes.html.twig' %}
+
+{% block title %}{{ 'dishes_dish.browser_title_list'|trans }}{% endblock %}
+
+{% block dishes_body %}
+<div class="level mb-4">
+    <div class="level-left">
+        <h1 class="title mb-0">{{ 'dishes_dish.page_title_list'|trans }}</h1>
+    </div>
+    {% if is_granted('ROLE_STEWARD') %}
+        <div class="level-right">
+            <a href="{{ path('app_plugin_dishes_dish_add') }}" class="button is-link">
+                <span class="icon"><i class="fa fa-plus"></i></span>
+                <span>{{ 'dishes_dish.button_add'|trans }}</span>
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+{% include '_components/item/list.html.twig' with {'itemType': 'dish', 'itemIds': itemIds, 'emptyMessage': 'dishes_dish.list_empty'} %}
+{% endblock %}

@@ -1,0 +1,31 @@
+wishlist:
+    menu_main: 'Wishlist'
+
+wishlist_attach:
+    pick_from_wishlist: 'Pick from wishlist'
+
+wishlist_entry:
+    page_title_mine: 'My wishlist'
+    page_title_group: 'Group wishlist'
+    button_mine: 'My wishlist'
+    button_group: 'Group wishlist'
+    button_remove: 'Remove'
+    empty_mine: 'Your wishlist is empty.'
+    empty_group: 'No one has wishlisted anything yet.'
+    col_item: 'Item'
+    col_priority: 'Priority'
+    col_since: 'Added'
+    priority_label: 'aged %count%x'
+    waiting_since: 'waited %count% events'
+    flash_added: 'Added to your wishlist.'
+    flash_removed: 'Removed from your wishlist.'
+
+wishlist_pick:
+    page_title: 'Pick from wishlist'
+    intro: 'Most-wanted items first. Attaching one ages the rest of the backlog.'
+    empty: 'There is nothing on the wishlist to pick from yet.'
+    col_item: 'Item'
+    col_wanters: 'Wanted by'
+    col_priority: 'Priority'
+    wanted_by_members: 'wanted by %count% members'
+    button_attach: 'Attach'

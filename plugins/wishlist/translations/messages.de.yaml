@@ -1,0 +1,31 @@
+wishlist:
+    menu_main: 'Wunschliste'
+
+wishlist_attach:
+    pick_from_wishlist: 'Aus Wunschliste wählen'
+
+wishlist_entry:
+    page_title_mine: 'Meine Wunschliste'
+    page_title_group: 'Gruppen-Wunschliste'
+    button_mine: 'Meine Wunschliste'
+    button_group: 'Gruppen-Wunschliste'
+    button_remove: 'Entfernen'
+    empty_mine: 'Deine Wunschliste ist leer.'
+    empty_group: 'Es hat noch niemand etwas auf die Wunschliste gesetzt.'
+    col_item: 'Eintrag'
+    col_priority: 'Priorität'
+    col_since: 'Hinzugefügt'
+    priority_label: '%count%x gealtert'
+    waiting_since: '%count% Veranstaltungen gewartet'
+    flash_added: 'Zu deiner Wunschliste hinzugefügt.'
+    flash_removed: 'Von deiner Wunschliste entfernt.'
+
+wishlist_pick:
+    page_title: 'Aus Wunschliste wählen'
+    intro: 'Meistgewünschte Einträge zuerst. Ein Eintrag anzuhängen lässt den Rest des Rückstands altern.'
+    empty: 'Es gibt noch nichts auf der Wunschliste zur Auswahl.'
+    col_item: 'Eintrag'
+    col_wanters: 'Gewünscht von'
+    col_priority: 'Priorität'
+    wanted_by_members: 'von %count% Mitgliedern gewünscht'
+    button_attach: 'Anhängen'

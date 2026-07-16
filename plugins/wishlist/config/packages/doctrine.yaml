@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Wishlist:
+                        dir: "%kernel.project_dir%/plugins/wishlist/src/Entity"
+                        is_bundle: false
+                        prefix: Plugin\Wishlist\Entity
+                        alias: Wishlist
+
+doctrine_migrations:
+    migrations_paths:
+        PluginWishlistMigrations: "%kernel.project_dir%/plugins/wishlist/migrations"

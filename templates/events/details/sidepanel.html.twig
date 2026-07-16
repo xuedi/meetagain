@@ -1,5 +1,17 @@
 
 {% include '_components/image.html.twig' with {'image': event.previewImage, 'size': '600x400'} %}
+{% set hasAttachControl = attachControl is defined and attachControl and not attachControl.isEmpty %}
+{% if itemCells is not empty or hasAttachControl %}
+    <div class="box mt-5">
+        <h2 class="title is-4">{{ 'item.heading'|trans }}</h2>
+        {% for cell in itemCells %}
+            <div class="item-cell mt-3">{{ cell|raw }}</div>
+        {% endfor %}
+        {% if hasAttachControl %}
+            {% include 'events/details/item_attach.html.twig' with {'attachControl': attachControl} %}
+        {% endif %}
+    </div>
+{% endif %}
 {% for tile in pluginTiles %}
     <div class="box mt-5">
         {{ tile|raw }}

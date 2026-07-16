@@ -8,10 +8,12 @@ use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
+use App\Item\ItemTypeRegistry;
 use App\Repository\EventRepository;
 use App\Service\Config\PluginService;
 use App\Service\Event\EventService;
 use App\Service\Event\RecurringEventService;
+use App\Service\Item\ItemAssociationService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -52,6 +54,8 @@ class EventServiceTest extends TestCase
             notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
+            itemAssociationService: $this->createStub(ItemAssociationService::class),
+            itemTypeRegistry: $this->createStub(ItemTypeRegistry::class),
             plugins: [],
         );
 
@@ -86,6 +90,8 @@ class EventServiceTest extends TestCase
             notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
+            itemAssociationService: $this->createStub(ItemAssociationService::class),
+            itemTypeRegistry: $this->createStub(ItemTypeRegistry::class),
             plugins: [],
         );
 
@@ -131,6 +137,8 @@ class EventServiceTest extends TestCase
             notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
+            itemAssociationService: $this->createStub(ItemAssociationService::class),
+            itemTypeRegistry: $this->createStub(ItemTypeRegistry::class),
             plugins: [],
         );
 
@@ -161,6 +169,8 @@ class EventServiceTest extends TestCase
             notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
+            itemAssociationService: $this->createStub(ItemAssociationService::class),
+            itemTypeRegistry: $this->createStub(ItemTypeRegistry::class),
             plugins: [],
         );
 
@@ -193,6 +203,8 @@ class EventServiceTest extends TestCase
             notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
+            itemAssociationService: $this->createStub(ItemAssociationService::class),
+            itemTypeRegistry: $this->createStub(ItemTypeRegistry::class),
             plugins: [],
         );
 
@@ -219,6 +231,8 @@ class EventServiceTest extends TestCase
             notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
+            itemAssociationService: $this->createStub(ItemAssociationService::class),
+            itemTypeRegistry: $this->createStub(ItemTypeRegistry::class),
             plugins: [],
         );
 
@@ -243,6 +257,8 @@ class EventServiceTest extends TestCase
             notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $recurringServiceMock,
+            itemAssociationService: $this->createStub(ItemAssociationService::class),
+            itemTypeRegistry: $this->createStub(ItemTypeRegistry::class),
             plugins: [],
         );
 
@@ -267,6 +283,8 @@ class EventServiceTest extends TestCase
             notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $recurringServiceMock,
+            itemAssociationService: $this->createStub(ItemAssociationService::class),
+            itemTypeRegistry: $this->createStub(ItemTypeRegistry::class),
             plugins: [],
         );
 
@@ -298,6 +316,8 @@ class EventServiceTest extends TestCase
             notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $this->createStub(RecurringEventService::class),
+            itemAssociationService: $this->createStub(ItemAssociationService::class),
+            itemTypeRegistry: $this->createStub(ItemTypeRegistry::class),
             plugins: [],
         );
 
@@ -323,6 +343,8 @@ class EventServiceTest extends TestCase
             notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $recurringServiceMock,
+            itemAssociationService: $this->createStub(ItemAssociationService::class),
+            itemTypeRegistry: $this->createStub(ItemTypeRegistry::class),
             plugins: [],
         );
 
@@ -347,6 +369,8 @@ class EventServiceTest extends TestCase
             notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
             recurringEventService: $recurringServiceMock,
+            itemAssociationService: $this->createStub(ItemAssociationService::class),
+            itemTypeRegistry: $this->createStub(ItemTypeRegistry::class),
             plugins: [],
         );
 

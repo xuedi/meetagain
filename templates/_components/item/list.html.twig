@@ -1,0 +1,61 @@
+{#
+    Item List - Shared switchable list of item cells with per-type view persistence
+
+    Renders any item type's list through one of four layouts (list, tiles, grid, gallery)
+    behind a Bulma view switcher. The current mode is read from and written to the session
+    keyed by item type, so each list remembers its own mode independently. Each item's inner
+    cell markup comes from the item-type provider's renderListCell(); this component owns only
+    the switcher, the layout wrappers, and the persistence.
+
+    Used in:    item-list pages of the films / books / dishes plugins
+    Parameters:
+        - itemType     (string, required)     -- registry key of the item type (e.g. 'film')
+        - itemIds      (list<int>, required)  -- ids of the items to render, in display order
+        - emptyMessage (string, optional)     -- translation key shown when itemIds is empty;
+                                                 default: 'item.list_empty'
+    Depends on: item_view_mode(), item_view_types(), item_list_cell() (ItemViewExtension);
+                the app_item_set_view route
+#}
+{% set current = item_view_mode(itemType) %}
+<div class="item-list" data-item-list="{{ itemType }}">
+    <div class="level mb-4">
+        <div class="level-left"></div>
+        <div class="level-right">
+            <div class="buttons has-addons mb-0">
+                {% for view in item_view_types() %}
+                    <a href="{{ path('app_item_set_view', {'itemType': itemType, 'mode': view.value}) }}"
+                       class="button is-small{% if current == view %} is-link{% endif %}"
+                       title="{{ view.label|trans }}">
+                        <span class="icon"><i class="fa-solid fa-{{ view.icon }}"></i></span>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% if itemIds is empty %}
+        <p class="has-text-grey">{{ (emptyMessage|default('item.list_empty'))|trans }}</p>
+    {% elseif current.value == 'list' %}
+        {% for id in itemIds %}
+            <div class="item-cell box mb-4">{{ item_list_cell(itemType, id) }}</div>
+        {% endfor %}
+    {% elseif current.value == 'tiles' %}
+        <div class="columns is-multiline">
+            {% for id in itemIds %}
+                <div class="column is-one-third item-cell">{{ item_list_cell(itemType, id) }}</div>
+            {% endfor %}
+        </div>
+    {% elseif current.value == 'grid' %}
+        <div class="columns is-multiline">
+            {% for id in itemIds %}
+                <div class="column is-one-quarter item-cell">{{ item_list_cell(itemType, id) }}</div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="columns is-multiline is-mobile">
+            {% for id in itemIds %}
+                <div class="column is-2 item-cell">{{ item_list_cell(itemType, id) }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

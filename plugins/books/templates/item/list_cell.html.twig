@@ -1,0 +1,6 @@
+{# Book cell rendered by the shared item-list component (core wraps it in the chosen layout). #}
+<a href="{{ path('app_plugin_books_book_show', {id: book.id}) }}" class="book-cell is-block has-text-centered">
+    {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x250', 'alt': book.title} %}
+    <p class="title is-6 mt-2 mb-0">{{ book.title }}</p>
+    {% if book.author %}<p class="subtitle is-7 has-text-grey">{{ book.author }}</p>{% endif %}
+</a>
