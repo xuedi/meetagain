@@ -1,0 +1,5 @@
+{
+  "name": "Voting",
+  "version": "1.0",
+  "description": "Turn any event item type into a ballot: candidates are polled, members approve-vote, the winner is attached to the event through the core item seam."
+}

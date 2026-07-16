@@ -1,0 +1,23 @@
+{# Steward picker to attach an existing dish to the event. Posts to the core attach route. #}
+{% if dishes is empty %}
+    <p class="has-text-grey is-size-7">{{ 'dishes.attach_empty'|trans }}</p>
+{% else %}
+    <form method="post" action="{{ path('app_item_attach', {id: eventId}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('app_item_attach' ~ eventId) }}">
+        <input type="hidden" name="item_type" value="dish">
+        <div class="field has-addons">
+            <div class="control is-expanded">
+                <div class="select is-small is-fullwidth">
+                    <select name="item_id">
+                        {% for dish in dishes %}
+                            <option value="{{ dish.id }}">{{ dish.getTranslatedName(app.locale) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="control">
+                <button type="submit" class="button is-small is-link">{{ 'dishes.attach_button'|trans }}</button>
+            </div>
+        </div>
+    </form>
+{% endif %}

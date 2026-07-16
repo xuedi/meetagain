@@ -1,0 +1,5 @@
+{
+  "name": "Books",
+  "version": "1.0",
+  "description": "Book catalog with keyless ISBN metadata lookup (Open Library), attachable to events via the core item system."
+}

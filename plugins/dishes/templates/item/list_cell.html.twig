@@ -1,0 +1,6 @@
+{# Dish cell rendered by the shared item-list component (core wraps it in the chosen layout). #}
+<a href="{{ path('app_plugin_dishes_dish_show', {id: dish.id}) }}" class="dish-cell is-block has-text-centered">
+    {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '400x400'} %}
+    <p class="title is-6 mt-2 mb-0">{{ dish.getTranslatedName(app.locale) }}</p>
+    {% if dish.origin %}<p class="subtitle is-7 has-text-grey">{{ dish.origin }}</p>{% endif %}
+</a>

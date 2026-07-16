@@ -1,0 +1,29 @@
+{# Dish cell rendered for one EventItemAssociation on the event detail page. The sectionLabel is the
+   former dinner-course name; associations are position-ordered so same-section dishes cluster. #}
+<div class="media">
+    <div class="media-left">
+        <a href="{{ path('app_plugin_dishes_dish_show', {id: dish.id}) }}">
+            {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '400x400'} %}
+        </a>
+    </div>
+    <div class="media-content">
+        {% if sectionLabel %}
+            <p class="is-size-7 has-text-grey has-text-weight-semibold is-uppercase mb-1">{{ sectionLabel }}</p>
+        {% endif %}
+        <p class="title is-6 mb-1">
+            <a href="{{ path('app_plugin_dishes_dish_show', {id: dish.id}) }}">{{ dish.getTranslatedName(app.locale) }}</a>
+        </p>
+        {% if dish.origin %}<p class="subtitle is-7 has-text-grey">{{ dish.origin }}</p>{% endif %}
+        {% if is_granted('ROLE_ORGANIZER') %}
+            <form method="post" action="{{ path('app_item_detach', {id: association.event.id}) }}" class="mt-2">
+                <input type="hidden" name="_token" value="{{ csrf_token('app_item_detach' ~ association.event.id) }}">
+                <input type="hidden" name="item_type" value="dish">
+                <input type="hidden" name="item_id" value="{{ dish.id }}">
+                <button type="submit" class="button is-small is-danger is-light">
+                    <span class="icon"><i class="fa fa-times"></i></span>
+                    <span>{{ 'dishes.detach'|trans }}</span>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</div>

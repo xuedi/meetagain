@@ -1,0 +1,64 @@
+{% extends '@Dishes/base_dishes.html.twig' %}
+
+{% block title %}{{ 'dishes_dish.page_title_add'|trans }}{% endblock %}
+
+{% block dishes_body %}
+<h1 class="title">{{ 'dishes_dish.page_title_add'|trans }}</h1>
+
+<div class="columns">
+    <div class="column is-8">
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+        <div class="field">
+            {{ form_label(form.language, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control"><div class="select">{{ form_widget(form.language) }}</div></div>
+            {{ form_errors(form.language) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.name, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.name) }}</div>
+            {{ form_errors(form.name) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.phonetic, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.phonetic) }}</div>
+            {{ form_errors(form.phonetic) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.description, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.description) }}</div>
+            {{ form_errors(form.description) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.recipe, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.recipe) }}</div>
+            {{ form_errors(form.recipe) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.origin, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.origin) }}</div>
+            {{ form_errors(form.origin) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.previewFile, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.previewFile) }}</div>
+            {{ form_errors(form.previewFile) }}
+        </div>
+
+        <div class="field is-grouped mt-4">
+            <div class="control">{{ form_widget(form.submit) }}</div>
+            <div class="control">
+                <a href="{{ path('app_dishes_dishlist') }}" class="button">{{ 'dishes_dish.button_cancel'|trans }}</a>
+            </div>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

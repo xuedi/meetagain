@@ -1,0 +1,53 @@
+{% extends '@Films/base_films.html.twig' %}
+
+{% block title %}{{ 'films_film.page_title_manual'|trans }}{% endblock %}
+
+{% block films_body %}
+<h1 class="title">{{ 'films_film.page_title_manual'|trans }}</h1>
+
+<div class="columns">
+    <div class="column is-8">
+        {{ form_start(form) }}
+
+        <div class="field">
+            {{ form_label(form.title, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">
+                {{ form_widget(form.title) }}
+            </div>
+            {{ form_errors(form.title) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.year, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">
+                {{ form_widget(form.year) }}
+            </div>
+            {{ form_errors(form.year) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.runtime, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">
+                {{ form_widget(form.runtime) }}
+            </div>
+            {{ form_errors(form.runtime) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.description, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">
+                {{ form_widget(form.description) }}
+            </div>
+            {{ form_errors(form.description) }}
+        </div>
+
+        <div class="field">
+            <div class="control">
+                {{ form_widget(form.submit) }}
+            </div>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

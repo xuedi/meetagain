@@ -1,0 +1,77 @@
+{% extends '@Voting/base_voting.html.twig' %}
+
+{% block title %}{{ 'voting_poll.page_title_list'|trans }}{% endblock %}
+
+{% block voting_body %}
+<h1 class="title">{{ 'voting_poll.page_title_list'|trans }}</h1>
+
+{% if activePolls is not empty %}
+<h2 class="subtitle">{{ 'voting_poll.heading_active'|trans }}</h2>
+<table class="table is-fullwidth is-striped">
+    <thead>
+        <tr>
+            <th>{{ 'voting_poll.col_candidates'|trans }}</th>
+            <th>{{ 'voting_poll.col_ends'|trans }}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for poll in activePolls %}
+        <tr>
+            <td>{{ poll.options|length }}</td>
+            <td>{{ poll.endDate|date('Y-m-d') }}</td>
+            <td>
+                <a href="{{ path('app_voting_poll_vote', {id: poll.id}) }}" class="button is-small">
+                    {{ 'voting_poll.button_vote'|trans }}
+                </a>
+                {% if is_granted('ROLE_ORGANIZER') %}
+                <a href="{{ path('app_voting_poll_close', {id: poll.id}) }}" class="button is-small">
+                    {{ 'voting_poll.button_close'|trans }}
+                </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if closedPolls is not empty %}
+<h2 class="subtitle">{{ 'voting_poll.heading_past'|trans }}</h2>
+<table class="table is-fullwidth is-striped">
+    <thead>
+        <tr>
+            <th>{{ 'voting_poll.col_closed_at'|trans }}</th>
+            <th>{{ 'voting_poll.col_winner'|trans }}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for poll in closedPolls %}
+        <tr>
+            <td>{{ poll.closedAt|date('Y-m-d') }}</td>
+            <td>
+                {% if poll.winningItemId %}
+                {{ item_list_cell(poll.itemType, poll.winningItemId) }}
+                {% elseif poll.tiedItemIds is not empty %}
+                <span class="has-text-grey">{{ 'voting_poll.awaiting_disambiguation'|trans }}</span>
+                {% else %}
+                <span class="has-text-grey">-</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{{ path('app_voting_poll_show', {id: poll.id}) }}" class="button is-small">
+                    {{ 'voting_poll.button_results'|trans }}
+                </a>
+                {% if is_granted('ROLE_ORGANIZER') and poll.tiedItemIds is not empty and poll.winningItemId is null %}
+                <a href="{{ path('app_voting_poll_close', {id: poll.id}) }}" class="button is-small is-warning">
+                    {{ 'voting_poll.button_disambiguate'|trans }}
+                </a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

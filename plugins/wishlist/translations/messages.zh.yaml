@@ -1,0 +1,31 @@
+wishlist:
+    menu_main: '愿望清单'
+
+wishlist_attach:
+    pick_from_wishlist: '从愿望清单中选择'
+
+wishlist_entry:
+    page_title_mine: '我的愿望清单'
+    page_title_group: '群组愿望清单'
+    button_mine: '我的愿望清单'
+    button_group: '群组愿望清单'
+    button_remove: '移除'
+    empty_mine: '你的愿望清单是空的。'
+    empty_group: '还没有人加入任何愿望。'
+    col_item: '条目'
+    col_priority: '优先级'
+    col_since: '添加于'
+    priority_label: '已累积 %count% 次'
+    waiting_since: '已等待 %count% 场活动'
+    flash_added: '已加入你的愿望清单。'
+    flash_removed: '已从你的愿望清单移除。'
+
+wishlist_pick:
+    page_title: '从愿望清单中选择'
+    intro: '最受期待的条目优先。关联其中一个会使其余积压条目累积优先级。'
+    empty: '愿望清单中暂时没有可选择的条目。'
+    col_item: '条目'
+    col_wanters: '期待人数'
+    col_priority: '优先级'
+    wanted_by_members: '有 %count% 位成员期待'
+    button_attach: '关联'

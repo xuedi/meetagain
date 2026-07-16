@@ -35,8 +35,6 @@ class GetRoutesContractTest extends WebTestCase
         'app_replace_image_select' => 'entity resolver before CSRF',
         'app_image_rotate' => 'entity resolver before CSRF',
         'app_event_delete_comment' => 'entity lookup before CSRF',
-        'plugin_dinnerclub_lists_delete' => 'entity lookup before CSRF',
-        'plugin_dinnerclub_image_delete' => 'entity lookup before CSRF',
         'app_plugin_glossary_suggestion_apply' => 'signed-token exception',
         'app_plugin_glossary_suggestion_delete' => 'signed-token exception',
         'app_admin_email_announcements_from_cms' => 'entity lookup before CSRF',
@@ -91,7 +89,6 @@ class GetRoutesContractTest extends WebTestCase
         yield 'member remove avatar' => ['/en/members/remove-image/1'];
         yield 'member restrict' => ['/en/members/restrict/1'];
         yield 'member verify' => ['/en/members/verify/1'];
-        yield 'bookclub withdraw' => ['/en/bookclub/withdraw/1'];
         yield 'glossary delete' => ['/en/glossary/delete/1'];
         yield 'glossary approval approve' => ['/en/glossary/approval/approve/1'];
         yield 'glossary approval deny' => ['/en/glossary/approval/deny/1'];

@@ -1,0 +1,27 @@
+{% extends '@Films/base_films.html.twig' %}
+
+{% block title %}{{ 'films_film.browser_title_list'|trans }}{% endblock %}
+
+{% block films_body %}
+<div class="level mb-4">
+    <div class="level-left">
+        <h1 class="title mb-0">{{ 'films_film.page_title_list'|trans }}</h1>
+    </div>
+    {% if is_granted('ROLE_STEWARD') %}
+        <div class="level-right">
+            <div class="buttons">
+                <a href="{{ path('app_plugin_films_film_lookup') }}" class="button is-link">
+                    <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
+                    <span>{{ 'films_film.button_lookup'|trans }}</span>
+                </a>
+                <a href="{{ path('app_plugin_films_film_manual') }}" class="button">
+                    <span class="icon"><i class="fa fa-plus"></i></span>
+                    <span>{{ 'films_film.button_manual'|trans }}</span>
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% include '_components/item/list.html.twig' with {'itemType': 'film', 'itemIds': itemIds, 'emptyMessage': 'films_film.list_empty'} %}
+{% endblock %}

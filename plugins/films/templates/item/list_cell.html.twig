@@ -1,0 +1,6 @@
+{# Film cell rendered by the shared item-list component (core wraps it in the chosen layout). #}
+<a href="{{ path('app_plugin_films_film_show', {id: film.id}) }}" class="film-cell is-block has-text-centered">
+    {% include '_components/image.html.twig' with {'image': film.posterImage, 'size': '200x300', 'alt': film.title} %}
+    <p class="title is-6 mt-2 mb-0">{{ film.title }}</p>
+    {% if film.year %}<p class="subtitle is-7 has-text-grey">{{ film.year }}</p>{% endif %}
+</a>
