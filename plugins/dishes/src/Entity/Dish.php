@@ -11,7 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Plugin\Dishes\Repository\DishRepository;
 
 #[ORM\Entity(repositoryClass: DishRepository::class)]
-#[ORM\Table(name: 'dishes_dish')]
+#[ORM\Table(name: 'plg_dishes_dish')]
 class Dish
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]

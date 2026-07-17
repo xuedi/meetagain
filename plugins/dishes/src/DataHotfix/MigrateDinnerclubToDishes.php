@@ -12,9 +12,9 @@ use Override;
  * Runs entirely on raw SQL so it does not depend on the (deleted) dinnerclub entity mappings.
  * The dishes tables are created by PluginDishesMigrations; the old dinnerclub tables still exist
  * on production until a later follow-up migration drops them. Steps, in order:
- *   1. copy `dish` -> `dishes_dish` (dropping approved/suggestions), preserving ids
- *   2. copy `dish_translation` -> `dishes_dish_translation`, preserving ids
- *   3. copy `dinnerclub_dish_image` -> `dishes_dish_image`, preserving ids (same core Image rows)
+ *   1. copy `dish` -> `plg_dishes_dish` (dropping approved/suggestions), preserving ids
+ *   2. copy `dish_translation` -> `plg_dishes_dish_translation`, preserving ids
+ *   3. copy `dinnerclub_dish_image` -> `plg_dishes_dish_image`, preserving ids (same core Image rows)
  *   4. flatten each `dinner`/`dinner_course`/`dinner_course_item` into `event_item_association`
  *      rows (item_type='dish', position from course+item order, section_label from course name)
  *
@@ -50,11 +50,11 @@ readonly class MigrateDinnerclubToDishes implements DataHotfixInterface
     {
         foreach ($this->connection->iterateAssociative('SELECT * FROM dish') as $row) {
             $id = (int) $row['id'];
-            if ($this->rowExists('dishes_dish', 'id', $id)) {
+            if ($this->rowExists('plg_dishes_dish', 'id', $id)) {
                 continue;
             }
 
-            $this->connection->insert('dishes_dish', [
+            $this->connection->insert('plg_dishes_dish', [
                 'id' => $id,
                 'preview_image_id' => $row['preview_image_id'],
                 'pronunciation_system_id' => $row['pronunciation_system_id'],
@@ -71,14 +71,14 @@ readonly class MigrateDinnerclubToDishes implements DataHotfixInterface
     {
         foreach ($this->connection->iterateAssociative('SELECT * FROM dish_translation') as $row) {
             $id = (int) $row['id'];
-            if ($this->rowExists('dishes_dish_translation', 'id', $id)) {
+            if ($this->rowExists('plg_dishes_dish_translation', 'id', $id)) {
                 continue;
             }
-            if (!$this->rowExists('dishes_dish', 'id', (int) $row['dish_id'])) {
+            if (!$this->rowExists('plg_dishes_dish', 'id', (int) $row['dish_id'])) {
                 continue;
             }
 
-            $this->connection->insert('dishes_dish_translation', [
+            $this->connection->insert('plg_dishes_dish_translation', [
                 'id' => $id,
                 'dish_id' => (int) $row['dish_id'],
                 'language' => $row['language'],
@@ -93,14 +93,14 @@ readonly class MigrateDinnerclubToDishes implements DataHotfixInterface
     {
         foreach ($this->connection->iterateAssociative('SELECT * FROM dinnerclub_dish_image') as $row) {
             $id = (int) $row['id'];
-            if ($this->rowExists('dishes_dish_image', 'id', $id)) {
+            if ($this->rowExists('plg_dishes_dish_image', 'id', $id)) {
                 continue;
             }
-            if (!$this->rowExists('dishes_dish', 'id', (int) $row['dish_id'])) {
+            if (!$this->rowExists('plg_dishes_dish', 'id', (int) $row['dish_id'])) {
                 continue;
             }
 
-            $this->connection->insert('dishes_dish_image', [
+            $this->connection->insert('plg_dishes_dish_image', [
                 'id' => $id,
                 'dish_id' => (int) $row['dish_id'],
                 'image_id' => (int) $row['image_id'],
@@ -133,7 +133,7 @@ readonly class MigrateDinnerclubToDishes implements DataHotfixInterface
                     $dishId = (int) $item['dish_id'];
                     // A dish can appear in several courses; the association unique (event,type,item)
                     // keeps only the first. The running position preserves the menu order regardless.
-                    if ($this->rowExists('dishes_dish', 'id', $dishId) && !$this->associationExists($eventId, $dishId)) {
+                    if ($this->rowExists('plg_dishes_dish', 'id', $dishId) && !$this->associationExists($eventId, $dishId)) {
                         $this->connection->insert('event_item_association', [
                             'event_id' => $eventId,
                             'item_type' => 'dish',

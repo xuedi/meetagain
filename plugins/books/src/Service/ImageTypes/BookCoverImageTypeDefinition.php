@@ -36,7 +36,7 @@ final class BookCoverImageTypeDefinition extends AbstractImageTypeDefinition
 
     public function discoverImageIds(): array
     {
-        $rows = $this->connection->fetchAllAssociative('SELECT cover_image_id AS image_id, id AS location_id FROM book WHERE cover_image_id IS NOT NULL');
+        $rows = $this->connection->fetchAllAssociative('SELECT cover_image_id AS image_id, id AS location_id FROM plg_books_book WHERE cover_image_id IS NOT NULL');
 
         return array_map(static fn(array $r) => [
             'imageId' => (int) $r['image_id'],

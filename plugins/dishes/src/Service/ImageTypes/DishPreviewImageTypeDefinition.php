@@ -43,14 +43,14 @@ final class DishPreviewImageTypeDefinition extends AbstractImageTypeDefinition
     {
         $pairs = [];
 
-        $gallery = $this->connection->fetchAllAssociative('SELECT image_id, dish_id AS location_id FROM dishes_dish_image');
+        $gallery = $this->connection->fetchAllAssociative('SELECT image_id, dish_id AS location_id FROM plg_dishes_dish_image');
         foreach ($gallery as $row) {
             $key = $row['image_id'] . ':' . $row['location_id'];
             $pairs[$key] = ['imageId' => (int) $row['image_id'], 'locationId' => (int) $row['location_id']];
         }
 
         $previews = $this->connection->fetchAllAssociative(
-            'SELECT preview_image_id AS image_id, id AS location_id FROM dishes_dish WHERE preview_image_id IS NOT NULL',
+            'SELECT preview_image_id AS image_id, id AS location_id FROM plg_dishes_dish WHERE preview_image_id IS NOT NULL',
         );
         foreach ($previews as $row) {
             $key = $row['image_id'] . ':' . $row['location_id'];
@@ -64,7 +64,7 @@ final class DishPreviewImageTypeDefinition extends AbstractImageTypeDefinition
     {
         $dish = $this->dishRepository->findOneBy(['previewImage' => $image]);
         if ($dish === null) {
-            $dishId = $this->connection->fetchOne('SELECT dish_id FROM dishes_dish_image WHERE image_id = ? LIMIT 1', [$image->getId()]);
+            $dishId = $this->connection->fetchOne('SELECT dish_id FROM plg_dishes_dish_image WHERE image_id = ? LIMIT 1', [$image->getId()]);
             $dish = $dishId !== false ? $this->dishRepository->find((int) $dishId) : null;
         }
         if ($dish === null) {

@@ -11,6 +11,7 @@ use Plugin\Voting\Repository\VoteRepository;
  * constraint makes a vote idempotent; a user's full set of rows is their approval ballot.
  */
 #[ORM\Entity(repositoryClass: VoteRepository::class)]
+#[ORM\Table(name: 'plg_voting_vote')]
 #[ORM\UniqueConstraint(name: 'uniq_vote_poll_user_item', columns: ['poll_id', 'user_id', 'item_id'])]
 class Vote
 {

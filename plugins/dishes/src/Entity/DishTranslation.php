@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Plugin\Dishes\Repository\DishTranslationRepository;
 
 #[ORM\Entity(repositoryClass: DishTranslationRepository::class)]
-#[ORM\Table(name: 'dishes_dish_translation')]
+#[ORM\Table(name: 'plg_dishes_dish_translation')]
 #[ORM\UniqueConstraint(name: 'uniq_dishes_translation_lang_dish', columns: ['language', 'dish_id'])]
 class DishTranslation
 {

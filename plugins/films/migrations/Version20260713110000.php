@@ -16,7 +16,7 @@ final class Version20260713110000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE film (
+        $this->addSql('CREATE TABLE plg_films_film (
             id INT AUTO_INCREMENT NOT NULL,
             poster_image_id INT DEFAULT NULL,
             title VARCHAR(255) NOT NULL,
@@ -29,13 +29,13 @@ final class Version20260713110000 extends AbstractMigration
             genres JSON NOT NULL,
             created_by INT NOT NULL,
             created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\',
-            INDEX IDX_8244BE222B29B2B (poster_image_id),
+            INDEX IDX_CDF89810DE75329 (poster_image_id),
             PRIMARY KEY(id)
         ) DEFAULT CHARACTER SET utf8mb4');
 
-        $this->addSql('ALTER TABLE film ADD CONSTRAINT FK_8244BE222B29B2B FOREIGN KEY (poster_image_id) REFERENCES image (id) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE plg_films_film ADD CONSTRAINT FK_CDF89810DE75329 FOREIGN KEY (poster_image_id) REFERENCES image (id) ON DELETE SET NULL');
 
-        $this->addSql('CREATE TABLE films_settings (
+        $this->addSql('CREATE TABLE plg_films_settings (
             id INT AUTO_INCREMENT NOT NULL,
             adapter VARCHAR(10) DEFAULT NULL,
             encrypted_tmdb_key LONGTEXT DEFAULT NULL,
@@ -46,8 +46,8 @@ final class Version20260713110000 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('DROP TABLE films_settings');
-        $this->addSql('ALTER TABLE film DROP FOREIGN KEY FK_8244BE222B29B2B');
-        $this->addSql('DROP TABLE film');
+        $this->addSql('DROP TABLE plg_films_settings');
+        $this->addSql('ALTER TABLE plg_films_film DROP FOREIGN KEY FK_CDF89810DE75329');
+        $this->addSql('DROP TABLE plg_films_film');
     }
 }

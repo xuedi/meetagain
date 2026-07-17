@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Plugin\Voting\Repository\PollRepository;
 
 #[ORM\Entity(repositoryClass: PollRepository::class)]
+#[ORM\Table(name: 'plg_voting_poll')]
 class Poll
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]

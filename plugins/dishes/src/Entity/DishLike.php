@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Plugin\Dishes\Repository\DishLikeRepository;
 
 #[ORM\Entity(repositoryClass: DishLikeRepository::class)]
-#[ORM\Table(name: 'dishes_dish_like')]
+#[ORM\Table(name: 'plg_dishes_dish_like')]
 #[ORM\UniqueConstraint(name: 'uniq_dishes_dish_user_like', columns: ['dish_id', 'user_id'])]
 class DishLike
 {

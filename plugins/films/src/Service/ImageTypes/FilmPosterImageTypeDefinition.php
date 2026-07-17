@@ -42,7 +42,7 @@ final class FilmPosterImageTypeDefinition extends AbstractImageTypeDefinition
 
     public function discoverImageIds(): array
     {
-        $rows = $this->connection->fetchAllAssociative('SELECT poster_image_id AS image_id, id AS location_id FROM film WHERE poster_image_id IS NOT NULL');
+        $rows = $this->connection->fetchAllAssociative('SELECT poster_image_id AS image_id, id AS location_id FROM plg_films_film WHERE poster_image_id IS NOT NULL');
 
         return array_map(static fn(array $r) => [
             'imageId' => (int) $r['image_id'],
