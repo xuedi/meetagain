@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Plugin\Dishes\Repository\DishImageRepository;
 
 #[ORM\Entity(repositoryClass: DishImageRepository::class)]
-#[ORM\Table(name: 'dishes_dish_image')]
+#[ORM\Table(name: 'plg_dishes_dish_image')]
 #[ORM\UniqueConstraint(name: 'uniq_dishes_dish_image', columns: ['dish_id', 'image_id'])]
 class DishImage
 {

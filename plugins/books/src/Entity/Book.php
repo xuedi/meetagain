@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Plugin\Books\Repository\BookRepository;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
+#[ORM\Table(name: 'plg_books_book')]
 class Book
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]

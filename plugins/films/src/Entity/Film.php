@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Plugin\Films\Repository\FilmRepository;
 
 #[ORM\Entity(repositoryClass: FilmRepository::class)]
+#[ORM\Table(name: 'plg_films_film')]
 class Film
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]

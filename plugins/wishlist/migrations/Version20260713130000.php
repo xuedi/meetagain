@@ -16,7 +16,7 @@ final class Version20260713130000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE wishlist_entry (
+        $this->addSql('CREATE TABLE plg_wishlist_entry (
             id INT AUTO_INCREMENT NOT NULL,
             user_id INT NOT NULL,
             item_type VARCHAR(50) NOT NULL,
@@ -30,6 +30,6 @@ final class Version20260713130000 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('DROP TABLE wishlist_entry');
+        $this->addSql('DROP TABLE plg_wishlist_entry');
     }
 }

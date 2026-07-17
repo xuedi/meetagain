@@ -12,6 +12,7 @@ use Plugin\Wishlist\Repository\WishlistEntryRepository;
  * is picked, so long-ignored wishes float to the top of the demand ranking.
  */
 #[ORM\Entity(repositoryClass: WishlistEntryRepository::class)]
+#[ORM\Table(name: 'plg_wishlist_entry')]
 #[ORM\UniqueConstraint(name: 'uniq_wishlist_user_item', columns: ['user_id', 'item_type', 'item_id'])]
 class WishlistEntry
 {
