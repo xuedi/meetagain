@@ -126,9 +126,11 @@ final class GlossaryConfig implements PluginSettingsData
     {
         $maxId = -1;
         foreach ($this->categories as $category) {
-            if ($category['id'] !== '' && (int) $category['id'] > $maxId) {
-                $maxId = (int) $category['id'];
+            if (!($category['id'] !== '' && (int) $category['id'] > $maxId)) {
+                continue;
             }
+
+            $maxId = (int) $category['id'];
         }
 
         $normalized = [];

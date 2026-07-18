@@ -57,7 +57,7 @@ class Kernel implements Plugin
             return;
         }
 
-        if ($this->wishlistService->listForUser($userIds[0]) !== []) {
+        if ($this->wishlistService->hasEntries()) {
             $output->writeln('<comment>Wishlist: already seeded, skipping.</comment>');
 
             return;

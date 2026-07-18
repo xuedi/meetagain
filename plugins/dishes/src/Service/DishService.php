@@ -17,7 +17,6 @@ use Plugin\Dishes\Entity\DishTranslation;
 use Plugin\Dishes\Repository\DishImageRepository;
 use Plugin\Dishes\Repository\DishLikeRepository;
 use Plugin\Dishes\Repository\DishRepository;
-use RuntimeException;
 
 readonly class DishService
 {
