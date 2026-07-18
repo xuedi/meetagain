@@ -66,6 +66,12 @@ readonly class WishlistService
         return $this->scopeEntries($this->wishlistRepo->findByUser($userId));
     }
 
+    /** Whether any wish exists at all, used to keep fixture self-seeding idempotent. */
+    public function hasEntries(): bool
+    {
+        return $this->wishlistRepo->hasAny();
+    }
+
     /**
      * @return array<array{itemId: int, wanterCount: int, totalPriority: int}> demand for one type, most-wanted first
      */
