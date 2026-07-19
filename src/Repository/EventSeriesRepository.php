@@ -19,11 +19,6 @@ class EventSeriesRepository extends ServiceEntityRepository
      */
     public function findOpen(): array
     {
-        return $this
-            ->createQueryBuilder('s')
-            ->where('s.rule IS NOT NULL')
-            ->orderBy('s.id', 'ASC')
-            ->getQuery()
-            ->getResult();
+        return $this->createQueryBuilder('s')->where('s.rule IS NOT NULL')->orderBy('s.id', 'ASC')->getQuery()->getResult();
     }
 }

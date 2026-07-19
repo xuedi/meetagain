@@ -46,10 +46,7 @@ class AbstractImageTypeDefinitionTest extends TestCase
 {
     private function makeDefinition(?ImageLocationRepository $repo = null): TestImageTypeDefinition
     {
-        return new TestImageTypeDefinition(
-            repo: $repo ?? $this->createStub(ImageLocationRepository::class),
-            connection: $this->createStub(Connection::class),
-        );
+        return new TestImageTypeDefinition(repo: $repo ?? $this->createStub(ImageLocationRepository::class), connection: $this->createStub(Connection::class));
     }
 
     // ---- thumbnailSizes(): universal merge ----

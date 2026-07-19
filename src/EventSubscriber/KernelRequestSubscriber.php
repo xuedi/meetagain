@@ -63,10 +63,7 @@ readonly class KernelRequestSubscriber implements EventSubscriberInterface
             return false;
         }
 
-        $matchesSkippedPrefix = array_any(
-            self::JUMPBACK_SKIP_PATH_PREFIXES,
-            static fn(string $prefix): bool => str_starts_with($path, $prefix),
-        );
+        $matchesSkippedPrefix = array_any(self::JUMPBACK_SKIP_PATH_PREFIXES, static fn(string $prefix): bool => str_starts_with($path, $prefix));
 
         return !$matchesSkippedPrefix;
     }

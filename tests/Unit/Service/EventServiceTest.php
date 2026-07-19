@@ -271,7 +271,11 @@ class EventServiceTest extends TestCase
         // Arrange: create a series member
         $parent = new EventStub()
             ->setId(1)
-            ->setSeries(new EventSeriesStub()->setId(9)->setRule(EventInterval::Weekly));
+            ->setSeries(
+                new EventSeriesStub()
+                    ->setId(9)
+                    ->setRule(EventInterval::Weekly),
+            );
         $parent->setStart(new DateTime('2025-01-01 10:00:00'));
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);
@@ -331,7 +335,11 @@ class EventServiceTest extends TestCase
         // Arrange: create an auto-generated series member
         $child = new EventStub()
             ->setId(2)
-            ->setSeries(new EventSeriesStub()->setId(9)->setRule(EventInterval::Weekly))
+            ->setSeries(
+                new EventSeriesStub()
+                    ->setId(9)
+                    ->setRule(EventInterval::Weekly),
+            )
             ->setStart(new DateTime('+1 week'));
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);
@@ -357,7 +365,11 @@ class EventServiceTest extends TestCase
         // Arrange: create a member of a closed series
         $child = new EventStub()
             ->setId(2)
-            ->setSeries(new EventSeriesStub()->setId(9)->setRule(null))
+            ->setSeries(
+                new EventSeriesStub()
+                    ->setId(9)
+                    ->setRule(null),
+            )
             ->setStart(new DateTime('+1 week'));
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);

@@ -22,7 +22,10 @@ final readonly class PluginSettingsService
     {
         $materialised = $descriptors instanceof Traversable ? iterator_to_array($descriptors, false) : array_values($descriptors);
 
-        usort($materialised, static fn(PluginSettingsDescriptorInterface $a, PluginSettingsDescriptorInterface $b): int => $b->getPriority() <=> $a->getPriority());
+        usort(
+            $materialised,
+            static fn(PluginSettingsDescriptorInterface $a, PluginSettingsDescriptorInterface $b): int => $b->getPriority() <=> $a->getPriority(),
+        );
 
         $keyed = [];
         foreach ($materialised as $descriptor) {
