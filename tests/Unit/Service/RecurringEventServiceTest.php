@@ -113,7 +113,11 @@ class RecurringEventServiceTest extends TestCase
         $memberWithoutFollowUps = new EventStub();
         $memberWithoutFollowUps->setId(2);
         $memberWithoutFollowUps->setStart(new DateTime('2025-06-01 19:00'));
-        $memberWithoutFollowUps->setSeries(new EventSeriesStub()->setId(9)->setRule(EventInterval::Weekly));
+        $memberWithoutFollowUps->setSeries(
+            new EventSeriesStub()
+                ->setId(9)
+                ->setRule(EventInterval::Weekly),
+        );
         yield 'series member with zero follow-ups → returns 0' => [
             'event' => $memberWithoutFollowUps,
         ];
@@ -681,9 +685,12 @@ class RecurringEventServiceTest extends TestCase
             }
         });
 
-        return [$this->createService($repo, $em, $seriesRepo), static function () use (&$created): array {
-            return $created;
-        }];
+        return [
+            $this->createService($repo, $em, $seriesRepo),
+            static function () use (&$created): array {
+                return $created;
+            },
+        ];
     }
 
     public function testExtendRecurringEventsSourcesScheduleAndContentFromNewestMember(): void

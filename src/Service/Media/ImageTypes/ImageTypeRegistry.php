@@ -20,10 +20,8 @@ class ImageTypeRegistry
     /**
      * @param iterable<ImageTypeDefinitionInterface> $definitions
      */
-    public function __construct(
-        #[AutowireIterator(ImageTypeDefinitionInterface::class)]
-        iterable $definitions,
-    ) {
+    public function __construct(#[AutowireIterator(ImageTypeDefinitionInterface::class)] iterable $definitions)
+    {
         $map = [];
         foreach ($definitions as $definition) {
             $type = $definition->getType();
@@ -43,8 +41,7 @@ class ImageTypeRegistry
 
     public function get(ImageType $type): ImageTypeDefinitionInterface
     {
-        return $this->definitions[$type->value]
-            ?? throw new RuntimeException(sprintf('No image type definition registered for "%s".', $type->name));
+        return $this->definitions[$type->value] ?? throw new RuntimeException(sprintf('No image type definition registered for "%s".', $type->name));
     }
 
     /** @return list<ImageTypeDefinitionInterface> */

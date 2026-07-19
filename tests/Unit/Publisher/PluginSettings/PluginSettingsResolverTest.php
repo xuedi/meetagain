@@ -18,10 +18,10 @@ class PluginSettingsResolverTest extends TestCase
         // Arrange
         $override = new StubSettingsData('override');
         $global = new StubSettingsData('global');
-        $resolver = $this->resolver(
-            stores: [$this->store(scoped: true, value: $override), $this->store(scoped: false, value: $global)],
-            scopeProviders: [$this->scope('7')],
-        );
+        $resolver = $this->resolver(stores: [
+            $this->store(scoped: true, value: $override),
+            $this->store(scoped: false, value: $global),
+        ], scopeProviders: [$this->scope('7')]);
 
         // Act + Assert
         static::assertSame($override, $resolver->resolve('stub'));
@@ -31,10 +31,10 @@ class PluginSettingsResolverTest extends TestCase
     {
         // Arrange
         $global = new StubSettingsData('global');
-        $resolver = $this->resolver(
-            stores: [$this->store(scoped: true, value: null), $this->store(scoped: false, value: $global)],
-            scopeProviders: [$this->scope('7')],
-        );
+        $resolver = $this->resolver(stores: [
+            $this->store(scoped: true, value: null),
+            $this->store(scoped: false, value: $global),
+        ], scopeProviders: [$this->scope('7')]);
 
         // Act + Assert
         static::assertSame($global, $resolver->resolve('stub'));
@@ -44,10 +44,7 @@ class PluginSettingsResolverTest extends TestCase
     {
         // Arrange
         $global = new StubSettingsData('global');
-        $resolver = $this->resolver(
-            stores: [$this->store(scoped: false, value: $global)],
-            scopeProviders: [],
-        );
+        $resolver = $this->resolver(stores: [$this->store(scoped: false, value: $global)], scopeProviders: []);
 
         // Act + Assert
         static::assertSame($global, $resolver->resolve('stub'));
@@ -56,10 +53,7 @@ class PluginSettingsResolverTest extends TestCase
     public function testReturnsDescriptorDefaultWhenNothingStored(): void
     {
         // Arrange
-        $resolver = $this->resolver(
-            stores: [$this->store(scoped: false, value: null)],
-            scopeProviders: [],
-        );
+        $resolver = $this->resolver(stores: [$this->store(scoped: false, value: null)], scopeProviders: []);
 
         // Act
         $result = $resolver->resolve('stub');
@@ -113,11 +107,7 @@ class PluginSettingsResolverTest extends TestCase
      */
     private function resolver(array $stores, array $scopeProviders): PluginSettingsResolver
     {
-        return new PluginSettingsResolver(
-            new PluginSettingsService([new StubDescriptor('stub')]),
-            $stores,
-            $scopeProviders,
-        );
+        return new PluginSettingsResolver(new PluginSettingsService([new StubDescriptor('stub')]), $stores, $scopeProviders);
     }
 
     private function store(bool $scoped, ?object $value, int $priority = 0): PluginSettingsStoreInterface
@@ -151,7 +141,9 @@ class PluginSettingsResolverTest extends TestCase
     private function scope(?string $id): PluginSettingsScopeProviderInterface
     {
         return new class($id) implements PluginSettingsScopeProviderInterface {
-            public function __construct(private readonly ?string $id) {}
+            public function __construct(
+                private readonly ?string $id,
+            ) {}
 
             public function getScopeId(): ?string
             {

@@ -22,13 +22,11 @@ class GlossaryType extends AbstractType
     {
         $config = $this->configService->getConfig();
 
-        $builder
-            ->add('phrase', TextType::class, [
-                'label' => $config->getPrimaryLabel() ?? 'glossary.label_phrase',
-            ])
-            ->add('explanation', TextareaType::class, [
-                'label' => $config->getDefinitionLabel() ?? 'glossary.label_explanation',
-            ]);
+        $builder->add('phrase', TextType::class, [
+            'label' => $config->getPrimaryLabel() ?? 'glossary.label_phrase',
+        ])->add('explanation', TextareaType::class, [
+            'label' => $config->getDefinitionLabel() ?? 'glossary.label_explanation',
+        ]);
 
         if ($config->isSecondaryEnabled()) {
             $builder->add('pinyin', TextType::class, [

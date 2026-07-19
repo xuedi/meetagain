@@ -48,9 +48,7 @@ class GlossaryRepository extends ServiceEntityRepository
             return null;
         }
 
-        $qb = $this->createQueryBuilder('g')
-            ->andWhere('g.id = :id')
-            ->setParameter('id', $id);
+        $qb = $this->createQueryBuilder('g')->andWhere('g.id = :id')->setParameter('id', $id);
         if ($ids !== null) {
             $qb->andWhere('g.id IN (:ids)')->setParameter('ids', $ids);
         }

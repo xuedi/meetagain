@@ -202,7 +202,7 @@ class ImageRepository extends ServiceEntityRepository
             $qb->andWhere('i.id IN (:ids)')->setParameter('ids', $restrictToIds);
         }
 
-        return ((int) $qb->getQuery()->getSingleScalarResult()) > 0;
+        return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
 
     /**
@@ -286,22 +286,14 @@ class ImageRepository extends ServiceEntityRepository
             $counts[(int) $r['id']] = (int) $r['cnt'];
         }
 
-        $images = $this
-            ->createQueryBuilder('i')
-            ->where('i.id IN (:ids)')
-            ->setParameter('ids', array_keys($counts))
-            ->getQuery()
-            ->getResult();
+        $images = $this->createQueryBuilder('i')->where('i.id IN (:ids)')->setParameter('ids', array_keys($counts))->getQuery()->getResult();
 
         $result = [];
         foreach ($images as $image) {
             $result[] = ['image' => $image, 'count' => $counts[$image->getId()]];
         }
 
-        usort(
-            $result,
-            static fn(array $a, array $b): int => $b['count'] <=> $a['count'] ?: $a['image']->getId() <=> $b['image']->getId(),
-        );
+        usort($result, static fn(array $a, array $b): int => $b['count'] <=> $a['count'] ?: $a['image']->getId() <=> $b['image']->getId());
 
         return $result;
     }

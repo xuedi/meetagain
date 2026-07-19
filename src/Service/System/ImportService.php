@@ -230,8 +230,15 @@ readonly class ImportService
      * @param array<string, User> $userEmailMap
      * @param array<string, int> $counts
      */
-    private function importEvents(array $eventsData, array $locationRefMap, array $seriesRefMap, array $userEmailMap, User $systemUser, string $tempDir, array &$counts): void
-    {
+    private function importEvents(
+        array $eventsData,
+        array $locationRefMap,
+        array $seriesRefMap,
+        array $userEmailMap,
+        User $systemUser,
+        string $tempDir,
+        array &$counts,
+    ): void {
         foreach ($eventsData as $eventData) {
             $locationRef = $eventData['location_ref'] ?? null;
             $location = $locationRef !== null ? $locationRefMap[(int) $locationRef] ?? null : null;

@@ -31,42 +31,42 @@ class DishEditType extends AbstractType
     {
         $dish = $options['dish'];
 
-        $this->translationFormHelper->addTranslatedFields($builder, [
-            'name' => [TextType::class, ['label' => 'dishes_dish.field_name', 'required' => false]],
-            'description' => [TextareaType::class, ['label' => 'dishes_dish.field_description', 'required' => false, 'attr' => ['rows' => 3]]],
-            'recipe' => [TextareaType::class, ['label' => 'dishes_dish.field_recipe', 'required' => false, 'attr' => ['rows' => 5]]],
-        ], static fn(string $code, string $field): ?string => match ($field) {
-            'name' => $dish?->findTranslation($code)?->getName() ?? '',
-            'description' => $dish?->findTranslation($code)?->getDescription(),
-            'recipe' => $dish?->findTranslation($code)?->getRecipe(),
-            default => null,
-        });
+        $this->translationFormHelper->addTranslatedFields(
+            $builder,
+            [
+                'name' => [TextType::class, ['label' => 'dishes_dish.field_name', 'required' => false]],
+                'description' => [TextareaType::class, ['label' => 'dishes_dish.field_description', 'required' => false, 'attr' => ['rows' => 3]]],
+                'recipe' => [TextareaType::class, ['label' => 'dishes_dish.field_recipe', 'required' => false, 'attr' => ['rows' => 5]]],
+            ],
+            static fn(string $code, string $field): ?string => match ($field) {
+                'name' => $dish?->findTranslation($code)?->getName() ?? '',
+                'description' => $dish?->findTranslation($code)?->getDescription(),
+                'recipe' => $dish?->findTranslation($code)?->getRecipe(),
+                default => null,
+            },
+        );
 
-        $builder
-            ->add('phonetic', TextType::class, [
-                'label' => 'dishes_dish.field_phonetic',
-                'required' => false,
-                'mapped' => false,
-                'data' => $dish?->getPhonetic(),
-            ])
-            ->add('origin', TextType::class, [
-                'label' => 'dishes_dish.field_origin',
-                'required' => false,
-                'mapped' => false,
-                'data' => $dish?->getOrigin(),
-            ])
-            ->add('previewFile', FileType::class, [
-                'label' => 'dishes_dish.field_preview',
-                'required' => false,
-                'mapped' => false,
-                'constraints' => [
-                    new File(maxSize: '8000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('dishes_dish.error_invalid_image')),
-                ],
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'dishes_dish.button_save',
-                'attr' => ['class' => 'button is-primary'],
-            ]);
+        $builder->add('phonetic', TextType::class, [
+            'label' => 'dishes_dish.field_phonetic',
+            'required' => false,
+            'mapped' => false,
+            'data' => $dish?->getPhonetic(),
+        ])->add('origin', TextType::class, [
+            'label' => 'dishes_dish.field_origin',
+            'required' => false,
+            'mapped' => false,
+            'data' => $dish?->getOrigin(),
+        ])->add('previewFile', FileType::class, [
+            'label' => 'dishes_dish.field_preview',
+            'required' => false,
+            'mapped' => false,
+            'constraints' => [
+                new File(maxSize: '8000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('dishes_dish.error_invalid_image')),
+            ],
+        ])->add('submit', SubmitType::class, [
+            'label' => 'dishes_dish.button_save',
+            'attr' => ['class' => 'button is-primary'],
+        ]);
     }
 
     #[\Override]

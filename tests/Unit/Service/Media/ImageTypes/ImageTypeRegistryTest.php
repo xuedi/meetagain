@@ -85,10 +85,7 @@ class ImageTypeRegistryTest extends TestCase
             $this->definition(ImageType::EventTeaser, [[1024, 768], [400, 400], [50, 50]]),
         ]);
 
-        static::assertSame(
-            ['400x400' => 0, '100x100' => 0, '50x50' => 0, '1024x768' => 0],
-            $registry->getThumbnailSizeList(),
-        );
+        static::assertSame(['400x400' => 0, '100x100' => 0, '50x50' => 0, '1024x768' => 0], $registry->getThumbnailSizeList());
     }
 
     public function testIsValidThumbnailSize(): void

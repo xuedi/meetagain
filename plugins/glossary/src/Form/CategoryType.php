@@ -16,9 +16,7 @@ class CategoryType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('id', HiddenType::class, ['required' => false])
-            ->add('label', TextType::class, ['label' => false, 'required' => false]);
+        $builder->add('id', HiddenType::class, ['required' => false])->add('label', TextType::class, ['label' => false, 'required' => false]);
     }
 
     #[\Override]
