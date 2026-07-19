@@ -292,6 +292,17 @@ details.activities-load-more {
     }
 }
 
+// Generic collection editor — keep the trash button attached to the input as a
+// right addon (see templates/_form/bulma.html.twig collection_widget). The entry's
+// inner field wrapper must not add height, or the addon button stretches past the input.
+.js-collection-fields .field {
+    margin-bottom: 0;
+}
+// The last row carries no bottom margin, so lift the add button off it.
+.js-collection-add {
+    margin-top: 0.5rem;
+}
+
 // ── Vendor fixes ─────────────────────────────────────────────────────────────
 
 // Leaflet map: reset z-index so map tiles render below Bulma dropdowns/modals.

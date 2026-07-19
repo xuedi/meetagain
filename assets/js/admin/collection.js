@@ -42,10 +42,10 @@
                 counter += 1;
 
                 const item = document.createElement('div');
-                item.className = 'js-collection-item';
-                item.innerHTML = '<div class="js-collection-fields">' + html + '</div>'
+                item.className = 'field has-addons js-collection-item';
+                item.innerHTML = '<div class="control is-expanded js-collection-fields">' + html + '</div>'
                     + (allowDelete
-                        ? '<button type="button" class="button is-small is-danger is-light js-collection-remove"><i class="fas fa-trash"></i></button>'
+                        ? '<div class="control"><button type="button" class="button is-danger is-light js-collection-remove"><span class="icon"><i class="fas fa-trash"></i></span></button></div>'
                         : '');
                 items.appendChild(item);
                 bindRemove(item);
