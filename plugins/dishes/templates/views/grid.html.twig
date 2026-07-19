@@ -1,0 +1,23 @@
+{# Dishes 'grid' layout - a dense strip of small image-only icons with a leading steward "add" icon. #}
+<div class="columns is-multiline">
+    {% if is_granted('ROLE_STEWARD') %}
+        <div class="column is-1 p-1">
+            <a href="{{ path('app_plugin_dishes_dish_add') }}" title="{{ 'dishes_views.title_add'|trans }}">
+                <figure class="image" style="background: hsl(217, 71%, 95%); display: flex; align-items: center; justify-content: center; aspect-ratio: 1;">
+                    <span class="icon has-text-link"><i class="fa-solid fa-plus fa-lg"></i></span>
+                </figure>
+            </a>
+        </div>
+    {% endif %}
+    {% for item in dishes %}
+        <div class="column is-1 p-1 dish-item" data-dish-id="{{ item.id }}">
+            {% include '_components/item/styles/thumb.html.twig' with {
+                href: path('app_plugin_dishes_dish_show', {'id': item.id}),
+                image: item.previewImage,
+                imageSize: '400x400',
+                alt: item.getTranslatedName(app.locale),
+                ratio: 'square'
+            } %}
+        </div>
+    {% endfor %}
+</div>

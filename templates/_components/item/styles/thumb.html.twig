@@ -1,0 +1,21 @@
+{#
+    Item tile style: thumb - an image-only thumbnail link for dense grid layouts, cropped to a fixed
+    ratio so a row of thumbnails stays uniform. No text under the image; the title (alt) fades in as a
+    caption overlay on hover. Width comes from the wrapping column.
+
+    Used in:    grid-mode cells (e.g. dishes/films/books item grids)
+    Parameters:
+        - href      (string, required)     -- link target
+        - image     (Image|null, optional) -- thumbnail; null shows the placeholder
+        - imageSize (string, optional)     -- thumbnail dimensions 'WxH'; default '400x400'
+        - alt       (string, optional)     -- image alt + hover caption; default ''
+        - ratio     (string, optional)     -- 'square' (is-1by1) or 'portrait' (is-2by3); default 'square'
+    Depends on: _components/image.html.twig; the .item-thumb rules in custom.scss (crop + hover caption)
+#}
+{% set ratioClass = {'square': 'is-1by1', 'portrait': 'is-2by3'}[ratio|default('square')] %}
+<a href="{{ href }}" class="item-thumb is-block">
+    <figure class="image {{ ratioClass }}">
+        {% include '_components/image.html.twig' with {'image': image|default(null), 'size': imageSize|default('400x400'), 'alt': alt|default('')} %}
+        {% if alt is defined and alt %}<span class="item-thumb__caption">{{ alt }}</span>{% endif %}
+    </figure>
+</a>

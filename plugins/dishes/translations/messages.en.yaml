@@ -7,6 +7,16 @@ dishes:
 
 dishes_config:
     page_title: 'Dishes list footer'
+    field_phonetic_in_list: 'Show phonetic in the list'
+    help_phonetic_in_list: 'Adds the phonetic (e.g. pinyin) under each dish name in the list.'
+
+dishes_views:
+    col_image: 'Image'
+    col_name: 'Name'
+    col_phonetic: 'Pronunciation'
+    col_description: 'Description'
+    button_add: 'Add dish'
+    title_add: 'Add a dish'
 
 dishes_dish:
     browser_title_list: 'Dishes'

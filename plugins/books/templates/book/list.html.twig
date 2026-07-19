@@ -23,5 +23,5 @@
     {% endif %}
 </div>
 
-{% include '_components/item/list.html.twig' with {'itemType': 'book', 'itemIds': itemIds, 'emptyMessage': 'books_book.list_empty'} %}
+{% include '_components/item/list.html.twig' with {'itemType': 'book', 'itemIds': itemIds, 'emptyMessage': 'books_book.list_empty', 'addUrl': path('app_plugin_books_book_manual'), 'addLabel': 'books_book.button_manual', 'gridRatio': 'portrait', 'listHeader': ['books_book.label_cover', 'books_book.label_title', 'books_book.label_author', '']} %}
 {% endblock %}

@@ -1,0 +1,41 @@
+{#
+    Item tile style: square - a card with a 1:1 image, a title, and an optional footer row
+    (a left badge counter + a right subtitle). For item lists that want a uniform square tile
+    (e.g. dishes). Width comes from the wrapping column; this style is width-agnostic.
+
+    Used in:    plugin item view/cell templates (e.g. plugins/dishes/templates/views/tiles.html.twig)
+    Parameters:
+        - href         (string, required)     -- link target for the whole tile
+        - title        (string, required)     -- primary label (single line, ellipsised)
+        - image        (Image|null, optional) -- thumbnail; null shows the placeholder
+        - imageSize    (string, optional)     -- thumbnail dimensions 'WxH'; default '400x400'
+        - alt          (string, optional)     -- image alt; default: title
+        - subtitle     (string, optional)     -- right-aligned secondary text (e.g. origin)
+        - subtitleIcon (string, optional)     -- Font Awesome name shown before the subtitle
+        - badge        (map, optional)        -- {icon, value, active(bool)} left-aligned counter
+    Depends on: _components/image.html.twig
+#}
+<a href="{{ href }}" class="is-block">
+    <div class="card">
+        <div class="card-image">
+            <figure class="image is-1by1">
+                {% include '_components/image.html.twig' with {'image': image|default(null), 'size': imageSize|default('400x400'), 'alt': alt|default(title)} %}
+            </figure>
+        </div>
+        <div class="card-content p-2">
+            <p class="has-text-centered is-size-7 has-text-dark" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ title }}</p>
+            {% if (badge is defined and badge) or (subtitle is defined and subtitle) %}
+                <div class="is-flex is-justify-content-space-between is-size-7 has-text-grey mt-1">
+                    <span class="{% if badge is defined and badge and badge.active|default(false) %}has-text-danger{% endif %}">
+                        {% if badge is defined and badge %}<span class="icon is-small"><i class="fa-solid fa-{{ badge.icon }}"></i></span> {{ badge.value }}{% endif %}
+                    </span>
+                    {% if subtitle is defined and subtitle %}
+                        <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 115px;">
+                            {% if subtitleIcon is defined and subtitleIcon %}<span class="icon is-small"><i class="fa-solid fa-{{ subtitleIcon }}"></i></span> {% endif %}{{ subtitle }}
+                        </span>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</a>

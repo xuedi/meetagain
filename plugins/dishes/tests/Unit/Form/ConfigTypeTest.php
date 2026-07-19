@@ -38,6 +38,43 @@ class ConfigTypeTest extends TestCase
         static::assertSame(['en' => 'See you next time', 'zh' => '下次见'], $config->getFooterText());
     }
 
+    public function testHasPhoneticToggle(): void
+    {
+        // Arrange + Act
+        $form = $this->factory(['en'])->create(ConfigType::class, new Config());
+
+        // Assert
+        static::assertTrue($form->has('phoneticInList'));
+    }
+
+    public function testSubmitEnablesPhonetic(): void
+    {
+        // Arrange
+        $form = $this->factory(['en'])->create(ConfigType::class, new Config());
+
+        // Act
+        $form->submit(['phoneticInList' => '1', 'en' => '']);
+
+        // Assert
+        $config = $form->getData();
+        static::assertInstanceOf(Config::class, $config);
+        static::assertTrue($config->isPhoneticInList());
+    }
+
+    public function testUncheckedPhoneticIsFalse(): void
+    {
+        // Arrange
+        $form = $this->factory(['en'])->create(ConfigType::class, (new Config())->setPhoneticInList(true));
+
+        // Act - an unchecked checkbox is absent from the submitted payload
+        $form->submit(['en' => '']);
+
+        // Assert
+        $config = $form->getData();
+        static::assertInstanceOf(Config::class, $config);
+        static::assertFalse($config->isPhoneticInList());
+    }
+
     public function testExistingFooterPrefillsFields(): void
     {
         // Arrange

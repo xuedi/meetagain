@@ -5,6 +5,7 @@ namespace Plugin\Dishes\Form;
 use App\Service\Config\LanguageService;
 use Plugin\Dishes\ValueObject\Config;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,6 +19,12 @@ class ConfigType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->add('phoneticInList', CheckboxType::class, [
+            'label' => 'dishes_config.field_phonetic_in_list',
+            'help' => 'dishes_config.help_phonetic_in_list',
+            'required' => false,
+        ]);
+
         foreach ($this->languageService->getAdminFilteredEnabledCodes() as $code) {
             $builder->add($code, TextareaType::class, [
                 'label' => strtoupper($code),

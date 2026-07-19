@@ -7,6 +7,16 @@ dishes:
 
 dishes_config:
     page_title: '菜肴列表页脚'
+    field_phonetic_in_list: '在列表中显示发音'
+    help_phonetic_in_list: '在列表中每个菜肴名称下方显示发音（例如拼音）。'
+
+dishes_views:
+    col_image: '图片'
+    col_name: '名称'
+    col_phonetic: '发音'
+    col_description: '描述'
+    button_add: '添加菜肴'
+    title_add: '添加菜肴'
 
 dishes_dish:
     browser_title_list: '菜肴'

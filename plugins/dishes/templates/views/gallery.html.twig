@@ -1,0 +1,19 @@
+{# Dishes 'gallery' layout - inline thumbnails opening a Fancybox lightbox (fancybox loaded by the
+   list page when this mode is active). #}
+<div>
+    {% for item in dishes %}
+        {% if item.previewImage is not null %}
+            {% set showUrl = path('app_plugin_dishes_dish_show', {'id': item.id}) %}
+            {% set reportUrl = path('app_report_image', {'id': item.previewImage.id}) %}
+            {% set caption = '<div style="text-align:center"><a href=' ~ showUrl ~ '>' ~ item.getTranslatedName(app.locale) ~ '</a> &middot; You can <a href=' ~ reportUrl ~ '>report</a> this image if there is something wrong.</div>' %}
+            <span class="dish-item" data-dish-id="{{ item.id }}" style="display: inline-block;">
+                <a data-fancybox="dish-gallery" data-caption="{{ caption }}" href="/images/thumbnails/{{ item.previewImage.hash }}_1024x768.webp">
+                    {% include '_components/image.html.twig' with {'image': item.previewImage, 'size': loop.first ? '600x400' : '350x263', 'alt': item.getTranslatedName(app.locale)} %}
+                </a>
+            </span>
+        {% endif %}
+    {% endfor %}
+</div>
+<script>
+    Fancybox.bind('[data-fancybox="dish-gallery"]', {compact: true});
+</script>
