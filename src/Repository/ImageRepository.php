@@ -258,12 +258,13 @@ class ImageRepository extends ServiceEntityRepository
     }
 
     /**
-     * Images with more than one usage and no alt text - high-impact SEO/a11y issues
-     * because one missing alt fans out across every page that embeds the image.
+     * Images used more than once (a missing alt fans out across every embed) as candidates for the
+     * missing-alt reminder. Per-language completeness depends on the JSON alt map and enabled locales,
+     * so the caller filters via Image::missingAltLocales() rather than in SQL.
      *
-     * @return array<array{id: int, count: int}>
+     * @return list<array{image: Image, count: int}>
      */
-    public function findHighUsageMissingAlt(int $limit = 10): array
+    public function findHighUsageMissingAlt(int $limit = 50): array
     {
         $rows = $this
             ->getEntityManager()
@@ -271,13 +272,38 @@ class ImageRepository extends ServiceEntityRepository
             ->fetchAllAssociative('SELECT i.id AS id, COUNT(il.id) AS cnt
              FROM image i
              INNER JOIN image_location il ON il.image_id = i.id
-             WHERE i.alt IS NULL OR i.alt = ""
              GROUP BY i.id
              HAVING cnt > 1
              ORDER BY cnt DESC, i.id ASC
              LIMIT ' . $limit);
 
-        return array_map(static fn(array $r) => ['id' => (int) $r['id'], 'count' => (int) $r['cnt']], $rows);
+        if ($rows === []) {
+            return [];
+        }
+
+        $counts = [];
+        foreach ($rows as $r) {
+            $counts[(int) $r['id']] = (int) $r['cnt'];
+        }
+
+        $images = $this
+            ->createQueryBuilder('i')
+            ->where('i.id IN (:ids)')
+            ->setParameter('ids', array_keys($counts))
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+        foreach ($images as $image) {
+            $result[] = ['image' => $image, 'count' => $counts[$image->getId()]];
+        }
+
+        usort(
+            $result,
+            static fn(array $a, array $b): int => $b['count'] <=> $a['count'] ?: $a['image']->getId() <=> $b['image']->getId(),
+        );
+
+        return $result;
     }
 
     public function getFileList(): array

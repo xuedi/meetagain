@@ -13,6 +13,7 @@ use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Enum\ImageType;
 use App\Repository\ImageLocationRepository;
 use App\Repository\ImageRepository;
+use App\Service\Config\LanguageService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
@@ -47,6 +48,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         private readonly ImageLocationService $imageLocationService,
         private readonly ImageTypeRegistry $imageTypeRegistry,
         private readonly EntityManagerInterface $entityManager,
+        private readonly LanguageService $languageService,
     ) {
         parent::__construct($translator, 'images');
     }
@@ -147,6 +149,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
             'locations' => $locations,
             'editLinks' => $editLinks,
             'previewSize' => $this->imageTypeRegistry->getAdminPreviewSize($image->getType()),
+            'sourceLocale' => $this->languageService->getFilteredDefaultLocale(),
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
@@ -164,10 +167,19 @@ final class ImagesController extends AbstractSettingsController implements Admin
             return $this->redirectToRoute('app_admin_system_images_show', ['id' => $id]);
         }
 
+        $locale = (string) $request->request->get('locale', '');
+        if (!in_array($locale, $this->languageService->getFilteredEnabledCodes(), true)) {
+            return $this->redirectToRoute('app_admin_system_images_show', ['id' => $id]);
+        }
+
         $alt = trim((string) $request->request->get('alt', ''));
         $alt = mb_substr($alt, 0, 255);
 
-        $image->setAlt($alt === '' ? null : $alt);
+        if ($locale === $this->languageService->getFilteredDefaultLocale()) {
+            $image->setAlt($alt === '' ? null : $alt);
+        } else {
+            $image->setAltTranslation($locale, $alt === '' ? null : $alt);
+        }
         $image->setUpdatedAt(new DateTimeImmutable());
         $this->entityManager->flush();
 
