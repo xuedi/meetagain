@@ -5,6 +5,9 @@ dishes:
     attach_empty: 'No dishes available to attach yet.'
     attach_button: 'Attach'
 
+dishes_config:
+    page_title: 'Dishes list footer'
+
 dishes_dish:
     browser_title_list: 'Dishes'
     page_title_list: 'Dish list'

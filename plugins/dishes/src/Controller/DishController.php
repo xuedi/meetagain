@@ -8,6 +8,7 @@ use Plugin\Dishes\Activity\Messages\DishAdded;
 use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Form\DishAddType;
 use Plugin\Dishes\Form\DishEditType;
+use Plugin\Dishes\Service\ConfigService;
 use Plugin\Dishes\Service\DishImageService;
 use Plugin\Dishes\Service\DishService;
 use RuntimeException;
@@ -24,15 +25,17 @@ final class DishController extends AbstractController
         private readonly DishService $dishService,
         private readonly DishImageService $dishImageService,
         private readonly ActivityService $activityService,
+        private readonly ConfigService $configService,
     ) {}
 
     #[Route('', name: 'app_dishes_dishlist', methods: ['GET'])]
-    public function list(): Response
+    public function list(Request $request): Response
     {
         $itemIds = array_map(static fn(Dish $dish): int => (int) $dish->getId(), $this->dishService->getList());
 
         return $this->render('@Dishes/dish/list.html.twig', [
             'itemIds' => $itemIds,
+            'footer' => $this->configService->getConfig()->getFooterFor($request->getLocale()),
         ]);
     }
 
