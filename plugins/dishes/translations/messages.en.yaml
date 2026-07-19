@@ -23,6 +23,7 @@ dishes_dish:
     page_title_list: 'Dish list'
     page_title_add: 'Add a dish'
     page_title_edit: 'Edit %name%'
+    hint_translations: 'Select a language to edit its content.'
     button_add: 'Add dish'
     button_edit: 'Edit'
     button_delete: 'Delete'

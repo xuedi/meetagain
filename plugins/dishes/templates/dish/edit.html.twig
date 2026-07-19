@@ -21,28 +21,13 @@
         </fieldset>
     </div>
     <div class="column is-8">
-        <div class="field">
-            {{ form_label(form.name, null, {'label_attr': {'class': 'label'}}) }}
-            <div class="control">{{ form_widget(form.name) }}</div>
-            {{ form_errors(form.name) }}
-        </div>
+        <p class="has-text-grey is-size-7 mb-2">{{ 'dishes_dish.hint_translations'|trans }}</p>
+        {% include '_components/item/translation_fields.html.twig' with {'form': form, 'fields': ['name', 'description', 'recipe']} %}
 
         <div class="field">
             {{ form_label(form.phonetic, null, {'label_attr': {'class': 'label'}}) }}
             <div class="control">{{ form_widget(form.phonetic) }}</div>
             {{ form_errors(form.phonetic) }}
-        </div>
-
-        <div class="field">
-            {{ form_label(form.description, null, {'label_attr': {'class': 'label'}}) }}
-            <div class="control">{{ form_widget(form.description) }}</div>
-            {{ form_errors(form.description) }}
-        </div>
-
-        <div class="field">
-            {{ form_label(form.recipe, null, {'label_attr': {'class': 'label'}}) }}
-            <div class="control">{{ form_widget(form.recipe) }}</div>
-            {{ form_errors(form.recipe) }}
         </div>
 
         <div class="field">

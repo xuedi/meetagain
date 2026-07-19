@@ -23,6 +23,7 @@ dishes_dish:
     page_title_list: '菜肴列表'
     page_title_add: '添加菜肴'
     page_title_edit: '编辑 %name%'
+    hint_translations: '选择一种语言以编辑其内容。'
     button_add: '添加菜肴'
     button_edit: '编辑'
     button_delete: '删除'

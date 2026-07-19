@@ -4,6 +4,7 @@ namespace Plugin\Dishes\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use App\Item\ItemTranslationFormHelper;
 use Plugin\Dishes\Activity\Messages\DishAdded;
 use Plugin\Dishes\Form\DishAddType;
 use Plugin\Dishes\Form\DishEditType;
@@ -27,6 +28,7 @@ final class DishController extends AbstractController
         private readonly ActivityService $activityService,
         private readonly ConfigService $configService,
         private readonly DishLikeRepository $dishLikeRepository,
+        private readonly ItemTranslationFormHelper $translationFormHelper,
     ) {}
 
     #[Route('', name: 'app_dishes_dishlist', methods: ['GET'])]
@@ -116,32 +118,18 @@ final class DishController extends AbstractController
             throw $this->createNotFoundException('Dish not found');
         }
 
-        $locale = $request->getLocale();
-        $translation = $dish->findTranslation($locale);
-        $form = $this->createForm(DishEditType::class);
+        $form = $this->createForm(DishEditType::class, null, ['dish' => $dish]);
         $form->handleRequest($request);
-
-        if (!$form->isSubmitted()) {
-            $form->get('name')->setData($translation?->getName() ?? $dish->getAnyTranslatedName());
-            $form->get('description')->setData($translation?->getDescription());
-            $form->get('recipe')->setData($translation?->getRecipe());
-            $form->get('phonetic')->setData($dish->getPhonetic());
-            $form->get('origin')->setData($dish->getOrigin());
-        }
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getAuthedUser();
             try {
                 $dish->setPhonetic($form->get('phonetic')->getData());
                 $dish->setOrigin($form->get('origin')->getData());
-                $this->dishService->updateTranslation(
+                $this->dishService->updateTranslations(
                     $dish,
-                    $locale,
-                    $form->get('name')->getData(),
-                    $form->get('description')->getData(),
-                    $form->get('recipe')->getData(),
+                    $this->translationFormHelper->extractTranslations($form, ['name', 'description', 'recipe']),
                 );
-                $this->dishService->saveBaseData($dish);
 
                 $previewFile = $form->get('previewFile')->getData();
                 if ($previewFile !== null) {
