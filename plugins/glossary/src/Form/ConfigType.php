@@ -15,36 +15,31 @@ class ConfigType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('primaryLabel', TextType::class, [
-                'label' => 'glossary_config.primary_label',
-                'required' => false,
-                'help' => 'glossary_config.primary_label_help',
-            ])
-            ->add('definitionLabel', TextType::class, [
-                'label' => 'glossary_config.definition_label',
-                'required' => false,
-                'help' => 'glossary_config.definition_label_help',
-            ])
-            ->add('secondaryEnabled', CheckboxType::class, [
-                'label' => 'glossary_config.secondary_enabled',
-                'required' => false,
-            ])
-            ->add('secondaryLabel', TextType::class, [
-                'label' => 'glossary_config.secondary_label',
-                'required' => false,
-                'help' => 'glossary_config.secondary_label_help',
-            ])
-            ->add('categories', CollectionType::class, [
-                'label' => 'glossary_config.categories',
-                'help' => 'glossary_config.categories_help',
-                'entry_type' => CategoryType::class,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'by_reference' => false,
-                'required' => false,
-                'prototype' => true,
-            ]);
+        $builder->add('primaryLabel', TextType::class, [
+            'label' => 'glossary_config.primary_label',
+            'required' => false,
+            'help' => 'glossary_config.primary_label_help',
+        ])->add('definitionLabel', TextType::class, [
+            'label' => 'glossary_config.definition_label',
+            'required' => false,
+            'help' => 'glossary_config.definition_label_help',
+        ])->add('secondaryEnabled', CheckboxType::class, [
+            'label' => 'glossary_config.secondary_enabled',
+            'required' => false,
+        ])->add('secondaryLabel', TextType::class, [
+            'label' => 'glossary_config.secondary_label',
+            'required' => false,
+            'help' => 'glossary_config.secondary_label_help',
+        ])->add('categories', CollectionType::class, [
+            'label' => 'glossary_config.categories',
+            'help' => 'glossary_config.categories_help',
+            'entry_type' => CategoryType::class,
+            'allow_add' => true,
+            'allow_delete' => true,
+            'by_reference' => false,
+            'required' => false,
+            'prototype' => true,
+        ]);
     }
 
     #[\Override]

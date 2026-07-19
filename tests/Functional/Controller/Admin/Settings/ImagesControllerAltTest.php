@@ -89,10 +89,12 @@ final class ImagesControllerAltTest extends WebTestCase
     private function loginAsAdmin(KernelBrowser $client): void
     {
         $crawler = $client->request('GET', '/en/login');
-        $form = $crawler->selectButton('Login')->form([
-            '_username' => self::ADMIN_EMAIL,
-            '_password' => self::ADMIN_PASSWORD,
-        ]);
+        $form = $crawler
+            ->selectButton('Login')
+            ->form([
+                '_username' => self::ADMIN_EMAIL,
+                '_password' => self::ADMIN_PASSWORD,
+            ]);
         $client->submit($form);
         $client->followRedirect();
     }

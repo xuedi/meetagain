@@ -268,9 +268,12 @@ class ImportServiceTest extends TestCase
 
         $service = $this->buildService($this->createStub(ExtendedFilesystem::class), $em);
 
-        return [$service, static function () use (&$persisted): array {
-            return $persisted;
-        }];
+        return [
+            $service,
+            static function () use (&$persisted): array {
+                return $persisted;
+            },
+        ];
     }
 
     /**

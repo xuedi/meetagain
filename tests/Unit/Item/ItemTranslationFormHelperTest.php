@@ -19,9 +19,13 @@ class ItemTranslationFormHelperTest extends TestCase
         $values = ['en' => 'Rice', 'de' => 'Reis', 'zh' => '米饭'];
 
         // Act
-        $helper->addTranslatedFields($builder, [
-            'name' => [TextType::class, ['required' => false]],
-        ], static fn(string $code, string $field): string => $values[$code] ?? '');
+        $helper->addTranslatedFields(
+            $builder,
+            [
+                'name' => [TextType::class, ['required' => false]],
+            ],
+            static fn(string $code, string $field): string => $values[$code] ?? '',
+        );
         $form = $builder->getForm();
 
         // Assert
@@ -38,23 +42,32 @@ class ItemTranslationFormHelperTest extends TestCase
         // Arrange
         $helper = $this->helper(['en', 'de']);
         $builder = Forms::createFormFactory()->createBuilder();
-        $helper->addTranslatedFields($builder, [
-            'name' => [TextType::class, ['required' => false]],
-            'recipe' => [TextareaType::class, ['required' => false]],
-        ], static fn(): string => '');
+        $helper->addTranslatedFields(
+            $builder,
+            [
+                'name' => [TextType::class, ['required' => false]],
+                'recipe' => [TextareaType::class, ['required' => false]],
+            ],
+            static fn(): string => '',
+        );
         $form = $builder->getForm();
 
         // Act
         $form->submit([
-            'name-en' => 'Rice', 'recipe-en' => 'Boil',
-            'name-de' => 'Reis', 'recipe-de' => 'Kochen',
+            'name-en' => 'Rice',
+            'recipe-en' => 'Boil',
+            'name-de' => 'Reis',
+            'recipe-de' => 'Kochen',
         ]);
 
         // Assert
-        static::assertSame([
-            'en' => ['name' => 'Rice', 'recipe' => 'Boil'],
-            'de' => ['name' => 'Reis', 'recipe' => 'Kochen'],
-        ], $helper->extractTranslations($form, ['name', 'recipe']));
+        static::assertSame(
+            [
+                'en' => ['name' => 'Rice', 'recipe' => 'Boil'],
+                'de' => ['name' => 'Reis', 'recipe' => 'Kochen'],
+            ],
+            $helper->extractTranslations($form, ['name', 'recipe']),
+        );
     }
 
     /** @param list<string> $codes */

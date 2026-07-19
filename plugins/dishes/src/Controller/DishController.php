@@ -35,9 +35,7 @@ final class DishController extends AbstractController
     public function list(Request $request): Response
     {
         $config = $this->configService->getConfig();
-        $favoriteDishIds = $this->isGranted('ROLE_USER')
-            ? $this->dishLikeRepository->findDishIdsByUser($this->getAuthedUser()->getId())
-            : [];
+        $favoriteDishIds = $this->isGranted('ROLE_USER') ? $this->dishLikeRepository->findDishIdsByUser($this->getAuthedUser()->getId()) : [];
 
         return $this->render('@Dishes/dish/list.html.twig', [
             'dishes' => $this->dishService->getList(),
@@ -126,10 +124,7 @@ final class DishController extends AbstractController
             try {
                 $dish->setPhonetic($form->get('phonetic')->getData());
                 $dish->setOrigin($form->get('origin')->getData());
-                $this->dishService->updateTranslations(
-                    $dish,
-                    $this->translationFormHelper->extractTranslations($form, ['name', 'description', 'recipe']),
-                );
+                $this->dishService->updateTranslations($dish, $this->translationFormHelper->extractTranslations($form, ['name', 'description', 'recipe']));
 
                 $previewFile = $form->get('previewFile')->getData();
                 if ($previewFile !== null) {

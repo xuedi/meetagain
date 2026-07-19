@@ -29,7 +29,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('GET', '/en/events', 'app_event_list');
 
         // Act
-        (new KernelRequestSubscriber())->onKernelRequest($event);
+        new KernelRequestSubscriber()->onKernelRequest($event);
 
         // Assert
         static::assertSame('/en/events', $event->getRequest()->getSession()->get('redirectUrl'));
@@ -41,7 +41,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('POST', '/en/events', 'app_event_list');
 
         // Act
-        (new KernelRequestSubscriber())->onKernelRequest($event);
+        new KernelRequestSubscriber()->onKernelRequest($event);
 
         // Assert
         static::assertNull($event->getRequest()->getSession()->get('redirectUrl'));
@@ -53,7 +53,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('GET', '/en/login', 'app_login');
 
         // Act
-        (new KernelRequestSubscriber())->onKernelRequest($event);
+        new KernelRequestSubscriber()->onKernelRequest($event);
 
         // Assert
         static::assertNull($event->getRequest()->getSession()->get('redirectUrl'));
@@ -76,13 +76,10 @@ class KernelRequestSubscriberTest extends TestCase
         foreach ($routes as $route => $path) {
             // Act
             $event = $this->makeEvent('GET', $path, $route);
-            (new KernelRequestSubscriber())->onKernelRequest($event);
+            new KernelRequestSubscriber()->onKernelRequest($event);
 
             // Assert
-            static::assertNull(
-                $event->getRequest()->getSession()->get('redirectUrl'),
-                "Route {$route} should be skipped",
-            );
+            static::assertNull($event->getRequest()->getSession()->get('redirectUrl'), "Route {$route} should be skipped");
         }
     }
 
@@ -94,13 +91,10 @@ class KernelRequestSubscriberTest extends TestCase
         foreach ($paths as $path) {
             // Act
             $event = $this->makeEvent('GET', $path, 'some_route');
-            (new KernelRequestSubscriber())->onKernelRequest($event);
+            new KernelRequestSubscriber()->onKernelRequest($event);
 
             // Assert
-            static::assertNull(
-                $event->getRequest()->getSession()->get('redirectUrl'),
-                "Path {$path} should be skipped",
-            );
+            static::assertNull($event->getRequest()->getSession()->get('redirectUrl'), "Path {$path} should be skipped");
         }
     }
 
@@ -110,7 +104,7 @@ class KernelRequestSubscriberTest extends TestCase
         $event = $this->makeEvent('GET', '/nope', null);
 
         // Act
-        (new KernelRequestSubscriber())->onKernelRequest($event);
+        new KernelRequestSubscriber()->onKernelRequest($event);
 
         // Assert
         static::assertNull($event->getRequest()->getSession()->get('redirectUrl'));
@@ -122,14 +116,10 @@ class KernelRequestSubscriberTest extends TestCase
         $request = Request::create('/en/events');
         $request->setSession(new Session(new MockArraySessionStorage()));
         $request->attributes->set('_route', 'app_event_list');
-        $event = new RequestEvent(
-            $this->createStub(HttpKernelInterface::class),
-            $request,
-            HttpKernelInterface::SUB_REQUEST,
-        );
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::SUB_REQUEST);
 
         // Act
-        (new KernelRequestSubscriber())->onKernelRequest($event);
+        new KernelRequestSubscriber()->onKernelRequest($event);
 
         // Assert
         static::assertNull($request->getSession()->get('redirectUrl'));
@@ -143,10 +133,6 @@ class KernelRequestSubscriberTest extends TestCase
             $request->attributes->set('_route', $route);
         }
 
-        return new RequestEvent(
-            $this->createStub(HttpKernelInterface::class),
-            $request,
-            HttpKernelInterface::MAIN_REQUEST,
-        );
+        return new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
     }
 }

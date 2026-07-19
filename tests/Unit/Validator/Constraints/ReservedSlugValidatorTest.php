@@ -27,7 +27,7 @@ class ReservedSlugValidatorTest extends ConstraintValidatorTestCase
     {
         // Arrange
         $this->reserved = true;
-        $cms = (new Cms())->setSlug('about');
+        $cms = new Cms()->setSlug('about');
 
         // Act
         $this->validator->validate($cms, new ReservedSlug());
@@ -40,7 +40,7 @@ class ReservedSlugValidatorTest extends ConstraintValidatorTestCase
     {
         // Arrange
         $this->reserved = false;
-        $cms = (new Cms())->setSlug('summer-party');
+        $cms = new Cms()->setSlug('summer-party');
 
         // Act
         $this->validator->validate($cms, new ReservedSlug());

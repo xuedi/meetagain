@@ -118,16 +118,14 @@ readonly class MigrateDinnerclubToDishes implements DataHotfixInterface
             $createdAt = $dinner['created_at'];
             $position = 0;
 
-            $courses = $this->connection->fetchAllAssociative(
-                'SELECT id, name FROM dinner_course WHERE dinner_id = ? ORDER BY sort_order ASC, id ASC',
-                [(int) $dinner['id']],
-            );
+            $courses = $this->connection->fetchAllAssociative('SELECT id, name FROM dinner_course WHERE dinner_id = ? ORDER BY sort_order ASC, id ASC', [
+                (int) $dinner['id'],
+            ]);
 
             foreach ($courses as $course) {
-                $items = $this->connection->fetchAllAssociative(
-                    'SELECT dish_id FROM dinner_course_item WHERE course_id = ? ORDER BY is_primary DESC, sort_order ASC, id ASC',
-                    [(int) $course['id']],
-                );
+                $items = $this->connection->fetchAllAssociative('SELECT dish_id FROM dinner_course_item WHERE course_id = ? ORDER BY is_primary DESC, sort_order ASC, id ASC', [
+                    (int) $course['id'],
+                ]);
 
                 foreach ($items as $item) {
                     $dishId = (int) $item['dish_id'];
@@ -153,10 +151,8 @@ readonly class MigrateDinnerclubToDishes implements DataHotfixInterface
 
     private function tableExists(string $table): bool
     {
-        return (int) $this->connection->fetchOne(
-            'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?',
-            [$table],
-        ) > 0;
+        return (int) $this->connection->fetchOne('SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?', [$table])
+        > 0;
     }
 
     private function rowExists(string $table, string $column, int $value): bool
@@ -166,9 +162,10 @@ readonly class MigrateDinnerclubToDishes implements DataHotfixInterface
 
     private function associationExists(int $eventId, int $dishId): bool
     {
-        return $this->connection->fetchOne(
-            'SELECT 1 FROM event_item_association WHERE event_id = ? AND item_type = ? AND item_id = ?',
-            [$eventId, 'dish', $dishId],
-        ) !== false;
+        return $this->connection->fetchOne('SELECT 1 FROM event_item_association WHERE event_id = ? AND item_type = ? AND item_id = ?', [
+            $eventId,
+            'dish',
+            $dishId,
+        ]) !== false;
     }
 }

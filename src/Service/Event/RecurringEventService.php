@@ -137,7 +137,7 @@ readonly class RecurringEventService implements CronTaskInterface
     {
         $series = $anchor->getSeries();
         $seriesClosing = $change->oldRule !== null && $change->newRule === null;
-        $rule = $seriesClosing ? null : ($change->newRule ?? $series?->getRule());
+        $rule = $seriesClosing ? null : $change->newRule ?? $series?->getRule();
         if ($series === null || $rule === null) {
             return new RealignmentPlan(null, (int) $anchor->getId(), null, []);
         }
@@ -200,9 +200,10 @@ readonly class RecurringEventService implements CronTaskInterface
                 day: (int) $occurrence->format('d'),
             );
             $newStop = $duration !== null ? $newStart->add($duration) : null;
-            $outcome = $newStart->getTimestamp() !== $currentStart->getTimestamp() || $newStop?->getTimestamp() !== $currentStop?->getTimestamp()
-                ? RealignmentOutcome::Moved
-                : RealignmentOutcome::DateUnchanged;
+            $outcome =
+                $newStart->getTimestamp() !== $currentStart->getTimestamp() || $newStop?->getTimestamp() !== $currentStop?->getTimestamp()
+                    ? RealignmentOutcome::Moved
+                    : RealignmentOutcome::DateUnchanged;
             $items[] = new RealignmentItem((int) $child->getId(), $currentStart, $currentStop, $newStart, $newStop, $rsvpCount, $outcome);
         }
 

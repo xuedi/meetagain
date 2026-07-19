@@ -59,14 +59,49 @@ class Kernel implements Plugin
 
         // [name, language, description, recipe, phonetic, origin]
         $catalog = [
-            ['Bruschetta', 'en', 'Grilled bread rubbed with garlic and topped with tomato.', 'Toast bread, rub with garlic, top with diced tomato and basil.', 'bruˈskɛtta', 'Italy'],
+            [
+                'Bruschetta',
+                'en',
+                'Grilled bread rubbed with garlic and topped with tomato.',
+                'Toast bread, rub with garlic, top with diced tomato and basil.',
+                'bruˈskɛtta',
+                'Italy',
+            ],
             ['Gyoza', 'en', 'Pan-fried dumplings filled with pork and cabbage.', 'Fill wrappers, pleat, pan-fry then steam.', 'ˈɡjoʊzə', 'Japan'],
             ['Pho Bo', 'en', 'Vietnamese beef noodle soup with herbs.', 'Simmer broth with spices, pour over noodles and beef.', 'fə˧˩ ɓɔ˧', 'Vietnam'],
-            ['Coq au Vin', 'en', 'Chicken braised in red wine with mushrooms.', 'Brown chicken, braise in wine with lardons and mushrooms.', 'kɔk o vɛ̃', 'France'],
-            ['Mapo Tofu', 'en', 'Silken tofu in a spicy fermented-bean sauce.', 'Fry doubanjiang, add stock and tofu, finish with sichuan pepper.', 'ˈmapo ˈtoʊfu', 'China'],
+            [
+                'Coq au Vin',
+                'en',
+                'Chicken braised in red wine with mushrooms.',
+                'Brown chicken, braise in wine with lardons and mushrooms.',
+                'kɔk o vɛ̃',
+                'France',
+            ],
+            [
+                'Mapo Tofu',
+                'en',
+                'Silken tofu in a spicy fermented-bean sauce.',
+                'Fry doubanjiang, add stock and tofu, finish with sichuan pepper.',
+                'ˈmapo ˈtoʊfu',
+                'China',
+            ],
             ['Ribollita', 'en', 'Tuscan bread and vegetable soup.', 'Simmer beans and kale, thicken with stale bread.', 'ribolˈliːta', 'Italy'],
-            ['Tiramisu', 'en', 'Coffee-soaked ladyfingers layered with mascarpone.', 'Layer soaked biscuits with whipped mascarpone, dust with cocoa.', 'tiramiˈsu', 'Italy'],
-            ['Mango Sticky Rice', 'en', 'Sweet coconut rice served with ripe mango.', 'Steam glutinous rice, fold in coconut milk, serve with mango.', 'ˈmæŋɡoʊ', 'Thailand'],
+            [
+                'Tiramisu',
+                'en',
+                'Coffee-soaked ladyfingers layered with mascarpone.',
+                'Layer soaked biscuits with whipped mascarpone, dust with cocoa.',
+                'tiramiˈsu',
+                'Italy',
+            ],
+            [
+                'Mango Sticky Rice',
+                'en',
+                'Sweet coconut rice served with ripe mango.',
+                'Steam glutinous rice, fold in coconut milk, serve with mango.',
+                'ˈmæŋɡoʊ',
+                'Thailand',
+            ],
             ['Panna Cotta', 'en', 'Set cream dessert with a berry coulis.', 'Warm cream with gelatine, set, top with coulis.', 'ˈpanna ˈkɔtta', 'Italy'],
         ];
 
