@@ -1,0 +1,34 @@
+{#
+    Item Translation Fields -- Per-language content editor with an in-page language toggle
+
+    Renders a set of translatable item fields once per enabled admin language, behind a Bulma
+    button group, so every language's content is editable at once - independent of the global
+    navbar UI language. The language list comes from get_admin_language_codes() (the group-scoped
+    admin languages), never the navbar switcher. The "{field}-{code}" children must already exist
+    on the form (see App\Item\ItemTranslationFormHelper). With JavaScript disabled every panel
+    stays visible, so all languages remain editable.
+
+    Used in:    plugins/dishes/templates/dish/edit.html.twig; any item edit form built with
+                ItemTranslationFormHelper::addTranslatedFields()
+    Parameters:
+        - form   (FormView, required)     -- the edit form carrying the "{field}-{code}" children
+        - fields (list<string>, required) -- field stems to render per language, e.g. ['name', 'description']
+    Depends on: js/item-translation-toggle.js (progressive-enhancement tab switching)
+#}
+<div class="mb-4" data-translation-group>
+    <div class="buttons has-addons mb-2">
+        {% for locale in get_admin_language_codes() %}
+            <button type="button"
+                    class="button is-small translation-toggle-button{{ loop.first ? ' is-active' }}"
+                    data-translation-target="{{ locale }}">{{ locale }}</button>
+        {% endfor %}
+    </div>
+
+    {% for locale in get_admin_language_codes() %}
+        <div class="translation-panel" data-translation-panel="{{ locale }}" lang="{{ locale }}">
+            {% for field in fields %}
+                {{ form_row(attribute(form, field ~ '-' ~ locale)) }}
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>

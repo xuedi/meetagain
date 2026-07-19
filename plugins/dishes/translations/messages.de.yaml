@@ -23,6 +23,7 @@ dishes_dish:
     page_title_list: 'Gerichteliste'
     page_title_add: 'Gericht hinzufügen'
     page_title_edit: '%name% bearbeiten'
+    hint_translations: 'Wähle eine Sprache, um ihren Inhalt zu bearbeiten.'
     button_add: 'Gericht hinzufügen'
     button_edit: 'Bearbeiten'
     button_delete: 'Löschen'

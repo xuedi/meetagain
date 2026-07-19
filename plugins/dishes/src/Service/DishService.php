@@ -55,27 +55,39 @@ readonly class DishService
         return $dish;
     }
 
-    public function updateTranslation(Dish $dish, string $language, string $name, ?string $description, ?string $recipe): void
+    /**
+     * Upsert the dish translations from a per-language field map. A language whose name is
+     * blank is removed rather than stored empty, so it never shadows the name fallback in
+     * Dish::getTranslatedName().
+     *
+     * @param array<string, array<string, mixed>> $translations language code => [name, description, recipe]
+     */
+    public function updateTranslations(Dish $dish, array $translations): void
     {
-        $translation = $dish->findTranslation($language);
-        if ($translation === null) {
-            $translation = new DishTranslation();
-            $translation->setLanguage($language);
-            $dish->addTranslation($translation);
+        foreach ($translations as $language => $fields) {
+            $name = trim((string) ($fields['name'] ?? ''));
+            $translation = $dish->findTranslation($language);
+
+            if ($name === '') {
+                if ($translation !== null) {
+                    $dish->removeTranslation($translation);
+                }
+
+                continue;
+            }
+
+            if ($translation === null) {
+                $translation = new DishTranslation();
+                $translation->setLanguage($language);
+                $dish->addTranslation($translation);
+            }
+
+            $recipe = $fields['recipe'] ?? null;
+            $translation->setName($name);
+            $translation->setDescription((string) ($fields['description'] ?? ''));
+            $translation->setRecipe($recipe === null ? null : (string) $recipe);
         }
 
-        $translation->setName($name);
-        $translation->setDescription($description ?? '');
-        $translation->setRecipe($recipe);
-
-        $this->em->persist($dish);
-        $this->em->flush();
-
-        $this->dispatcher->dispatch(ItemAction::Updated, self::ITEM_TYPE, (int) $dish->getId());
-    }
-
-    public function saveBaseData(Dish $dish): void
-    {
         $this->em->persist($dish);
         $this->em->flush();
 
