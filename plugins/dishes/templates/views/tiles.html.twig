@@ -1,0 +1,28 @@
+{# Dishes 'tiles' layout - square-style cards with a leading steward "add" card. #}
+<div class="columns is-multiline">
+    {% if is_granted('ROLE_STEWARD') %}
+        <div class="column is-narrow dish-item" style="width: 200px;">
+            <a href="{{ path('app_plugin_dishes_dish_add') }}" title="{{ 'dishes_views.title_add'|trans }}">
+                <div class="card has-background-link-light" style="height: 100%;">
+                    <div class="card-content has-text-centered" style="padding-top: 2rem;">
+                        <span class="icon is-large has-text-link"><i class="fa-solid fa-plus fa-2x"></i></span>
+                        <p class="mt-3 has-text-link">{{ 'dishes_views.button_add'|trans }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% endif %}
+    {% for item in dishes %}
+        <div class="column is-narrow dish-item" data-dish-id="{{ item.id }}" style="width: 200px;">
+            {% include '_components/item/styles/square.html.twig' with {
+                href: path('app_plugin_dishes_dish_show', {'id': item.id}),
+                image: item.previewImage,
+                imageSize: '400x400',
+                title: item.getTranslatedName(app.locale) ?: item.getAnyTranslatedName(),
+                badge: {icon: 'heart', value: item.likes, active: item.id in favoriteDishIds|default([])},
+                subtitle: item.origin,
+                subtitleIcon: 'location-dot'
+            } %}
+        </div>
+    {% endfor %}
+</div>

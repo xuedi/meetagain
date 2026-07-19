@@ -2,22 +2,34 @@
 
 {% block title %}{{ 'dishes_dish.browser_title_list'|trans }}{% endblock %}
 
+{% block javascripts %}
+    {% if item_view_mode('dish').value == 'gallery' %}
+        <script src="{{ asset('js/vendor/fancybox.umd.js') }}"></script>
+    {% endif %}
+{% endblock %}
+
 {% block dishes_body %}
+{% set viewMode = item_view_mode('dish').value %}
 <div class="level mb-4">
     <div class="level-left">
         <h1 class="title mb-0">{{ 'dishes_dish.page_title_list'|trans }}</h1>
     </div>
-    {% if is_granted('ROLE_STEWARD') %}
-        <div class="level-right">
-            <a href="{{ path('app_plugin_dishes_dish_add') }}" class="button is-link">
-                <span class="icon"><i class="fa fa-plus"></i></span>
-                <span>{{ 'dishes_dish.button_add'|trans }}</span>
-            </a>
-        </div>
-    {% endif %}
+    <div class="level-right">
+        {% include '_components/item/view_switcher.html.twig' with {'itemType': 'dish'} %}
+    </div>
 </div>
 
-{% include '_components/item/list.html.twig' with {'itemType': 'dish', 'itemIds': itemIds, 'emptyMessage': 'dishes_dish.list_empty'} %}
+{% if dishes is empty and not is_granted('ROLE_STEWARD') %}
+    <p class="has-text-grey">{{ 'dishes_dish.list_empty'|trans }}</p>
+{% elseif viewMode == 'tiles' %}
+    {% include '@Dishes/views/tiles.html.twig' %}
+{% elseif viewMode == 'grid' %}
+    {% include '@Dishes/views/grid.html.twig' %}
+{% elseif viewMode == 'gallery' %}
+    {% include '@Dishes/views/gallery.html.twig' %}
+{% else %}
+    {% include '@Dishes/views/list.html.twig' %}
+{% endif %}
 
 {% if footer is not empty %}
     <hr>

@@ -5,9 +5,9 @@ namespace Plugin\Dishes\Controller;
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use Plugin\Dishes\Activity\Messages\DishAdded;
-use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Form\DishAddType;
 use Plugin\Dishes\Form\DishEditType;
+use Plugin\Dishes\Repository\DishLikeRepository;
 use Plugin\Dishes\Service\ConfigService;
 use Plugin\Dishes\Service\DishImageService;
 use Plugin\Dishes\Service\DishService;
@@ -26,16 +26,22 @@ final class DishController extends AbstractController
         private readonly DishImageService $dishImageService,
         private readonly ActivityService $activityService,
         private readonly ConfigService $configService,
+        private readonly DishLikeRepository $dishLikeRepository,
     ) {}
 
     #[Route('', name: 'app_dishes_dishlist', methods: ['GET'])]
     public function list(Request $request): Response
     {
-        $itemIds = array_map(static fn(Dish $dish): int => (int) $dish->getId(), $this->dishService->getList());
+        $config = $this->configService->getConfig();
+        $favoriteDishIds = $this->isGranted('ROLE_USER')
+            ? $this->dishLikeRepository->findDishIdsByUser($this->getAuthedUser()->getId())
+            : [];
 
         return $this->render('@Dishes/dish/list.html.twig', [
-            'itemIds' => $itemIds,
-            'footer' => $this->configService->getConfig()->getFooterFor($request->getLocale()),
+            'dishes' => $this->dishService->getList(),
+            'footer' => $config->getFooterFor($request->getLocale()),
+            'showPhonetic' => $config->isPhoneticInList(),
+            'favoriteDishIds' => $favoriteDishIds,
         ]);
     }
 

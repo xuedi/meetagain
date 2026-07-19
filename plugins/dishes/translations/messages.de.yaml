@@ -7,6 +7,16 @@ dishes:
 
 dishes_config:
     page_title: 'Fußzeile der Gerichteliste'
+    field_phonetic_in_list: 'Aussprache in der Liste anzeigen'
+    help_phonetic_in_list: 'Zeigt die Aussprache (z. B. Pinyin) unter jedem Gerichtenamen in der Liste.'
+
+dishes_views:
+    col_image: 'Bild'
+    col_name: 'Name'
+    col_phonetic: 'Aussprache'
+    col_description: 'Beschreibung'
+    button_add: 'Gericht hinzufügen'
+    title_add: 'Gericht hinzufügen'
 
 dishes_dish:
     browser_title_list: 'Gerichte'

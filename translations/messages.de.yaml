@@ -585,3 +585,4 @@ item:
     view_grid: 'Raster'
     view_gallery: 'Galerie'
     list_empty: 'Noch nichts vorhanden.'
+    add: 'Hinzufügen'

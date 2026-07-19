@@ -1,0 +1,38 @@
+{# Dishes 'list' layout - a table of Image / Name / (Phonetic) / Description with steward actions. #}
+<table class="table is-fullwidth is-hoverable">
+    <thead>
+        <tr>
+            <th>{{ 'dishes_views.col_image'|trans }}</th>
+            <th>{{ 'dishes_views.col_name'|trans }}</th>
+            {% if showPhonetic %}<th>{{ 'dishes_views.col_phonetic'|trans }}</th>{% endif %}
+            <th>{{ 'dishes_views.col_description'|trans }}</th>
+            <th class="has-text-right">
+                {% if is_granted('ROLE_STEWARD') %}
+                    <a href="{{ path('app_plugin_dishes_dish_add') }}" title="{{ 'dishes_views.title_add'|trans }}">
+                        <span class="icon"><i class="fa fa-plus"></i></span>
+                    </a>
+                {% endif %}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in dishes %}
+            {% set showUrl = path('app_plugin_dishes_dish_show', {'id': item.id}) %}
+            <tr data-dish-id="{{ item.id }}">
+                <td style="vertical-align: middle;">
+                    <a href="{{ showUrl }}"><figure class="image is-64x64">{% include '_components/image.html.twig' with {'image': item.previewImage, 'size': '400x400', 'alt': item.getTranslatedName(app.locale)} %}</figure></a>
+                </td>
+                <td style="vertical-align: middle;"><a href="{{ showUrl }}" class="has-text-weight-medium">{{ item.getTranslatedName(app.locale) }}</a></td>
+                {% if showPhonetic %}<td style="vertical-align: middle;" class="has-text-grey">{{ item.phonetic }}</td>{% endif %}
+                <td style="vertical-align: middle;" class="has-text-grey">{{ item.getTranslatedDescription(app.locale) }}</td>
+                <td style="vertical-align: middle;" class="has-text-right">
+                    {% if is_granted('ROLE_STEWARD') %}
+                        <a href="{{ path('app_plugin_dishes_dish_edit', {'id': item.id}) }}" title="{{ 'dishes_dish.button_edit'|trans }}">
+                            <span class="icon"><i class="fa fa-pen-to-square"></i></span>
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

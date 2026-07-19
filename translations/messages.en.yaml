@@ -595,3 +595,4 @@ item:
     view_grid: 'Grid'
     view_gallery: 'Gallery'
     list_empty: 'Nothing here yet.'
+    add: 'Add'

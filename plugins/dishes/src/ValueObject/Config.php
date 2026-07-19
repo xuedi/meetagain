@@ -5,13 +5,16 @@ namespace Plugin\Dishes\ValueObject;
 use App\Publisher\PluginSettings\PluginSettingsData;
 
 /**
- * Effective dishes settings: an optional footer text shown at the bottom of the dish list,
- * held per locale. The neutral default is no footer at all.
+ * Effective dishes settings: an optional footer text shown at the bottom of the dish list
+ * (held per locale) and whether the phonetic column is shown in the list. The neutral default
+ * is no footer and no phonetic column.
  */
 final class Config implements PluginSettingsData
 {
     /** @var array<string, string> locale => footer text */
     private array $footerText = [];
+
+    private bool $phoneticInList = false;
 
     /** @return array<string, string> */
     public function getFooterText(): array
@@ -40,9 +43,24 @@ final class Config implements PluginSettingsData
         return $this->footerText[$locale] ?? '';
     }
 
+    public function isPhoneticInList(): bool
+    {
+        return $this->phoneticInList;
+    }
+
+    public function setPhoneticInList(bool $phoneticInList): static
+    {
+        $this->phoneticInList = $phoneticInList;
+
+        return $this;
+    }
+
     public function toArray(): array
     {
-        return ['footerText' => $this->footerText];
+        return [
+            'footerText' => $this->footerText,
+            'phoneticInList' => $this->phoneticInList,
+        ];
     }
 
     public static function fromArray(array $raw): static
@@ -52,6 +70,7 @@ final class Config implements PluginSettingsData
         if (is_array($footer)) {
             $config->setFooterText($footer);
         }
+        $config->setPhoneticInList((bool) ($raw['phoneticInList'] ?? false));
 
         return $config;
     }

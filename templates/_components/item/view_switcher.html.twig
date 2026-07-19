@@ -1,0 +1,23 @@
+{#
+    Item View Switcher - the Bulma view-mode toggle for an item list
+
+    Renders one icon button per ItemViewType (list/tiles/grid/gallery) linking to the JS-free
+    GET route app_item_set_view; the current mode is read per item type from the session. Item-list
+    pages that render their own per-mode layouts include this to get the shared switcher without the
+    shared layout wrappers.
+
+    Used in:    _components/item/list.html.twig; item-list pages that own their layouts (e.g. dishes)
+    Parameters:
+        - itemType (string, required) -- registry key of the item type (e.g. 'dish')
+    Depends on: item_view_mode(), item_view_types() (ItemViewExtension); the app_item_set_view route
+#}
+{% set current = item_view_mode(itemType) %}
+<div class="buttons has-addons mb-0">
+    {% for view in item_view_types() %}
+        <a href="{{ path('app_item_set_view', {'itemType': itemType, 'mode': view.value}) }}"
+           class="button is-small{% if current == view %} is-link{% endif %}"
+           title="{{ view.label|trans }}">
+            <span class="icon"><i class="fa-solid fa-{{ view.icon }}"></i></span>
+        </a>
+    {% endfor %}
+</div>

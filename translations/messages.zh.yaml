@@ -585,3 +585,4 @@ item:
     view_grid: '网格'
     view_gallery: '画廊'
     list_empty: '暂无内容。'
+    add: '添加'
