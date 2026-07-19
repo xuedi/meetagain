@@ -54,6 +54,25 @@ This keeps the plugin removable without leaving orphaned schema changes in core.
 
 ---
 
+## Make item content multilingual
+
+Store translatable content (name, description, ...) in a per-language side entity - a
+`*Translation` with a `language` char(2) column, a unique `(language, item)` constraint, and one row
+per language - not in single columns on the item. This keeps content editable in every language
+independent of the visitor's UI language.
+
+For the edit form, use the core helper `App\Item\ItemTranslationFormHelper` with the shared
+`_components/item/translation_fields.html.twig` partial: `addTranslatedFields()` builds one unmapped
+`"{field}-{code}"` child per enabled language (seeded from the item's translations), and
+`extractTranslations()` reads them back per language on save. The partial renders a language toggle
+that is decoupled from the navbar UI switch. The dishes plugin (`Plugin\Dishes\Form\DishEditType`,
+`Plugin\Dishes\Controller\DishController::edit`) is the reference implementation.
+
+Never key content editing off `$request->getLocale()` - that ties which translation you can edit to
+the UI language.
+
+---
+
 ## Use `#[AutoconfigureTag]` for auto-registration
 
 Optional interface implementations are discovered automatically when you add the tag attribute.

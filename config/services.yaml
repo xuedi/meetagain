@@ -19,6 +19,8 @@ services:
             - '../src/Kernel.php'
             - '../src/Activity/UnknownActivityMessage.php'
             - '../src/Service/Security/LoadtestBypass.php'
+            - '../src/Entity/'
+            - '../src/Security/Permission/Attribute/'
 
     # Load-test bypass: when the X-Loadtest-Bypass header is set in non-prod env,
     # these decorators short-circuit the rate limiters so synthetic load traffic

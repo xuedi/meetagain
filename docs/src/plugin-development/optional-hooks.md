@@ -1006,7 +1006,7 @@ reference.
 
 Inject `PluginSettingsResolver` and call `resolve('my_plugin')` to get the effective data object
 for the current request. Memoise it in a thin service if you read it often (see
-`plugins/glossary/src/Service/GlossaryConfigService.php`).
+`plugins/glossary/src/Service/ConfigService.php`).
 
 ### Dual-scope settings
 

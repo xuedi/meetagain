@@ -1,0 +1,56 @@
+{% extends '@Books/base_books.html.twig' %}
+
+{% block title %}{{ 'books_book.page_title_edit'|trans({'%title%': book.title}) }}{% endblock %}
+
+{% block books_body %}
+<style>
+    .cover-file-input input[type="file"] { color: transparent; width: 100%; }
+    .cover-file-input input[type="file"]::file-selector-button { color: initial; }
+    .cover-file-input input[type="file"]::-webkit-file-upload-button { color: initial; }
+</style>
+
+<h1 class="title">{{ 'books_book.page_title_edit'|trans({'%title%': book.title}) }}</h1>
+
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+{{ form_errors(form) }}
+
+<div class="columns">
+    <div class="column is-3-tablet is-12-mobile">
+        <fieldset class="p-4 mb-4" style="border: 1px solid #dbdbdb; border-radius: 4px;">
+            <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'books_book.label_cover'|trans }}</legend>
+            {% if book.coverImage %}
+                <p class="has-text-grey-light is-size-7 mb-2">{{ 'books_book.current_cover_label'|trans }}</p>
+                <figure class="image mb-3">
+                    {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x250', 'alt': book.title} %}
+                </figure>
+            {% else %}
+                <p class="has-text-grey-light is-size-7 mb-2">{{ 'books_book.no_cover'|trans }}</p>
+            {% endif %}
+            <div class="cover-file-input">
+                {{ form_row(form.coverFile, {'label': false}) }}
+            </div>
+            <p class="has-text-grey is-size-7 mt-2">{{ 'books_book.help_cover'|trans }}</p>
+        </fieldset>
+    </div>
+    <div class="column is-8">
+        {% for field in [form.title, form.author, form.description, form.pageCount, form.publishedYear] %}
+            <div class="field">
+                {{ form_label(field, null, {'label_attr': {'class': 'label'}}) }}
+                <div class="control">{{ form_widget(field) }}</div>
+                {{ form_errors(field) }}
+            </div>
+        {% endfor %}
+
+        <div class="field is-grouped mt-4">
+            <div class="control">{{ form_widget(form.submit) }}</div>
+            <div class="control">
+                <a href="{{ path('app_plugin_books_book_show', {id: book.id}) }}" class="button">
+                    {{ 'books_book.button_cancel'|trans }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}

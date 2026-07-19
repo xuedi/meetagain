@@ -1,0 +1,5 @@
+{
+  "name": "Dishes",
+  "version": "1.0",
+  "description": "Dish catalog with per-language translations, image gallery, phonetic pronunciation and likes. Dishes attach to events via the core item system; a dinner menu is dish associations grouped by course label."
+}

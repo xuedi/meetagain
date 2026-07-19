@@ -70,7 +70,7 @@ interface Plugin
     /**
      * Returns logical asset paths for stylesheets this plugin contributes.
      * Paths are relative to the plugin's assets/ directory.
-     * Example: ['styles/filmclub.css']
+     * Example: ['styles/main.css']
      * @return list<string>
      */
     public function getStylesheets(): array;

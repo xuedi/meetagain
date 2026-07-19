@@ -1,0 +1,51 @@
+{% extends '@Voting/base_voting.html.twig' %}
+
+{% block title %}{{ 'voting_poll.page_title_create'|trans }}{% endblock %}
+
+{% block voting_body %}
+<h1 class="title">{{ 'voting_poll.page_title_create'|trans }}</h1>
+
+<div class="box mb-4">
+    <p class="subtitle mb-1">{{ event.title(app.request.locale) }}</p>
+    <p class="has-text-grey is-size-7">{{ event.start|date('d.m.Y') }}</p>
+    {% if itemTypeLabelKey %}
+    <span class="tag is-light mt-2">{{ itemTypeLabelKey|trans }}</span>
+    {% endif %}
+</div>
+
+{% if candidateItemIds is empty %}
+<div class="notification is-warning">{{ 'voting_poll.no_candidates'|trans }}</div>
+<a href="{{ path('app_voting_poll_list') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+{% else %}
+<form method="POST" action="{{ path('app_voting_poll_create', {eventId: event.id, itemType: itemType}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('voting_poll_create' ~ event.id) }}">
+
+    <p class="mb-3 has-text-grey">{{ 'voting_poll.create_intro'|trans }}</p>
+
+    <div class="mb-4">
+        {% for itemId in candidateItemIds %}
+        <div class="box mb-2">
+            <label class="checkbox" style="display: flex; align-items: center; gap: 1rem; cursor: pointer">
+                <input type="checkbox" name="items[]" value="{{ itemId }}" checked>
+                <div>{{ item_list_cell(itemType, itemId) }}</div>
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="field">
+        <label class="label" for="voting-duration">{{ 'voting_poll.label_duration_days'|trans }}</label>
+        <div class="control">
+            <input class="input" type="number" id="voting-duration" name="durationDays"
+                   value="{{ defaultDurationDays }}" min="1" max="365" required>
+        </div>
+        <p class="help">{{ 'voting_poll.help_duration_days'|trans }}</p>
+    </div>
+
+    <div class="field mt-4">
+        <button type="submit" class="button is-primary">{{ 'voting_poll.button_create'|trans }}</button>
+        <a href="{{ path('app_voting_poll_list') }}" class="button ml-2">{{ 'global.button_cancel'|trans }}</a>
+    </div>
+</form>
+{% endif %}
+{% endblock %}

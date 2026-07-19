@@ -3,9 +3,9 @@
 namespace Plugin\Glossary\Tests\Unit\Form;
 
 use PHPUnit\Framework\TestCase;
-use Plugin\Glossary\Config\GlossaryConfig;
 use Plugin\Glossary\Form\GlossaryType;
-use Plugin\Glossary\Service\GlossaryConfigService;
+use Plugin\Glossary\Service\ConfigService;
+use Plugin\Glossary\ValueObject\Config;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
@@ -15,7 +15,7 @@ class GlossaryTypeTest extends TestCase
     public function testNeutralConfigBuildsTermAndDefinitionOnly(): void
     {
         // Arrange
-        $form = $this->formFor(new GlossaryConfig());
+        $form = $this->formFor(new Config());
 
         // Assert
         static::assertTrue($form->has('phrase'));
@@ -27,7 +27,7 @@ class GlossaryTypeTest extends TestCase
     public function testSecondaryEnabledAddsPinyinField(): void
     {
         // Arrange
-        $config = (new GlossaryConfig())->setSecondaryEnabled(true)->setSecondaryLabel('Romaji');
+        $config = (new Config())->setSecondaryEnabled(true)->setSecondaryLabel('Romaji');
 
         // Act
         $form = $this->formFor($config);
@@ -40,7 +40,7 @@ class GlossaryTypeTest extends TestCase
     public function testCategoriesAddCategoryChoiceField(): void
     {
         // Arrange
-        $config = (new GlossaryConfig())->setCategories([['id' => 0, 'label' => 'Greeting']]);
+        $config = (new Config())->setCategories([['id' => 0, 'label' => 'Greeting']]);
 
         // Act
         $form = $this->formFor($config);
@@ -50,15 +50,15 @@ class GlossaryTypeTest extends TestCase
         static::assertFalse($form->has('pinyin'));
     }
 
-    private function formFor(GlossaryConfig $config): \Symfony\Component\Form\FormInterface
+    private function formFor(Config $config): \Symfony\Component\Form\FormInterface
     {
-        $configService = $this->createStub(GlossaryConfigService::class);
+        $configService = $this->createStub(ConfigService::class);
         $configService->method('getConfig')->willReturn($config);
 
         return $this->factory($configService)->create(GlossaryType::class);
     }
 
-    private function factory(GlossaryConfigService $configService): FormFactoryInterface
+    private function factory(ConfigService $configService): FormFactoryInterface
     {
         return Forms::createFormFactoryBuilder()
             ->addExtension(new PreloadedExtension([new GlossaryType($configService)], []))

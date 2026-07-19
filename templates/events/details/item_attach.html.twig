@@ -1,0 +1,36 @@
+{# attachControl: App\Item\ItemAttachControl - the active item types a steward can attach to this event #}
+<div class="item-attach mt-4">
+    <h3 class="title is-5">{{ 'item.attach_heading'|trans }}</h3>
+
+    {% if attachControl.hasMultipleTypes %}
+        <div class="field">
+            <label class="label is-small" for="item-attach-type">{{ 'item.attach_type_label'|trans }}</label>
+            <div class="control">
+                <div class="select is-small is-fullwidth">
+                    <select id="item-attach-type" data-item-attach-switcher>
+                        {% for type in attachControl.types %}
+                            <option value="{{ type.key }}">{{ type.labelKey|trans }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    {% for type in attachControl.types %}
+        <div class="item-attach-panel{% if attachControl.hasMultipleTypes and not loop.first %} is-hidden{% endif %}"
+             data-item-attach-panel="{{ type.key }}">
+            {{ type.pickerHtml|raw }}
+            {% if type.slots is not empty %}
+                <div class="buttons mt-3">
+                    {% for slot in type.slots %}
+                        <a href="{{ slot.url }}" class="button is-small">
+                            {% if slot.icon %}<span class="icon"><i class="fas fa-{{ slot.icon }}"></i></span>{% endif %}
+                            <span>{{ slot.labelKey|trans }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>

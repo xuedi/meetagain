@@ -1,0 +1,5 @@
+{
+  "name": "Wishlist",
+  "version": "1.0",
+  "description": "A per-member backlog of wanted items of any type. Demand ranks candidates for votes and direct attach; picking an item ages the rest of the backlog up and clears the winner."
+}

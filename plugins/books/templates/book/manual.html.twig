@@ -1,0 +1,22 @@
+{% extends '@Books/base_books.html.twig' %}
+
+{% block title %}{{ 'books_book.page_title_manual'|trans }}{% endblock %}
+
+{% block books_body %}
+<h1 class="title">{{ 'books_book.page_title_manual'|trans }}</h1>
+
+{{ form_start(form) }}
+{{ form_errors(form) }}
+{% for field in [form.isbn, form.title, form.author, form.description, form.pageCount, form.publishedYear] %}
+<div class="field">
+    {{ form_label(field) }}
+    <div class="control">{{ form_widget(field) }}</div>
+    {{ form_errors(field) }}
+</div>
+{% endfor %}
+<div class="field mt-4">
+    {{ form_widget(form.submit, {'attr': {'class': 'button is-primary'}}) }}
+    <a href="{{ path('app_books_booklist') }}" class="button ml-2">{{ 'books_book.button_cancel'|trans }}</a>
+</div>
+{{ form_end(form) }}
+{% endblock %}

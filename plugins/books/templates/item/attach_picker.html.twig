@@ -1,0 +1,23 @@
+{# Steward picker to attach an existing book to the event. Posts to the core attach route. #}
+{% if books is empty %}
+    <p class="has-text-grey is-size-7">{{ 'books.attach_empty'|trans }}</p>
+{% else %}
+    <form method="post" action="{{ path('app_item_attach', {id: eventId}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('app_item_attach' ~ eventId) }}">
+        <input type="hidden" name="item_type" value="book">
+        <div class="field has-addons">
+            <div class="control is-expanded">
+                <div class="select is-small is-fullwidth">
+                    <select name="item_id">
+                        {% for book in books %}
+                            <option value="{{ book.id }}">{{ book.title }}{% if book.author %} - {{ book.author }}{% endif %}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="control">
+                <button type="submit" class="button is-small is-link">{{ 'books.attach_button'|trans }}</button>
+            </div>
+        </div>
+    </form>
+{% endif %}

@@ -1,0 +1,7 @@
+{# Dish cell for the shared item-list component. The dishes list page renders its own
+   plugins/dishes/templates/views/* layouts instead; this remains for the provider contract. #}
+<a href="{{ path('app_plugin_dishes_dish_show', {id: dish.id}) }}" class="dish-cell is-block has-text-centered">
+    {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '400x400', 'alt': dish.getTranslatedName(app.locale)} %}
+    <p class="title is-6 mt-2 mb-0">{{ dish.getTranslatedName(app.locale) }}</p>
+    {% if dish.origin %}<p class="subtitle is-7 has-text-grey">{{ dish.origin }}</p>{% endif %}
+</a>

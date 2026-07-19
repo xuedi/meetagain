@@ -1,0 +1,25 @@
+{# Film cell rendered for one EventItemAssociation on the event detail page. #}
+<div class="media">
+    <div class="media-left">
+        <a href="{{ path('app_plugin_films_film_show', {id: film.id}) }}">
+            {% include '_components/image.html.twig' with {'image': film.posterImage, 'size': '100x150', 'alt': film.title} %}
+        </a>
+    </div>
+    <div class="media-content">
+        <p class="title is-6 mb-1">
+            <a href="{{ path('app_plugin_films_film_show', {id: film.id}) }}">{{ film.title }}</a>
+        </p>
+        {% if film.year %}<p class="subtitle is-7 has-text-grey">{{ film.year }}</p>{% endif %}
+        {% if is_granted('ROLE_ORGANIZER') %}
+            <form method="post" action="{{ path('app_item_detach', {id: association.event.id}) }}" class="mt-2">
+                <input type="hidden" name="_token" value="{{ csrf_token('app_item_detach' ~ association.event.id) }}">
+                <input type="hidden" name="item_type" value="film">
+                <input type="hidden" name="item_id" value="{{ film.id }}">
+                <button type="submit" class="button is-small is-danger is-light">
+                    <span class="icon"><i class="fa fa-times"></i></span>
+                    <span>{{ 'films.detach'|trans }}</span>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</div>
