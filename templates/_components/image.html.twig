@@ -12,7 +12,8 @@
                                          auto-selected from image.type when omitted:
                                          type 1 -> 400x400, type 2 -> 600x400, type 3 -> 210x140,
                                          type 4 -> 432x432, default -> 50x50
-        - alt   (string, optional)     - alt text override; falls back to image.alt then ''
+        - alt   (string, optional)     - alt text override; when omitted, the current locale's alt
+                                         (image.getAltFor(app.locale)) is used, then base image.alt, then ''
 #}
 {% if size is not defined  %}
     {% set size = '50x50' %}
@@ -37,7 +38,7 @@
     {% if image.updatedAt is not null %}{# to invalidate browser cache #}
         {% set file = file ~ '?v' ~ image.updatedAt|date("YmdHis") %}
     {% endif %}
-    <img src="/images/thumbnails/{{ file }}" alt="{{ alt|default(image.alt|default('')) }}" width="{{ size|split('x')[0] }}" height="{{ size|split('x')[1] }}" />
+    <img src="/images/thumbnails/{{ file }}" alt="{{ alt|default(image.getAltFor(app.locale)|default('')) }}" width="{{ size|split('x')[0] }}" height="{{ size|split('x')[1] }}" />
 {% else %}
     <img src="{{ asset('images/default_' ~ size ~ '.png') }}" alt="Placeholder IMAGE"/>
 {% endif %}
