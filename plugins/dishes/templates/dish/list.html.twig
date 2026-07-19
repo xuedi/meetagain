@@ -18,4 +18,9 @@
 </div>
 
 {% include '_components/item/list.html.twig' with {'itemType': 'dish', 'itemIds': itemIds, 'emptyMessage': 'dishes_dish.list_empty'} %}
+
+{% if footer is not empty %}
+    <hr>
+    <div class="content has-text-grey">{{ footer|nl2br }}</div>
+{% endif %}
 {% endblock %}

@@ -5,6 +5,9 @@ dishes:
     attach_empty: 'Noch keine Gerichte zum Zuordnen verfügbar.'
     attach_button: 'Zuordnen'
 
+dishes_config:
+    page_title: 'Fußzeile der Gerichteliste'
+
 dishes_dish:
     browser_title_list: 'Gerichte'
     page_title_list: 'Gerichteliste'

@@ -5,6 +5,9 @@ dishes:
     attach_empty: '暂无可关联的菜肴。'
     attach_button: '关联'
 
+dishes_config:
+    page_title: '菜肴列表页脚'
+
 dishes_dish:
     browser_title_list: '菜肴'
     page_title_list: '菜肴列表'
