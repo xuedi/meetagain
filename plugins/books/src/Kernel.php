@@ -58,14 +58,14 @@ class Kernel implements Plugin
         $adminId = (int) $admin->getId();
 
         $catalog = [
-            ['978-0143105428', 'The Odyssey', 'Homer', 'The wanderings of Odysseus on his way home from Troy.', 541, 2006],
-            ['978-0141439518', 'Pride and Prejudice', 'Jane Austen', 'Elizabeth Bennet navigates manners, morality and marriage.', 480, 2003],
-            ['978-0060850524', 'Brave New World', 'Aldous Huxley', 'A dystopia of engineered contentment.', 288, 2006],
-            ['978-0060935467', 'To Kill a Mockingbird', 'Harper Lee', 'A lawyer defends a black man in the Depression-era South.', 336, 2002],
-            ['978-0143039433', 'East of Eden', 'John Steinbeck', 'Two families retrace the story of the fall from Eden.', 601, 2002],
-            ['978-0140283334', 'On the Road', 'Jack Kerouac', 'A restless cross-country search for meaning.', 307, 1999],
-            ['978-0140177398', 'Of Mice and Men', 'John Steinbeck', 'Two drifters chase a dream during the Great Depression.', 112, 1993],
-            ['978-0142437209', 'Moby-Dick', 'Herman Melville', 'Captain Ahab pursues the white whale.', 720, 2003],
+            ['978-0143105428', 'The Odyssey',           'Homer',           'The wanderings of Odysseus on his way home from Troy.',      541, 2006],
+            ['978-0141439518', 'Pride and Prejudice',   'Jane Austen',     'Elizabeth Bennet navigates manners, morality and marriage.', 480, 2003],
+            ['978-0060850524', 'Brave New World',       'Aldous Huxley',   'A dystopia of engineered contentment.',                      288, 2006],
+            ['978-0060935467', 'To Kill a Mockingbird', 'Harper Lee',      'A lawyer defends a black man in the Depression-era South.',  336, 2002],
+            ['978-0143039433', 'East of Eden',          'John Steinbeck',  'Two families retrace the story of the fall from Eden.',      601, 2002],
+            ['978-0140283334', 'On the Road',           'Jack Kerouac',    'A restless cross-country search for meaning.',               307, 1999],
+            ['978-0140177398', 'Of Mice and Men',       'John Steinbeck',  'Two drifters chase a dream during the Great Depression.',    112, 1993],
+            ['978-0142437209', 'Moby-Dick',             'Herman Melville', 'Captain Ahab pursues the white whale.',                      720, 2003],
         ];
 
         $created = [];

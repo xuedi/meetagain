@@ -138,11 +138,7 @@ final class BookController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getAuthedUser();
             try {
-                $this->bookService->update(
-                    book: $book,
-                    coverFile: $form->get('coverFile')->getData(),
-                    userId: $user->getId(),
-                );
+                $this->bookService->update(book: $book, coverFile: $form->get('coverFile')->getData(), userId: $user->getId());
                 $this->addFlash('success', 'books_book.flash_updated');
 
                 return $this->redirectToRoute('app_plugin_books_book_show', ['id' => $book->getId()]);

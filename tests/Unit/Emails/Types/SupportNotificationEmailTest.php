@@ -91,7 +91,14 @@ class SupportNotificationEmailTest extends TestCase
 
         $request = $this->makeRequest();
 
-        $emailType = new SupportNotificationEmail($this->createStub(BlocklistCheckerInterface::class), $queue, $config, $userRepo, $logger, $this->createStub(TranslatorInterface::class));
+        $emailType = new SupportNotificationEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
+            $queue,
+            $config,
+            $userRepo,
+            $logger,
+            $this->createStub(TranslatorInterface::class),
+        );
 
         // Act
         $emailType->send(['request' => $request]);

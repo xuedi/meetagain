@@ -21,37 +21,44 @@ class BookManualType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add('isbn', TextType::class, [
-            'label' => 'books_book.field_isbn',
-            'required' => true,
-            'attr' => ['class' => 'input'],
-            'constraints' => [
-                new NotBlank(),
-                new Regex(pattern: '/^[\d\-\s X]+$/i', message: 'books_book.error_isbn_invalid'),
-            ],
-        ])->add('title', TextType::class, [
-            'label' => 'books_book.label_title',
-            'required' => true,
-            'attr' => ['class' => 'input'],
-        ])->add('author', TextType::class, [
-            'label' => 'books_book.label_author',
-            'required' => false,
-            'attr' => ['class' => 'input'],
-        ])->add('description', TextareaType::class, [
-            'label' => 'books_book.label_description',
-            'required' => false,
-            'attr' => ['class' => 'textarea', 'rows' => 4],
-        ])->add('pageCount', IntegerType::class, [
-            'label' => 'books_book.label_page_count',
-            'required' => false,
-            'attr' => ['class' => 'input'],
-        ])->add('publishedYear', IntegerType::class, [
-            'label' => 'books_book.label_published_year',
-            'required' => false,
-            'attr' => ['class' => 'input'],
-        ])->add('submit', SubmitType::class, [
-            'label' => $this->translator->trans('books_book.button_submit'),
-            'attr' => ['class' => 'button'],
-        ]);
+        $builder
+            ->add('isbn', TextType::class, [
+                'label' => 'books_book.field_isbn',
+                'required' => true,
+                'attr' => ['class' => 'input'],
+                'constraints' => [
+                    new NotBlank(),
+                    new Regex(pattern: '/^[\d\-\s X]+$/i', message: 'books_book.error_isbn_invalid'),
+                ],
+            ])
+            ->add('title', TextType::class, [
+                'label' => 'books_book.label_title',
+                'required' => true,
+                'attr' => ['class' => 'input'],
+            ])
+            ->add('author', TextType::class, [
+                'label' => 'books_book.label_author',
+                'required' => false,
+                'attr' => ['class' => 'input'],
+            ])
+            ->add('description', TextareaType::class, [
+                'label' => 'books_book.label_description',
+                'required' => false,
+                'attr' => ['class' => 'textarea', 'rows' => 4],
+            ])
+            ->add('pageCount', IntegerType::class, [
+                'label' => 'books_book.label_page_count',
+                'required' => false,
+                'attr' => ['class' => 'input'],
+            ])
+            ->add('publishedYear', IntegerType::class, [
+                'label' => 'books_book.label_published_year',
+                'required' => false,
+                'attr' => ['class' => 'input'],
+            ])
+            ->add('submit', SubmitType::class, [
+                'label' => $this->translator->trans('books_book.button_submit'),
+                'attr' => ['class' => 'button'],
+            ]);
     }
 }

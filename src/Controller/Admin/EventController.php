@@ -241,8 +241,13 @@ final class EventController extends AbstractController implements AdminNavigatio
     /**
      * @param array<Event> $allEvents
      */
-    private function buildTypeDropdown(array $allEvents, ?DateTimeImmutable $until, string $range, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
-    {
+    private function buildTypeDropdown(
+        array $allEvents,
+        ?DateTimeImmutable $until,
+        string $range,
+        ?int $typeFilter,
+        string $scheduleFilter,
+    ): AdminTopActionDropdown {
         $countAll = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, null, $scheduleFilter)));
 
         $options = [
@@ -282,8 +287,13 @@ final class EventController extends AbstractController implements AdminNavigatio
     /**
      * @param array<Event> $allEvents
      */
-    private function buildScheduleDropdown(array $allEvents, ?DateTimeImmutable $until, string $range, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
-    {
+    private function buildScheduleDropdown(
+        array $allEvents,
+        ?DateTimeImmutable $until,
+        string $range,
+        ?int $typeFilter,
+        string $scheduleFilter,
+    ): AdminTopActionDropdown {
         $values = ['all', 'onetime', 'series'];
         $options = [];
         $activeLabel = '';
@@ -468,7 +478,7 @@ final class EventController extends AbstractController implements AdminNavigatio
 
             // a confirmed rule change realigns even without the allFollowing checkbox;
             // closing the series (rule change to null) never realigns
-            $executesRealign = $wantsRealign || ($isSeries && $ruleChanged && $newRule !== null);
+            $executesRealign = $wantsRealign || $isSeries && $ruleChanged && $newRule !== null;
             if ($executesRealign) {
                 $result = $this->eventService->executeRealignment($this->eventService->planRealignment($event, $change));
                 foreach ($result->removedAttendees as $userId => $removed) {
@@ -725,9 +735,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         if (trim((string) $form->get('seriesName')->getData()) !== '') {
             return true;
         }
-        $form->get('seriesName')->addError(new FormError(
-            $this->translator->trans('admin_event.validator_series_name_required', [], 'validators'),
-        ));
+        $form->get('seriesName')->addError(new FormError($this->translator->trans('admin_event.validator_series_name_required', [], 'validators')));
 
         return false;
     }

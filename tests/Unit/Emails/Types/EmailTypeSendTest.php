@@ -173,7 +173,14 @@ class EmailTypeSendTest extends TestCase
         $userRepo = $this->createStub(UserRepository::class);
         $userRepo->method('findAdminUsers')->willReturn([$admin]);
 
-        new SupportNotificationEmail($this->blocklist, $queue, $this->config, $userRepo, $this->createStub(LoggerInterface::class), $this->createStub(TranslatorInterface::class))->send([
+        new SupportNotificationEmail(
+            $this->blocklist,
+            $queue,
+            $this->config,
+            $userRepo,
+            $this->createStub(LoggerInterface::class),
+            $this->createStub(TranslatorInterface::class),
+        )->send([
             'request' => $request,
         ]);
     }

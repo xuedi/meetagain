@@ -22,8 +22,10 @@ class PluginSettingsResolver
      */
     public function __construct(
         private readonly PluginSettingsService $descriptors,
-        #[AutowireIterator(PluginSettingsStoreInterface::class)] private readonly iterable $stores,
-        #[AutowireIterator(PluginSettingsScopeProviderInterface::class)] private readonly iterable $scopeProviders,
+        #[AutowireIterator(PluginSettingsStoreInterface::class)]
+        private readonly iterable $stores,
+        #[AutowireIterator(PluginSettingsScopeProviderInterface::class)]
+        private readonly iterable $scopeProviders,
     ) {}
 
     public function resolve(string $key): object

@@ -169,7 +169,7 @@ class Image
     {
         $missing = [];
         foreach ($codes as $code) {
-            $own = $code === $sourceLocale ? $this->alt : ($this->altTranslations[$code] ?? null);
+            $own = $code === $sourceLocale ? $this->alt : $this->altTranslations[$code] ?? null;
             if ($own === null || $own === '') {
                 $missing[] = $code;
             }

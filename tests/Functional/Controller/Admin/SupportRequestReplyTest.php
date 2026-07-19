@@ -31,9 +31,11 @@ class SupportRequestReplyTest extends WebTestCase
 
         // Act
         $crawler = $client->request('GET', '/en/admin/support/' . $id);
-        $form = $crawler->selectButton('Send response')->form([
-            'support_reply[response]' => 'Thanks for reaching out, here is your answer.',
-        ]);
+        $form = $crawler
+            ->selectButton('Send response')
+            ->form([
+                'support_reply[response]' => 'Thanks for reaching out, here is your answer.',
+            ]);
         static::assertStringContainsString('/reply-email', (string) $form->getUri());
         $client->submit($form);
 
@@ -66,9 +68,11 @@ class SupportRequestReplyTest extends WebTestCase
 
         // Act - reply once, then revisit the detail page
         $crawler = $client->request('GET', '/en/admin/support/' . $id);
-        $form = $crawler->selectButton('Send response')->form([
-            'support_reply[response]' => 'First and only answer.',
-        ]);
+        $form = $crawler
+            ->selectButton('Send response')
+            ->form([
+                'support_reply[response]' => 'First and only answer.',
+            ]);
         $client->submit($form);
         $crawler = $client->request('GET', '/en/admin/support/' . $id);
 
@@ -94,9 +98,11 @@ class SupportRequestReplyTest extends WebTestCase
 
         // Act
         $crawler = $client->request('GET', '/en/admin/support/' . $id);
-        $form = $crawler->selectButton('Send response')->form([
-            'support_reply[response]' => 'Here is the answer to your member question.',
-        ]);
+        $form = $crawler
+            ->selectButton('Send response')
+            ->form([
+                'support_reply[response]' => 'Here is the answer to your member question.',
+            ]);
         static::assertStringContainsString('/reply-message', (string) $form->getUri());
         $client->submit($form);
 
@@ -112,18 +118,12 @@ class SupportRequestReplyTest extends WebTestCase
         $admin = $this->getUserByEmail($client, self::ADMIN_EMAIL);
         static::assertSame($admin->getId(), $reloaded->getRespondedBy()?->getId(), 'The responding admin owns the thread');
 
-        $question = $em->getRepository(Message::class)->findOneBy(
-            ['sender' => $member->getId(), 'receiver' => $admin->getId()],
-            ['id' => 'DESC'],
-        );
+        $question = $em->getRepository(Message::class)->findOneBy(['sender' => $member->getId(), 'receiver' => $admin->getId()], ['id' => 'DESC']);
         static::assertNotNull($question, 'The user question should be imported as a message to the admin');
         static::assertStringStartsWith(Message::SUPPORT_QUESTION_MARKER, (string) $question->getContent());
         static::assertStringContainsString('Original question text', (string) $question->getContent());
 
-        $answer = $em->getRepository(Message::class)->findOneBy(
-            ['sender' => $admin->getId(), 'receiver' => $member->getId()],
-            ['id' => 'DESC'],
-        );
+        $answer = $em->getRepository(Message::class)->findOneBy(['sender' => $admin->getId(), 'receiver' => $member->getId()], ['id' => 'DESC']);
         static::assertNotNull($answer, 'The admin answer should be sent to the member');
         static::assertSame('Here is the answer to your member question.', (string) $answer->getContent());
 
@@ -197,10 +197,12 @@ class SupportRequestReplyTest extends WebTestCase
     private function loginAsAdmin(KernelBrowser $client): void
     {
         $crawler = $client->request('GET', '/en/login');
-        $form = $crawler->selectButton('Login')->form([
-            '_username' => self::ADMIN_EMAIL,
-            '_password' => self::ADMIN_PASSWORD,
-        ]);
+        $form = $crawler
+            ->selectButton('Login')
+            ->form([
+                '_username' => self::ADMIN_EMAIL,
+                '_password' => self::ADMIN_PASSWORD,
+            ]);
         $client->submit($form);
         $client->followRedirect();
     }

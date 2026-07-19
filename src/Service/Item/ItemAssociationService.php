@@ -24,8 +24,14 @@ readonly class ItemAssociationService
         private EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
-    public function attach(int $eventId, string $itemType, int $itemId, int $createdBy, ?int $position = null, ?string $sectionLabel = null): EventItemAssociation
-    {
+    public function attach(
+        int $eventId,
+        string $itemType,
+        int $itemId,
+        int $createdBy,
+        ?int $position = null,
+        ?string $sectionLabel = null,
+    ): EventItemAssociation {
         $existing = $this->repository->findOneByEventAndItem($eventId, $itemType, $itemId);
         if ($existing !== null) {
             return $existing;

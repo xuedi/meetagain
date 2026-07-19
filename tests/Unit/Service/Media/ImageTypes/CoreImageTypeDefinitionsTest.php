@@ -58,10 +58,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
 
         $definition = new ProfilePictureImageTypeDefinition($this->repo(), $conn, $this->createStub(UserRepository::class));
 
-        static::assertSame(
-            [['imageId' => 10, 'locationId' => 1], ['imageId' => 20, 'locationId' => 2]],
-            $definition->discoverImageIds(),
-        );
+        static::assertSame([['imageId' => 10, 'locationId' => 1], ['imageId' => 20, 'locationId' => 2]], $definition->discoverImageIds());
     }
 
     public function testProfilePictureLocateResolvesUser(): void
@@ -77,10 +74,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
 
         $definition = new ProfilePictureImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $userRepo);
 
-        static::assertSame(
-            ['label' => 'Profile picture: Alice', 'route' => 'app_admin_member_edit', 'params' => ['id' => 3]],
-            $definition->locate($image),
-        );
+        static::assertSame(['label' => 'Profile picture: Alice', 'route' => 'app_admin_member_edit', 'params' => ['id' => 3]], $definition->locate($image));
     }
 
     public function testProfilePictureLocateReturnsNullWhenNoUser(): void
@@ -257,10 +251,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
 
         static::assertSame(ImageType::CmsCardImage, $definition->getType());
         static::assertSame([[600, 400], [350, 233], [300, 200], [100, 100], [50, 50]], $definition->thumbnailSizes());
-        static::assertSame(
-            [['imageId' => 20, 'locationId' => 3], ['imageId' => 21, 'locationId' => 3]],
-            $definition->discoverImageIds(),
-        );
+        static::assertSame([['imageId' => 20, 'locationId' => 3], ['imageId' => 21, 'locationId' => 3]], $definition->discoverImageIds());
     }
 
     public function testCmsGalleryIdentitySizesAndDiscovery(): void
@@ -274,10 +265,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
 
         static::assertSame(ImageType::CmsGallery, $definition->getType());
         static::assertSame([[1024, 768], [350, 263], [210, 140], [100, 100], [50, 50]], $definition->thumbnailSizes());
-        static::assertSame(
-            [['imageId' => 10, 'locationId' => 7], ['imageId' => 11, 'locationId' => 7]],
-            $definition->discoverImageIds(),
-        );
+        static::assertSame([['imageId' => 10, 'locationId' => 7], ['imageId' => 11, 'locationId' => 7]], $definition->discoverImageIds());
     }
 
     // =========================================================================
@@ -335,10 +323,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
         $definition = new SiteLogoImageTypeDefinition($this->repo(), $conn);
 
         static::assertSame([['imageId' => 42, 'locationId' => 0]], $definition->discoverImageIds());
-        static::assertSame(
-            ['label' => 'Site logo', 'route' => 'app_admin_system_theme', 'params' => []],
-            $definition->locate($image),
-        );
+        static::assertSame(['label' => 'Site logo', 'route' => 'app_admin_system_theme', 'params' => []], $definition->locate($image));
     }
 
     public function testSiteLogoLocateReturnsNullForNonConfiguredImage(): void
