@@ -4,18 +4,18 @@ namespace Plugin\Glossary\Tests\Unit\Service;
 
 use App\Publisher\PluginSettings\PluginSettingsResolver;
 use PHPUnit\Framework\TestCase;
-use Plugin\Glossary\Config\GlossaryConfig;
-use Plugin\Glossary\Service\GlossaryConfigService;
+use Plugin\Glossary\Service\ConfigService;
+use Plugin\Glossary\ValueObject\Config;
 
-class GlossaryConfigServiceTest extends TestCase
+class ConfigServiceTest extends TestCase
 {
     public function testReturnsResolvedConfig(): void
     {
         // Arrange
-        $config = (new GlossaryConfig())->setSecondaryEnabled(true);
+        $config = (new Config())->setSecondaryEnabled(true);
         $resolver = $this->createStub(PluginSettingsResolver::class);
         $resolver->method('resolve')->willReturn($config);
-        $service = new GlossaryConfigService($resolver);
+        $service = new ConfigService($resolver);
 
         // Act + Assert
         static::assertSame($config, $service->getConfig());
@@ -25,8 +25,8 @@ class GlossaryConfigServiceTest extends TestCase
     {
         // Arrange
         $resolver = $this->createMock(PluginSettingsResolver::class);
-        $resolver->expects(static::once())->method('resolve')->willReturn(new GlossaryConfig());
-        $service = new GlossaryConfigService($resolver);
+        $resolver->expects(static::once())->method('resolve')->willReturn(new Config());
+        $service = new ConfigService($resolver);
 
         // Act
         $first = $service->getConfig();

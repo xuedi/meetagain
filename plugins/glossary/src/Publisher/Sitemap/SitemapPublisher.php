@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Detail/edit/delete routes are auth-gated (ROLE_USER / ROLE_ORGANIZER) so only
  * the index page belongs in the sitemap.
  */
-final readonly class GlossarySitemapPublisher implements SitemapPublisherInterface
+final readonly class SitemapPublisher implements SitemapPublisherInterface
 {
     public function __construct(
         private LanguageService $languageService,

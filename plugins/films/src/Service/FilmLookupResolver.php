@@ -3,16 +3,16 @@
 namespace Plugin\Films\Service;
 
 use Plugin\Films\Entity\ExternalSource;
-use Plugin\Films\Entity\FilmsSettings;
-use Plugin\Films\Repository\FilmsSettingsRepository;
+use Plugin\Films\Entity\Settings;
+use Plugin\Films\Repository\SettingsRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 readonly class FilmLookupResolver
 {
     public function __construct(
-        private FilmsSettingsRepository $settingsRepository,
-        private FilmsSettingsService $settingsService,
+        private SettingsRepository $settingsRepository,
+        private SettingsService $settingsService,
         private HttpClientInterface $httpClient,
         private LoggerInterface $logger,
     ) {}
@@ -27,7 +27,7 @@ readonly class FilmLookupResolver
         return $this->resolveFromSettings($settings);
     }
 
-    private function resolveFromSettings(FilmsSettings $settings): ?FilmMetadataLookupInterface
+    private function resolveFromSettings(Settings $settings): ?FilmMetadataLookupInterface
     {
         return match ($settings->getAdapter()) {
             ExternalSource::Tmdb => $this->createTmdb($settings),
@@ -36,7 +36,7 @@ readonly class FilmLookupResolver
         };
     }
 
-    private function createTmdb(FilmsSettings $settings): ?FilmMetadataLookupInterface
+    private function createTmdb(Settings $settings): ?FilmMetadataLookupInterface
     {
         $key = $this->settingsService->getTmdbKey($settings);
         if ($key === null) {
@@ -46,7 +46,7 @@ readonly class FilmLookupResolver
         return new TmdbLookup($this->httpClient, $this->logger, $key);
     }
 
-    private function createOmdb(FilmsSettings $settings): ?FilmMetadataLookupInterface
+    private function createOmdb(Settings $settings): ?FilmMetadataLookupInterface
     {
         $key = $this->settingsService->getOmdbKey($settings);
         if ($key === null) {

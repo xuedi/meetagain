@@ -4,11 +4,11 @@ namespace Plugin\Films\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Plugin\Films\Repository\FilmsSettingsRepository;
+use Plugin\Films\Repository\SettingsRepository;
 
-#[ORM\Entity(repositoryClass: FilmsSettingsRepository::class)]
+#[ORM\Entity(repositoryClass: SettingsRepository::class)]
 #[ORM\Table(name: 'plg_films_settings')]
-class FilmsSettings
+class Settings
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]
     private ?int $id = null;

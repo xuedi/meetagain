@@ -2,15 +2,15 @@
 
 namespace Plugin\Voting\Form;
 
-use Plugin\Voting\Config\ChoiceMode;
-use Plugin\Voting\Config\VotingConfig;
+use Plugin\Voting\Enum\ChoiceMode;
+use Plugin\Voting\ValueObject\Config;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class VotingConfigType extends AbstractType
+class ConfigType extends AbstractType
 {
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -36,7 +36,13 @@ class VotingConfigType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => VotingConfig::class,
+            'data_class' => Config::class,
         ]);
+    }
+
+    #[\Override]
+    public function getBlockPrefix(): string
+    {
+        return 'voting_config';
     }
 }

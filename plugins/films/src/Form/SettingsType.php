@@ -3,7 +3,7 @@
 namespace Plugin\Films\Form;
 
 use Plugin\Films\Entity\ExternalSource;
-use Plugin\Films\Entity\FilmsSettings;
+use Plugin\Films\Entity\Settings;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
@@ -12,7 +12,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FilmsSettingsType extends AbstractType
+class SettingsType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
@@ -59,11 +59,16 @@ class FilmsSettingsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => FilmsSettings::class,
+            'data_class' => Settings::class,
             'tmdb_key_set' => false,
             'omdb_key_set' => false,
         ]);
         $resolver->setAllowedTypes('tmdb_key_set', 'bool');
         $resolver->setAllowedTypes('omdb_key_set', 'bool');
+    }
+
+    public function getBlockPrefix(): string
+    {
+        return 'films_settings';
     }
 }

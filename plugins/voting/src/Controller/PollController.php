@@ -10,8 +10,8 @@ use Plugin\Voting\Activity\Messages\PollClosed;
 use Plugin\Voting\Activity\Messages\PollCreated;
 use Plugin\Voting\Activity\Messages\VoteCast;
 use Plugin\Voting\Entity\PollStatus;
+use Plugin\Voting\Service\ConfigService;
 use Plugin\Voting\Service\PollService;
-use Plugin\Voting\Service\VotingConfigService;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,7 +24,7 @@ final class PollController extends AbstractController
 {
     public function __construct(
         private readonly PollService $pollService,
-        private readonly VotingConfigService $config,
+        private readonly ConfigService $config,
         private readonly EventRepository $eventRepo,
         private readonly ItemTypeRegistry $registry,
         private readonly ActivityService $activityService,

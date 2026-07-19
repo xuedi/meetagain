@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Contributes the "put it to a vote" action to the core attach control for every item type,
  * linking to the poll-create page seeded for that event and type.
  */
-final readonly class VotingAttachSlotProvider implements ItemAttachSlotProviderInterface
+final readonly class AttachSlotProvider implements ItemAttachSlotProviderInterface
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,

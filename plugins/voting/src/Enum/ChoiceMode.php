@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Plugin\Voting\Config;
+namespace Plugin\Voting\Enum;
 
 /**
  * How many candidates a voter may back on one poll. Multiple is approval voting (tick any

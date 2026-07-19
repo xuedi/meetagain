@@ -1,22 +1,22 @@
 <?php declare(strict_types=1);
 
-namespace Plugin\Dishes\Publisher\PluginSettings;
+namespace Plugin\Voting\Publisher\PluginSettings;
 
 use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
-use Plugin\Dishes\Form\ConfigType;
-use Plugin\Dishes\ValueObject\Config;
+use Plugin\Voting\Form\ConfigType;
+use Plugin\Voting\ValueObject\Config;
 use Symfony\Component\Form\FormInterface;
 
 final class ConfigDescriptor implements PluginSettingsDescriptorInterface
 {
     public function getKey(): string
     {
-        return 'dishes';
+        return 'voting';
     }
 
     public function getTitleKey(): string
     {
-        return 'dishes_config.page_title';
+        return 'voting_config.page_title';
     }
 
     public function getFormType(): string

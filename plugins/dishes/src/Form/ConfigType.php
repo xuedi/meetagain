@@ -3,7 +3,7 @@
 namespace Plugin\Dishes\Form;
 
 use App\Service\Config\LanguageService;
-use Plugin\Dishes\Config;
+use Plugin\Dishes\ValueObject\Config;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -34,5 +34,11 @@ class ConfigType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Config::class,
         ]);
+    }
+
+    #[\Override]
+    public function getBlockPrefix(): string
+    {
+        return 'dishes_config';
     }
 }

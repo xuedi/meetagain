@@ -3,28 +3,28 @@
 namespace Plugin\Voting\Service;
 
 use App\Publisher\PluginSettings\PluginSettingsResolver;
-use Plugin\Voting\Config\VotingConfig;
+use Plugin\Voting\ValueObject\Config;
 
 /**
  * Single read path for the effective voting config in the current request. Delegates to the
  * resolver (per-scope override, else global, else neutral default) and memoizes.
  */
-class VotingConfigService
+class ConfigService
 {
-    private ?VotingConfig $memo = null;
+    private ?Config $memo = null;
 
     public function __construct(
         private readonly PluginSettingsResolver $resolver,
     ) {}
 
-    public function getConfig(): VotingConfig
+    public function getConfig(): Config
     {
         if ($this->memo !== null) {
             return $this->memo;
         }
 
         $config = $this->resolver->resolve('voting');
-        \assert($config instanceof VotingConfig);
+        \assert($config instanceof Config);
 
         return $this->memo = $config;
     }

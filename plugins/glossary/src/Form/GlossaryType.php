@@ -3,7 +3,7 @@
 namespace Plugin\Glossary\Form;
 
 use Plugin\Glossary\Entity\Glossary;
-use Plugin\Glossary\Service\GlossaryConfigService;
+use Plugin\Glossary\Service\ConfigService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class GlossaryType extends AbstractType
 {
     public function __construct(
-        private readonly GlossaryConfigService $configService,
+        private readonly ConfigService $configService,
     ) {}
 
     #[\Override]

@@ -3,7 +3,7 @@
 namespace Plugin\Dishes\Service;
 
 use App\Publisher\PluginSettings\PluginSettingsResolver;
-use Plugin\Dishes\Config;
+use Plugin\Dishes\ValueObject\Config;
 
 /**
  * Single read path for the effective dishes config in the current request. Delegates to the
