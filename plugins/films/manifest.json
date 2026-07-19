@@ -1,0 +1,5 @@
+{
+  "name": "Films",
+  "version": "1.0",
+  "description": "Film catalog with external metadata lookup (TMDB/OMDB), attachable to events via the core item system."
+}

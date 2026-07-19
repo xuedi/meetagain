@@ -21,6 +21,8 @@ use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\EventService;
+use App\Service\Item\ItemAssociationService;
+use App\Service\Item\ItemAttachControlBuilder;
 use App\Service\Seo\CanonicalUrlService;
 use App\Service\Seo\EventSchemaService;
 use DateTimeImmutable;
@@ -47,6 +49,8 @@ final class EventController extends AbstractController
         private readonly EventFilterService $eventFilterService,
         private readonly EventSchemaService $eventSchemaService,
         private readonly CanonicalUrlService $canonicalUrlService,
+        private readonly ItemAssociationService $itemAssociationService,
+        private readonly ItemAttachControlBuilder $itemAttachControlBuilder,
         #[AutowireIterator(FeaturedEventProviderInterface::class)]
         private readonly iterable $featuredEventProviders = [],
     ) {}
@@ -125,6 +129,8 @@ final class EventController extends AbstractController
             'events/details.html.twig',
             [
                 'commentForm' => $form,
+                'itemCells' => $this->eventService->getRenderedItemCells($id),
+                'attachControl' => $this->isGranted('ROLE_ORGANIZER') ? $this->itemAttachControlBuilder->build($id) : null,
                 'pluginTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::Sidebar) : [],
                 'pluginBottomSidebarTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::BottomSidebar) : [],
                 'comments' => $this->comments->findByEventWithUser($id),
@@ -244,5 +250,41 @@ final class EventController extends AbstractController
         }
 
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
+    }
+
+    #[IsGranted('ROLE_ORGANIZER')]
+    #[Route('/event/{id}/item/attach', name: 'app_item_attach', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function attachItem(Request $request, int $id): Response
+    {
+        if (!$this->isCsrfTokenValid('app_item_attach' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+        $itemType = (string) $request->request->get('item_type');
+        $itemId = $request->request->getInt('item_id');
+        if ($itemType === '' || $itemId <= 0) {
+            throw new BadRequestHttpException('Missing item type or id.');
+        }
+
+        $this->itemAssociationService->attach($id, $itemType, $itemId, (int) $this->getAuthedUser()->getId());
+
+        return $this->redirectToRoute('app_event_details', ['id' => $id]);
+    }
+
+    #[IsGranted('ROLE_ORGANIZER')]
+    #[Route('/event/{id}/item/detach', name: 'app_item_detach', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function detachItem(Request $request, int $id): Response
+    {
+        if (!$this->isCsrfTokenValid('app_item_detach' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+        $itemType = (string) $request->request->get('item_type');
+        $itemId = $request->request->getInt('item_id');
+        if ($itemType === '' || $itemId <= 0) {
+            throw new BadRequestHttpException('Missing item type or id.');
+        }
+
+        $this->itemAssociationService->detach($id, $itemType, $itemId);
+
+        return $this->redirectToRoute('app_event_details', ['id' => $id]);
     }
 }

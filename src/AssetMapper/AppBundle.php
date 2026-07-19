@@ -27,6 +27,7 @@ final class AppBundle
         'js/modal.js',
         'js/block-user.js',
         'js/post-link.js',
+        'js/item-translation-toggle.js',
     ];
 
     private ?string $hash = null;

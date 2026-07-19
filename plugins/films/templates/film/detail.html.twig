@@ -1,0 +1,73 @@
+{% extends '@Films/base_films.html.twig' %}
+
+{% block title %}{{ film.title }}{% endblock %}
+
+{% block films_body %}
+<div class="columns">
+    <div class="column is-4-tablet is-12-mobile">
+        {% if film.posterImage %}
+        <figure class="image is-2by3" style="border: 1px solid #e0e0e0">
+            <img src="/images/thumbnails/{{ film.posterImage.hash }}_400x600.webp{% if film.posterImage.updatedAt %}?v{{ film.posterImage.updatedAt|date('YmdHis') }}{% endif %}" alt="{{ film.title }}">
+        </figure>
+        {% else %}
+        <figure class="image is-2by3">
+            <div class="box has-text-centered has-text-grey" style="height: 100%; display:flex; align-items:center; justify-content:center">
+                <span>{{ 'films_film.no_poster'|trans }}</span>
+            </div>
+        </figure>
+        {% endif %}
+    </div>
+    <div class="column">
+        <h1 class="title">{{ film.title }}</h1>
+        {% if film.originalTitle and film.originalTitle != film.title %}
+        <p class="subtitle has-text-grey">{{ film.originalTitle }}</p>
+        {% endif %}
+
+        <table class="table is-narrow">
+            {% if film.year %}
+            <tr>
+                <th>{{ 'films_film.col_year'|trans }}</th>
+                <td>{{ film.year }}</td>
+            </tr>
+            {% endif %}
+            {% if film.runtime %}
+            <tr>
+                <th>{{ 'films_film.col_runtime'|trans }}</th>
+                <td>{{ film.runtime }} min</td>
+            </tr>
+            {% endif %}
+            {% if film.genres is not empty %}
+            <tr>
+                <th>{{ 'films_film.col_genres'|trans }}</th>
+                <td>
+                    {% for genre in film.genres %}
+                    <span class="tag">{{ genre }}</span>
+                    {% endfor %}
+                </td>
+            </tr>
+            {% endif %}
+        </table>
+
+        {% if film.description %}
+        <p class="mt-3">{{ film.description }}</p>
+        {% endif %}
+
+        {% if is_granted('ROLE_STEWARD') %}
+        <div class="mt-4 buttons">
+            <a href="{{ path('app_plugin_films_film_edit', {id: film.id}) }}" class="button is-small">
+                <span class="icon"><i class="fa fa-edit"></i></span>
+                <span>{{ 'films_film.button_edit'|trans }}</span>
+            </a>
+            <a href="{{ path('app_plugin_films_film_delete', {id: film.id}) }}"
+               class="button is-small is-danger is-light"
+               data-post
+               data-csrf-token="{{ csrf_token('app_plugin_films_film_delete' ~ film.id) }}"
+               data-confirm="{{ 'films_film.confirm_delete'|trans }}">
+                <span class="icon"><i class="fa fa-trash"></i></span>
+                <span>{{ 'films_film.button_delete'|trans }}</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

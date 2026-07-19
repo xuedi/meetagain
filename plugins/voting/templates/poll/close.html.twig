@@ -1,0 +1,36 @@
+{% extends '@Voting/base_voting.html.twig' %}
+
+{% block title %}{{ 'voting_poll.page_title_close'|trans }}{% endblock %}
+
+{% block voting_body %}
+<h1 class="title">{{ 'voting_poll.page_title_close'|trans }}</h1>
+
+{% if poll.status.value == 2 and poll.tiedItemIds is not empty and poll.winningItemId is null %}
+<div class="notification is-warning mb-4">{{ 'voting_poll.tie_notice'|trans }}</div>
+{% else %}
+<p class="mb-4 has-text-grey">{{ 'voting_poll.close_intro'|trans }}</p>
+{% endif %}
+
+<form method="POST" action="{{ path('app_voting_poll_close', {id: poll.id}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('voting_poll_close' ~ poll.id) }}">
+
+    <div class="mb-4">
+        {% for itemId in tiedItemIds %}
+        <div class="box mb-2">
+            <label class="radio" style="display: flex; align-items: center; gap: 1rem; cursor: pointer">
+                <input type="radio" name="chosen_item_id" value="{{ itemId }}" required>
+                <div>
+                    {{ item_list_cell(poll.itemType, itemId) }}
+                    {% if voteCounts[itemId] is defined %}
+                    <p class="is-size-7 has-text-grey">{{ voteCounts[itemId] }} {{ 'voting_poll.col_votes'|trans }}</p>
+                    {% endif %}
+                </div>
+            </label>
+        </div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="button is-primary">{{ 'voting_poll.button_commit_outcome'|trans }}</button>
+    <a href="{{ path('app_voting_poll_show', {id: poll.id}) }}" class="button ml-2">{{ 'global.button_cancel'|trans }}</a>
+</form>
+{% endblock %}

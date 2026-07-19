@@ -1,0 +1,25 @@
+{# Book cell rendered for one EventItemAssociation on the event detail page. #}
+<div class="media">
+    <div class="media-left">
+        <a href="{{ path('app_plugin_books_book_show', {id: book.id}) }}">
+            {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x250', 'alt': book.title} %}
+        </a>
+    </div>
+    <div class="media-content">
+        <p class="title is-6 mb-1">
+            <a href="{{ path('app_plugin_books_book_show', {id: book.id}) }}">{{ book.title }}</a>
+        </p>
+        {% if book.author %}<p class="subtitle is-7 has-text-grey">{{ book.author }}</p>{% endif %}
+        {% if is_granted('ROLE_ORGANIZER') %}
+            <form method="post" action="{{ path('app_item_detach', {id: association.event.id}) }}" class="mt-2">
+                <input type="hidden" name="_token" value="{{ csrf_token('app_item_detach' ~ association.event.id) }}">
+                <input type="hidden" name="item_type" value="book">
+                <input type="hidden" name="item_id" value="{{ book.id }}">
+                <button type="submit" class="button is-small is-danger is-light">
+                    <span class="icon"><i class="fa fa-times"></i></span>
+                    <span>{{ 'books.detach'|trans }}</span>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</div>

@@ -20,17 +20,12 @@ enum EntityAction: string
     case CreateUser = 'create_user';
     case DeleteUser = 'delete_user';
     case CreateImage = 'create_image';
-    case CreateBookSuggestion = 'create_book_suggestion';
-    case DeleteBookSuggestion = 'delete_book_suggestion';
-    case CreateBook = 'create_book';
-    case DeleteBook = 'delete_book';
     case CreateHost = 'create_host';
     case DeleteHost = 'delete_host';
-    case CreateFilm = 'create_film';
-    case UpdateFilm = 'update_film';
-    case DeleteFilm = 'delete_film';
     case CreateWallPost = 'create_wall_post';
     case DeleteWallPost = 'delete_wall_post';
     case CreateGlossary = 'create_glossary';
     case DeleteGlossary = 'delete_glossary';
+    case CreateEventItemAssociation = 'create_event_item_association';
+    case DeleteEventItemAssociation = 'delete_event_item_association';
 }

@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Plugin\Glossary\Repository\GlossaryRepository;
 
 #[ORM\Entity(repositoryClass: GlossaryRepository::class)]
+#[ORM\Table(name: 'plg_glossary_glossary')]
 class Glossary
 {
     #[ORM\Id, ORM\GeneratedValue, ORM\Column]

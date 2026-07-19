@@ -1,0 +1,62 @@
+{% extends '@Films/base_films.html.twig' %}
+
+{% block title %}{{ 'films_film.page_title_lookup'|trans }}{% endblock %}
+
+{% block films_body %}
+<h1 class="title">{{ 'films_film.page_title_lookup'|trans }}</h1>
+
+<div class="box">
+    {{ form_start(form, {'method': 'GET', 'action': path('app_plugin_films_film_lookup')}) }}
+    <div class="field is-grouped">
+        <div class="control is-expanded">
+            {{ form_widget(form.query, {'attr': {'class': 'input'}}) }}
+        </div>
+        <div class="control" style="min-width: 8rem">
+            {{ form_widget(form.year, {'attr': {'class': 'input'}}) }}
+        </div>
+        <div class="control">
+            <button type="submit" class="button">{{ 'films_film.button_search'|trans }}</button>
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>
+
+{% if results is not empty %}
+<h2 class="subtitle">{{ 'films_film.heading_results'|trans }}</h2>
+<div class="columns is-multiline">
+    {% for film in results %}
+    <div class="column is-6">
+        <div class="box">
+            <div class="is-flex is-align-items-flex-start" style="gap: 1rem">
+                {% if film.posterUrl %}
+                <img src="{{ film.posterUrl }}" alt="{{ film.title }}" style="width: 80px; flex-shrink: 0">
+                {% endif %}
+                <div class="is-flex-grow-1">
+                    <p class="has-text-weight-semibold">{{ film.title }}</p>
+                    {% if film.originalTitle and film.originalTitle != film.title %}
+                    <p class="has-text-grey is-size-7">{{ film.originalTitle }}</p>
+                    {% endif %}
+                    {% if film.year %}<p class="is-size-7">{{ film.year }}</p>{% endif %}
+                    {% if film.runtime %}<p class="is-size-7">{{ film.runtime }} min</p>{% endif %}
+
+                    <form method="POST" action="{{ path('app_plugin_films_film_import') }}" class="mt-2">
+                        <input type="hidden" name="externalId" value="{{ film.externalId }}">
+                        <input type="hidden" name="source" value="{{ film.source.value }}">
+                        <button type="submit" class="button is-small">
+                            {{ 'films_film.button_import'|trans }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% elseif form.vars.submitted %}
+<p class="has-text-grey">{{ 'films_film.no_results'|trans }}</p>
+{% endif %}
+
+<p class="mt-4">
+    <a href="{{ path('app_plugin_films_film_manual') }}">{{ 'films_film.link_manual_entry'|trans }}</a>
+</p>
+{% endblock %}

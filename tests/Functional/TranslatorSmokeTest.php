@@ -66,28 +66,16 @@ class TranslatorSmokeTest extends WebTestCase
         'security',
         'shared',
         'support',
-        // Bookclub plugin namespaces
-        'bookclub',
-        'bookclub_book',
-        'bookclub_note',
-        'bookclub_poll',
-        'bookclub_poll_views',
-        'bookclub_suggestion',
-        'bookclub_manage',
-        'bookclub_tile',
-        'bookclub_views',
-        // Dinnerclub plugin namespaces
-        'dinnerclub',
-        'dinnerclub_dinner',
-        'dinnerclub_suggestion',
-        'dinnerclub_approval',
-        'dinnerclub_lists',
-        'dinnerclub_views',
-        'dinnerclub_tile',
-        // Filmclub plugin namespaces
-        'filmclub_film',
-        'filmclub_vote',
-        'filmclub_tile',
+        // Books plugin namespaces
+        'books',
+        'books_book',
+        // Dishes plugin namespaces
+        'dishes',
+        'dishes_dish',
+        // Films plugin namespaces
+        'films_film',
+        'films_vote',
+        'films_tile',
         // Glossary plugin namespaces
         'glossary',
         'glossary_blocks',

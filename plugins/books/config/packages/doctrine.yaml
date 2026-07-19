@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Books:
+                        dir: "%kernel.project_dir%/plugins/books/src/Entity"
+                        is_bundle: false
+                        prefix: Plugin\Books\Entity
+                        alias: Books
+
+doctrine_migrations:
+    migrations_paths:
+        PluginBooksMigrations: "%kernel.project_dir%/plugins/books/migrations"

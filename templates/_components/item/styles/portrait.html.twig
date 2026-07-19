@@ -1,0 +1,28 @@
+{#
+    Item tile style: portrait - a card with a natural-aspect (portrait) image, a title, and an
+    optional centered subtitle. For posters and covers (e.g. films, books). Width comes from the
+    wrapping column; the image keeps its own aspect ratio.
+
+    Used in:    plugin item cell templates (e.g. plugins/films/templates/item/list_cell.html.twig)
+    Parameters:
+        - href      (string, required)     -- link target for the whole tile
+        - title     (string, required)     -- primary label (single line, ellipsised)
+        - image     (Image|null, optional) -- thumbnail; null shows the placeholder
+        - imageSize (string, optional)     -- thumbnail dimensions 'WxH'; default '200x300'
+        - alt       (string, optional)     -- image alt; default: title
+        - subtitle  (string, optional)     -- centered secondary text (e.g. year, author)
+    Depends on: _components/image.html.twig
+#}
+<a href="{{ href }}" class="is-block">
+    <div class="card">
+        <div class="card-image">
+            <figure class="image">
+                {% include '_components/image.html.twig' with {'image': image|default(null), 'size': imageSize|default('200x300'), 'alt': alt|default(title)} %}
+            </figure>
+        </div>
+        <div class="card-content p-2 has-text-centered">
+            <p class="is-size-7 has-text-dark" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ title }}</p>
+            {% if subtitle is defined and subtitle %}<p class="is-size-7 has-text-grey">{{ subtitle }}</p>{% endif %}
+        </div>
+    </div>
+</a>

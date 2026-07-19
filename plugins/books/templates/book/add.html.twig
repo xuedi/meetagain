@@ -1,0 +1,21 @@
+{% extends '@Books/base_books.html.twig' %}
+
+{% block title %}{{ 'books_book.page_title_add'|trans }}{% endblock %}
+
+{% block books_body %}
+<h1 class="title">{{ 'books_book.page_title_add'|trans }}</h1>
+<p class="mb-4 has-text-grey">{{ 'books_book.add_intro'|trans }}</p>
+
+{{ form_start(form) }}
+{{ form_errors(form) }}
+<div class="field">
+    {{ form_label(form.isbn) }}
+    <div class="control">{{ form_widget(form.isbn, {'attr': {'class': 'input'}}) }}</div>
+    {{ form_errors(form.isbn) }}
+</div>
+<div class="field mt-4">
+    <button type="submit" class="button is-primary">{{ 'books_book.button_lookup'|trans }}</button>
+    <a href="{{ path('app_plugin_books_book_manual') }}" class="button ml-2">{{ 'books_book.link_manual_entry'|trans }}</a>
+</div>
+{{ form_end(form) }}
+{% endblock %}

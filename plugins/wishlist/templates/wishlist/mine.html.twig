@@ -1,0 +1,53 @@
+{% extends '@Wishlist/base_wishlist.html.twig' %}
+
+{% block title %}{{ 'wishlist_entry.page_title_mine'|trans }}{% endblock %}
+
+{% block wishlist_body %}
+<div class="level mb-4">
+    <div class="level-left"><h1 class="title mb-0">{{ 'wishlist_entry.page_title_mine'|trans }}</h1></div>
+    <div class="level-right">
+        <a href="{{ path('app_wishlist_group') }}" class="button is-small">{{ 'wishlist_entry.button_group'|trans }}</a>
+    </div>
+</div>
+
+{% if entries is empty %}
+<p class="has-text-grey">{{ 'wishlist_entry.empty_mine'|trans }}</p>
+{% else %}
+<table class="table is-fullwidth is-striped">
+    <thead>
+        <tr>
+            <th>{{ 'wishlist_entry.col_item'|trans }}</th>
+            <th>{{ 'wishlist_entry.col_priority'|trans }}</th>
+            <th>{{ 'wishlist_entry.col_since'|trans }}</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in entries %}
+        <tr>
+            <td>{{ item_list_cell(entry.itemType, entry.itemId) }}</td>
+            <td>
+                {% if entry.priorityCounter > 0 %}
+                <span class="has-text-grey-dark">{{ 'wishlist_entry.priority_label'|trans({'%count%': entry.priorityCounter}) }}</span>
+                {% else %}
+                <span class="has-text-grey">-</span>
+                {% endif %}
+            </td>
+            <td>
+                {{ entry.createdAt|date('Y-m-d') }}
+                {% if waitingSince[entry.id] is defined %}
+                <br><span class="is-size-7 has-text-grey">{{ 'wishlist_entry.waiting_since'|trans({'%count%': waitingSince[entry.id]}) }}</span>
+                {% endif %}
+            </td>
+            <td>
+                <form method="POST" action="{{ path('app_wishlist_remove', {itemType: entry.itemType, itemId: entry.itemId}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('wishlist_remove' ~ entry.itemType ~ entry.itemId) }}">
+                    <button type="submit" class="button is-small">{{ 'wishlist_entry.button_remove'|trans }}</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

@@ -10,8 +10,8 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 interface ReviewNotificationProviderInterface
 {
     /**
-     * Stable snake_case string unique to this provider (e.g. 'bookclub.book_approval').
-     * Embedded in form action URLs — must never change after deployment.
+     * Stable snake_case string unique to this provider, embedded in form action URLs -
+     * must never change after deployment.
      */
     public function getIdentifier(): string;
 

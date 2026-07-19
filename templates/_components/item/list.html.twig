@@ -1,0 +1,99 @@
+{#
+    Item List - Shared switchable list of item cells with per-type view persistence
+
+    Renders any item type's list through one of four layouts behind a Bulma view switcher:
+    'list' is a real <table> (each cell emits its own <td> columns), while tiles/grid/gallery
+    wrap each cell in a Bulma column. The current mode is read from and written to the session
+    keyed by item type, so each list remembers its own mode independently. Each item's inner
+    cell markup comes from the item-type provider's renderListCell(); this component owns only
+    the switcher, the table/column wrappers, the persistence, and an optional leading "add" tile.
+
+    Used in:    item-list pages of the films / books / dishes plugins
+    Parameters:
+        - itemType     (string, required)     -- registry key of the item type (e.g. 'film')
+        - itemIds      (list<int>, required)  -- ids of the items to render, in display order
+        - emptyMessage (string, optional)     -- translation key shown when itemIds is empty;
+                                                 default: 'item.list_empty'
+        - listHeader   (list<string>, optional) -- translation keys for the <thead> columns of the
+                                                 'list' table; must match the <td>s the cell emits.
+                                                 Omit for a table with no header row.
+        - addUrl       (string, optional)     -- when set and the viewer is a steward, a leading
+                                                 "add" tile linking here is shown in the
+                                                 tiles/grid/gallery layouts (list mode relies on the
+                                                 page's own header button). Shown even when empty.
+        - addLabel     (string, optional)     -- translation key for the add tile; default: 'item.add'
+    Depends on: item_view_mode(), item_view_types(), item_list_cell() (ItemViewExtension);
+                the app_item_set_view route
+#}
+{% import _self as itemList %}
+
+{% macro add_tile(addUrl, addLabel) %}
+    <a href="{{ addUrl }}"
+       class="is-flex is-flex-direction-column is-align-items-center is-justify-content-center has-background-link-light has-text-link item-add-tile"
+       title="{{ addLabel|trans }}" style="height: 100%; min-height: 8rem; border-radius: 6px;">
+        <span class="icon is-large"><i class="fa-solid fa-plus fa-2x"></i></span>
+        <span class="mt-2">{{ addLabel|trans }}</span>
+    </a>
+{% endmacro %}
+
+{% macro add_tile_icon(addUrl, addLabel, ratio) %}
+    {% set ratioClass = {'square': 'is-1by1', 'portrait': 'is-2by3'}[ratio|default('square')] %}
+    <a href="{{ addUrl }}" title="{{ addLabel|trans }}" class="is-block">
+        <figure class="image {{ ratioClass }}">
+            <span class="item-add-thumb has-background-link-light has-text-link">
+                <span class="icon"><i class="fa-solid fa-plus fa-lg"></i></span>
+            </span>
+        </figure>
+    </a>
+{% endmacro %}
+
+{% set current = item_view_mode(itemType) %}
+{% set showAdd = addUrl is defined and addUrl and is_granted('ROLE_STEWARD') %}
+{% set addLabel = addLabel|default('item.add') %}
+{% set gridRatio = gridRatio|default('square') %}
+<div class="item-list" data-item-list="{{ itemType }}">
+    <div class="level mb-4">
+        <div class="level-left"></div>
+        <div class="level-right">
+            {% include '_components/item/view_switcher.html.twig' with {'itemType': itemType} %}
+        </div>
+    </div>
+
+    {% if itemIds is empty and not (showAdd and current.value != 'list') %}
+        <p class="has-text-grey">{{ (emptyMessage|default('item.list_empty'))|trans }}</p>
+    {% elseif current.value == 'list' %}
+        <table class="table is-fullwidth is-hoverable">
+            {% if listHeader is defined and listHeader %}
+                <thead>
+                    <tr>{% for col in listHeader %}<th>{{ col|trans }}</th>{% endfor %}</tr>
+                </thead>
+            {% endif %}
+            <tbody>
+                {% for id in itemIds %}
+                    <tr>{{ item_list_cell(itemType, id) }}</tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% elseif current.value == 'tiles' %}
+        <div class="columns is-multiline">
+            {% if showAdd %}<div class="column is-one-quarter item-cell">{{ itemList.add_tile(addUrl, addLabel) }}</div>{% endif %}
+            {% for id in itemIds %}
+                <div class="column is-one-quarter item-cell">{{ item_list_cell(itemType, id) }}</div>
+            {% endfor %}
+        </div>
+    {% elseif current.value == 'grid' %}
+        <div class="columns is-multiline">
+            {% if showAdd %}<div class="column is-1 p-1 item-cell">{{ itemList.add_tile_icon(addUrl, addLabel, gridRatio) }}</div>{% endif %}
+            {% for id in itemIds %}
+                <div class="column is-1 p-1 item-cell">{{ item_list_cell(itemType, id) }}</div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="columns is-multiline is-mobile">
+            {% if showAdd %}<div class="column is-2 item-cell">{{ itemList.add_tile(addUrl, addLabel) }}</div>{% endif %}
+            {% for id in itemIds %}
+                <div class="column is-2 item-cell">{{ item_list_cell(itemType, id) }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>

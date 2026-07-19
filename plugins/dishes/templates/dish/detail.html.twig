@@ -1,0 +1,132 @@
+{% extends '@Dishes/base_dishes.html.twig' %}
+
+{% set dishName = dish.getTranslatedName(app.locale) %}
+
+{% block title %}{{ dishName }}{% endblock %}
+
+{% block javascripts %}
+    {% if dish.previewImage or dish.visibleGalleryImages|length > 0 %}
+        <script src="{{ asset('js/vendor/fancybox.umd.js') }}"></script>
+    {% endif %}
+{% endblock %}
+
+{% block dishes_body %}
+<div class="columns">
+    <div class="column is-8">
+        <div class="box">
+            <div class="level">
+                <div class="level-left">
+                    <h1 class="title is-3 mb-0">{{ dishName }}</h1>
+                </div>
+                <div class="level-right">
+                    {% if is_granted('ROLE_USER') %}
+                        <form method="post" action="{{ path('app_plugin_dishes_dish_like', {id: dish.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('dishes_like' ~ dish.id) }}">
+                            <button type="submit" class="button is-white">
+                                <span class="icon {% if liked %}has-text-danger{% else %}has-text-grey-light{% endif %}">
+                                    <i class="fa-solid fa-heart"></i>
+                                </span>
+                                <span>{{ dish.likes }}</span>
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if dish.phonetic %}
+                <p class="subtitle is-5 has-text-grey">
+                    <span class="icon"><i class="fa-solid fa-volume-high"></i></span>
+                    {{ dish.phonetic }}
+                </p>
+            {% endif %}
+
+            {% if dish.previewImage %}
+                {% set reportCaption = 'You can <a href=' ~ path('app_report_image', {'id': dish.previewImage.id}) ~ '>report</a> an image if there is something wrong.' %}
+                <figure class="image mb-2">
+                    <a data-fancybox="dish-gallery" data-caption="{{ reportCaption }}" href="/images/thumbnails/{{ dish.previewImage.hash }}_1024x768.webp">
+                        {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '600x400'} %}
+                    </a>
+                </figure>
+            {% endif %}
+
+            {% if dish.visibleGalleryImages|length > 0 %}
+                <div class="columns is-multiline is-mobile mt-1">
+                    {% for dishImage in dish.visibleGalleryImages %}
+                        {% set img = dishImage.image %}
+                        {% if not dish.previewImage or img.id != dish.previewImage.id %}
+                            {% set thumbCaption = 'You can <a href=' ~ path('app_report_image', {'id': img.id}) ~ '>report</a> an image if there is something wrong.' %}
+                            <div class="column is-2">
+                                <a data-fancybox="dish-gallery" data-caption="{{ thumbCaption }}" href="/images/thumbnails/{{ img.hash }}_1024x768.webp">
+                                    {% include '_components/image.html.twig' with {'image': img, 'size': '400x400'} %}
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% if dish.getTranslatedDescription(app.locale) %}
+                <div class="content">
+                    <h4>{{ 'dishes_dish.heading_description'|trans }}</h4>
+                    <p>{{ dish.getTranslatedDescription(app.locale)|nl2br }}</p>
+                </div>
+            {% endif %}
+
+            {% if dish.getTranslatedRecipe(app.locale) %}
+                <div class="content">
+                    <h4>{{ 'dishes_dish.heading_recipe'|trans }}</h4>
+                    <p>{{ dish.getTranslatedRecipe(app.locale)|nl2br }}</p>
+                </div>
+            {% endif %}
+
+            {% if dish.origin %}
+                <p>
+                    <span class="icon"><i class="fa-solid fa-location-dot"></i></span>
+                    <strong>{{ 'dishes_dish.label_origin'|trans }}</strong> {{ dish.origin }}
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="column is-4">
+        <div class="box">
+            <div class="level">
+                <div class="level-left">
+                    <h3 class="title is-5 mb-0">{{ 'dishes_dish.heading_info'|trans }}</h3>
+                </div>
+                {% if is_granted('ROLE_STEWARD') %}
+                    <div class="level-right">
+                        <a href="{{ path('app_plugin_dishes_dish_edit', {'id': dish.id}) }}" class="button is-link is-small">
+                            <span class="icon"><i class="fa-solid fa-pen-to-square"></i></span>
+                            <span>{{ 'dishes_dish.button_edit'|trans }}</span>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            <p><strong>{{ 'dishes_dish.label_added_by'|trans }}</strong> {{ get_user_name(dish.createdBy) }}</p>
+            <p><strong>{{ 'dishes_dish.label_added'|trans }}</strong> {{ dish.createdAt|time_diff }}</p>
+            {% if dish.pronunciationSystem %}
+                <p><strong>{{ 'dishes_dish.label_pronunciation'|trans }}</strong> {{ dish.pronunciationSystem.language }} ({{ dish.pronunciationSystem.name }})</p>
+            {% endif %}
+            <p><strong>{{ 'dishes_dish.label_likes'|trans }}</strong> {{ dish.likes }}</p>
+        </div>
+
+        {% if is_granted('ROLE_STEWARD') %}
+            <a href="{{ path('app_plugin_dishes_dish_delete', {'id': dish.id}) }}"
+               class="button is-danger is-light is-fullwidth"
+               data-post
+               data-csrf-token="{{ csrf_token('app_plugin_dishes_dish_delete' ~ dish.id) }}"
+               data-confirm="{{ 'dishes_dish.confirm_delete'|trans }}">
+                <span class="icon"><i class="fa fa-trash"></i></span>
+                <span>{{ 'dishes_dish.button_delete'|trans }}</span>
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if dish.previewImage or dish.visibleGalleryImages|length > 0 %}
+    <script>
+        Fancybox.bind("[data-fancybox='dish-gallery']", {compact: true});
+    </script>
+{% endif %}
+{% endblock %}

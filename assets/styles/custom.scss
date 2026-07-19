@@ -486,3 +486,45 @@ body.admin-shell-no-scroll {
 .event-description {
     overflow-wrap: anywhere;
 }
+
+// -- Item grid thumbnails --
+
+.item-thumb {
+    display: block;
+
+    .image img {
+        object-fit: cover;
+    }
+
+    &__caption {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 0.15rem 0.3rem;
+        background: rgba(0, 0, 0, 0.65);
+        color: #fff;
+        font-size: 0.7rem;
+        line-height: 1.2;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        opacity: 0;
+        transition: opacity 0.12s ease-in-out;
+        pointer-events: none;
+    }
+
+    &:hover &__caption {
+        opacity: 1;
+    }
+}
+
+.item-add-thumb {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+}

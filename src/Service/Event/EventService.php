@@ -4,14 +4,17 @@ namespace App\Service\Event;
 
 use App\Emails\Types\NotificationEventCanceledEmail;
 use App\Entity\Event;
+use App\Entity\EventItemAssociation;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTileLocation;
 use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
+use App\Item\ItemTypeRegistry;
 use App\Plugin;
 use App\Repository\EventRepository;
 use App\Service\Config\PluginService;
+use App\Service\Item\ItemAssociationService;
 use App\ValueObject\RealignmentPlan;
 use App\ValueObject\RealignmentResult;
 use App\ValueObject\ScheduleChange;
@@ -29,6 +32,8 @@ readonly class EventService
         private NotificationEventCanceledEmail $notificationEventCanceledEmail,
         private PluginService $pluginService,
         private RecurringEventService $recurringEventService,
+        private ItemAssociationService $itemAssociationService,
+        private ItemTypeRegistry $itemTypeRegistry,
         #[AutowireIterator(Plugin::class)]
         private iterable $plugins,
     ) {}
@@ -100,6 +105,38 @@ readonly class EventService
         }
 
         return $structuredList;
+    }
+
+    /**
+     * @return EventItemAssociation[]
+     */
+    public function getItemAssociations(int $eventId): array
+    {
+        return $this->itemAssociationService->listForEvent($eventId);
+    }
+
+    /**
+     * Resolves each of the event's associations to its item-type provider and renders its cell.
+     * Associations of inactive item types (no provider) or missing items (null cell) are skipped.
+     *
+     * @return list<string>
+     */
+    public function getRenderedItemCells(int $eventId): array
+    {
+        $cells = [];
+        foreach ($this->itemAssociationService->listForEvent($eventId) as $association) {
+            $provider = $this->itemTypeRegistry->providerFor((string) $association->getItemType());
+            if ($provider === null) {
+                continue;
+            }
+
+            $cell = $provider->renderEventCell((int) $association->getItemId(), $association);
+            if ($cell !== null) {
+                $cells[] = $cell;
+            }
+        }
+
+        return $cells;
     }
 
     public function getPluginEventTiles(int $id, EventTileLocation $location): array

@@ -1,0 +1,49 @@
+{% extends '@Dishes/base_dishes.html.twig' %}
+
+{% block title %}{{ 'dishes_dish.page_title_edit'|trans({'%name%': dish.getTranslatedName(app.locale)}) }}{% endblock %}
+
+{% block dishes_body %}
+<h1 class="title">{{ 'dishes_dish.page_title_edit'|trans({'%name%': dish.getTranslatedName(app.locale)}) }}</h1>
+
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+<div class="columns">
+    <div class="column is-3-tablet is-12-mobile">
+        <fieldset class="p-4 mb-4" style="border: 1px solid #dbdbdb; border-radius: 4px;">
+            <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'dishes_dish.label_preview'|trans }}</legend>
+            {% if dish.previewImage %}
+                {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '400x400'} %}
+            {% else %}
+                <p class="has-text-grey-light is-size-7 mb-2">{{ 'dishes_dish.no_preview'|trans }}</p>
+            {% endif %}
+            <div class="mt-3">{{ form_row(form.previewFile, {'label': false}) }}</div>
+            <p class="has-text-grey is-size-7 mt-2">{{ 'dishes_dish.help_preview'|trans }}</p>
+        </fieldset>
+    </div>
+    <div class="column is-8">
+        <p class="has-text-grey is-size-7 mb-2">{{ 'dishes_dish.hint_translations'|trans }}</p>
+        {% include '_components/item/translation_fields.html.twig' with {'form': form, 'fields': ['name', 'description', 'recipe']} %}
+
+        <div class="field">
+            {{ form_label(form.phonetic, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.phonetic) }}</div>
+            {{ form_errors(form.phonetic) }}
+        </div>
+
+        <div class="field">
+            {{ form_label(form.origin, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.origin) }}</div>
+            {{ form_errors(form.origin) }}
+        </div>
+
+        <div class="field is-grouped mt-4">
+            <div class="control">{{ form_widget(form.submit) }}</div>
+            <div class="control">
+                <a href="{{ path('app_plugin_dishes_dish_show', {id: dish.id}) }}" class="button">{{ 'dishes_dish.button_cancel'|trans }}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}

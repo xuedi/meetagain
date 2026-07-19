@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Films:
+                        dir: "%kernel.project_dir%/plugins/films/src/Entity"
+                        is_bundle: false
+                        prefix: Plugin\Films\Entity
+                        alias: Films
+
+doctrine_migrations:
+    migrations_paths:
+        PluginFilmsMigrations: "%kernel.project_dir%/plugins/films/migrations"

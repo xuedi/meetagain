@@ -20,7 +20,7 @@ final class Version20260712141000 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql(<<<'SQL'
-            ALTER TABLE glossary
+            ALTER TABLE plg_glossary_glossary
                 CHANGE pinyin pinyin VARCHAR(255) DEFAULT NULL,
                 CHANGE category category INT DEFAULT NULL
         SQL);
@@ -29,7 +29,7 @@ final class Version20260712141000 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->addSql(<<<'SQL'
-            ALTER TABLE glossary
+            ALTER TABLE plg_glossary_glossary
                 CHANGE pinyin pinyin VARCHAR(255) NOT NULL,
                 CHANGE category category INT NOT NULL
         SQL);
