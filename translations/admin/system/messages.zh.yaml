@@ -95,6 +95,7 @@ admin_system_images:
     placeholder_alt: '用于屏幕阅读器和 SEO 的简短描述'
     button_save_alt: '保存'
     flash_alt_saved: '替代文本已更新。'
+    flag_alt: '替代文本（%code%）'
     button_regenerate_thumbnails: '重新生成缩略图'
     button_cleanup_thumbnails: '清理缩略图'
     button_sync_locations: '同步图片位置'

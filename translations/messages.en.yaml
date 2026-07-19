@@ -25,7 +25,7 @@ chrome:
     notification_unread_messages: '%count% unread message(s)'
     notification_stale_emails: '%count% stale email(s)'
     notification_new_support_requests: '%count% new support request(s)'
-    notification_image_missing_alt: 'Image #%id% missing alt text (%count% usages)'
+    notification_image_missing_alt: 'Image #%id% missing alt text (%missing% languages)'
     footer_powered_by: 'powered by'
     aria_select_language: 'Select language'
 security:
