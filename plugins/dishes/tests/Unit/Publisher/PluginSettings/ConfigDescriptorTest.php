@@ -3,7 +3,7 @@
 namespace Plugin\Dishes\Tests\Unit\Publisher\PluginSettings;
 
 use PHPUnit\Framework\TestCase;
-use Plugin\Dishes\Config;
+use Plugin\Dishes\ValueObject\Config;
 use Plugin\Dishes\Form\ConfigType;
 use Plugin\Dishes\Publisher\PluginSettings\ConfigDescriptor;
 

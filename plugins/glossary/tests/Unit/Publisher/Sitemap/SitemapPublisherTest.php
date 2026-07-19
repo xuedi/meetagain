@@ -5,10 +5,10 @@ namespace Plugin\Glossary\Tests\Unit\Publisher\Sitemap;
 use App\Service\Config\LanguageService;
 use App\Service\Config\PluginService;
 use PHPUnit\Framework\TestCase;
-use Plugin\Glossary\Publisher\Sitemap\GlossarySitemapPublisher;
+use Plugin\Glossary\Publisher\Sitemap\SitemapPublisher;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class GlossarySitemapPublisherTest extends TestCase
+class SitemapPublisherTest extends TestCase
 {
     public function testEmitsGlossaryIndexForEachLocale(): void
     {
@@ -55,7 +55,7 @@ class GlossarySitemapPublisherTest extends TestCase
     /**
      * @param array<string> $locales
      */
-    private function makePublisher(array $locales, bool $pluginActive = true): GlossarySitemapPublisher
+    private function makePublisher(array $locales, bool $pluginActive = true): SitemapPublisher
     {
         $language = $this->createStub(LanguageService::class);
         $language->method('getFilteredEnabledCodes')->willReturn($locales);
@@ -72,6 +72,6 @@ class GlossarySitemapPublisherTest extends TestCase
         $pluginService = $this->createStub(PluginService::class);
         $pluginService->method('getActiveList')->willReturn($pluginActive ? ['glossary'] : []);
 
-        return new GlossarySitemapPublisher($language, $urlGenerator, $pluginService);
+        return new SitemapPublisher($language, $urlGenerator, $pluginService);
     }
 }

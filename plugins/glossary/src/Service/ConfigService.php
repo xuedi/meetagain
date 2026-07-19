@@ -3,28 +3,28 @@
 namespace Plugin\Glossary\Service;
 
 use App\Publisher\PluginSettings\PluginSettingsResolver;
-use Plugin\Glossary\Config\GlossaryConfig;
+use Plugin\Glossary\ValueObject\Config;
 
 /**
  * Single read path for the effective glossary config in the current request. Delegates to
  * the resolver (per-scope override, else global, else neutral default) and memoizes.
  */
-class GlossaryConfigService
+class ConfigService
 {
-    private ?GlossaryConfig $memo = null;
+    private ?Config $memo = null;
 
     public function __construct(
         private readonly PluginSettingsResolver $resolver,
     ) {}
 
-    public function getConfig(): GlossaryConfig
+    public function getConfig(): Config
     {
         if ($this->memo !== null) {
             return $this->memo;
         }
 
         $config = $this->resolver->resolve('glossary');
-        \assert($config instanceof GlossaryConfig);
+        \assert($config instanceof Config);
 
         return $this->memo = $config;
     }

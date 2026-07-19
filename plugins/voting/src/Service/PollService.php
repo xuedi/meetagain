@@ -27,7 +27,7 @@ readonly class PollService
         private PollRepository $pollRepo,
         private VoteRepository $voteRepo,
         private ItemAssociationService $itemAssociations,
-        private VotingConfigService $config,
+        private ConfigService $config,
         #[AutowireIterator(ItemCandidateProviderInterface::class)]
         private iterable $candidateProviders,
     ) {}

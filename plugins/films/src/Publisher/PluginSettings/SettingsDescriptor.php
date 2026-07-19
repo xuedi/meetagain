@@ -3,15 +3,15 @@
 namespace Plugin\Films\Publisher\PluginSettings;
 
 use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
-use Plugin\Films\Entity\FilmsSettings;
-use Plugin\Films\Form\FilmsSettingsType;
-use Plugin\Films\Service\FilmsSettingsService;
+use Plugin\Films\Entity\Settings;
+use Plugin\Films\Form\SettingsType;
+use Plugin\Films\Service\SettingsService;
 use Symfony\Component\Form\FormInterface;
 
-final readonly class FilmsSettingsDescriptor implements PluginSettingsDescriptorInterface
+final readonly class SettingsDescriptor implements PluginSettingsDescriptorInterface
 {
     public function __construct(
-        private FilmsSettingsService $settingsService,
+        private SettingsService $settingsService,
     ) {}
 
     public function getKey(): string
@@ -26,12 +26,12 @@ final readonly class FilmsSettingsDescriptor implements PluginSettingsDescriptor
 
     public function getFormType(): string
     {
-        return FilmsSettingsType::class;
+        return SettingsType::class;
     }
 
     public function getFormOptions(object $data): array
     {
-        \assert($data instanceof FilmsSettings);
+        \assert($data instanceof Settings);
 
         return [
             'tmdb_key_set' => $data->getEncryptedTmdbKey() !== null,
@@ -41,12 +41,12 @@ final readonly class FilmsSettingsDescriptor implements PluginSettingsDescriptor
 
     public function createDefault(): object
     {
-        return new FilmsSettings();
+        return new Settings();
     }
 
     public function applyForm(object $data, FormInterface $form): void
     {
-        \assert($data instanceof FilmsSettings);
+        \assert($data instanceof Settings);
 
         $tmdbKey = $form->get('tmdbKey')->getData();
         $clearTmdb = (bool) $form->get('clearTmdbKey')->getData();

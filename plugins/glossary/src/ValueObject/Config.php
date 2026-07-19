@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Plugin\Glossary\Config;
+namespace Plugin\Glossary\ValueObject;
 
 use App\Publisher\PluginSettings\PluginSettingsData;
 
@@ -9,7 +9,7 @@ use App\Publisher\PluginSettings\PluginSettingsData;
  * how the primary/secondary/definition fields and the category taxonomy are labelled. The
  * neutral default is term + definition only (secondary off, no categories, shipped labels).
  */
-final class GlossaryConfig implements PluginSettingsData
+final class Config implements PluginSettingsData
 {
     private bool $secondaryEnabled = false;
     private ?string $secondaryLabel = null;

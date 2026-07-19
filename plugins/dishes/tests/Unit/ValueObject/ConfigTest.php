@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Plugin\Dishes\Tests\Unit;
+namespace Plugin\Dishes\Tests\Unit\ValueObject;
 
 use PHPUnit\Framework\TestCase;
-use Plugin\Dishes\Config;
+use Plugin\Dishes\ValueObject\Config;
 
 class ConfigTest extends TestCase
 {

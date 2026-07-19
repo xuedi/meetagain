@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace Plugin\Glossary\Tests\Unit\Config;
+namespace Plugin\Glossary\Tests\Unit\ValueObject;
 
 use PHPUnit\Framework\TestCase;
-use Plugin\Glossary\Config\GlossaryConfig;
+use Plugin\Glossary\ValueObject\Config;
 
-class GlossaryConfigTest extends TestCase
+class ConfigTest extends TestCase
 {
     public function testNeutralDefaultIsTermAndDefinitionOnly(): void
     {
         // Arrange + Act
-        $config = new GlossaryConfig();
+        $config = new Config();
 
         // Assert
         static::assertFalse($config->isSecondaryEnabled());
@@ -22,7 +22,7 @@ class GlossaryConfigTest extends TestCase
     public function testToArrayFromArrayRoundTrip(): void
     {
         // Arrange
-        $config = (new GlossaryConfig())
+        $config = (new Config())
             ->setSecondaryEnabled(true)
             ->setSecondaryLabel('Pinyin')
             ->setPrimaryLabel('Word')
@@ -30,7 +30,7 @@ class GlossaryConfigTest extends TestCase
             ->setCategories([['id' => 0, 'label' => 'Greeting'], ['id' => 1, 'label' => 'Slang']]);
 
         // Act
-        $restored = GlossaryConfig::fromArray($config->toArray());
+        $restored = Config::fromArray($config->toArray());
 
         // Assert
         static::assertTrue($restored->isSecondaryEnabled());
@@ -46,7 +46,7 @@ class GlossaryConfigTest extends TestCase
         $raw = ['categories' => [['id' => '4', 'label' => 'Abbreviation']]];
 
         // Act
-        $config = GlossaryConfig::fromArray($raw);
+        $config = Config::fromArray($raw);
 
         // Assert
         static::assertSame('Abbreviation', $config->getCategoryLabel(4));
@@ -55,7 +55,7 @@ class GlossaryConfigTest extends TestCase
     public function testNormalizeAssignsIdsAndDropsEmptyLabels(): void
     {
         // Arrange
-        $config = (new GlossaryConfig())->setCategories([
+        $config = (new Config())->setCategories([
             ['id' => 5, 'label' => 'Existing'],
             ['id' => '', 'label' => 'Fresh'],
             ['id' => '', 'label' => '   '],
@@ -71,7 +71,7 @@ class GlossaryConfigTest extends TestCase
     public function testGetCategoryLabelReturnsNullForUnknownId(): void
     {
         // Arrange
-        $config = (new GlossaryConfig())->setCategories([['id' => 0, 'label' => 'Greeting']]);
+        $config = (new Config())->setCategories([['id' => 0, 'label' => 'Greeting']]);
 
         // Act + Assert
         static::assertNull($config->getCategoryLabel(99));

@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * Routes through FilmService::getList() so the item filter chain restricts
  * the result set when a visibility filter narrows the allowed films.
  */
-final readonly class FilmsSitemapPublisher implements SitemapPublisherInterface
+final readonly class SitemapPublisher implements SitemapPublisherInterface
 {
     public function __construct(
         private FilmService $filmService,

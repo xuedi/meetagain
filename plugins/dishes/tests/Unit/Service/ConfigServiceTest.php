@@ -4,7 +4,7 @@ namespace Plugin\Dishes\Tests\Unit\Service;
 
 use App\Publisher\PluginSettings\PluginSettingsResolver;
 use PHPUnit\Framework\TestCase;
-use Plugin\Dishes\Config;
+use Plugin\Dishes\ValueObject\Config;
 use Plugin\Dishes\Service\ConfigService;
 
 class ConfigServiceTest extends TestCase
@@ -12,7 +12,7 @@ class ConfigServiceTest extends TestCase
     public function testReturnsResolvedConfig(): void
     {
         // Arrange
-        $config = (new Config())->setFooterText(['en' => 'Footer']);
+        $config = new Config()->setFooterText(['en' => 'Footer']);
         $resolver = $this->createStub(PluginSettingsResolver::class);
         $resolver->method('resolve')->willReturn($config);
         $service = new ConfigService($resolver);

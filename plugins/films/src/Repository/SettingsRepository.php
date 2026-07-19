@@ -4,19 +4,19 @@ namespace Plugin\Films\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use Plugin\Films\Entity\FilmsSettings;
+use Plugin\Films\Entity\Settings;
 
 /**
- * @extends ServiceEntityRepository<FilmsSettings>
+ * @extends ServiceEntityRepository<Settings>
  */
-class FilmsSettingsRepository extends ServiceEntityRepository
+class SettingsRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, FilmsSettings::class);
+        parent::__construct($registry, Settings::class);
     }
 
-    public function save(FilmsSettings $entity, bool $flush = false): void
+    public function save(Settings $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -25,7 +25,7 @@ class FilmsSettingsRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(FilmsSettings $entity, bool $flush = false): void
+    public function remove(Settings $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -34,7 +34,7 @@ class FilmsSettingsRepository extends ServiceEntityRepository
         }
     }
 
-    public function findGlobal(): ?FilmsSettings
+    public function findGlobal(): ?Settings
     {
         return $this->createQueryBuilder('s')->setMaxResults(1)->getQuery()->getOneOrNullResult();
     }

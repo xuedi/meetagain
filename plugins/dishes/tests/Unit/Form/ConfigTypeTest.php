@@ -4,7 +4,7 @@ namespace Plugin\Dishes\Tests\Unit\Form;
 
 use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
-use Plugin\Dishes\Config;
+use Plugin\Dishes\ValueObject\Config;
 use Plugin\Dishes\Form\ConfigType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;

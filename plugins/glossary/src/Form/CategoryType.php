@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * One category row in the glossary config: a hidden stable id plus its editable label.
  */
-class GlossaryCategoryType extends AbstractType
+class CategoryType extends AbstractType
 {
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void

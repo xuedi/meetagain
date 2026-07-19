@@ -4,23 +4,23 @@ namespace Plugin\Films\Service;
 
 use App\Service\Security\SecretBox;
 use Doctrine\ORM\EntityManagerInterface;
-use Plugin\Films\Entity\FilmsSettings;
-use Plugin\Films\Repository\FilmsSettingsRepository;
+use Plugin\Films\Entity\Settings;
+use Plugin\Films\Repository\SettingsRepository;
 
-readonly class FilmsSettingsService
+readonly class SettingsService
 {
     public function __construct(
-        private FilmsSettingsRepository $settingsRepository,
+        private SettingsRepository $settingsRepository,
         private EntityManagerInterface $em,
         private SecretBox $secretBox,
     ) {}
 
-    public function getOrCreateGlobal(): FilmsSettings
+    public function getOrCreateGlobal(): Settings
     {
-        return $this->settingsRepository->findGlobal() ?? new FilmsSettings();
+        return $this->settingsRepository->findGlobal() ?? new Settings();
     }
 
-    public function save(FilmsSettings $settings): void
+    public function save(Settings $settings): void
     {
         $this->em->persist($settings);
         $this->em->flush();
@@ -31,7 +31,7 @@ readonly class FilmsSettingsService
         return $this->secretBox->encrypt($cleartext);
     }
 
-    public function getTmdbKey(FilmsSettings $settings): ?string
+    public function getTmdbKey(Settings $settings): ?string
     {
         if ($settings->getEncryptedTmdbKey() === null) {
             return null;
@@ -40,7 +40,7 @@ readonly class FilmsSettingsService
         return $this->secretBox->decrypt($settings->getEncryptedTmdbKey());
     }
 
-    public function getOmdbKey(FilmsSettings $settings): ?string
+    public function getOmdbKey(Settings $settings): ?string
     {
         if ($settings->getEncryptedOmdbKey() === null) {
             return null;
