@@ -1,0 +1,72 @@
+{#
+ # ImageListTable component - flat, client-paginated list of images (created, uploader, thumbnail,
+ # size, type, mime, usage count). The per-row action column renders only when a detail route is given.
+ #
+ # Inputs:
+ #   images      - iterable of App\Entity\Image
+ #   usageCounts - map<int, int> image id -> usage count (optional, default {})
+ #   detailRoute - route name for the per-row view link; omit for an action-less informative list
+ #}
+{% set usageCounts = usageCounts|default({}) %}
+{% set detailRoute = detailRoute|default(null) %}
+<table id="filteredTable" class="table is-fullwidth">
+    <thead>
+    <tr>
+        <th>{{ 'admin_system_images.col_created_at'|trans }}</th>
+        <th>{{ 'admin_system_images.col_uploader'|trans }}</th>
+        <th></th>
+        <th>{{ 'admin_system_images.col_size'|trans }}</th>
+        <th>{{ 'admin_system_images.col_type'|trans }}</th>
+        <th>{{ 'admin_system_images.col_mime_type'|trans }}</th>
+        <th>{{ 'admin_system_images.col_usages'|trans }}</th>
+        {% if detailRoute is not null %}<th></th>{% endif %}
+    </tr>
+    </thead>
+    <tbody>
+    {% for image in images %}
+        <tr>
+            <td>{{ image.createdAt | date('Y-m-d') }}</td>
+            <td>{{ image.uploader.email }}</td>
+            <td>
+                <div class="dropdown is-hoverable">
+                    <div class="dropdown-trigger">
+                        <span aria-haspopup="true" aria-controls="dropdown-image">
+                            <span class="icon is-small">
+                                <i class="fas fa-image" aria-hidden="true"></i>
+                            </span>
+                        </span>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-image" role="menu">
+                        <div class="dropdown-content">
+                            <div class="dropdown-item is-hovered">
+                                {% include '_components/image.html.twig' with {'image': image} %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td>{{ image.size | format_bytes }}</td>
+            <td>{{ image.type.name }}</td>
+            <td>{{ image.mimeType }}</td>
+            <td>
+                {% set cnt = usageCounts[image.id] ?? 0 %}
+                {% if cnt > 0 %}
+                    <span class="tag is-light">{{ cnt }}</span>
+                {% else %}
+                    <span class="has-text-grey">0</span>
+                {% endif %}
+            </td>
+            {% if detailRoute is not null %}
+                <td>
+                    <a href="{{ path(detailRoute, {'id': image.id}) }}">
+                        <span class="icon"><i class="fa fa-eye"></i></span>
+                    </a>
+                    {% if image.attributionStatus.name == 'Pending' %}
+                        <span class="icon has-text-warning" title="{{ 'attribution_status.pending'|trans }}"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i></span>
+                    {% endif %}
+                </td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
