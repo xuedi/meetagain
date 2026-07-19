@@ -4,6 +4,7 @@ namespace App\Service\Notification\User;
 
 use App\Entity\User;
 use App\Repository\ImageRepository;
+use App\Service\Config\LanguageService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -13,6 +14,7 @@ readonly class MissingAltImageNotificationProvider implements NotificationProvid
         private ImageRepository $imageRepository,
         private Security $security,
         private TranslatorInterface $translator,
+        private LanguageService $languageService,
     ) {}
 
     public function getNotifications(User $user): array
@@ -21,16 +23,25 @@ readonly class MissingAltImageNotificationProvider implements NotificationProvid
             return [];
         }
 
+        $codes = $this->languageService->getFilteredEnabledCodes();
+        $sourceLocale = $this->languageService->getFilteredDefaultLocale();
+
         $items = [];
-        foreach ($this->imageRepository->findHighUsageMissingAlt() as $row) {
+        foreach ($this->imageRepository->findHighUsageMissingAlt() as $candidate) {
+            $image = $candidate['image'];
+            $missing = $image->missingAltLocales($codes, $sourceLocale);
+            if ($missing === []) {
+                continue;
+            }
+
             $items[] = new NotificationItem(
                 label: $this->translator->trans('chrome.notification_image_missing_alt', [
-                    '%id%' => $row['id'],
-                    '%count%' => $row['count'],
+                    '%id%' => $image->getId(),
+                    '%missing%' => count($missing),
                 ]),
                 icon: 'fa-image',
                 route: 'app_admin_system_images_show',
-                routeParams: ['id' => $row['id']],
+                routeParams: ['id' => $image->getId()],
             );
         }
 

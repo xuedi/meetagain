@@ -48,6 +48,18 @@ class CoreNotificationProviderTest extends TestCase
         }
     }
 
+    public function testStaleEmailNotificationLinksToTheSendlog(): void
+    {
+        // Arrange
+        $provider = $this->createProvider(staleEmails: 1);
+
+        // Act
+        $result = $provider->getNotifications($this->createStub(User::class));
+
+        // Assert
+        static::assertSame('app_admin_email_sendlog', $result[0]->route);
+    }
+
     public static function getNotificationsProvider(): iterable
     {
         yield 'non-admin user → empty array' => [

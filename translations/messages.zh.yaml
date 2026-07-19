@@ -25,7 +25,7 @@ chrome:
     notification_unread_messages: '%count% 条未读消息'
     notification_stale_emails: '%count% 封延迟邮件'
     notification_new_support_requests: '%count% 条新支持请求'
-    notification_image_missing_alt: '图片 #%id% 缺少替代文本（被使用 %count% 次）'
+    notification_image_missing_alt: '图片 #%id% 有 %missing% 种语言缺少替代文本'
     footer_powered_by: '技术支持：'
     aria_select_language: '选择语言'
 security:

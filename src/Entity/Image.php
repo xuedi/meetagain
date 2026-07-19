@@ -32,6 +32,10 @@ class Image
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $alt = null;
 
+    /** @var array<string, string>|null */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $altTranslations = null;
+
     #[ORM\Column(length: 500, nullable: true)]
     private ?string $attribution = null;
 
@@ -120,6 +124,58 @@ class Image
         $this->alt = $alt;
 
         return $this;
+    }
+
+    /** Alt text for a locale, falling back to the base alt (a null locale returns the base alt directly). */
+    public function getAltFor(?string $locale): ?string
+    {
+        if ($locale === null) {
+            return $this->alt;
+        }
+
+        return $this->altTranslations[$locale] ?? $this->alt;
+    }
+
+    /**
+     * Raw stored per-locale alt with no fallback (empty when unset) - for widget pre-fill.
+     */
+    public function getAltTranslation(string $locale): ?string
+    {
+        return $this->altTranslations[$locale] ?? null;
+    }
+
+    public function setAltTranslation(string $locale, ?string $value): static
+    {
+        $value = $value === null ? '' : trim($value);
+        $map = $this->altTranslations ?? [];
+        if ($value === '') {
+            unset($map[$locale]);
+        } else {
+            $map[$locale] = $value;
+        }
+        $this->altTranslations = $map === [] ? null : $map;
+
+        return $this;
+    }
+
+    /**
+     * Enabled codes with no own alt yet - unlike getAltFor(), the base alt does not fill in for other
+     * locales, so a locale counts as complete only when it has its own text.
+     *
+     * @param array<string> $codes
+     * @return list<string>
+     */
+    public function missingAltLocales(array $codes, string $sourceLocale): array
+    {
+        $missing = [];
+        foreach ($codes as $code) {
+            $own = $code === $sourceLocale ? $this->alt : ($this->altTranslations[$code] ?? null);
+            if ($own === null || $own === '') {
+                $missing[] = $code;
+            }
+        }
+
+        return $missing;
     }
 
     public function getAttribution(): ?string

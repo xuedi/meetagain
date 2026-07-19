@@ -95,6 +95,7 @@ admin_system_images:
     placeholder_alt: 'Kurze Beschreibung für Screenreader und SEO'
     button_save_alt: 'Speichern'
     flash_alt_saved: 'Alt-Text aktualisiert.'
+    flag_alt: 'Alt-Text (%code%)'
     button_regenerate_thumbnails: 'Vorschaubilder neu generieren'
     button_cleanup_thumbnails: 'Vorschaubilder bereinigen'
     button_sync_locations: 'Bildorte synchronisieren'

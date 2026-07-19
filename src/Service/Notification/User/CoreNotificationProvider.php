@@ -28,7 +28,7 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
         if ($staleEmails > 0) {
             $items[] = new NotificationItem(label: $this->translator->trans('chrome.notification_stale_emails', [
                 '%count%' => $staleEmails,
-            ]), icon: 'fa-envelope');
+            ]), icon: 'fa-envelope', route: 'app_admin_email_sendlog');
         }
 
         $newSupportRequests = $this->supportRequestRepo->getNewCount();

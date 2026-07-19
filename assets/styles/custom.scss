@@ -106,6 +106,8 @@ details.activities-load-more {
 
 .is-flag      { height: 24px; }
 .is-flag-mini { height: 20px; }
+/* Fit the 32x24 flag into Bulma's square left-icon slot without distortion (per-language alt widget). */
+.control.has-icons-left .icon.is-left img.is-flag { width: auto; height: 1rem; }
 .flag-icon              { width: 32px; height: 24px; flex-shrink: 0; overflow: hidden; }
 .notifications-dropdown { min-width: 300px; }
 

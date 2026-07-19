@@ -58,21 +58,29 @@
                                 {% endif %}
                             </td>
                         </tr>
-                        <tr>
+                        {% set missingAlt = image.missingAltLocales(get_enabled_locales(), sourceLocale) %}
+                        <tr{% if missingAlt is not empty %} class="has-background-warning-light"{% endif %}>
                             <th>{{ 'admin_system_images.label_alt'|trans }}</th>
                             <td>
-                                <form method="post" action="{{ path('app_admin_system_images_update_alt', {id: image.id}) }}" class="field has-addons mb-0">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('image_update_alt_' ~ image.id) }}">
-                                    <div class="control is-expanded">
-                                        <input type="text" name="alt" maxlength="255" class="input is-small" value="{{ image.alt|default('') }}" placeholder="{{ 'admin_system_images.placeholder_alt'|trans }}">
-                                    </div>
-                                    <div class="control">
-                                        <button type="submit" class="button is-small">
-                                            <span class="icon"><i class="fa fa-save"></i></span>
-                                            <span>{{ 'admin_system_images.button_save_alt'|trans }}</span>
-                                        </button>
-                                    </div>
-                                </form>
+                                {% for code in get_enabled_locales() %}
+                                    {% set flagLabel = 'admin_system_images.flag_alt'|trans({'%code%': code}) %}
+                                    <form method="post" action="{{ path('app_admin_system_images_update_alt', {id: image.id}) }}" class="field has-addons mb-1">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('image_update_alt_' ~ image.id) }}">
+                                        <input type="hidden" name="locale" value="{{ code }}">
+                                        <div class="control is-expanded has-icons-left">
+                                            <input type="text" name="alt" maxlength="255" class="input is-small" aria-label="{{ flagLabel }}" value="{{ code == sourceLocale ? image.alt|default('') : image.getAltTranslation(code)|default('') }}" placeholder="{{ 'admin_system_images.placeholder_alt'|trans }}">
+                                            <span class="icon is-left">
+                                                <img class="is-flag" src="{{ asset('images/flags/' ~ code ~ '.svg') }}" width="32" height="24" alt="{{ flagLabel }}">
+                                            </span>
+                                        </div>
+                                        <div class="control">
+                                            <button type="submit" class="button is-small">
+                                                <span class="icon"><i class="fa fa-save"></i></span>
+                                                <span>{{ 'admin_system_images.button_save_alt'|trans }}</span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                {% endfor %}
                             </td>
                         </tr>
                         <tr{% if image.attributionStatus.name == 'Pending' %} class="has-background-warning-light"{% endif %}>
