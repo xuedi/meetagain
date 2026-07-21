@@ -2,6 +2,7 @@
 
 namespace Plugin\Glossary\Form;
 
+use App\Service\Config\LanguageService;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Service\ConfigService;
 use Symfony\Component\Form\AbstractType;
@@ -9,12 +10,15 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GlossaryType extends AbstractType
 {
     public function __construct(
         private readonly ConfigService $configService,
+        private readonly LanguageService $languageService,
+        private readonly RequestStack $requestStack,
     ) {}
 
     #[\Override]
@@ -36,16 +40,15 @@ class GlossaryType extends AbstractType
         }
 
         if ($config->hasCategories()) {
-            $choices = [];
-            foreach ($config->getCategoryMap() as $id => $label) {
-                $choices[$label] = $id;
-            }
+            $locale = $this->requestStack->getCurrentRequest()?->getLocale();
+            $sourceLocale = $this->languageService->getFilteredDefaultLocale();
 
             $builder->add('category', ChoiceType::class, [
                 'label' => 'glossary.label_category',
-                'choices' => $choices,
+                'choices' => $config->getTaxonomy()->categoryOptions($locale, $sourceLocale),
                 'required' => false,
                 'placeholder' => '',
+                'mapped' => false,
             ]);
         }
     }

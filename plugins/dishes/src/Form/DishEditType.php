@@ -3,7 +3,9 @@
 namespace Plugin\Dishes\Form;
 
 use App\Item\ItemTranslationFormHelper;
+use App\Item\Taxonomy\ItemAssignmentFormHelper;
 use Plugin\Dishes\Entity\Dish;
+use Plugin\Dishes\Service\DishService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -16,14 +18,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Edit form for a dish: the translatable name/description/recipe rendered once per enabled
- * language (via ItemTranslationFormHelper) plus the language-neutral phonetic, origin and
- * preview fields. The controller reads the per-language values back through the same helper.
+ * language (via ItemTranslationFormHelper), the language-neutral phonetic, origin and preview
+ * fields, and the category/tag assignment (via ItemAssignmentFormHelper). The controller reads
+ * the per-language values and the assignment back through the same helpers.
  */
 class DishEditType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly ItemTranslationFormHelper $translationFormHelper,
+        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
     ) {}
 
     #[\Override]
@@ -63,7 +67,11 @@ class DishEditType extends AbstractType
             'constraints' => [
                 new File(maxSize: '8000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('dishes_dish.error_invalid_image')),
             ],
-        ])->add('submit', SubmitType::class, [
+        ]);
+
+        $this->assignmentFormHelper->addAssignmentFields($builder, DishService::ITEM_TYPE, $dish?->getId());
+
+        $builder->add('submit', SubmitType::class, [
             'label' => 'dishes_dish.button_save',
             'attr' => ['class' => 'button is-primary'],
         ]);

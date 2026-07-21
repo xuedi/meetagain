@@ -29,6 +29,8 @@ Each interface is auto-registered via `#[AutoconfigureTag]` — no manual servic
 | `DataHotfixInterface`                         | Ship a one-off data repair that runs once per DB     | `getIdentifier()`, `execute()`                      |
 | `SecurityProviderInterface`                   | Participate in live security event detection         | `observe()`, `scanRetrospective()`                  |
 | `PluginSettingsDescriptorInterface`           | Add a settings section to `/admin/plugin/settings`   | `getFormType()`, `createDefault()`, `applyForm()`   |
+| `CategorizableTypeProviderInterface`          | Give an item type categories and tags                | `getTaxonomy()`, `supportsCategories()`, `supportsTags()` |
+| `ItemPortabilityContributorInterface`         | Carry an item type through group export and import   | `exportItems()`, `importItems()`                    |
 | `ProfileConfigPrivacyToggleProviderInterface` | Add a toggle row to `/profile/config` -> "privacy"   | `getToggle()`                                       |
 
 ---
@@ -971,6 +973,8 @@ a **descriptor**:
 final class MyPluginSettingsDescriptor implements PluginSettingsDescriptorInterface
 {
     public function getKey(): string { return 'my_plugin'; }
+    public function getPluginKey(): string { return 'my_plugin'; }
+    public function isScopable(): bool { return true; }
     public function getTitleKey(): string { return 'my_plugin_settings.page_title'; }
     public function getFormType(): string { return MyPluginSettingsType::class; }
     public function getFormOptions(object $data): array { return []; }
@@ -981,6 +985,16 @@ final class MyPluginSettingsDescriptor implements PluginSettingsDescriptorInterf
 ```
 
 `getKey()` must be unique across plugins; it routes the form submit and selects the store.
+
+`getPluginKey()` names the plugin that owns the section. One plugin may publish more than one
+section - if yours does, give each a distinct `getKey()` and have them all return the same
+`getPluginKey()`. The films plugin does this: `films` holds its global API keys and
+`films_taxonomy` holds its per-scope category and tag definitions.
+
+`isScopable()` says whether the section may be overridden per scope (see **Dual-scope settings**
+below). Return `false` when the record has nowhere per-scope to live - an encrypted API key kept in
+your own entity, for instance - and a host plugin will pin the section to the global scope instead
+of offering it per scope.
 
 `createDefault()` returns a fresh data object carrying your **neutral defaults** - the shape
 a plugin has before any operator touches the page.
@@ -998,9 +1012,8 @@ The descriptor does not persist anything itself: `GenericPluginSettingsStore` sa
 object to a shared JSON table automatically. Provide your own `PluginSettingsStoreInterface`
 only when the record needs a shape the JSON table cannot give it - own columns, a foreign key,
 or an encrypted secret. See
-`plugins/filmclub/src/Publisher/PluginSettings/FilmclubSettingsDescriptor.php` (descriptor) and
-`FilmclubSettingsStore.php` (custom store keeping an entity + encrypted key) for a working
-reference.
+`plugins/films/src/Publisher/PluginSettings/SettingsDescriptor.php` (descriptor) and
+`SettingsStore.php` (custom store keeping an entity + encrypted key) for a working reference.
 
 ### Reading the effective value
 
@@ -1017,3 +1030,115 @@ a host is present, `resolve()` returns the override record if the active scope h
 global record, else your neutral default - all transparent to your plugin, because it reads the
 same resolver either way. The override-scope machinery lives entirely in the host plugin; core
 registers no scope provider, so an install without such a host always resolves to the global record.
+
+## Item categories and tags
+
+If your plugin owns an item type (a dish, a book, a film, a glossary term), you can let stewards
+give each item a single **category** and any number of **tags** from a controlled vocabulary you
+define - useful for classifying and filtering a growing collection. Categories and tags are two
+independent, opt-in features; a real example is the dishes plugin classifying dishes by cuisine
+(category) and dietary flags like "vegan" or "quick" (tags).
+
+### When to implement
+
+Implement `App\Item\Taxonomy\CategorizableTypeProviderInterface` when your item type should carry
+categories and/or tags. This is orthogonal to the other two item seams - `ItemTypeProviderInterface`
+(whether the type attaches to events) and `App\Item\ListCellProviderInterface` (whether the type
+renders a cell in the shared item list) - and a type implements any combination of the three. A
+glossary-style type that is browsed and classified but never attached to an event implements the
+list-cell and categorizable seams and skips the event one.
+
+### What you implement
+
+1. **Embed the taxonomy in your settings.** Add a `App\Item\Taxonomy\TaxonomyConfig` property to your
+   settings data object and expose `getTaxonomy()`/`setTaxonomy()`; include it in `toArray()` /
+   `fromArray()`. Add `->add('taxonomy', TaxonomyConfigType::class)` to your settings FormType, and
+   call `$data->getTaxonomy()->normalize()` in your descriptor's `applyForm()`. The admin now edits
+   category/tag definitions per enabled language, at global scope and (with a host plugin) per scope.
+2. **Register the provider.** Implement `CategorizableTypeProviderInterface` - `getTypeKey()` is your
+   item-type string, and `getTaxonomy()` returns your settings' `getTaxonomy()` (scope-resolved
+   through your `ConfigService`). Set `supportsCategories()` / `supportsTags()` to what you enable.
+3. **Edit the assignment.** In your item's steward edit form, call
+   `ItemAssignmentFormHelper::addAssignmentFields($builder, $typeKey, $itemId)`; on save, pass
+   `extractAssignment($form)` to `ItemTaxonomyService::setCategory()` / `setTags()`. Dispatch
+   `ItemAction::Deleted` on item deletion so assignments are cleaned up.
+4. **Display and filter.** Wrap your list page in `_components/item/list_layout.html.twig`. It gives
+   you the two-column page layout plus a core-owned sidebar carrying the view switcher, the
+   category/tag filter box and an "about this list" box - so you never place the filter yourself:
+
+   ```twig
+   {% embed '_components/item/list_layout.html.twig' with {
+       'itemType': 'dish',
+       'itemCount': itemIds|length,
+       'infoKey': 'dishes_dish.sidebar_info'
+   } %}
+       {% block item_list_main %}
+           {% include '_components/item/list.html.twig' with {'itemType': 'dish', 'itemIds': itemIds} only %}
+       {% endblock %}
+   {% endembed %}
+   ```
+
+   | Parameter   | Meaning                                                                       |
+   |-------------|-------------------------------------------------------------------------------|
+   | `itemType`  | your item-type key (required)                                                 |
+   | `itemCount` | entries currently listed; omit to hide the count line                         |
+   | `modes`     | view-mode values your content suits; default all four (list/tiles/grid/gallery) |
+   | `infoKey`   | translation key of your one-paragraph blurb; defaults to a neutral core string |
+
+   Your list body goes in `{% block item_list_main %}` - either the shared
+   `_components/item/list.html.twig` (pass `itemIds` and implement `ListCellProviderInterface` so it
+   can ask you for each cell) or your own per-mode templates. `{% block item_sidebar_extra %}` adds
+   one more box below the core sidebar boxes. Include
+   `_components/item/taxonomy_badges.html.twig` on cells and detail pages. If your list service
+   funnels through `ItemFilterService`, category/tag narrowing is automatic.
+
+Reference implementation: the dishes plugin (`Plugin\Dishes\Item\DishCategorizableTypeProvider`,
+`Plugin\Dishes\ValueObject\Config`, `Plugin\Dishes\Controller\DishController::edit`).
+
+## Item export and import
+
+A group export ZIP carries locations, users, events, CMS pages - and any item type whose plugin
+opts in. Without opting in, a community that moves to another instance loses its dishes, books,
+films or glossary entries entirely, along with the categories and tags assigned to them.
+
+### When to implement
+
+Implement `App\Item\Portability\ItemPortabilityContributorInterface` when your plugin owns an item
+type whose content is worth carrying between instances. It is independent of the other item seams:
+a type can be portable without being event-attachable, categorizable, or list-cell renderable.
+
+### What you implement
+
+One class with both directions on it, because export and import must agree on the row shape:
+
+```php
+public function exportItems(array $itemIds, PortableImageWriterInterface $images): array;
+public function importItems(array $rows, ItemImportContext $context): ItemImportResult;
+```
+
+1. **Export.** You are handed the ids to serialize - never ask who owns them; that is the caller's
+   job and is what keeps your plugin usable in any deployment. Emit one row per item, each carrying
+   `'ref' => $item->getId()`. The rest of the row is yours; nothing outside your plugin reads it.
+   Write every image through `$images->addImage($image, 'images/dishes/12/preview')` and store the
+   returned archive path (or `null` when the file is gone).
+2. **Import.** Rebuild your entities from the rows, using
+   `$context->importImage($row['preview_image'], ImageType::PluginDishesPreview)` for images and
+   `$context->getSystemUser()` as the creator. Persist and **flush before returning** - the ids in
+   your result map must be real. Then re-register each image with
+   `ImageLocationService::addLocation()`, exactly as your normal create path does, or the imported
+   images will not appear in the image-location admin surfaces.
+3. **Deduplicate on your own key.** Core cannot know what makes two of your items the same. Pick the
+   natural key - an ISBN, an external id, a phrase - and on a hit return the **existing** item's id
+   for that `ref` and count it as `matched` instead of `created`. A type with no natural key (a dish)
+   always creates, like events do. Where a unique column exists this is mandatory: without it a
+   second import throws instead of merging.
+4. **Do not dispatch `ItemAction`.** An import is not a user action, and the handlers behind those
+   actions (activity log, notifications) must stay quiet.
+
+Category and tag assignments are handled by core, keyed by the same `ref` you emitted - you write no
+taxonomy code. Definition ids the target instance does not know are dropped and reported in the
+import summary.
+
+Reference implementation: `Plugin\Dishes\Portability\DishPortabilityContributor` (always creates,
+carries translations and a gallery) and `Plugin\Books\Portability\BookPortabilityContributor`
+(mandatory ISBN dedup).

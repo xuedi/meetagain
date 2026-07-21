@@ -2,8 +2,10 @@
 
 namespace Plugin\Films\Form;
 
+use App\Item\Taxonomy\ItemAssignmentFormHelper;
 use Override;
 use Plugin\Films\Entity\Film;
+use Plugin\Films\Service\FilmService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -19,6 +21,7 @@ class FilmEditType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
+        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
     ) {}
 
     #[Override]
@@ -67,11 +70,15 @@ class FilmEditType extends AbstractType
                 'constraints' => [
                     new File(maxSize: '8000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('films_film.flash_invalid_image')),
                 ],
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => $this->translator->trans('films_film.button_save'),
-                'attr' => ['class' => 'button is-primary'],
             ]);
+
+        $film = $builder->getData();
+        $this->assignmentFormHelper->addAssignmentFields($builder, FilmService::ITEM_TYPE, $film instanceof Film ? $film->getId() : null);
+
+        $builder->add('submit', SubmitType::class, [
+            'label' => $this->translator->trans('films_film.button_save'),
+            'attr' => ['class' => 'button is-primary'],
+        ]);
     }
 
     #[Override]

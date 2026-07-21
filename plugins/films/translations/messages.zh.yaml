@@ -32,6 +32,7 @@ films_film:
     confirm_delete: '确定删除这部电影吗？'
     flash_deleted: '电影已删除。'
     list_empty: '暂无电影。'
+    sidebar_info: '俱乐部看过或已排片的全部电影，最新的排在前面。'
     browser_title_list: '电影列表'
     page_title_new: '添加新电影'
     page_title_lookup: '搜索电影'
@@ -287,3 +288,6 @@ films_notifications:
 
 films_admin_secretbox:
     consumer_settings: '电影俱乐部API密钥'
+
+films_taxonomy:
+    page_title: '电影分类和标签'

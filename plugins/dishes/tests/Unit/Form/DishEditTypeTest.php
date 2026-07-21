@@ -3,6 +3,7 @@
 namespace Plugin\Dishes\Tests\Unit\Form;
 
 use App\Item\ItemTranslationFormHelper;
+use App\Item\Taxonomy\ItemAssignmentFormHelper;
 use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Dishes\Entity\Dish;
@@ -53,10 +54,11 @@ class DishEditTypeTest extends TestCase
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
         $helper = new ItemTranslationFormHelper($languageService);
+        $assignmentHelper = $this->createStub(ItemAssignmentFormHelper::class);
 
         return Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension(Validation::createValidator()))
-            ->addExtension(new PreloadedExtension([new DishEditType($translator, $helper)], []))
+            ->addExtension(new PreloadedExtension([new DishEditType($translator, $helper, $assignmentHelper)], []))
             ->getFormFactory();
     }
 }

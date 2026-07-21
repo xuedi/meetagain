@@ -489,6 +489,19 @@ body.admin-shell-no-scroll {
     overflow-wrap: anywhere;
 }
 
+// -- Item list sidebar --
+
+@media (min-width: 769px) {
+    .item-list-layout > .item-list-sidebar {
+        order: 2;
+        width: 16rem;
+    }
+
+    .item-list-layout > .item-list-main {
+        order: 1;
+    }
+}
+
 // -- Item grid thumbnails --
 
 .item-thumb {

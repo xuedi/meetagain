@@ -32,6 +32,7 @@ films_film:
     confirm_delete: 'Delete this film?'
     flash_deleted: 'Film deleted.'
     list_empty: 'No films yet.'
+    sidebar_info: 'Every film the club has watched or lined up, newest first.'
     browser_title_list: 'Filmlist'
     page_title_new: 'Add New Film'
     page_title_lookup: 'Search for a film'
@@ -285,3 +286,6 @@ films_notifications:
 
 films_admin_secretbox:
     consumer_settings: 'Films API keys'
+
+films_taxonomy:
+    page_title: 'Film categories & tags'

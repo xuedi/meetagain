@@ -1,0 +1,36 @@
+{#
+    Item List Layout - two-column wrapper pairing a plugin's list body with the shared sidebar
+
+    Owns the responsive wrapper of every item-list page: the plugin embeds this template and renders
+    its own list into {% block item_list_main %}, core renders the sidebar beside it. The sidebar
+    column comes first in the DOM so it stacks above the list below 769px and is moved to the right
+    above it by the .item-list-layout rules in custom.scss - which also keeps keyboard and screen
+    reader order at "filters before results" on every viewport. A page needing one more box in the
+    column appends it through {% block item_sidebar_extra %}.
+
+    Used in:    item-list pages of the films / books / dishes / glossary plugins
+    Parameters:
+        - itemType  (string, required)       -- registry key of the item type (e.g. 'film')
+        - itemCount (int, optional)          -- entries currently listed; omit to hide the count line
+        - modes     (list<string>, optional) -- view-mode values to offer; default: all four
+        - infoKey   (string, optional)       -- translation key of the sidebar blurb;
+                                                default: 'item.sidebar_info_default'
+    Blocks:
+        - item_list_main     -- the page's own list body
+        - item_sidebar_extra -- optional extra box below the shared sidebar boxes
+    Depends on: _components/item/sidebar.html.twig
+#}
+<div class="columns item-list-layout">
+    <div class="column is-narrow item-list-sidebar">
+        {% include '_components/item/sidebar.html.twig' with {
+            'itemType': itemType,
+            'itemCount': itemCount|default(null),
+            'modes': modes|default([]),
+            'infoKey': infoKey|default('item.sidebar_info_default')
+        } only %}
+        {% block item_sidebar_extra %}{% endblock %}
+    </div>
+    <div class="column item-list-main">
+        {% block item_list_main %}{% endblock %}
+    </div>
+</div>

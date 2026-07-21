@@ -6,7 +6,10 @@
     <td style="vertical-align: middle;">
         <a href="{{ showUrl }}"><figure class="image" style="width: 48px;">{% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x250', 'alt': book.title} %}</figure></a>
     </td>
-    <td style="vertical-align: middle;"><a href="{{ showUrl }}" class="has-text-weight-medium">{{ book.title }}</a></td>
+    <td style="vertical-align: middle;">
+        <a href="{{ showUrl }}" class="has-text-weight-medium">{{ book.title }}</a>
+        {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
+    </td>
     <td style="vertical-align: middle;" class="has-text-grey">{{ book.author }}</td>
     <td style="vertical-align: middle;" class="has-text-right">
         {% if is_granted('ROLE_STEWARD') %}
@@ -31,4 +34,5 @@
         title: book.title,
         subtitle: book.author
     } %}
+    {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
 {% endif %}

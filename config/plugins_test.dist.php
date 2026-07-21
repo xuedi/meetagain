@@ -5,6 +5,7 @@ return [
     'books' => true,
     'dishes' => true,
     'films' => true,
+    'glossary' => true,
     'voting' => true,
     'wishlist' => true,
 ];

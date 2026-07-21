@@ -1,0 +1,26 @@
+{#
+    Item Taxonomy Badges -- the assigned category as a badge and tags as chips for one item.
+
+    Renders the item's category label (if any) as a coloured Bulma tag and each assigned tag as a
+    light chip, labelled in the guest's locale with source-locale fallback. Renders nothing when the
+    item has neither a category nor tags, so callers can include it unconditionally. Reads the
+    assignments through item_category_label() / item_tag_labels() (ItemTaxonomyExtension).
+
+    Used in:    dishes / books / films list layouts and detail pages
+    Parameters:
+        - itemType (string, required) -- registry key of the item type (e.g. 'dish')
+        - itemId   (int, required)    -- id of the item whose assignments to render
+    Depends on: item_category_label(), item_tag_labels() (ItemTaxonomyExtension)
+#}
+{% set category = item_category_label(itemType, itemId) %}
+{% set tags = item_tag_labels(itemType, itemId) %}
+{% if category is not empty or tags is not empty %}
+    <div class="tags taxonomy-badges">
+        {% if category is not empty %}
+            <span class="tag is-info is-light">{{ category }}</span>
+        {% endif %}
+        {% for tag in tags %}
+            <span class="tag is-light">{{ tag }}</span>
+        {% endfor %}
+    </div>
+{% endif %}

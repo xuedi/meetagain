@@ -17,11 +17,12 @@ glossary:
     button_suggest_new: 'Suggest new'
     button_suggest_change: 'Suggest change'
     button_delete_yes: 'Yes'
-glossary_blocks:
-    col_phrase: 'Phrases'
-    col_pinyin: 'PinYin'
-    col_explanation: 'Explanation'
-    col_category: 'Category'
+    link_back_to_list: 'Back to the glossary'
+    list_empty: 'No entries yet.'
+    sidebar_info: 'Terms collected and explained by the community; anyone can suggest a new one.'
+    button_edit: 'Edit'
+    button_review_approval: 'Review approval'
+    button_review_suggestions: 'Review suggestions'
 glossary_config:
     page_title: 'Glossary configuration'
     primary_label: 'Primary field label'

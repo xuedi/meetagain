@@ -31,6 +31,9 @@ final class EditController extends AbstractGlossaryController
         $newGlossary = $this->service->get($id);
 
         $form = $this->createForm(GlossaryType::class, $newGlossary);
+        if ($form->has('category') && !$request->isMethod('POST')) {
+            $form->get('category')->setData($this->service->getCategory($id));
+        }
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->service->detach($newGlossary); // dont auto save entity
@@ -38,14 +41,16 @@ final class EditController extends AbstractGlossaryController
                 throw new AuthenticationException('Only for logged in users');
             }
 
+            $categoryId = $form->has('category') ? $this->intOrNull($form->get('category')->getData()) : null;
+
             if ($this->isGranted('ROLE_ORGANIZER')) {
                 // Managers can update directly
-                $this->service->update($newGlossary, $id);
+                $this->service->update($newGlossary, $id, $categoryId);
             }
 
             if (!$this->isGranted('ROLE_ORGANIZER')) {
                 // Regular users create suggestions
-                $this->service->generateSuggestions($newGlossary, $id, $this->getAuthedUser()->getId());
+                $this->service->generateSuggestions($newGlossary, $id, $this->getAuthedUser()->getId(), $categoryId);
 
                 $item = $this->service->get($id);
                 if ($item !== null) {
@@ -60,7 +65,7 @@ final class EditController extends AbstractGlossaryController
             return $this->redirectToRoute('app_plugin_glossary');
         }
 
-        return $this->renderList('@Glossary/edit.html.twig', [
+        return $this->renderPage('@Glossary/edit.html.twig', [
             'categoryFieldValue' => SuggestionField::Category->value,
             'editItem' => $this->service->get($id),
             'form' => $form,
