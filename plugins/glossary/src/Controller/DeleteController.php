@@ -25,7 +25,7 @@ final class DeleteController extends AbstractGlossaryController
     #[Route('/view/{id}', name: 'app_plugin_glossary_delete_view', methods: ['GET'])]
     public function deleteView(int $id): Response
     {
-        return $this->renderList('@Glossary/delete.html.twig', [
+        return $this->renderPage('@Glossary/delete.html.twig', [
             'editItem' => $this->service->get($id),
         ]);
     }

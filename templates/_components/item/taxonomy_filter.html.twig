@@ -1,0 +1,63 @@
+{#
+    Item Taxonomy Filter -- category dropdown and clickable tag cloud for narrowing an item list.
+
+    Reads the type's scope-resolved category/tag definitions and renders a GET category dropdown
+    (single-select) plus a tag cloud where each tag is a link toggling itself in/out of the tag[]
+    facet. Selection lives entirely in the URL query, so the whole box works with JavaScript disabled
+    (the category dropdown submits via its button). Narrowing is applied server-side by
+    App\Item\Taxonomy\TaxonomyItemFilter. Renders nothing when the type enables no categories or tags.
+    Laid out vertically throughout, since it lives in the narrow item-list side column.
+
+    Used in:    _components/item/sidebar.html.twig
+    Parameters:
+        - itemType (string, required) -- registry key of the item type (e.g. 'dish')
+    Depends on: item_taxonomy_category_choices(), item_taxonomy_tag_choices(),
+                item_taxonomy_current_category(), item_taxonomy_current_tags(),
+                item_taxonomy_tag_toggle_url() (ItemTaxonomyExtension)
+#}
+{% set categories = item_taxonomy_category_choices(itemType) %}
+{% set tags = item_taxonomy_tag_choices(itemType) %}
+{% if categories is not empty or tags is not empty %}
+    {% set currentCategory = item_taxonomy_current_category() %}
+    {% set currentTags = item_taxonomy_current_tags() %}
+    <div class="box taxonomy-filter mb-4">
+        {% if categories is not empty %}
+            <form method="get" class="field mb-4">
+                {% for tagId in currentTags %}
+                    <input type="hidden" name="tag[]" value="{{ tagId }}">
+                {% endfor %}
+                <label class="label is-small mb-1">{{ 'item.taxonomy_filter_category'|trans }}</label>
+                <div class="control mb-2">
+                    <div class="select is-small is-fullwidth">
+                        <select name="category">
+                            <option value="">{{ 'item.taxonomy_filter_all'|trans }}</option>
+                            {% for id, label in categories %}
+                                <option value="{{ id }}"{{ currentCategory is same as(id) ? ' selected' }}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="control">
+                    <button type="submit" class="button is-small is-fullwidth">{{ 'item.taxonomy_filter_apply'|trans }}</button>
+                </div>
+            </form>
+        {% endif %}
+
+        {% if tags is not empty %}
+            <div class="field">
+                <label class="label is-small mb-1">{{ 'item.taxonomy_filter_tags'|trans }}</label>
+                <div class="tags">
+                    {% for id, label in tags %}
+                        <a href="{{ item_taxonomy_tag_toggle_url(id) }}"
+                           class="tag {{ id in currentTags ? 'is-link' : 'is-light' }}"
+                           rel="nofollow">{{ label }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if currentCategory is not null or currentTags is not empty %}
+            <a href="{{ app.request.pathInfo }}" class="is-size-7" rel="nofollow">{{ 'item.taxonomy_filter_clear'|trans }}</a>
+        {% endif %}
+    </div>
+{% endif %}

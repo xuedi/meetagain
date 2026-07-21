@@ -20,6 +20,18 @@ interface PluginSettingsDescriptorInterface
     /** Stable, lowercase-snake_case key. Routes a form submit and selects a store. */
     public function getKey(): string;
 
+    /**
+     * Key of the plugin this section belongs to. A plugin may publish several sections,
+     * so this is not always the same string as getKey().
+     */
+    public function getPluginKey(): string;
+
+    /**
+     * Whether this section may be overridden per scope. False pins it to the global
+     * scope - the right answer when its store has no per-scope backing.
+     */
+    public function isScopable(): bool;
+
     /** Translation key for the section title. */
     public function getTitleKey(): string;
 

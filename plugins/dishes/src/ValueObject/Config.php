@@ -2,12 +2,13 @@
 
 namespace Plugin\Dishes\ValueObject;
 
+use App\Item\Taxonomy\TaxonomyConfig;
 use App\Publisher\PluginSettings\PluginSettingsData;
 
 /**
  * Effective dishes settings: an optional footer text shown at the bottom of the dish list
- * (held per locale) and whether the phonetic column is shown in the list. The neutral default
- * is no footer and no phonetic column.
+ * (held per locale), whether the phonetic column is shown in the list, and the shared category/tag
+ * taxonomy. The neutral default is no footer, no phonetic column, and taxonomy disabled.
  */
 final class Config implements PluginSettingsData
 {
@@ -15,6 +16,25 @@ final class Config implements PluginSettingsData
     private array $footerText = [];
 
     private bool $phoneticInList = false;
+
+    private TaxonomyConfig $taxonomy;
+
+    public function __construct()
+    {
+        $this->taxonomy = new TaxonomyConfig();
+    }
+
+    public function getTaxonomy(): TaxonomyConfig
+    {
+        return $this->taxonomy;
+    }
+
+    public function setTaxonomy(TaxonomyConfig $taxonomy): static
+    {
+        $this->taxonomy = $taxonomy;
+
+        return $this;
+    }
 
     /** @return array<string, string> */
     public function getFooterText(): array
@@ -60,6 +80,7 @@ final class Config implements PluginSettingsData
         return [
             'footerText' => $this->footerText,
             'phoneticInList' => $this->phoneticInList,
+            'taxonomy' => $this->taxonomy->toArray(),
         ];
     }
 
@@ -71,6 +92,7 @@ final class Config implements PluginSettingsData
             $config->setFooterText($footer);
         }
         $config->setPhoneticInList((bool) ($raw['phoneticInList'] ?? false));
+        $config->taxonomy = TaxonomyConfig::fromArray($raw['taxonomy'] ?? []);
 
         return $config;
     }

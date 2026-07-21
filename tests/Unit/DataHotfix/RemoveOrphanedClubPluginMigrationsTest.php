@@ -14,13 +14,13 @@ class RemoveOrphanedClubPluginMigrationsTest extends TestCase
         $captured = [];
         $connection = $this->createStub(Connection::class);
         $connection->method('fetchOne')->willReturn('1');
-        $connection->method('executeStatement')->willReturnCallback(
-            function (string $sql, array $params = []) use (&$captured): int {
+        $connection
+            ->method('executeStatement')
+            ->willReturnCallback(static function (string $sql, array $params = []) use (&$captured): int {
                 $captured[] = ['sql' => $sql, 'params' => $params];
 
                 return 1;
-            },
-        );
+            });
 
         $subject = new RemoveOrphanedClubPluginMigrations($connection);
 

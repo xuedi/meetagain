@@ -4,6 +4,8 @@ namespace Plugin\Films\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use App\Item\Taxonomy\ItemAssignmentFormHelper;
+use App\Item\Taxonomy\ItemTaxonomyService;
 use Plugin\Films\Activity\Messages\FilmAdded;
 use Plugin\Films\Entity\Film;
 use Plugin\Films\Form\FilmEditType;
@@ -25,6 +27,8 @@ final class FilmController extends AbstractController
         private readonly FilmService $filmService,
         private readonly FilmLookupResolver $lookupResolver,
         private readonly ActivityService $activityService,
+        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
+        private readonly ItemTaxonomyService $itemTaxonomyService,
     ) {}
 
     #[Route('', name: 'app_films_filmlist', methods: ['GET'])]
@@ -194,6 +198,11 @@ final class FilmController extends AbstractController
                     posterFile: $form->get('posterFile')->getData(),
                     userId: $user->getId(),
                 );
+
+                $assignment = $this->assignmentFormHelper->extractAssignment($form);
+                $this->itemTaxonomyService->setCategory(FilmService::ITEM_TYPE, (int) $film->getId(), $assignment['category']);
+                $this->itemTaxonomyService->setTags(FilmService::ITEM_TYPE, (int) $film->getId(), $assignment['tags']);
+
                 $this->addFlash('success', 'films_film.flash_updated');
 
                 return $this->redirectToRoute('app_plugin_films_film_show', ['id' => $film->getId()]);

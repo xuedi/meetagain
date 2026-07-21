@@ -14,6 +14,16 @@ final class ConfigDescriptor implements PluginSettingsDescriptorInterface
         return 'voting';
     }
 
+    public function getPluginKey(): string
+    {
+        return 'voting';
+    }
+
+    public function isScopable(): bool
+    {
+        return true;
+    }
+
     public function getTitleKey(): string
     {
         return 'voting_config.page_title';

@@ -17,11 +17,12 @@ glossary:
     button_suggest_new: 'Neu vorschlagen'
     button_suggest_change: 'Änderung vorschlagen'
     button_delete_yes: 'Ja'
-glossary_blocks:
-    col_phrase: 'Begriffe'
-    col_pinyin: 'PinYin'
-    col_explanation: 'Erklärung'
-    col_category: 'Kategorie'
+    link_back_to_list: 'Zurück zum Glossar'
+    list_empty: 'Noch keine Einträge.'
+    sidebar_info: 'Von der Community gesammelte und erklärte Begriffe; neue Vorschläge sind willkommen.'
+    button_edit: 'Bearbeiten'
+    button_review_approval: 'Genehmigung prüfen'
+    button_review_suggestions: 'Vorschläge prüfen'
 glossary_config:
     page_title: 'Glossar-Konfiguration'
     primary_label: 'Bezeichnung des Hauptfelds'

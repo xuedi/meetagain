@@ -14,6 +14,16 @@ final class ConfigDescriptor implements PluginSettingsDescriptorInterface
         return 'glossary';
     }
 
+    public function getPluginKey(): string
+    {
+        return 'glossary';
+    }
+
+    public function isScopable(): bool
+    {
+        return true;
+    }
+
     public function getTitleKey(): string
     {
         return 'glossary_config.page_title';
@@ -38,7 +48,7 @@ final class ConfigDescriptor implements PluginSettingsDescriptorInterface
     {
         \assert($data instanceof Config);
 
-        $data->normalizeCategories();
+        $data->getTaxonomy()->normalize();
     }
 
     public function getPriority(): int

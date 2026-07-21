@@ -10,11 +10,23 @@ final class StubDescriptor implements PluginSettingsDescriptorInterface
     public function __construct(
         private readonly string $key = 'stub',
         private readonly int $priority = 0,
+        private readonly ?string $pluginKey = null,
+        private readonly bool $scopable = true,
     ) {}
 
     public function getKey(): string
     {
         return $this->key;
+    }
+
+    public function getPluginKey(): string
+    {
+        return $this->pluginKey ?? $this->key;
+    }
+
+    public function isScopable(): bool
+    {
+        return $this->scopable;
     }
 
     public function getTitleKey(): string

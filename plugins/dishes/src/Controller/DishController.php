@@ -5,6 +5,8 @@ namespace Plugin\Dishes\Controller;
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Item\ItemTranslationFormHelper;
+use App\Item\Taxonomy\ItemAssignmentFormHelper;
+use App\Item\Taxonomy\ItemTaxonomyService;
 use Plugin\Dishes\Activity\Messages\DishAdded;
 use Plugin\Dishes\Form\DishAddType;
 use Plugin\Dishes\Form\DishEditType;
@@ -29,6 +31,8 @@ final class DishController extends AbstractController
         private readonly ConfigService $configService,
         private readonly DishLikeRepository $dishLikeRepository,
         private readonly ItemTranslationFormHelper $translationFormHelper,
+        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
+        private readonly ItemTaxonomyService $itemTaxonomyService,
     ) {}
 
     #[Route('', name: 'app_dishes_dishlist', methods: ['GET'])]
@@ -125,6 +129,10 @@ final class DishController extends AbstractController
                 $dish->setPhonetic($form->get('phonetic')->getData());
                 $dish->setOrigin($form->get('origin')->getData());
                 $this->dishService->updateTranslations($dish, $this->translationFormHelper->extractTranslations($form, ['name', 'description', 'recipe']));
+
+                $assignment = $this->assignmentFormHelper->extractAssignment($form);
+                $this->itemTaxonomyService->setCategory(DishService::ITEM_TYPE, (int) $dish->getId(), $assignment['category']);
+                $this->itemTaxonomyService->setTags(DishService::ITEM_TYPE, (int) $dish->getId(), $assignment['tags']);
 
                 $previewFile = $form->get('previewFile')->getData();
                 if ($previewFile !== null) {

@@ -6,7 +6,10 @@
     <td style="vertical-align: middle;">
         <a href="{{ showUrl }}"><figure class="image" style="width: 48px;">{% include '_components/image.html.twig' with {'image': film.posterImage, 'size': '200x300', 'alt': film.title} %}</figure></a>
     </td>
-    <td style="vertical-align: middle;"><a href="{{ showUrl }}" class="has-text-weight-medium">{{ film.title }}</a></td>
+    <td style="vertical-align: middle;">
+        <a href="{{ showUrl }}" class="has-text-weight-medium">{{ film.title }}</a>
+        {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'film', 'itemId': film.id} only %}
+    </td>
     <td style="vertical-align: middle;" class="has-text-grey">{{ film.year }}</td>
     <td style="vertical-align: middle;" class="has-text-right">
         {% if is_granted('ROLE_STEWARD') %}
@@ -31,4 +34,5 @@
         title: film.title,
         subtitle: film.year
     } %}
+    {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'film', 'itemId': film.id} only %}
 {% endif %}

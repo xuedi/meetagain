@@ -42,6 +42,24 @@
                             <td>{{ 'admin_system_import.cms_skipped'|trans }}</td>
                             <td>{{ summary.cmsPagesSkipped }}</td>
                         </tr>
+                        {% for itemType, itemCounts in summary.itemsByType %}
+                            <tr>
+                                <td>{{ 'admin_system_import.items_created'|trans({'%type%': itemType}) }}</td>
+                                <td>{{ itemCounts.created }}</td>
+                            </tr>
+                            <tr>
+                                <td>{{ 'admin_system_import.items_matched'|trans({'%type%': itemType}) }}</td>
+                                <td>{{ itemCounts.matched }}</td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td>{{ 'admin_system_import.item_sections_skipped'|trans }}</td>
+                            <td>{{ summary.itemSectionsSkipped }}</td>
+                        </tr>
+                        <tr>
+                            <td>{{ 'admin_system_import.taxonomy_dropped'|trans }}</td>
+                            <td>{{ summary.taxonomyAssignmentsDropped }}</td>
+                        </tr>
                     </tbody>
                 </table>
                 <p class="mt-3">{{ 'admin_system_import.note'|trans }}</p>

@@ -25,7 +25,7 @@ final class ApprovalController extends AbstractGlossaryController
     #[Route('/list/{id}', name: 'app_plugin_glossary_approval_list', methods: ['GET'])]
     public function approvalList(int $id): Response
     {
-        return $this->renderList('@Glossary/approval.html.twig', [
+        return $this->renderPage('@Glossary/approval.html.twig', [
             'editItem' => $this->service->get($id),
         ]);
     }

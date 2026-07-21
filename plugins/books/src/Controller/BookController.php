@@ -4,6 +4,8 @@ namespace Plugin\Books\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use App\Item\Taxonomy\ItemAssignmentFormHelper;
+use App\Item\Taxonomy\ItemTaxonomyService;
 use Plugin\Books\Activity\Messages\BookAdded;
 use Plugin\Books\Entity\Book;
 use Plugin\Books\Form\BookEditType;
@@ -23,6 +25,8 @@ final class BookController extends AbstractController
     public function __construct(
         private readonly BookService $bookService,
         private readonly ActivityService $activityService,
+        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
+        private readonly ItemTaxonomyService $itemTaxonomyService,
     ) {}
 
     #[Route('', name: 'app_books_booklist', methods: ['GET'])]
@@ -139,6 +143,11 @@ final class BookController extends AbstractController
             $user = $this->getAuthedUser();
             try {
                 $this->bookService->update(book: $book, coverFile: $form->get('coverFile')->getData(), userId: $user->getId());
+
+                $assignment = $this->assignmentFormHelper->extractAssignment($form);
+                $this->itemTaxonomyService->setCategory(BookService::ITEM_TYPE, (int) $book->getId(), $assignment['category']);
+                $this->itemTaxonomyService->setTags(BookService::ITEM_TYPE, (int) $book->getId(), $assignment['tags']);
+
                 $this->addFlash('success', 'books_book.flash_updated');
 
                 return $this->redirectToRoute('app_plugin_books_book_show', ['id' => $book->getId()]);

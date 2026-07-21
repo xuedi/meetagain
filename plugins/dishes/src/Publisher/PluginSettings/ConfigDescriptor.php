@@ -14,6 +14,16 @@ final class ConfigDescriptor implements PluginSettingsDescriptorInterface
         return 'dishes';
     }
 
+    public function getPluginKey(): string
+    {
+        return 'dishes';
+    }
+
+    public function isScopable(): bool
+    {
+        return true;
+    }
+
     public function getTitleKey(): string
     {
         return 'dishes_config.page_title';
@@ -34,7 +44,12 @@ final class ConfigDescriptor implements PluginSettingsDescriptorInterface
         return new Config();
     }
 
-    public function applyForm(object $data, FormInterface $form): void {}
+    public function applyForm(object $data, FormInterface $form): void
+    {
+        \assert($data instanceof Config);
+
+        $data->getTaxonomy()->normalize();
+    }
 
     public function getPriority(): int
     {

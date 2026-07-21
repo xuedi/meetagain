@@ -6,7 +6,7 @@ use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
 use App\Service\Admin\PluginSettingsService;
 use LogicException;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Form\FormInterface;
+use Tests\Unit\Publisher\PluginSettings\Fixtures\StubDescriptor;
 
 class PluginSettingsServiceTest extends TestCase
 {
@@ -70,45 +70,40 @@ class PluginSettingsServiceTest extends TestCase
         ]);
     }
 
-    private function makeProvider(string $key, int $priority = 0): PluginSettingsDescriptorInterface
+    public function testGetScopableByPluginGroupsSectionsUnderTheirPlugin(): void
     {
-        return new class($key, $priority) implements PluginSettingsDescriptorInterface {
-            public function __construct(
-                private readonly string $key,
-                private readonly int $priority,
-            ) {}
+        // Arrange
+        $taxonomy = $this->makeProvider('films_taxonomy', pluginKey: 'films');
+        $apiKeys = $this->makeProvider('films', pluginKey: 'films', scopable: false);
+        $dishes = $this->makeProvider('dishes');
+        $service = new PluginSettingsService([$taxonomy, $apiKeys, $dishes]);
 
-            public function getKey(): string
-            {
-                return $this->key;
-            }
+        // Act
+        $grouped = $service->getScopableByPlugin();
 
-            public function getTitleKey(): string
-            {
-                return 'test.title';
-            }
+        // Assert
+        static::assertSame([$taxonomy], $grouped['films']);
+        static::assertSame([$dishes], $grouped['dishes']);
+    }
 
-            public function getFormType(): string
-            {
-                return 'TestFormType';
-            }
+    public function testGetScopableByPluginOmitsPluginsWithNoScopableSection(): void
+    {
+        // Arrange
+        $service = new PluginSettingsService([$this->makeProvider('films', scopable: false)]);
 
-            public function getFormOptions(object $data): array
-            {
-                return [];
-            }
+        // Act
+        $grouped = $service->getScopableByPlugin();
 
-            public function createDefault(): object
-            {
-                return new \stdClass();
-            }
+        // Assert
+        static::assertSame([], $grouped);
+    }
 
-            public function applyForm(object $data, FormInterface $form): void {}
-
-            public function getPriority(): int
-            {
-                return $this->priority;
-            }
-        };
+    private function makeProvider(
+        string $key,
+        int $priority = 0,
+        ?string $pluginKey = null,
+        bool $scopable = true,
+    ): PluginSettingsDescriptorInterface {
+        return new StubDescriptor($key, $priority, $pluginKey, $scopable);
     }
 }

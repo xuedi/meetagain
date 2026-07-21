@@ -2,6 +2,7 @@
 
 namespace Plugin\Glossary\Tests\Unit\ValueObject;
 
+use App\Item\Taxonomy\TaxonomyConfig;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\ValueObject\Config;
 
@@ -22,12 +23,15 @@ class ConfigTest extends TestCase
     public function testToArrayFromArrayRoundTrip(): void
     {
         // Arrange
+        $taxonomy = (new TaxonomyConfig())
+            ->setCategoriesEnabled(true)
+            ->setCategories([['id' => 0, 'labels' => ['en' => 'Greeting']], ['id' => 1, 'labels' => ['en' => 'Slang']]]);
         $config = (new Config())
             ->setSecondaryEnabled(true)
             ->setSecondaryLabel('Pinyin')
             ->setPrimaryLabel('Word')
             ->setDefinitionLabel('Meaning')
-            ->setCategories([['id' => 0, 'label' => 'Greeting'], ['id' => 1, 'label' => 'Slang']]);
+            ->setTaxonomy($taxonomy);
 
         // Act
         $restored = Config::fromArray($config->toArray());
@@ -37,44 +41,18 @@ class ConfigTest extends TestCase
         static::assertSame('Pinyin', $restored->getSecondaryLabel());
         static::assertSame('Word', $restored->getPrimaryLabel());
         static::assertSame('Meaning', $restored->getDefinitionLabel());
-        static::assertSame([0 => 'Greeting', 1 => 'Slang'], $restored->getCategoryMap());
+        static::assertTrue($restored->hasCategories());
+        static::assertSame('Greeting', $restored->getTaxonomy()->categoryLabel(0, 'en', 'en'));
+        static::assertSame('Slang', $restored->getTaxonomy()->categoryLabel(1, 'en', 'en'));
     }
 
-    public function testFromArrayCoercesCategoryIdsToInt(): void
+    public function testHasCategoriesIsFalseWhenTaxonomyDisabled(): void
     {
-        // Arrange
-        $raw = ['categories' => [['id' => '4', 'label' => 'Abbreviation']]];
-
-        // Act
-        $config = Config::fromArray($raw);
-
-        // Assert
-        static::assertSame('Abbreviation', $config->getCategoryLabel(4));
-    }
-
-    public function testNormalizeAssignsIdsAndDropsEmptyLabels(): void
-    {
-        // Arrange
-        $config = (new Config())->setCategories([
-            ['id' => 5, 'label' => 'Existing'],
-            ['id' => '', 'label' => 'Fresh'],
-            ['id' => '', 'label' => '   '],
-        ]);
-
-        // Act
-        $config->normalizeCategories();
-
-        // Assert: existing id preserved, new row gets max+1, blank-label row dropped
-        static::assertSame([5 => 'Existing', 6 => 'Fresh'], $config->getCategoryMap());
-    }
-
-    public function testGetCategoryLabelReturnsNullForUnknownId(): void
-    {
-        // Arrange
-        $config = (new Config())->setCategories([['id' => 0, 'label' => 'Greeting']]);
+        // Arrange: categories defined but the enable flag is off
+        $taxonomy = (new TaxonomyConfig())->setCategories([['id' => 0, 'labels' => ['en' => 'Greeting']]]);
+        $config = (new Config())->setTaxonomy($taxonomy);
 
         // Act + Assert
-        static::assertNull($config->getCategoryLabel(99));
-        static::assertNull($config->getCategoryLabel(null));
+        static::assertFalse($config->hasCategories());
     }
 }

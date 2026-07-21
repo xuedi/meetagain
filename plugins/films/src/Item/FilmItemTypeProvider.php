@@ -4,15 +4,16 @@ namespace Plugin\Films\Item;
 
 use App\Entity\EventItemAssociation;
 use App\Item\ItemTypeProviderInterface;
+use App\Item\ListCellProviderInterface;
 use Override;
 use Plugin\Films\Service\FilmService;
 use Twig\Environment;
 
 /**
- * Registers the 'film' item type with the core item seam: the event-detail cell, the shared
+ * Registers the 'film' item type with the core item seams: the event-detail cell, the shared
  * list cell, and the steward attach picker are all rendered from the films plugin's templates.
  */
-final readonly class FilmItemTypeProvider implements ItemTypeProviderInterface
+final readonly class FilmItemTypeProvider implements ItemTypeProviderInterface, ListCellProviderInterface
 {
     public function __construct(
         private FilmService $filmService,

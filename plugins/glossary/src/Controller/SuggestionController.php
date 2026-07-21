@@ -26,7 +26,7 @@ final class SuggestionController extends AbstractGlossaryController
     #[Route('/list/{id}', name: 'app_plugin_glossary_suggestion_list', methods: ['GET'])]
     public function suggestionList(int $id): Response
     {
-        return $this->renderList('@Glossary/suggestion.html.twig', [
+        return $this->renderPage('@Glossary/suggestion.html.twig', [
             'categoryFieldValue' => SuggestionField::Category->value,
             'editItem' => $this->service->get($id),
         ]);
