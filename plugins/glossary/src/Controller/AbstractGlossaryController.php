@@ -6,6 +6,7 @@ use App\Entity\User;
 use Plugin\Glossary\Service\ConfigService;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as AbstractSymfonyController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -23,6 +24,11 @@ abstract class AbstractGlossaryController extends AbstractSymfonyController
         $this->configService = $configService;
     }
 
+    protected function intOrNull(mixed $value): ?int
+    {
+        return $value === null || $value === '' ? null : (int) $value;
+    }
+
     protected function getAuthedUser(): User
     {
         $user = $this->getUser();
@@ -33,10 +39,9 @@ abstract class AbstractGlossaryController extends AbstractSymfonyController
         return $user;
     }
 
-    protected function renderList(string $template, array $parameter = [])
+    protected function renderPage(string $template, array $parameter = []): Response
     {
         return $this->render($template, [
-            'list' => $this->service->getList(),
             'config' => $this->configService->getConfig(),
             ...$parameter,
         ]);

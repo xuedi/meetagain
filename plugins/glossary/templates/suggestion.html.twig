@@ -6,20 +6,17 @@
 
     <section class="section">
         <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-half">
 
-            <div class="columns">
-                <div class="column is-9">
-                    {% include '@Glossary/blocks/list.html.twig' %}
-                </div>
-                <div class="column is-3">
-                    {% if is_granted('ROLE_USER') %}
+                    <h1 class="title is-4">{{ 'glossary.heading_changes_approval'|trans }}</h1>
+                    <p class="subtitle is-6">{{ editItem.phrase }}</p>
 
-                        <h2 class="title is-5">{{ 'glossary.heading_changes_approval'|trans }}</h2>
-                        {% for suggestion in editItem.suggestions %}
-                            {% set value = suggestion.value %}
-                            {% if suggestion.field.value == categoryFieldValue %}
-                                {% set value = config.getCategoryMap()[suggestion.value]|default(suggestion.value) %}
-                            {% endif %}
+                    {% for suggestion in editItem.suggestions %}
+                        {% set value = suggestion.value %}
+                        {% if suggestion.field.value == categoryFieldValue %}
+                            {% set value = item_category_label_by_id('glossary', suggestion.value)|default(suggestion.value) %}
+                        {% endif %}
                         <div class="box">
                             <p>
                                 <b>{{ get_user_name(suggestion.createdBy) }}</b> suggested {{ suggestion.createdAt | time_diff }} to change the
@@ -40,12 +37,12 @@
                                 </a>
                             </div>
                         </div>
-                        {% endfor %}
-                    {% endif %}
+                    {% endfor %}
+
+                    <a href="{{ path('app_plugin_glossary') }}" class="is-size-7">{{ 'glossary.link_back_to_list'|trans }}</a>
 
                 </div>
             </div>
-
         </div>
     </section>
 

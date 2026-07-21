@@ -5,3 +5,4 @@
     <p class="title is-6 mt-2 mb-0">{{ dish.getTranslatedName(app.locale) }}</p>
     {% if dish.origin %}<p class="subtitle is-7 has-text-grey">{{ dish.origin }}</p>{% endif %}
 </a>
+{% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'dish', 'itemId': dish.id} only %}

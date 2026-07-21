@@ -23,6 +23,7 @@
                 subtitle: item.origin,
                 subtitleIcon: 'location-dot'
             } %}
+            {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'dish', 'itemId': item.id} only %}
         </div>
     {% endfor %}
 </div>

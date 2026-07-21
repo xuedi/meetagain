@@ -6,40 +6,35 @@
 
     <section class="section">
         <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-half">
 
-            <div class="columns">
-                <div class="column is-9">
-                    {% include '@Glossary/blocks/list.html.twig' %}
-                </div>
-                <div class="column is-3">
-                    {% if is_granted('ROLE_USER') %}
-                        <h2 class="title is-5">{{ 'glossary.heading_suggest_change'|trans }}</h2>
-                        <div class="box">
+                    <h1 class="title is-4">{{ 'glossary.heading_suggest_change'|trans }}</h1>
+                    <div class="box">
 
-                            {{ form_start(form) }}
-                            {{ form_row(form.phrase) }}
-                            {% if form.pinyin is defined %}{{ form_row(form.pinyin) }}{% endif %}
-                            {{ form_row(form.explanation) }}
-                            {% if form.category is defined %}{{ form_row(form.category) }}{% endif %}
-                            <div class="has-text-right mt-6">
-                                <a href="{{ path('app_plugin_glossary') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
-                                {% if is_granted('ROLE_ORGANIZER') %}
-                                    <button type="submit" class="button is-link">{{ 'global.button_save'|trans }}</button>
-                                {% else %}
-                                    <button type="submit" class="button is-link">{{ 'glossary.button_suggest_change'|trans }}</button>
-                                {% endif %}
-                            </div>
-                            {{ form_end(form) }}
-
+                        {{ form_start(form) }}
+                        {{ form_row(form.phrase) }}
+                        {% if form.pinyin is defined %}{{ form_row(form.pinyin) }}{% endif %}
+                        {{ form_row(form.explanation) }}
+                        {% if form.category is defined %}{{ form_row(form.category) }}{% endif %}
+                        <div class="has-text-right mt-6">
+                            <a href="{{ path('app_plugin_glossary') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                            {% if is_granted('ROLE_ORGANIZER') %}
+                                <button type="submit" class="button is-link">{{ 'global.button_save'|trans }}</button>
+                            {% else %}
+                                <button type="submit" class="button is-link">{{ 'glossary.button_suggest_change'|trans }}</button>
+                            {% endif %}
                         </div>
-                    {% endif %}
+                        {{ form_end(form) }}
+
+                    </div>
 
                     {% if editItem.suggestions is not empty %}
                         <h2 class="title is-5">{{ 'glossary.heading_waiting_approval'|trans }}</h2>
                         {% for suggestion in editItem.suggestions %}
                             {% set value = suggestion.value %}
                             {% if suggestion.field.value == categoryFieldValue %}
-                                {% set value = config.getCategoryMap()[suggestion.value]|default(suggestion.value) %}
+                                {% set value = item_category_label_by_id('glossary', suggestion.value)|default(suggestion.value) %}
                             {% endif %}
                             <div class="box has-background-info-light">
                                 <p>
@@ -49,9 +44,11 @@
                             </div>
                         {% endfor %}
                     {% endif %}
+
+                    <a href="{{ path('app_plugin_glossary') }}" class="is-size-7">{{ 'glossary.link_back_to_list'|trans }}</a>
+
                 </div>
             </div>
-
         </div>
     </section>
 

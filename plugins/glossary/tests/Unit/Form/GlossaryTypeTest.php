@@ -2,6 +2,8 @@
 
 namespace Plugin\Glossary\Tests\Unit\Form;
 
+use App\Item\Taxonomy\TaxonomyConfig;
+use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Form\GlossaryType;
 use Plugin\Glossary\Service\ConfigService;
@@ -9,6 +11,7 @@ use Plugin\Glossary\ValueObject\Config;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class GlossaryTypeTest extends TestCase
 {
@@ -40,7 +43,10 @@ class GlossaryTypeTest extends TestCase
     public function testCategoriesAddCategoryChoiceField(): void
     {
         // Arrange
-        $config = (new Config())->setCategories([['id' => 0, 'label' => 'Greeting']]);
+        $taxonomy = (new TaxonomyConfig())
+            ->setCategoriesEnabled(true)
+            ->setCategories([['id' => 0, 'labels' => ['en' => 'Greeting']]]);
+        $config = (new Config())->setTaxonomy($taxonomy);
 
         // Act
         $form = $this->formFor($config);
@@ -60,8 +66,13 @@ class GlossaryTypeTest extends TestCase
 
     private function factory(ConfigService $configService): FormFactoryInterface
     {
+        $languageService = $this->createStub(LanguageService::class);
+        $languageService->method('getFilteredDefaultLocale')->willReturn('en');
+
+        $type = new GlossaryType($configService, $languageService, new RequestStack());
+
         return Forms::createFormFactoryBuilder()
-            ->addExtension(new PreloadedExtension([new GlossaryType($configService)], []))
+            ->addExtension(new PreloadedExtension([$type], []))
             ->getFormFactory();
     }
 }

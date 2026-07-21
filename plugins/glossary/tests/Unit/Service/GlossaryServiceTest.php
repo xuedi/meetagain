@@ -3,10 +3,14 @@
 namespace Plugin\Glossary\Tests\Unit\Service;
 
 use App\EntityActionDispatcher;
+use App\Enum\ItemAction;
+use App\Item\ItemActionDispatcher;
+use App\Item\ItemFilterService;
+use App\Item\Taxonomy\ItemTaxonomyService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
-use Plugin\Glossary\Filter\GlossaryFilterService;
+use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
 use Plugin\Glossary\Repository\GlossaryRepository;
 use Plugin\Glossary\Service\GlossaryService;
 use ReflectionProperty;
@@ -113,19 +117,17 @@ class GlossaryServiceTest extends TestCase
         $current = (new Glossary())
             ->setPhrase('old')
             ->setPinyin('lǎo')
-            ->setExplanation('same')
-            ->setCategory(0);
+            ->setExplanation('same');
         $em = $this->createStub(EntityManagerInterface::class);
         $service = $this->makeService($em, $this->repoReturning($current));
 
         $submitted = (new Glossary())
             ->setPhrase('new')
             ->setPinyin('lǎo')
-            ->setExplanation('same')
-            ->setCategory(0);
+            ->setExplanation('same');
 
         // Act
-        $service->generateSuggestions($submitted, id: 1, userId: 5);
+        $service->generateSuggestions($submitted, id: 1, userId: 5, categoryId: null);
 
         // Assert: only the phrase changed, so exactly one suggestion is queued
         $stored = $this->readStoredSuggestions($current);
@@ -140,19 +142,17 @@ class GlossaryServiceTest extends TestCase
         $current = (new Glossary())
             ->setPhrase('same')
             ->setPinyin('same')
-            ->setExplanation('same')
-            ->setCategory(0);
+            ->setExplanation('same');
         $em = $this->createStub(EntityManagerInterface::class);
         $service = $this->makeService($em, $this->repoReturning($current));
 
         $submitted = (new Glossary())
             ->setPhrase('same')
             ->setPinyin('same')
-            ->setExplanation('same')
-            ->setCategory(0);
+            ->setExplanation('same');
 
         // Act
-        $service->generateSuggestions($submitted, id: 1, userId: 5);
+        $service->generateSuggestions($submitted, id: 1, userId: 5, categoryId: null);
 
         // Assert
         self::assertSame([], $current->getSuggestions());
@@ -181,12 +181,68 @@ class GlossaryServiceTest extends TestCase
         self::assertSame(1, $remaining);
     }
 
-    private function makeService(EntityManagerInterface $em, GlossaryRepository $repo): GlossaryService
+    public function testListNarrowsThroughTheCoreItemFilterChain(): void
     {
-        $filter = $this->createStub(GlossaryFilterService::class);
-        $filter->method('getAllowedGlossaryIds')->willReturn(null);
+        // Arrange
+        $filter = $this->createMock(ItemFilterService::class);
+        $filter->expects(self::once())
+            ->method('getAllowedItemIds')
+            ->with(GlossaryCategorizableTypeProvider::ITEM_TYPE)
+            ->willReturn([4, 7]);
 
-        return new GlossaryService($em, $repo, $filter, $this->createStub(EntityActionDispatcher::class));
+        $entry = (new Glossary())->setPhrase('你好');
+        $repo = $this->createMock(GlossaryRepository::class);
+        $repo->expects(self::once())
+            ->method('findAllowed')
+            ->with([4, 7], ['phrase' => 'ASC'])
+            ->willReturn([$entry]);
+
+        $service = $this->makeService($this->createStub(EntityManagerInterface::class), $repo, $filter);
+
+        // Act
+        $list = $service->getList();
+
+        // Assert
+        self::assertSame([$entry], $list);
+    }
+
+    public function testCreateAnnouncesTheNewItemToTheItemActionChain(): void
+    {
+        // Arrange
+        $dispatcher = $this->createMock(ItemActionDispatcher::class);
+        $dispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(ItemAction::Created, GlossaryCategorizableTypeProvider::ITEM_TYPE, 0);
+
+        $service = $this->makeService(
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(GlossaryRepository::class),
+            itemActionDispatcher: $dispatcher,
+        );
+
+        // Act
+        $service->create((new Glossary())->setPhrase('你好'), userId: 9);
+    }
+
+    private function makeService(
+        EntityManagerInterface $em,
+        GlossaryRepository $repo,
+        ?ItemFilterService $filter = null,
+        ?ItemActionDispatcher $itemActionDispatcher = null,
+    ): GlossaryService {
+        if ($filter === null) {
+            $filter = $this->createStub(ItemFilterService::class);
+            $filter->method('getAllowedItemIds')->willReturn(null);
+        }
+
+        return new GlossaryService(
+            $em,
+            $repo,
+            $filter,
+            $this->createStub(EntityActionDispatcher::class),
+            $this->createStub(ItemTaxonomyService::class),
+            $itemActionDispatcher ?? $this->createStub(ItemActionDispatcher::class),
+        );
     }
 
     private function repoReturning(?Glossary $item): GlossaryRepository

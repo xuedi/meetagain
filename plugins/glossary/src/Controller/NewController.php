@@ -36,7 +36,8 @@ final class NewController extends AbstractGlossaryController
             if (!$this->getUser() instanceof User) {
                 throw new AuthenticationException('Only for logged in users');
             }
-            $this->service->create($glossary, $this->getAuthedUser()->getId(), $this->isGranted('ROLE_ORGANIZER'));
+            $categoryId = $form->has('category') ? $this->intOrNull($form->get('category')->getData()) : null;
+            $this->service->create($glossary, $this->getAuthedUser()->getId(), $this->isGranted('ROLE_ORGANIZER'), $categoryId);
 
             $this->activityService->log(EntryCreated::TYPE, $this->getUser(), [
                 'glossary_id' => $glossary->getId(),
@@ -46,8 +47,7 @@ final class NewController extends AbstractGlossaryController
             return $this->redirectToRoute('app_plugin_glossary');
         }
 
-        return $this->renderList('@Glossary/new.html.twig', [
-            'shortList' => true,
+        return $this->renderPage('@Glossary/new.html.twig', [
             'form' => $form,
         ]);
     }

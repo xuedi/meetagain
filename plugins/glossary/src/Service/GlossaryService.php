@@ -4,12 +4,16 @@ namespace Plugin\Glossary\Service;
 
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
+use App\Enum\ItemAction;
+use App\Item\ItemActionDispatcher;
+use App\Item\ItemFilterService;
+use App\Item\Taxonomy\ItemTaxonomyService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Entity\Suggestion;
 use Plugin\Glossary\Entity\SuggestionField;
-use Plugin\Glossary\Filter\GlossaryFilterService;
+use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
 use Plugin\Glossary\Repository\GlossaryRepository;
 use RuntimeException;
 
@@ -18,9 +22,16 @@ readonly class GlossaryService
     public function __construct(
         private EntityManagerInterface $em,
         private GlossaryRepository $repo,
-        private GlossaryFilterService $filter,
+        private ItemFilterService $itemFilter,
         private EntityActionDispatcher $dispatcher,
+        private ItemTaxonomyService $taxonomyService,
+        private ItemActionDispatcher $itemActionDispatcher,
     ) {}
+
+    public function getCategory(int $id): ?int
+    {
+        return $this->taxonomyService->getCategory(GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
+    }
 
     public function approveNew(int $id): void
     {
@@ -47,6 +58,7 @@ readonly class GlossaryService
         $this->em->remove($item);
         $this->em->flush();
         $this->dispatcher->dispatch(EntityAction::DeleteGlossary, $id);
+        $this->itemActionDispatcher->dispatch(ItemAction::Deleted, GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
     }
 
     public function delete(int $id): void
@@ -59,12 +71,14 @@ readonly class GlossaryService
         $this->em->remove($item);
         $this->em->flush();
         $this->dispatcher->dispatch(EntityAction::DeleteGlossary, $id);
+        $this->itemActionDispatcher->dispatch(ItemAction::Deleted, GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
     }
 
     /**
-     * Update glossary directly (manager permission required).
+     * Update glossary directly (manager permission required). The category is an assignment kept in
+     * the shared taxonomy tables, not a column on the entity.
      */
-    public function update(Glossary $newGlossary, int $id): void
+    public function update(Glossary $newGlossary, int $id, ?int $categoryId): void
     {
         $current = $this->get($id);
         if ($current === null) {
@@ -73,17 +87,18 @@ readonly class GlossaryService
 
         $current->setPhrase($newGlossary->getPhrase());
         $current->setPinyin($newGlossary->getPinyin());
-        $current->setCategory($newGlossary->getCategory());
         $current->setExplanation($newGlossary->getExplanation());
 
         $this->em->persist($current);
         $this->em->flush();
+
+        $this->taxonomyService->setCategory(GlossaryCategorizableTypeProvider::ITEM_TYPE, $id, $categoryId);
     }
 
     /**
      * Generate suggestions for changes (regular user).
      */
-    public function generateSuggestions(Glossary $newGlossary, int $id, int $userId): void
+    public function generateSuggestions(Glossary $newGlossary, int $id, int $userId, ?int $categoryId): void
     {
         $current = $this->get($id);
         if ($current === null) {
@@ -110,12 +125,12 @@ readonly class GlossaryService
             ));
         }
 
-        if ($current->getCategory() !== $newGlossary->getCategory()) {
+        if ($this->getCategory($id) !== $categoryId) {
             $current->addSuggestions(Suggestion::fromParams(
                 createdBy: $userId,
                 createdAt: $timestamp,
                 field: SuggestionField::Category,
-                value: (string) $newGlossary->getCategory(),
+                value: (string) $categoryId,
             ));
         }
 
@@ -137,7 +152,7 @@ readonly class GlossaryService
      *
      * @param bool $autoApprove Whether to auto-approve (for managers)
      */
-    public function create(Glossary $glossary, int $userId, bool $autoApprove = false): void
+    public function create(Glossary $glossary, int $userId, bool $autoApprove = false, ?int $categoryId = null): void
     {
         $glossary->setCreatedBy($userId);
         $glossary->setCreatedAt(new DateTimeImmutable());
@@ -146,7 +161,10 @@ readonly class GlossaryService
         $this->em->persist($glossary);
         $this->em->flush();
 
+        $this->taxonomyService->setCategory(GlossaryCategorizableTypeProvider::ITEM_TYPE, (int) $glossary->getId(), $categoryId);
+
         $this->dispatcher->dispatch(EntityAction::CreateGlossary, (int) $glossary->getId());
+        $this->itemActionDispatcher->dispatch(ItemAction::Created, GlossaryCategorizableTypeProvider::ITEM_TYPE, (int) $glossary->getId());
     }
 
     public function applySuggestion(int $id, string $hash): int
@@ -165,7 +183,11 @@ readonly class GlossaryService
                 $item->setPinyin($suggestion->value === '' ? null : $suggestion->value);
                 break;
             case SuggestionField::Category:
-                $item->setCategory($suggestion->value === '' ? null : (int) $suggestion->value);
+                $this->taxonomyService->setCategory(
+                    GlossaryCategorizableTypeProvider::ITEM_TYPE,
+                    $id,
+                    $suggestion->value === '' ? null : (int) $suggestion->value,
+                );
                 break;
             case SuggestionField::Explanation:
                 $item->setExplanation($suggestion->value);
@@ -194,13 +216,13 @@ readonly class GlossaryService
 
     public function get(int $id): ?Glossary
     {
-        return $this->repo->findOneAllowed($id, $this->filter->getAllowedGlossaryIds());
+        return $this->repo->findOneAllowed($id, $this->itemFilter->getAllowedItemIds(GlossaryCategorizableTypeProvider::ITEM_TYPE));
     }
 
     /** @return Glossary[] */
     public function getList(): array
     {
-        return $this->repo->findAllowed($this->filter->getAllowedGlossaryIds(), ['phrase' => 'ASC']);
+        return $this->repo->findAllowed($this->itemFilter->getAllowedItemIds(GlossaryCategorizableTypeProvider::ITEM_TYPE), ['phrase' => 'ASC']);
     }
 
     public function detach(Glossary $newGlossary): void

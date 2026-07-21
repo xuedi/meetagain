@@ -2,12 +2,14 @@
 
 namespace Plugin\Glossary\ValueObject;
 
+use App\Item\Taxonomy\TaxonomyConfig;
 use App\Publisher\PluginSettings\PluginSettingsData;
 
 /**
- * Effective shape of one glossary: whether the secondary transcription field is shown and
- * how the primary/secondary/definition fields and the category taxonomy are labelled. The
- * neutral default is term + definition only (secondary off, no categories, shipped labels).
+ * Effective shape of one glossary: whether the secondary transcription field is shown, how the
+ * primary/secondary/definition fields are labelled, and the shared per-language category taxonomy
+ * (tags unused, but available without further schema work). The neutral default is term +
+ * definition only (secondary off, no categories, shipped labels).
  */
 final class Config implements PluginSettingsData
 {
@@ -16,13 +18,12 @@ final class Config implements PluginSettingsData
     private ?string $primaryLabel = null;
     private ?string $definitionLabel = null;
 
-    /**
-     * Category rows. Ids are int once normalized (via normalizeCategories / fromArray) but may
-     * transiently be an empty string (a freshly-added form row) before normalization.
-     *
-     * @var list<array{id: int|string, label: string}>
-     */
-    private array $categories = [];
+    private TaxonomyConfig $taxonomy;
+
+    public function __construct()
+    {
+        $this->taxonomy = new TaxonomyConfig();
+    }
 
     public function isSecondaryEnabled(): bool
     {
@@ -72,81 +73,21 @@ final class Config implements PluginSettingsData
         return $this;
     }
 
-    /** @return list<array{id: int|string, label: string}> */
-    public function getCategories(): array
+    public function getTaxonomy(): TaxonomyConfig
     {
-        return $this->categories;
+        return $this->taxonomy;
     }
 
-    /** @param iterable<array{id?: int|string|null, label?: string|null}> $categories */
-    public function setCategories(iterable $categories): static
+    public function setTaxonomy(TaxonomyConfig $taxonomy): static
     {
-        $rows = [];
-        foreach ($categories as $category) {
-            $rows[] = [
-                'id' => $category['id'] ?? '',
-                'label' => $category['label'] ?? '',
-            ];
-        }
-        $this->categories = $rows;
+        $this->taxonomy = $taxonomy;
 
         return $this;
     }
 
     public function hasCategories(): bool
     {
-        return $this->categories !== [];
-    }
-
-    /** @return array<int, string> id => label, preserving order */
-    public function getCategoryMap(): array
-    {
-        $map = [];
-        foreach ($this->categories as $category) {
-            $map[(int) $category['id']] = $category['label'];
-        }
-
-        return $map;
-    }
-
-    public function getCategoryLabel(?int $id): ?string
-    {
-        if ($id === null) {
-            return null;
-        }
-
-        return $this->getCategoryMap()[$id] ?? null;
-    }
-
-    /**
-     * Assign a stable id to any row lacking one and drop rows with empty labels. Existing
-     * ids are preserved so glossary entries keep pointing at the same category.
-     */
-    public function normalizeCategories(): void
-    {
-        $maxId = -1;
-        foreach ($this->categories as $category) {
-            if (!($category['id'] !== '' && (int) $category['id'] > $maxId)) {
-                continue;
-            }
-
-            $maxId = (int) $category['id'];
-        }
-
-        $normalized = [];
-        foreach ($this->categories as $category) {
-            $label = trim($category['label']);
-            if ($label === '') {
-                continue;
-            }
-
-            $normalized[] = [
-                'id' => $category['id'] === '' ? ++$maxId : (int) $category['id'],
-                'label' => $label,
-            ];
-        }
-
-        $this->categories = $normalized;
+        return $this->taxonomy->isCategoriesEnabled() && $this->taxonomy->categoryDefinitions() !== [];
     }
 
     public function toArray(): array
@@ -156,7 +97,7 @@ final class Config implements PluginSettingsData
             'secondaryLabel' => $this->secondaryLabel,
             'primaryLabel' => $this->primaryLabel,
             'definitionLabel' => $this->definitionLabel,
-            'categories' => $this->categories,
+            'taxonomy' => $this->taxonomy->toArray(),
         ];
     }
 
@@ -167,12 +108,7 @@ final class Config implements PluginSettingsData
         $config->secondaryLabel = self::trimToNullStatic($raw['secondaryLabel'] ?? null);
         $config->primaryLabel = self::trimToNullStatic($raw['primaryLabel'] ?? null);
         $config->definitionLabel = self::trimToNullStatic($raw['definitionLabel'] ?? null);
-
-        $categories = [];
-        foreach ($raw['categories'] ?? [] as $category) {
-            $categories[] = ['id' => (int) $category['id'], 'label' => (string) $category['label']];
-        }
-        $config->categories = $categories;
+        $config->taxonomy = TaxonomyConfig::fromArray($raw['taxonomy'] ?? []);
 
         return $config;
     }

@@ -22,12 +22,14 @@ use App\Enum\MenuLocation;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\ExtendedFilesystem;
+use App\Item\Portability\ItemImportContext;
+use App\Item\Portability\ItemPortabilityRegistry;
+use App\Item\Portability\ItemTaxonomyPortability;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use ZipArchive;
 
 readonly class ImportService
@@ -37,8 +39,9 @@ readonly class ImportService
         private UserRepository $userRepository,
         private LocationRepository $locationRepository,
         private ExtendedFilesystem $fs,
-        #[Autowire('%kernel.project_dir%')]
-        private string $projectDir,
+        private PortableImageImporter $imageImporter,
+        private ItemPortabilityRegistry $itemRegistry,
+        private ItemTaxonomyPortability $taxonomyPortability,
     ) {}
 
     public function import(string $zipPath): ImportSummary
@@ -76,6 +79,8 @@ readonly class ImportService
                 'eventsCreated' => 0,
                 'cmsPagesCreated' => 0,
                 'cmsPagesSkipped' => 0,
+                'itemSectionsSkipped' => 0,
+                'taxonomyAssignmentsDropped' => 0,
             ];
 
             $locationRefMap = $this->importLocations($data['locations'] ?? [], $systemUser, $counts);
@@ -86,6 +91,8 @@ readonly class ImportService
 
             $this->em->flush();
 
+            $itemsByType = $this->importItems($data['items'] ?? [], $tempDir, $systemUser, $counts);
+
             return new ImportSummary(
                 usersCreated: $counts['usersCreated'],
                 usersSkipped: $counts['usersSkipped'],
@@ -93,6 +100,9 @@ readonly class ImportService
                 eventsCreated: $counts['eventsCreated'],
                 cmsPagesCreated: $counts['cmsPagesCreated'],
                 cmsPagesSkipped: $counts['cmsPagesSkipped'],
+                itemsByType: $itemsByType,
+                itemSectionsSkipped: $counts['itemSectionsSkipped'],
+                taxonomyAssignmentsDropped: $counts['taxonomyAssignmentsDropped'],
             );
         } finally {
             $this->removeDirectory($tempDir);
@@ -375,47 +385,46 @@ readonly class ImportService
         }
     }
 
+    /**
+     * Item sections run after the core flush: a contributor needs the generated ids to build its
+     * ref map, and the taxonomy re-keying needs that map in turn.
+     *
+     * @param array<string, mixed> $itemsData
+     * @param array<string, int> $counts
+     * @return array<string, array{created: int, matched: int}>
+     */
+    private function importItems(array $itemsData, string $tempDir, User $systemUser, array &$counts): array
+    {
+        $context = new ItemImportContext($this->imageImporter, $tempDir, $systemUser);
+        $byType = [];
+
+        foreach ($itemsData as $itemType => $block) {
+            $contributor = $this->itemRegistry->contributorFor($itemType);
+            if ($contributor === null || !is_array($block)) {
+                ++$counts['itemSectionsSkipped'];
+                continue;
+            }
+
+            $rows = array_values(array_filter(
+                is_array($block['rows'] ?? null) ? $block['rows'] : [],
+                is_array(...),
+            ));
+            $result = $contributor->importItems($rows, $context);
+
+            $byType[$itemType] = ['created' => $result->created, 'matched' => $result->matched];
+            $counts['taxonomyAssignmentsDropped'] += $this->taxonomyPortability->import(
+                $itemType,
+                $block,
+                $result->refToItemId,
+            );
+        }
+
+        return $byType;
+    }
+
     private function importImage(string $imagePath, ImageType $type, User $uploader): ?Image
     {
-        if (!$this->fs->fileExists($imagePath)) {
-            return null;
-        }
-
-        $content = (string) $this->fs->getFileContents($imagePath);
-        $hash = sha1($content);
-
-        $existing = $this->em->getRepository(Image::class)->findOneBy(['hash' => $hash]);
-        if ($existing !== null) {
-            return $existing;
-        }
-
-        $extension = strtolower(pathinfo($imagePath, PATHINFO_EXTENSION));
-        if ($extension === '') {
-            return null;
-        }
-
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($content) ?: 'application/octet-stream';
-
-        $targetDir = $this->projectDir . '/data/images/';
-        if (!$this->fs->isDirectory($targetDir)) {
-            $this->fs->makeDirectory($targetDir);
-        }
-
-        $this->fs->putFileContents($targetDir . $hash . '.' . $extension, $content);
-
-        $image = new Image();
-        $image->setHash($hash);
-        $image->setExtension($extension);
-        $image->setMimeType($mimeType);
-        $image->setSize(strlen($content));
-        $image->setType($type);
-        $image->setUploader($uploader);
-        $image->setCreatedAt(new DateTimeImmutable());
-
-        $this->em->persist($image);
-
-        return $image;
+        return $this->imageImporter->import($imagePath, $type, $uploader);
     }
 
     /**

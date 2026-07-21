@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ entry.phrase }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-two-thirds">
+
+                    <h1 class="title">{{ entry.phrase }}</h1>
+                    {% if config.secondaryEnabled and entry.pinyin %}
+                        <p class="subtitle has-text-grey">{{ entry.pinyin }}</p>
+                    {% endif %}
+
+                    {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'glossary', 'itemId': entry.id} only %}
+
+                    <table class="table is-narrow">
+                        <tr>
+                            <th>{{ config.definitionLabel ?? ('glossary.label_explanation'|trans) }}</th>
+                            <td>{{ entry.explanation|nl2br }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'glossary.label_created_by'|trans }}</th>
+                            <td>{{ get_user_name(entry.createdBy) }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'glossary.label_created_at'|trans }}</th>
+                            <td>{{ entry.createdAt|time_diff }}</td>
+                        </tr>
+                    </table>
+
+                    <div class="mt-4 buttons">
+                        {% if is_granted('ROLE_USER') %}
+                            <a href="{{ path('app_plugin_glossary_edit', {id: entry.id}) }}" class="button is-small">
+                                <span class="icon"><i class="fa fa-edit"></i></span>
+                                <span>{{ is_granted('ROLE_ORGANIZER') ? ('glossary.button_edit'|trans) : ('glossary.button_suggest_change'|trans) }}</span>
+                            </a>
+                        {% endif %}
+                        {% if is_granted('ROLE_ORGANIZER') %}
+                            {% if not entry.approved %}
+                                <a href="{{ path('app_plugin_glossary_approval_list', {id: entry.id}) }}" class="button is-small is-success is-light">
+                                    <span class="icon"><i class="fa fa-check"></i></span>
+                                    <span>{{ 'glossary.button_review_approval'|trans }}</span>
+                                </a>
+                            {% endif %}
+                            {% if entry.suggestions is not empty %}
+                                <a href="{{ path('app_plugin_glossary_suggestion_list', {id: entry.id}) }}" class="button is-small is-warning is-light">
+                                    <span class="icon"><i class="fa fa-edit"></i></span>
+                                    <span>{{ 'glossary.button_review_suggestions'|trans }}</span>
+                                </a>
+                            {% endif %}
+                            <a href="{{ path('app_plugin_glossary_delete_view', {id: entry.id}) }}" class="button is-small is-danger is-light">
+                                <span class="icon"><i class="fa fa-trash"></i></span>
+                                <span>{{ 'global.button_delete'|trans }}</span>
+                            </a>
+                        {% endif %}
+                    </div>
+
+                    <a href="{{ path('app_plugin_glossary') }}" class="is-size-7">{{ 'glossary.link_back_to_list'|trans }}</a>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

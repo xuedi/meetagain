@@ -1,0 +1,54 @@
+{# Glossary cell rendered by the shared item-list component (core wraps it in the chosen layout). #}
+{% set mode = item_view_mode('glossary').value %}
+{% if mode not in ['list', 'tiles'] %}{% set mode = 'list' %}{% endif %}
+{% set showUrl = path('app_plugin_glossary_show', {id: entry.id}) %}
+
+{% if mode == 'list' %}
+    <td style="vertical-align: middle;">
+        <a href="{{ showUrl }}" class="has-text-weight-medium">{{ entry.phrase }}</a>
+    </td>
+    {% if config.secondaryEnabled %}<td style="vertical-align: middle;" class="has-text-grey">{{ entry.pinyin }}</td>{% endif %}
+    <td style="vertical-align: middle;">{{ entry.getExplanationShortened(110)|nl2br }}</td>
+    {% if config.hasCategories %}<td style="vertical-align: middle;">{{ item_category_label('glossary', entry.id)|default('') }}</td>{% endif %}
+    {% if is_granted('ROLE_USER') %}
+        <td style="vertical-align: middle;" class="has-text-right">
+            {% if is_granted('ROLE_ORGANIZER') %}
+                {% if not entry.approved %}
+                    <a class="has-text-success" href="{{ path('app_plugin_glossary_approval_list', {id: entry.id}) }}"
+                       title="{{ 'glossary.heading_waiting_approval'|trans }}">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                {% endif %}
+                {% if entry.suggestions is not empty %}
+                    <a class="has-text-warning" href="{{ path('app_plugin_glossary_suggestion_list', {id: entry.id}) }}"
+                       title="{{ 'glossary.heading_changes_approval'|trans }}">
+                        <i class="fa fa-edit"></i>
+                    </a>
+                {% endif %}
+                {% if entry.approved and entry.suggestions is empty %}
+                    <a href="{{ path('app_plugin_glossary_edit', {id: entry.id}) }}">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                {% endif %}
+                <a class="has-text-danger" href="{{ path('app_plugin_glossary_delete_view', {id: entry.id}) }}">
+                    <i class="fa fa-trash"></i>
+                </a>
+            {% else %}
+                <a href="{{ path('app_plugin_glossary_edit', {id: entry.id}) }}">
+                    <i class="fas fa-edit"></i>
+                </a>
+            {% endif %}
+        </td>
+    {% endif %}
+{% else %}
+    <div class="card" style="height: 100%;">
+        <div class="card-content">
+            <p class="title is-5"><a href="{{ showUrl }}">{{ entry.phrase }}</a></p>
+            {% if config.secondaryEnabled and entry.pinyin %}
+                <p class="subtitle is-6 has-text-grey">{{ entry.pinyin }}</p>
+            {% endif %}
+            <p>{{ entry.getExplanationShortened(110)|nl2br }}</p>
+            {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'glossary', 'itemId': entry.id} only %}
+        </div>
+    </div>
+{% endif %}

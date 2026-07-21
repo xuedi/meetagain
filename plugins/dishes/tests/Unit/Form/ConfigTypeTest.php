@@ -2,6 +2,8 @@
 
 namespace Plugin\Dishes\Tests\Unit\Form;
 
+use App\Form\Item\TaxonomyConfigType;
+use App\Form\Item\TaxonomyDefinitionType;
 use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Dishes\ValueObject\Config;
@@ -95,7 +97,11 @@ class ConfigTypeTest extends TestCase
         $languageService->method('getAdminFilteredEnabledCodes')->willReturn($codes);
 
         return Forms::createFormFactoryBuilder()
-            ->addExtension(new PreloadedExtension([new ConfigType($languageService)], []))
+            ->addExtension(new PreloadedExtension([
+                new ConfigType($languageService),
+                new TaxonomyConfigType(),
+                new TaxonomyDefinitionType($languageService),
+            ], []))
             ->getFormFactory();
     }
 }

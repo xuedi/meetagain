@@ -32,6 +32,7 @@ dishes_dish:
     button_cancel: 'Abbrechen'
     confirm_delete: 'Dieses Gericht löschen?'
     list_empty: 'Noch keine Gerichte.'
+    sidebar_info: 'Alle Gerichte aus der Runde, mit Fotos, wo jemand eines gemacht hat.'
     no_preview: 'Kein Bild verfügbar'
     label_preview: 'Vorschaubild'
     help_preview: 'JPG oder PNG, bis zu 8 MB. Ersetzt das aktuelle Vorschaubild.'

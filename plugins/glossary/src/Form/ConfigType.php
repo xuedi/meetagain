@@ -2,10 +2,10 @@
 
 namespace Plugin\Glossary\Form;
 
+use App\Form\Item\TaxonomyConfigType;
 use Plugin\Glossary\ValueObject\Config;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -30,16 +30,7 @@ class ConfigType extends AbstractType
             'label' => 'glossary_config.secondary_label',
             'required' => false,
             'help' => 'glossary_config.secondary_label_help',
-        ])->add('categories', CollectionType::class, [
-            'label' => 'glossary_config.categories',
-            'help' => 'glossary_config.categories_help',
-            'entry_type' => CategoryType::class,
-            'allow_add' => true,
-            'allow_delete' => true,
-            'by_reference' => false,
-            'required' => false,
-            'prototype' => true,
-        ]);
+        ])->add('taxonomy', TaxonomyConfigType::class);
     }
 
     #[\Override]

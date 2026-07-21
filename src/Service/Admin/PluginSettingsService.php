@@ -50,6 +50,24 @@ final readonly class PluginSettingsService
         return $this->descriptors[$key] ?? null;
     }
 
+    /**
+     * Scopable descriptors grouped under their owning plugin key, priority order preserved.
+     *
+     * @return array<string, list<PluginSettingsDescriptorInterface>>
+     */
+    public function getScopableByPlugin(): array
+    {
+        $grouped = [];
+        foreach ($this->descriptors as $descriptor) {
+            if (!$descriptor->isScopable()) {
+                continue;
+            }
+            $grouped[$descriptor->getPluginKey()][] = $descriptor;
+        }
+
+        return $grouped;
+    }
+
     public function hasAny(): bool
     {
         return $this->descriptors !== [];

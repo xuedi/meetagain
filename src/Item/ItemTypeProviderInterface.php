@@ -6,7 +6,7 @@ use App\Entity\EventItemAssociation;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Registers one item type with the core item seam. The registry keys providers by
+ * Registers one item type as attachable to events. The registry keys providers by
  * getKey() and shows only those whose owning plugin is active.
  */
 #[AutoconfigureTag]
@@ -23,9 +23,6 @@ interface ItemTypeProviderInterface
 
     /** Cell rendered on the event detail page for one association; null when the item no longer exists. */
     public function renderEventCell(int $itemId, EventItemAssociation $association): ?string;
-
-    /** Per-item cell markup the shared list component wraps in the chosen layout; null when the item is gone. */
-    public function renderListCell(int $itemId): ?string;
 
     /** Steward search/pick fragment rendered inside the attach control. */
     public function renderAttachPicker(int $eventId): string;

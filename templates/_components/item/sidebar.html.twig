@@ -1,0 +1,45 @@
+{#
+    Item List Sidebar - the shared side column of an item-list page
+
+    Three stacked boxes for any item type: the view-mode switcher, the category/tag filter (which
+    renders nothing of its own when the type defines no vocabulary), and an "about this list" box
+    carrying the entry count, a plugin-supplied blurb and - for a steward looking at a type with no
+    vocabulary yet - a hint pointing at the plugin settings. Everything except the count and the
+    blurb key is read from the core item Twig functions, so a page adopts the whole column by naming
+    its item type.
+
+    Used in:    _components/item/list_layout.html.twig
+    Parameters:
+        - itemType  (string, required)       -- registry key of the item type (e.g. 'film')
+        - itemCount (int, optional)          -- entries currently listed; omit to hide the count line
+        - modes     (list<string>, optional) -- view-mode values to offer; default: all four
+        - infoKey   (string, optional)       -- translation key of the blurb;
+                                                default: 'item.sidebar_info_default'
+    Depends on: _components/item/view_switcher.html.twig, _components/item/taxonomy_filter.html.twig;
+                item_taxonomy_category_choices(), item_taxonomy_tag_choices() (ItemTaxonomyExtension);
+                the app_admin_plugin_settings route
+#}
+<div class="box mb-4">
+    <p class="heading">{{ 'item.sidebar_view_heading'|trans }}</p>
+    {% include '_components/item/view_switcher.html.twig' with {'itemType': itemType, 'modes': modes|default([])} only %}
+</div>
+
+{% include '_components/item/taxonomy_filter.html.twig' with {'itemType': itemType} only %}
+
+<div class="box">
+    <p class="heading">{{ 'item.sidebar_about_heading'|trans }}</p>
+    {% if itemCount is defined and itemCount is not null %}
+        <p class="has-text-weight-semibold">{{ 'item.sidebar_count'|trans({'%count%': itemCount}) }}</p>
+    {% endif %}
+    <p class="is-size-7 has-text-grey">{{ (infoKey|default('item.sidebar_info_default'))|trans }}</p>
+    {% if is_granted('ROLE_STEWARD')
+        and item_taxonomy_category_choices(itemType) is empty
+        and item_taxonomy_tag_choices(itemType) is empty %}
+        <p class="is-size-7 has-text-grey mt-3">
+            {{ 'item.sidebar_taxonomy_hint'|trans }}
+            {% if is_granted('ROLE_ADMIN') %}
+                <a href="{{ path('app_admin_plugin_settings') }}">{{ 'item.sidebar_taxonomy_settings_link'|trans }}</a>
+            {% endif %}
+        </p>
+    {% endif %}
+</div>

@@ -10,29 +10,26 @@
 
 {% block dishes_body %}
 {% set viewMode = item_view_mode('dish').value %}
-<div class="level mb-4">
-    <div class="level-left">
-        <h1 class="title mb-0">{{ 'dishes_dish.page_title_list'|trans }}</h1>
-    </div>
-    <div class="level-right">
-        {% include '_components/item/view_switcher.html.twig' with {'itemType': 'dish'} %}
-    </div>
-</div>
+<h1 class="title mb-4">{{ 'dishes_dish.page_title_list'|trans }}</h1>
 
-{% if dishes is empty and not is_granted('ROLE_STEWARD') %}
-    <p class="has-text-grey">{{ 'dishes_dish.list_empty'|trans }}</p>
-{% elseif viewMode == 'tiles' %}
-    {% include '@Dishes/views/tiles.html.twig' %}
-{% elseif viewMode == 'grid' %}
-    {% include '@Dishes/views/grid.html.twig' %}
-{% elseif viewMode == 'gallery' %}
-    {% include '@Dishes/views/gallery.html.twig' %}
-{% else %}
-    {% include '@Dishes/views/list.html.twig' %}
-{% endif %}
+{% embed '_components/item/list_layout.html.twig' with {'itemType': 'dish', 'itemCount': dishes|length, 'infoKey': 'dishes_dish.sidebar_info'} %}
+    {% block item_list_main %}
+        {% if dishes is empty and not is_granted('ROLE_STEWARD') %}
+            <p class="has-text-grey">{{ 'dishes_dish.list_empty'|trans }}</p>
+        {% elseif viewMode == 'tiles' %}
+            {% include '@Dishes/views/tiles.html.twig' %}
+        {% elseif viewMode == 'grid' %}
+            {% include '@Dishes/views/grid.html.twig' %}
+        {% elseif viewMode == 'gallery' %}
+            {% include '@Dishes/views/gallery.html.twig' %}
+        {% else %}
+            {% include '@Dishes/views/list.html.twig' %}
+        {% endif %}
 
-{% if footer is not empty %}
-    <hr>
-    <div class="content has-text-grey">{{ footer|nl2br }}</div>
-{% endif %}
+        {% if footer is not empty %}
+            <hr>
+            <div class="content has-text-grey">{{ footer|nl2br }}</div>
+        {% endif %}
+    {% endblock %}
+{% endembed %}
 {% endblock %}

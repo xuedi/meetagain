@@ -67,6 +67,13 @@
             {{ form_errors(form.genresCsv) }}
         </div>
 
+        {% if form.taxonomyCategory is defined %}
+            <div class="field">{{ form_row(form.taxonomyCategory) }}</div>
+        {% endif %}
+        {% if form.taxonomyTags is defined %}
+            <div class="field">{{ form_row(form.taxonomyTags) }}</div>
+        {% endif %}
+
         <div class="field is-grouped mt-4">
             <div class="control">{{ form_widget(form.submit) }}</div>
             <div class="control">

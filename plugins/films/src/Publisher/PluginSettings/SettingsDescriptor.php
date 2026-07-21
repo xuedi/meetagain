@@ -19,6 +19,17 @@ final readonly class SettingsDescriptor implements PluginSettingsDescriptorInter
         return 'films';
     }
 
+    public function getPluginKey(): string
+    {
+        return 'films';
+    }
+
+    /** The API keys live in a SecretBox-encrypted entity with a global-only store. */
+    public function isScopable(): bool
+    {
+        return false;
+    }
+
     public function getTitleKey(): string
     {
         return 'films_settings.page_title';

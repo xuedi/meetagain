@@ -3,7 +3,7 @@
 namespace App\Twig;
 
 use App\Enum\ItemViewType;
-use App\Item\ItemTypeRegistry;
+use App\Item\ListCellRegistry;
 use App\Service\Item\ItemViewResolver;
 use Override;
 use Twig\Extension\AbstractExtension;
@@ -17,7 +17,7 @@ final class ItemViewExtension extends AbstractExtension
 {
     public function __construct(
         private readonly ItemViewResolver $viewResolver,
-        private readonly ItemTypeRegistry $registry,
+        private readonly ListCellRegistry $registry,
     ) {}
 
     #[Override]

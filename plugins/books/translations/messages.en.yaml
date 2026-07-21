@@ -22,6 +22,7 @@ books_book:
     confirm_delete: 'Delete this book?'
     link_manual_entry: 'Add manually instead'
     list_empty: 'No books yet.'
+    sidebar_info: 'Every book the club has read or put on the shelf, newest first.'
     no_cover: 'No cover available'
     field_isbn: 'ISBN'
     field_isbn_placeholder: 'e.g. 978-0143105428'
@@ -42,3 +43,6 @@ books_book:
     flash_isbn_not_found: 'No book found for that ISBN. You can add it manually.'
     flash_already_exists: 'This book is already in the catalog.'
     flash_invalid_image: 'The uploaded image could not be processed. Please use a JPG or PNG.'
+
+books_config:
+    page_title: 'Books'
