@@ -1,17 +1,22 @@
 {#
     Item List - Shared switchable list of item cells with per-type view persistence
 
-    Renders any item type's list through one of four layouts behind a Bulma view switcher:
-    'list' is a real <table> (each cell emits its own <td> columns), while tiles/grid/gallery
-    wrap each cell in a Bulma column. The current mode is read from and written to the session
-    keyed by item type, so each list remembers its own mode independently. Each item's inner
-    cell markup comes from the item-type provider's renderListCell(); this component owns only
-    the switcher, the table/column wrappers, the persistence, and an optional leading "add" tile.
+    Renders any item type's list through one of four layouts: 'list' is a real <table> (each cell
+    emits its own <td> columns), while tiles/grid/gallery wrap each cell in a Bulma column. The
+    current mode is read from the session keyed by item type, so each list remembers its own mode
+    independently; the switcher that writes it lives in the sidebar of
+    _components/item/list_layout.html.twig. Each item's inner cell markup comes from the list-cell
+    provider's renderListCell(); this component owns only the table/column wrappers and an optional
+    leading "add" tile.
 
-    Used in:    item-list pages of the films / books / dishes plugins
+    Used in:    item-list pages of the films / books / dishes / glossary plugins
     Parameters:
         - itemType     (string, required)     -- registry key of the item type (e.g. 'film')
         - itemIds      (list<int>, required)  -- ids of the items to render, in display order
+        - modes        (list<string>, optional) -- view-mode values the type offers; a session mode
+                                                 outside the list is clamped to the first allowed
+                                                 one. Cells of such a type must clamp the same way.
+                                                 Default: all four
         - emptyMessage (string, optional)     -- translation key shown when itemIds is empty;
                                                  default: 'item.list_empty'
         - listHeader   (list<string>, optional) -- translation keys for the <thead> columns of the
@@ -22,8 +27,7 @@
                                                  tiles/grid/gallery layouts (list mode relies on the
                                                  page's own header button). Shown even when empty.
         - addLabel     (string, optional)     -- translation key for the add tile; default: 'item.add'
-    Depends on: item_view_mode(), item_view_types(), item_list_cell() (ItemViewExtension);
-                the app_item_set_view route
+    Depends on: item_view_mode(), item_list_cell() (ItemViewExtension)
 #}
 {% import _self as itemList %}
 
@@ -47,21 +51,18 @@
     </a>
 {% endmacro %}
 
-{% set current = item_view_mode(itemType) %}
+{% set allowedModes = modes|default([]) %}
+{% set current = item_view_mode(itemType).value %}
+{% if allowedModes is not empty and current not in allowedModes %}
+    {% set current = allowedModes|first %}
+{% endif %}
 {% set showAdd = addUrl is defined and addUrl and is_granted('ROLE_STEWARD') %}
 {% set addLabel = addLabel|default('item.add') %}
 {% set gridRatio = gridRatio|default('square') %}
 <div class="item-list" data-item-list="{{ itemType }}">
-    <div class="level mb-4">
-        <div class="level-left"></div>
-        <div class="level-right">
-            {% include '_components/item/view_switcher.html.twig' with {'itemType': itemType} %}
-        </div>
-    </div>
-
-    {% if itemIds is empty and not (showAdd and current.value != 'list') %}
+    {% if itemIds is empty and not (showAdd and current != 'list') %}
         <p class="has-text-grey">{{ (emptyMessage|default('item.list_empty'))|trans }}</p>
-    {% elseif current.value == 'list' %}
+    {% elseif current == 'list' %}
         <table class="table is-fullwidth is-hoverable">
             {% if listHeader is defined and listHeader %}
                 <thead>
@@ -74,14 +75,14 @@
                 {% endfor %}
             </tbody>
         </table>
-    {% elseif current.value == 'tiles' %}
+    {% elseif current == 'tiles' %}
         <div class="columns is-multiline">
             {% if showAdd %}<div class="column is-one-quarter item-cell">{{ itemList.add_tile(addUrl, addLabel) }}</div>{% endif %}
             {% for id in itemIds %}
                 <div class="column is-one-quarter item-cell">{{ item_list_cell(itemType, id) }}</div>
             {% endfor %}
         </div>
-    {% elseif current.value == 'grid' %}
+    {% elseif current == 'grid' %}
         <div class="columns is-multiline">
             {% if showAdd %}<div class="column is-1 p-1 item-cell">{{ itemList.add_tile_icon(addUrl, addLabel, gridRatio) }}</div>{% endif %}
             {% for id in itemIds %}

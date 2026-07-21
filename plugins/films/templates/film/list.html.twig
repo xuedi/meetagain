@@ -23,5 +23,9 @@
     {% endif %}
 </div>
 
-{% include '_components/item/list.html.twig' with {'itemType': 'film', 'itemIds': itemIds, 'emptyMessage': 'films_film.list_empty', 'addUrl': path('app_plugin_films_film_manual'), 'addLabel': 'films_film.button_manual', 'gridRatio': 'portrait', 'listHeader': ['films_film.label_poster', 'films_film.col_title', 'films_film.col_year', '']} %}
+{% embed '_components/item/list_layout.html.twig' with {'itemType': 'film', 'itemCount': itemIds|length, 'infoKey': 'films_film.sidebar_info'} %}
+    {% block item_list_main %}
+        {% include '_components/item/list.html.twig' with {'itemType': 'film', 'itemIds': itemIds, 'emptyMessage': 'films_film.list_empty', 'addUrl': path('app_plugin_films_film_manual'), 'addLabel': 'films_film.button_manual', 'gridRatio': 'portrait', 'listHeader': ['films_film.label_poster', 'films_film.col_title', 'films_film.col_year', '']} only %}
+    {% endblock %}
+{% endembed %}
 {% endblock %}

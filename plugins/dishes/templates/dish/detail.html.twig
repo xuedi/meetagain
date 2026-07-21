@@ -40,6 +40,8 @@
                 </p>
             {% endif %}
 
+            {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'dish', 'itemId': dish.id} only %}
+
             {% if dish.previewImage %}
                 {% set reportCaption = 'You can <a href=' ~ path('app_report_image', {'id': dish.previewImage.id}) ~ '>report</a> an image if there is something wrong.' %}
                 <figure class="image mb-2">

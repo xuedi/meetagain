@@ -78,7 +78,6 @@ class TranslatorSmokeTest extends WebTestCase
         'films_tile',
         // Glossary plugin namespaces
         'glossary',
-        'glossary_blocks',
         // Commercial-plugin namespaces are covered by the plugin's own TranslatorSmokeTest.
     ];
 

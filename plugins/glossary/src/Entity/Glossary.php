@@ -31,9 +31,6 @@ class Glossary
     private bool $approved = false;
 
     #[ORM\Column(nullable: true)]
-    private ?int $category = null;
-
-    #[ORM\Column(nullable: true)]
     private ?array $suggestion = null;
 
     #[ORM\Column(type: Types::TEXT)]
@@ -105,18 +102,6 @@ class Glossary
     public function setCreatedBy(?int $createdBy): static
     {
         $this->createdBy = $createdBy;
-
-        return $this;
-    }
-
-    public function getCategory(): ?int
-    {
-        return $this->category;
-    }
-
-    public function setCategory(?int $category): static
-    {
-        $this->category = $category;
 
         return $this;
     }

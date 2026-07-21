@@ -2,8 +2,10 @@
 
 namespace Plugin\Books\Form;
 
+use App\Item\Taxonomy\ItemAssignmentFormHelper;
 use Override;
 use Plugin\Books\Entity\Book;
+use Plugin\Books\Service\BookService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -19,6 +21,7 @@ class BookEditType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
+        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
     ) {}
 
     #[Override]
@@ -57,11 +60,15 @@ class BookEditType extends AbstractType
                 'constraints' => [
                     new File(maxSize: '8000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('books_book.flash_invalid_image')),
                 ],
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'books_book.button_save',
-                'attr' => ['class' => 'button is-primary'],
             ]);
+
+        $book = $builder->getData();
+        $this->assignmentFormHelper->addAssignmentFields($builder, BookService::ITEM_TYPE, $book instanceof Book ? $book->getId() : null);
+
+        $builder->add('submit', SubmitType::class, [
+            'label' => 'books_book.button_save',
+            'attr' => ['class' => 'button is-primary'],
+        ]);
     }
 
     #[Override]

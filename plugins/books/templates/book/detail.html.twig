@@ -23,6 +23,8 @@
         <p class="subtitle has-text-grey">{{ book.author }}</p>
         {% endif %}
 
+        {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
+
         <table class="table is-narrow">
             <tr>
                 <th>{{ 'books_book.col_isbn'|trans }}</th>

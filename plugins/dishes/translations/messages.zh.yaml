@@ -32,6 +32,7 @@ dishes_dish:
     button_cancel: '取消'
     confirm_delete: '删除此菜肴？'
     list_empty: '暂无菜肴。'
+    sidebar_info: '大家分享过的全部菜肴，有人拍了照片的还配有图片。'
     no_preview: '暂无图片'
     label_preview: '预览图片'
     help_preview: 'JPG 或 PNG，最大 8 MB。将替换当前预览图片。'

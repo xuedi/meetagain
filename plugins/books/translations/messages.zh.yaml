@@ -22,6 +22,7 @@ books_book:
     confirm_delete: '删除这本书？'
     link_manual_entry: '改为手动添加'
     list_empty: '暂无书籍。'
+    sidebar_info: '俱乐部读过或已上架的全部书籍，最新的排在前面。'
     no_cover: '暂无封面'
     field_isbn: 'ISBN'
     field_isbn_placeholder: '例如 978-0143105428'
@@ -42,3 +43,6 @@ books_book:
     flash_isbn_not_found: '未找到该 ISBN 对应的书籍。你可以手动添加。'
     flash_already_exists: '该书籍已在目录中。'
     flash_invalid_image: '上传的图片无法处理。请使用 JPG 或 PNG。'
+
+books_config:
+    page_title: '书籍'

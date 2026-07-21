@@ -32,6 +32,7 @@ dishes_dish:
     button_cancel: 'Cancel'
     confirm_delete: 'Delete this dish?'
     list_empty: 'No dishes yet.'
+    sidebar_info: 'Every dish shared by the group, with photos where someone brought a camera.'
     no_preview: 'No image available'
     label_preview: 'Preview image'
     help_preview: 'JPG or PNG, up to 8 MB. Replaces the current preview.'

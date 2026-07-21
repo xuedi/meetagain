@@ -13,13 +13,13 @@ class RemoveOrphanedClubPluginTablesTest extends TestCase
         // Arrange
         $captured = [];
         $connection = $this->createStub(Connection::class);
-        $connection->method('executeStatement')->willReturnCallback(
-            function (string $sql) use (&$captured): int {
+        $connection
+            ->method('executeStatement')
+            ->willReturnCallback(static function (string $sql) use (&$captured): int {
                 $captured[] = $sql;
 
                 return 0;
-            },
-        );
+            });
 
         $subject = new RemoveOrphanedClubPluginTables($connection);
 

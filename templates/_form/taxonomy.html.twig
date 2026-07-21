@@ -1,0 +1,53 @@
+{#
+    Item Taxonomy form theme -- renders TaxonomyConfigType (the embedded category/tag definition
+    editor) with a per-language column toggle and per-feature enable gating, on top of the generic
+    descriptor form rendering used by the plugin settings pages. Each definition row shows one label
+    column per enabled admin language; js/admin/taxonomy-definitions.js shows one column at a time
+    and hides a collection whose enable checkbox is off. With JavaScript disabled every column and
+    both collections stay visible, so every label remains editable.
+
+    Registered in: config/packages/twig.yaml (form_themes, after _form/bulma.html.twig)
+    Depends on:    js/admin/taxonomy-definitions.js; get_admin_language_codes()
+#}
+{%- block item_taxonomy_config_widget -%}
+    <div class="taxonomy-config">
+        <div class="box p-3 mb-4" data-taxonomy-section>
+            <p class="label is-small mb-2">{{ 'item.taxonomy_categories_heading'|trans }}</p>
+            {{ form_row(form.categoriesEnabled) }}
+            <div data-taxonomy-body>
+                {{ block('taxonomy_locale_toggle') }}
+                {{ form_row(form.categories, {label: false}) }}
+            </div>
+        </div>
+
+        <div class="box p-3 mb-4" data-taxonomy-section>
+            <p class="label is-small mb-2">{{ 'item.taxonomy_tags_heading'|trans }}</p>
+            {{ form_row(form.tagsEnabled) }}
+            <div data-taxonomy-body>
+                {{ block('taxonomy_locale_toggle') }}
+                {{ form_row(form.tags, {label: false}) }}
+            </div>
+        </div>
+    </div>
+{%- endblock -%}
+
+{%- block taxonomy_locale_toggle -%}
+    <div class="buttons has-addons mb-2 taxonomy-locale-toggle">
+        {% for code in get_admin_language_codes() %}
+            <button type="button"
+                    class="button is-small taxonomy-locale-button{{ loop.first ? ' is-active' }}"
+                    data-taxonomy-locale-target="{{ code }}">{{ code|upper }}</button>
+        {% endfor %}
+    </div>
+{%- endblock -%}
+
+{%- block taxonomy_definition_row_widget -%}
+    {{- form_widget(form.id) -}}
+    <div class="taxonomy-row is-flex is-flex-wrap-wrap" style="gap: 0.5rem;">
+        {% for code in get_admin_language_codes() %}
+            <div class="taxonomy-locale-cell" data-taxonomy-locale-cell="{{ code }}" style="flex: 1 1 12rem;">
+                {{- form_row(attribute(form, code), {label: code|upper, attr: {placeholder: code|upper}}) -}}
+            </div>
+        {% endfor %}
+    </div>
+{%- endblock -%}

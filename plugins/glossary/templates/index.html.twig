@@ -2,27 +2,58 @@
 
 {% block title %}{{ 'glossary.page_title'|trans }}{% endblock %}
 
+{% block javascripts %}
+    <script src="{{ asset('js/vendor/jstable.min.js') }}"></script>
+{% endblock %}
+
 {% block body %}
+
+    {% set primaryLabel = config.primaryLabel ?? ('glossary.label_phrase'|trans) %}
+    {% set secondaryLabel = config.secondaryLabel ?? ('glossary.label_pinyin'|trans) %}
+    {% set definitionLabel = config.definitionLabel ?? ('glossary.label_explanation'|trans) %}
+
+    {% set viewModes = ['list', 'tiles'] %}
+    {% set listHeader = [primaryLabel] %}
+    {% if config.secondaryEnabled %}{% set listHeader = listHeader|merge([secondaryLabel]) %}{% endif %}
+    {% set listHeader = listHeader|merge([definitionLabel]) %}
+    {% if config.hasCategories %}{% set listHeader = listHeader|merge([('glossary.label_category'|trans)]) %}{% endif %}
+    {% if is_granted('ROLE_USER') %}{% set listHeader = listHeader|merge(['']) %}{% endif %}
 
     <section class="section">
         <div class="container">
 
-            {% include '@Glossary/blocks/list.html.twig' %}
+            <div class="level mb-4">
+                <div class="level-left">
+                    <h1 class="title mb-0">{{ 'glossary.page_title'|trans }}</h1>
+                </div>
+                {% if is_granted('ROLE_USER') %}
+                    <div class="level-right">
+                        <a href="{{ path('app_plugin_glossary_new') }}" class="button is-link">
+                            <span class="icon"><i class="fa fa-plus"></i></span>
+                            <span>{{ 'glossary.button_suggest_new'|trans }}</span>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% embed '_components/item/list_layout.html.twig' with {
+                'itemType': 'glossary',
+                'itemCount': itemIds|length,
+                'modes': viewModes,
+                'infoKey': 'glossary.sidebar_info'
+            } %}
+                {% block item_list_main %}
+                    {% include '_components/item/list.html.twig' with {
+                        'itemType': 'glossary',
+                        'itemIds': itemIds,
+                        'modes': viewModes,
+                        'emptyMessage': 'glossary.list_empty',
+                        'listHeader': listHeader
+                    } only %}
+                {% endblock %}
+            {% endembed %}
 
         </div>
     </section>
 
-    <script src="{{ asset('js/vendor/jstable.min.js') }}"></script>
-    <script>
-        let myTable = new JSTable("#filteredTable", {
-            sortable: true,
-            searchable: true,
-            perPage: 25,
-            perPageSelect: [
-                25, 50, 100, 250, 500, 2500,
-            ]
-        });
-    </script>
-
 {% endblock %}
-

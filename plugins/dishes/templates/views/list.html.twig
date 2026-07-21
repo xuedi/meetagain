@@ -22,7 +22,10 @@
                 <td style="vertical-align: middle;">
                     <a href="{{ showUrl }}"><figure class="image is-64x64">{% include '_components/image.html.twig' with {'image': item.previewImage, 'size': '400x400', 'alt': item.getTranslatedName(app.locale)} %}</figure></a>
                 </td>
-                <td style="vertical-align: middle;"><a href="{{ showUrl }}" class="has-text-weight-medium">{{ item.getTranslatedName(app.locale) }}</a></td>
+                <td style="vertical-align: middle;">
+                    <a href="{{ showUrl }}" class="has-text-weight-medium">{{ item.getTranslatedName(app.locale) }}</a>
+                    {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'dish', 'itemId': item.id} only %}
+                </td>
                 {% if showPhonetic %}<td style="vertical-align: middle;" class="has-text-grey">{{ item.phonetic }}</td>{% endif %}
                 <td style="vertical-align: middle;" class="has-text-grey">{{ item.getTranslatedDescription(app.locale) }}</td>
                 <td style="vertical-align: middle;" class="has-text-right">

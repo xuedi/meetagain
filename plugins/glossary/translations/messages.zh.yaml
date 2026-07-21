@@ -17,11 +17,12 @@ glossary:
     button_suggest_new: '建议新增'
     button_suggest_change: '建议修改'
     button_delete_yes: '是'
-glossary_blocks:
-    col_phrase: '短语'
-    col_pinyin: '拼音'
-    col_explanation: '解释'
-    col_category: '类别'
+    link_back_to_list: '返回术语表'
+    list_empty: '暂无条目。'
+    sidebar_info: '由社区收集并解释的词条，欢迎任何人提交新词条。'
+    button_edit: '编辑'
+    button_review_approval: '审核批准'
+    button_review_suggestions: '审核建议'
 glossary_config:
     page_title: '术语表配置'
     primary_label: '主字段标签'

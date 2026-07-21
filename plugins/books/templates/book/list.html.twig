@@ -23,5 +23,9 @@
     {% endif %}
 </div>
 
-{% include '_components/item/list.html.twig' with {'itemType': 'book', 'itemIds': itemIds, 'emptyMessage': 'books_book.list_empty', 'addUrl': path('app_plugin_books_book_manual'), 'addLabel': 'books_book.button_manual', 'gridRatio': 'portrait', 'listHeader': ['books_book.label_cover', 'books_book.label_title', 'books_book.label_author', '']} %}
+{% embed '_components/item/list_layout.html.twig' with {'itemType': 'book', 'itemCount': itemIds|length, 'infoKey': 'books_book.sidebar_info'} %}
+    {% block item_list_main %}
+        {% include '_components/item/list.html.twig' with {'itemType': 'book', 'itemIds': itemIds, 'emptyMessage': 'books_book.list_empty', 'addUrl': path('app_plugin_books_book_manual'), 'addLabel': 'books_book.button_manual', 'gridRatio': 'portrait', 'listHeader': ['books_book.label_cover', 'books_book.label_title', 'books_book.label_author', '']} only %}
+    {% endblock %}
+{% endembed %}
 {% endblock %}
