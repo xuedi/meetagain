@@ -58,6 +58,31 @@ final class ImagesControllerAltTest extends WebTestCase
         static::assertNotSame('should be ignored', $image->getAlt());
     }
 
+    public function testUpdateAltInvalidatesTheAltStatusCacheEntry(): void
+    {
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+
+        $id = $this->firstImageId();
+        if ($id === null) {
+            static::markTestSkipped('No images in fixtures.');
+        }
+
+        $pool = self::getContainer()->get('cache.image_alt_status');
+        $pool->clear();
+
+        // The admin list warms the per-image status entry.
+        $client->request('GET', '/en/admin/system/images');
+        $this->assertResponseIsSuccessful();
+        static::assertTrue($pool->getItem('image_alt_status.' . $id)->isHit());
+
+        [$action, $token] = $this->altFormFor($client, $id);
+        $client->request('POST', $action, ['_token' => $token, 'locale' => 'en', 'alt' => 'cache buster']);
+        $this->assertResponseRedirects();
+
+        static::assertFalse($pool->getItem('image_alt_status.' . $id)->isHit());
+    }
+
     /**
      * @return array{string, string} action URL and CSRF token, shared by every per-locale alt form
      */

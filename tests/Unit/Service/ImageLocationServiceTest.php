@@ -6,6 +6,7 @@ use App\Entity\Image;
 use App\Entity\ImageLocation;
 use App\Enum\ImageType;
 use App\Repository\ImageLocationRepository;
+use App\Service\Media\ImageAltStatusCache;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageTypes\ImageTypeDefinitionInterface;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
@@ -19,10 +20,12 @@ class ImageLocationServiceTest extends TestCase
         ?ImageLocationRepository $locationRepo = null,
         ?ImageTypeRegistry $registry = null,
         ?LoggerInterface $logger = null,
+        ?ImageAltStatusCache $statusCache = null,
     ): ImageLocationService {
         return new ImageLocationService(
             locationRepository: $locationRepo ?? $this->createStub(ImageLocationRepository::class),
             registry: $registry ?? $this->createStub(ImageTypeRegistry::class),
+            imageAltStatusCache: $statusCache ?? $this->createStub(ImageAltStatusCache::class),
             logger: $logger ?? $this->createStub(LoggerInterface::class),
         );
     }
@@ -57,6 +60,19 @@ class ImageLocationServiceTest extends TestCase
 
         // Act
         $service->removeLocation(5, ImageType::ProfilePicture, 7);
+    }
+
+    public function testAddAndRemoveLocationInvalidateTheAltStatusEntry(): void
+    {
+        // Arrange
+        $statusCache = $this->createMock(ImageAltStatusCache::class);
+        $statusCache->expects($this->exactly(2))->method('invalidateImage')->with(10);
+
+        $service = $this->createService(statusCache: $statusCache);
+
+        // Act
+        $service->addLocation(10, ImageType::EventTeaser, 20);
+        $service->removeLocation(10, ImageType::EventTeaser, 20);
     }
 
     // ---- discover() ----
@@ -107,6 +123,21 @@ class ImageLocationServiceTest extends TestCase
         $registry->method('all')->willReturn([$failing, $working]);
 
         $service = $this->createService(registry: $registry);
+
+        // Act
+        $service->discover();
+    }
+
+    public function testDiscoverInvalidatesAllAltStatusEntries(): void
+    {
+        // Arrange
+        $registry = $this->createStub(ImageTypeRegistry::class);
+        $registry->method('all')->willReturn([]);
+
+        $statusCache = $this->createMock(ImageAltStatusCache::class);
+        $statusCache->expects($this->once())->method('invalidateAll');
+
+        $service = $this->createService(registry: $registry, statusCache: $statusCache);
 
         // Act
         $service->discover();
