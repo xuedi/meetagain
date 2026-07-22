@@ -15,6 +15,7 @@ readonly class ImageLocationService
     public function __construct(
         private ImageLocationRepository $locationRepository,
         private ImageTypeRegistry $registry,
+        private ImageAltStatusCache $imageAltStatusCache,
         private LoggerInterface $logger,
     ) {}
 
@@ -24,6 +25,7 @@ readonly class ImageLocationService
     public function addLocation(int $imageId, ImageType $type, int $locationId): void
     {
         $this->locationRepository->insertForType($type, [['imageId' => $imageId, 'locationId' => $locationId]]);
+        $this->imageAltStatusCache->invalidateImage($imageId);
     }
 
     /**
@@ -32,6 +34,7 @@ readonly class ImageLocationService
     public function removeLocation(int $imageId, ImageType $type, int $locationId): void
     {
         $this->locationRepository->deleteByTypeAndPairs($type, [['imageId' => $imageId, 'locationId' => $locationId]]);
+        $this->imageAltStatusCache->invalidateImage($imageId);
     }
 
     /**
@@ -50,6 +53,7 @@ readonly class ImageLocationService
                 ]);
             }
         }
+        $this->imageAltStatusCache->invalidateAll();
     }
 
     /**

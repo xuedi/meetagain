@@ -257,7 +257,7 @@ class ImageRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Image[]
+     * @return list<Image>
      */
     public function findFiltered(?ImageType $type, ?DateTimeImmutable $since): array
     {

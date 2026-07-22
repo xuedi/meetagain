@@ -14,6 +14,7 @@ use App\Enum\ImageType;
 use App\Form\LanguageType;
 use App\Repository\LanguageRepository;
 use App\Service\Config\LanguageService;
+use App\Service\Media\ImageAltStatusCache;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,6 +38,7 @@ final class LanguageController extends AbstractSettingsController implements Adm
         private readonly LanguageService $languageService,
         private readonly ImageService $imageService,
         private readonly ImageLocationService $imageLocationService,
+        private readonly ImageAltStatusCache $imageAltStatusCache,
     ) {
         parent::__construct($translator, 'language');
     }
@@ -86,6 +88,7 @@ final class LanguageController extends AbstractSettingsController implements Adm
             }
 
             $this->languageService->invalidateCache();
+            $this->imageAltStatusCache->invalidateAll();
 
             $this->addFlash('success', $this->translator->trans('admin_system_language.flash_added'));
 
@@ -123,6 +126,7 @@ final class LanguageController extends AbstractSettingsController implements Adm
             }
 
             $this->languageService->invalidateCache();
+            $this->imageAltStatusCache->invalidateAll();
 
             $this->addFlash('success', $this->translator->trans('admin_system_language.flash_updated'));
 
@@ -149,6 +153,7 @@ final class LanguageController extends AbstractSettingsController implements Adm
         $language->setEnabled(!$language->isEnabled());
         $this->em->flush();
         $this->languageService->invalidateCache();
+        $this->imageAltStatusCache->invalidateAll();
 
         return $this->redirectToRoute('app_admin_language');
     }

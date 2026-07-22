@@ -64,7 +64,7 @@ class GetRoutesContractTest extends WebTestCase
         yield 'seo indexnow submit' => ['/en/admin/system/seo/indexnow-submit'];
         yield 'regenerate thumbnails' => ['/en/admin/system/images/regenerate_thumbnails'];
         yield 'cleanup thumbnails' => ['/en/admin/system/images/cleanup_thumbnails'];
-        yield 'sync image locations' => ['/en/admin/system/images/sync_locations'];
+        yield 'sync image locations' => ['/en/admin/system/images/sync'];
         yield 'support report resolve' => ['/en/admin/support/reports/resolve/1'];
         yield 'support mark read' => ['/en/admin/support/mark-read/1'];
     }
