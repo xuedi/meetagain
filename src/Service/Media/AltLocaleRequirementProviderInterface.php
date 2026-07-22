@@ -15,4 +15,13 @@ interface AltLocaleRequirementProviderInterface
      * @return list<string>|null
      */
     public function getRequiredAltLocales(Image $image): ?array;
+
+    /**
+     * Batch counterpart of getRequiredAltLocales() for a page of images: the same per-image
+     * decision, keyed by image ID (null defers that image to the next provider).
+     *
+     * @param list<Image> $images
+     * @return array<int, list<string>|null>
+     */
+    public function getRequiredAltLocalesForImages(array $images): array;
 }

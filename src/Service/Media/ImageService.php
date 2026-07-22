@@ -56,7 +56,7 @@ readonly class ImageService
         $image->setCreatedAt(new DateTimeImmutable());
         $image->setUploader($user);
 
-        $this->filesystem->copy($imageData->getRealPath(), $this->getSourceFile($image));
+        $this->filesystem->copy($imageData->getRealPath(), $this->getSourcePath($image));
         $this->entityManager->persist($image);
 
         return $image;
@@ -89,7 +89,7 @@ readonly class ImageService
     public function createThumbnails(Image $image, ?ImageType $imageType = null): int
     {
         $cnt = 0;
-        $source = $this->getSourceFile($image);
+        $source = $this->getSourcePath($image);
         $imageType ??= $image->getType();
         $sizes = $this->imageTypeRegistry->getThumbnailSizes($imageType);
         $fitMode = $this->imageTypeRegistry->getFitMode($imageType);
@@ -266,11 +266,40 @@ readonly class ImageService
         throw new RuntimeException('Could not determine file extension for uploaded file.');
     }
 
-    private function getSourceFile(Image $image): string
+    public function getSourcePath(Image $image): string
     {
         $path = $this->kernelProjectDir . '/data/images/';
 
         return $path . $image->getHash() . '.' . $image->getExtension();
+    }
+
+    /**
+     * @return array{content: string, mimeType: string}|null null when the original file is missing
+     */
+    public function renderPreview(Image $image, int $maxEdge = 1024): ?array
+    {
+        $source = $this->getSourcePath($image);
+        if (!$this->filesystem->fileExists($source)) {
+            return null;
+        }
+
+        try {
+            $imagick = new Imagick();
+            $imagick->readImage($source);
+            $imagick->setImageCompressionQuality(90);
+            $imagick->autoOrient();
+            if ($imagick->getImageWidth() > $maxEdge || $imagick->getImageHeight() > $maxEdge) {
+                $imagick->thumbnailImage($maxEdge, $maxEdge, true);
+            }
+            $imagick->stripImage(); // metadata
+            $imagick->setFormat('webp');
+
+            return ['content' => $imagick->getImageBlob(), 'mimeType' => 'image/webp'];
+        } catch (ImagickException $e) {
+            $this->logger->error(sprintf("Error rendering preview for image '%s': %s", $image->getHash(), $e->getMessage()));
+
+            return ['content' => (string) $this->filesystem->getFileContents($source), 'mimeType' => $image->getMimeType()];
+        }
     }
 
     private function getThumbnailFile(Image $image, int $width, int $height): string
