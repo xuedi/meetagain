@@ -10,6 +10,8 @@ use App\Service\Media\ImageService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Persistence\ObjectManager;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -166,11 +168,14 @@ class UserFixture extends AbstractFixture
     public function __construct(
         private readonly UserPasswordHasherInterface $hasher,
         private readonly ImageService $imageService,
+        #[Autowire(service: 'cache.image_alt_status')]
+        private readonly CacheItemPoolInterface $imageAltStatusPool,
     ) {}
 
     public function load(ObjectManager $manager): void
     {
         $this->start();
+        $this->imageAltStatusPool->clear();
         foreach ($this->getData() as $data) {
             $name = $data['name'];
 

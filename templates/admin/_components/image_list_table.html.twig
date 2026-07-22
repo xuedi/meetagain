@@ -6,9 +6,13 @@
  #   images      - iterable of App\Entity\Image
  #   usageCounts - map<int, int> image id -> usage count (optional, default {})
  #   detailRoute - route name for the per-row view link; omit for an action-less informative list
+ #   imageIssues - map<int, list<string>> image id -> translated issue labels; a non-empty list
+ #                 renders one warning marker with the labels as tooltip (optional; when absent the
+ #                 marker falls back to the attribution-pending check alone)
  #}
 {% set usageCounts = usageCounts|default({}) %}
 {% set detailRoute = detailRoute|default(null) %}
+{% set imageIssues = imageIssues|default(null) %}
 <table id="filteredTable" class="table is-fullwidth">
     <thead>
     <tr>
@@ -61,7 +65,12 @@
                     <a href="{{ path(detailRoute, {'id': image.id}) }}">
                         <span class="icon"><i class="fa fa-eye"></i></span>
                     </a>
-                    {% if image.attributionStatus.name == 'Pending' %}
+                    {% if imageIssues is not null %}
+                        {% set issues = imageIssues[image.id] ?? [] %}
+                        {% if issues is not empty %}
+                            <span class="icon has-text-warning" title="{{ issues|join(', ') }}"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i></span>
+                        {% endif %}
+                    {% elseif image.attributionStatus.name == 'Pending' %}
                         <span class="icon has-text-warning" title="{{ 'attribution_status.pending'|trans }}"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i></span>
                     {% endif %}
                 </td>

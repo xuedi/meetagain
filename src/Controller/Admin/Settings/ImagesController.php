@@ -10,12 +10,16 @@ use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
+use App\Entity\Image;
+use App\Enum\AttributionStatus;
+use App\Enum\ImageIssueFilter;
 use App\Enum\ImageType;
 use App\Repository\ImageLocationRepository;
 use App\Repository\ImageRepository;
 use App\Service\Config\LanguageService;
 use App\Service\Media\AltLocaleRequirementResolver;
 use App\Service\Media\ImageAltService;
+use App\Service\Media\ImageAltStatusCache;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
@@ -53,6 +57,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         private readonly LanguageService $languageService,
         private readonly AltLocaleRequirementResolver $altLocaleRequirementResolver,
         private readonly ImageAltService $imageAltService,
+        private readonly ImageAltStatusCache $imageAltStatusCache,
     ) {
         parent::__construct($translator, 'images');
     }
@@ -69,19 +74,30 @@ final class ImagesController extends AbstractSettingsController implements Admin
 
         $locationParam = $request->query->getString('location');
         $locationFilter = $this->resolveLocation($locationParam);
+        $issuesFilter = ImageIssueFilter::tryFrom($request->query->getString('issues')) ?? ImageIssueFilter::All;
 
         $totalCount = $this->imageRepository->countFiltered(null, null);
-        $filteredCount = $this->imageRepository->countFiltered($locationFilter, $since);
         $images = $this->imageRepository->findFiltered($locationFilter, $since);
         $usageCounts = $this->imageLocationRepository->countPerImageId();
+
+        $issuesByImageId = $this->classifyIssues($images);
+        $issueCounts = $this->countIssues($issuesByImageId);
+        if ($issuesFilter !== ImageIssueFilter::All) {
+            $images = array_values(array_filter(
+                $images,
+                static fn(Image $image): bool => $issuesFilter === ImageIssueFilter::Healthy
+                    ? $issuesByImageId[(int) $image->getId()] === []
+                    : in_array($issuesFilter, $issuesByImageId[(int) $image->getId()], true),
+            ));
+        }
 
         $info = [
             new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_system_images.summary_total'))),
         ];
-        if ($since !== null || $locationFilter !== null) {
+        if ($since !== null || $locationFilter !== null || $issuesFilter !== ImageIssueFilter::All) {
             $info[] = new AdminTopInfoHtml(sprintf(
                 '<strong>%d</strong>&nbsp;%s',
-                $filteredCount,
+                count($images),
                 $this->translator->trans('admin_system_images.summary_in_range'),
             ));
         }
@@ -108,14 +124,16 @@ final class ImagesController extends AbstractSettingsController implements Admin
                 icon: 'map-pin',
                 variant: 'is-warning',
             ),
-            $this->buildLocationDropdown($locationFilter, $range, $since),
-            $this->buildRangeDropdown($range, $locationFilter),
+            $this->buildIssuesDropdown($issuesFilter, $locationFilter, $range, $issueCounts),
+            $this->buildLocationDropdown($locationFilter, $range, $since, $issuesFilter),
+            $this->buildRangeDropdown($range, $locationFilter, $issuesFilter),
         ]);
 
         return $this->render('admin/system/images/index.html.twig', [
             'active' => 'system',
             'images' => $images,
             'usageCounts' => $usageCounts,
+            'imageIssues' => $this->translateIssues($issuesByImageId),
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
@@ -246,17 +264,84 @@ final class ImagesController extends AbstractSettingsController implements Admin
         return $this->redirectToRoute('app_admin_system_images');
     }
 
-    #[Route('/sync_locations', name: 'app_admin_sync_image_locations', methods: ['POST'])]
-    public function syncLocations(Request $request): Response
+    #[Route('/sync', name: 'app_admin_sync_image_locations', methods: ['POST'])]
+    public function sync(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('admin_sync_image_locations', (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
         $this->imageLocationService->discover();
+        $this->imageAltStatusCache->warm($this->imageRepository->findFiltered(null, null));
+
         $this->addFlash('success', $this->translator->trans('admin_system_images.flash_locations_synced'));
 
         return $this->redirectToRoute('app_admin_system_images');
+    }
+
+    /**
+     * @param list<Image> $images
+     * @return array<int, list<ImageIssueFilter>>
+     */
+    private function classifyIssues(array $images): array
+    {
+        $missingAltMap = $this->imageAltStatusCache->getMissingAltMap($images);
+
+        $issuesByImageId = [];
+        foreach ($images as $image) {
+            $issues = [];
+            if ($missingAltMap[(int) $image->getId()] ?? false) {
+                $issues[] = ImageIssueFilter::MissingAlt;
+            }
+            if ($image->getAttributionStatus() === AttributionStatus::Pending) {
+                $issues[] = ImageIssueFilter::MissingAttribution;
+            }
+            if ($image->getReported() !== null) {
+                $issues[] = ImageIssueFilter::Reported;
+            }
+            $issuesByImageId[(int) $image->getId()] = $issues;
+        }
+
+        return $issuesByImageId;
+    }
+
+    /**
+     * @param array<int, list<ImageIssueFilter>> $issuesByImageId
+     * @return array<string, int> filter value => image count
+     */
+    private function countIssues(array $issuesByImageId): array
+    {
+        $counts = [
+            ImageIssueFilter::Healthy->value => 0,
+            ImageIssueFilter::MissingAlt->value => 0,
+            ImageIssueFilter::MissingAttribution->value => 0,
+            ImageIssueFilter::Reported->value => 0,
+        ];
+        foreach ($issuesByImageId as $issues) {
+            if ($issues === []) {
+                ++$counts[ImageIssueFilter::Healthy->value];
+            }
+            foreach ($issues as $issue) {
+                ++$counts[$issue->value];
+            }
+        }
+
+        return $counts;
+    }
+
+    /**
+     * @param array<int, list<ImageIssueFilter>> $issuesByImageId
+     * @return array<int, list<string>> imageId => translated issue labels
+     */
+    private function translateIssues(array $issuesByImageId): array
+    {
+        return array_map(
+            fn(array $issues): array => array_map(
+                fn(ImageIssueFilter $issue): string => $this->translator->trans($issue->label()),
+                $issues,
+            ),
+            $issuesByImageId,
+        );
     }
 
     private function resolveLocation(string $param): ?ImageType
@@ -274,19 +359,57 @@ final class ImagesController extends AbstractSettingsController implements Admin
         return null;
     }
 
-    private function buildLocationDropdown(?ImageType $current, string $range, ?DateTimeImmutable $since): AdminTopActionDropdown
+    /**
+     * @param array<string, int> $counts filter value => image count
+     */
+    private function buildIssuesDropdown(ImageIssueFilter $current, ?ImageType $location, string $range, array $counts): AdminTopActionDropdown
     {
-        $rangeParam = $range === self::DEFAULT_RANGE ? [] : ['range' => $range];
+        $extraParams = [];
+        if ($location !== null) {
+            $extraParams['location'] = $location->name;
+        }
+        if ($range !== self::DEFAULT_RANGE) {
+            $extraParams['range'] = $range;
+        }
+
+        $options = [];
+        foreach (ImageIssueFilter::cases() as $case) {
+            $params = $case === ImageIssueFilter::All ? $extraParams : ['issues' => $case->value] + $extraParams;
+            $options[] = new AdminTopActionDropdownOption(
+                label: $this->translator->trans($case->label()),
+                target: $this->generateUrl('app_admin_system_images', $params),
+                isActive: $case === $current,
+                count: $case === ImageIssueFilter::All ? null : $counts[$case->value],
+            );
+        }
+
+        return new AdminTopActionDropdown(
+            label: sprintf(
+                '%s %s',
+                $this->translator->trans('admin_system_images.issues_filter_label'),
+                $this->translator->trans($current->label()),
+            ),
+            options: $options,
+            icon: 'triangle-exclamation',
+        );
+    }
+
+    private function buildLocationDropdown(?ImageType $current, string $range, ?DateTimeImmutable $since, ImageIssueFilter $issues): AdminTopActionDropdown
+    {
+        $extraParams = $range === self::DEFAULT_RANGE ? [] : ['range' => $range];
+        if ($issues !== ImageIssueFilter::All) {
+            $extraParams['issues'] = $issues->value;
+        }
 
         $options = [
             new AdminTopActionDropdownOption(
                 label: $this->translator->trans('admin_system_images.location_filter_all'),
-                target: $this->generateUrl('app_admin_system_images', $rangeParam),
+                target: $this->generateUrl('app_admin_system_images', $extraParams),
                 isActive: $current === null,
             ),
         ];
         foreach (ImageType::cases() as $case) {
-            $params = ['location' => $case->name] + $rangeParam;
+            $params = ['location' => $case->name] + $extraParams;
             $options[] = new AdminTopActionDropdownOption(
                 label: $case->name,
                 target: $this->generateUrl('app_admin_system_images', $params),
@@ -306,13 +429,16 @@ final class ImagesController extends AbstractSettingsController implements Admin
         );
     }
 
-    private function buildRangeDropdown(string $current, ?ImageType $location): AdminTopActionDropdown
+    private function buildRangeDropdown(string $current, ?ImageType $location, ImageIssueFilter $issues): AdminTopActionDropdown
     {
         $options = [];
         foreach (self::RANGE_OFFSETS as $key => $offset) {
             $params = $key === self::DEFAULT_RANGE ? [] : ['range' => $key];
             if ($location !== null) {
                 $params['location'] = $location->name;
+            }
+            if ($issues !== ImageIssueFilter::All) {
+                $params['issues'] = $issues->value;
             }
             $optionSince = $offset !== null ? new DateTimeImmutable($offset) : null;
             $options[] = new AdminTopActionDropdownOption(
