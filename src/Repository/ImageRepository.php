@@ -288,10 +288,19 @@ class ImageRepository extends ServiceEntityRepository
     }
 
     /**
-     * Images used more than once (a missing alt fans out across every embed) as candidates for the
-     * missing-alt reminder. Per-language completeness depends on the JSON alt map and enabled locales,
-     * so the caller filters via Image::missingAltLocales() rather than in SQL.
-     *
+     * @return list<Image>
+     */
+    public function findAuditCandidates(?int $afterId, int $limit): array
+    {
+        $qb = $this->createQueryBuilder('i')->orderBy('i.id', 'ASC')->setMaxResults($limit);
+        if ($afterId !== null) {
+            $qb->where('i.id > :afterId')->setParameter('afterId', $afterId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    /**
      * @return list<array{image: Image, count: int}>
      */
     public function findHighUsageMissingAlt(int $limit = 50): array

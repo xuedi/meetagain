@@ -15,6 +15,7 @@ use App\Repository\ImageLocationRepository;
 use App\Repository\ImageRepository;
 use App\Service\Config\LanguageService;
 use App\Service\Media\AltLocaleRequirementResolver;
+use App\Service\Media\ImageAltService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
@@ -51,6 +52,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         private readonly EntityManagerInterface $entityManager,
         private readonly LanguageService $languageService,
         private readonly AltLocaleRequirementResolver $altLocaleRequirementResolver,
+        private readonly ImageAltService $imageAltService,
     ) {
         parent::__construct($translator, 'images');
     }
@@ -174,16 +176,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
             return $this->redirectToRoute('app_admin_system_images_show', ['id' => $id]);
         }
 
-        $alt = trim((string) $request->request->get('alt', ''));
-        $alt = mb_substr($alt, 0, 255);
-
-        if ($locale === $this->languageService->getFilteredDefaultLocale()) {
-            $image->setAlt($alt === '' ? null : $alt);
-        } else {
-            $image->setAltTranslation($locale, $alt === '' ? null : $alt);
-        }
-        $image->setUpdatedAt(new DateTimeImmutable());
-        $this->entityManager->flush();
+        $this->imageAltService->applyAlt($image, [$locale => (string) $request->request->get('alt', '')]);
 
         $this->addFlash('success', $this->translator->trans('admin_system_images.flash_alt_saved'));
 
