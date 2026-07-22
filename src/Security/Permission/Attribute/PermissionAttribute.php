@@ -64,6 +64,8 @@ final class PermissionAttribute
     public const string SYSTEM_LANGUAGE_READ = 'system.language.read';
     public const string SYSTEM_LANGUAGE_UPDATE = 'system.language.update';
     public const string SYSTEM_SITEMAP_READ = 'system.sitemap.read';
+    public const string SYSTEM_IMAGES_ALT_READ = 'system.images.alt.read';
+    public const string SYSTEM_IMAGES_ALT_UPDATE = 'system.images.alt.update';
     public const string SYSTEM_REPORTS_READ = 'system.reports.read';
     public const string SYSTEM_SUPPORT_READ = 'system.support.read';
     public const string SYSTEM_INTEGRITY_READ = 'system.integrity.read';

@@ -27,4 +27,37 @@ readonly class AltLocaleRequirementResolver
 
         return [];
     }
+
+    /**
+     * @param list<Image> $images
+     * @return array<int, list<string>> imageId => required codes ([] when every provider defers)
+     */
+    public function getRequiredAltLocalesForImages(array $images): array
+    {
+        $resolved = [];
+        $remaining = $images;
+        foreach ($this->providers as $provider) {
+            if ($remaining === []) {
+                break;
+            }
+
+            $results = $provider->getRequiredAltLocalesForImages($remaining);
+            $deferred = [];
+            foreach ($remaining as $image) {
+                $codes = $results[(int) $image->getId()] ?? null;
+                if ($codes === null) {
+                    $deferred[] = $image;
+                } else {
+                    $resolved[(int) $image->getId()] = $codes;
+                }
+            }
+            $remaining = $deferred;
+        }
+
+        foreach ($remaining as $image) {
+            $resolved[(int) $image->getId()] = [];
+        }
+
+        return $resolved;
+    }
 }
