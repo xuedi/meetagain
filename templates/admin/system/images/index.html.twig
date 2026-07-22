@@ -10,6 +10,7 @@
         {% include 'admin/_components/image_list_table.html.twig' with {
             'images': images,
             'usageCounts': usageCounts,
+            'imageIssues': imageIssues,
             'detailRoute': 'app_admin_system_images_show',
         } only %}
 

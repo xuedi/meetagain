@@ -7,6 +7,7 @@ use App\Repository\ImageRepository;
 use App\Service\Config\LanguageService;
 use App\Service\Media\AltLocaleRequirementResolver;
 use App\Service\Media\ImageAltService;
+use App\Service\Media\ImageAltStatusCache;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -73,6 +74,18 @@ class ImageAltServiceTest extends TestCase
         $service->applyAlt($image, ['de' => 'deutscher alt', 'fr' => 'texte']);
     }
 
+    public function testApplyAltInvalidatesTheImageStatusCacheEntry(): void
+    {
+        // Arrange
+        $image = self::imageWithId(7);
+        $statusCache = $this->createMock(ImageAltStatusCache::class);
+        $statusCache->expects($this->once())->method('invalidateImage')->with(7);
+        $service = $this->service(requiredLocales: ['en'], statusCache: $statusCache);
+
+        // Act
+        $service->applyAlt($image, ['en' => 'english alt']);
+    }
+
     public function testFindMissingAltPageFiltersCompleteImagesAndReturnsCursorOnFullPage(): void
     {
         // Arrange - a full page of two candidates; image 1 is complete, image 2 misses 'de'.
@@ -129,6 +142,7 @@ class ImageAltServiceTest extends TestCase
         array $requiredLocales,
         array $candidates = [],
         ?EntityManagerInterface $entityManager = null,
+        ?ImageAltStatusCache $statusCache = null,
     ): ImageAltService {
         $repository = $this->createStub(ImageRepository::class);
         $repository->method('findAuditCandidates')->willReturn($candidates);
@@ -154,6 +168,7 @@ class ImageAltServiceTest extends TestCase
             $language,
             $requirements,
             $entityManager ?? $this->createStub(EntityManagerInterface::class),
+            $statusCache ?? $this->createStub(ImageAltStatusCache::class),
         );
     }
 

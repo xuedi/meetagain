@@ -12,3 +12,6 @@ framework:
                 adapter: cache.adapter.redis_tag_aware
             cache.config:
                 adapter: cache.adapter.redis_tag_aware
+            cache.image_alt_status:
+                adapter: cache.adapter.redis_tag_aware
+                default_lifetime: 86400

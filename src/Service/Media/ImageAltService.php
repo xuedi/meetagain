@@ -16,6 +16,7 @@ readonly class ImageAltService
         private LanguageService $languageService,
         private AltLocaleRequirementResolver $altLocaleRequirementResolver,
         private EntityManagerInterface $entityManager,
+        private ImageAltStatusCache $imageAltStatusCache,
     ) {}
 
     public function getSourceLocale(): string
@@ -76,5 +77,6 @@ readonly class ImageAltService
 
         $image->setUpdatedAt(new DateTimeImmutable());
         $this->entityManager->flush();
+        $this->imageAltStatusCache->invalidateImage((int) $image->getId());
     }
 }
