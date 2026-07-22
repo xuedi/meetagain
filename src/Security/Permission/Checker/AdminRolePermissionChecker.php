@@ -63,6 +63,8 @@ final class AdminRolePermissionChecker implements PermissionCheckerInterface
         Attr::SYSTEM_LANGUAGE_READ,
         Attr::SYSTEM_LANGUAGE_UPDATE,
         Attr::SYSTEM_SITEMAP_READ,
+        Attr::SYSTEM_IMAGES_ALT_READ,
+        Attr::SYSTEM_IMAGES_ALT_UPDATE,
         Attr::SYSTEM_REPORTS_READ,
         Attr::SYSTEM_SUPPORT_READ,
         Attr::SYSTEM_INTEGRITY_READ,

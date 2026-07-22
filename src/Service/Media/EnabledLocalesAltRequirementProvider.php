@@ -19,4 +19,17 @@ readonly class EnabledLocalesAltRequirementProvider implements AltLocaleRequirem
     {
         return $this->languageService->getEnabledCodes();
     }
+
+    #[Override]
+    public function getRequiredAltLocalesForImages(array $images): array
+    {
+        $codes = $this->languageService->getEnabledCodes();
+
+        $result = [];
+        foreach ($images as $image) {
+            $result[(int) $image->getId()] = $codes;
+        }
+
+        return $result;
+    }
 }
