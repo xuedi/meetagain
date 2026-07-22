@@ -6,6 +6,7 @@ use App\Entity\Image;
 use App\Entity\User;
 use App\Repository\ImageRepository;
 use App\Service\Config\LanguageService;
+use App\Service\Media\AltLocaleRequirementResolver;
 use App\Service\Notification\User\MissingAltImageNotificationProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -28,6 +29,7 @@ class MissingAltImageNotificationProviderTest extends TestCase
             $security,
             $this->createStub(TranslatorInterface::class),
             $this->createStub(LanguageService::class),
+            $this->createStub(AltLocaleRequirementResolver::class),
         );
 
         // Act / Assert
@@ -41,8 +43,10 @@ class MissingAltImageNotificationProviderTest extends TestCase
         $security->method('isGranted')->willReturn(true);
 
         $language = $this->createStub(LanguageService::class);
-        $language->method('getFilteredEnabledCodes')->willReturn(['en', 'de']);
         $language->method('getFilteredDefaultLocale')->willReturn('en');
+
+        $requirements = $this->createStub(AltLocaleRequirementResolver::class);
+        $requirements->method('getRequiredAltLocales')->willReturn(['en', 'de']);
 
         // Every language has its own value (en -> base, de -> map), so nothing is missing.
         $complete = self::imageWithId(5);
@@ -52,7 +56,7 @@ class MissingAltImageNotificationProviderTest extends TestCase
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findHighUsageMissingAlt')->willReturn([['image' => $complete, 'count' => 9]]);
 
-        $provider = new MissingAltImageNotificationProvider($imageRepo, $security, $this->createStub(TranslatorInterface::class), $language);
+        $provider = new MissingAltImageNotificationProvider($imageRepo, $security, $this->createStub(TranslatorInterface::class), $language, $requirements);
 
         // Act / Assert
         static::assertSame([], $provider->getNotifications($this->createStub(User::class)));
@@ -65,8 +69,10 @@ class MissingAltImageNotificationProviderTest extends TestCase
         $security->method('isGranted')->willReturn(true);
 
         $language = $this->createStub(LanguageService::class);
-        $language->method('getFilteredEnabledCodes')->willReturn(['en', 'de', 'zh']);
         $language->method('getFilteredDefaultLocale')->willReturn('en');
+
+        $requirements = $this->createStub(AltLocaleRequirementResolver::class);
+        $requirements->method('getRequiredAltLocales')->willReturn(['en', 'de', 'zh']);
 
         $partly = self::imageWithId(11);
         $partly->setAlt('');
@@ -85,7 +91,7 @@ class MissingAltImageNotificationProviderTest extends TestCase
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnCallback(static fn(string $key, array $params) => $key . ':' . $params['%id%'] . ':' . $params['%missing%']);
 
-        $provider = new MissingAltImageNotificationProvider($imageRepo, $security, $translator, $language);
+        $provider = new MissingAltImageNotificationProvider($imageRepo, $security, $translator, $language, $requirements);
 
         // Act
         $items = $provider->getNotifications($this->createStub(User::class));

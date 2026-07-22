@@ -5,6 +5,7 @@ namespace App\Service\Notification\User;
 use App\Entity\User;
 use App\Repository\ImageRepository;
 use App\Service\Config\LanguageService;
+use App\Service\Media\AltLocaleRequirementResolver;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -15,6 +16,7 @@ readonly class MissingAltImageNotificationProvider implements NotificationProvid
         private Security $security,
         private TranslatorInterface $translator,
         private LanguageService $languageService,
+        private AltLocaleRequirementResolver $altLocaleRequirementResolver,
     ) {}
 
     public function getNotifications(User $user): array
@@ -23,13 +25,12 @@ readonly class MissingAltImageNotificationProvider implements NotificationProvid
             return [];
         }
 
-        $codes = $this->languageService->getFilteredEnabledCodes();
         $sourceLocale = $this->languageService->getFilteredDefaultLocale();
 
         $items = [];
         foreach ($this->imageRepository->findHighUsageMissingAlt() as $candidate) {
             $image = $candidate['image'];
-            $missing = $image->missingAltLocales($codes, $sourceLocale);
+            $missing = $image->missingAltLocales($this->altLocaleRequirementResolver->getRequiredAltLocales($image), $sourceLocale);
             if ($missing === []) {
                 continue;
             }
