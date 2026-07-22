@@ -52,7 +52,7 @@ services:
   # Redis-compatible cache server
   valkey:
     container_name: "ma-valkey"
-    image: valkey/valkey:9.1@sha256:4963247afc4cd33c7d3b2d2816b9f7f8eeebab148d29056c2ca4d7cbc966f2d9
+    image: valkey/valkey:9.1@sha256:8e8d64b405ce18f41b8e5ee20aa4687a8ed0022d1298f2ce31cdcf3a76e09411
     command: valkey-server --save 60 1 --loglevel warning
     volumes:
       - ma-valkey-data:/data
@@ -102,7 +102,7 @@ services:
 
   # Page speed analyzer (run via: just testPerformance)
   sitespeed:
-    image: sitespeedio/sitespeed.io:41.4.1@sha256:4c755cd46238636b7b80adeec8f54936e416a3dcc3f04279192096d2a1d861ee
+    image: sitespeedio/sitespeed.io:42.1.1@sha256:c62eaaca148bd9b050ccc1deff0540ce6f80b4a72a6abeec21edd9d7e4ece80d
     container_name: "ma-sitespeed"
     network_mode: "host"
     environment:
