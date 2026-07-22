@@ -64,6 +64,42 @@ class ImageLocationRepository extends ServiceEntityRepository
     }
 
     /**
+     * Reverse of findImageIdsByTypesAndLocationId: for each given image, the location IDs it is
+     * stored at for any of the given types. Used to resolve directly-owned images back to the
+     * entity IDs stored as their location_id.
+     *
+     * @param list<int>       $imageIds
+     * @param list<ImageType> $types
+     * @return array<int, list<int>> imageId => location IDs
+     */
+    public function findLocationIdsByImageIdsAndTypes(array $imageIds, array $types): array
+    {
+        if ($imageIds === [] || $types === []) {
+            return [];
+        }
+
+        $typeValues = array_map(static fn(ImageType $type) => $type->value, $types);
+        $imagePlaceholders = implode(', ', array_fill(0, count($imageIds), '?'));
+        $typePlaceholders = implode(', ', array_fill(0, count($typeValues), '?'));
+
+        $rows = $this
+            ->getEntityManager()
+            ->getConnection()
+            ->fetchAllAssociative(
+                "SELECT DISTINCT image_id, location_id FROM image_location
+                 WHERE image_id IN ({$imagePlaceholders}) AND location_type IN ({$typePlaceholders})",
+                array_merge($imageIds, $typeValues),
+            );
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[(int) $row['image_id']][] = (int) $row['location_id'];
+        }
+
+        return $result;
+    }
+
+    /**
      * Bulk-delete rows matching the given type and (imageId, locationId) pairs.
      *
      * @param array<array{imageId: int, locationId: int}> $pairs

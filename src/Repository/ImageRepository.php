@@ -227,6 +227,36 @@ class ImageRepository extends ServiceEntityRepository
     }
 
     /**
+     * Reverse of findImageIdsForEvents: for each given image that belongs to an event, its event ID.
+     * Images with no event are omitted.
+     *
+     * @param list<int> $imageIds
+     * @return array<int, int> imageId => eventId
+     */
+    public function findEventIdsByImageIds(array $imageIds): array
+    {
+        if ($imageIds === []) {
+            return [];
+        }
+
+        $rows = $this
+            ->createQueryBuilder('i')
+            ->select('i.id AS imageId', 'IDENTITY(i.event) AS eventId')
+            ->where('i.id IN (:imageIds)')
+            ->andWhere('i.event IS NOT NULL')
+            ->setParameter('imageIds', $imageIds)
+            ->getQuery()
+            ->getArrayResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[(int) $row['imageId']] = (int) $row['eventId'];
+        }
+
+        return $result;
+    }
+
+    /**
      * @return Image[]
      */
     public function findFiltered(?ImageType $type, ?DateTimeImmutable $since): array

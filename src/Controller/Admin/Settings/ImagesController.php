@@ -14,6 +14,7 @@ use App\Enum\ImageType;
 use App\Repository\ImageLocationRepository;
 use App\Repository\ImageRepository;
 use App\Service\Config\LanguageService;
+use App\Service\Media\AltLocaleRequirementResolver;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
@@ -49,6 +50,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         private readonly ImageTypeRegistry $imageTypeRegistry,
         private readonly EntityManagerInterface $entityManager,
         private readonly LanguageService $languageService,
+        private readonly AltLocaleRequirementResolver $altLocaleRequirementResolver,
     ) {
         parent::__construct($translator, 'images');
     }
@@ -168,7 +170,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         }
 
         $locale = (string) $request->request->get('locale', '');
-        if (!in_array($locale, $this->languageService->getFilteredEnabledCodes(), true)) {
+        if (!in_array($locale, $this->altLocaleRequirementResolver->getRequiredAltLocales($image), true)) {
             return $this->redirectToRoute('app_admin_system_images_show', ['id' => $id]);
         }
 
