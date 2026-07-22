@@ -58,11 +58,11 @@
                                 {% endif %}
                             </td>
                         </tr>
-                        {% set missingAlt = image.missingAltLocales(get_enabled_locales(), sourceLocale) %}
+                        {% set missingAlt = image.missingAltLocales(required_alt_locales(image), sourceLocale) %}
                         <tr{% if missingAlt is not empty %} class="has-background-warning-light"{% endif %}>
                             <th>{{ 'admin_system_images.label_alt'|trans }}</th>
                             <td>
-                                {% for code in get_enabled_locales() %}
+                                {% for code in required_alt_locales(image) %}
                                     {% set flagLabel = 'admin_system_images.flag_alt'|trans({'%code%': code}) %}
                                     <form method="post" action="{{ path('app_admin_system_images_update_alt', {id: image.id}) }}" class="field has-addons mb-1">
                                         <input type="hidden" name="_token" value="{{ csrf_token('image_update_alt_' ~ image.id) }}">
