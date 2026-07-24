@@ -1,0 +1,59 @@
+{% set proposal = card.proposal %}
+{% set csrfToken = csrf_token('change_proposal' ~ proposal.id) %}
+<div class="box">
+    <p class="mb-3">
+        <strong>{{ proposal.proposedBy.name }}</strong>
+        <span class="has-text-grey">{{ proposal.createdAt|time_diff }}</span>
+    </p>
+    <table class="table is-fullwidth is-narrow">
+        <thead>
+            <tr>
+                <th>{{ 'review.col_field'|trans }}</th>
+                <th>{{ 'review.col_before'|trans }}</th>
+                <th>{{ 'review.col_after'|trans }}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in card.rows %}
+            <tr>
+                <th style="vertical-align: middle;">{{ row.label }}</th>
+                <td style="vertical-align: middle;" class="has-text-grey">{{ row.before|default('-')|nl2br }}</td>
+                <td style="vertical-align: middle;">{{ row.after|default('-')|nl2br }}</td>
+                <td style="vertical-align: middle;" class="has-text-right">
+                    {% if row.resolution is not null %}
+                        <span class="tag is-light {{ row.resolution.value == 'applied' ? 'is-success' : 'is-danger' }}">
+                            {{ row.resolution.label|trans }}
+                        </span>
+                    {% elseif canReview %}
+                        <a href="{{ path('app_review_proposal_apply', {id: proposal.id, field: row.field}) }}"
+                           class="button is-success is-small"
+                           title="{{ 'review.button_apply'|trans }}"
+                           data-post
+                           data-csrf-token="{{ csrfToken }}">
+                            <i class="fas fa-check"></i>
+                        </a>
+                        <a href="{{ path('app_review_proposal_deny', {id: proposal.id, field: row.field}) }}"
+                           class="button is-danger is-small"
+                           title="{{ 'review.button_deny'|trans }}"
+                           data-post
+                           data-csrf-token="{{ csrfToken }}">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if card.isProposer %}
+        <div class="has-text-right">
+            <a href="{{ path('app_review_proposal_withdraw', {id: proposal.id}) }}"
+               class="button is-small"
+               data-post
+               data-csrf-token="{{ csrfToken }}">
+                {{ 'review.button_withdraw'|trans }}
+            </a>
+        </div>
+    {% endif %}
+</div>

@@ -2,11 +2,13 @@
 
 namespace Plugin\Glossary\Controller;
 
-use App\Activity\ActivityService;
 use App\Entity\User;
-use Plugin\Glossary\Activity\Messages\SuggestionCreated;
-use Plugin\Glossary\Entity\SuggestionField;
+use App\Review\ChangeProposalService;
+use App\Review\FieldChange;
+use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Form\GlossaryType;
+use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use Plugin\Glossary\Review\GlossaryChangeTarget;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +22,7 @@ final class EditController extends AbstractGlossaryController
 {
     public function __construct(
         GlossaryService $service,
-        private readonly ActivityService $activityService,
+        private readonly ChangeProposalService $changeProposalService,
     ) {
         parent::__construct($service);
     }
@@ -46,29 +48,53 @@ final class EditController extends AbstractGlossaryController
             if ($this->isGranted('ROLE_ORGANIZER')) {
                 // Managers can update directly
                 $this->service->update($newGlossary, $id, $categoryId);
-            }
-
-            if (!$this->isGranted('ROLE_ORGANIZER')) {
-                // Regular users create suggestions
-                $this->service->generateSuggestions($newGlossary, $id, $this->getAuthedUser()->getId(), $categoryId);
-
-                $item = $this->service->get($id);
-                if ($item !== null) {
-                    $this->activityService->log(SuggestionCreated::TYPE, $this->getUser(), [
-                        'glossary_id' => $id,
-                        'term' => $item->getPhrase(),
-                        'field' => 'edit',
-                    ]);
-                }
+            } else {
+                // Regular users propose changes for review
+                $this->changeProposalService->propose(
+                    GlossaryCategorizableTypeProvider::ITEM_TYPE,
+                    $id,
+                    $this->getAuthedUser(),
+                    $this->buildChanges($newGlossary, $id, $categoryId),
+                );
             }
 
             return $this->redirectToRoute('app_plugin_glossary');
         }
 
+        $pendingProposals = [];
+        foreach ($this->changeProposalService->pendingForTarget(GlossaryCategorizableTypeProvider::ITEM_TYPE, (int) $id) as $proposal) {
+            $pendingProposals[] = [
+                'proposal' => $proposal,
+                'rows' => $this->changeProposalService->fieldRows($proposal),
+            ];
+        }
+
         return $this->renderPage('@Glossary/edit.html.twig', [
-            'categoryFieldValue' => SuggestionField::Category->value,
             'editItem' => $this->service->get($id),
+            'pendingProposals' => $pendingProposals,
             'form' => $form,
         ]);
+    }
+
+    /** @return list<FieldChange> */
+    private function buildChanges(Glossary $submitted, int $id, ?int $categoryId): array
+    {
+        $current = $this->service->get($id);
+        if ($current === null) {
+            return [];
+        }
+
+        $currentCategory = $this->service->getCategory($id);
+
+        return [
+            new FieldChange(GlossaryChangeTarget::FIELD_PHRASE, $current->getPhrase(), $submitted->getPhrase()),
+            new FieldChange(GlossaryChangeTarget::FIELD_PINYIN, $current->getPinyin(), $submitted->getPinyin()),
+            new FieldChange(GlossaryChangeTarget::FIELD_EXPLANATION, $current->getExplanation(), $submitted->getExplanation()),
+            new FieldChange(
+                GlossaryChangeTarget::FIELD_CATEGORY,
+                $currentCategory === null ? null : (string) $currentCategory,
+                $categoryId === null ? null : (string) $categoryId,
+            ),
+        ];
     }
 }
