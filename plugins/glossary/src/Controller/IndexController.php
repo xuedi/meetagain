@@ -2,13 +2,23 @@
 
 namespace Plugin\Glossary\Controller;
 
+use App\Review\ChangeProposalService;
 use Plugin\Glossary\Entity\Glossary;
+use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/glossary')]
 final class IndexController extends AbstractGlossaryController
 {
+    public function __construct(
+        GlossaryService $service,
+        private readonly ChangeProposalService $changeProposalService,
+    ) {
+        parent::__construct($service);
+    }
+
     #[Route('', name: 'app_plugin_glossary', methods: ['GET'])]
     public function show(): Response
     {
@@ -45,10 +55,12 @@ final class IndexController extends AbstractGlossaryController
             return array_values(array_map(static fn(Glossary $entry): int => (int) $entry->getId(), $approved));
         }
 
+        $pendingProposalIds = $this->changeProposalService->pendingTargetIds(GlossaryCategorizableTypeProvider::ITEM_TYPE);
+
         $needsAttention = [];
         $rest = [];
         foreach ($entries as $entry) {
-            if (!$entry->getApproved() || $entry->getSuggestions() !== []) {
+            if (!$entry->getApproved() || in_array((int) $entry->getId(), $pendingProposalIds, true)) {
                 $needsAttention[] = (int) $entry->getId();
                 continue;
             }

@@ -29,18 +29,24 @@
 
                     </div>
 
-                    {% if editItem.suggestions is not empty %}
+                    {% if pendingProposals is not empty %}
                         <h2 class="title is-5">{{ 'glossary.heading_waiting_approval'|trans }}</h2>
-                        {% for suggestion in editItem.suggestions %}
-                            {% set value = suggestion.value %}
-                            {% if suggestion.field.value == categoryFieldValue %}
-                                {% set value = item_category_label_by_id('glossary', suggestion.value)|default(suggestion.value) %}
-                            {% endif %}
+                        {% for entry in pendingProposals %}
                             <div class="box has-background-info-light">
-                                <p>
-                                    <b>{{ get_user_name(suggestion.createdBy) }}</b> suggested {{ suggestion.createdAt | time_diff }} to change the
-                                    <b>{{ suggestion.field.value }}</b> to '<b>{{ value }}</b>'
+                                <p class="mb-2">
+                                    <b>{{ entry.proposal.proposedBy.name }}</b>
+                                    <span class="has-text-grey">{{ entry.proposal.createdAt|time_diff }}</span>
                                 </p>
+                                <ul>
+                                    {% for row in entry.rows %}
+                                        <li>
+                                            <b>{{ row.label }}</b>:
+                                            <span class="has-text-grey">{{ row.before|default('-') }}</span>
+                                            <i class="fas fa-arrow-right is-size-7"></i>
+                                            {{ row.after|default('-') }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
                             </div>
                         {% endfor %}
                     {% endif %}
