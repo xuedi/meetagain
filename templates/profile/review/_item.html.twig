@@ -20,6 +20,11 @@
         </div>
         <div class="column is-narrow">
             <div class="buttons are-small">
+                {% if item.detailUrl is not null %}
+                <a href="{{ item.detailUrl }}" class="button is-link is-outlined">
+                    {{ 'profile_review.link_details'|trans }}
+                </a>
+                {% endif %}
                 <a href="{{ path('app_profile_review_approve', {providerIdentifier: providerIdentifier, itemId: item.id}) }}"
                    class="button is-success"
                    data-post

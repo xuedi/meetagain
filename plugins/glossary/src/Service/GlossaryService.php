@@ -8,13 +8,14 @@ use App\Enum\ItemAction;
 use App\Item\ItemActionDispatcher;
 use App\Item\ItemFilterService;
 use App\Item\Taxonomy\ItemTaxonomyService;
+use App\Review\ChangeProposalService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Plugin\Glossary\Entity\Glossary;
-use Plugin\Glossary\Entity\Suggestion;
-use Plugin\Glossary\Entity\SuggestionField;
 use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
 use Plugin\Glossary\Repository\GlossaryRepository;
+use Plugin\Glossary\Review\GlossaryChangeTarget;
 use RuntimeException;
 
 readonly class GlossaryService
@@ -26,6 +27,7 @@ readonly class GlossaryService
         private EntityActionDispatcher $dispatcher,
         private ItemTaxonomyService $taxonomyService,
         private ItemActionDispatcher $itemActionDispatcher,
+        private ChangeProposalService $changeProposalService,
     ) {}
 
     public function getCategory(int $id): ?int
@@ -59,6 +61,7 @@ readonly class GlossaryService
         $this->em->flush();
         $this->dispatcher->dispatch(EntityAction::DeleteGlossary, $id);
         $this->itemActionDispatcher->dispatch(ItemAction::Deleted, GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
+        $this->changeProposalService->removeForTarget(GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
     }
 
     public function delete(int $id): void
@@ -72,6 +75,7 @@ readonly class GlossaryService
         $this->em->flush();
         $this->dispatcher->dispatch(EntityAction::DeleteGlossary, $id);
         $this->itemActionDispatcher->dispatch(ItemAction::Deleted, GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
+        $this->changeProposalService->removeForTarget(GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
     }
 
     /**
@@ -96,54 +100,38 @@ readonly class GlossaryService
     }
 
     /**
-     * Generate suggestions for changes (regular user).
+     * Write one approved proposal field onto the entry. The category is an assignment kept in the
+     * shared taxonomy tables, not a column on the entity.
      */
-    public function generateSuggestions(Glossary $newGlossary, int $id, int $userId, ?int $categoryId): void
+    public function applyChange(int $id, string $field, ?string $value): void
     {
-        $current = $this->get($id);
-        if ($current === null) {
-            return;
+        $item = $this->get($id);
+        if ($item === null) {
+            throw new RuntimeException('Item not found');
         }
 
-        $timestamp = new DateTimeImmutable();
-
-        if ($current->getPhrase() !== $newGlossary->getPhrase()) {
-            $current->addSuggestions(Suggestion::fromParams(
-                createdBy: $userId,
-                createdAt: $timestamp,
-                field: SuggestionField::Phrase,
-                value: $newGlossary->getPhrase(),
-            ));
+        switch ($field) {
+            case GlossaryChangeTarget::FIELD_PHRASE:
+                $item->setPhrase((string) $value);
+                break;
+            case GlossaryChangeTarget::FIELD_PINYIN:
+                $item->setPinyin($value === null || $value === '' ? null : $value);
+                break;
+            case GlossaryChangeTarget::FIELD_EXPLANATION:
+                $item->setExplanation((string) $value);
+                break;
+            case GlossaryChangeTarget::FIELD_CATEGORY:
+                $this->taxonomyService->setCategory(
+                    GlossaryCategorizableTypeProvider::ITEM_TYPE,
+                    $id,
+                    $value === null || $value === '' ? null : (int) $value,
+                );
+                return;
+            default:
+                throw new InvalidArgumentException(sprintf('Unknown glossary field "%s"', $field));
         }
 
-        if ($current->getPinyin() !== $newGlossary->getPinyin()) {
-            $current->addSuggestions(Suggestion::fromParams(
-                createdBy: $userId,
-                createdAt: $timestamp,
-                field: SuggestionField::Pinyin,
-                value: (string) $newGlossary->getPinyin(),
-            ));
-        }
-
-        if ($this->getCategory($id) !== $categoryId) {
-            $current->addSuggestions(Suggestion::fromParams(
-                createdBy: $userId,
-                createdAt: $timestamp,
-                field: SuggestionField::Category,
-                value: (string) $categoryId,
-            ));
-        }
-
-        if ($current->getExplanation() !== $newGlossary->getExplanation()) {
-            $current->addSuggestions(Suggestion::fromParams(
-                createdBy: $userId,
-                createdAt: $timestamp,
-                field: SuggestionField::Explanation,
-                value: $newGlossary->getExplanation(),
-            ));
-        }
-
-        $this->em->persist($current);
+        $this->em->persist($item);
         $this->em->flush();
     }
 
@@ -165,53 +153,6 @@ readonly class GlossaryService
 
         $this->dispatcher->dispatch(EntityAction::CreateGlossary, (int) $glossary->getId());
         $this->itemActionDispatcher->dispatch(ItemAction::Created, GlossaryCategorizableTypeProvider::ITEM_TYPE, (int) $glossary->getId());
-    }
-
-    public function applySuggestion(int $id, string $hash): int
-    {
-        $item = $this->get($id);
-        if ($item === null) {
-            throw new RuntimeException('Item not found');
-        }
-
-        $suggestion = $item->getSuggestion($hash);
-        switch ($suggestion->field) {
-            case SuggestionField::Phrase:
-                $item->setPhrase($suggestion->value);
-                break;
-            case SuggestionField::Pinyin:
-                $item->setPinyin($suggestion->value === '' ? null : $suggestion->value);
-                break;
-            case SuggestionField::Category:
-                $this->taxonomyService->setCategory(
-                    GlossaryCategorizableTypeProvider::ITEM_TYPE,
-                    $id,
-                    $suggestion->value === '' ? null : (int) $suggestion->value,
-                );
-                break;
-            case SuggestionField::Explanation:
-                $item->setExplanation($suggestion->value);
-                break;
-        }
-        $leftOver = $item->removeSuggestion($hash);
-        $this->em->persist($item);
-        $this->em->flush();
-
-        return $leftOver;
-    }
-
-    public function denySuggestion(int $id, string $hash): int
-    {
-        $item = $this->get($id);
-        if ($item === null) {
-            throw new RuntimeException('Item not found');
-        }
-
-        $leftOver = $item->removeSuggestion($hash);
-        $this->em->persist($item);
-        $this->em->flush();
-
-        return $leftOver;
     }
 
     public function get(int $id): ?Glossary

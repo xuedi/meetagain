@@ -3,13 +3,17 @@
 namespace Plugin\Glossary\DataFixtures;
 
 use App\DataFixtures\AbstractFixture;
+use App\Entity\ChangeProposal;
 use App\Entity\ItemCategoryAssignment;
 use App\Entity\PluginSettings;
+use App\Entity\User;
+use App\Review\FieldChange;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use Plugin\Glossary\Review\GlossaryChangeTarget;
 
 class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
 {
@@ -44,7 +48,31 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
         }
         $manager->flush();
 
+        $this->seedPendingProposal($manager, $assignments[0][0]);
+
         echo 'OK' . PHP_EOL;
+    }
+
+    /**
+     * One pending change proposal on the first entry so dev environments show the review flow.
+     */
+    private function seedPendingProposal(ObjectManager $manager, Glossary $entry): void
+    {
+        $member = $manager->getRepository(User::class)->findOneBy(['email' => 'Adem.Lane@example.org']);
+        if ($member === null) {
+            return;
+        }
+
+        $proposal = new ChangeProposal();
+        $proposal->setTargetType(GlossaryCategorizableTypeProvider::ITEM_TYPE);
+        $proposal->setTargetId((int) $entry->getId());
+        $proposal->setProposedBy($member);
+        $proposal->setChanges([
+            new FieldChange(GlossaryChangeTarget::FIELD_EXPLANATION, $entry->getExplanation(), 'go away (very rude)'),
+            new FieldChange(GlossaryChangeTarget::FIELD_CATEGORY, '1', '3'),
+        ]);
+        $manager->persist($proposal);
+        $manager->flush();
     }
 
     /**
