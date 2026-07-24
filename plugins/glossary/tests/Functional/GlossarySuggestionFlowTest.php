@@ -2,27 +2,30 @@
 
 namespace Plugin\Glossary\Tests\Functional;
 
+use App\Entity\ChangeProposal;
 use App\Entity\User;
+use App\Enum\ChangeProposalStatus;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Glossary\Entity\Glossary;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
- * Regression cover for the member suggestion / moderator review flow, which the item refactor
- * leaves untouched: a member's edit becomes a suggestion, a moderator's edit is written directly,
- * and a moderator can apply a suggestion or approve a pending entry.
+ * Regression cover for the member proposal / moderator review flow on the universal change
+ * proposal tool: a member's edit becomes a pending proposal, a moderator's edit is written
+ * directly, a moderator resolves proposals per field on the core review page, and the proposer
+ * can withdraw. The separate new-entry approval flow stays as it was.
  */
 class GlossarySuggestionFlowTest extends WebTestCase
 {
     private const string MODERATOR_EMAIL = 'Admin@example.org';
     private const string MEMBER_EMAIL = 'Adem.Lane@example.org';
 
-    public function testMemberEditBecomesASuggestion(): void
+    public function testMemberEditCreatesAPendingProposal(): void
     {
         // Arrange
         $client = static::createClient();
-        $entry = $this->approvedEntry($client);
+        $entry = $this->approvedEntryWithoutProposals($client);
         $original = (string) $entry->getExplanation();
         $client->loginUser($this->user($client, self::MEMBER_EMAIL));
 
@@ -32,15 +35,16 @@ class GlossarySuggestionFlowTest extends WebTestCase
         // Assert
         $reloaded = $this->reload($client, (int) $entry->getId());
         self::assertSame($original, $reloaded->getExplanation());
-        self::assertCount(1, $reloaded->getSuggestions());
-        self::assertSame('a member proposal', $reloaded->getSuggestions()[0]->value);
+        $proposals = $this->pendingProposals($client, (int) $entry->getId());
+        self::assertCount(1, $proposals);
+        self::assertSame('a member proposal', $proposals[0]->getChange('explanation')->after);
     }
 
     public function testModeratorEditIsWrittenDirectly(): void
     {
         // Arrange
         $client = static::createClient();
-        $entry = $this->approvedEntry($client);
+        $entry = $this->approvedEntryWithoutProposals($client);
         $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
 
         // Act
@@ -49,32 +53,104 @@ class GlossarySuggestionFlowTest extends WebTestCase
         // Assert
         $reloaded = $this->reload($client, (int) $entry->getId());
         self::assertSame('a moderator rewrite', $reloaded->getExplanation());
-        self::assertSame([], $reloaded->getSuggestions());
+        self::assertCount(0, $this->pendingProposals($client, (int) $entry->getId()));
     }
 
-    public function testModeratorAppliesASuggestion(): void
+    public function testModeratorAppliesOneFieldAndDeniesAnother(): void
     {
         // Arrange
         $client = static::createClient();
-        $entry = $this->approvedEntry($client);
+        $entry = $this->approvedEntryWithoutProposals($client);
+        $id = (int) $entry->getId();
+        $originalPhrase = (string) $entry->getPhrase();
+
+        $client->loginUser($this->user($client, self::MEMBER_EMAIL));
+        $this->submitEdit($client, $id, 'proposal to apply', 'proposed phrase');
+
+        $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
+        $proposalId = (int) $this->pendingProposals($client, $id)[0]->getId();
+        $crawler = $client->request('GET', '/en/review/proposals/glossary/' . $id);
+        $this->assertResponseIsSuccessful();
+        $token = (string) $crawler->filter('a[href$="/proposal/' . $proposalId . '/apply/explanation"]')->attr('data-csrf-token');
+
+        // Act
+        $client->request('POST', '/en/review/proposal/' . $proposalId . '/apply/explanation', ['_token' => $token]);
+        $this->assertResponseRedirects();
+        $client->request('POST', '/en/review/proposal/' . $proposalId . '/deny/phrase', ['_token' => $token]);
+        $this->assertResponseRedirects();
+
+        // Assert
+        $reloaded = $this->reload($client, $id);
+        self::assertSame('proposal to apply', $reloaded->getExplanation());
+        self::assertSame($originalPhrase, $reloaded->getPhrase());
+        self::assertSame(ChangeProposalStatus::Approved, $this->proposal($client, $proposalId)->getStatus());
+    }
+
+    public function testProposerCanWithdrawAPendingProposal(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $entry = $this->approvedEntryWithoutProposals($client);
         $id = (int) $entry->getId();
 
         $client->loginUser($this->user($client, self::MEMBER_EMAIL));
-        $this->submitEdit($client, $id, 'proposal to apply');
+        $this->submitEdit($client, $id, 'to be withdrawn');
+        $proposalId = (int) $this->pendingProposals($client, $id)[0]->getId();
 
-        $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
-        $hash = $this->reload($client, $id)->getSuggestions()[0]->getHash();
-        $crawler = $client->request('GET', '/en/glossary/suggestion/list/' . $id);
-        $token = (string) $crawler->filter('a[href$="/suggestion/apply/' . $id . '/' . $hash . '"]')->attr('data-csrf-token');
+        $crawler = $client->request('GET', '/en/review/proposals/glossary/' . $id);
+        $this->assertResponseIsSuccessful();
+        $token = (string) $crawler->filter('a[href$="/proposal/' . $proposalId . '/withdraw"]')->attr('data-csrf-token');
 
         // Act
-        $client->request('POST', '/en/glossary/suggestion/apply/' . $id . '/' . $hash, ['_token' => $token]);
+        $client->request('POST', '/en/review/proposal/' . $proposalId . '/withdraw', ['_token' => $token]);
 
         // Assert
         $this->assertResponseRedirects();
-        $reloaded = $this->reload($client, $id);
-        self::assertSame('proposal to apply', $reloaded->getExplanation());
-        self::assertSame([], $reloaded->getSuggestions());
+        self::assertSame(ChangeProposalStatus::Withdrawn, $this->proposal($client, $proposalId)->getStatus());
+        self::assertCount(0, $this->pendingProposals($client, $id));
+    }
+
+    public function testMemberCannotApplyAProposal(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $entry = $this->approvedEntryWithoutProposals($client);
+        $id = (int) $entry->getId();
+
+        $client->loginUser($this->user($client, self::MEMBER_EMAIL));
+        $this->submitEdit($client, $id, 'a member proposal');
+        $proposalId = (int) $this->pendingProposals($client, $id)[0]->getId();
+
+        $crawler = $client->request('GET', '/en/review/proposals/glossary/' . $id);
+        $token = (string) $crawler->filter('a[href$="/proposal/' . $proposalId . '/withdraw"]')->attr('data-csrf-token');
+
+        // Act
+        $client->request('POST', '/en/review/proposal/' . $proposalId . '/apply/explanation', ['_token' => $token]);
+
+        // Assert
+        $this->assertResponseStatusCodeSame(403);
+        self::assertCount(1, $this->pendingProposals($client, $id));
+    }
+
+    public function testApplyWithInvalidCsrfTokenIsRejected(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $entry = $this->approvedEntryWithoutProposals($client);
+        $id = (int) $entry->getId();
+
+        $client->loginUser($this->user($client, self::MEMBER_EMAIL));
+        $this->submitEdit($client, $id, 'a member proposal');
+        $proposalId = (int) $this->pendingProposals($client, $id)[0]->getId();
+
+        $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
+
+        // Act
+        $client->request('POST', '/en/review/proposal/' . $proposalId . '/apply/explanation', ['_token' => 'broken']);
+
+        // Assert
+        $this->assertResponseStatusCodeSame(403);
+        self::assertCount(1, $this->pendingProposals($client, $id));
     }
 
     public function testModeratorApprovesAPendingEntry(): void
@@ -96,20 +172,30 @@ class GlossarySuggestionFlowTest extends WebTestCase
         self::assertTrue($this->reload($client, $id)->getApproved());
     }
 
-    private function submitEdit(KernelBrowser $client, int $id, string $explanation): void
+    private function submitEdit(KernelBrowser $client, int $id, string $explanation, ?string $phrase = null): void
     {
         $crawler = $client->request('GET', '/en/glossary/edit/' . $id);
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->filter('.box form')->form();
         $form['glossary[explanation]'] = $explanation;
+        if ($phrase !== null) {
+            $form['glossary[phrase]'] = $phrase;
+        }
         $client->submit($form);
         $this->assertResponseRedirects();
     }
 
-    private function approvedEntry(KernelBrowser $client): Glossary
+    private function approvedEntryWithoutProposals(KernelBrowser $client): Glossary
     {
-        return $this->entry($client, true);
+        $entries = $this->em($client)->getRepository(Glossary::class)->findBy(['approved' => true]);
+        foreach ($entries as $entry) {
+            if ($this->pendingProposals($client, (int) $entry->getId()) === []) {
+                return $entry;
+            }
+        }
+
+        self::fail('No approved glossary fixture entry without pending proposals');
     }
 
     private function entry(KernelBrowser $client, bool $approved): Glossary
@@ -120,6 +206,28 @@ class GlossarySuggestionFlowTest extends WebTestCase
         }
 
         return $entry;
+    }
+
+    /** @return list<ChangeProposal> */
+    private function pendingProposals(KernelBrowser $client, int $targetId): array
+    {
+        return $this->em($client)->getRepository(ChangeProposal::class)->findBy([
+            'targetType' => 'glossary',
+            'targetId' => $targetId,
+            'status' => ChangeProposalStatus::Pending,
+        ]);
+    }
+
+    private function proposal(KernelBrowser $client, int $id): ChangeProposal
+    {
+        $em = $this->em($client);
+        $em->clear();
+        $proposal = $em->getRepository(ChangeProposal::class)->find($id);
+        if (!$proposal instanceof ChangeProposal) {
+            self::fail('Change proposal vanished');
+        }
+
+        return $proposal;
     }
 
     private function reload(KernelBrowser $client, int $id): Glossary

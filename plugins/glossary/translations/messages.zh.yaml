@@ -23,6 +23,9 @@ glossary:
     button_edit: '编辑'
     button_review_approval: '审核批准'
     button_review_suggestions: '审核建议'
+    validation_entry_missing: '该词条已不存在。'
+    validation_phrase_blank: '词条不能为空。'
+    validation_category_unknown: '该分类已不存在。'
 glossary_config:
     page_title: '术语表配置'
     primary_label: '主字段标签'

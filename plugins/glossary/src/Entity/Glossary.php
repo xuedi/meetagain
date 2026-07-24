@@ -5,7 +5,6 @@ namespace Plugin\Glossary\Entity;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use InvalidArgumentException;
 use Plugin\Glossary\Repository\GlossaryRepository;
 
 #[ORM\Entity(repositoryClass: GlossaryRepository::class)]
@@ -29,9 +28,6 @@ class Glossary
 
     #[ORM\Column]
     private bool $approved = false;
-
-    #[ORM\Column(nullable: true)]
-    private ?array $suggestion = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $explanation = null;
@@ -114,52 +110,6 @@ class Glossary
     public function setApproved(bool $approved): static
     {
         $this->approved = $approved;
-
-        return $this;
-    }
-
-    public function getSuggestion(string $hash): Suggestion
-    {
-        foreach ($this->getSuggestions() as $suggestion) {
-            if ($suggestion->getHash() !== $hash) {
-                continue;
-            }
-
-            return $suggestion;
-        }
-        throw new InvalidArgumentException('Suggestion not found');
-    }
-
-    public function removeSuggestion(string $hash): int
-    {
-        $newList = [];
-        foreach ($this->getSuggestions() as $suggestion) {
-            if ($suggestion->getHash() === $hash) {
-                continue;
-            }
-
-            $newList[] = $suggestion->jsonSerialize();
-        }
-        $this->suggestion = $newList;
-
-        return count($this->suggestion);
-    }
-
-    public function getSuggestions(): array
-    {
-        if (($this->suggestion ?? []) === []) {
-            return [];
-        }
-        $suggestions = [];
-        foreach ($this->suggestion as $json) {
-            $suggestions[] = Suggestion::fromJson($json);
-        }
-        return $suggestions;
-    }
-
-    public function addSuggestions(Suggestion $suggestion): static
-    {
-        $this->suggestion[] = $suggestion->jsonSerialize();
 
         return $this;
     }

@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'review.page_title'|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-two-thirds">
+
+                    <h1 class="title is-4">{{ 'review.page_title'|trans }}</h1>
+                    <p class="subtitle is-6">
+                        {% if targetUrl is not null %}
+                            <a href="{{ targetUrl }}">{{ targetLabel }}</a>
+                        {% else %}
+                            {{ targetLabel }}
+                        {% endif %}
+                    </p>
+
+                    {% if cards is empty %}
+                        <p class="has-text-grey">{{ 'review.empty_state'|trans }}</p>
+                    {% else %}
+                        {% for card in cards %}
+                            {{ include('review/_proposal_card.html.twig', {card: card, canReview: canReview}) }}
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if targetUrl is not null %}
+                        <a href="{{ targetUrl }}" class="is-size-7">{{ 'review.link_target'|trans }}</a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

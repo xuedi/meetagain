@@ -7,13 +7,15 @@ use App\Enum\ItemAction;
 use App\Item\ItemActionDispatcher;
 use App\Item\ItemFilterService;
 use App\Item\Taxonomy\ItemTaxonomyService;
+use App\Review\ChangeProposalService;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
 use Plugin\Glossary\Repository\GlossaryRepository;
+use Plugin\Glossary\Review\GlossaryChangeTarget;
 use Plugin\Glossary\Service\GlossaryService;
-use ReflectionProperty;
 use RuntimeException;
 
 class GlossaryServiceTest extends TestCase
@@ -96,89 +98,92 @@ class GlossaryServiceTest extends TestCase
         // Assert — mock verifies remove()/flush() were called
     }
 
-    public function testDeleteRemovesEntry(): void
+    public function testDeleteRemovesEntryAndItsPendingProposals(): void
     {
         // Arrange
         $item = new Glossary();
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('remove')->with($item);
         $em->expects(self::once())->method('flush');
-        $service = $this->makeService($em, $this->repoReturning($item));
+        $proposals = $this->createMock(ChangeProposalService::class);
+        $proposals->expects(self::once())
+            ->method('removeForTarget')
+            ->with(GlossaryCategorizableTypeProvider::ITEM_TYPE, 1);
+        $service = $this->makeService($em, $this->repoReturning($item), changeProposalService: $proposals);
 
         // Act
         $service->delete(1);
-
-        // Assert — mock verifies remove()/flush() were called
     }
 
-    public function testGenerateSuggestionsRecordsOnlyChangedFields(): void
-    {
-        // Arrange
-        $current = (new Glossary())
-            ->setPhrase('old')
-            ->setPinyin('lǎo')
-            ->setExplanation('same');
-        $em = $this->createStub(EntityManagerInterface::class);
-        $service = $this->makeService($em, $this->repoReturning($current));
-
-        $submitted = (new Glossary())
-            ->setPhrase('new')
-            ->setPinyin('lǎo')
-            ->setExplanation('same');
-
-        // Act
-        $service->generateSuggestions($submitted, id: 1, userId: 5, categoryId: null);
-
-        // Assert: only the phrase changed, so exactly one suggestion is queued
-        $stored = $this->readStoredSuggestions($current);
-        self::assertCount(1, $stored);
-        self::assertSame('phrase', $stored[0]['field']);
-        self::assertSame('new', $stored[0]['value']);
-    }
-
-    public function testGenerateSuggestionsRecordsNothingWhenUnchanged(): void
-    {
-        // Arrange
-        $current = (new Glossary())
-            ->setPhrase('same')
-            ->setPinyin('same')
-            ->setExplanation('same');
-        $em = $this->createStub(EntityManagerInterface::class);
-        $service = $this->makeService($em, $this->repoReturning($current));
-
-        $submitted = (new Glossary())
-            ->setPhrase('same')
-            ->setPinyin('same')
-            ->setExplanation('same');
-
-        // Act
-        $service->generateSuggestions($submitted, id: 1, userId: 5, categoryId: null);
-
-        // Assert
-        self::assertSame([], $current->getSuggestions());
-    }
-
-    public function testApplySuggestionUpdatesFieldAndReturnsRemainingCount(): void
+    public function testApplyChangeWritesScalarField(): void
     {
         // Arrange
         $item = (new Glossary())->setPhrase('old');
-        $this->injectStoredSuggestions($item, [
-            $this->storedSuggestion(1, 'phrase', 'brandnew'),
-            $this->storedSuggestion(2, 'pinyin', 'xīn'),
-        ]);
-        $phraseHash = $item->getSuggestions()[0]->getHash();
-
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('persist')->with($item);
         $em->expects(self::once())->method('flush');
         $service = $this->makeService($em, $this->repoReturning($item));
 
         // Act
-        $remaining = $service->applySuggestion(1, $phraseHash);
+        $service->applyChange(1, GlossaryChangeTarget::FIELD_PHRASE, 'brandnew');
 
         // Assert
         self::assertSame('brandnew', $item->getPhrase());
-        self::assertSame(1, $remaining);
+    }
+
+    public function testApplyChangeEmptyPinyinClearsTheField(): void
+    {
+        // Arrange
+        $item = (new Glossary())->setPinyin('lǎo');
+        $em = $this->createStub(EntityManagerInterface::class);
+        $service = $this->makeService($em, $this->repoReturning($item));
+
+        // Act
+        $service->applyChange(1, GlossaryChangeTarget::FIELD_PINYIN, '');
+
+        // Assert
+        self::assertNull($item->getPinyin());
+    }
+
+    public function testApplyChangeRoutesCategoryThroughTheTaxonomy(): void
+    {
+        // Arrange
+        $taxonomy = $this->createMock(ItemTaxonomyService::class);
+        $taxonomy->expects(self::once())
+            ->method('setCategory')
+            ->with(GlossaryCategorizableTypeProvider::ITEM_TYPE, 1, 3);
+        $service = $this->makeService(
+            $this->createStub(EntityManagerInterface::class),
+            $this->repoReturning(new Glossary()),
+            taxonomyService: $taxonomy,
+        );
+
+        // Act
+        $service->applyChange(1, GlossaryChangeTarget::FIELD_CATEGORY, '3');
+    }
+
+    public function testApplyChangeRejectsUnknownField(): void
+    {
+        // Arrange
+        $service = $this->makeService($this->createStub(EntityManagerInterface::class), $this->repoReturning(new Glossary()));
+
+        // Assert
+        $this->expectException(InvalidArgumentException::class);
+
+        // Act
+        $service->applyChange(1, 'unknown', 'value');
+    }
+
+    public function testApplyChangeThrowsWhenEntryIsGone(): void
+    {
+        // Arrange
+        $service = $this->makeService($this->createStub(EntityManagerInterface::class), $this->repoReturning(null));
+
+        // Assert
+        $this->expectException(RuntimeException::class);
+
+        // Act
+        $service->applyChange(1, GlossaryChangeTarget::FIELD_PHRASE, 'value');
     }
 
     public function testListNarrowsThroughTheCoreItemFilterChain(): void
@@ -229,6 +234,8 @@ class GlossaryServiceTest extends TestCase
         GlossaryRepository $repo,
         ?ItemFilterService $filter = null,
         ?ItemActionDispatcher $itemActionDispatcher = null,
+        ?ItemTaxonomyService $taxonomyService = null,
+        ?ChangeProposalService $changeProposalService = null,
     ): GlossaryService {
         if ($filter === null) {
             $filter = $this->createStub(ItemFilterService::class);
@@ -240,8 +247,9 @@ class GlossaryServiceTest extends TestCase
             $repo,
             $filter,
             $this->createStub(EntityActionDispatcher::class),
-            $this->createStub(ItemTaxonomyService::class),
+            $taxonomyService ?? $this->createStub(ItemTaxonomyService::class),
             $itemActionDispatcher ?? $this->createStub(ItemActionDispatcher::class),
+            $changeProposalService ?? $this->createStub(ChangeProposalService::class),
         );
     }
 
@@ -251,37 +259,5 @@ class GlossaryServiceTest extends TestCase
         $repo->method('findOneAllowed')->willReturn($item);
 
         return $repo;
-    }
-
-    /**
-     * @return array{createdBy: int, createdAt: array{date: string, timezone_type: int, timezone: string}, field: string, value: string}
-     */
-    private function storedSuggestion(int $createdBy, string $field, string $value): array
-    {
-        return [
-            'createdBy' => $createdBy,
-            'createdAt' => ['date' => '2026-07-12 10:00:00.000000', 'timezone_type' => 3, 'timezone' => 'UTC'],
-            'field' => $field,
-            'value' => $value,
-        ];
-    }
-
-    /**
-     * @param list<array<string, mixed>> $suggestions
-     */
-    private function injectStoredSuggestions(Glossary $glossary, array $suggestions): void
-    {
-        $property = new ReflectionProperty(Glossary::class, 'suggestion');
-        $property->setValue($glossary, $suggestions);
-    }
-
-    /**
-     * @return list<array<string, mixed>>
-     */
-    private function readStoredSuggestions(Glossary $glossary): array
-    {
-        $property = new ReflectionProperty(Glossary::class, 'suggestion');
-
-        return $property->getValue($glossary) ?? [];
     }
 }
