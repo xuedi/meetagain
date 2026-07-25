@@ -11,6 +11,7 @@ admin_shell:
     menu_support: 'Support'
     menu_email: 'Emails'
     menu_logs: 'Logs'
+    menu_seo: 'SEO'
     menu_security: 'Security'
     menu_plugin: 'Plugins'
     menu_system: 'Settings'
@@ -504,9 +505,7 @@ admin_system:
     tab_theme: 'Theme'
     tab_images: 'Images'
     tab_language: 'Language'
-    tab_seo: 'SEO'
     tab_import: 'Import'
-    tab_sitemap: 'Sitemap'
     tab_secretbox: 'Secret Keys'
     flash_invalid_csrf: 'Invalid CSRF token'
 admin_secretbox:

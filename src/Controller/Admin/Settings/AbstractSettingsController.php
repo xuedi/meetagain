@@ -55,18 +55,6 @@ abstract class AbstractSettingsController extends AbstractController
                 isActive: $this->activeSettingsTab === 'language',
             ),
             new AdminTab(
-                label: $this->translator->trans('admin_system.tab_seo'),
-                target: $this->generateUrl('app_admin_system_seo'),
-                icon: 'search',
-                isActive: $this->activeSettingsTab === 'seo',
-            ),
-            new AdminTab(
-                label: $this->translator->trans('admin_system.tab_sitemap'),
-                target: $this->generateUrl('app_admin_system_sitemap'),
-                icon: 'sitemap',
-                isActive: $this->activeSettingsTab === 'sitemap',
-            ),
-            new AdminTab(
                 label: $this->translator->trans('admin_system.tab_import'),
                 target: $this->generateUrl('app_admin_system_import'),
                 icon: 'file-import',
