@@ -138,6 +138,10 @@ admin_system_seo:
     placeholder_default: '全站元描述（最多160个字符）'
     placeholder_events: '活动列表的元描述（最多160个字符）'
     placeholder_members: '成员列表的元描述（最多160个字符）'
+    heading_canonical: '系列活动规范页面'
+    help_canonical: '在内容差异足够大之前，同一系列的各次活动共用一个规范页面。此阈值决定一次活动需要改动多少才会成为独立页面。'
+    field_canonical_threshold: '差异阈值（百分比）'
+    help_canonical_threshold: '内容改动达到该百分比时，该次活动成为独立页面。数值越低独立页面越多，越高则越多活动合并为一页。'
 admin_system_import:
     button: '导入'
     heading: '导入群组数据'

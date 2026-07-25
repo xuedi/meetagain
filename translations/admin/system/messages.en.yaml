@@ -138,6 +138,10 @@ admin_system_seo:
     placeholder_default: 'Site-wide meta description (max 160 chars)'
     placeholder_events: 'Meta description for the events listing (max 160 chars)'
     placeholder_members: 'Meta description for the members listing (max 160 chars)'
+    heading_canonical: 'Event series canonical'
+    help_canonical: 'Occurrences of a recurring series share one canonical page until their content differs enough. This threshold decides how much an occurrence must change before it becomes a page of its own.'
+    field_canonical_threshold: 'Divergence threshold (percent)'
+    help_canonical_threshold: 'Percent of changed content that makes an occurrence its own page. Lower means more separate pages, higher means more occurrences folded into one.'
 admin_system_import:
     button: 'Import'
     heading: 'Import Group Data'

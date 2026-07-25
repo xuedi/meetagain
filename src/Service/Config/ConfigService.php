@@ -49,6 +49,11 @@ readonly class ConfigService
         };
     }
 
+    public function getEventCanonicalThreshold(): int
+    {
+        return $this->getInt('event_canonical_threshold', 20);
+    }
+
     public function getSystemUserId(): int
     {
         return $this->getInt('system_user_id', 1);
@@ -180,6 +185,7 @@ readonly class ConfigService
         $this->setString('seo_description_default', $formData['seoDescriptionDefault'] ?? '');
         $this->setString('seo_description_events', $formData['seoDescriptionEvents'] ?? '');
         $this->setString('seo_description_members', $formData['seoDescriptionMembers'] ?? '');
+        $this->setInt('event_canonical_threshold', (int) ($formData['eventCanonicalThreshold'] ?? 20));
     }
 
     public function getThemeColors(): array

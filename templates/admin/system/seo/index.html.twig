@@ -17,6 +17,11 @@
                 {{ form_row(form.seoDescriptionDefault) }}
                 {{ form_row(form.seoDescriptionEvents) }}
                 {{ form_row(form.seoDescriptionMembers) }}
+
+                <h2 class="title is-5 mt-5">{{ 'admin_system_seo.heading_canonical'|trans }}</h2>
+                <p class="content">{{ 'admin_system_seo.help_canonical'|trans }}</p>
+                {{ form_row(form.eventCanonicalThreshold) }}
+
                 <button class="button is-primary">{{ 'global.button_save'|trans }}</button>
                 {{ form_end(form) }}
 
