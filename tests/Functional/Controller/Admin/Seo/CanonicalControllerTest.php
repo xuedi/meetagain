@@ -5,6 +5,7 @@ namespace Tests\Functional\Controller\Admin\Seo;
 use App\Repository\EventCanonicalRootRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Crawler;
 
 final class CanonicalControllerTest extends WebTestCase
 {
@@ -12,7 +13,7 @@ final class CanonicalControllerTest extends WebTestCase
     private const string ADMIN_PASSWORD = '1234';
     private const string CANONICAL_PATH = '/en/admin/seo/canonical';
 
-    public function testLanesRenderWithTheMarkerLegend(): void
+    public function testEveryLaneOpensWithItsFirstOccurrence(): void
     {
         // Arrange
         $client = static::createClient();
@@ -21,9 +22,15 @@ final class CanonicalControllerTest extends WebTestCase
         // Act
         $crawler = $client->request('GET', self::CANONICAL_PATH);
 
-        // Assert
+        // Assert: the fixtures carry no markers, so each lane collapses to first + one follower run.
         $this->assertResponseIsSuccessful();
-        self::assertStringContainsString('follower', $crawler->filter('body')->text());
+        $lanes = $crawler->filter('table tbody tr');
+        self::assertGreaterThan(0, $lanes->count());
+        foreach ($lanes as $lane) {
+            $chips = (new Crawler($lane))->filter('.tags .tag')->each(static fn($node) => trim($node->text()));
+            self::assertNotEmpty($chips);
+            self::assertSame('first', $chips[0]);
+        }
     }
 
     public function testRebuildAllWritesMarkersAndRedirects(): void

@@ -14,7 +14,6 @@ final readonly class CanonicalLaneStop
         public bool $locked,
         public bool $canceled,
         public int $rootEventId,
-        public string $rootLabel,
         public float $percentChanged,
     ) {}
 

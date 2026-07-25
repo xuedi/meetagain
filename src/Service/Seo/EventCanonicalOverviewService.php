@@ -16,8 +16,6 @@ use App\ValueObject\CanonicalLaneStop;
  */
 readonly class EventCanonicalOverviewService
 {
-    private const string ROOT_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
     public function __construct(
         private EventSeriesRepository $seriesRepository,
         private EventRepository $eventRepository,
@@ -102,12 +100,12 @@ readonly class EventCanonicalOverviewService
     {
         $localeMembers = array_values(array_filter($members, static fn(Event $m) => $m->findTranslation($locale) !== null));
 
-        $rootLabels = [];
+        $rootIds = [];
         $stops = [];
         foreach ($localeMembers as $member) {
             $root = $this->resolver->resolveRoot($member, $locale);
             $rootId = (int) $root->getId();
-            $rootLabels[$rootId] ??= self::ROOT_LABELS[count($rootLabels) % strlen(self::ROOT_LABELS)];
+            $rootIds[$rootId] = true;
 
             $stops[] = new CanonicalLaneStop(
                 eventId: (int) $member->getId(),
@@ -117,7 +115,6 @@ readonly class EventCanonicalOverviewService
                 locked: $member->getStatus() === EventStatus::Locked,
                 canceled: $member->isCanceled(),
                 rootEventId: $rootId,
-                rootLabel: $rootLabels[$rootId],
                 percentChanged: $this->similarityService->compare($member, $root, $locale)->total,
             );
         }
@@ -127,7 +124,7 @@ readonly class EventCanonicalOverviewService
             seriesName: $series->getName(),
             locale: $locale,
             stops: $stops,
-            rootCount: count($rootLabels),
+            rootCount: count($rootIds),
         );
     }
 
