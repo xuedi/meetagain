@@ -1,0 +1,18 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+<div class="container">
+
+    {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+    {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+    <p class="has-text-grey mb-4">{{ 'admin_seo_canonical.intro'|trans({'%threshold%': threshold}) }}</p>
+
+    {% include 'admin/seo/canonical/_lanes.html.twig' with {
+        'lanes': lanes,
+        'rebuildRoute': 'app_admin_seo_canonical_rebuild_series',
+        'rebuildTokenId': 'admin_seo_canonical_rebuild_series',
+    } only %}
+
+</div>
+{% endblock %}

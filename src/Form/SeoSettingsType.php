@@ -5,9 +5,11 @@ namespace App\Form;
 use App\Service\Config\ConfigService;
 use Override;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SeoSettingsType extends AbstractType
@@ -21,32 +23,39 @@ class SeoSettingsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('seoDescriptionDefault', TextareaType::class, [
-            'label' => 'admin_system_seo.field_default',
+            'label' => 'admin_seo_meta.field_default',
             'required' => false,
             'data' => $this->configService->getSeoDescription('default'),
             'attr' => [
                 'rows' => 3,
                 'maxlength' => 160,
-                'placeholder' => $this->translator->trans('admin_system_seo.placeholder_default'),
+                'placeholder' => $this->translator->trans('admin_seo_meta.placeholder_default'),
             ],
         ])->add('seoDescriptionEvents', TextareaType::class, [
-            'label' => 'admin_system_seo.field_events',
+            'label' => 'admin_seo_meta.field_events',
             'required' => false,
             'data' => $this->configService->getSeoDescription('events'),
             'attr' => [
                 'rows' => 3,
                 'maxlength' => 160,
-                'placeholder' => $this->translator->trans('admin_system_seo.placeholder_events'),
+                'placeholder' => $this->translator->trans('admin_seo_meta.placeholder_events'),
             ],
         ])->add('seoDescriptionMembers', TextareaType::class, [
-            'label' => 'admin_system_seo.field_members',
+            'label' => 'admin_seo_meta.field_members',
             'required' => false,
             'data' => $this->configService->getSeoDescription('members'),
             'attr' => [
                 'rows' => 3,
                 'maxlength' => 160,
-                'placeholder' => $this->translator->trans('admin_system_seo.placeholder_members'),
+                'placeholder' => $this->translator->trans('admin_seo_meta.placeholder_members'),
             ],
+        ])->add('eventCanonicalThreshold', IntegerType::class, [
+            'label' => 'admin_seo_meta.field_canonical_threshold',
+            'help' => 'admin_seo_meta.help_canonical_threshold',
+            'required' => false,
+            'data' => $this->configService->getEventCanonicalThreshold(),
+            'constraints' => [new Range(min: 1, max: 100, notInRangeMessage: 'admin_seo_meta.validator_canonical_threshold_range')],
+            'attr' => ['min' => 1, 'max' => 100],
         ]);
     }
 

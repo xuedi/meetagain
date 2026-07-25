@@ -11,6 +11,7 @@ admin_shell:
     menu_support: '支持'
     menu_email: '电子邮件'
     menu_logs: '日志'
+    menu_seo: 'SEO'
     menu_security: '安全'
     menu_plugin: '插件'
     menu_system: '设置'
@@ -504,9 +505,7 @@ admin_system:
     tab_theme: '主题'
     tab_images: '图片'
     tab_language: '语言'
-    tab_seo: 'SEO'
     tab_import: '导入'
-    tab_sitemap: '站点地图'
     tab_secretbox: '密钥管理'
     flash_invalid_csrf: 'CSRF令牌无效'
 admin_secretbox:

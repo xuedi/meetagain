@@ -423,6 +423,28 @@ class EventRepository extends ServiceEntityRepository
         return $query->getResult();
     }
 
+    /**
+     * @param array<int> $seriesIds
+     * @return array<int, Event>
+     */
+    public function findSeriesMembers(array $seriesIds): array
+    {
+        if ($seriesIds === []) {
+            return [];
+        }
+
+        return $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->where('e.series IN (:seriesIds)')
+            ->setParameter('seriesIds', $seriesIds)
+            ->orderBy('e.start', 'ASC')
+            ->addOrderBy('e.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findNewestSeriesMember(int $seriesId): ?Event
     {
         return $this

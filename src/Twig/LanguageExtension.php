@@ -3,6 +3,7 @@
 namespace App\Twig;
 
 use App\Filter\Language\AlternateLinkFilterInterface;
+use App\Publisher\AlternateLinks\AlternateLinkProviderInterface;
 use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
@@ -33,6 +34,8 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         private readonly iterable $organizationProviders = [],
         #[AutowireIterator(AlternateLinkFilterInterface::class)]
         private readonly iterable $alternateLinkFilters = [],
+        #[AutowireIterator(AlternateLinkProviderInterface::class)]
+        private readonly iterable $alternateLinkProviders = [],
     ) {}
 
     #[Override]
@@ -114,11 +117,23 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             return [];
         }
 
+        // The language switcher lists the other languages; an hreflang cluster must also name the
+        // page itself, otherwise search engines discard the whole cluster.
         $altLangList = $this->languageService->getAltLangList($request->getLocale(), $currentUri);
-        $altLangList = $this->applyAlternateLinkFilters($altLangList, $request);
-        $host = rtrim($this->configService->getHost(), '/');
+        $altLangList[$request->getLocale()] = $currentUri;
 
-        return array_map(static fn(string $path) => $host . $path, $altLangList);
+        $host = rtrim($this->configService->getHost(), '/');
+        $localeUrls = array_map(static fn(string $path) => $host . $path, $altLangList);
+
+        foreach ($this->alternateLinkProviders as $provider) {
+            $provided = $provider->getAlternateLinks($localeUrls, $request);
+            if ($provided !== null) {
+                $localeUrls = $provided;
+                break;
+            }
+        }
+
+        return $this->applyAlternateLinkFilters($localeUrls, $request);
     }
 
     /**

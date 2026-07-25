@@ -4,6 +4,8 @@ namespace Tests\Unit\Publisher\Sitemap;
 
 use App\Entity\Cms;
 use App\Entity\Event;
+use App\Entity\EventSeries;
+use App\Entity\EventTranslation;
 use App\Filter\Cms\CmsFilterResult;
 use App\Filter\Cms\CmsFilterService;
 use App\Filter\Member\MemberFilterResult;
@@ -11,13 +13,18 @@ use App\Filter\Member\MemberFilterService;
 use App\Filter\Sitemap\SitemapEventVisibilityService;
 use App\Publisher\Sitemap\CoreSitemapPublisher;
 use App\Repository\CmsRepository;
+use App\Repository\EventCanonicalRootRepository;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Config\LanguageService;
+use App\Service\Seo\EventCanonicalResolver;
 use DateTime;
 use DateTimeImmutable;
+use DateTimeInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Tests\Unit\Stubs\EventSeriesStub;
+use Tests\Unit\Stubs\EventStub;
 
 class CoreSitemapPublisherTest extends TestCase
 {
@@ -205,10 +212,42 @@ class CoreSitemapPublisherTest extends TestCase
         }
     }
 
+    public function testSeriesFollowersAreOmittedAndAlternatesPointAtTheRoot(): void
+    {
+        // Arrange
+        $series = new EventSeriesStub();
+        $series->setId(7);
+        $root = $this->makeSeriesMember(1, new DateTime('2026-05-01'), $series);
+        $follower = $this->makeSeriesMember(2, new DateTime('2026-05-08'), $series);
+
+        $publisher = $this->makePublisher(
+            locales: ['en', 'de'],
+            cmsPages: [],
+            events: [$root, $follower],
+            cmsFilter: CmsFilterResult::noFilter(),
+            shouldEmitEvents: true,
+            seriesMembers: [$root, $follower],
+        );
+
+        // Act
+        $urls = array_values(array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains($u->loc, '/event/')));
+
+        // Assert: the root once per locale, the follower not at all, alternates pointing at the root
+        self::assertCount(2, $urls);
+        foreach ($urls as $url) {
+            self::assertStringContainsString('/event/1', $url->loc);
+            self::assertSame([
+                'en' => 'https://example.com/en/event/1',
+                'de' => 'https://example.com/de/event/1',
+            ], $url->alternates);
+        }
+    }
+
     /**
      * @param array<string> $locales
      * @param array<Cms> $cmsPages
      * @param array<Event> $events
+     * @param array<Event> $seriesMembers
      */
     private function makePublisher(
         array $locales,
@@ -217,9 +256,11 @@ class CoreSitemapPublisherTest extends TestCase
         CmsFilterResult $cmsFilter,
         bool $shouldEmitEvents,
         int $memberCount = 0,
+        array $seriesMembers = [],
     ): CoreSitemapPublisher {
         $eventRepo = $this->createStub(EventRepository::class);
         $eventRepo->method('findForSitemap')->willReturn($events);
+        $eventRepo->method('findSeriesMembers')->willReturn($seriesMembers);
 
         $cmsRepo = $this->createStub(CmsRepository::class);
         $cmsRepo->method('findPublished')->willReturn($cmsPages);
@@ -264,6 +305,7 @@ class CoreSitemapPublisherTest extends TestCase
             cmsFilterService: $cmsFilterService,
             memberFilterService: $memberFilterService,
             eventVisibilityService: $visibility,
+            canonicalResolver: new EventCanonicalResolver($eventRepo, $this->createStub(EventCanonicalRootRepository::class)),
         );
     }
 
@@ -277,6 +319,24 @@ class CoreSitemapPublisherTest extends TestCase
         $reflection->getProperty('createdAt')->setValue($page, new DateTimeImmutable('2026-04-01'));
 
         return $page;
+    }
+
+    private function makeSeriesMember(int $id, DateTimeInterface $start, EventSeries $series): Event
+    {
+        $event = new EventStub();
+        $event->setId($id);
+        $event->setStart($start);
+        $event->setSeries($series);
+
+        foreach (['en', 'de'] as $locale) {
+            $translation = new EventTranslation();
+            $translation->setLanguage($locale);
+            $translation->setTitle('Weekly meetup');
+            $translation->setDescription('Same content on every occurrence.');
+            $event->addTranslation($translation);
+        }
+
+        return $event;
     }
 
     private function makeEvent(int $id, \DateTimeInterface $start): Event
