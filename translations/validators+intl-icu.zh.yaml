@@ -46,3 +46,6 @@ Error: 错误
 
 # Admin event namespace - series creation
 'admin_event.validator_series_name_required': '请输入系列名称。'
+
+# Admin system SEO namespace - series canonical threshold
+'admin_system_seo.validator_canonical_threshold_range': '阈值必须介于 {min} 和 {max} 百分比之间。'

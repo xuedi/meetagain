@@ -138,6 +138,10 @@ admin_system_seo:
     placeholder_default: 'Website-weite Meta-Beschreibung (max. 160 Zeichen)'
     placeholder_events: 'Meta-Beschreibung für die Veranstaltungsliste (max. 160 Zeichen)'
     placeholder_members: 'Meta-Beschreibung für die Mitgliederliste (max. 160 Zeichen)'
+    heading_canonical: 'Kanonische Seite bei Terminreihen'
+    help_canonical: 'Termine einer Reihe teilen sich eine kanonische Seite, solange sich ihre Inhalte kaum unterscheiden. Dieser Schwellenwert legt fest, wie stark sich ein Termin ändern muss, um eine eigene Seite zu werden.'
+    field_canonical_threshold: 'Abweichungs-Schwellenwert (Prozent)'
+    help_canonical_threshold: 'Anteil geänderter Inhalte, ab dem ein Termin eine eigene Seite wird. Niedriger bedeutet mehr eigene Seiten, höher bedeutet mehr Termine auf einer Seite.'
 admin_system_import:
     button: 'Importieren'
     heading: 'Gruppendaten importieren'

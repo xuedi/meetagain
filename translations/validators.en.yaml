@@ -215,3 +215,6 @@ Error: Error
 
 # Admin event namespace - series creation
 'admin_event.validator_series_name_required': 'Please enter a name for the series.'
+
+# Admin system SEO namespace - series canonical threshold
+'admin_system_seo.validator_canonical_threshold_range': 'The threshold must be between {{ min }} and {{ max }} percent.'

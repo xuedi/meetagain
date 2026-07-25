@@ -18,7 +18,7 @@ class CanonicalLinkHeaderSubscriberTest extends TestCase
         $events = CanonicalLinkHeaderSubscriber::getSubscribedEvents();
 
         static::assertArrayHasKey(KernelEvents::RESPONSE, $events);
-        static::assertSame(['onKernelResponse', 0], $events[KernelEvents::RESPONSE]);
+        static::assertSame(['onKernelResponse', -128], $events[KernelEvents::RESPONSE]);
     }
 
     public function testSubRequestsAreIgnored(): void
@@ -83,6 +83,28 @@ class CanonicalLinkHeaderSubscriberTest extends TestCase
 
         // Assert
         static::assertSame('<https://example.test/foo>; rel="canonical"', $response->headers->get('Link'));
+    }
+
+    public function testExistingLinkHeadersSurvive(): void
+    {
+        // Arrange
+        $canonical = $this->createStub(CanonicalUrlService::class);
+        $canonical->method('getCanonicalUrl')->willReturn('https://example.test/foo');
+
+        $subscriber = new CanonicalLinkHeaderSubscriber($canonical);
+        $response = new Response('<html></html>', 200, [
+            'Content-Type' => 'text/html; charset=utf-8',
+            'Link' => '</media/app.css>; rel="preload"; as="style"',
+        ]);
+
+        // Act
+        $subscriber->onKernelResponse($this->createEvent($response));
+
+        // Assert
+        static::assertSame([
+            '</media/app.css>; rel="preload"; as="style"',
+            '<https://example.test/foo>; rel="canonical"',
+        ], $response->headers->all('Link'));
     }
 
     private function createEvent(Response $response, int $type = HttpKernelInterface::MAIN_REQUEST): ResponseEvent

@@ -452,15 +452,15 @@ class ConfigServiceTest extends TestCase
 
     // ---- saveSeoForm ----
 
-    public function testSaveSeoFormPersistsThreeDescriptions(): void
+    public function testSaveSeoFormPersistsEveryField(): void
     {
         // Arrange: no existing configs
         $repoStub = $this->createStub(ConfigRepository::class);
         $repoStub->method('findOneBy')->willReturn(null);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->exactly(3))->method('persist')->with(static::isInstanceOf(Config::class));
-        $emMock->expects($this->exactly(3))->method('flush');
+        $emMock->expects($this->exactly(4))->method('persist')->with(static::isInstanceOf(Config::class));
+        $emMock->expects($this->exactly(4))->method('flush');
 
         $subject = new ConfigService(
             repo: $repoStub,
@@ -476,6 +476,7 @@ class ConfigServiceTest extends TestCase
             'seoDescriptionDefault' => 'Default',
             'seoDescriptionEvents' => 'Events',
             'seoDescriptionMembers' => 'Members',
+            'eventCanonicalThreshold' => 25,
         ]);
 
         // Assert: verified by mock expectations above

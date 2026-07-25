@@ -37,6 +37,7 @@ use App\Service\Config\LanguageService;
 use App\Service\Event\EventService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
+use App\Service\Seo\EventCanonicalRebuildService;
 use App\ValueObject\ScheduleChange;
 use DateTime;
 use DateTimeImmutable;
@@ -92,6 +93,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         private readonly EventUpdateNotificationEmail $eventUpdateNotificationEmail,
         private readonly SeriesRescheduledEmail $seriesRescheduledEmail,
         private readonly HtmlSanitizerInterface $cmsContent,
+        private readonly EventCanonicalRebuildService $canonicalRebuildService,
     ) {}
 
     #[Route('', name: 'app_admin_event')]
@@ -502,6 +504,8 @@ final class EventController extends AbstractController implements AdminNavigatio
             } else {
                 $this->addFlash('success', $this->translator->trans('admin_event.flash_saved'));
             }
+
+            $this->canonicalRebuildService->refreshAfterEdit($event, $form->get('allFollowing')->getData() === true);
 
             return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
         }

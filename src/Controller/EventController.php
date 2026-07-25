@@ -96,6 +96,9 @@ final class EventController extends AbstractController
 
         $response = $this->getResponse();
         $event = $this->repo->findOneForDetails($id);
+        if (!$event instanceof Event) {
+            throw $this->createNotFoundException();
+        }
 
         if ($event->findTranslation($request->getLocale()) === null) {
             return $this->redirectToRoute(self::ROUTE_EVENT);
