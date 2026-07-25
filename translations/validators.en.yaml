@@ -217,4 +217,4 @@ Error: Error
 'admin_event.validator_series_name_required': 'Please enter a name for the series.'
 
 # Admin system SEO namespace - series canonical threshold
-'admin_seo_meta.validator_canonical_threshold_range': 'The threshold must be between {{ min }} and {{ max }} percent.'
+'admin_seo_canonical.validator_threshold_range': 'The threshold must be between {{ min }} and {{ max }} percent.'

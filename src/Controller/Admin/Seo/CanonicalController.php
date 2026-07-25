@@ -4,13 +4,16 @@ namespace App\Controller\Admin\Seo;
 
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
+use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Entity\EventSeries;
 use App\Filter\Admin\Event\AdminEventListFilterService;
+use App\Form\EventCanonicalSettingsType;
 use App\Repository\EventSeriesRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
@@ -61,6 +64,32 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
             'lanes' => $lanes,
             'threshold' => $this->configService->getEventCanonicalThreshold(),
             'adminTop' => $this->buildTop($lanes, $seriesId, $locale, $onlyBranched),
+            'adminTabs' => $this->getTabs(),
+        ]);
+    }
+
+    #[Route('/canonical/config', name: 'app_admin_seo_canonical_config', methods: ['GET', 'POST'])]
+    public function config(Request $request): Response
+    {
+        $form = $this->createForm(EventCanonicalSettingsType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->configService->saveEventCanonicalForm($form->getData());
+            $this->addFlash('success', $this->translator->trans('admin_seo_canonical.flash_config_saved'));
+
+            return $this->redirectToRoute('app_admin_seo_canonical_config');
+        }
+
+        $adminTop = new AdminTop(
+            info: [new AdminTopInfoText($this->translator->trans('admin_seo_canonical.topbar_config'))],
+            actions: [$this->backToCanonical()],
+        );
+
+        return $this->render('admin/seo/canonical/config.html.twig', [
+            'active' => 'seo',
+            'form' => $form,
+            'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
     }
@@ -146,10 +175,24 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
                 variant: 'is-warning',
                 confirm: $this->translator->trans('admin_seo_canonical.confirm_rebuild_all'),
             ),
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_seo_canonical.button_config'),
+                target: $this->generateUrl('app_admin_seo_canonical_config'),
+                icon: 'cog',
+            ),
             $this->seriesDropdown($seriesId, $locale, $onlyBranched),
             $this->localeDropdown($seriesId, $locale, $onlyBranched),
             $this->branchedDropdown($seriesId, $locale, $onlyBranched),
         ]);
+    }
+
+    private function backToCanonical(): AdminTopActionButton
+    {
+        return new AdminTopActionButton(
+            label: $this->translator->trans('global.button_back'),
+            target: $this->generateUrl('app_admin_seo_canonical'),
+            icon: 'arrow-left',
+        );
     }
 
     private function seriesDropdown(?int $seriesId, ?string $locale, bool $onlyBranched): AdminTopActionDropdown

@@ -5,11 +5,9 @@ namespace App\Form;
 use App\Service\Config\ConfigService;
 use Override;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SeoSettingsType extends AbstractType
@@ -49,13 +47,6 @@ class SeoSettingsType extends AbstractType
                 'maxlength' => 160,
                 'placeholder' => $this->translator->trans('admin_seo_meta.placeholder_members'),
             ],
-        ])->add('eventCanonicalThreshold', IntegerType::class, [
-            'label' => 'admin_seo_meta.field_canonical_threshold',
-            'help' => 'admin_seo_meta.help_canonical_threshold',
-            'required' => false,
-            'data' => $this->configService->getEventCanonicalThreshold(),
-            'constraints' => [new Range(min: 1, max: 100, notInRangeMessage: 'admin_seo_meta.validator_canonical_threshold_range')],
-            'attr' => ['min' => 1, 'max' => 100],
         ]);
     }
 
