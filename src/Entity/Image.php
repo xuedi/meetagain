@@ -144,6 +144,14 @@ class Image
         return $this->altTranslations[$locale] ?? null;
     }
 
+    /**
+     * @return array<string, string> locale => alt text
+     */
+    public function getAltTranslations(): array
+    {
+        return $this->altTranslations ?? [];
+    }
+
     public function setAltTranslation(string $locale, ?string $value): static
     {
         $value = $value === null ? '' : trim($value);

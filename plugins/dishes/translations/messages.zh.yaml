@@ -1,6 +1,7 @@
 dishes:
     menu_main: '菜肴'
     item_label: '菜肴'
+    localized_content_source: '菜肴文本'
     detach: '移除'
     attach_empty: '暂无可关联的菜肴。'
     attach_button: '关联'

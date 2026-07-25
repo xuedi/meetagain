@@ -1,6 +1,7 @@
 dishes:
     menu_main: 'Gerichte'
     item_label: 'Gericht'
+    localized_content_source: 'Gerichtstexte'
     detach: 'Entfernen'
     attach_empty: 'Noch keine Gerichte zum Zuordnen verfügbar.'
     attach_button: 'Zuordnen'
