@@ -459,8 +459,8 @@ class ConfigServiceTest extends TestCase
         $repoStub->method('findOneBy')->willReturn(null);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->exactly(4))->method('persist')->with(static::isInstanceOf(Config::class));
-        $emMock->expects($this->exactly(4))->method('flush');
+        $emMock->expects($this->exactly(3))->method('persist')->with(static::isInstanceOf(Config::class));
+        $emMock->expects($this->exactly(3))->method('flush');
 
         $subject = new ConfigService(
             repo: $repoStub,
@@ -476,8 +476,34 @@ class ConfigServiceTest extends TestCase
             'seoDescriptionDefault' => 'Default',
             'seoDescriptionEvents' => 'Events',
             'seoDescriptionMembers' => 'Members',
-            'eventCanonicalThreshold' => 25,
         ]);
+
+        // Assert: verified by mock expectations above
+    }
+
+    // ---- saveEventCanonicalForm ----
+
+    public function testSaveEventCanonicalFormPersistsTheThreshold(): void
+    {
+        // Arrange: no existing configs
+        $repoStub = $this->createStub(ConfigRepository::class);
+        $repoStub->method('findOneBy')->willReturn(null);
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')->with(static::isInstanceOf(Config::class));
+        $emMock->expects($this->once())->method('flush');
+
+        $subject = new ConfigService(
+            repo: $repoStub,
+            em: $emMock,
+            cache: $this->createStub(CacheInterface::class),
+            kernel: $this->createStub(KernelInterface::class),
+            appState: $this->createStub(AppStateService::class),
+            fs: $this->createStub(ExtendedFilesystem::class),
+        );
+
+        // Act
+        $subject->saveEventCanonicalForm(['eventCanonicalThreshold' => 25]);
 
         // Assert: verified by mock expectations above
     }
