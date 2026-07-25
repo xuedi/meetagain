@@ -3,8 +3,10 @@
 namespace Tests\Functional\Controller\Admin\Seo;
 
 use App\Repository\EventCanonicalRootRepository;
+use App\Service\Config\ConfigService;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Crawler;
 
 final class CanonicalControllerTest extends WebTestCase
 {
@@ -12,7 +14,7 @@ final class CanonicalControllerTest extends WebTestCase
     private const string ADMIN_PASSWORD = '1234';
     private const string CANONICAL_PATH = '/en/admin/seo/canonical';
 
-    public function testLanesRenderWithTheMarkerLegend(): void
+    public function testEveryLaneOpensWithItsFirstOccurrence(): void
     {
         // Arrange
         $client = static::createClient();
@@ -21,9 +23,15 @@ final class CanonicalControllerTest extends WebTestCase
         // Act
         $crawler = $client->request('GET', self::CANONICAL_PATH);
 
-        // Assert
+        // Assert: the fixtures carry no markers, so each lane collapses to first + one follower run.
         $this->assertResponseIsSuccessful();
-        self::assertStringContainsString('follower', $crawler->filter('body')->text());
+        $lanes = $crawler->filter('table tbody tr');
+        self::assertGreaterThan(0, $lanes->count());
+        foreach ($lanes as $lane) {
+            $chips = (new Crawler($lane))->filter('.tags .tag')->each(static fn($node) => trim($node->text()));
+            self::assertNotEmpty($chips);
+            self::assertSame('first', $chips[0]);
+        }
     }
 
     public function testRebuildAllWritesMarkersAndRedirects(): void
@@ -41,6 +49,38 @@ final class CanonicalControllerTest extends WebTestCase
         $this->assertResponseRedirects();
         $repository = static::getContainer()->get(EventCanonicalRootRepository::class);
         self::assertGreaterThanOrEqual(0, $repository->count([]));
+    }
+
+    public function testTheConfigSubpageSavesTheThreshold(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+        $crawler = $client->request('GET', self::CANONICAL_PATH . '/config');
+
+        // Act
+        $form = $crawler->selectButton('Save')->form();
+        $form['event_canonical_settings[eventCanonicalThreshold]'] = '35';
+        $client->submit($form);
+
+        // Assert
+        $this->assertResponseRedirects(self::CANONICAL_PATH . '/config');
+        $configService = static::getContainer()->get(ConfigService::class);
+        self::assertSame(35, $configService->getEventCanonicalThreshold());
+    }
+
+    public function testTheCanonicalPageLinksToTheConfigSubpage(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+
+        // Act
+        $crawler = $client->request('GET', self::CANONICAL_PATH);
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        self::assertSame(1, $crawler->filter('a[href="' . self::CANONICAL_PATH . '/config"]')->count());
     }
 
     public function testRebuildAllRejectsAnInvalidCsrfToken(): void

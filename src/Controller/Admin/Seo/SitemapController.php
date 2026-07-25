@@ -29,7 +29,7 @@ final class SitemapController extends AbstractSeoController implements AdminNavi
         parent::__construct($translator, 'sitemap');
     }
 
-    #[Route('/sitemap', name: 'app_admin_seo_sitemap', methods: ['GET'])]
+    #[Route('', name: 'app_admin_seo_sitemap', methods: ['GET'])]
     public function sitemap(Request $request): Response
     {
         $locales = $this->languageService->getFilteredEnabledCodes();
