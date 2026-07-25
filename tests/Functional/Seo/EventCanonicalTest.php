@@ -16,11 +16,10 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 /**
  * Existing fixture events are reused as series members rather than freshly created ones:
  * only events that already carry their plugin-side ownership mapping are reachable on the
- * public event page.
+ * public event page. These cases use the Go-club events, which share one single-language owner.
  *
- * The canonical cases use the Go-club events, which share one single-language owner. The
- * hreflang cases need a public owner that publishes in two languages, which is why they use the
- * karaoke events instead - an owner with one language emits no alternate links at all.
+ * Hreflang needs an owner publishing in two languages and no core fixture has one, so those cases
+ * cannot live here - they belong to whichever plugin ships such a fixture.
  */
 class EventCanonicalTest extends WebTestCase
 {
@@ -28,8 +27,6 @@ class EventCanonicalTest extends WebTestCase
     private const string BRANCH_TITLE = EventFixture::ONLINE_SIMULTANEOUS;
     private const string FOLLOWER_TITLE = EventFixture::WEEKEND_RETREAT;
     private const string ONE_OFF_TITLE = EventFixture::BERLIN_TOURNAMENT;
-    private const string BILINGUAL_ROOT_TITLE = 'Biweekly Karaoke Box Night';
-    private const string BILINGUAL_FOLLOWER_TITLE = 'Open-Mic Karaoke - Mitte Stage Night';
 
     private function getEventByTitle(KernelBrowser $client, string $title): Event
     {
@@ -180,53 +177,6 @@ class EventCanonicalTest extends WebTestCase
         // Assert
         static::assertStringEndsWith('/en/event/' . $detached->getId(), $detachedCanonical);
         static::assertStringEndsWith('/en/event/' . $root->getId(), $followerCanonical);
-    }
-
-    public function testFollowerHreflangClusterPointsAtTheRootUrls(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $root = $this->getEventByTitle($client, self::BILINGUAL_ROOT_TITLE);
-        $follower = $this->adoptIntoSeries($client, self::BILINGUAL_FOLLOWER_TITLE, $root, '+7 days');
-
-        // Act
-        $crawler = $client->request('GET', '/en/event/' . $follower->getId());
-
-        // Assert
-        $this->assertResponseIsSuccessful();
-        $alternates = $crawler->filter('link[rel="alternate"]')->each(
-            static fn($node) => [$node->attr('hreflang'), $node->attr('href')],
-        );
-        static::assertNotEmpty($alternates);
-        foreach ($alternates as [$hreflang, $href]) {
-            static::assertStringEndsWith('/' . $hreflang . '/event/' . $root->getId(), (string) $href);
-        }
-        static::assertContains(
-            (string) $crawler->filter('link[rel="canonical"]')->attr('href'),
-            array_map(static fn(array $alternate) => $alternate[1], $alternates),
-        );
-    }
-
-    public function testPerLocaleDivergenceYieldsDifferentEventsInOneCluster(): void
-    {
-        // Arrange: the member is a German root but an English follower
-        $client = static::createClient();
-        $root = $this->getEventByTitle($client, self::BILINGUAL_ROOT_TITLE);
-        $germanBranch = $this->adoptIntoSeries($client, self::BILINGUAL_FOLLOWER_TITLE, $root, '+7 days', [
-            'de' => 'Karaokeabend mit gemieteter Anlage und vollem Liederbuch.',
-        ]);
-        $this->markMember($client, $germanBranch, 'de', EventCanonicalRootType::Root);
-
-        // Act
-        $crawler = $client->request('GET', '/en/event/' . $germanBranch->getId());
-
-        // Assert
-        $hrefByLocale = [];
-        foreach ($crawler->filter('link[rel="alternate"]') as $node) {
-            $hrefByLocale[$node->getAttribute('hreflang')] = $node->getAttribute('href');
-        }
-        static::assertStringEndsWith('/en/event/' . $root->getId(), $hrefByLocale['en'] ?? '');
-        static::assertStringEndsWith('/de/event/' . $germanBranch->getId(), $hrefByLocale['de'] ?? '');
     }
 
     public function testSitemapListsRootsButNotFollowers(): void
