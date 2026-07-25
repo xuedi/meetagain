@@ -488,6 +488,13 @@ attributions:
     heading: 'Bildnachweise'
     intro: 'Nachweise für auf dieser Website verwendete Bilder, deren Lizenzen eine Nennung des Urhebers verlangen.'
     empty: 'Es wurden noch keine Bildnachweise erfasst.'
+localized_content:
+    source_event_translation: 'Veranstaltungstexte'
+    source_event_canonical_root: 'Kanonische Veranstaltungsmarker'
+    source_cms_title: 'CMS-Seitentitel'
+    source_cms_link_name: 'CMS-Menübeschriftungen'
+    source_cms_block: 'CMS-Inhaltsblöcke'
+    source_image_alt: 'Bild-Alternativtexte'
 image_type:
     profilepicture: 'Profilbild'
     eventteaser: 'Veranstaltungs-Teaser'
