@@ -1,0 +1,33 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <div class="columns">
+            <div class="column is-6">
+
+                <h1 class="title is-5">{{ 'admin_seo_meta.heading_meta'|trans }}</h1>
+                <p class="content">{{ 'admin_seo_meta.help_meta'|trans }}</p>
+
+                {{ form_start(form) }}
+                {{ form_row(form.seoDescriptionDefault) }}
+                {{ form_row(form.seoDescriptionEvents) }}
+                {{ form_row(form.seoDescriptionMembers) }}
+
+                <h2 class="title is-5 mt-5">{{ 'admin_seo_meta.heading_canonical'|trans }}</h2>
+                <p class="content">{{ 'admin_seo_meta.help_canonical'|trans }}</p>
+                {{ form_row(form.eventCanonicalThreshold) }}
+
+                <button class="button is-primary">{{ 'global.button_save'|trans }}</button>
+                {{ form_end(form) }}
+
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

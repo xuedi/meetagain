@@ -1,0 +1,68 @@
+{#
+    Canonical Lanes -- one row per series per locale, with a chip per occurrence.
+
+    Renders the whole lane table: header, body, per-row rebuild action and the marker legend.
+    Every caller passes the same `CanonicalLane` list; the two `extra_columns_*` blocks are the
+    only place a caller may add columns of its own, so the table body is never forked. Callers
+    that need extra columns `{% embed %}` this instead of `{% include %}`-ing it.
+
+    Used in:    templates/admin/seo/canonical/index.html.twig
+    Parameters:
+        - lanes (list<App\ValueObject\CanonicalLane>, required)  -- rows to render
+        - rebuildRoute (string, required)                        -- route name of the per-series rebuild action
+        - rebuildTokenId (string, required)                      -- CSRF intention; the series id is appended
+    Blocks:
+        - extra_columns_head  -- extra `<th>` cells, appended after the Lane column
+        - extra_columns_body  -- extra `<td>` cells for `lane`, appended after the Lane column
+#}
+{% if lanes is empty %}
+    <p class="has-text-grey">{{ 'admin_seo_canonical.empty'|trans }}</p>
+{% else %}
+    <table class="table is-fullwidth">
+        <thead>
+            <tr>
+                <th>{{ 'admin_seo_canonical.col_series'|trans }}</th>
+                <th>{{ 'admin_seo_canonical.col_locale'|trans }}</th>
+                <th>{{ 'admin_seo_canonical.col_lane'|trans }}</th>
+                {% block extra_columns_head %}{% endblock %}
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for lane in lanes %}
+                <tr>
+                    <td>{{ lane.seriesName }}</td>
+                    <td>{{ lane.locale }}</td>
+                    <td>
+                        <div class="tags">
+                            {% for stop in lane.stops %}
+                                <span class="tag {% if stop.marker and stop.marker.value == 'root' %}is-success{% elseif stop.marker %}is-warning{% elseif stop.isRoot %}is-info{% else %}is-light{% endif %}"
+                                      title="{{ stop.date }} - {{ stop.title }} - {{ 'admin_seo_canonical.hover_changed'|trans({'%percent%': stop.percentChanged}) }}">
+                                    {{ stop.rootLabel }}&nbsp;{{ stop.date|slice(5) }}
+                                    {% if stop.locked %}&nbsp;<i class="fa fa-lock"></i>{% endif %}
+                                    {% if stop.canceled %}&nbsp;<i class="fa fa-ban"></i>{% endif %}
+                                </span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    {% block extra_columns_body %}{% endblock %}
+                    <td class="has-text-right">
+                        <a href="{{ path(rebuildRoute, {id: lane.seriesId}) }}"
+                           data-post
+                           data-csrf-token="{{ csrf_token(rebuildTokenId ~ lane.seriesId) }}"
+                           title="{{ 'admin_seo_canonical.button_rebuild_series'|trans }}">
+                            <i class="fa fa-rotate"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p class="has-text-grey is-size-7">
+        <span class="tag is-info">A</span> {{ 'admin_seo_canonical.legend_implicit_root'|trans }}
+        <span class="tag is-success">A</span> {{ 'admin_seo_canonical.legend_root'|trans }}
+        <span class="tag is-warning">A</span> {{ 'admin_seo_canonical.legend_detached'|trans }}
+        <span class="tag is-light">A</span> {{ 'admin_seo_canonical.legend_follower'|trans }}
+    </p>
+{% endif %}

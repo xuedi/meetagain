@@ -217,4 +217,4 @@ Error: Fehler
 'admin_event.validator_series_name_required': 'Bitte einen Namen für die Serie eingeben.'
 
 # Admin system SEO namespace - series canonical threshold
-'admin_system_seo.validator_canonical_threshold_range': 'Der Schwellenwert muss zwischen {{ min }} und {{ max }} Prozent liegen.'
+'admin_seo_meta.validator_canonical_threshold_range': 'Der Schwellenwert muss zwischen {{ min }} und {{ max }} Prozent liegen.'
