@@ -61,6 +61,8 @@ final class ImagesControllerAltTest extends WebTestCase
     public function testUpdateAltInvalidatesTheAltStatusCacheEntry(): void
     {
         $client = static::createClient();
+        // The pool is in-memory in tests; a reboot between requests would detach it from $pool.
+        $client->disableReboot();
         $this->loginAsAdmin($client);
 
         $id = $this->firstImageId();

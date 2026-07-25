@@ -61,7 +61,9 @@ class GetRoutesContractTest extends WebTestCase
         yield 'security incidents unblock' => ['/en/admin/security/incidents/1/unblock'];
         yield 'security rate limiting clear' => ['/en/admin/security/rate-limiting/clear'];
         yield 'redis cache clear' => ['/en/admin/system/cache/clear'];
-        yield 'seo indexnow submit' => ['/en/admin/system/seo/indexnow-submit'];
+        yield 'seo indexnow submit' => ['/en/admin/seo/indexnow/submit'];
+        yield 'seo canonical rebuild all' => ['/en/admin/seo/canonical/rebuild'];
+        yield 'seo canonical rebuild series' => ['/en/admin/seo/canonical/1/rebuild'];
         yield 'regenerate thumbnails' => ['/en/admin/system/images/regenerate_thumbnails'];
         yield 'cleanup thumbnails' => ['/en/admin/system/images/cleanup_thumbnails'];
         yield 'sync image locations' => ['/en/admin/system/images/sync'];
@@ -74,6 +76,8 @@ class GetRoutesContractTest extends WebTestCase
         yield 'cms pages unassign' => ['/en/admin/meta/cms-pages/1/unassign'];
         yield 'cms pages toggle locked' => ['/en/admin/meta/cms-pages/1/toggle-locked'];
         yield 'subscriptions reload' => ['/en/admin/meta/subscriptions/1/reload'];
+        yield 'meta seo indexnow submit all' => ['/en/admin/meta/seo/indexnow/submit-all'];
+        yield 'meta seo canonical rebuild all' => ['/en/admin/meta/seo/canonical/rebuild'];
     }
 
     public static function provideUserRoutes(): iterable

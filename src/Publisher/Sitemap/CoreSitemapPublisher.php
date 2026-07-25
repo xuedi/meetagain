@@ -10,6 +10,7 @@ use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Config\LanguageService;
+use App\Service\Seo\EventCanonicalResolver;
 use DateTimeImmutable;
 use Override;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -33,6 +34,7 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
         private CmsFilterService $cmsFilterService,
         private MemberFilterService $memberFilterService,
         private SitemapEventVisibilityService $eventVisibilityService,
+        private EventCanonicalResolver $canonicalResolver,
         #[AutowireIterator(SitemapEventLocaleFilterInterface::class)]
         private iterable $eventLocaleFilters = [],
     ) {}
@@ -215,6 +217,7 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
 
         $eventIds = array_filter(array_map(static fn($e) => $e->getId(), $events));
         $allowedLocalesByEventId = $this->resolveAllowedLocalesByEventId(array_values($eventIds));
+        $rootIds = $this->canonicalResolver->resolveRootIds($events, $locales);
 
         $urls = [];
 
@@ -231,12 +234,16 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
             foreach ($eventLocales as $locale) {
                 $localeUrls[$locale] = $this->urlGenerator->generate(
                     'app_event_details',
-                    ['_locale' => $locale, 'id' => $id],
+                    ['_locale' => $locale, 'id' => $rootIds[$id][$locale] ?? $id],
                     UrlGeneratorInterface::ABSOLUTE_URL,
                 );
             }
 
             foreach ($eventLocales as $locale) {
+                if (($rootIds[$id][$locale] ?? $id) !== $id) {
+                    continue;
+                }
+
                 $urls[] = new SitemapUrl(
                     loc: $localeUrls[$locale],
                     lastmod: $lastmod,

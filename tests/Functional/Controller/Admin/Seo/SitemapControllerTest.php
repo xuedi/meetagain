@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Functional\Controller\Admin\Settings;
+namespace Tests\Functional\Controller\Admin\Seo;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -9,7 +9,7 @@ final class SitemapControllerTest extends WebTestCase
 {
     private const string ADMIN_EMAIL = 'Admin@example.org';
     private const string ADMIN_PASSWORD = '1234';
-    private const string SITEMAP_PATH = '/en/admin/system/sitemap';
+    private const string SITEMAP_PATH = '/en/admin/seo/sitemap';
 
     public function testSitemapPageRendersWithPublisherChainOutput(): void
     {

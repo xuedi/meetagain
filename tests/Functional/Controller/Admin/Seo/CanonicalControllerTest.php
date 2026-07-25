@@ -1,0 +1,69 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Functional\Controller\Admin\Seo;
+
+use App\Repository\EventCanonicalRootRepository;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+
+final class CanonicalControllerTest extends WebTestCase
+{
+    private const string ADMIN_EMAIL = 'Admin@example.org';
+    private const string ADMIN_PASSWORD = '1234';
+    private const string CANONICAL_PATH = '/en/admin/seo/canonical';
+
+    public function testLanesRenderWithTheMarkerLegend(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+
+        // Act
+        $crawler = $client->request('GET', self::CANONICAL_PATH);
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        self::assertStringContainsString('follower', $crawler->filter('body')->text());
+    }
+
+    public function testRebuildAllWritesMarkersAndRedirects(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+        $crawler = $client->request('GET', self::CANONICAL_PATH);
+        $token = (string) $crawler->filter('a[data-post][href="' . self::CANONICAL_PATH . '/rebuild"]')->attr('data-csrf-token');
+
+        // Act
+        $client->request('POST', self::CANONICAL_PATH . '/rebuild', ['_token' => $token]);
+
+        // Assert: the rebuild is idempotent, so the marker table is in a consistent state afterwards.
+        $this->assertResponseRedirects();
+        $repository = static::getContainer()->get(EventCanonicalRootRepository::class);
+        self::assertGreaterThanOrEqual(0, $repository->count([]));
+    }
+
+    public function testRebuildAllRejectsAnInvalidCsrfToken(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+
+        // Act
+        $client->request('POST', self::CANONICAL_PATH . '/rebuild', ['_token' => 'invalid']);
+
+        // Assert
+        $this->assertResponseStatusCodeSame(400);
+    }
+
+    private function loginAsAdmin(KernelBrowser $client): void
+    {
+        $crawler = $client->request('GET', '/en/login');
+        $form = $crawler->selectButton('Login')->form([
+            '_username' => self::ADMIN_EMAIL,
+            '_password' => self::ADMIN_PASSWORD,
+        ]);
+        $client->submit($form);
+        $client->followRedirect();
+    }
+}

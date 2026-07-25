@@ -23,8 +23,10 @@ final readonly class CanonicalLinkHeaderSubscriber implements EventSubscriberInt
     #[Override]
     public static function getSubscribedEvents(): array
     {
+        // After Symfony's ResponseListener (priority 0), which is what fills in Content-Type;
+        // reading it any earlier makes every normal page look like a non-HTML response.
         return [
-            KernelEvents::RESPONSE => ['onKernelResponse', 0],
+            KernelEvents::RESPONSE => ['onKernelResponse', -128],
         ];
     }
 
@@ -48,6 +50,7 @@ final readonly class CanonicalLinkHeaderSubscriber implements EventSubscriberInt
         }
 
         $canonicalUrl = $this->canonicalUrlService->getCanonicalUrl($request);
-        $response->headers->set('Link', sprintf('<%s>; rel="canonical"', $canonicalUrl));
+        // Appended, not set: asset preload links live in the same header and must survive.
+        $response->headers->set('Link', sprintf('<%s>; rel="canonical"', $canonicalUrl), false);
     }
 }
