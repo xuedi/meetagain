@@ -488,6 +488,13 @@ attributions:
     heading: '图片来源'
     intro: '本网站所用图片的署名信息，这些图片的许可协议要求注明作者。'
     empty: '尚未记录任何图片来源。'
+localized_content:
+    source_event_translation: '活动文本'
+    source_event_canonical_root: '活动规范标记'
+    source_cms_title: 'CMS 页面标题'
+    source_cms_link_name: 'CMS 菜单标签'
+    source_cms_block: 'CMS 内容块'
+    source_image_alt: '图片替代文本'
 image_type:
     profilepicture: '头像'
     eventteaser: '活动预览图'

@@ -1,6 +1,7 @@
 dishes:
     menu_main: 'Dishes'
     item_label: 'Dish'
+    localized_content_source: 'Dish texts'
     detach: 'Remove'
     attach_empty: 'No dishes available to attach yet.'
     attach_button: 'Attach'

@@ -488,6 +488,13 @@ attributions:
     heading: 'Image credits'
     intro: 'Attributions for images used on this site whose licenses require crediting the author.'
     empty: 'No image credits have been recorded yet.'
+localized_content:
+    source_event_translation: 'Event texts'
+    source_event_canonical_root: 'Event canonical markers'
+    source_cms_title: 'CMS page titles'
+    source_cms_link_name: 'CMS menu labels'
+    source_cms_block: 'CMS content blocks'
+    source_image_alt: 'Image alt texts'
 image_type:
     profilepicture: 'Profile picture'
     eventteaser: 'Event teaser'
