@@ -185,6 +185,10 @@ readonly class ConfigService
         $this->setString('seo_description_default', $formData['seoDescriptionDefault'] ?? '');
         $this->setString('seo_description_events', $formData['seoDescriptionEvents'] ?? '');
         $this->setString('seo_description_members', $formData['seoDescriptionMembers'] ?? '');
+    }
+
+    public function saveEventCanonicalForm(array $formData): void
+    {
         $this->setInt('event_canonical_threshold', (int) ($formData['eventCanonicalThreshold'] ?? 20));
     }
 

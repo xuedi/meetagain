@@ -21,7 +21,7 @@ abstract class AbstractSeoController extends AbstractController
         return new AdminNavigationConfig(
             section: 'admin_shell.section_system',
             links: [
-                new AdminLink(label: 'admin_shell.menu_seo', route: 'app_admin_seo', active: 'seo', role: 'ROLE_ADMIN'),
+                new AdminLink(label: 'admin_shell.menu_seo', route: 'app_admin_seo_sitemap', active: 'seo', role: 'ROLE_ADMIN'),
             ],
             sectionPriority: 100,
         );
@@ -31,22 +31,16 @@ abstract class AbstractSeoController extends AbstractController
     {
         return new AdminTabs([
             new AdminTab(
-                label: $this->translator->trans('admin_seo.tab_dashboard'),
-                target: $this->generateUrl('app_admin_seo'),
-                icon: 'gauge',
-                isActive: $this->activeSeoTab === 'dashboard',
+                label: $this->translator->trans('admin_seo.tab_sitemap'),
+                target: $this->generateUrl('app_admin_seo_sitemap'),
+                icon: 'sitemap',
+                isActive: $this->activeSeoTab === 'sitemap',
             ),
             new AdminTab(
                 label: $this->translator->trans('admin_seo.tab_meta'),
                 target: $this->generateUrl('app_admin_seo_meta'),
                 icon: 'tags',
                 isActive: $this->activeSeoTab === 'meta',
-            ),
-            new AdminTab(
-                label: $this->translator->trans('admin_seo.tab_sitemap'),
-                target: $this->generateUrl('app_admin_seo_sitemap'),
-                icon: 'sitemap',
-                isActive: $this->activeSeoTab === 'sitemap',
             ),
             new AdminTab(
                 label: $this->translator->trans('admin_seo.tab_indexnow'),

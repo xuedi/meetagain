@@ -16,9 +16,8 @@ final class SeoAreaTest extends WebTestCase
      */
     public static function seoRoutes(): iterable
     {
-        yield 'dashboard' => ['/en/admin/seo'];
+        yield 'sitemap' => ['/en/admin/seo'];
         yield 'meta' => ['/en/admin/seo/meta'];
-        yield 'sitemap' => ['/en/admin/seo/sitemap'];
         yield 'indexnow' => ['/en/admin/seo/indexnow'];
         yield 'canonical' => ['/en/admin/seo/canonical'];
     }
@@ -50,19 +49,24 @@ final class SeoAreaTest extends WebTestCase
         self::assertContains($client->getResponse()->getStatusCode(), [302, 401, 403]);
     }
 
-    public function testSidebarLinksToTheSeoArea(): void
+    #[DataProvider('seoRoutes')]
+    public function testEveryTabSharesOneStripWithItselfMarkedActive(string $path): void
     {
         // Arrange
         $client = static::createClient();
         $this->loginAsAdmin($client);
 
         // Act
-        $crawler = $client->request('GET', '/en/admin/seo');
+        $crawler = $client->request('GET', $path);
 
-        // Assert: the area contributes exactly one sidebar entry, marked active on its own pages.
-        $links = $crawler->filter('aside.menu a[href="/en/admin/seo"]');
-        self::assertSame(1, $links->count(), 'SEO must appear once in the sidebar');
-        self::assertStringContainsString('is-active', (string) $links->attr('class'));
+        // Assert: whichever tab is open, the strip is the same four and exactly one is current.
+        $tabs = $crawler->filter('.tabs li');
+        self::assertSame(4, $tabs->count());
+        self::assertSame(1, $crawler->filter('.tabs li.is-active')->count());
+        self::assertSame(
+            $path,
+            (string) $crawler->filter('.tabs li.is-active a')->attr('href'),
+        );
     }
 
     private function loginAsAdmin(KernelBrowser $client): void

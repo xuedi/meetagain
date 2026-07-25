@@ -9,7 +9,7 @@ final class SitemapControllerTest extends WebTestCase
 {
     private const string ADMIN_EMAIL = 'Admin@example.org';
     private const string ADMIN_PASSWORD = '1234';
-    private const string SITEMAP_PATH = '/en/admin/seo/sitemap';
+    private const string SITEMAP_PATH = '/en/admin/seo';
 
     public function testSitemapPageRendersWithPublisherChainOutput(): void
     {
