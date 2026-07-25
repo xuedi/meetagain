@@ -15,6 +15,7 @@
         - extra_columns_head  -- extra `<th>` cells, appended after the Lane column
         - extra_columns_body  -- extra `<td>` cells for `lane`, appended after the Lane column
 #}
+{% set tagClass = {'first': 'is-info', 'root': 'is-success', 'detached': 'is-warning', 'follower': 'is-light'} %}
 {% if lanes is empty %}
     <p class="has-text-grey">{{ 'admin_seo_canonical.empty'|trans }}</p>
 {% else %}
@@ -35,12 +36,14 @@
                     <td>{{ lane.locale }}</td>
                     <td>
                         <div class="tags">
-                            {% for stop in lane.stops %}
-                                <span class="tag {% if stop.marker and stop.marker.value == 'root' %}is-success{% elseif stop.marker %}is-warning{% elseif stop.isRoot %}is-info{% else %}is-light{% endif %}"
-                                      title="{{ stop.date }} - {{ stop.title }} - {{ 'admin_seo_canonical.hover_changed'|trans({'%percent%': stop.percentChanged}) }}">
-                                    {{ stop.rootLabel }}&nbsp;{{ stop.date|slice(5) }}
-                                    {% if stop.locked %}&nbsp;<i class="fa fa-lock"></i>{% endif %}
-                                    {% if stop.canceled %}&nbsp;<i class="fa fa-ban"></i>{% endif %}
+                            {% for segment in lane.segments %}
+                                <span class="tag {{ tagClass[segment.type.value] }}"
+                                      title="{{ segment.count > 1
+                                          ? 'admin_seo_canonical.hover_run'|trans({'%from%': segment.fromDate, '%to%': segment.toDate})
+                                          : segment.fromDate ~ ' - ' ~ segment.title ~ ' - ' ~ 'admin_seo_canonical.hover_changed'|trans({'%percent%': segment.percentChanged}) }}">
+                                    {{ segment.type.label()|trans({'%count%': segment.count}) }}
+                                    {% if segment.locked %}&nbsp;<i class="fa fa-lock"></i>{% endif %}
+                                    {% if segment.canceled %}&nbsp;<i class="fa fa-ban"></i>{% endif %}
                                 </span>
                             {% endfor %}
                         </div>
@@ -58,11 +61,4 @@
             {% endfor %}
         </tbody>
     </table>
-
-    <p class="has-text-grey is-size-7">
-        <span class="tag is-info">A</span> {{ 'admin_seo_canonical.legend_implicit_root'|trans }}
-        <span class="tag is-success">A</span> {{ 'admin_seo_canonical.legend_root'|trans }}
-        <span class="tag is-warning">A</span> {{ 'admin_seo_canonical.legend_detached'|trans }}
-        <span class="tag is-light">A</span> {{ 'admin_seo_canonical.legend_follower'|trans }}
-    </p>
 {% endif %}

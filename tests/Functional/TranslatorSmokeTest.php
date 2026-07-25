@@ -36,7 +36,6 @@ class TranslatorSmokeTest extends WebTestCase
         'admin_logs',
         'admin_seo',
         'admin_seo_canonical',
-        'admin_seo_dashboard',
         'admin_seo_indexnow',
         'admin_seo_meta',
         'admin_seo_sitemap',

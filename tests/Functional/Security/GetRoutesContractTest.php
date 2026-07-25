@@ -77,6 +77,7 @@ class GetRoutesContractTest extends WebTestCase
         yield 'cms pages toggle locked' => ['/en/admin/meta/cms-pages/1/toggle-locked'];
         yield 'subscriptions reload' => ['/en/admin/meta/subscriptions/1/reload'];
         yield 'meta seo indexnow submit all' => ['/en/admin/meta/seo/indexnow/submit-all'];
+        yield 'meta seo indexnow submit group' => ['/en/admin/meta/seo/indexnow/1/submit'];
         yield 'meta seo canonical rebuild all' => ['/en/admin/meta/seo/canonical/rebuild'];
     }
 

@@ -59,7 +59,7 @@ class EventCanonicalOverviewServiceTest extends TestCase
         // Assert
         self::assertSame(1, $lanes[0]->rootCount);
         self::assertFalse($lanes[0]->isBranched());
-        self::assertSame(['A', 'A'], array_map(static fn($stop) => $stop->rootLabel, $lanes[0]->stops));
+        self::assertSame([1, 1], array_map(static fn($stop) => $stop->rootEventId, $lanes[0]->stops));
     }
 
     public function testEachLocaleGetsItsOwnLane(): void
