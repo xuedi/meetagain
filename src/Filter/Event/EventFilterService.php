@@ -107,6 +107,30 @@ readonly class EventFilterService
     }
 
     /**
+     * @param int[] $eventIds
+     * @return int[]
+     */
+    public function getAccessibleEventIds(array $eventIds): array
+    {
+        $accessible = array_values($eventIds);
+
+        foreach ($this->getSortedFilters() as $filter) {
+            if ($accessible === []) {
+                return [];
+            }
+
+            $filterResult = $filter->narrowAccessibleEventIds($accessible);
+            if ($filterResult === null) {
+                continue;
+            }
+
+            $accessible = array_values(array_intersect($accessible, $filterResult));
+        }
+
+        return $accessible;
+    }
+
+    /**
      * @return array<EventFilterInterface>
      */
     private function getSortedFilters(): array

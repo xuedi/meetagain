@@ -3,6 +3,7 @@
 namespace App\Publisher\Sitemap;
 
 use App\Filter\Cms\CmsFilterService;
+use App\Filter\Event\EventFilterService;
 use App\Filter\Member\MemberFilterService;
 use App\Filter\Sitemap\SitemapEventLocaleFilterInterface;
 use App\Filter\Sitemap\SitemapEventVisibilityService;
@@ -29,6 +30,7 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
         private UrlGeneratorInterface $urlGenerator,
         private CmsFilterService $cmsFilterService,
         private MemberFilterService $memberFilterService,
+        private EventFilterService $eventFilterService,
         private SitemapEventVisibilityService $eventVisibilityService,
         private EventCanonicalResolver $canonicalResolver,
         #[AutowireIterator(SitemapEventLocaleFilterInterface::class)]
@@ -205,8 +207,14 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
             return [];
         }
 
-        $eventIds = array_filter(array_map(static fn($e) => $e->getId(), $events));
-        $allowedLocalesByEventId = $this->resolveAllowedLocalesByEventId(array_values($eventIds));
+        $eventIds = array_values(array_filter(array_map(static fn($e) => $e->getId(), $events)));
+        $accessibleIds = array_flip($this->eventFilterService->getAccessibleEventIds($eventIds));
+        $events = array_values(array_filter($events, static fn($e) => isset($accessibleIds[$e->getId()])));
+        if ($events === []) {
+            return [];
+        }
+
+        $allowedLocalesByEventId = $this->resolveAllowedLocalesByEventId(array_keys($accessibleIds));
         $rootIds = $this->canonicalResolver->resolveRootIds($events, $locales);
 
         $urls = [];
