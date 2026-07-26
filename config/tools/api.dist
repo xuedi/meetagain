@@ -1,0 +1,18 @@
+# Operator CLI for the deployment's own REST API.
+#
+# Every credential below is empty on purpose. Supply the real values through the gitignored
+# config/tools/api.local overlay, which the tool also writes back to when it refreshes a token.
+
+API_URL=https://meetagain.org
+
+# Personal Access Token for first-party operator tooling. Issue one in the profile area and put
+# the `mapat_...` value in api.local. The binary sends `Authorization: Bearer $PAT_TOKEN`.
+PAT_TOKEN=
+
+# OAuth client-credentials grant, used only when no PAT is configured. OAUTH_ACCESS_TOKEN and
+# OAUTH_USER_ACCESS_TOKEN are caches the tool refreshes on its own.
+OAUTH_CLIENT_ID=
+OAUTH_CLIENT_SECRET=
+OAUTH_ACCESS_TOKEN=
+OAUTH_USER_ACCESS_TOKEN=
+OAUTH_USER_REFRESH_TOKEN=

@@ -1,0 +1,16 @@
+[package]
+name = "gsc"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "gsc"
+path = "src/main.rs"
+
+[dependencies]
+toolconfig.workspace = true
+clap.workspace = true
+ureq.workspace = true
+serde_json.workspace = true
+jsonwebtoken = "9"
+base64 = "0.22"

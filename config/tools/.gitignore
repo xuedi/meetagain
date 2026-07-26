@@ -1,0 +1,4 @@
+# Private overlay for the tools in bin/tools/: credentials and any rule set that must not be
+# published. Written by the operator, never committed. The committed .dist files carry
+# everything a contributor needs.
+*.local

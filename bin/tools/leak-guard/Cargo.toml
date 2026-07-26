@@ -1,0 +1,13 @@
+[package]
+name = "leak-guard"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "leak-guard"
+path = "src/main.rs"
+
+[dependencies]
+toolconfig.workspace = true
+walkdir.workspace = true
+regex = "1"

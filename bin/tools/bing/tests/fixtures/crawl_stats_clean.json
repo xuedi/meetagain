@@ -1,0 +1,40 @@
+{
+  "d": [
+    {
+      "__type": "CrawlStats:#Microsoft.Bing.Webmaster.Api",
+      "AllOtherCodes": 5,
+      "BlockedByRobotsTxt": 0,
+      "Code2xx": 22,
+      "Code301": 4,
+      "Code302": 0,
+      "Code4xx": 3,
+      "Code5xx": 0,
+      "ConnectionTimeout": 0,
+      "ContainsMalware": 0,
+      "CrawlErrors": 4,
+      "CrawledPages": 30,
+      "Date": "/Date(99999999999000-0700)/",
+      "DnsFailures": 0,
+      "InIndex": 25,
+      "InLinks": 1
+    },
+    {
+      "__type": "CrawlStats:#Microsoft.Bing.Webmaster.Api",
+      "AllOtherCodes": 3,
+      "BlockedByRobotsTxt": 0,
+      "Code2xx": 18,
+      "Code301": 4,
+      "Code302": 0,
+      "Code4xx": 2,
+      "Code5xx": 0,
+      "ConnectionTimeout": 0,
+      "ContainsMalware": 0,
+      "CrawlErrors": 3,
+      "CrawledPages": 25,
+      "Date": "/Date(99999999999000+0000)/",
+      "DnsFailures": 0,
+      "InIndex": 26,
+      "InLinks": 1
+    }
+  ]
+}

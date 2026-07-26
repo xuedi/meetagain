@@ -1,0 +1,26 @@
+{
+  "d": [
+    {
+      "__type": "Feed:#Microsoft.Bing.Webmaster.Api",
+      "Compressed": false,
+      "FileSize": 87234,
+      "LastCrawled": "/Date(1714262400000)/",
+      "Status": "Success",
+      "Submitted": "/Date(1714003200000)/",
+      "Type": "Sitemap",
+      "Url": "https://meetagain.org/sitemap.xml",
+      "UrlCount": 286
+    },
+    {
+      "__type": "Feed:#Microsoft.Bing.Webmaster.Api",
+      "Compressed": true,
+      "FileSize": 3120,
+      "LastCrawled": "/Date(1714176000000)/",
+      "Status": "Pending",
+      "Submitted": "/Date(1713916800000)/",
+      "Type": "Sitemap",
+      "Url": "https://meetagain.org/news-sitemap.xml.gz",
+      "UrlCount": 14
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+# Read-only client for the deployment's error tracker.
+#
+# BUGTRACKER_URL and BUGTRACKER_TOKEN identify a private instance, so both are empty here -
+# supply them through the gitignored config/tools/bugsink.local overlay.
+
+BUGTRACKER_URL=
+BUGTRACKER_TOKEN=
+
+# Numeric project id the issue listings are scoped to.
+BUGTRACKER_PROJECT=1

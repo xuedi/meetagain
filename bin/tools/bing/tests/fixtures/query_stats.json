@@ -1,0 +1,40 @@
+{
+  "d": [
+    {
+      "__type": "QueryStats:#Microsoft.Bing.Webmaster.Api",
+      "Query": "meetagain",
+      "Date": "/Date(99999999999000-0700)/",
+      "Clicks": 0,
+      "Impressions": 5,
+      "AvgClickPosition": -1,
+      "AvgImpressionPosition": 3.2
+    },
+    {
+      "__type": "QueryStats:#Microsoft.Bing.Webmaster.Api",
+      "Query": "meetagain",
+      "Date": "/Date(99999999999000+0000)/",
+      "Clicks": 1,
+      "Impressions": 4,
+      "AvgClickPosition": 2.0,
+      "AvgImpressionPosition": 2.8
+    },
+    {
+      "__type": "QueryStats:#Microsoft.Bing.Webmaster.Api",
+      "Query": "meetagain",
+      "Date": "/Date(99999999999000)/",
+      "Clicks": 2,
+      "Impressions": 6,
+      "AvgClickPosition": 1.5,
+      "AvgImpressionPosition": 2.0
+    },
+    {
+      "__type": "QueryStats:#Microsoft.Bing.Webmaster.Api",
+      "Query": "language exchange",
+      "Date": "/Date(99999999999000-0700)/",
+      "Clicks": 0,
+      "Impressions": 2,
+      "AvgClickPosition": -1,
+      "AvgImpressionPosition": 8.5
+    }
+  ]
+}
