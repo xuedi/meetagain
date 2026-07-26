@@ -4,6 +4,7 @@ namespace App\Service\Media\ImageTypes;
 
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
+use App\Service\Media\ThumbnailSizeFormat;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -15,8 +16,10 @@ class ImageTypeRegistry
     /**
      * @param iterable<ImageTypeDefinitionInterface> $definitions
      */
-    public function __construct(#[AutowireIterator(ImageTypeDefinitionInterface::class)] iterable $definitions)
-    {
+    public function __construct(
+        #[AutowireIterator(ImageTypeDefinitionInterface::class)] iterable $definitions,
+        private readonly ThumbnailSizeFormat $thumbnailSizeFormat,
+    ) {
         $map = [];
         foreach ($definitions as $definition) {
             $type = $definition->getType();
@@ -28,6 +31,7 @@ class ImageTypeRegistry
                     $definition::class,
                 ));
             }
+            $this->assertSizesAreWellFormed($definition);
             $map[$type->value] = $definition;
         }
 
@@ -60,7 +64,7 @@ class ImageTypeRegistry
     {
         foreach ($this->get($type)->thumbnailSizes() as [$width, $height]) {
             if ($width === 350) {
-                return sprintf('%dx%d', $width, $height);
+                return $this->thumbnailSizeFormat->format($width, $height);
             }
         }
 
@@ -75,7 +79,7 @@ class ImageTypeRegistry
         $list = [];
         foreach ($this->definitions as $definition) {
             foreach ($definition->thumbnailSizes() as [$width, $height]) {
-                $list[sprintf('%dx%d', $width, $height)] = 0;
+                $list[$this->thumbnailSizeFormat->format($width, $height)] = 0;
             }
         }
 
@@ -91,5 +95,24 @@ class ImageTypeRegistry
         }
 
         return false;
+    }
+
+    private function assertSizesAreWellFormed(ImageTypeDefinitionInterface $definition): void
+    {
+        $free = ImageTypeDefinitionInterface::FREE_AXIS;
+        foreach ($definition->thumbnailSizes() as [$width, $height]) {
+            $bothAxesFree = $width === $free && $height === $free;
+            $widthOutOfRange = $width !== $free && $width < 1;
+            $heightOutOfRange = $height !== $free && $height < 1;
+            if ($bothAxesFree || $widthOutOfRange || $heightOutOfRange) {
+                throw new RuntimeException(sprintf(
+                    'Invalid thumbnail size [%d, %d] in %s: at most one axis may be free (%d), the other must be a positive pixel count.',
+                    $width,
+                    $height,
+                    $definition::class,
+                    $free,
+                ));
+            }
+        }
     }
 }

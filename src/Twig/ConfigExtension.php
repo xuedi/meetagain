@@ -27,6 +27,7 @@ final class ConfigExtension extends AbstractExtension
             new TwigFunction('get_date_format_flatpickr', $this->configService->getDateFormatFlatpickr(...)),
             new TwigFunction('get_footer_column_title', $this->configService->getFooterColumnTitle(...)),
             new TwigFunction('site_logo_url', $this->siteLogoResolver->resolveUrl(...)),
+            new TwigFunction('site_logo', $this->siteLogoResolver->resolve(...)),
             new TwigFunction('has_image_attributions', $this->imageAttributionService->hasAny(...)),
         ];
     }

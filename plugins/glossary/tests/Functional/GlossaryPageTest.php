@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class GlossaryPageTest extends WebTestCase
 {
     private const string MODERATOR_EMAIL = 'Admin@example.org';
+    private const string MEMBER_EMAIL = 'Adem.Lane@example.org';
 
     public function testListRendersThroughTheSharedItemComponent(): void
     {
@@ -128,6 +129,48 @@ class GlossaryPageTest extends WebTestCase
 
         // Act
         $client->request('GET', '/en/glossary/' . $pending->getId());
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testEditFormOfAnUnapprovedEntryIsNotFoundForMembers(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $pending = $this->entry($client, false);
+        $client->loginUser($this->user($client, self::MEMBER_EMAIL));
+
+        // Act
+        $client->request('GET', '/en/glossary/edit/' . $pending->getId());
+
+        // Assert
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testEditFormOfAnApprovedEntryStaysOpenToMembers(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $approved = $this->entry($client, true);
+        $client->loginUser($this->user($client, self::MEMBER_EMAIL));
+
+        // Act
+        $client->request('GET', '/en/glossary/edit/' . $approved->getId());
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testEditFormOfAnUnapprovedEntryIsOpenToModerators(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $pending = $this->entry($client, false);
+        $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
+
+        // Act
+        $client->request('GET', '/en/glossary/edit/' . $pending->getId());
 
         // Assert
         $this->assertResponseIsSuccessful();
