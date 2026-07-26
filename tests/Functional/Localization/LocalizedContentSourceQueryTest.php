@@ -5,10 +5,6 @@ namespace App\Tests\Functional\Localization;
 use App\Localization\LocalizedContentSourceRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-/**
- * Every registered source builds its own DQL from field names that only exist at runtime, so a
- * renamed property surfaces as a query error rather than a static failure.
- */
 class LocalizedContentSourceQueryTest extends WebTestCase
 {
     public function testEverySourceCanExecuteItsQueries(): void

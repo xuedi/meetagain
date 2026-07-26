@@ -44,7 +44,7 @@ class SecurityServiceTest extends TestCase
         // Act
         $service->event(SecurityEventType::NotFound, $request);
 
-        // Assert - mock expectations verify
+        // Assert
         static::assertTrue(true);
     }
 
@@ -110,7 +110,7 @@ class SecurityServiceTest extends TestCase
         // Act
         $service->event(SecurityEventType::NotFound, $request);
 
-        // Assert - the IP is blocked, no incident written
+        // Assert
         static::assertTrue($blockStore->isIpBlocked('1.2.3.4'));
     }
 
@@ -223,7 +223,7 @@ class SecurityServiceTest extends TestCase
         // Act
         $service->event(SecurityEventType::RateLimit, $request);
 
-        // Assert - no stamping repos were called
+        // Assert
         static::assertTrue($blockStore->isIpBlocked('1.2.3.4'));
     }
 

@@ -4,10 +4,6 @@ namespace App\Filter\Member;
 
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composite member filter service that collects all registered MemberFilterInterface implementations.
- * Combines multiple filters using AND logic for user ID restrictions.
- */
 readonly class MemberFilterService
 {
     /**
@@ -18,10 +14,6 @@ readonly class MemberFilterService
         private iterable $filters,
     ) {}
 
-    /**
-     * Get the combined user ID filter from all registered filters.
-     * Uses intersection (AND) logic: a member must pass ALL filters.
-     */
     public function getUserIdFilter(): MemberFilterResult
     {
         $resultSet = null;
@@ -31,7 +23,7 @@ readonly class MemberFilterService
             $filterResult = $filter->getUserIdFilter();
 
             if ($filterResult === null) {
-                continue; // No filtering from this filter
+                continue;
             }
 
             $hasActiveFilter = true;
@@ -44,7 +36,6 @@ readonly class MemberFilterService
                 $resultSet = $filterResult;
                 continue;
             }
-            // Intersect: member must pass ALL filters
             $resultSet = array_values(array_intersect($resultSet, $filterResult));
             if ($resultSet === []) {
                 return MemberFilterResult::emptyResult();
@@ -54,22 +45,17 @@ readonly class MemberFilterService
         return new MemberFilterResult($resultSet, $hasActiveFilter);
     }
 
-    /**
-     * Check if a member is accessible according to all registered filters.
-     * Any filter returning false will deny access.
-     * Returns true only if all filters allow (or have no opinion).
-     */
     public function isMemberAccessible(int $userId): bool
     {
         foreach ($this->getSortedFilters() as $filter) {
             $result = $filter->isMemberAccessible($userId);
 
             if ($result === false) {
-                return false; // Explicit deny
+                return false;
             }
         }
 
-        return true; // All filters allow or have no opinion
+        return true;
     }
 
     /**

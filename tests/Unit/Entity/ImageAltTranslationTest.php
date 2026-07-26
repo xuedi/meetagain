@@ -52,7 +52,7 @@ class ImageAltTranslationTest extends TestCase
         // Act
         $image->setAltTranslation('de', '');
 
-        // Assert - the map has no lingering empty entry, so getAltFor falls back to base again
+        // Assert
         static::assertNull($image->getAltTranslation('de'));
         static::assertSame('base', $image->setAlt('base')->getAltFor('de'));
     }

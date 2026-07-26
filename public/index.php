@@ -1,6 +1,5 @@
 <?php
 
-// Check if this instance needs to be installed
 $lockFile = dirname(__DIR__) . '/installed.lock';
 if (!file_exists($lockFile)) {
     $requestUri = $_SERVER['REQUEST_URI'] ?? '';
@@ -9,7 +8,6 @@ if (!file_exists($lockFile)) {
         exit;
     }
 
-    // Otherwise redirect to installer
     header('Location: /install/');
     exit;
 }

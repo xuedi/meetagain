@@ -14,9 +14,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-/**
- * Manual entry point only - no deploy step, cron task, or migration triggers a rebuild.
- */
 #[AsCommand(name: 'app:event:canonical-rebuild', description: 'Recompute the canonical markers of one or all event series')]
 class EventCanonicalRebuildCommand extends Command
 {

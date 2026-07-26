@@ -5,13 +5,8 @@ namespace App\Item;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Restricts which item ids of a given type are visible in the current request.
- * Multiple implementations compose with AND logic.
- *
- * Conventions:
- *   null  = no opinion; bypasses filtering (no implementation registered)
- *   []    = block all
- *   int[] = restrict to these ids
+ * Narrows the visible item ids of one type. Implementations compose with AND-intersection;
+ * null = no opinion, [] = block all, [id, ...] = allow-list.
  */
 #[AutoconfigureTag]
 interface ItemFilterInterface

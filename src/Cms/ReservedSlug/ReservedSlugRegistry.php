@@ -5,10 +5,6 @@ namespace App\Cms\ReservedSlug;
 use App\Repository\CmsRepository;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Unions the reserved slugs contributed by every provider and answers whether a
- * given slug may be assigned to a CMS page.
- */
 class ReservedSlugRegistry
 {
     /**
@@ -25,12 +21,6 @@ class ReservedSlugRegistry
         private readonly CmsRepository $cmsRepository,
     ) {}
 
-    /**
-     * A slug is reserved when any provider claims it, unless the page being
-     * edited already owns that exact slug in the database - a page may always
-     * keep its own persisted slug; it just cannot be changed to (or created
-     * with) a slug another source claims.
-     */
     public function isReserved(string $slug, ?int $ignoreCmsId = null): bool
     {
         $normalized = $this->normalize($slug);

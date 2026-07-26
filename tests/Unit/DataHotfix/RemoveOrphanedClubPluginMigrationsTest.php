@@ -50,7 +50,7 @@ class RemoveOrphanedClubPluginMigrationsTest extends TestCase
         // Act
         $subject->execute();
 
-        // Assert - expectation on executeStatement asserts it was never called
+        // Assert
     }
 
     public function testIdentifierIsDatePrefixed(): void

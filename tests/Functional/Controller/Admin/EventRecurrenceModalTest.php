@@ -16,7 +16,7 @@ class EventRecurrenceModalTest extends WebTestCase
 
     public function testTheBuilderOpensOnDefaultsRegardlessOfTheSeriesRule(): void
     {
-        // Arrange: a BiMonthly series bridges to a weekly period, where an ordinal cannot apply
+        // Arrange
         $client = static::createClient();
         $this->loginAsAdmin($client);
         $eventId = $this->findEventWithRule($client, EventInterval::BiMonthly);

@@ -43,7 +43,6 @@ final class MessageController extends AbstractController
 
         $conversationPartner = $this->userRepo->findOneBy(['id' => $id]);
         if ($conversationPartner !== null) {
-            // Check if either user has blocked the other
             $isBlocked = $this->blockingService->isBlocked($user, $conversationPartner);
 
             if (!$isBlocked) {
@@ -64,7 +63,6 @@ final class MessageController extends AbstractController
                     $this->activityService->log(SendMessage::TYPE, $user, ['user_id' => $conversationPartner->getId()]);
                 }
             }
-            // preRender then flush when no new messages
             $messages = $this->msgRepo->getMessages($user, $conversationPartner);
             $this->msgRepo->markConversationRead($user, $conversationPartner);
             if (!$this->msgRepo->hasNewMessages($user)) {
@@ -72,10 +70,8 @@ final class MessageController extends AbstractController
             }
         }
 
-        // Check if current user has blocked the partner (for showing block/unblock button)
         $hasBlockedPartner = $conversationPartner !== null && $this->blockingService->hasBlocked($user, $conversationPartner);
 
-        // Get excluded user IDs for filtering conversations list
         $excludeUserIds = $this->blockingService->getExcludedUserIds($user);
 
         return $this->render('profile/messages/index.html.twig', [

@@ -147,7 +147,7 @@ class LogEntryTest extends TestCase
             $hashes[$name] = LogEntry::fromString($line)->getHash();
         }
 
-        // Assert - all hashes distinct
+        // Assert
         static::assertCount(count($linesByName), array_unique($hashes));
     }
 

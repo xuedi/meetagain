@@ -275,7 +275,7 @@ class UserServiceTest extends TestCase
 
     public function testTransitionStatusInvalidTransitionThrows(): void
     {
-        // Arrange: Active -> Denied is not in the allow-list
+        // Arrange
         $actor = $this->makeUser(self::ACTOR_ID, UserRole::Admin);
         $target = $this->makeUser(self::TARGET_ID, UserRole::User, UserStatus::Active);
 

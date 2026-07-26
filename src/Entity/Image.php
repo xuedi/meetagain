@@ -126,7 +126,6 @@ class Image
         return $this;
     }
 
-    /** Alt text for a locale, falling back to the base alt (a null locale returns the base alt directly). */
     public function getAltFor(?string $locale): ?string
     {
         if ($locale === null) {
@@ -136,9 +135,6 @@ class Image
         return $this->altTranslations[$locale] ?? $this->alt;
     }
 
-    /**
-     * Raw stored per-locale alt with no fallback (empty when unset) - for widget pre-fill.
-     */
     public function getAltTranslation(string $locale): ?string
     {
         return $this->altTranslations[$locale] ?? null;
@@ -167,9 +163,6 @@ class Image
     }
 
     /**
-     * Enabled codes with no own alt yet - unlike getAltFor(), the base alt does not fill in for other
-     * locales, so a locale counts as complete only when it has its own text.
-     *
      * @param array<string> $codes
      * @return list<string>
      */

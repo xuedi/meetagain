@@ -4,10 +4,6 @@ namespace Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-/**
- * Smoke tests for public routes that require no authentication.
- * These guard against regressions in SEO-critical and globally accessible endpoints.
- */
 class PublicPagesTest extends WebTestCase
 {
     public function testSitemapReturns200WithXmlContentType(): void
@@ -97,11 +93,11 @@ class PublicPagesTest extends WebTestCase
         $client->request('GET', '/');
         $content = $client->getResponse()->getContent();
 
-        // Assert: WebSite JSON-LD block is present
+        // Assert
         static::assertStringContainsString('"@type":"WebSite"', $content);
         static::assertStringContainsString('"inLanguage"', $content);
 
-        // Assert: meta_description block was overridden (not the generic default)
+        // Assert
         static::assertMatchesRegularExpression(
             '#<meta name="description" content="meetAgain is a community platform[^"]+">#',
             $content,

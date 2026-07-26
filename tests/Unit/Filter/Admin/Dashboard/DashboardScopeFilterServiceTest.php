@@ -103,7 +103,7 @@ final class DashboardScopeFilterServiceTest extends TestCase
 
     public function testHigherPriorityFiltersAreOrderedFirst(): void
     {
-        // Arrange: lower priority must still intersect, regardless of order
+        // Arrange
         $low = $this->filter(eventIds: [2, 3], userIds: null, priority: 10);
         $high = $this->filter(eventIds: [1, 2, 3, 4], userIds: null, priority: 100);
         $service = new DashboardScopeFilterService([$low, $high]);

@@ -53,7 +53,7 @@ class ReservedSlugRegistryTest extends TestCase
 
     public function testOwnPersistedSlugIsAllowedOnEdit(): void
     {
-        // Arrange - the page being edited already owns the reserved slug in the DB
+        // Arrange
         $registry = $this->buildRegistry([['imprint']], ['5' => 'imprint']);
 
         // Act & Assert
@@ -62,7 +62,7 @@ class ReservedSlugRegistryTest extends TestCase
 
     public function testReservedSlugBlockedWhenAnotherPageOwnsIt(): void
     {
-        // Arrange - page 9's persisted slug differs from the reserved slug it is being changed to
+        // Arrange
         $registry = $this->buildRegistry([['imprint']], ['9' => 'something-else']);
 
         // Act & Assert
@@ -71,7 +71,7 @@ class ReservedSlugRegistryTest extends TestCase
 
     public function testProviderSlugWithoutBackingPageIsAlwaysReserved(): void
     {
-        // Arrange - no Cms row backs the slug, so the id never matches
+        // Arrange
         $registry = $this->buildRegistry([['pricing']], []);
 
         // Act & Assert

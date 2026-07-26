@@ -34,10 +34,6 @@ class CoreImageTypeDefinitionsTest extends TestCase
         return $this->createStub(ImageLocationRepository::class);
     }
 
-    // =========================================================================
-    // ProfilePicture
-    // =========================================================================
-
     public function testProfilePictureIdentityAndSizes(): void
     {
         $definition = new ProfilePictureImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $this->createStub(UserRepository::class));
@@ -87,10 +83,6 @@ class CoreImageTypeDefinitionsTest extends TestCase
         static::assertNull($definition->locate($this->createStub(Image::class)));
     }
 
-    // =========================================================================
-    // EventTeaser
-    // =========================================================================
-
     public function testEventTeaserIdentityAndSizes(): void
     {
         $definition = new EventTeaserImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $this->createStub(EventRepository::class));
@@ -130,10 +122,6 @@ class CoreImageTypeDefinitionsTest extends TestCase
         static::assertSame('app_admin_event_edit', $result['route']);
         static::assertSame(['id' => 11], $result['params']);
     }
-
-    // =========================================================================
-    // EventUpload
-    // =========================================================================
 
     public function testEventUploadIdentityAndSizes(): void
     {
@@ -184,10 +172,6 @@ class CoreImageTypeDefinitionsTest extends TestCase
 
         static::assertNull($definition->locate($image));
     }
-
-    // =========================================================================
-    // CmsBlock / CmsCardImage / CmsGallery
-    // =========================================================================
 
     public function testCmsBlockIdentityAndSizes(): void
     {
@@ -268,10 +252,6 @@ class CoreImageTypeDefinitionsTest extends TestCase
         static::assertSame([['imageId' => 10, 'locationId' => 7], ['imageId' => 11, 'locationId' => 7]], $definition->discoverImageIds());
     }
 
-    // =========================================================================
-    // LanguageTile
-    // =========================================================================
-
     public function testLanguageTileIdentitySizesAndEditLink(): void
     {
         $definition = new LanguageTileImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $this->createStub(LanguageRepository::class));
@@ -297,10 +277,6 @@ class CoreImageTypeDefinitionsTest extends TestCase
             $definition->locate($this->createStub(Image::class)),
         );
     }
-
-    // =========================================================================
-    // SiteLogo (singleton config, Fit)
-    // =========================================================================
 
     public function testSiteLogoIdentitySizesAndFitMode(): void
     {
@@ -338,10 +314,6 @@ class CoreImageTypeDefinitionsTest extends TestCase
 
         static::assertNull($definition->locate($image));
     }
-
-    // =========================================================================
-    // WebsiteImage (singleton config)
-    // =========================================================================
 
     public function testWebsiteImageIdentitySizesAndEditLink(): void
     {

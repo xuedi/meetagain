@@ -15,11 +15,6 @@ use App\ValueObject\CanonicalRebuildSummary;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
-/**
- * Recomputes every canonical marker of a series from its content alone. Authoritative and
- * self-healing: existing markers are dropped first, so the result depends only on the current
- * translations and the current threshold, never on the order past edits happened in.
- */
 final readonly class EventCanonicalRebuildService
 {
     public function __construct(
@@ -100,14 +95,6 @@ final readonly class EventCanonicalRebuildService
         return array_values($totals);
     }
 
-    /**
-     * Marker upkeep after an admin saved one series member. Classification uses the same
-     * comparison as the rebuild pass - post-edit content against the baseline root - so an edit
-     * can never write a state the next rebuild would immediately overturn.
-     *
-     * $appliedToFollowing is the edit form's "update all following" choice: it says the new
-     * content is meant to stick, which is what separates a new root from a one-off deviation.
-     */
     public function refreshAfterEdit(Event $event, bool $appliedToFollowing): void
     {
         $series = $event->getSeries();
@@ -147,9 +134,6 @@ final readonly class EventCanonicalRebuildService
     }
 
     /**
-     * The followers "update all following" just overwrote with identical content. Locked members
-     * are skipped by the content sync, so their markers stay untouched until the next rebuild.
-     *
      * @return array<int>
      */
     private function syncedFollowerIds(Event $event): array
@@ -169,10 +153,6 @@ final readonly class EventCanonicalRebuildService
     }
 
     /**
-     * Walks the members in start order, carrying a "running root". A member that stays below the
-     * threshold is a plain follower. One that crosses it becomes a new root when the members after
-     * it stay closer to it than to the running root, and a one-off `detached` deviation otherwise.
-     *
      * @param array<Event> $members ordered by start, all with a translation in $locale
      * @return array<int, EventCanonicalRootType> eventId => marker type
      */

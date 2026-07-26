@@ -6,10 +6,6 @@ use App\Publisher\Sitemap\SitemapPublisherInterface;
 use App\Publisher\Sitemap\SitemapUrl;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Collects URLs from all registered publishers and renders a single flat
- * `<urlset>` sitemap document.
- */
 final readonly class SitemapService
 {
     /**

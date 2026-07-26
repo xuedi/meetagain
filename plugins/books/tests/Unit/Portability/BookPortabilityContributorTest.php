@@ -44,7 +44,7 @@ class BookPortabilityContributorTest extends TestCase
 
     public function testCollidingIsbnResolvesToTheExistingBook(): void
     {
-        // Arrange - the ISBN column is unique, so a second insert would throw
+        // Arrange
         $existing = $this->book(77, '9781234567897', 'Dune');
         $repo = $this->createStub(BookRepository::class);
         $repo->method('findOneBy')->willReturn($existing);

@@ -1,0 +1,8 @@
+# Areas of this plugin intricate enough that prose earns its place, per the project's comment policy.
+# One line per symbol, and every line needs a reason. Enforced by comment-guard on every commit;
+# adding an entry is a deliberate decision, never an automatic fix.
+#
+# Format: path/relative/to/this/plugin.php::symbol // why
+
+src/Service/PollService.php::close // the filter is a data-integrity guard: stray votes for non-ballot ids must never win
+src/Entity/Vote.php::Vote // the unique (poll, user, item) constraint is what makes a vote idempotent

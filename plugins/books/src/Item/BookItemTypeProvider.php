@@ -9,10 +9,6 @@ use Override;
 use Plugin\Books\Service\BookService;
 use Twig\Environment;
 
-/**
- * Registers the 'book' item type with the core item seams: the event-detail cell, the shared
- * list cell, and the steward attach picker are all rendered from the books plugin's templates.
- */
 final readonly class BookItemTypeProvider implements ItemTypeProviderInterface, ListCellProviderInterface
 {
     public function __construct(

@@ -154,7 +154,6 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
 
     public function getMetaDescription(string $context = 'default'): string
     {
-        // 1. Plugin-provided value
         foreach ($this->metaDescriptionProviders as $provider) {
             $value = $provider->getMetaDescription($context);
             if ($value !== null && $value !== '') {
@@ -162,13 +161,11 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             }
         }
 
-        // 2. System-wide admin config
         $systemValue = $this->configService->getSeoDescription($context);
         if ($systemValue !== '') {
             return $systemValue;
         }
 
-        // 3. Hardcoded fallback
         return match ($context) {
             'events' => 'Browse upcoming events and meetups.',
             'members' => 'Meet the members of this community.',

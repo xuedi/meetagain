@@ -35,22 +35,18 @@ class PluginCommand extends Command
         $action = $input->getArgument('action');
         $plugin = $input->getArgument('plugin');
 
-        // No arguments - do nothing
         if ($action === null) {
             return Command::SUCCESS;
         }
 
-        // Validate action
         if ($action !== 'enable' && $action !== 'disable') {
             return Command::FAILURE;
         }
 
-        // No plugin argument - do nothing (enable/disable zero plugins)
         if ($plugin === null || $plugin === '') {
             return Command::SUCCESS;
         }
 
-        // Route to appropriate method
         if ($action === 'enable') {
             return $this->enablePlugins($plugin);
         }

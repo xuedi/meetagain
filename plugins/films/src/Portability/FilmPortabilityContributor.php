@@ -17,10 +17,6 @@ use Plugin\Films\Entity\Film;
 use Plugin\Films\Repository\FilmRepository;
 use Plugin\Films\Service\FilmService;
 
-/**
- * An external id from the same source identifies a film across instances; a manually entered film
- * has none, so title plus year is the fallback key.
- */
 readonly class FilmPortabilityContributor implements ItemPortabilityContributorInterface
 {
     public function __construct(

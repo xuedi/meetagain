@@ -310,7 +310,7 @@ class RecurrencePatternTest extends TestCase
     #[DataProvider('providePresetBridgeCases')]
     public function testFromIntervalBridgesThePresets(EventInterval $interval, ?string $expected): void
     {
-        // Arrange - 2026-08-12 is a Wednesday
+        // Arrange
         $anchor = new DateTimeImmutable('2026-08-12 19:00:00');
 
         // Act

@@ -9,8 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class TrioCardsTest extends TestCase
 {
-    // --- Arrange / Act / Assert ---
-
     public function testFromJsonWithFullData(): void
     {
         // Arrange

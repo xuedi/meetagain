@@ -25,11 +25,9 @@ final class ImagesControllerAltTest extends WebTestCase
 
         [$action, $token] = $this->altFormFor($client, $id);
 
-        // Source locale (en) writes the base alt column.
         $client->request('POST', $action, ['_token' => $token, 'locale' => 'en', 'alt' => 'English alt']);
         $this->assertResponseRedirects();
 
-        // Non-source locale (de) writes into the translations map, not the base column.
         $client->request('POST', $action, ['_token' => $token, 'locale' => 'de', 'alt' => 'Deutscher Alt']);
         $this->assertResponseRedirects();
 
@@ -61,7 +59,6 @@ final class ImagesControllerAltTest extends WebTestCase
     public function testUpdateAltInvalidatesTheAltStatusCacheEntry(): void
     {
         $client = static::createClient();
-        // The pool is in-memory in tests; a reboot between requests would detach it from $pool.
         $client->disableReboot();
         $this->loginAsAdmin($client);
 
@@ -73,7 +70,6 @@ final class ImagesControllerAltTest extends WebTestCase
         $pool = self::getContainer()->get('cache.image_alt_status');
         $pool->clear();
 
-        // The admin list warms the per-image status entry.
         $client->request('GET', '/en/admin/system/images');
         $this->assertResponseIsSuccessful();
         static::assertTrue($pool->getItem('image_alt_status.' . $id)->isHit());

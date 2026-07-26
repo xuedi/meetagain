@@ -8,10 +8,6 @@ use App\Repository\ItemCategoryAssignmentRepository;
 use App\Repository\ItemTagAssignmentRepository;
 use Override;
 
-/**
- * Sweeps taxonomy assignment rows when an item is deleted. The assignment tables carry no FK to
- * any item table, so orphan rows are removed here instead of by a cascade.
- */
 final readonly class TaxonomyAssignmentCleanupHandler implements ItemActionInterface
 {
     public function __construct(

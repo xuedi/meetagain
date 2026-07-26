@@ -29,11 +29,9 @@ final class IndexController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        // set session
         $session = $request->getSession();
         $session->set('_locale', $locale);
 
-        // set user preferences in DB
         $user = $this->getUser();
         if ($user instanceof User) {
             $user->setLocale($locale);

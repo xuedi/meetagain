@@ -5,10 +5,6 @@ namespace App\Item\Portability;
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Unions the portability contributors whose plugin is active and answers keyed lookups.
- * Mirrors CategorizableTypeRegistry's active-plugin guard on the portability axis.
- */
 class ItemPortabilityRegistry
 {
     /**

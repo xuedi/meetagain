@@ -1,10 +1,5 @@
 <?php declare(strict_types=1);
 
-/**
- * Null Mail Provider.
- *
- * Disables email sending - useful for testing environments.
- */
 class NullMailProvider implements MailProvider
 {
     public function getName(): string
@@ -29,13 +24,11 @@ class NullMailProvider implements MailProvider
 
     public function validate(array $postData, Installer $installer): bool
     {
-        // No validation needed
         return true;
     }
 
     public function collectConfig(array $postData, Installer $installer): array
     {
-        // No configuration needed
         return [];
     }
 

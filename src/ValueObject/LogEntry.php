@@ -72,11 +72,6 @@ class LogEntry
     }
 
     /**
-     * Splits the raw json tail (Monolog's `{context} {extra}` shape) into individual
-     * top-level JSON blocks and decodes each. Skips empty `[]` / `{}` extras and
-     * undecodable fragments. On any unexpected error, falls back to returning the
-     * raw tail as a single string element so the caller can still display it.
-     *
      * @return list<mixed>
      */
     public function getContextChunks(): array

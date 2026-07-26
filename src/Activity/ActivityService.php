@@ -79,8 +79,6 @@ readonly class ActivityService
     }
 
     /**
-     * Validates all activities in the database and returns invalid ones.
-     *
      * @return array<array{id: int, type: string, error: string}>
      */
     public function validateAllActivities(): array

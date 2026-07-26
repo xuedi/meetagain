@@ -10,17 +10,6 @@ use Override;
 use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
 use Plugin\Glossary\Migration\LegacyGlossaryCategoryConverter;
 
-/**
- * Migrates glossary onto the shared item taxonomy. Two steps, both idempotent:
- *   1. Copy each entry's legacy `category` int into item_category_assignment (item_type='glossary').
- *      The column is still physically present (its DROP is a later release); the raw read is skipped
- *      where the column no longer exists (dev/test schemas built without it).
- *   2. Rewrite the GLOBAL glossary plugin_settings config from the single-label category shape to the
- *      per-locale taxonomy shape (existing label -> the site's default locale).
- *
- * Per-scope configs stored by a host plugin are rewritten by that plugin's own sibling hotfix; the
- * entry-category backfill above already covers every entry (they are ordinary glossary rows).
- */
 readonly class MigrateGlossaryCategories implements DataHotfixInterface
 {
     private const string GLOSSARY_TABLE = 'plg_glossary_glossary';

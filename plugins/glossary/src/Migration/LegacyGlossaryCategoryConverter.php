@@ -2,17 +2,9 @@
 
 namespace Plugin\Glossary\Migration;
 
-/**
- * Converts an old-shape glossary config (single-label `categories`) to the new per-locale
- * `taxonomy` shape. Shared by the glossary global-config hotfix and any per-scope config hotfix a
- * host plugin ships for its own settings store.
- */
 final class LegacyGlossaryCategoryConverter
 {
     /**
-     * Returns the rewritten config array, or null when there is nothing to convert - a `taxonomy`
-     * key is already present, or the config never carried categories - so callers stay idempotent.
-     *
      * @param array<string, mixed> $config
      * @return array<string, mixed>|null
      */

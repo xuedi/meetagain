@@ -8,10 +8,6 @@ use Plugin\Glossary\Service\ConfigService;
 use Plugin\Glossary\Service\GlossaryService;
 use Twig\Environment;
 
-/**
- * Renders a glossary entry's cell for the shared item list. Glossary is not event-attachable, so
- * this is the only core item seam it registers with besides the categorizable one.
- */
 final readonly class GlossaryListCellProvider implements ListCellProviderInterface
 {
     public function __construct(

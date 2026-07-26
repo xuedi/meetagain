@@ -36,8 +36,6 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
     }
 
     /**
-     * Item ids carrying every one of the given tags (AND-intersection), for the tag-cloud filter.
-     *
      * @param list<int> $tagIds
      * @return list<int>
      */

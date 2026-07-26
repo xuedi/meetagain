@@ -7,11 +7,6 @@ use App\Enum\ImageType;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Resolves an ImageType to its single definition. Fails loudly at construction if two definitions
- * claim the same type, and at lookup if a type has no definition - so thumbnail generation cannot
- * silently skip a type.
- */
 class ImageTypeRegistry
 {
     /** @var array<int, ImageTypeDefinitionInterface> keyed by ImageType->value */
@@ -61,9 +56,6 @@ class ImageTypeRegistry
         return $this->get($type)->fitMode();
     }
 
-    /**
-     * Returns the 'WxH' string for the universal 350-width admin preview thumbnail.
-     */
     public function getAdminPreviewSize(ImageType $type): string
     {
         foreach ($this->get($type)->thumbnailSizes() as [$width, $height]) {
@@ -76,8 +68,6 @@ class ImageTypeRegistry
     }
 
     /**
-     * The union of every registered type's thumbnail sizes, as a 'WxH' => 0 count map.
-     *
      * @return array<string, int>
      */
     public function getThumbnailSizeList(): array

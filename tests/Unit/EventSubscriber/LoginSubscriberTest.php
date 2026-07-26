@@ -80,7 +80,6 @@ class LoginSubscriberTest extends TestCase
 
         $subscriber->onLoginSuccess($event);
 
-        // Response should not have any cookies set (returns early before setting consent)
         static::assertEmpty($response->headers->getCookies());
     }
 
@@ -110,7 +109,7 @@ class LoginSubscriberTest extends TestCase
 
     public function testOnLoginSuccessReturnsEarlyWhenResponseIsNull(): void
     {
-        // Arrange - osm consent path runs but response is null; must not crash
+        // Arrange
         $subscriber = new LoginSubscriber();
 
         $user = new User();
@@ -128,7 +127,7 @@ class LoginSubscriberTest extends TestCase
         $event->method('getRequest')->willReturn($request);
         $event->method('getResponse')->willReturn(null);
 
-        // Act / Assert - completes without throwing
+        // Act / Assert
         $subscriber->onLoginSuccess($event);
         static::assertTrue(true);
     }

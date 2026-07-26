@@ -172,26 +172,20 @@ final class SecurityController extends AbstractController
             return $this->render('security/register_error.html.twig');
         }
 
-        // clean up and write activity
         $user->setRegcode(null);
         $user->setRegcodeExpiresAt(null);
         $this->activityService->log(RegistrationEmailConfirmed::TYPE, $user, []);
 
-        // Check if automatic registration is enabled
         if ($this->configService->isAutomaticRegistration()) {
-            // Auto-approve user
             $user->setStatus(UserStatus::Active);
             $em->persist($user);
             $em->flush();
 
-            // Send welcome email
             $this->welcomeEmail->send(['user' => $user]);
 
-            // Redirect to events page
             return $this->render('security/approved.html.twig');
         }
 
-        // Manual approval required
         $user->setStatus(UserStatus::EmailVerified);
         $em->persist($user);
         $em->flush();

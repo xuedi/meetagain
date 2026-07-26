@@ -7,10 +7,6 @@ use App\Entity\User;
 use App\Enum\ImageType;
 use App\Service\System\PortableImageImporter;
 
-/**
- * The per-import services a contributor needs: turning an archive-relative image path back into a
- * persisted Image, and the account that owns everything an import creates.
- */
 readonly class ItemImportContext
 {
     public function __construct(

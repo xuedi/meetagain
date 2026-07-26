@@ -12,10 +12,6 @@ readonly class RequestHostResolver
         private ConfigService $config,
     ) {}
 
-    /**
-     * Scheme + host of the current HTTP request (e.g. "https://example.com").
-     * Falls back to ConfigService::getHost() when no request is active (CLI, cron).
-     */
     public function getSchemeAndHost(): string
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -26,10 +22,6 @@ readonly class RequestHostResolver
         return rtrim($this->config->getHost(), '/');
     }
 
-    /**
-     * Bare host of the current HTTP request (e.g. "example.com"), used for human-readable
-     * "you signed up for X" copy. Falls back to ConfigService::getUrl() when no request is active.
-     */
     public function getHost(): string
     {
         $request = $this->requestStack->getCurrentRequest();

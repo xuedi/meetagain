@@ -7,19 +7,6 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Security test for SafeHtmlExtension::safeHtml().
- *
- * Design principle: strip_tags removes tags but KEEPS text content — e.g.
- * <script>alert(1)</script> becomes the harmless text "alert(1)". The danger
- * is never the text payload but the tag/attribute that would execute it.
- * All assertions therefore target dangerous HTML constructs, not text content.
- *
- * Security invariants enforced after every case (via testScriptInjectionIsBlocked):
- *   - No <script, <iframe, <object, <embed, <form tag in output
- *   - No event-handler attributes ( on…= ) on any tag
- *   - No javascript: / vbscript: protocol inside an HTML attribute
- */
 class SafeHtmlExtensionTest extends TestCase
 {
     private SafeHtmlExtension $subject;
@@ -29,10 +16,6 @@ class SafeHtmlExtensionTest extends TestCase
         $this->subject = new SafeHtmlExtension();
     }
 
-    // -------------------------------------------------------------------------
-    // Filter registration
-    // -------------------------------------------------------------------------
-
     public function testGetFiltersReturnsSafeHtmlFilter(): void
     {
         $filters = $this->subject->getFilters();
@@ -40,10 +23,6 @@ class SafeHtmlExtensionTest extends TestCase
         static::assertCount(1, $filters);
         static::assertSame('safe_html', $filters[0]->getName());
     }
-
-    // -------------------------------------------------------------------------
-    // Allowed tags pass through (no attributes)
-    // -------------------------------------------------------------------------
 
     #[DataProvider('allowedTagsProvider')]
     public function testAllowedTagsPassThrough(string $input, string $expected): void
@@ -67,10 +46,6 @@ class SafeHtmlExtensionTest extends TestCase
         yield 'empty string' => ['', ''];
     }
 
-    // -------------------------------------------------------------------------
-    // Attributes are stripped from allowed tags
-    // -------------------------------------------------------------------------
-
     #[DataProvider('attributeStrippingProvider')]
     public function testAttributesAreStrippedFromAllowedTags(string $input, string $expected): void
     {
@@ -90,10 +65,6 @@ class SafeHtmlExtensionTest extends TestCase
         yield 'entity-encoded attribute' => ['<b &#111;nclick="alert(1)">x</b>', '<b>x</b>'];
         yield 'data URI in b href' => ['<b href="data:text/html,<x>">x</b>', '<b>x</b>'];
     }
-
-    // -------------------------------------------------------------------------
-    // Disallowed tags — tag stripped, text content kept
-    // -------------------------------------------------------------------------
 
     #[DataProvider('disallowedTagsProvider')]
     public function testDisallowedTagsAreStripped(string $input, string $expected): void
@@ -124,20 +95,11 @@ class SafeHtmlExtensionTest extends TestCase
         yield 'base tag' => ['<base href="http://evil.com">', ''];
     }
 
-    // -------------------------------------------------------------------------
-    // Script injection — exact output + security invariants
-    //
-    // Each case specifies the exact expected output. In addition,
-    // testScriptInjectionIsBlocked() enforces that no dangerous HTML construct
-    // (executable tag, event handler, javascript: in attribute) survives.
-    // -------------------------------------------------------------------------
-
     #[DataProvider('scriptInjectionProvider')]
     public function testScriptInjectionIsBlocked(string $input, string $expectedOutput): void
     {
         $result = $this->subject->safeHtml($input);
 
-        // Dangerous HTML constructs that must never survive, regardless of input
         static::assertStringNotContainsStringIgnoringCase('<script', $result, "Script tag in output for: {$input}");
         static::assertStringNotContainsStringIgnoringCase('<iframe', $result, "iframe tag in output for: {$input}");
         static::assertStringNotContainsStringIgnoringCase('<object', $result, "object tag in output for: {$input}");
@@ -161,7 +123,6 @@ class SafeHtmlExtensionTest extends TestCase
 
     public static function scriptInjectionProvider(): Generator
     {
-        // --- Script tags (tag stripped, text content remains as harmless text) ---
         yield 'basic script tag' => ['<script>alert(1)</script>', 'alert(1)'];
         yield 'uppercase SCRIPT' => ['<SCRIPT>alert(1)</SCRIPT>', 'alert(1)'];
         yield 'mixed case Script' => ['<Script>alert(1)</Script>', 'alert(1)'];
@@ -171,12 +132,10 @@ class SafeHtmlExtensionTest extends TestCase
         yield 'script inside div' => ['<div><script>alert(1)</script></div>', 'alert(1)'];
         yield 'script after allowed tag' => ['<b>ok</b><script>alert(1)</script>', '<b>ok</b>alert(1)'];
 
-        // --- Malformed / obfuscated script tags ---
         yield 'null byte in tag name' => ["<scr\x00ipt>alert(1)</scr\x00ipt>", 'alert(1)'];
         yield 'newline in tag name' => ["<scr\nipt>alert(1)</script>", 'alert(1)'];
         yield 'tab in tag name' => ["<scr\tipt>alert(1)</script>", 'alert(1)'];
 
-        // --- Event handlers on allowed tags (stripped by attribute regex) ---
         yield 'onclick on b' => ['<b onclick="alert(1)">x</b>', '<b>x</b>'];
         yield 'onmouseover on strong' => ['<strong onmouseover="alert(1)">x</strong>', '<strong>x</strong>'];
         yield 'onfocus on em' => ['<em onfocus="alert(1)">x</em>', '<em>x</em>'];
@@ -186,56 +145,43 @@ class SafeHtmlExtensionTest extends TestCase
         yield 'ontouchstart on b' => ['<b ontouchstart="alert(1)">x</b>', '<b>x</b>'];
         yield 'entity-encoded attribute name' => ['<b &#111;nclick="alert(1)">x</b>', '<b>x</b>'];
 
-        // --- javascript:/vbscript: protocols in attributes (attribute stripped) ---
         yield 'javascript: in href on b' => ['<b href="javascript:alert(1)">x</b>', '<b>x</b>'];
         yield 'JAVASCRIPT: uppercase' => ['<b href="JAVASCRIPT:alert(1)">x</b>', '<b>x</b>'];
         yield 'vbscript: in href on b' => ['<b href="vbscript:msgbox(1)">x</b>', '<b>x</b>'];
         yield 'data URI in b href' => ['<b href="data:text/html,<x>">x</b>', '<b>x</b>'];
 
-        // --- img XSS (tag stripped entirely) ---
         yield 'img onerror' => ['<img src="x" onerror="alert(1)">', ''];
         yield 'img javascript src' => ['<img src="javascript:alert(1)">', ''];
 
-        // --- SVG/MathML XSS ---
         yield 'svg with script' => ['<svg><script>alert(1)</script></svg>', 'alert(1)'];
         yield 'svg onload' => ['<svg onload="alert(1)">x</svg>', 'x'];
 
-        // --- iframe/object/embed (all stripped) ---
         yield 'iframe javascript src' => ['<iframe src="javascript:alert(1)"></iframe>', ''];
         yield 'object with data' => ['<object data="javascript:alert(1)"></object>', ''];
         yield 'embed with src' => ['<embed src="javascript:alert(1)">', ''];
 
-        // --- CSS injection (style tag stripped, CSS text remains as harmless plain text) ---
         yield 'style tag with expression' => [
             '<style>body{background:url("javascript:alert(1)")}</style>',
             'body{background:url("javascript:alert(1)")}',
         ];
         yield 'style attribute on b' => ['<b style="background:url(javascript:alert(1))">x</b>', '<b>x</b>'];
 
-        // --- HTML entities used to hide tags ---
         yield 'entity-encoded script (text)' => [
             '&lt;script&gt;alert(1)&lt;/script&gt;',
             '&lt;script&gt;alert(1)&lt;/script&gt;',
         ];
 
-        // --- Form / phishing ---
         yield 'form with action' => ['<form action="http://evil.com"><input name="p"></form>', ''];
         yield 'button with onclick' => ['<button onclick="steal()">click</button>', 'click'];
 
-        // --- Meta / base tag hijacks ---
         yield 'meta refresh redirect' => ['<meta http-equiv="refresh" content="0;url=http://evil.com">', ''];
         yield 'base href hijack' => ['<base href="http://evil.com">', ''];
 
-        // --- Bad actor combining multiple techniques ---
         yield 'onclick + script inside b' => [
             '<b onclick="alert(1)" style="color:red"><script>steal()</script>click me</b>',
             '<b>steal()click me</b>',
         ];
     }
-
-    // -------------------------------------------------------------------------
-    // Newline handling (nl2br behaviour preserved)
-    // -------------------------------------------------------------------------
 
     #[DataProvider('newlineProvider')]
     public function testNewlinesAreConvertedToBr(string $input, string $expected): void
@@ -250,10 +196,6 @@ class SafeHtmlExtensionTest extends TestCase
         yield 'multiple newlines' => ["a\nb\nc", "a<br />\nb<br />\nc"];
         yield 'newline after allowed' => ["<b>bold</b>\ntext", "<b>bold</b><br />\ntext"];
     }
-
-    // -------------------------------------------------------------------------
-    // Real-world mixed content
-    // -------------------------------------------------------------------------
 
     #[DataProvider('realWorldProvider')]
     public function testRealWorldContent(string $input, string $expected): void

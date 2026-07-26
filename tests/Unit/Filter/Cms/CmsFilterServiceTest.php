@@ -16,7 +16,7 @@ class CmsFilterServiceTest extends TestCase
         // Act
         $result = $service->isCmsAccessible(123);
 
-        // Assert - Default behavior allows access when no filters registered
+        // Assert
         static::assertTrue($result);
     }
 
@@ -94,21 +94,21 @@ class CmsFilterServiceTest extends TestCase
 
     public function testIsCmsAccessibleChecksFiltersInPriorityOrder(): void
     {
-        // Arrange - High priority filter denies early
+        // Arrange
         $highPriorityFilter = $this->createMock(CmsFilterInterface::class);
         $highPriorityFilter->method('getPriority')->willReturn(200);
         $highPriorityFilter->expects($this->once())->method('isCmsAccessible')->with(789)->willReturn(false);
 
         $lowPriorityFilter = $this->createMock(CmsFilterInterface::class);
         $lowPriorityFilter->method('getPriority')->willReturn(50);
-        $lowPriorityFilter->expects($this->never())->method('isCmsAccessible'); // Should not be called
+        $lowPriorityFilter->expects($this->never())->method('isCmsAccessible');
 
         $service = new CmsFilterService([$lowPriorityFilter, $highPriorityFilter]);
 
         // Act
         $result = $service->isCmsAccessible(789);
 
-        // Assert - Returns false without checking low priority filter
+        // Assert
         static::assertFalse($result);
     }
 }

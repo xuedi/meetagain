@@ -2,10 +2,6 @@
 
 namespace App\Item;
 
-/**
- * View-model for the event detail attach control: the event it targets and the active item
- * types a steward can attach. A type dropdown is shown only when more than one type is active.
- */
 readonly class ItemAttachControl
 {
     /**

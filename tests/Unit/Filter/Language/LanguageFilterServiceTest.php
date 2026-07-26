@@ -16,7 +16,7 @@ class LanguageFilterServiceTest extends TestCase
         // Act
         $result = $service->getLanguageCodeFilter();
 
-        // Assert - No active filters means no restriction
+        // Assert
         static::assertNull($result->getLanguageCodes());
         static::assertFalse($result->hasActiveFilter());
     }
@@ -50,7 +50,7 @@ class LanguageFilterServiceTest extends TestCase
         // Act
         $result = $service->getLanguageCodeFilter();
 
-        // Assert - null means no opinion, should return no filter
+        // Assert
         static::assertNull($result->getLanguageCodes());
         static::assertFalse($result->hasActiveFilter());
     }
@@ -67,7 +67,7 @@ class LanguageFilterServiceTest extends TestCase
         // Act
         $result = $service->getLanguageCodeFilter();
 
-        // Assert - Empty array means block all
+        // Assert
         static::assertTrue($result->isEmpty());
         static::assertEquals([], $result->getLanguageCodes());
         static::assertTrue($result->hasActiveFilter());
@@ -89,7 +89,7 @@ class LanguageFilterServiceTest extends TestCase
         // Act
         $result = $service->getLanguageCodeFilter();
 
-        // Assert - AND logic: only codes in both filters
+        // Assert
         static::assertEquals(['de', 'fr'], $result->getLanguageCodes());
         static::assertTrue($result->hasActiveFilter());
     }
@@ -110,7 +110,7 @@ class LanguageFilterServiceTest extends TestCase
         // Act
         $result = $service->getLanguageCodeFilter();
 
-        // Assert - No intersection means empty result
+        // Assert
         static::assertTrue($result->isEmpty());
         static::assertEquals([], $result->getLanguageCodes());
     }
@@ -123,7 +123,7 @@ class LanguageFilterServiceTest extends TestCase
         // Act
         $result = $service->isLanguageAccessible('en');
 
-        // Assert - Default behavior allows access when no filters registered
+        // Assert
         static::assertTrue($result);
     }
 
@@ -161,21 +161,21 @@ class LanguageFilterServiceTest extends TestCase
 
     public function testFilterPriorityOrdering(): void
     {
-        // Arrange - High priority filter should be checked first
+        // Arrange
         $highPriorityFilter = $this->createMock(LanguageFilterInterface::class);
         $highPriorityFilter->method('getPriority')->willReturn(200);
         $highPriorityFilter->expects($this->once())->method('isLanguageAccessible')->with('de')->willReturn(false);
 
         $lowPriorityFilter = $this->createMock(LanguageFilterInterface::class);
         $lowPriorityFilter->method('getPriority')->willReturn(50);
-        $lowPriorityFilter->expects($this->never())->method('isLanguageAccessible'); // Should not be called
+        $lowPriorityFilter->expects($this->never())->method('isLanguageAccessible');
 
         $service = new LanguageFilterService([$lowPriorityFilter, $highPriorityFilter]);
 
         // Act
         $result = $service->isLanguageAccessible('de');
 
-        // Assert - Returns false without checking low priority filter
+        // Assert
         static::assertFalse($result);
     }
 }

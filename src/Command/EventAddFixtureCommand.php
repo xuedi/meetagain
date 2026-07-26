@@ -67,7 +67,6 @@ class EventAddFixtureCommand extends Command
         $minComments = (int) $input->getOption('min-comments');
         $maxComments = (int) $input->getOption('max-comments');
 
-        // Find all auto-generated series members
         $recurringEvents = $this->em->createQuery('SELECT e FROM App\Entity\Event e WHERE e.series IS NOT NULL AND e.initial = false')->getResult();
 
         if ($recurringEvents === []) {
@@ -76,7 +75,6 @@ class EventAddFixtureCommand extends Command
             return Command::SUCCESS;
         }
 
-        // Get all users for random selection
         $allUsers = $this->userRepo->findAll();
 
         if (count($allUsers) < $minRsvps) {
@@ -89,7 +87,6 @@ class EventAddFixtureCommand extends Command
         $commentCount = 0;
 
         foreach ($recurringEvents as $event) {
-            // Add RSVPs if event doesn't have any
             if ($event->getRsvp()->count() === 0) {
                 $numRsvps = random_int($minRsvps, min($maxRsvps, count($allUsers)));
                 $selectedUsers = $this->getRandomUsers($allUsers, $numRsvps);
@@ -102,7 +99,6 @@ class EventAddFixtureCommand extends Command
                 $this->em->persist($event);
             }
 
-            // Add random comments
             $numComments = random_int($minComments, min($maxComments, count($allUsers)));
             for ($i = 0; $i < $numComments; ++$i) {
                 $comment = new Comment();
@@ -110,7 +106,6 @@ class EventAddFixtureCommand extends Command
                 $comment->setUser($this->getRandomUsers($allUsers, 1)[0]);
                 $comment->setContent($this->getRandomComment());
 
-                // Create timestamp between event creation and now
                 $daysAfterEvent = random_int(0, 7);
                 $comment->setCreatedAt((clone $event->getCreatedAt())->modify("+{$daysAfterEvent} days"));
 
@@ -128,7 +123,6 @@ class EventAddFixtureCommand extends Command
             count($recurringEvents),
         ));
 
-        // Run plugin fixtures for enabled plugins only
         $enabledPlugins = $this->pluginService->getGloballyActiveList();
         foreach ($this->plugins as $plugin) {
             if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {

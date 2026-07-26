@@ -5,9 +5,6 @@ namespace App\Service\Seo;
 use App\Entity\Event;
 use App\ValueObject\SimilarityScore;
 
-/**
- * Scores how far two events of the same series have drifted apart in one locale.
- */
 final readonly class EventSimilarityService
 {
     private const int WEIGHT_TITLE = 20;
@@ -48,10 +45,6 @@ final readonly class EventSimilarityService
         );
     }
 
-    /**
-     * Percent changed for a single field, or null when the field is empty on both sides
-     * and must therefore drop out of the weighting.
-     */
     private function fieldChange(string $left, string $right, ?int $lengthCap = null): ?float
     {
         $normalizedLeft = $this->normalize($left, $lengthCap);

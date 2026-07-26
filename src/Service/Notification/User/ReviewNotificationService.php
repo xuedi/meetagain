@@ -14,9 +14,6 @@ readonly class ReviewNotificationService
     ) {}
 
     /**
-     * Returns providers that have at least one item for the user.
-     * Each entry is ['provider' => ReviewNotificationProviderInterface, 'items' => ReviewNotificationItem[]].
-     *
      * @return array<int, array{provider: ReviewNotificationProviderInterface, items: ReviewNotificationItem[]}>
      */
     public function getProvidersForUser(User $user): array

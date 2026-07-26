@@ -7,14 +7,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormTypeInterface;
 
-/**
- * Builds and reads the per-language field set behind the shared item translation toggle.
- *
- * Each translatable field is added once per enabled admin language as an unmapped
- * "{field}-{code}" child (e.g. name-en, name-de), so every language is editable at once
- * regardless of the UI locale. The language set comes from LanguageService, never the
- * navbar switcher. Pair with templates/_components/item/translation_fields.html.twig.
- */
 readonly class ItemTranslationFormHelper
 {
     public function __construct(

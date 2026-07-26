@@ -78,7 +78,6 @@ class MessageRepositoryTest extends KernelTestCase
             self::assertNull($found);
         }
 
-        // Cleanup
         $this->em->remove($msg);
         $this->em->flush();
     }

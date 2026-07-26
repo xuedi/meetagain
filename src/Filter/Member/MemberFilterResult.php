@@ -2,9 +2,6 @@
 
 namespace App\Filter\Member;
 
-/**
- * Result from composing multiple member filters.
- */
 readonly class MemberFilterResult
 {
     /**

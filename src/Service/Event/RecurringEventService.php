@@ -91,7 +91,7 @@ readonly class RecurringEventService implements CronTaskInterface
                 continue; // the series-keyed query can return the anchor itself
             }
             if ($child->getStatus() === EventStatus::Locked) {
-                continue; // skip manually-customized events
+                continue;
             }
             $child->setLocation($event->getLocation());
             $child->setPreviewImage($event->getPreviewImage());
@@ -117,25 +117,6 @@ readonly class RecurringEventService implements CronTaskInterface
         return $updatedCount;
     }
 
-    /**
-     * Computes how future auto-generated members realign onto a changed schedule:
-     * 1. Resolve the anchor's series and the effective rule (the changed rule when given,
-     *    otherwise the series rule); without both there is nothing to realign - empty plan.
-     *    A change from a rule to NonRecurring closes the series: also an empty plan, the
-     *    members keep their dates.
-     * 2. Collect members after the OLD start (members sitting between old and new start
-     *    must not be orphaned when the anchor moves later), then keep only future ones.
-     * 3. Locked and canceled members become skipped items; they neither move nor consume
-     *    an occurrence slot.
-     * 4. Take count(realignable) occurrences of the new rule anchored at the new start - by
-     *    count, not by window, so existing members keep mapping even beyond the cron
-     *    lookahead when the new rule is sparser.
-     * 5. Map realignable members in start order 1:1 onto occurrences; the new stop is
-     *    start + old duration so cross-midnight events stay intact. Members past the last
-     *    occurrence drop out of the plan and keep their dates.
-     * 6. A member whose computed dates equal its current ones is DateUnchanged and keeps
-     *    its RSVPs; only Moved members lose them on execution.
-     */
     public function planRealignment(Event $anchor, ScheduleChange $change): RealignmentPlan
     {
         $series = $anchor->getSeries();
@@ -280,7 +261,6 @@ readonly class RecurringEventService implements CronTaskInterface
 
         $this->em->flush();
 
-        // Dispatch CreateEvent for each created recurring event (now they have IDs)
         foreach ($createdEvents as $createdEvent) {
             $this->entityActionDispatcher->dispatch(EntityAction::CreateEvent, (int) $createdEvent->getId());
         }
@@ -302,7 +282,6 @@ readonly class RecurringEventService implements CronTaskInterface
         $recurringEvent->setSeries($series);
         $recurringEvent->setCreatedAt(new DateTimeImmutable());
 
-        // Reload host collection from managed template to avoid detached state issues
         if ($template->getHost()->count() > 0) {
             foreach ($template->getHost() as $host) {
                 $recurringEvent->addHost($host);

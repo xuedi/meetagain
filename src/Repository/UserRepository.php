@@ -43,9 +43,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Cursor-style iteration over every user. Streams results without loading all users into
-     * memory at once.
-     *
      * @return iterable<User>
      */
     public function iterateAll(): iterable
@@ -104,9 +101,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $friendList;
     }
 
-    /**
-     * Used to upgrade (rehash) the user's password automatically over time.
-     */
     #[Override]
     public function upgradePassword(PasswordAuthenticatedUserInterface $user, #[\SensitiveParameter] string $newHashedPassword): void
     {
@@ -125,7 +119,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function findActivePublicMembers(int $limit = 500, int $offset = 0, ?array $restrictToUserIds = null): array
     {
         if ($restrictToUserIds === []) {
-            return []; // Empty filter = no results
+            return [];
         }
 
         return $this
@@ -141,7 +135,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function findActiveMembers(int $limit = 500, int $offset = 0, array $excludeIds = [], ?array $restrictToUserIds = null): array
     {
         if ($restrictToUserIds === []) {
-            return []; // Empty filter = no results
+            return [];
         }
 
         return $this
@@ -156,7 +150,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function getNumberOfActivePublicMembers(?array $restrictToUserIds = null): int
     {
         if ($restrictToUserIds === []) {
-            return 0; // Empty filter = no results
+            return 0;
         }
 
         $qb = $this->buildActiveMembersQuery(excludeIds: [], restrictToUserIds: $restrictToUserIds, excludeSystemUser: false);
@@ -173,7 +167,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function getNumberOfActiveMembers(array $excludeIds = [], ?array $restrictToUserIds = null): int
     {
         if ($restrictToUserIds === []) {
-            return 0; // Empty filter = no results
+            return 0;
         }
 
         $qb = $this->buildActiveMembersQuery(excludeIds: $excludeIds, restrictToUserIds: $restrictToUserIds, excludeSystemUser: true);
@@ -184,8 +178,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Builds a query for active public members with optional filters.
-     *
      * @param int[] $excludeIds User IDs to exclude
      * @param array<int>|null $restrictToUserIds Optional user ID filter
      */
@@ -345,9 +337,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * Count users stuck in EmailVerified status (verified but not approved).
-     */
     public function getUnverifiedCount(): int
     {
         return (int) $this
@@ -360,7 +349,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Find users by status.
      * @return list<User>
      */
     public function findByStatus(UserStatus $status): array
@@ -452,13 +440,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         ];
     }
 
-    /**
-     * Find users who have enabled announcement notifications.
-     * Note: The notificationSettings.announcements check is done in PHP
-     * since it's stored as JSON.
-     *
-     * @return User[]
-     */
+    // notificationSettings.announcements is a JSON column, so that filter runs in PHP downstream
+    /** @return User[] */
     public function findAnnouncementSubscribers(): array
     {
         return $this
@@ -485,7 +468,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * Find all active admin users with an email address.
      * @return User[]
      */
     public function findAdminUsers(): array
@@ -504,7 +486,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function findAllForAdmin(?array $restrictToUserIds = null): array
     {
         if ($restrictToUserIds === []) {
-            return []; // Empty filter = no results
+            return [];
         }
 
         $qb = $this->createQueryBuilder('u')->select('u, i')->leftJoin('u.image', 'i')->orderBy('u.status', 'ASC')->addOrderBy('u.createdAt', 'DESC');

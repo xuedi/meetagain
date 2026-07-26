@@ -9,10 +9,6 @@ use Doctrine\DBAL\Connection;
 
 abstract class AbstractImageTypeDefinition implements ImageTypeDefinitionInterface
 {
-    /**
-     * The report preview and micro sizes every type carries; appended to each definition's
-     * distinctive sizes, so individual definitions never have to repeat them.
-     */
     private const array UNIVERSAL_SIZES = [[100, 100], [50, 50]];
 
     public function __construct(
@@ -21,9 +17,6 @@ abstract class AbstractImageTypeDefinition implements ImageTypeDefinitionInterfa
     ) {}
 
     /**
-     * This type's distinctive [width, height] pairs, including its own native-aspect 350-width
-     * admin-preview entry. The universal report and micro sizes are added by thumbnailSizes().
-     *
      * @return array<int, array{0: int, 1: int}>
      */
     abstract protected function sizes(): array;
@@ -48,10 +41,6 @@ abstract class AbstractImageTypeDefinition implements ImageTypeDefinitionInterfa
         return null;
     }
 
-    /**
-     * Reads the current DB state for this type, diffs against discoverImageIds(),
-     * and applies partial delete/insert - never truncates the whole table.
-     */
     final public function sync(): void
     {
         $discovered = $this->discoverImageIds();

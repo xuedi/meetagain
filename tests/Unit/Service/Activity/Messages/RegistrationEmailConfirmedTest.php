@@ -30,7 +30,6 @@ class RegistrationEmailConfirmedTest extends TestCase
         $subject = new RegistrationEmailConfirmed();
         $subject->injectServices($this->router, $this->imageService, $this->translator);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(RegistrationEmailConfirmed::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

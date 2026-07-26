@@ -39,7 +39,6 @@ class FollowedUserTest extends TestCase
         $subject = new FollowedUser();
         $subject->injectServices($router, $this->imageService, $this->translator, $meta, $userNames);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(FollowedUser::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

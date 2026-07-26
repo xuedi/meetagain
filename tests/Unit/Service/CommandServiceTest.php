@@ -13,7 +13,7 @@ class CommandServiceTest extends TestCase
 {
     private function createService(): CommandService
     {
-        // Arrange: stub event dispatcher and container
+        // Arrange
         $eventDispatcherStub = $this->createStub(EventDispatcher::class);
 
         $containerStub = $this->createStub(ContainerInterface::class);
@@ -27,29 +27,29 @@ class CommandServiceTest extends TestCase
 
     public function testExecuteCommandReturnsOutput(): void
     {
-        // Arrange: create service with default stubs
+        // Arrange
         $service = $this->createService();
 
-        // Act & Assert: execute echo command returns output
+        // Act & Assert
         static::assertNotEmpty($service->execute(new EchoCommand('test')));
     }
 
     public function testClearCacheExecutesWithoutError(): void
     {
-        // Arrange: create service with default stubs
+        // Arrange
         $service = $this->createService();
 
-        // Act & Assert: clear cache runs without throwing
+        // Act & Assert
         $service->clearCache();
         static::assertTrue(true);
     }
 
     public function testExecuteMigrationsExecutesWithoutError(): void
     {
-        // Arrange: create service with default stubs
+        // Arrange
         $service = $this->createService();
 
-        // Act & Assert: execute migrations runs without throwing
+        // Act & Assert
         $service->executeMigrations();
         static::assertTrue(true);
     }

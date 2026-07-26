@@ -10,11 +10,6 @@ use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthentication
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 
-/**
- * Logs every login attempt that Symfony's login throttler refuses with a
- * TooManyLoginAttemptsAuthenticationException, so it shows up in the admin
- * Rate-limiting tab alongside the form-driven rate-limit refusals.
- */
 readonly class LoginThrottleSubscriber implements EventSubscriberInterface
 {
     public function __construct(

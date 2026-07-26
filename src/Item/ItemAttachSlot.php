@@ -2,11 +2,6 @@
 
 namespace App\Item;
 
-/**
- * One extra attach action a subsystem contributes to the attach control
- * (e.g. "put it to a vote", "pick from wishlist"): a target url plus a
- * translation key for the button label and an optional Font Awesome icon name.
- */
 readonly class ItemAttachSlot
 {
     public function __construct(

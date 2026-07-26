@@ -29,56 +29,47 @@ interface Plugin
     public function getEventTile(int $eventId, EventTileLocation $location): ?string;
 
     /**
-     * Runs fixture data creation after events have been extended.
-     * Called by app:event:add-fixture command.
+     * Called by app:event:add-fixture, after events have been extended.
      */
     public function loadPostExtendFixtures(OutputInterface $output): void;
 
     /**
-     * Runs pre-fixture tasks before plugin fixtures are loaded.
-     * Called by app:plugin:pre-fixtures command, after base fixtures load.
-     * Use this for migration tasks that need to run before plugin fixtures.
+     * Called by app:plugin:pre-fixtures, after base fixtures load and before plugin fixtures.
      */
     public function preFixtures(OutputInterface $output): void;
 
     /**
-     * Runs post-fixture tasks after doctrine:fixtures:load completes.
-     * Called by app:plugin:post-fixtures command.
+     * Called by app:plugin:post-fixtures, after doctrine:fixtures:load completes.
      */
     public function postFixtures(OutputInterface $output): void;
 
     /**
-     * Returns rendered HTML for the footer "about" section (copyright/branding area).
-     * Return null if the plugin doesn't provide custom footer content.
+     * Null contributes nothing to the footer "about" section.
      */
     public function getFooterAbout(): ?string;
 
     /**
-     * Returns tags/badges to display for an event in list views.
      * @return list<EventListItemTag>
      */
     public function getEventListItemTags(int $eventId): array;
 
     /**
-     * Pre-warms any per-request caches before a list render loop.
-     * Called once with all visible IDs of the given type to avoid N individual queries.
+     * Called once with every visible id of the type, so implementations can avoid N queries.
      *
      * @param array<int> $ids
      */
     public function warmCache(WarmCacheType $type, array $ids): void;
 
     /**
-     * Returns logical asset paths for stylesheets this plugin contributes.
-     * Paths are relative to the plugin's assets/ directory.
-     * Example: ['styles/main.css']
+     * Stylesheet paths relative to the plugin's assets/ directory, e.g. ['styles/main.css'].
+     *
      * @return list<string>
      */
     public function getStylesheets(): array;
 
     /**
-     * Returns logical asset paths for JavaScript files this plugin contributes.
-     * Paths are relative to the plugin's assets/ directory.
-     * Example: ['js/ratings.js']
+     * JavaScript paths relative to the plugin's assets/ directory, e.g. ['js/ratings.js'].
+     *
      * @return list<string>
      */
     public function getJavascripts(): array;

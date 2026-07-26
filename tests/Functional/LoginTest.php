@@ -9,13 +9,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-/**
- * Functional tests for the login click path.
- *
- * Uses fixture credentials:
- * - Admin: Admin@example.org / 1234
- * - Crystal Liu: Crystal.Liu@example.org / 1234
- */
 class LoginTest extends WebTestCase
 {
     private const ADMIN_EMAIL = 'Admin@example.org';
@@ -52,12 +45,10 @@ class LoginTest extends WebTestCase
         $this->assertResponseRedirects();
         $client->followRedirect();
 
-        // Verify user is authenticated by checking security token
         $user = $client->getContainer()->get('security.token_storage')->getToken()?->getUser();
         static::assertInstanceOf(User::class, $user);
         static::assertEqualsIgnoringCase(self::ADMIN_EMAIL, $user->getEmail());
 
-        // Verify login activity was recorded in the database
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         $activity = $em->getRepository(Activity::class)->findOneBy([
             'user' => $user,
@@ -119,7 +110,6 @@ class LoginTest extends WebTestCase
     {
         $client = static::createClient();
 
-        // Login
         $crawler = $client->request('GET', '/en/login');
         $form = $crawler
             ->selectButton('Login')
@@ -130,7 +120,6 @@ class LoginTest extends WebTestCase
         $client->submit($form);
         $client->followRedirect();
 
-        // Access profile (with trailing slash)
         $client->request('GET', '/en/profile/');
         $this->assertResponseIsSuccessful();
     }
@@ -139,7 +128,6 @@ class LoginTest extends WebTestCase
     {
         $client = static::createClient();
 
-        // Login first
         $crawler = $client->request('GET', '/en/login');
         $form = $crawler
             ->selectButton('Login')
@@ -150,12 +138,10 @@ class LoginTest extends WebTestCase
         $client->submit($form);
         $client->followRedirect();
 
-        // Logout via POST with CSRF token (logout is POST-only for CSRF protection)
         $csrfToken = $client->getContainer()->get('security.csrf.token_manager')->getToken('logout')->getValue();
         $client->request('POST', '/en/logout', ['_token' => $csrfToken]);
         $this->assertResponseRedirects();
 
-        // Profile should now redirect to login
         $client->followRedirect();
         $client->request('GET', '/en/profile/');
         $this->assertResponseRedirects();

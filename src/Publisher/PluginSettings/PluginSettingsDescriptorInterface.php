@@ -6,13 +6,9 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\Form\FormInterface;
 
 /**
- * Scope-agnostic description of one plugin's settings surface: its form, its data
- * object, its neutral defaults. A plugin defines this once; core renders it at the
- * global scope and any override scope supplied by a scope provider renders the same
- * descriptor. Persistence is delegated to a store, so a descriptor never touches the
- * database.
- *
- * Implementations are auto-discovered via #[AutoconfigureTag].
+ * Scope-agnostic description of one plugin's settings surface: its form, its data object, its
+ * neutral defaults. Defined once, then rendered at the global scope and at any override scope.
+ * Persistence is delegated to a store, so a descriptor never touches the database.
  */
 #[AutoconfigureTag]
 interface PluginSettingsDescriptorInterface

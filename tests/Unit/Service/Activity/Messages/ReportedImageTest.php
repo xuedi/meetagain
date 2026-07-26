@@ -36,7 +36,6 @@ class ReportedImageTest extends TestCase
         $subject = new ReportedImage();
         $subject->injectServices($this->router, $this->imageService, $this->translator, $meta);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(ReportedImage::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());
@@ -55,7 +54,6 @@ class ReportedImageTest extends TestCase
         $subject = new ReportedImage();
         $subject->injectServices($this->router, $this->imageService, $this->translator, $meta);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(ReportedImage::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

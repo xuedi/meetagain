@@ -98,7 +98,6 @@ class TranslationScanCommand extends Command
 
     private function lineMentionsKey(string $line, string $key): bool
     {
-        // Only count lines that look like translation usage to reduce false positives.
         if (!str_contains($line, $key)) {
             return false;
         }

@@ -13,30 +13,11 @@ use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\RateLimiter\Reservation;
 
-/**
- * Single file housing all load-test bypass plumbing:
- *
- *   - {@see isActive()}        - the central decision (env + header check) used
- *                                 by SecurityService and BlockedSessionSubscriber
- *   - {@see RateLimiterFactory} - decorator wrapping form rate limiters
- *                                 (limiter.password_reset, .registration, .support)
- *   - {@see RequestRateLimiter} - decorator wrapping login_throttling
- *                                 (security.login_throttling.main.limiter)
- *
- * The two decorator classes are inner so they can share the `isActive` check
- * and the `accepted()` helper without anything else needing to know they
- * exist. They are wired via services.yaml.
- *
- * Bypass triggers when:
- *   - APP_ENV !== 'prod'
- *   - request carries `X-Loadtest-Bypass: 1`
- *
- * Both conditions must hold. In prod the header is silently ignored.
- */
 final class LoadtestBypass
 {
     public const string HEADER = 'X-Loadtest-Bypass';
 
+    // Both conditions must hold; in prod the header is silently ignored
     public static function isActive(?Request $request, string $environment): bool
     {
         if ($environment === 'prod') {
@@ -54,10 +35,6 @@ final class LoadtestBypass
     }
 }
 
-/**
- * Decorator for form-style rate limiters (limiter.password_reset, etc.).
- * Returns a no-op LimiterInterface when bypass is active.
- */
 final readonly class LoadtestBypassRateLimiterFactory implements RateLimiterFactoryInterface
 {
     public function __construct(
@@ -93,12 +70,6 @@ final readonly class LoadtestBypassRateLimiterFactory implements RateLimiterFact
     }
 }
 
-/**
- * Decorator for the request-bound login_throttling limiter
- * (security.login_throttling.main.limiter). Returns an accepted RateLimit
- * directly when bypass is active so login_throttling never trips for
- * synthetic load traffic.
- */
 final readonly class LoadtestBypassRequestRateLimiter implements RequestRateLimiterInterface
 {
     public function __construct(

@@ -8,13 +8,6 @@ use App\Repository\ItemTagAssignmentRepository;
 use Override;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Narrows an item list by the request's taxonomy facets: ?category=<id> is a single equality,
- * ?tag[]=<id> is AND (an item must carry every selected tag), and the two facets AND together.
- * This composes with the rest of the ItemFilterInterface chain by AND-intersection, so any external
- * visibility filter still applies. Returns null (no opinion) when no facet is present for the type,
- * or the type is not categorizable - staying inert on unfiltered lists and event-cell rendering.
- */
 final readonly class TaxonomyItemFilter implements ItemFilterInterface
 {
     public function __construct(

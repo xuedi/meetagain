@@ -21,13 +21,13 @@ class NotFoundProviderTest extends TestCase
         $repo = $this->createStub(NotFoundLogRepository::class);
         $provider = new NotFoundProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
 
-        // Act - hammer the same /api/foo path many times
+        // Act
         $report = null;
         for ($i = 0; $i < 50; ++$i) {
             $report = $provider->observe(SecurityEventType::NotFound, Request::create('/api/foo'), [], 'sess', '1.2.3.4');
         }
 
-        // Assert - lenient: never blocks
+        // Assert
         static::assertNotNull($report);
         static::assertSame(SecurityRecommendation::Handled, $report->recommendation);
     }
@@ -39,7 +39,7 @@ class NotFoundProviderTest extends TestCase
         $repo = $this->createStub(NotFoundLogRepository::class);
         $provider = new NotFoundProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
 
-        // Act - 30 distinct probe URLs (no api/ prefix)
+        // Act
         $report = null;
         for ($i = 0; $i < 30; ++$i) {
             $report = $provider->observe(SecurityEventType::NotFound, Request::create('/random-path-' . $i), [], 'sess', '1.2.3.4');
@@ -58,7 +58,7 @@ class NotFoundProviderTest extends TestCase
         $repo = $this->createStub(NotFoundLogRepository::class);
         $provider = new NotFoundProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
 
-        // Act - probing /.env adds the suspicious-pattern boost
+        // Act
         $reportSuspicious = $provider->observe(SecurityEventType::NotFound, Request::create('/.env'), [], 'sess-a', '1.1.1.1');
         $reportPlain = $provider->observe(SecurityEventType::NotFound, Request::create('/whatever'), [], 'sess-b', '2.2.2.2');
 
@@ -73,13 +73,13 @@ class NotFoundProviderTest extends TestCase
         $repo = $this->createStub(NotFoundLogRepository::class);
         $provider = new NotFoundProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
 
-        // Act - 40 distinct asset 404s (stale browser cache after a redeploy)
+        // Act
         $report = null;
         for ($i = 0; $i < 40; ++$i) {
             $report = $provider->observe(SecurityEventType::NotFound, Request::create('/assets/app-staleHash' . $i . '.js'), [], 'sess', '1.2.3.4');
         }
 
-        // Assert - 40 asset 404s = 40/300 * 100 ≈ 13 threat, well below block threshold
+        // Assert
         static::assertNotNull($report);
         static::assertSame(SecurityRecommendation::Handled, $report->recommendation);
         static::assertLessThan(100, $report->threatLevel);
@@ -92,7 +92,7 @@ class NotFoundProviderTest extends TestCase
         $repo = $this->createStub(NotFoundLogRepository::class);
         $provider = new NotFoundProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
 
-        // Act - scanner hammering /assets/* at scale
+        // Act
         $report = null;
         for ($i = 0; $i < 300; ++$i) {
             $report = $provider->observe(SecurityEventType::NotFound, Request::create('/assets/scan-' . $i . '.js'), [], 'sess', '1.2.3.4');
@@ -111,7 +111,7 @@ class NotFoundProviderTest extends TestCase
         $repo = $this->createStub(NotFoundLogRepository::class);
         $provider = new NotFoundProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
 
-        // Act - 15 regular probes (50 threat) + 150 asset 404s (50 threat) = 100, blocks
+        // Act
         $report = null;
         for ($i = 0; $i < 15; ++$i) {
             $report = $provider->observe(SecurityEventType::NotFound, Request::create('/probe-' . $i), [], 'sess', '1.2.3.4');

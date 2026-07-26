@@ -38,7 +38,6 @@ class EventsPageTest extends WebTestCase
         $crawler = $client->request('GET', '/en/events');
         $this->assertResponseIsSuccessful();
 
-        // Submit filter form if it exists
         $forms = $crawler->filter('form');
         if ($forms->count() > 0) {
             $form = $forms->first()->form();
@@ -51,7 +50,6 @@ class EventsPageTest extends WebTestCase
     {
         $client = static::createClient();
 
-        // Event ID 1 should exist from fixtures
         $crawler = $client->request('GET', '/en/event/1');
 
         $this->assertResponseIsSuccessful();
@@ -130,7 +128,6 @@ class EventsPageTest extends WebTestCase
         $crawler = $client->request('GET', '/en/event/1');
         $this->assertResponseIsSuccessful();
 
-        // Verify comment form exists for logged-in users
         $this->assertSelectorExists('form', 'Comment form should exist for logged in users');
         $this->assertSelectorExists('textarea', 'Comment textarea should exist');
     }
@@ -141,7 +138,6 @@ class EventsPageTest extends WebTestCase
 
         $client->request('GET', '/en/event/99999');
 
-        // Event not found should result in error (404 or 500 if null check fails)
         static::assertTrue($client->getResponse()->getStatusCode() >= 400, 'Non-existent event should return error status');
     }
 

@@ -24,7 +24,6 @@ final readonly class SettingsDescriptor implements PluginSettingsDescriptorInter
         return 'films';
     }
 
-    /** The API keys live in a SecretBox-encrypted entity with a global-only store. */
     public function isScopable(): bool
     {
         return false;

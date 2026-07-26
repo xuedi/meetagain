@@ -30,7 +30,6 @@ class RegisteredTest extends TestCase
         $subject = new Registered();
         $subject->injectServices($this->router, $this->imageService, $this->translator);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(Registered::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

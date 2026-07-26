@@ -31,7 +31,6 @@ class ConfigServiceTest extends TestCase
         $this->entityManagerStub = $this->createStub(EntityManagerInterface::class);
         $this->cacheStub = $this->createStub(CacheInterface::class);
         $this->kernelStub = $this->createStub(KernelInterface::class);
-        // Always simulate a cache miss so the callback (and thus the repo) is exercised
         $this->cacheStub->method('get')->willReturnCallback(fn(string $key, callable $callback): mixed => $callback($this->createStub(ItemInterface::class)));
         $this->subject = new ConfigService(
             repo: $this->configRepoStub,
@@ -217,8 +216,6 @@ class ConfigServiceTest extends TestCase
         ]);
     }
 
-    // ---- boolean getters: default, on, off ----
-
     #[DataProvider('booleanGetterProvider')]
     public function testBooleanGetters(string $method, ?string $configValue, bool $expected): void
     {
@@ -241,12 +238,10 @@ class ConfigServiceTest extends TestCase
         yield 'isEmailDeliverySyncEnabled enabled' => ['isEmailDeliverySyncEnabled', 'true', true];
     }
 
-    // ---- getSeoDescription ----
-
     #[DataProvider('seoDescriptionProvider')]
     public function testGetSeoDescription(string $context, string $configKey, string $storedValue, string $expected): void
     {
-        // Arrange: only return a value when the correct config key is queried
+        // Arrange
         $this->configRepoStub->method('findOneBy')->willReturnCallback(static fn(array $c) => $c['name'] === $configKey
             ? new Config()->setValue($storedValue)
             : null);
@@ -284,8 +279,6 @@ class ConfigServiceTest extends TestCase
         yield 'events context with no config returns empty string' => ['events', 'nonexistent', 'anything', ''];
     }
 
-    // ---- getDateFormat / getDateFormatFlatpickr ----
-
     public function testGetDateFormatReturnsDefaultWhenNotConfigured(): void
     {
         // Arrange
@@ -306,27 +299,25 @@ class ConfigServiceTest extends TestCase
 
     public function testGetDateFormatFlatpickrConvertsAmPmToken(): void
     {
-        // Arrange: date format contains 'A' (AM/PM token)
+        // Arrange
         $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('Y-m-d h:i A'));
 
-        // Act & Assert: 'A' must be replaced with 'K' for Flatpickr
+        // Act & Assert
         static::assertSame('Y-m-d h:i K', $this->subject->getDateFormatFlatpickr());
     }
 
     public function testGetDateFormatFlatpickrWithDefaultFormatIsUnchanged(): void
     {
-        // Arrange: default format has no 'A'
+        // Arrange
         $this->configRepoStub->method('findOneBy')->willReturn(null);
 
         // Act & Assert
         static::assertSame('Y-m-d H:i', $this->subject->getDateFormatFlatpickr());
     }
 
-    // ---- getFooterColumnTitle ----
-
     public function testGetFooterColumnTitleReturnsConfiguredValue(): void
     {
-        // Arrange — footer titles are stored in AppStateService, not the config repo
+        // Arrange
         $appStateStub = $this->createStub(AppStateService::class);
         $appStateStub->method('get')->willReturn('News');
 
@@ -345,7 +336,7 @@ class ConfigServiceTest extends TestCase
 
     public function testGetFooterColumnTitleReturnsEmptyStringWhenNotConfigured(): void
     {
-        // Arrange — AppStateService returns null when not set
+        // Arrange
         $appStateStub = $this->createStub(AppStateService::class);
         $appStateStub->method('get')->willReturn(null);
 
@@ -361,8 +352,6 @@ class ConfigServiceTest extends TestCase
         // Act & Assert
         static::assertSame('', $subject->getFooterColumnTitle('col2'));
     }
-
-    // ---- toggleBoolean ----
 
     public function testToggleBooleanFromTrueSetsFalseAndReturnsFalse(): void
     {
@@ -450,11 +439,9 @@ class ConfigServiceTest extends TestCase
         $subject->toggleBoolean('nonexistent');
     }
 
-    // ---- saveSeoForm ----
-
     public function testSaveSeoFormPersistsEveryField(): void
     {
-        // Arrange: no existing configs
+        // Arrange
         $repoStub = $this->createStub(ConfigRepository::class);
         $repoStub->method('findOneBy')->willReturn(null);
 
@@ -478,14 +465,12 @@ class ConfigServiceTest extends TestCase
             'seoDescriptionMembers' => 'Members',
         ]);
 
-        // Assert: verified by mock expectations above
+        // Assert
     }
-
-    // ---- saveEventCanonicalForm ----
 
     public function testSaveEventCanonicalFormPersistsTheThreshold(): void
     {
-        // Arrange: no existing configs
+        // Arrange
         $repoStub = $this->createStub(ConfigRepository::class);
         $repoStub->method('findOneBy')->willReturn(null);
 
@@ -505,10 +490,8 @@ class ConfigServiceTest extends TestCase
         // Act
         $subject->saveEventCanonicalForm(['eventCanonicalThreshold' => 25]);
 
-        // Assert: verified by mock expectations above
+        // Assert
     }
-
-    // ---- getInt / setString / setInt ----
 
     public function testGetIntReturnsDefaultWhenNotConfigured(): void
     {
@@ -583,7 +566,7 @@ class ConfigServiceTest extends TestCase
         // Act
         $subject->setString('existing_key', 'new_value');
 
-        // Assert: the existing entity has the new value
+        // Assert
         static::assertSame('new_value', $existing->getValue());
     }
 
@@ -642,11 +625,9 @@ class ConfigServiceTest extends TestCase
         // Act
         $subject->setInt('count_key', 99);
 
-        // Assert: value stored as string
+        // Assert
         static::assertSame('99', $existing->getValue());
     }
-
-    // ---- getBooleanConfigs ----
 
     public function testGetBooleanConfigsDelegatesToRepo(): void
     {

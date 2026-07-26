@@ -9,11 +9,6 @@ use App\Enum\Weekday;
 use App\ValueObject\RecurrenceBuilderState;
 use App\ValueObject\RecurrencePattern;
 
-/**
- * The single authority on which builder selections are legal. Everything it returns is
- * constructible into a RecurrencePattern, so an inconsistent selection is corrected here
- * rather than rejected at the edge or second-guessed in the browser.
- */
 final readonly class RecurrenceBuilderStateResolver
 {
     private const int DEFAULT_DAY_OF_MONTH = 1;

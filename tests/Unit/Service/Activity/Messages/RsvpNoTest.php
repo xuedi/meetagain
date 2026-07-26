@@ -39,7 +39,6 @@ class RsvpNoTest extends TestCase
         $subject = new RsvpNo();
         $subject->injectServices($router, $this->imageService, $this->translator, $meta, [], $eventNames);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(RsvpNo::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

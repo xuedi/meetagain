@@ -51,7 +51,7 @@ class ImageReportReasonTest extends TestCase
         // Act
         $list = ImageReportReason::getTranslatedList($translator);
 
-        // Assert - keyed by enum value (int), value is the translation key
+        // Assert
         static::assertSame('report.reason_privacy', $list[ImageReportReason::Privacy->value]);
         static::assertSame('report.reason_copyright', $list[ImageReportReason::Copyright->value]);
         static::assertSame('report.reason_inappropriate', $list[ImageReportReason::Inappropriate->value]);

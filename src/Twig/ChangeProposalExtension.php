@@ -7,10 +7,6 @@ use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-/**
- * Twig bridge for change proposals: the pending-proposal count for one target, so templates can
- * badge their surfaces without injecting core services into cell providers.
- */
 final class ChangeProposalExtension extends AbstractExtension
 {
     public function __construct(

@@ -9,12 +9,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * One taxonomy definition row (category or tag): a hidden stable id plus one label field per
- * enabled admin language, so every locale's label is editable at once behind the shared language
- * toggle. Array-shaped (data_class null) like glossary's former CategoryType, so the proven
- * CollectionType add/delete mechanics carry over.
- */
 class TaxonomyDefinitionType extends AbstractType
 {
     public function __construct(

@@ -59,7 +59,7 @@ final class SeoAreaTest extends WebTestCase
         // Act
         $crawler = $client->request('GET', $path);
 
-        // Assert: whichever tab is open, the strip is the same four and exactly one is current.
+        // Assert
         $tabs = $crawler->filter('.tabs li');
         self::assertSame(4, $tabs->count());
         self::assertSame(1, $crawler->filter('.tabs li.is-active')->count());

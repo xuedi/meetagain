@@ -9,10 +9,6 @@ use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-/**
- * Twig bridge for the shared item-list component: the current per-type view mode, the
- * available modes, and each item's provider-rendered list cell.
- */
 final class ItemViewExtension extends AbstractExtension
 {
     public function __construct(

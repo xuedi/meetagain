@@ -9,11 +9,6 @@ use Override;
 use Plugin\Dishes\Service\DishService;
 use Twig\Environment;
 
-/**
- * Registers the 'dish' item type with the core item seams: event attachment plus the shared list
- * cell. The event-detail cell surfaces the association's sectionLabel (the former dinner-course
- * name), so an event's dish associations - ordered by position - read as a menu grouped by course.
- */
 final readonly class DishItemTypeProvider implements ItemTypeProviderInterface, ListCellProviderInterface
 {
     public function __construct(

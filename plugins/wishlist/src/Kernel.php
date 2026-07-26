@@ -41,8 +41,6 @@ class Kernel implements Plugin
 
     public function loadPostExtendFixtures(OutputInterface $output): void
     {
-        // Wishlist is item-agnostic: seed a backlog over whichever item type has the most
-        // events-attached items, read from the neutral core association table.
         [$itemType, $itemIds] = $this->richestSeededItemType();
         if ($itemIds === []) {
             $output->writeln('<comment>Wishlist: no seeded items to add, skipping.</comment>');
@@ -65,7 +63,6 @@ class Kernel implements Plugin
 
         $count = 0;
         foreach ($userIds as $offset => $userId) {
-            // Each member wants a rotating window of items, so wanter counts differ per item.
             for ($n = 0; $n < 3; $n++) {
                 $itemId = $itemIds[($offset + $n) % count($itemIds)];
                 $this->wishlistService->add($itemType, $itemId, $userId);

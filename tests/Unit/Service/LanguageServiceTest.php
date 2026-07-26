@@ -92,7 +92,7 @@ class LanguageServiceTest extends TestCase
         $this->appCache->method('delete')->willThrowException(new class extends Exception implements InvalidArgumentException {});
 
         $this->service->invalidateCache();
-        static::assertTrue(true); // Should not throw
+        static::assertTrue(true);
     }
 
     public function testGetLocaleRegexPattern(): void
@@ -135,11 +135,9 @@ class LanguageServiceTest extends TestCase
         static::assertSame($lang, $this->service->findByCode('en'));
     }
 
-    // --- getFilteredEnabledCodes ---
-
     public function testGetFilteredEnabledCodesReturnsAllWhenNoActiveFilter(): void
     {
-        // Arrange - Filter returns noFilter() (no active filter)
+        // Arrange
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de', 'zh']);
@@ -150,13 +148,13 @@ class LanguageServiceTest extends TestCase
         // Act
         $result = $this->service->getFilteredEnabledCodes();
 
-        // Assert - All enabled codes returned when no filter active
+        // Assert
         static::assertEquals(['en', 'de', 'zh'], $result);
     }
 
     public function testGetFilteredEnabledCodesReturnsIntersectionWithFilter(): void
     {
-        // Arrange - Filter restricts to ['en', 'de'], enabled codes are ['en', 'de', 'zh']
+        // Arrange
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de', 'zh']);
@@ -167,13 +165,13 @@ class LanguageServiceTest extends TestCase
         // Act
         $result = $this->service->getFilteredEnabledCodes();
 
-        // Assert - Only codes in both filter result and enabled set are returned
+        // Assert
         static::assertEquals(['en', 'de'], $result);
     }
 
     public function testGetFilteredEnabledCodesFallbackWhenFilterReturnsEmptyResult(): void
     {
-        // Arrange - Filter returns emptyResult() (hasActiveFilter=true but codes=[])
+        // Arrange
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
@@ -184,13 +182,13 @@ class LanguageServiceTest extends TestCase
         // Act
         $result = $this->service->getFilteredEnabledCodes();
 
-        // Assert - Safety fallback: never show zero language tabs
+        // Assert
         static::assertEquals(['en', 'de'], $result);
     }
 
     public function testGetFilteredEnabledCodesFallbackWhenFilterCodesAreNull(): void
     {
-        // Arrange - Filter is active but returns null codes (hasActiveFilter=true, codes=null)
+        // Arrange
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
@@ -201,13 +199,13 @@ class LanguageServiceTest extends TestCase
         // Act
         $result = $this->service->getFilteredEnabledCodes();
 
-        // Assert - Safety fallback: null codes with active filter still returns all enabled
+        // Assert
         static::assertEquals(['en', 'de'], $result);
     }
 
     public function testGetFilteredEnabledCodesFallbackWhenIntersectionIsEmpty(): void
     {
-        // Arrange - Filter returns ['fr'] but enabled codes are ['en', 'de'] — no overlap
+        // Arrange
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
@@ -218,15 +216,13 @@ class LanguageServiceTest extends TestCase
         // Act
         $result = $this->service->getFilteredEnabledCodes();
 
-        // Assert - Safety fallback: empty intersection returns all enabled codes
+        // Assert
         static::assertEquals(['en', 'de'], $result);
     }
 
-    // --- getAdminFilteredEnabledCodes ---
-
     public function testGetAdminFilteredEnabledCodesReturnsAllWhenNoActiveFilter(): void
     {
-        // Arrange - Admin filter returns noFilter()
+        // Arrange
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de', 'zh']);
@@ -237,13 +233,13 @@ class LanguageServiceTest extends TestCase
         // Act
         $result = $this->service->getAdminFilteredEnabledCodes();
 
-        // Assert - All enabled codes returned when no filter active
+        // Assert
         static::assertEquals(['en', 'de', 'zh'], $result);
     }
 
     public function testGetAdminFilteredEnabledCodesReturnsIntersection(): void
     {
-        // Arrange - Admin filter restricts to ['en'] only
+        // Arrange
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de', 'zh']);
@@ -260,7 +256,7 @@ class LanguageServiceTest extends TestCase
 
     public function testGetAdminFilteredEnabledCodesFallbackWhenEmptyResult(): void
     {
-        // Arrange - Admin filter returns emptyResult()
+        // Arrange
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
@@ -271,13 +267,13 @@ class LanguageServiceTest extends TestCase
         // Act
         $result = $this->service->getAdminFilteredEnabledCodes();
 
-        // Assert - Safety fallback: empty result never breaks admin interface
+        // Assert
         static::assertEquals(['en', 'de'], $result);
     }
 
     public function testGetAdminFilteredEnabledCodesFallbackWhenIntersectionEmpty(): void
     {
-        // Arrange - Admin filter returns ['fr'] but enabled codes are ['en', 'de'] — no overlap
+        // Arrange
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'de']);
@@ -288,11 +284,9 @@ class LanguageServiceTest extends TestCase
         // Act
         $result = $this->service->getAdminFilteredEnabledCodes();
 
-        // Assert - Safety fallback: empty intersection returns all enabled codes
+        // Assert
         static::assertEquals(['en', 'de'], $result);
     }
-
-    // --- getAltLangList ---
 
     public function testGetAltLangListReturnsAlternativesExcludingCurrentLocale(): void
     {
@@ -315,7 +309,7 @@ class LanguageServiceTest extends TestCase
 
     public function testGetAltLangListWithZhLocaleReplacesCorrectly(): void
     {
-        // Arrange — zh locale after DB rename: zh is a first-class code with no mapping needed
+        // Arrange
         $this->appCache = $this->createStub(TagAwareCacheInterface::class);
         $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'zh']);
@@ -326,7 +320,7 @@ class LanguageServiceTest extends TestCase
         // Act
         $result = $this->service->getAltLangList('zh', '/zh/events');
 
-        // Assert — current locale excluded; en alternative URL uses en prefix
+        // Assert
         static::assertArrayNotHasKey('zh', $result);
         static::assertSame('/en/events', $result['en']);
     }
@@ -347,8 +341,6 @@ class LanguageServiceTest extends TestCase
         // Assert
         static::assertSame([], $result);
     }
-
-    // --- replaceUriLanguageCode ---
 
     public function testReplaceUriLanguageCodeSwapsLocaleInPath(): void
     {
@@ -383,7 +375,7 @@ class LanguageServiceTest extends TestCase
         $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'zh']);
         $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
 
-        // Act & Assert — URI without a known locale prefix is returned unchanged
+        // Act & Assert
         static::assertSame('/some/path', $this->service->replaceUriLanguageCode('/some/path', 'zh'));
     }
 }

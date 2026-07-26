@@ -8,11 +8,6 @@ use App\Security\Permission\PermissionContext;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 
-/**
- * Decides domain-neutral admin attributes by enforcing a role floor.
- * Platform admins always allowed. ROLE_ORGANIZER required for event/cms/member/host/location
- * actions; ROLE_ADMIN required for system/email/elevated member actions.
- */
 final class AdminRolePermissionChecker implements PermissionCheckerInterface
 {
     private const array ORGANIZER_ATTRIBUTES = [

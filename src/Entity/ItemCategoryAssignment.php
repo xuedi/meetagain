@@ -5,12 +5,6 @@ namespace App\Entity;
 use App\Repository\ItemCategoryAssignmentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * The single category assigned to one item. itemType is a registry key and itemId is a plain INT
- * (no FK to any plugin entity, mirroring EventItemAssociation); categoryId references a definition
- * id living in the plugin Config JSON, so it is a plain INT too. Unique per (itemType, itemId) -
- * an item carries at most one category.
- */
 #[ORM\Entity(repositoryClass: ItemCategoryAssignmentRepository::class)]
 #[ORM\Table(name: 'item_category_assignment')]
 #[ORM\UniqueConstraint(name: 'uniq_item_category', columns: ['item_type', 'item_id'])]

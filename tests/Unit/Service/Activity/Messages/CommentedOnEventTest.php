@@ -18,7 +18,7 @@ class CommentedOnEventTest extends TestCase
 
     public function setUp(): void
     {
-        // Arrange (shared stubs)
+        // Arrange
         $this->router = $this->createStub(RouterInterface::class);
         $this->imageService = $this->createStub(ImageHtmlRenderer::class);
         $this->translator = new IdentityTranslator();

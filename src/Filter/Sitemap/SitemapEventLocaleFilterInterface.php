@@ -5,15 +5,8 @@ namespace App\Filter\Sitemap;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Hook for restricting which locale URLs are emitted per event in the sitemap.
- *
- * The default core behavior is to emit every enabled locale for every event.
- * Plugins may implement this interface to limit specific events to a subset of
- * locales, preventing sitemap entries that would result in 404 responses.
- *
- * Return null to signal no restriction (all locales pass through).
- * Return a map of eventId => string[] to restrict specific events.
- * Events absent from the map are not restricted.
+ * Narrows the locale URLs emitted per event in the sitemap; unlisted events keep every
+ * enabled locale.
  */
 #[AutoconfigureTag]
 interface SitemapEventLocaleFilterInterface

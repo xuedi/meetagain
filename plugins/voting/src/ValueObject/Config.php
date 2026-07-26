@@ -5,11 +5,6 @@ namespace Plugin\Voting\ValueObject;
 use App\Publisher\PluginSettings\PluginSettingsData;
 use Plugin\Voting\Enum\ChoiceMode;
 
-/**
- * Effective voting behaviour: how many days a new poll runs by default and whether voters
- * may approve several candidates or exactly one. The neutral default is a 7-day poll with
- * multiple (approval) voting.
- */
 final class Config implements PluginSettingsData
 {
     private int $defaultDurationDays = 7;

@@ -4,10 +4,6 @@ namespace App\Filter\Attribution;
 
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composes all registered ImageAttributionFilterInterface implementations with AND
- * (intersection) logic to produce the set of image IDs visible in the current context.
- */
 readonly class ImageAttributionFilterService
 {
     /**

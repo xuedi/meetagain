@@ -43,7 +43,6 @@ class MessageFactoryTest extends TestCase
 
     public function testBuildReturnsCorrectMessage(): void
     {
-        // Configure mocks
         $activityType = 'core.login';
         $meta = ['key' => 'value'];
         $userNames = ['userNames'];
@@ -61,7 +60,6 @@ class MessageFactoryTest extends TestCase
         $this->userRepository->method('getUserNameList')->willReturn($userNames);
         $this->eventRepository->method('getEventNameList')->willReturn($eventNames);
 
-        // Create factory with mocked messages
         $factory = new MessageFactory(
             $this->messages,
             $this->router,
@@ -72,23 +70,20 @@ class MessageFactoryTest extends TestCase
             $this->translator,
         );
 
-        // Call the method under test
         $result = $factory->build($this->activity);
 
-        // Assert the result
+        // Assert
         static::assertSame($this->message, $result);
     }
 
     public function testBuildReturnsUnknownActivityMessageWhenNoMatchingMessage(): void
     {
-        // Configure mocks
         $activityType = 'core.login';
         $differentType = 'core.changed_username';
 
         $this->activity->method('getType')->willReturn($activityType);
         $this->message->method('getType')->willReturn($differentType);
 
-        // Create factory with mocked messages
         $factory = new MessageFactory(
             $this->messages,
             $this->router,
@@ -99,10 +94,9 @@ class MessageFactoryTest extends TestCase
             $this->translator,
         );
 
-        // Call the method under test
         $result = $factory->build($this->activity);
 
-        // Assert an UnknownActivityMessage is returned instead of throwing
+        // Assert
         static::assertInstanceOf(UnknownActivityMessage::class, $result);
     }
 }

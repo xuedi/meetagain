@@ -13,14 +13,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-/**
- * Existing fixture events are reused as series members rather than freshly created ones:
- * only events that already carry their plugin-side ownership mapping are reachable on the
- * public event page. These cases use the Go-club events, which share one single-language owner.
- *
- * Hreflang needs an owner publishing in two languages and no core fixture has one, so those cases
- * cannot live here - they belong to whichever plugin ships such a fixture.
- */
 class EventCanonicalTest extends WebTestCase
 {
     private const string SERIES_ROOT_TITLE = EventFixture::WEEKLY_GO_STUDY;

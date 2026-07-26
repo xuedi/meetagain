@@ -8,10 +8,7 @@ use App\Enum\ImageType;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Describes everything the application needs to know about one image type: its identity, the
- * thumbnail sizes and fit mode it renders, how its usages are discovered and synced, and how a
- * single usage is linked and labelled in the admin.
- *
+ * Describes one image type: thumbnail sizes, fit mode, usage discovery, and admin labelling.
  * Exactly one definition handles each ImageType; the type doubles as the location discriminator.
  */
 #[AutoconfigureTag]

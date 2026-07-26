@@ -72,7 +72,6 @@ class ActivityRepository extends ServiceEntityRepository
     {
         $em = $this->getEntityManager();
 
-        // Get RSVP event IDs with a single query instead of lazy-loading collection
         $events = $em
             ->createQueryBuilder()
             ->select('e.id')
@@ -83,7 +82,6 @@ class ActivityRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleColumnResult();
 
-        // Get following user IDs with a single query instead of lazy-loading collection
         $following = $em
             ->createQueryBuilder()
             ->select('f.id')
@@ -94,7 +92,6 @@ class ActivityRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleColumnResult();
 
-        // Get all activities of the wanted types with user eager-loaded
         $userActivities = $this
             ->createQueryBuilder('a')
             ->leftJoin('a.user', 'u')
@@ -137,7 +134,6 @@ class ActivityRepository extends ServiceEntityRepository
 
                 case BlockedUser::TYPE:
                 case UnblockedUser::TYPE:
-                    // Only visible to the user themselves (self-only visibility)
                     if ($user->getId() === $activityUserId) {
                         $activityIds[] = $userActivity->getId();
                     }
@@ -150,7 +146,6 @@ class ActivityRepository extends ServiceEntityRepository
                     break;
 
                 case FollowedUser::TYPE:
-                    // Visible to the target user (the user being followed - "X started following you")
                     $targetUserId = $userActivity->getMeta()['user_id'] ?? null;
                     if ($user->getId() === $targetUserId) {
                         $activityIds[] = $userActivity->getId();
@@ -177,8 +172,6 @@ class ActivityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get RSVP statistics for a time period.
-     *
      * @param array<int>|null $restrictToUserIds
      * @return array{yes: int, no: int, total: int}
      */
@@ -199,8 +192,6 @@ class ActivityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get login activity trend for dashboard.
-     *
      * @param array<int>|null $restrictToUserIds
      * @return array<string, int> Day name => login count
      */
@@ -238,8 +229,6 @@ class ActivityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Yes-RSVPs per day-of-week label (Monday..Sunday) for the week-bar chart.
-     *
      * @param array<int>|null $restrictToUserIds
      * @return array<string, int>
      */
@@ -277,8 +266,6 @@ class ActivityRepository extends ServiceEntityRepository
     }
 
     /**
-     * Daily counts of logins, RSVPs (yes+no), and new members for the multi-series chart.
-     *
      * @param array<int>|null $restrictToUserIds
      * @return array{labels: list<string>, logins: list<int>, rsvps: list<int>, newMembers: list<int>}
      */
@@ -304,7 +291,6 @@ class ActivityRepository extends ServiceEntityRepository
 
         $logins = $this->countByDay(Login::TYPE, $start, $end, $restrictToUserIds, $emptyByDay);
 
-        // RSVPs combined (yes + no)
         $yes = $this->countByDay(RsvpYes::TYPE, $start, $end, $restrictToUserIds, $emptyByDay);
         $no = $this->countByDay(RsvpNo::TYPE, $start, $end, $restrictToUserIds, $emptyByDay);
         $rsvps = $emptyByDay;

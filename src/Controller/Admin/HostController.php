@@ -114,9 +114,6 @@ final class HostController extends AbstractController implements AdminNavigation
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        // Safe to delete regardless of events: the event_host join table has ON DELETE CASCADE,
-        // and Event has no direct FK to Host, so events stay intact and just lose this host
-        // from their host collection.
         $hostId = $host->getId();
         $entityManager->remove($host);
         $entityManager->flush();

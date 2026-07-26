@@ -19,7 +19,7 @@ class AbstractSecurityProviderTest extends TestCase
 {
     public function testReadOnlyShortCircuitsBeforeProcessEvent(): void
     {
-        // Arrange - provider with processEvent stub that throws if invoked
+        // Arrange
         $provider = new FakeSecurityProvider(new ArrayAdapter(), new NullLogger());
         $provider->processEventShouldFail = true;
 
@@ -33,7 +33,7 @@ class AbstractSecurityProviderTest extends TestCase
 
     public function testHandlesTypeFilterPreventsProcessing(): void
     {
-        // Arrange - fake says it does not handle the type
+        // Arrange
         $provider = new FakeSecurityProvider(new ArrayAdapter(), new NullLogger());
         $provider->handles = false;
         $provider->processEventShouldFail = true;
@@ -41,7 +41,7 @@ class AbstractSecurityProviderTest extends TestCase
         // Act
         $report = $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], 'sess', '1.2.3.4');
 
-        // Assert - returns baseline report without invoking processEvent
+        // Assert
         static::assertSame(SecurityRecommendation::Handled, $report->recommendation);
     }
 
@@ -60,7 +60,7 @@ class AbstractSecurityProviderTest extends TestCase
         // Act
         $report = $provider->observe(SecurityEventType::NotFound, Request::create('/foo'), [], 'sess', '1.2.3.4');
 
-        // Assert - report carries fresh values
+        // Assert
         static::assertSame(50, $report->threatLevel);
         static::assertSame('noted', $report->summary);
         static::assertSame(SecurityRecommendation::Handled, $report->recommendation);
@@ -70,7 +70,7 @@ class AbstractSecurityProviderTest extends TestCase
 
     public function testAlreadyBlockedStateSkipsReprocessing(): void
     {
-        // Arrange - prime the cache with a Block recommendation
+        // Arrange
         $cache = new ArrayAdapter();
         $provider = new FakeSecurityProvider($cache, new NullLogger());
         $provider->nextResult = [
@@ -79,16 +79,14 @@ class AbstractSecurityProviderTest extends TestCase
             'summary' => 'blocked!',
             'details' => [],
         ];
-        // First call: writes Block to state
         $provider->observe(SecurityEventType::NotFound, Request::create('/foo'), [], 'sess', '1.2.3.4');
 
-        // Now flip processEvent to a tripwire and call again
         $provider->processEventShouldFail = true;
 
-        // Act - second observe must short-circuit
+        // Act
         $report = $provider->observe(SecurityEventType::NotFound, Request::create('/foo'), [], 'sess', '1.2.3.4');
 
-        // Assert - replays cached state
+        // Assert
         static::assertSame(100, $report->threatLevel);
         static::assertSame('blocked!', $report->summary);
     }
@@ -132,7 +130,7 @@ class AbstractSecurityProviderTest extends TestCase
 
     public function testLoadStateReturnsEmptyArrayOnCacheException(): void
     {
-        // Arrange - cache pool that throws on getItem
+        // Arrange
         $cache = $this->createStub(CacheItemPoolInterface::class);
         $cache->method('getItem')->willThrowException(new RuntimeException('cache broken'));
 
@@ -144,7 +142,7 @@ class AbstractSecurityProviderTest extends TestCase
             'details' => [],
         ];
 
-        // Act - loadState swallows, processEvent runs anyway
+        // Act
         $report = $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], 'sess', '1.2.3.4');
 
         // Assert
@@ -155,7 +153,7 @@ class AbstractSecurityProviderTest extends TestCase
 
     public function testClearAllStateRemovesIndexedKeys(): void
     {
-        // Arrange - populate state for two keys
+        // Arrange
         $cache = new ArrayAdapter();
         $provider = new FakeSecurityProvider($cache, new NullLogger());
         $provider->nextResult = [
@@ -168,13 +166,12 @@ class AbstractSecurityProviderTest extends TestCase
             $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], $sess, '1.2.3.4');
         }
 
-        // Sanity: state keys exist
         static::assertTrue($cache->getItem('security_provider_fake_sess-a')->isHit());
 
         // Act
         $provider->clearAllState();
 
-        // Assert - both state entries plus the index are gone
+        // Assert
         static::assertFalse($cache->getItem('security_provider_fake_sess-a')->isHit());
         static::assertFalse($cache->getItem('security_provider_fake_sess-b')->isHit());
         static::assertFalse($cache->getItem('security_provider_state_index_fake')->isHit());
@@ -182,7 +179,7 @@ class AbstractSecurityProviderTest extends TestCase
 
     public function testClearAllStateSwallowsCacheErrors(): void
     {
-        // Arrange - cache pool that throws on deleteItem
+        // Arrange
         $cache = $this->createStub(CacheItemPoolInterface::class);
         $item = $this->createStub(CacheItemInterface::class);
         $item->method('isHit')->willReturn(false);
@@ -191,14 +188,14 @@ class AbstractSecurityProviderTest extends TestCase
 
         $provider = new FakeSecurityProvider($cache, new NullLogger());
 
-        // Act / Assert - no exception escapes
+        // Act / Assert
         $provider->clearAllState();
         static::assertTrue(true);
     }
 
     public function testCacheKeySanitisesUnsafeStateKey(): void
     {
-        // Arrange - state key with characters that should be sanitised to underscores
+        // Arrange
         $cache = new ArrayAdapter();
         $provider = new FakeSecurityProvider($cache, new NullLogger());
         $provider->nextResult = [
@@ -208,17 +205,14 @@ class AbstractSecurityProviderTest extends TestCase
             'details' => [],
         ];
 
-        // Act - use a session id with slashes and colons
+        // Act
         $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], 'weird:session/key', '1.2.3.4');
 
-        // Assert - sanitised key was written
+        // Assert
         static::assertTrue($cache->getItem('security_provider_fake_weird_session_key')->isHit());
     }
 }
 
-/**
- * Concrete fake exposing the protected hooks so the abstract behaviour is exercisable.
- */
 class FakeSecurityProvider extends AbstractSecurityProvider
 {
     public bool $handles = true;

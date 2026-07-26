@@ -25,7 +25,7 @@ class EventEditNotificationBoxTest extends WebTestCase
         // Act
         $crawler = $client->request('GET', '/en/admin/events/' . $event->getId() . '/edit');
 
-        // Assert: Berlin tournament has admin as creator + 3 non-creator RSVPs (ADEM, CRYSTAL, ALISA)
+        // Assert
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('div.notification.is-info', '3');
         $this->assertSelectorTextContains('div.notification.is-info', 'decided to attend');
@@ -42,7 +42,6 @@ class EventEditNotificationBoxTest extends WebTestCase
         $client = static::createClient();
         $em = $client->getContainer()->get(EntityManagerInterface::class);
 
-        // Flip every non-creator RSVP's attendedEventUpdate toggle off
         $event = $this->getEventByTitle($client, EventFixture::BERLIN_TOURNAMENT);
         $creatorId = $event->getUser()?->getId();
         $changed = [];
@@ -75,7 +74,6 @@ class EventEditNotificationBoxTest extends WebTestCase
                 'Notify-attendees checkbox should be hidden when no opted-in RSVPs',
             );
         } finally {
-            // Reset
             foreach ($changed as $rsvp) {
                 $settings = $rsvp->getNotificationSettings();
                 $settings->attendedEventUpdate = true;

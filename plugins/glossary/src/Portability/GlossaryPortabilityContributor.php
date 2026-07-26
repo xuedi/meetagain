@@ -13,10 +13,6 @@ use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
 use Plugin\Glossary\Repository\GlossaryRepository;
 
-/**
- * A glossary is a phrase dictionary, so the phrase is the key: an incoming duplicate resolves to
- * the entry already present. Pending member suggestions are workflow state and stay behind.
- */
 readonly class GlossaryPortabilityContributor implements ItemPortabilityContributorInterface
 {
     public function __construct(

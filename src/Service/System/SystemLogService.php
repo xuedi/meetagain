@@ -86,10 +86,6 @@ readonly class SystemLogService
     }
 
     /**
-     * Reads every log file for the current environment in chronological order.
-     * Picks up both the non-rotated `{env}.log` and the daily rotated
-     * `{env}-YYYY-MM-DD.log` files.
-     *
      * @return list<LogEntry>
      */
     public function getAllEntries(): array
@@ -148,10 +144,6 @@ readonly class SystemLogService
     }
 
     /**
-     * Deletes every dated rotated log file whose filename-encoded date is older
-     * than `$cutoff`. The active non-rotated `{env}.log` and any file whose
-     * name does not match the `{env}-YYYY-MM-DD.log` pattern are left alone.
-     *
      * @return int number of deleted files
      */
     public function deleteOlderThan(DateTimeImmutable $cutoff): int

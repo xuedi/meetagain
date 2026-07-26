@@ -98,8 +98,6 @@ class EmailQueueRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get pending emails grouped by template type.
-     *
      * @return array<string, int> Template name => count
      */
     public function getPendingByTemplate(): array
@@ -123,8 +121,6 @@ class EmailQueueRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get delivery stats for the dashboard.
-     *
      * @return array{total: int, sent: int, failed: int}
      */
     public function getDeliveryStats(DateTimeImmutable $since): array
@@ -151,9 +147,6 @@ class EmailQueueRepository extends ServiceEntityRepository
         ];
     }
 
-    /**
-     * Calculate delivery success rate.
-     */
     public function getDeliverySuccessRate(DateTimeImmutable $since): float
     {
         $stats = $this->getDeliveryStats($since);

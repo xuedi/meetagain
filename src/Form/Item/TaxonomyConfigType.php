@@ -9,12 +9,6 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * The embeddable taxonomy fragment a plugin Config form adds with one
- * ->add('taxonomy', TaxonomyConfigType::class). Two independent enable toggles each gate a
- * per-language definition collection. Rendered by the _form/taxonomy.html.twig form theme
- * (language toggle + enable gating).
- */
 class TaxonomyConfigType extends AbstractType
 {
     #[\Override]

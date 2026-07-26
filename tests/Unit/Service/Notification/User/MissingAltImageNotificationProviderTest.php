@@ -48,7 +48,6 @@ class MissingAltImageNotificationProviderTest extends TestCase
         $requirements = $this->createStub(AltLocaleRequirementResolver::class);
         $requirements->method('getRequiredAltLocales')->willReturn(['en', 'de']);
 
-        // Every language has its own value (en -> base, de -> map), so nothing is missing.
         $complete = self::imageWithId(5);
         $complete->setAlt('english alt');
         $complete->setAltTranslation('de', 'deutscher alt');
