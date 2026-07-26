@@ -19,7 +19,7 @@ class EventRecurrenceModalTest extends WebTestCase
         // Arrange
         $client = static::createClient();
         $this->loginAsAdmin($client);
-        $eventId = $this->findEventWithRule($client, EventInterval::BiMonthly);
+        $eventId = $this->findEventWithRule($client, EventInterval::Weekly);
 
         // Act
         $crawler = $client->request('GET', '/en/admin/events/' . $eventId . '/edit');
@@ -36,7 +36,7 @@ class EventRecurrenceModalTest extends WebTestCase
         // Arrange
         $client = static::createClient();
         $this->loginAsAdmin($client);
-        $eventId = $this->findEventWithRule($client, EventInterval::BiMonthly);
+        $eventId = $this->findEventWithRule($client, EventInterval::Weekly);
 
         // Act
         $crawler = $client->request('GET', '/en/admin/events/' . $eventId . '/edit');
