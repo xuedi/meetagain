@@ -79,6 +79,11 @@ class EventType extends AbstractType
                 'mapped' => false,
                 'data' => $event?->getSeries()?->getRule(),
             ])
+            ->add('customRuleSpec', HiddenType::class, [
+                'required' => false,
+                'mapped' => false,
+                'data' => $event?->getSeries()?->getRuleSpec(),
+            ])
             ->add('seriesName', TextType::class, [
                 'label' => $this->translator->trans('admin_event.form_label_series_name'),
                 'required' => false,

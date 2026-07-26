@@ -13,6 +13,7 @@ use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
 use App\Repository\EventSeriesRepository;
 use App\Service\Cms\CmsService;
+use App\Service\Event\RecurrenceResolver;
 use App\Service\Event\RecurringEventService;
 use App\ValueObject\RealignmentItem;
 use App\ValueObject\RealignmentPlan;
@@ -32,12 +33,13 @@ class RecurringEventServiceTest extends TestCase
 {
     // ---- helpers ----
 
-    private function makeSeries(int $id, ?EventInterval $rule): EventSeriesStub
+    private function makeSeries(int $id, ?EventInterval $rule, ?string $ruleSpec = null): EventSeriesStub
     {
         $series = new EventSeriesStub();
         $series->setId($id);
         $series->setName('Test Series');
         $series->setRule($rule);
+        $series->setRuleSpec($ruleSpec);
 
         return $series;
     }
@@ -61,6 +63,7 @@ class RecurringEventServiceTest extends TestCase
             entityActionDispatcher: $this->createStub(EntityActionDispatcher::class),
             cmsBlockRepository: $this->createStub(CmsBlockRepository::class),
             cmsService: $this->createStub(CmsService::class),
+            recurrenceResolver: new RecurrenceResolver(),
         );
     }
 
@@ -302,9 +305,11 @@ class RecurringEventServiceTest extends TestCase
             oldStart: new DateTimeImmutable('2030-01-02 19:00'),
             oldStop: new DateTimeImmutable('2030-01-02 22:00'),
             oldRule: EventInterval::Weekly,
+            oldRuleSpec: null,
             newStart: new DateTimeImmutable('2030-01-12 20:00'),
             newStop: new DateTimeImmutable('2030-01-12 23:30'),
             newRule: EventInterval::Weekly,
+            newRuleSpec: null,
         );
     }
 
@@ -355,9 +360,11 @@ class RecurringEventServiceTest extends TestCase
             oldStart: new DateTimeImmutable('2030-01-02 19:00'),
             oldStop: null,
             oldRule: EventInterval::Weekly,
+            oldRuleSpec: null,
             newStart: new DateTimeImmutable('2030-01-12 20:00'),
             newStop: null,
             newRule: EventInterval::Monthly,
+            newRuleSpec: null,
         );
 
         // Act
@@ -433,9 +440,11 @@ class RecurringEventServiceTest extends TestCase
             oldStart: new DateTimeImmutable('2030-01-05 19:00'),
             oldStop: null,
             oldRule: EventInterval::Weekly,
+            oldRuleSpec: null,
             newStart: new DateTimeImmutable('2030-01-05 19:00'),
             newStop: null,
             newRule: EventInterval::Weekly,
+            newRuleSpec: null,
         );
 
         // Act
@@ -520,9 +529,11 @@ class RecurringEventServiceTest extends TestCase
             oldStart: new DateTimeImmutable('2030-01-09 19:00'),
             oldStop: null,
             oldRule: null,
+            oldRuleSpec: null,
             newStart: new DateTimeImmutable('2030-01-10 19:00'),
             newStop: null,
             newRule: null,
+            newRuleSpec: null,
         );
 
         // Act
@@ -550,9 +561,11 @@ class RecurringEventServiceTest extends TestCase
             oldStart: new DateTimeImmutable('2030-01-02 19:00'),
             oldStop: null,
             oldRule: null,
+            oldRuleSpec: null,
             newStart: new DateTimeImmutable('2030-01-03 19:00'),
             newStop: null,
             newRule: null,
+            newRuleSpec: null,
         );
 
         // Act
@@ -580,9 +593,11 @@ class RecurringEventServiceTest extends TestCase
             oldStart: new DateTimeImmutable('2030-01-02 19:00'),
             oldStop: null,
             oldRule: EventInterval::Weekly,
+            oldRuleSpec: null,
             newStart: new DateTimeImmutable('2030-01-02 19:00'),
             newStop: null,
             newRule: null,
+            newRuleSpec: null,
         );
 
         // Act
@@ -625,7 +640,7 @@ class RecurringEventServiceTest extends TestCase
             rsvpCount: 1,
             outcome: RealignmentOutcome::DateUnchanged,
         );
-        $plan = new RealignmentPlan(9, 1, EventInterval::Weekly, [$movedItem, $unchangedItem]);
+        $plan = new RealignmentPlan(9, 1, EventInterval::Weekly, null, [$movedItem, $unchangedItem]);
 
         $repo = $this->createMock(EventRepository::class);
         $repo->expects($this->once())->method('find')->with(2)->willReturn($movedChild);
@@ -746,6 +761,150 @@ class RecurringEventServiceTest extends TestCase
             static::assertSame('19:00', $event->getStart()->format('H:i'));
             static::assertSame('Old Title', $event->getTitle('en'));
         }
+    }
+
+    // ---- custom rule generation ----
+
+    /**
+     * @return array<DateTime>
+     */
+    private function generateCustomSeries(string $spec, string $anchor): array
+    {
+        $series = $this->makeSeries(9, EventInterval::Custom, $spec);
+        $template = $this->makeFutureEvent(1, $anchor);
+        [$service, $createdEvents] = $this->createExtensionService($series, $template);
+
+        $service->extentRecurringEvents();
+
+        return array_map(static fn(Event $event): DateTime => $event->getStart(), $createdEvents());
+    }
+
+    public function testExtendGeneratesTheFirstWeekdayOfEachMonth(): void
+    {
+        // Act
+        $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYDAY=1SU', 'tomorrow 19:00');
+
+        // Assert
+        static::assertNotEmpty($starts);
+        foreach ($starts as $start) {
+            static::assertSame('Sunday', $start->format('l'));
+            static::assertLessThanOrEqual(7, (int) $start->format('j'));
+            static::assertSame('19:00', $start->format('H:i'));
+        }
+    }
+
+    public function testExtendGeneratesTheLastWeekdayOfEachMonth(): void
+    {
+        // Act
+        $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYDAY=-1FR', 'tomorrow 19:00');
+
+        // Assert
+        static::assertNotEmpty($starts);
+        foreach ($starts as $start) {
+            static::assertSame('Friday', $start->format('l'));
+            $sameWeekdayNextWeek = DateTime::createFromInterface($start)->modify('+7 days');
+            static::assertNotSame($start->format('n'), $sameWeekdayNextWeek->format('n'));
+        }
+    }
+
+    public function testExtendSkipsMonthsWithoutADayThirtyOne(): void
+    {
+        // Act
+        $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYMONTHDAY=31', 'tomorrow 19:00');
+
+        // Assert
+        static::assertNotEmpty($starts);
+        foreach ($starts as $start) {
+            static::assertSame('31', $start->format('j'));
+        }
+    }
+
+    public function testExtendGeneratesTheLastDayOfEachMonth(): void
+    {
+        // Act
+        $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYMONTHDAY=-1', 'tomorrow 19:00');
+
+        // Assert
+        static::assertNotEmpty($starts);
+        foreach ($starts as $start) {
+            static::assertSame($start->format('t'), $start->format('j'));
+        }
+    }
+
+    public function testExtendKeepsQuarterlySpacing(): void
+    {
+        // Act
+        $starts = $this->generateCustomSeries('FREQ=MONTHLY;INTERVAL=3;BYDAY=3MO', 'tomorrow 19:00');
+
+        // Assert
+        static::assertNotEmpty($starts);
+        foreach ($starts as $start) {
+            static::assertSame('Monday', $start->format('l'));
+            $dayOfMonth = (int) $start->format('j');
+            static::assertGreaterThanOrEqual(15, $dayOfMonth);
+            static::assertLessThanOrEqual(21, $dayOfMonth);
+        }
+    }
+
+    public function testExtendKeepsTheFirstOccurrenceWhenTheAnchorIsOffPattern(): void
+    {
+        // Arrange: an anchor that is deliberately not a first Sunday, so the anchor does not
+        // head the occurrence set - skipping by position would silently eat a real date
+        $anchor = new DateTime('first sunday of next month 19:00')->modify('+3 days');
+
+        // Act
+        $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYDAY=1SU', $anchor->format('Y-m-d H:i'));
+
+        // Assert
+        $monthAfterAnchor = DateTime::createFromInterface($anchor)->modify('first day of next month');
+        $expectedFirst = new DateTime('first sunday of ' . $monthAfterAnchor->format('F Y'));
+        static::assertNotEmpty($starts);
+        static::assertSame($expectedFirst->format('Y-m-d'), $starts[0]->format('Y-m-d'));
+    }
+
+    public function testExtendSkipsASeriesWhoseCustomSpecCannotBeParsed(): void
+    {
+        // Arrange
+        $series = $this->makeSeries(9, EventInterval::Custom, 'FREQ=NONSENSE');
+        $template = $this->makeFutureEvent(1, 'tomorrow 19:00');
+        [$service, $createdEvents] = $this->createExtensionService($series, $template);
+
+        // Act
+        $count = $service->extentRecurringEvents();
+
+        // Assert
+        static::assertSame(0, $count);
+        static::assertCount(0, $createdEvents());
+    }
+
+    public function testPlanRealignmentReturnsUnmovedItemsWhenTheCustomSpecCannotBeParsed(): void
+    {
+        // Arrange: a Custom series whose spec resolves to no rule at all
+        $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00');
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Custom, 'FREQ=NONSENSE'));
+
+        $child = $this->makeFutureEvent(2, '2030-01-09 19:00');
+
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$child]);
+        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
+
+        $change = new ScheduleChange(
+            oldStart: new DateTimeImmutable('2030-01-02 19:00'),
+            oldStop: null,
+            oldRule: EventInterval::Custom,
+            oldRuleSpec: 'FREQ=NONSENSE',
+            newStart: new DateTimeImmutable('2030-01-05 19:00'),
+            newStop: null,
+            newRule: EventInterval::Custom,
+            newRuleSpec: 'FREQ=NONSENSE',
+        );
+
+        // Act
+        $plan = $service->planRealignment($anchor, $change);
+
+        // Assert
+        static::assertSame(0, $plan->movedCount());
     }
 
     public function testExtendRecurringEventsSkipsSeriesWithoutUsableTemplate(): void

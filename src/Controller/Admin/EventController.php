@@ -28,6 +28,11 @@ use App\Enum\EntityAction;
 use App\Enum\EventInterval;
 use App\Enum\EventType as EventTypeEnum;
 use App\Enum\ImageType;
+use App\Enum\RecurrenceMode;
+use App\Enum\RecurrenceOrdinal;
+use App\Enum\RecurrencePeriod;
+use App\Enum\Weekday;
+use App\Exception\Event\InvalidRecurrencePatternException;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
 use App\Repository\EventRepository;
@@ -37,7 +42,11 @@ use App\Service\Config\LanguageService;
 use App\Service\Event\EventService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
+use App\Service\Event\RecurrenceDescriber;
+use App\Service\Event\RecurrencePreviewService;
+use App\Service\Event\RecurrenceResolver;
 use App\Service\Seo\EventCanonicalRebuildService;
+use App\ValueObject\RecurrencePattern;
 use App\ValueObject\ScheduleChange;
 use DateTime;
 use DateTimeImmutable;
@@ -47,6 +56,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -94,7 +104,44 @@ final class EventController extends AbstractController implements AdminNavigatio
         private readonly SeriesRescheduledEmail $seriesRescheduledEmail,
         private readonly HtmlSanitizerInterface $cmsContent,
         private readonly EventCanonicalRebuildService $canonicalRebuildService,
+        private readonly RecurrencePreviewService $recurrencePreviewService,
+        private readonly RecurrenceResolver $recurrenceResolver,
+        private readonly RecurrenceDescriber $recurrenceDescriber,
     ) {}
+
+    #[Route('/recurrence/preview', name: 'app_admin_event_recurrence_preview', methods: ['GET'])]
+    public function recurrencePreview(Request $request): JsonResponse
+    {
+        $mode = RecurrenceMode::tryFrom((string) $request->query->get('mode'));
+        $period = RecurrencePeriod::tryFrom((string) $request->query->get('period'));
+        $after = DateTimeImmutable::createFromFormat('Y-m-d', (string) $request->query->get('after'))
+            ?: new DateTimeImmutable('today');
+
+        if (!$mode instanceof RecurrenceMode || !$period instanceof RecurrencePeriod) {
+            return $this->json(['error' => 'invalid_parameters'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $ordinal = $request->query->has('ordinal')
+            ? RecurrenceOrdinal::tryFrom($request->query->getInt('ordinal'))
+            : null;
+        $dayOfMonth = $request->query->has('day') ? $request->query->getInt('day') : null;
+
+        try {
+            $candidates = $this->recurrencePreviewService->candidates(
+                mode: $mode,
+                period: $period,
+                ordinal: $ordinal,
+                weekday: Weekday::tryFrom((string) $request->query->get('weekday')),
+                dayOfMonth: $dayOfMonth,
+                after: $after,
+                locale: $request->getLocale(),
+            );
+        } catch (InvalidRecurrencePatternException) {
+            return $this->json(['error' => 'invalid_parameters'], Response::HTTP_BAD_REQUEST);
+        }
+
+        return $this->json(['candidates' => $candidates]);
+    }
 
     #[Route('', name: 'app_admin_event')]
     public function list(Request $request): Response
@@ -347,6 +394,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         $oldStart = DateTimeImmutable::createFromInterface($event->getStart());
         $oldStop = $event->getStop() !== null ? DateTimeImmutable::createFromInterface($event->getStop()) : null;
         $oldRule = $event->getSeries()?->getRule();
+        $oldRuleSpec = $event->getSeries()?->getRuleSpec();
 
         // TODO: simplify with vanilla symfony components now the cascading flush effect is fixed
         $form->handleRequest($request);
@@ -355,8 +403,9 @@ final class EventController extends AbstractController implements AdminNavigatio
 
             $isSeries = $event->getSeries() !== null;
             $newRule = $form->get('seriesRule')->getData();
+            $newRuleSpec = $this->resolveSubmittedRuleSpec($form, $newRule);
             $seriesName = trim((string) $form->get('seriesName')->getData());
-            $ruleChanged = $oldRule !== $newRule;
+            $ruleChanged = $oldRule !== $newRule || $oldRuleSpec !== $newRuleSpec;
 
             if (!$isSeries && !$this->validateSeriesName($form)) {
                 $this->entityManager->refresh($event);
@@ -368,9 +417,11 @@ final class EventController extends AbstractController implements AdminNavigatio
                 oldStart: $oldStart,
                 oldStop: $oldStop,
                 oldRule: $oldRule,
+                oldRuleSpec: $oldRuleSpec,
                 newStart: DateTimeImmutable::createFromInterface($event->getStart()),
                 newStop: $event->getStop() !== null ? DateTimeImmutable::createFromInterface($event->getStop()) : null,
                 newRule: $newRule,
+                newRuleSpec: $newRuleSpec,
             );
             $wantsRealign = $form->get('allFollowing')->getData() === true && $isSeries && $change->isChanged();
             $ruleChangeForcesConfirm = $isSeries && $ruleChanged;
@@ -405,9 +456,10 @@ final class EventController extends AbstractController implements AdminNavigatio
                 }
                 if ($ruleChanged) {
                     $series->setRule($newRule);
+                    $series->setRuleSpec($newRuleSpec);
                 }
             } elseif ($newRule instanceof EventInterval) {
-                $event->setSeries($this->createSeries($seriesName, $newRule));
+                $event->setSeries($this->createSeries($seriesName, $newRule, $newRuleSpec));
             }
 
             // manually hydrate location (unmapped field)
@@ -537,7 +589,61 @@ final class EventController extends AbstractController implements AdminNavigatio
                 ),
             ]),
             'notifiableAttendeeCount' => $this->countNotifiableAttendees($event),
+            'recurrence' => $this->buildRecurrenceContext($event),
         ]);
+    }
+
+    /**
+     * @return array{
+     *     pattern: RecurrencePattern,
+     *     summary: string,
+     *     customValue: int,
+     *     ordinals: list<array{value: int, label: string}>,
+     *     weekdays: list<array{value: string, label: string}>,
+     *     periods: list<array{value: string, label: string}>
+     * }
+     */
+    private function buildRecurrenceContext(?Event $event): array
+    {
+        $series = $event?->getSeries();
+        $anchor = $event?->getStart() ?? new DateTimeImmutable();
+        $pattern = $series !== null
+            ? $this->recurrenceResolver->pattern($series->getRule(), $series->getRuleSpec(), $anchor)
+            : null;
+        $isCustom = $series?->getRule() === EventInterval::Custom;
+
+        $pattern ??= RecurrencePattern::weekday(
+            RecurrencePeriod::Month,
+            Weekday::fromDate($anchor),
+            RecurrenceOrdinal::First,
+        );
+
+        return [
+            'pattern' => $pattern,
+            'summary' => $isCustom ? $this->recurrenceDescriber->describe($pattern) : '',
+            'customValue' => EventInterval::Custom->value,
+            'ordinals' => array_map(
+                fn(RecurrenceOrdinal $case): array => [
+                    'value' => $case->value,
+                    'label' => $this->translator->trans($case->label()),
+                ],
+                RecurrenceOrdinal::cases(),
+            ),
+            'weekdays' => array_map(
+                fn(Weekday $case): array => [
+                    'value' => $case->value,
+                    'label' => $this->recurrenceDescriber->weekdayName($case),
+                ],
+                Weekday::cases(),
+            ),
+            'periods' => array_map(
+                fn(RecurrencePeriod $case): array => [
+                    'value' => $case->value,
+                    'label' => $this->translator->trans($case->label()),
+                ],
+                RecurrencePeriod::cases(),
+            ),
+        ];
     }
 
     /**
@@ -686,7 +792,11 @@ final class EventController extends AbstractController implements AdminNavigatio
 
             $seriesRule = $form->get('seriesRule')->getData();
             if ($seriesRule instanceof EventInterval) {
-                $event->setSeries($this->createSeries(trim((string) $form->get('seriesName')->getData()), $seriesRule));
+                $event->setSeries($this->createSeries(
+                    trim((string) $form->get('seriesName')->getData()),
+                    $seriesRule,
+                    $this->resolveSubmittedRuleSpec($form, $seriesRule),
+                ));
             }
 
             // manually hydrate location (unmapped field)
@@ -721,6 +831,7 @@ final class EventController extends AbstractController implements AdminNavigatio
             'location' => $event,
             'form' => $form,
             'adminTop' => $this->buildBackOnlyTop(),
+            'recurrence' => $this->buildRecurrenceContext(null),
         ]);
     }
 
@@ -744,11 +855,23 @@ final class EventController extends AbstractController implements AdminNavigatio
         return false;
     }
 
-    private function createSeries(string $name, EventInterval $rule): EventSeries
+    private function resolveSubmittedRuleSpec(FormInterface $form, ?EventInterval $rule): ?string
+    {
+        if (EventInterval::Custom !== $rule) {
+            return null;
+        }
+
+        $submitted = trim((string) $form->get('customRuleSpec')->getData());
+
+        return '' === $submitted ? null : $submitted;
+    }
+
+    private function createSeries(string $name, EventInterval $rule, ?string $ruleSpec = null): EventSeries
     {
         $series = new EventSeries();
         $series->setName($name);
         $series->setRule($rule);
+        $series->setRuleSpec($ruleSpec);
         $series->setCreatedAt(new DateTimeImmutable());
         $this->entityManager->persist($series);
 

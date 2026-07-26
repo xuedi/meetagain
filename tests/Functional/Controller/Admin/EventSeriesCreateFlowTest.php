@@ -40,6 +40,60 @@ class EventSeriesCreateFlowTest extends WebTestCase
         static::assertSame($series->getId(), $event->getSeries()?->getId());
     }
 
+    public function testCreateWithCustomRulePersistsTheRuleSpec(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+        $start = new DateTime('2031-03-02 13:37');
+
+        // Act
+        $this->submitNewEventForm(
+            $client,
+            $start,
+            seriesRule: (string) EventInterval::Custom->value,
+            seriesName: 'First Sunday Series',
+            customRuleSpec: 'FREQ=MONTHLY;BYDAY=1SU',
+        );
+
+        // Assert
+        $this->assertResponseRedirects();
+
+        $em = $this->getEntityManager($client);
+        $em->clear();
+        $series = $em->getRepository(EventSeries::class)->findOneBy(['name' => 'First Sunday Series']);
+        static::assertNotNull($series);
+        static::assertSame(EventInterval::Custom, $series->getRule());
+        static::assertSame('FREQ=MONTHLY;BYDAY=1SU', $series->getRuleSpec());
+    }
+
+    public function testCreateWithAPresetRuleLeavesTheRuleSpecEmpty(): void
+    {
+        // Arrange: a stale spec submitted alongside a preset must not be stored
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+        $start = new DateTime('2031-03-04 13:37');
+
+        // Act
+        $this->submitNewEventForm(
+            $client,
+            $start,
+            seriesRule: (string) EventInterval::Weekly->value,
+            seriesName: 'Preset Series',
+            customRuleSpec: 'FREQ=MONTHLY;BYDAY=1SU',
+        );
+
+        // Assert
+        $this->assertResponseRedirects();
+
+        $em = $this->getEntityManager($client);
+        $em->clear();
+        $series = $em->getRepository(EventSeries::class)->findOneBy(['name' => 'Preset Series']);
+        static::assertNotNull($series);
+        static::assertSame(EventInterval::Weekly, $series->getRule());
+        static::assertNull($series->getRuleSpec());
+    }
+
     public function testCreateWithRuleAndBlankNameRendersErrorAndPersistsNothing(): void
     {
         // Arrange
@@ -84,8 +138,13 @@ class EventSeriesCreateFlowTest extends WebTestCase
         static::assertCount($seriesCountBefore, $em->getRepository(EventSeries::class)->findAll());
     }
 
-    private function submitNewEventForm(KernelBrowser $client, DateTime $start, string $seriesRule, string $seriesName): Crawler
-    {
+    private function submitNewEventForm(
+        KernelBrowser $client,
+        DateTime $start,
+        string $seriesRule,
+        string $seriesName,
+        string $customRuleSpec = '',
+    ): Crawler {
         $crawler = $client->request('GET', '/en/admin/events/new');
         $this->assertResponseIsSuccessful();
 
@@ -95,6 +154,7 @@ class EventSeriesCreateFlowTest extends WebTestCase
         $form['event[location]'] = $crawler->filter('#event_location option')->first()->attr('value');
         $form['event[seriesRule]'] = $seriesRule;
         $form['event[seriesName]'] = $seriesName;
+        $form['event[customRuleSpec]'] = $customRuleSpec;
 
         return $client->submit($form);
     }

@@ -20,6 +20,10 @@ class EventSeries
     #[ORM\Column(type: 'integer', nullable: true, enumType: EventInterval::class)]
     private ?EventInterval $rule = null;
 
+    // Authoritative only when the rule is EventInterval::Custom; an RFC-5545 rule string.
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $ruleSpec = null;
+
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
@@ -48,6 +52,18 @@ class EventSeries
     public function setRule(?EventInterval $rule): static
     {
         $this->rule = $rule;
+
+        return $this;
+    }
+
+    public function getRuleSpec(): ?string
+    {
+        return $this->ruleSpec;
+    }
+
+    public function setRuleSpec(?string $ruleSpec): static
+    {
+        $this->ruleSpec = $ruleSpec;
 
         return $this;
     }

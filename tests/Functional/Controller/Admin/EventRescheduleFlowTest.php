@@ -183,13 +183,55 @@ class EventRescheduleFlowTest extends WebTestCase
         static::assertCount(1, $child->getRsvp());
     }
 
-    private function submitRuleChange(KernelBrowser $client, int $parentId, string $seriesRule): Crawler
+    public function testSwitchingAPresetToACustomRulePersistsTheSpecAndRealigns(): void
     {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+        [$parentId, $childId] = $this->prepareSeriesWithRsvpdChild($client);
+
+        // Act: swap the weekly preset for a custom "first Sunday of the month" rule
+        $crawler = $this->submitRuleChange(
+            $client,
+            $parentId,
+            (string) EventInterval::Custom->value,
+            'FREQ=MONTHLY;BYDAY=1SU',
+        );
+
+        // Assert: interstitial renders the described rule rather than the bare enum label
+        $this->assertResponseIsSuccessful();
+        static::assertStringContainsString('Every first Sunday of the month', (string) $client->getResponse()->getContent());
+
+        // Act: confirm
+        $confirmForm = $crawler->selectButton('Reschedule series')->form();
+        $client->submit($confirmForm);
+
+        // Assert: spec stored and the follower landed on a first Sunday
+        $this->assertResponseRedirects('/en/admin/events/' . $parentId . '/edit');
+
+        $em = $this->getEntityManager($client);
+        $em->clear();
+        $parent = $em->getRepository(Event::class)->find($parentId);
+        static::assertSame(EventInterval::Custom, $parent->getSeries()->getRule());
+        static::assertSame('FREQ=MONTHLY;BYDAY=1SU', $parent->getSeries()->getRuleSpec());
+
+        $child = $em->getRepository(Event::class)->find($childId);
+        static::assertSame('Sunday', $child->getStart()->format('l'));
+        static::assertLessThanOrEqual(7, (int) $child->getStart()->format('j'));
+    }
+
+    private function submitRuleChange(
+        KernelBrowser $client,
+        int $parentId,
+        string $seriesRule,
+        string $customRuleSpec = '',
+    ): Crawler {
         $crawler = $client->request('GET', '/en/admin/events/' . $parentId . '/edit');
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->selectButton('Save')->form();
         $form['event[seriesRule]'] = $seriesRule;
+        $form['event[customRuleSpec]'] = $customRuleSpec;
 
         return $client->submit($form);
     }
