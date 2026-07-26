@@ -65,9 +65,6 @@ readonly class PollService
     }
 
     /**
-     * Replaces the user's full approval set in one transaction. Single-choice config caps the
-     * ballot to the first selection.
-     *
      * @param list<int> $selectedItemIds
      */
     public function castVote(int $userId, Poll $poll, array $selectedItemIds): void
@@ -138,12 +135,6 @@ readonly class PollService
         return new PollClosure(null, $leadingItemIds);
     }
 
-    /**
-     * Commits the outcome after a tie-break or clean single-winner close: records the winner on
-     * the poll and attaches it to the event through the core association seam. The attach
-     * dispatches CreateEventItemAssociation, which the wishlist subsystem reacts to for backlog
-     * aging - voting never references wishlist directly.
-     */
     public function commitOutcome(Poll $poll, int $chosenItemId): void
     {
         $poll->setWinningItemId($chosenItemId);
@@ -154,8 +145,6 @@ readonly class PollService
     }
 
     /**
-     * Ranked candidate item ids for a type, from the core candidate-provider union chain.
-     *
      * @return list<int>
      */
     public function getCandidateItemIds(string $itemType): array

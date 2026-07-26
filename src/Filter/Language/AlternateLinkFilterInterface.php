@@ -6,11 +6,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Allows plugins to restrict which locale codes appear as hreflang alternate
- * links in the page <head>. Does NOT affect the language switcher dropdown.
- *
- * Return null to signal no opinion (all locales pass through).
- * Return an array to restrict alternate links to those locale codes only.
+ * Narrows the locale codes emitted as hreflang alternates. Does not affect the language switcher.
  */
 #[AutoconfigureTag]
 interface AlternateLinkFilterInterface

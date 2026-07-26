@@ -13,9 +13,6 @@ final readonly class ScheduledMailItem
         public int $expectedRecipients,
     ) {}
 
-    /**
-     * Stable URL-safe identifier for routing into the per-item guard-detail page.
-     */
     public function getKey(): string
     {
         return $this->mailType . '_' . $this->expectedTime->getTimestamp();

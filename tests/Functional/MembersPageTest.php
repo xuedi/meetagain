@@ -37,11 +37,9 @@ class MembersPageTest extends WebTestCase
     {
         $client = static::createClient();
 
-        // Get count for anonymous user
         $crawler = $client->request('GET', '/en/members/1');
         $this->assertResponseIsSuccessful();
 
-        // Login and check again - logged in users should potentially see more members (non-public ones)
         $this->login($client, self::USER_EMAIL, self::USER_PASSWORD);
 
         $crawler = $client->request('GET', '/en/members/1');
@@ -72,11 +70,9 @@ class MembersPageTest extends WebTestCase
     {
         $client = static::createClient();
 
-        // First page
         $crawler = $client->request('GET', '/en/members/1');
         $this->assertResponseIsSuccessful();
 
-        // Second page (if exists)
         $crawler = $client->request('GET', '/en/members/2');
         $this->assertResponseIsSuccessful();
     }

@@ -41,7 +41,6 @@ class EmailTemplateSeedCommand extends Command
             $template = $this->templateService->getTemplate($emailType);
 
             if (!$template instanceof EmailTemplate) {
-                // Create new template
                 $template = new EmailTemplate();
                 $template->setIdentifier($identifier);
                 $template->setAvailableVariables($data['variables']);
@@ -52,7 +51,6 @@ class EmailTemplateSeedCommand extends Command
                 $output->writeln(sprintf('Created template "%s".', $identifier));
             }
 
-            // Ensure translations exist for all enabled languages
             foreach ($languages as $languageCode) {
                 $existingTranslation = $this->translationRepo->findOneBy([
                     'emailTemplate' => $template->getId(),
@@ -63,7 +61,6 @@ class EmailTemplateSeedCommand extends Command
                     continue;
                 }
 
-                // Get language-specific defaults
                 $langDefaults = $this->templateService->getDefaultTemplates($languageCode);
                 $langData = $langDefaults[$identifier];
 

@@ -5,10 +5,6 @@ namespace Plugin\Books\Service;
 use App\Publisher\PluginSettings\PluginSettingsResolver;
 use Plugin\Books\ValueObject\Config;
 
-/**
- * Single read path for the effective books config in the current request. Delegates to the
- * resolver (per-scope override, else global, else neutral default) and memoizes.
- */
 class ConfigService
 {
     private ?Config $memo = null;

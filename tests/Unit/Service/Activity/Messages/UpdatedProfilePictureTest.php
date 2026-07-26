@@ -19,7 +19,6 @@ class UpdatedProfilePictureTest extends TestCase
     public function setUp(): void
     {
         $this->router = $this->createStub(RouterInterface::class);
-        // keep ImageHtmlRenderer as a mock because interaction is asserted
         $this->imageRenderer = $this->createMock(ImageHtmlRenderer::class);
         $this->translator = new IdentityTranslator();
     }
@@ -37,7 +36,6 @@ class UpdatedProfilePictureTest extends TestCase
             . '</div>';
         $meta = ['old' => 0, 'new' => 1];
 
-        // Set up expectations for renderThumbnail
         $this->imageRenderer
             ->expects($this->exactly(2))
             ->method('renderThumbnail')
@@ -48,7 +46,6 @@ class UpdatedProfilePictureTest extends TestCase
 
         $subject = new UpdatedProfilePicture()->injectServices($this->router, $this->imageRenderer, $this->translator, $meta);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(UpdatedProfilePicture::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

@@ -22,7 +22,7 @@ class TaxonomyAssignmentCleanupHandlerTest extends TestCase
         // Act
         $handler->onItemAction(ItemAction::Deleted, 'dish', 42);
 
-        // Assert - mocks verify deleteFor was called on both
+        // Assert
     }
 
     public function testNonDeleteActionIsIgnored(): void
@@ -37,6 +37,6 @@ class TaxonomyAssignmentCleanupHandlerTest extends TestCase
         // Act
         $handler->onItemAction(ItemAction::Updated, 'dish', 42);
 
-        // Assert - mocks verify deleteFor was never called
+        // Assert
     }
 }

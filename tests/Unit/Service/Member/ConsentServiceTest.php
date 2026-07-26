@@ -35,8 +35,6 @@ class ConsentServiceTest extends TestCase
         return $session;
     }
 
-    // ---- getShowCookieConsent ----
-
     public function testGetShowCookieConsentNoRequestReturnsTrue(): void
     {
         // Arrange & Act & Assert
@@ -45,23 +43,21 @@ class ConsentServiceTest extends TestCase
 
     public function testGetShowCookieConsentUnknownReturnsTrue(): void
     {
-        // Arrange: consent=Unknown → show the banner
+        // Arrange
         static::assertTrue($this->makeService($this->makeSession('unknown', 'unknown'))->getShowCookieConsent());
     }
 
     public function testGetShowCookieConsentGrantedReturnsFalse(): void
     {
-        // Arrange: consent already given → do not show banner
+        // Arrange
         static::assertFalse($this->makeService($this->makeSession('granted', 'unknown'))->getShowCookieConsent());
     }
 
     public function testGetShowCookieConsentDeniedReturnsFalse(): void
     {
-        // Arrange: explicitly denied → do not show banner again
+        // Arrange
         static::assertFalse($this->makeService($this->makeSession('denied', 'unknown'))->getShowCookieConsent());
     }
-
-    // ---- getShowOsm ----
 
     public function testGetShowOsmNoRequestReturnsTrue(): void
     {
@@ -71,19 +67,19 @@ class ConsentServiceTest extends TestCase
 
     public function testGetShowOsmGrantedReturnsTrue(): void
     {
-        // Arrange: osm consent granted → show the OSM map
+        // Arrange
         static::assertTrue($this->makeService($this->makeSession('granted', 'granted'))->getShowOsm());
     }
 
     public function testGetShowOsmUnknownReturnsFalse(): void
     {
-        // Arrange: osm consent unknown → do not show OSM map
+        // Arrange
         static::assertFalse($this->makeService($this->makeSession('unknown', 'unknown'))->getShowOsm());
     }
 
     public function testGetShowOsmDeniedReturnsFalse(): void
     {
-        // Arrange: osm consent denied → do not show OSM map
+        // Arrange
         static::assertFalse($this->makeService($this->makeSession('unknown', 'denied'))->getShowOsm());
     }
 }

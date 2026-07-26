@@ -2,9 +2,6 @@
 
 namespace App\Filter\Location;
 
-/**
- * Result from composing multiple location filters.
- */
 readonly class LocationFilterResult
 {
     /**

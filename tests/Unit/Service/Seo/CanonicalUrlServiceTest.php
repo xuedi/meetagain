@@ -91,7 +91,7 @@ class CanonicalUrlServiceTest extends TestCase
         // Act
         $result = $service->getCanonicalUrl($request);
 
-        // Assert: no double slash between host and path
+        // Assert
         static::assertSame('https://example.com/path', $result);
     }
 }

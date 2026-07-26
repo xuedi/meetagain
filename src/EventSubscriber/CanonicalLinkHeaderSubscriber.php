@@ -8,12 +8,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-/**
- * Emits a Link: <url>; rel="canonical" HTTP response header.
- *
- * Search engines treat this header as equivalent to <link rel="canonical"> in HTML.
- * Only added for full HTML page responses (not XHR, API, or redirect responses).
- */
 final readonly class CanonicalLinkHeaderSubscriber implements EventSubscriberInterface
 {
     public function __construct(
@@ -39,7 +33,6 @@ final readonly class CanonicalLinkHeaderSubscriber implements EventSubscriberInt
         $request = $event->getRequest();
         $response = $event->getResponse();
 
-        // Only add to HTML responses, not redirects, API, or XHR
         $contentType = $response->headers->get('Content-Type', '');
         if (!str_contains($contentType, 'text/html')) {
             return;

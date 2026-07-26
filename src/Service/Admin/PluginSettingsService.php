@@ -7,9 +7,6 @@ use LogicException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Traversable;
 
-/**
- * Registry of plugin settings descriptors, keyed by descriptor key and priority-sorted.
- */
 final readonly class PluginSettingsService
 {
     /** @var array<string, PluginSettingsDescriptorInterface> */
@@ -51,8 +48,6 @@ final readonly class PluginSettingsService
     }
 
     /**
-     * Scopable descriptors grouped under their owning plugin key, priority order preserved.
-     *
      * @return array<string, list<PluginSettingsDescriptorInterface>>
      */
     public function getScopableByPlugin(): array

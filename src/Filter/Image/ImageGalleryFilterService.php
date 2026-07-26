@@ -6,10 +6,6 @@ use App\Entity\Image;
 use App\Enum\ImageType;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composite image gallery filter service that collects all registered ImageGalleryFilterInterface implementations.
- * Combines multiple filters using AND logic for image ID restrictions.
- */
 readonly class ImageGalleryFilterService
 {
     /**
@@ -21,9 +17,6 @@ readonly class ImageGalleryFilterService
     ) {}
 
     /**
-     * Get the combined image ID filter from all registered filters.
-     * Uses intersection (AND) logic: an image must pass ALL filters.
-     *
      * @return array<int>|null null = no filter, [] = block all, [id,...] = whitelist
      */
     public function getImageIdFilter(ImageType $type): ?array
@@ -55,8 +48,6 @@ readonly class ImageGalleryFilterService
     }
 
     /**
-     * Apply the combined filter to an array of images, returning only allowed ones.
-     *
      * @param array<Image> $images
      * @return array<Image>
      */

@@ -27,19 +27,19 @@ class BlockedSessionStoreTest extends TestCase
         // Arrange
         $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
 
-        // Act - block 'subject' and confirm visibility
+        // Act
         $block($store, 'subject', ['k' => 'v']);
 
-        // Assert - present
+        // Assert
         static::assertTrue($isBlocked($store, 'subject'));
         static::assertSame(['k' => 'v'], $getSnapshot($store, 'subject'));
         static::assertFalse($isBlocked($store, 'other'));
         static::assertNull($getSnapshot($store, 'other'));
 
-        // Act - unblock
+        // Act
         $unblock($store, 'subject');
 
-        // Assert - gone from both the snapshot store and the index
+        // Assert
         static::assertFalse($isBlocked($store, 'subject'));
         static::assertSame([], $list($store));
     }
@@ -64,7 +64,7 @@ class BlockedSessionStoreTest extends TestCase
 
     public function testSessionAndIpNamespacesDoNotCollide(): void
     {
-        // Arrange - same key on both axes must remain independent
+        // Arrange
         $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
 
         // Act
@@ -81,7 +81,7 @@ class BlockedSessionStoreTest extends TestCase
         // Arrange
         $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
 
-        // Act & Assert - both should complete without exception
+        // Act & Assert
         $store->unblockSession('never-blocked');
         $store->unblockIp('never-blocked');
         static::assertSame([], $store->listBlockedSessions());
@@ -132,7 +132,7 @@ class BlockedSessionStoreTest extends TestCase
         // Act
         $expires = $store->getSessionBlockExpiresAt('abc');
 
-        // Assert - within a 10-second tolerance window of `now + 3600`
+        // Assert
         static::assertNotNull($expires);
         $delta = $expires->getTimestamp() - time();
         static::assertGreaterThanOrEqual(3590, $delta);
@@ -151,7 +151,7 @@ class BlockedSessionStoreTest extends TestCase
 
     public function testListPrunesStaleEntriesAndStillReturnsLiveOnes(): void
     {
-        // Arrange - plant a fresh entry, then inject an expired index row
+        // Arrange
         $pool = new ArrayAdapter();
         $store = new BlockedSessionStore($pool, new NullLogger());
         $store->blockSession('fresh', ['k' => 'v']);
@@ -166,13 +166,13 @@ class BlockedSessionStoreTest extends TestCase
         // Act
         $entries = $store->listBlockedSessions();
 
-        // Assert - stale dropped, fresh kept
+        // Assert
         static::assertSame([['key' => 'fresh', 'snapshot' => ['k' => 'v']]], $entries);
     }
 
     public function testListPrunesIndexedEntriesWhenTheirSnapshotIsMissing(): void
     {
-        // Arrange - index says 'orphan' is live but the snapshot key was evicted
+        // Arrange
         $pool = new ArrayAdapter();
         $store = new BlockedSessionStore($pool, new NullLogger());
         $store->blockSession('orphan', ['k' => 'v']);
@@ -187,7 +187,7 @@ class BlockedSessionStoreTest extends TestCase
 
     public function testAddToIndexPrunesPreviouslyStaleEntries(): void
     {
-        // Arrange - plant a stale entry, then block something new
+        // Arrange
         $pool = new ArrayAdapter();
         $item = $pool->getItem('security_blocked_sessions_index');
         $item->set(['stale' => time() - 60]);
@@ -198,7 +198,7 @@ class BlockedSessionStoreTest extends TestCase
         // Act
         $store->blockSession('fresh', ['k' => 'v']);
 
-        // Assert - stale gone, fresh present
+        // Assert
         $entries = $store->listBlockedSessions();
         static::assertSame([['key' => 'fresh', 'snapshot' => ['k' => 'v']]], $entries);
     }
@@ -248,7 +248,7 @@ class BlockedSessionStoreTest extends TestCase
 
     public function testLoadIndexFiltersOutEntriesWithUnexpectedShape(): void
     {
-        // Arrange - index mixes valid and invalid rows; only valid+matched row survives
+        // Arrange
         $pool = new ArrayAdapter();
         $item = $pool->getItem('security_blocked_sessions_index');
         $item->set([
@@ -275,7 +275,7 @@ class BlockedSessionStoreTest extends TestCase
     #[DataProvider('provideSanitizableKeys')]
     public function testKeySanitizationCollapsesSpecialChars(array $variants): void
     {
-        // Arrange - any of the variants should land in the same sanitized cache slot
+        // Arrange
         $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
         $store->blockSession($variants[0], ['from' => $variants[0]]);
 
@@ -302,7 +302,7 @@ class BlockedSessionStoreTest extends TestCase
     #[DataProvider('provideThrowingPoolCases')]
     public function testCachePoolExceptionsAreSwallowed(Closure $invoke, mixed $expected): void
     {
-        // Arrange - every pool operation throws; the store must absorb and return a safe fallback
+        // Arrange
         $pool = $this->createStub(CacheItemPoolInterface::class);
         $pool->method('getItem')->willThrowException(new Exception('boom'));
         $pool->method('deleteItem')->willThrowException(new Exception('boom'));
@@ -311,7 +311,7 @@ class BlockedSessionStoreTest extends TestCase
         // Act
         $result = $invoke($store);
 
-        // Assert - the documented fallback per API
+        // Assert
         static::assertSame($expected, $result);
     }
 
@@ -358,7 +358,7 @@ class BlockedSessionStoreTest extends TestCase
 
     public function testReadBlockReturnsNullWhenCacheItemIsNotAHit(): void
     {
-        // Arrange - item exists but reports miss (TTL expired between the pool's hit-check and our read)
+        // Arrange
         $miss = $this->createStub(CacheItemInterface::class);
         $miss->method('isHit')->willReturn(false);
         $pool = $this->createStub(CacheItemPoolInterface::class);

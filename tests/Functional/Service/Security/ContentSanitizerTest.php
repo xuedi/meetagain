@@ -35,7 +35,6 @@ class ContentSanitizerTest extends KernelTestCase
 
     public function testEscapeNeutralisesTagsLosslessly(): void
     {
-        // Bug-report style content with angle brackets must survive verbatim.
         $result = $this->sanitizer->escape('shows <error>X</error> here');
 
         static::assertStringContainsString('X', $result);

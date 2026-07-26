@@ -29,7 +29,7 @@ class EventServiceTest extends TestCase
 {
     public function testStructureListGroupsEventsByYearAndMonth(): void
     {
-        // Arrange: create events across different months
+        // Arrange
         $event1 = new EventStub()
             ->setId(1)
             ->setStart(new DateTimeImmutable('2002-01-01'));
@@ -59,12 +59,12 @@ class EventServiceTest extends TestCase
             plugins: [],
         );
 
-        // Act: invoke private structureList method via reflection
+        // Act
         $method = new ReflectionClass($subject)->getMethod('structureList');
 
         $result = $method->invoke($subject, $eventList);
 
-        // Assert: events are grouped by year-month with correct structure
+        // Assert
         static::assertArrayHasKey('2002-01', $result);
         static::assertArrayHasKey('2002-04', $result);
 
@@ -80,7 +80,7 @@ class EventServiceTest extends TestCase
     #[DataProvider('filteredListDataProvider')]
     public function testGetFilteredListAppliesCorrectCriteria(EventTimeFilter $time, EventSortFilter $sort, EventType $types, EventRsvpFilter $rsvp): void
     {
-        // Arrange: mock repository to verify call and return empty array
+        // Arrange
         $repoMock = $this->createMock(EventRepository::class);
         $repoMock->expects($this->once())->method('findByFilters')->with($time, $sort, $types, null, $rsvp)->willReturn([]);
 
@@ -95,10 +95,10 @@ class EventServiceTest extends TestCase
             plugins: [],
         );
 
-        // Act: get filtered list
+        // Act
         $result = $subject->getFilteredList($time, $sort, $types, $rsvp);
 
-        // Assert: returns structured (empty) list
+        // Assert
         static::assertSame([], $result);
     }
 
@@ -114,7 +114,7 @@ class EventServiceTest extends TestCase
 
     public function testCancelEventSetsCanceledFlagAndSendsNotifications(): void
     {
-        // Arrange: create future event with RSVP users
+        // Arrange
         $user1 = new UserStub()->setId(1);
         $user2 = new UserStub()->setId(2);
 
@@ -142,16 +142,16 @@ class EventServiceTest extends TestCase
             plugins: [],
         );
 
-        // Act: cancel the event
+        // Act
         $subject->cancelEvent($event);
 
-        // Assert: event is marked as canceled
+        // Assert
         static::assertTrue($event->isCanceled());
     }
 
     public function testCancelEventWithNoRsvpsDoesNotSendEmails(): void
     {
-        // Arrange: create future event without RSVPs
+        // Arrange
         $event = new EventStub()
             ->setId(1)
             ->setStart(new DateTime('+1 week'));
@@ -174,16 +174,16 @@ class EventServiceTest extends TestCase
             plugins: [],
         );
 
-        // Act: cancel the event
+        // Act
         $subject->cancelEvent($event);
 
-        // Assert: event is marked as canceled
+        // Assert
         static::assertTrue($event->isCanceled());
     }
 
     public function testCancelPastEventDoesNotSendNotifications(): void
     {
-        // Arrange: create past event with RSVP users
+        // Arrange
         $user = new UserStub()->setId(1);
         $event = new EventStub()
             ->setId(1)
@@ -208,16 +208,16 @@ class EventServiceTest extends TestCase
             plugins: [],
         );
 
-        // Act: cancel the past event
+        // Act
         $subject->cancelEvent($event);
 
-        // Assert: event is marked as canceled but no notifications sent
+        // Assert
         static::assertTrue($event->isCanceled());
     }
 
     public function testUncancelEventRemovesCanceledFlag(): void
     {
-        // Arrange: create canceled event
+        // Arrange
         $event = new EventStub()->setId(1);
         $event->setCanceled(true);
 
@@ -236,16 +236,16 @@ class EventServiceTest extends TestCase
             plugins: [],
         );
 
-        // Act: uncancel the event
+        // Act
         $subject->uncancelEvent($event);
 
-        // Assert: event is no longer canceled
+        // Assert
         static::assertFalse($event->isCanceled());
     }
 
     public function testUpdateRecurringEventsWithNoRecurringReturnZero(): void
     {
-        // Arrange: create event without recurring rule
+        // Arrange
         $event = new EventStub()->setId(1);
 
         $recurringServiceMock = $this->createMock(RecurringEventService::class);
@@ -268,7 +268,7 @@ class EventServiceTest extends TestCase
 
     public function testUpdateRecurringEventsWithSeriesMemberReturnsCount(): void
     {
-        // Arrange: create a series member
+        // Arrange
         $parent = new EventStub()
             ->setId(1)
             ->setSeries(
@@ -298,7 +298,7 @@ class EventServiceTest extends TestCase
 
     public function testCancelEventSendsEmailsAndFlushes(): void
     {
-        // Arrange: create future event with RSVP
+        // Arrange
         $user = new UserStub()
             ->setId(1)
             ->setEmail('test@example.com');
@@ -332,7 +332,7 @@ class EventServiceTest extends TestCase
 
     public function testUpdateRecurringEventsWithAutoMemberDelegates(): void
     {
-        // Arrange: create an auto-generated series member
+        // Arrange
         $child = new EventStub()
             ->setId(2)
             ->setSeries(
@@ -362,7 +362,7 @@ class EventServiceTest extends TestCase
 
     public function testUpdateRecurringEventsWithClosedSeriesReturnsZero(): void
     {
-        // Arrange: create a member of a closed series
+        // Arrange
         $child = new EventStub()
             ->setId(2)
             ->setSeries(

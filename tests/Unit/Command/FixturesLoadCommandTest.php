@@ -17,27 +17,27 @@ class FixturesLoadCommandTest extends TestCase
 
     public function testReturnsSuccessWhenNoFixturesFound(): void
     {
-        // Arrange: Create a command with a loader that returns no fixtures
+        // Arrange
         $command = new FixturesLoadCommand(new StubFixturesLoader([]));
         $this->setupCommandTester($command);
 
-        // Act: Execute the command
+        // Act
         $exitCode = $this->commandTester->execute(['--group' => ['plugin']]);
 
-        // Assert: Command succeeds
+        // Assert
         static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testOutputsMessageWhenNoFixturesFound(): void
     {
-        // Arrange: Create a command with a loader that returns no fixtures
+        // Arrange
         $command = new FixturesLoadCommand(new StubFixturesLoader([]));
         $this->setupCommandTester($command);
 
-        // Act: Execute the command (not in quiet mode)
+        // Act
         $this->commandTester->execute(['--group' => ['plugin']]);
 
-        // Assert: Message is displayed
+        // Assert
         $output = $this->commandTester->getDisplay();
         static::assertStringContainsString('No fixtures found for plugin', $output);
         static::assertStringContainsString('Skipping', $output);
@@ -45,66 +45,64 @@ class FixturesLoadCommandTest extends TestCase
 
     public function testNoOutputInQuietModeWhenNoFixturesFound(): void
     {
-        // Arrange: Create a command with a loader that returns no fixtures
+        // Arrange
         $command = new FixturesLoadCommand(new StubFixturesLoader([]));
         $this->setupCommandTester($command);
 
-        // Act: Execute the command in quiet mode (use verbosity flag)
+        // Act
         $this->commandTester->execute(['--group' => ['plugin']], ['verbosity' => OutputInterface::VERBOSITY_QUIET]);
 
-        // Assert: No output (quiet mode suppresses messages)
+        // Assert
         $output = $this->commandTester->getDisplay();
         static::assertEmpty($output);
     }
 
     public function testDelegatesToDoctrineCommandWhenFixturesExist(): void
     {
-        // Arrange: Fixtures exist for the specified group
+        // Arrange
         $mockFixture = $this->createStub(FixtureInterface::class);
         $command = new FixturesLoadCommand(new StubFixturesLoader([$mockFixture]));
 
-        // Mock the doctrine:fixtures:load command
         $doctrineCommand = $this->createMock(Command::class);
         $doctrineCommand->expects($this->once())->method('run')->willReturn(Command::SUCCESS);
 
-        // Mock the application to return our mocked doctrine command
         $application = $this->createMock(Application::class);
         $application->expects($this->once())->method('find')->with('doctrine:fixtures:load')->willReturn($doctrineCommand);
 
         $command->setApplication($application);
         $this->commandTester = new CommandTester($command);
 
-        // Act: Execute the command
+        // Act
         $exitCode = $this->commandTester->execute(['--group' => ['plugin']]);
 
-        // Assert: Command delegates to doctrine command
+        // Assert
         static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testHandlesMultipleGroups(): void
     {
-        // Arrange: No fixtures for multiple groups
+        // Arrange
         $command = new FixturesLoadCommand(new StubFixturesLoader([]));
         $this->setupCommandTester($command);
 
-        // Act: Execute the command with multiple groups
+        // Act
         $this->commandTester->execute(['--group' => ['plugin', 'test']]);
 
-        // Assert: Message includes all groups
+        // Assert
         $output = $this->commandTester->getDisplay();
         static::assertStringContainsString('plugin, test', $output);
     }
 
     public function testHandlesNoGroupOption(): void
     {
-        // Arrange: No fixtures exist at all
+        // Arrange
         $command = new FixturesLoadCommand(new StubFixturesLoader([]));
         $this->setupCommandTester($command);
 
-        // Act: Execute without --group option
+        // Act
         $this->commandTester->execute([]);
 
-        // Assert: Message mentions "all groups"
+        // Assert
         $output = $this->commandTester->getDisplay();
         static::assertStringContainsString('all groups', $output);
     }
@@ -118,10 +116,6 @@ class FixturesLoadCommandTest extends TestCase
     }
 }
 
-/**
- * Stub fixtures loader for testing purposes.
- * Implements FixturesLoaderInterface to provide testable behavior.
- */
 class StubFixturesLoader implements FixturesLoaderInterface
 {
     private array $fixtures = [];

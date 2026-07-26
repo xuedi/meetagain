@@ -52,17 +52,11 @@ class DashboardStatsServiceTest extends TestCase
 
     public function testGetDetailsReturnsExpectedKeys(): void
     {
-        // Testing structure - actual counts require database integration
-        // This test verifies the service method returns the expected array structure
-
         $this->notFoundRepoStub->method('count')->willReturn(100);
         $this->userRepoStub->method('count')->willReturn(50);
         $this->activityRepoStub->method('count')->willReturn(200);
         $this->eventRepoStub->method('count')->willReturn(25);
         $this->mailRepoStub->method('count')->willReturn(75);
-
-        // Skip week counts as they require matching() which needs lazy collections
-        // Full integration test would cover this
 
         static::assertSame(100, $this->notFoundRepoStub->count());
         static::assertSame(50, $this->userRepoStub->count());

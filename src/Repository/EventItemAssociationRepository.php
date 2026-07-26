@@ -37,8 +37,6 @@ class EventItemAssociationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Distinct item ids currently associated to any event for the given type.
-     *
      * @return list<int>
      */
     public function findItemIdsByType(string $itemType): array

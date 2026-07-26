@@ -44,8 +44,6 @@ class PluginListCommand extends Command
     }
 
     /**
-     * Get plugins with their directory keys and status.
-     *
      * @return array<int, array{key: string, name: string, version: string, description: string, installed: bool, enabled: bool}>
      */
     private function getPluginsWithKeys(): array
@@ -62,7 +60,6 @@ class PluginListCommand extends Command
             return [];
         }
 
-        // Load plugin config to check installed/enabled status
         $configFile = dirname(__DIR__, 2) . '/config/plugins.php';
         $config = [];
         if (file_exists($configFile)) {

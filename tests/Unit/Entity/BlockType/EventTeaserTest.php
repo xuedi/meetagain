@@ -10,8 +10,6 @@ use PHPUnit\Framework\TestCase;
 
 class EventTeaserTest extends TestCase
 {
-    // --- Arrange / Act / Assert ---
-
     public function testFromJsonWithFullDataReadsConfiguredFields(): void
     {
         // Arrange

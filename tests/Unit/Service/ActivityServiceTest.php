@@ -19,24 +19,24 @@ class ActivityServiceTest extends TestCase
 {
     public function testLog(): void
     {
-        // Arrange: prepare test data
+        // Arrange
         $type = Login::TYPE;
         $user = $this->createStub(User::class);
         $meta = ['key' => 'value'];
 
-        // Arrange: mock MessageInterface to verify validation is called
+        // Arrange
         $messageMock = $this->createMock(MessageInterface::class);
         $messageMock->expects($this->once())->method('validate');
 
-        // Arrange: mock MessageFactory to return the message mock
+        // Arrange
         $messageFactoryMock = $this->createMock(MessageFactory::class);
         $messageFactoryMock->expects($this->once())->method('build')->willReturn($messageMock);
 
-        // Arrange: mock NotificationService to verify notification is sent
+        // Arrange
         $notificationServiceMock = $this->createMock(ActivityNotificationService::class);
         $notificationServiceMock->expects($this->once())->method('notify');
 
-        // Arrange: mock EntityManager to verify Activity is persisted with correct data
+        // Arrange
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $entityManagerMock
             ->expects($this->once())
@@ -51,7 +51,7 @@ class ActivityServiceTest extends TestCase
             ));
         $entityManagerMock->expects($this->once())->method('flush');
 
-        // Arrange: create subject with mocked dependencies
+        // Arrange
         $subject = new ActivityService(
             em: $entityManagerMock,
             repo: $this->createStub(ActivityRepository::class),
@@ -61,18 +61,18 @@ class ActivityServiceTest extends TestCase
             enrichers: [],
         );
 
-        // Act: log the activity
+        // Act
         $subject->log($type, $user, $meta);
 
-        // Assert: expectations are verified automatically by PHPUnit
+        // Assert
     }
 
     public function testGetUserList(): void
     {
-        // Arrange: create user stub
+        // Arrange
         $user = $this->createStub(User::class);
 
-        // Arrange: mock Activity entities that expect setMessage to be called
+        // Arrange
         $activity1 = $this->createMock(Activity::class);
         $activity1->expects($this->once())->method('setMessage')->with('Message 1')->willReturn($activity1);
 
@@ -81,22 +81,22 @@ class ActivityServiceTest extends TestCase
 
         $activities = [$activity1, $activity2];
 
-        // Arrange: mock repository to return activities for the user
+        // Arrange
         $repoMock = $this->createMock(ActivityRepository::class);
         $repoMock->expects($this->once())->method('getUserDisplay')->with($user)->willReturn($activities);
 
-        // Arrange: mock MessageInterface instances that render messages for user view (with links)
+        // Arrange
         $message1 = $this->createMock(MessageInterface::class);
         $message1->expects($this->once())->method('render')->with(true)->willReturn('Message 1');
 
         $message2 = $this->createMock(MessageInterface::class);
         $message2->expects($this->once())->method('render')->with(true)->willReturn('Message 2');
 
-        // Arrange: mock MessageFactory to build messages for each activity
+        // Arrange
         $messageFactoryMock = $this->createMock(MessageFactory::class);
         $messageFactoryMock->expects($this->exactly(2))->method('build')->willReturnOnConsecutiveCalls($message1, $message2);
 
-        // Arrange: create subject with mocked dependencies
+        // Arrange
         $subject = new ActivityService(
             em: $this->createStub(EntityManagerInterface::class),
             repo: $repoMock,
@@ -106,16 +106,16 @@ class ActivityServiceTest extends TestCase
             enrichers: [],
         );
 
-        // Act: get user activity list
+        // Act
         $result = $subject->getUserList($user);
 
-        // Assert: returned activities match expected
+        // Assert
         static::assertSame($activities, $result);
     }
 
     public function testGetAdminList(): void
     {
-        // Arrange: mock Activity entities that expect setMessage to be called
+        // Arrange
         $activity1 = $this->createMock(Activity::class);
         $activity1->expects($this->once())->method('setMessage')->with('Message 1')->willReturn($activity1);
 
@@ -124,22 +124,22 @@ class ActivityServiceTest extends TestCase
 
         $activities = [$activity1, $activity2];
 
-        // Arrange: mock repository to return latest 250 activities sorted by date descending
+        // Arrange
         $repoMock = $this->createMock(ActivityRepository::class);
         $repoMock->expects($this->once())->method('findRecentForAdmin')->with(250, null, null)->willReturn($activities);
 
-        // Arrange: mock MessageInterface instances that render messages for admin view (without links)
+        // Arrange
         $message1 = $this->createMock(MessageInterface::class);
         $message1->expects($this->once())->method('render')->with(false)->willReturn('Message 1');
 
         $message2 = $this->createMock(MessageInterface::class);
         $message2->expects($this->once())->method('render')->with(false)->willReturn('Message 2');
 
-        // Arrange: mock MessageFactory to build messages for each activity
+        // Arrange
         $messageFactoryMock = $this->createMock(MessageFactory::class);
         $messageFactoryMock->expects($this->exactly(2))->method('build')->willReturnOnConsecutiveCalls($message1, $message2);
 
-        // Arrange: create subject with mocked dependencies
+        // Arrange
         $subject = new ActivityService(
             em: $this->createStub(EntityManagerInterface::class),
             repo: $repoMock,
@@ -149,32 +149,32 @@ class ActivityServiceTest extends TestCase
             enrichers: [],
         );
 
-        // Act: get admin activity list
+        // Act
         $result = $subject->getAdminList();
 
-        // Assert: returned activities match expected
+        // Assert
         static::assertSame($activities, $result);
     }
 
     public function testGetAdminDetailReturnsActivityWithHtmlMessage(): void
     {
-        // Arrange: create an Activity stub
+        // Arrange
         $activity = $this->createMock(Activity::class);
         $activity->expects($this->once())->method('setMessage')->with('<b>HTML</b>')->willReturn($activity);
 
-        // Arrange: mock repository to return the activity by ID
+        // Arrange
         $repoMock = $this->createMock(ActivityRepository::class);
         $repoMock->expects($this->once())->method('find')->with(42)->willReturn($activity);
 
-        // Arrange: mock MessageInterface to return HTML from render(true)
+        // Arrange
         $messageMock = $this->createMock(MessageInterface::class);
         $messageMock->expects($this->once())->method('render')->with(true)->willReturn('<b>HTML</b>');
 
-        // Arrange: mock MessageFactory to build the message
+        // Arrange
         $messageFactoryMock = $this->createMock(MessageFactory::class);
         $messageFactoryMock->expects($this->once())->method('build')->with($activity)->willReturn($messageMock);
 
-        // Arrange: create subject with mocked dependencies
+        // Arrange
         $subject = new ActivityService(
             em: $this->createStub(EntityManagerInterface::class),
             repo: $repoMock,
@@ -187,17 +187,17 @@ class ActivityServiceTest extends TestCase
         // Act
         $result = $subject->getAdminDetail(42);
 
-        // Assert: the activity is returned with its HTML message set
+        // Assert
         static::assertSame($activity, $result);
     }
 
     public function testGetAdminDetailReturnsNullWhenNotFound(): void
     {
-        // Arrange: mock repository to return null
+        // Arrange
         $repoMock = $this->createMock(ActivityRepository::class);
         $repoMock->expects($this->once())->method('find')->with(99)->willReturn(null);
 
-        // Arrange: create subject with mocked dependencies
+        // Arrange
         $subject = new ActivityService(
             em: $this->createStub(EntityManagerInterface::class),
             repo: $repoMock,
@@ -210,7 +210,7 @@ class ActivityServiceTest extends TestCase
         // Act
         $result = $subject->getAdminDetail(99);
 
-        // Assert: null is returned for a missing activity
+        // Assert
         static::assertNull($result);
     }
 }

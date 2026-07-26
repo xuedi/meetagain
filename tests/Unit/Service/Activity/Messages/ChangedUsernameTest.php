@@ -33,7 +33,6 @@ class ChangedUsernameTest extends TestCase
         $subject = new ChangedUsername();
         $subject->injectServices($this->router, $this->imageService, $this->translator, $meta);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(ChangedUsername::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

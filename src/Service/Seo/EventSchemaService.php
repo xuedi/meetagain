@@ -8,10 +8,6 @@ use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Builds a schema.org/Event JSON-LD array for use in templates.
- * Covers all Google Event rich result required and recommended fields.
- */
 final readonly class EventSchemaService
 {
     private const string DEFAULT_IMAGE_PATH = '/images/locations/default.jpg';

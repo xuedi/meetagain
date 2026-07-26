@@ -157,8 +157,6 @@ class ImageRepository extends ServiceEntityRepository
     }
 
     /**
-     * Images carrying an attribution credit (attribution set and not flagged as "no credit needed").
-     *
      * @param array<int>|null $restrictToIds null = no restriction, [] = block all
      * @return Image[]
      */
@@ -227,9 +225,6 @@ class ImageRepository extends ServiceEntityRepository
     }
 
     /**
-     * Reverse of findImageIdsForEvents: for each given image that belongs to an event, its event ID.
-     * Images with no event are omitted.
-     *
      * @param list<int> $imageIds
      * @return array<int, int> imageId => eventId
      */

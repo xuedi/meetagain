@@ -4,14 +4,6 @@ namespace App\Filter\Admin\Dashboard;
 
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composes all registered DashboardScopeFilterInterface implementations into a single
- * DashboardScope value object. Higher priority filters are intersected first.
- *
- * - All filters return null  -> platform-wide scope
- * - Any filter returns []    -> empty scope
- * - Otherwise                -> intersection of every non-null result
- */
 readonly class DashboardScopeFilterService
 {
     /**

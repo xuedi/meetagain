@@ -10,11 +10,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Wishlist\Entity\WishlistEntry;
 use Plugin\Wishlist\Repository\WishlistEntryRepository;
 
-/**
- * The per-member item backlog. Reads and writes are scoped to the item ids the core
- * ItemFilterService allows for a type, so the same backlog narrows automatically once a
- * scoping filter is registered. Never references voting or any item plugin directly.
- */
 readonly class WishlistService
 {
     public function __construct(
@@ -66,7 +61,6 @@ readonly class WishlistService
         return $this->scopeEntries($this->wishlistRepo->findByUser($userId));
     }
 
-    /** Whether any wish exists at all, used to keep fixture self-seeding idempotent. */
     public function hasEntries(): bool
     {
         return $this->wishlistRepo->hasAny();
@@ -108,11 +102,6 @@ readonly class WishlistService
         return $this->wishlistRepo->countWantersForItem($itemType, $itemId);
     }
 
-    /**
-     * Aging denominator: how many in-scope events have happened since a wish was added. The one
-     * intentional core coupling - the backlog reaches into the event stream, scoped by the core
-     * event filter, to show "waited N events".
-     */
     public function countPastEventsInGroupSince(DateTimeImmutable $since): int
     {
         $allowedEventIds = $this->eventFilter->getEventIdFilter()->getEventIds();
@@ -135,10 +124,6 @@ readonly class WishlistService
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
-    /**
-     * Ages the backlog after an item of a type is chosen (by a vote or a direct attach): the
-     * winner is cleared from every member's backlog, every other wish of that type ages up one.
-     */
     public function onSelectionOutcome(string $itemType, int $winnerItemId): void
     {
         $allowedItemIds = $this->itemFilter->getAllowedItemIds($itemType);

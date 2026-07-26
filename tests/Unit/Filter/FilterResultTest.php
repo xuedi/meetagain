@@ -8,10 +8,6 @@ use PHPUnit\Framework\TestCase;
 
 class FilterResultTest extends TestCase
 {
-    // =========================================================================
-    // LocationFilterResult
-    // =========================================================================
-
     public function testLocationFilterResultNoFilter(): void
     {
         $result = LocationFilterResult::noFilter();
@@ -38,10 +34,6 @@ class FilterResultTest extends TestCase
         static::assertTrue($result->hasActiveFilter());
         static::assertFalse($result->isEmpty());
     }
-
-    // =========================================================================
-    // MemberFilterResult
-    // =========================================================================
 
     public function testMemberFilterResultNoFilter(): void
     {

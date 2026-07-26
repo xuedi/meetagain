@@ -37,8 +37,6 @@ class CmsRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find published CMS page by slug, optionally filtered by allowed IDs.
-     *
      * @param string $slug The page slug
      * @param array<int>|null $allowedIds Allowed CMS IDs, or null for no filtering
      * @return Cms|null
@@ -49,7 +47,7 @@ class CmsRepository extends ServiceEntityRepository
 
         if ($allowedIds !== null) {
             if ($allowedIds === []) {
-                return null; // No allowed IDs = no results
+                return null;
             }
 
             $qb->andWhere('c.id IN (:allowedIds)')->setParameter('allowedIds', $allowedIds);
@@ -64,8 +62,6 @@ class CmsRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all published CMS pages for sitemap generation.
-     *
      * @return array<Cms>
      */
     public function findPublished(): array
@@ -74,9 +70,6 @@ class CmsRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find CMS pages by IDs, optionally filtered by allowed IDs.
-     * If no IDs provided, returns all pages.
-     *
      * @param array<int>|null $ids CMS IDs to fetch, or null for all pages
      * @return array<Cms>
      */
@@ -120,11 +113,9 @@ class CmsRepository extends ServiceEntityRepository
     }
 
     /**
-     * IDs are cached in Valkey; entities are fetched fresh on each request to avoid
-     * serializing Doctrine proxy objects into the cache.
-     *
      * @return array<Cms>
      */
+    // Only ids are cached: caching entities would serialize Doctrine proxies into Valkey
     public function findByMenuLocation(MenuLocation $location): array
     {
         $ids = $this->cache->get('cms_menu_location_' . $location->value, function (ItemInterface $item) use ($location): array {
@@ -179,11 +170,6 @@ class CmsRepository extends ServiceEntityRepository
         });
     }
 
-    /**
-     * Reads the persisted slug straight from the database by id. A scalar query
-     * is used deliberately so an unflushed in-memory slug change on the managed
-     * entity does not mask the originally stored value.
-     */
     public function findSlugById(int $id): ?string
     {
         $rows = $this

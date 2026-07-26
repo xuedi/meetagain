@@ -54,7 +54,7 @@ class AltLocaleRequirementResolverTest extends TestCase
 
     public function testBatchResolvesEachImageThroughTheFirstNonDeferringProvider(): void
     {
-        // Arrange - the first provider claims image 1 only, the second claims everything.
+        // Arrange
         $imageOne = self::imageWithId(1);
         $imageTwo = self::imageWithId(2);
         $resolver = new AltLocaleRequirementResolver([

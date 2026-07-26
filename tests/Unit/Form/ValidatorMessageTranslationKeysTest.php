@@ -5,12 +5,6 @@ namespace Tests\Unit\Form;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Guards the i18n hardening plan: no validator constraint in src/Form or src/Entity
- * may ship an English literal as its message / minMessage / maxMessage /
- * invalidMessage / mimeTypesMessage. The value must look like a translation key
- * (namespace.key with no spaces).
- */
 class ValidatorMessageTranslationKeysTest extends TestCase
 {
     private const string FORM_DIR = __DIR__ . '/../../../src/Form';
@@ -35,7 +29,7 @@ class ValidatorMessageTranslationKeysTest extends TestCase
         $code = file_get_contents($file);
         static::assertNotFalse($code, "Could not read {$file}");
 
-        // Act - find every `<param>: '...'` pair where <param> is a known message param
+        // Act
         $offenders = [];
         foreach (self::MESSAGE_PARAMS as $param) {
             $pattern = '/\b' . preg_quote($param, '/') . ':\s*([\'"])([^\'"]+)\1/';

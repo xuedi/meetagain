@@ -53,7 +53,7 @@ class IncidentsControllerTest extends WebTestCase
         // Act
         $client->request('GET', '/en/admin/security/incidents?range=' . $rangeParam);
 
-        // Assert - all known and unknown values resolve to a 200 (unknown falls back to default)
+        // Assert
         $this->assertResponseIsSuccessful();
     }
 
@@ -68,26 +68,26 @@ class IncidentsControllerTest extends WebTestCase
 
     public function testListShowsClearButtonOnlyWhenIncidentsExist(): void
     {
-        // Arrange - start from a clean slate (transaction-rolled-back by DAMA)
+        // Arrange
         $client = static::createClient();
         $em = static::getContainer()->get(EntityManagerInterface::class);
         $em->getConnection()->executeStatement('DELETE FROM logs_incident');
         $this->loginAsAdmin($client);
 
-        // Act - empty state
+        // Act
         $crawler = $client->request('GET', '/en/admin/security/incidents');
 
-        // Assert - no Clear button in the topbar
+        // Assert
         $this->assertResponseIsSuccessful();
         static::assertSame(0, $crawler->filter('.box .level-right form button:contains("Clear")')->count());
 
-        // Arrange - plant one incident
+        // Arrange
         $this->createIncident($em);
 
-        // Act - populated state
+        // Act
         $crawler = $client->request('GET', '/en/admin/security/incidents');
 
-        // Assert - Clear button is rendered
+        // Assert
         $this->assertResponseIsSuccessful();
         static::assertGreaterThan(0, $crawler->filter('.box .level-right a[data-post][href*="/clear"]')->count());
     }
@@ -98,7 +98,7 @@ class IncidentsControllerTest extends WebTestCase
         $client = static::createClient();
         $this->loginAsAdmin($client);
 
-        // Act - any numeric id that does not exist
+        // Act
         $client->request('GET', '/en/admin/security/incidents/999999');
 
         // Assert
@@ -107,7 +107,7 @@ class IncidentsControllerTest extends WebTestCase
 
     public function testShowPageHidesUnblockButtonWhenNoBlockIsActive(): void
     {
-        // Arrange - the "block active" case cannot be tested here: cache.app is the
+        // Arrange
         // resettable ArrayAdapter in the test env, and Symfony's kernel.reset
         // wipes its contents between HTTP requests. Planting a block from the
         // test then issuing a GET sees a clean cache. The hides-when-empty
@@ -152,7 +152,7 @@ class IncidentsControllerTest extends WebTestCase
 
     public function testUnblockRouteRedirectsToShow(): void
     {
-        // Arrange - we cannot meaningfully assert "block was cleared" here because
+        // Arrange
         // the in-memory cache.adapter.array used by cache.app in the test env is
         // reset between HTTP requests (Symfony kernel.reset), so a block planted
         // from the test does not survive into the controller's request scope.

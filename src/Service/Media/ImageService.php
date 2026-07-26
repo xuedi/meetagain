@@ -34,7 +34,6 @@ readonly class ImageService
 
     public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
     {
-        // load or create
         $hash = sha1($imageData->getContent());
         $image = $this->imageRepo->findOneBy(['hash' => $hash]);
         if ($image !== null) {
@@ -109,7 +108,7 @@ readonly class ImageService
                 } else {
                     $imagick->cropThumbnailImage($width, $height);
                 }
-                $imagick->stripImage(); // metadata
+                $imagick->stripImage();
                 $imagick->setFormat('webp');
                 $imagick->writeImage($target);
                 ++$cnt;
@@ -291,7 +290,7 @@ readonly class ImageService
             if ($imagick->getImageWidth() > $maxEdge || $imagick->getImageHeight() > $maxEdge) {
                 $imagick->thumbnailImage($maxEdge, $maxEdge, true);
             }
-            $imagick->stripImage(); // metadata
+            $imagick->stripImage();
             $imagick->setFormat('webp');
 
             return ['content' => $imagick->getImageBlob(), 'mimeType' => 'image/webp'];

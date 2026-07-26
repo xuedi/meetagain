@@ -35,7 +35,6 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // save explicit session, if not available restore from session
         $locale = $request->attributes->get('_locale');
         if ($locale) {
             $request->getSession()->set('_locale', $locale);
@@ -47,9 +46,6 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
             return;
         }
 
-        // No explicit session locale: honour Accept-Language as a hint without
-        // persisting it. Picks one of the enabled codes (q-weighted match);
-        // falls back to the configured filtered default if none match.
         $codes = $this->languageService->getEnabledCodes();
         $hint = $codes === [] ? null : $request->getPreferredLanguage($codes);
         $request->setLocale($hint ?? $this->languageService->getFilteredDefaultLocale());

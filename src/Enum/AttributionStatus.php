@@ -2,10 +2,6 @@
 
 namespace App\Enum;
 
-/**
- * Review state of an image's attribution credit. Derived from the Image's attribution
- * fields, never stored.
- */
 enum AttributionStatus
 {
     case Pending;

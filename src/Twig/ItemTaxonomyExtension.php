@@ -8,10 +8,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-/**
- * Twig bridge for item taxonomy display: the assigned category label and tag labels for one item,
- * resolved in the current request's locale with source-locale fallback.
- */
 final class ItemTaxonomyExtension extends AbstractExtension
 {
     public function __construct(
@@ -94,7 +90,6 @@ final class ItemTaxonomyExtension extends AbstractExtension
         return array_values(array_unique($ids));
     }
 
-    /** The current-request URL with the given tag toggled in/out of the tag[] facet. */
     public function tagToggleUrl(int $tagId): string
     {
         $request = $this->requestStack->getCurrentRequest();

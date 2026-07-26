@@ -77,14 +77,12 @@ class CmsType extends AbstractType
             $locale = $options['edit_locale'];
             $form = $event->getForm();
 
-            // Populate menuLocations
             $values = [];
             foreach ($cms->getMenuLocations() as $ml) {
                 $values[] = $ml->getLocation()?->value;
             }
             $form->get('menuLocations')->setData($values);
 
-            // Populate pageTitle
             foreach ($cms->getTitles() as $title) {
                 if ($title->getLanguage() !== $locale) {
                     continue;
@@ -94,7 +92,6 @@ class CmsType extends AbstractType
                 break;
             }
 
-            // Populate linkName
             foreach ($cms->getLinkNames() as $linkName) {
                 if ($linkName->getLanguage() !== $locale) {
                     continue;
@@ -114,17 +111,14 @@ class CmsType extends AbstractType
 
             $locale = $options['edit_locale'];
 
-            // Handle menuLocations
             if ($form->get('menuLocations')->isSubmitted()) {
                 $values = $form->get('menuLocations')->getData() ?? [];
 
-                // Get current location values
                 $existingValues = [];
                 foreach ($cms->getMenuLocations() as $ml) {
                     $existingValues[$ml->getLocation()?->value] = $ml;
                 }
 
-                // Remove locations that are no longer selected
                 foreach ($existingValues as $value => $ml) {
                     if (in_array($value, $values, strict: true)) {
                         continue;
@@ -133,7 +127,6 @@ class CmsType extends AbstractType
                     $cms->removeMenuLocation($ml);
                 }
 
-                // Add new locations that don't exist yet
                 foreach ($values as $value) {
                     if (isset($existingValues[$value])) {
                         continue;
@@ -147,7 +140,6 @@ class CmsType extends AbstractType
                 }
             }
 
-            // Handle pageTitle
             $titleText = $form->get('pageTitle')->getData();
             $existingTitle = null;
             foreach ($cms->getTitles() as $title) {
@@ -172,7 +164,6 @@ class CmsType extends AbstractType
                 $cms->removeTitle($existingTitle);
             }
 
-            // Handle linkName
             $linkNameText = $form->get('linkName')->getData();
             $existingLinkName = null;
             foreach ($cms->getLinkNames() as $linkName) {

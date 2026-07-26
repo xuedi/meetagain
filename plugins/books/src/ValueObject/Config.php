@@ -5,11 +5,6 @@ namespace Plugin\Books\ValueObject;
 use App\Item\Taxonomy\TaxonomyConfig;
 use App\Publisher\PluginSettings\PluginSettingsData;
 
-/**
- * Effective books settings: the shared category/tag taxonomy. The neutral default is taxonomy
- * disabled. Books had no settings surface before; this is the first, added solely to carry the
- * per-scope taxonomy definitions.
- */
 final class Config implements PluginSettingsData
 {
     private TaxonomyConfig $taxonomy;

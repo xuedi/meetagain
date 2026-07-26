@@ -64,8 +64,6 @@ final class PluginExtension extends AbstractExtension
     }
 
     /**
-     * Returns AssetMapper logical paths for all plugin stylesheets.
-     * Wrapped in asset() by the Twig template.
      * @return list<string>
      */
     public function getPluginStylesheets(): array
@@ -77,8 +75,6 @@ final class PluginExtension extends AbstractExtension
     }
 
     /**
-     * Returns AssetMapper logical paths for all plugin JavaScript files.
-     * Wrapped in asset() by the Twig template.
      * @return list<string>
      */
     public function getPluginJavascripts(): array
@@ -89,25 +85,16 @@ final class PluginExtension extends AbstractExtension
         ));
     }
 
-    /**
-     * Returns rendered HTML for footer "about" section from first plugin that provides it.
-     */
     public function getPluginFooterAbout(): ?string
     {
         return $this->findFirstFromPlugins(static fn(Plugin $p) => $p->getFooterAbout());
     }
 
-    /**
-     * Returns links contributed by plugins for the given footer column.
-     */
     public function getPluginFooterLinks(string $column): array
     {
         return $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getFooterLinks($column));
     }
 
-    /**
-     * Returns links contributed by plugins for the profile dropdown menu, sorted by priority.
-     */
     public function getPluginProfileDropdownLinks(): array
     {
         /** @var list<Link> $links */
@@ -119,7 +106,6 @@ final class PluginExtension extends AbstractExtension
     }
 
     /**
-     * Returns links contributed by plugins for the profile config page action area, sorted by priority.
      * @return list<Link>
      */
     public function getPluginProfileConfigLinks(): array
@@ -141,8 +127,6 @@ final class PluginExtension extends AbstractExtension
     }
 
     /**
-     * Pre-warms per-request caches for all visible event IDs before the list render loop.
-     *
      * @param array<int> $eventIds
      */
     public function warmEventListItemTags(array $eventIds): void
@@ -183,8 +167,6 @@ final class PluginExtension extends AbstractExtension
     }
 
     /**
-     * Collects results from all enabled plugins using the provided callback.
-     *
      * @template T
      * @param callable(Plugin): (T|list<T>|null) $callback
      * @return list<T>
@@ -219,8 +201,6 @@ final class PluginExtension extends AbstractExtension
     }
 
     /**
-     * Returns first non-null result from enabled plugins.
-     *
      * @template T
      * @param callable(Plugin): ?T $callback
      * @return ?T

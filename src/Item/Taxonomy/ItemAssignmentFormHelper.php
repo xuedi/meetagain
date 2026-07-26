@@ -8,13 +8,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Builds and reads the unmapped category/tag assignment fields on an item's steward edit form.
- * Options come from the type's scope-resolved definitions, labelled in the admin's UI locale;
- * assignment is a selection (an id), not translated content, so there is no per-language editing.
- * Fields are added only for the features the type enables and supports. Pair with
- * ItemTaxonomyService to persist what extractAssignment() returns.
- */
 readonly class ItemAssignmentFormHelper
 {
     public const string CATEGORY_FIELD = 'taxonomyCategory';

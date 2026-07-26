@@ -212,8 +212,6 @@ final class RequestsController extends AbstractSupportController implements Admi
 
         $response = $this->contentSanitizer->basic((string) $form->get('response')->getData());
 
-        // The first admin to respond owns the conversation; later replies (from any admin) are
-        // attributed to that admin so all support correspondence stays in one user-admin thread.
         $owner = $request->getRespondedBy();
         $isFirstResponse = !$owner instanceof User;
         if ($isFirstResponse) {

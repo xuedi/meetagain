@@ -56,7 +56,7 @@ class OccurrenceCalculatorTest extends TestCase
 
     public function testABiweeklyRuleCountsWeeksFromMondayNotFromTheAnchor(): void
     {
-        // Arrange: Sunday 4 Jan belongs to the Mon-Sun week that started on 29 Dec, so the next
+        // Arrange
         // interval week begins 12 Jan - eight days out, not fourteen.
         $calculator = new OccurrenceCalculator();
         $pattern = RecurrencePattern::weekday(RecurrencePeriod::TwoWeeks, Weekday::Wednesday);
@@ -74,7 +74,7 @@ class OccurrenceCalculatorTest extends TestCase
         $calculator = new OccurrenceCalculator();
         $pattern = RecurrencePattern::dayOfMonth(RecurrencePeriod::Quarter, 15);
 
-        // Act: the 15th of the anchor's own month is already past, so January yields nothing
+        // Act
         $occurrences = $calculator->take($pattern, new DateTimeImmutable('2026-01-20'), 3);
 
         // Assert
@@ -87,7 +87,7 @@ class OccurrenceCalculatorTest extends TestCase
         $calculator = new OccurrenceCalculator();
         $pattern = RecurrencePattern::dayOfMonth(RecurrencePeriod::TwoMonths, 31);
 
-        // Act: from February the interval months are Feb, Apr, Jun, Aug - only August has a 31st
+        // Act
         $occurrences = $calculator->take($pattern, new DateTimeImmutable('2026-02-01'), 3);
 
         // Assert
@@ -113,7 +113,7 @@ class OccurrenceCalculatorTest extends TestCase
         $calculator = new OccurrenceCalculator();
         $pattern = RecurrencePattern::weekday(RecurrencePeriod::Month, Weekday::Sunday, RecurrenceOrdinal::First);
 
-        // Act: 4 Feb is a Wednesday, so February's first Sunday is behind us but March's is not
+        // Act
         $occurrences = $calculator->take($pattern, new DateTimeImmutable('2026-02-04'), 2);
 
         // Assert
@@ -148,7 +148,7 @@ class OccurrenceCalculatorTest extends TestCase
 
     public function testTwoOrdinalsCollapsingOntoTheSameDateYieldItOnce(): void
     {
-        // Arrange: February 2026 has exactly four Fridays, so the fourth is also the last
+        // Arrange
         $calculator = new OccurrenceCalculator();
         $pattern = RecurrencePattern::weekday(
             RecurrencePeriod::Month,
@@ -182,7 +182,7 @@ class OccurrenceCalculatorTest extends TestCase
         $calculator = new OccurrenceCalculator();
         $pattern = RecurrencePattern::dayOfMonth(RecurrencePeriod::Month, [28, 31]);
 
-        // Act: February 2026 keeps the 28th and simply has no 31st
+        // Act
         $occurrences = $calculator->until(
             $pattern,
             new DateTimeImmutable('2026-01-01'),

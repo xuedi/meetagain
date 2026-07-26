@@ -5,24 +5,9 @@ namespace Tests\Functional;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-/**
- * Smoke test for i18n
- *
- * Loads a selection of public routes in en / de / zh and asserts:
- *   - the page renders successfully (HTTP 2xx/3xx)
- *   - no response body contains an unresolved translation key from the
- *     new nested namespaces (e.g. the literal text `admin_member.status_active`
- *     would indicate that a `{{ ... |trans }}` was missing somewhere)
- */
 class TranslatorSmokeTest extends WebTestCase
 {
-    /**
-     * Namespace prefixes introduced by the i18n hardening plan. If the literal
-     * text `<namespace>.<word>` appears in the rendered body, a translate call
-     * is missing or the key does not exist.
-     */
     private const array KNOWN_NAMESPACES = [
-        // Core namespaces
         'admin_cms',
         'admin_email',
         'admin_email_blocklist',
@@ -69,19 +54,14 @@ class TranslatorSmokeTest extends WebTestCase
         'security',
         'shared',
         'support',
-        // Books plugin namespaces
         'books',
         'books_book',
-        // Dishes plugin namespaces
         'dishes',
         'dishes_dish',
-        // Films plugin namespaces
         'films_film',
         'films_vote',
         'films_tile',
-        // Glossary plugin namespaces
         'glossary',
-        // Commercial-plugin namespaces are covered by the plugin's own TranslatorSmokeTest.
     ];
 
     #[DataProvider('provideRoutes')]
@@ -94,12 +74,11 @@ class TranslatorSmokeTest extends WebTestCase
         $client->request('GET', "/{$locale}{$route}");
         $response = $client->getResponse();
 
-        // Assert - the page must load (allow redirects; login-required routes get a 302)
-        // We also allow 404s for fixture-dependent routes that may not have locale variants
+        // Assert
         $status = $response->getStatusCode();
         static::assertTrue($status < 500, "Route /{$locale}{$route} returned HTTP {$status} (server error)");
 
-        // Assert - no unresolved translation key should leak as visible text
+        // Assert
         $content = $response->getContent();
         if ($content === false || $content === '' || $status >= 400) {
             return;
@@ -139,18 +118,11 @@ class TranslatorSmokeTest extends WebTestCase
         }
     }
 
-    /**
-     * Strip HTML tags, script/style blocks, and attributes so we only assert
-     * against what the user actually sees. Translation keys in CSS classes
-     * or data attributes would be false positives.
-     */
     private static function extractVisibleText(string $html): string
     {
-        // Drop <script> and <style> blocks entirely
         $html = preg_replace('#<script[^>]*>.*?</script>#is', ' ', $html) ?? $html;
         $html = preg_replace('#<style[^>]*>.*?</style>#is', ' ', $html) ?? $html;
 
-        // Drop all tag attributes by stripping tags
         return strip_tags($html);
     }
 }

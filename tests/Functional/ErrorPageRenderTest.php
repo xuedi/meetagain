@@ -12,10 +12,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Twig\Environment;
 
-/**
- * Renders cms/error.html.twig through the real Twig service to catch
- * template-level regressions that mocked Twig in unit tests cannot.
- */
 class ErrorPageRenderTest extends KernelTestCase
 {
     public function test500PageRendersErrorIdAndBackHomeLink(): void
@@ -42,7 +38,6 @@ class ErrorPageRenderTest extends KernelTestCase
         static::assertStringContainsString('Something went wrong', $html);
         static::assertStringContainsString('Error reference', $html);
         static::assertStringContainsString('Back to home', $html);
-        // The 32-char hex error id appears in the readonly input.
         static::assertMatchesRegularExpression('#value="[0-9a-f]{32}"#', $html);
     }
 }

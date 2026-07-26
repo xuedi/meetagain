@@ -6,13 +6,6 @@ use App\DataHotfix\DataHotfixInterface;
 use Doctrine\DBAL\Connection;
 use Override;
 
-/**
- * Deletes leftover doctrine_migration_versions rows for the bookclub, dinnerclub and filmclub
- * plugins, which were replaced by the books, dishes and films item plugins. Their migration
- * classes no longer exist, so Doctrine reports the rows as "previously executed migrations that
- * are not registered" on every deploy. Removing the orphaned rows silences that warning without
- * affecting any live migration namespace (none of which share these prefixes).
- */
 readonly class RemoveOrphanedClubPluginMigrations implements DataHotfixInterface
 {
     private const string MIGRATIONS_TABLE = 'doctrine_migration_versions';

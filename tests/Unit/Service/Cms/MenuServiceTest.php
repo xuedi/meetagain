@@ -18,7 +18,7 @@ class MenuServiceTest extends TestCase
     #[DataProvider('provideUnknownMenuTypeCases')]
     public function testGetMenuForContextReturnsEmptyListForUnknownType(string $unknownType): void
     {
-        // Arrange - repo must not be touched for unknown types
+        // Arrange
         $cmsRepo = $this->createMock(CmsRepository::class);
         $cmsRepo->expects($this->never())->method('findByMenuLocation');
 
@@ -46,7 +46,7 @@ class MenuServiceTest extends TestCase
         array $cmsIds,
         array $expectedSlugs,
     ): void {
-        // Arrange - repo records the location it was asked for and returns matching pages
+        // Arrange
         $pages = [
             $this->makeCmsStub(1, 'home', 'Home'),
             $this->makeCmsStub(2, 'about', 'About'),
@@ -68,7 +68,7 @@ class MenuServiceTest extends TestCase
         // Act
         $items = $service->getMenuForContext($type, null, 'en');
 
-        // Assert - location lookup matches the mapping, and filter narrows the result
+        // Assert
         static::assertSame($expectedLocation, $capturedLocation);
         static::assertSame($expectedSlugs, array_map(static fn($i) => $i->slug, $items));
     }
@@ -121,7 +121,7 @@ class MenuServiceTest extends TestCase
 
     public function testGetMenuForContextCachesPerCacheKey(): void
     {
-        // Arrange - repo should only be hit on first call; second call comes from cache
+        // Arrange
         $cmsRepo = $this->createMock(CmsRepository::class);
         $cmsRepo
             ->expects($this->once())

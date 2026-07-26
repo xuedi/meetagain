@@ -65,8 +65,6 @@ class RecurringEventExtensionTest extends TestCase
         );
     }
 
-    // ---- extension template resolution ----
-
     private function makeTranslation(string $title): EventTranslation
     {
         $translation = new EventTranslation();
@@ -109,7 +107,7 @@ class RecurringEventExtensionTest extends TestCase
 
     public function testExtendRecurringEventsSourcesScheduleAndContentFromNewestMember(): void
     {
-        // Arrange: the newest non-locked member carries the current time, content, and creator
+        // Arrange
         $series = $this->makeSeries(9, EventInterval::Weekly);
 
         $creator = new UserStub()->setId(77);
@@ -139,7 +137,7 @@ class RecurringEventExtensionTest extends TestCase
 
     public function testExtendRecurringEventsUsesTheOnlyMemberAsTemplate(): void
     {
-        // Arrange: a fresh series where the manually created first event is the only member
+        // Arrange
         $series = $this->makeSeries(9, EventInterval::Weekly);
 
         $template = $this->makeFutureEvent(1, '2026-06-14 19:00', '2026-06-14 22:00');
@@ -162,7 +160,7 @@ class RecurringEventExtensionTest extends TestCase
 
     public function testExtendCreatesAnOccurrenceFallingLaterToday(): void
     {
-        // Arrange: the rule fires today at 19:00 and it is only 08:00
+        // Arrange
         $series = $this->makeSeries(9, EventInterval::Weekly);
         $template = $this->makeFutureEvent(1, '2026-06-09 19:00');
         [$service, $createdEvents] = $this->createExtensionService($series, $template, '2026-06-16 08:00:00');
@@ -176,7 +174,7 @@ class RecurringEventExtensionTest extends TestCase
 
     public function testExtendSkipsAnOccurrenceThatAlreadyPassedToday(): void
     {
-        // Arrange: same rule, but 19:00 is behind us
+        // Arrange
         $series = $this->makeSeries(9, EventInterval::Weekly);
         $template = $this->makeFutureEvent(1, '2026-06-09 19:00');
         [$service, $createdEvents] = $this->createExtensionService($series, $template, '2026-06-16 20:00:00');
@@ -190,7 +188,7 @@ class RecurringEventExtensionTest extends TestCase
 
     public function testExtendReachesTheNextLeapDayOfAYearlySeries(): void
     {
-        // Arrange: 29 February recurs only every four years, so a horizon under that never extends
+        // Arrange
         $series = $this->makeSeries(9, EventInterval::Yearly);
         $template = $this->makeFutureEvent(1, '2028-02-29 19:00');
         [$service, $createdEvents] = $this->createExtensionService($series, $template, '2028-03-01 12:00:00');
@@ -202,8 +200,6 @@ class RecurringEventExtensionTest extends TestCase
         static::assertSame(1, $count);
         static::assertSame('2032-02-29 19:00', $createdEvents()[0]->getStart()->format('Y-m-d H:i'));
     }
-
-    // ---- custom rule generation ----
 
     private function generateCustomSeries(string $spec, string $anchor = '2026-06-16 19:00'): string
     {
@@ -242,7 +238,7 @@ class RecurringEventExtensionTest extends TestCase
 
     public function testExtendSkipsMonthsWithoutADayThirtyOne(): void
     {
-        // Act: June, September and November are skipped entirely rather than shifted to the 30th
+        // Act
         $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYMONTHDAY=31');
 
         // Assert
@@ -275,7 +271,7 @@ class RecurringEventExtensionTest extends TestCase
         // Act
         $starts = $this->generateCustomSeries('FREQ=WEEKLY;BYDAY=MO,WE,FR', '2026-06-16 19:00');
 
-        // Assert: the anchor is a Tuesday, so the first hit is that same week's Wednesday
+        // Assert
         static::assertStringStartsWith('2026-06-17 19:00,2026-06-19 19:00,2026-06-22 19:00,2026-06-24 19:00', $starts);
     }
 
@@ -295,7 +291,7 @@ class RecurringEventExtensionTest extends TestCase
 
     public function testExtendKeepsTheFirstOccurrenceWhenTheAnchorIsOffPattern(): void
     {
-        // Act: 8 July is a Wednesday, so July's first Sunday is already behind the anchor -
+        // Act
         // dropping the head of the set by position would silently eat August's real date
         $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYDAY=1SU', '2026-07-08 19:00');
 
@@ -320,7 +316,7 @@ class RecurringEventExtensionTest extends TestCase
 
     public function testExtendSkipsASeriesWhoseCustomSpecCanNeverFire(): void
     {
-        // Arrange: February never has a 30th, so the spec is rejected rather than walked forever
+        // Arrange
         $series = $this->makeSeries(9, EventInterval::Custom, 'FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=30');
         $template = $this->makeFutureEvent(1, '2026-06-16 19:00');
         [$service, $createdEvents] = $this->createExtensionService($series, $template);
@@ -335,7 +331,7 @@ class RecurringEventExtensionTest extends TestCase
 
     public function testExtendRecurringEventsSkipsSeriesWithoutUsableTemplate(): void
     {
-        // Arrange: every member is locked - findNewestSeriesMember finds nothing
+        // Arrange
         $series = $this->makeSeries(9, EventInterval::Weekly);
 
         [$service, $createdEvents] = $this->createExtensionService($series, null);

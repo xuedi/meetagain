@@ -68,7 +68,6 @@ final class EventController extends AbstractController
         $type = $data['type'] ?? EventType::All;
         $rsvp = $data['rsvp'] ?? EventRsvpFilter::All;
 
-        // Apply content filtering from all registered filters
         $filterResult = $this->eventFilterService->getEventIdFilter();
         $allowedEventIds = $filterResult->getEventIds();
 
@@ -89,7 +88,6 @@ final class EventController extends AbstractController
     #[Route('/event/{id}', name: 'app_event_details', requirements: ['id' => '\d+'])]
     public function details(EntityManagerInterface $em, Request $request, int $id): Response
     {
-        // Check if event is accessible using composite filter
         if (!$this->eventFilterService->isEventAccessible($id)) {
             throw $this->createNotFoundException();
         }
@@ -161,7 +159,6 @@ final class EventController extends AbstractController
     {
         $response = $this->getResponse();
 
-        // Check if any plugin provides custom featured events list
         $featuredEvents = $this->getProvidedFeaturedEvents();
 
         $filterResult = $this->eventFilterService->getEventIdFilter();
@@ -183,15 +180,12 @@ final class EventController extends AbstractController
     }
 
     /**
-     * Get featured events from a provider plugin if one should handle it.
-     *
      * @return array<Event>|null
      */
     private function getProvidedFeaturedEvents(): ?array
     {
         $providers = iterator_to_array($this->featuredEventProviders);
 
-        // Sort by priority (highest first)
         usort($providers, static fn(FeaturedEventProviderInterface $a, FeaturedEventProviderInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         foreach ($providers as $provider) {

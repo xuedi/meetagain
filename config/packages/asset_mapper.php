@@ -6,18 +6,14 @@ return static function (ContainerConfigurator $container): void {
     $projectDir = realpath(__DIR__ . '/../..');
 
     $paths = [
-        // Core assets (no namespace — files at assets/styles/app.css are referenced as 'styles/app.css')
         $projectDir . '/assets/' => '',
     ];
 
-    // Plugin assets — auto-discovered, no plugin names in core.
-    // A plugin gains asset serving simply by creating a plugins/{key}/assets/ directory.
     $pluginGlob = glob($projectDir . '/plugins/*/assets');
     if ($pluginGlob !== false) {
         foreach ($pluginGlob as $pluginAssetPath) {
             if (is_dir($pluginAssetPath)) {
                 $pluginKey = basename(dirname($pluginAssetPath));
-                // Namespace prefix: plugins/filmclub/assets/styles/film.css → logical path 'plugins/filmclub/styles/film.css'
                 $paths[$pluginAssetPath . '/'] = 'plugins/' . $pluginKey;
             }
         }

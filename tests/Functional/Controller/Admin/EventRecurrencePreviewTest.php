@@ -75,7 +75,7 @@ class EventRecurrencePreviewTest extends WebTestCase
             'after' => '2030-01-01',
         ]);
 
-        // Assert: one candidate per month, each anchoring the yearly rule to its own month
+        // Assert
         $this->assertResponseIsSuccessful();
         $payload = json_decode((string) $client->getResponse()->getContent(), true);
         static::assertCount(12, $payload['candidates']);
@@ -142,7 +142,7 @@ class EventRecurrencePreviewTest extends WebTestCase
             'after' => '2030-01-01',
         ]);
 
-        // Assert: a monthly rule carries one weekday, so the selection is corrected rather than refused
+        // Assert
         $this->assertResponseIsSuccessful();
         $payload = json_decode((string) $client->getResponse()->getContent(), true);
         static::assertSame(['MO'], $payload['selection']['weekday']);
@@ -188,7 +188,7 @@ class EventRecurrencePreviewTest extends WebTestCase
             'after' => '2030-01-01',
         ]);
 
-        // Assert: a week holds one of each weekday, so the ordinal is dropped, not greyed out
+        // Assert
         $this->assertResponseIsSuccessful();
         $payload = json_decode((string) $client->getResponse()->getContent(), true);
         static::assertSame([], $payload['selection']['ordinal']);
@@ -235,7 +235,7 @@ class EventRecurrencePreviewTest extends WebTestCase
             'after' => '2030-01-02',
         ]);
 
-        // Assert: "last day" is its own sentence, so it wins and the numbered days drop out
+        // Assert
         $this->assertResponseIsSuccessful();
         $payload = json_decode((string) $client->getResponse()->getContent(), true);
         static::assertSame([-1], $payload['selection']['day']);

@@ -23,7 +23,6 @@ readonly class SiteLogoResolver
 
     public function resolveUrl(): string
     {
-        // 1. Plugin-provided override
         foreach ($this->providers as $provider) {
             $url = $provider->resolveSiteLogoUrl();
             if ($url !== null) {
@@ -31,7 +30,6 @@ readonly class SiteLogoResolver
             }
         }
 
-        // 2. Admin-configured SiteLogo (from theme settings).
         $logoId = $this->configService->getSiteLogoId();
         if ($logoId !== null) {
             $image = $this->imageRepository->find($logoId);
@@ -45,7 +43,6 @@ readonly class SiteLogoResolver
             }
         }
 
-        // 3. Post-SiteLogo fallback (e.g. main-host-group's logo as implicit platform branding).
         foreach ($this->providers as $provider) {
             $url = $provider->resolveFallbackSiteLogoUrl();
             if ($url !== null) {
@@ -53,7 +50,6 @@ readonly class SiteLogoResolver
             }
         }
 
-        // 4. Bundled default asset.
         return $this->assetPackages->getUrl('images/logo.webp');
     }
 }

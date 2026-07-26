@@ -1,10 +1,5 @@
 <?php declare(strict_types=1);
 
-/**
- * SendGrid Mail Provider.
- *
- * Cloud email delivery service using API key authentication.
- */
 class SendgridMailProvider implements MailProvider
 {
     public function getName(): string

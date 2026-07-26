@@ -5,11 +5,6 @@ namespace App\Filter\Admin\Member;
 use App\Filter\Member\MemberFilterResult;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composite admin member list filter service.
- * Collects all registered AdminMemberListFilterInterface implementations.
- * Combines multiple filters using AND logic for user ID restrictions.
- */
 readonly class AdminMemberListFilterService
 {
     /**
@@ -20,10 +15,6 @@ readonly class AdminMemberListFilterService
         private iterable $filters,
     ) {}
 
-    /**
-     * Get the combined user ID filter from all registered filters.
-     * Uses intersection (AND) logic: a member must pass ALL filters.
-     */
     public function getUserIdFilter(): MemberFilterResult
     {
         $resultSet = null;
@@ -55,11 +46,6 @@ readonly class AdminMemberListFilterService
         return new MemberFilterResult($resultSet, $hasActiveFilter);
     }
 
-    /**
-     * Check if a member is accessible according to all registered filters.
-     * Any filter returning false will deny access.
-     * Returns true only if all filters allow (or have no opinion).
-     */
     public function isMemberAccessible(int $userId): bool
     {
         foreach ($this->getSortedFilters() as $filter) {
@@ -74,7 +60,6 @@ readonly class AdminMemberListFilterService
     }
 
     /**
-     * Get combined debug context from all registered filters.
      * @return array<string, mixed>
      */
     public function getDebugContext(int $userId): array

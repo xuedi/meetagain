@@ -46,7 +46,7 @@ class FuseSecurityProviderTest extends TestCase
         // Arrange
         $provider = new FuseSecurityProvider(new ArrayAdapter(), new NullLogger());
 
-        // Act - cycle through many sessions on the same IP
+        // Act
         $finalReport = null;
         for ($i = 0; $i < (FuseSecurityProvider::EVENTS_PER_IP_FUSE + 1); ++$i) {
             $finalReport = $provider->observe(SecurityEventType::NotFound, new Request(), [], 'rotating-session-' . $i, '5.6.7.8');
@@ -65,11 +65,11 @@ class FuseSecurityProviderTest extends TestCase
             $provider->observe(SecurityEventType::NotFound, new Request(), [], 'sess', '9.9.9.9');
         }
 
-        // Act - read-only should return cached state without incrementing
+        // Act
         $report1 = $provider->observe(SecurityEventType::NotFound, new Request(), [], 'sess', '9.9.9.9', readOnly: true);
         $report2 = $provider->observe(SecurityEventType::NotFound, new Request(), [], 'sess', '9.9.9.9', readOnly: true);
 
-        // Assert - threat level didn't grow despite multiple observe calls
+        // Assert
         static::assertSame($report1->threatLevel, $report2->threatLevel);
     }
 

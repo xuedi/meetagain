@@ -11,11 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-/**
- * A canonical target must appear in the hreflang cluster it is listed in, otherwise search
- * engines discard the cluster - so an event page advertises the roots of the other locales,
- * not its own URLs. The locales of one series can resolve to different events.
- */
 final readonly class EventAlternateLinkProvider implements AlternateLinkProviderInterface
 {
     public function __construct(
@@ -42,6 +37,7 @@ final readonly class EventAlternateLinkProvider implements AlternateLinkProvider
             return null;
         }
 
+        // Roots, not the event's own URLs: a canonical target absent from its cluster voids the cluster
         $host = rtrim($this->configService->getHost(), '/');
         $rootUrls = [];
         foreach (array_keys($localeUrls) as $locale) {

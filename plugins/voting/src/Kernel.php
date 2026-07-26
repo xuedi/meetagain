@@ -49,8 +49,6 @@ class Kernel implements Plugin
             return;
         }
 
-        // Voting is item-agnostic: seed over whichever item type has the most events-attached items,
-        // read from the neutral core association table (no dependency on films/books/dishes).
         [$itemType, $itemIds] = $this->richestSeededItemType();
         if (count($itemIds) < 2) {
             $output->writeln('<comment>Voting: no seeded items to vote on, skipping.</comment>');
@@ -69,7 +67,6 @@ class Kernel implements Plugin
 
         $candidates = array_slice($itemIds, 0, 5);
 
-        // Closed poll on a past event: cast a spread of votes, then close (steward tie-break if needed).
         $pastEvents = $this->eventRepository->getPastEvents(1);
         if ($pastEvents !== []) {
             $poll = $this->pollService->create($pastEvents[0], $itemType, $candidates, 7, $adminId);
@@ -82,7 +79,6 @@ class Kernel implements Plugin
             }
         }
 
-        // Open poll on the next upcoming event: a couple of early votes.
         $nextEventId = $this->eventRepository->getNextEventId();
         $nextEvent = $nextEventId !== null ? $this->eventRepository->find($nextEventId) : null;
         if ($nextEvent !== null) {

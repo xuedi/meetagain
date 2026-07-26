@@ -19,11 +19,6 @@ use Plugin\Dishes\Entity\DishTranslation;
 use Plugin\Dishes\Repository\DishRepository;
 use Plugin\Dishes\Service\DishService;
 
-/**
- * Dishes have no natural key, so every imported row creates a new dish - the same rule events
- * follow. The pronunciation system travels as its (language, name) pair because its ids are
- * instance-local.
- */
 readonly class DishPortabilityContributor implements ItemPortabilityContributorInterface
 {
     public function __construct(

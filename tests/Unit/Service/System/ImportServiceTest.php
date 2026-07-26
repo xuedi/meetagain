@@ -43,7 +43,7 @@ class ImportServiceTest extends TestCase
 
     public function testRemoveDirectoryRecursesAndDeletesEntries(): void
     {
-        // Arrange - layout: /root/{.,..,a.txt,sub/{.,..,b.txt}}
+        // Arrange
         $deletedFiles = [];
         $removedDirs = [];
 
@@ -70,7 +70,6 @@ class ImportServiceTest extends TestCase
 
         // Assert
         static::assertSame(['/root/a.txt', '/root/sub/b.txt'], $deletedFiles);
-        // Subdir removed before root
         static::assertSame(['/root/sub', '/root'], $removedDirs);
     }
 
@@ -90,7 +89,7 @@ class ImportServiceTest extends TestCase
         // Act
         $this->invokeImportEvents($service, $eventsData, []);
 
-        // Assert: exactly one series synthesized, named after the en title
+        // Assert
         $series = array_values(array_filter($persisted(), static fn(object $entity): bool => $entity instanceof EventSeries));
         static::assertCount(1, $series);
         static::assertSame('My Legacy Event', $series[0]->getName());
@@ -121,7 +120,7 @@ class ImportServiceTest extends TestCase
         // Act
         $this->invokeImportEvents($service, $eventsData, $seriesRefMap);
 
-        // Assert: member attached by ref, closed series keeps a null rule
+        // Assert
         static::assertSame(EventInterval::Monthly, $seriesRefMap[1]->getRule());
         static::assertNull($seriesRefMap[2]->getRule());
         static::assertSame('Series B', $seriesRefMap[2]->getName());
@@ -148,7 +147,7 @@ class ImportServiceTest extends TestCase
 
     public function testImportSeriesDropsAnUnparseableRuleSpec(): void
     {
-        // Arrange: an archive from a newer version may carry a shape this one cannot parse
+        // Arrange
         [$service] = $this->buildCapturingService();
 
         // Act
@@ -156,7 +155,7 @@ class ImportServiceTest extends TestCase
             ['ref' => 1, 'name' => 'Future Series', 'rule' => 'Custom', 'ruleSpec' => 'FREQ=HOURLY;BYDAY=1SU'],
         ]);
 
-        // Assert: imports as a closed custom series rather than failing the whole archive
+        // Assert
         static::assertSame(EventInterval::Custom, $seriesRefMap[1]->getRule());
         static::assertNull($seriesRefMap[1]->getRuleSpec());
     }

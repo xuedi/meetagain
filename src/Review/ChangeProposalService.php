@@ -189,8 +189,6 @@ readonly class ChangeProposalService
     }
 
     /**
-     * Display rows for the proposal's field diff, formatted through the target provider.
-     *
      * @return list<array{field: string, label: string, before: string, after: string, resolution: ?FieldResolution}>
      */
     public function fieldRows(ChangeProposal $proposal): array

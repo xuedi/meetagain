@@ -76,10 +76,10 @@ class EmailTemplateServiceTest extends TestCase
         $template = $this->makeTemplate('welcome', 'Welcome!', '<h1>Hello</h1>');
         $this->repoStub->method('findByIdentifier')->willReturn($template);
 
-        // Act - request German, but only English exists
+        // Act
         $result = $this->subject->getTemplateContent(EmailType::Welcome, 'de');
 
-        // Assert - should fall back to English
+        // Assert
         static::assertSame('Welcome!', $result['subject']);
         static::assertSame('<h1>Hello</h1>', $result['body']);
     }
@@ -99,7 +99,7 @@ class EmailTemplateServiceTest extends TestCase
 
     public function testGetTemplateContentThrowsWhenNoTranslationFound(): void
     {
-        // Arrange - template without any translations
+        // Arrange
         $template = new EmailTemplate();
         $template->setIdentifier('welcome');
         $template->setAvailableVariables(['username']);
@@ -175,7 +175,7 @@ class EmailTemplateServiceTest extends TestCase
         // Act
         $result = $this->subject->renderContent($content, $context);
 
-        // Assert: non-scalar values should not be replaced
+        // Assert
         static::assertSame('Object: {{obj}}, Array: {{arr}}', $result);
     }
 
@@ -223,7 +223,6 @@ class EmailTemplateServiceTest extends TestCase
         $template->setAvailableVariables(['username', 'host']);
         $template->setUpdatedAt(new DateTimeImmutable());
 
-        // Create English translation
         $translation = new EmailTemplateTranslation();
         $translation->setEmailTemplate($template);
         $translation->setLanguage('en');

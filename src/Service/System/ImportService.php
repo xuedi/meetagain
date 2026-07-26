@@ -93,6 +93,7 @@ readonly class ImportService
 
             $this->em->flush();
 
+            // After the flush: a contributor needs the generated ids, and taxonomy re-keying needs its ref map
             $itemsByType = $this->importItems($data['items'] ?? [], $tempDir, $systemUser, $counts);
 
             return new ImportSummary(
@@ -389,9 +390,6 @@ readonly class ImportService
     }
 
     /**
-     * Item sections run after the core flush: a contributor needs the generated ids to build its
-     * ref map, and the taxonomy re-keying needs that map in turn.
-     *
      * @param array<string, mixed> $itemsData
      * @param array<string, int> $counts
      * @return array<string, array{created: int, matched: int}>
@@ -478,8 +476,6 @@ readonly class ImportService
     }
 
     /**
-     * A spec this version cannot parse imports as closed rather than failing the whole archive.
-     *
      * @param array<string, mixed> $data
      */
     private function readRuleSpec(array $data, ?EventInterval $rule): ?string

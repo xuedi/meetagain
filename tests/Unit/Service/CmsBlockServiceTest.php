@@ -49,9 +49,7 @@ class CmsBlockServiceTest extends TestCase
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
         $dispatcherMock = $this->createMock(EntityActionDispatcher::class);
 
-        // persist called once for the new block; reorderBlocks finds no blocks (findBy returns [])
         $emMock->expects($this->once())->method('persist')->with(static::isInstanceOf(CmsBlock::class));
-        // flush called twice: once after persist, once in reorderBlocks
         $emMock->expects($this->exactly(2))->method('flush');
 
         $dispatcherMock->expects($this->once())->method('dispatch')->with(EntityAction::UpdateCmsBlock, 1);
@@ -201,7 +199,7 @@ class CmsBlockServiceTest extends TestCase
 
         $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator(), $dispatcherStub);
 
-        // Act + Assert: imageRight missing from payload (unchecked)
+        // Act + Assert
         $payload = [
             'headline' => 'new',
             'subHeadline' => 'new',
@@ -213,7 +211,7 @@ class CmsBlockServiceTest extends TestCase
         $subject->updateBlock(42, CmsBlockType::Hero, $payload);
         static::assertFalse($block->getJson()['imageRight']);
 
-        // Act + Assert: imageRight in payload (checked)
+        // Act + Assert
         $payload['imageRight'] = '1';
         $subject->updateBlock(42, CmsBlockType::Hero, $payload);
         static::assertTrue($block->getJson()['imageRight']);

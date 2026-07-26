@@ -2,10 +2,6 @@
 
 namespace Plugin\Voting\ValueObject;
 
-/**
- * Outcome of closing a poll: either a single winning item id, or - on a vote tie - the set
- * of tied item ids awaiting a steward tie-break. Both empty means no votes were cast.
- */
 final readonly class PollClosure
 {
     /**

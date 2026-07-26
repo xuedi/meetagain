@@ -5,10 +5,6 @@ namespace App\Item;
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Unions the list-cell providers whose plugin is active and answers keyed lookups.
- * Mirrors ItemTypeRegistry's active-plugin guard on the separate list-cell axis.
- */
 class ListCellRegistry
 {
     /**

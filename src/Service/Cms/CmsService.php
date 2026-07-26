@@ -34,25 +34,20 @@ readonly class CmsService
 
     public function handle(string $locale, string $slug, Response $response): Response
     {
-        // Apply CMS filtering based on current context (determines access, not content)
         $cmsFilterResult = $this->cmsFilterService->getCmsIdFilter();
 
-        // check if we have this page
         $cms = $this->repo->findPublishedBySlug($slug, $cmsFilterResult->getCmsIds());
         if ($cms === null) {
             throw new NotFoundHttpException();
         }
 
-        // build a cache key
         $pageId = (int) $cms->getId();
         $host = $this->requestStack->getCurrentRequest()?->getHost() ?? '';
         $eventIds = $this->eventFilterService->getEventIdFilter()->getEventIds();
         $cacheKey = $this->getCacheKey($pageId, $locale, $slug, $host, $eventIds);
 
-        // check if we can deliver a cached version of this page
         $body = $this->getCachedBody($cacheKey);
         if ($body === null) {
-            // collect the blocks in order
             $blocks = $cms->getLanguageFilteredBlockJsonList($locale);
             if ($blocks->count() === 0) {
                 return new Response($this->twig->render('cms/204.html.twig', [
@@ -64,7 +59,6 @@ readonly class CmsService
             $this->storeCachedBody($cacheKey, $pageId, $body);
         }
 
-        // actual return of page
         $content = $this->twig->render('cms/index.html.twig', [
             'title' => $cms->getPageTitle($locale) ?? $this->translator->trans('cms.page_no_title_fallback'),
             'body' => $body,

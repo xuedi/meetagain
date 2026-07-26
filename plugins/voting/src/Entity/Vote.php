@@ -6,12 +6,9 @@ use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Plugin\Voting\Repository\VoteRepository;
 
-/**
- * One user's approval of one candidate item on a poll. The unique (poll, user, item)
- * constraint makes a vote idempotent; a user's full set of rows is their approval ballot.
- */
 #[ORM\Entity(repositoryClass: VoteRepository::class)]
 #[ORM\Table(name: 'plg_voting_vote')]
+// The unique constraint is what makes a vote idempotent: a user's rows are their approval ballot
 #[ORM\UniqueConstraint(name: 'uniq_vote_poll_user_item', columns: ['poll_id', 'user_id', 'item_id'])]
 class Vote
 {

@@ -16,9 +16,6 @@ readonly class BlockHydrator
     ) {}
 
     /**
-     * Validates $data against the block type's field definitions, applies defaults
-     * for optional missing fields, then calls fromJson() to build the block object.
-     *
      * @throws BlockValidationException when required fields are missing
      */
     public function hydrate(CmsBlockType $type, array $data, ?ImageEntity $image = null): BlockType

@@ -54,7 +54,7 @@ class PortableImageImporterTest extends TestCase
 
     public function testReturnsNullWhenExtensionIsEmpty(): void
     {
-        // Arrange - file exists, hash not known, but path has no extension
+        // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(true);
         $fs->method('getFileContents')->willReturn('bytes');

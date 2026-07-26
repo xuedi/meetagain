@@ -119,7 +119,6 @@ final class EventController extends AbstractController implements AdminNavigatio
         $after = DateTimeImmutable::createFromFormat('Y-m-d', (string) $request->query->get('after'))
             ?: new DateTimeImmutable('today');
 
-        // Unparseable input is a bad request; a merely inconsistent selection is normalised below.
         if (!$mode instanceof RecurrenceMode || !$period instanceof RecurrencePeriod) {
             return $this->json(['error' => 'invalid_parameters'], Response::HTTP_BAD_REQUEST);
         }
@@ -414,14 +413,12 @@ final class EventController extends AbstractController implements AdminNavigatio
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::EVENT_UPDATE, $event);
 
-        // Validate event is accessible in current context
         if (!$this->eventFilterService->isEventAccessible($event->getId())) {
             throw $this->createAccessDeniedException('This event is not accessible in the current context');
         }
 
         $form = $this->createForm(EventType::class, $event);
 
-        // Only set form data on GET request (initial load)
         if ($request->isMethod('GET')) {
             $form->get('location')->setData($event->getLocation());
             $form->get('host')->setData($event->getHost());
@@ -481,11 +478,9 @@ final class EventController extends AbstractController implements AdminNavigatio
                 }
             }
 
-            // overwrite basic data
             $event->setInitial(true);
             $event->setUser($user);
 
-            // series updates: rename freely, rule changes only arrive here confirmed
             if ($isSeries) {
                 $series = $event->getSeries();
                 if ($seriesName !== '') {
@@ -499,13 +494,11 @@ final class EventController extends AbstractController implements AdminNavigatio
                 $event->setSeries($this->createSeries($seriesName, $newRule, $newRuleSpec));
             }
 
-            // manually hydrate location (unmapped field)
             $locationData = $form->get('location')->getData();
             if ($locationData instanceof Location) {
                 $event->setLocation($locationData);
             }
 
-            // manually hydrate hosts (unmapped field)
             $event->getHost()->clear();
             $hostsData = $form->get('host')->getData();
             if (is_iterable($hostsData)) {
@@ -518,7 +511,6 @@ final class EventController extends AbstractController implements AdminNavigatio
                 }
             }
 
-            // event image
             $image = null;
             $oldPreviewId = $event->getPreviewImage()?->getId();
             $imageData = $form->get('image')->getData();
@@ -529,7 +521,6 @@ final class EventController extends AbstractController implements AdminNavigatio
                 $event->setPreviewImage($image);
             }
 
-            // save translations
             foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
                 $translation = $this->getTranslation($languageCode, $event->getId());
                 $translation->setEvent($event);
@@ -553,7 +544,6 @@ final class EventController extends AbstractController implements AdminNavigatio
                 $this->dispatchEventUpdateNotifications($event, $user, $beforeSnapshot, $afterSnapshot);
             }
 
-            // create thumbnail and update location index
             if ($image instanceof Image) {
                 $this->imageService->createThumbnails($image, ImageType::EventTeaser);
                 if ($oldPreviewId !== null) {
@@ -567,8 +557,7 @@ final class EventController extends AbstractController implements AdminNavigatio
                 $syncCount = $this->eventService->updateRecurringEvents($event, $oldStart);
             }
 
-            // a confirmed rule change realigns even without the allFollowing checkbox;
-            // closing the series (rule change to null) never realigns
+            // A confirmed rule change realigns without allFollowing; closing the series never realigns
             $executesRealign = $wantsRealign || $isSeries && $ruleChanged && $newRule !== null;
             if ($executesRealign) {
                 $result = $this->eventService->executeRealignment($this->eventService->planRealignment($event, $change));
@@ -653,7 +642,6 @@ final class EventController extends AbstractController implements AdminNavigatio
             : null;
         $isCustom = $series?->getRule() === EventInterval::Custom;
 
-        // The builder always opens on defaults; the rule in force is shown as text, not pre-filled.
         $state = $this->recurrenceBuilderStateResolver->resolve(
             mode: RecurrenceMode::Weekday,
             period: RecurrencePeriod::Month,
@@ -708,10 +696,6 @@ final class EventController extends AbstractController implements AdminNavigatio
     }
 
     /**
-     * Cancellation via the dedicated cancel route is handled by NotificationEventCanceledEmail
-     * inside EventService::cancelEvent(); this diff path only fires on the form-edit save and
-     * therefore never double-sends.
-     *
      * @param array{start: int, startFormatted: string, locationId: ?int, locationName: string, canceled: bool} $before
      * @param array{start: int, startFormatted: string, locationId: ?int, locationName: string, canceled: bool} $after
      */
@@ -846,13 +830,11 @@ final class EventController extends AbstractController implements AdminNavigatio
                 ));
             }
 
-            // manually hydrate location (unmapped field)
             $locationData = $form->get('location')->getData();
             if ($locationData instanceof Location) {
                 $event->setLocation($locationData);
             }
 
-            // manually hydrate hosts (unmapped field)
             $hostsData = $form->get('host')->getData();
             if (is_iterable($hostsData)) {
                 foreach ($hostsData as $host) {

@@ -1,10 +1,5 @@
 <?php declare(strict_types=1);
 
-/**
- * Amazon SES Mail Provider.
- *
- * AWS Simple Email Service with region and access key configuration.
- */
 class SesMailProvider implements MailProvider
 {
     public function getName(): string

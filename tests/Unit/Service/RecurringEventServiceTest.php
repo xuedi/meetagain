@@ -33,8 +33,6 @@ class RecurringEventServiceTest extends TestCase
 {
     private const string NOW = '2026-06-15 12:00:00'; // a Monday, so weekday maths in the fixtures is readable
 
-    // ---- helpers ----
-
     private function makeSeries(int $id, ?EventInterval $rule, ?string $ruleSpec = null): EventSeriesStub
     {
         $series = new EventSeriesStub();
@@ -71,8 +69,6 @@ class RecurringEventServiceTest extends TestCase
         );
     }
 
-    // ---- runCronTask ----
-
     public function testRunCronTaskReturnsOkResult(): void
     {
         // Arrange
@@ -88,8 +84,6 @@ class RecurringEventServiceTest extends TestCase
         static::assertSame(CronTaskStatus::ok, $result->status);
         static::assertSame('0 events extended', $result->message);
     }
-
-    // ---- updateRecurringEvents: early-return cases (data provider) ----
 
     #[DataProvider('updateRecurringEventsReturnsZeroProvider')]
     public function testUpdateRecurringEventsReturnsZero(EventStub $event): void
@@ -129,8 +123,6 @@ class RecurringEventServiceTest extends TestCase
             'event' => $memberWithoutFollowUps,
         ];
     }
-
-    // ---- updateRecurringEvents: member with unlocked follow-ups → counts and persists ----
 
     public function testUpdateRecurringEventsMemberWithTwoUnlockedFollowUpsReturnsTwo(): void
     {
@@ -207,8 +199,6 @@ class RecurringEventServiceTest extends TestCase
         static::assertSame(2, $result);
     }
 
-    // ---- updateRecurringEvents: lookup keyed on the series ----
-
     public function testUpdateRecurringEventsUsesSeriesIdForFollowUpLookup(): void
     {
         // Arrange
@@ -233,7 +223,7 @@ class RecurringEventServiceTest extends TestCase
 
     public function testUpdateRecurringEventsExcludesTheAnchorItself(): void
     {
-        // Arrange: the series-keyed query can return the anchor among the follow-ups
+        // Arrange
         $anchor = $this->makeEvent(1);
         $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
@@ -255,11 +245,9 @@ class RecurringEventServiceTest extends TestCase
         static::assertSame(1, $result);
     }
 
-    // ---- updateRecurringEvents: translation propagation ----
-
     public function testUpdateRecurringEventsPropagatesTranslationsToFollowUps(): void
     {
-        // Arrange: anchor event with one translation
+        // Arrange
         $anchor = $this->makeEvent(1);
         $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
@@ -270,7 +258,7 @@ class RecurringEventServiceTest extends TestCase
         $translation->setDescription('Anchor Description');
         $anchor->addTranslation($translation);
 
-        // Arrange: follow-up with no existing translation for 'en'
+        // Arrange
         $child = $this->makeEvent(2);
 
         $repo = $this->createStub(EventRepository::class);
@@ -282,15 +270,13 @@ class RecurringEventServiceTest extends TestCase
         // Act
         $service->updateRecurringEvents($anchor);
 
-        // Assert: follow-up now has the 'en' translation with propagated fields
+        // Assert
         $childTranslation = $child->findTranslation('en');
         static::assertNotNull($childTranslation);
         static::assertSame('Anchor Title', $childTranslation->getTitle());
         static::assertSame('Anchor Teaser', $childTranslation->getTeaser());
         static::assertSame('Anchor Description', $childTranslation->getDescription());
     }
-
-    // ---- planRealignment ----
 
     private function makeFutureEvent(int $id, string $start, ?string $stop = null, EventStatus $status = EventStatus::Published): EventStub
     {
@@ -374,7 +360,7 @@ class RecurringEventServiceTest extends TestCase
         // Act
         $plan = $service->planRealignment($anchor, $change);
 
-        // Assert: nothing dropped, monthly occurrences continue past the old weekly spacing
+        // Assert
         static::assertCount(2, $plan->items);
         static::assertSame('2030-02-12 20:00', $plan->items[0]->newStart->format('Y-m-d H:i'));
         static::assertNull($plan->items[0]->newStop);
@@ -397,7 +383,7 @@ class RecurringEventServiceTest extends TestCase
         // Act
         $plan = $service->planRealignment($anchor, $this->makeWeeklyChange());
 
-        // Assert: the realignable child takes the occurrence the locked one would have taken
+        // Assert
         static::assertSame(RealignmentOutcome::SkippedLocked, $plan->items[0]->outcome);
         static::assertNull($plan->items[0]->newStart);
         static::assertSame('2030-01-09 19:00', $plan->items[0]->currentStart->format('Y-m-d H:i'));
@@ -429,7 +415,7 @@ class RecurringEventServiceTest extends TestCase
 
     public function testPlanRealignmentChildAlreadyOnPatternIsDateUnchanged(): void
     {
-        // Arrange: anchor keeps its start, one child sits on the pattern, one is off by a day
+        // Arrange
         $anchor = $this->makeFutureEvent(1, '2030-01-05 19:00');
         $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
@@ -462,7 +448,7 @@ class RecurringEventServiceTest extends TestCase
 
     public function testPlanRealignmentCollectsChildrenFromOldStart(): void
     {
-        // Arrange: anchor moves later; a child between old and new start must stay included
+        // Arrange
         $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00');
         $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
@@ -523,7 +509,7 @@ class RecurringEventServiceTest extends TestCase
 
     public function testPlanRealignmentOnClosedSeriesReturnsEmptyPlan(): void
     {
-        // Arrange: anchor belongs to a closed series (rule = null) and no rule change is submitted
+        // Arrange
         $anchor = $this->makeFutureEvent(2, '2030-01-09 19:00');
         $anchor->setSeries($this->makeSeries(9, null));
 
@@ -551,7 +537,7 @@ class RecurringEventServiceTest extends TestCase
 
     public function testPlanRealignmentResolvesRuleFromSeriesWhenChangeCarriesNone(): void
     {
-        // Arrange: the change carries no rule at all - the series rule applies
+        // Arrange
         $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00');
         $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
@@ -583,7 +569,7 @@ class RecurringEventServiceTest extends TestCase
 
     public function testPlanRealignmentRuleChangeToNonRecurringReturnsEmptyPlan(): void
     {
-        // Arrange: closing the series - members keep their dates, nothing realigns
+        // Arrange
         $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00');
         $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
 
@@ -611,8 +597,6 @@ class RecurringEventServiceTest extends TestCase
         static::assertTrue($plan->isEmpty());
         static::assertNull($plan->rule);
     }
-
-    // ---- executeRealignment ----
 
     public function testExecuteRealignmentMovesChildRemovesRsvpsAndResetsSentFlags(): void
     {
@@ -673,7 +657,7 @@ class RecurringEventServiceTest extends TestCase
 
     public function testPlanRealignmentReturnsUnmovedItemsWhenTheCustomSpecCannotBeParsed(): void
     {
-        // Arrange: a Custom series whose spec resolves to no rule at all
+        // Arrange
         $anchor = $this->makeFutureEvent(1, '2030-01-02 19:00');
         $anchor->setSeries($this->makeSeries(9, EventInterval::Custom, 'FREQ=NONSENSE'));
 
@@ -703,7 +687,7 @@ class RecurringEventServiceTest extends TestCase
 
     public function testUpdateRecurringEventsUpdatesExistingFollowUpTranslation(): void
     {
-        // Arrange: anchor event with 'de' translation
+        // Arrange
         $anchor = $this->makeEvent(1);
         $anchor->setSeries($this->makeSeries(9, EventInterval::Monthly));
 
@@ -714,7 +698,7 @@ class RecurringEventServiceTest extends TestCase
         $anchorTranslation->setDescription('Neue Beschreibung');
         $anchor->addTranslation($anchorTranslation);
 
-        // Arrange: follow-up already has a 'de' translation with old data
+        // Arrange
         $child = $this->makeEvent(2);
         $existingTranslation = new EventTranslation();
         $existingTranslation->setLanguage('de');
@@ -732,7 +716,7 @@ class RecurringEventServiceTest extends TestCase
         // Act
         $service->updateRecurringEvents($anchor);
 
-        // Assert: existing follow-up translation is updated in-place
+        // Assert
         $childTranslation = $child->findTranslation('de');
         static::assertNotNull($childTranslation);
         static::assertSame('Neuer Titel', $childTranslation->getTitle());

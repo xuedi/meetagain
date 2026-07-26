@@ -6,10 +6,6 @@ use App\Entity\Image;
 use App\Service\Config\LanguageService;
 use Override;
 
-/**
- * Core default (lowest priority): every enabled locale must have its own alt text. Uses the
- * unfiltered enabled set so the global audit never inherits any context narrowing.
- */
 readonly class EnabledLocalesAltRequirementProvider implements AltLocaleRequirementProviderInterface
 {
     public function __construct(private LanguageService $languageService) {}

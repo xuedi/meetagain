@@ -59,9 +59,6 @@ readonly class PluginService
     }
 
     /**
-     * Returns all globally active plugin keys from config/plugins.php.
-     * Does NOT apply any context filters — always reflects the platform admin's settings.
-     *
      * @return array<string>
      */
     public function getGloballyActiveList(): array
@@ -70,18 +67,12 @@ readonly class PluginService
 
         $activePlugins = array_keys(array_filter($config, static fn($enabled) => $enabled === true));
 
-        // Core plugins are always active
         $activePlugins[] = 'core_navigation';
 
         return $activePlugins;
     }
 
     /**
-     * Returns active plugin keys for the current request context.
-     * Applies all registered PluginListFilterInterface implementations (AND logic).
-     * Filters only operate on filterable plugins; core and infrastructure plugins
-     * are always included.
-     *
      * @return array<string>
      */
     public function getActiveList(): array
@@ -103,9 +94,6 @@ readonly class PluginService
     }
 
     /**
-     * Returns globally active plugins that group founders can activate for their group.
-     * Excludes plugins where manifest.json has "group_activatable": false.
-     *
      * @return array<array{key: string, name: string, description: string}>
      */
     public function getActivatableByGroupList(): array
@@ -136,7 +124,6 @@ readonly class PluginService
                 continue;
             }
 
-            // Skip plugins that have opted out of group activation
             if (isset($pluginData['group_activatable']) && $pluginData['group_activatable'] === false) {
                 continue;
             }
@@ -219,7 +206,6 @@ readonly class PluginService
 
     private function getPluginConfig(): array
     {
-        // Check for environment-specific config first (e.g., plugins_test.php)
         $envConfigFile = $this->configDir . '/plugins_' . $this->environment . '.php';
         if ($this->filesystem->fileExists($envConfigFile)) {
             try {
@@ -231,7 +217,6 @@ readonly class PluginService
             }
         }
 
-        // Fallback to default plugins.php
         $configFile = $this->configDir . '/plugins.php';
         if (!$this->filesystem->fileExists($configFile)) {
             return [];

@@ -23,7 +23,7 @@ class TaxonomyConfigTypeTest extends TestCase
         // Act
         $form = $this->factory(['en', 'de'])->create(TaxonomyConfigType::class, $taxonomy);
 
-        // Assert - the row's per-locale label fields are seeded from the labels map
+        // Assert
         $row = $form->get('categories')->get('0');
         static::assertSame('Greeting', $row->get('en')->getData());
         static::assertSame('Gruss', $row->get('de')->getData());

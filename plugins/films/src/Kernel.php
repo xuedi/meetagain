@@ -75,8 +75,6 @@ class Kernel implements Plugin
             $created[] = $this->filmService->createManual($title, $year, $runtime, $description, $genres, $adminId);
         }
 
-        // Attach a handful of films across the available events (several per event when past
-        // events are few), so the event pages and the voting/wishlist backlogs have real data.
         $events = $this->eventRepository->getPastEvents(6);
         if ($events === []) {
             $events = $this->eventRepository->getUpcomingEvents(6);

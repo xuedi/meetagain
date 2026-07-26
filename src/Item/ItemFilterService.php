@@ -4,10 +4,6 @@ namespace App\Item;
 
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composes all ItemFilterInterface implementations via AND-intersection, keyed by item type.
- * Returns null when no implementation has an opinion, so with none registered items are unfiltered.
- */
 readonly class ItemFilterService
 {
     /**

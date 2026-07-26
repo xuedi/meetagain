@@ -116,9 +116,6 @@ readonly class EventService
     }
 
     /**
-     * Resolves each of the event's associations to its item-type provider and renders its cell.
-     * Associations of inactive item types (no provider) or missing items (null cell) are skipped.
-     *
      * @return list<string>
      */
     public function getRenderedItemCells(int $eventId): array

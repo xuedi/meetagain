@@ -5,11 +5,6 @@ namespace App\Filter\Admin\Event;
 use App\Filter\Event\EventFilterResult;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composite admin event list filter service.
- * Collects all registered AdminEventListFilterInterface implementations.
- * Combines multiple filters using AND logic for event ID restrictions.
- */
 readonly class AdminEventListFilterService
 {
     /**
@@ -20,10 +15,6 @@ readonly class AdminEventListFilterService
         private iterable $filters,
     ) {}
 
-    /**
-     * Get the combined event ID filter from all registered filters.
-     * Uses intersection (AND) logic: an event must pass ALL filters.
-     */
     public function getEventIdFilter(): EventFilterResult
     {
         $resultSet = null;
@@ -55,11 +46,6 @@ readonly class AdminEventListFilterService
         return new EventFilterResult($resultSet, $hasActiveFilter);
     }
 
-    /**
-     * Check if an event is accessible according to all registered filters.
-     * Any filter returning false will deny access.
-     * Returns true only if all filters allow (or have no opinion).
-     */
     public function isEventAccessible(int $eventId): bool
     {
         foreach ($this->getSortedFilters() as $filter) {
@@ -74,7 +60,6 @@ readonly class AdminEventListFilterService
     }
 
     /**
-     * Get combined debug context from all registered filters.
      * @return array<string, mixed>
      */
     public function getDebugContext(int $eventId): array

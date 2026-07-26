@@ -26,7 +26,7 @@ class AnnouncementServiceTest extends TestCase
 {
     public function testSendThrowsExceptionWhenNotDraft(): void
     {
-        // Arrange: create announcement that is already sent
+        // Arrange
         $announcement = $this->createStub(Announcement::class);
         $announcement->method('isDraft')->willReturn(false);
 
@@ -39,17 +39,17 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Assert: expect exception
+        // Assert
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Announcement has already been sent');
 
-        // Act: try to send
+        // Act
         $subject->send($announcement);
     }
 
     public function testSendThrowsExceptionWhenNoCmsPage(): void
     {
-        // Arrange: create draft announcement without CMS page
+        // Arrange
         $announcement = $this->createStub(Announcement::class);
         $announcement->method('isDraft')->willReturn(true);
         $announcement->method('getCmsPage')->willReturn(null);
@@ -63,29 +63,29 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Assert: expect exception
+        // Assert
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Announcement must have a CMS page linked before sending');
 
-        // Act: try to send
+        // Act
         $subject->send($announcement);
     }
 
     public function testSendSuccessfullyProcessesSubscribers(): void
     {
-        // Arrange: create CMS blocks
+        // Arrange
         $textBlock = $this->createStub(CmsBlock::class);
         $textBlock->method('getLanguage')->willReturn('en');
         $textBlock->method('getType')->willReturn(CmsBlockType::Text);
         $textBlock->method('getJson')->willReturn(['content' => 'Test content']);
         $textBlock->method('getImage')->willReturn(null);
 
-        // Arrange: create CMS page with blocks
+        // Arrange
         $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getPageTitle')->willReturn('Test Title');
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$textBlock]));
 
-        // Arrange: create draft announcement with CMS page
+        // Arrange
         $announcement = $this->createMock(Announcement::class);
         $announcement->method('isDraft')->willReturn(true);
         $announcement->method('getCmsPage')->willReturn($cmsPage);
@@ -94,11 +94,11 @@ class AnnouncementServiceTest extends TestCase
         $announcement->expects($this->once())->method('setSentAt');
         $announcement->expects($this->once())->method('setRecipientCount')->with(2);
 
-        // Arrange: create notification settings that allow announcements
+        // Arrange
         $notificationSettings = $this->createStub(NotificationSettings::class);
         $notificationSettings->method('isActive')->willReturn(true);
 
-        // Arrange: create subscribers
+        // Arrange
         $subscriber1 = $this->createStub(User::class);
         $subscriber1->method('getLocale')->willReturn('en');
         $subscriber1->method('getNotificationSettings')->willReturn($notificationSettings);
@@ -107,19 +107,19 @@ class AnnouncementServiceTest extends TestCase
         $subscriber2->method('getLocale')->willReturn('en');
         $subscriber2->method('getNotificationSettings')->willReturn($notificationSettings);
 
-        // Arrange: user repository returns subscribers
+        // Arrange
         $userRepoMock = $this->createMock(UserRepository::class);
         $userRepoMock->expects($this->once())->method('findAnnouncementSubscribers')->willReturn([$subscriber1, $subscriber2]);
 
-        // Arrange: config service returns host
+        // Arrange
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
 
-        // Arrange: email class should be called for each subscriber
+        // Arrange
         $announcementEmailMock = $this->createMock(AnnouncementEmail::class);
         $announcementEmailMock->expects($this->exactly(2))->method('send');
 
-        // Arrange: entity manager should persist and flush
+        // Arrange
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->once())->method('persist')->with($announcement);
         $emMock->expects($this->once())->method('flush');
@@ -133,34 +133,34 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Act: send announcement
+        // Act
         $result = $subject->send($announcement);
 
-        // Assert: returns recipient count
+        // Assert
         static::assertSame(2, $result);
     }
 
     public function testSendFiltersOutUsersWithDisabledNotifications(): void
     {
-        // Arrange: create CMS page with title
+        // Arrange
         $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getPageTitle')->willReturn('Test Title');
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([]));
 
-        // Arrange: create draft announcement
+        // Arrange
         $announcement = $this->createMock(Announcement::class);
         $announcement->method('isDraft')->willReturn(true);
         $announcement->method('getCmsPage')->willReturn($cmsPage);
         $announcement->expects($this->once())->method('setRecipientCount')->with(1);
 
-        // Arrange: notification settings - one enabled, one disabled
+        // Arrange
         $enabledSettings = $this->createStub(NotificationSettings::class);
         $enabledSettings->method('isActive')->willReturn(true);
 
         $disabledSettings = $this->createStub(NotificationSettings::class);
         $disabledSettings->method('isActive')->willReturn(false);
 
-        // Arrange: create subscribers
+        // Arrange
         $enabledSubscriber = $this->createStub(User::class);
         $enabledSubscriber->method('getLocale')->willReturn('en');
         $enabledSubscriber->method('getNotificationSettings')->willReturn($enabledSettings);
@@ -168,11 +168,11 @@ class AnnouncementServiceTest extends TestCase
         $disabledSubscriber = $this->createStub(User::class);
         $disabledSubscriber->method('getNotificationSettings')->willReturn($disabledSettings);
 
-        // Arrange: user repository returns both subscribers
+        // Arrange
         $userRepoMock = $this->createMock(UserRepository::class);
         $userRepoMock->expects($this->once())->method('findAnnouncementSubscribers')->willReturn([$enabledSubscriber, $disabledSubscriber]);
 
-        // Arrange: email class should only be called once (for enabled subscriber)
+        // Arrange
         $announcementEmailMock = $this->createMock(AnnouncementEmail::class);
         $announcementEmailMock->expects($this->once())->method('send');
 
@@ -188,34 +188,34 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Act: send announcement
+        // Act
         $result = $subject->send($announcement);
 
-        // Assert: only one recipient
+        // Assert
         static::assertSame(1, $result);
     }
 
     public function testGetPreviewContextReturnsCorrectData(): void
     {
-        // Arrange: create CMS blocks
+        // Arrange
         $textBlock = $this->createStub(CmsBlock::class);
         $textBlock->method('getLanguage')->willReturn('en');
         $textBlock->method('getType')->willReturn(CmsBlockType::Text);
         $textBlock->method('getJson')->willReturn(['content' => 'Preview content']);
         $textBlock->method('getImage')->willReturn(null);
 
-        // Arrange: create CMS page
+        // Arrange
         $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getPageTitle')->willReturn('Preview Title');
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$textBlock]));
 
-        // Arrange: create announcement
+        // Arrange
         $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(123);
         $announcement->method('getLinkHash')->willReturn('abc123hash');
         $announcement->method('getCmsPage')->willReturn($cmsPage);
 
-        // Arrange: config service
+        // Arrange
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
 
@@ -228,10 +228,10 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Act: get preview context
+        // Act
         $result = $subject->getPreviewContext($announcement, 'en');
 
-        // Assert: context contains expected data
+        // Assert
         static::assertSame('Preview Title', $result['title']);
         static::assertStringContainsString('Preview content', $result['content']);
         static::assertSame('https://example.com/announcement/abc123hash', $result['announcementUrl']);
@@ -242,13 +242,13 @@ class AnnouncementServiceTest extends TestCase
 
     public function testGetPreviewContextUsesPreviewHashWhenLinkHashIsNull(): void
     {
-        // Arrange: create announcement without link hash
+        // Arrange
         $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(42);
         $announcement->method('getLinkHash')->willReturn(null);
         $announcement->method('getCmsPage')->willReturn(null);
 
-        // Arrange: config service
+        // Arrange
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
 
@@ -261,22 +261,22 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Act: get preview context
+        // Act
         $result = $subject->getPreviewContext($announcement, 'en');
 
-        // Assert: uses preview hash
+        // Assert
         static::assertSame('https://example.com/announcement/preview-42', $result['announcementUrl']);
     }
 
     public function testGetPreviewContextHandlesMissingCmsPage(): void
     {
-        // Arrange: create announcement without CMS page
+        // Arrange
         $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(1);
         $announcement->method('getLinkHash')->willReturn('hash');
         $announcement->method('getCmsPage')->willReturn(null);
 
-        // Arrange: config service
+        // Arrange
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
 
@@ -289,20 +289,20 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Act: get preview context
+        // Act
         $result = $subject->getPreviewContext($announcement, 'en');
 
-        // Assert: returns null title and empty content
+        // Assert
         static::assertNull($result['title']);
         static::assertSame('', $result['content']);
     }
 
     public function testRenderPreviewThrowsExceptionWhenTemplateNotFound(): void
     {
-        // Arrange: create announcement
+        // Arrange
         $announcement = $this->createStub(Announcement::class);
 
-        // Arrange: template service returns null
+        // Arrange
         $templateServiceMock = $this->createMock(EmailTemplateService::class);
         $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement)->willReturn(null);
 
@@ -315,33 +315,33 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Assert: expect exception
+        // Assert
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Announcement email template not found in database');
 
-        // Act: try to render preview
+        // Act
         $subject->renderPreview($announcement);
     }
 
     public function testRenderPreviewReturnsRenderedSubjectAndBody(): void
     {
-        // Arrange: create CMS page
+        // Arrange
         $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getPageTitle')->willReturn('My Title');
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([]));
 
-        // Arrange: create announcement
+        // Arrange
         $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(1);
         $announcement->method('getLinkHash')->willReturn('hash123');
         $announcement->method('getCmsPage')->willReturn($cmsPage);
 
-        // Arrange: create email template
+        // Arrange
         $emailTemplate = $this->createStub(EmailTemplate::class);
         $emailTemplate->method('getSubject')->willReturn('Subject: {{title}}');
         $emailTemplate->method('getBody')->willReturn('Body: {{content}}');
 
-        // Arrange: template service
+        // Arrange
         $templateServiceMock = $this->createMock(EmailTemplateService::class);
         $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement)->willReturn($emailTemplate);
         $templateServiceMock
@@ -349,7 +349,7 @@ class AnnouncementServiceTest extends TestCase
             ->method('renderContent')
             ->willReturnCallback(static fn(string $content) => str_replace(['{{title}}', '{{content}}'], ['My Title', ''], $content));
 
-        // Arrange: config service
+        // Arrange
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
 
@@ -362,17 +362,17 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Act: render preview
+        // Act
         $result = $subject->renderPreview($announcement, 'en');
 
-        // Assert: returns subject and body
+        // Assert
         static::assertArrayHasKey('subject', $result);
         static::assertArrayHasKey('body', $result);
     }
 
     public function testRenderContentIncludesImageBlock(): void
     {
-        // Arrange: create gallery block
+        // Arrange
         $imageBlock = $this->createStub(CmsBlock::class);
         $imageBlock->method('getLanguage')->willReturn('en');
         $imageBlock->method('getType')->willReturn(CmsBlockType::Gallery);
@@ -383,17 +383,17 @@ class AnnouncementServiceTest extends TestCase
                 'images' => [['id' => 1, 'hash' => 'imagehash123']],
             ]);
 
-        // Arrange: create CMS page
+        // Arrange
         $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$imageBlock]));
 
-        // Arrange: create announcement
+        // Arrange
         $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(1);
         $announcement->method('getLinkHash')->willReturn('hash');
         $announcement->method('getCmsPage')->willReturn($cmsPage);
 
-        // Arrange: config service
+        // Arrange
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
 
@@ -406,17 +406,17 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Act: get preview context to trigger renderContent
+        // Act
         $result = $subject->getPreviewContext($announcement, 'en');
 
-        // Assert: content contains image HTML
+        // Assert
         static::assertStringContainsString('imagehash123', $result['content']);
         static::assertStringContainsString('<img', $result['content']);
     }
 
     public function testRenderContentSkipsBlocksForDifferentLocale(): void
     {
-        // Arrange: create blocks for different locales
+        // Arrange
         $enBlock = $this->createStub(CmsBlock::class);
         $enBlock->method('getLanguage')->willReturn('en');
         $enBlock->method('getType')->willReturn(CmsBlockType::Text);
@@ -429,17 +429,17 @@ class AnnouncementServiceTest extends TestCase
         $deBlock->method('getJson')->willReturn(['content' => 'German content']);
         $deBlock->method('getImage')->willReturn(null);
 
-        // Arrange: create CMS page
+        // Arrange
         $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$enBlock, $deBlock]));
 
-        // Arrange: create announcement
+        // Arrange
         $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(1);
         $announcement->method('getLinkHash')->willReturn('hash');
         $announcement->method('getCmsPage')->willReturn($cmsPage);
 
-        // Arrange: config service
+        // Arrange
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
 
@@ -452,34 +452,34 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Act: get preview context for English
+        // Act
         $result = $subject->getPreviewContext($announcement, 'en');
 
-        // Assert: only English content is included
+        // Assert
         static::assertStringContainsString('English content', $result['content']);
         static::assertStringNotContainsString('German content', $result['content']);
     }
 
     public function testRenderContentShowsErrorWhenNoContentForLocale(): void
     {
-        // Arrange: create block for different locale only
+        // Arrange
         $deBlock = $this->createStub(CmsBlock::class);
         $deBlock->method('getLanguage')->willReturn('de');
         $deBlock->method('getType')->willReturn(CmsBlockType::Text);
         $deBlock->method('getJson')->willReturn(['content' => 'German content']);
         $deBlock->method('getImage')->willReturn(null);
 
-        // Arrange: create CMS page
+        // Arrange
         $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([$deBlock]));
 
-        // Arrange: create announcement
+        // Arrange
         $announcement = $this->createStub(Announcement::class);
         $announcement->method('getId')->willReturn(1);
         $announcement->method('getLinkHash')->willReturn('hash');
         $announcement->method('getCmsPage')->willReturn($cmsPage);
 
-        // Arrange: config service
+        // Arrange
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
 
@@ -492,10 +492,10 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
         );
 
-        // Act: get preview context for English (which has no content)
+        // Act
         $result = $subject->getPreviewContext($announcement, 'en');
 
-        // Assert: error message is shown
+        // Assert
         static::assertStringContainsString('ERROR', $result['content']);
         static::assertStringContainsString('[en]', $result['content']);
     }

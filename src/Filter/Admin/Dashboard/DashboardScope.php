@@ -2,14 +2,6 @@
 
 namespace App\Filter\Admin\Dashboard;
 
-/**
- * Resolved dashboard data scope after intersecting all registered filters.
- *
- * Three states:
- *   - platform-wide: every filter returned null. `eventIds()` and `userIds()` return null.
- *   - empty:         at least one filter returned []. `isEmpty()` is true.
- *   - restricted:    the intersection of all filter results.
- */
 final readonly class DashboardScope
 {
     /**

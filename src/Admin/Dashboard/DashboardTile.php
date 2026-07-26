@@ -3,10 +3,8 @@
 namespace App\Admin\Dashboard;
 
 /**
- * Marker interface for a dashboard tile value object.
- *
- * Implementations expose `partial()` (the basename of the Twig partial under
- * `templates/admin/_components/dashboard/`) and `title()` (the translation key).
+ * A dashboard tile: `partial()` names a Twig partial in `templates/admin/_components/dashboard/`,
+ * `title()` a translation key.
  */
 interface DashboardTile
 {

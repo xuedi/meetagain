@@ -5,14 +5,10 @@ namespace App\Publisher\PluginSettings;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Persists a plugin's settings data object for one scope. Stores form a
- * first-supporting-store-wins provider chain over an opaque scope: the highest-priority
- * store whose supports() is true owns load/save for that (key, scopeId).
- *
- * scopeId === null addresses the global/default record; a non-null scopeId is an opaque
- * id supplied by a scope provider. A custom store outranks the generic fallback.
- *
- * Implementations are auto-discovered via #[AutoconfigureTag].
+ * Persists a plugin's settings data object for one scope. The highest-priority store whose
+ * supports() is true owns load/save for that (key, scopeId), so a custom store outranks the
+ * generic fallback. scopeId === null addresses the global record; any other id is opaque and
+ * comes from a scope provider.
  */
 #[AutoconfigureTag]
 interface PluginSettingsStoreInterface

@@ -78,7 +78,7 @@ class CronIntervalCheckServiceTest extends TestCase
 
     public function testWarningMessageIncludesThreshold(): void
     {
-        // Arrange: 11 min gap (inside warning band)
+        // Arrange
         $previousLog = new CronLog(new DateTimeImmutable('2026-04-21 22:32:30'), CronTaskStatus::ok, 0, []);
 
         $repo = $this->createStub(CronLogRepository::class);
@@ -96,7 +96,7 @@ class CronIntervalCheckServiceTest extends TestCase
 
     public function testErrorMessageIncludesThreshold(): void
     {
-        // Arrange: 30 min gap (past error threshold)
+        // Arrange
         $previousLog = new CronLog(new DateTimeImmutable('2026-04-21 22:13:30'), CronTaskStatus::ok, 0, []);
 
         $repo = $this->createStub(CronLogRepository::class);

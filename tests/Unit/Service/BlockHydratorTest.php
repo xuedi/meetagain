@@ -39,8 +39,6 @@ class BlockHydratorTest extends TestCase
         };
     }
 
-    // --- Arrange / Act / Assert ---
-
     public function testHydratesValidPayload(): void
     {
         // Arrange

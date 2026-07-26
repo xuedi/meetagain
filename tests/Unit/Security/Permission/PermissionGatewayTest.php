@@ -78,7 +78,7 @@ class PermissionGatewayTest extends TestCase
 
     public function testGrantBeatsDenyAcrossCheckers(): void
     {
-        // Arrange - if any supporting checker grants, gateway grants
+        // Arrange
         $gateway = $this->makeGateway(false, $this->fixedChecker(supports: true, decision: false), $this->fixedChecker(supports: true, decision: true));
 
         // Act
@@ -138,7 +138,7 @@ class PermissionGatewayTest extends TestCase
 
     public function testNonStringAttributesAreSkipped(): void
     {
-        // Arrange - a checker that would grant for strings; with non-string attrs it should never be consulted
+        // Arrange
         $gateway = $this->makeGateway(false, $this->fixedChecker(supports: true, decision: true));
 
         // Act

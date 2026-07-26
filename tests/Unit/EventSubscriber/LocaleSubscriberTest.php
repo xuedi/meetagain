@@ -27,7 +27,6 @@ class LocaleSubscriberTest extends TestCase
      */
     private function createRequestWithSession(SessionInterface $session): Request
     {
-        // Create request with session cookie to simulate previous session
         $request = new Request([], [], [], ['PHPSESSID' => 'test-session-id']);
         $session->method('getName')->willReturn('PHPSESSID');
         $request->setSession($session);
@@ -49,15 +48,13 @@ class LocaleSubscriberTest extends TestCase
         $subscriber = new LocaleSubscriber($languageService);
 
         $request = new Request();
-        // No session set, so hasPreviousSession() returns false
 
         $kernelMock = $this->createStub(HttpKernelInterface::class);
         $event = new RequestEvent($kernelMock, $request, HttpKernelInterface::MAIN_REQUEST);
 
-        // Should not throw any errors, just return early
         $subscriber->onKernelRequest($event);
 
-        static::assertTrue(true); // If we got here, no exception was thrown
+        static::assertTrue(true);
     }
 
     public function testOnKernelRequestSavesLocaleToSessionWhenAttributePresent(): void
@@ -87,7 +84,6 @@ class LocaleSubscriberTest extends TestCase
         $sessionStub->method('get')->willReturn('fr');
 
         $request = $this->createRequestWithSession($sessionStub);
-        // No _locale attribute set
 
         $kernelStub = $this->createStub(HttpKernelInterface::class);
         $event = new RequestEvent($kernelStub, $request, HttpKernelInterface::MAIN_REQUEST);
@@ -99,15 +95,13 @@ class LocaleSubscriberTest extends TestCase
 
     public function testOnKernelRequestUsesAcceptLanguageHintWhenSessionEmpty(): void
     {
-        // No session locale set, but Accept-Language header asks for German.
-        // The subscriber should pick `de` (an enabled code) without persisting.
         $languageService = $this->createLanguageServiceStub('en', ['en', 'de', 'zh']);
         $subscriber = new LocaleSubscriber($languageService);
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->method('getName')->willReturn('PHPSESSID');
         $sessionMock->method('has')->willReturn(false);
-        $sessionMock->expects($this->never())->method('set'); // hint not persisted
+        $sessionMock->expects($this->never())->method('set');
 
         $request = new Request([], [], [], ['PHPSESSID' => 'test-session-id']);
         $request->setSession($sessionMock);
@@ -123,8 +117,6 @@ class LocaleSubscriberTest extends TestCase
 
     public function testOnKernelRequestFallsBackToFilteredDefaultWhenAcceptLanguageHasNoMatch(): void
     {
-        // Accept-Language asks for Japanese, which is not enabled.
-        // The subscriber should fall back to the filtered default (`en`).
         $languageService = $this->createLanguageServiceStub('en', ['en', 'de', 'zh']);
         $subscriber = new LocaleSubscriber($languageService);
 

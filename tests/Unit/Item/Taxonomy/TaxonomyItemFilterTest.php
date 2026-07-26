@@ -24,7 +24,7 @@ class TaxonomyItemFilterTest extends TestCase
 
     public function testNoOpinionForUnregisteredType(): void
     {
-        // Arrange: registry returns no provider for 'dish'
+        // Arrange
         $registry = $this->createStub(CategorizableTypeRegistry::class);
         $registry->method('providerFor')->willReturn(null);
         $stack = new RequestStack();
@@ -57,7 +57,7 @@ class TaxonomyItemFilterTest extends TestCase
 
     public function testCategoryAndTagsAndTogether(): void
     {
-        // Arrange: category allows {10,11}, tags allow {11,12} -> intersection {11}
+        // Arrange
         $categoryRepo = $this->categoryRepo(['itemIdsWithCategory' => [10, 11]]);
         $tagRepo = $this->tagRepo(['itemIdsWithAllTags' => [11, 12]]);
         $filter = $this->makeFilter('/dishes?category=3&tag[]=1', $categoryRepo, $tagRepo);

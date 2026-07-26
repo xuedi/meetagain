@@ -99,10 +99,6 @@ readonly class IndexNowService
     }
 
     /**
-     * Submit an explicit URL list to IndexNow for a given host. The key file is served by this app
-     * on every host it answers, so the shared key validates against any of them; only the payload
-     * `host` and `keyLocation` change per host.
-     *
      * @param array<string> $urls
      * @return array{status: int, host: string}
      */

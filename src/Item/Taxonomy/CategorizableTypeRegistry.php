@@ -5,10 +5,6 @@ namespace App\Item\Taxonomy;
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Unions the categorizable-type providers whose plugin is active and answers keyed lookups.
- * Mirrors ItemTypeRegistry's active-plugin guard on the separate categorizable axis.
- */
 class CategorizableTypeRegistry
 {
     /**

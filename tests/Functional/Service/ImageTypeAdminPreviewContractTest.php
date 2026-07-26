@@ -13,7 +13,7 @@ final class ImageTypeAdminPreviewContractTest extends KernelTestCase
         self::bootKernel();
         $registry = self::getContainer()->get(ImageTypeRegistry::class);
 
-        // Act & Assert - getAdminPreviewSize() throws for any definition without a 350-width entry
+        // Act & Assert
         foreach ($registry->all() as $definition) {
             $size = $registry->getAdminPreviewSize($definition->getType());
             static::assertStringStartsWith('350x', $size, $definition::class);

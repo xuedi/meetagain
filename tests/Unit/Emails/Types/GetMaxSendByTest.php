@@ -30,25 +30,15 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Regression coverage for each email type's getMaxSendBy() policy. The exact numbers come
- * from the original design analysis for the email-queue max-delay guard. A sign flip or a
- * changed constant should fail one of these assertions immediately.
- */
 final class GetMaxSendByTest extends TestCase
 {
     private const string NOW = '2026-04-21 10:00:00';
-
-    // =========================================================================
-    // Event-bound: min(now + X, event.start)
-    // =========================================================================
 
     /**
      * @return iterable<string, array{0: string, 1: string}>
      */
     public static function eventReminderProvider(): iterable
     {
-        // budget = 3h, clock = 2026-04-21 10:00:00 -> now+3h = 2026-04-21 13:00:00
         yield 'event far in future uses 3h budget' => ['2026-04-21 18:00:00', '2026-04-21 13:00:00'];
         yield 'event soon (under 3h) clamps to event start' => ['2026-04-21 11:30:00', '2026-04-21 11:30:00'];
         yield 'event already started returns past cap (real incident path)' => [
@@ -92,7 +82,6 @@ final class GetMaxSendByTest extends TestCase
      */
     public static function cancellationProvider(): iterable
     {
-        // budget = 6h -> now+6h = 2026-04-21 16:00:00
         yield 'event far in future uses 6h budget' => ['2026-04-22 10:00:00', '2026-04-21 16:00:00'];
         yield 'event within 6h clamps to event start' => ['2026-04-21 13:00:00', '2026-04-21 13:00:00'];
         yield 'event already started' => ['2026-04-21 09:00:00', '2026-04-21 09:00:00'];
@@ -149,7 +138,6 @@ final class GetMaxSendByTest extends TestCase
      */
     public static function rsvpAggregatedProvider(): iterable
     {
-        // budget = 12h -> now+12h = 2026-04-21 22:00:00
         yield 'event far in future uses 12h budget' => ['2026-04-22 10:00:00', '2026-04-21 22:00:00'];
         yield 'event within 12h clamps to event start' => ['2026-04-21 19:00:00', '2026-04-21 19:00:00'];
         yield 'event already started' => ['2026-04-21 09:00:00', '2026-04-21 09:00:00'];
@@ -171,10 +159,6 @@ final class GetMaxSendByTest extends TestCase
 
         static::assertSame($expected, $result?->format('Y-m-d H:i:s'));
     }
-
-    // =========================================================================
-    // Time-windowed: now + X
-    // =========================================================================
 
     public function testUpcomingDigestCapIsFourHours(): void
     {
@@ -249,10 +233,6 @@ final class GetMaxSendByTest extends TestCase
 
         static::assertSame('2026-04-22 10:00:00', $result?->format('Y-m-d H:i:s'));
     }
-
-    // =========================================================================
-    // No-cap (null) - locks the contract against accidental future caps
-    // =========================================================================
 
     public function testSupportNotificationHasNoCap(): void
     {

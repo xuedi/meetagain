@@ -4,11 +4,6 @@ namespace App\Filter\Language;
 
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composite language filter service.
- * Collects all registered LanguageFilterInterface implementations.
- * Combines multiple filters using AND logic for language code restrictions.
- */
 readonly class LanguageFilterService
 {
     /**
@@ -19,10 +14,6 @@ readonly class LanguageFilterService
         private iterable $filters,
     ) {}
 
-    /**
-     * Get the combined language code filter from all registered filters.
-     * Uses intersection (AND) logic: a language must pass ALL filters.
-     */
     public function getLanguageCodeFilter(): LanguageFilterResult
     {
         $resultSet = null;
@@ -54,11 +45,6 @@ readonly class LanguageFilterService
         return new LanguageFilterResult($resultSet, $hasActiveFilter);
     }
 
-    /**
-     * Check if a language is accessible according to all registered filters.
-     * Any filter returning false will deny access.
-     * Returns true only if all filters allow (or have no opinion).
-     */
     public function isLanguageAccessible(string $code): bool
     {
         foreach ($this->getSortedFilters() as $filter) {

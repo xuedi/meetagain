@@ -96,10 +96,6 @@ class EmailTypeSendTest extends TestCase
         return $event;
     }
 
-    // =========================================================================
-    // send() — assert queue->enqueue() fires with the correct EmailType
-    // =========================================================================
-
     public function testAdminNotificationSend(): void
     {
         $queue = $this->createMock(EmailQueueInterface::class);
@@ -288,10 +284,6 @@ class EmailTypeSendTest extends TestCase
             'attendeeMap' => [],
         ]);
     }
-
-    // =========================================================================
-    // guardCheck() — complex branches
-    // =========================================================================
 
     public function testAnnouncementGuardCheckReturnsTrueWhenActive(): void
     {
@@ -491,10 +483,6 @@ class EmailTypeSendTest extends TestCase
 
         static::assertTrue($email->guardCheck(['user' => $user, 'event' => $this->makeEvent(), 'attendeeMap' => []]));
     }
-
-    // =========================================================================
-    // RsvpAggregatedEmail follower-filter wiring (buildAttendeeMap via getDueContexts)
-    // =========================================================================
 
     public function testRsvpAggregatedIncludesFollowerWhenFilterAllows(): void
     {

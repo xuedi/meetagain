@@ -61,17 +61,14 @@ class TestCoverageReportCommand extends Command
             return Command::FAILURE;
         }
 
-        // Extract file coverage
         $files = [];
         foreach ($xml->xpath('//file') as $file) {
             $path = (string) $file['name'];
 
-            // Only include files from Service and Security directories
             if (!str_contains($path, '/Service/') && !str_contains($path, '/Security/')) {
                 continue;
             }
 
-            // Get class/file metrics (not method metrics)
             $metrics = $file->xpath('.//metrics[@complexity]');
             if ($metrics === false || $metrics === []) {
                 continue;
@@ -89,7 +86,6 @@ class TestCoverageReportCommand extends Command
             $uncovered = $elements - $covered;
             $basename = basename($path);
 
-            // Apply threshold filter
             if ($percentage > $threshold) {
                 continue;
             }
@@ -104,19 +100,16 @@ class TestCoverageReportCommand extends Command
             ];
         }
 
-        // Sort
         $sortFn = $sortBy === 'uncovered'
             ? static fn($a, $b) => $b['uncovered'] <=> $a['uncovered']
             : static fn($a, $b) => $a['percentage'] <=> $b['percentage'];
         usort($files, $sortFn);
 
-        // Get total metrics
         $totalMetrics = $xml->xpath('//project/metrics')[0] ?? null;
         $totalElements = $totalMetrics ? (int) $totalMetrics['elements'] : 0;
         $totalCovered = $totalMetrics ? (int) $totalMetrics['coveredelements'] : 0;
         $totalPercentage = $totalElements > 0 ? (int) round(($totalCovered / $totalElements) * 100) : 0;
 
-        // Output
         $output->writeln('');
         $output->writeln("COVERAGE: {$totalPercentage}% ({$totalCovered}/{$totalElements})");
         $output->writeln('---');
@@ -126,7 +119,6 @@ class TestCoverageReportCommand extends Command
             return Command::SUCCESS;
         }
 
-        // Only show files below 80% (needs attention)
         $needsWork = array_filter($files, static fn($f) => $f['percentage'] < 80);
 
         if ($needsWork !== []) {
@@ -137,7 +129,6 @@ class TestCoverageReportCommand extends Command
             }
         }
 
-        // Show count of good files
         $goodFiles = count($files) - count($needsWork);
         if ($goodFiles > 0) {
             $output->writeln("\n{$goodFiles} files with 80%+ coverage (not shown)");

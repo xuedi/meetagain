@@ -1,0 +1,9 @@
+# Areas of this plugin intricate enough that prose earns its place, per the project's comment policy.
+# One line per symbol, and every line needs a reason. Enforced by comment-guard on every commit;
+# adding an entry is a deliberate decision, never an automatic fix.
+#
+# Format: path/relative/to/this/plugin.php::symbol // why
+
+src/Controller/EditController.php::edit // required ordering: the entity must be detached before the request's changes reach a flush
+tests/Unit/DataHotfix/MigrateGlossaryCategoriesTest.php::testBackfillsAssignmentsFromLegacyColumn // names which stubbed row is deliberately absent, which is the case
+tests/Unit/DataHotfix/MigrateGlossaryCategoriesTest.php::testSkipsBackfillWhenLegacyColumnAbsentButRewritesConfig // names which stubbed row is deliberately absent, which is the case

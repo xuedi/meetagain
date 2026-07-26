@@ -2,9 +2,6 @@
 
 namespace App\Filter\Event;
 
-/**
- * Result from composing multiple event filters.
- */
 readonly class EventFilterResult
 {
     /**

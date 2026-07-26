@@ -39,7 +39,6 @@ class SendMessageTest extends TestCase
         $subject = new SendMessage();
         $subject->injectServices($router, $this->imageService, $this->translator, $meta, $userNames);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(SendMessage::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

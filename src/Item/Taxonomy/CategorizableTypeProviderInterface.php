@@ -5,11 +5,9 @@ namespace App\Item\Taxonomy;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Registers one item type as categorizable and/or taggable. This axis is orthogonal to
- * event-attachability (ItemTypeProviderInterface): a type may implement one, the other, or both.
- * The registry keys providers by getTypeKey() and shows only those whose owning plugin is active.
- * getTaxonomy() returns the type's own scope-resolved definitions, so core never reads a plugin
- * config class and per-scope resolution rides on the plugin's own settings resolver.
+ * Registers one item type as categorizable and/or taggable. Orthogonal to event-attachability
+ * (ItemTypeProviderInterface): a type may implement one, the other, or both. getTaxonomy() returns
+ * the type's own scope-resolved definitions, so core never reads a plugin config class.
  */
 #[AutoconfigureTag]
 interface CategorizableTypeProviderInterface

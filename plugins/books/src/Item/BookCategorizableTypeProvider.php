@@ -8,10 +8,6 @@ use Override;
 use Plugin\Books\Service\ConfigService;
 use Plugin\Books\Service\BookService;
 
-/**
- * Registers the 'book' item type as categorizable and taggable, reading its scope-resolved
- * definitions from the books config. Orthogonal to the event-attachable BookItemTypeProvider.
- */
 final readonly class BookCategorizableTypeProvider implements CategorizableTypeProviderInterface
 {
     public function __construct(

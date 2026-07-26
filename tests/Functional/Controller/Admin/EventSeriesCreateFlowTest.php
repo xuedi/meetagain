@@ -26,7 +26,7 @@ class EventSeriesCreateFlowTest extends WebTestCase
         // Act
         $this->submitNewEventForm($client, $start, seriesRule: (string) EventInterval::Weekly->value, seriesName: 'My Test Series');
 
-        // Assert: PRG to the edit page, series row created and attached
+        // Assert
         $this->assertResponseRedirects();
 
         $em = $this->getEntityManager($client);
@@ -69,7 +69,7 @@ class EventSeriesCreateFlowTest extends WebTestCase
 
     public function testCreateWithAPresetRuleLeavesTheRuleSpecEmpty(): void
     {
-        // Arrange: a stale spec submitted alongside a preset must not be stored
+        // Arrange
         $client = static::createClient();
         $this->loginAsAdmin($client);
         $start = new DateTime('2031-03-04 13:37');
@@ -107,7 +107,7 @@ class EventSeriesCreateFlowTest extends WebTestCase
         // Act
         $this->submitNewEventForm($client, $start, seriesRule: (string) EventInterval::Weekly->value, seriesName: '');
 
-        // Assert: form re-renders with the validator message, nothing persisted
+        // Assert
         $this->assertResponseIsUnprocessable();
         static::assertStringContainsString('Please enter a name for the series.', (string) $client->getResponse()->getContent());
 

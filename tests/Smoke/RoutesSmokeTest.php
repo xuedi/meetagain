@@ -9,13 +9,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-/**
- * Router-driven smoke test.
- *
- * Discovers every GET route registered in Symfony (core + all plugins) via
- * the shared RouteDiscoverer service, generates a URL using its parameter
- * map, and asserts no 5xx response.
- */
 class RoutesSmokeTest extends WebTestCase
 {
     private const string ADMIN_EMAIL = 'Admin@example.org';

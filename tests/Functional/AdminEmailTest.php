@@ -50,7 +50,6 @@ class AdminEmailTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         static::assertGreaterThan(0, $crawler->filter('form')->count(), 'Edit form should exist');
-        // Form fields are now language-specific
         $this->assertSelectorExists('input[name="email_template[subject-en]"]');
         $this->assertSelectorExists('textarea[name="email_template[body-en]"]');
     }
@@ -79,7 +78,7 @@ class AdminEmailTest extends WebTestCase
 
         $crawler = $client->request('GET', '/en/admin/email/templates/' . $template->getId() . '/edit');
 
-        // Act - select by form name to avoid the navbar logout button (also a submit button)
+        // Act
         $form = $crawler
             ->filter('form[name="email_template"]')
             ->form([
@@ -91,7 +90,6 @@ class AdminEmailTest extends WebTestCase
         // Assert
         $this->assertResponseRedirects('/en/admin/email/templates/' . $template->getId() . '/edit');
 
-        // Verify changes persisted
         $client->followRedirect();
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         $em->clear();
@@ -107,7 +105,6 @@ class AdminEmailTest extends WebTestCase
         $template = $this->getFirstTemplate($client);
         $originalSubject = $template->getSubject('en');
 
-        // First change the template — select by form name to avoid the navbar logout button
         $crawler = $client->request('GET', '/en/admin/email/templates/' . $template->getId() . '/edit');
         $form = $crawler
             ->filter('form[name="email_template"]')
@@ -118,7 +115,7 @@ class AdminEmailTest extends WebTestCase
         $client->submit($form);
         $client->followRedirect();
 
-        // Act: reset to default - extract CSRF token from the Reset button form on the edit page
+        // Act
         $editCrawler = $client->getCrawler();
         $token = $editCrawler->filter('a[href*="/reset"][data-post]')->attr('data-csrf-token');
         $client->request('POST', '/en/admin/email/templates/' . $template->getId() . '/reset', ['_token' => $token]);

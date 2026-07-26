@@ -13,7 +13,7 @@ class SitemapServiceTest extends TestCase
 {
     public function testMergesPublishersInPriorityOrder(): void
     {
-        // Arrange: two publishers, high priority first.
+        // Arrange
         $low = $this->makePublisher(priority: 0, urls: [new SitemapUrl(loc: 'https://example.com/low')]);
         $high = $this->makePublisher(priority: 10, urls: [new SitemapUrl(loc: 'https://example.com/high')]);
 
@@ -29,7 +29,7 @@ class SitemapServiceTest extends TestCase
 
     public function testMergesMultiplePluginPublishersInPriorityOrder(): void
     {
-        // Arrange: simulate the real shape - core (priority 0) + multiple plugin publishers (priority 10).
+        // Arrange
         $core = $this->makePublisher(priority: 0, urls: [new SitemapUrl(loc: 'https://example.com/core')]);
         $pluginA = $this->makePublisher(priority: 10, urls: [new SitemapUrl(loc: 'https://example.com/plugin-a')]);
         $pluginB = $this->makePublisher(priority: 10, urls: [new SitemapUrl(loc: 'https://example.com/plugin-b')]);
@@ -39,7 +39,7 @@ class SitemapServiceTest extends TestCase
         // Act
         $urls = $service->getUrls();
 
-        // Assert: plugin URLs come first (any order between them), core last.
+        // Assert
         self::assertCount(3, $urls);
         self::assertSame('https://example.com/core', end($urls)->loc);
         $pluginLocs = [$urls[0]->loc, $urls[1]->loc];
@@ -86,7 +86,7 @@ class SitemapServiceTest extends TestCase
         // Act
         $xml = $service->renderXml();
 
-        // Assert: well-formed and & is escaped.
+        // Assert
         $doc = new DOMDocument();
         self::assertTrue($doc->loadXML($xml));
         self::assertStringContainsString('&amp;', $xml);

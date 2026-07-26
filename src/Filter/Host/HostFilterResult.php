@@ -2,9 +2,6 @@
 
 namespace App\Filter\Host;
 
-/**
- * Result from composing multiple host filters.
- */
 readonly class HostFilterResult
 {
     /**

@@ -7,10 +7,6 @@ use App\Enum\RecurrenceOrdinal;
 use App\Enum\RecurrencePeriod;
 use App\Enum\Weekday;
 
-/**
- * A builder selection that is guaranteed to produce a valid RecurrencePattern, plus which controls
- * that selection leaves applicable. Only RecurrenceBuilderStateResolver may construct one.
- */
 final readonly class RecurrenceBuilderState
 {
     private const int SHORT_MONTH_THRESHOLD = 29;

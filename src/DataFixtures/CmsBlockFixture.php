@@ -19,7 +19,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
     public function load(ObjectManager $manager): void
     {
         $this->start();
-        $priority = 1; // it is OK to increase the priority of the blocks
+        $priority = 1;
         $importUser = $this->getRefUser(UserFixture::ADMIN);
         foreach ($this->getData() as [$page, $lang, $type, $json, $imageName]) {
             $block = new CmsBlock();
@@ -35,7 +35,6 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 $uploadedImage = new UploadedFile($imageFile, $block->getId() . '.jpg');
 
                 if ($type === CmsBlockType::Gallery) {
-                    // Gallery blocks store image refs in JSON; flush first to get image ID
                     $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsGallery);
                     $manager->persist($image);
                     $manager->flush();
@@ -47,7 +46,6 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 }
 
                 if ($type !== CmsBlockType::Gallery) {
-                    // Other block types use the associated Image entity field
                     $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsBlock);
                     $this->imageService->createThumbnails($image, ImageType::CmsBlock);
                     $block->setImage($image);
@@ -265,7 +263,6 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 ],
                 'group-zh.jpg',
             ],
-            // ========== FactsRow on INDEX (1-6 trust facts) ==========
             [
                 CmsFixture::INDEX,
                 LanguageFixture::ENGLISH,
@@ -311,7 +308,6 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 ],
                 null,
             ],
-            // ========== Rules Page ==========
             [
                 CmsFixture::RULES,
                 LanguageFixture::ENGLISH,
@@ -400,7 +396,6 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 null,
             ],
 
-            // ========== Announcement Page ==========
             [
                 CmsFixture::ANNOUNCEMENT,
                 LanguageFixture::ENGLISH,

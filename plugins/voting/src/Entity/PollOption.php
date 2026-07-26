@@ -5,10 +5,6 @@ namespace Plugin\Voting\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Plugin\Voting\Repository\PollOptionRepository;
 
-/**
- * One candidate item on a poll's ballot. itemId is a plain INT keyed by the poll's itemType
- * (no FK to any plugin entity), so a poll of any item type stores candidates the same way.
- */
 #[ORM\Entity(repositoryClass: PollOptionRepository::class)]
 #[ORM\Table(name: 'plg_voting_poll_option')]
 #[ORM\UniqueConstraint(name: 'uniq_poll_option_poll_item', columns: ['poll_id', 'item_id'])]
