@@ -8,7 +8,8 @@
  *      each carrying the rule string that picking it would produce.
  *   3. Apply — writes the chosen spec, date and times into the form's hidden inputs.
  *
- * Computes no dates and builds no rule strings; php-rrule stays the only implementation.
+ * Computes nothing. Dates, rule strings and which controls apply all come from the preview
+ * endpoint; this file reads inputs, sends them, and renders the answer.
  *
  * Loaded in:  templates/admin/event/edit.html.twig, new.html.twig
  * Used by:    templates/admin/event/_recurrence_modal.html.twig, _recurrence_summary.html.twig
@@ -37,8 +38,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const endTime = document.getElementById('recurrence-end-time');
     const preview = document.getElementById('recurrence-preview');
     const hint = document.getElementById('recurrence-hint');
+    const multiHint = document.getElementById('recurrence-multi-hint');
+    const ordinalWrap = document.getElementById('recurrence-ordinal-wrap');
+    const weekdayWrap = document.getElementById('recurrence-weekday-wrap');
+    const weekdayControls = document.getElementById('recurrence-weekday-controls');
+    const dayControls = document.getElementById('recurrence-day-controls');
 
-    const WEEKLY_PERIODS = ['week', 'two_weeks'];
+    const WEEKDAY_LIST_SIZE = 7;
     // Flatpickr renders these as text with "Y-m-d H:i"; a datetime-local build uses "T".
     const DATETIME_PATTERN = /^(\d{4}-\d{2}-\d{2})([T ])(\d{2}:\d{2})/;
     let candidates = [];
@@ -67,36 +73,59 @@ document.addEventListener('DOMContentLoaded', function () {
     const selectedMode = () => modal.querySelector('input[name="recurrence-mode"]:checked').value;
     const isCustom = () => ruleSelect.value === config.customValue;
 
-    // php-rrule rejects BYMONTHDAY with FREQ=WEEKLY, so that pairing must stay unreachable.
-    function applyConstraints() {
-        const dayMode = selectedMode() === 'day_of_month';
-        const weekly = WEEKLY_PERIODS.indexOf(period.value) !== -1;
+    function selectedValues(select) {
+        return Array.from(select.selectedOptions).map(function (option) {
+            return option.value;
+        });
+    }
 
-        ordinal.disabled = dayMode || weekly;
-        weekday.disabled = dayMode;
-        day.disabled = !dayMode;
+    function applySelection(select, values) {
+        Array.from(select.options).forEach(function (option) {
+            option.selected = values.indexOf(option.value) !== -1;
+        });
+    }
+
+    // The server decides which controls the current selection leaves applicable, and corrects the
+    // selection itself when the two disagree. Nothing here re-derives those rules.
+    function applyState(payload) {
+        const controls = payload.controls;
+        const selection = payload.selection;
+
+        modal.querySelectorAll('input[name="recurrence-mode"]').forEach(function (radio) {
+            radio.checked = radio.value === selection.mode;
+        });
+
+        weekday.multiple = controls.weekdayMultiple;
+        weekday.size = controls.weekdayMultiple ? WEEKDAY_LIST_SIZE : 1;
+        weekdayWrap.classList.toggle('is-multiple', controls.weekdayMultiple);
+
+        applySelection(ordinal, selection.ordinal.map(String));
+        applySelection(weekday, selection.weekday);
+        applySelection(day, selection.day.map(String));
+        period.value = selection.period;
 
         Array.from(period.options).forEach(function (option) {
-            option.disabled = dayMode && WEEKLY_PERIODS.indexOf(option.value) !== -1;
+            option.hidden = controls.periods.indexOf(option.value) === -1;
         });
-        if (dayMode && weekly) {
-            period.value = 'month';
-        }
 
-        const shortMonthRisk = dayMode && ['29', '30', '31'].indexOf(day.value) !== -1;
-        hint.classList.toggle('is-hidden', !shortMonthRisk);
+        weekdayControls.classList.toggle('is-hidden', !controls.weekday);
+        ordinalWrap.classList.toggle('is-hidden', !controls.ordinal);
+        dayControls.classList.toggle('is-hidden', !controls.day);
+        multiHint.classList.toggle('is-hidden', !controls.multiHint);
+        hint.classList.toggle('is-hidden', !controls.shortMonthHint);
     }
 
     function refreshCandidates() {
-        applyConstraints();
-
         const params = new URLSearchParams({ mode: selectedMode(), period: period.value });
-        if (selectedMode() === 'day_of_month') {
-            params.set('day', day.value);
-        } else {
-            params.set('weekday', weekday.value);
-            if (!ordinal.disabled) params.set('ordinal', ordinal.value);
-        }
+        selectedValues(day).forEach(function (value) {
+            params.append('day[]', value);
+        });
+        selectedValues(weekday).forEach(function (value) {
+            params.append('weekday[]', value);
+        });
+        selectedValues(ordinal).forEach(function (value) {
+            params.append('ordinal[]', value);
+        });
 
         // Guards against a slow earlier response landing after a newer one.
         const token = ++requestToken;
@@ -109,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(function (payload) {
                 if (token !== requestToken) return;
 
+                applyState(payload);
                 candidates = payload.candidates || [];
                 startSelect.innerHTML = '';
                 candidates.forEach(function (candidate, index) {

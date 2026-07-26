@@ -27,6 +27,19 @@ enum Weekday: string
         };
     }
 
+    /**
+     * @param list<self> $weekdays
+     *
+     * @return list<self>
+     */
+    public static function sort(array $weekdays): array
+    {
+        $unique = array_values(array_unique($weekdays, SORT_REGULAR));
+        usort($unique, static fn(self $a, self $b): int => $a->isoNumber() <=> $b->isoNumber());
+
+        return $unique;
+    }
+
     public function isoNumber(): int
     {
         return match ($this) {

@@ -124,9 +124,142 @@ class RecurrencePatternTest extends TestCase
         // Assert
         static::assertSame(RecurrenceMode::Weekday, $pattern->mode);
         static::assertSame(RecurrencePeriod::Quarter, $pattern->period);
-        static::assertSame(RecurrenceOrdinal::Last, $pattern->ordinal);
-        static::assertSame(Weekday::Friday, $pattern->weekday);
-        static::assertNull($pattern->dayOfMonth);
+        static::assertSame([RecurrenceOrdinal::Last], $pattern->ordinals);
+        static::assertSame([Weekday::Friday], $pattern->weekdays);
+        static::assertSame([], $pattern->daysOfMonth);
+    }
+
+    #[DataProvider('provideMultiEntryPatterns')]
+    public function testSeveralByDayEntriesRoundTripInCalendarOrder(RecurrencePeriod $period, array $weekdays, array $ordinals, string $expected): void
+    {
+        // Act
+        $pattern = RecurrencePattern::weekday($period, $weekdays, $ordinals);
+
+        // Assert
+        static::assertSame($expected, $pattern->toRfcString());
+        static::assertSame($expected, RecurrencePattern::fromRfcString($expected)->toRfcString());
+    }
+
+    public static function provideMultiEntryPatterns(): iterable
+    {
+        yield 'several weekdays in a week' => [
+            RecurrencePeriod::Week,
+            [Weekday::Friday, Weekday::Monday, Weekday::Wednesday],
+            [],
+            'FREQ=WEEKLY;BYDAY=MO,WE,FR',
+        ];
+        yield 'weekend every two weeks' => [
+            RecurrencePeriod::TwoWeeks,
+            [Weekday::Sunday, Weekday::Saturday],
+            [],
+            'FREQ=WEEKLY;INTERVAL=2;BYDAY=SA,SU',
+        ];
+        yield 'first and third Friday' => [
+            RecurrencePeriod::Month,
+            [Weekday::Friday],
+            [RecurrenceOrdinal::Third, RecurrenceOrdinal::First],
+            'FREQ=MONTHLY;BYDAY=1FR,3FR',
+        ];
+        yield 'last sorts after the numbered ordinals' => [
+            RecurrencePeriod::Quarter,
+            [Weekday::Monday],
+            [RecurrenceOrdinal::Last, RecurrenceOrdinal::Second],
+            'FREQ=MONTHLY;INTERVAL=3;BYDAY=2MO,-1MO',
+        ];
+        yield 'duplicates collapse' => [
+            RecurrencePeriod::Week,
+            [Weekday::Monday, Weekday::Monday],
+            [],
+            'FREQ=WEEKLY;BYDAY=MO',
+        ];
+    }
+
+    #[DataProvider('provideRejectedMultiEntryPatterns')]
+    public function testSeveralByDayEntriesRejectMixedShapes(RecurrencePeriod $period, array $weekdays, array $ordinals): void
+    {
+        // Assert
+        $this->expectException(InvalidRecurrencePatternException::class);
+
+        // Act
+        RecurrencePattern::weekday($period, $weekdays, $ordinals);
+    }
+
+    public static function provideRejectedMultiEntryPatterns(): iterable
+    {
+        yield 'monthly needs exactly one weekday' => [
+            RecurrencePeriod::Month,
+            [Weekday::Friday, Weekday::Monday],
+            [RecurrenceOrdinal::First],
+        ];
+        yield 'no weekday at all' => [RecurrencePeriod::Week, [], []];
+    }
+
+    #[DataProvider('provideImpossibleYearlyDays')]
+    public function testAYearlyDayThatTheMonthNeverHasIsRejected(int $dayOfMonth, int $anchorMonth): void
+    {
+        // Assert
+        $this->expectException(InvalidRecurrencePatternException::class);
+
+        // Act
+        RecurrencePattern::dayOfMonth(RecurrencePeriod::Year, $dayOfMonth, $anchorMonth);
+    }
+
+    public static function provideImpossibleYearlyDays(): iterable
+    {
+        yield '30 February' => [30, 2];
+        yield '31 February' => [31, 2];
+        yield '31 April' => [31, 4];
+        yield '31 November' => [31, 11];
+    }
+
+    #[DataProvider('provideMultiDayPatterns')]
+    public function testSeveralDaysOfMonthRoundTripInAscendingOrder(RecurrencePeriod $period, array $days, string $expected): void
+    {
+        // Act
+        $pattern = RecurrencePattern::dayOfMonth($period, $days);
+
+        // Assert
+        static::assertSame($expected, $pattern->toRfcString());
+        static::assertSame($expected, RecurrencePattern::fromRfcString($expected)->toRfcString());
+        static::assertFalse($pattern->isLastDayOfMonth());
+    }
+
+    public static function provideMultiDayPatterns(): iterable
+    {
+        yield 'first and fifteenth' => [RecurrencePeriod::Month, [15, 1], 'FREQ=MONTHLY;BYMONTHDAY=1,15'];
+        yield 'duplicates collapse' => [RecurrencePeriod::Month, [10, 10], 'FREQ=MONTHLY;BYMONTHDAY=10'];
+        yield 'three days quarterly' => [
+            RecurrencePeriod::Quarter, [28, 5, 12], 'FREQ=MONTHLY;INTERVAL=3;BYMONTHDAY=5,12,28',
+        ];
+    }
+
+    public function testTheLastDayCannotJoinNumberedDays(): void
+    {
+        // Assert
+        $this->expectException(InvalidRecurrencePatternException::class);
+
+        // Act
+        RecurrencePattern::dayOfMonth(RecurrencePeriod::Month, [1, RecurrencePattern::LAST_DAY_OF_MONTH]);
+    }
+
+    public function testAYearlyLeapDayIsAllowed(): void
+    {
+        // Act
+        $pattern = RecurrencePattern::dayOfMonth(RecurrencePeriod::Year, 29, 2);
+
+        // Assert
+        static::assertSame('FREQ=YEARLY;BYMONTH=2;BYMONTHDAY=29', $pattern->toRfcString());
+    }
+
+    public function testADailyPatternRoundTrips(): void
+    {
+        // Act
+        $pattern = RecurrencePattern::fromRfcString('FREQ=DAILY');
+
+        // Assert
+        static::assertSame(RecurrenceMode::EveryDay, $pattern->mode);
+        static::assertSame(RecurrencePeriod::Day, $pattern->period);
+        static::assertSame('FREQ=DAILY', $pattern->toRfcString());
     }
 
     #[DataProvider('provideRejectedSpecs')]
@@ -146,8 +279,11 @@ class RecurrencePatternTest extends TestCase
         yield 'unsupported frequency' => ['FREQ=HOURLY;BYDAY=1SU'];
         yield 'unsupported interval' => ['FREQ=MONTHLY;INTERVAL=7;BYDAY=1SU'];
         yield 'no BYDAY or BYMONTHDAY' => ['FREQ=MONTHLY'];
-        yield 'multiple weekdays' => ['FREQ=MONTHLY;BYDAY=1FR,3FR'];
+        yield 'mixed ordinal and bare weekday' => ['FREQ=MONTHLY;BYDAY=1FR,MO'];
+        yield 'several weekdays under one ordinal' => ['FREQ=MONTHLY;BYDAY=1FR,3MO'];
         yield 'unsupported ordinal' => ['FREQ=MONTHLY;BYDAY=5SU'];
+        yield 'last day mixed with a numbered day' => ['FREQ=MONTHLY;BYMONTHDAY=1,-1'];
+        yield 'daily carrying a BYDAY' => ['FREQ=DAILY;BYDAY=MO'];
         yield 'monthly weekday without ordinal' => ['FREQ=MONTHLY;BYDAY=SU'];
         yield 'day of month out of range' => ['FREQ=MONTHLY;BYMONTHDAY=32'];
         yield 'yearly without anchor month' => ['FREQ=YEARLY;BYDAY=1SU'];
@@ -190,7 +326,7 @@ class RecurrencePatternTest extends TestCase
         yield 'bimonthly becomes two weeks' => [EventInterval::BiMonthly, 'FREQ=WEEKLY;INTERVAL=2;BYDAY=WE'];
         yield 'monthly takes the anchor day' => [EventInterval::Monthly, 'FREQ=MONTHLY;BYMONTHDAY=12'];
         yield 'yearly takes anchor day and month' => [EventInterval::Yearly, 'FREQ=YEARLY;BYMONTH=8;BYMONTHDAY=12'];
-        yield 'daily is not expressible' => [EventInterval::Daily, null];
+        yield 'daily needs nothing from the anchor' => [EventInterval::Daily, 'FREQ=DAILY'];
         yield 'custom resolves from its own spec' => [EventInterval::Custom, null];
     }
 }

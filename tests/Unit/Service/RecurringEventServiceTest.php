@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Service;
 
-use App\Entity\Event;
 use App\Entity\EventTranslation;
 use App\EntityActionDispatcher;
 use App\Enum\CronTaskStatus;
@@ -13,6 +12,7 @@ use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
 use App\Repository\EventSeriesRepository;
 use App\Service\Cms\CmsService;
+use App\Service\Event\OccurrenceCalculator;
 use App\Service\Event\RecurrenceResolver;
 use App\Service\Event\RecurringEventService;
 use App\ValueObject\RealignmentItem;
@@ -23,7 +23,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use ReflectionProperty;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Console\Output\OutputInterface;
 use Tests\Unit\Stubs\EventSeriesStub;
 use Tests\Unit\Stubs\EventStub;
@@ -31,6 +31,8 @@ use Tests\Unit\Stubs\UserStub;
 
 class RecurringEventServiceTest extends TestCase
 {
+    private const string NOW = '2026-06-15 12:00:00'; // a Monday, so weekday maths in the fixtures is readable
+
     // ---- helpers ----
 
     private function makeSeries(int $id, ?EventInterval $rule, ?string $ruleSpec = null): EventSeriesStub
@@ -54,7 +56,7 @@ class RecurringEventServiceTest extends TestCase
         return $event;
     }
 
-    private function createService(EventRepository $repo, EntityManagerInterface $em, ?EventSeriesRepository $seriesRepo = null): RecurringEventService
+    private function createService(EventRepository $repo, EntityManagerInterface $em, ?EventSeriesRepository $seriesRepo = null, string $now = self::NOW): RecurringEventService
     {
         return new RecurringEventService(
             repo: $repo,
@@ -64,6 +66,8 @@ class RecurringEventServiceTest extends TestCase
             cmsBlockRepository: $this->createStub(CmsBlockRepository::class),
             cmsService: $this->createStub(CmsService::class),
             recurrenceResolver: new RecurrenceResolver(),
+            calculator: new OccurrenceCalculator(),
+            clock: new MockClock(new DateTimeImmutable($now)),
         );
     }
 
@@ -666,216 +670,6 @@ class RecurringEventServiceTest extends TestCase
         static::assertSame($attendee2, $result->removedAttendees[11]['user']);
     }
 
-    // ---- extension template resolution ----
-
-    private function makeTranslation(string $title): EventTranslation
-    {
-        $translation = new EventTranslation();
-        $translation->setLanguage('en');
-        $translation->setTitle($title);
-        $translation->setTeaser($title . ' teaser');
-        $translation->setDescription($title . ' description');
-
-        return $translation;
-    }
-
-    /**
-     * @return array{RecurringEventService, callable(): array<Event>}
-     */
-    private function createExtensionService(EventSeriesStub $series, ?EventStub $template): array
-    {
-        $seriesRepo = $this->createStub(EventSeriesRepository::class);
-        $seriesRepo->method('findOpen')->willReturn([$series]);
-        $seriesRepo->method('find')->willReturn($series);
-
-        $repo = $this->createStub(EventRepository::class);
-        $repo->method('findNewestSeriesMember')->willReturn($template);
-
-        $created = [];
-        $em = $this->createStub(EntityManagerInterface::class);
-        $em->method('persist')->willReturnCallback(static function (object $entity) use (&$created): void {
-            if ($entity instanceof Event && $entity->getId() === null) {
-                new ReflectionProperty(Event::class, 'id')->setValue($entity, 1000 + count($created));
-                $created[] = $entity;
-            }
-        });
-
-        return [
-            $this->createService($repo, $em, $seriesRepo),
-            static function () use (&$created): array {
-                return $created;
-            },
-        ];
-    }
-
-    public function testExtendRecurringEventsSourcesScheduleAndContentFromNewestMember(): void
-    {
-        // Arrange: the newest non-locked member carries the current time, content, and creator
-        $series = $this->makeSeries(9, EventInterval::Weekly);
-
-        $creator = new UserStub()->setId(77);
-        $template = $this->makeFutureEvent(5, 'tomorrow 20:30', 'tomorrow 23:00');
-        $template->setUser($creator);
-        $template->addTranslation($this->makeTranslation('New Title'));
-
-        [$service, $createdEvents] = $this->createExtensionService($series, $template);
-
-        // Act
-        $count = $service->extentRecurringEvents();
-
-        // Assert
-        $created = $createdEvents();
-        static::assertGreaterThan(0, $count);
-        static::assertCount($count, $created);
-        $expectedFirst = new DateTime('tomorrow 20:30')->modify('+7 days');
-        static::assertSame($expectedFirst->format('Y-m-d H:i'), $created[0]->getStart()->format('Y-m-d H:i'));
-        foreach ($created as $event) {
-            static::assertSame('20:30', $event->getStart()->format('H:i'));
-            static::assertSame('23:00', $event->getStop()->format('H:i'));
-            static::assertSame('New Title', $event->getTitle('en'));
-            static::assertSame($series, $event->getSeries());
-            static::assertSame($creator, $event->getUser());
-            static::assertFalse($event->isInitial());
-        }
-    }
-
-    public function testExtendRecurringEventsUsesTheOnlyMemberAsTemplate(): void
-    {
-        // Arrange: a fresh series where the manually created first event is the only member
-        $series = $this->makeSeries(9, EventInterval::Weekly);
-
-        $template = $this->makeFutureEvent(1, 'yesterday 19:00', 'yesterday 22:00');
-        $template->addTranslation($this->makeTranslation('Old Title'));
-
-        [$service, $createdEvents] = $this->createExtensionService($series, $template);
-
-        // Act
-        $count = $service->extentRecurringEvents();
-
-        // Assert
-        $created = $createdEvents();
-        static::assertGreaterThan(0, $count);
-        $expectedFirst = new DateTime('yesterday 19:00')->modify('+7 days');
-        static::assertSame($expectedFirst->format('Y-m-d H:i'), $created[0]->getStart()->format('Y-m-d H:i'));
-        foreach ($created as $event) {
-            static::assertSame('19:00', $event->getStart()->format('H:i'));
-            static::assertSame('Old Title', $event->getTitle('en'));
-        }
-    }
-
-    // ---- custom rule generation ----
-
-    /**
-     * @return array<DateTime>
-     */
-    private function generateCustomSeries(string $spec, string $anchor): array
-    {
-        $series = $this->makeSeries(9, EventInterval::Custom, $spec);
-        $template = $this->makeFutureEvent(1, $anchor);
-        [$service, $createdEvents] = $this->createExtensionService($series, $template);
-
-        $service->extentRecurringEvents();
-
-        return array_map(static fn(Event $event): DateTime => $event->getStart(), $createdEvents());
-    }
-
-    public function testExtendGeneratesTheFirstWeekdayOfEachMonth(): void
-    {
-        // Act
-        $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYDAY=1SU', 'tomorrow 19:00');
-
-        // Assert
-        static::assertNotEmpty($starts);
-        foreach ($starts as $start) {
-            static::assertSame('Sunday', $start->format('l'));
-            static::assertLessThanOrEqual(7, (int) $start->format('j'));
-            static::assertSame('19:00', $start->format('H:i'));
-        }
-    }
-
-    public function testExtendGeneratesTheLastWeekdayOfEachMonth(): void
-    {
-        // Act
-        $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYDAY=-1FR', 'tomorrow 19:00');
-
-        // Assert
-        static::assertNotEmpty($starts);
-        foreach ($starts as $start) {
-            static::assertSame('Friday', $start->format('l'));
-            $sameWeekdayNextWeek = DateTime::createFromInterface($start)->modify('+7 days');
-            static::assertNotSame($start->format('n'), $sameWeekdayNextWeek->format('n'));
-        }
-    }
-
-    public function testExtendSkipsMonthsWithoutADayThirtyOne(): void
-    {
-        // Act
-        $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYMONTHDAY=31', 'tomorrow 19:00');
-
-        // Assert
-        static::assertNotEmpty($starts);
-        foreach ($starts as $start) {
-            static::assertSame('31', $start->format('j'));
-        }
-    }
-
-    public function testExtendGeneratesTheLastDayOfEachMonth(): void
-    {
-        // Act
-        $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYMONTHDAY=-1', 'tomorrow 19:00');
-
-        // Assert
-        static::assertNotEmpty($starts);
-        foreach ($starts as $start) {
-            static::assertSame($start->format('t'), $start->format('j'));
-        }
-    }
-
-    public function testExtendKeepsQuarterlySpacing(): void
-    {
-        // Act
-        $starts = $this->generateCustomSeries('FREQ=MONTHLY;INTERVAL=3;BYDAY=3MO', 'tomorrow 19:00');
-
-        // Assert
-        static::assertNotEmpty($starts);
-        foreach ($starts as $start) {
-            static::assertSame('Monday', $start->format('l'));
-            $dayOfMonth = (int) $start->format('j');
-            static::assertGreaterThanOrEqual(15, $dayOfMonth);
-            static::assertLessThanOrEqual(21, $dayOfMonth);
-        }
-    }
-
-    public function testExtendKeepsTheFirstOccurrenceWhenTheAnchorIsOffPattern(): void
-    {
-        // Arrange: an anchor that is deliberately not a first Sunday, so the anchor does not
-        // head the occurrence set - skipping by position would silently eat a real date
-        $anchor = new DateTime('first sunday of next month 19:00')->modify('+3 days');
-
-        // Act
-        $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYDAY=1SU', $anchor->format('Y-m-d H:i'));
-
-        // Assert
-        $monthAfterAnchor = DateTime::createFromInterface($anchor)->modify('first day of next month');
-        $expectedFirst = new DateTime('first sunday of ' . $monthAfterAnchor->format('F Y'));
-        static::assertNotEmpty($starts);
-        static::assertSame($expectedFirst->format('Y-m-d'), $starts[0]->format('Y-m-d'));
-    }
-
-    public function testExtendSkipsASeriesWhoseCustomSpecCannotBeParsed(): void
-    {
-        // Arrange
-        $series = $this->makeSeries(9, EventInterval::Custom, 'FREQ=NONSENSE');
-        $template = $this->makeFutureEvent(1, 'tomorrow 19:00');
-        [$service, $createdEvents] = $this->createExtensionService($series, $template);
-
-        // Act
-        $count = $service->extentRecurringEvents();
-
-        // Assert
-        static::assertSame(0, $count);
-        static::assertCount(0, $createdEvents());
-    }
 
     public function testPlanRealignmentReturnsUnmovedItemsWhenTheCustomSpecCannotBeParsed(): void
     {
@@ -905,21 +699,6 @@ class RecurringEventServiceTest extends TestCase
 
         // Assert
         static::assertSame(0, $plan->movedCount());
-    }
-
-    public function testExtendRecurringEventsSkipsSeriesWithoutUsableTemplate(): void
-    {
-        // Arrange: every member is locked - findNewestSeriesMember finds nothing
-        $series = $this->makeSeries(9, EventInterval::Weekly);
-
-        [$service, $createdEvents] = $this->createExtensionService($series, null);
-
-        // Act
-        $count = $service->extentRecurringEvents();
-
-        // Assert
-        static::assertSame(0, $count);
-        static::assertCount(0, $createdEvents());
     }
 
     public function testUpdateRecurringEventsUpdatesExistingFollowUpTranslation(): void

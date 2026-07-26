@@ -3,7 +3,7 @@
 namespace App\Service\Event;
 
 use App\Enum\RecurrenceMode;
-use App\Enum\RecurrencePeriod;
+use App\Enum\RecurrenceOrdinal;
 use App\Enum\Weekday;
 use App\ValueObject\RecurrencePattern;
 use DateTimeImmutable;
@@ -41,24 +41,20 @@ final readonly class RecurrenceDescriber
         );
     }
 
+    // The period slot in every sentence key is the enum's backed value; renaming a case breaks the lookup.
     private function sentenceKey(RecurrencePattern $pattern): string
     {
-        $slot = match ($pattern->period) {
-            RecurrencePeriod::Week => 'week',
-            RecurrencePeriod::TwoWeeks => 'two_weeks',
-            RecurrencePeriod::Month => 'month',
-            RecurrencePeriod::TwoMonths => 'two_months',
-            RecurrencePeriod::Quarter => 'quarter',
-            RecurrencePeriod::Year => 'year',
-        };
+        if (RecurrenceMode::EveryDay === $pattern->mode) {
+            return 'admin_event.recurrence_text_every_day';
+        }
 
         if (RecurrenceMode::Weekday === $pattern->mode) {
-            return 'admin_event.recurrence_text_weekday_' . $slot;
+            return 'admin_event.recurrence_text_weekday_' . $pattern->period->value;
         }
 
         return $pattern->isLastDayOfMonth()
-            ? 'admin_event.recurrence_text_last_day_' . $slot
-            : 'admin_event.recurrence_text_day_' . $slot;
+            ? 'admin_event.recurrence_text_last_day_' . $pattern->period->value
+            : 'admin_event.recurrence_text_day_' . $pattern->period->value;
     }
 
     /**
@@ -70,18 +66,36 @@ final readonly class RecurrenceDescriber
     {
         $parameters = [];
 
-        if (null !== $pattern->weekday) {
-            $parameters['%weekday%'] = $this->weekdayName($pattern->weekday, $intlLocale);
+        if ([] !== $pattern->weekdays) {
+            $parameters['%weekday%'] = $this->joinList(
+                array_map(fn(Weekday $weekday): string => $this->weekdayName($weekday, $intlLocale), $pattern->weekdays),
+                $intlLocale,
+            );
         }
 
-        if (null !== $pattern->ordinal) {
-            $parameters['%ordinal%'] = $this->translator->trans($pattern->ordinal->label(), [], null, $intlLocale);
+        if ([] !== $pattern->ordinals) {
+            $parameters['%ordinal%'] = $this->joinList(
+                array_map(
+                    fn(RecurrenceOrdinal $ordinal): string => $this->translator->trans($ordinal->label(), [], null, $intlLocale),
+                    $pattern->ordinals,
+                ),
+                $intlLocale,
+            );
         }
 
-        if (null !== $pattern->dayOfMonth && !$pattern->isLastDayOfMonth()) {
-            $parameters['%day%'] = (string) $pattern->dayOfMonth;
-            $parameters['%day_ordinal%'] = (new NumberFormatter($intlLocale, NumberFormatter::ORDINAL))
-                ->format($pattern->dayOfMonth) ?: (string) $pattern->dayOfMonth;
+        if ([] !== $pattern->daysOfMonth && !$pattern->isLastDayOfMonth()) {
+            $ordinalFormatter = new NumberFormatter($intlLocale, NumberFormatter::ORDINAL);
+            $parameters['%day%'] = $this->joinList(
+                array_map(static fn(int $day): string => (string) $day, $pattern->daysOfMonth),
+                $intlLocale,
+            );
+            $parameters['%day_ordinal%'] = $this->joinList(
+                array_map(
+                    static fn(int $day): string => $ordinalFormatter->format($day) ?: (string) $day,
+                    $pattern->daysOfMonth,
+                ),
+                $intlLocale,
+            );
         }
 
         if (null !== $pattern->anchorMonth) {
@@ -93,6 +107,22 @@ final readonly class RecurrenceDescriber
         }
 
         return $parameters;
+    }
+
+    /**
+     * @param list<string> $items
+     */
+    private function joinList(array $items, string $intlLocale): string
+    {
+        if (count($items) < 2) {
+            return implode('', $items);
+        }
+
+        $last = array_pop($items);
+
+        return implode($this->translator->trans('admin_event.recurrence_list_separator', [], null, $intlLocale), $items)
+            . $this->translator->trans('admin_event.recurrence_list_last_separator', [], null, $intlLocale)
+            . $last;
     }
 
     private function formatDate(DateTimeInterface $date, string $intlLocale, string $pattern): string

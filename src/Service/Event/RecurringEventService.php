@@ -20,13 +20,12 @@ use App\ValueObject\CronTaskResult;
 use App\ValueObject\RealignmentItem;
 use App\ValueObject\RealignmentPlan;
 use App\ValueObject\RealignmentResult;
-use App\ValueObject\ResolvedRecurrence;
 use App\ValueObject\ScheduleChange;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use RRule\RRule;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 readonly class RecurringEventService implements CronTaskInterface
@@ -39,6 +38,8 @@ readonly class RecurringEventService implements CronTaskInterface
         private CmsBlockRepository $cmsBlockRepository,
         private CmsService $cmsService,
         private RecurrenceResolver $recurrenceResolver,
+        private OccurrenceCalculator $calculator,
+        private ClockInterface $clock,
     ) {}
 
     public function getIdentifier(): string
@@ -126,10 +127,9 @@ readonly class RecurringEventService implements CronTaskInterface
      *    must not be orphaned when the anchor moves later), then keep only future ones.
      * 3. Locked and canceled members become skipped items; they neither move nor consume
      *    an occurrence slot.
-     * 4. Generate count(realignable)+1 occurrences of the new rule anchored at the new
-     *    start (no until-window: existing members keep mapping even beyond the cron
-     *    lookahead when the new rule is sparser) and drop the anchor's own date, which
-     *    heads the set only when the new start already matches the new rule.
+     * 4. Take count(realignable) occurrences of the new rule anchored at the new start - by
+     *    count, not by window, so existing members keep mapping even beyond the cron
+     *    lookahead when the new rule is sparser.
      * 5. Map realignable members in start order 1:1 onto occurrences; the new stop is
      *    start + old duration so cross-midnight events stay intact. Members past the last
      *    occurrence drop out of the plan and keep their dates.
@@ -146,7 +146,7 @@ readonly class RecurringEventService implements CronTaskInterface
             return new RealignmentPlan(null, (int) $anchor->getId(), null, null, []);
         }
 
-        $now = new DateTimeImmutable();
+        $now = $this->clock->now();
         $children = [];
         foreach ($this->repo->findFollowUpEvents(seriesId: (int) $series->getId(), greaterThan: $change->oldStart) as $child) {
             if ($child->getId() === $anchor->getId()) {
@@ -168,17 +168,9 @@ readonly class RecurringEventService implements CronTaskInterface
         ));
 
         $occurrences = [];
-        $recurrence = $this->recurrenceResolver->resolve($rule, $ruleSpec, $change->newStart);
-        if ($realignableCount > 0 && $recurrence !== null) {
-            $anchorDate = $change->newStart->format('Y-m-d');
-            $rrule = new RRule(
-                sprintf('%s;COUNT=%d', $recurrence->rfcString, $realignableCount + 1),
-                $anchorDate,
-            );
-            $occurrences = array_values(array_filter(
-                $rrule->getOccurrences(),
-                static fn(DateTime $occurrence): bool => $occurrence->format('Y-m-d') !== $anchorDate,
-            ));
+        $pattern = $this->recurrenceResolver->resolve($rule, $ruleSpec, $change->newStart);
+        if ($realignableCount > 0 && $pattern !== null) {
+            $occurrences = $this->calculator->take($pattern, $change->newStart, $realignableCount);
         }
 
         $duration = $change->newStop !== null ? $change->newStart->diff($change->newStop) : null;
@@ -266,26 +258,22 @@ readonly class RecurringEventService implements CronTaskInterface
             return 0; // a series without a non-locked member cannot be extended
         }
 
-        $recurrence = $this->recurrenceResolver->resolve($series->getRule(), $series->getRuleSpec(), $template->getStart());
-        if ($recurrence === null) {
+        $pattern = $this->recurrenceResolver->resolve($series->getRule(), $series->getRuleSpec(), $template->getStart());
+        if ($pattern === null) {
             return 0;
         }
 
-        $rrule = $this->createRRule($template, $recurrence);
+        $now = $this->clock->now();
         $createdEvents = [];
-        $now = new DateTime();
-        $anchorDate = $template->getStart()->format('Y-m-d');
 
-        foreach ($rrule as $occurrence) {
-            // Match by date, not position: an off-pattern anchor does not head the set.
-            if ($occurrence->format('Y-m-d') === $anchorDate) {
-                continue;
-            }
-            if ($occurrence < $now) {
+        foreach ($this->calculator->until($pattern, $template->getStart(), $now->modify($pattern->period->lookaheadModifier())) as $occurrence) {
+            // Compare the composed start, not the bare date: an occurrence today may still be ahead.
+            $start = $this->updateDate($template->getStart(), $occurrence);
+            if (!$start instanceof DateTime || $start < $now) {
                 continue;
             }
 
-            $newEvent = $this->createRecurringEvent($series, $template, $occurrence);
+            $newEvent = $this->createRecurringEvent($series, $template, $start, $this->updateDate($template->getStop(), $occurrence));
             $this->em->persist($newEvent);
             $createdEvents[] = $newEvent;
         }
@@ -300,17 +288,7 @@ readonly class RecurringEventService implements CronTaskInterface
         return count($createdEvents);
     }
 
-    private function createRRule(Event $templateEvent, ResolvedRecurrence $recurrence): RRule
-    {
-        $until = (new DateTime())->modify($recurrence->lookaheadModifier);
-
-        return new RRule(
-            sprintf('%s;UNTIL=%s', $recurrence->rfcString, $until->format('Ymd')),
-            $templateEvent->getStart()->format('Y-m-d'),
-        );
-    }
-
-    private function createRecurringEvent(EventSeries $series, Event $template, DateTime $occurrence): Event
+    private function createRecurringEvent(EventSeries $series, Event $template, DateTime $start, ?DateTime $stop): Event
     {
         $recurringEvent = new Event();
         $recurringEvent->setUser($template->getUser());
@@ -319,8 +297,8 @@ readonly class RecurringEventService implements CronTaskInterface
         $recurringEvent->setLocation($template->getLocation());
         $recurringEvent->setPreviewImage($template->getPreviewImage());
         $recurringEvent->setInitial(false);
-        $recurringEvent->setStart($this->updateDate($template->getStart(), $occurrence));
-        $recurringEvent->setStop($this->updateDate($template->getStop(), $occurrence));
+        $recurringEvent->setStart($start);
+        $recurringEvent->setStop($stop);
         $recurringEvent->setSeries($series);
         $recurringEvent->setCreatedAt(new DateTimeImmutable());
 
@@ -348,7 +326,7 @@ readonly class RecurringEventService implements CronTaskInterface
         return $recurringEvent;
     }
 
-    private function updateDate(?DateTimeInterface $target, DateTime $occurrence): ?DateTime
+    private function updateDate(?DateTimeInterface $target, DateTimeImmutable $occurrence): ?DateTime
     {
         if (!$target instanceof DateTimeInterface) {
             return null;

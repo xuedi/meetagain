@@ -8,10 +8,11 @@ use App\Entity\EventSeries;
 use App\Entity\EventTranslation;
 use App\Entity\User;
 use App\Enum\EventInterval;
+use App\Service\Event\OccurrenceCalculator;
 use App\Service\Event\RecurringEventService;
+use App\ValueObject\RecurrencePattern;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use RRule\RRule;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Crawler;
@@ -135,13 +136,11 @@ class EventRescheduleFlowTest extends WebTestCase
         $parent = $em->getRepository(Event::class)->find($parentId);
         static::assertSame(EventInterval::Monthly, $parent->getSeries()->getRule());
 
-        $rrule = new RRule([
-            'freq' => RRule::MONTHLY,
-            'interval' => 1,
-            'dtstart' => $parent->getStart()->format('Y-m-d'),
-            'count' => 2,
-        ]);
-        $occurrence = $rrule->getOccurrences()[1];
+        $occurrence = new OccurrenceCalculator()->take(
+            RecurrencePattern::fromInterval(EventInterval::Monthly, $parent->getStart()),
+            $parent->getStart(),
+            1,
+        )[0];
         $expectedChildStart = (clone $parent->getStart())->setDate(
             (int) $occurrence->format('Y'),
             (int) $occurrence->format('m'),
