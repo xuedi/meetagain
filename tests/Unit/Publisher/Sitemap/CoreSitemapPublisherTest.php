@@ -8,6 +8,7 @@ use App\Entity\EventSeries;
 use App\Entity\EventTranslation;
 use App\Filter\Cms\CmsFilterResult;
 use App\Filter\Cms\CmsFilterService;
+use App\Filter\Event\EventFilterService;
 use App\Filter\Member\MemberFilterResult;
 use App\Filter\Member\MemberFilterService;
 use App\Filter\Sitemap\SitemapEventVisibilityService;
@@ -212,6 +213,55 @@ class CoreSitemapPublisherTest extends TestCase
         }
     }
 
+    public function testOmitsEventsTheDetailPageWouldReject(): void
+    {
+        // Arrange
+        $reachable = $this->makeEvent(42, new DateTime('2026-05-01'));
+        $unreachable = $this->makeEvent(109, new DateTime('2026-05-02'));
+
+        $publisher = $this->makePublisher(
+            locales: ['en', 'de'],
+            cmsPages: [],
+            events: [$reachable, $unreachable],
+            cmsFilter: CmsFilterResult::noFilter(),
+            shouldEmitEvents: true,
+            accessibleEventIds: [42],
+        );
+
+        // Act
+        $locs = array_map(static fn($u) => $u->loc, $publisher->getSitemapUrls());
+
+        // Assert
+        self::assertNotEmpty(array_filter($locs, static fn($loc) => str_contains($loc, '/event/42')));
+        self::assertEmpty(array_filter($locs, static fn($loc) => str_contains($loc, '/event/109')));
+    }
+
+    public function testOmitsEventsFromAlternatesWhenNoneAreAccessible(): void
+    {
+        // Arrange
+        $event = $this->makeEvent(109, new DateTime('2026-05-01'));
+
+        $publisher = $this->makePublisher(
+            locales: ['en', 'de'],
+            cmsPages: [],
+            events: [$event],
+            cmsFilter: CmsFilterResult::noFilter(),
+            shouldEmitEvents: true,
+            accessibleEventIds: [],
+        );
+
+        // Act
+        $urls = $publisher->getSitemapUrls();
+
+        // Assert
+        foreach ($urls as $url) {
+            self::assertStringNotContainsString('/event/', $url->loc);
+            foreach ($url->alternates as $href) {
+                self::assertStringNotContainsString('/event/', $href);
+            }
+        }
+    }
+
     public function testSeriesFollowersAreOmittedAndAlternatesPointAtTheRoot(): void
     {
         // Arrange
@@ -248,6 +298,7 @@ class CoreSitemapPublisherTest extends TestCase
      * @param array<Cms> $cmsPages
      * @param array<Event> $events
      * @param array<Event> $seriesMembers
+     * @param int[]|null $accessibleEventIds null = every event stays accessible
      */
     private function makePublisher(
         array $locales,
@@ -257,6 +308,7 @@ class CoreSitemapPublisherTest extends TestCase
         bool $shouldEmitEvents,
         int $memberCount = 0,
         array $seriesMembers = [],
+        ?array $accessibleEventIds = null,
     ): CoreSitemapPublisher {
         $eventRepo = $this->createStub(EventRepository::class);
         $eventRepo->method('findForSitemap')->willReturn($events);
@@ -293,6 +345,13 @@ class CoreSitemapPublisherTest extends TestCase
         $memberFilterService = $this->createStub(MemberFilterService::class);
         $memberFilterService->method('getUserIdFilter')->willReturn(MemberFilterResult::noFilter());
 
+        $eventFilterService = $this->createStub(EventFilterService::class);
+        $eventFilterService
+            ->method('getAccessibleEventIds')
+            ->willReturnCallback(
+                static fn(array $ids) => $accessibleEventIds === null ? $ids : array_values(array_intersect($ids, $accessibleEventIds)),
+            );
+
         $visibility = $this->createStub(SitemapEventVisibilityService::class);
         $visibility->method('shouldEmitEvents')->willReturn($shouldEmitEvents);
 
@@ -304,6 +363,7 @@ class CoreSitemapPublisherTest extends TestCase
             urlGenerator: $urlGenerator,
             cmsFilterService: $cmsFilterService,
             memberFilterService: $memberFilterService,
+            eventFilterService: $eventFilterService,
             eventVisibilityService: $visibility,
             canonicalResolver: new EventCanonicalResolver($eventRepo, $this->createStub(EventCanonicalRootRepository::class)),
         );
