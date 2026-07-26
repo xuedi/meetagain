@@ -1,0 +1,8 @@
+# mermaid-guard lints mermaid code blocks in markdown for syntax GitHub refuses to render.
+#
+# Extend this through the optional config/tools/mermaid-guard.local overlay: SCAN_PATHS is a
+# list key, so an overlay entry adds a root rather than replacing these.
+
+# Markdown roots scanned when no path argument is given, and the prefixes `--staged` keeps.
+# Files as well as directories are accepted.
+SCAN_PATHS=docs/src,README.md

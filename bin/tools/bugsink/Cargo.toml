@@ -1,0 +1,14 @@
+[package]
+name = "bugsink"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "bugsink"
+path = "src/main.rs"
+
+[dependencies]
+toolconfig.workspace = true
+clap.workspace = true
+ureq.workspace = true
+serde_json.workspace = true

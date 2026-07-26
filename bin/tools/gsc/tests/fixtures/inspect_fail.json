@@ -1,0 +1,25 @@
+{
+  "inspectionResult": {
+    "indexStatusResult": {
+      "verdict": "FAIL",
+      "coverageState": "Crawled - currently not indexed",
+      "robotsTxtState": "ALLOWED",
+      "indexingState": "INDEXING_ALLOWED",
+      "pageFetchState": "SUCCESSFUL",
+      "lastCrawlTime": "2026-04-15T08:30:00Z",
+      "crawledAs": "MOBILE",
+      "googleCanonical": "https://meetagain.org/en/events/another",
+      "userCanonical": "https://meetagain.org/en/events/another",
+      "referringUrls": []
+    },
+    "mobileUsabilityResult": {
+      "verdict": "FAIL",
+      "issues": [
+        {
+          "severity": "ERROR",
+          "message": "Clickable elements too close together"
+        }
+      ]
+    }
+  }
+}

@@ -72,4 +72,5 @@ See [Architecture](architecture.md) for the full dependency rules and plugin sys
 | [Data Fixtures](fixtures.md)          | AbstractFixture, cross-references, fixture groups          |
 | [Testing](testing.md)                 | AAA pattern, test doubles, functional tests, running tests |
 | [Best Practices](best-practices.md)   | Readonly services, N+1, enums, HTML sanitization           |
+| [Developer Tooling](tooling.md)       | The commit-hook guards, `just buildTools`, tool config     |
 | [Troubleshooting](troubleshooting.md) | Common problems and how to fix them                        |

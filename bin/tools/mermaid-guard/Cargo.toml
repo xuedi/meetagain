@@ -1,0 +1,12 @@
+[package]
+name = "mermaid-guard"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "mermaid-guard"
+path = "src/main.rs"
+
+[dependencies]
+toolconfig.workspace = true
+walkdir.workspace = true

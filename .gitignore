@@ -7,6 +7,8 @@ installed.lock
 /config/plugins.php
 /config/plugins_test.php
 /config/plugins-post-fixtures.sh
+/bin/tools/bin/
+/bin/tools/target/
 /public/bundles/
 /tests/reports/clover.xml
 /tests/reports/junit.xml
@@ -20,8 +22,6 @@ installed.lock
 /vendor/
 /.idea/
 /.deptrac.cache
-/plugins/multisite/
-/.claude/
 /docs/site/
 tmp/
 

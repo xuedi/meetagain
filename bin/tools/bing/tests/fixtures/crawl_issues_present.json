@@ -1,0 +1,16 @@
+{
+  "d": [
+    {
+      "__type": "CrawlIssue:#Microsoft.Bing.Webmaster.Api",
+      "Issue": "Http404",
+      "Severity": "Warning",
+      "Url": "https://meetagain.org/event/old-event"
+    },
+    {
+      "__type": "CrawlIssue:#Microsoft.Bing.Webmaster.Api",
+      "Issue": "BlockedByRobotsTxt",
+      "Severity": "Error",
+      "Url": "https://meetagain.org/private/something"
+    }
+  ]
+}

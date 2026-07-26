@@ -1,0 +1,22 @@
+{
+  "d": [
+    {
+      "__type": "CrawlStats:#Microsoft.Bing.Webmaster.Api",
+      "AllOtherCodes": 3,
+      "BlockedByRobotsTxt": 0,
+      "Code2xx": 19,
+      "Code301": 4,
+      "Code302": 0,
+      "Code4xx": 2,
+      "Code5xx": 4,
+      "ConnectionTimeout": 0,
+      "ContainsMalware": 0,
+      "CrawlErrors": 6,
+      "CrawledPages": 28,
+      "Date": "/Date(99999999999000)/",
+      "DnsFailures": 1,
+      "InIndex": 25,
+      "InLinks": 1
+    }
+  ]
+}

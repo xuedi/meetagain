@@ -1,0 +1,24 @@
+# One line per PATTERNS entry in config/tools/leak-guard.dist:
+#
+#   <pattern-name> | <a string the pattern must match> | <a near-miss it must not>
+#
+# Every example carries a `<>` splice marker that the test strips before matching. The marker
+# exists because these strings are credential-shaped by design, and this repository is public:
+# GitHub push protection rejected an earlier version of this file for containing a Mailgun key,
+# and any other scanner (gitleaks, TruffleHog, a CI secret step) would do the same. Splicing the
+# literal means no complete key-shaped string is ever stored, while the assembled value still
+# exercises the real regex. Put the marker just after the part a detector keys on - the prefix,
+# or the character that starts the secret portion.
+#
+# The .txt extension keeps the file out of leak-guard's own EXTENSIONS list, so the guard cannot
+# report itself. The test asserts every shipped pattern appears here, so a new pattern without a
+# fixture fails the suite.
+pat-token|mapat_<>gCVAf3sHDGaqLGeQjPzn8kYuTwR1xVbNmKp0oIeUaSc|mapat_<>short
+mollie-key|live_<>7fVhP2wQmXn4RtYuIoPaSdFgHjKlZx|live_<>short
+private-key-pem|-----BEGIN RSA <>PRIVATE KEY-----|-----BEGIN <>PUBLIC KEY-----
+aws-access-key-id|AKIA<>IOSFODNN7EXAMPLE|AKIA<>TOOSHORT
+sendgrid-key|SG.<>ngeVfQFYQlKU0ufo8x5d1A.TwL2iGABf9DHoTf09kqeF8tAmbihYzrnopKc1s5cr|SG.<>ngeVfQFYQlKU0ufo8x5d1A
+mailgun-key|key-<>1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d|key-<>1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6
+github-token|ghp_<>16C7e42F292c6912E7710c838347Ae178B4a12345j|ghp_<>tooshort
+app-secret|APP_SECRET=<>1b23f99fb5e114fbd4705e8774111e6d|the APP_SECRET is read from the environment
+dsn-inline-password|DATABASE_URL=mys<>ql://app:s3cr3t@db:3306/app|DATABASE_URL="mysql://${MARIADB_USER}:${MARIADB_PASSWORD}@${MARIADB_HOST}:3306/db"
