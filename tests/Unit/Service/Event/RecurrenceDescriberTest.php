@@ -49,6 +49,27 @@ class RecurrenceDescriberTest extends TestCase
         yield 'fourth Thursday yearly de' => [
             'FREQ=YEARLY;BYMONTH=8;BYDAY=4TH', 'de', 'Jeden vierten Donnerstag im August jedes Jahr',
         ];
+        yield 'several weekdays en' => [
+            'FREQ=WEEKLY;BYDAY=MO,WE,FR', 'en', 'Every Monday, Wednesday and Friday',
+        ];
+        yield 'several weekdays de' => [
+            'FREQ=WEEKLY;BYDAY=MO,WE,FR', 'de', 'Jeden Montag, Mittwoch und Freitag',
+        ];
+        yield 'several weekdays zh' => [
+            'FREQ=WEEKLY;BYDAY=MO,WE,FR', 'zh', '每星期一、星期三和星期五',
+        ];
+        yield 'two weekdays en' => [
+            'FREQ=WEEKLY;BYDAY=SA,SU', 'en', 'Every Saturday and Sunday',
+        ];
+        yield 'several ordinals en' => [
+            'FREQ=MONTHLY;BYDAY=1FR,3FR', 'en', 'Every first and third Friday of the month',
+        ];
+        yield 'several ordinals de' => [
+            'FREQ=MONTHLY;BYDAY=1FR,3FR', 'de', 'Jeden ersten und dritten Freitag im Monat',
+        ];
+        yield 'daily en' => ['FREQ=DAILY', 'en', 'Every day'];
+        yield 'daily de' => ['FREQ=DAILY', 'de', 'Jeden Tag'];
+        yield 'daily zh' => ['FREQ=DAILY', 'zh', '每天'];
     }
 
     #[DataProvider('provideDayOfMonthSentences')]
@@ -80,6 +101,12 @@ class RecurrenceDescriberTest extends TestCase
         yield 'last day en' => ['FREQ=MONTHLY;BYMONTHDAY=-1', 'en', 'On the last day of the month'];
         yield 'last day de' => ['FREQ=MONTHLY;BYMONTHDAY=-1', 'de', 'Am letzten Tag des Monats'];
         yield 'last day zh' => ['FREQ=MONTHLY;BYMONTHDAY=-1', 'zh', '每月最后一天'];
+        yield 'two days en' => ['FREQ=MONTHLY;BYMONTHDAY=1,15', 'en', 'Every 1st and 15th of the month'];
+        yield 'three days en' => [
+            'FREQ=MONTHLY;BYMONTHDAY=5,12,28', 'en', 'Every 5th, 12th and 28th of the month',
+        ];
+        yield 'two days de' => ['FREQ=MONTHLY;BYMONTHDAY=1,15', 'de', 'Jeden 1. und 15. des Monats'];
+        yield 'two days zh' => ['FREQ=MONTHLY;BYMONTHDAY=1,15', 'zh', '每月1和15日'];
         yield 'last day yearly en' => [
             'FREQ=YEARLY;BYMONTH=8;BYMONTHDAY=-1', 'en', 'On the last day of August each year',
         ];
@@ -89,11 +116,18 @@ class RecurrenceDescriberTest extends TestCase
     {
         // Arrange
         $describer = new RecurrenceDescriber($this->createTranslator());
-        $patterns = [];
+        $patterns = [RecurrencePattern::daily()];
         foreach (RecurrencePeriod::cases() as $period) {
+            if (!$period->carriesDayRule()) {
+                continue;
+            }
+
             $anchorMonth = RecurrencePeriod::Year === $period ? 8 : null;
             $ordinal = $period->isWeekly() ? null : RecurrenceOrdinal::First;
             $patterns[] = RecurrencePattern::weekday($period, Weekday::Sunday, $ordinal, $anchorMonth);
+            $patterns[] = $period->isWeekly()
+                ? RecurrencePattern::weekday($period, [Weekday::Monday, Weekday::Wednesday, Weekday::Friday], [], $anchorMonth)
+                : RecurrencePattern::weekday($period, Weekday::Sunday, [RecurrenceOrdinal::First, RecurrenceOrdinal::Last], $anchorMonth);
             if (!$period->isWeekly()) {
                 $patterns[] = RecurrencePattern::dayOfMonth($period, 15, $anchorMonth);
                 $patterns[] = RecurrencePattern::dayOfMonth(

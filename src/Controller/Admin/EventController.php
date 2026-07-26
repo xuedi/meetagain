@@ -42,11 +42,12 @@ use App\Service\Config\LanguageService;
 use App\Service\Event\EventService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
+use App\Service\Event\RecurrenceBuilderStateResolver;
 use App\Service\Event\RecurrenceDescriber;
 use App\Service\Event\RecurrencePreviewService;
 use App\Service\Event\RecurrenceResolver;
 use App\Service\Seo\EventCanonicalRebuildService;
-use App\ValueObject\RecurrencePattern;
+use App\ValueObject\RecurrenceBuilderState;
 use App\ValueObject\ScheduleChange;
 use DateTime;
 use DateTimeImmutable;
@@ -107,6 +108,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         private readonly RecurrencePreviewService $recurrencePreviewService,
         private readonly RecurrenceResolver $recurrenceResolver,
         private readonly RecurrenceDescriber $recurrenceDescriber,
+        private readonly RecurrenceBuilderStateResolver $recurrenceBuilderStateResolver,
     ) {}
 
     #[Route('/recurrence/preview', name: 'app_admin_event_recurrence_preview', methods: ['GET'])]
@@ -117,30 +119,65 @@ final class EventController extends AbstractController implements AdminNavigatio
         $after = DateTimeImmutable::createFromFormat('Y-m-d', (string) $request->query->get('after'))
             ?: new DateTimeImmutable('today');
 
+        // Unparseable input is a bad request; a merely inconsistent selection is normalised below.
         if (!$mode instanceof RecurrenceMode || !$period instanceof RecurrencePeriod) {
             return $this->json(['error' => 'invalid_parameters'], Response::HTTP_BAD_REQUEST);
         }
 
-        $ordinal = $request->query->has('ordinal')
-            ? RecurrenceOrdinal::tryFrom($request->query->getInt('ordinal'))
-            : null;
-        $dayOfMonth = $request->query->has('day') ? $request->query->getInt('day') : null;
+        $query = $request->query->all();
+        $state = $this->recurrenceBuilderStateResolver->resolve(
+            mode: $mode,
+            period: $period,
+            ordinals: array_values(array_filter(array_map(
+                static fn(mixed $value): ?RecurrenceOrdinal => RecurrenceOrdinal::tryFrom((int) $value),
+                (array) ($query['ordinal'] ?? []),
+            ))),
+            weekdays: array_values(array_filter(array_map(
+                static fn(mixed $value): ?Weekday => Weekday::tryFrom((string) $value),
+                (array) ($query['weekday'] ?? []),
+            ))),
+            daysOfMonth: array_values(array_map(
+                static fn(mixed $value): int => (int) $value,
+                (array) ($query['day'] ?? []),
+            )),
+            fallbackWeekday: Weekday::fromDate($after),
+        );
 
         try {
-            $candidates = $this->recurrencePreviewService->candidates(
-                mode: $mode,
-                period: $period,
-                ordinal: $ordinal,
-                weekday: Weekday::tryFrom((string) $request->query->get('weekday')),
-                dayOfMonth: $dayOfMonth,
-                after: $after,
-                locale: $request->getLocale(),
-            );
+            $candidates = $this->recurrencePreviewService->candidates($state, $after, $request->getLocale());
         } catch (InvalidRecurrencePatternException) {
             return $this->json(['error' => 'invalid_parameters'], Response::HTTP_BAD_REQUEST);
         }
 
-        return $this->json(['candidates' => $candidates]);
+        return $this->json($this->recurrenceStatePayload($state) + ['candidates' => $candidates]);
+    }
+
+    /**
+     * @return array{
+     *     selection: array{mode: string, period: string, ordinal: list<int>, weekday: list<string>, day: list<int>},
+     *     controls: array{ordinal: bool, weekday: bool, weekdayMultiple: bool, day: bool, multiHint: bool, shortMonthHint: bool, periods: list<string>}
+     * }
+     */
+    private function recurrenceStatePayload(RecurrenceBuilderState $state): array
+    {
+        return [
+            'selection' => [
+                'mode' => $state->mode->value,
+                'period' => $state->period->value,
+                'ordinal' => array_map(static fn(RecurrenceOrdinal $case): int => $case->value, $state->ordinals),
+                'weekday' => array_map(static fn(Weekday $case): string => $case->value, $state->weekdays),
+                'day' => $state->daysOfMonth,
+            ],
+            'controls' => [
+                'ordinal' => $state->showsOrdinal(),
+                'weekday' => $state->showsWeekday(),
+                'weekdayMultiple' => $state->allowsSeveralWeekdays(),
+                'day' => $state->showsDayOfMonth(),
+                'multiHint' => $state->allowsSeveralEntries(),
+                'shortMonthHint' => $state->warnsAboutShortMonths(),
+                'periods' => array_map(static fn(RecurrencePeriod $case): string => $case->value, $state->periods),
+            ],
+        ];
     }
 
     #[Route('', name: 'app_admin_event')]
@@ -595,8 +632,12 @@ final class EventController extends AbstractController implements AdminNavigatio
 
     /**
      * @return array{
-     *     pattern: RecurrencePattern,
+     *     selection: array{mode: string, period: string, ordinal: list<int>, weekday: list<string>, day: list<int>},
+     *     controls: array{ordinal: bool, weekday: bool, weekdayMultiple: bool, day: bool, multiHint: bool, shortMonthHint: bool, periods: list<string>},
      *     summary: string,
+     *     currentRule: ?EventInterval,
+     *     currentRuleSpec: ?string,
+     *     anchor: DateTime|DateTimeImmutable,
      *     customValue: int,
      *     ordinals: list<array{value: int, label: string}>,
      *     weekdays: list<array{value: string, label: string}>,
@@ -607,20 +648,26 @@ final class EventController extends AbstractController implements AdminNavigatio
     {
         $series = $event?->getSeries();
         $anchor = $event?->getStart() ?? new DateTimeImmutable();
-        $pattern = $series !== null
-            ? $this->recurrenceResolver->pattern($series->getRule(), $series->getRuleSpec(), $anchor)
+        $currentPattern = $series !== null
+            ? $this->recurrenceResolver->resolve($series->getRule(), $series->getRuleSpec(), $anchor)
             : null;
         $isCustom = $series?->getRule() === EventInterval::Custom;
 
-        $pattern ??= RecurrencePattern::weekday(
-            RecurrencePeriod::Month,
-            Weekday::fromDate($anchor),
-            RecurrenceOrdinal::First,
+        // The builder always opens on defaults; the rule in force is shown as text, not pre-filled.
+        $state = $this->recurrenceBuilderStateResolver->resolve(
+            mode: RecurrenceMode::Weekday,
+            period: RecurrencePeriod::Month,
+            ordinals: [],
+            weekdays: [],
+            daysOfMonth: [],
+            fallbackWeekday: Weekday::fromDate($anchor),
         );
 
-        return [
-            'pattern' => $pattern,
-            'summary' => $isCustom ? $this->recurrenceDescriber->describe($pattern) : '',
+        return $this->recurrenceStatePayload($state) + [
+            'summary' => $isCustom && $currentPattern !== null ? $this->recurrenceDescriber->describe($currentPattern) : '',
+            'currentRule' => $series?->getRule(),
+            'currentRuleSpec' => $series?->getRuleSpec(),
+            'anchor' => $anchor,
             'customValue' => EventInterval::Custom->value,
             'ordinals' => array_map(
                 fn(RecurrenceOrdinal $case): array => [
@@ -641,7 +688,7 @@ final class EventController extends AbstractController implements AdminNavigatio
                     'value' => $case->value,
                     'label' => $this->translator->trans($case->label()),
                 ],
-                RecurrencePeriod::cases(),
+                array_values(array_filter(RecurrencePeriod::cases(), static fn(RecurrencePeriod $case): bool => $case->carriesDayRule())),
             ),
         ];
     }

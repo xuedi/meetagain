@@ -4,6 +4,7 @@ namespace App\Enum;
 
 enum RecurrencePeriod: string
 {
+    case Day = 'day';
     case Week = 'week';
     case TwoWeeks = 'two_weeks';
     case Month = 'month';
@@ -14,6 +15,7 @@ enum RecurrencePeriod: string
     public function label(): string
     {
         return match ($this) {
+            self::Day => 'admin_event.recurrence_period_day',
             self::Week => 'admin_event.recurrence_period_week',
             self::TwoWeeks => 'admin_event.recurrence_period_two_weeks',
             self::Month => 'admin_event.recurrence_period_month',
@@ -26,6 +28,7 @@ enum RecurrencePeriod: string
     public function frequency(): string
     {
         return match ($this) {
+            self::Day => 'DAILY',
             self::Week, self::TwoWeeks => 'WEEKLY',
             self::Month, self::TwoMonths, self::Quarter => 'MONTHLY',
             self::Year => 'YEARLY',
@@ -46,14 +49,20 @@ enum RecurrencePeriod: string
         return 'WEEKLY' === $this->frequency();
     }
 
-    /** Must span at least one full period or a sparse series never extends. */
+    public function carriesDayRule(): bool
+    {
+        return self::Day !== $this;
+    }
+
+    /** Must span at least one full period, and for Year a leap-day gap, or a sparse series never extends. */
     public function lookaheadModifier(): string
     {
         return match ($this) {
+            self::Day => '+2 weeks',
             self::Week, self::TwoWeeks => '+3 months',
             self::Month => '+6 months',
             self::TwoMonths, self::Quarter => '+12 months',
-            self::Year => '+3 years',
+            self::Year => '+5 years',
         };
     }
 }

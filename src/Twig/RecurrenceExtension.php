@@ -42,7 +42,7 @@ final class RecurrenceExtension extends AbstractExtension
             return $this->translator->trans($rule->label());
         }
 
-        $pattern = $this->resolver->pattern($rule, $ruleSpec, $anchor ?? new DateTimeImmutable());
+        $pattern = $this->resolver->resolve($rule, $ruleSpec, $anchor ?? new DateTimeImmutable());
 
         return $pattern instanceof RecurrencePattern
             ? $this->describer->describe($pattern)
