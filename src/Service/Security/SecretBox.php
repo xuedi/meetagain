@@ -4,13 +4,6 @@ namespace App\Service\Security;
 
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-/**
- * Reversible secret storage via libsodium secretbox.
- *
- * Wire format: base64(24-byte nonce || ciphertext).
- * Key is read from APP_SECRET_BOX_KEY (base64-encoded 32-byte value).
- * Rotate by re-encrypting every consumer's records.
- */
 readonly class SecretBox
 {
     private string $key;

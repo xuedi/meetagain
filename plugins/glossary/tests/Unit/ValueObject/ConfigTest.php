@@ -48,7 +48,7 @@ class ConfigTest extends TestCase
 
     public function testHasCategoriesIsFalseWhenTaxonomyDisabled(): void
     {
-        // Arrange: categories defined but the enable flag is off
+        // Arrange
         $taxonomy = (new TaxonomyConfig())->setCategories([['id' => 0, 'labels' => ['en' => 'Greeting']]]);
         $config = (new Config())->setTaxonomy($taxonomy);
 

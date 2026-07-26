@@ -10,11 +10,6 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Builds admin sidebar navigation from controllers contributing via
- * `App\Admin\Navigation\AdminNavigationInterface`. Sections and links are
- * sorted alphabetically.
- */
 readonly class AdminNavigationService
 {
     /**
@@ -35,7 +30,6 @@ readonly class AdminNavigationService
         $sectionsMap = [];
         $modifications = [];
 
-        // First pass: collect all route modifications
         foreach ($this->controllers as $controller) {
             $config = $controller->getAdminNavigation();
             if ($config === null) {
@@ -49,7 +43,6 @@ readonly class AdminNavigationService
             }
         }
 
-        // Second pass: collect navigation, applying modifications
         foreach ($this->controllers as $controller) {
             $config = $controller->getAdminNavigation();
             if ($config === null) {
@@ -67,7 +60,6 @@ readonly class AdminNavigationService
                 if (isset($modifications[$route])) {
                     $mods = $modifications[$route];
 
-                    // Drop the link entirely when explicitly hidden by a modifier.
                     if (($mods['hidden'] ?? false) === true) {
                         continue;
                     }
@@ -111,18 +103,15 @@ readonly class AdminNavigationService
             }
         }
 
-        // Sort sections by priority ASC, then alphabetically within same priority
         uksort($sectionsMap, static function (string $a, string $b) use ($sectionsMap): int {
             $diff = $sectionsMap[$a]['priority'] <=> $sectionsMap[$b]['priority'];
             return $diff !== 0 ? $diff : strcmp($a, $b);
         });
 
-        // Sort links within each section alphabetically by label
         foreach ($sectionsMap as &$sectionData) {
             usort($sectionData['links'], static fn(AdminLink $a, AdminLink $b): int => strcmp($a->label, $b->label));
         }
 
-        // Build AdminSection objects and filter by role
         $sections = [];
         foreach ($sectionsMap as $sectionName => $data) {
             if ($data['role'] !== null && !$this->security->isGranted($data['role'])) {

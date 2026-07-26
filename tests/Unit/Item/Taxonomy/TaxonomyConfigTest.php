@@ -37,7 +37,7 @@ class TaxonomyConfigTest extends TestCase
         // Act
         $config->normalize();
 
-        // Assert: existing id preserved, new row gets max+1, all-blank row dropped, tags start at 0
+        // Assert
         $categories = $config->categoryDefinitions();
         static::assertCount(2, $categories);
         static::assertSame(5, $categories[0]->id);

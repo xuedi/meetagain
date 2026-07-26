@@ -32,7 +32,6 @@ class SupportContactTest extends WebTestCase
         static::assertStringContainsString('Thank you', $client->getResponse()->getContent());
         static::assertSame(0, $crawler->filter('textarea[name="support_request[message]"]')->count(), 'The form should be replaced by the confirmation panel');
 
-        // Reset
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         foreach ($em->getRepository(SupportRequest::class)->findBy(['email' => self::MEMBER_EMAIL]) as $request) {
             $em->remove($request);

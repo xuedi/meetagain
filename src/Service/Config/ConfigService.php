@@ -135,7 +135,6 @@ readonly class ConfigService
 
     public function getDateFormatFlatpickr(): string
     {
-        // Convert PHP date format to flatpickr format (A -> K for AM/PM)
         return str_replace('A', 'K', $this->getDateFormat());
     }
 

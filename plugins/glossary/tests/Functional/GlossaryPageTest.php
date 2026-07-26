@@ -8,11 +8,6 @@ use Plugin\Glossary\Entity\Glossary;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-/**
- * The rendered cell markup comes from the list-cell provider, which only answers when the glossary
- * plugin is active for the request context - so these assertions count rendered rows rather than
- * cell content, which is what the controller's visibility gating actually decides.
- */
 class GlossaryPageTest extends WebTestCase
 {
     private const string MODERATOR_EMAIL = 'Admin@example.org';

@@ -5,12 +5,8 @@ namespace App\Filter\Attribution;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Restricts which attributed images are visible in the current context.
- *
- * Plugins can implement this to narrow the images shown on the public attributions
- * page. Multiple filters compose with AND (intersection): an image must pass all of
- * them. With no implementations registered, nothing is restricted and all attributed
- * images are visible.
+ * Narrows the attributed images visible on the public attributions page. Implementations
+ * compose with AND-intersection.
  */
 #[AutoconfigureTag]
 interface ImageAttributionFilterInterface

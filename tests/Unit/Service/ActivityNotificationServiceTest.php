@@ -23,7 +23,7 @@ final class ActivityNotificationServiceTest extends TestCase
 {
     public function testNotifyWithRsvpYesCallsSendRsvp(): void
     {
-        // Arrange: create activity with RsvpYes type
+        // Arrange
         $user = new UserStub()->setId(1);
         $activity = $this->createStub(Activity::class);
         $activity->method('getUser')->willReturn($user);
@@ -42,15 +42,15 @@ final class ActivityNotificationServiceTest extends TestCase
             guardEvaluator: new EmailGuardEvaluator(),
         );
 
-        // Act: notify
+        // Act
         $service->notify($activity);
 
-        // Assert: event repository was called (verified by mock)
+        // Assert
     }
 
     public function testNotifyWithSendMessageCallsSendMessage(): void
     {
-        // Arrange: create activity with SendMessage type
+        // Arrange
         $sender = new UserStub()->setId(1);
         $recipient = new UserStub()->setId(2);
 
@@ -74,15 +74,15 @@ final class ActivityNotificationServiceTest extends TestCase
             guardEvaluator: new EmailGuardEvaluator(),
         );
 
-        // Act: notify
+        // Act
         $service->notify($activity);
 
-        // Assert: user repository was called (verified by mock)
+        // Assert
     }
 
     public function testNotifyWithUnknownTypeDoesNothing(): void
     {
-        // Arrange: create activity with default type
+        // Arrange
         $activity = $this->createStub(Activity::class);
         $activity->method('getUser')->willReturn(new UserStub());
         $activity->method('getType')->willReturn(Login::TYPE);
@@ -103,15 +103,15 @@ final class ActivityNotificationServiceTest extends TestCase
             guardEvaluator: new EmailGuardEvaluator(),
         );
 
-        // Act: notify
+        // Act
         $service->notify($activity);
 
-        // Assert: no repository calls (verified by mocks)
+        // Assert
     }
 
     public function testSendRsvpReturnsEarlyWhenEventNotFound(): void
     {
-        // Arrange: event does not exist
+        // Arrange
         $user = new UserStub()->setId(1);
 
         $eventRepoStub = $this->createStub(EventRepository::class);
@@ -129,15 +129,15 @@ final class ActivityNotificationServiceTest extends TestCase
             guardEvaluator: new EmailGuardEvaluator(),
         );
 
-        // Act: send RSVP notification
+        // Act
         $service->sendRsvp($user, 999);
 
-        // Assert: cache not accessed (verified by mock)
+        // Assert
     }
 
     public function testSendRsvpNotifiesFollowersWhenNotificationEnabled(): void
     {
-        // Arrange: user with followers who have notifications enabled
+        // Arrange
         $user = new UserStub()->setId(1);
         $follower = new UserStub()->setId(2);
         $follower->setNotification(true);
@@ -171,15 +171,15 @@ final class ActivityNotificationServiceTest extends TestCase
             guardEvaluator: new EmailGuardEvaluator(),
         );
 
-        // Act: send RSVP notification
+        // Act
         $service->sendRsvp($user, 42);
 
-        // Assert: cache was accessed (verified by mock)
+        // Assert
     }
 
     public function testSendRsvpSkipsFollowersWithNotificationsDisabled(): void
     {
-        // Arrange: user with follower who has notifications disabled
+        // Arrange
         $user = new UserStub()->setId(1);
         $follower = new UserStub()->setId(2);
         $follower->setNotification(false);
@@ -210,15 +210,15 @@ final class ActivityNotificationServiceTest extends TestCase
             guardEvaluator: new EmailGuardEvaluator(),
         );
 
-        // Act: send RSVP notification
+        // Act
         $service->sendRsvp($user, 42);
 
-        // Assert: follower skipped due to notification settings
+        // Assert
     }
 
     public function testSendMessageReturnsEarlyWhenUserIsNull(): void
     {
-        // Arrange: null user
+        // Arrange
         $userRepoMock = $this->createMock(UserRepository::class);
         $userRepoMock->expects($this->never())->method('findOneBy');
 
@@ -231,16 +231,16 @@ final class ActivityNotificationServiceTest extends TestCase
             guardEvaluator: new EmailGuardEvaluator(),
         );
 
-        // Act: send message notification with null user (via reflection)
+        // Act
         $method = new ReflectionMethod($service, 'sendMessage');
         $method->invoke($service, null, 2);
 
-        // Assert: no repository calls (verified by mock)
+        // Assert
     }
 
     public function testSendMessageReturnsEarlyWhenRecipientNotFound(): void
     {
-        // Arrange: recipient does not exist
+        // Arrange
         $sender = new UserStub()->setId(1);
 
         $userRepoStub = $this->createStub(UserRepository::class);
@@ -258,16 +258,16 @@ final class ActivityNotificationServiceTest extends TestCase
             guardEvaluator: new EmailGuardEvaluator(),
         );
 
-        // Act: send message notification (via reflection)
+        // Act
         $method = new ReflectionMethod($service, 'sendMessage');
         $method->invoke($service, $sender, 999);
 
-        // Assert: cache not accessed (verified by mock)
+        // Assert
     }
 
     public function testSendMessageSendsEmailWhenConditionsAreMet(): void
     {
-        // Arrange: sender and recipient with notifications enabled
+        // Arrange
         $sender = new UserStub()->setId(1);
         $recipient = new UserStub()->setId(2);
         $recipient->setNotification(true);
@@ -302,16 +302,16 @@ final class ActivityNotificationServiceTest extends TestCase
             guardEvaluator: new EmailGuardEvaluator(),
         );
 
-        // Act: send message notification (via reflection)
+        // Act
         $method = new ReflectionMethod($service, 'sendMessage');
         $method->invoke($service, $sender, 2);
 
-        // Assert: email service methods called (verified by mocks)
+        // Assert
     }
 
     public function testSendMessageSkipsWhenRecipientRecentlyActive(): void
     {
-        // Arrange: recipient logged in recently (within 2 hours)
+        // Arrange
         $sender = new UserStub()->setId(1);
         $recipient = new UserStub()->setId(2);
         $recipient->setNotification(true);
@@ -362,10 +362,10 @@ final class ActivityNotificationServiceTest extends TestCase
             guardEvaluator: new EmailGuardEvaluator(),
         );
 
-        // Act: send message notification (via reflection)
+        // Act
         $method = new ReflectionMethod($service, 'sendMessage');
         $method->invoke($service, $sender, 2);
 
-        // Assert: email not sent due to recent activity
+        // Assert
     }
 }

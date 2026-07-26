@@ -10,12 +10,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Throwable;
 
-/**
- * Per-image missing-alt status in a shared cache pool. Values are computed against the current
- * locale context, which plugins can narrow per request - warm reads therefore belong only on
- * surfaces resolving in the unnarrowed default context (the system images admin list); every
- * other call site invalidates only.
- */
 class ImageAltStatusCache
 {
     private const string KEY_PREFIX = 'image_alt_status.';

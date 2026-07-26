@@ -59,7 +59,7 @@ class ReportedImageAdminNotificationProviderTest extends TestCase
 
     public function testGetPendingItemsWithDeletedImageUsesDeletedPlaceholder(): void
     {
-        // Arrange: getImage() returns null → image was deleted
+        // Arrange
         $report = $this->createStub(ImageReport::class);
         $report->method('getImage')->willReturn(null);
         $report->method('getReason')->willReturn(ImageReportReason::Inappropriate);

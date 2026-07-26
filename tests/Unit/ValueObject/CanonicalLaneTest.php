@@ -13,7 +13,7 @@ class CanonicalLaneTest extends TestCase
 {
     public function testFollowerRunsCollapseAroundTheOccurrencesThatMovedTheRoot(): void
     {
-        // Arrange: first, 3 followers, a detached one-off, 2 more followers
+        // Arrange
         $lane = $this->makeLane([
             $this->stop(1, '2026-01-05', null, rootEventId: 1),
             $this->stop(2, '2026-01-12', null, rootEventId: 1),
@@ -66,7 +66,7 @@ class CanonicalLaneTest extends TestCase
         // Act
         $run = $lane->segments()[1];
 
-        // Assert: a summarized run must not silently drop the states it swallowed.
+        // Assert
         self::assertSame(2, $run->locked);
         self::assertSame(1, $run->canceled);
     }

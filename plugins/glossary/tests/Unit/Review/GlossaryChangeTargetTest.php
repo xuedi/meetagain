@@ -62,7 +62,7 @@ class GlossaryChangeTargetTest extends TestCase
         // Arrange
         $target = $this->makeTarget();
 
-        // Act & Assert: primary label is configured, definition falls back to the translated default
+        // Act & Assert
         self::assertSame('Term', $target->getFieldLabel(GlossaryChangeTarget::FIELD_PHRASE));
         self::assertSame('glossary.label_explanation', $target->getFieldLabel(GlossaryChangeTarget::FIELD_EXPLANATION));
     }

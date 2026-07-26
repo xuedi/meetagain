@@ -16,7 +16,7 @@ class UserRoleTest extends TestCase
         // Act
         $choices = UserRole::getChoices($translator);
 
-        // Assert - IdentityTranslator returns keys unchanged, so array keys are translation keys
+        // Assert
         static::assertSame(UserRole::Admin, $choices['admin_member.role_admin']);
         static::assertSame(UserRole::User, $choices['admin_member.role_user']);
         static::assertCount(2, $choices, 'System role must not be exposed as a form choice');

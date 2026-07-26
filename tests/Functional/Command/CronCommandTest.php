@@ -16,7 +16,7 @@ class CronCommandTest extends KernelTestCase
         $container = static::getContainer();
         $em = $container->get('doctrine')->getManager();
 
-        // Arrange: queue a pending email
+        // Arrange
         $email = new EmailQueue();
         $email->setSender('sender@example.com');
         $email->setRecipient('recipient@example.com');
@@ -31,7 +31,7 @@ class CronCommandTest extends KernelTestCase
         $emailId = $email->getId();
         static::assertNotNull($emailId);
 
-        // Act: drive only the EmailService cron task (not the full app:cron pipeline)
+        // Act
         $emailService = $container->get(EmailService::class);
         $sentCount = $emailService->sendQueue();
         static::assertSame('1', $sentCount);

@@ -5,11 +5,6 @@ namespace Plugin\Dishes\ValueObject;
 use App\Item\Taxonomy\TaxonomyConfig;
 use App\Publisher\PluginSettings\PluginSettingsData;
 
-/**
- * Effective dishes settings: an optional footer text shown at the bottom of the dish list
- * (held per locale), whether the phonetic column is shown in the list, and the shared category/tag
- * taxonomy. The neutral default is no footer, no phonetic column, and taxonomy disabled.
- */
 final class Config implements PluginSettingsData
 {
     /** @var array<string, string> locale => footer text */

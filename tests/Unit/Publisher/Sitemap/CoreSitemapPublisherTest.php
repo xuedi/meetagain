@@ -38,7 +38,7 @@ class CoreSitemapPublisherTest extends TestCase
         // Act
         $urls = $publisher->getSitemapUrls();
 
-        // Assert: STATIC_ROUTE_COUNT static routes x 2 locales = expected URL entries; each has 2 alternates.
+        // Assert
         self::assertCount(self::STATIC_ROUTE_COUNT * 2, $urls);
         foreach ($urls as $url) {
             self::assertArrayHasKey('en', $url->alternates);
@@ -55,7 +55,7 @@ class CoreSitemapPublisherTest extends TestCase
         $urls = $publisher->getSitemapUrls();
         $locs = array_map(static fn($u) => $u->loc, $urls);
 
-        // Assert: every documented static route appears
+        // Assert
         $expected = [
             'app_default',
             'app_event',
@@ -79,7 +79,7 @@ class CoreSitemapPublisherTest extends TestCase
         // Act
         $urls = $publisher->getSitemapUrls();
 
-        // Assert: auth routes are deliberately low-priority so they don't steal crawl budget
+        // Assert
         foreach ($urls as $url) {
             foreach (['app_login', 'app_register', 'app_reset', 'app_cookie'] as $route) {
                 if (!str_contains($url->loc, $route)) {
@@ -93,7 +93,7 @@ class CoreSitemapPublisherTest extends TestCase
 
     public function testEmitsMemberPagesBasedOnMemberCount(): void
     {
-        // Arrange: 60 public members at PAGE_SIZE 24 = 3 pages
+        // Arrange
         $publisher = $this->makePublisher(
             locales: ['en'],
             cmsPages: [],
@@ -107,7 +107,7 @@ class CoreSitemapPublisherTest extends TestCase
         $urls = $publisher->getSitemapUrls();
         $memberUrls = array_filter($urls, static fn($u) => str_contains($u->loc, 'app_member'));
 
-        // Assert: 3 pages emitted (60 / 24 = 2.5, ceil = 3)
+        // Assert
         self::assertCount(3, $memberUrls);
     }
 
@@ -133,7 +133,7 @@ class CoreSitemapPublisherTest extends TestCase
 
     public function testCapsMemberPaginationAtFifty(): void
     {
-        // Arrange: an absurd member count to test the cap
+        // Arrange
         $publisher = $this->makePublisher(
             locales: ['en'],
             cmsPages: [],
@@ -147,13 +147,13 @@ class CoreSitemapPublisherTest extends TestCase
         $urls = $publisher->getSitemapUrls();
         $memberUrls = array_filter($urls, static fn($u) => str_contains($u->loc, 'app_member'));
 
-        // Assert: cap at 50 pages so the sitemap doesn't blow up
+        // Assert
         self::assertCount(50, $memberUrls);
     }
 
     public function testRespectsCmsFilterService(): void
     {
-        // Arrange: two published pages, but the filter only allows id=1.
+        // Arrange
         $page1 = $this->makeCmsPage(1, 'allowed');
         $page2 = $this->makeCmsPage(2, 'blocked');
 
@@ -168,7 +168,7 @@ class CoreSitemapPublisherTest extends TestCase
         // Act
         $urls = $publisher->getSitemapUrls();
 
-        // Assert: only `allowed` appears. 'blocked' does not.
+        // Assert
         $locs = array_map(static fn($u) => $u->loc, $urls);
         $matching = array_filter($locs, static fn($loc) => str_contains($loc, 'allowed'));
         $blocked = array_filter($locs, static fn($loc) => str_contains($loc, 'blocked'));
@@ -186,7 +186,7 @@ class CoreSitemapPublisherTest extends TestCase
         // Act
         $urls = $publisher->getSitemapUrls();
 
-        // Assert: no event URLs in the output.
+        // Assert
         $locs = array_map(static fn($u) => $u->loc, $urls);
         foreach ($locs as $loc) {
             self::assertStringNotContainsString('/event/42', $loc);
@@ -203,7 +203,7 @@ class CoreSitemapPublisherTest extends TestCase
         // Act
         $urls = $publisher->getSitemapUrls();
 
-        // Assert: at least one URL is an event URL with lastmod = event start.
+        // Assert
         $eventUrls = array_filter($urls, static fn($u) => str_contains($u->loc, '/event/42'));
         self::assertNotEmpty($eventUrls);
         foreach ($eventUrls as $u) {
@@ -232,7 +232,7 @@ class CoreSitemapPublisherTest extends TestCase
         // Act
         $urls = array_values(array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains($u->loc, '/event/')));
 
-        // Assert: the root once per locale, the follower not at all, alternates pointing at the root
+        // Assert
         self::assertCount(2, $urls);
         foreach ($urls as $url) {
             self::assertStringContainsString('/event/1', $url->loc);

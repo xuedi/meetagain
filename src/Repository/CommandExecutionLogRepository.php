@@ -19,8 +19,6 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get the last execution for each command.
-     *
      * @return array<string, CommandExecutionLog>
      */
     public function getLastExecutionsByCommand(): array
@@ -40,8 +38,6 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get execution stats for the dashboard.
-     *
      * @return array{total: int, successful: int, failed: int}
      */
     public function getStats(DateTimeImmutable $since): array
@@ -69,8 +65,6 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get recent failed executions.
-     *
      * @return CommandExecutionLog[]
      */
     public function getRecentFailed(int $limit = 10): array
@@ -86,8 +80,6 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get execution history for a specific command.
-     *
      * @return CommandExecutionLog[]
      */
     public function getHistoryForCommand(string $commandName, int $limit = 20): array
@@ -102,9 +94,6 @@ class CommandExecutionLogRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    /**
-     * Check if a command is currently running.
-     */
     public function isCommandRunning(string $commandName): bool
     {
         $count = $this

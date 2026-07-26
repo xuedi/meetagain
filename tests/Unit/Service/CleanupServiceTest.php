@@ -34,34 +34,34 @@ class CleanupServiceTest extends TestCase
 
     public function testRemoveImageCacheUpdatesOldImagesAndPersists(): void
     {
-        // Arrange: mock images that need cache refresh
+        // Arrange
         $imageMockA = $this->createMock(Image::class);
         $imageMockA->expects($this->once())->method('setUpdatedAt');
 
         $imageMockB = $this->createMock(Image::class);
         $imageMockB->expects($this->once())->method('setUpdatedAt');
 
-        // Arrange: mock repository to return images needing update
+        // Arrange
         $imageRepoMock = $this->createMock(ImageRepository::class);
         $imageRepoMock->expects($this->once())->method('getOldImageUpdates')->willReturn([$imageMockA, $imageMockB]);
 
-        // Arrange: mock entity manager to verify persist and flush
+        // Arrange
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $entityManagerMock->expects($this->exactly(2))->method('persist');
         $entityManagerMock->expects($this->once())->method('flush');
 
         $subject = $this->createService(imageRepo: $imageRepoMock, entityManager: $entityManagerMock);
 
-        // Act: remove image cache
+        // Act
         $subject->removeImageCache();
     }
 
     public function testRemoveGhostedRegistrationsDeletesUsersAndActivities(): void
     {
-        // Arrange: stub activity for the user
+        // Arrange
         $activityStub = $this->createStub(Activity::class);
 
-        // Arrange: mock user to return activities collection and ID
+        // Arrange
         $userMock = $this->createMock(User::class);
         $userMock->method('getId')->willReturn(42);
         $userMock
@@ -69,7 +69,7 @@ class CleanupServiceTest extends TestCase
             ->method('getActivities')
             ->willReturn(new ArrayCollection([$activityStub]));
 
-        // Arrange: mock user repository to return old registrations
+        // Arrange
         $userRepoMock = $this->createMock(UserRepository::class);
         $userRepoMock
             ->expects($this->once())
@@ -77,14 +77,14 @@ class CleanupServiceTest extends TestCase
             ->with(10)
             ->willReturn(new ArrayCollection([$userMock]));
 
-        // Arrange: mock entity manager to verify removes and flush
+        // Arrange
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
         $entityManagerMock->expects($this->exactly(2))->method('remove');
         $entityManagerMock->expects($this->once())->method('flush');
 
         $subject = $this->createService(userRepo: $userRepoMock, entityManager: $entityManagerMock);
 
-        // Act: remove ghosted registrations
+        // Act
         $subject->removeGhostedRegistrations();
     }
 }

@@ -125,7 +125,7 @@ final class EmailServiceTest extends TestCase
 
     public function testEnricherContextKeyAppearsInPersistedEmailQueue(): void
     {
-        // Arrange: enricher that injects a custom key
+        // Arrange
         $enricher = new class implements EmailContextEnricherInterface {
             public function enrich(array $context, string $locale): array
             {
@@ -161,7 +161,7 @@ final class EmailServiceTest extends TestCase
 
     public function testSendQueueSendsPendingEmailsAndMarksAsSent(): void
     {
-        // Arrange: create queued email
+        // Arrange
         $queued = new EmailQueue()
             ->setSender('"email sender" <sender@email.com>')
             ->setRecipient('user@example.com')
@@ -170,17 +170,17 @@ final class EmailServiceTest extends TestCase
             ->setLang('en')
             ->setContext(['k' => 'v']);
 
-        // Arrange: mock mail repository to return pending email
+        // Arrange
         $mailRepoMock = $this->createMock(EmailQueueRepository::class);
         $mailRepoMock->expects($this->once())->method('findBy')->with(['status' => EmailQueueStatus::Pending], ['id' => 'ASC'], 1000)->willReturn([$queued]);
 
-        // Arrange: mock transport to verify send is called
+        // Arrange
         $sentMessage = $this->createStub(SentMessage::class);
         $sentMessage->method('getMessageId')->willReturn('msg-id-123');
         $mailerMock = $this->createMock(TransportInterface::class);
         $mailerMock->expects($this->once())->method('send')->with(static::isInstanceOf(TemplatedEmail::class))->willReturn($sentMessage);
 
-        // Arrange: mock entity manager to verify persist/flush
+        // Arrange
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock
             ->expects($this->once())
@@ -196,13 +196,13 @@ final class EmailServiceTest extends TestCase
 
         $service = $this->createService(mailer: $mailerMock, mailRepo: $mailRepoMock, em: $emMock);
 
-        // Act: send queue
+        // Act
         $service->sendQueue();
     }
 
     public function testSendQueueSkipsRowPastMaxSendByAndMarksLate(): void
     {
-        // Arrange: a pending row whose cutoff is in the past
+        // Arrange
         $queued = new EmailQueue()
             ->setSender('"email sender" <sender@email.com>')
             ->setRecipient('user@example.com')
@@ -215,7 +215,6 @@ final class EmailServiceTest extends TestCase
         $mailRepoStub = $this->createStub(EmailQueueRepository::class);
         $mailRepoStub->method('findBy')->willReturn([$queued]);
 
-        // Transport MUST NOT be called
         $mailerMock = $this->createMock(TransportInterface::class);
         $mailerMock->expects($this->never())->method('send');
 
@@ -237,7 +236,7 @@ final class EmailServiceTest extends TestCase
 
     public function testSendQueueDispatchesWhenMaxSendByInFuture(): void
     {
-        // Arrange: cutoff is ahead, dispatch proceeds normally
+        // Arrange
         $queued = new EmailQueue()
             ->setSender('"email sender" <sender@email.com>')
             ->setRecipient('user@example.com')
@@ -308,7 +307,7 @@ final class EmailServiceTest extends TestCase
 
     public function testSendQueueMixedResultReturnsCorrectCountAndLogsWarning(): void
     {
-        // Arrange: 1 good email, 1 failing email
+        // Arrange
         $good = new EmailQueue()
             ->setSender('"email sender" <sender@email.com>')
             ->setRecipient('good@example.com')
@@ -357,7 +356,7 @@ final class EmailServiceTest extends TestCase
 
     public function testRunCronTaskWritesQueueCountToOutput(): void
     {
-        // Arrange: empty queue → count = '0'
+        // Arrange
         $mailRepoStub = $this->createStub(EmailQueueRepository::class);
         $mailRepoStub->method('findBy')->willReturn([]);
 

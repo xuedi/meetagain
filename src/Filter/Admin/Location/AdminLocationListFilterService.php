@@ -5,11 +5,6 @@ namespace App\Filter\Admin\Location;
 use App\Filter\Location\LocationFilterResult;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composite admin location list filter service.
- * Collects all registered AdminLocationListFilterInterface implementations.
- * Combines multiple filters using AND logic for location ID restrictions.
- */
 readonly class AdminLocationListFilterService
 {
     /**
@@ -20,10 +15,6 @@ readonly class AdminLocationListFilterService
         private iterable $filters,
     ) {}
 
-    /**
-     * Get the combined location ID filter from all registered filters.
-     * Uses intersection (AND) logic: a location must pass ALL filters.
-     */
     public function getLocationIdFilter(): LocationFilterResult
     {
         $resultSet = null;
@@ -55,11 +46,6 @@ readonly class AdminLocationListFilterService
         return new LocationFilterResult($resultSet, $hasActiveFilter);
     }
 
-    /**
-     * Check if a location is accessible according to all registered filters.
-     * Any filter returning false will deny access.
-     * Returns true only if all filters allow (or have no opinion).
-     */
     public function isLocationAccessible(int $locationId): bool
     {
         foreach ($this->getSortedFilters() as $filter) {
@@ -74,7 +60,6 @@ readonly class AdminLocationListFilterService
     }
 
     /**
-     * Get combined debug context from all registered filters.
      * @return array<string, mixed>
      */
     public function getDebugContext(int $locationId): array

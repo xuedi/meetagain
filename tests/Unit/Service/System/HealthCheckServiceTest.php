@@ -56,7 +56,7 @@ class HealthCheckServiceTest extends TestCase
 
     public function testTestLogSizeTreatsFalseSizeAsZero(): void
     {
-        // Arrange - fileExists true but filesize() returns false (race / permissions)
+        // Arrange
         $service = $this->makeService(logExists: true, logSize: false);
 
         // Act

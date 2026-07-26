@@ -28,6 +28,11 @@ use App\Enum\EntityAction;
 use App\Enum\EventInterval;
 use App\Enum\EventType as EventTypeEnum;
 use App\Enum\ImageType;
+use App\Enum\RecurrenceMode;
+use App\Enum\RecurrenceOrdinal;
+use App\Enum\RecurrencePeriod;
+use App\Enum\Weekday;
+use App\Exception\Event\InvalidRecurrencePatternException;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
 use App\Repository\EventRepository;
@@ -37,7 +42,12 @@ use App\Service\Config\LanguageService;
 use App\Service\Event\EventService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
+use App\Service\Event\RecurrenceBuilderStateResolver;
+use App\Service\Event\RecurrenceDescriber;
+use App\Service\Event\RecurrencePreviewService;
+use App\Service\Event\RecurrenceResolver;
 use App\Service\Seo\EventCanonicalRebuildService;
+use App\ValueObject\RecurrenceBuilderState;
 use App\ValueObject\ScheduleChange;
 use DateTime;
 use DateTimeImmutable;
@@ -47,6 +57,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -94,7 +105,79 @@ final class EventController extends AbstractController implements AdminNavigatio
         private readonly SeriesRescheduledEmail $seriesRescheduledEmail,
         private readonly HtmlSanitizerInterface $cmsContent,
         private readonly EventCanonicalRebuildService $canonicalRebuildService,
+        private readonly RecurrencePreviewService $recurrencePreviewService,
+        private readonly RecurrenceResolver $recurrenceResolver,
+        private readonly RecurrenceDescriber $recurrenceDescriber,
+        private readonly RecurrenceBuilderStateResolver $recurrenceBuilderStateResolver,
     ) {}
+
+    #[Route('/recurrence/preview', name: 'app_admin_event_recurrence_preview', methods: ['GET'])]
+    public function recurrencePreview(Request $request): JsonResponse
+    {
+        $mode = RecurrenceMode::tryFrom((string) $request->query->get('mode'));
+        $period = RecurrencePeriod::tryFrom((string) $request->query->get('period'));
+        $after = DateTimeImmutable::createFromFormat('Y-m-d', (string) $request->query->get('after'))
+            ?: new DateTimeImmutable('today');
+
+        if (!$mode instanceof RecurrenceMode || !$period instanceof RecurrencePeriod) {
+            return $this->json(['error' => 'invalid_parameters'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $query = $request->query->all();
+        $state = $this->recurrenceBuilderStateResolver->resolve(
+            mode: $mode,
+            period: $period,
+            ordinals: array_values(array_filter(array_map(
+                static fn(mixed $value): ?RecurrenceOrdinal => RecurrenceOrdinal::tryFrom((int) $value),
+                (array) ($query['ordinal'] ?? []),
+            ))),
+            weekdays: array_values(array_filter(array_map(
+                static fn(mixed $value): ?Weekday => Weekday::tryFrom((string) $value),
+                (array) ($query['weekday'] ?? []),
+            ))),
+            daysOfMonth: array_values(array_map(
+                static fn(mixed $value): int => (int) $value,
+                (array) ($query['day'] ?? []),
+            )),
+            fallbackWeekday: Weekday::fromDate($after),
+        );
+
+        try {
+            $candidates = $this->recurrencePreviewService->candidates($state, $after, $request->getLocale());
+        } catch (InvalidRecurrencePatternException) {
+            return $this->json(['error' => 'invalid_parameters'], Response::HTTP_BAD_REQUEST);
+        }
+
+        return $this->json($this->recurrenceStatePayload($state) + ['candidates' => $candidates]);
+    }
+
+    /**
+     * @return array{
+     *     selection: array{mode: string, period: string, ordinal: list<int>, weekday: list<string>, day: list<int>},
+     *     controls: array{ordinal: bool, weekday: bool, weekdayMultiple: bool, day: bool, multiHint: bool, shortMonthHint: bool, periods: list<string>}
+     * }
+     */
+    private function recurrenceStatePayload(RecurrenceBuilderState $state): array
+    {
+        return [
+            'selection' => [
+                'mode' => $state->mode->value,
+                'period' => $state->period->value,
+                'ordinal' => array_map(static fn(RecurrenceOrdinal $case): int => $case->value, $state->ordinals),
+                'weekday' => array_map(static fn(Weekday $case): string => $case->value, $state->weekdays),
+                'day' => $state->daysOfMonth,
+            ],
+            'controls' => [
+                'ordinal' => $state->showsOrdinal(),
+                'weekday' => $state->showsWeekday(),
+                'weekdayMultiple' => $state->allowsSeveralWeekdays(),
+                'day' => $state->showsDayOfMonth(),
+                'multiHint' => $state->allowsSeveralEntries(),
+                'shortMonthHint' => $state->warnsAboutShortMonths(),
+                'periods' => array_map(static fn(RecurrencePeriod $case): string => $case->value, $state->periods),
+            ],
+        ];
+    }
 
     #[Route('', name: 'app_admin_event')]
     public function list(Request $request): Response
@@ -330,14 +413,12 @@ final class EventController extends AbstractController implements AdminNavigatio
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::EVENT_UPDATE, $event);
 
-        // Validate event is accessible in current context
         if (!$this->eventFilterService->isEventAccessible($event->getId())) {
             throw $this->createAccessDeniedException('This event is not accessible in the current context');
         }
 
         $form = $this->createForm(EventType::class, $event);
 
-        // Only set form data on GET request (initial load)
         if ($request->isMethod('GET')) {
             $form->get('location')->setData($event->getLocation());
             $form->get('host')->setData($event->getHost());
@@ -347,6 +428,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         $oldStart = DateTimeImmutable::createFromInterface($event->getStart());
         $oldStop = $event->getStop() !== null ? DateTimeImmutable::createFromInterface($event->getStop()) : null;
         $oldRule = $event->getSeries()?->getRule();
+        $oldRuleSpec = $event->getSeries()?->getRuleSpec();
 
         // TODO: simplify with vanilla symfony components now the cascading flush effect is fixed
         $form->handleRequest($request);
@@ -355,8 +437,9 @@ final class EventController extends AbstractController implements AdminNavigatio
 
             $isSeries = $event->getSeries() !== null;
             $newRule = $form->get('seriesRule')->getData();
+            $newRuleSpec = $this->resolveSubmittedRuleSpec($form, $newRule);
             $seriesName = trim((string) $form->get('seriesName')->getData());
-            $ruleChanged = $oldRule !== $newRule;
+            $ruleChanged = $oldRule !== $newRule || $oldRuleSpec !== $newRuleSpec;
 
             if (!$isSeries && !$this->validateSeriesName($form)) {
                 $this->entityManager->refresh($event);
@@ -368,9 +451,11 @@ final class EventController extends AbstractController implements AdminNavigatio
                 oldStart: $oldStart,
                 oldStop: $oldStop,
                 oldRule: $oldRule,
+                oldRuleSpec: $oldRuleSpec,
                 newStart: DateTimeImmutable::createFromInterface($event->getStart()),
                 newStop: $event->getStop() !== null ? DateTimeImmutable::createFromInterface($event->getStop()) : null,
                 newRule: $newRule,
+                newRuleSpec: $newRuleSpec,
             );
             $wantsRealign = $form->get('allFollowing')->getData() === true && $isSeries && $change->isChanged();
             $ruleChangeForcesConfirm = $isSeries && $ruleChanged;
@@ -393,11 +478,9 @@ final class EventController extends AbstractController implements AdminNavigatio
                 }
             }
 
-            // overwrite basic data
             $event->setInitial(true);
             $event->setUser($user);
 
-            // series updates: rename freely, rule changes only arrive here confirmed
             if ($isSeries) {
                 $series = $event->getSeries();
                 if ($seriesName !== '') {
@@ -405,18 +488,17 @@ final class EventController extends AbstractController implements AdminNavigatio
                 }
                 if ($ruleChanged) {
                     $series->setRule($newRule);
+                    $series->setRuleSpec($newRuleSpec);
                 }
             } elseif ($newRule instanceof EventInterval) {
-                $event->setSeries($this->createSeries($seriesName, $newRule));
+                $event->setSeries($this->createSeries($seriesName, $newRule, $newRuleSpec));
             }
 
-            // manually hydrate location (unmapped field)
             $locationData = $form->get('location')->getData();
             if ($locationData instanceof Location) {
                 $event->setLocation($locationData);
             }
 
-            // manually hydrate hosts (unmapped field)
             $event->getHost()->clear();
             $hostsData = $form->get('host')->getData();
             if (is_iterable($hostsData)) {
@@ -429,7 +511,6 @@ final class EventController extends AbstractController implements AdminNavigatio
                 }
             }
 
-            // event image
             $image = null;
             $oldPreviewId = $event->getPreviewImage()?->getId();
             $imageData = $form->get('image')->getData();
@@ -440,7 +521,6 @@ final class EventController extends AbstractController implements AdminNavigatio
                 $event->setPreviewImage($image);
             }
 
-            // save translations
             foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
                 $translation = $this->getTranslation($languageCode, $event->getId());
                 $translation->setEvent($event);
@@ -464,7 +544,6 @@ final class EventController extends AbstractController implements AdminNavigatio
                 $this->dispatchEventUpdateNotifications($event, $user, $beforeSnapshot, $afterSnapshot);
             }
 
-            // create thumbnail and update location index
             if ($image instanceof Image) {
                 $this->imageService->createThumbnails($image, ImageType::EventTeaser);
                 if ($oldPreviewId !== null) {
@@ -478,8 +557,7 @@ final class EventController extends AbstractController implements AdminNavigatio
                 $syncCount = $this->eventService->updateRecurringEvents($event, $oldStart);
             }
 
-            // a confirmed rule change realigns even without the allFollowing checkbox;
-            // closing the series (rule change to null) never realigns
+            // A confirmed rule change realigns without allFollowing; closing the series never realigns
             $executesRealign = $wantsRealign || $isSeries && $ruleChanged && $newRule !== null;
             if ($executesRealign) {
                 $result = $this->eventService->executeRealignment($this->eventService->planRealignment($event, $change));
@@ -537,7 +615,70 @@ final class EventController extends AbstractController implements AdminNavigatio
                 ),
             ]),
             'notifiableAttendeeCount' => $this->countNotifiableAttendees($event),
+            'recurrence' => $this->buildRecurrenceContext($event),
         ]);
+    }
+
+    /**
+     * @return array{
+     *     selection: array{mode: string, period: string, ordinal: list<int>, weekday: list<string>, day: list<int>},
+     *     controls: array{ordinal: bool, weekday: bool, weekdayMultiple: bool, day: bool, multiHint: bool, shortMonthHint: bool, periods: list<string>},
+     *     summary: string,
+     *     currentRule: ?EventInterval,
+     *     currentRuleSpec: ?string,
+     *     anchor: DateTime|DateTimeImmutable,
+     *     customValue: int,
+     *     ordinals: list<array{value: int, label: string}>,
+     *     weekdays: list<array{value: string, label: string}>,
+     *     periods: list<array{value: string, label: string}>
+     * }
+     */
+    private function buildRecurrenceContext(?Event $event): array
+    {
+        $series = $event?->getSeries();
+        $anchor = $event?->getStart() ?? new DateTimeImmutable();
+        $currentPattern = $series !== null
+            ? $this->recurrenceResolver->resolve($series->getRule(), $series->getRuleSpec(), $anchor)
+            : null;
+        $isCustom = $series?->getRule() === EventInterval::Custom;
+
+        $state = $this->recurrenceBuilderStateResolver->resolve(
+            mode: RecurrenceMode::Weekday,
+            period: RecurrencePeriod::Month,
+            ordinals: [],
+            weekdays: [],
+            daysOfMonth: [],
+            fallbackWeekday: Weekday::fromDate($anchor),
+        );
+
+        return $this->recurrenceStatePayload($state) + [
+            'summary' => $isCustom && $currentPattern !== null ? $this->recurrenceDescriber->describe($currentPattern) : '',
+            'currentRule' => $series?->getRule(),
+            'currentRuleSpec' => $series?->getRuleSpec(),
+            'anchor' => $anchor,
+            'customValue' => EventInterval::Custom->value,
+            'ordinals' => array_map(
+                fn(RecurrenceOrdinal $case): array => [
+                    'value' => $case->value,
+                    'label' => $this->translator->trans($case->label()),
+                ],
+                RecurrenceOrdinal::cases(),
+            ),
+            'weekdays' => array_map(
+                fn(Weekday $case): array => [
+                    'value' => $case->value,
+                    'label' => $this->recurrenceDescriber->weekdayName($case),
+                ],
+                Weekday::cases(),
+            ),
+            'periods' => array_map(
+                fn(RecurrencePeriod $case): array => [
+                    'value' => $case->value,
+                    'label' => $this->translator->trans($case->label()),
+                ],
+                array_values(array_filter(RecurrencePeriod::cases(), static fn(RecurrencePeriod $case): bool => $case->carriesDayRule())),
+            ),
+        ];
     }
 
     /**
@@ -555,10 +696,6 @@ final class EventController extends AbstractController implements AdminNavigatio
     }
 
     /**
-     * Cancellation via the dedicated cancel route is handled by NotificationEventCanceledEmail
-     * inside EventService::cancelEvent(); this diff path only fires on the form-edit save and
-     * therefore never double-sends.
-     *
      * @param array{start: int, startFormatted: string, locationId: ?int, locationName: string, canceled: bool} $before
      * @param array{start: int, startFormatted: string, locationId: ?int, locationName: string, canceled: bool} $after
      */
@@ -686,16 +823,18 @@ final class EventController extends AbstractController implements AdminNavigatio
 
             $seriesRule = $form->get('seriesRule')->getData();
             if ($seriesRule instanceof EventInterval) {
-                $event->setSeries($this->createSeries(trim((string) $form->get('seriesName')->getData()), $seriesRule));
+                $event->setSeries($this->createSeries(
+                    trim((string) $form->get('seriesName')->getData()),
+                    $seriesRule,
+                    $this->resolveSubmittedRuleSpec($form, $seriesRule),
+                ));
             }
 
-            // manually hydrate location (unmapped field)
             $locationData = $form->get('location')->getData();
             if ($locationData instanceof Location) {
                 $event->setLocation($locationData);
             }
 
-            // manually hydrate hosts (unmapped field)
             $hostsData = $form->get('host')->getData();
             if (is_iterable($hostsData)) {
                 foreach ($hostsData as $host) {
@@ -721,6 +860,7 @@ final class EventController extends AbstractController implements AdminNavigatio
             'location' => $event,
             'form' => $form,
             'adminTop' => $this->buildBackOnlyTop(),
+            'recurrence' => $this->buildRecurrenceContext(null),
         ]);
     }
 
@@ -744,11 +884,23 @@ final class EventController extends AbstractController implements AdminNavigatio
         return false;
     }
 
-    private function createSeries(string $name, EventInterval $rule): EventSeries
+    private function resolveSubmittedRuleSpec(FormInterface $form, ?EventInterval $rule): ?string
+    {
+        if (EventInterval::Custom !== $rule) {
+            return null;
+        }
+
+        $submitted = trim((string) $form->get('customRuleSpec')->getData());
+
+        return '' === $submitted ? null : $submitted;
+    }
+
+    private function createSeries(string $name, EventInterval $rule, ?string $ruleSpec = null): EventSeries
     {
         $series = new EventSeries();
         $series->setName($name);
         $series->setRule($rule);
+        $series->setRuleSpec($ruleSpec);
         $series->setCreatedAt(new DateTimeImmutable());
         $this->entityManager->persist($series);
 

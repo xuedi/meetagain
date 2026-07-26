@@ -22,7 +22,8 @@
     <p>
         {{ event.start|date('H:i') }} to {{ event.stop|date('H:i') }}<br>
         {% if event.series and event.series.rule %}
-            {{ 'events.label_recurring'|trans }} {{ event.series.rule.label()|trans }}
+            {{ 'events.label_recurring'|trans }}
+            {{ recurrence_label(event.series.rule, event.series.ruleSpec, event.start) }}
         {% endif %}
     </p>
 </div>

@@ -5,12 +5,6 @@ namespace App\Entity;
 use App\Repository\ItemTagAssignmentRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * One tag assigned to one item; an item with several tags is several rows. itemType is a registry
- * key and itemId is a plain INT (no FK to any plugin entity); tagId references a definition id in
- * the plugin Config JSON (plain INT). Unique per (itemType, itemId, tagId); the (itemType, tagId)
- * index serves the tag-cloud filter query.
- */
 #[ORM\Entity(repositoryClass: ItemTagAssignmentRepository::class)]
 #[ORM\Table(name: 'item_tag_assignment')]
 #[ORM\UniqueConstraint(name: 'uniq_item_tag', columns: ['item_type', 'item_id', 'tag_id'])]

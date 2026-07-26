@@ -9,12 +9,6 @@ use App\Service\Config\PluginService;
 use Override;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * Adds the public glossary index to the sitemap.
- *
- * Detail/edit/delete routes are auth-gated (ROLE_USER / ROLE_ORGANIZER) so only
- * the index page belongs in the sitemap.
- */
 final readonly class SitemapPublisher implements SitemapPublisherInterface
 {
     public function __construct(

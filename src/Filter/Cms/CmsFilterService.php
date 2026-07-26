@@ -4,10 +4,6 @@ namespace App\Filter\Cms;
 
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composite CMS filter service that collects all registered CmsFilterInterface implementations.
- * Combines multiple filters using AND logic for CMS page ID restrictions.
- */
 readonly class CmsFilterService
 {
     /**
@@ -18,10 +14,6 @@ readonly class CmsFilterService
         private iterable $filters,
     ) {}
 
-    /**
-     * Get the combined CMS ID filter from all registered filters.
-     * Uses intersection (AND) logic: a CMS page must pass ALL filters.
-     */
     public function getCmsIdFilter(): CmsFilterResult
     {
         $resultSet = null;
@@ -31,7 +23,7 @@ readonly class CmsFilterService
             $filterResult = $filter->getCmsIdFilter();
 
             if ($filterResult === null) {
-                continue; // No filtering from this filter
+                continue;
             }
 
             $hasActiveFilter = true;
@@ -44,7 +36,6 @@ readonly class CmsFilterService
                 $resultSet = $filterResult;
                 continue;
             }
-            // Intersect: CMS page must pass ALL filters
             $resultSet = array_values(array_intersect($resultSet, $filterResult));
             if ($resultSet === []) {
                 return CmsFilterResult::emptyResult();
@@ -54,22 +45,17 @@ readonly class CmsFilterService
         return new CmsFilterResult($resultSet, $hasActiveFilter);
     }
 
-    /**
-     * Check if a CMS page is accessible according to all registered filters.
-     * Any filter returning false will deny access.
-     * Returns true only if all filters allow (or have no opinion).
-     */
     public function isCmsAccessible(int $cmsId): bool
     {
         foreach ($this->getSortedFilters() as $filter) {
             $result = $filter->isCmsAccessible($cmsId);
 
             if ($result === false) {
-                return false; // Explicit deny
+                return false;
             }
         }
 
-        return true; // All filters allow or have no opinion
+        return true;
     }
 
     /**

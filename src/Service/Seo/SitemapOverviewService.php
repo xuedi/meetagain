@@ -9,10 +9,6 @@ use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\ValueObject\SitemapRow;
 
-/**
- * Turns the publisher chain's raw sitemap URLs into admin rows: a human label per entry plus the
- * content warnings that make an entry worth looking at.
- */
 readonly class SitemapOverviewService
 {
     /**

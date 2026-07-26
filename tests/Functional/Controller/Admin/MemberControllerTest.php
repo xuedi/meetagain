@@ -53,7 +53,6 @@ class MemberControllerTest extends WebTestCase
         $reloaded = $em->getRepository(User::class)->find($target->getId());
         static::assertSame(UserRole::Admin, $reloaded->getRole());
 
-        // Reset
         $reloaded->setRole(UserRole::User);
         $em->flush();
     }
@@ -64,7 +63,6 @@ class MemberControllerTest extends WebTestCase
         $client = static::createClient();
         $this->loginAsAdmin($client);
         $admin = $this->getUserByEmail($client, self::ADMIN_EMAIL);
-        // Self-modification guard runs before CSRF check, so any token suffices
         $client->request('GET', '/en/admin/member/edit/' . $admin->getId());
 
         // Act
@@ -122,7 +120,6 @@ class MemberControllerTest extends WebTestCase
         $reloaded = $em->getRepository(User::class)->find($target->getId());
         static::assertNotSame($original, $reloaded->isVerified());
 
-        // Reset
         $reloaded->setVerified($original);
         $em->flush();
     }
@@ -157,7 +154,7 @@ class MemberControllerTest extends WebTestCase
         }
         $token = $this->extractCsrf($client, $target->getId(), '/set-status/');
 
-        // Act: Active -> Denied is not in the allow-list
+        // Act
         $client->request('POST', '/en/admin/member/' . $target->getId() . '/set-status/' . UserStatus::Denied->value, [
             '_token' => $token,
         ]);

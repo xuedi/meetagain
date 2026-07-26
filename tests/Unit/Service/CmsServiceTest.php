@@ -24,7 +24,7 @@ class CmsServiceTest extends TestCase
 {
     public function testGetSitesReturnsAllCmsPages(): void
     {
-        // Arrange: mock repository to return list of CMS pages
+        // Arrange
         $expectedSites = [
             $this->createStub(Cms::class),
             $this->createStub(Cms::class),
@@ -43,16 +43,16 @@ class CmsServiceTest extends TestCase
             requestStack: $this->createStub(RequestStack::class),
         );
 
-        // Act: get all sites
+        // Act
         $result = $subject->getSites();
 
-        // Assert: returns array of CMS pages
+        // Assert
         static::assertSame($expectedSites, $result);
     }
 
     public function testHandleThrowsNotFoundWhenPageNotFound(): void
     {
-        // Arrange: repository returns null (slug miss)
+        // Arrange
         $locale = 'en';
         $slug = 'non-existent-page';
 
@@ -65,7 +65,7 @@ class CmsServiceTest extends TestCase
         $twigMock = $this->createMock(Environment::class);
         $twigMock->expects($this->never())->method('render');
 
-        // Arrange: cache must NOT be touched on the 404 path
+        // Arrange
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
         $cacheMock->expects($this->never())->method('get');
 
@@ -79,7 +79,7 @@ class CmsServiceTest extends TestCase
             requestStack: $this->createStub(RequestStack::class),
         );
 
-        // Assert: handle() throws so the framework error pipeline can render the 404
+        // Assert
         $this->expectException(NotFoundHttpException::class);
 
         // Act
@@ -88,7 +88,7 @@ class CmsServiceTest extends TestCase
 
     public function testHandleReturns204WhenPageHasNoContentInRequestedLanguage(): void
     {
-        // Arrange: mock CMS page with no content blocks for requested locale
+        // Arrange
         $locale = 'en';
         $slug = 'existing-page';
         $expectedContent = '204 page content';
@@ -110,7 +110,7 @@ class CmsServiceTest extends TestCase
             ->with('cms/204.html.twig', ['message' => 'cms.error_204_default_message'])
             ->willReturn($expectedContent);
 
-        // Arrange: cache miss; the 204 path must NOT write to the cache (single get(), no beta=INF store)
+        // Arrange
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
         $cacheMock
             ->expects($this->once())
@@ -132,17 +132,17 @@ class CmsServiceTest extends TestCase
             requestStack: $this->createStub(RequestStack::class),
         );
 
-        // Act: handle request for page without content in requested language
+        // Act
         $response = $subject->handle($locale, $slug, new Response());
 
-        // Assert: returns 204 No Content response
+        // Assert
         static::assertSame($expectedContent, $response->getContent());
         static::assertSame(Response::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 
     public function testHandleReturns200WithContentWhenPageExists(): void
     {
-        // Arrange: mock CMS page with content blocks; cache miss path renders both inner and outer templates
+        // Arrange
         $locale = 'en';
         $slug = 'existing-page';
         $pageTitle = 'Page Title';
@@ -178,7 +178,7 @@ class CmsServiceTest extends TestCase
                 return $expectedContent;
             });
 
-        // Arrange: cache miss + store; capture key shape and tags
+        // Arrange
         $capturedKey = null;
         $capturedTags = null;
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
@@ -255,10 +255,10 @@ class CmsServiceTest extends TestCase
             requestStack: $this->createStub(RequestStack::class),
         );
 
-        // Act: handle request for page with content
+        // Act
         $response = $subject->handle($locale, $slug, new Response());
 
-        // Assert: returns 200 OK response with rendered content
+        // Assert
         static::assertSame($expectedContent, $response->getContent());
         static::assertSame(Response::HTTP_OK, $response->getStatusCode());
         static::assertNotNull($capturedKey);
@@ -268,30 +268,30 @@ class CmsServiceTest extends TestCase
 
     public function testHandleUsesDefaultTitleWhenPageTitleIsNull(): void
     {
-        // Arrange: mock CMS page with null title
+        // Arrange
         $locale = 'en';
         $slug = 'page-without-title';
         $expectedContent = 'rendered page content';
         $blocks = new ArrayCollection(['block1']);
 
-        // Arrange: stub CMS entity to return blocks and null title
+        // Arrange
         $cmsStub = $this->createStub(Cms::class);
         $cmsStub->method('getLanguageFilteredBlockJsonList')->willReturn($blocks);
         $cmsStub->method('getPageTitle')->willReturn(null);
         $cmsStub->method('getId')->willReturn(456);
 
-        // Arrange: stub repository to return the CMS entity
+        // Arrange
         $cmsRepoStub = $this->createStub(CmsRepository::class);
         $cmsRepoStub->method('findPublishedBySlug')->willReturn($cmsStub);
 
-        // Arrange: stub filter services
+        // Arrange
         $cmsFilterServiceStub = $this->createStub(CmsFilterService::class);
         $cmsFilterServiceStub->method('getCmsIdFilter')->willReturn(CmsFilterResult::noFilter());
 
         $eventFilterServiceStub = $this->createStub(EventFilterService::class);
         $eventFilterServiceStub->method('getEventIdFilter')->willReturn(new EventFilterResult(null, false));
 
-        // Arrange: mock Twig to verify default title is used
+        // Arrange
         $renderedBody = '<inner-body/>';
         $twigMock = $this->createMock(Environment::class);
         $twigMock
@@ -324,16 +324,16 @@ class CmsServiceTest extends TestCase
             requestStack: $this->createStub(RequestStack::class),
         );
 
-        // Act: handle request for page without title
+        // Act
         $response = $subject->handle($locale, $slug, new Response());
 
-        // Assert: uses default title translation key 'cms.page_no_title_fallback'
+        // Assert
         static::assertSame($expectedContent, $response->getContent());
     }
 
     public function testHandleReturnsCachedBodyWithoutFetchingBlocksOnCacheHit(): void
     {
-        // Arrange: a cache hit should skip block fetch entirely and reuse the stored inner HTML
+        // Arrange
         $locale = 'en';
         $slug = 'privacy';
         $pageTitle = 'Privacy';
@@ -354,7 +354,7 @@ class CmsServiceTest extends TestCase
         $cmsRepoStub = $this->createStub(CmsRepository::class);
         $cmsRepoStub->method('findPublishedBySlug')->willReturn($cmsMock);
 
-        // Arrange: cache hit returns the cached body directly without invoking the miss callback
+        // Arrange
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
         $cacheMock
             ->expects($this->once())
@@ -381,14 +381,14 @@ class CmsServiceTest extends TestCase
         // Act
         $response = $subject->handle($locale, $slug, new Response());
 
-        // Assert: returns 200 with the rendered outer HTML; block fetch never happened
+        // Assert
         static::assertSame($outerHtml, $response->getContent());
         static::assertSame(Response::HTTP_OK, $response->getStatusCode());
     }
 
     public function testHandleCacheKeyIncludesHostFromCurrentRequest(): void
     {
-        // Arrange: the host segment of the cache key must come from the current request
+        // Arrange
         $locale = 'en';
         $slug = 'about';
         $host = 'example.test';
@@ -436,7 +436,7 @@ class CmsServiceTest extends TestCase
         // Act
         $subject->handle($locale, $slug, new Response());
 
-        // Assert: both the get() and the store() use the same key, prefixed with the page id
+        // Assert
         static::assertCount(2, $capturedKeys);
         static::assertSame($capturedKeys[0], $capturedKeys[1]);
         static::assertStringStartsWith('cms_page.42.', $capturedKeys[0]);

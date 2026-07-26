@@ -16,8 +16,6 @@ class ImageLocationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns all (imageId, locationId) pairs currently stored for the given type.
-     *
      * @return array<array{imageId: int, locationId: int}>
      */
     public function findPairsByType(ImageType $type): array
@@ -36,10 +34,6 @@ class ImageLocationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns the distinct image IDs stored at a given location for any of the given types.
-     * Resolves images owned directly by an entity, where that entity's own ID is stored as the
-     * location_id (as opposed to images owned indirectly through other content).
-     *
      * @param list<ImageType> $types
      * @return array<int>
      */
@@ -64,10 +58,6 @@ class ImageLocationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Reverse of findImageIdsByTypesAndLocationId: for each given image, the location IDs it is
-     * stored at for any of the given types. Used to resolve directly-owned images back to the
-     * entity IDs stored as their location_id.
-     *
      * @param list<int>       $imageIds
      * @param list<ImageType> $types
      * @return array<int, list<int>> imageId => location IDs
@@ -100,8 +90,6 @@ class ImageLocationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Bulk-delete rows matching the given type and (imageId, locationId) pairs.
-     *
      * @param array<array{imageId: int, locationId: int}> $pairs
      */
     public function deleteByTypeAndPairs(ImageType $type, array $pairs): void
@@ -121,9 +109,6 @@ class ImageLocationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Bulk-insert (imageId, locationId) pairs for the given type.
-     * Silently skips rows that already exist (via INSERT IGNORE on the unique constraint).
-     *
      * @param array<array{imageId: int, locationId: int}> $pairs
      */
     public function insertForType(ImageType $type, array $pairs): void
@@ -143,8 +128,6 @@ class ImageLocationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns a map of imageId → location row count for use in list views.
-     *
      * @return array<int, int>
      */
     public function countPerImageId(): array

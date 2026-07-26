@@ -100,8 +100,6 @@ readonly class DashboardStatsService
     }
 
     /**
-     * Multi-series daily counts for the platform activity chart.
-     *
      * @return array{labels: list<string>, logins: list<int>, rsvps: list<int>, newMembers: list<int>}
      */
     public function getActivityTrend(int $year, int $week, ?DashboardScope $scope = null): array

@@ -19,12 +19,6 @@ class NotFoundLogRepository extends ServiceEntityRepository
 
     public function getWeekSummary(DateTimeImmutable $startDate, DateTimeImmutable $endDate): array
     {
-        // TODO: remove custom stuff (doctrine.yaml::DoctrineExtensions\Query\Mysql\DateFormat) and find a upstream way
-        //       also fill up dateRange in sql and return key value pair straight as array
-
-        // $dbal = $this->getDoctrine()->getConnection();
-        // $idsAndNames = $dbal->executeQuery('SELECT id, name FROM Categories')->fetchAll(\PDO::FETCH_KEY_PAIR);
-
         $unhydratedList = $this
             ->getEntityManager()
             ->createQueryBuilder()

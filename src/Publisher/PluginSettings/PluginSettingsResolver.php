@@ -6,11 +6,6 @@ use App\Service\Admin\PluginSettingsService;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Returns the effective settings data object for a key in the current request via an
- * override-over-global rule: an override-scope record if one exists, else the global
- * record, else the descriptor's neutral default. Memoized per (key, scopeId) per request.
- */
 class PluginSettingsResolver
 {
     /** @var array<string, object> */
@@ -68,7 +63,6 @@ class PluginSettingsResolver
         return null;
     }
 
-    /** The highest-priority store whose supports() is true for this (key, scopeId). */
     public function resolveStore(string $key, ?string $scopeId): ?PluginSettingsStoreInterface
     {
         $best = null;

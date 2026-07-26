@@ -20,9 +20,7 @@ final class SitemapControllerTest extends WebTestCase
         // Act
         $crawler = $client->request('GET', self::SITEMAP_PATH);
 
-        // Assert: page reaches the publisher chain and renders rows. Static
-        // routes are emitted by CoreSitemapPublisher and must be present on
-        // every host regardless of plugin state.
+        // Assert
         $this->assertResponseIsSuccessful();
         $rowCount = $crawler->filter('#filteredTable tbody tr')->count();
         self::assertGreaterThan(0, $rowCount, 'Sitemap admin page should list at least static routes from the publisher chain');
@@ -39,7 +37,7 @@ final class SitemapControllerTest extends WebTestCase
         // Act
         $crawler = $client->request('GET', self::SITEMAP_PATH . '?section=static');
 
-        // Assert: every visible row carries the static section label.
+        // Assert
         $this->assertResponseIsSuccessful();
         $sections = $crawler->filter('#filteredTable tbody tr td:first-child')->each(static fn($node) => trim($node->text()));
         self::assertNotEmpty($sections);

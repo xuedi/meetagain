@@ -26,7 +26,6 @@ readonly class MenuService
      */
     public function getMenuForContext(string $type, ?UserInterface $user, string $locale): array
     {
-        // Map location string to MenuLocation enum
         $menuLocation = match ($type) {
             'top' => MenuLocation::TopBar,
             'col1' => MenuLocation::BottomCol1,

@@ -73,8 +73,6 @@ class Kernel implements Plugin
             $created[] = $this->bookService->createManual($isbn, $title, $author, $description, $pageCount, $publishedYear, $adminId);
         }
 
-        // Attach several books across the available events (multiple per event when past events
-        // are few), giving the event pages and the item list real associations.
         $events = $this->eventRepository->getPastEvents(4);
         if ($events === []) {
             $events = $this->eventRepository->getUpcomingEvents(4);

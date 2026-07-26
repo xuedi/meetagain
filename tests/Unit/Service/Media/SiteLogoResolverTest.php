@@ -26,7 +26,7 @@ class SiteLogoResolverTest extends TestCase
 
     public function testFilterOverrideWinsOverEverything(): void
     {
-        // Arrange: filter returns override URL; configured SiteLogo also exists.
+        // Arrange
         $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
         $filter->method('resolveSiteLogoUrl')->willReturn('/group/logo.webp');
         $this->configServiceStub->method('getSiteLogoId')->willReturn(99);
@@ -43,8 +43,7 @@ class SiteLogoResolverTest extends TestCase
 
     public function testSiteLogoWinsOverFallback(): void
     {
-        // Arrange: no override, but both SiteLogo configured AND fallback would match.
-        // SiteLogo (admin's explicit choice) must win over the fallback (implicit).
+        // Arrange
         $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
         $filter->method('resolveSiteLogoUrl')->willReturn(null);
         $filter->method('resolveFallbackSiteLogoUrl')->willReturn('/fallback/logo.webp');
@@ -66,7 +65,7 @@ class SiteLogoResolverTest extends TestCase
 
     public function testFallbackUsedWhenNoSiteLogoConfigured(): void
     {
-        // Arrange: no override, no SiteLogo, but fallback returns a URL.
+        // Arrange
         $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
         $filter->method('resolveSiteLogoUrl')->willReturn(null);
         $filter->method('resolveFallbackSiteLogoUrl')->willReturn('/fallback/logo.webp');
@@ -84,7 +83,7 @@ class SiteLogoResolverTest extends TestCase
 
     public function testFallsThroughToDefaultAssetWhenNothingMatches(): void
     {
-        // Arrange: no override, no SiteLogo, no fallback.
+        // Arrange
         $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
         $filter->method('resolveSiteLogoUrl')->willReturn(null);
         $filter->method('resolveFallbackSiteLogoUrl')->willReturn(null);
@@ -102,7 +101,7 @@ class SiteLogoResolverTest extends TestCase
 
     public function testFallsThroughToDefaultAssetWhenConfiguredImageMissing(): void
     {
-        // Arrange: configured id points at a deleted image, no filters.
+        // Arrange
         $this->configServiceStub->method('getSiteLogoId')->willReturn(42);
         $this->imageRepositoryStub->method('find')->willReturn(null);
 

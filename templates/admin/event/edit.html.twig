@@ -37,13 +37,16 @@
 
         <div class="columns">
             <div class="column is-3">
+                {{ form_row(form.seriesRule) }}
+            </div>
+            <div class="column is-3" data-recurrence-schedule>
                 {{ form_row(form.start) }}
             </div>
-            <div class="column is-3">
+            <div class="column is-3" data-recurrence-schedule>
                 {{ form_row(form.stop) }}
             </div>
-            <div class="column is-3">
-                {{ form_row(form.seriesRule) }}
+            <div class="column is-6 is-hidden" id="recurrence-summary-wrapper">
+                {% include 'admin/event/_recurrence_summary.html.twig' %}
             </div>
             <div class="column is-3 {% if event.series is null %}is-hidden{% endif %}" id="series-name-wrapper">
                 {{ form_row(form.seriesName) }}
@@ -173,10 +176,13 @@
 
         {{ form_end(form) }}
 
+        {% include 'admin/event/_recurrence_modal.html.twig' %}
+
     </div>
 
     <script src="{{ asset('js/vendor/quill.min.js') }}"></script>
     <script src="{{ asset('js/admin/quill-editor.js') }}" defer></script>
+    <script src="{{ asset('js/recurrence-builder.js') }}" defer></script>
 
     <script type="text/javascript">
 

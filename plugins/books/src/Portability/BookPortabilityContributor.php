@@ -16,10 +16,6 @@ use Plugin\Books\Entity\Book;
 use Plugin\Books\Repository\BookRepository;
 use Plugin\Books\Service\BookService;
 
-/**
- * Deduplication on ISBN is mandatory rather than a nicety: Book::$isbn is a unique column, so a
- * colliding row must resolve to the book already present instead of being inserted.
- */
 readonly class BookPortabilityContributor implements ItemPortabilityContributorInterface
 {
     public function __construct(

@@ -62,8 +62,6 @@ readonly class CommandExecutionService
     }
 
     /**
-     * Get stats for dashboard.
-     *
      * @return array{total: int, successful: int, failed: int}
      */
     public function getStats(int $hours = 24): array
@@ -74,8 +72,6 @@ readonly class CommandExecutionService
     }
 
     /**
-     * Get last execution for each command.
-     *
      * @return array<string, CommandExecutionLog>
      */
     public function getLastExecutions(): array
@@ -84,8 +80,6 @@ readonly class CommandExecutionService
     }
 
     /**
-     * Get recent failed executions.
-     *
      * @return CommandExecutionLog[]
      */
     public function getRecentFailed(int $limit = 10): array

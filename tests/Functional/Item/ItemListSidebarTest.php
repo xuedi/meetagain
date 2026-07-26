@@ -5,11 +5,6 @@ namespace Tests\Functional\Item;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-/**
- * The sidebar is pure Twig, so its only coverage is the rendered page. The four list pages have
- * deliberately different shapes - shared list component, own per-mode layouts, restricted mode set -
- * which is what makes them worth asserting together.
- */
 class ItemListSidebarTest extends WebTestCase
 {
     /** @return iterable<string, array{string, string}> */

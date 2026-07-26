@@ -30,7 +30,6 @@ class PasswordResetTest extends TestCase
         $subject = new PasswordReset();
         $subject->injectServices($this->router, $this->imageService, $this->translator);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(PasswordReset::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

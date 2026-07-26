@@ -125,7 +125,6 @@ readonly class CaptchaService
         $image->newImage(100, 60, new ImagickPixel('grey'));
         $image->setImageFormat('png');
 
-        // Add noise lines
         for ($i = 0; $i < 4; $i++) {
             $draw = new ImagickDraw();
             $draw->setStrokeColor(sprintf('rgb(%d,%d,%d)', random_int(130, 190), random_int(130, 190), random_int(130, 190)));
@@ -134,7 +133,6 @@ readonly class CaptchaService
             $image->drawImage($draw);
         }
 
-        // Add noise dots
         for ($i = 0; $i < 40; $i++) {
             $draw = new ImagickDraw();
             $draw->setFillColor(sprintf('rgb(%d,%d,%d)', random_int(80, 180), random_int(80, 180), random_int(80, 180)));
@@ -142,7 +140,6 @@ readonly class CaptchaService
             $image->drawImage($draw);
         }
 
-        // Draw characters
         $x = 8;
         $baseY = 38;
         $size = 25;

@@ -68,7 +68,7 @@ class ConfigTypeTest extends TestCase
         // Arrange
         $form = $this->factory(['en'])->create(ConfigType::class, (new Config())->setPhoneticInList(true));
 
-        // Act - an unchecked checkbox is absent from the submitted payload
+        // Act
         $form->submit(['en' => '']);
 
         // Assert

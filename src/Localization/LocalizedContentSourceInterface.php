@@ -5,12 +5,8 @@ namespace App\Localization;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Reports and deletes per-locale content belonging to a caller-supplied set of owner ids.
- *
- * Implementations promise:
- *   - the caller decides which owner ids are in scope; the source never asks who owns them
- *   - an empty owner-id list or an empty keep-locale list yields nothing and deletes nothing
- *   - count, find and delete describe the same set for the same arguments
+ * Reports and deletes per-locale content for caller-supplied owner ids. An empty owner-id or
+ * keep-locale list yields nothing; count, find and delete describe the same set.
  */
 #[AutoconfigureTag]
 interface LocalizedContentSourceInterface

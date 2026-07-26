@@ -64,14 +64,11 @@ class EventRepository extends ServiceEntityRepository
             if ($rsvp === EventRsvpFilter::My) {
                 $qb->innerJoin('e.rsvp', 'u', 'WITH', 'u.id = :userId')->setParameter('userId', $user->getId());
             }
-
-            // Friends filtering not yet implemented
         }
 
-        // Apply event ID filter if provided
         if ($restrictToEventIds !== null) {
             if ($restrictToEventIds === []) {
-                return []; // Empty filter = no results
+                return [];
             }
             $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
@@ -108,10 +105,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find upcoming events that need RSVP follower notifications.
-     * Returns events where: start is between $from and $to, rsvpNotificationSentAt IS NULL,
-     * not canceled, and has at least one RSVP attendee.
-     *
      * @return array<Event>
      */
     public function findUpcomingEventsNeedingRsvpNotification(DateTimeInterface $from, DateTimeInterface $to): array
@@ -134,9 +127,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find events starting within $from to $to that have RSVP attendees
-     * and have not yet had a reminder sent.
-     *
      * @return array<Event>
      */
     public function findEventsNeedingReminder(DateTimeInterface $from, DateTimeInterface $to): array
@@ -162,8 +152,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find upcoming events within a date range that the given user has NOT RSVP'd to.
-     *
      * @return array<Event>
      */
     public function findUpcomingEventsNotRsvpdByUser(DateTimeInterface $from, DateTimeInterface $to, User $user): array
@@ -189,10 +177,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all upcoming, published, non-canceled events in a window with their RSVP set
-     * eagerly hydrated. Used by previews that need to filter "user has RSVP'd" in PHP across
-     * many users without firing one query per user.
-     *
      * @return array<Event>
      */
     public function findUpcomingEventsWithRsvp(DateTimeInterface $from, DateTimeInterface $to): array
@@ -353,8 +337,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Count past events the user attended (RSVPed to).
-     *
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      */
     public function countAttendedEvents(User $user, ?array $restrictToEventIds = null): int
@@ -379,8 +361,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Count upcoming events the user has RSVPed to.
-     *
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      */
     public function countUpcomingRsvpEvents(User $user, ?array $restrictToEventIds = null): int
@@ -460,17 +440,12 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get the ID of the next upcoming event.
-     *
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      */
     public function getNextEventId(?array $restrictToEventIds = null): ?int
     {
         $now = new DateTime();
         foreach ($this->findAllForAdmin($restrictToEventIds) as $event) {
-            // An event stays the "next" one until its end time passes, so a same-day
-            // or currently-running event keeps the marker until it is actually over.
-            // Events without an explicit end are treated as ending at their start.
             $end = $event->getStop() ?? $event->getStart();
             if ($end > $now) {
                 return $event->getId();
@@ -544,9 +519,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find upcoming events in the next N days that have fewer than $minYes "yes" RSVPs,
-     * optionally restricted to a set of event IDs.
-     *
      * @param array<int>|null $restrictToEventIds
      * @return array<Event>
      */
@@ -580,8 +552,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all events for admin interface with optional filtering.
-     *
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return array<Event>
      */
@@ -596,10 +566,9 @@ class EventRepository extends ServiceEntityRepository
             ->leftJoin('e.series', 's')
             ->addSelect('s');
 
-        // Apply event ID filter if provided
         if ($restrictToEventIds !== null) {
             if ($restrictToEventIds === []) {
-                return []; // Empty filter = no results
+                return [];
             }
             $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
         }
@@ -608,8 +577,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get RSVP counts per event in a single aggregate query.
-     *
      * @param array<int>|null $eventIds Optional event ID filter
      * @return array<int, int> Map of event ID to RSVP count
      */
@@ -631,8 +598,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find featured events with location and preview image eagerly loaded.
-     *
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return array<Event>
      */
@@ -661,10 +626,6 @@ class EventRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * Find a single event with all detail-page associations eagerly loaded to avoid N+1 queries.
-     * Fetches: location, previewImage, images, host, host.user, rsvp, rsvp.image, translations.
-     */
     public function findOneForDetails(int $id): ?Event
     {
         return $this
@@ -692,8 +653,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find events by their IDs with translations eagerly loaded.
-     *
      * @param array<int> $eventIds
      * @return array<Event>
      */
@@ -715,10 +674,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Paginated public upcoming events for the JSON API.
-     * Returns `[items, total]`. `items` respects $restrictToEventIds; $total is the
-     * full matching row count (pre-limit/offset) so callers can render pagination.
-     *
      * @param array<int>|null $restrictToEventIds null = no restriction, [] = empty result
      * @return array{items: Event[], total: int}
      */
@@ -761,8 +716,6 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all published events for sitemap generation.
-     *
      * @return Event[]
      */
     public function findForSitemap(): array

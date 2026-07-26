@@ -36,7 +36,7 @@ class RateLimitProviderTest extends TestCase
         $repo = $this->createStub(RateLimitLogRepository::class);
         $provider = new RateLimitProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
 
-        // Act - 20 hits on support never block
+        // Act
         $report = null;
         for ($i = 0; $i < 20; ++$i) {
             $report = $provider->observe(SecurityEventType::RateLimit, new Request(), ['limiter' => 'support'], 'sess', '1.2.3.4');
@@ -61,7 +61,7 @@ class RateLimitProviderTest extends TestCase
             $reports[] = $provider->observe(SecurityEventType::RateLimit, new Request(), ['limiter' => 'api_default'], 'sess', '1.2.3.4');
         }
 
-        // Assert - by the tenth call, threat level is at 100
+        // Assert
         static::assertSame(SecurityRecommendation::Block, end($reports)->recommendation);
     }
 

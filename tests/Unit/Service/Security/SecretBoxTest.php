@@ -12,7 +12,7 @@ class SecretBoxTest extends TestCase
 
     protected function setUp(): void
     {
-        // Arrange - a valid 32-byte key, base64-encoded
+        // Arrange
         $key = base64_encode(str_repeat('A', SODIUM_CRYPTO_SECRETBOX_KEYBYTES));
         $this->secretBox = new SecretBox($key);
     }
@@ -40,7 +40,7 @@ class SecretBoxTest extends TestCase
         $first = $this->secretBox->encrypt($cleartext);
         $second = $this->secretBox->encrypt($cleartext);
 
-        // Assert - nonce randomness means ciphertexts differ
+        // Assert
         static::assertNotSame($first, $second);
     }
 

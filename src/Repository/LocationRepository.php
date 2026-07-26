@@ -17,8 +17,6 @@ class LocationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Find all locations for admin interface with optional filtering.
-     *
      * @param array<int>|null $restrictToLocationIds Optional location ID filter
      * @return array<Location>
      */
@@ -38,9 +36,6 @@ class LocationRepository extends ServiceEntityRepository
     }
 
     /**
-     * Create query builder for admin forms with optional filtering.
-     * Used in form dropdowns to limit location choices based on admin context.
-     *
      * @param array<int>|null $restrictToLocationIds Optional location ID filter
      */
     public function createQueryBuilderForAdmin(?array $restrictToLocationIds = null)

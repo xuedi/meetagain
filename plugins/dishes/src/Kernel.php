@@ -110,8 +110,6 @@ class Kernel implements Plugin
             $created[] = $this->dishService->create($name, $language, $description, $recipe, $phonetic, $origin, $adminId);
         }
 
-        // Seed a dinner-style grouped menu on a past event: dishes clustered by course label,
-        // ordered by a running position - this is what the dish cell renderer groups by sectionLabel.
         $pastEvents = $this->eventRepository->getPastEvents(1);
         $attached = 0;
         if ($pastEvents !== [] && count($created) >= 5) {

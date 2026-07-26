@@ -25,10 +25,6 @@ class BlockedUnblockedUserTest extends TestCase
         $this->translator = new IdentityTranslator();
     }
 
-    // =========================================================================
-    // BlockedUser
-    // =========================================================================
-
     public function testBlockedUserGetType(): void
     {
         static::assertSame('core.blocked_user', new BlockedUser()->getType());
@@ -82,10 +78,6 @@ class BlockedUnblockedUserTest extends TestCase
         $subject->validate();
     }
 
-    // =========================================================================
-    // UnblockedUser
-    // =========================================================================
-
     public function testUnblockedUserGetType(): void
     {
         static::assertSame('core.unblocked_user', new UnblockedUser()->getType());
@@ -120,10 +112,6 @@ class BlockedUnblockedUserTest extends TestCase
         $subject->validate();
     }
 
-    // =========================================================================
-    // RegistrationEmailResent
-    // =========================================================================
-
     public function testRegistrationEmailResentGetType(): void
     {
         static::assertSame('core.registration_email_resent', new RegistrationEmailResent()->getType());
@@ -139,10 +127,6 @@ class BlockedUnblockedUserTest extends TestCase
         static::assertSame('profile_social.activity_registration_email_resent', $subject->render());
         static::assertSame('profile_social.activity_registration_email_resent', $subject->render(true));
     }
-
-    // =========================================================================
-    // UnknownActivityMessage
-    // =========================================================================
 
     public function testUnknownActivityMessageGetType(): void
     {

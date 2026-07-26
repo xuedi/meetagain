@@ -11,10 +11,6 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 
-/**
- * Attaches, detaches and lists the universal event-to-item associations, dispatching the
- * neutral association EntityAction cases after flush so subsystems can react.
- */
 readonly class ItemAssociationService
 {
     public function __construct(

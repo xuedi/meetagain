@@ -18,7 +18,7 @@ class EmailTemplateServiceTest extends TestCase
 
     public function testGetDefaultTemplatesUsesLanguageSpecificTemplateWhenItExists(): void
     {
-        // Arrange - language-prefixed paths exist; default paths also exist as fallback
+        // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(true);
         $fs->method('getFileContents')->willReturnCallback(static fn(string $p): string => str_contains($p, '/de/')
@@ -35,7 +35,7 @@ class EmailTemplateServiceTest extends TestCase
 
     public function testGetDefaultTemplatesFallsBackToDefaultTemplateWhenLanguageFileMissing(): void
     {
-        // Arrange - only default (non-language) paths exist
+        // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturnCallback(static fn(string $p): bool => !str_contains($p, '/de/'));
         $fs->method('getFileContents')->willReturnCallback(static fn(string $p): string => '<en>body:' . basename($p));
@@ -79,7 +79,7 @@ class EmailTemplateServiceTest extends TestCase
 
     public function testGetTemplateContentFallsBackToEnglishWhenLanguageMissing(): void
     {
-        // Arrange - only English translation exists
+        // Arrange
         $template = $this->buildTemplate('en', 'Welcome', '<en>body');
         $repo = $this->createStub(EmailTemplateRepository::class);
         $repo->method('findByIdentifier')->willReturn($template);
@@ -108,7 +108,7 @@ class EmailTemplateServiceTest extends TestCase
 
     public function testGetTemplateContentThrowsWhenNoTranslationsExist(): void
     {
-        // Arrange - template entity with zero translations
+        // Arrange
         $template = new EmailTemplate();
         $template->setIdentifier(EmailType::Welcome->value);
         $repo = $this->createStub(EmailTemplateRepository::class);

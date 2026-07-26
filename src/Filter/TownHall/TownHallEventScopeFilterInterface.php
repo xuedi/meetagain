@@ -5,12 +5,8 @@ namespace App\Filter\TownHall;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Narrows the set of events and members the town-hall draws data from.
- *
- * Implementations return either:
- *   null  - no opinion
- *   []    - block: zero rows
- *   array - intersect
+ * Narrows the events and members the town hall draws data from. Each getter returns
+ * null = no opinion, [] = block all, [id, ...] = allow-list.
  */
 #[AutoconfigureTag]
 interface TownHallEventScopeFilterInterface

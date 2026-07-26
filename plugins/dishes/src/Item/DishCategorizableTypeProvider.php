@@ -8,11 +8,6 @@ use Override;
 use Plugin\Dishes\Service\ConfigService;
 use Plugin\Dishes\Service\DishService;
 
-/**
- * Registers the 'dish' item type as categorizable and taggable. Orthogonal to the event-attachable
- * DishItemTypeProvider: dishes implement both seams. getTaxonomy() returns the scope-resolved dishes
- * config's taxonomy, so core reads per-scope definitions without knowing the dishes Config class.
- */
 final readonly class DishCategorizableTypeProvider implements CategorizableTypeProviderInterface
 {
     public function __construct(

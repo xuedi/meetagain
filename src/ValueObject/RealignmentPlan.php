@@ -14,6 +14,7 @@ final readonly class RealignmentPlan
         public ?int $seriesId,
         public int $anchorEventId,
         public ?EventInterval $rule,
+        public ?string $ruleSpec,
         public array $items,
     ) {}
 

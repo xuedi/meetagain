@@ -7,14 +7,6 @@ use App\Item\Taxonomy\ItemTaxonomyService;
 use App\Repository\ItemCategoryAssignmentRepository;
 use App\Repository\ItemTagAssignmentRepository;
 
-/**
- * Carries category and tag assignments across an export/import. Assignments reference definition
- * ids that live in each plugin's settings and do not travel, so an id this instance does not define
- * is dropped and counted rather than written.
- *
- * Import never overwrites what the target already classified: a category is only written to an item
- * that has none, and tags are merged with the ones already assigned.
- */
 readonly class ItemTaxonomyPortability
 {
     public function __construct(
@@ -48,6 +40,7 @@ readonly class ItemTaxonomyPortability
      * @param array<int, int> $refToItemId
      * @return int assignments dropped because this instance does not define the id
      */
+    // Never overwrites: a category is written only to an item with none, and tags merge with existing
     public function import(string $itemType, array $block, array $refToItemId): int
     {
         $taxonomy = $this->registry->providerFor($itemType)?->getTaxonomy();

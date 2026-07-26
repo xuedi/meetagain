@@ -5,10 +5,6 @@ namespace App;
 use App\Enum\EntityAction;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Dispatches entity lifecycle actions to all registered handlers.
- * Follows the same pattern as EventFilterService, CmsFilterService, etc.
- */
 readonly class EntityActionDispatcher
 {
     /**
@@ -19,10 +15,6 @@ readonly class EntityActionDispatcher
         private iterable $handlers,
     ) {}
 
-    /**
-     * Dispatch an action to all registered handlers.
-     * Called by core controllers after entity operations complete.
-     */
     public function dispatch(EntityAction $action, int $entityId): void
     {
         foreach ($this->handlers as $handler) {

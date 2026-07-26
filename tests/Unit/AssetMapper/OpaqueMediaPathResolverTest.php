@@ -22,7 +22,7 @@ class OpaqueMediaPathResolverTest extends TestCase
         // Act
         $result = $this->resolver->resolvePublicPath($logicalPath);
 
-        // Assert: starts with /media/ and preserves extension
+        // Assert
         $this->assertStringStartsWith('/media/', $result);
         $this->assertStringEndsWith('.png', $result);
     }
@@ -36,7 +36,7 @@ class OpaqueMediaPathResolverTest extends TestCase
         $first = $this->resolver->resolvePublicPath($logicalPath);
         $second = $this->resolver->resolvePublicPath($logicalPath);
 
-        // Assert: same input always produces the same URL
+        // Assert
         $this->assertSame($first, $second);
     }
 
@@ -81,7 +81,7 @@ class OpaqueMediaPathResolverTest extends TestCase
 
     public function testMjsExtensionIsNormalizedToJs(): void
     {
-        // Arrange: .mjs is served as JavaScript; URL normalizes to .js to match MediaCompileCommand output
+        // Arrange
         $logicalPath = 'js/module.mjs';
 
         // Act
@@ -119,13 +119,13 @@ class OpaqueMediaPathResolverTest extends TestCase
 
     public function testScssExtensionIsNormalizedToCss(): void
     {
-        // Arrange: SCSS logical paths are compiled to CSS by sass:build; URL must reflect the actual content type
+        // Arrange
         $logicalPath = 'styles/app.scss';
 
         // Act
         $result = $this->resolver->resolvePublicPath($logicalPath);
 
-        // Assert: extension in URL is .css, not .scss
+        // Assert
         $this->assertStringEndsWith('.css', $result);
         $this->assertStringStartsWith('/media/', $result);
     }

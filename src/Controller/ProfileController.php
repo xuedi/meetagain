@@ -63,7 +63,6 @@ final class ProfileController extends AbstractController
             return $this->redirectToRoute('app_profile');
         }
 
-        // Apply user-scoped content filtering (group memberships + domain context)
         $filterResult = $this->eventFilterService->getEventIdFilterForUserProfile($user);
         $eventIds = $filterResult->getEventIds();
 

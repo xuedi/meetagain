@@ -7,9 +7,6 @@ use App\Emails\EmailGuardResult;
 use App\Emails\EmailGuardRuleInterface;
 use App\Entity\User;
 
-/**
- * Used when the recipient lives under the 'recipient' key (NotificationMessage), not 'user'.
- */
 final readonly class RecipientKeyUserPresentRule implements EmailGuardRuleInterface
 {
     public function getName(): string

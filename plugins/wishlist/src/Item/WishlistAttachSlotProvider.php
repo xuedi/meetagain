@@ -7,10 +7,6 @@ use App\Item\ItemAttachSlotProviderInterface;
 use Override;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * Contributes the "pick from wishlist" action to the core attach control, linking to the
- * ranked-backlog picker scoped to that event and item type.
- */
 final readonly class WishlistAttachSlotProvider implements ItemAttachSlotProviderInterface
 {
     public function __construct(

@@ -5,11 +5,6 @@ namespace App\Filter\Admin\Host;
 use App\Filter\Host\HostFilterResult;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composite admin host list filter service.
- * Collects all registered AdminHostListFilterInterface implementations.
- * Combines multiple filters using AND logic for host ID restrictions.
- */
 readonly class AdminHostListFilterService
 {
     /**
@@ -20,10 +15,6 @@ readonly class AdminHostListFilterService
         private iterable $filters,
     ) {}
 
-    /**
-     * Get the combined host ID filter from all registered filters.
-     * Uses intersection (AND) logic: a host must pass ALL filters.
-     */
     public function getHostIdFilter(): HostFilterResult
     {
         $resultSet = null;
@@ -55,11 +46,6 @@ readonly class AdminHostListFilterService
         return new HostFilterResult($resultSet, $hasActiveFilter);
     }
 
-    /**
-     * Check if a host is accessible according to all registered filters.
-     * Any filter returning false will deny access.
-     * Returns true only if all filters allow (or have no opinion).
-     */
     public function isHostAccessible(int $hostId): bool
     {
         foreach ($this->getSortedFilters() as $filter) {
@@ -74,7 +60,6 @@ readonly class AdminHostListFilterService
     }
 
     /**
-     * Get combined debug context from all registered filters.
      * @return array<string, mixed>
      */
     public function getDebugContext(int $hostId): array

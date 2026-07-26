@@ -95,7 +95,7 @@ class GlossaryServiceTest extends TestCase
         // Act
         $service->deleteNew(1);
 
-        // Assert — mock verifies remove()/flush() were called
+        // Assert
     }
 
     public function testDeleteRemovesEntryAndItsPendingProposals(): void

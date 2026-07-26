@@ -138,7 +138,6 @@ final class ImageUploadController extends AbstractController
                 $this->em->flush();
                 $this->entityActionDispatcher->dispatch(EntityAction::CreateImage, $image->getId());
 
-                // associate image with the entity
                 $entity->setImage($image);
                 $this->em->persist($entity);
                 $this->em->flush();

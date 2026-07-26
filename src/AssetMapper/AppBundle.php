@@ -5,13 +5,6 @@ namespace App\AssetMapper;
 use RuntimeException;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 
-/**
- * Source of truth for the global JS bundle compiled into public/media/.
- *
- * The public URL is a content hash of the bundle's source files. When any
- * source changes, the URL changes — so browsers cannot serve a stale bundle
- * out of the long /media/ cache window (Caddyfile sets max-age=86400).
- */
 final class AppBundle
 {
     /**

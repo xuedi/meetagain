@@ -40,7 +40,6 @@ final class MemberController extends AbstractController
         $offset = ($page - 1) * self::PAGE_SIZE;
         $currentUser = $this->getUser();
 
-        // Get member filter from all registered filters
         $filterResult = $this->memberFilterService->getUserIdFilter();
         $restrictToUserIds = $filterResult->getUserIds();
 
@@ -81,12 +80,10 @@ final class MemberController extends AbstractController
                 throw $this->createNotFoundException();
             }
 
-            // If the target user has blocked the current user, deny access
             if ($this->blockingService->hasBlocked($userDetails, $currentUser)) {
                 throw $this->createAccessDeniedException();
             }
 
-            // Check if current user has blocked the target (to show unblock button)
             $hasBlockedTarget = $this->blockingService->hasBlocked($currentUser, $userDetails);
 
             return $this->render(

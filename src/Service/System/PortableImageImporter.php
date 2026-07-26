@@ -11,11 +11,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use finfo;
 
-/**
- * Turns a file extracted from an import archive into a persisted Image, deduplicating on the SHA1
- * of its content so the same picture referenced from several rows lands once. Thumbnails stay
- * ungenerated until first requested.
- */
 readonly class PortableImageImporter
 {
     public function __construct(

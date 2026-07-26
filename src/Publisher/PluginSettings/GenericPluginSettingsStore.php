@@ -9,12 +9,6 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 
-/**
- * Global-scope store backed by the single plugin_settings JSON table. An adopting plugin
- * whose DTO implements PluginSettingsData needs no entity or migration of its own. Lowest
- * priority, so any custom store outranks it. Handles only the global scope; override
- * scopes are owned by whoever supplies the scope provider and its store.
- */
 readonly class GenericPluginSettingsStore implements PluginSettingsStoreInterface
 {
     public function __construct(

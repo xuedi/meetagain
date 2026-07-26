@@ -9,11 +9,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 interface ActivityMetaEnricherInterface
 {
     /**
-     * Enrich activity meta with additional context before the activity is persisted.
-     * Return only the keys to add. Original caller keys always take precedence.
-     * Must not throw — enrichment is best-effort.
-     *
-     * Key naming convention: use '_<plugin_key>_' prefix to avoid collisions.
+     * Returns only the keys to add, prefixed '_<owner_key>_'. Caller keys win; must not throw.
      *
      * @param array<string, mixed> $meta
      * @return array<string, mixed>

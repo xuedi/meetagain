@@ -6,12 +6,7 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
-/**
- * Extended Filesystem service that adds functionality not available in Symfony's Filesystem.
- * This class extends Symfony's Filesystem and adds methods from the original FilesystemService.
- *
- * @codeCoverageIgnore
- */
+/** @codeCoverageIgnore */
 class ExtendedFilesystem extends SymfonyFilesystem
 {
     public function __construct(

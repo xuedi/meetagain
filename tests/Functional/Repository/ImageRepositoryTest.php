@@ -30,13 +30,11 @@ class ImageRepositoryTest extends KernelTestCase
         $uploader = $this->em->getRepository(User::class)->findOneBy([]);
         static::assertInstanceOf(User::class, $uploader);
 
-        // Used more than once with a base alt set - still a candidate, since completeness is decided in PHP.
         $highUsage = $this->persistImage($uploader, 'a base alt');
         $this->persistLocation($highUsage, 42001);
         $this->persistLocation($highUsage, 42002);
         $this->persistLocation($highUsage, 42003);
 
-        // Single-usage image stays below the "used more than once" gate.
         $singleUsage = $this->persistImage($uploader, null);
         $this->persistLocation($singleUsage, 42004);
 

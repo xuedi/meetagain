@@ -10,11 +10,6 @@ use Override;
 use Plugin\Films\Service\FilmService;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * Adds the public film list and a detail entry per film to the sitemap.
- * Routes through FilmService::getList() so the item filter chain restricts
- * the result set when a visibility filter narrows the allowed films.
- */
 final readonly class SitemapPublisher implements SitemapPublisherInterface
 {
     public function __construct(

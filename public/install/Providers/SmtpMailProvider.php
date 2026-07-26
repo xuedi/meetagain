@@ -1,11 +1,5 @@
 <?php declare(strict_types=1);
 
-/**
- * SMTP Mail Provider.
- *
- * Custom SMTP server configuration with optional connection testing.
- * Supports TLS, SSL, and unencrypted connections.
- */
 class SmtpMailProvider implements MailProvider
 {
     public function getName(): string
@@ -38,7 +32,6 @@ class SmtpMailProvider implements MailProvider
             return false;
         }
 
-        // Optionally test SMTP connection if requested
         if (!empty($postData['test_smtp'])) {
             $port = (int) ($postData['smtp_port'] ?? 587);
             $user = $postData['smtp_user'] ?? '';
@@ -99,9 +92,6 @@ class SmtpMailProvider implements MailProvider
         return true;
     }
 
-    /**
-     * Test SMTP server connection.
-     */
     private function testSmtpConnection(
         string $host,
         int $port,

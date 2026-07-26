@@ -39,7 +39,6 @@ class UnFollowedUserTest extends TestCase
         $subject = new UnFollowedUser();
         $subject->injectServices($router, $this->imageService, $this->translator, $meta, $userNames);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(UnFollowedUser::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

@@ -198,13 +198,11 @@ class UserFixture extends AbstractFixture
 
             $manager->persist($user);
 
-            // upload file and create thumbnails
             $imageFile = __DIR__ . '/User/' . $name . '.jpg';
             $uploadedImage = new UploadedFile($imageFile, $user->getId() . '.jpg');
             $image = $this->imageService->upload($uploadedImage, $user, ImageType::ProfilePicture);
             $this->imageService->createThumbnails($image, ImageType::ProfilePicture);
 
-            // associate image with a user
             $user->setImage($image);
             $manager->persist($user);
 
@@ -212,7 +210,6 @@ class UserFixture extends AbstractFixture
         }
         $manager->flush();
 
-        // after all references are set, we can add followers and following
         foreach ($this->getData() as $data) {
             $name = $data['name'];
             $user = $this->getRefUser($name);

@@ -12,7 +12,7 @@ class MigrateGlossaryCategoriesTest extends TestCase
 {
     public function testBackfillsAssignmentsFromLegacyColumn(): void
     {
-        // Arrange: the legacy category column is present, one entry has category 5, not yet assigned
+        // Arrange
         $connection = $this->createMock(Connection::class);
         $connection->method('fetchOne')->willReturnCallback(
             static fn(string $sql): mixed => str_contains($sql, 'information_schema') ? 1 : false,
@@ -28,12 +28,12 @@ class MigrateGlossaryCategoriesTest extends TestCase
         // Act
         $this->makeSubject($connection)->execute();
 
-        // Assert - insert asserted via mock
+        // Assert
     }
 
     public function testSkipsBackfillWhenLegacyColumnAbsentButRewritesConfig(): void
     {
-        // Arrange: no category column (dev/test schema), config still in the old single-label shape
+        // Arrange
         $oldConfig = json_encode(['secondaryEnabled' => true, 'categories' => [['id' => 0, 'label' => 'Greeting']]]);
         $connection = $this->createMock(Connection::class);
         $connection->method('fetchOne')->willReturn(0); // information_schema: column absent
@@ -55,12 +55,12 @@ class MigrateGlossaryCategoriesTest extends TestCase
         // Act
         $this->makeSubject($connection)->execute();
 
-        // Assert - update asserted via callback
+        // Assert
     }
 
     public function testIdempotentConfigRewriteWhenAlreadyMigrated(): void
     {
-        // Arrange: config already carries a taxonomy key
+        // Arrange
         $newConfig = json_encode(['taxonomy' => ['categoriesEnabled' => true, 'categories' => [], 'tags' => []]]);
         $connection = $this->createMock(Connection::class);
         $connection->method('fetchOne')->willReturn(0);
@@ -70,7 +70,7 @@ class MigrateGlossaryCategoriesTest extends TestCase
         // Act
         $this->makeSubject($connection)->execute();
 
-        // Assert - update never called (no-op)
+        // Assert
     }
 
     private function makeSubject(Connection $connection): MigrateGlossaryCategories

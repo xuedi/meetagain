@@ -27,10 +27,9 @@ readonly class BlockingService
         }
 
         if ($this->blockRepo->isBlocked($blocker, $blocked)) {
-            return; // Already blocked
+            return;
         }
 
-        // Remove any following relationship in both directions
         $blocker->removeFollowing($blocked);
         $blocker->removeFollower($blocked);
         $blocked->removeFollowing($blocker);
@@ -57,7 +56,7 @@ readonly class BlockingService
         ]);
 
         if ($block === null) {
-            return; // Not blocked
+            return;
         }
 
         $this->em->remove($block);
@@ -71,9 +70,6 @@ readonly class BlockingService
         return $this->blockRepo->isBlockedEitherWay($user1, $user2);
     }
 
-    /**
-     * Check if blocker has blocked the blocked user (one-way check).
-     */
     public function hasBlocked(User $blocker, User $blocked): bool
     {
         return $this->blockRepo->isBlocked($blocker, $blocked);
@@ -93,8 +89,6 @@ readonly class BlockingService
     }
 
     /**
-     * Get all user IDs that should be excluded from lists.
-     *
      * @return int[]
      */
     public function getExcludedUserIds(User $user): array

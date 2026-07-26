@@ -54,7 +54,6 @@ class SupportRequestReplyTest extends WebTestCase
         ]);
         static::assertNotEmpty($queued, 'A support_response email should be queued for the guest');
 
-        // Reset
         $this->deleteQueuedFor($em, self::GUEST_EMAIL);
         $this->deleteRequest($em, $id);
     }
@@ -66,7 +65,7 @@ class SupportRequestReplyTest extends WebTestCase
         $this->loginAsAdmin($client);
         $id = $this->createRequest($client, self::GUEST_EMAIL);
 
-        // Act - reply once, then revisit the detail page
+        // Act
         $crawler = $client->request('GET', '/en/admin/support/' . $id);
         $form = $crawler
             ->selectButton('Send response')
@@ -76,13 +75,12 @@ class SupportRequestReplyTest extends WebTestCase
         $client->submit($form);
         $crawler = $client->request('GET', '/en/admin/support/' . $id);
 
-        // Assert - the stored response is shown in the locked view and no reply form remains
+        // Assert
         static::assertStringContainsString('First and only answer.', $crawler->html());
         static::assertStringContainsString('Response sent', $crawler->html());
         static::assertCount(0, $crawler->selectButton('Send response'));
         static::assertStringNotContainsString('/reply-email', $crawler->html());
 
-        // Reset
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         $this->deleteQueuedFor($em, self::GUEST_EMAIL);
         $this->deleteRequest($em, $id);
@@ -127,7 +125,6 @@ class SupportRequestReplyTest extends WebTestCase
         static::assertNotNull($answer, 'The admin answer should be sent to the member');
         static::assertSame('Here is the answer to your member question.', (string) $answer->getContent());
 
-        // Reset
         $em->remove($question);
         $em->remove($answer);
         $em->flush();
@@ -157,7 +154,6 @@ class SupportRequestReplyTest extends WebTestCase
             'No email should be queued without a valid CSRF token',
         );
 
-        // Reset
         $this->deleteRequest($em, $id);
     }
 

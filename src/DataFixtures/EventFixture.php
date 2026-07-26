@@ -33,7 +33,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
     {
         $this->start();
 
-        // Load the preview image once and reuse it for all events
         $imageFile = __DIR__ . '/Event/preview_wednesday_meetup.jpg';
         $uploadedImage = new UploadedFile($imageFile, 'preview_wednesday_meetup.jpg');
         $previewImage = $this->imageService->upload($uploadedImage, $this->getRefUser(UserFixture::ADMIN), ImageType::EventTeaser);
@@ -59,11 +58,9 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                 $event->addRsvp($this->getRefUser($rsvpUser));
             }
 
-            // Use the pre-loaded image instead of uploading each time
             $event->setPreviewImage($previewImage);
             $manager->persist($event);
 
-            // add contents
             foreach ($data['content'] as $language => $contentData) {
                 $eventTranslation = new EventTranslation();
                 $eventTranslation->setEvent($event);
@@ -74,7 +71,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                 $manager->persist($eventTranslation);
             }
 
-            // add comments
             foreach ($data['comments'] as $commentData) {
                 $comment = new Comment();
                 $comment->setEvent($event);
@@ -119,7 +115,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
     private function getData(): array
     {
         return [
-            // 1. Weekly Go Study Group - Main recurring event
             [
                 'start' => $this->getWednesdayMeetupDate(),
                 'stop' => $this->getWednesdayMeetupDate()->modify('+3 hour'),
@@ -185,7 +180,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                 ],
             ],
 
-            // 2. Berlin Go Tournament 2026
             [
                 'start' => new DateTime('now')
                     ->modify('+2 months')
@@ -244,7 +238,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                 ],
             ],
 
-            // 3. Beginner Workshop: Learn Go
             [
                 'start' => new DateTime('now')
                     ->modify('+1 month')
@@ -289,7 +282,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                 'comments' => [],
             ],
 
-            // 4. Online Simultaneous Game with 5-Dan
             [
                 'start' => new DateTime('now')
                     ->modify('+3 weeks')
@@ -346,7 +338,6 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                 ],
             ],
 
-            // 5. Weekend Go Retreat
             [
                 'start' => new DateTime('now')
                     ->modify('+6 weeks')

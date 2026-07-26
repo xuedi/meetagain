@@ -35,14 +35,12 @@ class EventImageUploadedTest extends TestCase
         $meta = ['event_id' => $eventId, 'images' => $imageCount];
         $eventNames = [$eventId => $eventName];
 
-        // Use a focused local mock for router to assert interaction
         $router = $this->createMock(RouterInterface::class);
         $router->expects($this->once())->method('generate')->with('app_event_details', ['id' => $eventId])->willReturn($eventUrl);
 
         $subject = new EventImageUploaded();
         $subject->injectServices($router, $this->imageService, $this->translator, $meta, [], $eventNames);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(EventImageUploaded::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

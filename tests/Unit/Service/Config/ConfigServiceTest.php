@@ -67,7 +67,7 @@ class ConfigServiceTest extends TestCase
 
     public function testGetThemeColorsSkipsMissingScssVariables(): void
     {
-        // Arrange - only $primary is present in this SCSS
+        // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('getFileContents')->willReturn('$primary: #112233;');
         $service = $this->buildService($fs);
@@ -98,7 +98,7 @@ class ConfigServiceTest extends TestCase
         // Act
         $service->saveColors($colors);
 
-        // Assert - unchanged file written back
+        // Assert
         static::assertSame(self::SCSS_FIXTURE, $written);
     }
 
@@ -130,7 +130,6 @@ class ConfigServiceTest extends TestCase
         static::assertNotNull($written);
         static::assertStringContainsString('$primary: #ff00ff;', $written);
         static::assertStringContainsString('$link: #00ffff;', $written);
-        // Untouched keys keep their original values
         static::assertStringContainsString('$info: #aabbcc;', $written);
     }
 
@@ -149,7 +148,7 @@ class ConfigServiceTest extends TestCase
         // Act
         $service->saveColors(['color_primary' => '#ff00ff']);
 
-        // Assert - no write attempted when read failed
+        // Assert
         static::assertSame(0, $putCalls);
     }
 

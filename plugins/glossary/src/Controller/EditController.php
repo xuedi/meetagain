@@ -38,7 +38,7 @@ final class EditController extends AbstractGlossaryController
         }
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->service->detach($newGlossary); // dont auto save entity
+            $this->service->detach($newGlossary); // detach first: a managed entity would be flushed with the request's changes
             if (!$this->getUser() instanceof User) {
                 throw new AuthenticationException('Only for logged in users');
             }
@@ -46,10 +46,8 @@ final class EditController extends AbstractGlossaryController
             $categoryId = $form->has('category') ? $this->intOrNull($form->get('category')->getData()) : null;
 
             if ($this->isGranted('ROLE_ORGANIZER')) {
-                // Managers can update directly
                 $this->service->update($newGlossary, $id, $categoryId);
             } else {
-                // Regular users propose changes for review
                 $this->changeProposalService->propose(
                     GlossaryCategorizableTypeProvider::ITEM_TYPE,
                     $id,

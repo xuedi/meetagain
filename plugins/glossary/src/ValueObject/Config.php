@@ -5,12 +5,6 @@ namespace Plugin\Glossary\ValueObject;
 use App\Item\Taxonomy\TaxonomyConfig;
 use App\Publisher\PluginSettings\PluginSettingsData;
 
-/**
- * Effective shape of one glossary: whether the secondary transcription field is shown, how the
- * primary/secondary/definition fields are labelled, and the shared per-language category taxonomy
- * (tags unused, but available without further schema work). The neutral default is term +
- * definition only (secondary off, no categories, shipped labels).
- */
 final class Config implements PluginSettingsData
 {
     private bool $secondaryEnabled = false;

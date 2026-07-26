@@ -6,21 +6,6 @@ use App\DataHotfix\DataHotfixInterface;
 use Doctrine\DBAL\Connection;
 use Override;
 
-/**
- * One-shot production migration from the removed dinnerclub schema to the dishes schema.
- *
- * Runs entirely on raw SQL so it does not depend on the (deleted) dinnerclub entity mappings.
- * The dishes tables are created by PluginDishesMigrations; the old dinnerclub tables still exist
- * on production until a later follow-up migration drops them. Steps, in order:
- *   1. copy `dish` -> `plg_dishes_dish` (dropping approved/suggestions), preserving ids
- *   2. copy `dish_translation` -> `plg_dishes_dish_translation`, preserving ids
- *   3. copy `dinnerclub_dish_image` -> `plg_dishes_dish_image`, preserving ids (same core Image rows)
- *   4. flatten each `dinner`/`dinner_course`/`dinner_course_item` into `event_item_association`
- *      rows (item_type='dish', position from course+item order, section_label from course name)
- *
- * Ids are preserved so the association item_id equals the original dish id and every step is
- * idempotent by primary-key existence. No-ops on fresh installs where the source tables are absent.
- */
 readonly class MigrateDinnerclubToDishes implements DataHotfixInterface
 {
     public function __construct(

@@ -121,7 +121,6 @@ final class TemplatesController extends AbstractEmailController implements Admin
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Save translations for each language
             foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
                 $translation = $this->getOrCreateTranslation($languageCode, $template->getId());
                 $translation->setEmailTemplate($template);
@@ -216,7 +215,6 @@ final class TemplatesController extends AbstractEmailController implements Admin
 
         $identifier = $template->getIdentifier();
 
-        // Reset translations for all enabled languages with language-specific defaults
         foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
             $langDefaults = $this->templateService->getDefaultTemplates($languageCode);
 

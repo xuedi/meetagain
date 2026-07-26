@@ -169,7 +169,7 @@ class AppStateServiceTest extends TestCase
         // Act
         $this->makeService($em)->set('existing_key', 'updated_value');
 
-        // Assert: value was mutated on the existing entity
+        // Assert
         static::assertSame('updated_value', $existing->getValue());
     }
 

@@ -25,7 +25,7 @@ class CmsRepositoryTest extends KernelTestCase
         // Act
         $slugs = $this->repo->findLockedSlugs();
 
-        // Assert - the canonical platform-wide legal pages are locked
+        // Assert
         static::assertContains('imprint', $slugs);
         static::assertContains('privacy', $slugs);
     }

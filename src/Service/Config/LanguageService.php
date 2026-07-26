@@ -59,37 +59,20 @@ readonly class LanguageService
         return $codes === [] ? 'en' : implode('|', $codes);
     }
 
-    /**
-     * Doctrine entities with proxy associations cannot be safely round-tripped
-     * through the application cache: deserializing detaches the `tileImage`
-     * proxy and reading `image.hash` returns null, breaking the language tile
-     * render. The query against `language` is a single indexed scan on a tiny
-     * table; Doctrine's first-level cache further deduplicates within a
-     * request, so skipping the app cache here is cheap.
-     *
-     * @return Language[]
-     */
+    // Never app-cached: deserializing detaches the tileImage proxy, so image.hash reads back null
+    /** @return Language[] */
     public function getAllLanguages(): array
     {
         return $this->languageRepo->findAllOrdered();
     }
 
-    /**
-     * See `getAllLanguages()` for why entities are not cached.
-     *
-     * @return Language[]
-     */
+    /** @return Language[] */
     public function getEnabledLanguages(): array
     {
         return $this->languageRepo->findEnabledOrdered();
     }
 
     /**
-     * Entity counterpart of `getFilteredEnabledCodes()`: enabled `Language`
-     * entities restricted to codes the frontend filter chain allows. Use this
-     * wherever language tiles must respect the same filters as the navbar
-     * selector.
-     *
      * @return Language[]
      */
     public function getFilteredEnabledLanguages(): array
@@ -105,9 +88,6 @@ readonly class LanguageService
     }
 
     /**
-     * Get enabled language codes filtered by current context.
-     * This applies any registered language filters (e.g., from plugins).
-     *
      * @return list<string> Array of filtered language codes
      */
     public function getFilteredEnabledCodes(): array
@@ -129,18 +109,12 @@ readonly class LanguageService
         return $result === [] ? $enabledCodes : $result; // Safety: never return empty
     }
 
-    /**
-     * Check if a language code is valid in the filtered context.
-     */
     public function isFilteredValidCode(string $code): bool
     {
         return in_array($code, $this->getFilteredEnabledCodes(), true);
     }
 
     /**
-     * Get enabled language codes filtered for admin context.
-     * This applies admin-specific language filters (e.g., group language restrictions in admin forms).
-     *
      * @return list<string> Array of filtered language codes
      */
     public function getAdminFilteredEnabledCodes(): array
@@ -162,18 +136,11 @@ readonly class LanguageService
         return $result === [] ? $enabledCodes : $result; // Safety: never return empty
     }
 
-    /**
-     * Check if a language code is valid in the admin filtered context.
-     */
     public function isAdminFilteredValidCode(string $code): bool
     {
         return in_array($code, $this->getAdminFilteredEnabledCodes(), true);
     }
 
-    /**
-     * Get the default locale for the current filtered context.
-     * Prefers 'en' if available, otherwise returns the first filtered code.
-     */
     public function getFilteredDefaultLocale(): string
     {
         $filteredCodes = $this->getFilteredEnabledCodes();
@@ -181,12 +148,10 @@ readonly class LanguageService
             return 'en';
         }
 
-        return $filteredCodes[0] ?? 'en'; // First by sort order, or 'en' as absolute fallback
+        return $filteredCodes[0] ?? 'en';
     }
 
     /**
-     * Build an hreflang alternate-language list for the given URI.
-     *
      * @return array<string, string> locale => URL
      */
     public function getAltLangList(string $currentLocale, string $currentUri): array

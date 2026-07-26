@@ -8,10 +8,6 @@ use Override;
 use Plugin\Films\Service\ConfigService;
 use Plugin\Films\Service\FilmService;
 
-/**
- * Registers the 'film' item type as categorizable and taggable, reading its scope-resolved
- * definitions from the films taxonomy config. Orthogonal to the event-attachable FilmItemTypeProvider.
- */
 final readonly class FilmCategorizableTypeProvider implements CategorizableTypeProviderInterface
 {
     public function __construct(

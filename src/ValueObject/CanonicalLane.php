@@ -24,10 +24,6 @@ final readonly class CanonicalLane
     }
 
     /**
-     * The lane as an operator scans it: every occurrence that moved the canonical target keeps its
-     * own segment, and the untouched runs between them collapse into one. A series running for
-     * years is otherwise hundreds of indistinguishable chips.
-     *
      * @return list<CanonicalLaneSegment>
      */
     public function segments(): array

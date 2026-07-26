@@ -30,8 +30,6 @@ class ImageLocationServiceTest extends TestCase
         );
     }
 
-    // ---- addLocation / removeLocation ----
-
     public function testAddLocationDelegatesToRepo(): void
     {
         // Arrange
@@ -75,8 +73,6 @@ class ImageLocationServiceTest extends TestCase
         $service->removeLocation(10, ImageType::EventTeaser, 20);
     }
 
-    // ---- discover() ----
-
     public function testDiscoverCallsSyncOnEveryDefinition(): void
     {
         // Arrange
@@ -106,7 +102,7 @@ class ImageLocationServiceTest extends TestCase
 
         $service = $this->createService(registry: $registry, logger: $loggerMock);
 
-        // Act: must not throw
+        // Act
         $service->discover();
     }
 
@@ -142,8 +138,6 @@ class ImageLocationServiceTest extends TestCase
         // Act
         $service->discover();
     }
-
-    // ---- resolveEditLink() ----
 
     public function testResolveEditLinkDelegatesToDefinition(): void
     {
@@ -185,8 +179,6 @@ class ImageLocationServiceTest extends TestCase
         // Act & Assert
         static::assertNull($service->resolveEditLink($location));
     }
-
-    // ---- locate() ----
 
     public function testLocateDelegatesToDefinition(): void
     {

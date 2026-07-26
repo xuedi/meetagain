@@ -47,7 +47,7 @@ class EmailDeliveryStatusSyncServiceTest extends TestCase
 
     public function testSyncPendingUpdatesStatusForLogsThatExist(): void
     {
-        // Arrange - 2 queue entries, both have provider logs
+        // Arrange
         $email1 = $this->makeQueueEntry(1, 'tx-1');
         $email2 = $this->makeQueueEntry(2, 'tx-2');
 
@@ -82,7 +82,7 @@ class EmailDeliveryStatusSyncServiceTest extends TestCase
 
     public function testSyncPendingSkipsEntriesWithNoMatchingLog(): void
     {
-        // Arrange - 2 entries, only one has a log
+        // Arrange
         $email1 = $this->makeQueueEntry(1, 'tx-1');
         $email2 = $this->makeQueueEntry(2, 'missing');
 
@@ -171,7 +171,7 @@ class EmailDeliveryStatusSyncServiceTest extends TestCase
 
     public function testRunCronTaskCatchesExceptions(): void
     {
-        // Arrange - config throws
+        // Arrange
         $config = $this->createStub(ConfigService::class);
         $config->method('isEmailDeliverySyncEnabled')->willThrowException(new RuntimeException('config blew up'));
 

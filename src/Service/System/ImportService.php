@@ -21,12 +21,14 @@ use App\Enum\ImageType;
 use App\Enum\MenuLocation;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
+use App\Exception\Event\InvalidRecurrencePatternException;
 use App\ExtendedFilesystem;
 use App\Item\Portability\ItemImportContext;
 use App\Item\Portability\ItemPortabilityRegistry;
 use App\Item\Portability\ItemTaxonomyPortability;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
+use App\ValueObject\RecurrencePattern;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -91,6 +93,7 @@ readonly class ImportService
 
             $this->em->flush();
 
+            // After the flush: a contributor needs the generated ids, and taxonomy re-keying needs its ref map
             $itemsByType = $this->importItems($data['items'] ?? [], $tempDir, $systemUser, $counts);
 
             return new ImportSummary(
@@ -224,6 +227,7 @@ readonly class ImportService
             $series = new EventSeries();
             $series->setName($name !== '' ? $name : 'Imported series');
             $series->setRule($rule);
+            $series->setRuleSpec($this->readRuleSpec($data, $rule));
             $series->setCreatedAt(new DateTimeImmutable());
 
             $this->em->persist($series);
@@ -386,9 +390,6 @@ readonly class ImportService
     }
 
     /**
-     * Item sections run after the core flush: a contributor needs the generated ids to build its
-     * ref map, and the taxonomy re-keying needs that map in turn.
-     *
      * @param array<string, mixed> $itemsData
      * @param array<string, int> $counts
      * @return array<string, array{created: int, matched: int}>
@@ -472,6 +473,27 @@ readonly class ImportService
         }
 
         return null;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function readRuleSpec(array $data, ?EventInterval $rule): ?string
+    {
+        if (EventInterval::Custom !== $rule) {
+            return null;
+        }
+
+        $spec = trim((string) ($data['ruleSpec'] ?? ''));
+        if ('' === $spec) {
+            return null;
+        }
+
+        try {
+            return RecurrencePattern::fromRfcString($spec)->toRfcString();
+        } catch (InvalidRecurrencePatternException) {
+            return null;
+        }
     }
 
     private function findEventIntervalByName(string $name): ?EventInterval

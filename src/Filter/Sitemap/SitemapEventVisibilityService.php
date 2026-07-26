@@ -4,10 +4,6 @@ namespace App\Filter\Sitemap;
 
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composite service: events are emitted only if every registered filter agrees.
- * Any implementation returning false suppresses events from the sitemap.
- */
 readonly class SitemapEventVisibilityService
 {
     /**

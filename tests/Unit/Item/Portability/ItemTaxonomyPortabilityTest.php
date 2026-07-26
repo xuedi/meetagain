@@ -13,7 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class ItemTaxonomyPortabilityTest extends TestCase
 {
-    /** A legacy "no category" row carries id 0, which is not a definition id and must not travel. */
     public function testExportReadsBothAssignmentTablesKeyedBySourceItemId(): void
     {
         // Arrange
@@ -70,7 +69,7 @@ class ItemTaxonomyPortabilityTest extends TestCase
         // Act
         $dropped = $portability->import('dish', $block, [12 => 91]);
 
-        // Assert - the unknown category and the unknown tag
+        // Assert
         self::assertSame(2, $dropped);
     }
 

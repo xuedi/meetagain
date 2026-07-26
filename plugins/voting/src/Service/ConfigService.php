@@ -5,10 +5,6 @@ namespace Plugin\Voting\Service;
 use App\Publisher\PluginSettings\PluginSettingsResolver;
 use Plugin\Voting\ValueObject\Config;
 
-/**
- * Single read path for the effective voting config in the current request. Delegates to the
- * resolver (per-scope override, else global, else neutral default) and memoizes.
- */
 class ConfigService
 {
     private ?Config $memo = null;

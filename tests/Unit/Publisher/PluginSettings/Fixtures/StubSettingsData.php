@@ -4,9 +4,6 @@ namespace Tests\Unit\Publisher\PluginSettings\Fixtures;
 
 use App\Publisher\PluginSettings\PluginSettingsData;
 
-/**
- * A minimal DTO proving the generic store works independently of any real plugin.
- */
 final class StubSettingsData implements PluginSettingsData
 {
     public function __construct(

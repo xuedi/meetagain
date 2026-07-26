@@ -1,0 +1,139 @@
+# Areas of the core intricate enough that prose earns its place, per the project's comment policy.
+# One line per symbol, and every line needs a reason. Enforced by comment-guard on every commit;
+# adding an entry is a deliberate decision, never an automatic fix.
+#
+# Format: path/relative/to/repo/root.php::symbol // why this code needs prose
+
+# --- Tooling and entry points ---
+bin/check-get-routes.php::routeIsGetReachable // Symfony rule: an omitted `methods:` means all verbs, so absence is not "not GET"
+bin/check-get-routes.php::findUnguardedMutationCalls // name collision: `$form->remove()` is a Form call, not the EntityManager one the scan hunts
+config/packages/asset_mapper.php:: // upstream layout: only Bulma's sass/ tree is an input, the rest is pre-built output
+
+# --- Standalone web installer (runs before composer install, no autoloading) ---
+public/install/Installer.php::createUser // magic literal: the installer cannot reach the UserStatus enum, so the status column is a bare int
+public/install/TemplateRenderer.php::render // required ordering: loops run first because conditionals inside a loop body need the loop variables
+
+# --- Activity and notifications ---
+src/Activity/ActivityService.php::log // merge direction: caller keys must survive the defaults, and array order decides that
+src/Activity/NotificationService.php::sendRsvp // deliberate swallow: a cache write failure must not stop the notification going out
+src/Service/Notification/User/CoreNotificationProvider.php::getNotifications // the guard above it is the boundary, and everything past it is admin-only
+
+# --- Admin surfaces ---
+src/Admin/Top/Infos/AdminTopInfoHtml.php::__construct // XSS constraint: the renderer emits this with |raw, so callers own the escaping
+src/Service/Admin/AdminNavigationService.php::getSidebarSections // required ordering for routeExists(), plus why links dedup by route
+
+# --- Assets ---
+src/AssetMapper/AppBundle.php::SOURCES // required ordering: ma-fetch defines maFetch, which the later sources depend on
+src/Controller/AbstractController.php::getResponse // app.js is built by MediaCompileCommand, so AssetMapper's versioning does not apply to it
+
+# --- Controllers ---
+src/Controller/Admin/EventController.php::edit // realignment rules: a confirmed rule change realigns without allFollowing, and closing a series never does
+src/Controller/SupportController.php::index // deliberately not a PRG redirect, because the confirmation carries no replayable form
+src/Controller/CookieController.php::index // legal constraint: a rejection must be persisted too, or the banner reappears forever
+src/Controller/ProfileController.php::toggleRsvp // the redirect is load-bearing: the flash message only renders on a fresh request
+
+# --- Entities and enums ---
+src/Entity/EventSeries.php::ruleSpec // the column is only authoritative for EventInterval::Custom; other intervals ignore it
+src/Entity/Message.php::SUPPORT_QUESTION_MARKER // wire format: the chat view strips this sentinel, so changing it orphans stored rows
+src/Entity/Session/Consent.php::getBySession // deliberate fallback: a malformed session must degrade to defaults, not fatal the request
+src/Entity/User.php::eraseCredentials // Symfony 8 dropped this from UserInterface; it survives because our own code still calls it
+src/Enum/RecurrenceOrdinal.php::sort // declaration order is calendar order but the backed values are not, so sorting cannot use them
+src/Enum/RecurrencePeriod.php::lookaheadModifier // the window must span a full period (and a leap day for Year) or sparse rules never match
+
+# --- Event subscribers: priority is a contract with Symfony's own listeners ---
+src/EventSubscriber/CanonicalLinkHeaderSubscriber.php::getSubscribedEvents // priority is pinned relative to Symfony's ResponseListener, which fills Content-Type
+src/EventSubscriber/CanonicalLinkHeaderSubscriber.php::onKernelResponse // append, never set: asset preload links share this header and must survive
+src/EventSubscriber/LocaleSubscriber.php::getSubscribedEvents // priority is pinned between SessionListener and RouterListener, and both matter
+src/EventSubscriber/LocaleValidationSubscriber.php::getSubscribedEvents // must run after LocaleSubscriber, whose priority the number encodes
+src/EventSubscriber/Security/BlockedSessionSubscriber.php::getSubscribedEvents // priority is pinned after SessionListener so the session factory exists
+
+# --- Item taxonomy ---
+src/Item/Portability/ItemTaxonomyPortability.php::import // import is additive by contract: it never overwrites a classification the target already has
+src/Item/Portability/ItemTaxonomyPortability.php::export // legacy rows carry category id 0, which is a sentinel and not a definition id
+
+# --- SEO and canonical URLs ---
+src/Publisher/AlternateLinks/EventAlternateLinkProvider.php::getAlternateLinks // search engines void an hreflang cluster whose canonical target is missing from it
+src/Publisher/CanonicalUrl/EventCanonicalUrlProvider.php::getCanonicalUrl // security constraint: an alternate host must not be able to dictate the canonical
+src/Service/Seo/EventSchemaService.php::buildSchema // schema.org rules for a cancelled event, and why performer mirrors organizer here
+src/Service/Seo/EventSimilarityService.php::DESCRIPTION_LENGTH_CAP // magic constant: similar_text() is quadratic, so article-sized input has to be capped
+src/Service/Seo/SitemapOverviewService.php::SECTION_ORDER // fixed order so the section dropdown does not reshuffle as plugins are toggled
+src/Twig/LanguageExtension.php::getHreflangLanguageCodes // an hreflang cluster must name the current language too, unlike the language switcher
+
+# --- Repositories: query shape is the constraint ---
+src/Repository/CmsRepository.php::findByMenuLocation // only ids are cached, because caching entities would serialize Doctrine proxies into Valkey
+src/Repository/CmsRepository.php::findPublishedBySlug // a stable order plus LIMIT 1 so an ambiguous slug resolves deterministically
+src/Repository/EventRepository.php::getUpcomingEvents // two-step query so setMaxResults counts distinct events, not post-join rows
+src/Repository/EventRepository.php::getPastEvents // two-step query so setMaxResults counts distinct events, not post-join rows
+src/Repository/UserRepository.php::findAnnouncementSubscribers // the announcements flag is a JSON column, so that filter cannot live in the query
+
+# --- Caching and config ---
+src/Service/Cache/RedisCacheService.php::intResult // upstream behaviour: phpredis returns the client itself inside MULTI/PIPELINE
+src/Service/Config/LanguageService.php::invalidateCache // deliberate swallow: a failed invalidation self-heals on the next request
+src/Service/Config/LanguageService.php::getAllLanguages // never app-cached: deserializing detaches the tileImage proxy and image.hash reads null
+src/Service/Config/LanguageService.php::getFilteredEnabledCodes // an empty filter result must fall back to all codes, or the site loses every language
+src/Service/Config/LanguageService.php::getAdminFilteredEnabledCodes // an empty filter result must fall back to all codes, or admin loses every language
+src/Service/Config/PluginService.php::getPluginConfig // deliberate fallthrough: a corrupt environment config must degrade to plugins.php
+
+# --- Recurrence engine: RFC-5545 semantics the code cannot state on its own ---
+src/Service/Event/OccurrenceCalculator.php::MAX_PERIOD_STEPS // magic constant: bounds the walk for sparse rules like a yearly leap-day series
+src/Service/Event/OccurrenceCalculator.php::firstPeriodStart // WKST=MO, so a Sunday anchor belongs to the week that began six days earlier
+src/Service/Event/RecurrenceBuilderStateResolver.php::resolve // the builder never authors a daily rule; Daily stays a preset
+src/Service/Event/RecurrenceBuilderStateResolver.php::resolveDaysOfMonth // "last day" is its own sentence, so it can never join a numbered-day list
+src/Service/Event/RecurrenceDescriber.php::weekdayName // magic date: 2024-01-01 was a Monday, which is what makes the ISO day arithmetic work
+src/Service/Event/RecurrenceDescriber.php::sentenceKey // translation keys embed the enum's backed value, so renaming a case breaks catalogues
+src/Service/Event/RecurrenceDescriber.php::parameters // both day forms are passed because catalogues need different ones per language
+src/Service/Event/RecurrencePreviewService.php::candidates // a yearly rule needs a BYMONTH only the picked date supplies, and why takeFrom not take
+src/Service/Event/RecurrenceResolver.php::resolve // an unparseable spec resolves to null on purpose: one bad row must not fatal a listing
+src/Service/Event/RecurringEventService.php::updateRecurringEvents // the series-keyed query can return the anchor itself, which the filter below removes
+src/Service/Event/RecurringEventService.php::planRealignment // a finite rule can run out, and the remaining members keep their dates rather than move
+src/Service/Event/RecurringEventService.php::fillRecurringEvents // extension needs a non-locked member, and the comparison uses the composed start
+src/ValueObject/RecurrencePattern.php::dayOfMonth // "last day" is a different sentence from a numbered day, so it never joins a list
+
+# --- Media ---
+src/Service/Media/ImageService.php::rotateThumbNail // Doctrine lazy-ghost case: persist+flush on a OneToOne proxy silently no-ops, hence DQL
+
+# --- Security ---
+src/Review/ChangeTargetRegistry.php::ChangeTargetRegistry // gated on the global plugin list, not the request context, so proposals resolve from every host
+src/Service/Security/LoadtestBypass.php::isActive // env and header must both hold, and prod ignores the header silently
+src/Service/Security/ContentSanitizer.php::escape // htmlspecialchars, not the sanitizer: the sanitizer drops tags together with their text
+src/Service/Security/Provider/NotFoundProvider.php::processEvent // asset 404s are normal after a redeploy and must not count towards a block
+src/Service/Security/SecurityService.php::event // one high-priority provider can blow the fuse, which is what stops a write-amplified DOS
+src/Twig/ContentExtension.php::safeMessage // re-applies the allow-list on output so pre-sanitizer rows cannot inject
+
+# --- System ---
+src/DataHotfix/Hotfixes/RemoveOrphanedClubPluginTables.php::execute // FK checks are disabled so the interdependent tables drop in any order
+src/Service/System/ImportService.php::import // required ordering: items run after the core flush because contributors need the generated ids
+src/Service/System/CronIntervalCheckService.php::WARNING_THRESHOLD_SECONDS // magic constant: the budget behind the 10/20 minute thresholds
+src/Service/System/ImportService.php::importUsers // imported users are locked on purpose; the password reset flow is the only way in
+src/Service/System/ImportService.php::importEvents // pre-1.1 exports carried the rule on the event, so a series has to be synthesized
+
+# --- Tests: fixture facts a reader would otherwise have to recompute ---
+tests/Functional/Controller/Admin/Security/IncidentsControllerTest.php::testShowPageHidesUnblockButtonWhenNoBlockIsActive // the test-env ArrayAdapter is reset by kernel.reset, which the setup works around
+tests/Functional/Controller/Admin/Security/IncidentsControllerTest.php::testUnblockRouteRedirectsToShow // the test-env ArrayAdapter is reset by kernel.reset, which the setup works around
+tests/Unit/Emails/Types/EmailTypesTest.php::emailTypeProvider // provider keys must match allTypes(), and why the instances are built in the body
+tests/Unit/Emails/Types/GetMaxSendByTest.php::eventStartingAt // must stay a mutable DateTime because production goes through createFromMutable()
+tests/Unit/EventSubscriber/LocaleSubscriberTest.php::testOnKernelRequestFallsBackToFilteredDefaultWhenAcceptLanguageHasNoMatch // Symfony's getPreferredLanguage returns the first listed locale when nothing matches
+tests/Unit/Form/ValidatorMessageTranslationKeysTest.php::looksLikeTranslationKey // spells out the key grammar the regex encodes, which decides what the test rejects
+tests/Unit/Service/AdminNotificationServiceTest.php::testReturnsNoNewItemsWhenNothingNewerThanLastSent // the timestamps only mean something relative to each other
+tests/Unit/Service/AdminNotificationServiceTest.php::testSendsEmailToAllAdminsWhenNewItemsExist // the null stands for "never sent before", which drives the whole branch
+tests/Unit/Service/AdminNotificationServiceTest.php::testSkipsProvidersWithNoItems // marks which fixture section is the empty one the assertion turns on
+tests/Unit/Service/BlockHydratorTest.php::testAppliesDefaultForOptionalMissingField // names the field deliberately left out, which is the whole case
+tests/Unit/Service/BlockHydratorTest.php::testThrowsOnMissingRequiredField // names the field deliberately left out, which is the whole case
+tests/Unit/Service/BlockHydratorTest.php::testThrowsWithAllMissingRequiredFields // lists the required fields, so the expected message can be read against them
+tests/Unit/Service/CaptchaServiceTest.php::testIsValidForcesResetAfterMaxAttempts // marks which attempt crosses the threshold, which is not visible in the loop
+tests/Unit/Service/CaptchaServiceTest.php::testGetRefreshTimeReturnsSmallestRemainingTime // marks which fixture timestamp is the oldest, which decides the expectation
+tests/Unit/Service/Email/SendScheduledEmailsServiceTest.php::testGuardErrorIsLoggedAndLoopContinues // marks which user survives the guard, which is what the assertion checks
+tests/Unit/Service/Event/OccurrenceCalculatorTest.php::OccurrenceCalculatorTest // the matrix fixture pins rlanvin/php-rrule v2.6 behaviour, WKST=MO default included
+tests/Unit/Service/Event/OccurrenceCalculatorTest.php::testABiweeklyRuleCountsWeeksFromMondayNotFromTheAnchor // the eight-day gap is the point of the case and is not obvious from the dates
+tests/Unit/Service/Event/RecurringEventExtensionTest.php::NOW // the anchor date is a Monday, which is what makes the weekday maths readable
+tests/Unit/Service/Event/RecurringEventExtensionTest.php::testExtendKeepsTheFirstOccurrenceWhenTheAnchorIsOffPattern // records the regression: dropping the head by position ate a real date
+tests/Unit/Service/ImageServiceTest.php::testGetObsoleteThumbnails // labels which fixture rows are valid vs obsolete, and why the size check is limited
+tests/Unit/Service/LanguageServiceTest.php::testGetAllLanguagesQueriesRepoEachCall // records why entities are not cached, which is the behaviour under test
+tests/Unit/Service/Notification/User/MissingAltImageNotificationProviderTest.php::testEmitsItemPerIncompleteImageWithMissingLanguageCount // shows how each fixture row adds up to its expected missing-language count
+tests/Unit/Service/PasswordResetServiceTest.php::testRequestResetSetsRegcodeAndPersistsUser // magic constant: 64 is bin2hex(random_bytes(32)), not an arbitrary length
+tests/Unit/Service/RecurringEventServiceTest.php::NOW // the anchor date is a Monday, which is what makes the weekday maths readable
+tests/Unit/Service/Seo/EventSimilarityServiceTest.php::testFieldsEmptyOnBothSidesDoNotDistortTheWeighting // spells out which weights remain, which is the arithmetic behind the expectation
+tests/Unit/Service/System/CronIntervalCheckServiceTest.php::gapProvider // fixes the reference "now" and the thresholds every provider row is measured against
+tests/Unit/Service/System/HealthCheckServiceTest.php::makeService // why disk-space lookups are stubbed: runAll() would otherwise touch the real filesystem
+tests/Unit/Twig/SafeHtmlExtensionTest.php::testScriptInjectionIsBlocked // the attack only works inside an attribute value, which is what the case encodes
+tests/stubs/imagick.stub.php::ImagickPixel // states the stub's scope: only the API surface the tests touch, so a gap is expected

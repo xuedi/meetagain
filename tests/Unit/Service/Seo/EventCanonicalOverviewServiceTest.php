@@ -31,7 +31,7 @@ class EventCanonicalOverviewServiceTest extends TestCase
         // Act
         $lanes = $service->getLanes();
 
-        // Assert: the value object exposes no group-shaped data - scope is the caller's concern.
+        // Assert
         self::assertCount(1, $lanes);
         self::assertSame(7, $lanes[0]->seriesId);
         self::assertSame('Tuesday Meetup', $lanes[0]->seriesName);

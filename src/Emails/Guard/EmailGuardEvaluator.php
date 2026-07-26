@@ -19,10 +19,6 @@ final readonly class EmailGuardEvaluator
         private iterable $providers = [],
     ) {}
 
-    /**
-     * Run the chain in order, short-circuit on first non-Pass result. Returns the offending result
-     * or a synthetic Pass when all rules pass.
-     */
     public function evaluate(EmailInterface $email, array $context): EmailGuardResult
     {
         foreach ($this->resolveChain($email) as $rule) {
@@ -36,9 +32,6 @@ final readonly class EmailGuardEvaluator
     }
 
     /**
-     * Run every rule regardless of outcome. Used by the admin guard-detail page so the operator
-     * can see the full chain even past the short-circuit point.
-     *
      * @return list<EmailGuardResult>
      */
     public function evaluateAll(EmailInterface $email, array $context): array

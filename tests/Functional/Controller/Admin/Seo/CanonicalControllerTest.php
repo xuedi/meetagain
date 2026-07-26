@@ -23,7 +23,7 @@ final class CanonicalControllerTest extends WebTestCase
         // Act
         $crawler = $client->request('GET', self::CANONICAL_PATH);
 
-        // Assert: the fixtures carry no markers, so each lane collapses to first + one follower run.
+        // Assert
         $this->assertResponseIsSuccessful();
         $lanes = $crawler->filter('table tbody tr');
         self::assertGreaterThan(0, $lanes->count());
@@ -45,7 +45,7 @@ final class CanonicalControllerTest extends WebTestCase
         // Act
         $client->request('POST', self::CANONICAL_PATH . '/rebuild', ['_token' => $token]);
 
-        // Assert: the rebuild is idempotent, so the marker table is in a consistent state afterwards.
+        // Assert
         $this->assertResponseRedirects();
         $repository = static::getContainer()->get(EventCanonicalRootRepository::class);
         self::assertGreaterThanOrEqual(0, $repository->count([]));

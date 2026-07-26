@@ -9,11 +9,6 @@ use App\Repository\ItemTagAssignmentRepository;
 use App\Service\Config\LanguageService;
 use Doctrine\ORM\EntityManagerInterface;
 
-/**
- * Read/write item taxonomy assignments keyed by (itemType, itemId), and resolve display labels
- * from the scope-resolved definitions. Writes validate the id against the current definitions and
- * silently drop unknown ids rather than throw.
- */
 readonly class ItemTaxonomyService
 {
     public function __construct(
@@ -114,7 +109,6 @@ readonly class ItemTaxonomyService
         return $this->taxonomyFor($itemType)?->categoryLabel($categoryId, $locale, $this->sourceLocale());
     }
 
-    /** Label for an arbitrary category id (not necessarily assigned), e.g. a pending suggestion. */
     public function categoryLabelForId(string $itemType, int $categoryId, ?string $locale): ?string
     {
         return $this->taxonomyFor($itemType)?->categoryLabel($categoryId, $locale, $this->sourceLocale());
@@ -140,9 +134,6 @@ readonly class ItemTaxonomyService
     }
 
     /**
-     * Category options for the list filter, id => label, in the given locale. Empty when the type
-     * does not support/enable categories.
-     *
      * @return array<int, string>
      */
     public function categoryChoices(string $itemType, ?string $locale): array
@@ -166,9 +157,6 @@ readonly class ItemTaxonomyService
     }
 
     /**
-     * Tag options for the list filter, id => label, in the given locale. Empty when the type does
-     * not support/enable tags.
-     *
      * @return array<int, string>
      */
     public function tagChoices(string $itemType, ?string $locale): array

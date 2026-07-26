@@ -5,10 +5,6 @@ namespace App\Item;
 use App\Enum\ItemAction;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Dispatches item lifecycle actions to all registered handlers.
- * Mirrors EntityActionDispatcher; called by item plugins after flush.
- */
 readonly class ItemActionDispatcher
 {
     /**

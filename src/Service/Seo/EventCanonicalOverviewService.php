@@ -10,10 +10,6 @@ use App\Repository\EventSeriesRepository;
 use App\ValueObject\CanonicalLane;
 use App\ValueObject\CanonicalLaneStop;
 
-/**
- * Builds the per-series, per-locale lanes of the canonical admin page. Presentation only - every
- * classification decision comes from the resolver.
- */
 readonly class EventCanonicalOverviewService
 {
     public function __construct(

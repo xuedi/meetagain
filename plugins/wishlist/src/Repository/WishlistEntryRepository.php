@@ -34,7 +34,6 @@ class WishlistEntryRepository extends ServiceEntityRepository
         return $this->findOneBy(['userId' => $userId, 'itemType' => $itemType, 'itemId' => $itemId]);
     }
 
-    /** Whether any wish exists at all. */
     public function hasAny(): bool
     {
         return $this->count([]) > 0;
@@ -47,8 +46,6 @@ class WishlistEntryRepository extends ServiceEntityRepository
     }
 
     /**
-     * Aggregated demand for one item type: item id, distinct wanters, summed priority.
-     *
      * @param list<int>|null $allowedItemIds null: no restriction; []: block all
      *
      * @return array<array{item_id: int, wanter_count: int, total_priority: int}>

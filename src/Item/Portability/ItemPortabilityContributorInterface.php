@@ -5,16 +5,9 @@ namespace App\Item\Portability;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Serializes one item type out of and back into this instance. Both directions live on one
- * interface because they must agree on the row shape.
- *
- * Implementations promise:
- *   - every exported row carries a 'ref' equal to the source item id; the rest of the row is
- *     opaque to core
- *   - the caller decides which ids to export; the contributor never asks who owns them
- *   - importItems() persists and flushes before returning, and maps every incoming ref to a real
- *     item id - a row resolved to an already-present item maps to that item and counts as matched
- *   - importItems() dispatches no item action: an import is not a user action
+ * Serializes one item type out of and back into this instance. Every exported row carries a
+ * 'ref' equal to its source item id; importItems() flushes before returning, maps every ref to
+ * a real item id, and dispatches no item action.
  */
 #[AutoconfigureTag]
 interface ItemPortabilityContributorInterface

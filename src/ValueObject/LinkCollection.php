@@ -4,10 +4,6 @@ namespace App\ValueObject;
 
 use App\Entity\Link;
 
-/**
- * Immutable value object holding all link slots a plugin can contribute.
- * Use the with*() fluent builders to populate only the slots you need.
- */
 readonly class LinkCollection
 {
     /**

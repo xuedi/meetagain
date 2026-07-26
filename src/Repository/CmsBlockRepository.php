@@ -28,8 +28,6 @@ class CmsBlockRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns the IDs of all CMS pages that contain at least one block of the given type.
-     *
      * @return array<int>
      */
     public function findPageIdsWithType(CmsBlockType $type): array
