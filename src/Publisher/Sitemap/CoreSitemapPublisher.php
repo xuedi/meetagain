@@ -214,7 +214,7 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
             return [];
         }
 
-        $allowedLocalesByEventId = $this->resolveAllowedLocalesByEventId(array_keys($accessibleIds));
+        $emittableLocalesByEventId = $this->resolveEmittableLocalesByEventId(array_keys($accessibleIds), $locales);
         $rootIds = $this->canonicalResolver->resolveRootIds($events, $locales);
 
         $urls = [];
@@ -226,7 +226,7 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
             }
 
             $lastmod = new DateTimeImmutable($event->getStart()->format('Y-m-d'));
-            $eventLocales = $allowedLocalesByEventId[$id] ?? $locales;
+            $eventLocales = $emittableLocalesByEventId[$id] ?? $locales;
 
             $localeUrls = [];
             foreach ($eventLocales as $locale) {
@@ -255,6 +255,21 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
         }
 
         return $urls;
+    }
+
+    /**
+     * @param int[] $eventIds
+     * @param array<string> $locales
+     * @return array<int, string[]> eventId => locales (only for restricted events)
+     */
+    private function resolveEmittableLocalesByEventId(array $eventIds, array $locales): array
+    {
+        $emittable = [];
+        foreach ($this->resolveAllowedLocalesByEventId($eventIds) as $eventId => $allowed) {
+            $emittable[$eventId] = array_values(array_intersect($locales, $allowed));
+        }
+
+        return $emittable;
     }
 
     /**

@@ -4,13 +4,16 @@ namespace Tests\Unit\Publisher\Sitemap;
 
 use App\Entity\Cms;
 use App\Entity\Event;
+use App\Entity\EventCanonicalRoot;
 use App\Entity\EventSeries;
 use App\Entity\EventTranslation;
+use App\Enum\EventCanonicalRootType;
 use App\Filter\Cms\CmsFilterResult;
 use App\Filter\Cms\CmsFilterService;
 use App\Filter\Event\EventFilterService;
 use App\Filter\Member\MemberFilterResult;
 use App\Filter\Member\MemberFilterService;
+use App\Filter\Sitemap\SitemapEventLocaleFilterInterface;
 use App\Filter\Sitemap\SitemapEventVisibilityService;
 use App\Publisher\Sitemap\CoreSitemapPublisher;
 use App\Repository\CmsRepository;
@@ -262,6 +265,127 @@ class CoreSitemapPublisherTest extends TestCase
         }
     }
 
+    public function testEmitsEveryMarkedRootOfASeries(): void
+    {
+        // Arrange
+        $series = new EventSeriesStub();
+        $series->setId(7);
+        $first = $this->makeSeriesMember(1, new DateTime('2026-05-01'), $series);
+        $follower = $this->makeSeriesMember(2, new DateTime('2026-05-08'), $series);
+        $branched = $this->makeSeriesMember(3, new DateTime('2026-05-15'), $series);
+        $afterBranch = $this->makeSeriesMember(4, new DateTime('2026-05-22'), $series);
+
+        $publisher = $this->makePublisher(
+            locales: ['en', 'de'],
+            cmsPages: [],
+            events: [$first, $follower, $branched, $afterBranch],
+            cmsFilter: CmsFilterResult::noFilter(),
+            shouldEmitEvents: true,
+            seriesMembers: [$first, $follower, $branched, $afterBranch],
+            markers: [$this->makeMarker($branched, 'en', EventCanonicalRootType::Root), $this->makeMarker($branched, 'de', EventCanonicalRootType::Root)],
+        );
+
+        // Act
+        $locs = array_values(array_map(
+            static fn($u) => $u->loc,
+            array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains($u->loc, '/event/')),
+        ));
+        sort($locs);
+
+        // Assert
+        self::assertSame([
+            'https://example.com/de/event/1',
+            'https://example.com/de/event/3',
+            'https://example.com/en/event/1',
+            'https://example.com/en/event/3',
+        ], $locs);
+    }
+
+    public function testEmitsMarkedRootsUnderAGroupLocaleToo(): void
+    {
+        // Arrange
+        $series = new EventSeriesStub();
+        $series->setId(7);
+        $first = $this->makeSeriesMember(1, new DateTime('2026-05-01'), $series);
+        $follower = $this->makeSeriesMember(2, new DateTime('2026-05-08'), $series);
+        $branched = $this->makeSeriesMember(3, new DateTime('2026-05-15'), $series);
+
+        $publisher = $this->makePublisher(
+            locales: ['en', 'de'],
+            cmsPages: [],
+            events: [$first, $follower, $branched],
+            cmsFilter: CmsFilterResult::noFilter(),
+            shouldEmitEvents: true,
+            seriesMembers: [$first, $follower, $branched],
+            allowedLocalesByEventId: [1 => ['de', 'es'], 2 => ['de', 'es'], 3 => ['de', 'es']],
+            markers: [$this->makeMarker($branched, 'de', EventCanonicalRootType::Root)],
+        );
+
+        // Act
+        $locs = array_values(array_map(
+            static fn($u) => $u->loc,
+            array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains($u->loc, '/event/')),
+        ));
+        sort($locs);
+
+        // Assert
+        self::assertSame([
+            'https://example.com/de/event/1',
+            'https://example.com/de/event/3',
+        ], $locs);
+    }
+
+    public function testDropsLocalesTheSiteDoesNotServe(): void
+    {
+        // Arrange
+        $event = $this->makeEvent(42, new DateTime('2026-05-01'));
+
+        $publisher = $this->makePublisher(
+            locales: ['en', 'de'],
+            cmsPages: [],
+            events: [$event],
+            cmsFilter: CmsFilterResult::noFilter(),
+            shouldEmitEvents: true,
+            allowedLocalesByEventId: [42 => ['de', 'es']],
+        );
+
+        // Act
+        $urls = array_values(array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains($u->loc, '/event/')));
+
+        // Assert
+        self::assertCount(1, $urls);
+        self::assertSame('https://example.com/de/event/42', $urls[0]->loc);
+        self::assertSame(['de' => 'https://example.com/de/event/42'], $urls[0]->alternates);
+    }
+
+    public function testSeriesFollowersStayOmittedUnderAnUnservedLocale(): void
+    {
+        // Arrange
+        $series = new EventSeriesStub();
+        $series->setId(7);
+        $root = $this->makeSeriesMember(1, new DateTime('2026-05-01'), $series);
+        $follower = $this->makeSeriesMember(2, new DateTime('2026-05-08'), $series);
+
+        $publisher = $this->makePublisher(
+            locales: ['en', 'de'],
+            cmsPages: [],
+            events: [$root, $follower],
+            cmsFilter: CmsFilterResult::noFilter(),
+            shouldEmitEvents: true,
+            seriesMembers: [$root, $follower],
+            allowedLocalesByEventId: [1 => ['de', 'es'], 2 => ['de', 'es']],
+        );
+
+        // Act
+        $locs = array_map(
+            static fn($u) => $u->loc,
+            array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains($u->loc, '/event/')),
+        );
+
+        // Assert
+        self::assertSame(['https://example.com/de/event/1'], array_values($locs));
+    }
+
     public function testSeriesFollowersAreOmittedAndAlternatesPointAtTheRoot(): void
     {
         // Arrange
@@ -299,6 +423,8 @@ class CoreSitemapPublisherTest extends TestCase
      * @param array<Event> $events
      * @param array<Event> $seriesMembers
      * @param int[]|null $accessibleEventIds null = every event stays accessible
+     * @param array<int, string[]>|null $allowedLocalesByEventId null = no locale filter registered
+     * @param array<EventCanonicalRoot> $markers
      */
     private function makePublisher(
         array $locales,
@@ -309,6 +435,8 @@ class CoreSitemapPublisherTest extends TestCase
         int $memberCount = 0,
         array $seriesMembers = [],
         ?array $accessibleEventIds = null,
+        ?array $allowedLocalesByEventId = null,
+        array $markers = [],
     ): CoreSitemapPublisher {
         $eventRepo = $this->createStub(EventRepository::class);
         $eventRepo->method('findForSitemap')->willReturn($events);
@@ -355,6 +483,17 @@ class CoreSitemapPublisherTest extends TestCase
         $visibility = $this->createStub(SitemapEventVisibilityService::class);
         $visibility->method('shouldEmitEvents')->willReturn($shouldEmitEvents);
 
+        $markerRepo = $this->createStub(EventCanonicalRootRepository::class);
+        $markerRepo->method('findBySeriesIds')->willReturn($markers);
+        $markerRepo->method('findBySeries')->willReturn($markers);
+
+        $localeFilters = [];
+        if ($allowedLocalesByEventId !== null) {
+            $localeFilter = $this->createStub(SitemapEventLocaleFilterInterface::class);
+            $localeFilter->method('getAllowedLocalesByEventId')->willReturn($allowedLocalesByEventId);
+            $localeFilters[] = $localeFilter;
+        }
+
         return new CoreSitemapPublisher(
             eventRepository: $eventRepo,
             cmsRepository: $cmsRepo,
@@ -365,7 +504,8 @@ class CoreSitemapPublisherTest extends TestCase
             memberFilterService: $memberFilterService,
             eventFilterService: $eventFilterService,
             eventVisibilityService: $visibility,
-            canonicalResolver: new EventCanonicalResolver($eventRepo, $this->createStub(EventCanonicalRootRepository::class)),
+            canonicalResolver: new EventCanonicalResolver($eventRepo, $markerRepo),
+            eventLocaleFilters: $localeFilters,
         );
     }
 
@@ -379,6 +519,16 @@ class CoreSitemapPublisherTest extends TestCase
         $reflection->getProperty('createdAt')->setValue($page, new DateTimeImmutable('2026-04-01'));
 
         return $page;
+    }
+
+    private function makeMarker(Event $event, string $locale, EventCanonicalRootType $type): EventCanonicalRoot
+    {
+        $marker = new EventCanonicalRoot();
+        $marker->setEvent($event);
+        $marker->setLocale($locale);
+        $marker->setType($type);
+
+        return $marker;
     }
 
     private function makeSeriesMember(int $id, DateTimeInterface $start, EventSeries $series): Event
