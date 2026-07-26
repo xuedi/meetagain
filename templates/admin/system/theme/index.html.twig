@@ -38,7 +38,7 @@
 
                     {% if currentLogo %}
                         <p class="has-text-grey-light is-size-7 mb-2">{{ 'admin_system_theme.current_logo_label'|trans }}</p>
-                        {% include '_components/image.html.twig' with {image: currentLogo, size: '400x400'} %}
+                        <img src="/images/thumbnails/{{ currentLogo.hash }}_h120.webp{% if currentLogo.updatedAt %}?v{{ currentLogo.updatedAt|date('YmdHis') }}{% endif %}" alt="{{ 'admin_system_theme.current_logo_label'|trans }}" style="max-height: 60px; max-width: 100%; width: auto;" class="mb-3">
                     {% else %}
                         <p class="has-text-grey-light is-size-7 mb-2">{{ 'admin_system_theme.default_logo_label'|trans }}</p>
                         <img src="{{ asset('images/logo.webp') }}" alt="Default logo" width="100" height="100">

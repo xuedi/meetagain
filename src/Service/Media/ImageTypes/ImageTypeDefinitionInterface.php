@@ -14,12 +14,16 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag]
 interface ImageTypeDefinitionInterface
 {
+    public const int FREE_AXIS = -1;
+
     /** The ImageType this definition handles - identity and DB key. */
     public function getType(): ImageType;
 
     /**
      * The effective [width, height] thumbnail pairs for this type, including the universal
-     * report and micro sizes supplied by the abstract base.
+     * report and micro sizes supplied by the abstract base. Exactly one axis of a pair may be
+     * FREE_AXIS, meaning the thumbnail scales proportionally and that axis is only known once
+     * a source image has been read.
      *
      * @return array<int, array{0: int, 1: int}>
      */

@@ -76,10 +76,11 @@ input[type="color"] {
 
 // Bulma's `$navbar-item-img-max-height` is overridden to 3rem in vendor/bulma-themed.scss
 // so the brand logo can fill the topbar's vertical slot.
+// 6rem reserves the burger (3.25rem) plus navbar-item padding on narrow viewports.
 .brand-logo {
     height: 2.5rem; // 40px
     width: auto;
-    max-width: 200px;
+    max-width: min(280px, calc(100vw - 6rem));
     object-fit: contain;
 }
 

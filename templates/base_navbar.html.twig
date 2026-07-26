@@ -2,7 +2,8 @@
     <div class="container">
         <div class="navbar-brand">
             <a class="navbar-item" href="{{ path('app_default', {'_locale': current_locale()}) }}">
-                <img class="brand-logo" src="{{ site_logo_url() }}" height="40" alt="Website Logo">
+                {% set logo = site_logo() %}
+                <img class="brand-logo" src="{{ logo.url }}"{% if logo.width %} width="{{ logo.width }}"{% endif %} height="{{ logo.height|default(40) }}" alt="Website Logo">
             </a>
             {% include 'base_navbar_burger.html.twig' %}
         </div>

@@ -2,31 +2,54 @@
 
 namespace App\Service\Media;
 
-use App\Publisher\SiteLogo\SiteLogoUrlProviderInterface;
+use App\Entity\Image;
+use App\Publisher\SiteLogo\SiteLogoProviderInterface;
 use App\Repository\ImageRepository;
 use App\Service\Config\ConfigService;
+use App\Service\Media\ImageTypes\ImageTypeDefinitionInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class SiteLogoResolver
 {
+    private const array SIZE = [ImageTypeDefinitionInterface::FREE_AXIS, 120];
+
     /**
-     * @param iterable<SiteLogoUrlProviderInterface> $providers
+     * @param iterable<SiteLogoProviderInterface> $providers
      */
     public function __construct(
-        #[AutowireIterator(SiteLogoUrlProviderInterface::class)]
+        #[AutowireIterator(SiteLogoProviderInterface::class)]
         private iterable $providers,
         private ConfigService $configService,
         private ImageRepository $imageRepository,
         private Packages $assetPackages,
+        private ThumbnailSizeFormat $thumbnailSizeFormat,
     ) {}
 
     public function resolveUrl(): string
     {
+        return $this->resolve()['url'];
+    }
+
+    /**
+     * @return array{url: string, width: ?int, height: ?int}
+     */
+    public function resolve(): array
+    {
+        $image = $this->resolveImage();
+        if ($image === null) {
+            return ['url' => $this->assetPackages->getUrl('images/logo.webp'), 'width' => null, 'height' => null];
+        }
+
+        return ['url' => $this->buildUrl($image), 'width' => null, 'height' => self::SIZE[1]];
+    }
+
+    private function resolveImage(): ?Image
+    {
         foreach ($this->providers as $provider) {
-            $url = $provider->resolveSiteLogoUrl();
-            if ($url !== null) {
-                return $url;
+            $image = $provider->resolveSiteLogo();
+            if ($image !== null) {
+                return $image;
             }
         }
 
@@ -34,22 +57,31 @@ readonly class SiteLogoResolver
         if ($logoId !== null) {
             $image = $this->imageRepository->find($logoId);
             if ($image !== null) {
-                $url = sprintf('/images/thumbnails/%s_100x100.webp', $image->getHash());
-                if ($image->getUpdatedAt() !== null) {
-                    $url .= '?v' . $image->getUpdatedAt()->format('YmdHis');
-                }
-
-                return $url;
+                return $image;
             }
         }
 
         foreach ($this->providers as $provider) {
-            $url = $provider->resolveFallbackSiteLogoUrl();
-            if ($url !== null) {
-                return $url;
+            $image = $provider->resolveFallbackSiteLogo();
+            if ($image !== null) {
+                return $image;
             }
         }
 
-        return $this->assetPackages->getUrl('images/logo.webp');
+        return null;
+    }
+
+    private function buildUrl(Image $image): string
+    {
+        $url = sprintf(
+            '/images/thumbnails/%s_%s.webp',
+            $image->getHash(),
+            $this->thumbnailSizeFormat->format(self::SIZE[0], self::SIZE[1]),
+        );
+        if ($image->getUpdatedAt() !== null) {
+            $url .= '?v' . $image->getUpdatedAt()->format('YmdHis');
+        }
+
+        return $url;
     }
 }
