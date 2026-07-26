@@ -2,9 +2,9 @@
 
 namespace App\Service\Email\Delivery\Provider;
 
-use App\Service\Email\Delivery\EmailDeliveryLog;
-use App\Service\Email\Delivery\EmailDeliveryLogCollection;
-use App\Service\Email\Delivery\EmailDeliveryLogFilter;
+use App\Service\Email\Delivery\Log;
+use App\Service\Email\Delivery\LogCollection;
+use App\Service\Email\Delivery\LogFilter;
 use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
@@ -35,10 +35,10 @@ final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProvide
         return $this->apiKey !== '';
     }
 
-    public function getLogs(EmailDeliveryLogFilter $filter): EmailDeliveryLogCollection
+    public function getLogs(LogFilter $filter): LogCollection
     {
         if (!$this->isAvailable()) {
-            return new EmailDeliveryLogCollection([], 0, $filter->offset, $filter->size);
+            return new LogCollection([], 0, $filter->offset, $filter->size);
         }
 
         try {
@@ -76,27 +76,27 @@ final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProvide
                 ]);
             }
 
-            return new EmailDeliveryLogCollection($items, $data['nb_result_without_offset'] ?? count($items), $filter->offset, $filter->size);
+            return new LogCollection($items, $data['nb_result_without_offset'] ?? count($items), $filter->offset, $filter->size);
         } catch (Throwable $e) {
             $this->logger->error('Sweego API request failed', [
                 'message' => $e->getMessage(),
                 'filter' => (array) $filter,
             ]);
 
-            return new EmailDeliveryLogCollection([], 0, $filter->offset, $filter->size);
+            return new LogCollection([], 0, $filter->offset, $filter->size);
         }
     }
 
-    public function getLogByMessageId(string $messageId): ?EmailDeliveryLog
+    public function getLogByMessageId(string $messageId): ?Log
     {
-        $collection = $this->getLogs(new EmailDeliveryLogFilter(messageId: $messageId, size: 1));
+        $collection = $this->getLogs(new LogFilter(messageId: $messageId, size: 1));
 
         return $collection->isEmpty() ? null : $collection->items[0];
     }
 
-    private function mapLog(array $data): EmailDeliveryLog
+    private function mapLog(array $data): Log
     {
-        return new EmailDeliveryLog(
+        return new Log(
             messageId: $data['transaction_id'] ?? $data['swg_uid'] ?? '',
             status: $data['status'] ?? 'unknown',
             recipientEmail: $data['email_to'] ?? '',

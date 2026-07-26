@@ -3,12 +3,12 @@
 namespace App\Security\Permission\Checker;
 
 use App\Security\Permission\Attribute\PermissionAttribute as Attr;
-use App\Security\Permission\PermissionCheckerInterface;
-use App\Security\Permission\PermissionContext;
+use App\Security\Permission\CheckerInterface;
+use App\Security\Permission\Context;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 
-final class AdminRolePermissionChecker implements PermissionCheckerInterface
+final class AdminRolePermissionChecker implements CheckerInterface
 {
     private const array ORGANIZER_ATTRIBUTES = [
         Attr::EVENT_CREATE,
@@ -80,7 +80,7 @@ final class AdminRolePermissionChecker implements PermissionCheckerInterface
     }
 
     #[Override]
-    public function vote(string $attribute, PermissionContext $context): ?bool
+    public function vote(string $attribute, Context $context): ?bool
     {
         if ($context->isAdmin) {
             return true;

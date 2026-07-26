@@ -2,8 +2,8 @@
 
 namespace Plugin\Dishes\Tests\Unit\Form;
 
-use App\Item\ItemTranslationFormHelper;
-use App\Item\Taxonomy\ItemAssignmentFormHelper;
+use App\Item\TranslationFormHelper;
+use App\Item\Taxonomy\AssignmentFormHelper;
 use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Dishes\Entity\Dish;
@@ -53,8 +53,8 @@ class DishEditTypeTest extends TestCase
         $languageService->method('getAdminFilteredEnabledCodes')->willReturn($codes);
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
-        $helper = new ItemTranslationFormHelper($languageService);
-        $assignmentHelper = $this->createStub(ItemAssignmentFormHelper::class);
+        $helper = new TranslationFormHelper($languageService);
+        $assignmentHelper = $this->createStub(AssignmentFormHelper::class);
 
         return Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension(Validation::createValidator()))

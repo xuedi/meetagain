@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
  * Registers one item type as categorizable and/or taggable. Orthogonal to event-attachability
- * (ItemTypeProviderInterface): a type may implement one, the other, or both. getTaxonomy() returns
+ * (TypeProviderInterface): a type may implement one, the other, or both. getTaxonomy() returns
  * the type's own scope-resolved definitions, so core never reads a plugin config class.
  */
 #[AutoconfigureTag]
@@ -26,5 +26,5 @@ interface CategorizableTypeProviderInterface
     public function supportsTags(): bool;
 
     /** The type's effective, scope-resolved taxonomy definitions for the current request. */
-    public function getTaxonomy(): TaxonomyConfig;
+    public function getTaxonomy(): Config;
 }

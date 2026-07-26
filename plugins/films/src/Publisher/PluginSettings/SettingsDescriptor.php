@@ -2,13 +2,13 @@
 
 namespace Plugin\Films\Publisher\PluginSettings;
 
-use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
+use App\Publisher\PluginSettings\DescriptorInterface;
 use Plugin\Films\Entity\Settings;
 use Plugin\Films\Form\SettingsType;
 use Plugin\Films\Service\SettingsService;
 use Symfony\Component\Form\FormInterface;
 
-final readonly class SettingsDescriptor implements PluginSettingsDescriptorInterface
+final readonly class SettingsDescriptor implements DescriptorInterface
 {
     public function __construct(
         private SettingsService $settingsService,

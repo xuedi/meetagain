@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Entity\WallPost;
 use App\Repository\WallPostRepository;
-use App\Service\TownHall\TownHallAccessService;
+use App\Service\TownHall\AccessService;
 use App\Service\TownHallService;
 use App\Service\WallService;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class TownHallController extends AbstractController
 {
     public function __construct(
-        private readonly TownHallAccessService $accessService,
+        private readonly AccessService $accessService,
         private readonly TownHallService $townHallService,
         private readonly WallService $wallService,
         private readonly WallPostRepository $wallPostRepo,

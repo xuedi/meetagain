@@ -2,7 +2,7 @@
 
 namespace App\Admin\Dashboard;
 
-final readonly class ListTile implements DashboardTile
+final readonly class ListTile implements Tile
 {
     /**
      * @param list<TileListItem> $items

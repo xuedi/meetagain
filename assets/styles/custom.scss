@@ -489,7 +489,7 @@ body.admin-shell-no-scroll {
     overflow-wrap: anywhere;
 }
 
-// -- Item list sidebar --
+// -- Item list --
 
 @media (min-width: 769px) {
     .item-list-layout > .item-list-sidebar {
@@ -499,7 +499,14 @@ body.admin-shell-no-scroll {
 
     .item-list-layout > .item-list-main {
         order: 1;
+        // Without this the flex item cannot shrink below the table width and pushes the sidebar out.
+        min-width: 0;
     }
+}
+
+// JSTable's vendor CSS forces white-space:nowrap on every cell; prose columns opt back out.
+.item-list .dt-table td.item-cell-prose {
+    white-space: normal;
 }
 
 // -- Item grid thumbnails --

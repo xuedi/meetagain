@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Enum\ItemViewType;
-use App\Service\Item\ItemViewResolver;
+use App\Service\Item\ViewResolver;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ItemController extends AbstractController
 {
     public function __construct(
-        private readonly ItemViewResolver $viewResolver,
+        private readonly ViewResolver $viewResolver,
     ) {}
 
     #[Route('/item/{itemType}/view/{mode}', name: 'app_item_set_view', methods: ['GET'])]

@@ -2,10 +2,10 @@
 
 namespace Plugin\Books\Filter;
 
-use App\Item\ItemFilterInterface;
+use App\Item\FilterInterface;
 use Override;
 
-final readonly class BookItemFilter implements ItemFilterInterface
+final readonly class BookItemFilter implements FilterInterface
 {
     #[Override]
     public function getAllowedItemIds(string $itemType): ?array

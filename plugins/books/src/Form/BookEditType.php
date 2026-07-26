@@ -2,7 +2,7 @@
 
 namespace Plugin\Books\Form;
 
-use App\Item\Taxonomy\ItemAssignmentFormHelper;
+use App\Item\Taxonomy\AssignmentFormHelper;
 use Override;
 use Plugin\Books\Entity\Book;
 use Plugin\Books\Service\BookService;
@@ -21,7 +21,7 @@ class BookEditType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
-        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {}
 
     #[Override]

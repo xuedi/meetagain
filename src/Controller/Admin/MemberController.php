@@ -11,8 +11,8 @@ use App\Enum\UserStatus;
 use App\Filter\Admin\Member\AdminMemberListFilterService;
 use App\Repository\UserRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
-use App\Service\Member\MemberActionException;
-use App\Service\Member\MemberActionFailure;
+use App\Service\Member\ActionException;
+use App\Service\Member\ActionFailure;
 use App\Service\Member\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -88,7 +88,7 @@ final class MemberController extends AbstractController implements AdminNavigati
 
         try {
             $this->userService->softDelete($this->getAuthedUser(), $user);
-        } catch (MemberActionException $e) {
+        } catch (ActionException $e) {
             $this->handleFailure($e);
         }
 
@@ -119,7 +119,7 @@ final class MemberController extends AbstractController implements AdminNavigati
 
         try {
             $this->userService->changeRole($this->getAuthedUser(), $user, $newRole);
-        } catch (MemberActionException $e) {
+        } catch (ActionException $e) {
             $this->handleFailure($e);
         }
 
@@ -146,7 +146,7 @@ final class MemberController extends AbstractController implements AdminNavigati
                 'verified' => $this->userService->toggleVerified($this->getAuthedUser(), $user),
                 'restricted' => $this->userService->toggleRestricted($this->getAuthedUser(), $user),
             };
-        } catch (MemberActionException $e) {
+        } catch (ActionException $e) {
             $this->handleFailure($e);
         }
 
@@ -174,7 +174,7 @@ final class MemberController extends AbstractController implements AdminNavigati
 
         try {
             $this->userService->transitionStatus($this->getAuthedUser(), $user, $newStatus);
-        } catch (MemberActionException $e) {
+        } catch (ActionException $e) {
             $this->handleFailure($e);
         }
 
@@ -188,10 +188,10 @@ final class MemberController extends AbstractController implements AdminNavigati
         }
     }
 
-    private function handleFailure(MemberActionException $e): void
+    private function handleFailure(ActionException $e): void
     {
         match ($e->failure) {
-            MemberActionFailure::SystemUser => throw $this->createAccessDeniedException('Cannot modify system users.'),
+            ActionFailure::SystemUser => throw $this->createAccessDeniedException('Cannot modify system users.'),
             default => null,
         };
     }

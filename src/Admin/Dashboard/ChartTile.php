@@ -2,7 +2,7 @@
 
 namespace App\Admin\Dashboard;
 
-final readonly class ChartTile implements DashboardTile
+final readonly class ChartTile implements Tile
 {
     /**
      * @param list<array{x: string, y: int}> $dataset

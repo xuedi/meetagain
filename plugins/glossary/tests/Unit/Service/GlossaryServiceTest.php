@@ -4,9 +4,9 @@ namespace Plugin\Glossary\Tests\Unit\Service;
 
 use App\EntityActionDispatcher;
 use App\Enum\ItemAction;
-use App\Item\ItemActionDispatcher;
-use App\Item\ItemFilterService;
-use App\Item\Taxonomy\ItemTaxonomyService;
+use App\Item\ActionDispatcher;
+use App\Item\FilterService;
+use App\Item\Taxonomy\TaxonomyService;
 use App\Review\ChangeProposalService;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
@@ -148,7 +148,7 @@ class GlossaryServiceTest extends TestCase
     public function testApplyChangeRoutesCategoryThroughTheTaxonomy(): void
     {
         // Arrange
-        $taxonomy = $this->createMock(ItemTaxonomyService::class);
+        $taxonomy = $this->createMock(TaxonomyService::class);
         $taxonomy->expects(self::once())
             ->method('setCategory')
             ->with(GlossaryCategorizableTypeProvider::ITEM_TYPE, 1, 3);
@@ -189,7 +189,7 @@ class GlossaryServiceTest extends TestCase
     public function testListNarrowsThroughTheCoreItemFilterChain(): void
     {
         // Arrange
-        $filter = $this->createMock(ItemFilterService::class);
+        $filter = $this->createMock(FilterService::class);
         $filter->expects(self::once())
             ->method('getAllowedItemIds')
             ->with(GlossaryCategorizableTypeProvider::ITEM_TYPE)
@@ -214,7 +214,7 @@ class GlossaryServiceTest extends TestCase
     public function testCreateAnnouncesTheNewItemToTheItemActionChain(): void
     {
         // Arrange
-        $dispatcher = $this->createMock(ItemActionDispatcher::class);
+        $dispatcher = $this->createMock(ActionDispatcher::class);
         $dispatcher->expects(self::once())
             ->method('dispatch')
             ->with(ItemAction::Created, GlossaryCategorizableTypeProvider::ITEM_TYPE, 0);
@@ -232,13 +232,13 @@ class GlossaryServiceTest extends TestCase
     private function makeService(
         EntityManagerInterface $em,
         GlossaryRepository $repo,
-        ?ItemFilterService $filter = null,
-        ?ItemActionDispatcher $itemActionDispatcher = null,
-        ?ItemTaxonomyService $taxonomyService = null,
+        ?FilterService $filter = null,
+        ?ActionDispatcher $itemActionDispatcher = null,
+        ?TaxonomyService $taxonomyService = null,
         ?ChangeProposalService $changeProposalService = null,
     ): GlossaryService {
         if ($filter === null) {
-            $filter = $this->createStub(ItemFilterService::class);
+            $filter = $this->createStub(FilterService::class);
             $filter->method('getAllowedItemIds')->willReturn(null);
         }
 
@@ -247,8 +247,8 @@ class GlossaryServiceTest extends TestCase
             $repo,
             $filter,
             $this->createStub(EntityActionDispatcher::class),
-            $taxonomyService ?? $this->createStub(ItemTaxonomyService::class),
-            $itemActionDispatcher ?? $this->createStub(ItemActionDispatcher::class),
+            $taxonomyService ?? $this->createStub(TaxonomyService::class),
+            $itemActionDispatcher ?? $this->createStub(ActionDispatcher::class),
             $changeProposalService ?? $this->createStub(ChangeProposalService::class),
         );
     }

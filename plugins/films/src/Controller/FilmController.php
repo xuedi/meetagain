@@ -4,8 +4,8 @@ namespace Plugin\Films\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
-use App\Item\Taxonomy\ItemAssignmentFormHelper;
-use App\Item\Taxonomy\ItemTaxonomyService;
+use App\Item\Taxonomy\AssignmentFormHelper;
+use App\Item\Taxonomy\TaxonomyService;
 use Plugin\Films\Activity\Messages\FilmAdded;
 use Plugin\Films\Entity\Film;
 use Plugin\Films\Form\FilmEditType;
@@ -27,8 +27,8 @@ final class FilmController extends AbstractController
         private readonly FilmService $filmService,
         private readonly FilmLookupResolver $lookupResolver,
         private readonly ActivityService $activityService,
-        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
-        private readonly ItemTaxonomyService $itemTaxonomyService,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
+        private readonly TaxonomyService $itemTaxonomyService,
     ) {}
 
     #[Route('', name: 'app_films_filmlist', methods: ['GET'])]

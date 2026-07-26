@@ -5,7 +5,7 @@ namespace App\Service\TownHall;
 use App\Entity\User;
 use App\Service\Config\ConfigService;
 
-readonly class CoreTownHallAccessChecker implements TownHallAccessCheckerInterface
+readonly class CoreTownHallAccessChecker implements AccessCheckerInterface
 {
     public function __construct(
         private ConfigService $configService,

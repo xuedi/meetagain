@@ -6,8 +6,8 @@ use App\Admin\Navigation\AdminNavigationConfig;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
-use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
-use App\Publisher\PluginSettings\PluginSettingsResolver;
+use App\Publisher\PluginSettings\DescriptorInterface;
+use App\Publisher\PluginSettings\Resolver;
 use App\Service\Admin\PluginSettingsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -22,7 +22,7 @@ final class PluginSettingsController extends AbstractController implements Admin
 {
     public function __construct(
         private readonly PluginSettingsService $pluginSettingsService,
-        private readonly PluginSettingsResolver $resolver,
+        private readonly Resolver $resolver,
         private readonly TranslatorInterface $translator,
     ) {}
 
@@ -82,14 +82,14 @@ final class PluginSettingsController extends AbstractController implements Admin
         ]);
     }
 
-    private function loadGlobal(PluginSettingsDescriptorInterface $descriptor): object
+    private function loadGlobal(DescriptorInterface $descriptor): object
     {
         $key = $descriptor->getKey();
 
         return $this->resolver->resolveStore($key, null)?->load($key, null) ?? $descriptor->createDefault();
     }
 
-    private function buildForm(PluginSettingsDescriptorInterface $descriptor, object $data): FormInterface
+    private function buildForm(DescriptorInterface $descriptor, object $data): FormInterface
     {
         return $this->createForm($descriptor->getFormType(), $data, $descriptor->getFormOptions($data));
     }

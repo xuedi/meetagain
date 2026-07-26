@@ -2,12 +2,12 @@
 
 namespace Plugin\Books\Publisher\PluginSettings;
 
-use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
+use App\Publisher\PluginSettings\DescriptorInterface;
 use Plugin\Books\Form\ConfigType;
 use Plugin\Books\ValueObject\Config;
 use Symfony\Component\Form\FormInterface;
 
-final class ConfigDescriptor implements PluginSettingsDescriptorInterface
+final class ConfigDescriptor implements DescriptorInterface
 {
     public function getKey(): string
     {

@@ -3,7 +3,7 @@
 namespace Plugin\Glossary\Review;
 
 use App\Entity\User;
-use App\Item\Taxonomy\ItemTaxonomyService;
+use App\Item\Taxonomy\TaxonomyService;
 use App\Review\ChangeTargetProviderInterface;
 use Override;
 use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
@@ -24,7 +24,7 @@ final readonly class GlossaryChangeTarget implements ChangeTargetProviderInterfa
     public function __construct(
         private GlossaryService $service,
         private ConfigService $configService,
-        private ItemTaxonomyService $taxonomyService,
+        private TaxonomyService $taxonomyService,
         private Security $security,
         private RouterInterface $router,
         private RequestStack $requestStack,

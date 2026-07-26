@@ -5,11 +5,11 @@
     button group, so every language's content is editable at once - independent of the global
     navbar UI language. The language list comes from get_admin_language_codes() (the group-scoped
     admin languages), never the navbar switcher. The "{field}-{code}" children must already exist
-    on the form (see App\Item\ItemTranslationFormHelper). With JavaScript disabled every panel
+    on the form (see App\Item\TranslationFormHelper). With JavaScript disabled every panel
     stays visible, so all languages remain editable.
 
     Used in:    plugins/dishes/templates/dish/edit.html.twig; any item edit form built with
-                ItemTranslationFormHelper::addTranslatedFields()
+                TranslationFormHelper::addTranslatedFields()
     Parameters:
         - form   (FormView, required)     -- the edit form carrying the "{field}-{code}" children
         - fields (list<string>, required) -- field stems to render per language, e.g. ['name', 'description']

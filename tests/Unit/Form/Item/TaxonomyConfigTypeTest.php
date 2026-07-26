@@ -4,7 +4,7 @@ namespace Tests\Unit\Form\Item;
 
 use App\Form\Item\TaxonomyConfigType;
 use App\Form\Item\TaxonomyDefinitionType;
-use App\Item\Taxonomy\TaxonomyConfig;
+use App\Item\Taxonomy\Config;
 use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -16,7 +16,7 @@ class TaxonomyConfigTypeTest extends TestCase
     public function testPrefillsCategoryLabelsPerLocale(): void
     {
         // Arrange
-        $taxonomy = (new TaxonomyConfig())
+        $taxonomy = (new Config())
             ->setCategoriesEnabled(true)
             ->setCategories([['id' => 0, 'labels' => ['en' => 'Greeting', 'de' => 'Gruss']]]);
 
@@ -32,7 +32,7 @@ class TaxonomyConfigTypeTest extends TestCase
     public function testSubmitRoundTripsLabelsIntoTaxonomy(): void
     {
         // Arrange
-        $form = $this->factory(['en', 'de'])->create(TaxonomyConfigType::class, new TaxonomyConfig());
+        $form = $this->factory(['en', 'de'])->create(TaxonomyConfigType::class, new Config());
 
         // Act
         $form->submit([
@@ -46,7 +46,7 @@ class TaxonomyConfigTypeTest extends TestCase
 
         // Assert
         $taxonomy = $form->getData();
-        static::assertInstanceOf(TaxonomyConfig::class, $taxonomy);
+        static::assertInstanceOf(Config::class, $taxonomy);
         static::assertTrue($taxonomy->isCategoriesEnabled());
         static::assertSame(
             [['id' => '0', 'labels' => ['en' => 'Greeting', 'de' => 'Gruss']]],

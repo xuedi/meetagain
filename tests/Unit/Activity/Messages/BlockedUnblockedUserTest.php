@@ -5,7 +5,7 @@ namespace Tests\Unit\Activity\Messages;
 use App\Activity\Messages\BlockedUser;
 use App\Activity\Messages\RegistrationEmailResent;
 use App\Activity\Messages\UnblockedUser;
-use App\Activity\UnknownActivityMessage;
+use App\Activity\UnknownMessage;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -130,13 +130,13 @@ class BlockedUnblockedUserTest extends TestCase
 
     public function testUnknownActivityMessageGetType(): void
     {
-        static::assertSame('foo.bar', new UnknownActivityMessage('foo.bar')->getType());
+        static::assertSame('foo.bar', new UnknownMessage('foo.bar')->getType());
     }
 
     public function testUnknownActivityMessageRenderWithNamespaceAndAction(): void
     {
         // Arrange
-        $subject = new UnknownActivityMessage('myplugin.did_something');
+        $subject = new UnknownMessage('myplugin.did_something');
 
         // Act
         $result = $subject->render();
@@ -150,7 +150,7 @@ class BlockedUnblockedUserTest extends TestCase
     public function testUnknownActivityMessageRenderWithNoAction(): void
     {
         // Arrange
-        $subject = new UnknownActivityMessage('weird');
+        $subject = new UnknownMessage('weird');
 
         // Act
         $result = $subject->render();
@@ -163,7 +163,7 @@ class BlockedUnblockedUserTest extends TestCase
 
     public function testUnknownActivityMessageInjectServicesReturnsSelf(): void
     {
-        $subject = new UnknownActivityMessage('x.y');
+        $subject = new UnknownMessage('x.y');
         $result = $subject->injectServices($this->router, $this->imageRenderer, $this->translator);
         static::assertSame($subject, $result);
     }

@@ -1,0 +1,154 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit\Publisher\PluginSettings;
+
+use App\Publisher\PluginSettings\Resolver;
+use App\Publisher\PluginSettings\ScopeProviderInterface;
+use App\Publisher\PluginSettings\StoreInterface;
+use App\Service\Admin\PluginSettingsService;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use Tests\Unit\Publisher\PluginSettings\Fixtures\StubDescriptor;
+use Tests\Unit\Publisher\PluginSettings\Fixtures\StubSettingsData;
+
+class ResolverTest extends TestCase
+{
+    public function testReturnsOverrideWhenScopeHasStoredRecord(): void
+    {
+        // Arrange
+        $override = new StubSettingsData('override');
+        $global = new StubSettingsData('global');
+        $resolver = $this->resolver(stores: [
+            $this->store(scoped: true, value: $override),
+            $this->store(scoped: false, value: $global),
+        ], scopeProviders: [$this->scope('7')]);
+
+        // Act + Assert
+        static::assertSame($override, $resolver->resolve('stub'));
+    }
+
+    public function testFallsBackToGlobalWhenOverrideScopeEmpty(): void
+    {
+        // Arrange
+        $global = new StubSettingsData('global');
+        $resolver = $this->resolver(stores: [
+            $this->store(scoped: true, value: null),
+            $this->store(scoped: false, value: $global),
+        ], scopeProviders: [$this->scope('7')]);
+
+        // Act + Assert
+        static::assertSame($global, $resolver->resolve('stub'));
+    }
+
+    public function testReturnsGlobalWhenNoScopeActive(): void
+    {
+        // Arrange
+        $global = new StubSettingsData('global');
+        $resolver = $this->resolver(stores: [$this->store(scoped: false, value: $global)], scopeProviders: []);
+
+        // Act + Assert
+        static::assertSame($global, $resolver->resolve('stub'));
+    }
+
+    public function testReturnsDescriptorDefaultWhenNothingStored(): void
+    {
+        // Arrange
+        $resolver = $this->resolver(stores: [$this->store(scoped: false, value: null)], scopeProviders: []);
+
+        // Act
+        $result = $resolver->resolve('stub');
+
+        // Assert
+        static::assertInstanceOf(StubSettingsData::class, $result);
+        static::assertSame('default', $result->label);
+    }
+
+    public function testUnknownKeyThrows(): void
+    {
+        // Arrange
+        $resolver = $this->resolver(stores: [], scopeProviders: []);
+
+        // Assert
+        $this->expectException(InvalidArgumentException::class);
+
+        // Act
+        $resolver->resolve('missing');
+    }
+
+    public function testResolveStorePicksHighestPrioritySupportingStore(): void
+    {
+        // Arrange
+        $low = $this->store(scoped: false, value: null, priority: -100);
+        $high = $this->store(scoped: false, value: null, priority: 10);
+        $resolver = $this->resolver(stores: [$low, $high], scopeProviders: []);
+
+        // Act
+        $selected = $resolver->resolveStore('stub', null);
+
+        // Assert
+        static::assertSame($high, $selected);
+    }
+
+    public function testResolveStoreIgnoresStoresForDisjointScope(): void
+    {
+        // Arrange
+        $globalOnly = $this->store(scoped: false, value: null);
+        $overrideOnly = $this->store(scoped: true, value: null);
+        $resolver = $this->resolver(stores: [$globalOnly, $overrideOnly], scopeProviders: []);
+
+        // Act + Assert
+        static::assertSame($globalOnly, $resolver->resolveStore('stub', null));
+        static::assertSame($overrideOnly, $resolver->resolveStore('stub', '7'));
+    }
+
+    /**
+     * @param list<StoreInterface>         $stores
+     * @param list<ScopeProviderInterface> $scopeProviders
+     */
+    private function resolver(array $stores, array $scopeProviders): Resolver
+    {
+        return new Resolver(new PluginSettingsService([new StubDescriptor('stub')]), $stores, $scopeProviders);
+    }
+
+    private function store(bool $scoped, ?object $value, int $priority = 0): StoreInterface
+    {
+        return new class($scoped, $value, $priority) implements StoreInterface {
+            public function __construct(
+                private readonly bool $scoped,
+                private readonly ?object $value,
+                private readonly int $priority,
+            ) {}
+
+            public function supports(string $key, ?string $scopeId): bool
+            {
+                return $this->scoped ? $scopeId !== null : $scopeId === null;
+            }
+
+            public function load(string $key, ?string $scopeId): ?object
+            {
+                return $this->value;
+            }
+
+            public function save(string $key, object $data, ?string $scopeId): void {}
+
+            public function getPriority(): int
+            {
+                return $this->priority;
+            }
+        };
+    }
+
+    private function scope(?string $id): ScopeProviderInterface
+    {
+        return new class($id) implements ScopeProviderInterface {
+            public function __construct(
+                private readonly ?string $id,
+            ) {}
+
+            public function getScopeId(): ?string
+            {
+                return $this->id;
+            }
+        };
+    }
+}

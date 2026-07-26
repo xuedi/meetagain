@@ -10,7 +10,7 @@ use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
-use App\Service\System\SystemLogService;
+use App\Service\System\LogService;
 use App\ValueObject\LogEntry;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,7 +46,7 @@ final class SystemLogController extends AbstractLogsController implements AdminN
 
     public function __construct(
         TranslatorInterface $translator,
-        private readonly SystemLogService $systemLogService,
+        private readonly LogService $systemLogService,
     ) {
         parent::__construct($translator, 'system');
     }
