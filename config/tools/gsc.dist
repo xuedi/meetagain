@@ -1,0 +1,12 @@
+# Google Search Console API client.
+#
+# GSC_SERVICE_ACCOUNT_JSON is the path to the JSON key file downloaded from the Google Cloud
+# console for a service account that has been added as a user to the property. It is empty on
+# purpose - supply it through the gitignored config/tools/gsc.local overlay.
+
+GSC_SERVICE_ACCOUNT_JSON=
+
+# Default property used when no --site flag is given. Two valid forms:
+#   sc-domain:example.org      (Domain property - covers all subdomains and protocols)
+#   https://example.org/       (URL-prefix property - exact protocol/host/path)
+GSC_DEFAULT_SITE=sc-domain:meetagain.org

@@ -29,6 +29,10 @@ just fixMago
 just checkMagoAll
 ```
 
+Three Rust guards also run on every commit - they catch leaked credentials, broken mermaid
+diagrams and unjustified comments. Build them once with `just buildTools` (or just run
+`just install`, which does it for you). See [Developer Tooling](core-development/tooling.md).
+
 Key rules:
 
 - `declare(strict_types=1)` on every PHP file

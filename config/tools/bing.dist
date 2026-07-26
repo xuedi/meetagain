@@ -1,0 +1,9 @@
+# Bing Webmaster Tools API client.
+#
+# BING_API_KEY is empty on purpose - supply it through the gitignored
+# config/tools/bing.local overlay.
+
+BING_API_KEY=
+
+# Default site used when no --site flag is given.
+BING_DEFAULT_SITE=https://meetagain.org/

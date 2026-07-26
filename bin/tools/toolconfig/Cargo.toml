@@ -1,0 +1,8 @@
+[package]
+name = "toolconfig"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "toolconfig"
+path = "src/lib.rs"

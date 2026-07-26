@@ -1,0 +1,12 @@
+{
+  "siteEntry": [
+    {
+      "siteUrl": "sc-domain:meetagain.org",
+      "permissionLevel": "siteOwner"
+    },
+    {
+      "siteUrl": "https://example.com/",
+      "permissionLevel": "siteFullUser"
+    }
+  ]
+}

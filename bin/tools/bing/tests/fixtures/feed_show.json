@@ -1,0 +1,13 @@
+{
+  "d": {
+    "__type": "Feed:#Microsoft.Bing.Webmaster.Api",
+    "Compressed": false,
+    "FileSize": 87234,
+    "LastCrawled": "/Date(1714262400000)/",
+    "Status": "Success",
+    "Submitted": "/Date(1714003200000)/",
+    "Type": "Sitemap",
+    "Url": "https://meetagain.org/sitemap.xml",
+    "UrlCount": 286
+  }
+}

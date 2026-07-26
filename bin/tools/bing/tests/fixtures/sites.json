@@ -1,0 +1,18 @@
+{
+  "d": [
+    {
+      "__type": "Site:#Microsoft.Bing.Webmaster.Api",
+      "AuthenticationCode": "ABCD1234",
+      "DnsVerificationCode": "abc.meetagain.org",
+      "IsVerified": true,
+      "Url": "https://meetagain.org/"
+    },
+    {
+      "__type": "Site:#Microsoft.Bing.Webmaster.Api",
+      "AuthenticationCode": "ABCD1234",
+      "DnsVerificationCode": "xyz.example.com",
+      "IsVerified": false,
+      "Url": "https://example.com/"
+    }
+  ]
+}
