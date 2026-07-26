@@ -4,7 +4,9 @@
  * Manages the global image modal (#globalImageModal) declared in base.html.twig
  * and all file interactions that appear inside it:
  *   1. Modal open (.modalTrigger / data-modal-url) — lazy-loads HTML from the given
- *      URL via maFetch and injects it into the modal content area.
+ *      URL via maFetch and injects it into the modal content area. The request is sent
+ *      as XHR because fragment routes serve the bare partial only to XHR callers and
+ *      redirect a direct hit to a real page.
  *   2. Modal close — dismisses via the .modal-close button or .modal-background click.
  *   3. File upload (.fileUploadTrigger) — sends the selected file via FormData POST
  *      and reloads. Uses event delegation to support dynamically injected modal content.
@@ -31,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const content = document.getElementById('globalImageModalContent');
             if (!modal || !content) return;
 
-            maFetch(url)
+            maFetch(url, true)
                 .then(function (html) {
                     content.innerHTML = html;
                     modal.classList.add('is-active');

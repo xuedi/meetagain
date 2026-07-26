@@ -3,10 +3,12 @@
 namespace Tests\Unit\Service\Media;
 
 use App\Entity\Image;
-use App\Publisher\SiteLogo\SiteLogoUrlProviderInterface;
+use App\Enum\ImageType;
+use App\Publisher\SiteLogo\SiteLogoProviderInterface;
 use App\Repository\ImageRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Media\SiteLogoResolver;
+use App\Service\Media\ThumbnailSizeFormat;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 
@@ -24,94 +26,101 @@ class SiteLogoResolverTest extends TestCase
         $this->packagesStub->method('getUrl')->willReturn('/build/images/logo-default.webp');
     }
 
-    public function testFilterOverrideWinsOverEverything(): void
+    private function logo(string $hash): Image
     {
-        // Arrange
-        $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
-        $filter->method('resolveSiteLogoUrl')->willReturn('/group/logo.webp');
-        $this->configServiceStub->method('getSiteLogoId')->willReturn(99);
+        $image = new Image();
+        $image->setHash($hash);
+        $image->setType(ImageType::SiteLogo);
 
-        $resolver = new SiteLogoResolver(
-            providers: [$filter],
+        return $image;
+    }
+
+    private function resolver(array $providers): SiteLogoResolver
+    {
+        return new SiteLogoResolver(
+            providers: $providers,
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,
+            thumbnailSizeFormat: new ThumbnailSizeFormat(),
         );
+    }
 
-        static::assertSame('/group/logo.webp', $resolver->resolveUrl());
+    public function testProviderOverrideWinsOverEverything(): void
+    {
+        $provider = $this->createStub(SiteLogoProviderInterface::class);
+        $provider->method('resolveSiteLogo')->willReturn($this->logo('groupHash'));
+        $this->configServiceStub->method('getSiteLogoId')->willReturn(99);
+
+        static::assertSame(
+            '/images/thumbnails/groupHash_h120.webp',
+            $this->resolver([$provider])->resolveUrl(),
+        );
     }
 
     public function testSiteLogoWinsOverFallback(): void
     {
-        // Arrange
-        $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
-        $filter->method('resolveSiteLogoUrl')->willReturn(null);
-        $filter->method('resolveFallbackSiteLogoUrl')->willReturn('/fallback/logo.webp');
+        $provider = $this->createStub(SiteLogoProviderInterface::class);
+        $provider->method('resolveSiteLogo')->willReturn(null);
+        $provider->method('resolveFallbackSiteLogo')->willReturn($this->logo('fallbackHash'));
         $this->configServiceStub->method('getSiteLogoId')->willReturn(42);
+        $this->imageRepositoryStub->method('find')->willReturn($this->logo('abc123'));
 
-        $image = new Image();
-        $image->setHash('abc123');
-        $this->imageRepositoryStub->method('find')->willReturn($image);
-
-        $resolver = new SiteLogoResolver(
-            providers: [$filter],
-            configService: $this->configServiceStub,
-            imageRepository: $this->imageRepositoryStub,
-            assetPackages: $this->packagesStub,
+        static::assertSame(
+            '/images/thumbnails/abc123_h120.webp',
+            $this->resolver([$provider])->resolveUrl(),
         );
-
-        static::assertSame('/images/thumbnails/abc123_100x100.webp', $resolver->resolveUrl());
     }
 
     public function testFallbackUsedWhenNoSiteLogoConfigured(): void
     {
-        // Arrange
-        $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
-        $filter->method('resolveSiteLogoUrl')->willReturn(null);
-        $filter->method('resolveFallbackSiteLogoUrl')->willReturn('/fallback/logo.webp');
+        $provider = $this->createStub(SiteLogoProviderInterface::class);
+        $provider->method('resolveSiteLogo')->willReturn(null);
+        $provider->method('resolveFallbackSiteLogo')->willReturn($this->logo('fallbackHash'));
         $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
 
-        $resolver = new SiteLogoResolver(
-            providers: [$filter],
-            configService: $this->configServiceStub,
-            imageRepository: $this->imageRepositoryStub,
-            assetPackages: $this->packagesStub,
+        static::assertSame(
+            '/images/thumbnails/fallbackHash_h120.webp',
+            $this->resolver([$provider])->resolveUrl(),
         );
-
-        static::assertSame('/fallback/logo.webp', $resolver->resolveUrl());
     }
 
     public function testFallsThroughToDefaultAssetWhenNothingMatches(): void
     {
-        // Arrange
-        $filter = $this->createStub(SiteLogoUrlProviderInterface::class);
-        $filter->method('resolveSiteLogoUrl')->willReturn(null);
-        $filter->method('resolveFallbackSiteLogoUrl')->willReturn(null);
+        $provider = $this->createStub(SiteLogoProviderInterface::class);
+        $provider->method('resolveSiteLogo')->willReturn(null);
+        $provider->method('resolveFallbackSiteLogo')->willReturn(null);
         $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
 
-        $resolver = new SiteLogoResolver(
-            providers: [$filter],
-            configService: $this->configServiceStub,
-            imageRepository: $this->imageRepositoryStub,
-            assetPackages: $this->packagesStub,
-        );
-
-        static::assertSame('/build/images/logo-default.webp', $resolver->resolveUrl());
+        static::assertSame('/build/images/logo-default.webp', $this->resolver([$provider])->resolveUrl());
     }
 
     public function testFallsThroughToDefaultAssetWhenConfiguredImageMissing(): void
     {
-        // Arrange
         $this->configServiceStub->method('getSiteLogoId')->willReturn(42);
         $this->imageRepositoryStub->method('find')->willReturn(null);
 
-        $resolver = new SiteLogoResolver(
-            providers: [],
-            configService: $this->configServiceStub,
-            imageRepository: $this->imageRepositoryStub,
-            assetPackages: $this->packagesStub,
-        );
+        static::assertSame('/build/images/logo-default.webp', $this->resolver([])->resolveUrl());
+    }
 
-        static::assertSame('/build/images/logo-default.webp', $resolver->resolveUrl());
+    public function testResolveReportsTheFixedAxisOnlyAndLeavesTheFreeOneNull(): void
+    {
+        $provider = $this->createStub(SiteLogoProviderInterface::class);
+        $provider->method('resolveSiteLogo')->willReturn($this->logo('wideHash'));
+
+        static::assertSame(
+            ['url' => '/images/thumbnails/wideHash_h120.webp', 'width' => null, 'height' => 120],
+            $this->resolver([$provider])->resolve(),
+        );
+    }
+
+    public function testDefaultAssetCarriesNoDimensions(): void
+    {
+        $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
+
+        static::assertSame(
+            ['url' => '/build/images/logo-default.webp', 'width' => null, 'height' => null],
+            $this->resolver([])->resolve(),
+        );
     }
 }

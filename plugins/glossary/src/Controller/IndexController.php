@@ -31,7 +31,7 @@ final class IndexController extends AbstractGlossaryController
     public function detail(int $id): Response
     {
         $entry = $this->service->get($id);
-        if ($entry === null || (!$entry->getApproved() && !$this->isGranted('ROLE_ORGANIZER'))) {
+        if ($entry === null) {
             throw $this->createNotFoundException();
         }
 
@@ -48,9 +48,7 @@ final class IndexController extends AbstractGlossaryController
         $entries = $this->service->getList();
 
         if (!$this->isGranted('ROLE_ORGANIZER')) {
-            $approved = array_filter($entries, static fn(Glossary $entry): bool => $entry->getApproved());
-
-            return array_values(array_map(static fn(Glossary $entry): int => (int) $entry->getId(), $approved));
+            return array_values(array_map(static fn(Glossary $entry): int => (int) $entry->getId(), $entries));
         }
 
         $pendingProposalIds = $this->changeProposalService->pendingTargetIds(GlossaryCategorizableTypeProvider::ITEM_TYPE);

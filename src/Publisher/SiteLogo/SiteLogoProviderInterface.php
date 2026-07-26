@@ -2,12 +2,13 @@
 
 namespace App\Publisher\SiteLogo;
 
+use App\Entity\Image;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag]
-interface SiteLogoUrlProviderInterface
+interface SiteLogoProviderInterface
 {
-    public function resolveSiteLogoUrl(): ?string;
+    public function resolveSiteLogo(): ?Image;
 
-    public function resolveFallbackSiteLogoUrl(): ?string;
+    public function resolveFallbackSiteLogo(): ?Image;
 }

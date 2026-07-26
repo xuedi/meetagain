@@ -28,7 +28,7 @@ class ConfigExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(7, $functions);
+        static::assertCount(8, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('is_show_frontpage', $functionNames);
@@ -37,6 +37,7 @@ class ConfigExtensionTest extends TestCase
         static::assertContains('get_date_format_flatpickr', $functionNames);
         static::assertContains('get_footer_column_title', $functionNames);
         static::assertContains('site_logo_url', $functionNames);
+        static::assertContains('site_logo', $functionNames);
         static::assertContains('has_image_attributions', $functionNames);
     }
 
