@@ -33,10 +33,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Blocklist enforcement lives in guardCheck() for every email type. A blocked recipient
- * causes guardCheck() to return false - same semantics as any other opt-out.
- */
 final class EmailTypeBlocklistTest extends TestCase
 {
     private ConfigService $config;

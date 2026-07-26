@@ -2,10 +2,6 @@
 
 namespace App\Item;
 
-/**
- * One item type inside the attach control: its key, label, the provider's rendered
- * search/pick fragment, and the subsystem attach slots offered for this type.
- */
 readonly class ItemAttachControlType
 {
     /**

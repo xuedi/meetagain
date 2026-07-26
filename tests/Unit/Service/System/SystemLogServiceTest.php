@@ -30,7 +30,7 @@ class SystemLogServiceTest extends TestCase
 
     public function testGetRecentEntriesReturnsParsedLinesReversed(): void
     {
-        // Arrange - three lines in chronological order in the file
+        // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('glob')->willReturn([]);
         $fs->method('fileExists')->willReturn(true);
@@ -42,7 +42,7 @@ class SystemLogServiceTest extends TestCase
         ]));
         $service = new SystemLogService($fs, self::LOGS_DIR, self::ENV);
 
-        // Act - newest first
+        // Act
         $entries = $service->getRecentEntries();
 
         // Assert
@@ -88,7 +88,7 @@ class SystemLogServiceTest extends TestCase
         // Act
         $entries = $service->getRecentEntries(limit: 2);
 
-        // Assert - newest two
+        // Assert
         static::assertCount(2, $entries);
         static::assertSame('msg4', $entries[0]->getMessage());
         static::assertSame('msg3', $entries[1]->getMessage());
@@ -110,7 +110,7 @@ class SystemLogServiceTest extends TestCase
 
     public function testGetLogFilePathPicksNewestRotatedFile(): void
     {
-        // Arrange - 'b' has higher mtime than 'a'
+        // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('glob')->willReturn([
             self::LOGS_DIR . '/prod-2026-05-10.log',
@@ -215,7 +215,7 @@ class SystemLogServiceTest extends TestCase
         // Act
         $entries = $service->getAllEntries();
 
-        // Assert - both files contribute one entry each
+        // Assert
         static::assertCount(2, $entries);
         $messages = array_map(static fn($e) => $e->getMessage(), $entries);
         static::assertContains('today', $messages);
@@ -232,7 +232,7 @@ class SystemLogServiceTest extends TestCase
         $fs->method('getFileContents')->willReturn($line);
         $service = new SystemLogService($fs, self::LOGS_DIR, self::ENV);
 
-        // Act - compute the expected hash via the same code path
+        // Act
         $expectedHash = $service->getAllEntries()[0]->getHash();
         $found = $service->findByHash($expectedHash);
 
@@ -278,7 +278,7 @@ class SystemLogServiceTest extends TestCase
         $fs->method('getFileContents')->willReturn("one\ntwo\nthree\n");
         $service = new SystemLogService($fs, self::LOGS_DIR, self::ENV);
 
-        // Act / Assert - trailing newline does not add an extra count
+        // Act / Assert
         static::assertSame(3, $service->countLines());
     }
 }

@@ -95,7 +95,7 @@ class CmsEventTeaserExtensionTest extends TestCase
         // Act
         $subject->getUpcomingEvents(5);
 
-        // Assert: expectation on the mock above (called with limit=5)
+        // Assert
         static::assertTrue(true);
     }
 }

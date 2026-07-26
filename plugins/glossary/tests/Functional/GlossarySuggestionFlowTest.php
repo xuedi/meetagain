@@ -10,12 +10,6 @@ use Plugin\Glossary\Entity\Glossary;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-/**
- * Regression cover for the member proposal / moderator review flow on the universal change
- * proposal tool: a member's edit becomes a pending proposal, a moderator's edit is written
- * directly, a moderator resolves proposals per field on the core review page, and the proposer
- * can withdraw. The separate new-entry approval flow stays as it was.
- */
 class GlossarySuggestionFlowTest extends WebTestCase
 {
     private const string MODERATOR_EMAIL = 'Admin@example.org';

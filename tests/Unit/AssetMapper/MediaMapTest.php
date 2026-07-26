@@ -24,7 +24,7 @@ class MediaMapTest extends TestCase
         // Act
         $map = $mediaMap->build();
 
-        // Assert: map is keyed by hash, value is logical path
+        // Assert
         $expectedHashA = OpaqueMediaPathResolver::hashLogicalPath('images/logo.png');
         $expectedHashB = OpaqueMediaPathResolver::hashLogicalPath('images/banner.webp');
 

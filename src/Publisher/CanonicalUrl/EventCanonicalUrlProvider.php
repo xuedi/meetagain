@@ -11,10 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-/**
- * Points an occurrence of a recurring series at the occurrence that owns the content.
- * Returns null for every other route, and for an event that is its own root.
- */
 final readonly class EventCanonicalUrlProvider implements CanonicalUrlProviderInterface
 {
     public function __construct(

@@ -42,14 +42,14 @@ class EventSchemaServiceTest extends TestCase
 
     public function testMinimalEventStillEmitsAllFiveRecommendedFieldsViaFallbacks(): void
     {
-        // Arrange: no teaser, no description, no preview image, no host
+        // Arrange
         $event = $this->makeEvent(title: 'Coffee chat');
         $subject = $this->makeService();
 
         // Act
         $schema = $subject->buildSchema($event, self::CANONICAL_URL, 'en');
 
-        // Assert: every field falls back to a non-empty value
+        // Assert
         static::assertSame('Coffee chat', $schema['description'], 'description falls back to title');
         static::assertSame([self::PLATFORM_HOST . '/images/locations/default.jpg'], $schema['image'], 'image falls back to default static asset');
         static::assertSame('https://schema.org/EventScheduled', $schema['eventStatus']);
@@ -197,7 +197,7 @@ class EventSchemaServiceTest extends TestCase
         // Act
         $schema = $subject->buildSchema($event, self::CANONICAL_URL, $locale);
 
-        // Assert: name and the description fallback both reflect the locale-specific title
+        // Assert
         static::assertSame($titles[$locale], $schema['name']);
         static::assertSame($titles[$locale], $schema['description']);
     }

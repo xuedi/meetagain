@@ -19,28 +19,18 @@ readonly class ImageLocationService
         private LoggerInterface $logger,
     ) {}
 
-    /**
-     * Insert one location row. No-op if the row already exists (INSERT IGNORE).
-     */
     public function addLocation(int $imageId, ImageType $type, int $locationId): void
     {
         $this->locationRepository->insertForType($type, [['imageId' => $imageId, 'locationId' => $locationId]]);
         $this->imageAltStatusCache->invalidateImage($imageId);
     }
 
-    /**
-     * Delete one location row. No-op if the row does not exist.
-     */
     public function removeLocation(int $imageId, ImageType $type, int $locationId): void
     {
         $this->locationRepository->deleteByTypeAndPairs($type, [['imageId' => $imageId, 'locationId' => $locationId]]);
         $this->imageAltStatusCache->invalidateImage($imageId);
     }
 
-    /**
-     * Full re-sync via all registered definitions.
-     * Per-definition failures are caught and logged so one broken definition cannot abort the rest.
-     */
     public function discover(): void
     {
         foreach ($this->registry->all() as $definition) {
@@ -57,8 +47,6 @@ readonly class ImageLocationService
     }
 
     /**
-     * Returns the edit link for a given ImageLocation by delegating to its type definition.
-     *
      * @return array{route: string, params: array<string, mixed>}|null
      */
     public function resolveEditLink(ImageLocation $location): ?array
@@ -67,9 +55,6 @@ readonly class ImageLocationService
     }
 
     /**
-     * Returns location context for an image: a human-readable label, an optional admin route name,
-     * and optional route params. Returns null when the location cannot be determined.
-     *
      * @return array{label: string, route: string|null, params: array<string, mixed>}|null
      */
     public function locate(Image $image): ?array

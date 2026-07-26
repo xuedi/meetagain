@@ -103,7 +103,7 @@ class CoreImageReportProviderTest extends TestCase
 
     public function testApproveItemThrowsWhenReportNotFound(): void
     {
-        // Arrange - admin but repo finds nothing
+        // Arrange
         $repo = $this->createStub(ImageReportRepository::class);
         $repo->method('find')->willReturn(null);
 
@@ -161,7 +161,7 @@ class CoreImageReportProviderTest extends TestCase
 
     public function testDenyItemResolvesAndPersistsReport(): void
     {
-        // Arrange - deny and approve share the same body in this provider
+        // Arrange
         $report = $this->createMock(ImageReport::class);
         $report->expects($this->once())->method('setStatus')->with(ImageReportStatus::Resolved);
 

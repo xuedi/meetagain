@@ -8,10 +8,6 @@ use App\Localization\LocalizedContentSourceInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 
-/**
- * Alt text is a locale-keyed JSON map on the image itself, so there is no row to delete - a stale
- * locale is removed by unsetting its key.
- */
 final readonly class ImageAltSource implements LocalizedContentSourceInterface
 {
     public function __construct(

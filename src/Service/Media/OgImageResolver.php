@@ -30,7 +30,6 @@ readonly class OgImageResolver
 
     public function resolve(): ?ResolvedOgImage
     {
-        // 1. Plugin-provided override
         foreach ($this->providers as $provider) {
             $resolved = $provider->resolveOgImage();
             if ($resolved !== null) {
@@ -38,7 +37,6 @@ readonly class OgImageResolver
             }
         }
 
-        // 2. Admin-configured website image (from system config).
         $imageId = $this->configService->getWebsiteImageId();
         if ($imageId === null) {
             return null;
@@ -49,8 +47,6 @@ readonly class OgImageResolver
             return null;
         }
 
-        // 3. No bundled fallback - if no provider claims and no admin image is set,
-        //    callers receive null and the meta tags are simply omitted.
         return new ResolvedOgImage(
             absoluteUrl: $this->buildAbsoluteUrl($image),
             width: self::OG_WIDTH,

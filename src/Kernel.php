@@ -10,11 +10,6 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
-/**
- * This class extends Symfony's BaseKernel and incorporates the MicroKernelTrait
- * to manage the application's kernel, configuration, plugins, and routing setup.
- * More: https://symfony.com/doc/current/configuration/multiple_kernels.html
- */
 class Kernel extends BaseKernel
 {
     use MicroKernelTrait;
@@ -25,12 +20,6 @@ class Kernel extends BaseKernel
     }
 
     /**
-     * Merge per-plugin bundle registrations into the kernel. Plugins ship their
-     * Symfony bundles in plugins/<name>/config/bundles.php using the same array
-     * shape as core's config/bundles.php. Registration depends only on the
-     * directory existing (matching composer dependency presence), not on the
-     * runtime plugin-enabled flag in config/plugins.php.
-     *
      * @return iterable<BundleInterface>
      */
     public function registerBundles(): iterable
@@ -71,7 +60,6 @@ class Kernel extends BaseKernel
 
     public function getPluginConfigDirs(): iterable
     {
-        // Check for environment-specific plugins config first (e.g., plugins_test.php)
         $envPluginsFile = $this->getProjectDir() . '/config/plugins_' . $this->environment . '.php';
         $plugins = [];
         $pluginsFile = $this->getProjectDir() . '/config/plugins.php';

@@ -4,9 +4,6 @@ namespace Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-/**
- * Verifies that plugin admin navigation section keys merge correctly with core.
- */
 class AdminNavigationSectionMergeTest extends WebTestCase
 {
     private const ADMIN_EMAIL = 'Admin@example.org';
@@ -38,7 +35,7 @@ class AdminNavigationSectionMergeTest extends WebTestCase
         $crawler = $client->request('GET', '/en/admin/logs/system');
         $this->assertResponseIsSuccessful();
 
-        // Assert - count sidebar section headings with text "System"
+        // Assert
         $systemHeadings = $crawler->filter('aside.menu p.menu-label')->reduce(static fn($node): bool => trim($node->text()) === 'System');
 
         static::assertCount(
@@ -62,8 +59,7 @@ class AdminNavigationSectionMergeTest extends WebTestCase
         $crawler = $client->request('GET', '/en/admin/events');
         $this->assertResponseIsSuccessful();
 
-        // Assert - the "Content" section heading must never appear twice. A plugin may move
-        // its links into a different section, so the heading may also be absent.
+        // Assert
         $contentHeadings = $crawler->filter('aside.menu p.menu-label')->reduce(static fn($node): bool => trim($node->text()) === 'Content');
 
         static::assertLessThanOrEqual(

@@ -1,14 +1,5 @@
 <?php declare(strict_types=1);
 
-/**
- * MeetAgain Web Installer.
- *
- * Standalone installer that runs before composer install.
- * Handles system requirements checking, database setup, mail configuration,
- * and initial application installation.
- *
- * @author MeetAgain Team
- */
 class Installer
 {
     private const string LOCK_FILE = '../../installed.lock';
@@ -70,7 +61,6 @@ class Installer
         return count($this->errors) > 0;
     }
 
-    // CSRF Protection
     public function generateCsrfToken(): string
     {
         if (!isset($this->session['csrf_token'])) {
@@ -85,7 +75,6 @@ class Installer
         return isset($this->session['csrf_token']) && hash_equals($this->session['csrf_token'], $token);
     }
 
-    // Session data management
     public function setSessionData(string $key, mixed $value): void
     {
         $this->session['install_data'][$key] = $value;
@@ -101,11 +90,7 @@ class Installer
         return $this->session['install_data'] ?? [];
     }
 
-    /**
-     * Store multiple values in session data.
-     *
-     * @param array<string, mixed> $data Key-value pairs to store
-     */
+    /** @param array<string, mixed> $data */
     public function storeSessionData(array $data): void
     {
         foreach ($data as $key => $value) {
@@ -113,14 +98,7 @@ class Installer
         }
     }
 
-    /**
-     * Handle form validation and conditional redirect.
-     *
-     * If there are errors, stores the provided data and calls the error handler.
-     * If successful, stores the data and redirects to the next step.
-     *
-     * @param array<string, mixed> $data
-     */
+    /** @param array<string, mixed> $data */
     public function handleFormResult(array $data, ?int $nextStep = null, ?callable $onError = null): void
     {
         $this->storeSessionData($data);
@@ -140,27 +118,17 @@ class Installer
         }
     }
 
-    /**
-     * Check system requirements for MeetAgain installation.
-     *
-     * @return array<string, array{name: string, passed: bool, current: string, optional?: bool}>
-     */
+    /** @return array<string, array{name: string, passed: bool, current: string, optional?: bool}> */
     public function checkRequirements(): array
     {
         return $this->systemRequirements->check();
     }
 
-    /**
-     * Check if all non-optional requirements pass.
-     */
     public function allRequirementsPassed(): bool
     {
         return $this->systemRequirements->allRequirementsPassed($this->checkRequirements());
     }
 
-    /**
-     * Test database connection with provided credentials.
-     */
     public function testDatabaseConnection(string $host, int $port, string $name, string $user, string $password): bool
     {
         try {
@@ -169,7 +137,6 @@ class Installer
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_TIMEOUT => 3,
             ];
-            // Add MySQL-specific connect timeout if available
             if (defined('PDO::MYSQL_ATTR_CONNECT_TIMEOUT')) {
                 $options[PDO::MYSQL_ATTR_CONNECT_TIMEOUT] = 3;
             }
@@ -184,7 +151,6 @@ class Installer
         }
     }
 
-    // Generate .env file
     public function generateEnvFile(): bool
     {
         $data = $this->getAllSessionData();
@@ -229,20 +195,17 @@ ENV;
             return false;
         }
 
-        // Restrict .env file permissions to owner-only (0600)
         chmod($envPath, 0600);
 
         return true;
     }
 
-    // Run composer install
     public function runComposerInstall(): bool
     {
         $projectRoot = realpath(__DIR__ . '/../../');
         $output = [];
         $returnCode = 0;
 
-        // Change to project root and run composer
         $command = sprintf(
             'cd %s && composer install --no-dev --optimize-autoloader 2>&1',
             escapeshellarg($projectRoot)
@@ -259,7 +222,6 @@ ENV;
         return true;
     }
 
-    // Run database migrations
     public function runMigrations(): bool
     {
         $projectRoot = realpath(__DIR__ . '/../../');
@@ -282,14 +244,7 @@ ENV;
         return true;
     }
 
-    /**
-     * Generic user creation method.
-     *
-     * Creates a user with provided data, merging with sensible defaults.
-     * Automatically hashes passwords using bcrypt.
-     *
-     * @param array<string, mixed> $userData
-     */
+    /** @param array<string, mixed> $userData */
     private function createUser(PDO $pdo, array $userData): int
     {
         $now = date('Y-m-d H:i:s');
@@ -311,7 +266,6 @@ ENV;
 
         $data = array_merge($defaults, $userData);
 
-        // Hash password if provided and not already hashed
         if (!empty($data['password']) && !str_starts_with($data['password'], '$2y$')) {
             $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT, ['cost' => 13]);
         }
@@ -341,24 +295,18 @@ ENV;
         return (int) $pdo->lastInsertId();
     }
 
-    /**
-     * Create system user for automated operations.
-     */
     public function createSystemUser(PDO $pdo): int
     {
         return $this->createUser($pdo, [
             'name' => 'System',
             'email' => 'system@localhost',
             'roles' => ['ROLE_SYSTEM'],
-            'password' => '', // No password for system user
+            'password' => '',
             'public' => 0,
             'tagging' => 0,
         ]);
     }
 
-    /**
-     * Create admin user with full privileges.
-     */
     public function createAdminUser(PDO $pdo, string $email, string $password, string $name): int
     {
         return $this->createUser($pdo, [
@@ -371,7 +319,6 @@ ENV;
         ]);
     }
 
-    // Create default config entries
     public function createDefaultConfig(PDO $pdo, int $systemUserId): void
     {
         $data = $this->getAllSessionData();
@@ -393,7 +340,6 @@ ENV;
         }
     }
 
-    // Create lock file
     public function createLockFile(): bool
     {
         $lockPath = __DIR__ . '/' . self::LOCK_FILE;
@@ -408,7 +354,6 @@ ENV;
         return file_put_contents($lockPath, $content) !== false;
     }
 
-    // Get database connection from session data
     public function getDatabaseConnection(): ?PDO
     {
         $data = $this->getAllSessionData();
@@ -431,39 +376,22 @@ ENV;
         }
     }
 
-    /**
-     * Run the complete installation process.
-     *
-     * Executes all installation steps:
-     * 1. Generate .env file
-     * 2. Run composer install
-     * 3. Run database migrations
-     * 4. Create system and admin users
-     * 5. Create default configuration
-     * 6. Create installation lock file
-     *
-     * @return bool True if installation successful, false otherwise
-     */
     public function runInstallation(): bool
     {
         $data = $this->getAllSessionData();
 
-        // Step 1: Generate .env file
         if (!$this->generateEnvFile()) {
             return false;
         }
 
-        // Step 2: Run composer install
         if (!$this->runComposerInstall()) {
             return false;
         }
 
-        // Step 3: Run migrations
         if (!$this->runMigrations()) {
             return false;
         }
 
-        // Step 4: Create users and config
         $pdo = $this->getDatabaseConnection();
         if (!$pdo) {
             return false;
@@ -484,21 +412,18 @@ ENV;
             return false;
         }
 
-        // Step 5: Create lock file
         if (!$this->createLockFile()) {
             $this->addError('Failed to create lock file');
 
             return false;
         }
 
-        // Clear session
         $this->session = [];
         session_destroy();
 
         return true;
     }
 
-    // Helper methods
     private function generateSecret(): string
     {
         return bin2hex(random_bytes(16));
@@ -524,14 +449,9 @@ ENV;
         return function_exists('posix_getgid') ? posix_getgid() : 1000;
     }
 
-    /**
-     * Render a template with default installer variables.
-     *
-     * @param array<string, mixed> $vars
-     */
+    /** @param array<string, mixed> $vars */
     public function render(string $template, array $vars = []): string
     {
-        // Add default vars
         $vars['csrf_token'] = $this->generateCsrfToken();
         $vars['errors'] = $this->errors;
         $vars['current_step'] = $this->getCurrentStep();
@@ -539,7 +459,6 @@ ENV;
         return $this->renderer->render($template, $vars);
     }
 
-    // Input sanitization
     public function sanitize(string $value): string
     {
         return htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');

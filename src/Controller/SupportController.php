@@ -87,8 +87,7 @@ final class SupportController extends AbstractController
 
                 $this->supportNotificationEmail->send(['request' => $supportRequest]);
 
-                // Intentionally not a PRG redirect: the confirmation state carries no live form,
-                // so a browser refresh cannot replay the submission.
+                // Not a PRG redirect on purpose: the confirmation carries no live form, so a refresh cannot replay it
                 return $this->render('support/index.html.twig', ['submitted' => true]);
             }
         }

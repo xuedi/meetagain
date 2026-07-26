@@ -49,10 +49,6 @@ final readonly class CmsBlockSource extends AbstractCmsLocalizedSource
         return $rows;
     }
 
-    /**
-     * The rendered inner body is cached per page, so a deleted block stays visible until every
-     * touched page is invalidated.
-     */
     #[Override]
     public function deleteOutsideLocales(array $ownerIds, array $keepLocales): int
     {

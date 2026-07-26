@@ -7,10 +7,6 @@ use Plugin\Films\Form\ConfigType;
 use Plugin\Films\ValueObject\Config;
 use Symfony\Component\Form\FormInterface;
 
-/**
- * Descriptor for the films taxonomy settings. Distinct key from SettingsDescriptor ('films'):
- * the taxonomy is JSON on the generic per-scope store, the API keys are a custom entity store.
- */
 final class ConfigDescriptor implements PluginSettingsDescriptorInterface
 {
     public function getKey(): string

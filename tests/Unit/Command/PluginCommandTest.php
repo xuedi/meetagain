@@ -24,100 +24,100 @@ class PluginCommandTest extends TestCase
 
     public function testNoArgumentsReturnsSuccess(): void
     {
-        // Act: execute command without arguments
+        // Act
         $exitCode = $this->commandTester->execute([]);
 
-        // Assert: returns success
+        // Assert
         static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testInvalidActionReturnsFailure(): void
     {
-        // Act: execute command with invalid action
+        // Act
         $exitCode = $this->commandTester->execute([
             'action' => 'invalid',
             'plugin' => 'demo',
         ]);
 
-        // Assert: returns failure
+        // Assert
         static::assertSame(Command::FAILURE, $exitCode);
     }
 
     public function testEnableWithoutPluginArgumentIsNoOp(): void
     {
-        // Arrange: expect no service calls when plugin is missing
+        // Arrange
         $this->pluginService->expects($this->never())->method('install');
         $this->pluginService->expects($this->never())->method('enable');
 
-        // Act: execute command with action but no plugin
+        // Act
         $exitCode = $this->commandTester->execute([
             'action' => 'enable',
         ]);
 
-        // Assert: returns success without calling service
+        // Assert
         static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testEnableWithEmptyPluginArgumentIsNoOp(): void
     {
-        // Arrange: expect no service calls when plugin is empty string
+        // Arrange
         $this->pluginService->expects($this->never())->method('install');
         $this->pluginService->expects($this->never())->method('enable');
 
-        // Act: execute command with empty plugin
+        // Act
         $exitCode = $this->commandTester->execute([
             'action' => 'enable',
             'plugin' => '',
         ]);
 
-        // Assert: returns success without calling service
+        // Assert
         static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testEnablePluginCallsService(): void
     {
-        // Arrange: expect install and enable to be called
+        // Arrange
         $this->pluginService->expects($this->once())->method('install')->with('demo');
 
         $this->pluginService->expects($this->once())->method('enable')->with('demo');
 
-        // Act: enable a plugin
+        // Act
         $exitCode = $this->commandTester->execute([
             'action' => 'enable',
             'plugin' => 'demo',
         ]);
 
-        // Assert: returns success
+        // Assert
         static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testDisablePluginCallsService(): void
     {
-        // Arrange: expect disable to be called
+        // Arrange
         $this->pluginService->expects($this->once())->method('disable')->with('demo');
 
-        // Act: disable a plugin
+        // Act
         $exitCode = $this->commandTester->execute([
             'action' => 'disable',
             'plugin' => 'demo',
         ]);
 
-        // Assert: returns success
+        // Assert
         static::assertSame(Command::SUCCESS, $exitCode);
     }
 
     public function testDisableAllClearsConfig(): void
     {
-        // Arrange: expect setPluginConfig to be called with empty array
+        // Arrange
         $this->pluginService->expects($this->once())->method('setPluginConfig')->with([]);
 
-        // Act: disable all plugins
+        // Act
         $exitCode = $this->commandTester->execute([
             'action' => 'disable',
             'plugin' => 'all',
         ]);
 
-        // Assert: returns success
+        // Assert
         static::assertSame(Command::SUCCESS, $exitCode);
     }
 }

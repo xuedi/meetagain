@@ -18,7 +18,7 @@ class SitemapPublisherTest extends TestCase
         // Act
         $urls = $publisher->getSitemapUrls();
 
-        // Assert: one entry per locale, each with all-locale alternates and weekly priority 0.7
+        // Assert
         self::assertCount(3, $urls);
         foreach ($urls as $url) {
             self::assertSame(0.7, $url->priority);

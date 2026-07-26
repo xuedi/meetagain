@@ -17,7 +17,7 @@ class ImageAltStatusCacheTest extends TestCase
 {
     public function testComputesAndStoresOnMiss(): void
     {
-        // Arrange - image 1 has every required alt, image 2 misses 'de'.
+        // Arrange
         $complete = self::imageWithId(1);
         $complete->setAlt('english');
         $complete->setAltTranslation('de', 'deutsch');

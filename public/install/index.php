@@ -1,9 +1,5 @@
 <?php declare(strict_types=1);
 
-/**
- * MeetAgain Web Installer - Entry Point.
- */
-
 require_once __DIR__ . '/TemplateRenderer.php';
 require_once __DIR__ . '/SystemRequirements.php';
 require_once __DIR__ . '/Installer.php';
@@ -19,17 +15,14 @@ require_once __DIR__ . '/Providers/SesMailProvider.php';
 $installer = new Installer();
 $mailProviderRegistry = MailProviderRegistry::createDefault();
 
-// Check if already installed
 if ($installer->isInstalled()) {
     header('Location: /');
     exit;
 }
 
-// Handle routing
 $step = $_GET['step'] ?? null;
 $action = $_POST['action'] ?? null;
 
-// CSRF validation for POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $csrfToken = $_POST['csrf_token'] ?? '';
     if (!$installer->validateCsrfToken($csrfToken)) {
@@ -39,7 +32,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Route handling
 switch ($action) {
     case 'step1':
         handleStep1($installer);
@@ -95,7 +87,6 @@ function showStep1(Installer $installer): void
 
 function handleStep1(Installer $installer): void
 {
-    // Collect and sanitize database settings
     $data = [
         'db_host' => $installer->sanitize($_POST['db_host'] ?? 'localhost'),
         'db_port' => $installer->sanitizeInt($_POST['db_port'] ?? 3306),
@@ -104,7 +95,6 @@ function handleStep1(Installer $installer): void
     ];
     $dbPassword = $_POST['db_password'] ?? '';
 
-    // Validation
     if (empty($data['db_user'])) {
         $installer->addError('Database user is required');
     }
@@ -113,7 +103,6 @@ function handleStep1(Installer $installer): void
         $installer->addError('Database password is required');
     }
 
-    // Test connection if no validation errors
     if (!$installer->hasErrors()) {
         $installer->testDatabaseConnection(
             $data['db_host'],
@@ -124,7 +113,6 @@ function handleStep1(Installer $installer): void
         );
     }
 
-    // Store password only on success
     if (!$installer->hasErrors()) {
         $data['db_password'] = $dbPassword;
     }
@@ -157,7 +145,6 @@ function handleStep2(Installer $installer): void
 
     $providerName = $installer->sanitize($_POST['mail_provider'] ?? 'null');
 
-    // Get the provider instance
     try {
         $provider = $mailProviderRegistry->getProvider($providerName);
     } catch (InvalidArgumentException $e) {
@@ -167,14 +154,11 @@ function handleStep2(Installer $installer): void
         return;
     }
 
-    // Validate provider-specific configuration
     $provider->validate($_POST, $installer);
 
-    // Collect provider-specific configuration
     $mailConfig = $provider->collectConfig($_POST, $installer);
     $mailConfig['provider'] = $providerName;
 
-    // Build and store MAILER_DSN on success
     $data = array_merge(['mail_provider' => $providerName], $mailConfig);
     if (!$installer->hasErrors()) {
         $data['mailer_dsn'] = $provider->buildDsn($mailConfig);
@@ -185,7 +169,6 @@ function handleStep2(Installer $installer): void
 
 function showStep3(Installer $installer): void
 {
-    // Auto-detect site URL
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $defaultUrl = $protocol . '://' . $host;
@@ -200,7 +183,6 @@ function showStep3(Installer $installer): void
 
 function handleStep3(Installer $installer): void
 {
-    // Collect and sanitize site settings
     $data = [
         'site_url' => $installer->sanitize($_POST['site_url'] ?? ''),
         'site_name' => $installer->sanitize($_POST['site_name'] ?? 'MeetAgain'),
@@ -210,7 +192,6 @@ function handleStep3(Installer $installer): void
     $adminPassword = $_POST['admin_password'] ?? '';
     $adminPasswordConfirm = $_POST['admin_password_confirm'] ?? '';
 
-    // Validation
     if (empty($data['site_url'])) {
         $installer->addError('Site URL is required');
     }
@@ -229,14 +210,12 @@ function handleStep3(Installer $installer): void
         $installer->addError('Passwords do not match');
     }
 
-    // Store password only on success
     if (!$installer->hasErrors()) {
         $data['admin_password'] = $adminPassword;
     }
 
     $installer->handleFormResult($data, null, fn () => showStep3($installer));
 
-    // Run installation (only reached if no errors)
     if ($installer->runInstallation()) {
         echo $installer->render('success', [
             'site_url' => $data['site_url'],

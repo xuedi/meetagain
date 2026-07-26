@@ -45,7 +45,6 @@ abstract class AbstractSecurityProvider implements SecurityProviderInterface
      */
     protected function persistLog(Request $request, array $context): void
     {
-        // default no-op; detection providers override
     }
 
     protected function resolveStateKey(string $sessionId, string $ip): string

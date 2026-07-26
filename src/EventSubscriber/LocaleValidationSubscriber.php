@@ -34,19 +34,16 @@ readonly class LocaleValidationSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        // Check for locale in route attributes
         $locale = $request->attributes->get('_locale') ?? $request->attributes->get('locale');
 
         if ($locale === null) {
             return;
         }
 
-        // Globally disabled language -> 404
         if (!$this->languageService->isValidCode($locale)) {
             throw new NotFoundHttpException(sprintf('Locale "%s" is not available', $locale));
         }
 
-        // Context-filtered language -> redirect to default filtered locale
         if (!$this->languageService->isFilteredValidCode($locale)) {
             $defaultLocale = $this->languageService->getFilteredDefaultLocale();
             $uri = $request->getRequestUri();

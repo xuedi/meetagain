@@ -269,7 +269,6 @@ class Cms
 
     public function removeBlock(CmsBlock $block): static
     {
-        // set the owning side to null (unless already changed)
         if ($this->blocks->removeElement($block) && $block->getPage() === $this) {
             $block->setPage(null);
         }

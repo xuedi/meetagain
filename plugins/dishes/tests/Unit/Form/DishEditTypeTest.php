@@ -31,7 +31,7 @@ class DishEditTypeTest extends TestCase
         // Act
         $form = $this->factory(['en', 'de', 'zh'])->create(DishEditType::class, null, ['dish' => $dish]);
 
-        // Assert - one field group per language, plus the language-neutral fields
+        // Assert
         static::assertTrue($form->has('name-en'));
         static::assertTrue($form->has('name-de'));
         static::assertTrue($form->has('description-zh'));
@@ -39,7 +39,7 @@ class DishEditTypeTest extends TestCase
         static::assertTrue($form->has('phonetic'));
         static::assertTrue($form->has('origin'));
 
-        // Assert - values seeded from the dish, not from the UI locale
+        // Assert
         static::assertSame('Reis', $form->get('name-de')->getData());
         static::assertSame('', $form->get('name-en')->getData());
         static::assertSame('mǐ fàn', $form->get('phonetic')->getData());

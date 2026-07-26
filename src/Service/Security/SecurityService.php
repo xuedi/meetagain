@@ -141,9 +141,6 @@ readonly class SecurityService implements CronTaskInterface
         try {
             $from = $lastRunRaw !== null ? new DateTimeImmutable()->setTimestamp((int) $lastRunRaw) : $now->modify('-1 hour');
 
-            // TODO(2026-05-09) Aggregated reports are currently observation-only:
-            // hook in admin notification dispatch / threshold alerting once the
-            // notification routing for high retrospective threat levels is decided.
             $parts = [];
             foreach ($this->sortedProviders() as $provider) {
                 $report = $provider->scanRetrospective($from, $now);

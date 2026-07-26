@@ -9,11 +9,6 @@ use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use Plugin\Dishes\Repository\DishRepository;
 
-/**
- * PluginDishesPreview covers two image sources that share one ImageType - dish gallery images and
- * the dish preview image. Discovery merges both in a single pass so sync() sees the complete set;
- * splitting them into two definitions would make each delete the other's rows.
- */
 final class DishPreviewImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function __construct(

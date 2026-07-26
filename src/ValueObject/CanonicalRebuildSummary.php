@@ -2,9 +2,6 @@
 
 namespace App\ValueObject;
 
-/**
- * Outcome of one rebuild pass over one locale of one series.
- */
 final readonly class CanonicalRebuildSummary
 {
     public function __construct(

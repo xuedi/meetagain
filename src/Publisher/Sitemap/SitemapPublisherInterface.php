@@ -5,11 +5,8 @@ namespace App\Publisher\Sitemap;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Extension point for plugins (and core) to contribute URLs to the sitemap.
- *
- * Implementations must apply any active filters themselves; `loc` must be absolute.
- * SitemapService merges results from all publishers in priority order (higher first).
- * A publisher may return an empty array to suppress its contribution on a request.
+ * Contributes URLs to the sitemap. Implementations must apply active filters themselves and
+ * `loc` must be absolute; results are merged in priority order.
  */
 #[AutoconfigureTag]
 interface SitemapPublisherInterface

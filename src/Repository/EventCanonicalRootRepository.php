@@ -98,10 +98,6 @@ class EventCanonicalRootRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->execute();
     }
 
-    /**
-     * Markers whose event no longer belongs to any series: resolution already ignores them,
-     * the rebuild pass is what actually clears them out.
-     */
     public function deleteOrphaned(): int
     {
         $orphanedEventIds = $this

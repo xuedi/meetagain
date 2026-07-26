@@ -108,7 +108,7 @@ class CoreMemberApprovalProviderTest extends TestCase
 
     public function testApproveItemThrowsWhenUserHasWrongStatus(): void
     {
-        // Arrange - user exists but is already Active, not EmailVerified
+        // Arrange
         $wrong = $this->makeUser(1, 'X', UserStatus::Active);
         $provider = $this->makeProvider(findResult: $wrong, isAdmin: true);
 

@@ -16,10 +16,6 @@ use Override;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-/**
- * Core sitemap URLs: public static routes, published CMS pages, published events.
- * Event URLs may be suppressed by registered SitemapEventVisibilityFilterInterface implementations.
- */
 final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
 {
     private const int MEMBER_PAGE_SIZE = 24;
@@ -68,14 +64,11 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
     private function collectStaticRoutes(array $locales): array
     {
         $staticRoutes = [
-            // Content entry points
             ['route' => 'app_default', 'params' => [], 'priority' => 1.0, 'changefreq' => 'daily'],
             ['route' => 'app_event', 'params' => [], 'priority' => 0.9, 'changefreq' => 'daily'],
             ['route' => 'app_event_featured', 'params' => [], 'priority' => 0.7, 'changefreq' => 'weekly'],
-            // Static utility / docs
             ['route' => 'app_contact', 'params' => [], 'priority' => 0.5, 'changefreq' => 'yearly'],
             ['route' => 'app_cookie', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
-            // Auth entry points - low priority so they don't steal crawl budget from content
             ['route' => 'app_login', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
             ['route' => 'app_register', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
             ['route' => 'app_reset', 'params' => [], 'priority' => 0.3, 'changefreq' => 'yearly'],
@@ -110,9 +103,6 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
     }
 
     /**
-     * One entry per page of the public member directory, applying the same
-     * MemberFilterService restrictions an anonymous visitor would see.
-     *
      * @param array<string> $locales
      * @return array<SitemapUrl>
      */

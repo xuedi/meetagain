@@ -5,10 +5,6 @@ namespace App\Filter\Event;
 use App\Entity\User;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Composite event filter service that collects all registered EventFilterInterface implementations.
- * Combines multiple filters using AND logic for event ID restrictions.
- */
 readonly class EventFilterService
 {
     /**
@@ -22,10 +18,6 @@ readonly class EventFilterService
         private iterable $userProfileFilters,
     ) {}
 
-    /**
-     * Get the combined event ID filter from all registered filters.
-     * Uses intersection (AND) logic: an event must pass ALL filters.
-     */
     public function getEventIdFilter(): EventFilterResult
     {
         $resultSet = null;
@@ -35,7 +27,7 @@ readonly class EventFilterService
             $filterResult = $filter->getEventIdFilter();
 
             if ($filterResult === null) {
-                continue; // No filtering from this filter
+                continue;
             }
 
             $hasActiveFilter = true;
@@ -48,7 +40,6 @@ readonly class EventFilterService
                 $resultSet = $filterResult;
                 continue;
             }
-            // Intersect: event must pass ALL filters
             $resultSet = array_values(array_intersect($resultSet, $filterResult));
             if ($resultSet === []) {
                 return EventFilterResult::emptyResult();
@@ -58,10 +49,6 @@ readonly class EventFilterService
         return new EventFilterResult($resultSet, $hasActiveFilter);
     }
 
-    /**
-     * Get the combined event ID filter for a specific user's profile page.
-     * Intersects the context filter with any registered user-scoped filters.
-     */
     public function getEventIdFilterForUserProfile(User $user): EventFilterResult
     {
         $contextFilter = $this->getEventIdFilter();
@@ -96,7 +83,6 @@ readonly class EventFilterService
             return $contextFilter;
         }
 
-        // Intersect user-scoped result with the context filter
         $contextIds = $contextFilter->getEventIds();
         if ($contextIds === null) {
             return new EventFilterResult($userResultSet, true);
@@ -107,22 +93,17 @@ readonly class EventFilterService
         return new EventFilterResult($intersection, true);
     }
 
-    /**
-     * Check if an event is accessible according to all registered filters.
-     * Any filter returning false will deny access.
-     * Returns true only if all filters allow (or have no opinion).
-     */
     public function isEventAccessible(int $eventId): bool
     {
         foreach ($this->getSortedFilters() as $filter) {
             $result = $filter->isEventAccessible($eventId);
 
             if ($result === false) {
-                return false; // Explicit deny
+                return false;
             }
         }
 
-        return true; // All filters allow or have no opinion
+        return true;
     }
 
     /**

@@ -11,6 +11,7 @@ enum EventInterval: int
     case BiMonthly = 3;
     case Monthly = 4;
     case Yearly = 5;
+    case Custom = 6;
 
     public function label(): string
     {
@@ -20,6 +21,7 @@ enum EventInterval: int
             self::BiMonthly => 'admin_event.interval_bimonthly',
             self::Monthly => 'admin_event.interval_monthly',
             self::Yearly => 'admin_event.interval_yearly',
+            self::Custom => 'admin_event.interval_custom',
         };
     }
 

@@ -22,7 +22,7 @@ class FriendshipServiceTest extends TestCase
 {
     public function testToggleFollowAddsUserWhenNotFollowing(): void
     {
-        // Arrange: set up current user not following target user
+        // Arrange
         $userId = 42;
         $returnRoute = 'app_profile_view';
         $locale = 'en';
@@ -72,17 +72,17 @@ class FriendshipServiceTest extends TestCase
             activityService: $activityServiceStub,
         );
 
-        // Act: toggle follow
+        // Act
         $response = $subject->toggleFollow($userId, $returnRoute);
 
-        // Assert: returns redirect to generated route
+        // Assert
         static::assertInstanceOf(RedirectResponse::class, $response);
         static::assertSame($generatedRoute, $response->getTargetUrl());
     }
 
     public function testToggleFollowRemovesUserWhenAlreadyFollowing(): void
     {
-        // Arrange: set up current user already following target user
+        // Arrange
         $userId = 42;
         $returnRoute = 'app_profile_view';
         $locale = 'en';
@@ -132,17 +132,17 @@ class FriendshipServiceTest extends TestCase
             activityService: $activityServiceStub,
         );
 
-        // Act: toggle follow
+        // Act
         $response = $subject->toggleFollow($userId, $returnRoute);
 
-        // Assert: returns redirect to generated route
+        // Assert
         static::assertInstanceOf(RedirectResponse::class, $response);
         static::assertSame($generatedRoute, $response->getTargetUrl());
     }
 
     public function testToggleFollowThrowsExceptionWhenNotAuthenticated(): void
     {
-        // Arrange: security returns null (unauthenticated)
+        // Arrange
         $securityStub = $this->createStub(Security::class);
         $securityStub->method('getUser')->willReturn(null);
 
@@ -156,17 +156,17 @@ class FriendshipServiceTest extends TestCase
             activityService: $this->createStub(ActivityService::class),
         );
 
-        // Assert: expect authentication exception
+        // Assert
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
         $this->expectExceptionMessage('Should never happen, see: config/packages/security.yaml');
 
-        // Act: toggle follow without authentication
+        // Act
         $subject->toggleFollow(42, 'app_profile_view');
     }
 
     public function testToggleFollowThrowsExceptionWhenUserIsNotUserEntity(): void
     {
-        // Arrange: security returns non-User object implementing UserInterface
+        // Arrange
         $nonUserMock = $this->createStub(UserInterface::class);
 
         $securityStub = $this->createStub(Security::class);
@@ -182,11 +182,11 @@ class FriendshipServiceTest extends TestCase
             activityService: $this->createStub(ActivityService::class),
         );
 
-        // Assert: expect authentication exception
+        // Assert
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
         $this->expectExceptionMessage('Should never happen, see: config/packages/security.yaml');
 
-        // Act: toggle follow with non-User object
+        // Act
         $subject->toggleFollow(42, 'app_profile_view');
     }
 }

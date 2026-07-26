@@ -1,0 +1,163 @@
+{#
+    Recurrence builder -- modal for composing a custom RFC-5545 recurrence rule
+
+    Overlays the event form, so nothing navigates and no form state has to be saved.
+    Always opens on defaults; the rule currently in force is shown as text, never pre-filled.
+    Which controls apply is decided server-side and re-sent with every preview response.
+
+    Used in:    admin/event/edit.html.twig, admin/event/new.html.twig
+    Parameters: recurrence (selection, controls, summary, currentRule, currentRuleSpec, anchor,
+                customValue, ordinals, weekdays, periods), form
+    Depends on: assets/js/recurrence-builder.js
+#}
+<div class="modal"
+     id="recurrence-modal"
+     data-preview-url="{{ path('app_admin_event_recurrence_preview') }}"
+     data-custom-value="{{ recurrence.customValue }}"
+     data-rule-select="{{ form.seriesRule.vars.id }}"
+     data-spec-input="{{ form.customRuleSpec.vars.id }}"
+     data-start-input="{{ form.start.vars.id }}"
+     data-stop-input="{{ form.stop.vars.id }}">
+    <div class="modal-background" data-recurrence-close></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">{{ 'admin_event.recurrence_modal_title'|trans }}</p>
+            <button class="delete" aria-label="close" type="button" data-recurrence-close></button>
+        </header>
+        <section class="modal-card-body">
+
+            <div class="columns">
+                <div class="column is-7">
+
+                    <div class="field">
+                        <label class="radio">
+                            <input type="radio" name="recurrence-mode" value="weekday"
+                                   {% if recurrence.selection.mode == 'weekday' %}checked{% endif %}>
+                            {{ 'admin_event.recurrence_label_every'|trans }}
+                        </label>
+                        <div class="control mt-2{% if not recurrence.controls.weekday %} is-hidden{% endif %}"
+                             id="recurrence-weekday-controls">
+                            <div class="select is-multiple{% if not recurrence.controls.ordinal %} is-hidden{% endif %}"
+                                 id="recurrence-ordinal-wrap">
+                                <select id="recurrence-ordinal" multiple size="5">
+                                    {% for ordinal in recurrence.ordinals %}
+                                        <option value="{{ ordinal.value }}"
+                                                {% if ordinal.value in recurrence.selection.ordinal %}selected{% endif %}>
+                                            {{ ordinal.label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="select{% if recurrence.controls.weekdayMultiple %} is-multiple{% endif %}"
+                                 id="recurrence-weekday-wrap">
+                                <select id="recurrence-weekday"
+                                        {% if recurrence.controls.weekdayMultiple %}multiple size="7"{% endif %}>
+                                    {% for weekday in recurrence.weekdays %}
+                                        <option value="{{ weekday.value }}"
+                                                {% if weekday.value in recurrence.selection.weekday %}selected{% endif %}>
+                                            {{ weekday.label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label class="radio">
+                            <input type="radio" name="recurrence-mode" value="day_of_month"
+                                   {% if recurrence.selection.mode == 'day_of_month' %}checked{% endif %}>
+                            {{ 'admin_event.recurrence_label_on_day'|trans }}
+                        </label>
+                        <div class="control mt-2{% if not recurrence.controls.day %} is-hidden{% endif %}"
+                             id="recurrence-day-controls">
+                            <div class="select is-multiple">
+                                <select id="recurrence-day" multiple size="8">
+                                    {% for day in 1..31 %}
+                                        <option value="{{ day }}"
+                                                {% if day in recurrence.selection.day %}selected{% endif %}>{{ day }}</option>
+                                    {% endfor %}
+                                    <option value="-1" {% if -1 in recurrence.selection.day %}selected{% endif %}>
+                                        {{ 'admin_event.recurrence_day_last'|trans }}
+                                    </option>
+                                </select>
+                            </div>
+                            <p class="help has-text-grey{% if not recurrence.controls.shortMonthHint %} is-hidden{% endif %}"
+                               id="recurrence-hint">
+                                {{ 'admin_event.recurrence_hint_short_months'|trans }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <p class="help has-text-grey{% if not recurrence.controls.multiHint %} is-hidden{% endif %}"
+                       id="recurrence-multi-hint">
+                        {{ 'admin_event.recurrence_hint_multi_select'|trans }}
+                    </p>
+
+                </div>
+                <div class="column is-5">
+                    <div class="box p-4 is-size-7 has-text-grey">
+                        {% if recurrence.currentRule %}
+                            <p class="mb-3 has-text-weight-semibold has-text-grey-dark">
+                                {{ 'admin_event.recurrence_current_rule'|trans({
+                                    '%rule%': recurrence_label(recurrence.currentRule, recurrence.currentRuleSpec, recurrence.anchor)
+                                }) }}
+                            </p>
+                        {% endif %}
+                        <p class="mb-2">{{ 'admin_event.recurrence_tip_start_date'|trans }}</p>
+                        <p class="mb-2">{{ 'admin_event.recurrence_tip_yearly_month'|trans }}</p>
+                        <p>{{ 'admin_event.recurrence_tip_not_saved'|trans }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label is-size-7">{{ 'admin_event.recurrence_label_repeats'|trans }}</label>
+                <div class="control">
+                    <div class="select">
+                        <select id="recurrence-period">
+                            {% for period in recurrence.periods %}
+                                <option value="{{ period.value }}"
+                                        {% if period.value not in recurrence.controls.periods %}hidden{% endif %}
+                                        {% if recurrence.selection.period == period.value %}selected{% endif %}>
+                                    {{ period.label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label class="label is-size-7">{{ 'admin_event.recurrence_label_starting'|trans }}</label>
+                <div class="control">
+                    <div class="select">
+                        <select id="recurrence-start"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="columns">
+                <div class="column is-6">
+                    <label class="label is-size-7">{{ 'admin_event.recurrence_label_start_time'|trans }}</label>
+                    <input class="input" type="time" id="recurrence-start-time">
+                </div>
+                <div class="column is-6">
+                    <label class="label is-size-7">{{ 'admin_event.recurrence_label_end_time'|trans }}</label>
+                    <input class="input" type="time" id="recurrence-end-time">
+                </div>
+            </div>
+
+            <p class="has-text-weight-semibold" id="recurrence-preview"></p>
+
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-primary" type="button" id="recurrence-apply">
+                {{ 'admin_event.recurrence_button_apply'|trans }}
+            </button>
+            <button class="button" type="button" data-recurrence-close>
+                {{ 'global.button_cancel'|trans }}
+            </button>
+        </footer>
+    </div>
+</div>

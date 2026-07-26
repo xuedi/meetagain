@@ -22,7 +22,7 @@ class AccessDeniedProviderTest extends TestCase
         // Arrange
         $provider = $this->buildProvider();
 
-        // Act - 5 access-denied events stay in lenient zone
+        // Act
         $report = null;
         for ($i = 0; $i < 5; ++$i) {
             $report = $provider->observe(SecurityEventType::AccessDenied, Request::create('/page-' . $i), ['reason' => 'voter'], 'sess', '1.2.3.4');
@@ -38,7 +38,7 @@ class AccessDeniedProviderTest extends TestCase
         // Arrange
         $provider = $this->buildProvider();
 
-        // Act - 15 hits across 8+ distinct paths trips the script detector
+        // Act
         $report = null;
         for ($i = 0; $i < 15; ++$i) {
             $report = $provider->observe(SecurityEventType::AccessDenied, Request::create('/path-' . $i), ['reason' => 'voter'], 'sess', '1.2.3.4');

@@ -183,7 +183,6 @@ readonly class EmailTemplateService
             throw new RuntimeException(sprintf('Email template "%s" not found in database.', $identifier->value));
         }
 
-        // Try requested language first, fallback to English
         $translation = $template->findTranslation($language) ?? $template->findTranslation(self::DEFAULT_LANGUAGE);
 
         if (!$translation instanceof EmailTemplateTranslation) {

@@ -17,7 +17,7 @@ class BlockingServiceTest extends TestCase
 {
     public function testBlockThrowsExceptionWhenBlockingYourself(): void
     {
-        // Arrange: create user that tries to block themselves
+        // Arrange
         $user = $this->createStub(User::class);
         $user->method('getId')->willReturn(42);
 
@@ -27,43 +27,43 @@ class BlockingServiceTest extends TestCase
             activityService: $this->createStub(ActivityService::class),
         );
 
-        // Assert: expect exception
+        // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot block yourself');
 
-        // Act: try to block yourself
+        // Act
         $subject->block($user, $user);
     }
 
     public function testBlockDoesNothingWhenAlreadyBlocked(): void
     {
-        // Arrange: create users
+        // Arrange
         $blocker = $this->createStub(User::class);
         $blocker->method('getId')->willReturn(1);
 
         $blocked = $this->createStub(User::class);
         $blocked->method('getId')->willReturn(2);
 
-        // Arrange: repository indicates already blocked
+        // Arrange
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
         $blockRepoMock->expects($this->once())->method('isBlocked')->with($blocker, $blocked)->willReturn(true);
 
-        // Arrange: entity manager should not be called
+        // Arrange
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->never())->method('persist');
         $emMock->expects($this->never())->method('flush');
 
         $subject = new BlockingService(blockRepo: $blockRepoMock, em: $emMock, activityService: $this->createStub(ActivityService::class));
 
-        // Act: try to block already blocked user
+        // Act
         $subject->block($blocker, $blocked);
 
-        // Assert: expectations verified by PHPUnit
+        // Assert
     }
 
     public function testBlockCreatesBlockAndRemovesFollowing(): void
     {
-        // Arrange: create users
+        // Arrange
         $blocker = $this->createMock(User::class);
         $blocker->method('getId')->willReturn(1);
         $blocker->expects($this->once())->method('removeFollowing');
@@ -74,11 +74,11 @@ class BlockingServiceTest extends TestCase
         $blocked->expects($this->once())->method('removeFollowing');
         $blocked->expects($this->once())->method('removeFollower');
 
-        // Arrange: repository indicates not blocked
+        // Arrange
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
         $blockRepoMock->expects($this->once())->method('isBlocked')->with($blocker, $blocked)->willReturn(false);
 
-        // Arrange: entity manager should persist block and both users
+        // Arrange
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock
             ->expects($this->exactly(3))
@@ -86,7 +86,7 @@ class BlockingServiceTest extends TestCase
             ->with(static::logicalOr(static::isInstanceOf(UserBlock::class), static::identicalTo($blocker), static::identicalTo($blocked)));
         $emMock->expects($this->once())->method('flush');
 
-        // Arrange: activity service should log
+        // Arrange
         $activityServiceMock = $this->createMock(ActivityService::class);
         $activityServiceMock->expects($this->once())->method('log')->with(BlockedUser::TYPE, $blocker, [
             'user_id' => 2,
@@ -94,55 +94,55 @@ class BlockingServiceTest extends TestCase
 
         $subject = new BlockingService(blockRepo: $blockRepoMock, em: $emMock, activityService: $activityServiceMock);
 
-        // Act: block user
+        // Act
         $subject->block($blocker, $blocked);
 
-        // Assert: expectations verified by PHPUnit
+        // Assert
     }
 
     public function testUnblockDoesNothingWhenNotBlocked(): void
     {
-        // Arrange: create users
+        // Arrange
         $blocker = $this->createStub(User::class);
         $blocked = $this->createStub(User::class);
 
-        // Arrange: repository returns null (not blocked)
+        // Arrange
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
         $blockRepoMock->expects($this->once())->method('findOneBy')->with(['blocker' => $blocker, 'blocked' => $blocked])->willReturn(null);
 
-        // Arrange: entity manager should not be called
+        // Arrange
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->never())->method('remove');
         $emMock->expects($this->never())->method('flush');
 
         $subject = new BlockingService(blockRepo: $blockRepoMock, em: $emMock, activityService: $this->createStub(ActivityService::class));
 
-        // Act: try to unblock not blocked user
+        // Act
         $subject->unblock($blocker, $blocked);
 
-        // Assert: expectations verified by PHPUnit
+        // Assert
     }
 
     public function testUnblockRemovesBlockAndLogsActivity(): void
     {
-        // Arrange: create users
+        // Arrange
         $blocker = $this->createStub(User::class);
         $blocked = $this->createStub(User::class);
         $blocked->method('getId')->willReturn(42);
 
-        // Arrange: create existing block
+        // Arrange
         $block = $this->createStub(UserBlock::class);
 
-        // Arrange: repository returns block
+        // Arrange
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
         $blockRepoMock->expects($this->once())->method('findOneBy')->with(['blocker' => $blocker, 'blocked' => $blocked])->willReturn($block);
 
-        // Arrange: entity manager should remove and flush
+        // Arrange
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->once())->method('remove')->with($block);
         $emMock->expects($this->once())->method('flush');
 
-        // Arrange: activity service should log
+        // Arrange
         $activityServiceMock = $this->createMock(ActivityService::class);
         $activityServiceMock->expects($this->once())->method('log')->with(UnblockedUser::TYPE, $blocker, [
             'user_id' => 42,
@@ -150,19 +150,19 @@ class BlockingServiceTest extends TestCase
 
         $subject = new BlockingService(blockRepo: $blockRepoMock, em: $emMock, activityService: $activityServiceMock);
 
-        // Act: unblock user
+        // Act
         $subject->unblock($blocker, $blocked);
 
-        // Assert: expectations verified by PHPUnit
+        // Assert
     }
 
     public function testIsBlockedDelegatesToRepository(): void
     {
-        // Arrange: create users
+        // Arrange
         $user1 = $this->createStub(User::class);
         $user2 = $this->createStub(User::class);
 
-        // Arrange: repository returns true
+        // Arrange
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
         $blockRepoMock->expects($this->once())->method('isBlockedEitherWay')->with($user1, $user2)->willReturn(true);
 
@@ -172,17 +172,17 @@ class BlockingServiceTest extends TestCase
             activityService: $this->createStub(ActivityService::class),
         );
 
-        // Act & Assert: check if blocked
+        // Act & Assert
         static::assertTrue($subject->isBlocked($user1, $user2));
     }
 
     public function testHasBlockedDelegatesToRepository(): void
     {
-        // Arrange: create users
+        // Arrange
         $blocker = $this->createStub(User::class);
         $blocked = $this->createStub(User::class);
 
-        // Arrange: repository returns true
+        // Arrange
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
         $blockRepoMock->expects($this->once())->method('isBlocked')->with($blocker, $blocked)->willReturn(true);
 
@@ -192,17 +192,17 @@ class BlockingServiceTest extends TestCase
             activityService: $this->createStub(ActivityService::class),
         );
 
-        // Act & Assert: check if has blocked
+        // Act & Assert
         static::assertTrue($subject->hasBlocked($blocker, $blocked));
     }
 
     public function testCanInteractReturnsTrueWhenNotBlocked(): void
     {
-        // Arrange: create users
+        // Arrange
         $actor = $this->createStub(User::class);
         $target = $this->createStub(User::class);
 
-        // Arrange: repository returns false (not blocked)
+        // Arrange
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
         $blockRepoMock->expects($this->once())->method('isBlockedEitherWay')->with($actor, $target)->willReturn(false);
 
@@ -212,17 +212,17 @@ class BlockingServiceTest extends TestCase
             activityService: $this->createStub(ActivityService::class),
         );
 
-        // Act & Assert: can interact
+        // Act & Assert
         static::assertTrue($subject->canInteract($actor, $target));
     }
 
     public function testCanInteractReturnsFalseWhenBlocked(): void
     {
-        // Arrange: create users
+        // Arrange
         $actor = $this->createStub(User::class);
         $target = $this->createStub(User::class);
 
-        // Arrange: repository returns true (blocked)
+        // Arrange
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
         $blockRepoMock->expects($this->once())->method('isBlockedEitherWay')->with($actor, $target)->willReturn(true);
 
@@ -232,21 +232,21 @@ class BlockingServiceTest extends TestCase
             activityService: $this->createStub(ActivityService::class),
         );
 
-        // Act & Assert: cannot interact
+        // Act & Assert
         static::assertFalse($subject->canInteract($actor, $target));
     }
 
     public function testGetBlockedUsersDelegatesToRepository(): void
     {
-        // Arrange: create user
+        // Arrange
         $user = $this->createStub(User::class);
 
-        // Arrange: create expected blocks
+        // Arrange
         $block1 = $this->createStub(UserBlock::class);
         $block2 = $this->createStub(UserBlock::class);
         $expectedBlocks = [$block1, $block2];
 
-        // Arrange: repository returns blocks
+        // Arrange
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
         $blockRepoMock->expects($this->once())->method('getBlockedUsers')->with($user)->willReturn($expectedBlocks);
 
@@ -256,19 +256,19 @@ class BlockingServiceTest extends TestCase
             activityService: $this->createStub(ActivityService::class),
         );
 
-        // Act & Assert: get blocked users
+        // Act & Assert
         static::assertSame($expectedBlocks, $subject->getBlockedUsers($user));
     }
 
     public function testGetExcludedUserIdsDelegatesToRepository(): void
     {
-        // Arrange: create user
+        // Arrange
         $user = $this->createStub(User::class);
 
-        // Arrange: expected IDs
+        // Arrange
         $expectedIds = [1, 2, 3];
 
-        // Arrange: repository returns IDs
+        // Arrange
         $blockRepoMock = $this->createMock(UserBlockRepository::class);
         $blockRepoMock->expects($this->once())->method('getAllBlockRelatedIds')->with($user)->willReturn($expectedIds);
 
@@ -278,7 +278,7 @@ class BlockingServiceTest extends TestCase
             activityService: $this->createStub(ActivityService::class),
         );
 
-        // Act & Assert: get excluded user IDs
+        // Act & Assert
         static::assertSame($expectedIds, $subject->getExcludedUserIds($user));
     }
 }

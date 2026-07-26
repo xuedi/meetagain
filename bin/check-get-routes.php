@@ -1,10 +1,6 @@
 #!/usr/bin/env php
 <?php declare(strict_types=1);
 
-/**
- * Fails when a GET-reachable controller method contains an unguarded mutation call
- */
-
 $root = dirname(__DIR__);
 
 require $root . '/vendor/autoload.php';

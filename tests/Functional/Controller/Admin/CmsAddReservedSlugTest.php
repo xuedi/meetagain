@@ -20,10 +20,10 @@ class CmsAddReservedSlugTest extends WebTestCase
         $em = $client->getContainer()->get(EntityManagerInterface::class);
         $before = $em->getRepository(Cms::class)->count(['slug' => 'imprint']);
 
-        // Act - 'imprint' is a locked page slug, so it is reserved
+        // Act
         $this->submitAddForm($client, 'imprint');
 
-        // Assert - redirected back to the list, no new page created
+        // Assert
         $this->assertResponseRedirects('/en/admin/cms');
         $em->clear();
         static::assertSame($before, $em->getRepository(Cms::class)->count(['slug' => 'imprint']));
@@ -40,21 +40,19 @@ class CmsAddReservedSlugTest extends WebTestCase
         // Act
         $this->submitAddForm($client, $slug);
 
-        // Assert - redirected to the edit screen of the freshly created page
+        // Assert
         $this->assertResponseRedirects();
         static::assertStringContainsString('/admin/cms/', (string) $client->getResponse()->headers->get('Location'));
         $em->clear();
         $created = $em->getRepository(Cms::class)->findOneBy(['slug' => $slug]);
         static::assertInstanceOf(Cms::class, $created);
 
-        // Reset
         $em->remove($created);
         $em->flush();
     }
 
     private function submitAddForm(KernelBrowser $client, string $slug): void
     {
-        // cmsAdd reads the slug straight from the request (no form binding, no CSRF check).
         $client->request('POST', '/en/admin/cms/add', [
             'cms' => ['slug' => $slug],
         ]);

@@ -56,10 +56,6 @@ readonly class DishService
     }
 
     /**
-     * Upsert the dish translations from a per-language field map. A language whose name is
-     * blank is removed rather than stored empty, so it never shadows the name fallback in
-     * Dish::getTranslatedName().
-     *
      * @param array<string, array<string, mixed>> $translations language code => [name, description, recipe]
      */
     public function updateTranslations(Dish $dish, array $translations): void

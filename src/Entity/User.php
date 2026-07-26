@@ -137,22 +137,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     #[Override]
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     *
-     * @return list<string>
-     */
+    /** @return list<string> */
     #[Override]
     public function getRoles(): array
     {
@@ -184,14 +175,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * Clear any temporary, sensitive data on the user.
-     * Note: eraseCredentials() was removed from UserInterface in Symfony 8.
-     */
+    // Kept after Symfony 8 dropped eraseCredentials() from UserInterface: still called by our own code
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
     }
 
     public function getCreatedAt(): ?DateTimeImmutable
@@ -367,7 +353,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeActivity(Activity $activity): static
     {
-        // set the owning side to null (unless already changed)
         if ($this->activities->removeElement($activity) && $activity->getUser() === $this) {
             $activity->setUser(null);
         }
@@ -477,7 +462,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeMessagesSend(Message $messagesSend): static
     {
-        // set the owning side to null (unless already changed)
         if ($this->messagesSend->removeElement($messagesSend) && $messagesSend->getSender() === $this) {
             $messagesSend->setSender(null);
         }
@@ -505,7 +489,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeMessagesReceived(Message $messagesReceived): static
     {
-        // set the owning side to null (unless already changed)
         if ($this->messagesReceived->removeElement($messagesReceived) && $messagesReceived->getReceiver() === $this) {
             $messagesReceived->setReceiver(null);
         }

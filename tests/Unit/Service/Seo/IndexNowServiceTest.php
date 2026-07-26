@@ -73,13 +73,13 @@ class IndexNowServiceTest extends TestCase
         // Act
         $key = $service->getOrCreateKey();
 
-        // Assert: key is a 32-char hex string
+        // Assert
         static::assertMatchesRegularExpression('/^[a-f0-9]{32}$/', $key);
     }
 
     public function testGetOrCreateKeyReturnsSameKeyOnConsecutiveCalls(): void
     {
-        // Arrange: first call returns null (key generated), subsequent calls return the generated key
+        // Arrange
         $generatedKey = null;
         $appStateStub = $this->createStub(AppStateService::class);
         $appStateStub
@@ -99,27 +99,27 @@ class IndexNowServiceTest extends TestCase
         $key1 = $service->getOrCreateKey();
         $key2 = $service->getOrCreateKey();
 
-        // Assert: both calls return the same key
+        // Assert
         static::assertSame($key1, $key2);
     }
 
     public function testGetUrlListIncludesStaticCmsAndEventUrls(): void
     {
-        // Arrange: CMS page with a slug
+        // Arrange
         $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getSlug')->willReturn('about');
 
         $cmsRepositoryStub = $this->createStub(CmsRepository::class);
         $cmsRepositoryStub->method('findPublished')->willReturn([$cmsPage]);
 
-        // Arrange: event with an ID
+        // Arrange
         $event = $this->createStub(Event::class);
         $event->method('getId')->willReturn(42);
 
         $eventRepositoryStub = $this->createStub(EventRepository::class);
         $eventRepositoryStub->method('findForSitemap')->willReturn([$event]);
 
-        // Arrange: URL generator returns distinct URLs per route
+        // Arrange
         $urlGeneratorStub = $this->createStub(UrlGeneratorInterface::class);
         $urlGeneratorStub
             ->method('generate')
@@ -137,7 +137,7 @@ class IndexNowServiceTest extends TestCase
         // Act
         $urls = $service->getUrlList();
 
-        // Assert: all five expected URLs are present
+        // Assert
         static::assertContains('https://example.com/en/', $urls);
         static::assertContains('https://example.com/en/events', $urls);
         static::assertContains('https://example.com/en/members', $urls);
@@ -148,7 +148,7 @@ class IndexNowServiceTest extends TestCase
 
     public function testGetUrlListSkipsCmsPageWithNullSlug(): void
     {
-        // Arrange: CMS page without a slug
+        // Arrange
         $cmsPage = $this->createStub(Cms::class);
         $cmsPage->method('getSlug')->willReturn(null);
 
@@ -166,13 +166,13 @@ class IndexNowServiceTest extends TestCase
         // Act
         $urls = $service->getUrlList();
 
-        // Assert: only 3 static routes, no CMS URL added
+        // Assert
         static::assertCount(3, $urls);
     }
 
     public function testGetUrlListSkipsEventWithNullId(): void
     {
-        // Arrange: event without an ID
+        // Arrange
         $event = $this->createStub(Event::class);
         $event->method('getId')->willReturn(null);
 
@@ -190,7 +190,7 @@ class IndexNowServiceTest extends TestCase
         // Act
         $urls = $service->getUrlList();
 
-        // Assert: only 3 static routes, no event URL added
+        // Assert
         static::assertCount(3, $urls);
     }
 
@@ -332,6 +332,6 @@ class IndexNowServiceTest extends TestCase
         // Act
         $service->recordSubmission();
 
-        // Assert: expectation verified automatically
+        // Assert
     }
 }

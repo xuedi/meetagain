@@ -159,7 +159,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
 
     public function testGetLogsReturnsEmptyCollectionWhenApiKeyMissing(): void
     {
-        // Arrange - DSN with no user component → empty api key → not available
+        // Arrange
         $callCount = 0;
         $http = new MockHttpClient(static function () use (&$callCount): MockResponse {
             $callCount++;
@@ -190,7 +190,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
 
     public function testGetLogsReturnsEmptyCollectionWhenHttpThrows(): void
     {
-        // Arrange - HTTP client throws on request
+        // Arrange
         $http = new MockHttpClient(static function (): MockResponse {
             throw new Exception('network down');
         });
@@ -199,7 +199,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
         // Act
         $collection = $provider->getLogs(new EmailDeliveryLogFilter(offset: 2, size: 10));
 
-        // Assert - swallowed, empty collection with the requested paging echoed back
+        // Assert
         static::assertTrue($collection->isEmpty());
         static::assertSame(0, $collection->total);
         static::assertSame(2, $collection->offset);
@@ -208,7 +208,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
 
     public function testGetLogsFallsBackToItemCountWhenTotalKeyMissing(): void
     {
-        // Arrange - API response without nb_result_without_offset
+        // Arrange
         $http = $this->httpClientReturning([
             'result' => [
                 ['transaction_id' => 'a', 'status' => 'delivered', 'email_to' => 'x@y.z'],
@@ -220,7 +220,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
         // Act
         $collection = $provider->getLogs(new EmailDeliveryLogFilter());
 
-        // Assert - total falls back to item count
+        // Assert
         static::assertSame(2, $collection->total);
     }
 
@@ -258,7 +258,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
 
     public function testConstructorUrlDecodesPercentEncodedApiKey(): void
     {
-        // Arrange - api key with reserved chars, percent-encoded in the DSN
+        // Arrange
         $rawKey = 'sk:test/with@chars';
         $encodedDsn = 'sweego+api://' . rawurlencode($rawKey) . '@default';
         $captured = ['headers' => null];

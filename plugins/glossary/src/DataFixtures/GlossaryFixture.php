@@ -53,9 +53,6 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
         echo 'OK' . PHP_EOL;
     }
 
-    /**
-     * One pending change proposal on the first entry so dev environments show the review flow.
-     */
     private function seedPendingProposal(ObjectManager $manager, Glossary $entry): void
     {
         $member = $manager->getRepository(User::class)->findOneBy(['email' => 'Adem.Lane@example.org']);
@@ -75,10 +72,6 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
         $manager->flush();
     }
 
-    /**
-     * Global glossary config in the new taxonomy shape: Pinyin secondary field on, seven
-     * per-locale categories whose ids (0..6) line up with the entry assignments below.
-     */
     private function buildGlobalConfig(): PluginSettings
     {
         $labels = [

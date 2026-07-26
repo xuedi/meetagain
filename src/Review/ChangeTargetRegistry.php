@@ -5,12 +5,8 @@ namespace App\Review;
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Unions the change-target providers whose plugin is globally enabled and answers keyed lookups.
- * Deliberately not gated on the request-context plugin list: proposals must stay resolvable on
- * every host a reviewer works from, and per-context enforcement already lives in the provider's
- * canPropose/canReview plus its target visibility.
- */
+// Gated on the global plugin list, never the request context: a proposal must stay resolvable on
+// every host a reviewer works from
 class ChangeTargetRegistry
 {
     /**

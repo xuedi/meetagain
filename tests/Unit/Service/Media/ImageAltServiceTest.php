@@ -69,7 +69,7 @@ class ImageAltServiceTest extends TestCase
         $entityManager->expects($this->never())->method('flush');
         $service = $this->service(requiredLocales: ['en', 'de'], entityManager: $entityManager);
 
-        // Act & Assert - validation happens before any mutation, so 'de' is not applied either.
+        // Act & Assert
         $this->expectException(InvalidArgumentException::class);
         $service->applyAlt($image, ['de' => 'deutscher alt', 'fr' => 'texte']);
     }
@@ -88,7 +88,7 @@ class ImageAltServiceTest extends TestCase
 
     public function testFindMissingAltPageFiltersCompleteImagesAndReturnsCursorOnFullPage(): void
     {
-        // Arrange - a full page of two candidates; image 1 is complete, image 2 misses 'de'.
+        // Arrange
         $complete = self::imageWithId(1);
         $complete->setAlt('english');
         $complete->setAltTranslation('de', 'deutsch');
@@ -113,7 +113,7 @@ class ImageAltServiceTest extends TestCase
 
     public function testFindMissingAltPageEndsCursorOnPartialPage(): void
     {
-        // Arrange - fewer candidates than the limit means the scan reached the end.
+        // Arrange
         $incomplete = self::imageWithId(5);
         $service = $this->service(requiredLocales: ['en'], candidates: [$incomplete]);
 

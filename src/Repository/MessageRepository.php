@@ -45,7 +45,6 @@ class MessageRepository extends ServiceEntityRepository
             $partner = $isReceived ? $message->getSender() : $message->getReceiver();
             $partnerId = $partner->getId();
 
-            // Skip blocked users
             if (in_array($partnerId, $excludeUserIds, true)) {
                 continue;
             }
@@ -67,7 +66,6 @@ class MessageRepository extends ServiceEntityRepository
             }
         }
 
-        // Only add new conversation partner if not blocked
         if ($id !== null && !isset($list[$id]) && !in_array($id, $excludeUserIds, true)) {
             $userRepo = $this->getEntityManager()->getRepository(User::class);
             $list[] = [
@@ -154,8 +152,6 @@ class MessageRepository extends ServiceEntityRepository
     }
 
     /**
-     * Get system-wide message statistics.
-     *
      * @param array<int>|null $restrictToUserIds Both sender and receiver must be in this set.
      * @return array{total: int, unread: int}
      */

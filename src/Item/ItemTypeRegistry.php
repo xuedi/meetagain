@@ -5,10 +5,6 @@ namespace App\Item;
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Unions the item-type providers whose plugin is active and answers keyed lookups.
- * Mirrors the active-plugin guard used by PluginExtension and EventService.
- */
 class ItemTypeRegistry
 {
     /**

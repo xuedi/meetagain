@@ -149,7 +149,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $output = new BufferedOutput();
         $service->runCronTask($output);
 
-        // Assert: markContextSent called after all send calls
+        // Assert
         static::assertSame(['send', 'send', 'markContextSent'], $callOrder);
     }
 
@@ -176,13 +176,13 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $output = new BufferedOutput();
         $result = $service->runCronTask($output);
 
-        // Assert: 1 from email1 + 2 from email2
+        // Assert
         static::assertSame('3 emails queued', $result->message);
     }
 
     public function testGuardErrorIsLoggedAndLoopContinues(): void
     {
-        // Arrange: user1 returns Error, user2 passes
+        // Arrange
         $clock = new MockClock(new DateTimeImmutable('2026-04-12 10:00:00'));
 
         $user1 = new UserStub()->setId(1);
@@ -212,7 +212,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
 
     public function testGuardErrorDedupedPerSweep(): void
     {
-        // Arrange: 3 users, same rule fires Error every time - expect 1 log line only
+        // Arrange
         $clock = new MockClock(new DateTimeImmutable('2026-04-12 10:00:00'));
 
         $users = [new UserStub()->setId(1), new UserStub()->setId(2), new UserStub()->setId(3)];
@@ -236,7 +236,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
 
     public function testDistinctGuardErrorsAreAllLogged(): void
     {
-        // Arrange: 2 users, 2 distinct error rule names - expect 2 log lines
+        // Arrange
         $clock = new MockClock(new DateTimeImmutable('2026-04-12 10:00:00'));
 
         $user1 = new UserStub()->setId(1);

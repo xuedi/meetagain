@@ -12,12 +12,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-/**
- * Logs every kernel-level access-denied turn into a 403, durable for the admin UI.
- *
- * Runs at priority 16, below NotFoundSubscriber (32) so 404s never reach this code path,
- * above the firewall's own access-denied handler so the response is left untouched.
- */
 readonly class AccessDeniedSubscriber implements EventSubscriberInterface
 {
     public function __construct(

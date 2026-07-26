@@ -5,11 +5,6 @@ namespace App\Entity;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * The universal event-to-item link. itemType is a registry key and itemId is a plain INT
- * (no FK to any plugin entity). Multiple associations per event are allowed - a menu of
- * several items, or a multi-item event, is several rows.
- */
 #[ORM\Entity]
 #[ORM\UniqueConstraint(name: 'unique_event_item', columns: ['event_id', 'item_type', 'item_id'])]
 class EventItemAssociation

@@ -26,7 +26,7 @@ class EventSeriesCreateFlowTest extends WebTestCase
         // Act
         $this->submitNewEventForm($client, $start, seriesRule: (string) EventInterval::Weekly->value, seriesName: 'My Test Series');
 
-        // Assert: PRG to the edit page, series row created and attached
+        // Assert
         $this->assertResponseRedirects();
 
         $em = $this->getEntityManager($client);
@@ -38,6 +38,60 @@ class EventSeriesCreateFlowTest extends WebTestCase
         $event = $em->getRepository(Event::class)->findOneBy(['start' => $start]);
         static::assertNotNull($event);
         static::assertSame($series->getId(), $event->getSeries()?->getId());
+    }
+
+    public function testCreateWithCustomRulePersistsTheRuleSpec(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+        $start = new DateTime('2031-03-02 13:37');
+
+        // Act
+        $this->submitNewEventForm(
+            $client,
+            $start,
+            seriesRule: (string) EventInterval::Custom->value,
+            seriesName: 'First Sunday Series',
+            customRuleSpec: 'FREQ=MONTHLY;BYDAY=1SU',
+        );
+
+        // Assert
+        $this->assertResponseRedirects();
+
+        $em = $this->getEntityManager($client);
+        $em->clear();
+        $series = $em->getRepository(EventSeries::class)->findOneBy(['name' => 'First Sunday Series']);
+        static::assertNotNull($series);
+        static::assertSame(EventInterval::Custom, $series->getRule());
+        static::assertSame('FREQ=MONTHLY;BYDAY=1SU', $series->getRuleSpec());
+    }
+
+    public function testCreateWithAPresetRuleLeavesTheRuleSpecEmpty(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+        $start = new DateTime('2031-03-04 13:37');
+
+        // Act
+        $this->submitNewEventForm(
+            $client,
+            $start,
+            seriesRule: (string) EventInterval::Weekly->value,
+            seriesName: 'Preset Series',
+            customRuleSpec: 'FREQ=MONTHLY;BYDAY=1SU',
+        );
+
+        // Assert
+        $this->assertResponseRedirects();
+
+        $em = $this->getEntityManager($client);
+        $em->clear();
+        $series = $em->getRepository(EventSeries::class)->findOneBy(['name' => 'Preset Series']);
+        static::assertNotNull($series);
+        static::assertSame(EventInterval::Weekly, $series->getRule());
+        static::assertNull($series->getRuleSpec());
     }
 
     public function testCreateWithRuleAndBlankNameRendersErrorAndPersistsNothing(): void
@@ -53,7 +107,7 @@ class EventSeriesCreateFlowTest extends WebTestCase
         // Act
         $this->submitNewEventForm($client, $start, seriesRule: (string) EventInterval::Weekly->value, seriesName: '');
 
-        // Assert: form re-renders with the validator message, nothing persisted
+        // Assert
         $this->assertResponseIsUnprocessable();
         static::assertStringContainsString('Please enter a name for the series.', (string) $client->getResponse()->getContent());
 
@@ -84,8 +138,13 @@ class EventSeriesCreateFlowTest extends WebTestCase
         static::assertCount($seriesCountBefore, $em->getRepository(EventSeries::class)->findAll());
     }
 
-    private function submitNewEventForm(KernelBrowser $client, DateTime $start, string $seriesRule, string $seriesName): Crawler
-    {
+    private function submitNewEventForm(
+        KernelBrowser $client,
+        DateTime $start,
+        string $seriesRule,
+        string $seriesName,
+        string $customRuleSpec = '',
+    ): Crawler {
         $crawler = $client->request('GET', '/en/admin/events/new');
         $this->assertResponseIsSuccessful();
 
@@ -95,6 +154,7 @@ class EventSeriesCreateFlowTest extends WebTestCase
         $form['event[location]'] = $crawler->filter('#event_location option')->first()->attr('value');
         $form['event[seriesRule]'] = $seriesRule;
         $form['event[seriesName]'] = $seriesName;
+        $form['event[customRuleSpec]'] = $customRuleSpec;
 
         return $client->submit($form);
     }

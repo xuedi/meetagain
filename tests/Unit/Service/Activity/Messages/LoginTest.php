@@ -29,7 +29,6 @@ class LoginTest extends TestCase
 
         $subject = new Login()->injectServices($this->router, $this->imageService, $this->translator);
 
-        // check returns
         static::assertInstanceOf(MessageInterface::class, $subject->validate());
         static::assertEquals(Login::TYPE, $subject->getType());
         static::assertEquals($expectedText, $subject->render());

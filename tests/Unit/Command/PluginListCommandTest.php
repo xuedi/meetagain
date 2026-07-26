@@ -26,7 +26,7 @@ class PluginListCommandTest extends TestCase
 
     public function testListsPluginsWithStatus(): void
     {
-        // Arrange: create test plugin structure
+        // Arrange
         $pluginDir = $this->tempDir . '/plugins/demo';
         mkdir($pluginDir);
         file_put_contents($pluginDir . '/manifest.json', json_encode([
@@ -35,10 +35,8 @@ class PluginListCommandTest extends TestCase
             'description' => 'Demo plugin',
         ]));
 
-        // Create plugin config
         file_put_contents($this->tempDir . '/config/plugins.php', "<?php\nreturn ['demo' => true];");
 
-        // Create command with modified paths
         $command = new class($this->tempDir) extends PluginListCommand {
             public function __construct(
                 private string $baseDir,
@@ -48,12 +46,10 @@ class PluginListCommandTest extends TestCase
 
             protected function execute($input, $output): int
             {
-                // Override to use test directory
                 $reflection = new \ReflectionClass($this);
                 $method = $reflection->getMethod('getPluginsWithKeys');
                 $method->setAccessible(true);
 
-                // Temporarily modify __DIR__ behavior by creating a custom implementation
                 $plugins = $this->getTestPlugins();
 
                 if ($plugins === []) {
@@ -126,10 +122,10 @@ class PluginListCommandTest extends TestCase
 
         $commandTester = new CommandTester($command);
 
-        // Act: execute command
+        // Act
         $exitCode = $commandTester->execute([]);
 
-        // Assert: output contains plugin info
+        // Assert
         $output = $commandTester->getDisplay();
         static::assertSame(Command::SUCCESS, $exitCode);
         static::assertStringContainsString('demo', $output);
@@ -140,7 +136,7 @@ class PluginListCommandTest extends TestCase
 
     public function testReturnsSuccessWhenNoPluginsFound(): void
     {
-        // Arrange: empty plugins directory
+        // Arrange
         $emptyDir = sys_get_temp_dir() . '/plugin_list_empty_test_' . uniqid();
         mkdir($emptyDir);
         mkdir($emptyDir . '/plugins');
@@ -184,15 +180,14 @@ class PluginListCommandTest extends TestCase
 
         $commandTester = new CommandTester($command);
 
-        // Act: execute command
+        // Act
         $exitCode = $commandTester->execute([]);
 
-        // Assert: returns success with appropriate message
+        // Assert
         static::assertSame(Command::SUCCESS, $exitCode);
         $output = $commandTester->getDisplay();
         static::assertStringContainsString('No plugins found', $output);
 
-        // Cleanup
         rmdir($emptyDir . '/config');
         rmdir($emptyDir . '/plugins');
         rmdir($emptyDir);

@@ -79,6 +79,11 @@ class EventType extends AbstractType
                 'mapped' => false,
                 'data' => $event?->getSeries()?->getRule(),
             ])
+            ->add('customRuleSpec', HiddenType::class, [
+                'required' => false,
+                'mapped' => false,
+                'data' => $event?->getSeries()?->getRuleSpec(),
+            ])
             ->add('seriesName', TextType::class, [
                 'label' => $this->translator->trans('admin_event.form_label_series_name'),
                 'required' => false,
@@ -141,7 +146,7 @@ class EventType extends AbstractType
             ]);
 
         $eventId = $event?->getId();
-        if (null !== $eventId) { // not for new events
+        if (null !== $eventId) {
             foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
                 $translation = $this->eventTransRepo->findOneBy(['event' => $eventId, 'language' => $languageCode]);
                 $builder->add("title-{$languageCode}", TextType::class, [

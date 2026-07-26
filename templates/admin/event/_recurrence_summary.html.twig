@@ -1,0 +1,20 @@
+{#
+    Recurrence summary -- the sentence that replaces Start/Stop while the rule is Custom
+
+    Hidden until the Recurring dropdown is switched to Custom.
+
+    Used in:    admin/event/edit.html.twig, admin/event/new.html.twig
+    Parameters: recurrence (summary)
+    Depends on: assets/js/recurrence-builder.js
+#}
+<div class="field">
+    <label class="label">{{ 'admin_event.recurrence_summary_label'|trans }}</label>
+    <p class="control">
+        <span id="recurrence-summary-text">
+            {{ recurrence.summary ?: 'admin_event.recurrence_summary_empty'|trans }}
+        </span>
+        <a href="#" id="recurrence-summary-edit" class="ml-2 is-size-7">
+            {{ 'admin_event.recurrence_button_edit'|trans }}
+        </a>
+    </p>
+</div>

@@ -6,10 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Override;
 
-/**
- * Shared count/fetch/delete for sources backed by a table with one row per (owner, locale).
- * Subclasses name the mapping and turn entities into rows.
- */
 abstract readonly class AbstractLocalizedRowSource implements LocalizedContentSourceInterface
 {
     private const int PREVIEW_LENGTH = 80;

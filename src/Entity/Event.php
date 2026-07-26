@@ -336,7 +336,6 @@ class Event
 
     public function removeComment(Comment $comment): static
     {
-        // set the owning side to null (unless already changed)
         if ($this->comments->removeElement($comment) && $comment->getEvent() === $this) {
             $comment->setEvent(null);
         }
@@ -416,7 +415,6 @@ class Event
 
     public function removeImage(Image $image): static
     {
-        // set the owning side to null (unless already changed)
         if ($this->images->removeElement($image) && $image->getEvent() === $this) {
             $image->setEvent(null);
         }

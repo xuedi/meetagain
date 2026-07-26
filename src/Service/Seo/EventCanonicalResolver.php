@@ -8,12 +8,6 @@ use App\Enum\EventCanonicalRootType;
 use App\Repository\EventCanonicalRootRepository;
 use App\Repository\EventRepository;
 
-/**
- * Answers which event URL is canonical for a given event and locale.
- *
- * Markers are sparse: a series with no markers canonicalizes entirely to its first member
- * that has a translation in the requested locale.
- */
 final class EventCanonicalResolver
 {
     /** @var array<int, array<int, Event>> seriesId => members ordered by start */
@@ -36,11 +30,6 @@ final class EventCanonicalResolver
         return $this->resolveBaselineRoot($event, $locale) ?? $event;
     }
 
-    /**
-     * The root this event would follow if it carried no marker: the nearest preceding member
-     * carrying a root marker, else the series' first member with a translation in the locale.
-     * Null when the event is that first member, or belongs to no series.
-     */
     public function resolveBaselineRoot(Event $event, string $locale): ?Event
     {
         $series = $event->getSeries();
@@ -79,9 +68,6 @@ final class EventCanonicalResolver
     }
 
     /**
-     * Batch entry point: one member load and one marker load per series, no matter how many
-     * events or locales are asked for.
-     *
      * @param array<Event> $events
      * @param array<string> $locales
      * @return array<int, array<string, int>> eventId => locale => canonical root event id

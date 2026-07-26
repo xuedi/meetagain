@@ -41,8 +41,6 @@ final class IndexController extends AbstractGlossaryController
     }
 
     /**
-     * Moderators see every entry, the ones needing attention first; everyone else only approved ones.
-     *
      * @return list<int>
      */
     private function listedItemIds(): array

@@ -9,11 +9,6 @@ use App\Item\ItemAttachSlotProviderInterface;
 use App\Item\ItemTypeRegistry;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-/**
- * Assembles the event detail attach control from the active item types: each type's rendered
- * picker fragment plus the union of subsystem attach slots. Permission gating stays in the
- * controller; this only builds the view-model.
- */
 readonly class ItemAttachControlBuilder
 {
     /**

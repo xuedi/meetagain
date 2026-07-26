@@ -6,26 +6,15 @@ use App\DataHotfix\DataHotfixInterface;
 use Doctrine\DBAL\Connection;
 use Override;
 
-/**
- * Drops the orphaned tables left behind by the removed bookclub, dinnerclub and filmclub plugins
- * (superseded by the books, dishes and films item plugins). The only real data - the dinnerclub
- * dishes - was already copied into the plg_dishes_* schema by MigrateDinnerclubToDishes and is live;
- * everything else was test data. The source tables were never dropped, so they linger as dead weight.
- *
- * FK checks are disabled so the interdependent tables drop in any order; IF EXISTS makes it a no-op
- * on fresh installs and anywhere a table is already gone.
- */
 readonly class RemoveOrphanedClubPluginTables implements DataHotfixInterface
 {
     private const array ORPHANED_TABLES = [
-        // bookclub -> books
         'book_note',
         'book_poll_vote',
         'book_poll',
         'book_selection',
         'book_suggestion',
         'book',
-        // dinnerclub -> dishes
         'dinner_course_item',
         'dinner_course',
         'dinner',
@@ -35,7 +24,6 @@ readonly class RemoveOrphanedClubPluginTables implements DataHotfixInterface
         'dish_like',
         'dish_list',
         'dish',
-        // filmclub -> films
         'film_note',
         'film_poll_vote',
         'film_poll_films',
@@ -62,6 +50,7 @@ readonly class RemoveOrphanedClubPluginTables implements DataHotfixInterface
     #[Override]
     public function execute(): void
     {
+        // FK checks off so the interdependent tables drop in any order; IF EXISTS keeps it a no-op
         $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS = 0');
         foreach (self::ORPHANED_TABLES as $table) {
             $this->connection->executeStatement(sprintf('DROP TABLE IF EXISTS %s', $table));

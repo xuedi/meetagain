@@ -69,11 +69,6 @@ readonly class NotificationService
                         return 'skip';
                     }
 
-                    // $this->emailService->prepareRsvpNotification(
-                    //     userRsvp: $user,
-                    //     userRecipient: $follower,
-                    //     event: $event
-                    // );
                     return 'send';
                 });
             } catch (CacheInvalidArgumentException) {

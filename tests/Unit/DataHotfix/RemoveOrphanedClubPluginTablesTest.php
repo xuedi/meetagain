@@ -26,7 +26,7 @@ class RemoveOrphanedClubPluginTablesTest extends TestCase
         // Act
         $subject->execute();
 
-        // Assert - FK checks are toggled around a block of guarded drops
+        // Assert
         static::assertSame('SET FOREIGN_KEY_CHECKS = 0', $captured[0]);
         static::assertSame('SET FOREIGN_KEY_CHECKS = 1', $captured[array_key_last($captured)]);
 

@@ -10,13 +10,6 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-/**
- * Single Symfony voter that owns every domain.action permission attribute and
- * dispatches to tagged PermissionCheckerInterface implementations. The first
- * supporting checker that returns a non-null vote wins; if no checker supports
- * or every supporting checker abstains, the gateway abstains - which under
- * affirmative + allow_if_all_abstain: true means access is allowed.
- */
 final class PermissionGateway implements VoterInterface
 {
     /**

@@ -5,9 +5,7 @@ namespace App\Emails;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Plugin extension point: lets a plugin splice extra guard rules into a core email type's chain
- * without modifying core. Rules returned from a provider are appended after the email type's own
- * `getGuardRules()` and run after them.
+ * Contributes extra guard rules to an email type's chain, appended after its own `getGuardRules()`.
  */
 #[AutoconfigureTag]
 interface EmailGuardRuleProviderInterface

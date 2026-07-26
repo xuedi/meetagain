@@ -28,7 +28,7 @@ class BlockedSessionSubscriberTest extends TestCase
 
     public function testSubRequestsAreIgnored(): void
     {
-        // Arrange - sub-request must not consult the block store
+        // Arrange
         $blockStore = $this->createMock(BlockedSessionStore::class);
         $blockStore->expects($this->never())->method('isIpBlocked');
         $blockStore->expects($this->never())->method('isSessionBlocked');
@@ -45,7 +45,7 @@ class BlockedSessionSubscriberTest extends TestCase
 
     public function testLoadtestBypassHeaderInNonProdShortCircuitsBeforeStore(): void
     {
-        // Arrange - dev env + bypass header => store must never be touched
+        // Arrange
         $blockStore = $this->createMock(BlockedSessionStore::class);
         $blockStore->expects($this->never())->method('isIpBlocked');
         $blockStore->expects($this->never())->method('isSessionBlocked');
@@ -58,7 +58,7 @@ class BlockedSessionSubscriberTest extends TestCase
         // Act
         $subscriber->onKernelRequest($this->createEvent($request));
 
-        // Assert - no response set
+        // Assert
         static::assertTrue(true);
     }
 
@@ -113,7 +113,7 @@ class BlockedSessionSubscriberTest extends TestCase
 
     public function testBlockedSessionAlsoProducesA403(): void
     {
-        // Arrange - IP clean, session id resolves to a blocked key
+        // Arrange
         $blockStore = $this->createStub(BlockedSessionStore::class);
         $blockStore->method('isIpBlocked')->willReturn(false);
         $blockStore->method('isSessionBlocked')->willReturn(true);
@@ -137,7 +137,7 @@ class BlockedSessionSubscriberTest extends TestCase
 
     public function testEmptyIpSkipsIpCheckButStillChecksSession(): void
     {
-        // Arrange - bare Request => no REMOTE_ADDR => getClientIp() returns null
+        // Arrange
         $blockStore = $this->createMock(BlockedSessionStore::class);
         $blockStore->expects($this->never())->method('isIpBlocked');
         $blockStore->expects($this->once())->method('isSessionBlocked')->willReturn(false);
@@ -171,7 +171,7 @@ class BlockedSessionSubscriberTest extends TestCase
 
     public function testTwigFailureFallsBackToHardcodedHtmlAndLogs(): void
     {
-        // Arrange - twig throws => fallback HTML, but still 403
+        // Arrange
         $blockStore = $this->createStub(BlockedSessionStore::class);
         $blockStore->method('isIpBlocked')->willReturn(true);
 
@@ -184,7 +184,7 @@ class BlockedSessionSubscriberTest extends TestCase
         // Act
         $subscriber->onKernelRequest($event);
 
-        // Assert - fallback content still served
+        // Assert
         $response = $event->getResponse();
         static::assertNotNull($response);
         static::assertSame(403, $response->getStatusCode());
@@ -198,7 +198,6 @@ class BlockedSessionSubscriberTest extends TestCase
         ?RequestIdentityResolver $resolver = null,
     ): BlockedSessionSubscriber {
         $resolver ??= $this->createStub(RequestIdentityResolver::class);
-        // Default resolver returns a benign key so isSessionBlocked is reached but innocuous
         if ($resolver instanceof \PHPUnit\Framework\MockObject\Stub) {
             $resolver->method('resolveSessionKey')->willReturn('sess-default');
         }

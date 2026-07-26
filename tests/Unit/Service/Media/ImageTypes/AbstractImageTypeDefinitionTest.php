@@ -10,9 +10,6 @@ use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/**
- * Minimal concrete definition for exercising the shared abstract behaviour.
- */
 class TestImageTypeDefinition extends AbstractImageTypeDefinition
 {
     /** @var array<array{imageId: int, locationId: int}> */
@@ -49,8 +46,6 @@ class AbstractImageTypeDefinitionTest extends TestCase
         return new TestImageTypeDefinition(repo: $repo ?? $this->createStub(ImageLocationRepository::class), connection: $this->createStub(Connection::class));
     }
 
-    // ---- thumbnailSizes(): universal merge ----
-
     public function testThumbnailSizesAppendsUniversalReportAndMicroSizes(): void
     {
         $definition = $this->makeDefinition();
@@ -67,8 +62,6 @@ class AbstractImageTypeDefinitionTest extends TestCase
         static::assertSame([[350, 350], [100, 100], [50, 50]], $definition->thumbnailSizes());
     }
 
-    // ---- fitMode() / locate(): defaults ----
-
     public function testFitModeDefaultsToCrop(): void
     {
         static::assertSame(ImageFitMode::Crop, $this->makeDefinition()->fitMode());
@@ -78,8 +71,6 @@ class AbstractImageTypeDefinitionTest extends TestCase
     {
         static::assertNull($this->makeDefinition()->locate($this->createStub(\App\Entity\Image::class)));
     }
-
-    // ---- sync(): insert/delete/no-op ----
 
     #[DataProvider('syncProvider')]
     public function testSync(array $currentPairs, array $discoveredPairs, array $expectedToInsert, array $expectedToDelete): void

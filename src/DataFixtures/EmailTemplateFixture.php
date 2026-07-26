@@ -31,7 +31,6 @@ class EmailTemplateFixture extends AbstractFixture implements FixtureGroupInterf
 
             $manager->persist($template);
 
-            // Create translations for all enabled languages with language-specific content
             foreach ($languages as $languageCode) {
                 $langDefaults = $this->templateService->getDefaultTemplates($languageCode);
                 $langData = $langDefaults[$identifier];

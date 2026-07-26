@@ -78,10 +78,6 @@ readonly class GlossaryService
         $this->changeProposalService->removeForTarget(GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
     }
 
-    /**
-     * Update glossary directly (manager permission required). The category is an assignment kept in
-     * the shared taxonomy tables, not a column on the entity.
-     */
     public function update(Glossary $newGlossary, int $id, ?int $categoryId): void
     {
         $current = $this->get($id);
@@ -99,10 +95,6 @@ readonly class GlossaryService
         $this->taxonomyService->setCategory(GlossaryCategorizableTypeProvider::ITEM_TYPE, $id, $categoryId);
     }
 
-    /**
-     * Write one approved proposal field onto the entry. The category is an assignment kept in the
-     * shared taxonomy tables, not a column on the entity.
-     */
     public function applyChange(int $id, string $field, ?string $value): void
     {
         $item = $this->get($id);
@@ -136,8 +128,6 @@ readonly class GlossaryService
     }
 
     /**
-     * Create new glossary entry.
-     *
      * @param bool $autoApprove Whether to auto-approve (for managers)
      */
     public function create(Glossary $glossary, int $userId, bool $autoApprove = false, ?int $categoryId = null): void

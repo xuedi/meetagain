@@ -16,12 +16,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-/**
- * Edit form for a dish: the translatable name/description/recipe rendered once per enabled
- * language (via ItemTranslationFormHelper), the language-neutral phonetic, origin and preview
- * fields, and the category/tag assignment (via ItemAssignmentFormHelper). The controller reads
- * the per-language values and the assignment back through the same helpers.
- */
 class DishEditType extends AbstractType
 {
     public function __construct(

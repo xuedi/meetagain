@@ -2,9 +2,6 @@
 
 namespace App\Filter\Cms;
 
-/**
- * Result from composing multiple CMS page filters.
- */
 readonly class CmsFilterResult
 {
     /**

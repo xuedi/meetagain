@@ -34,7 +34,7 @@ class LegacyGlossaryCategoryConverterTest extends TestCase
 
     public function testReturnsNullWhenAlreadyMigrated(): void
     {
-        // Arrange: a config already carrying a taxonomy key
+        // Arrange
         $already = ['taxonomy' => ['categoriesEnabled' => true, 'categories' => []]];
 
         // Act + Assert

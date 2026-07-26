@@ -37,7 +37,7 @@ class UserStatusTest extends TestCase
         // Act
         $choices = UserStatus::getChoices($translator);
 
-        // Assert - IdentityTranslator returns keys unchanged, so array keys are translation keys
+        // Assert
         static::assertSame(UserStatus::Registered, $choices['admin_member.status_registered']);
         static::assertSame(UserStatus::EmailVerified, $choices['admin_member.status_email_verified']);
         static::assertSame(UserStatus::Active, $choices['admin_member.status_active']);

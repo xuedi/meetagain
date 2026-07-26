@@ -2,10 +2,6 @@
 
 namespace App\ValueObject;
 
-/**
- * Percent-changed between two events for one locale: 0 means identical content,
- * 100 means nothing in common. `total` is the weighted composite of the three fields.
- */
 final readonly class SimilarityScore
 {
     public function __construct(

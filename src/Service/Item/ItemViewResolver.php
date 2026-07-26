@@ -5,11 +5,6 @@ namespace App\Service\Item;
 use App\Enum\ItemViewType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-/**
- * Reads and writes the current list view mode in the session, keyed per item type so each
- * list remembers its own mode independently. Session-only UI preference (see
- * architecture/security/get-routes.md exception 2).
- */
 readonly class ItemViewResolver
 {
     private const string SESSION_PREFIX = 'item.viewMode.';

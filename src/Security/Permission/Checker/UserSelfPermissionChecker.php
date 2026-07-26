@@ -8,12 +8,6 @@ use App\Security\Permission\PermissionCheckerInterface;
 use App\Security\Permission\PermissionContext;
 use Override;
 
-/**
- * Decides user.* attributes that act on the authenticated user themselves
- * (settings, password, blocks, profile images, messages). Platform admins
- * bypass; otherwise the actor must be the same User as the subject (or null
- * subject means "self").
- */
 final class UserSelfPermissionChecker implements PermissionCheckerInterface
 {
     private const array SELF_ATTRIBUTES = [

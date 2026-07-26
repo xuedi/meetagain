@@ -7,11 +7,6 @@ use App\Service\Config\ConfigService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 
-/**
- * Resolves the canonical URL for the current request. Delegates to any registered
- * CanonicalUrlProviderInterface; falls back to a self-referencing canonical
- * (ConfigService::getHost() + current path) when no provider returns a value.
- */
 readonly class CanonicalUrlService
 {
     /**

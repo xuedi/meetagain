@@ -2,15 +2,6 @@
 
 namespace App\Item\Taxonomy;
 
-/**
- * The composable taxonomy sub-object a plugin Config embeds: two independent enable flags and
- * two per-locale definition lists (categories, single-select; tags, controlled multi-select).
- *
- * Rows are held in form shape - array{id: int|string, labels: array<locale, label>} - so the
- * CollectionType binds directly. Ids are int once normalized (via normalize / fromArray) but may
- * transiently be an empty string for a freshly-added form row before normalization. Domain reads
- * go through the typed definition/label/option accessors.
- */
 final class TaxonomyConfig
 {
     private bool $categoriesEnabled = false;
@@ -74,10 +65,6 @@ final class TaxonomyConfig
         return $this;
     }
 
-    /**
-     * Assign a stable id to any new row, drop rows whose labels are all blank, and trim labels.
-     * The per-language, two-list generalization of glossary's single-label normalizeCategories().
-     */
     public function normalize(): void
     {
         $this->categories = $this->normalizeRows($this->categories);

@@ -7,11 +7,6 @@ use App\Item\Taxonomy\TaxonomyConfig;
 use Override;
 use Plugin\Glossary\Service\ConfigService;
 
-/**
- * Registers 'glossary' as a categorizable type. Glossary is not event-attachable, so it implements
- * only this seam and not ItemTypeProviderInterface - the exact reason the two axes are separate.
- * Categories only; tags are unused for glossary.
- */
 final readonly class GlossaryCategorizableTypeProvider implements CategorizableTypeProviderInterface
 {
     public const string ITEM_TYPE = 'glossary';

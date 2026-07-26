@@ -32,7 +32,6 @@ class FixturesLoadCommand extends Command
     {
         $groups = $input->getOption('group');
 
-        // Check if any fixtures exist for the specified groups
         $fixtures = $this->fixturesLoader->getFixtures($groups);
 
         if ($fixtures === []) {
@@ -43,7 +42,6 @@ class FixturesLoadCommand extends Command
             return Command::SUCCESS;
         }
 
-        // Delegate to the doctrine:fixtures:load command
         $doctrineCommand = $this->getApplication()->find('doctrine:fixtures:load');
 
         $arguments = [
