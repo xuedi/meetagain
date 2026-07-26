@@ -1,9 +1,10 @@
 framework:
     cache:
         app: cache.adapter.array
-
-        # Named pools keep their prod adapter unless listed here - a Redis pool stays shared across
-        # every parallel test worker.
         pools:
             cache.image_alt_status:
+                adapter: cache.adapter.array
+            cache.config:
+                adapter: cache.adapter.array
+            cache.app_state:
                 adapter: cache.adapter.array

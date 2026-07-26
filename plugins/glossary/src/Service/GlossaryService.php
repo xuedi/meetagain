@@ -17,6 +17,7 @@ use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
 use Plugin\Glossary\Repository\GlossaryRepository;
 use Plugin\Glossary\Review\GlossaryChangeTarget;
 use RuntimeException;
+use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class GlossaryService
 {
@@ -28,6 +29,7 @@ readonly class GlossaryService
         private TaxonomyService $taxonomyService,
         private ActionDispatcher $itemActionDispatcher,
         private ChangeProposalService $changeProposalService,
+        private Security $security,
     ) {}
 
     public function getCategory(int $id): ?int
@@ -37,7 +39,7 @@ readonly class GlossaryService
 
     public function approveNew(int $id): void
     {
-        $item = $this->get($id);
+        $item = $this->findIncludingUnapproved($id);
         if ($item === null) {
             return;
         }
@@ -49,7 +51,7 @@ readonly class GlossaryService
 
     public function deleteNew(int $id): void
     {
-        $item = $this->get($id);
+        $item = $this->findIncludingUnapproved($id);
         if ($item === null) {
             return;
         }
@@ -66,7 +68,7 @@ readonly class GlossaryService
 
     public function delete(int $id): void
     {
-        $item = $this->get($id);
+        $item = $this->findIncludingUnapproved($id);
         if ($item === null) {
             return;
         }
@@ -80,7 +82,7 @@ readonly class GlossaryService
 
     public function update(Glossary $newGlossary, int $id, ?int $categoryId): void
     {
-        $current = $this->get($id);
+        $current = $this->findIncludingUnapproved($id);
         if ($current === null) {
             return;
         }
@@ -97,7 +99,7 @@ readonly class GlossaryService
 
     public function applyChange(int $id, string $field, ?string $value): void
     {
-        $item = $this->get($id);
+        $item = $this->findIncludingUnapproved($id);
         if ($item === null) {
             throw new RuntimeException('Item not found');
         }
@@ -147,17 +149,33 @@ readonly class GlossaryService
 
     public function get(int $id): ?Glossary
     {
-        return $this->repo->findOneAllowed($id, $this->itemFilter->getAllowedItemIds(GlossaryCategorizableTypeProvider::ITEM_TYPE));
+        return $this->repo->findOneAllowed($id, $this->allowedIds(), !$this->canSeeUnapproved());
     }
 
     /** @return Glossary[] */
     public function getList(): array
     {
-        return $this->repo->findAllowed($this->itemFilter->getAllowedItemIds(GlossaryCategorizableTypeProvider::ITEM_TYPE), ['phrase' => 'ASC']);
+        return $this->repo->findAllowed($this->allowedIds(), ['phrase' => 'ASC'], !$this->canSeeUnapproved());
     }
 
     public function detach(Glossary $newGlossary): void
     {
         $this->em->detach($newGlossary);
+    }
+
+    private function findIncludingUnapproved(int $id): ?Glossary
+    {
+        return $this->repo->findOneAllowed($id, $this->allowedIds());
+    }
+
+    /** @return list<int>|null */
+    private function allowedIds(): ?array
+    {
+        return $this->itemFilter->getAllowedItemIds(GlossaryCategorizableTypeProvider::ITEM_TYPE);
+    }
+
+    private function canSeeUnapproved(): bool
+    {
+        return $this->security->isGranted('ROLE_ORGANIZER');
     }
 }

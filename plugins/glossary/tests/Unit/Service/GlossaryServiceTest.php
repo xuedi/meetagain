@@ -17,6 +17,7 @@ use Plugin\Glossary\Repository\GlossaryRepository;
 use Plugin\Glossary\Review\GlossaryChangeTarget;
 use Plugin\Glossary\Service\GlossaryService;
 use RuntimeException;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class GlossaryServiceTest extends TestCase
 {
@@ -199,7 +200,7 @@ class GlossaryServiceTest extends TestCase
         $repo = $this->createMock(GlossaryRepository::class);
         $repo->expects(self::once())
             ->method('findAllowed')
-            ->with([4, 7], ['phrase' => 'ASC'])
+            ->with([4, 7], ['phrase' => 'ASC'], true)
             ->willReturn([$entry]);
 
         $service = $this->makeService($this->createStub(EntityManagerInterface::class), $repo, $filter);
@@ -209,6 +210,69 @@ class GlossaryServiceTest extends TestCase
 
         // Assert
         self::assertSame([$entry], $list);
+    }
+
+    public function testReadPathNarrowsToApprovedEntriesForOrdinaryViewers(): void
+    {
+        // Arrange
+        $repo = $this->createMock(GlossaryRepository::class);
+        $repo->expects(self::once())->method('findOneAllowed')->with(4, null, true)->willReturn(null);
+        $service = $this->makeService($this->createStub(EntityManagerInterface::class), $repo);
+
+        // Act
+        $entry = $service->get(4);
+
+        // Assert
+        self::assertNull($entry);
+    }
+
+    public function testReadPathKeepsUnapprovedEntriesVisibleToModerators(): void
+    {
+        // Arrange
+        $pending = (new Glossary())->setApproved(false);
+        $repo = $this->createMock(GlossaryRepository::class);
+        $repo->expects(self::once())->method('findOneAllowed')->with(4, null, false)->willReturn($pending);
+        $service = $this->makeService(
+            $this->createStub(EntityManagerInterface::class),
+            $repo,
+            security: $this->viewer(moderator: true),
+        );
+
+        // Act
+        $entry = $service->get(4);
+
+        // Assert
+        self::assertSame($pending, $entry);
+    }
+
+    public function testListKeepsUnapprovedEntriesVisibleToModerators(): void
+    {
+        // Arrange
+        $repo = $this->createMock(GlossaryRepository::class);
+        $repo->expects(self::once())->method('findAllowed')->with(null, ['phrase' => 'ASC'], false)->willReturn([]);
+        $service = $this->makeService(
+            $this->createStub(EntityManagerInterface::class),
+            $repo,
+            security: $this->viewer(moderator: true),
+        );
+
+        // Act
+        $service->getList();
+    }
+
+    public function testApproveNewReachesPendingEntriesWithoutAModeratorToken(): void
+    {
+        // Arrange
+        $pending = (new Glossary())->setApproved(false);
+        $repo = $this->createMock(GlossaryRepository::class);
+        $repo->expects(self::once())->method('findOneAllowed')->with(1, null)->willReturn($pending);
+        $service = $this->makeService($this->createStub(EntityManagerInterface::class), $repo);
+
+        // Act
+        $service->approveNew(1);
+
+        // Assert
+        self::assertTrue($pending->getApproved());
     }
 
     public function testCreateAnnouncesTheNewItemToTheItemActionChain(): void
@@ -236,6 +300,7 @@ class GlossaryServiceTest extends TestCase
         ?ActionDispatcher $itemActionDispatcher = null,
         ?TaxonomyService $taxonomyService = null,
         ?ChangeProposalService $changeProposalService = null,
+        ?Security $security = null,
     ): GlossaryService {
         if ($filter === null) {
             $filter = $this->createStub(FilterService::class);
@@ -250,7 +315,16 @@ class GlossaryServiceTest extends TestCase
             $taxonomyService ?? $this->createStub(TaxonomyService::class),
             $itemActionDispatcher ?? $this->createStub(ActionDispatcher::class),
             $changeProposalService ?? $this->createStub(ChangeProposalService::class),
+            $security ?? $this->viewer(moderator: false),
         );
+    }
+
+    private function viewer(bool $moderator): Security
+    {
+        $security = $this->createStub(Security::class);
+        $security->method('isGranted')->willReturn($moderator);
+
+        return $security;
     }
 
     private function repoReturning(?Glossary $item): GlossaryRepository

@@ -28,9 +28,12 @@ final class EditController extends AbstractGlossaryController
     }
 
     #[Route('/{id}', name: 'app_plugin_glossary_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, ?int $id = null): Response
+    public function edit(Request $request, int $id): Response
     {
         $newGlossary = $this->service->get($id);
+        if ($newGlossary === null) {
+            throw $this->createNotFoundException();
+        }
 
         $form = $this->createForm(GlossaryType::class, $newGlossary);
         if ($form->has('category') && !$request->isMethod('POST')) {
