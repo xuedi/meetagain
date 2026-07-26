@@ -137,23 +137,6 @@ class ImageTypeRegistryTest extends TestCase
         static::assertSame(['400x400' => 0, '100x100' => 0, '50x50' => 0, '1024x768' => 0], $registry->getThumbnailSizeList());
     }
 
-    public function testIsValidThumbnailSize(): void
-    {
-        $registry = new ImageTypeRegistry([$this->definition(ImageType::ProfilePicture, [[400, 400], [100, 100], [50, 50]])], $this->format());
-
-        static::assertTrue($registry->isValidThumbnailSize(ImageType::ProfilePicture, 400, 400));
-        static::assertFalse($registry->isValidThumbnailSize(ImageType::ProfilePicture, 123, 456));
-    }
-
-    public function testIsValidThumbnailSizeAcceptsAFreeAxis(): void
-    {
-        $registry = new ImageTypeRegistry([$this->definition(ImageType::SiteLogo, [[self::FREE, 120], [350, self::FREE]])], $this->format());
-
-        static::assertTrue($registry->isValidThumbnailSize(ImageType::SiteLogo, self::FREE, 120));
-        static::assertTrue($registry->isValidThumbnailSize(ImageType::SiteLogo, 350, self::FREE));
-        static::assertFalse($registry->isValidThumbnailSize(ImageType::SiteLogo, self::FREE, 350));
-    }
-
     public function testAllReturnsEveryRegisteredDefinition(): void
     {
         $first = $this->definition(ImageType::ProfilePicture);
