@@ -284,7 +284,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
 
         static::assertSame(ImageType::SiteLogo, $definition->getType());
         static::assertSame(ImageFitMode::Fit, $definition->fitMode());
-        static::assertSame([[400, 400], [350, 350], [100, 100], [50, 50]], $definition->thumbnailSizes());
+        static::assertSame([[-1, 120], [350, -1], [100, 100], [50, 50]], $definition->thumbnailSizes());
         static::assertSame(['route' => 'app_admin_system_theme', 'params' => []], $definition->getEditLink(0));
     }
 

@@ -15,7 +15,7 @@ final class SiteLogoImageTypeDefinition extends AbstractImageTypeDefinition
 
     protected function sizes(): array
     {
-        return [[400, 400], [350, 350]];
+        return [[self::FREE_AXIS, 120], [350, self::FREE_AXIS]];
     }
 
     public function fitMode(): ImageFitMode

@@ -1,5 +1,5 @@
 {#
-    Image — Thumbnail image tag with automatic size selection and cache-busting
+    Image -- Thumbnail image tag with automatic size selection and cache-busting
 
     Renders a WebP thumbnail from /images/thumbnails/ or a default PNG placeholder when
     no image is provided. The size can be passed explicitly; when omitted it is derived
@@ -8,8 +8,11 @@
     Used in:    widely used - _components/comment, usercard, image_upload and many page templates
     Parameters:
         - image (Image|null, optional) - entity with hash, alt, updatedAt, type; null shows placeholder
-        - size  (string, optional)     - explicit thumbnail dimensions as 'WxH' e.g. '400x400';
-                                         auto-selected from image.type when omitted:
+        - size  (string, optional)     - explicit thumbnail dimensions as 'WxH' e.g. '400x400', or a
+                                         free-ratio form naming the one fixed axis: 'h120' is 120 tall
+                                         and 'w350' is 350 wide, with the other axis following the
+                                         source, so only the fixed axis is emitted on the tag.
+                                         Auto-selected from image.type when omitted:
                                          type 1 -> 400x400, type 2 -> 600x400, type 3 -> 210x140,
                                          type 4 -> 432x432, default -> 50x50
         - alt   (string, optional)     - alt text override; when omitted, the current locale's alt
@@ -34,11 +37,11 @@
 {% endif %}
 
 {% if image is defined and image and image.hash %}
-    {% set file = image.hash ~ '_' ~ size ~ '.webp' %}{# ~ image.extension #}
+    {% set file = image.hash ~ '_' ~ size ~ '.webp' %}
     {% if image.updatedAt is not null %}{# to invalidate browser cache #}
         {% set file = file ~ '?v' ~ image.updatedAt|date("YmdHis") %}
     {% endif %}
-    <img src="/images/thumbnails/{{ file }}" alt="{{ alt|default(image.getAltFor(app.locale)|default('')) }}" width="{{ size|split('x')[0] }}" height="{{ size|split('x')[1] }}" />
+    <img src="/images/thumbnails/{{ file }}" alt="{{ alt|default(image.getAltFor(app.locale)|default('')) }}"{% if size starts with 'h' %} height="{{ size|slice(1) }}"{% elseif size starts with 'w' %} width="{{ size|slice(1) }}"{% else %} width="{{ size|split('x')[0] }}" height="{{ size|split('x')[1] }}"{% endif %} />
 {% else %}
     <img src="{{ asset('images/default_' ~ size ~ '.png') }}" alt="Placeholder IMAGE"/>
 {% endif %}

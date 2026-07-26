@@ -9,6 +9,7 @@ use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
 use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
+use App\Service\Media\ImageTypes\ImageTypeDefinitionInterface;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,10 +23,13 @@ use Symfony\Component\Mime\MimeTypes;
 
 readonly class ImageService
 {
+    private const int FREE_AXIS_CEILING = 2400;
+
     public function __construct(
         private ImageRepository $imageRepo,
         private EntityManagerInterface $entityManager,
         private ImageTypeRegistry $imageTypeRegistry,
+        private ThumbnailSizeFormat $thumbnailSizeFormat,
         private ExtendedFilesystem $filesystem,
         private LoggerInterface $logger,
         private string $kernelProjectDir,
@@ -103,21 +107,59 @@ readonly class ImageService
                 $imagick->readImage($source);
                 $imagick->setImageCompressionQuality(90);
                 $imagick->autoOrient();
-                if ($fitMode === ImageFitMode::Fit) {
-                    $imagick->thumbnailImage($width, $height, true);
-                } else {
-                    $imagick->cropThumbnailImage($width, $height);
-                }
+                $this->scaleThumbnail($imagick, $width, $height, $fitMode, $target);
                 $imagick->stripImage();
                 $imagick->setFormat('webp');
                 $imagick->writeImage($target);
                 ++$cnt;
             } catch (ImagickException $e) {
-                $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $target, $e->getMessage()));
+                $this->logger->error(sprintf("Error creating thumbnail '%s': %s", $target, $e->getMessage()));
             }
         }
 
         return $cnt;
+    }
+
+    private function scaleThumbnail(Imagick $imagick, int $width, int $height, ImageFitMode $fitMode, string $target): void
+    {
+        $free = ImageTypeDefinitionInterface::FREE_AXIS;
+
+        if ($width === $free) {
+            $imagick->thumbnailImage(self::FREE_AXIS_CEILING, $height, true);
+            $this->logFreeAxisClamp($imagick->getImageWidth(), $imagick->getImageHeight(), $height, $target);
+
+            return;
+        }
+
+        if ($height === $free) {
+            $imagick->thumbnailImage($width, self::FREE_AXIS_CEILING, true);
+            $this->logFreeAxisClamp($imagick->getImageHeight(), $imagick->getImageWidth(), $width, $target);
+
+            return;
+        }
+
+        if ($fitMode === ImageFitMode::Fit) {
+            $imagick->thumbnailImage($width, $height, true);
+
+            return;
+        }
+
+        $imagick->cropThumbnailImage($width, $height);
+    }
+
+    private function logFreeAxisClamp(int $freeAxis, int $fixedAxis, int $requestedFixedAxis, string $target): void
+    {
+        if ($freeAxis !== self::FREE_AXIS_CEILING || $fixedAxis >= $requestedFixedAxis) {
+            return;
+        }
+
+        $this->logger->warning(sprintf(
+            "Thumbnail '%s' hit the %dpx free-axis ceiling; its fixed axis is %dpx instead of the requested %dpx.",
+            $target,
+            self::FREE_AXIS_CEILING,
+            $fixedAxis,
+            $requestedFixedAxis,
+        ));
     }
 
     public function regenerateAllThumbnails(): int
@@ -165,7 +207,10 @@ readonly class ImageService
                 continue;
             }
             $thumpFileList[$file] = true;
-            $size = explode('_', explode('.', (string) $file)[0])[1];
+            $size = $this->sizeTokenOf((string) $file);
+            if ($size === null) {
+                continue;
+            }
             $sizeListCount[$size] = ($sizeListCount[$size] ?? 0) + 1;
         }
 
@@ -200,14 +245,15 @@ readonly class ImageService
             if (str_starts_with((string) $file, '.')) {
                 continue;
             }
-            [$fileName, $fileType] = explode('.', (string) $file);
-            [$hash, $size] = explode('_', $fileName);
-            [$width, $height] = explode('x', $size);
+            $hash = explode('_', explode('.', (string) $file)[0], 2)[0];
             if (!isset($imageList[$hash])) {
                 $list[] = $file;
                 continue;
             }
-            if (!$this->imageTypeRegistry->isValidThumbnailSize($imageList[$hash], (int) $width, (int) $height)) {
+
+            $token = $this->sizeTokenOf((string) $file);
+            $size = $token === null ? null : $this->thumbnailSizeFormat->parse($token);
+            if ($size === null || !$this->imageTypeRegistry->isValidThumbnailSize($imageList[$hash], $size[0], $size[1])) {
                 $list[] = $file;
             }
         }
@@ -308,12 +354,17 @@ readonly class ImageService
 
     private function getThumbnailFileByHash(string $hash, int $width, int $height, ?bool $justName = false): string
     {
-        $filename = sprintf('%s_%sx%s.webp', $hash, $width, $height);
+        $filename = sprintf('%s_%s.webp', $hash, $this->thumbnailSizeFormat->format($width, $height));
         if ($justName) {
             return $filename;
         }
 
         return $this->getThumbnailDir() . $filename;
+    }
+
+    private function sizeTokenOf(string $file): ?string
+    {
+        return explode('_', explode('.', $file)[0], 2)[1] ?? null;
     }
 
     private function getThumbnailDir(): string
