@@ -19,7 +19,7 @@ readonly class ActivityService
         private NotificationService $notificationService,
         private MessageFactory $messageFactory,
         private LoggerInterface $logger,
-        #[AutowireIterator(ActivityMetaEnricherInterface::class)]
+        #[AutowireIterator(MetaEnricherInterface::class)]
         private iterable $enrichers,
     ) {}
 

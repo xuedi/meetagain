@@ -2,13 +2,13 @@
 
 namespace App\Item\Taxonomy;
 
-use App\Item\ItemFilterInterface;
+use App\Item\FilterInterface;
 use App\Repository\ItemCategoryAssignmentRepository;
 use App\Repository\ItemTagAssignmentRepository;
 use Override;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final readonly class TaxonomyItemFilter implements ItemFilterInterface
+final readonly class TaxonomyItemFilter implements FilterInterface
 {
     public function __construct(
         private RequestStack $requestStack,

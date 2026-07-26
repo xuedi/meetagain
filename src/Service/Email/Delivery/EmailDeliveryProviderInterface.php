@@ -4,9 +4,9 @@ namespace App\Service\Email\Delivery;
 
 interface EmailDeliveryProviderInterface
 {
-    public function getLogs(EmailDeliveryLogFilter $filter): EmailDeliveryLogCollection;
+    public function getLogs(LogFilter $filter): LogCollection;
 
-    public function getLogByMessageId(string $messageId): ?EmailDeliveryLog;
+    public function getLogByMessageId(string $messageId): ?Log;
 
     public function isAvailable(): bool;
 }

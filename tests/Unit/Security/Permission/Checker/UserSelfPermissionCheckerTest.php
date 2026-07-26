@@ -5,7 +5,7 @@ namespace App\Tests\Unit\Security\Permission\Checker;
 use App\Entity\User;
 use App\Security\Permission\Attribute\PermissionAttribute as Attr;
 use App\Security\Permission\Checker\UserSelfPermissionChecker;
-use App\Security\Permission\PermissionContext;
+use App\Security\Permission\Context;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
@@ -37,7 +37,7 @@ class UserSelfPermissionCheckerTest extends TestCase
 
     public function testAdminAlwaysAllowed(): void
     {
-        $ctx = new PermissionContext(actor: null, subject: $this->makeUser(1), isAdmin: true);
+        $ctx = new Context(actor: null, subject: $this->makeUser(1), isAdmin: true);
         self::assertTrue($this->checker->vote(Attr::USER_UPDATE_SELF, $ctx));
         self::assertTrue($this->checker->vote(Attr::USER_UPDATE, $ctx));
     }
@@ -45,7 +45,7 @@ class UserSelfPermissionCheckerTest extends TestCase
     public function testElevatedAttributeDeniedForNonAdmin(): void
     {
         $actor = $this->makeUser(1);
-        $ctx = new PermissionContext(actor: $actor, subject: $actor, isAdmin: false);
+        $ctx = new Context(actor: $actor, subject: $actor, isAdmin: false);
         self::assertFalse($this->checker->vote(Attr::USER_UPDATE, $ctx));
         self::assertFalse($this->checker->vote(Attr::USER_VIEW, $ctx));
     }
@@ -53,33 +53,33 @@ class UserSelfPermissionCheckerTest extends TestCase
     public function testSelfAttributeAllowsSameUser(): void
     {
         $actor = $this->makeUser(1);
-        $ctx = new PermissionContext(actor: $actor, subject: $actor, isAdmin: false);
+        $ctx = new Context(actor: $actor, subject: $actor, isAdmin: false);
         self::assertTrue($this->checker->vote(Attr::USER_UPDATE_SELF, $ctx));
         self::assertTrue($this->checker->vote(Attr::USER_PASSWORD_UPDATE, $ctx));
     }
 
     public function testSelfAttributeDeniesOtherUser(): void
     {
-        $ctx = new PermissionContext(actor: $this->makeUser(1), subject: $this->makeUser(2), isAdmin: false);
+        $ctx = new Context(actor: $this->makeUser(1), subject: $this->makeUser(2), isAdmin: false);
         self::assertFalse($this->checker->vote(Attr::USER_UPDATE_SELF, $ctx));
         self::assertFalse($this->checker->vote(Attr::USER_PASSWORD_UPDATE, $ctx));
     }
 
     public function testSelfAttributeWithNullSubjectAllowsActor(): void
     {
-        $ctx = new PermissionContext(actor: $this->makeUser(1), subject: null, isAdmin: false);
+        $ctx = new Context(actor: $this->makeUser(1), subject: null, isAdmin: false);
         self::assertTrue($this->checker->vote(Attr::USER_VIEW_SELF, $ctx));
     }
 
     public function testAnonymousActorDenied(): void
     {
-        $ctx = new PermissionContext(actor: null, subject: $this->makeUser(1), isAdmin: false);
+        $ctx = new Context(actor: null, subject: $this->makeUser(1), isAdmin: false);
         self::assertFalse($this->checker->vote(Attr::USER_UPDATE_SELF, $ctx));
     }
 
     public function testNonUserSubjectIsDenied(): void
     {
-        $ctx = new PermissionContext(actor: $this->makeUser(1), subject: new \stdClass(), isAdmin: false);
+        $ctx = new Context(actor: $this->makeUser(1), subject: new \stdClass(), isAdmin: false);
         self::assertFalse($this->checker->vote(Attr::USER_UPDATE_SELF, $ctx));
     }
 

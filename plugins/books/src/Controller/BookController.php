@@ -4,8 +4,8 @@ namespace Plugin\Books\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
-use App\Item\Taxonomy\ItemAssignmentFormHelper;
-use App\Item\Taxonomy\ItemTaxonomyService;
+use App\Item\Taxonomy\AssignmentFormHelper;
+use App\Item\Taxonomy\TaxonomyService;
 use Plugin\Books\Activity\Messages\BookAdded;
 use Plugin\Books\Entity\Book;
 use Plugin\Books\Form\BookEditType;
@@ -25,8 +25,8 @@ final class BookController extends AbstractController
     public function __construct(
         private readonly BookService $bookService,
         private readonly ActivityService $activityService,
-        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
-        private readonly ItemTaxonomyService $itemTaxonomyService,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
+        private readonly TaxonomyService $itemTaxonomyService,
     ) {}
 
     #[Route('', name: 'app_books_booklist', methods: ['GET'])]

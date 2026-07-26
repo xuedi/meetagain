@@ -1,0 +1,65 @@
+<?php declare(strict_types=1);
+
+namespace App\Publisher\PluginSettings;
+
+use App\Entity\PluginSettings;
+use App\Repository\PluginSettingsRepository;
+use App\Service\Admin\PluginSettingsService;
+use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
+use LogicException;
+
+readonly class GenericStore implements StoreInterface
+{
+    public function __construct(
+        private PluginSettingsRepository $repository,
+        private EntityManagerInterface $em,
+        private PluginSettingsService $descriptors,
+    ) {}
+
+    public function supports(string $key, ?string $scopeId): bool
+    {
+        return $scopeId === null;
+    }
+
+    public function load(string $key, ?string $scopeId): ?object
+    {
+        $row = $this->repository->findOneByPluginKey($key);
+        if ($row === null) {
+            return null;
+        }
+
+        return $this->dataClass($key)::fromArray($row->getData());
+    }
+
+    public function save(string $key, object $data, ?string $scopeId): void
+    {
+        if (!$data instanceof Data) {
+            throw new LogicException(sprintf('Data for "%s" must implement %s to use the generic store.', $key, Data::class));
+        }
+
+        $row = $this->repository->findOneByPluginKey($key) ?? new PluginSettings();
+        $row->setPluginKey($key);
+        $row->setData($data->toArray());
+        $row->setUpdatedAt(new DateTimeImmutable());
+
+        $this->em->persist($row);
+        $this->em->flush();
+    }
+
+    public function getPriority(): int
+    {
+        return -100;
+    }
+
+    /** @return class-string<Data> */
+    private function dataClass(string $key): string
+    {
+        $default = $this->descriptors->getProvider($key)?->createDefault();
+        if (!$default instanceof Data) {
+            throw new LogicException(sprintf('Descriptor for "%s" must create a %s to use the generic store.', $key, Data::class));
+        }
+
+        return $default::class;
+    }
+}

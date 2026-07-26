@@ -10,11 +10,11 @@ use App\Enum\EventSortFilter;
 use App\Enum\EventTileLocation;
 use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
-use App\Item\ItemTypeRegistry;
+use App\Item\TypeRegistry;
 use App\Plugin;
 use App\Repository\EventRepository;
 use App\Service\Config\PluginService;
-use App\Service\Item\ItemAssociationService;
+use App\Service\Item\AssociationService;
 use App\ValueObject\RealignmentPlan;
 use App\ValueObject\RealignmentResult;
 use App\ValueObject\ScheduleChange;
@@ -32,8 +32,8 @@ readonly class EventService
         private NotificationEventCanceledEmail $notificationEventCanceledEmail,
         private PluginService $pluginService,
         private RecurringEventService $recurringEventService,
-        private ItemAssociationService $itemAssociationService,
-        private ItemTypeRegistry $itemTypeRegistry,
+        private AssociationService $itemAssociationService,
+        private TypeRegistry $itemTypeRegistry,
         #[AutowireIterator(Plugin::class)]
         private iterable $plugins,
     ) {}

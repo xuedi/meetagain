@@ -4,9 +4,9 @@ namespace Plugin\Dishes\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
-use App\Item\ItemTranslationFormHelper;
-use App\Item\Taxonomy\ItemAssignmentFormHelper;
-use App\Item\Taxonomy\ItemTaxonomyService;
+use App\Item\TranslationFormHelper;
+use App\Item\Taxonomy\AssignmentFormHelper;
+use App\Item\Taxonomy\TaxonomyService;
 use Plugin\Dishes\Activity\Messages\DishAdded;
 use Plugin\Dishes\Form\DishAddType;
 use Plugin\Dishes\Form\DishEditType;
@@ -30,9 +30,9 @@ final class DishController extends AbstractController
         private readonly ActivityService $activityService,
         private readonly ConfigService $configService,
         private readonly DishLikeRepository $dishLikeRepository,
-        private readonly ItemTranslationFormHelper $translationFormHelper,
-        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
-        private readonly ItemTaxonomyService $itemTaxonomyService,
+        private readonly TranslationFormHelper $translationFormHelper,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
+        private readonly TaxonomyService $itemTaxonomyService,
     ) {}
 
     #[Route('', name: 'app_dishes_dishlist', methods: ['GET'])]

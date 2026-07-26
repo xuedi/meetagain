@@ -50,7 +50,7 @@ readonly class UserService
         $this->assertStructural($actor, $target);
 
         if ($target->getRole() === $newRole) {
-            throw MemberActionException::noOp();
+            throw ActionException::noOp();
         }
 
         $target->setRole($newRole);
@@ -94,12 +94,12 @@ readonly class UserService
 
         $oldStatus = $target->getStatus();
         if ($oldStatus === $newStatus) {
-            throw MemberActionException::noOp();
+            throw ActionException::noOp();
         }
 
         $allowed = self::ALLOWED_STATUS_TRANSITIONS[$oldStatus->value] ?? [];
         if (!in_array($newStatus, $allowed, true)) {
-            throw MemberActionException::invalidStatusTransition();
+            throw ActionException::invalidStatusTransition();
         }
 
         $target->setStatus($newStatus);
@@ -129,7 +129,7 @@ readonly class UserService
 
         $oldStatus = $target->getStatus();
         if ($oldStatus === UserStatus::Deleted) {
-            throw MemberActionException::noOp();
+            throw ActionException::noOp();
         }
 
         $target->setStatus(UserStatus::Deleted);
@@ -151,7 +151,7 @@ readonly class UserService
 
         $oldStatus = $target->getStatus();
         if ($oldStatus === UserStatus::Active) {
-            throw MemberActionException::noOp();
+            throw ActionException::noOp();
         }
 
         $target->setStatus(UserStatus::Active);
@@ -168,11 +168,11 @@ readonly class UserService
     private function assertStructural(User $actor, User $target): void
     {
         if ($actor->getId() === $target->getId()) {
-            throw MemberActionException::selfModification();
+            throw ActionException::selfModification();
         }
 
         if ($target->getRole() === UserRole::System) {
-            throw MemberActionException::systemUser();
+            throw ActionException::systemUser();
         }
     }
 }

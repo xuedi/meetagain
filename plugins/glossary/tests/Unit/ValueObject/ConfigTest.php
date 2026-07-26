@@ -2,7 +2,7 @@
 
 namespace Plugin\Glossary\Tests\Unit\ValueObject;
 
-use App\Item\Taxonomy\TaxonomyConfig;
+use App\Item\Taxonomy\Config as TaxonomyConfig;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\ValueObject\Config;
 

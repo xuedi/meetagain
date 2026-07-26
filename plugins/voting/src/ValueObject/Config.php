@@ -2,10 +2,10 @@
 
 namespace Plugin\Voting\ValueObject;
 
-use App\Publisher\PluginSettings\PluginSettingsData;
+use App\Publisher\PluginSettings\Data;
 use Plugin\Voting\Enum\ChoiceMode;
 
-final class Config implements PluginSettingsData
+final class Config implements Data
 {
     private int $defaultDurationDays = 7;
     private ChoiceMode $choiceMode = ChoiceMode::Multiple;

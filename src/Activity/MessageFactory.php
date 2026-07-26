@@ -45,6 +45,6 @@ readonly class MessageFactory
             );
         }
 
-        return new UnknownActivityMessage($activity->getType() ?? 'unknown');
+        return new UnknownMessage($activity->getType() ?? 'unknown');
     }
 }

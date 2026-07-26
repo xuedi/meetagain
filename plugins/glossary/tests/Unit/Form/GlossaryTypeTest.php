@@ -2,7 +2,7 @@
 
 namespace Plugin\Glossary\Tests\Unit\Form;
 
-use App\Item\Taxonomy\TaxonomyConfig;
+use App\Item\Taxonomy\Config as TaxonomyConfig;
 use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Form\GlossaryType;

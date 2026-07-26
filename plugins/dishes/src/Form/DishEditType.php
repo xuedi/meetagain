@@ -2,8 +2,8 @@
 
 namespace Plugin\Dishes\Form;
 
-use App\Item\ItemTranslationFormHelper;
-use App\Item\Taxonomy\ItemAssignmentFormHelper;
+use App\Item\TranslationFormHelper;
+use App\Item\Taxonomy\AssignmentFormHelper;
 use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Service\DishService;
 use Symfony\Component\Form\AbstractType;
@@ -20,8 +20,8 @@ class DishEditType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
-        private readonly ItemTranslationFormHelper $translationFormHelper,
-        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
+        private readonly TranslationFormHelper $translationFormHelper,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {}
 
     #[\Override]

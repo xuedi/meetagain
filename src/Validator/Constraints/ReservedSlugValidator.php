@@ -2,7 +2,7 @@
 
 namespace App\Validator\Constraints;
 
-use App\Cms\ReservedSlug\ReservedSlugRegistry;
+use App\Cms\ReservedSlug\Registry;
 use App\Entity\Cms;
 use Override;
 use Symfony\Component\Validator\Constraint;
@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 final class ReservedSlugValidator extends ConstraintValidator
 {
     public function __construct(
-        private readonly ReservedSlugRegistry $registry,
+        private readonly Registry $registry,
     ) {}
 
     #[Override]

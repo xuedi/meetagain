@@ -5,9 +5,9 @@ namespace Plugin\Glossary\Service;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Enum\ItemAction;
-use App\Item\ItemActionDispatcher;
-use App\Item\ItemFilterService;
-use App\Item\Taxonomy\ItemTaxonomyService;
+use App\Item\ActionDispatcher;
+use App\Item\FilterService;
+use App\Item\Taxonomy\TaxonomyService;
 use App\Review\ChangeProposalService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,10 +23,10 @@ readonly class GlossaryService
     public function __construct(
         private EntityManagerInterface $em,
         private GlossaryRepository $repo,
-        private ItemFilterService $itemFilter,
+        private FilterService $itemFilter,
         private EntityActionDispatcher $dispatcher,
-        private ItemTaxonomyService $taxonomyService,
-        private ItemActionDispatcher $itemActionDispatcher,
+        private TaxonomyService $taxonomyService,
+        private ActionDispatcher $itemActionDispatcher,
         private ChangeProposalService $changeProposalService,
     ) {}
 

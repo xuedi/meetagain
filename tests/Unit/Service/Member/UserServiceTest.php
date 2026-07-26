@@ -19,8 +19,8 @@ use App\Enum\EntityAction;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
-use App\Service\Member\MemberActionException;
-use App\Service\Member\MemberActionFailure;
+use App\Service\Member\ActionException;
+use App\Service\Member\ActionFailure;
 use App\Service\Member\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
@@ -81,11 +81,11 @@ class UserServiceTest extends TestCase
         $subject = $this->makeService();
 
         // Assert
-        $this->expectException(MemberActionException::class);
+        $this->expectException(ActionException::class);
         try {
             $subject->changeRole($actor, $target, UserRole::Admin);
-        } catch (MemberActionException $e) {
-            self::assertSame(MemberActionFailure::NoOp, $e->failure);
+        } catch (ActionException $e) {
+            self::assertSame(ActionFailure::NoOp, $e->failure);
             throw $e;
         }
     }
@@ -98,11 +98,11 @@ class UserServiceTest extends TestCase
         $subject = $this->makeService();
 
         // Act + Assert
-        $this->expectException(MemberActionException::class);
+        $this->expectException(ActionException::class);
         try {
             $subject->changeRole($actor, $actor, UserRole::User);
-        } catch (MemberActionException $e) {
-            self::assertSame(MemberActionFailure::SelfModification, $e->failure);
+        } catch (ActionException $e) {
+            self::assertSame(ActionFailure::SelfModification, $e->failure);
             throw $e;
         }
     }
@@ -116,11 +116,11 @@ class UserServiceTest extends TestCase
         $subject = $this->makeService();
 
         // Act + Assert
-        $this->expectException(MemberActionException::class);
+        $this->expectException(ActionException::class);
         try {
             $subject->changeRole($actor, $target, UserRole::User);
-        } catch (MemberActionException $e) {
-            self::assertSame(MemberActionFailure::SystemUser, $e->failure);
+        } catch (ActionException $e) {
+            self::assertSame(ActionFailure::SystemUser, $e->failure);
             throw $e;
         }
     }
@@ -282,11 +282,11 @@ class UserServiceTest extends TestCase
         $subject = $this->makeService();
 
         // Act + Assert
-        $this->expectException(MemberActionException::class);
+        $this->expectException(ActionException::class);
         try {
             $subject->transitionStatus($actor, $target, UserStatus::Denied);
-        } catch (MemberActionException $e) {
-            self::assertSame(MemberActionFailure::InvalidStatusTransition, $e->failure);
+        } catch (ActionException $e) {
+            self::assertSame(ActionFailure::InvalidStatusTransition, $e->failure);
             throw $e;
         }
     }
@@ -300,11 +300,11 @@ class UserServiceTest extends TestCase
         $subject = $this->makeService();
 
         // Act + Assert
-        $this->expectException(MemberActionException::class);
+        $this->expectException(ActionException::class);
         try {
             $subject->transitionStatus($actor, $target, UserStatus::Active);
-        } catch (MemberActionException $e) {
-            self::assertSame(MemberActionFailure::NoOp, $e->failure);
+        } catch (ActionException $e) {
+            self::assertSame(ActionFailure::NoOp, $e->failure);
             throw $e;
         }
     }
@@ -344,11 +344,11 @@ class UserServiceTest extends TestCase
         $subject = $this->makeService(dispatcher: $dispatcher);
 
         // Act + Assert
-        $this->expectException(MemberActionException::class);
+        $this->expectException(ActionException::class);
         try {
             $subject->softDelete($actor, $target);
-        } catch (MemberActionException $e) {
-            self::assertSame(MemberActionFailure::NoOp, $e->failure);
+        } catch (ActionException $e) {
+            self::assertSame(ActionFailure::NoOp, $e->failure);
             throw $e;
         }
     }
@@ -385,11 +385,11 @@ class UserServiceTest extends TestCase
         $subject = $this->makeService();
 
         // Act + Assert
-        $this->expectException(MemberActionException::class);
+        $this->expectException(ActionException::class);
         try {
             $subject->restore($actor, $target);
-        } catch (MemberActionException $e) {
-            self::assertSame(MemberActionFailure::NoOp, $e->failure);
+        } catch (ActionException $e) {
+            self::assertSame(ActionFailure::NoOp, $e->failure);
             throw $e;
         }
     }

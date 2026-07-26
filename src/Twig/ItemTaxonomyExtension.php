@@ -2,7 +2,7 @@
 
 namespace App\Twig;
 
-use App\Item\Taxonomy\ItemTaxonomyService;
+use App\Item\Taxonomy\TaxonomyService;
 use Override;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\AbstractExtension;
@@ -11,7 +11,7 @@ use Twig\TwigFunction;
 final class ItemTaxonomyExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly ItemTaxonomyService $taxonomyService,
+        private readonly TaxonomyService $taxonomyService,
         private readonly RequestStack $requestStack,
     ) {}
 

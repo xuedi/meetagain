@@ -4,11 +4,11 @@ namespace App\Security\Permission\Checker;
 
 use App\Entity\User;
 use App\Security\Permission\Attribute\PermissionAttribute as Attr;
-use App\Security\Permission\PermissionCheckerInterface;
-use App\Security\Permission\PermissionContext;
+use App\Security\Permission\CheckerInterface;
+use App\Security\Permission\Context;
 use Override;
 
-final class UserSelfPermissionChecker implements PermissionCheckerInterface
+final class UserSelfPermissionChecker implements CheckerInterface
 {
     private const array SELF_ATTRIBUTES = [
         Attr::USER_VIEW_SELF,
@@ -37,7 +37,7 @@ final class UserSelfPermissionChecker implements PermissionCheckerInterface
     }
 
     #[Override]
-    public function vote(string $attribute, PermissionContext $context): ?bool
+    public function vote(string $attribute, Context $context): ?bool
     {
         if ($context->isAdmin) {
             return true;

@@ -5,8 +5,8 @@ namespace Plugin\Dishes\Service;
 use App\Entity\Image;
 use App\Enum\ImageType;
 use App\Enum\ItemAction;
-use App\Item\ItemActionDispatcher;
-use App\Item\ItemFilterService;
+use App\Item\ActionDispatcher;
+use App\Item\FilterService;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,8 +27,8 @@ readonly class DishService
         private DishRepository $dishRepo,
         private DishLikeRepository $likeRepo,
         private DishImageRepository $imageRepo,
-        private ItemFilterService $itemFilter,
-        private ItemActionDispatcher $dispatcher,
+        private FilterService $itemFilter,
+        private ActionDispatcher $dispatcher,
         private ImageLocationService $imageLocationService,
     ) {}
 

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Service\Admin;
 
-use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
+use App\Publisher\PluginSettings\DescriptorInterface;
 use App\Service\Admin\PluginSettingsService;
 use LogicException;
 use PHPUnit\Framework\TestCase;
@@ -103,7 +103,7 @@ class PluginSettingsServiceTest extends TestCase
         int $priority = 0,
         ?string $pluginKey = null,
         bool $scopable = true,
-    ): PluginSettingsDescriptorInterface {
+    ): DescriptorInterface {
         return new StubDescriptor($key, $priority, $pluginKey, $scopable);
     }
 }

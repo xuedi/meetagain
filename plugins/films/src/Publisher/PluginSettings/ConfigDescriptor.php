@@ -2,12 +2,12 @@
 
 namespace Plugin\Films\Publisher\PluginSettings;
 
-use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
+use App\Publisher\PluginSettings\DescriptorInterface;
 use Plugin\Films\Form\ConfigType;
 use Plugin\Films\ValueObject\Config;
 use Symfony\Component\Form\FormInterface;
 
-final class ConfigDescriptor implements PluginSettingsDescriptorInterface
+final class ConfigDescriptor implements DescriptorInterface
 {
     public function getKey(): string
     {

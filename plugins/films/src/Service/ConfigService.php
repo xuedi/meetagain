@@ -2,7 +2,7 @@
 
 namespace Plugin\Films\Service;
 
-use App\Publisher\PluginSettings\PluginSettingsResolver;
+use App\Publisher\PluginSettings\Resolver;
 use Plugin\Films\ValueObject\Config;
 
 class ConfigService
@@ -10,7 +10,7 @@ class ConfigService
     private ?Config $memo = null;
 
     public function __construct(
-        private readonly PluginSettingsResolver $resolver,
+        private readonly Resolver $resolver,
     ) {}
 
     public function getConfig(): Config
