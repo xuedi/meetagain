@@ -104,24 +104,10 @@ final class ImagesController extends AbstractSettingsController implements Admin
 
         $adminTop = new AdminTop(info: $info, actions: [
             new AdminTopActionForm(
-                label: $this->translator->trans('admin_system_images.button_regenerate_thumbnails'),
-                target: $this->generateUrl('app_admin_regenerate_thumbnails'),
-                csrfTokenId: 'admin_regenerate_thumbnails',
+                label: $this->translator->trans('admin_system_images.button_sync'),
+                target: $this->generateUrl('app_admin_system_images_sync'),
+                csrfTokenId: 'admin_system_images_sync',
                 icon: 'sync',
-                variant: 'is-warning',
-            ),
-            new AdminTopActionForm(
-                label: $this->translator->trans('admin_system_images.button_cleanup_thumbnails'),
-                target: $this->generateUrl('app_admin_cleanup_thumbnails'),
-                csrfTokenId: 'admin_cleanup_thumbnails',
-                icon: 'trash',
-                variant: 'is-warning',
-            ),
-            new AdminTopActionForm(
-                label: $this->translator->trans('admin_system_images.button_sync_locations'),
-                target: $this->generateUrl('app_admin_sync_image_locations'),
-                csrfTokenId: 'admin_sync_image_locations',
-                icon: 'map-pin',
                 variant: 'is-warning',
             ),
             $this->buildIssuesDropdown($issuesFilter, $locationFilter, $range, $issueCounts),
@@ -226,55 +212,27 @@ final class ImagesController extends AbstractSettingsController implements Admin
         return $this->redirectToRoute('app_admin_system_images_show', ['id' => $id]);
     }
 
-    #[Route('/regenerate_thumbnails', name: 'app_admin_regenerate_thumbnails', methods: ['POST'])]
-    public function regenerateThumbnails(Request $request): Response
-    {
-        if (!$this->isCsrfTokenValid('admin_regenerate_thumbnails', (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
-
-        $startTime = microtime(true);
-        $cnt = $this->imageService->regenerateAllThumbnails();
-        $executionTime = round(microtime(true) - $startTime, 2);
-
-        $this->addFlash('success', $this->translator->trans('admin_system_images.flash_thumbnails_regenerated', [
-            '%count%' => $cnt,
-            '%seconds%' => $executionTime,
-        ]));
-
-        return $this->redirectToRoute('app_admin_system_images');
-    }
-
-    #[Route('/cleanup_thumbnails', name: 'app_admin_cleanup_thumbnails', methods: ['POST'])]
-    public function cleanupThumbnails(Request $request): Response
-    {
-        if (!$this->isCsrfTokenValid('admin_cleanup_thumbnails', (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
-
-        $startTime = microtime(true);
-        $cnt = $this->imageService->deleteObsoleteThumbnails();
-        $executionTime = round(microtime(true) - $startTime, 2);
-
-        $this->addFlash('success', $this->translator->trans('admin_system_images.flash_thumbnails_cleaned', [
-            '%count%' => $cnt,
-            '%seconds%' => $executionTime,
-        ]));
-
-        return $this->redirectToRoute('app_admin_system_images');
-    }
-
-    #[Route('/sync', name: 'app_admin_sync_image_locations', methods: ['POST'])]
+    #[Route('/sync', name: 'app_admin_system_images_sync', methods: ['POST'])]
     public function sync(Request $request): Response
     {
-        if (!$this->isCsrfTokenValid('admin_sync_image_locations', (string) $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('admin_system_images_sync', (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
+
+        $startTime = microtime(true);
 
         $this->imageLocationService->discover();
         $this->imageAltStatusCache->warm($this->imageRepository->findFiltered(null, null));
+        $deleted = $this->imageService->deleteObsoleteThumbnails();
+        $created = $this->imageService->regenerateAllThumbnails();
 
-        $this->addFlash('success', $this->translator->trans('admin_system_images.flash_locations_synced'));
+        $executionTime = round(microtime(true) - $startTime, 2);
+
+        $this->addFlash('success', $this->translator->trans('admin_system_images.flash_synced', [
+            '%deleted%' => $deleted,
+            '%created%' => $created,
+            '%seconds%' => $executionTime,
+        ]));
 
         return $this->redirectToRoute('app_admin_system_images');
     }
