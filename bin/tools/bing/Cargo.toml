@@ -1,0 +1,14 @@
+[package]
+name = "bing"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "bing"
+path = "src/main.rs"
+
+[dependencies]
+toolconfig.workspace = true
+clap.workspace = true
+ureq.workspace = true
+serde_json.workspace = true

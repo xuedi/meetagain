@@ -58,6 +58,7 @@ nav:
     - Guides:
       - Data Fixtures: core-development/fixtures.md
       - Testing: core-development/testing.md
+      - Developer Tooling: core-development/tooling.md
       - Best Practices: core-development/best-practices.md
     - Troubleshooting: core-development/troubleshooting.md
   - Plugin Development:

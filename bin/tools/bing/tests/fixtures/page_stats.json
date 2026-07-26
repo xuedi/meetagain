@@ -1,0 +1,22 @@
+{
+  "d": [
+    {
+      "__type": "PageStats:#Microsoft.Bing.Webmaster.Api",
+      "Page": "https://meetagain.org/",
+      "Date": "/Date(99999999999000-0700)/",
+      "Clicks": 3,
+      "Impressions": 24,
+      "AvgClickPosition": 2.0,
+      "AvgImpressionPosition": 3.1
+    },
+    {
+      "__type": "PageStats:#Microsoft.Bing.Webmaster.Api",
+      "Page": "https://meetagain.org/en/about-platform",
+      "Date": "/Date(99999999999000-0700)/",
+      "Clicks": 0,
+      "Impressions": 7,
+      "AvgClickPosition": -1,
+      "AvgImpressionPosition": 8.4
+    }
+  ]
+}

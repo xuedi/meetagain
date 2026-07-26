@@ -1,0 +1,45 @@
+# comment-guard reads this on every run; changing it needs no rebuild.
+#
+# The guard enforces the comment policy over PHP only. Twig, JavaScript and SCSS stay governed
+# by prose. A comment that is not allowed by shape must be justified in the owning repo's
+# tests/importantCodeComments.txt.
+#
+# Values here can be extended by an optional config/tools/comment-guard.local overlay:
+# list keys (SCAN_PATHS, EXCLUDE_PATHS, ...) concatenate, scalar keys replace.
+
+# Directories to scan, relative to the current working directory (always the repo root).
+# `plugins` is included on purpose - the tool covers every bundled plugin and every private
+# plugin repo, each against its own baseline file.
+SCAN_PATHS=src,tests,config,bin,public,plugins
+
+# Path-prefix exclusions, relative to the repo root. Doctrine migrations are immutable once
+# shipped; `config/reference.php` and `config/importmap.php` are written by generators
+# (`importmap:require` restores its own header), so neither can be edited to satisfy the guard.
+EXCLUDE_PATHS=config/reference.php,config/importmap.php,public/bundles,public/assets,public/media,tests/reports
+
+# Directory basenames skipped anywhere in the tree.
+EXCLUDE_DIRS=vendor,node_modules,var,target,.git,reports,.cache,.idea,migrations
+
+# Interface docblocks are allowed (case 1), but case 1 asks for a *short* summary. A docblock
+# with more prose lines than this is reported like any other unjustified comment.
+INTERFACE_MAX_PROSE_LINES=4
+
+# Counted and reported, never failed. Matched at the start of a comment line, with or without a
+# leading `@`, and only when the whole word matches (so `TODOS` is not a marker).
+MARKERS=TODO,FIXME
+
+# Tool directives. Matched case-insensitively against the start of a comment line; a comment whose
+# every line is a directive is allowed silently.
+DIRECTIVES=@phpstan,@psalm-suppress,@mago-,phpcs:,@codeCoverageIgnore,@SuppressWarnings,@noinspection
+
+# Docblock tags that carry type information rather than prose (case 6), plus `deprecated`, which
+# static analysers and IDEs act on. A docblock whose every line is one of these - or a directive,
+# or a wrapped continuation of one - is allowed.
+TAGS=deprecated,param,return,var,throws,template,template-covariant,extends,implements,use,method,property,property-read,property-write,psalm-type,psalm-import-type,psalm-return,psalm-param,phpstan-type,phpstan-return,phpstan-param,covers,coversNothing,dataProvider,inheritDoc,inheritdoc
+
+# Bare AAA section markers in unit tests (case 2). A marker plus an explanation is not bare and
+# is reported.
+AAA_MARKERS=Arrange,Act,Assert
+
+# Document explaining the policy, named in the tool's help output.
+POLICY_DOC=docs/src/core-development/tooling.md

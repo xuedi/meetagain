@@ -1,0 +1,13 @@
+{
+  "d": {
+    "__type": "UrlInfo:#Microsoft.Bing.Webmaster.Api",
+    "AnchorCount": 12,
+    "DiscoveryDate": "/Date(1658991600000-0700)/",
+    "DocumentSize": 18432,
+    "HttpStatus": 0,
+    "IsPage": true,
+    "LastCrawledDate": "/Date(1714262400000)/",
+    "TotalChildUrlCount": 87,
+    "Url": "https://meetagain.org/"
+  }
+}

@@ -1,0 +1,59 @@
+# leak-guard reads this on every run; changing it needs no rebuild.
+#
+# The guard refuses to let two kinds of string leave this repository:
+#
+#   PATTERNS  credentials - anything key-shaped, matched by regex (this file)
+#   WORDS     vocabulary  - substrings a repository has decided not to publish
+#
+# WORDS is deliberately absent here. A published word list states in plain text exactly what
+# was meant to stay unsaid, so a deployment that needs one supplies it through the optional
+# config/tools/leak-guard.local overlay. List keys concatenate .dist then .local, so the
+# overlay extends these rules instead of restating them.
+
+# Credential patterns, one per line, in the form `PATTERNS=<name>=<regex>`. The value after the
+# first `=` is taken verbatim, so a regex may contain `=` and `,`. Findings report <name> and the
+# location only - the matched text is never echoed, or the guard would leak what it caught.
+PATTERNS=pat-token=\bmapat_[A-Za-z0-9_-]{40,}
+PATTERNS=mollie-key=\b(?:live|test)_[A-Za-z0-9_]{30,}
+PATTERNS=private-key-pem=-----BEGIN (?:RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY(?: BLOCK)?-----
+PATTERNS=aws-access-key-id=\b(?:AKIA|ASIA|ABIA|ACCA)[A-Z0-9]{16}\b
+PATTERNS=sendgrid-key=\bSG\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}
+PATTERNS=mailgun-key=\bkey-[a-f0-9]{32}\b
+PATTERNS=github-token=\bgh[pousr]_[A-Za-z0-9]{36,}
+PATTERNS=app-secret=\bAPP_SECRET(?:_BOX_KEY)?\s*=\s*["']?[A-Za-z0-9+/=_-]{16,}
+PATTERNS=dsn-inline-password=\b(?:mysql|mariadb|postgres|postgresql|redis|rediss|amqp|amqps|smtp|smtps|mongodb)://[^:/@\s${}]+:[^@\s${}]+@
+
+# Findings a pattern is meant to produce, in the form `path::pattern-name`. One entry
+# suppresses exactly one pattern at one path prefix; it never widens to every pattern in a file.
+#
+# `.env.dist` carries the committed development placeholders the installer overwrites, so an
+# APP_SECRET assignment there is the file doing its job. The hosting guide and the CI workflow
+# spell out DSNs whose passwords are documentation and throwaway service credentials.
+ALLOW=.env.dist::app-secret,docs/src/hosting.md::dsn-inline-password,.github/workflows::dsn-inline-password
+
+# Paths where the vocabulary rules do not apply but the credential patterns still do. The
+# private directories this covers exist precisely to name what the public tree may not; that is
+# no reason to let a key sit in one. Supplied by the overlay, since naming them is itself the
+# kind of statement WORDS exists to prevent.
+WORDS_EXCLUDE_PATHS=
+
+# The tool always scans from the project root (the current working directory). Two exclusion
+# lists govern what is skipped:
+#
+# EXCLUDE_PATHS -- directory OR file paths relative to project root, matched as a path-prefix.
+#                  Mixes generated or compiled output with individual files where a flagged
+#                  string is structurally unavoidable: legacy SQL DDL migrations that drop
+#                  tables named after a plugin, plugin-key registries, and the public
+#                  AI-crawler user-agent list used by robots.txt.
+EXCLUDE_PATHS=docs/site,docs/src/plugin-development,docs/src/getting-started.md,public/bundles,public/assets,public/media,assets/vendor,tmp,migrations/Version20260129192214.php,plugins/bookclub/migrations/Version20260312120000.php,config/plugins.php,config/plugins_test.php,bin/commit-hooks,src/Controller/NonLocale/RobotsController.php,tests/Functional/PublicPagesTest.php,tests/config/get-routes-allowlist.php,tests/Functional/Security/GetRoutesContractTest.php
+
+# EXCLUDE_DIRS -- directory names matched anywhere in the tree, by basename.
+#                 Use for nested directories (vendor/, var/, node_modules/) that may appear at
+#                 multiple depths and should always be skipped.
+EXCLUDE_DIRS=vendor,node_modules,var,target,.git,reports,.cache,.idea
+
+# File extensions to scan. Anything outside this whitelist is silently skipped. `rs` is here so
+# the guard covers its own source under bin/tools/ rather than exempting it; `dist` covers the
+# committed configuration templates. The gitignored `.local` overlay is deliberately absent -
+# scanning it would make the guard report its own rule list.
+EXTENSIONS=php,twig,yaml,yml,scss,css,js,md,json,sql,html,xml,sh,bash,toml,rs,dist

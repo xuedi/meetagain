@@ -1,0 +1,15 @@
+[package]
+name = "comment-guard"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "comment-guard"
+path = "src/main.rs"
+
+[dependencies]
+toolconfig.workspace = true
+walkdir.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
