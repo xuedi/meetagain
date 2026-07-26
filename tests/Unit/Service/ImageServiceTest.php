@@ -471,7 +471,7 @@ class ImageServiceTest extends TestCase
         $subject = $this->createService(
             imageRepo: $imageRepo,
             imageTypeRegistry: $registry,
-            filesystemService: $this->missingThumbnails(),
+            filesystemService: $this->realThumbnailPresence(),
             kernelProjectDir: $workspace,
             imageLocationRepo: $this->locationRepoFor([7 => [ImageType::GroupLogo]]),
         );
@@ -938,6 +938,14 @@ class ImageServiceTest extends TestCase
     {
         $filesystem = $this->createStub(ExtendedFilesystem::class);
         $filesystem->method('fileExists')->willReturn(false);
+
+        return $filesystem;
+    }
+
+    private function realThumbnailPresence(): ExtendedFilesystem
+    {
+        $filesystem = $this->createStub(ExtendedFilesystem::class);
+        $filesystem->method('fileExists')->willReturnCallback(static fn(string $path): bool => file_exists($path));
 
         return $filesystem;
     }

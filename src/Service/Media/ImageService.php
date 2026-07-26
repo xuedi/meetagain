@@ -93,17 +93,12 @@ readonly class ImageService
 
     public function createThumbnails(Image $image, ?ImageType $imageType = null): int
     {
-        return $this->createRenditions($image, $this->renditionsOfType($imageType ?? $image->getType()));
-    }
-
-    /**
-     * @param array<string, array{0: int, 1: int, 2: ImageFitMode}> $renditions
-     */
-    private function createRenditions(Image $image, array $renditions): int
-    {
         $cnt = 0;
         $source = $this->getSourcePath($image);
-        foreach ($renditions as [$width, $height, $fitMode]) {
+        $imageType ??= $image->getType();
+        $sizes = $this->imageTypeRegistry->getThumbnailSizes($imageType);
+        $fitMode = $this->imageTypeRegistry->getFitMode($imageType);
+        foreach ($sizes as [$width, $height]) {
             $target = $this->getThumbnailFile($image, $width, $height);
             if ($this->filesystem->fileExists($target)) {
                 continue;
@@ -128,49 +123,33 @@ readonly class ImageService
     }
 
     /**
-     * @return array<string, array{0: int, 1: int, 2: ImageFitMode}> size token => width, height, fit mode
+     * @return array<string, array<string, true>> hash => set of valid size tokens
      */
-    private function renditionsOfType(ImageType $type): array
-    {
-        $fitMode = $this->imageTypeRegistry->getFitMode($type);
-
-        $renditions = [];
-        foreach ($this->imageTypeRegistry->getThumbnailSizes($type) as [$width, $height]) {
-            $renditions[$this->thumbnailSizeFormat->format($width, $height)] = [$width, $height, $fitMode];
-        }
-
-        return $renditions;
-    }
-
-    /**
-     * @param list<ImageType> $locationTypes
-     * @return array<string, array{0: int, 1: int, 2: ImageFitMode}>
-     */
-    private function requiredRenditions(Image $image, array $locationTypes): array
-    {
-        $renditions = [];
-        foreach ([$image->getType(), ...$locationTypes] as $type) {
-            foreach ($this->renditionsOfType($type) as $token => $rendition) {
-                $renditions[$token] ??= $rendition;
-            }
-        }
-
-        return $renditions;
-    }
-
-    /**
-     * @return array<string, array<string, array{0: int, 1: int, 2: ImageFitMode}>> hash => renditions
-     */
-    private function requiredRenditionsByHash(): array
+    private function requiredSizeTokensByHash(): array
     {
         $typesByImageId = $this->imageLocationRepo->findTypesPerImageId();
 
         $map = [];
         foreach ($this->imageRepo->findAll() as $image) {
-            $map[$image->getHash()] = $this->requiredRenditions($image, $typesByImageId[$image->getId()] ?? []);
+            $tokens = [];
+            foreach ($this->usedTypes($image, $typesByImageId) as $type) {
+                foreach ($this->imageTypeRegistry->getThumbnailSizes($type) as [$width, $height]) {
+                    $tokens[$this->thumbnailSizeFormat->format($width, $height)] = true;
+                }
+            }
+            $map[$image->getHash()] = $tokens;
         }
 
         return $map;
+    }
+
+    /**
+     * @param array<int, list<ImageType>> $typesByImageId
+     * @return list<ImageType>
+     */
+    private function usedTypes(Image $image, array $typesByImageId): array
+    {
+        return [$image->getType(), ...$typesByImageId[$image->getId()] ?? []];
     }
 
     private function scaleThumbnail(Imagick $imagick, int $width, int $height, ImageFitMode $fitMode, string $target): void
@@ -221,7 +200,9 @@ readonly class ImageService
 
         $cnt = 0;
         foreach ($this->imageRepo->findAll() as $image) {
-            $cnt += $this->createRenditions($image, $this->requiredRenditions($image, $typesByImageId[$image->getId()] ?? []));
+            foreach ($this->usedTypes($image, $typesByImageId) as $type) {
+                $cnt += $this->createThumbnails($image, $type);
+            }
         }
 
         return $cnt;
@@ -275,8 +256,8 @@ readonly class ImageService
         }
 
         $missingThumbnailsCount = 0;
-        foreach ($this->requiredRenditionsByHash() as $hash => $renditions) {
-            foreach (array_keys($renditions) as $token) {
+        foreach ($this->requiredSizeTokensByHash() as $hash => $tokens) {
+            foreach (array_keys($tokens) as $token) {
                 if (!isset($thumpFileList[sprintf('%s_%s.webp', $hash, $token)])) {
                     ++$missingThumbnailsCount;
                 }
@@ -295,7 +276,7 @@ readonly class ImageService
 
     public function getObsoleteThumbnails(): array
     {
-        $renditionsByHash = $this->requiredRenditionsByHash();
+        $tokensByHash = $this->requiredSizeTokensByHash();
 
         $list = [];
         foreach ($this->filesystem->scanDirectory($this->getThumbnailDir()) as $file) {
@@ -304,7 +285,7 @@ readonly class ImageService
             }
             $hash = explode('_', explode('.', (string) $file)[0], 2)[0];
             $token = $this->sizeTokenOf((string) $file);
-            if ($token === null || !isset($renditionsByHash[$hash][$token])) {
+            if ($token === null || !isset($tokensByHash[$hash][$token])) {
                 $list[] = $file;
             }
         }
