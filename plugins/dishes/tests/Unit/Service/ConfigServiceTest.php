@@ -2,7 +2,7 @@
 
 namespace Plugin\Dishes\Tests\Unit\Service;
 
-use App\Publisher\PluginSettings\PluginSettingsResolver;
+use App\Publisher\PluginSettings\Resolver;
 use PHPUnit\Framework\TestCase;
 use Plugin\Dishes\ValueObject\Config;
 use Plugin\Dishes\Service\ConfigService;
@@ -13,7 +13,7 @@ class ConfigServiceTest extends TestCase
     {
         // Arrange
         $config = new Config()->setFooterText(['en' => 'Footer']);
-        $resolver = $this->createStub(PluginSettingsResolver::class);
+        $resolver = $this->createStub(Resolver::class);
         $resolver->method('resolve')->willReturn($config);
         $service = new ConfigService($resolver);
 
@@ -24,7 +24,7 @@ class ConfigServiceTest extends TestCase
     public function testMemoizesResolvedConfig(): void
     {
         // Arrange
-        $resolver = $this->createMock(PluginSettingsResolver::class);
+        $resolver = $this->createMock(Resolver::class);
         $resolver->expects(static::once())->method('resolve')->willReturn(new Config());
         $service = new ConfigService($resolver);
 

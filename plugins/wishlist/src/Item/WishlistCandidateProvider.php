@@ -2,11 +2,11 @@
 
 namespace Plugin\Wishlist\Item;
 
-use App\Item\ItemCandidateProviderInterface;
+use App\Item\CandidateProviderInterface;
 use Override;
 use Plugin\Wishlist\Service\WishlistService;
 
-final readonly class WishlistCandidateProvider implements ItemCandidateProviderInterface
+final readonly class WishlistCandidateProvider implements CandidateProviderInterface
 {
     public function __construct(
         private WishlistService $wishlistService,

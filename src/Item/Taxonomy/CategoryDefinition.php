@@ -2,4 +2,4 @@
 
 namespace App\Item\Taxonomy;
 
-final readonly class CategoryDefinition extends AbstractTaxonomyDefinition {}
+final readonly class CategoryDefinition extends AbstractDefinition {}

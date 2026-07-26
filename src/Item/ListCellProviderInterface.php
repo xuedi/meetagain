@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 /**
  * Renders one item's cell for the shared item-list component. The registry keys implementations
  * by getKey() and shows only those whose owning plugin is active. Independent of
- * ItemTypeProviderInterface: a type that only lists implements this seam alone.
+ * TypeProviderInterface: a type that only lists implements this seam alone.
  */
 #[AutoconfigureTag]
 interface ListCellProviderInterface

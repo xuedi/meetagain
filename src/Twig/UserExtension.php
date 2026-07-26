@@ -3,8 +3,8 @@
 namespace App\Twig;
 
 use App\Entity\User;
-use App\Service\Member\MemberViewActionProviderInterface;
-use App\Service\Member\MemberViewSectionProviderInterface;
+use App\Service\Member\ViewActionProviderInterface;
+use App\Service\Member\ViewSectionProviderInterface;
 use App\Service\Member\UserService;
 use Override;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -15,14 +15,14 @@ use Twig\TwigFunction;
 final class UserExtension extends AbstractExtension
 {
     /**
-     * @param iterable<MemberViewActionProviderInterface>  $memberViewActionProviders
-     * @param iterable<MemberViewSectionProviderInterface> $memberViewSectionProviders
+     * @param iterable<ViewActionProviderInterface>  $memberViewActionProviders
+     * @param iterable<ViewSectionProviderInterface> $memberViewSectionProviders
      */
     public function __construct(
         private readonly UserService $userService,
-        #[AutowireIterator(MemberViewActionProviderInterface::class)]
+        #[AutowireIterator(ViewActionProviderInterface::class)]
         private readonly iterable $memberViewActionProviders,
-        #[AutowireIterator(MemberViewSectionProviderInterface::class)]
+        #[AutowireIterator(ViewSectionProviderInterface::class)]
         private readonly iterable $memberViewSectionProviders,
     ) {}
 

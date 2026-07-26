@@ -3,7 +3,7 @@
 namespace Plugin\Wishlist\Service;
 
 use App\Filter\Event\EventFilterService;
-use App\Item\ItemFilterService;
+use App\Item\FilterService;
 use App\Repository\EventRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,7 +15,7 @@ readonly class WishlistService
     public function __construct(
         private EntityManagerInterface $em,
         private WishlistEntryRepository $wishlistRepo,
-        private ItemFilterService $itemFilter,
+        private FilterService $itemFilter,
         private EventFilterService $eventFilter,
         private EventRepository $eventRepo,
     ) {}

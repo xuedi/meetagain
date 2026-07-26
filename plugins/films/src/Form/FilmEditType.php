@@ -2,7 +2,7 @@
 
 namespace Plugin\Films\Form;
 
-use App\Item\Taxonomy\ItemAssignmentFormHelper;
+use App\Item\Taxonomy\AssignmentFormHelper;
 use Override;
 use Plugin\Films\Entity\Film;
 use Plugin\Films\Service\FilmService;
@@ -21,7 +21,7 @@ class FilmEditType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
-        private readonly ItemAssignmentFormHelper $assignmentFormHelper,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {}
 
     #[Override]

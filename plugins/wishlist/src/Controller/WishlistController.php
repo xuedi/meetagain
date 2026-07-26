@@ -4,7 +4,7 @@ namespace Plugin\Wishlist\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
-use App\Item\ItemTypeRegistry;
+use App\Item\TypeRegistry;
 use App\Repository\EventRepository;
 use Plugin\Wishlist\Activity\Messages\WishlistAdded;
 use Plugin\Wishlist\Service\WishlistService;
@@ -20,7 +20,7 @@ final class WishlistController extends AbstractController
 {
     public function __construct(
         private readonly WishlistService $wishlistService,
-        private readonly ItemTypeRegistry $registry,
+        private readonly TypeRegistry $registry,
         private readonly EventRepository $eventRepo,
         private readonly ActivityService $activityService,
     ) {}

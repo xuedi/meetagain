@@ -61,7 +61,7 @@ Store translatable content (name, description, ...) in a per-language side entit
 per language - not in single columns on the item. This keeps content editable in every language
 independent of the visitor's UI language.
 
-For the edit form, use the core helper `App\Item\ItemTranslationFormHelper` with the shared
+For the edit form, use the core helper `App\Item\TranslationFormHelper` with the shared
 `_components/item/translation_fields.html.twig` partial: `addTranslatedFields()` builds one unmapped
 `"{field}-{code}"` child per enabled language (seeded from the item's translations), and
 `extractTranslations()` reads them back per language on save. The partial renders a language toggle

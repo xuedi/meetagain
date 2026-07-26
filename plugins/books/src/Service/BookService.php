@@ -4,8 +4,8 @@ namespace Plugin\Books\Service;
 
 use App\Enum\ImageType;
 use App\Enum\ItemAction;
-use App\Item\ItemActionDispatcher;
-use App\Item\ItemFilterService;
+use App\Item\ActionDispatcher;
+use App\Item\FilterService;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,8 +23,8 @@ readonly class BookService
         private BookRepository $bookRepo,
         private IsbnLookupInterface $isbnLookup,
         private CoverImageService $coverImageService,
-        private ItemFilterService $itemFilter,
-        private ItemActionDispatcher $dispatcher,
+        private FilterService $itemFilter,
+        private ActionDispatcher $dispatcher,
         private ImageLocationService $imageLocationService,
     ) {}
 

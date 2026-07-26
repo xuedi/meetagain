@@ -3,7 +3,7 @@
 namespace Plugin\Films\Item;
 
 use App\Item\Taxonomy\CategorizableTypeProviderInterface;
-use App\Item\Taxonomy\TaxonomyConfig;
+use App\Item\Taxonomy\Config;
 use Override;
 use Plugin\Films\Service\ConfigService;
 use Plugin\Films\Service\FilmService;
@@ -45,7 +45,7 @@ final readonly class FilmCategorizableTypeProvider implements CategorizableTypeP
     }
 
     #[Override]
-    public function getTaxonomy(): TaxonomyConfig
+    public function getTaxonomy(): Config
     {
         return $this->configService->getConfig()->getTaxonomy();
     }

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Validator\Constraints;
 
-use App\Cms\ReservedSlug\ReservedSlugRegistry;
+use App\Cms\ReservedSlug\Registry;
 use App\Entity\Cms;
 use App\Validator\Constraints\ReservedSlug;
 use App\Validator\Constraints\ReservedSlugValidator;
@@ -17,7 +17,7 @@ class ReservedSlugValidatorTest extends ConstraintValidatorTestCase
     #[Override]
     protected function createValidator(): ConstraintValidatorInterface
     {
-        $registry = $this->createStub(ReservedSlugRegistry::class);
+        $registry = $this->createStub(Registry::class);
         $registry->method('isReserved')->willReturnCallback(fn(): bool => $this->reserved);
 
         return new ReservedSlugValidator($registry);

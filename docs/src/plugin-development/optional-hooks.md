@@ -20,7 +20,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `NotificationProviderInterface`               | Add informational items to the notification bell      | `getNotifications()`                                      |
 | `ReviewNotificationProviderInterface`         | Add approve/deny items to the review page             | `getReviewItems()`, `approveItem()`, `denyItem()`         |
 | `EntityActionInterface`                       | React to core entity lifecycle events                 | `handleEntityAction()`                                    |
-| `ActivityMetaEnricherInterface`               | Enrich metadata on all activity types                 | `enrich()`                                                |
+| `MetaEnricherInterface`               | Enrich metadata on all activity types                 | `enrich()`                                                |
 | `MessageInterface`                            | Define a new activity type with display rendering     | `getType()`, `validate()`, `render()`                     |
 | `SitemapPublisherInterface`                   | Contribute URLs to `/sitemap.xml`                     | `getPriority()`, `getSitemapUrls()`                       |
 | `SitemapEventVisibilityFilterInterface`       | Suppress event URLs on specific tenants               | `shouldEmitEvents()`                                      |
@@ -28,11 +28,11 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `ImageAttributionFilterInterface`             | Narrow which attributed images `/attributions` shows  | `getVisibleImageIdFilter()`                               |
 | `DataHotfixInterface`                         | Ship a one-off data repair that runs once per DB      | `getIdentifier()`, `execute()`                            |
 | `SecurityProviderInterface`                   | Participate in live security event detection          | `observe()`, `scanRetrospective()`                        |
-| `PluginSettingsDescriptorInterface`           | Add a settings section to `/admin/plugin/settings`    | `getFormType()`, `createDefault()`, `applyForm()`         |
+| `DescriptorInterface`           | Add a settings section to `/admin/plugin/settings`    | `getFormType()`, `createDefault()`, `applyForm()`         |
 | `CategorizableTypeProviderInterface`          | Give an item type categories and tags                 | `getTaxonomy()`, `supportsCategories()`, `supportsTags()` |
-| `ItemPortabilityContributorInterface`         | Carry an item type through group export and import    | `exportItems()`, `importItems()`                          |
+| `ContributorInterface`         | Carry an item type through group export and import    | `exportItems()`, `importItems()`                          |
 | `ChangeTargetProviderInterface`               | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()`    |
-| `ProfileConfigPrivacyToggleProviderInterface` | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                             |
+| `ConfigPrivacyToggleProviderInterface` | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                             |
 
 ---
 
@@ -689,16 +689,16 @@ calling the service method, since the entity may be removed during the operation
 
 ### Enriching activity metadata
 
-Implement `ActivityMetaEnricherInterface` to inject context into **all** activity types — for example, adding the
+Implement `MetaEnricherInterface` to inject context into **all** activity types — for example, adding the
 current group or domain to every logged action.
 
 ```php
 namespace Plugin\YourPlugin\Activity;
 
-use App\Activity\ActivityMetaEnricherInterface;
+use App\Activity\MetaEnricherInterface;
 use App\Entity\User;
 
-readonly class GroupContextEnricher implements ActivityMetaEnricherInterface
+readonly class GroupContextEnricher implements MetaEnricherInterface
 {
     public function enrich(string $type, User $user, array $meta): array
     {
@@ -831,7 +831,7 @@ on top via AND-intersection with that one.
 ## Data Hotfix
 
 Implement `DataHotfixInterface` to ship a one-off data repair that runs once per database lifetime. The runner
-(`DataHotfixRunner`) discovers all implementations on every cron tick, checks the per-identifier AppState lock, runs the
+(`Runner`) discovers all implementations on every cron tick, checks the per-identifier AppState lock, runs the
 hotfix if not yet locked, and writes the lock on success. Throwing leaves the lock unwritten so the next tick retries.
 
 ```php
@@ -955,10 +955,10 @@ below), with no extra work on your side.
 
 ### What you implement
 
-A **data object** implementing `PluginSettingsData`, a Symfony **FormType** for it, and a **descriptor**:
+A **data object** implementing `Data`, a Symfony **FormType** for it, and a **descriptor**:
 
 ```php
-final class MyPluginSettingsDescriptor implements PluginSettingsDescriptorInterface
+final class MyPluginSettingsDescriptor implements DescriptorInterface
 {
     public function getKey(): string { return 'my_plugin'; }
     public function getPluginKey(): string { return 'my_plugin'; }
@@ -995,8 +995,8 @@ store's job.
 
 `getPriority()` controls display order on the page (higher first).
 
-The descriptor does not persist anything itself: `GenericPluginSettingsStore` saves your data object to a shared JSON
-table automatically. Provide your own `PluginSettingsStoreInterface`
+The descriptor does not persist anything itself: `GenericStore` saves your data object to a shared JSON
+table automatically. Provide your own `StoreInterface`
 only when the record needs a shape the JSON table cannot give it - own columns, a foreign key, or an encrypted secret.
 See
 `plugins/films/src/Publisher/PluginSettings/SettingsDescriptor.php` (descriptor) and
@@ -1004,15 +1004,15 @@ See
 
 ### Reading the effective value
 
-Inject `PluginSettingsResolver` and call `resolve('my_plugin')` to get the effective data object for the current
+Inject `Resolver` and call `resolve('my_plugin')` to get the effective data object for the current
 request. Memoise it in a thin service if you read it often (see
 `plugins/glossary/src/Service/ConfigService.php`).
 
 ### Dual-scope settings
 
 The global scope is all a standalone plugin needs. A **host plugin** can layer an override scope on top: it implements
-`PluginSettingsScopeProviderInterface` to name the active scope for a request (an opaque id), and a
-`PluginSettingsStoreInterface` that persists one record per scope. When such a host is present, `resolve()` returns the
+`ScopeProviderInterface` to name the active scope for a request (an opaque id), and a
+`StoreInterface` that persists one record per scope. When such a host is present, `resolve()` returns the
 override record if the active scope has one, else the global record, else your neutral default - all transparent to your
 plugin, because it reads the same resolver either way. The override-scope machinery lives entirely in the host plugin;
 core registers no scope provider, so an install without such a host always resolves to the global record.
@@ -1027,14 +1027,14 @@ classifying dishes by cuisine (category) and dietary flags like "vegan" or "quic
 ### When to implement
 
 Implement `App\Item\Taxonomy\CategorizableTypeProviderInterface` when your item type should carry categories and/or
-tags. This is orthogonal to the other two item seams - `ItemTypeProviderInterface`
+tags. This is orthogonal to the other two item seams - `TypeProviderInterface`
 (whether the type attaches to events) and `App\Item\ListCellProviderInterface` (whether the type renders a cell in the
 shared item list) - and a type implements any combination of the three. A glossary-style type that is browsed and
 classified but never attached to an event implements the list-cell and categorizable seams and skips the event one.
 
 ### What you implement
 
-1. **Embed the taxonomy in your settings.** Add a `App\Item\Taxonomy\TaxonomyConfig` property to your settings data
+1. **Embed the taxonomy in your settings.** Add a `App\Item\Taxonomy\Config` property to your settings data
    object and expose `getTaxonomy()`/`setTaxonomy()`; include it in `toArray()` /
    `fromArray()`. Add `->add('taxonomy', TaxonomyConfigType::class)` to your settings FormType, and call
    `$data->getTaxonomy()->normalize()` in your descriptor's `applyForm()`. The admin now edits category/tag definitions
@@ -1043,8 +1043,8 @@ classified but never attached to an event implements the list-cell and categoriz
    and `getTaxonomy()` returns your settings' `getTaxonomy()` (scope-resolved through your `ConfigService`). Set
    `supportsCategories()` / `supportsTags()` to what you enable.
 3. **Edit the assignment.** In your item's steward edit form, call
-   `ItemAssignmentFormHelper::addAssignmentFields($builder, $typeKey, $itemId)`; on save, pass
-   `extractAssignment($form)` to `ItemTaxonomyService::setCategory()` / `setTags()`. Dispatch
+   `AssignmentFormHelper::addAssignmentFields($builder, $typeKey, $itemId)`; on save, pass
+   `extractAssignment($form)` to `TaxonomyService::setCategory()` / `setTags()`. Dispatch
    `ItemAction::Deleted` on item deletion so assignments are cleaned up.
 4. **Display and filter.** Wrap your list page in `_components/item/list_layout.html.twig`. It gives you the two-column
    page layout plus a core-owned sidebar carrying the view switcher, the category/tag filter box and an "about this
@@ -1074,7 +1074,7 @@ classified but never attached to an event implements the list-cell and categoriz
    each cell) or your own per-mode templates. `{% block item_sidebar_extra %}` adds one more box below the core sidebar
    boxes. Include
    `_components/item/taxonomy_badges.html.twig` on cells and detail pages. If your list service funnels through
-   `ItemFilterService`, category/tag narrowing is automatic.
+   `FilterService`, category/tag narrowing is automatic.
 
 Reference implementation: the dishes plugin (`Plugin\Dishes\Item\DishCategorizableTypeProvider`,
 `Plugin\Dishes\ValueObject\Config`, `Plugin\Dishes\Controller\DishController::edit`).
@@ -1087,7 +1087,7 @@ the categories and tags assigned to them.
 
 ### When to implement
 
-Implement `App\Item\Portability\ItemPortabilityContributorInterface` when your plugin owns an item type whose content is
+Implement `App\Item\Portability\ContributorInterface` when your plugin owns an item type whose content is
 worth carrying between instances. It is independent of the other item seams:
 a type can be portable without being event-attachable, categorizable, or list-cell renderable.
 
@@ -1097,7 +1097,7 @@ One class with both directions on it, because export and import must agree on th
 
 ```php
 public function exportItems(array $itemIds, PortableImageWriterInterface $images): array;
-public function importItems(array $rows, ItemImportContext $context): ItemImportResult;
+public function importItems(array $rows, ImportContext $context): ImportResult;
 ```
 
 1. **Export.** You are handed the ids to serialize - never ask who owns them; that is the caller's job and is what keeps
@@ -1122,8 +1122,8 @@ public function importItems(array $rows, ItemImportContext $context): ItemImport
 Category and tag assignments are handled by core, keyed by the same `ref` you emitted - you write no taxonomy code.
 Definition ids the target instance does not know are dropped and reported in the import summary.
 
-Reference implementation: `Plugin\Dishes\Portability\DishPortabilityContributor` (always creates, carries translations
-and a gallery) and `Plugin\Books\Portability\BookPortabilityContributor`
+Reference implementation: `Plugin\Dishes\Portability\DishContributor` (always creates, carries translations
+and a gallery) and `Plugin\Books\Portability\BookContributor`
 (mandatory ISBN dedup).
 
 ## Member change proposals

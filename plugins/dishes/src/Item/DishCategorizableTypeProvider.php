@@ -3,7 +3,7 @@
 namespace Plugin\Dishes\Item;
 
 use App\Item\Taxonomy\CategorizableTypeProviderInterface;
-use App\Item\Taxonomy\TaxonomyConfig;
+use App\Item\Taxonomy\Config;
 use Override;
 use Plugin\Dishes\Service\ConfigService;
 use Plugin\Dishes\Service\DishService;
@@ -45,7 +45,7 @@ final readonly class DishCategorizableTypeProvider implements CategorizableTypeP
     }
 
     #[Override]
-    public function getTaxonomy(): TaxonomyConfig
+    public function getTaxonomy(): Config
     {
         return $this->configService->getConfig()->getTaxonomy();
     }

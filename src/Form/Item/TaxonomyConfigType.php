@@ -2,7 +2,7 @@
 
 namespace App\Form\Item;
 
-use App\Item\Taxonomy\TaxonomyConfig;
+use App\Item\Taxonomy\Config;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -43,7 +43,7 @@ class TaxonomyConfigType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => TaxonomyConfig::class,
+            'data_class' => Config::class,
         ]);
     }
 

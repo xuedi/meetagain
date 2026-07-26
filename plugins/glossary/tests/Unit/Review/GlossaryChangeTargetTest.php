@@ -3,7 +3,7 @@
 namespace Plugin\Glossary\Tests\Unit\Review;
 
 use App\Entity\User;
-use App\Item\Taxonomy\ItemTaxonomyService;
+use App\Item\Taxonomy\TaxonomyService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
@@ -47,7 +47,7 @@ class GlossaryChangeTargetTest extends TestCase
     public function testFormatValueResolvesCategoryLabels(): void
     {
         // Arrange
-        $taxonomyService = $this->createStub(ItemTaxonomyService::class);
+        $taxonomyService = $this->createStub(TaxonomyService::class);
         $taxonomyService->method('categoryLabelForId')->willReturn('Slang');
         $target = $this->makeTarget(taxonomyService: $taxonomyService);
 
@@ -113,7 +113,7 @@ class GlossaryChangeTargetTest extends TestCase
     private function makeTarget(
         ?Glossary $entry = null,
         bool $granted = true,
-        ?ItemTaxonomyService $taxonomyService = null,
+        ?TaxonomyService $taxonomyService = null,
         ?GlossaryService $service = null,
     ): GlossaryChangeTarget {
         if ($service === null) {
@@ -141,7 +141,7 @@ class GlossaryChangeTargetTest extends TestCase
         return new GlossaryChangeTarget(
             $service,
             $configService,
-            $taxonomyService ?? $this->createStub(ItemTaxonomyService::class),
+            $taxonomyService ?? $this->createStub(TaxonomyService::class),
             $security,
             $this->createStub(RouterInterface::class),
             new RequestStack(),

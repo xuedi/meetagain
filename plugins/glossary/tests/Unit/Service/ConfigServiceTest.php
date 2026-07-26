@@ -2,7 +2,7 @@
 
 namespace Plugin\Glossary\Tests\Unit\Service;
 
-use App\Publisher\PluginSettings\PluginSettingsResolver;
+use App\Publisher\PluginSettings\Resolver;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Service\ConfigService;
 use Plugin\Glossary\ValueObject\Config;
@@ -13,7 +13,7 @@ class ConfigServiceTest extends TestCase
     {
         // Arrange
         $config = (new Config())->setSecondaryEnabled(true);
-        $resolver = $this->createStub(PluginSettingsResolver::class);
+        $resolver = $this->createStub(Resolver::class);
         $resolver->method('resolve')->willReturn($config);
         $service = new ConfigService($resolver);
 
@@ -24,7 +24,7 @@ class ConfigServiceTest extends TestCase
     public function testMemoizesResolvedConfig(): void
     {
         // Arrange
-        $resolver = $this->createMock(PluginSettingsResolver::class);
+        $resolver = $this->createMock(Resolver::class);
         $resolver->expects(static::once())->method('resolve')->willReturn(new Config());
         $service = new ConfigService($resolver);
 

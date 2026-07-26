@@ -2,11 +2,11 @@
 
 namespace Plugin\Films\Publisher\PluginSettings;
 
-use App\Publisher\PluginSettings\PluginSettingsStoreInterface;
+use App\Publisher\PluginSettings\StoreInterface;
 use Plugin\Films\Entity\Settings;
 use Plugin\Films\Service\SettingsService;
 
-final readonly class SettingsStore implements PluginSettingsStoreInterface
+final readonly class SettingsStore implements StoreInterface
 {
     public function __construct(
         private SettingsService $settingsService,

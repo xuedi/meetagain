@@ -8,7 +8,7 @@ use App\Enum\WarmCacheType;
 use App\Plugin;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use App\Service\Item\ItemAssociationService;
+use App\Service\Item\AssociationService;
 use App\ValueObject\LinkCollection;
 use Plugin\Books\Service\BookService;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -19,7 +19,7 @@ class Kernel implements Plugin
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly BookService $bookService,
-        private readonly ItemAssociationService $itemAssociations,
+        private readonly AssociationService $itemAssociations,
         private readonly EventRepository $eventRepository,
         private readonly UserRepository $userRepository,
     ) {}

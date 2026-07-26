@@ -2,7 +2,7 @@
 
 namespace App\Admin\Dashboard;
 
-final readonly class TableTile implements DashboardTile
+final readonly class TableTile implements Tile
 {
     /**
      * @param list<string>   $headers     Translation keys for column headers (empty list = no header row).
