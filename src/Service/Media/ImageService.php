@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
 use App\ExtendedFilesystem;
+use App\Repository\ImageLocationRepository;
 use App\Repository\ImageRepository;
 use App\Service\Media\ImageTypes\ImageTypeDefinitionInterface;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
@@ -34,6 +35,7 @@ readonly class ImageService
         private LoggerInterface $logger,
         private string $kernelProjectDir,
         private ImageLocationService $imageLocationService,
+        private ImageLocationRepository $imageLocationRepo,
     ) {}
 
     public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
@@ -120,6 +122,36 @@ readonly class ImageService
         return $cnt;
     }
 
+    /**
+     * @return array<string, array<string, true>> hash => set of valid size tokens
+     */
+    private function requiredSizeTokensByHash(): array
+    {
+        $typesByImageId = $this->imageLocationRepo->findTypesPerImageId();
+
+        $map = [];
+        foreach ($this->imageRepo->findAll() as $image) {
+            $tokens = [];
+            foreach ($this->usedTypes($image, $typesByImageId) as $type) {
+                foreach ($this->imageTypeRegistry->getThumbnailSizes($type) as [$width, $height]) {
+                    $tokens[$this->thumbnailSizeFormat->format($width, $height)] = true;
+                }
+            }
+            $map[$image->getHash()] = $tokens;
+        }
+
+        return $map;
+    }
+
+    /**
+     * @param array<int, list<ImageType>> $typesByImageId
+     * @return list<ImageType>
+     */
+    private function usedTypes(Image $image, array $typesByImageId): array
+    {
+        return [$image->getType(), ...$typesByImageId[$image->getId()] ?? []];
+    }
+
     private function scaleThumbnail(Imagick $imagick, int $width, int $height, ImageFitMode $fitMode, string $target): void
     {
         $free = ImageTypeDefinitionInterface::FREE_AXIS;
@@ -164,9 +196,13 @@ readonly class ImageService
 
     public function regenerateAllThumbnails(): int
     {
+        $typesByImageId = $this->imageLocationRepo->findTypesPerImageId();
+
         $cnt = 0;
         foreach ($this->imageRepo->findAll() as $image) {
-            $cnt += $this->createThumbnails($image);
+            foreach ($this->usedTypes($image, $typesByImageId) as $type) {
+                $cnt += $this->createThumbnails($image, $type);
+            }
         }
 
         return $cnt;
@@ -215,12 +251,14 @@ readonly class ImageService
         }
 
         $imageTypes = [];
-        $missingThumbnailsCount = 0;
-        foreach ($this->imageRepo->getFileList() as $hash => $type) {
+        foreach ($this->imageRepo->getFileList() as $type) {
             $imageTypes[$type->name] = ($imageTypes[$type->name] ?? 0) + 1;
-            foreach ($this->imageTypeRegistry->getThumbnailSizes($type) as [$width, $height]) {
-                $expected = $this->getThumbnailFileByHash($hash, $width, $height, true);
-                if (!isset($thumpFileList[$expected])) {
+        }
+
+        $missingThumbnailsCount = 0;
+        foreach ($this->requiredSizeTokensByHash() as $hash => $tokens) {
+            foreach (array_keys($tokens) as $token) {
+                if (!isset($thumpFileList[sprintf('%s_%s.webp', $hash, $token)])) {
                     ++$missingThumbnailsCount;
                 }
             }
@@ -238,7 +276,7 @@ readonly class ImageService
 
     public function getObsoleteThumbnails(): array
     {
-        $imageList = $this->imageRepo->getFileList();
+        $tokensByHash = $this->requiredSizeTokensByHash();
 
         $list = [];
         foreach ($this->filesystem->scanDirectory($this->getThumbnailDir()) as $file) {
@@ -246,14 +284,8 @@ readonly class ImageService
                 continue;
             }
             $hash = explode('_', explode('.', (string) $file)[0], 2)[0];
-            if (!isset($imageList[$hash])) {
-                $list[] = $file;
-                continue;
-            }
-
             $token = $this->sizeTokenOf((string) $file);
-            $size = $token === null ? null : $this->thumbnailSizeFormat->parse($token);
-            if ($size === null || !$this->imageTypeRegistry->isValidThumbnailSize($imageList[$hash], $size[0], $size[1])) {
+            if ($token === null || !isset($tokensByHash[$hash][$token])) {
                 $list[] = $file;
             }
         }
@@ -349,17 +381,7 @@ readonly class ImageService
 
     private function getThumbnailFile(Image $image, int $width, int $height): string
     {
-        return $this->getThumbnailFileByHash($image->getHash(), $width, $height);
-    }
-
-    private function getThumbnailFileByHash(string $hash, int $width, int $height, ?bool $justName = false): string
-    {
-        $filename = sprintf('%s_%s.webp', $hash, $this->thumbnailSizeFormat->format($width, $height));
-        if ($justName) {
-            return $filename;
-        }
-
-        return $this->getThumbnailDir() . $filename;
+        return $this->getThumbnailDir() . sprintf('%s_%s.webp', $image->getHash(), $this->thumbnailSizeFormat->format($width, $height));
     }
 
     private function sizeTokenOf(string $file): ?string

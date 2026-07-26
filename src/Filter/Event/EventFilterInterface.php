@@ -24,4 +24,13 @@ interface EventFilterInterface
      * @return bool|null null = no opinion, true = allow, false = deny
      */
     public function isEventAccessible(int $eventId): ?bool;
+
+    /**
+     * Batch counterpart of isEventAccessible() for callers outside a localized request.
+     * Filters whose verdict depends on the request locale return null here.
+     *
+     * @param int[] $eventIds
+     * @return int[]|null null = no opinion, otherwise the accessible subset
+     */
+    public function narrowAccessibleEventIds(array $eventIds): ?array;
 }

@@ -3,6 +3,7 @@
 namespace App\Publisher\Sitemap;
 
 use App\Filter\Cms\CmsFilterService;
+use App\Filter\Event\EventFilterService;
 use App\Filter\Member\MemberFilterService;
 use App\Filter\Sitemap\SitemapEventLocaleFilterInterface;
 use App\Filter\Sitemap\SitemapEventVisibilityService;
@@ -29,6 +30,7 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
         private UrlGeneratorInterface $urlGenerator,
         private CmsFilterService $cmsFilterService,
         private MemberFilterService $memberFilterService,
+        private EventFilterService $eventFilterService,
         private SitemapEventVisibilityService $eventVisibilityService,
         private EventCanonicalResolver $canonicalResolver,
         #[AutowireIterator(SitemapEventLocaleFilterInterface::class)]
@@ -205,8 +207,14 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
             return [];
         }
 
-        $eventIds = array_filter(array_map(static fn($e) => $e->getId(), $events));
-        $allowedLocalesByEventId = $this->resolveAllowedLocalesByEventId(array_values($eventIds));
+        $eventIds = array_values(array_filter(array_map(static fn($e) => $e->getId(), $events)));
+        $accessibleIds = array_flip($this->eventFilterService->getAccessibleEventIds($eventIds));
+        $events = array_values(array_filter($events, static fn($e) => isset($accessibleIds[$e->getId()])));
+        if ($events === []) {
+            return [];
+        }
+
+        $emittableLocalesByEventId = $this->resolveEmittableLocalesByEventId(array_keys($accessibleIds), $locales);
         $rootIds = $this->canonicalResolver->resolveRootIds($events, $locales);
 
         $urls = [];
@@ -218,7 +226,7 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
             }
 
             $lastmod = new DateTimeImmutable($event->getStart()->format('Y-m-d'));
-            $eventLocales = $allowedLocalesByEventId[$id] ?? $locales;
+            $eventLocales = $emittableLocalesByEventId[$id] ?? $locales;
 
             $localeUrls = [];
             foreach ($eventLocales as $locale) {
@@ -247,6 +255,21 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
         }
 
         return $urls;
+    }
+
+    /**
+     * @param int[] $eventIds
+     * @param array<string> $locales
+     * @return array<int, string[]> eventId => locales (only for restricted events)
+     */
+    private function resolveEmittableLocalesByEventId(array $eventIds, array $locales): array
+    {
+        $emittable = [];
+        foreach ($this->resolveAllowedLocalesByEventId($eventIds) as $eventId => $allowed) {
+            $emittable[$eventId] = array_values(array_intersect($locales, $allowed));
+        }
+
+        return $emittable;
     }
 
     /**
