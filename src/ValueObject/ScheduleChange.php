@@ -11,9 +11,11 @@ final readonly class ScheduleChange
         public DateTimeImmutable $oldStart,
         public ?DateTimeImmutable $oldStop,
         public ?EventInterval $oldRule,
+        public ?string $oldRuleSpec,
         public DateTimeImmutable $newStart,
         public ?DateTimeImmutable $newStop,
         public ?EventInterval $newRule,
+        public ?string $newRuleSpec,
     ) {}
 
     public function isChanged(): bool
@@ -24,7 +26,10 @@ final readonly class ScheduleChange
         if ($this->oldStop?->getTimestamp() !== $this->newStop?->getTimestamp()) {
             return true;
         }
+        if ($this->oldRule !== $this->newRule) {
+            return true;
+        }
 
-        return $this->oldRule !== $this->newRule;
+        return $this->oldRuleSpec !== $this->newRuleSpec;
     }
 }

@@ -44,7 +44,7 @@
                 <h2 class="title is-5">{{ 'admin_event.reschedule_old_schedule'|trans }}</h2>
                 <p>
                     <strong>{{ 'admin_event.reschedule_label_rule'|trans }}:</strong>
-                    {{ change.oldRule ? change.oldRule.label()|trans : '-' }}<br>
+                    {{ change.oldRule ? recurrence_label(change.oldRule, change.oldRuleSpec, change.oldStart) : '-' }}<br>
                     <strong>{{ 'admin_event.reschedule_label_start'|trans }}:</strong>
                     {{ change.oldStart|date('Y-m-d H:i') }}
                 </p>
@@ -53,7 +53,7 @@
                 <h2 class="title is-5">{{ 'admin_event.reschedule_new_schedule'|trans }}</h2>
                 <p>
                     <strong>{{ 'admin_event.reschedule_label_rule'|trans }}:</strong>
-                    {{ change.newRule ? change.newRule.label()|trans : '-' }}<br>
+                    {{ change.newRule ? recurrence_label(change.newRule, change.newRuleSpec, change.newStart) : '-' }}<br>
                     <strong>{{ 'admin_event.reschedule_label_start'|trans }}:</strong>
                     {{ change.newStart|date('Y-m-d H:i') }}
                 </p>

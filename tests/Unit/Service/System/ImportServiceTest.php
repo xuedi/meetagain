@@ -131,6 +131,51 @@ class ImportServiceTest extends TestCase
         static::assertSame($seriesRefMap[2], $events[0]->getSeries());
     }
 
+    public function testImportSeriesRoundTripsACustomRuleSpec(): void
+    {
+        // Arrange
+        [$service] = $this->buildCapturingService();
+
+        // Act
+        $seriesRefMap = $this->invokeImportSeries($service, [
+            ['ref' => 1, 'name' => 'Custom Series', 'rule' => 'Custom', 'ruleSpec' => 'FREQ=MONTHLY;BYDAY=1SU'],
+        ]);
+
+        // Assert
+        static::assertSame(EventInterval::Custom, $seriesRefMap[1]->getRule());
+        static::assertSame('FREQ=MONTHLY;BYDAY=1SU', $seriesRefMap[1]->getRuleSpec());
+    }
+
+    public function testImportSeriesDropsAnUnparseableRuleSpec(): void
+    {
+        // Arrange: an archive from a newer version may carry a shape this one cannot parse
+        [$service] = $this->buildCapturingService();
+
+        // Act
+        $seriesRefMap = $this->invokeImportSeries($service, [
+            ['ref' => 1, 'name' => 'Future Series', 'rule' => 'Custom', 'ruleSpec' => 'FREQ=HOURLY;BYDAY=1SU'],
+        ]);
+
+        // Assert: imports as a closed custom series rather than failing the whole archive
+        static::assertSame(EventInterval::Custom, $seriesRefMap[1]->getRule());
+        static::assertNull($seriesRefMap[1]->getRuleSpec());
+    }
+
+    public function testImportSeriesIgnoresARuleSpecBehindAPreset(): void
+    {
+        // Arrange
+        [$service] = $this->buildCapturingService();
+
+        // Act
+        $seriesRefMap = $this->invokeImportSeries($service, [
+            ['ref' => 1, 'name' => 'Preset Series', 'rule' => 'Weekly', 'ruleSpec' => 'FREQ=MONTHLY;BYDAY=1SU'],
+        ]);
+
+        // Assert
+        static::assertSame(EventInterval::Weekly, $seriesRefMap[1]->getRule());
+        static::assertNull($seriesRefMap[1]->getRuleSpec());
+    }
+
     public function testImportEventsWithoutSeriesDataStaysSeriesless(): void
     {
         // Arrange
