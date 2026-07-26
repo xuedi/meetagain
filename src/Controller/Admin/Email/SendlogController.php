@@ -15,7 +15,7 @@ use App\Enum\EmailQueueStatus;
 use App\Enum\EmailType;
 use App\Repository\EmailQueueRepository;
 use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
-use App\Service\Email\Delivery\EmailDeliveryStatusSyncService;
+use App\Service\Email\Delivery\StatusSyncService;
 use App\Service\Email\EmailTemplateService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -49,7 +49,7 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         TranslatorInterface $translator,
         private readonly EmailQueueRepository $emailQueueRepo,
         private readonly EmailDeliveryProviderInterface $provider,
-        private readonly EmailDeliveryStatusSyncService $syncService,
+        private readonly StatusSyncService $syncService,
         private readonly EmailTemplateService $templateService,
         private readonly EntityManagerInterface $em,
     ) {

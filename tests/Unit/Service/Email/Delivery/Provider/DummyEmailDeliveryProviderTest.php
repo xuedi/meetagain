@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Service\Email\Delivery\Provider;
 
-use App\Service\Email\Delivery\EmailDeliveryLogFilter;
+use App\Service\Email\Delivery\LogFilter;
 use App\Service\Email\Delivery\Provider\DummyEmailDeliveryProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +16,7 @@ class DummyEmailDeliveryProviderTest extends TestCase
     public function testGetLogsReturnsEmptyCollection(): void
     {
         // Act
-        $collection = new DummyEmailDeliveryProvider()->getLogs(new EmailDeliveryLogFilter());
+        $collection = new DummyEmailDeliveryProvider()->getLogs(new LogFilter());
 
         // Assert
         static::assertTrue($collection->isEmpty());

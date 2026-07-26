@@ -7,7 +7,7 @@ use App\Entity\User;
 use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\Plugin;
-use App\Service\TownHall\TownHallAccessService;
+use App\Service\TownHall\AccessService;
 use App\ValueObject\LinkCollection;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,7 +20,7 @@ readonly class NavigationPlugin implements Plugin
         private RouterInterface $router,
         private RequestStack $requestStack,
         private Security $security,
-        private TownHallAccessService $townHallAccess,
+        private AccessService $townHallAccess,
     ) {}
 
     public function getPluginKey(): string

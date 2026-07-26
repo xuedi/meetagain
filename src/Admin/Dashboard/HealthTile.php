@@ -2,7 +2,7 @@
 
 namespace App\Admin\Dashboard;
 
-final readonly class HealthTile implements DashboardTile
+final readonly class HealthTile implements Tile
 {
     /**
      * @param list<TileHealthCheck> $checks

@@ -3,7 +3,7 @@
 namespace Plugin\Books\Item;
 
 use App\Item\Taxonomy\CategorizableTypeProviderInterface;
-use App\Item\Taxonomy\TaxonomyConfig;
+use App\Item\Taxonomy\Config;
 use Override;
 use Plugin\Books\Service\ConfigService;
 use Plugin\Books\Service\BookService;
@@ -45,7 +45,7 @@ final readonly class BookCategorizableTypeProvider implements CategorizableTypeP
     }
 
     #[Override]
-    public function getTaxonomy(): TaxonomyConfig
+    public function getTaxonomy(): Config
     {
         return $this->configService->getConfig()->getTaxonomy();
     }

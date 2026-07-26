@@ -2,10 +2,9 @@
 
 namespace Plugin\Books\ValueObject;
 
-use App\Item\Taxonomy\TaxonomyConfig;
-use App\Publisher\PluginSettings\PluginSettingsData;
-
-final class Config implements PluginSettingsData
+use App\Item\Taxonomy\Config as TaxonomyConfig;
+use App\Publisher\PluginSettings\Data;
+final class Config implements Data
 {
     private TaxonomyConfig $taxonomy;
 

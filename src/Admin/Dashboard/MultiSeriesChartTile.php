@@ -2,7 +2,7 @@
 
 namespace App\Admin\Dashboard;
 
-final readonly class MultiSeriesChartTile implements DashboardTile
+final readonly class MultiSeriesChartTile implements Tile
 {
     /**
      * @param list<string>       $labels

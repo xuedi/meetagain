@@ -2,9 +2,9 @@
 
 namespace App\Service\Email\Delivery\Provider;
 
-use App\Service\Email\Delivery\EmailDeliveryLog;
-use App\Service\Email\Delivery\EmailDeliveryLogCollection;
-use App\Service\Email\Delivery\EmailDeliveryLogFilter;
+use App\Service\Email\Delivery\Log;
+use App\Service\Email\Delivery\LogCollection;
+use App\Service\Email\Delivery\LogFilter;
 use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
 
 final readonly class DummyEmailDeliveryProvider implements EmailDeliveryProviderInterface
@@ -14,12 +14,12 @@ final readonly class DummyEmailDeliveryProvider implements EmailDeliveryProvider
         return false;
     }
 
-    public function getLogs(EmailDeliveryLogFilter $filter): EmailDeliveryLogCollection
+    public function getLogs(LogFilter $filter): LogCollection
     {
-        return new EmailDeliveryLogCollection([], 0, 0, 0);
+        return new LogCollection([], 0, 0, 0);
     }
 
-    public function getLogByMessageId(string $messageId): ?EmailDeliveryLog
+    public function getLogByMessageId(string $messageId): ?Log
     {
         return null;
     }

@@ -3,8 +3,8 @@
 namespace App\Twig;
 
 use App\Entity\User;
-use App\Service\Profile\ProfileConfigPrivacyToggle;
-use App\Service\Profile\ProfileConfigPrivacyToggleProviderInterface;
+use App\Service\Profile\ConfigPrivacyToggle;
+use App\Service\Profile\ConfigPrivacyToggleProviderInterface;
 use Override;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Twig\Extension\AbstractExtension;
@@ -13,10 +13,10 @@ use Twig\TwigFunction;
 final class ProfileConfigExtension extends AbstractExtension
 {
     /**
-     * @param iterable<ProfileConfigPrivacyToggleProviderInterface> $privacyToggleProviders
+     * @param iterable<ConfigPrivacyToggleProviderInterface> $privacyToggleProviders
      */
     public function __construct(
-        #[AutowireIterator(ProfileConfigPrivacyToggleProviderInterface::class)]
+        #[AutowireIterator(ConfigPrivacyToggleProviderInterface::class)]
         private readonly iterable $privacyToggleProviders,
     ) {}
 
@@ -29,7 +29,7 @@ final class ProfileConfigExtension extends AbstractExtension
     }
 
     /**
-     * @return list<ProfileConfigPrivacyToggle>
+     * @return list<ConfigPrivacyToggle>
      */
     public function getPrivacyToggles(User $user): array
     {

@@ -4,7 +4,7 @@ namespace Plugin\Voting\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
-use App\Item\ItemTypeRegistry;
+use App\Item\TypeRegistry;
 use App\Repository\EventRepository;
 use Plugin\Voting\Activity\Messages\PollClosed;
 use Plugin\Voting\Activity\Messages\PollCreated;
@@ -26,7 +26,7 @@ final class PollController extends AbstractController
         private readonly PollService $pollService,
         private readonly ConfigService $config,
         private readonly EventRepository $eventRepo,
-        private readonly ItemTypeRegistry $registry,
+        private readonly TypeRegistry $registry,
         private readonly ActivityService $activityService,
     ) {}
 

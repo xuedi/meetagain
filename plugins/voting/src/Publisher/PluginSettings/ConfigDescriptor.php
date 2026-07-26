@@ -2,12 +2,12 @@
 
 namespace Plugin\Voting\Publisher\PluginSettings;
 
-use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
+use App\Publisher\PluginSettings\DescriptorInterface;
 use Plugin\Voting\Form\ConfigType;
 use Plugin\Voting\ValueObject\Config;
 use Symfony\Component\Form\FormInterface;
 
-final class ConfigDescriptor implements PluginSettingsDescriptorInterface
+final class ConfigDescriptor implements DescriptorInterface
 {
     public function getKey(): string
     {

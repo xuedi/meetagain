@@ -2,26 +2,26 @@
 
 namespace App\Service\Admin;
 
-use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
+use App\Publisher\PluginSettings\DescriptorInterface;
 use LogicException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Traversable;
 
 final readonly class PluginSettingsService
 {
-    /** @var array<string, PluginSettingsDescriptorInterface> */
+    /** @var array<string, DescriptorInterface> */
     private array $descriptors;
 
     /**
-     * @param iterable<PluginSettingsDescriptorInterface> $descriptors
+     * @param iterable<DescriptorInterface> $descriptors
      */
-    public function __construct(#[AutowireIterator(PluginSettingsDescriptorInterface::class)] iterable $descriptors)
+    public function __construct(#[AutowireIterator(DescriptorInterface::class)] iterable $descriptors)
     {
         $materialised = $descriptors instanceof Traversable ? iterator_to_array($descriptors, false) : array_values($descriptors);
 
         usort(
             $materialised,
-            static fn(PluginSettingsDescriptorInterface $a, PluginSettingsDescriptorInterface $b): int => $b->getPriority() <=> $a->getPriority(),
+            static fn(DescriptorInterface $a, DescriptorInterface $b): int => $b->getPriority() <=> $a->getPriority(),
         );
 
         $keyed = [];
@@ -36,19 +36,19 @@ final readonly class PluginSettingsService
         $this->descriptors = $keyed;
     }
 
-    /** @return array<string, PluginSettingsDescriptorInterface> */
+    /** @return array<string, DescriptorInterface> */
     public function getProviders(): array
     {
         return $this->descriptors;
     }
 
-    public function getProvider(string $key): ?PluginSettingsDescriptorInterface
+    public function getProvider(string $key): ?DescriptorInterface
     {
         return $this->descriptors[$key] ?? null;
     }
 
     /**
-     * @return array<string, list<PluginSettingsDescriptorInterface>>
+     * @return array<string, list<DescriptorInterface>>
      */
     public function getScopableByPlugin(): array
     {

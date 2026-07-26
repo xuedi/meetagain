@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Publisher\PluginSettings\Fixtures;
 
-use App\Publisher\PluginSettings\PluginSettingsDescriptorInterface;
+use App\Publisher\PluginSettings\DescriptorInterface;
 use Symfony\Component\Form\FormInterface;
 
-final class StubDescriptor implements PluginSettingsDescriptorInterface
+final class StubDescriptor implements DescriptorInterface
 {
     public function __construct(
         private readonly string $key = 'stub',

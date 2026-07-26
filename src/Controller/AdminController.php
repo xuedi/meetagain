@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Admin\Dashboard\ChartTile;
 use App\Admin\Dashboard\CounterTile;
-use App\Admin\Dashboard\DashboardTile;
+use App\Admin\Dashboard\Tile;
 use App\Admin\Dashboard\HealthTile;
 use App\Admin\Dashboard\ListTile;
 use App\Admin\Dashboard\MultiSeriesChartTile;
@@ -72,8 +72,8 @@ final class AdminController extends AbstractController
     }
 
     /**
-     * @param list<DashboardTile> $centerTiles
-     * @param list<DashboardTile> $sideTiles
+     * @param list<Tile> $centerTiles
+     * @param list<Tile> $sideTiles
      */
     private function buildAdminPlatform(int $year, int $week, array &$centerTiles, array &$sideTiles): void
     {
@@ -164,8 +164,8 @@ final class AdminController extends AbstractController
     }
 
     /**
-     * @param list<DashboardTile> $centerTiles
-     * @param list<DashboardTile> $sideTiles
+     * @param list<Tile> $centerTiles
+     * @param list<Tile> $sideTiles
      */
     private function buildScopedTiles(
         int $year,

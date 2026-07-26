@@ -5,7 +5,7 @@ namespace App\Tests\Unit\Security\Permission\Checker;
 use App\Entity\User;
 use App\Security\Permission\Attribute\PermissionAttribute as Attr;
 use App\Security\Permission\Checker\AdminRolePermissionChecker;
-use App\Security\Permission\PermissionContext;
+use App\Security\Permission\Context;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -44,7 +44,7 @@ class AdminRolePermissionCheckerTest extends TestCase
 
     public function testAdminAlwaysAllowed(): void
     {
-        $ctx = new PermissionContext(actor: new User(), subject: null, isAdmin: true);
+        $ctx = new Context(actor: new User(), subject: null, isAdmin: true);
         self::assertTrue($this->checker->vote(Attr::CMS_PAGE_DELETE, $ctx));
         self::assertTrue($this->checker->vote(Attr::SYSTEM_SETTINGS_UPDATE, $ctx));
     }
@@ -52,7 +52,7 @@ class AdminRolePermissionCheckerTest extends TestCase
     public function testAdminOnlyAttributeDeniesOrganizer(): void
     {
         $this->security->method('isGranted')->willReturn(true);
-        $ctx = new PermissionContext(actor: new User(), subject: null, isAdmin: false);
+        $ctx = new Context(actor: new User(), subject: null, isAdmin: false);
         self::assertFalse($this->checker->vote(Attr::SYSTEM_LOGS_CRON_READ, $ctx));
         self::assertFalse($this->checker->vote(Attr::MEMBER_DELETE, $ctx));
     }
@@ -60,7 +60,7 @@ class AdminRolePermissionCheckerTest extends TestCase
     public function testOrganizerCanPerformOrganizerAttributes(): void
     {
         $this->security->method('isGranted')->willReturn(true);
-        $ctx = new PermissionContext(actor: new User(), subject: null, isAdmin: false);
+        $ctx = new Context(actor: new User(), subject: null, isAdmin: false);
         self::assertTrue($this->checker->vote(Attr::CMS_PAGE_UPDATE, $ctx));
         self::assertTrue($this->checker->vote(Attr::EVENT_UPDATE, $ctx));
     }
@@ -68,7 +68,7 @@ class AdminRolePermissionCheckerTest extends TestCase
     public function testNonOrganizerCannotPerformOrganizerAttributes(): void
     {
         $this->security->method('isGranted')->willReturn(false);
-        $ctx = new PermissionContext(actor: new User(), subject: null, isAdmin: false);
+        $ctx = new Context(actor: new User(), subject: null, isAdmin: false);
         self::assertFalse($this->checker->vote(Attr::CMS_PAGE_UPDATE, $ctx));
         self::assertFalse($this->checker->vote(Attr::EVENT_DELETE, $ctx));
     }
@@ -82,7 +82,7 @@ class AdminRolePermissionCheckerTest extends TestCase
 
     public function testSecurityAttributesAdminAllowed(): void
     {
-        $ctx = new PermissionContext(actor: new User(), subject: null, isAdmin: true);
+        $ctx = new Context(actor: new User(), subject: null, isAdmin: true);
         self::assertTrue($this->checker->vote(Attr::SYSTEM_SECURITY_INCIDENTS_READ, $ctx));
         self::assertTrue($this->checker->vote(Attr::SYSTEM_SECURITY_ACCESS_DENIED_READ, $ctx));
         self::assertTrue($this->checker->vote(Attr::SYSTEM_SECURITY_RATE_LIMITING_READ, $ctx));
@@ -91,7 +91,7 @@ class AdminRolePermissionCheckerTest extends TestCase
     public function testSecurityAttributesNonAdminDenied(): void
     {
         $this->security->method('isGranted')->willReturn(true);
-        $ctx = new PermissionContext(actor: new User(), subject: null, isAdmin: false);
+        $ctx = new Context(actor: new User(), subject: null, isAdmin: false);
         self::assertFalse($this->checker->vote(Attr::SYSTEM_SECURITY_INCIDENTS_READ, $ctx));
         self::assertFalse($this->checker->vote(Attr::SYSTEM_SECURITY_ACCESS_DENIED_READ, $ctx));
         self::assertFalse($this->checker->vote(Attr::SYSTEM_SECURITY_RATE_LIMITING_READ, $ctx));

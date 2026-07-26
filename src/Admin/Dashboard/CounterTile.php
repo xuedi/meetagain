@@ -2,7 +2,7 @@
 
 namespace App\Admin\Dashboard;
 
-final readonly class CounterTile implements DashboardTile
+final readonly class CounterTile implements Tile
 {
     public function __construct(
         public string $title,

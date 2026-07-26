@@ -4,8 +4,8 @@ namespace Plugin\Films\Service;
 
 use App\Enum\ImageType;
 use App\Enum\ItemAction;
-use App\Item\ItemActionDispatcher;
-use App\Item\ItemFilterService;
+use App\Item\ActionDispatcher;
+use App\Item\FilterService;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -22,8 +22,8 @@ readonly class FilmService
     public function __construct(
         private EntityManagerInterface $em,
         private FilmRepository $filmRepo,
-        private ItemFilterService $itemFilter,
-        private ItemActionDispatcher $dispatcher,
+        private FilterService $itemFilter,
+        private ActionDispatcher $dispatcher,
         private PosterImageService $posterImageService,
         private ImageLocationService $imageLocationService,
     ) {}

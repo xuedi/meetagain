@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Service\Email\Delivery\Provider;
 
-use App\Service\Email\Delivery\EmailDeliveryLogFilter;
+use App\Service\Email\Delivery\LogFilter;
 use App\Service\Email\Delivery\Provider\SweegoEmailDeliveryProvider;
 use DateTimeImmutable;
 use Exception;
@@ -22,7 +22,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
      * @param array<string, mixed> $expectedBodySubset
      */
     #[DataProvider('provideFilterToRequestBodyCases')]
-    public function testGetLogsBuildsRequestBodyFromFilter(EmailDeliveryLogFilter $filter, array $expectedBodySubset): void
+    public function testGetLogsBuildsRequestBodyFromFilter(LogFilter $filter, array $expectedBodySubset): void
     {
         // Arrange
         $captured = ['url' => null, 'body' => null, 'headers' => null];
@@ -46,27 +46,27 @@ class SweegoEmailDeliveryProviderTest extends TestCase
     public static function provideFilterToRequestBodyCases(): iterable
     {
         yield 'channel + offset + size always present' => [
-            new EmailDeliveryLogFilter(offset: 10, size: 25),
+            new LogFilter(offset: 10, size: 25),
             ['channel' => 'email', 'offset' => 10, 'size' => 25],
         ];
         yield 'messageId maps to transaction_id' => [
-            new EmailDeliveryLogFilter(messageId: 'msg-1'),
+            new LogFilter(messageId: 'msg-1'),
             ['transaction_id' => 'msg-1'],
         ];
         yield 'recipientEmail maps to email_to' => [
-            new EmailDeliveryLogFilter(recipientEmail: 'a@b.test'),
+            new LogFilter(recipientEmail: 'a@b.test'),
             ['email_to' => 'a@b.test'],
         ];
         yield 'statuses array maps to status' => [
-            new EmailDeliveryLogFilter(statuses: ['delivered', 'bounced']),
+            new LogFilter(statuses: ['delivered', 'bounced']),
             ['status' => ['delivered', 'bounced']],
         ];
         yield 'since maps to start_date in Y-m-d' => [
-            new EmailDeliveryLogFilter(since: new DateTimeImmutable('2026-05-01')),
+            new LogFilter(since: new DateTimeImmutable('2026-05-01')),
             ['start_date' => '2026-05-01'],
         ];
         yield 'until maps to end_date in Y-m-d' => [
-            new EmailDeliveryLogFilter(until: new DateTimeImmutable('2026-05-12 23:59:59')),
+            new LogFilter(until: new DateTimeImmutable('2026-05-12 23:59:59')),
             ['end_date' => '2026-05-12'],
         ];
     }
@@ -91,7 +91,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
         $provider = new SweegoEmailDeliveryProvider($http, new NullLogger(), self::DSN);
 
         // Act
-        $collection = $provider->getLogs(new EmailDeliveryLogFilter());
+        $collection = $provider->getLogs(new LogFilter());
 
         // Assert
         static::assertSame(42, $collection->total);
@@ -117,7 +117,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
         $provider = new SweegoEmailDeliveryProvider($http, new NullLogger(), self::DSN);
 
         // Act
-        $log = $provider->getLogs(new EmailDeliveryLogFilter())->items[0];
+        $log = $provider->getLogs(new LogFilter())->items[0];
 
         // Assert
         static::assertSame($expectedValue, $log->{$expectedField});
@@ -168,7 +168,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
         $provider = new SweegoEmailDeliveryProvider($http, new NullLogger(), 'sweego+api://default');
 
         // Act
-        $collection = $provider->getLogs(new EmailDeliveryLogFilter(offset: 5, size: 7));
+        $collection = $provider->getLogs(new LogFilter(offset: 5, size: 7));
 
         // Assert
         static::assertFalse($provider->isAvailable());
@@ -197,7 +197,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
         $provider = new SweegoEmailDeliveryProvider($http, new NullLogger(), self::DSN);
 
         // Act
-        $collection = $provider->getLogs(new EmailDeliveryLogFilter(offset: 2, size: 10));
+        $collection = $provider->getLogs(new LogFilter(offset: 2, size: 10));
 
         // Assert
         static::assertTrue($collection->isEmpty());
@@ -218,7 +218,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
         $provider = new SweegoEmailDeliveryProvider($http, new NullLogger(), self::DSN);
 
         // Act
-        $collection = $provider->getLogs(new EmailDeliveryLogFilter());
+        $collection = $provider->getLogs(new LogFilter());
 
         // Assert
         static::assertSame(2, $collection->total);
@@ -266,7 +266,7 @@ class SweegoEmailDeliveryProviderTest extends TestCase
         $provider = new SweegoEmailDeliveryProvider($http, new NullLogger(), $encodedDsn);
 
         // Act
-        $provider->getLogs(new EmailDeliveryLogFilter());
+        $provider->getLogs(new LogFilter());
 
         // Assert
         static::assertSame($rawKey, $captured['headers']['Api-Key'][0] ?? null);

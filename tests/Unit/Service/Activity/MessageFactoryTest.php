@@ -4,7 +4,7 @@ namespace Tests\Unit\Service\Activity;
 
 use App\Activity\MessageFactory;
 use App\Activity\MessageInterface;
-use App\Activity\UnknownActivityMessage;
+use App\Activity\UnknownMessage;
 use App\Entity\Activity;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
@@ -97,6 +97,6 @@ class MessageFactoryTest extends TestCase
         $result = $factory->build($this->activity);
 
         // Assert
-        static::assertInstanceOf(UnknownActivityMessage::class, $result);
+        static::assertInstanceOf(UnknownMessage::class, $result);
     }
 }

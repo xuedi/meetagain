@@ -21,8 +21,8 @@ use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\EventService;
-use App\Service\Item\ItemAssociationService;
-use App\Service\Item\ItemAttachControlBuilder;
+use App\Service\Item\AssociationService;
+use App\Service\Item\AttachControlBuilder;
 use App\Service\Seo\CanonicalUrlService;
 use App\Service\Seo\EventSchemaService;
 use DateTimeImmutable;
@@ -49,8 +49,8 @@ final class EventController extends AbstractController
         private readonly EventFilterService $eventFilterService,
         private readonly EventSchemaService $eventSchemaService,
         private readonly CanonicalUrlService $canonicalUrlService,
-        private readonly ItemAssociationService $itemAssociationService,
-        private readonly ItemAttachControlBuilder $itemAttachControlBuilder,
+        private readonly AssociationService $itemAssociationService,
+        private readonly AttachControlBuilder $itemAttachControlBuilder,
         #[AutowireIterator(FeaturedEventProviderInterface::class)]
         private readonly iterable $featuredEventProviders = [],
     ) {}

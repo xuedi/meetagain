@@ -3,8 +3,8 @@
 namespace Plugin\Voting\Service;
 
 use App\Entity\Event;
-use App\Item\ItemCandidateProviderInterface;
-use App\Service\Item\ItemAssociationService;
+use App\Item\CandidateProviderInterface;
+use App\Service\Item\AssociationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Voting\Entity\Poll;
@@ -20,15 +20,15 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 readonly class PollService
 {
     /**
-     * @param iterable<ItemCandidateProviderInterface> $candidateProviders
+     * @param iterable<CandidateProviderInterface> $candidateProviders
      */
     public function __construct(
         private EntityManagerInterface $em,
         private PollRepository $pollRepo,
         private VoteRepository $voteRepo,
-        private ItemAssociationService $itemAssociations,
+        private AssociationService $itemAssociations,
         private ConfigService $config,
-        #[AutowireIterator(ItemCandidateProviderInterface::class)]
+        #[AutowireIterator(CandidateProviderInterface::class)]
         private iterable $candidateProviders,
     ) {}
 

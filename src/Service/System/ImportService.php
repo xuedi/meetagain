@@ -23,9 +23,9 @@ use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Exception\Event\InvalidRecurrencePatternException;
 use App\ExtendedFilesystem;
-use App\Item\Portability\ItemImportContext;
-use App\Item\Portability\ItemPortabilityRegistry;
-use App\Item\Portability\ItemTaxonomyPortability;
+use App\Item\Portability\ImportContext;
+use App\Item\Portability\Registry;
+use App\Item\Portability\TaxonomyPortability;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
 use App\ValueObject\RecurrencePattern;
@@ -42,8 +42,8 @@ readonly class ImportService
         private LocationRepository $locationRepository,
         private ExtendedFilesystem $fs,
         private PortableImageImporter $imageImporter,
-        private ItemPortabilityRegistry $itemRegistry,
-        private ItemTaxonomyPortability $taxonomyPortability,
+        private Registry $itemRegistry,
+        private TaxonomyPortability $taxonomyPortability,
     ) {}
 
     public function import(string $zipPath): ImportSummary
@@ -396,7 +396,7 @@ readonly class ImportService
      */
     private function importItems(array $itemsData, string $tempDir, User $systemUser, array &$counts): array
     {
-        $context = new ItemImportContext($this->imageImporter, $tempDir, $systemUser);
+        $context = new ImportContext($this->imageImporter, $tempDir, $systemUser);
         $byType = [];
 
         foreach ($itemsData as $itemType => $block) {

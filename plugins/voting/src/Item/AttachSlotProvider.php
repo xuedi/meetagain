@@ -2,12 +2,12 @@
 
 namespace Plugin\Voting\Item;
 
-use App\Item\ItemAttachSlot;
-use App\Item\ItemAttachSlotProviderInterface;
+use App\Item\AttachSlot;
+use App\Item\AttachSlotProviderInterface;
 use Override;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final readonly class AttachSlotProvider implements ItemAttachSlotProviderInterface
+final readonly class AttachSlotProvider implements AttachSlotProviderInterface
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
@@ -17,7 +17,7 @@ final readonly class AttachSlotProvider implements ItemAttachSlotProviderInterfa
     public function getAttachSlots(int $eventId, string $itemType): array
     {
         return [
-            new ItemAttachSlot(
+            new AttachSlot(
                 url: $this->urlGenerator->generate('app_voting_poll_create', ['eventId' => $eventId, 'itemType' => $itemType]),
                 labelKey: 'voting_attach.put_to_vote',
                 icon: 'check-to-slot',

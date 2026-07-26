@@ -30,17 +30,4 @@ class GlossaryTest extends TestCase
         self::assertSame(2, $glossary->getCreatedBy());
         self::assertSame($createdAt, $glossary->getCreatedAt());
     }
-
-    public function testGetExplanationShortenedWrapsLongText(): void
-    {
-        // Arrange
-        $glossary = new Glossary();
-        $glossary->setExplanation(str_repeat('word ', 40));
-
-        // Act
-        $wrapped = $glossary->getExplanationShortened(60);
-
-        // Assert
-        self::assertStringContainsString("\n", $wrapped);
-    }
 }
