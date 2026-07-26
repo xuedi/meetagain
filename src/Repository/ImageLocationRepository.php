@@ -90,6 +90,27 @@ class ImageLocationRepository extends ServiceEntityRepository
     }
 
     /**
+     * @return array<int, list<ImageType>> imageId => location types, ascending by type value
+     */
+    public function findTypesPerImageId(): array
+    {
+        $rows = $this
+            ->getEntityManager()
+            ->getConnection()
+            ->fetchAllAssociative('SELECT DISTINCT image_id, location_type FROM image_location ORDER BY image_id, location_type');
+
+        $result = [];
+        foreach ($rows as $row) {
+            $type = ImageType::tryFrom((int) $row['location_type']);
+            if ($type !== null) {
+                $result[(int) $row['image_id']][] = $type;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @param array<array{imageId: int, locationId: int}> $pairs
      */
     public function deleteByTypeAndPairs(ImageType $type, array $pairs): void

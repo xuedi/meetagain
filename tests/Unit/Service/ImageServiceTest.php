@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
 use App\ExtendedFilesystem;
+use App\Repository\ImageLocationRepository;
 use App\Repository\ImageRepository;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
@@ -48,6 +49,7 @@ class ImageServiceTest extends TestCase
         ?ExtendedFilesystem $filesystemService = null,
         ?LoggerInterface $logger = null,
         ?string $kernelProjectDir = null,
+        ?ImageLocationRepository $imageLocationRepo = null,
     ): ImageService {
         return new ImageService(
             $imageRepo ?? $this->createStub(ImageRepository::class),
@@ -58,7 +60,30 @@ class ImageServiceTest extends TestCase
             $logger ?? $this->createStub(LoggerInterface::class),
             $kernelProjectDir ?? $this->kernelProjectDir,
             $this->createStub(ImageLocationService::class),
+            $imageLocationRepo ?? $this->createStub(ImageLocationRepository::class),
         );
+    }
+
+    /**
+     * @param array<int, list<ImageType>> $typesByImageId
+     */
+    private function locationRepoFor(array $typesByImageId): ImageLocationRepository
+    {
+        $repo = $this->createStub(ImageLocationRepository::class);
+        $repo->method('findTypesPerImageId')->willReturn($typesByImageId);
+
+        return $repo;
+    }
+
+    private function storedImage(int $id, string $hash, ImageType $type): Image
+    {
+        $image = $this->createStub(Image::class);
+        $image->method('getId')->willReturn($id);
+        $image->method('getHash')->willReturn($hash);
+        $image->method('getExtension')->willReturn('png');
+        $image->method('getType')->willReturn($type);
+
+        return $image;
     }
 
     public function testUploadExistingImage(): void
@@ -174,6 +199,7 @@ class ImageServiceTest extends TestCase
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
+                $this->createStub(ImageLocationRepository::class),
             ])
             ->onlyMethods(['createThumbnails'])
             ->getMock();
@@ -208,6 +234,7 @@ class ImageServiceTest extends TestCase
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
+                $this->createStub(ImageLocationRepository::class),
             ])
             ->onlyMethods(['rotateThumbNail'])
             ->getMock();
@@ -227,15 +254,10 @@ class ImageServiceTest extends TestCase
     public function testGetStatistics(): void
     {
         // Arrange
-        $imageTypeRegistryMock = $this->createMock(ImageTypeRegistry::class);
-        $imageTypeRegistryMock->expects($this->once())->method('getThumbnailSizeList')->willReturn(['100x100' => 0, '200x200' => 0]);
-        $imageTypeRegistryMock
-            ->expects($this->exactly(2))
-            ->method('getThumbnailSizes')
-            ->willReturnMap([
-                [ImageType::ProfilePicture, [[100, 100]]],
-                [ImageType::EventTeaser, [[200, 200]]],
-            ]);
+        $imageTypeRegistryMock = new ImageTypeRegistry([
+            $this->definition(ImageType::ProfilePicture, [[100, 100]]),
+            $this->definition(ImageType::EventTeaser, [[200, 200]]),
+        ], new ThumbnailSizeFormat());
 
         // Arrange
         $filesystemMock = $this->createMock(ExtendedFilesystem::class);
@@ -254,6 +276,13 @@ class ImageServiceTest extends TestCase
                 'hash1' => ImageType::ProfilePicture,
                 'hash2' => ImageType::EventTeaser,
             ]);
+        $imageRepoMock
+            ->expects($this->once())
+            ->method('findAll')
+            ->willReturn([
+                $this->storedImage(1, 'hash1', ImageType::ProfilePicture),
+                $this->storedImage(2, 'hash2', ImageType::EventTeaser),
+            ]);
         $imageRepoMock->expects($this->once())->method('count')->willReturn(2);
 
         // Arrange
@@ -268,6 +297,7 @@ class ImageServiceTest extends TestCase
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
+                $this->createStub(ImageLocationRepository::class),
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
             ->getMock();
@@ -299,10 +329,10 @@ class ImageServiceTest extends TestCase
         $imageRepoMock = $this->createMock(ImageRepository::class);
         $imageRepoMock
             ->expects($this->once())
-            ->method('getFileList')
+            ->method('findAll')
             ->willReturn([
-                'hash1' => ImageType::ProfilePicture,
-                'hash2' => ImageType::EventTeaser,
+                $this->storedImage(1, 'hash1', ImageType::ProfilePicture),
+                $this->storedImage(2, 'hash2', ImageType::EventTeaser),
             ]);
 
         // Arrange
@@ -321,25 +351,10 @@ class ImageServiceTest extends TestCase
             ]);
 
         // Arrange
-        // Note: isValidThumbnailSize is only called for hashes that exist in the file list
-        // hash3 is not in the list, so we only get 3 calls (hash1_100x100, hash2_200x200, hash1_300x300)
-        $imageTypeRegistryMock = $this->createMock(ImageTypeRegistry::class);
-        $imageTypeRegistryMock
-            ->expects($this->exactly(3))
-            ->method('isValidThumbnailSize')
-            ->willReturnCallback(static function (ImageType $type, int $width, int $height) {
-                if ($type === ImageType::ProfilePicture && $width === 100 && $height === 100) {
-                    return true;
-                }
-                if ($type === ImageType::ProfilePicture && $width === 300 && $height === 300) {
-                    return false;
-                }
-                if ($type === ImageType::EventTeaser && $width === 200 && $height === 200) {
-                    return true;
-                }
-
-                return false;
-            });
+        $imageTypeRegistryMock = new ImageTypeRegistry([
+            $this->definition(ImageType::ProfilePicture, [[100, 100]]),
+            $this->definition(ImageType::EventTeaser, [[200, 200]]),
+        ], new ThumbnailSizeFormat());
 
         $subject = $this->createService(imageRepo: $imageRepoMock, imageTypeRegistry: $imageTypeRegistryMock, filesystemService: $filesystemMock);
 
@@ -351,6 +366,122 @@ class ImageServiceTest extends TestCase
         static::assertCount(2, $result);
         static::assertContains('hash3_100x100.webp', $result);
         static::assertContains('hash1_300x300.webp', $result);
+    }
+
+    public function testObsoleteThumbnailsSparesARenditionOnlyARecordedLocationDemands(): void
+    {
+        // Arrange
+        $imageRepo = $this->createStub(ImageRepository::class);
+        $imageRepo->method('findAll')->willReturn([$this->storedImage(7, 'shared', ImageType::GroupPreview)]);
+
+        $registry = new ImageTypeRegistry([
+            $this->definition(ImageType::GroupPreview, [[400, 400]], ImageFitMode::Crop),
+            $this->definition(ImageType::GroupLogo, [[self::FREE, 120]]),
+        ], new ThumbnailSizeFormat());
+
+        $filesystem = $this->createStub(ExtendedFilesystem::class);
+        $filesystem->method('scanDirectory')->willReturn(['shared_400x400.webp', 'shared_h120.webp']);
+
+        $subject = $this->createService(
+            imageRepo: $imageRepo,
+            imageTypeRegistry: $registry,
+            filesystemService: $filesystem,
+            imageLocationRepo: $this->locationRepoFor([7 => [ImageType::GroupLogo]]),
+        );
+
+        // Act
+        $result = $subject->getObsoleteThumbnails();
+
+        // Assert
+        static::assertSame([], $result);
+    }
+
+    public function testObsoleteThumbnailsDropsARenditionNoRecordedUsageDemands(): void
+    {
+        // Arrange
+        $imageRepo = $this->createStub(ImageRepository::class);
+        $imageRepo->method('findAll')->willReturn([$this->storedImage(7, 'shared', ImageType::GroupPreview)]);
+
+        $registry = new ImageTypeRegistry([
+            $this->definition(ImageType::GroupPreview, [[400, 400]], ImageFitMode::Crop),
+            $this->definition(ImageType::GroupLogo, [[self::FREE, 120]]),
+        ], new ThumbnailSizeFormat());
+
+        $filesystem = $this->createStub(ExtendedFilesystem::class);
+        $filesystem->method('scanDirectory')->willReturn(['shared_400x400.webp', 'shared_h120.webp']);
+
+        $subject = $this->createService(
+            imageRepo: $imageRepo,
+            imageTypeRegistry: $registry,
+            filesystemService: $filesystem,
+            imageLocationRepo: $this->locationRepoFor([]),
+        );
+
+        // Act
+        $result = $subject->getObsoleteThumbnails();
+
+        // Assert
+        static::assertSame(['shared_h120.webp'], $result);
+    }
+
+    public function testRegenerateAllThumbnailsCreatesRenditionsARecordedLocationDemands(): void
+    {
+        // Arrange
+        $workspace = $this->createWorkspace();
+        $this->writeSourceImage($workspace, 'shared', 400, 200);
+
+        $imageRepo = $this->createStub(ImageRepository::class);
+        $imageRepo->method('findAll')->willReturn([$this->storedImage(7, 'shared', ImageType::GroupPreview)]);
+
+        $registry = new ImageTypeRegistry([
+            $this->definition(ImageType::GroupPreview, [[400, 400]], ImageFitMode::Crop),
+            $this->definition(ImageType::GroupLogo, [[self::FREE, 120]]),
+        ], new ThumbnailSizeFormat());
+
+        $subject = $this->createService(
+            imageRepo: $imageRepo,
+            imageTypeRegistry: $registry,
+            filesystemService: $this->missingThumbnails(),
+            kernelProjectDir: $workspace,
+            imageLocationRepo: $this->locationRepoFor([7 => [ImageType::GroupLogo]]),
+        );
+
+        // Act
+        $created = $subject->regenerateAllThumbnails();
+
+        // Assert
+        static::assertSame(2, $created);
+        static::assertSame([240, 120], $this->thumbnailSize($workspace, 'shared_h120'));
+    }
+
+    public function testTheRowTypeOwnsTheFitModeWhenTwoUsagesDeclareTheSameSize(): void
+    {
+        // Arrange
+        $workspace = $this->createWorkspace();
+        $this->writeSourceImage($workspace, 'shared', 400, 200);
+
+        $imageRepo = $this->createStub(ImageRepository::class);
+        $imageRepo->method('findAll')->willReturn([$this->storedImage(7, 'shared', ImageType::GroupPreview)]);
+
+        $registry = new ImageTypeRegistry([
+            $this->definition(ImageType::GroupPreview, [[100, 100]], ImageFitMode::Crop),
+            $this->definition(ImageType::GroupLogo, [[100, 100]], ImageFitMode::Fit),
+        ], new ThumbnailSizeFormat());
+
+        $subject = $this->createService(
+            imageRepo: $imageRepo,
+            imageTypeRegistry: $registry,
+            filesystemService: $this->realThumbnailPresence(),
+            kernelProjectDir: $workspace,
+            imageLocationRepo: $this->locationRepoFor([7 => [ImageType::GroupLogo]]),
+        );
+
+        // Act
+        $created = $subject->regenerateAllThumbnails();
+
+        // Assert
+        static::assertSame(1, $created);
+        static::assertSame([100, 100], $this->thumbnailSize($workspace, 'shared_100x100'));
     }
 
     public function testDeleteObsoleteThumbnails(): void
@@ -369,6 +500,7 @@ class ImageServiceTest extends TestCase
                 $this->createStub(LoggerInterface::class),
                 $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
+                $this->createStub(ImageLocationRepository::class),
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
             ->getMock();
@@ -563,6 +695,7 @@ class ImageServiceTest extends TestCase
             $this->createStub(LoggerInterface::class),
             $this->kernelProjectDir,
             $locationService,
+            $this->createStub(ImageLocationRepository::class),
         );
 
         // Act
@@ -733,7 +866,7 @@ class ImageServiceTest extends TestCase
     {
         // Arrange
         $imageRepo = $this->createStub(ImageRepository::class);
-        $imageRepo->method('getFileList')->willReturn(['hash1' => ImageType::SiteLogo]);
+        $imageRepo->method('findAll')->willReturn([$this->storedImage(1, 'hash1', ImageType::SiteLogo)]);
 
         $filesystem = $this->createStub(ExtendedFilesystem::class);
         $filesystem->method('scanDirectory')->willReturn([
@@ -785,18 +918,34 @@ class ImageServiceTest extends TestCase
      */
     private function registryFor(array $sizes): ImageTypeRegistry
     {
-        $definition = $this->createStub(ImageTypeDefinitionInterface::class);
-        $definition->method('getType')->willReturn(ImageType::SiteLogo);
-        $definition->method('thumbnailSizes')->willReturn($sizes);
-        $definition->method('fitMode')->willReturn(ImageFitMode::Fit);
+        return new ImageTypeRegistry([$this->definition(ImageType::SiteLogo, $sizes)], new ThumbnailSizeFormat());
+    }
 
-        return new ImageTypeRegistry([$definition], new ThumbnailSizeFormat());
+    /**
+     * @param list<array{0: int, 1: int}> $sizes
+     */
+    private function definition(ImageType $type, array $sizes, ImageFitMode $fitMode = ImageFitMode::Fit): ImageTypeDefinitionInterface
+    {
+        $definition = $this->createStub(ImageTypeDefinitionInterface::class);
+        $definition->method('getType')->willReturn($type);
+        $definition->method('thumbnailSizes')->willReturn($sizes);
+        $definition->method('fitMode')->willReturn($fitMode);
+
+        return $definition;
     }
 
     private function missingThumbnails(): ExtendedFilesystem
     {
         $filesystem = $this->createStub(ExtendedFilesystem::class);
         $filesystem->method('fileExists')->willReturn(false);
+
+        return $filesystem;
+    }
+
+    private function realThumbnailPresence(): ExtendedFilesystem
+    {
+        $filesystem = $this->createStub(ExtendedFilesystem::class);
+        $filesystem->method('fileExists')->willReturnCallback(static fn(string $path): bool => file_exists($path));
 
         return $filesystem;
     }

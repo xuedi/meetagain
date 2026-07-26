@@ -723,7 +723,9 @@ class EventRepository extends ServiceEntityRepository
         return $this
             ->createQueryBuilder('e')
             ->where('e.status IN (:statuses)')
+            ->andWhere('e.canceled = :notCanceled')
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
+            ->setParameter('notCanceled', false)
             ->orderBy('e.start', 'DESC')
             ->getQuery()
             ->getResult();

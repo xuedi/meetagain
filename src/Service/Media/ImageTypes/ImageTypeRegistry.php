@@ -86,17 +86,6 @@ class ImageTypeRegistry
         return $list;
     }
 
-    public function isValidThumbnailSize(ImageType $type, int $checkWidth, int $checkHeight): bool
-    {
-        foreach ($this->get($type)->thumbnailSizes() as [$width, $height]) {
-            if ($checkWidth === $width && $checkHeight === $height) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private function assertSizesAreWellFormed(ImageTypeDefinitionInterface $definition): void
     {
         $free = ImageTypeDefinitionInterface::FREE_AXIS;
