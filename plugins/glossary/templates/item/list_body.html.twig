@@ -1,0 +1,17 @@
+{% set primaryLabel = config.primaryLabel ?? ('glossary.label_phrase'|trans) %}
+{% set secondaryLabel = config.secondaryLabel ?? ('glossary.label_pinyin'|trans) %}
+{% set definitionLabel = config.definitionLabel ?? ('glossary.label_explanation'|trans) %}
+
+{% set listHeader = [primaryLabel] %}
+{% if config.secondaryEnabled %}{% set listHeader = listHeader|merge([secondaryLabel]) %}{% endif %}
+{% set listHeader = listHeader|merge([definitionLabel]) %}
+{% if config.hasCategories %}{% set listHeader = listHeader|merge([('glossary.label_category'|trans)]) %}{% endif %}
+{% if is_granted('ROLE_USER') %}{% set listHeader = listHeader|merge(['']) %}{% endif %}
+
+{% include '_components/item/list.html.twig' with {
+    'itemType': 'glossary',
+    'itemIds': itemIds,
+    'modes': ['list', 'tiles'],
+    'emptyMessage': 'glossary.list_empty',
+    'listHeader': listHeader
+} only %}

@@ -7,7 +7,6 @@ use App\Controller\AbstractController;
 use App\Item\Taxonomy\AssignmentFormHelper;
 use App\Item\Taxonomy\TaxonomyService;
 use Plugin\Films\Activity\Messages\FilmAdded;
-use Plugin\Films\Entity\Film;
 use Plugin\Films\Form\FilmEditType;
 use Plugin\Films\Form\FilmLookupType;
 use Plugin\Films\Form\FilmManualType;
@@ -34,11 +33,7 @@ final class FilmController extends AbstractController
     #[Route('', name: 'app_films_filmlist', methods: ['GET'])]
     public function list(): Response
     {
-        $itemIds = array_map(static fn(Film $film): int => (int) $film->getId(), $this->filmService->getList());
-
-        return $this->render('@Films/film/list.html.twig', [
-            'itemIds' => $itemIds,
-        ]);
+        return $this->render('@Films/film/list.html.twig');
     }
 
     #[Route('/lookup', name: 'app_plugin_films_film_lookup', methods: ['GET'])]

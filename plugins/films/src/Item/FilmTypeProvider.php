@@ -5,15 +5,19 @@ namespace Plugin\Films\Item;
 use App\Entity\EventItemAssociation;
 use App\Item\TypeProviderInterface;
 use App\Item\ListCellProviderInterface;
+use App\Item\ListProviderInterface;
 use Override;
+use Plugin\Films\Entity\Film;
 use Plugin\Films\Service\FilmService;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-final readonly class FilmTypeProvider implements TypeProviderInterface, ListCellProviderInterface
+final readonly class FilmTypeProvider implements TypeProviderInterface, ListCellProviderInterface, ListProviderInterface
 {
     public function __construct(
         private FilmService $filmService,
         private Environment $twig,
+        private UrlGeneratorInterface $urlGenerator,
     ) {}
 
     #[Override]
@@ -59,6 +63,26 @@ final readonly class FilmTypeProvider implements TypeProviderInterface, ListCell
         return $this->twig->render('@Films/item/list_cell.html.twig', [
             'film' => $film,
         ]);
+    }
+
+    #[Override]
+    public function getItemIds(): array
+    {
+        return array_values(array_map(static fn(Film $film): int => (int) $film->getId(), $this->filmService->getList()));
+    }
+
+    #[Override]
+    public function renderList(): string
+    {
+        return $this->twig->render('@Films/item/list_body.html.twig', [
+            'itemIds' => $this->getItemIds(),
+        ]);
+    }
+
+    #[Override]
+    public function getListUrl(): string
+    {
+        return $this->urlGenerator->generate('app_films_filmlist');
     }
 
     #[Override]

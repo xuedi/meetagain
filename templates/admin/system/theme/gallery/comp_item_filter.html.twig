@@ -1,0 +1,51 @@
+{#
+    Gallery: Item facet filter -- chip rows, counts and the disabled zero-count option
+
+    Static reproduction of the item-list filter box: one chip row per facet group, the active chip
+    filled, an inactive one light, and an option that would yield nothing rendered as a dimmed span
+    instead of a link. The live box is data-driven per item type, so this entry shows the states
+    rather than including the component.
+
+    Used in:    admin/system/theme/gallery/index.html.twig
+    Parameters: none
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/item/taxonomy_filter.html.twig</code>
+</p>
+
+<div class="columns mt-3">
+    <div class="column is-narrow" style="width: 16rem;">
+        <div class="box taxonomy-filter">
+            <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
+                <p class="heading mb-0">{{ 'item.facet_heading'|trans }}</p>
+                <a href="#" class="is-size-7" rel="nofollow">{{ 'item.facet_clear'|trans }}</a>
+            </div>
+            <div class="field">
+                <p class="label is-small mb-1">{{ 'item.facet_categories'|trans }}</p>
+                <div class="tags">
+                    <a href="#" class="tag is-link" rel="nofollow">Starter<span class="ml-1">4</span></a>
+                    <a href="#" class="tag is-light" rel="nofollow">Main<span class="ml-1 has-text-grey">7</span></a>
+                    <span class="tag is-light has-text-grey-light" title="{{ 'item.facet_zero_hint'|trans }}">Dessert<span class="ml-1">0</span></span>
+                </div>
+            </div>
+            <div class="field">
+                <p class="label is-small mb-1">{{ 'item.facet_tags'|trans }}</p>
+                <div class="tags">
+                    <a href="#" class="tag is-light" rel="nofollow">Spicy<span class="ml-1 has-text-grey">2</span></a>
+                    <span class="tag is-light has-text-grey-light" title="{{ 'item.facet_zero_hint'|trans }}">Vegan<span class="ml-1">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <div class="item-result-header mb-3">
+            <p class="is-size-7 has-text-grey">{{ 'item.result_showing'|trans({'%shown%': 4, '%total%': 11}) }}</p>
+            <div class="tags mt-2">
+                <a href="#" class="tag is-link" rel="nofollow">Starter <span class="icon is-small ml-1"><i class="fa-solid fa-xmark"></i></span></a>
+                <a href="#" class="tag is-light" rel="nofollow">{{ 'item.facet_clear'|trans }}</a>
+            </div>
+        </div>
+        <p class="has-text-grey is-size-7">{{ 'admin_system_gallery.item_filter_body'|trans }}</p>
+    </div>
+</div>

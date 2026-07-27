@@ -7,11 +7,12 @@
     shared layout wrappers. A type that only reads well in some modes passes `modes` to offer a
     subset; a session mode outside that subset is highlighted as the first allowed one.
 
-    Used in:    _components/item/list.html.twig; item-list pages that own their layouts (e.g. dishes)
+    Used in:    _components/item/sidebar.html.twig
     Parameters:
         - itemType (string, required)       -- registry key of the item type (e.g. 'dish')
         - modes    (list<string>, optional) -- view-mode values to offer; default: all four
-    Depends on: item_view_mode(), item_view_types() (ItemViewExtension); the app_item_set_view route
+    Depends on: item_view_mode(), item_view_types() (ItemViewExtension); the app_item_set_view
+                route; assets/js/item-list.js, which turns a click into a fragment swap
 #}
 {% set allowedModes = modes|default([]) %}
 {% set currentValue = item_view_mode(itemType).value %}
@@ -23,6 +24,8 @@
         {% if allowedModes is empty or view.value in allowedModes %}
             <a href="{{ path('app_item_set_view', {'itemType': itemType, 'mode': view.value}) }}"
                class="button is-small{% if currentValue == view.value %} is-link{% endif %}"
+               data-item-facet
+               data-item-mode="{{ view.value }}"
                title="{{ view.label|trans }}">
                 <span class="icon"><i class="fa-solid fa-{{ view.icon }}"></i></span>
             </a>

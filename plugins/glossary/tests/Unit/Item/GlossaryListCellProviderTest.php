@@ -2,6 +2,7 @@
 
 namespace Plugin\Glossary\Tests\Unit\Item;
 
+use App\Review\ChangeProposalService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
@@ -9,6 +10,8 @@ use Plugin\Glossary\Item\GlossaryListCellProvider;
 use Plugin\Glossary\Service\ConfigService;
 use Plugin\Glossary\Service\GlossaryService;
 use Plugin\Glossary\ValueObject\Config;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 class GlossaryListCellProviderTest extends TestCase
@@ -25,7 +28,7 @@ class GlossaryListCellProviderTest extends TestCase
             ->with('@Glossary/item/list_cell.html.twig', ['entry' => $entry, 'config' => $config])
             ->willReturn('<td>你好</td>');
 
-        $provider = new GlossaryListCellProvider($this->serviceReturning($entry), $this->configReturning($config), $twig);
+        $provider = $this->makeProvider($this->serviceReturning($entry), $this->configReturning($config), $twig);
 
         // Act
         $cell = $provider->renderListCell(7);
@@ -40,7 +43,7 @@ class GlossaryListCellProviderTest extends TestCase
         $twig = $this->createMock(Environment::class);
         $twig->expects(self::never())->method('render');
 
-        $provider = new GlossaryListCellProvider($this->serviceReturning(null), $this->configReturning(new Config()), $twig);
+        $provider = $this->makeProvider($this->serviceReturning(null), $this->configReturning(new Config()), $twig);
 
         // Act
         $cell = $provider->renderListCell(404);
@@ -52,7 +55,7 @@ class GlossaryListCellProviderTest extends TestCase
     public function testRegistersUnderTheGlossaryItemType(): void
     {
         // Arrange
-        $provider = new GlossaryListCellProvider(
+        $provider = $this->makeProvider(
             $this->serviceReturning(null),
             $this->configReturning(new Config()),
             $this->createStub(Environment::class),
@@ -61,6 +64,39 @@ class GlossaryListCellProviderTest extends TestCase
         // Act & Assert
         self::assertSame('glossary', $provider->getPluginKey());
         self::assertSame(GlossaryCategorizableTypeProvider::ITEM_TYPE, $provider->getKey());
+    }
+
+    public function testListUrlPointsAtTheGlossaryIndex(): void
+    {
+        // Arrange
+        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
+        $urlGenerator->method('generate')->willReturn('/en/glossary');
+
+        $provider = $this->makeProvider(
+            $this->serviceReturning(null),
+            $this->configReturning(new Config()),
+            $this->createStub(Environment::class),
+            $urlGenerator,
+        );
+
+        // Act & Assert
+        self::assertSame('/en/glossary', $provider->getListUrl());
+    }
+
+    private function makeProvider(
+        GlossaryService $service,
+        ConfigService $configService,
+        Environment $twig,
+        ?UrlGeneratorInterface $urlGenerator = null,
+    ): GlossaryListCellProvider {
+        return new GlossaryListCellProvider(
+            $service,
+            $configService,
+            $twig,
+            $this->createStub(ChangeProposalService::class),
+            $this->createStub(Security::class),
+            $urlGenerator ?? $this->createStub(UrlGeneratorInterface::class),
+        );
     }
 
     private function serviceReturning(?Glossary $entry): GlossaryService

@@ -2,29 +2,16 @@
 
 namespace Plugin\Glossary\Controller;
 
-use App\Review\ChangeProposalService;
-use Plugin\Glossary\Entity\Glossary;
-use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
-use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/glossary')]
 final class IndexController extends AbstractGlossaryController
 {
-    public function __construct(
-        GlossaryService $service,
-        private readonly ChangeProposalService $changeProposalService,
-    ) {
-        parent::__construct($service);
-    }
-
     #[Route('', name: 'app_plugin_glossary', methods: ['GET'])]
     public function show(): Response
     {
-        return $this->renderPage('@Glossary/index.html.twig', [
-            'itemIds' => $this->listedItemIds(),
-        ]);
+        return $this->renderPage('@Glossary/index.html.twig');
     }
 
     #[Route('/{id}', name: 'app_plugin_glossary_show', methods: ['GET'], requirements: ['id' => '\d+'])]
@@ -38,32 +25,5 @@ final class IndexController extends AbstractGlossaryController
         return $this->renderPage('@Glossary/detail.html.twig', [
             'entry' => $entry,
         ]);
-    }
-
-    /**
-     * @return list<int>
-     */
-    private function listedItemIds(): array
-    {
-        $entries = $this->service->getList();
-
-        if (!$this->isGranted('ROLE_ORGANIZER')) {
-            return array_values(array_map(static fn(Glossary $entry): int => (int) $entry->getId(), $entries));
-        }
-
-        $pendingProposalIds = $this->changeProposalService->pendingTargetIds(GlossaryCategorizableTypeProvider::ITEM_TYPE);
-
-        $needsAttention = [];
-        $rest = [];
-        foreach ($entries as $entry) {
-            if (!$entry->getApproved() || in_array((int) $entry->getId(), $pendingProposalIds, true)) {
-                $needsAttention[] = (int) $entry->getId();
-                continue;
-            }
-
-            $rest[] = (int) $entry->getId();
-        }
-
-        return [...$needsAttention, ...$rest];
     }
 }
