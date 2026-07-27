@@ -178,6 +178,17 @@ readonly class PluginService
         $this->setPluginConfig($config);
     }
 
+    public function getName(string $pluginKey): string
+    {
+        foreach ($this->getAdminList() as $plugin) {
+            if ($plugin['key'] === $pluginKey) {
+                return (string) $plugin['name'];
+            }
+        }
+
+        return $pluginKey;
+    }
+
     public function isInstalled(string $pluginKey): bool
     {
         $config = $this->getPluginConfig();

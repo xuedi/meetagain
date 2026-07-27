@@ -50,6 +50,94 @@ class NotFoundLogRepository extends ServiceEntityRepository
         return $qb->getQuery()->getArrayResult();
     }
 
+    /**
+     * @return list<array{value: string, number: int}>
+     */
+    public function getTopUrls(int $limit, ?DateTimeImmutable $since = null): array
+    {
+        return $this->getTopValues('url', $limit, $since, false);
+    }
+
+    /**
+     * @return list<array{value: string, number: int}>
+     */
+    public function getTopIps(int $limit, ?DateTimeImmutable $since = null): array
+    {
+        return $this->getTopValues('ip', $limit, $since, false);
+    }
+
+    /**
+     * @return list<array{value: string, number: int}>
+     */
+    public function getTopReferers(int $limit, ?DateTimeImmutable $since = null): array
+    {
+        return $this->getTopValues('referer', $limit, $since, true);
+    }
+
+    /**
+     * @return list<array{value: string, number: int}>
+     */
+    public function getTopUserAgents(int $limit, ?DateTimeImmutable $since = null): array
+    {
+        return $this->getTopValues('userAgent', $limit, $since, true);
+    }
+
+    /**
+     * @return list<array{bucket: string, number: int}>
+     */
+    public function getDailyCounts(int $limit, ?DateTimeImmutable $since = null): array
+    {
+        return $this->getBucketCounts('%Y-%m-%d', $limit, $since);
+    }
+
+    /**
+     * @return list<array{bucket: string, number: int}>
+     */
+    public function getHourlyCounts(int $limit, ?DateTimeImmutable $since = null): array
+    {
+        return $this->getBucketCounts('%Y-%m-%d %H:00', $limit, $since);
+    }
+
+    /**
+     * @param list<string> $urls
+     *
+     * @return array<string, int>
+     */
+    public function countByUrls(array $urls, ?DateTimeImmutable $since = null): array
+    {
+        if ($urls === []) {
+            return [];
+        }
+
+        $qb = $this
+            ->createQueryBuilder('n')
+            ->select('n.url AS url', 'COUNT(n.id) AS number')
+            ->andWhere('n.url IN (:urls)')
+            ->groupBy('n.url')
+            ->setParameter('urls', $urls);
+
+        if ($since !== null) {
+            $qb->andWhere('n.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        $counts = [];
+        foreach ($qb->getQuery()->getArrayResult() as $row) {
+            $counts[(string) $row['url']] = (int) $row['number'];
+        }
+
+        return $counts;
+    }
+
+    public function countDistinctUrls(?DateTimeImmutable $since = null): int
+    {
+        return $this->countDistinct('url', $since);
+    }
+
+    public function countDistinctIps(?DateTimeImmutable $since = null): int
+    {
+        return $this->countDistinct('ip', $since);
+    }
+
     public function getRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
     {
         $qb = $this->createQueryBuilder('n')->orderBy('n.createdAt', 'DESC')->setMaxResults($limit);
@@ -175,5 +263,65 @@ class NotFoundLogRepository extends ServiceEntityRepository
         }
 
         return array_values($qb->getQuery()->getResult());
+    }
+
+    /**
+     * @return list<array{bucket: string, number: int}>
+     */
+    private function getBucketCounts(string $format, int $limit, ?DateTimeImmutable $since): array
+    {
+        $qb = $this
+            ->createQueryBuilder('n')
+            ->select(sprintf('DATE_FORMAT(n.createdAt, \'%s\') AS bucket', $format), 'COUNT(n.id) AS number')
+            ->groupBy('bucket')
+            ->orderBy('bucket', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($since !== null) {
+            $qb->andWhere('n.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        $rows = array_map(
+            static fn(array $row): array => ['bucket' => (string) $row['bucket'], 'number' => (int) $row['number']],
+            $qb->getQuery()->getArrayResult(),
+        );
+
+        return array_values(array_reverse($rows));
+    }
+
+    /**
+     * @return list<array{value: string, number: int}>
+     */
+    private function getTopValues(string $field, int $limit, ?DateTimeImmutable $since, bool $skipEmpty): array
+    {
+        $qb = $this
+            ->createQueryBuilder('n')
+            ->select(sprintf('n.%s AS value', $field), 'COUNT(n.id) AS number')
+            ->groupBy(sprintf('n.%s', $field))
+            ->orderBy('number', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($since !== null) {
+            $qb->andWhere('n.createdAt >= :since')->setParameter('since', $since);
+        }
+        if ($skipEmpty) {
+            $qb->andWhere(sprintf('n.%s IS NOT NULL', $field))->andWhere(sprintf("n.%s != ''", $field));
+        }
+
+        return array_values(array_map(
+            static fn(array $row): array => ['value' => (string) $row['value'], 'number' => (int) $row['number']],
+            $qb->getQuery()->getArrayResult(),
+        ));
+    }
+
+    private function countDistinct(string $field, ?DateTimeImmutable $since): int
+    {
+        $qb = $this->createQueryBuilder('n')->select(sprintf('COUNT(DISTINCT n.%s)', $field));
+
+        if ($since !== null) {
+            $qb->andWhere('n.createdAt >= :since')->setParameter('since', $since);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 }

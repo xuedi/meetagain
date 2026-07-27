@@ -16,7 +16,8 @@
         - infoKey   (string, optional)       -- translation key of the blurb;
                                                 default: 'item.sidebar_info_default'
     Depends on: _components/item/view_switcher.html.twig, _components/item/taxonomy_filter.html.twig;
-                item_taxonomy_category_choices(), item_taxonomy_tag_choices() (ItemTaxonomyExtension);
+                item_taxonomy_category_choices(), item_taxonomy_tag_choices(),
+                item_taxonomy_plugin_key() (ItemTaxonomyExtension);
                 the app_admin_plugin_settings route
 #}
 <div class="box mb-4">
@@ -35,10 +36,11 @@
     {% if is_granted('ROLE_STEWARD')
         and item_taxonomy_category_choices(itemType) is empty
         and item_taxonomy_tag_choices(itemType) is empty %}
+        {% set settingsPluginKey = item_taxonomy_plugin_key(itemType) %}
         <p class="is-size-7 has-text-grey mt-3">
             {{ 'item.sidebar_taxonomy_hint'|trans }}
-            {% if is_granted('ROLE_ADMIN') %}
-                <a href="{{ path('app_admin_plugin_settings') }}">{{ 'item.sidebar_taxonomy_settings_link'|trans }}</a>
+            {% if is_granted('ROLE_ADMIN') and settingsPluginKey %}
+                <a href="{{ path('app_admin_plugin_settings', {key: settingsPluginKey}) }}">{{ 'item.sidebar_taxonomy_settings_link'|trans }}</a>
             {% endif %}
         </p>
     {% endif %}
