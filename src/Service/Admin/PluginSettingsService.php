@@ -47,6 +47,26 @@ final readonly class PluginSettingsService
         return $this->descriptors[$key] ?? null;
     }
 
+    /** @return array<string, DescriptorInterface> */
+    public function getByPlugin(string $pluginKey): array
+    {
+        return array_filter(
+            $this->descriptors,
+            static fn(DescriptorInterface $descriptor): bool => $descriptor->getPluginKey() === $pluginKey,
+        );
+    }
+
+    /** @return list<string> */
+    public function getConfigurablePluginKeys(): array
+    {
+        $keys = [];
+        foreach ($this->descriptors as $descriptor) {
+            $keys[$descriptor->getPluginKey()] = true;
+        }
+
+        return array_keys($keys);
+    }
+
     /**
      * @return array<string, list<DescriptorInterface>>
      */

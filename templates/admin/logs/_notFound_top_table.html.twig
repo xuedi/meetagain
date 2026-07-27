@@ -1,0 +1,30 @@
+{#
+    Renders one "top N" aggregate table for the 404 statistics page.
+
+    Parameters:
+        - heading   -- translation key for the table heading
+        - label     -- translation key for the value column header
+        - rows      -- list of {value, number} as returned by NotFoundLogRepository::getTop*
+        - truncate  -- max characters before the value is shortened
+#}
+<h2 class="title is-6">{{ heading|trans }}</h2>
+<table class="table is-fullwidth is-narrow">
+    <thead>
+        <tr>
+            <th>{{ label|trans }}</th>
+            <th class="has-text-right">{{ 'admin_logs.col_count'|trans }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+            <tr>
+                <td title="{{ row.value }}">{{ row.value|length > truncate ? row.value|slice(0, truncate - 3) ~ '...' : row.value }}</td>
+                <td class="has-text-right">{{ row.number }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="2" class="has-text-centered has-text-grey">{{ 'admin_logs.empty_statistics'|trans }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

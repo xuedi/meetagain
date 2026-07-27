@@ -98,6 +98,38 @@ class PluginSettingsServiceTest extends TestCase
         static::assertSame([], $grouped);
     }
 
+    public function testGetByPluginReturnsEverySectionOfThatPlugin(): void
+    {
+        // Arrange
+        $taxonomy = $this->makeProvider('films_taxonomy', pluginKey: 'films');
+        $apiKeys = $this->makeProvider('films', pluginKey: 'films', scopable: false);
+        $dishes = $this->makeProvider('dishes');
+        $service = new PluginSettingsService([$taxonomy, $apiKeys, $dishes]);
+
+        // Act
+        $sections = $service->getByPlugin('films');
+
+        // Assert
+        static::assertSame(['films_taxonomy' => $taxonomy, 'films' => $apiKeys], $sections);
+        static::assertSame([], $service->getByPlugin('missing'));
+    }
+
+    public function testGetConfigurablePluginKeysDeduplicatesMultiSectionPlugins(): void
+    {
+        // Arrange
+        $service = new PluginSettingsService([
+            $this->makeProvider('films_taxonomy', pluginKey: 'films'),
+            $this->makeProvider('films', pluginKey: 'films'),
+            $this->makeProvider('dishes'),
+        ]);
+
+        // Act
+        $keys = $service->getConfigurablePluginKeys();
+
+        // Assert
+        static::assertSame(['films', 'dishes'], $keys);
+    }
+
     private function makeProvider(
         string $key,
         int $priority = 0,

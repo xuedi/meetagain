@@ -5,7 +5,7 @@
  *   data-chart        - single-series bar chart (existing tiles)
  *   data-multi-chart  - multi-series line chart with shared X axis (new in 2026-05)
  *
- * Loaded in:  templates/admin/index.html.twig only
+ * Loaded in:  templates/admin/index.html.twig, templates/admin/logs/logs_notFound_statistics.html.twig
  * Depends on: chart.js (Chart)
  */
 

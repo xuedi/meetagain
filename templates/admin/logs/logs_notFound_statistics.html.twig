@@ -1,0 +1,93 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/vendor/chart.js') }}"></script>
+    <script src="{{ asset('js/admin/dashboard.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        {% include 'admin/_components/dashboard/chart.html.twig' with {'tile': chartTile} only %}
+
+        <h2 class="title is-6">{{ 'admin_logs.heading_suspicious'|trans }}</h2>
+        <table class="table is-fullwidth is-narrow">
+            <thead>
+                <tr>
+                    <th>{{ 'admin_logs.col_url'|trans }}</th>
+                    <th>{{ 'admin_logs.col_marked_at'|trans }}</th>
+                    <th class="has-text-right">{{ 'admin_logs.col_count'|trans }}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in suspicious %}
+                    <tr>
+                        <td class="has-text-danger" title="{{ entry.url }}">
+                            {{ entry.url|length > 80 ? entry.url|slice(0, 77) ~ '...' : entry.url }}
+                        </td>
+                        <td class="is-nowrap has-text-grey">{{ entry.createdAt|date('Y-m-d') }}</td>
+                        <td class="has-text-right">{{ suspiciousCounts[entry.url]|default(0) }}</td>
+                        <td>
+                            <a href="{{ path('app_admin_not_found_log_suspicious_remove', {'id': entry.id}) }}"
+                               class="button-as-icon has-text-grey"
+                               title="{{ 'admin_logs.action_unmark_suspicious'|trans }}"
+                               data-post
+                               data-csrf-token="{{ csrf_token('admin_not_found_log_suspicious_remove' ~ entry.id) }}">
+                                <span class="icon"><i class="fa fa-flag"></i></span>
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="has-text-centered has-text-grey">{{ 'admin_logs.empty_suspicious'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="columns">
+            <div class="column is-6">
+                {% include 'admin/logs/_notFound_top_table.html.twig' with {
+                    'heading': 'admin_logs.heading_top_urls',
+                    'label': 'admin_logs.col_url',
+                    'rows': topUrls,
+                    'truncate': 60,
+                } only %}
+            </div>
+            <div class="column is-6">
+                {% include 'admin/logs/_notFound_top_table.html.twig' with {
+                    'heading': 'admin_logs.heading_top_ips',
+                    'label': 'admin_logs.col_ip',
+                    'rows': topIps,
+                    'truncate': 45,
+                } only %}
+            </div>
+        </div>
+
+        <div class="columns">
+            <div class="column is-6">
+                {% include 'admin/logs/_notFound_top_table.html.twig' with {
+                    'heading': 'admin_logs.heading_top_referers',
+                    'label': 'admin_logs.col_referer',
+                    'rows': topReferers,
+                    'truncate': 60,
+                } only %}
+            </div>
+            <div class="column is-6">
+                {% include 'admin/logs/_notFound_top_table.html.twig' with {
+                    'heading': 'admin_logs.heading_top_user_agents',
+                    'label': 'admin_logs.col_user_agent',
+                    'rows': topUserAgents,
+                    'truncate': 60,
+                } only %}
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

@@ -149,7 +149,7 @@ readonly class ImageService
      */
     private function usedTypes(Image $image, array $typesByImageId): array
     {
-        return [$image->getType(), ...$typesByImageId[$image->getId()] ?? []];
+        return [$image->getType(), ...($typesByImageId[$image->getId()] ?? [])];
     }
 
     private function scaleThumbnail(Imagick $imagick, int $width, int $height, ImageFitMode $fitMode, string $target): void
@@ -258,9 +258,11 @@ readonly class ImageService
         $missingThumbnailsCount = 0;
         foreach ($this->requiredSizeTokensByHash() as $hash => $tokens) {
             foreach (array_keys($tokens) as $token) {
-                if (!isset($thumpFileList[sprintf('%s_%s.webp', $hash, $token)])) {
-                    ++$missingThumbnailsCount;
+                if (isset($thumpFileList[sprintf('%s_%s.webp', $hash, $token)])) {
+                    continue;
                 }
+
+                ++$missingThumbnailsCount;
             }
         }
 

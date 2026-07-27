@@ -26,8 +26,8 @@
                 <tr>
                     <td>{{ plugin.version }}</td>
                     <td>{{ plugin.name }}</td>
-                    <td>{{ plugin.description }}</td>
-                    <td class="has-text-right">
+                    <td title="{{ plugin.description }}">{{ plugin.description|u.truncate(70, '...') }}</td>
+                    <td class="has-text-right is-nowrap">
                         {% if plugin.installed %}
                             {% if plugin.enabled %}
                                 <button class="button is-danger is-light" disabled>{{ 'admin_system_plugins.button_uninstall'|trans }}</button>
@@ -47,6 +47,22 @@
                                class="button is-success is-light"
                                data-post>{{ 'admin_system_plugins.button_install'|trans }}</a>
                             <button class="button is-success is-light" disabled>{{ 'admin_system_plugins.button_enable'|trans }}</button>
+                        {% endif %}
+                        {% if plugin.enabled and plugin.key in configurableKeys %}
+                            <a href="{{ path('app_admin_plugin_settings', {key: plugin.key}) }}"
+                               class="button is-light"
+                               title="{{ 'admin_system_plugins.button_configure'|trans }}">
+                                <span class="icon"><i class="fa fa-cog"></i></span>
+                            </a>
+                        {% else %}
+                            {# title sits on the wrapper: a disabled button takes no mouse events and never shows its own #}
+                            <span title="{{ (plugin.key in configurableKeys
+                                ? 'admin_system_plugins.button_configure_inactive'
+                                : 'admin_system_plugins.button_configure_none')|trans }}">
+                                <button class="button is-light" disabled>
+                                    <span class="icon"><i class="fa fa-cog"></i></span>
+                                </button>
+                            </span>
                         {% endif %}
                     </td>
                 </tr>
