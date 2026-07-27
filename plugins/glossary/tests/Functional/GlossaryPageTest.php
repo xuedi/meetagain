@@ -12,6 +12,7 @@ class GlossaryPageTest extends WebTestCase
 {
     private const string MODERATOR_EMAIL = 'Admin@example.org';
     private const string MEMBER_EMAIL = 'Adem.Lane@example.org';
+    private const string GLOSSARY_HOST = 'dragon.meetagain.local';
 
     public function testListRendersThroughTheSharedItemComponent(): void
     {
@@ -19,7 +20,7 @@ class GlossaryPageTest extends WebTestCase
         $client = static::createClient();
 
         // Act
-        $client->request('GET', '/en/glossary');
+        $client->request('GET', '/en/glossary', server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -45,14 +46,17 @@ class GlossaryPageTest extends WebTestCase
     {
         // Arrange
         $client = static::createClient();
+        $rows = $client->request('GET', '/en/glossary', server: ['HTTP_HOST' => self::GLOSSARY_HOST])
+            ->filter('.item-list tbody tr')->count();
 
         // Act
-        $client->request('GET', '/en/item/glossary/view/tiles');
-        $crawler = $client->request('GET', '/en/glossary');
+        $client->request('GET', '/en/item/glossary/view/tiles', server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
+        $crawler = $client->request('GET', '/en/glossary', server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
+        static::assertGreaterThan(0, $rows);
         static::assertCount(0, $crawler->filter('.item-list table'));
-        static::assertSame($this->approvedCount($client), $crawler->filter('.item-list .item-cell')->count());
+        static::assertSame($rows, $crawler->filter('.item-list .item-cell')->count());
     }
 
     public function testDisallowedModeFallsBackToList(): void
@@ -61,36 +65,45 @@ class GlossaryPageTest extends WebTestCase
         $client = static::createClient();
 
         // Act
-        $client->request('GET', '/en/item/glossary/view/gallery');
-        $crawler = $client->request('GET', '/en/glossary');
+        $client->request('GET', '/en/item/glossary/view/gallery', server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
+        $crawler = $client->request('GET', '/en/glossary', server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         static::assertCount(1, $crawler->filter('.item-list table'));
     }
 
-    public function testGuestsSeeOnlyApprovedEntries(): void
+    public function testGuestsSeeNoUnapprovedEntry(): void
     {
         // Arrange
         $client = static::createClient();
+        $pendingPhrases = $this->pendingPhrases($client);
 
         // Act
-        $crawler = $client->request('GET', '/en/glossary');
+        $listed = $client->request('GET', '/en/glossary', server: ['HTTP_HOST' => self::GLOSSARY_HOST])
+            ->filter('.item-list tbody tr')->each(static fn($row): string => $row->text());
 
         // Assert
-        static::assertSame($this->approvedCount($client), $crawler->filter('.item-list tbody tr')->count());
+        static::assertNotEmpty($listed);
+        foreach ($listed as $row) {
+            foreach ($pendingPhrases as $phrase) {
+                static::assertStringNotContainsString($phrase, $row);
+            }
+        }
     }
 
     public function testModeratorsAlsoSeeUnapprovedEntries(): void
     {
         // Arrange
         $client = static::createClient();
+        $guestRows = $client->request('GET', '/en/glossary', server: ['HTTP_HOST' => self::GLOSSARY_HOST])
+            ->filter('.item-list tbody tr')->count();
         $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
 
         // Act
-        $crawler = $client->request('GET', '/en/glossary');
+        $crawler = $client->request('GET', '/en/glossary', server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
-        static::assertGreaterThan($this->approvedCount($client), $crawler->filter('.item-list tbody tr')->count());
+        static::assertGreaterThan($guestRows, $crawler->filter('.item-list tbody tr')->count());
     }
 
     public function testDetailPageOfAnApprovedEntryIsPublic(): void
@@ -176,9 +189,12 @@ class GlossaryPageTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    private function approvedCount(KernelBrowser $client): int
+    /** @return list<string> */
+    private function pendingPhrases(KernelBrowser $client): array
     {
-        return $this->em($client)->getRepository(Glossary::class)->count(['approved' => true]);
+        $pending = $this->em($client)->getRepository(Glossary::class)->findBy(['approved' => false]);
+
+        return array_values(array_map(static fn(Glossary $entry): string => (string) $entry->getPhrase(), $pending));
     }
 
     private function entry(KernelBrowser $client, bool $approved): Glossary

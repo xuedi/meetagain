@@ -1,0 +1,12 @@
+{% set viewMode = item_view_mode('dish').value %}
+{% if dishes is empty and not is_granted('ROLE_STEWARD') %}
+    <p class="has-text-grey">{{ 'dishes_dish.list_empty'|trans }}</p>
+{% elseif viewMode == 'tiles' %}
+    {% include '@Dishes/views/tiles.html.twig' %}
+{% elseif viewMode == 'grid' %}
+    {% include '@Dishes/views/grid.html.twig' %}
+{% elseif viewMode == 'gallery' %}
+    {% include '@Dishes/views/gallery.html.twig' %}
+{% else %}
+    {% include '@Dishes/views/list.html.twig' %}
+{% endif %}

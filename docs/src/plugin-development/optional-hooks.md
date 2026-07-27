@@ -1027,10 +1027,11 @@ classifying dishes by cuisine (category) and dietary flags like "vegan" or "quic
 ### When to implement
 
 Implement `App\Item\Taxonomy\CategorizableTypeProviderInterface` when your item type should carry categories and/or
-tags. This is orthogonal to the other two item seams - `TypeProviderInterface`
-(whether the type attaches to events) and `App\Item\ListCellProviderInterface` (whether the type renders a cell in the
-shared item list) - and a type implements any combination of the three. A glossary-style type that is browsed and
-classified but never attached to an event implements the list-cell and categorizable seams and skips the event one.
+tags. This is orthogonal to the other item seams - `TypeProviderInterface` (whether the type attaches to events),
+`App\Item\ListCellProviderInterface` (whether the type renders a cell in the shared item list) and
+`App\Item\ListProviderInterface` (whether core can render the type's whole list) - and a type implements any combination
+of them. A glossary-style type that is browsed and classified but never attached to an event implements the list,
+list-cell and categorizable seams and skips the event one.
 
 ### What you implement
 
@@ -1046,38 +1047,52 @@ classified but never attached to an event implements the list-cell and categoriz
    `AssignmentFormHelper::addAssignmentFields($builder, $typeKey, $itemId)`; on save, pass
    `extractAssignment($form)` to `TaxonomyService::setCategory()` / `setTags()`. Dispatch
    `ItemAction::Deleted` on item deletion so assignments are cleaned up.
-4. **Display and filter.** Wrap your list page in `_components/item/list_layout.html.twig`. It gives you the two-column
-   page layout plus a core-owned sidebar carrying the view switcher, the category/tag filter box and an "about this
-   list" box - so you never place the filter yourself:
+4. **Hand core your list.** Implement `App\Item\ListProviderInterface` (usually on the class that already implements the
+   other item seams) and move your list markup into a `templates/item/list_body.html.twig` partial that
+   `renderList()` renders:
 
-   ```twig
-   {% embed '_components/item/list_layout.html.twig' with {
-       'itemType': 'dish',
-       'itemCount': itemIds|length,
-       'infoKey': 'dishes_dish.sidebar_info'
-   } %}
-       {% block item_list_main %}
-           {% include '_components/item/list.html.twig' with {'itemType': 'dish', 'itemIds': itemIds} only %}
-       {% endblock %}
-   {% endembed %}
+   ```php
+   public function getItemIds(): array   { /* ids in display order, after your filter chain */ }
+   public function renderList(): string  { /* your templates/item/list_body.html.twig */ }
+   public function getListUrl(): string  { /* path of your clean list page */ }
    ```
 
-   | Parameter   | Meaning                                                                       |
-         |-------------|-------------------------------------------------------------------------------|
-   | `itemType`  | your item-type key (required)                                                 |
-   | `itemCount` | entries currently listed; omit to hide the count line                         |
-   | `modes`     | view-mode values your content suits; default all four (list/tiles/grid/gallery) |
-   | `infoKey`   | translation key of your one-paragraph blurb; defaults to a neutral core string |
+   Do **not** memoise `getItemIds()` per request - core evaluates it a second time with the facets suppressed to work
+   out the unfiltered total and the per-option counts.
 
-   Your list body goes in `{% block item_list_main %}` - either the shared
-   `_components/item/list.html.twig` (pass `itemIds` and implement `ListCellProviderInterface` so it can ask you for
-   each cell) or your own per-mode templates. `{% block item_sidebar_extra %}` adds one more box below the core sidebar
-   boxes. Include
+5. **Display and filter.** Include `_components/item/list_layout.html.twig` from your list page and name your item type.
+   It gives you the two-column page layout, a core-owned sidebar (filter box, view switcher, "about this list"
+   box) and, above the list, a result header stating `Showing X of Y` with the active facets as removable chips - so you
+   never place the filter, the count or the reload yourself:
+
+   ```twig
+   {% include '_components/item/list_layout.html.twig' with {
+       'itemType': 'dish',
+       'infoKey': 'dishes_dish.sidebar_info'
+   } only %}
+   ```
+
+   | Parameter  | Meaning                                                                         |
+   |------------|---------------------------------------------------------------------------------|
+   | `itemType` | your item-type key (required)                                                   |
+   | `modes`    | view-mode values your content suits; default all four (list/tiles/grid/gallery) |
+   | `infoKey`  | translation key of your one-paragraph blurb; defaults to a neutral core string  |
+
+   Your `list_body.html.twig` normally includes the shared `_components/item/list.html.twig` (pass `itemIds` and
+   implement `ListCellProviderInterface` so it can ask you for each cell), or renders your own per-mode templates.
+   `{% block item_sidebar_extra %}` adds one more box below the core sidebar boxes, and `{% block item_list_main %}`
+   wraps the list region when you need markup around it - call `{{ item_list_body('dish') }}` inside that block and put
+   your extra markup outside it, since only what the function emits is re-rendered on a facet click. Include
    `_components/item/taxonomy_badges.html.twig` on cells and detail pages. If your list service funnels through
    `FilterService`, category/tag narrowing is automatic.
 
+   A facet click reloads only the list region through the core fragment route; every chip is still a real link, so the
+   page works unchanged with JavaScript disabled. If you enhance the rendered list from your own JS (a table plugin, a
+   lightbox), bind through a `MutationObserver` on `[data-item-list-body]` - injected markup never runs inline scripts.
+
 Reference implementation: the dishes plugin (`Plugin\Dishes\Item\DishCategorizableTypeProvider`,
-`Plugin\Dishes\ValueObject\Config`, `Plugin\Dishes\Controller\DishController::edit`).
+`Plugin\Dishes\Item\DishTypeProvider`, `Plugin\Dishes\ValueObject\Config`,
+`Plugin\Dishes\Controller\DishController::edit`).
 
 ## Item export and import
 

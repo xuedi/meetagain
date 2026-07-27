@@ -7,7 +7,6 @@ use App\Controller\AbstractController;
 use App\Item\Taxonomy\AssignmentFormHelper;
 use App\Item\Taxonomy\TaxonomyService;
 use Plugin\Books\Activity\Messages\BookAdded;
-use Plugin\Books\Entity\Book;
 use Plugin\Books\Form\BookEditType;
 use Plugin\Books\Form\BookIsbnType;
 use Plugin\Books\Form\BookManualType;
@@ -32,11 +31,7 @@ final class BookController extends AbstractController
     #[Route('', name: 'app_books_booklist', methods: ['GET'])]
     public function list(): Response
     {
-        $itemIds = array_map(static fn(Book $book): int => (int) $book->getId(), $this->bookService->getList());
-
-        return $this->render('@Books/book/list.html.twig', [
-            'itemIds' => $itemIds,
-        ]);
+        return $this->render('@Books/book/list.html.twig');
     }
 
     #[Route('/add', name: 'app_plugin_books_book_add', methods: ['GET', 'POST'])]

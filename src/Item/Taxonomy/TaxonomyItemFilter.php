@@ -6,12 +6,11 @@ use App\Item\FilterInterface;
 use App\Repository\ItemCategoryAssignmentRepository;
 use App\Repository\ItemTagAssignmentRepository;
 use Override;
-use Symfony\Component\HttpFoundation\RequestStack;
 
 final readonly class TaxonomyItemFilter implements FilterInterface
 {
     public function __construct(
-        private RequestStack $requestStack,
+        private FacetResolver $facetResolver,
         private CategorizableTypeRegistry $registry,
         private ItemCategoryAssignmentRepository $categoryRepo,
         private ItemTagAssignmentRepository $tagRepo,
@@ -21,47 +20,22 @@ final readonly class TaxonomyItemFilter implements FilterInterface
     public function getAllowedItemIds(string $itemType): ?array
     {
         $provider = $this->registry->providerFor($itemType);
-        $request = $this->requestStack->getCurrentRequest();
-        if ($provider === null || $request === null) {
+        if ($provider === null) {
             return null;
         }
 
+        $selection = $this->facetResolver->current();
         $result = null;
 
-        $categoryRaw = $request->query->get('category');
-        if ($provider->supportsCategories() && $categoryRaw !== null && $categoryRaw !== '') {
-            $result = $this->categoryRepo->itemIdsWithCategory($itemType, (int) $categoryRaw);
+        if ($provider->supportsCategories() && $selection->category !== null) {
+            $result = $this->categoryRepo->itemIdsWithCategory($itemType, $selection->category);
         }
 
-        $tagIds = $this->readTagIds($request->query->all());
-        if ($provider->supportsTags() && $tagIds !== []) {
-            $tagAllowed = $this->tagRepo->itemIdsWithAllTags($itemType, $tagIds);
+        if ($provider->supportsTags() && $selection->tags !== []) {
+            $tagAllowed = $this->tagRepo->itemIdsWithAllTags($itemType, $selection->tags);
             $result = $result === null ? $tagAllowed : array_values(array_intersect($result, $tagAllowed));
         }
 
         return $result;
-    }
-
-    /**
-     * @param array<string, mixed> $query
-     * @return list<int>
-     */
-    private function readTagIds(array $query): array
-    {
-        $raw = $query['tag'] ?? [];
-        if (!is_array($raw)) {
-            $raw = [$raw];
-        }
-
-        $ids = [];
-        foreach ($raw as $value) {
-            if (!is_numeric($value)) {
-                continue;
-            }
-
-            $ids[] = (int) $value;
-        }
-
-        return array_values(array_unique($ids));
     }
 }

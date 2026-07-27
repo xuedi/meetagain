@@ -1,0 +1,16 @@
+{#
+    Item List Body -- the swappable region of an item-list page
+
+    Pairs the result header with the type's own list markup, supplied by its
+    App\Item\ListProviderInterface implementation. This is exactly what the fragment route returns
+    and what assets/js/item-list.js writes into [data-item-list-body] after a facet or view-mode
+    click, so the AJAX and the full-page path render the same HTML.
+
+    Used in:    item_list_body() (App\Twig\ItemListExtension),
+                App\Controller\ItemController::listFragment
+    Parameters:
+        - itemType (string, required) -- registry key of the item type (e.g. 'dish')
+    Depends on: _components/item/result_header.html.twig; item_list_markup() (ItemListExtension)
+#}
+{% include '_components/item/result_header.html.twig' with {'itemType': itemType} only %}
+{{ item_list_markup(itemType) }}

@@ -1,63 +1,92 @@
 {#
-    Item Taxonomy Filter -- category dropdown and clickable tag cloud for narrowing an item list.
+    Item Facet Filter -- one chip row per facet group for narrowing an item list
 
-    Reads the type's scope-resolved category/tag definitions and renders a GET category dropdown
-    (single-select) plus a tag cloud where each tag is a link toggling itself in/out of the tag[]
-    facet. Selection lives entirely in the URL query, so the whole box works with JavaScript disabled
-    (the category dropdown submits via its button). Narrowing is applied server-side by
-    App\Item\Taxonomy\TaxonomyItemFilter. Renders nothing when the type enables no categories or tags.
-    Laid out vertically throughout, since it lives in the narrow item-list side column.
+    Renders the type's scope-resolved category and tag vocabularies as rows of Bulma tag chips:
+    category chips are single-select (clicking the active one clears it), tag chips toggle. Every
+    chip is a real link to a facet URL, so the box narrows the list with JavaScript disabled.
+    Each option carries the number of entries it would yield against the current selection and
+    renders as a dimmed span instead of a link when that number is zero. Renders nothing when the
+    type enables no categories or tags.
 
-    Used in:    _components/item/sidebar.html.twig
+    Used in:    _components/item/sidebar.html.twig, App\Controller\ItemController::listFragment
     Parameters:
         - itemType (string, required) -- registry key of the item type (e.g. 'dish')
-    Depends on: item_taxonomy_category_choices(), item_taxonomy_tag_choices(),
-                item_taxonomy_current_category(), item_taxonomy_current_tags(),
-                item_taxonomy_tag_toggle_url() (ItemTaxonomyExtension)
+    Depends on: item_taxonomy_category_choices(), item_taxonomy_tag_choices(), item_facet_current(),
+                item_facet_url(), item_facet_counts() (ItemTaxonomyExtension); item_list_url()
+                (ItemListExtension); assets/js/item-list.js for the swap and the mobile collapse
 #}
+{% import _self as facet %}
+
+{% macro chip(url, label, count, active, extra) %}
+    {% set classes = 'tag' ~ (active ? ' is-link' : ' is-light') ~ (extra ? ' item-facet-extra' : '') %}
+    {% if count is same as(0) and not active %}
+        <span class="{{ classes }} has-text-grey-light" title="{{ 'item.facet_zero_hint'|trans }}">{{ label }}<span class="ml-1">0</span></span>
+    {% else %}
+        <a href="{{ url }}" class="{{ classes }}" rel="nofollow" data-item-facet>{{ label }}{% if count is not null %}<span class="ml-1 {{ active ? '' : 'has-text-grey' }}">{{ count }}</span>{% endif %}</a>
+    {% endif %}
+{% endmacro %}
+
 {% set categories = item_taxonomy_category_choices(itemType) %}
 {% set tags = item_taxonomy_tag_choices(itemType) %}
 {% if categories is not empty or tags is not empty %}
-    {% set currentCategory = item_taxonomy_current_category() %}
-    {% set currentTags = item_taxonomy_current_tags() %}
+    {% set selection = item_facet_current() %}
+    {% set counts = item_facet_counts(itemType) %}
+    {% set baseUrl = item_list_url(itemType) %}
+    {% set activeCount = selection.count() %}
+    {% set visibleChips = 12 %}
     <div class="box taxonomy-filter mb-4">
-        {% if categories is not empty %}
-            <form method="get" class="field mb-4">
-                {% for tagId in currentTags %}
-                    <input type="hidden" name="tag[]" value="{{ tagId }}">
-                {% endfor %}
-                <label class="label is-small mb-1">{{ 'item.taxonomy_filter_category'|trans }}</label>
-                <div class="control mb-2">
-                    <div class="select is-small is-fullwidth">
-                        <select name="category">
-                            <option value="">{{ 'item.taxonomy_filter_all'|trans }}</option>
-                            {% for id, label in categories %}
-                                <option value="{{ id }}"{{ currentCategory is same as(id) ? ' selected' }}>{{ label }}</option>
-                            {% endfor %}
-                        </select>
+        <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
+            <p class="heading mb-0">{{ 'item.facet_heading'|trans }}</p>
+            {% if activeCount > 0 %}
+                <a href="{{ baseUrl }}" class="is-size-7" rel="nofollow" data-item-facet>{{ 'item.facet_clear'|trans }}</a>
+            {% endif %}
+        </div>
+
+        <button type="button" class="button is-small is-fullwidth mb-2 is-hidden-tablet is-hidden" data-item-facet-toggle>
+            <span class="icon"><i class="fa-solid fa-filter"></i></span>
+            <span>{{ 'item.facet_toggle'|trans({'%count%': activeCount}) }}</span>
+        </button>
+
+        <div data-item-facet-panel>
+            {% if categories is not empty %}
+                <div class="field">
+                    <p class="label is-small mb-1">{{ 'item.facet_categories'|trans }}</p>
+                    <div class="tags">
+                        {% for id, label in categories %}
+                            {{ facet.chip(
+                                item_facet_url(baseUrl, selection.withCategory(selection.category is same as(id) ? null : id)),
+                                label,
+                                counts ? counts.forCategory(id) : null,
+                                selection.category is same as(id),
+                                loop.index0 >= visibleChips
+                            ) }}
+                        {% endfor %}
+                        {% if categories|length > visibleChips %}
+                            <button type="button" class="tag is-white has-text-link is-hidden" data-item-facet-more>{{ 'item.facet_show_all'|trans({'%count%': categories|length}) }}</button>
+                        {% endif %}
                     </div>
                 </div>
-                <div class="control">
-                    <button type="submit" class="button is-small is-fullwidth">{{ 'item.taxonomy_filter_apply'|trans }}</button>
-                </div>
-            </form>
-        {% endif %}
+            {% endif %}
 
-        {% if tags is not empty %}
-            <div class="field">
-                <label class="label is-small mb-1">{{ 'item.taxonomy_filter_tags'|trans }}</label>
-                <div class="tags">
-                    {% for id, label in tags %}
-                        <a href="{{ item_taxonomy_tag_toggle_url(id) }}"
-                           class="tag {{ id in currentTags ? 'is-link' : 'is-light' }}"
-                           rel="nofollow">{{ label }}</a>
-                    {% endfor %}
+            {% if tags is not empty %}
+                <div class="field">
+                    <p class="label is-small mb-1">{{ 'item.facet_tags'|trans }}</p>
+                    <div class="tags">
+                        {% for id, label in tags %}
+                            {{ facet.chip(
+                                item_facet_url(baseUrl, selection.withTagToggled(id)),
+                                label,
+                                counts ? counts.forTag(id) : null,
+                                selection.hasTag(id),
+                                loop.index0 >= visibleChips
+                            ) }}
+                        {% endfor %}
+                        {% if tags|length > visibleChips %}
+                            <button type="button" class="tag is-white has-text-link is-hidden" data-item-facet-more>{{ 'item.facet_show_all'|trans({'%count%': tags|length}) }}</button>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-        {% endif %}
-
-        {% if currentCategory is not null or currentTags is not empty %}
-            <a href="{{ app.request.pathInfo }}" class="is-size-7" rel="nofollow">{{ 'item.taxonomy_filter_clear'|trans }}</a>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 {% endif %}

@@ -5,15 +5,19 @@ namespace Plugin\Books\Item;
 use App\Entity\EventItemAssociation;
 use App\Item\TypeProviderInterface;
 use App\Item\ListCellProviderInterface;
+use App\Item\ListProviderInterface;
 use Override;
+use Plugin\Books\Entity\Book;
 use Plugin\Books\Service\BookService;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
-final readonly class BookTypeProvider implements TypeProviderInterface, ListCellProviderInterface
+final readonly class BookTypeProvider implements TypeProviderInterface, ListCellProviderInterface, ListProviderInterface
 {
     public function __construct(
         private BookService $bookService,
         private Environment $twig,
+        private UrlGeneratorInterface $urlGenerator,
     ) {}
 
     #[Override]
@@ -59,6 +63,26 @@ final readonly class BookTypeProvider implements TypeProviderInterface, ListCell
         return $this->twig->render('@Books/item/list_cell.html.twig', [
             'book' => $book,
         ]);
+    }
+
+    #[Override]
+    public function getItemIds(): array
+    {
+        return array_values(array_map(static fn(Book $book): int => (int) $book->getId(), $this->bookService->getList()));
+    }
+
+    #[Override]
+    public function renderList(): string
+    {
+        return $this->twig->render('@Books/item/list_body.html.twig', [
+            'itemIds' => $this->getItemIds(),
+        ]);
+    }
+
+    #[Override]
+    public function getListUrl(): string
+    {
+        return $this->urlGenerator->generate('app_books_booklist');
     }
 
     #[Override]

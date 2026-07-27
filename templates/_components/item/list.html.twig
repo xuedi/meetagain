@@ -9,7 +9,8 @@
     provider's renderListCell(); this component owns only the table/column wrappers and an optional
     leading "add" tile.
 
-    Used in:    item-list pages of the films / books / dishes / glossary plugins
+    Used in:    the templates/item/list_body.html.twig partial of the films / books / glossary
+                plugins, rendered through their App\Item\ListProviderInterface implementation
     Parameters:
         - itemType     (string, required)     -- registry key of the item type (e.g. 'film')
         - itemIds      (list<int>, required)  -- ids of the items to render, in display order
