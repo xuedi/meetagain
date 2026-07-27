@@ -12,11 +12,14 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
 
 class EventSchemaServiceTest extends TestCase
 {
     private const string CANONICAL_URL = 'https://meetagain.org/en/events/foo';
     private const string PLATFORM_HOST = 'https://meetagain.org';
+    private const string NOW = '2026-04-01T09:00:00+00:00';
+    private const string EVENT_START = '2026-05-01T10:00:00+00:00';
 
     public function testFullyPopulatedEventEmitsAllFiveRecommendedFields(): void
     {
@@ -68,6 +71,65 @@ class EventSchemaServiceTest extends TestCase
 
         // Assert
         static::assertSame('https://schema.org/EventCancelled', $schema['eventStatus']);
+    }
+
+    public function testUpcomingEventEmitsFreeOfferWithFullOfferFields(): void
+    {
+        // Arrange
+        $event = $this->makeEvent(title: 'Coffee chat', createdAt: '2026-03-01T08:00:00+00:00');
+        $subject = $this->makeService();
+
+        // Act
+        $schema = $subject->buildSchema($event, self::CANONICAL_URL, 'en');
+
+        // Assert
+        static::assertSame([
+            '@type' => 'Offer',
+            'url' => self::CANONICAL_URL,
+            'price' => '0',
+            'priceCurrency' => 'EUR',
+            'availability' => 'https://schema.org/InStock',
+            'validFrom' => '2026-03-01T08:00:00+00:00',
+        ], $schema['offers']);
+    }
+
+    public function testOfferValidFromFallsBackToStartWhenCreatedAtMissing(): void
+    {
+        // Arrange
+        $event = $this->makeEvent(title: 'Coffee chat');
+        $subject = $this->makeService();
+
+        // Act
+        $schema = $subject->buildSchema($event, self::CANONICAL_URL, 'en');
+
+        // Assert
+        static::assertSame(self::EVENT_START, $schema['offers']['validFrom']);
+    }
+
+    public function testOfferIsSoldOutWhenEventIsCanceled(): void
+    {
+        // Arrange
+        $event = $this->makeEvent(title: 'Coffee chat', canceled: true);
+        $subject = $this->makeService();
+
+        // Act
+        $schema = $subject->buildSchema($event, self::CANONICAL_URL, 'en');
+
+        // Assert
+        static::assertSame('https://schema.org/SoldOut', $schema['offers']['availability']);
+    }
+
+    public function testOfferIsSoldOutWhenEventAlreadyStarted(): void
+    {
+        // Arrange
+        $event = $this->makeEvent(title: 'Coffee chat', start: '2026-03-15T10:00:00+00:00');
+        $subject = $this->makeService();
+
+        // Act
+        $schema = $subject->buildSchema($event, self::CANONICAL_URL, 'en');
+
+        // Assert
+        static::assertSame('https://schema.org/SoldOut', $schema['offers']['availability']);
     }
 
     public function testOrganizerUsesEventHostWhenPresent(): void
@@ -217,7 +279,7 @@ class EventSchemaServiceTest extends TestCase
             $providers[] = $provider;
         }
 
-        return new EventSchemaService($configService, $providers);
+        return new EventSchemaService($configService, $providers, new MockClock(new DateTimeImmutable(self::NOW)));
     }
 
     private function makeEvent(
@@ -228,9 +290,12 @@ class EventSchemaServiceTest extends TestCase
         ?string $hostName = null,
         bool $canceled = false,
         ?ArrayCollection $hosts = null,
+        string $start = self::EVENT_START,
+        ?string $createdAt = null,
     ): Event {
         $event = $this->createStub(Event::class);
-        $event->method('getStart')->willReturn(new DateTimeImmutable('2026-05-01T10:00:00+00:00'));
+        $event->method('getStart')->willReturn(new DateTimeImmutable($start));
+        $event->method('getCreatedAt')->willReturn($createdAt === null ? null : new DateTimeImmutable($createdAt));
         $event->method('getStop')->willReturn(null);
         $event->method('isCanceled')->willReturn($canceled);
         $event->method('getLocation')->willReturn(null);

@@ -54,7 +54,6 @@ src/Item/Portability/TaxonomyPortability.php::export // legacy rows carry catego
 # --- SEO and canonical URLs ---
 src/Publisher/AlternateLinks/EventAlternateLinkProvider.php::getAlternateLinks // search engines void an hreflang cluster whose canonical target is missing from it
 src/Publisher/CanonicalUrl/EventCanonicalUrlProvider.php::getCanonicalUrl // security constraint: an alternate host must not be able to dictate the canonical
-src/Service/Seo/EventSchemaService.php::buildSchema // schema.org rules for a cancelled event, and why performer mirrors organizer here
 src/Service/Seo/EventSimilarityService.php::DESCRIPTION_LENGTH_CAP // magic constant: similar_text() is quadratic, so article-sized input has to be capped
 src/Service/Seo/SitemapOverviewService.php::SECTION_ORDER // fixed order so the section dropdown does not reshuffle as plugins are toggled
 src/Twig/LanguageExtension.php::getHreflangLanguageCodes // an hreflang cluster must name the current language too, unlike the language switcher
