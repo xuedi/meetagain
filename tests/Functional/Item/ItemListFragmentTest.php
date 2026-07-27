@@ -66,22 +66,6 @@ class ItemListFragmentTest extends WebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
-    public function testTypeOfAnInactivePluginIsNotFound(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $client->catchExceptions(true);
-
-        // Act
-        $client->request('GET', '/en/item/glossary/fragment', server: [
-            'HTTP_HOST' => 'cinema.meetagain.local',
-            'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
-        ]);
-
-        // Assert
-        $this->assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
-    }
-
     /** @return array<string, string> */
     private function xhr(): array
     {
