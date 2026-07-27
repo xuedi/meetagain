@@ -41,6 +41,32 @@ class ItemCategoryAssignmentRepository extends ServiceEntityRepository
 
     /**
      * @param list<int> $itemIds
+     * @return array<int, int> category id => how many of the given items carry it
+     */
+    public function countsByCategory(string $itemType, array $itemIds): array
+    {
+        if ($itemIds === []) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('a')
+            ->select('a.categoryId AS categoryId', 'COUNT(a.itemId) AS total')
+            ->where('a.itemType = :type')->setParameter('type', $itemType)
+            ->andWhere('a.itemId IN (:ids)')->setParameter('ids', $itemIds)
+            ->groupBy('a.categoryId')
+            ->getQuery()
+            ->getScalarResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['categoryId']] = (int) $row['total'];
+        }
+
+        return $counts;
+    }
+
+    /**
+     * @param list<int> $itemIds
      * @return array<int, int> item id => category id, for the items that carry one
      */
     public function categoriesForItems(string $itemType, array $itemIds): array

@@ -4,6 +4,7 @@ namespace Tests\Unit\Item\Taxonomy;
 
 use App\Item\Taxonomy\CategorizableTypeProviderInterface;
 use App\Item\Taxonomy\CategorizableTypeRegistry;
+use App\Item\Taxonomy\FacetResolver;
 use App\Item\Taxonomy\TaxonomyItemFilter;
 use App\Repository\ItemCategoryAssignmentRepository;
 use App\Repository\ItemTagAssignmentRepository;
@@ -29,7 +30,7 @@ class TaxonomyItemFilterTest extends TestCase
         $registry->method('providerFor')->willReturn(null);
         $stack = new RequestStack();
         $stack->push(Request::create('/dishes?category=3'));
-        $filter = new TaxonomyItemFilter($stack, $registry, $this->categoryRepo(), $this->tagRepo());
+        $filter = new TaxonomyItemFilter(new FacetResolver($stack), $registry, $this->categoryRepo(), $this->tagRepo());
 
         // Act + Assert
         static::assertNull($filter->getAllowedItemIds('dish'));
@@ -78,7 +79,7 @@ class TaxonomyItemFilterTest extends TestCase
         $stack = new RequestStack();
         $stack->push(Request::create($uri));
 
-        return new TaxonomyItemFilter($stack, $registry, $categoryRepo, $tagRepo);
+        return new TaxonomyItemFilter(new FacetResolver($stack), $registry, $categoryRepo, $tagRepo);
     }
 
     /** @param array<string, list<int>> $returns */

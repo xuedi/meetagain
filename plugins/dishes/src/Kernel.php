@@ -153,6 +153,6 @@ class Kernel implements Plugin
 
     public function getJavascripts(): array
     {
-        return [];
+        return ['js/dish_gallery.js'];
     }
 }

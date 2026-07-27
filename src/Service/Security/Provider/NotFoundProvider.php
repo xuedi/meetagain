@@ -5,6 +5,7 @@ namespace App\Service\Security\Provider;
 use App\Entity\NotFoundLog;
 use App\Enum\SecurityEventType;
 use App\Repository\NotFoundLogRepository;
+use App\Service\Security\SuspiciousUrlMatcher;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -20,6 +21,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
     private const int RECENT_PATHS_CAP = 10;
     private const int BLOCK_AT_PROBES = 30;
     private const int BLOCK_AT_ASSET_HITS = 300;
+    private const int FLAGGED_URL_WEIGHT = 5;
 
     /** @var list<string> */
     private const array ASSET_PATH_PREFIXES = [
@@ -47,6 +49,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
         LoggerInterface $logger,
         private readonly EntityManagerInterface $em,
         private readonly NotFoundLogRepository $logRepo,
+        private readonly SuspiciousUrlMatcher $suspiciousUrls,
     ) {
         parent::__construct($securityCachePool, $logger);
     }
@@ -79,6 +82,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
         $apiHits = (int) ($state['apiHits'] ?? 0);
         $probeHits = (int) ($state['probeHits'] ?? 0);
         $assetHits = (int) ($state['assetHits'] ?? 0);
+        $flaggedHits = (int) ($state['flaggedHits'] ?? 0);
         $recentPaths = is_array($state['recentPaths'] ?? null) ? $state['recentPaths'] : [];
         $waveTimestamps = is_array($state['waveTimestamps'] ?? null) ? $state['waveTimestamps'] : [];
 
@@ -98,16 +102,18 @@ final class NotFoundProvider extends AbstractSecurityProvider
             break;
         }
 
-        if ($isAsset) {
+        if ($this->suspiciousUrls->matches($path)) {
+            ++$flaggedHits;
+            $threatLevel = $this->weightedThreat($probeHits, $assetHits, $flaggedHits);
+            $summary = $this->buildSummary($probeHits, $flaggedHits, $assetHits, $distinctPaths);
+        } elseif ($isAsset) {
             // Asset 404s are normal after a redeploy (stale browser cache, old importmap hashes).
             // They still accumulate threat but at 1/10 the weight of regular probes so that a
             // browser clearing stale assets after a deploy never blocks a real user, while a
             // scanner hammering /assets/* at scale still eventually trips the threshold.
             ++$assetHits;
-            $probeWeight = $probeHits * (100 / self::BLOCK_AT_PROBES);
-            $assetWeight = $assetHits * (100 / self::BLOCK_AT_ASSET_HITS);
-            $threatLevel = (int) min(100, $probeWeight + $assetWeight);
-            $summary = sprintf('%d probe 404s, %d asset 404s (distinct paths: %d)', $probeHits, $assetHits, $distinctPaths);
+            $threatLevel = $this->weightedThreat($probeHits, $assetHits, $flaggedHits);
+            $summary = $this->buildSummary($probeHits, $flaggedHits, $assetHits, $distinctPaths);
         } elseif ($isApi) {
             ++$apiHits;
             if ($distinctPaths <= 3 && $apiHits <= 2000) {
@@ -127,10 +133,8 @@ final class NotFoundProvider extends AbstractSecurityProvider
                 $base += 5;
                 break;
             }
-            $probeWeight = $probeHits * (100 / self::BLOCK_AT_PROBES);
-            $assetWeight = (int) ($state['assetHits'] ?? 0) * (100 / self::BLOCK_AT_ASSET_HITS);
-            $threatLevel = (int) min(100, $base + $probeWeight + $assetWeight);
-            $summary = sprintf('%d probe 404s, %d asset 404s (distinct paths: %d)', $probeHits, $assetHits, $distinctPaths);
+            $threatLevel = $this->weightedThreat($probeHits, $assetHits, $flaggedHits, $base);
+            $summary = $this->buildSummary($probeHits, $flaggedHits, $assetHits, $distinctPaths);
         }
 
         $previousThreat = (int) ($state['threatLevel'] ?? 0);
@@ -146,6 +150,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
             'apiHits' => $apiHits,
             'probeHits' => $probeHits,
             'assetHits' => $assetHits,
+            'flaggedHits' => $flaggedHits,
             'distinctPaths' => $distinctPaths,
             'recentPaths' => array_values($recentPaths),
             'waveCount' => count($waveTimestamps),
@@ -157,6 +162,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
                 'apiHits' => $apiHits,
                 'probeHits' => $probeHits,
                 'assetHits' => $assetHits,
+                'flaggedHits' => $flaggedHits,
                 'distinctPaths' => $distinctPaths,
                 'recentPaths' => array_values($recentPaths),
                 'waveTimestamps' => array_values($waveTimestamps),
@@ -166,6 +172,30 @@ final class NotFoundProvider extends AbstractSecurityProvider
             'summary' => $summary,
             'details' => $details,
         ];
+    }
+
+    private function weightedThreat(int $probeHits, int $assetHits, int $flaggedHits, int $base = 0): int
+    {
+        $probeWeight = 100 / self::BLOCK_AT_PROBES;
+
+        return (int) min(
+            100,
+            $base
+            + $probeHits * $probeWeight
+            + $flaggedHits * self::FLAGGED_URL_WEIGHT * $probeWeight
+            + $assetHits * (100 / self::BLOCK_AT_ASSET_HITS),
+        );
+    }
+
+    private function buildSummary(int $probeHits, int $flaggedHits, int $assetHits, int $distinctPaths): string
+    {
+        return sprintf(
+            '%d probe 404s, %d flagged 404s, %d asset 404s (distinct paths: %d)',
+            $probeHits,
+            $flaggedHits,
+            $assetHits,
+            $distinctPaths,
+        );
     }
 
     #[Override]
@@ -194,25 +224,35 @@ final class NotFoundProvider extends AbstractSecurityProvider
         $rows = $this->logRepo->findFiltered(limit: 1000, since: $from, ip: null, from: $from, to: $to);
 
         $uniqueIps = [];
-        $suspiciousHits = 0;
+        $patternHits = 0;
+        $flaggedHits = 0;
         foreach ($rows as $row) {
             $ip = $row->getIp();
             if ($ip !== null && $ip !== '') {
                 $uniqueIps[$ip] = true;
             }
             $url = (string) $row->getUrl();
+            if ($this->suspiciousUrls->matches($url)) {
+                ++$flaggedHits;
+            }
             foreach (self::SUSPICIOUS_PATTERNS as $pattern) {
                 if (!str_contains($url, $pattern)) {
                     continue;
                 }
 
-                ++$suspiciousHits;
+                ++$patternHits;
                 break;
             }
         }
 
-        $threatLevel = (int) min(100, ($suspiciousHits + count($uniqueIps)) / 100);
-        $summary = sprintf('%d 404s in window, %d unique IPs, %d suspicious-pattern hits', count($rows), count($uniqueIps), $suspiciousHits);
+        $threatLevel = (int) min(100, ($patternHits + $flaggedHits * self::FLAGGED_URL_WEIGHT + count($uniqueIps)) / 100);
+        $summary = sprintf(
+            '%d 404s in window, %d unique IPs, %d suspicious-pattern hits, %d flagged-URL hits',
+            count($rows),
+            count($uniqueIps),
+            $patternHits,
+            $flaggedHits,
+        );
 
         return [
             'threatLevel' => $threatLevel,
@@ -220,7 +260,8 @@ final class NotFoundProvider extends AbstractSecurityProvider
             'details' => [
                 'rows' => count($rows),
                 'uniqueIps' => count($uniqueIps),
-                'suspiciousHits' => $suspiciousHits,
+                'patternHits' => $patternHits,
+                'flaggedHits' => $flaggedHits,
             ],
         ];
     }

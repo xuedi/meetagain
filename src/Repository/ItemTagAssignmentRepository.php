@@ -59,6 +59,32 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
 
     /**
      * @param list<int> $itemIds
+     * @return array<int, int> tag id => how many of the given items carry it
+     */
+    public function countsByTag(string $itemType, array $itemIds): array
+    {
+        if ($itemIds === []) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('a')
+            ->select('a.tagId AS tagId', 'COUNT(a.itemId) AS total')
+            ->where('a.itemType = :type')->setParameter('type', $itemType)
+            ->andWhere('a.itemId IN (:ids)')->setParameter('ids', $itemIds)
+            ->groupBy('a.tagId')
+            ->getQuery()
+            ->getScalarResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['tagId']] = (int) $row['total'];
+        }
+
+        return $counts;
+    }
+
+    /**
+     * @param list<int> $itemIds
      * @return array<int, list<int>> item id => tag ids, for the items that carry any
      */
     public function tagIdsForItems(string $itemType, array $itemIds): array

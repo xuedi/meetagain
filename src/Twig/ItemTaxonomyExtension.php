@@ -3,6 +3,10 @@
 namespace App\Twig;
 
 use App\Item\Taxonomy\CategorizableTypeRegistry;
+use App\Item\Taxonomy\FacetCounter;
+use App\Item\Taxonomy\FacetCounts;
+use App\Item\Taxonomy\FacetResolver;
+use App\Item\Taxonomy\FacetSelection;
 use App\Item\Taxonomy\TaxonomyService;
 use Override;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -15,6 +19,8 @@ final class ItemTaxonomyExtension extends AbstractExtension
         private readonly TaxonomyService $taxonomyService,
         private readonly CategorizableTypeRegistry $registry,
         private readonly RequestStack $requestStack,
+        private readonly FacetResolver $facetResolver,
+        private readonly FacetCounter $facetCounter,
     ) {}
 
     #[Override]
@@ -26,11 +32,32 @@ final class ItemTaxonomyExtension extends AbstractExtension
             new TwigFunction('item_tag_labels', $this->tagLabels(...)),
             new TwigFunction('item_taxonomy_category_choices', $this->categoryChoices(...)),
             new TwigFunction('item_taxonomy_tag_choices', $this->tagChoices(...)),
-            new TwigFunction('item_taxonomy_current_category', $this->currentCategory(...)),
-            new TwigFunction('item_taxonomy_current_tags', $this->currentTags(...)),
-            new TwigFunction('item_taxonomy_tag_toggle_url', $this->tagToggleUrl(...)),
             new TwigFunction('item_taxonomy_plugin_key', $this->pluginKey(...)),
+            new TwigFunction('item_facet_current', $this->currentFacets(...)),
+            new TwigFunction('item_facet_active', $this->facetsActive(...)),
+            new TwigFunction('item_facet_url', $this->facetUrl(...)),
+            new TwigFunction('item_facet_counts', $this->facetCounts(...)),
         ];
+    }
+
+    public function currentFacets(): FacetSelection
+    {
+        return $this->facetResolver->current();
+    }
+
+    public function facetsActive(): bool
+    {
+        return !$this->facetResolver->current()->isEmpty();
+    }
+
+    public function facetUrl(string $baseUrl, FacetSelection $selection): string
+    {
+        return $this->facetResolver->urlFor($baseUrl, $selection);
+    }
+
+    public function facetCounts(string $itemType): ?FacetCounts
+    {
+        return $this->facetCounter->counts($itemType);
     }
 
     public function pluginKey(string $itemType): ?string
@@ -68,60 +95,6 @@ final class ItemTaxonomyExtension extends AbstractExtension
     public function tagChoices(string $itemType): array
     {
         return $this->taxonomyService->tagChoices($itemType, $this->locale());
-    }
-
-    public function currentCategory(): ?int
-    {
-        $value = $this->requestStack->getCurrentRequest()?->query->get('category');
-
-        return $value !== null && $value !== '' ? (int) $value : null;
-    }
-
-    /** @return list<int> */
-    public function currentTags(): array
-    {
-        $query = $this->requestStack->getCurrentRequest()?->query->all() ?? [];
-        $raw = $query['tag'] ?? [];
-        if (!is_array($raw)) {
-            $raw = [$raw];
-        }
-
-        $ids = [];
-        foreach ($raw as $value) {
-            if (!is_numeric($value)) {
-                continue;
-            }
-
-            $ids[] = (int) $value;
-        }
-
-        return array_values(array_unique($ids));
-    }
-
-    public function tagToggleUrl(int $tagId): string
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        if ($request === null) {
-            return '';
-        }
-
-        $query = $request->query->all();
-        $tags = $this->currentTags();
-        if (in_array($tagId, $tags, true)) {
-            $tags = array_values(array_filter($tags, static fn(int $id): bool => $id !== $tagId));
-        } else {
-            $tags[] = $tagId;
-        }
-
-        if ($tags === []) {
-            unset($query['tag']);
-        } else {
-            $query['tag'] = $tags;
-        }
-
-        $queryString = http_build_query($query);
-
-        return $request->getPathInfo() . ($queryString !== '' ? '?' . $queryString : '');
     }
 
     private function locale(): ?string

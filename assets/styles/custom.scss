@@ -510,6 +510,12 @@ body.admin-shell-no-scroll {
     white-space: normal;
 }
 
+.item-list-layout.item-list-busy .item-list-main {
+    opacity: 0.5;
+    transition: opacity 0.12s ease-in-out;
+    pointer-events: none;
+}
+
 // -- Item grid thumbnails --
 
 .item-thumb {
