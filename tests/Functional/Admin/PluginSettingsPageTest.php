@@ -17,13 +17,26 @@ class PluginSettingsPageTest extends WebTestCase
         $this->loginAsAdmin($client);
 
         // Act
-        $client->request('GET', '/en/admin/plugin/settings');
+        $client->request('GET', '/en/admin/plugin/glossary/settings');
 
         // Assert
         $this->assertResponseIsSuccessful();
     }
 
-    public function testPluginListShowsSettingsTopbarButton(): void
+    public function testUnknownPluginReturns404(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+
+        // Act
+        $client->request('GET', '/en/admin/plugin/does_not_exist/settings');
+
+        // Assert
+        static::assertSame(404, $client->getResponse()->getStatusCode());
+    }
+
+    public function testPluginListLinksToThePerPluginSettingsPage(): void
     {
         // Arrange
         $client = static::createClient();
@@ -36,19 +49,55 @@ class PluginSettingsPageTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         static::assertGreaterThan(
             0,
-            $crawler->filter('a[href$="/admin/plugin/settings"]')->count(),
-            'Settings topbar button should link to /admin/plugin/settings',
+            $crawler->filter('a[href$="/admin/plugin/glossary/settings"]')->count(),
+            'Enabled plugins with settings should carry a configure link',
         );
     }
 
-    public function testPostingWithUnknownProviderReturns404(): void
+    public function testPluginWithoutSettingsShowsADisabledConfigureButton(): void
     {
         // Arrange
         $client = static::createClient();
         $this->loginAsAdmin($client);
 
         // Act
-        $client->request('POST', '/en/admin/plugin/settings?provider=does_not_exist');
+        $crawler = $client->request('GET', '/en/admin/plugin');
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        static::assertSame(
+            0,
+            $crawler->filter('a[href$="/admin/plugin/karaoke/settings"]')->count(),
+            'A plugin without settings must not link anywhere',
+        );
+        static::assertGreaterThan(
+            0,
+            $crawler->filter('td span[title] > button[disabled] .fa-cog')->count(),
+            'A plugin without settings must show a disabled cog carrying a hover explanation',
+        );
+    }
+
+    public function testPostingWithUnknownSectionReturns404(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+
+        // Act
+        $client->request('POST', '/en/admin/plugin/glossary/settings?section=does_not_exist');
+
+        // Assert
+        static::assertSame(404, $client->getResponse()->getStatusCode());
+    }
+
+    public function testPostingASectionOfAnotherPluginReturns404(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+
+        // Act
+        $client->request('POST', '/en/admin/plugin/glossary/settings?section=dishes');
 
         // Assert
         static::assertSame(404, $client->getResponse()->getStatusCode());
@@ -60,7 +109,7 @@ class PluginSettingsPageTest extends WebTestCase
         $client = static::createClient();
 
         // Act
-        $client->request('GET', '/en/admin/plugin/settings');
+        $client->request('GET', '/en/admin/plugin/glossary/settings');
 
         // Assert
         $status = $client->getResponse()->getStatusCode();

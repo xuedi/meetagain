@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use App\Item\Taxonomy\CategorizableTypeRegistry;
 use App\Item\Taxonomy\TaxonomyService;
 use Override;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -12,6 +13,7 @@ final class ItemTaxonomyExtension extends AbstractExtension
 {
     public function __construct(
         private readonly TaxonomyService $taxonomyService,
+        private readonly CategorizableTypeRegistry $registry,
         private readonly RequestStack $requestStack,
     ) {}
 
@@ -27,7 +29,13 @@ final class ItemTaxonomyExtension extends AbstractExtension
             new TwigFunction('item_taxonomy_current_category', $this->currentCategory(...)),
             new TwigFunction('item_taxonomy_current_tags', $this->currentTags(...)),
             new TwigFunction('item_taxonomy_tag_toggle_url', $this->tagToggleUrl(...)),
+            new TwigFunction('item_taxonomy_plugin_key', $this->pluginKey(...)),
         ];
+    }
+
+    public function pluginKey(string $itemType): ?string
+    {
+        return $this->registry->providerFor($itemType)?->getPluginKey();
     }
 
     public function categoryLabel(string $itemType, int $itemId): ?string

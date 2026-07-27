@@ -5,7 +5,6 @@ namespace App\Controller\Admin;
 use App\Admin\Navigation\AdminLink;
 use App\Admin\Navigation\AdminNavigationConfig;
 use App\Admin\Navigation\AdminNavigationInterface;
-use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Service\Admin\CommandService;
@@ -46,15 +45,6 @@ final class PluginController extends AbstractController implements AdminNavigati
         $installedCount = count(array_filter($plugins, static fn(array $p): bool => (bool) ($p['installed'] ?? false)));
         $enabledCount = count(array_filter($plugins, static fn(array $p): bool => (bool) ($p['enabled'] ?? false)));
 
-        $actions = [];
-        if ($this->pluginSettingsService->hasAny()) {
-            $actions[] = new AdminTopActionButton(
-                label: $this->translator->trans('admin_system_plugins.action_settings'),
-                target: $this->generateUrl('app_admin_plugin_settings'),
-                icon: 'cog',
-            );
-        }
-
         $adminTop = new AdminTop(info: [
             new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_system_plugins.summary_available'))),
             new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $installedCount, $this->translator->trans('admin_system_plugins.summary_installed'))),
@@ -63,10 +53,11 @@ final class PluginController extends AbstractController implements AdminNavigati
                 $enabledCount,
                 $this->translator->trans('admin_system_plugins.summary_enabled'),
             )),
-        ], actions: $actions);
+        ]);
 
         return $this->render('admin/system/plugin_list.html.twig', [
             'plugins' => $plugins,
+            'configurableKeys' => $this->pluginSettingsService->getConfigurablePluginKeys(),
             'active' => 'plugin',
             'adminTop' => $adminTop,
         ]);

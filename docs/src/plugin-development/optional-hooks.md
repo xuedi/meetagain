@@ -7,32 +7,32 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 
 ## Capabilities at a glance
 
-| Interface                                     | When to use it                                        | Key method                                                |
-|-----------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------|
-| `Plugin` (base interface)                     | Serve CSS/JS assets from your plugin                  | `getStylesheets()`, `getJavascripts()`                    |
-| `AdminNavigationInterface`                    | Add sections and links to the admin sidebar           | `getAdminNavigation()`                                    |
-| `EventFilterInterface`                        | Control which events are visible                      | `getEventIdFilter()`                                      |
-| `MenuFilterInterface`                         | Filter or modify navigation links                     | `filterMenuLinks()`                                       |
-| `CmsFilterInterface`                          | Control which CMS pages are visible                   | `getCmsPageSlugs()`                                       |
-| `ReservedSlugProviderInterface`               | Reserve slugs the CMS editor must refuse to assign    | `getReservedSlugs()`                                      |
-| `MemberFilterInterface`                       | Filter which members appear in lists                  | `getUserIds()`                                            |
-| `EventFilterFormContributorInterface`         | Add fields to the event filter form                   | `addFields()`                                             |
-| `NotificationProviderInterface`               | Add informational items to the notification bell      | `getNotifications()`                                      |
-| `ReviewNotificationProviderInterface`         | Add approve/deny items to the review page             | `getReviewItems()`, `approveItem()`, `denyItem()`         |
-| `EntityActionInterface`                       | React to core entity lifecycle events                 | `handleEntityAction()`                                    |
-| `MetaEnricherInterface`               | Enrich metadata on all activity types                 | `enrich()`                                                |
-| `MessageInterface`                            | Define a new activity type with display rendering     | `getType()`, `validate()`, `render()`                     |
-| `SitemapPublisherInterface`                   | Contribute URLs to `/sitemap.xml`                     | `getPriority()`, `getSitemapUrls()`                       |
-| `SitemapEventVisibilityFilterInterface`       | Suppress event URLs on specific tenants               | `shouldEmitEvents()`                                      |
-| `FollowerEventNotificationFilterInterface`    | Drop follower-RSVP email recipients per event         | `isFollowerAllowed()`                                     |
-| `ImageAttributionFilterInterface`             | Narrow which attributed images `/attributions` shows  | `getVisibleImageIdFilter()`                               |
-| `DataHotfixInterface`                         | Ship a one-off data repair that runs once per DB      | `getIdentifier()`, `execute()`                            |
-| `SecurityProviderInterface`                   | Participate in live security event detection          | `observe()`, `scanRetrospective()`                        |
-| `DescriptorInterface`           | Add a settings section to `/admin/plugin/settings`    | `getFormType()`, `createDefault()`, `applyForm()`         |
-| `CategorizableTypeProviderInterface`          | Give an item type categories and tags                 | `getTaxonomy()`, `supportsCategories()`, `supportsTags()` |
-| `ContributorInterface`         | Carry an item type through group export and import    | `exportItems()`, `importItems()`                          |
-| `ChangeTargetProviderInterface`               | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()`    |
-| `ConfigPrivacyToggleProviderInterface` | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                             |
+| Interface                                  | When to use it                                        | Key method                                                |
+|--------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------|
+| `Plugin` (base interface)                  | Serve CSS/JS assets from your plugin                  | `getStylesheets()`, `getJavascripts()`                    |
+| `AdminNavigationInterface`                 | Add sections and links to the admin sidebar           | `getAdminNavigation()`                                    |
+| `EventFilterInterface`                     | Control which events are visible                      | `getEventIdFilter()`                                      |
+| `MenuFilterInterface`                      | Filter or modify navigation links                     | `filterMenuLinks()`                                       |
+| `CmsFilterInterface`                       | Control which CMS pages are visible                   | `getCmsPageSlugs()`                                       |
+| `ReservedSlugProviderInterface`            | Reserve slugs the CMS editor must refuse to assign    | `getReservedSlugs()`                                      |
+| `MemberFilterInterface`                    | Filter which members appear in lists                  | `getUserIds()`                                            |
+| `EventFilterFormContributorInterface`      | Add fields to the event filter form                   | `addFields()`                                             |
+| `NotificationProviderInterface`            | Add informational items to the notification bell      | `getNotifications()`                                      |
+| `ReviewNotificationProviderInterface`      | Add approve/deny items to the review page             | `getReviewItems()`, `approveItem()`, `denyItem()`         |
+| `EntityActionInterface`                    | React to core entity lifecycle events                 | `handleEntityAction()`                                    |
+| `MetaEnricherInterface`                    | Enrich metadata on all activity types                 | `enrich()`                                                |
+| `MessageInterface`                         | Define a new activity type with display rendering     | `getType()`, `validate()`, `render()`                     |
+| `SitemapPublisherInterface`                | Contribute URLs to `/sitemap.xml`                     | `getPriority()`, `getSitemapUrls()`                       |
+| `SitemapEventVisibilityFilterInterface`    | Suppress event URLs on specific tenants               | `shouldEmitEvents()`                                      |
+| `FollowerEventNotificationFilterInterface` | Drop follower-RSVP email recipients per event         | `isFollowerAllowed()`                                     |
+| `ImageAttributionFilterInterface`          | Narrow which attributed images `/attributions` shows  | `getVisibleImageIdFilter()`                               |
+| `DataHotfixInterface`                      | Ship a one-off data repair that runs once per DB      | `getIdentifier()`, `execute()`                            |
+| `SecurityProviderInterface`                | Participate in live security event detection          | `observe()`, `scanRetrospective()`                        |
+| `DescriptorInterface`                      | Add a settings section to your plugin's settings page | `getFormType()`, `createDefault()`, `applyForm()`         |
+| `CategorizableTypeProviderInterface`       | Give an item type categories and tags                 | `getTaxonomy()`, `supportsCategories()`, `supportsTags()` |
+| `ContributorInterface`                     | Carry an item type through group export and import    | `exportItems()`, `importItems()`                          |
+| `ChangeTargetProviderInterface`            | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()`    |
+| `ConfigPrivacyToggleProviderInterface`     | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                             |
 
 ---
 
@@ -689,8 +689,8 @@ calling the service method, since the entity may be removed during the operation
 
 ### Enriching activity metadata
 
-Implement `MetaEnricherInterface` to inject context into **all** activity types — for example, adding the
-current group or domain to every logged action.
+Implement `MetaEnricherInterface` to inject context into **all** activity types — for example, adding the current group
+or domain to every logged action.
 
 ```php
 namespace Plugin\YourPlugin\Activity;
@@ -831,8 +831,8 @@ on top via AND-intersection with that one.
 ## Data Hotfix
 
 Implement `DataHotfixInterface` to ship a one-off data repair that runs once per database lifetime. The runner
-(`Runner`) discovers all implementations on every cron tick, checks the per-identifier AppState lock, runs the
-hotfix if not yet locked, and writes the lock on success. Throwing leaves the lock unwritten so the next tick retries.
+(`Runner`) discovers all implementations on every cron tick, checks the per-identifier AppState lock, runs the hotfix if
+not yet locked, and writes the lock on success. Throwing leaves the lock unwritten so the next tick retries.
 
 ```php
 namespace Plugin\YourPlugin\DataHotfix;
@@ -940,9 +940,9 @@ session and IP in Redis with a 4h TTL. Lower threat levels are recorded but not 
 
 ## Plugin settings page
 
-Offer a configuration UI to operators without shipping your own admin chrome. Core renders every registered descriptor
-as a framed fieldset on a single page at
-`/admin/plugin/settings`, reached from a "Settings" button on `/admin/plugin`.
+Offer a configuration UI to operators without shipping your own admin chrome. Core gives every plugin its own settings
+page at `/admin/plugin/{pluginKey}/settings`, renders each of that plugin's descriptors as a framed fieldset on it, and
+links to it from the cog action in the plugin's row on `/admin/plugin`.
 
 You define your settings surface **once** as a descriptor. Core renders and persists it at the global scope for free.
 The same descriptor can also be rendered per override scope when a host plugin supplies one (see "Dual-scope settings"
@@ -995,8 +995,8 @@ store's job.
 
 `getPriority()` controls display order on the page (higher first).
 
-The descriptor does not persist anything itself: `GenericStore` saves your data object to a shared JSON
-table automatically. Provide your own `StoreInterface`
+The descriptor does not persist anything itself: `GenericStore` saves your data object to a shared JSON table
+automatically. Provide your own `StoreInterface`
 only when the record needs a shape the JSON table cannot give it - own columns, a foreign key, or an encrypted secret.
 See
 `plugins/films/src/Publisher/PluginSettings/SettingsDescriptor.php` (descriptor) and
@@ -1004,18 +1004,18 @@ See
 
 ### Reading the effective value
 
-Inject `Resolver` and call `resolve('my_plugin')` to get the effective data object for the current
-request. Memoise it in a thin service if you read it often (see
+Inject `Resolver` and call `resolve('my_plugin')` to get the effective data object for the current request. Memoise it
+in a thin service if you read it often (see
 `plugins/glossary/src/Service/ConfigService.php`).
 
 ### Dual-scope settings
 
 The global scope is all a standalone plugin needs. A **host plugin** can layer an override scope on top: it implements
 `ScopeProviderInterface` to name the active scope for a request (an opaque id), and a
-`StoreInterface` that persists one record per scope. When such a host is present, `resolve()` returns the
-override record if the active scope has one, else the global record, else your neutral default - all transparent to your
-plugin, because it reads the same resolver either way. The override-scope machinery lives entirely in the host plugin;
-core registers no scope provider, so an install without such a host always resolves to the global record.
+`StoreInterface` that persists one record per scope. When such a host is present, `resolve()` returns the override
+record if the active scope has one, else the global record, else your neutral default - all transparent to your plugin,
+because it reads the same resolver either way. The override-scope machinery lives entirely in the host plugin; core
+registers no scope provider, so an install without such a host always resolves to the global record.
 
 ## Item categories and tags
 
@@ -1034,8 +1034,8 @@ classified but never attached to an event implements the list-cell and categoriz
 
 ### What you implement
 
-1. **Embed the taxonomy in your settings.** Add a `App\Item\Taxonomy\Config` property to your settings data
-   object and expose `getTaxonomy()`/`setTaxonomy()`; include it in `toArray()` /
+1. **Embed the taxonomy in your settings.** Add a `App\Item\Taxonomy\Config` property to your settings data object and
+   expose `getTaxonomy()`/`setTaxonomy()`; include it in `toArray()` /
    `fromArray()`. Add `->add('taxonomy', TaxonomyConfigType::class)` to your settings FormType, and call
    `$data->getTaxonomy()->normalize()` in your descriptor's `applyForm()`. The admin now edits category/tag definitions
    per enabled language, at global scope and (with a host plugin) per scope.
@@ -1063,7 +1063,7 @@ classified but never attached to an event implements the list-cell and categoriz
    ```
 
    | Parameter   | Meaning                                                                       |
-      |-------------|-------------------------------------------------------------------------------|
+         |-------------|-------------------------------------------------------------------------------|
    | `itemType`  | your item-type key (required)                                                 |
    | `itemCount` | entries currently listed; omit to hide the count line                         |
    | `modes`     | view-mode values your content suits; default all four (list/tiles/grid/gallery) |
@@ -1087,8 +1087,8 @@ the categories and tags assigned to them.
 
 ### When to implement
 
-Implement `App\Item\Portability\ContributorInterface` when your plugin owns an item type whose content is
-worth carrying between instances. It is independent of the other item seams:
+Implement `App\Item\Portability\ContributorInterface` when your plugin owns an item type whose content is worth carrying
+between instances. It is independent of the other item seams:
 a type can be portable without being event-attachable, categorizable, or list-cell renderable.
 
 ### What you implement
@@ -1122,8 +1122,8 @@ public function importItems(array $rows, ImportContext $context): ImportResult;
 Category and tag assignments are handled by core, keyed by the same `ref` you emitted - you write no taxonomy code.
 Definition ids the target instance does not know are dropped and reported in the import summary.
 
-Reference implementation: `Plugin\Dishes\Portability\DishContributor` (always creates, carries translations
-and a gallery) and `Plugin\Books\Portability\BookContributor`
+Reference implementation: `Plugin\Dishes\Portability\DishContributor` (always creates, carries translations and a
+gallery) and `Plugin\Books\Portability\BookContributor`
 (mandatory ISBN dedup).
 
 ## Member change proposals
