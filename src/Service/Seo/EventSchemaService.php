@@ -6,11 +6,13 @@ use App\Entity\Event;
 use App\Entity\Host;
 use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final readonly class EventSchemaService
 {
     private const string DEFAULT_IMAGE_PATH = '/images/locations/default.jpg';
+    private const string OFFER_CURRENCY = 'EUR';
 
     /**
      * @param iterable<OrganizationSchemaProviderInterface> $organizationProviders
@@ -19,6 +21,7 @@ final readonly class EventSchemaService
         private ConfigService $configService,
         #[AutowireIterator(OrganizationSchemaProviderInterface::class)]
         private iterable $organizationProviders,
+        private ClockInterface $clock,
     ) {}
 
     /**
@@ -34,18 +37,13 @@ final readonly class EventSchemaService
             'name' => $event->getTitle($locale),
             'startDate' => $event->getStart()->format('c'),
             'url' => $canonicalUrl,
-            // EventCancelled is emitted when the event is cancelled. previousStartDate is
-            // intentionally omitted: the Event entity does not currently track a prior
-            // start date for cancelled events.
             'eventStatus' => $event->isCanceled() ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
             'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
             'description' => $this->resolveDescription($event, $locale),
             'image' => $this->resolveImage($event, $organizer),
             'organizer' => $organizer,
-            // Meetagain events have no traditional performer concept, so performer mirrors
-            // organizer. Schema.org accepts this and Google treats the recommended field
-            // as filled, eliminating the GSC warning at zero data cost.
             'performer' => $organizer,
+            'offers' => $this->buildOffer($event, $canonicalUrl),
         ];
 
         if ($event->getStop() !== null) {
@@ -77,6 +75,24 @@ final readonly class EventSchemaService
         }
 
         return $schema;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function buildOffer(Event $event, string $canonicalUrl): array
+    {
+        $rsvpOpen = !$event->isCanceled() && $event->getStart() > $this->clock->now();
+        $validFrom = $event->getCreatedAt() ?? $event->getStart();
+
+        return [
+            '@type' => 'Offer',
+            'url' => $canonicalUrl,
+            'price' => '0',
+            'priceCurrency' => self::OFFER_CURRENCY,
+            'availability' => $rsvpOpen ? 'https://schema.org/InStock' : 'https://schema.org/SoldOut',
+            'validFrom' => $validFrom->format('c'),
+        ];
     }
 
     private function resolveDescription(Event $event, string $locale): string
