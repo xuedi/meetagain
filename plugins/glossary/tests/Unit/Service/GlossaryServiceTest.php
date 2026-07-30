@@ -5,6 +5,7 @@ namespace Plugin\Glossary\Tests\Unit\Service;
 use App\EntityActionDispatcher;
 use App\Enum\ItemAction;
 use App\Item\ActionDispatcher;
+use App\Item\AdminFilterService;
 use App\Item\FilterService;
 use App\Item\Taxonomy\TaxonomyService;
 use App\Review\ChangeProposalService;
@@ -297,6 +298,7 @@ class GlossaryServiceTest extends TestCase
         EntityManagerInterface $em,
         GlossaryRepository $repo,
         ?FilterService $filter = null,
+        ?AdminFilterService $adminFilter = null,
         ?ActionDispatcher $itemActionDispatcher = null,
         ?TaxonomyService $taxonomyService = null,
         ?ChangeProposalService $changeProposalService = null,
@@ -307,10 +309,16 @@ class GlossaryServiceTest extends TestCase
             $filter->method('getAllowedItemIds')->willReturn(null);
         }
 
+        if ($adminFilter === null) {
+            $adminFilter = $this->createStub(AdminFilterService::class);
+            $adminFilter->method('getAllowedItemIds')->willReturn(null);
+        }
+
         return new GlossaryService(
             $em,
             $repo,
             $filter,
+            $adminFilter,
             $this->createStub(EntityActionDispatcher::class),
             $taxonomyService ?? $this->createStub(TaxonomyService::class),
             $itemActionDispatcher ?? $this->createStub(ActionDispatcher::class),

@@ -4,9 +4,11 @@ namespace Plugin\Dishes\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use App\Item\ListRegistry;
 use App\Item\TranslationFormHelper;
 use App\Item\Taxonomy\AssignmentFormHelper;
 use App\Item\Taxonomy\TaxonomyService;
+use App\Service\Seo\BreadcrumbBuilder;
 use Plugin\Dishes\Activity\Messages\DishAdded;
 use Plugin\Dishes\Form\DishAddType;
 use Plugin\Dishes\Form\DishEditType;
@@ -88,8 +90,12 @@ final class DishController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_plugin_dishes_dish_show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function show(int $id): Response
+    public function show(int $id, Request $request, ListRegistry $listRegistry, BreadcrumbBuilder $breadcrumbBuilder): Response
     {
+        if (!$listRegistry->has(DishService::ITEM_TYPE)) {
+            throw $this->createNotFoundException();
+        }
+
         $dish = $this->dishService->get($id);
         if ($dish === null) {
             throw $this->createNotFoundException('Dish not found');
@@ -100,6 +106,11 @@ final class DishController extends AbstractController
         return $this->render('@Dishes/dish/detail.html.twig', [
             'dish' => $dish,
             'liked' => $liked,
+            'breadcrumbs' => $breadcrumbBuilder->build(
+                'app_dishes_dishlist',
+                'dishes.menu_main',
+                $dish->getTranslatedName($request->getLocale()),
+            ),
         ]);
     }
 
@@ -107,7 +118,7 @@ final class DishController extends AbstractController
     #[IsGranted('ROLE_STEWARD')]
     public function edit(int $id, Request $request): Response
     {
-        $dish = $this->dishService->get($id);
+        $dish = $this->dishService->getManaged($id);
         if ($dish === null) {
             throw $this->createNotFoundException('Dish not found');
         }
@@ -152,7 +163,7 @@ final class DishController extends AbstractController
     #[IsGranted('ROLE_STEWARD')]
     public function delete(int $id, Request $request): Response
     {
-        $dish = $this->dishService->get($id);
+        $dish = $this->dishService->getManaged($id);
         if ($dish === null) {
             throw $this->createNotFoundException('Dish not found');
         }

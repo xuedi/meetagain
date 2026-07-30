@@ -6,6 +6,7 @@ use App\Entity\Image;
 use App\Enum\ImageType;
 use App\Enum\ItemAction;
 use App\Item\ActionDispatcher;
+use App\Item\AdminFilterService;
 use App\Item\FilterService;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
@@ -28,6 +29,7 @@ readonly class DishService
         private DishLikeRepository $likeRepo,
         private DishImageRepository $imageRepo,
         private FilterService $itemFilter,
+        private AdminFilterService $adminItemFilter,
         private ActionDispatcher $dispatcher,
         private ImageLocationService $imageLocationService,
     ) {}
@@ -184,8 +186,24 @@ readonly class DishService
         return $this->dishRepo->findAll($this->itemFilter->getAllowedItemIds(self::ITEM_TYPE));
     }
 
+    /** @return Dish[] */
+    public function getManagedList(): array
+    {
+        return $this->dishRepo->findAll($this->adminItemFilter->getAllowedItemIds(self::ITEM_TYPE));
+    }
+
     public function get(int $id): ?Dish
     {
-        return $this->dishRepo->find($id);
+        return $this->dishRepo->findOneAllowed($id, $this->itemFilter->getAllowedItemIds(self::ITEM_TYPE));
+    }
+
+    public function getManaged(int $id): ?Dish
+    {
+        return $this->dishRepo->findOneAllowed($id, $this->adminItemFilter->getAllowedItemIds(self::ITEM_TYPE));
+    }
+
+    public function getAttached(int $id): ?Dish
+    {
+        return $this->dishRepo->findOneAllowed($id, null);
     }
 }

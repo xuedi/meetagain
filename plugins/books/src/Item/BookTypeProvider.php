@@ -9,7 +9,6 @@ use App\Item\ListProviderInterface;
 use Override;
 use Plugin\Books\Entity\Book;
 use Plugin\Books\Service\BookService;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 final readonly class BookTypeProvider implements TypeProviderInterface, ListCellProviderInterface, ListProviderInterface
@@ -17,7 +16,6 @@ final readonly class BookTypeProvider implements TypeProviderInterface, ListCell
     public function __construct(
         private BookService $bookService,
         private Environment $twig,
-        private UrlGeneratorInterface $urlGenerator,
     ) {}
 
     #[Override]
@@ -41,7 +39,7 @@ final readonly class BookTypeProvider implements TypeProviderInterface, ListCell
     #[Override]
     public function renderEventCell(int $itemId, EventItemAssociation $association): ?string
     {
-        $book = $this->bookService->get($itemId);
+        $book = $this->bookService->getAttached($itemId);
         if ($book === null) {
             return null;
         }
@@ -80,9 +78,34 @@ final readonly class BookTypeProvider implements TypeProviderInterface, ListCell
     }
 
     #[Override]
-    public function getListUrl(): string
+    public function getListRoute(): string
     {
-        return $this->urlGenerator->generate('app_books_booklist');
+        return 'app_books_booklist';
+    }
+
+    #[Override]
+    public function getDetailRoute(): ?string
+    {
+        return 'app_plugin_books_book_show';
+    }
+
+    #[Override]
+    public function getLastmodByItemId(array $itemIds): array
+    {
+        $wanted = array_flip($itemIds);
+
+        $stamps = [];
+        foreach ($this->bookService->getList() as $book) {
+            $id = (int) $book->getId();
+            $createdAt = $book->getCreatedAt();
+            if ($createdAt === null || !isset($wanted[$id])) {
+                continue;
+            }
+
+            $stamps[$id] = $createdAt;
+        }
+
+        return $stamps;
     }
 
     #[Override]
@@ -90,7 +113,7 @@ final readonly class BookTypeProvider implements TypeProviderInterface, ListCell
     {
         return $this->twig->render('@Books/item/attach_picker.html.twig', [
             'eventId' => $eventId,
-            'books' => $this->bookService->getList(),
+            'books' => $this->bookService->getManagedList(),
         ]);
     }
 

@@ -122,7 +122,7 @@ readonly class EventService
     {
         $cells = [];
         foreach ($this->itemAssociationService->listForEvent($eventId) as $association) {
-            $provider = $this->itemTypeRegistry->providerFor((string) $association->getItemType());
+            $provider = $this->itemTypeRegistry->providerForIncludingInactive((string) $association->getItemType());
             if ($provider === null) {
                 continue;
             }

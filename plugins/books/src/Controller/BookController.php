@@ -4,8 +4,10 @@ namespace Plugin\Books\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use App\Item\ListRegistry;
 use App\Item\Taxonomy\AssignmentFormHelper;
 use App\Item\Taxonomy\TaxonomyService;
+use App\Service\Seo\BreadcrumbBuilder;
 use Plugin\Books\Activity\Messages\BookAdded;
 use Plugin\Books\Form\BookEditType;
 use Plugin\Books\Form\BookIsbnType;
@@ -108,8 +110,12 @@ final class BookController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_plugin_books_book_show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function show(int $id): Response
+    public function show(int $id, ListRegistry $listRegistry, BreadcrumbBuilder $breadcrumbBuilder): Response
     {
+        if (!$listRegistry->has(BookService::ITEM_TYPE)) {
+            throw $this->createNotFoundException();
+        }
+
         $book = $this->bookService->get($id);
         if ($book === null) {
             throw $this->createNotFoundException('Book not found');
@@ -117,6 +123,7 @@ final class BookController extends AbstractController
 
         return $this->render('@Books/book/detail.html.twig', [
             'book' => $book,
+            'breadcrumbs' => $breadcrumbBuilder->build('app_books_booklist', 'books.menu_main', (string) $book->getTitle()),
         ]);
     }
 
@@ -124,7 +131,7 @@ final class BookController extends AbstractController
     #[IsGranted('ROLE_STEWARD')]
     public function edit(int $id, Request $request): Response
     {
-        $book = $this->bookService->get($id);
+        $book = $this->bookService->getManaged($id);
         if ($book === null) {
             throw $this->createNotFoundException('Book not found');
         }
@@ -161,7 +168,7 @@ final class BookController extends AbstractController
     #[IsGranted('ROLE_STEWARD')]
     public function delete(int $id, Request $request): Response
     {
-        $book = $this->bookService->get($id);
+        $book = $this->bookService->getManaged($id);
         if ($book === null) {
             throw $this->createNotFoundException('Book not found');
         }

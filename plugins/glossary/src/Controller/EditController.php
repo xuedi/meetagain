@@ -30,7 +30,7 @@ final class EditController extends AbstractGlossaryController
     #[Route('/{id}', name: 'app_plugin_glossary_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, int $id): Response
     {
-        $newGlossary = $this->service->get($id);
+        $newGlossary = $this->service->getManaged($id);
         if ($newGlossary === null) {
             throw $this->createNotFoundException();
         }
@@ -71,7 +71,7 @@ final class EditController extends AbstractGlossaryController
         }
 
         return $this->renderPage('@Glossary/edit.html.twig', [
-            'editItem' => $this->service->get($id),
+            'editItem' => $this->service->getManaged($id),
             'pendingProposals' => $pendingProposals,
             'form' => $form,
         ]);
@@ -80,7 +80,7 @@ final class EditController extends AbstractGlossaryController
     /** @return list<FieldChange> */
     private function buildChanges(Glossary $submitted, int $id, ?int $categoryId): array
     {
-        $current = $this->service->get($id);
+        $current = $this->service->getManaged($id);
         if ($current === null) {
             return [];
         }

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Publisher\Sitemap;
 
 use App\Entity\Cms;
+use App\Entity\CmsBlock;
 use App\Entity\Event;
 use App\Entity\EventCanonicalRoot;
 use App\Entity\EventSeries;
@@ -14,17 +15,20 @@ use App\Filter\Event\EventFilterService;
 use App\Filter\Member\MemberFilterResult;
 use App\Filter\Member\MemberFilterService;
 use App\Filter\Sitemap\SitemapEventLocaleFilterInterface;
-use App\Filter\Sitemap\SitemapEventVisibilityService;
 use App\Publisher\Sitemap\CoreSitemapPublisher;
+use App\Publisher\UrlOwner\UrlOwnerProviderInterface;
 use App\Repository\CmsRepository;
 use App\Repository\EventCanonicalRootRepository;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
+use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use App\Service\Seo\EventCanonicalResolver;
+use App\Service\Seo\UrlOwnerService;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Tests\Unit\Stubs\EventSeriesStub;
@@ -37,7 +41,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testEmitsStaticRoutesWithLocaleAlternates(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(locales: ['en', 'de'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter(), shouldEmitEvents: true);
+        $publisher = $this->makePublisher(locales: ['en', 'de'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter());
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -53,7 +57,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testEmitsAllExpectedStaticRoutes(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter(), shouldEmitEvents: true);
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter());
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -78,7 +82,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testAuthRoutesUseLowPriority(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter(), shouldEmitEvents: true);
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter());
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -103,7 +107,6 @@ class CoreSitemapPublisherTest extends TestCase
             cmsPages: [],
             events: [],
             cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
             memberCount: 60,
         );
 
@@ -123,7 +126,6 @@ class CoreSitemapPublisherTest extends TestCase
             cmsPages: [],
             events: [],
             cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
             memberCount: 0,
         );
 
@@ -143,7 +145,6 @@ class CoreSitemapPublisherTest extends TestCase
             cmsPages: [],
             events: [],
             cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
             memberCount: 100_000,
         );
 
@@ -166,7 +167,6 @@ class CoreSitemapPublisherTest extends TestCase
             cmsPages: [$page1, $page2],
             events: [],
             cmsFilter: new CmsFilterResult([1], true),
-            shouldEmitEvents: true,
         );
 
         // Act
@@ -180,12 +180,96 @@ class CoreSitemapPublisherTest extends TestCase
         self::assertEmpty($blocked);
     }
 
-    public function testSuppressesEventsWhenVisibilityFilterDenies(): void
+    public function testDropsStaticRoutesAnotherHostOwns(): void
+    {
+        // Arrange
+        $publisher = $this->makePublisher(
+            locales: ['en'],
+            cmsPages: [],
+            events: [],
+            cmsFilter: CmsFilterResult::noFilter(),
+            foreignOwnedRoutes: ['app_login', 'app_register', 'app_reset'],
+        );
+
+        // Act
+        $locs = array_map(static fn($u) => $u->loc, $publisher->getSitemapUrls());
+
+        // Assert
+        self::assertSame([
+            'https://example.com/en/app_default',
+            'https://example.com/en/app_event',
+            'https://example.com/en/app_event_featured',
+            'https://example.com/en/app_contact',
+            'https://example.com/en/app_cookie',
+        ], $locs);
+    }
+
+    public function testEmitsACmsPageOnlyInTheLocalesItHasContentFor(): void
+    {
+        // Arrange
+        $page = $this->makeCmsPage(1, 'privacy', ['de']);
+
+        $publisher = $this->makePublisher(
+            locales: ['en', 'de'],
+            cmsPages: [$page],
+            events: [],
+            cmsFilter: CmsFilterResult::noFilter(),
+        );
+
+        // Act
+        $urls = array_values(array_filter($publisher->getSitemapUrls(), static fn($u) => $u->section === 'cms'));
+
+        // Assert
+        self::assertCount(1, $urls);
+        self::assertSame('https://example.com/de/privacy', $urls[0]->loc);
+        self::assertSame(['de' => 'https://example.com/de/privacy'], $urls[0]->alternates);
+    }
+
+    public function testDropsACmsPageWithNoContentInAnyServedLocale(): void
+    {
+        // Arrange
+        $page = $this->makeCmsPage(1, 'privacy', ['fr']);
+
+        $publisher = $this->makePublisher(
+            locales: ['en', 'de'],
+            cmsPages: [$page],
+            events: [],
+            cmsFilter: CmsFilterResult::noFilter(),
+        );
+
+        // Act
+        $urls = array_filter($publisher->getSitemapUrls(), static fn($u) => $u->section === 'cms');
+
+        // Assert
+        self::assertEmpty($urls);
+    }
+
+    public function testDropsCmsPagesAnotherHostOwns(): void
+    {
+        // Arrange
+        $page = $this->makeCmsPage(1, 'imprint');
+
+        $publisher = $this->makePublisher(
+            locales: ['en'],
+            cmsPages: [$page],
+            events: [],
+            cmsFilter: CmsFilterResult::noFilter(),
+            foreignOwnedRoutes: ['app_catch_all'],
+        );
+
+        // Act
+        $urls = array_filter($publisher->getSitemapUrls(), static fn($u) => $u->section === 'cms');
+
+        // Assert
+        self::assertEmpty($urls);
+    }
+
+    public function testDropsEventsAnotherHostOwns(): void
     {
         // Arrange
         $event = $this->makeEvent(42, new DateTime('2026-05-01'));
 
-        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [$event], cmsFilter: CmsFilterResult::noFilter(), shouldEmitEvents: false);
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [$event], cmsFilter: CmsFilterResult::noFilter(), foreignOwnedRoutes: ['app_event_details']);
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -202,7 +286,7 @@ class CoreSitemapPublisherTest extends TestCase
         // Arrange
         $event = $this->makeEvent(42, new DateTime('2026-05-01'));
 
-        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [$event], cmsFilter: CmsFilterResult::noFilter(), shouldEmitEvents: true);
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [$event], cmsFilter: CmsFilterResult::noFilter());
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -227,7 +311,6 @@ class CoreSitemapPublisherTest extends TestCase
             cmsPages: [],
             events: [$reachable, $unreachable],
             cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
             accessibleEventIds: [42],
         );
 
@@ -249,7 +332,6 @@ class CoreSitemapPublisherTest extends TestCase
             cmsPages: [],
             events: [$event],
             cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
             accessibleEventIds: [],
         );
 
@@ -280,7 +362,6 @@ class CoreSitemapPublisherTest extends TestCase
             cmsPages: [],
             events: [$first, $follower, $branched, $afterBranch],
             cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
             seriesMembers: [$first, $follower, $branched, $afterBranch],
             markers: [$this->makeMarker($branched, 'en', EventCanonicalRootType::Root), $this->makeMarker($branched, 'de', EventCanonicalRootType::Root)],
         );
@@ -315,7 +396,6 @@ class CoreSitemapPublisherTest extends TestCase
             cmsPages: [],
             events: [$first, $follower, $branched],
             cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
             seriesMembers: [$first, $follower, $branched],
             allowedLocalesByEventId: [1 => ['de', 'es'], 2 => ['de', 'es'], 3 => ['de', 'es']],
             markers: [$this->makeMarker($branched, 'de', EventCanonicalRootType::Root)],
@@ -345,7 +425,6 @@ class CoreSitemapPublisherTest extends TestCase
             cmsPages: [],
             events: [$event],
             cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
             allowedLocalesByEventId: [42 => ['de', 'es']],
         );
 
@@ -371,7 +450,6 @@ class CoreSitemapPublisherTest extends TestCase
             cmsPages: [],
             events: [$root, $follower],
             cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
             seriesMembers: [$root, $follower],
             allowedLocalesByEventId: [1 => ['de', 'es'], 2 => ['de', 'es']],
         );
@@ -399,7 +477,6 @@ class CoreSitemapPublisherTest extends TestCase
             cmsPages: [],
             events: [$root, $follower],
             cmsFilter: CmsFilterResult::noFilter(),
-            shouldEmitEvents: true,
             seriesMembers: [$root, $follower],
         );
 
@@ -425,18 +502,19 @@ class CoreSitemapPublisherTest extends TestCase
      * @param int[]|null $accessibleEventIds null = every event stays accessible
      * @param array<int, string[]>|null $allowedLocalesByEventId null = no locale filter registered
      * @param array<EventCanonicalRoot> $markers
+     * @param array<string> $foreignOwnedRoutes routes another host owns, so this feed must drop them
      */
     private function makePublisher(
         array $locales,
         array $cmsPages,
         array $events,
         CmsFilterResult $cmsFilter,
-        bool $shouldEmitEvents,
         int $memberCount = 0,
         array $seriesMembers = [],
         ?array $accessibleEventIds = null,
         ?array $allowedLocalesByEventId = null,
         array $markers = [],
+        array $foreignOwnedRoutes = [],
     ): CoreSitemapPublisher {
         $eventRepo = $this->createStub(EventRepository::class);
         $eventRepo->method('findForSitemap')->willReturn($events);
@@ -480,9 +558,6 @@ class CoreSitemapPublisherTest extends TestCase
                 static fn(array $ids) => $accessibleEventIds === null ? $ids : array_values(array_intersect($ids, $accessibleEventIds)),
             );
 
-        $visibility = $this->createStub(SitemapEventVisibilityService::class);
-        $visibility->method('shouldEmitEvents')->willReturn($shouldEmitEvents);
-
         $markerRepo = $this->createStub(EventCanonicalRootRepository::class);
         $markerRepo->method('findBySeriesIds')->willReturn($markers);
         $markerRepo->method('findBySeries')->willReturn($markers);
@@ -503,13 +578,34 @@ class CoreSitemapPublisherTest extends TestCase
             cmsFilterService: $cmsFilterService,
             memberFilterService: $memberFilterService,
             eventFilterService: $eventFilterService,
-            eventVisibilityService: $visibility,
             canonicalResolver: new EventCanonicalResolver($eventRepo, $markerRepo),
+            urlOwnerService: $this->makeUrlOwnerService($foreignOwnedRoutes),
             eventLocaleFilters: $localeFilters,
         );
     }
 
-    private function makeCmsPage(int $id, string $slug): Cms
+    /**
+     * @param array<string> $foreignOwnedRoutes
+     */
+    private function makeUrlOwnerService(array $foreignOwnedRoutes): UrlOwnerService
+    {
+        $config = $this->createStub(ConfigService::class);
+        $config->method('getHost')->willReturn('https://example.com');
+
+        $provider = $this->createStub(UrlOwnerProviderInterface::class);
+        $provider
+            ->method('getOwnerHost')
+            ->willReturnCallback(
+                static fn(string $route) => in_array($route, $foreignOwnedRoutes, true) ? 'https://other.example.com' : null,
+            );
+
+        return new UrlOwnerService($config, [$provider]);
+    }
+
+    /**
+     * @param array<string> $languages
+     */
+    private function makeCmsPage(int $id, string $slug, array $languages = ['en', 'de']): Cms
     {
         $reflection = new \ReflectionClass(Cms::class);
         $page = $reflection->newInstanceWithoutConstructor();
@@ -517,6 +613,10 @@ class CoreSitemapPublisherTest extends TestCase
         $reflection->getProperty('id')->setValue($page, $id);
         $reflection->getProperty('slug')->setValue($page, $slug);
         $reflection->getProperty('createdAt')->setValue($page, new DateTimeImmutable('2026-04-01'));
+        $reflection->getProperty('blocks')->setValue($page, new ArrayCollection(array_map(
+            static fn(string $language): CmsBlock => (new CmsBlock())->setLanguage($language),
+            $languages,
+        )));
 
         return $page;
     }

@@ -4,8 +4,8 @@ namespace App\Publisher\CanonicalUrl;
 
 use App\Entity\Event;
 use App\Repository\EventRepository;
-use App\Service\Config\ConfigService;
 use App\Service\Seo\EventCanonicalResolver;
+use App\Service\Seo\UrlOwnerService;
 use Override;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -16,7 +16,7 @@ final readonly class EventCanonicalUrlProvider implements CanonicalUrlProviderIn
     public function __construct(
         private EventRepository $eventRepository,
         private EventCanonicalResolver $resolver,
-        private ConfigService $configService,
+        private UrlOwnerService $urlOwnerService,
         private RouterInterface $router,
     ) {}
 
@@ -42,14 +42,14 @@ final readonly class EventCanonicalUrlProvider implements CanonicalUrlProviderIn
             return null;
         }
 
-        // The configured host, never the request host - an alternate host must not be able to
-        // declare itself canonical for events.
         $path = $this->router->generate(
             'app_event_details',
             ['_locale' => $request->getLocale(), 'id' => $root->getId()],
             UrlGeneratorInterface::ABSOLUTE_PATH,
         );
 
-        return rtrim($this->configService->getHost(), '/') . $path;
+        // The owning host, never the request host - an alternate host must not be able to declare
+        // itself canonical for events.
+        return $this->urlOwnerService->getOwnerHost('app_event_details', ['id' => $root->getId()]) . $path;
     }
 }

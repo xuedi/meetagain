@@ -2,6 +2,7 @@
 
 namespace Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class PublicPagesTest extends WebTestCase
@@ -33,6 +34,34 @@ class PublicPagesTest extends WebTestCase
         static::assertStringContainsString('<urlset', $content, 'Sitemap root should be a flat urlset');
         static::assertStringNotContainsString('<sitemapindex', $content, 'Flat sitemap must not emit a sitemap index');
         static::assertStringContainsString('<loc>', $content, 'Sitemap should contain at least one URL');
+    }
+
+    public function testSitemapListsEveryLocOnlyOnce(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/sitemap.xml');
+        $locs = $this->sitemapLocs($client);
+
+        // Assert
+        static::assertNotEmpty($locs);
+        static::assertSame([], array_values(array_diff_assoc($locs, array_unique($locs))), 'A loc is advertised twice');
+    }
+
+    public function testSitemapAdvertisesTheListAndDetailPagesOfAnActiveItemType(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/sitemap.xml', server: ['HTTP_HOST' => 'dragon.meetagain.local']);
+        $locs = $this->sitemapLocs($client);
+
+        // Assert
+        static::assertNotEmpty(preg_grep('#/en/glossary$#', $locs), 'The glossary list page is missing');
+        static::assertNotEmpty(preg_grep('#/en/glossary/\d+$#', $locs), 'No glossary entry page is advertised');
     }
 
     public function testRobotsTxtDisallowsApiPathsAndAdvertisesSitemap(): void
@@ -103,5 +132,14 @@ class PublicPagesTest extends WebTestCase
             $content,
             'Frontpage must override meta_description with the frontpage-specific value',
         );
+    }
+
+    /** @return list<string> */
+    private function sitemapLocs(KernelBrowser $client): array
+    {
+        $this->assertResponseIsSuccessful();
+        preg_match_all('#<loc>([^<]+)</loc>#', (string) $client->getResponse()->getContent(), $matches);
+
+        return $matches[1];
     }
 }
