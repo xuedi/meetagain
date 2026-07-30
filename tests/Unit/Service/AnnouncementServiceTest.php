@@ -304,7 +304,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange
         $templateServiceMock = $this->createMock(EmailTemplateService::class);
-        $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement)->willReturn(null);
+        $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement->value)->willReturn(null);
 
         $subject = new AnnouncementService(
             em: $this->createStub(EntityManagerInterface::class),
@@ -343,7 +343,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange
         $templateServiceMock = $this->createMock(EmailTemplateService::class);
-        $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement)->willReturn($emailTemplate);
+        $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement->value)->willReturn($emailTemplate);
         $templateServiceMock
             ->expects($this->exactly(2))
             ->method('renderContent')

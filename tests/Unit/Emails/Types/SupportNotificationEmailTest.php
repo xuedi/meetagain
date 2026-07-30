@@ -7,7 +7,6 @@ use App\Emails\Types\SupportNotificationEmail;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\ContactType;
-use App\Enum\EmailType;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
@@ -46,7 +45,6 @@ class SupportNotificationEmailTest extends TestCase
                     $enqueuedEmails[] = $email;
                     return true;
                 }),
-                EmailType::SupportNotification,
                 $this->anything(),
             );
 

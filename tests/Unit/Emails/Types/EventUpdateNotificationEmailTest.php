@@ -56,7 +56,6 @@ class EventUpdateNotificationEmailTest extends TestCase
                         && !str_contains($context['changesHtml'], 'email_event_update.line_location')
                     );
                 }),
-                EmailType::EventUpdateNotification,
                 $this->anything(),
             );
 
@@ -84,7 +83,6 @@ class EventUpdateNotificationEmailTest extends TestCase
                     $email->getContext()['changesHtml'],
                     'email_event_update.line_location',
                 )),
-                EmailType::EventUpdateNotification,
                 $this->anything(),
             );
 
@@ -112,7 +110,6 @@ class EventUpdateNotificationEmailTest extends TestCase
                     $email->getContext()['changesHtml'],
                     'email_event_update.line_canceled',
                 )),
-                EmailType::EventUpdateNotification,
                 $this->anything(),
             );
 
@@ -140,7 +137,6 @@ class EventUpdateNotificationEmailTest extends TestCase
                     $email->getContext()['changesHtml'],
                     'email_event_update.line_uncanceled',
                 )),
-                EmailType::EventUpdateNotification,
                 $this->anything(),
             );
 

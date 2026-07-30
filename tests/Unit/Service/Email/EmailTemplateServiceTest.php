@@ -71,7 +71,7 @@ class EmailTemplateServiceTest extends TestCase
         $service = new EmailTemplateService($repo, $this->createStub(ExtendedFilesystem::class), self::PROJECT_DIR);
 
         // Act
-        $content = $service->getTemplateContent(EmailType::Welcome, 'de');
+        $content = $service->getTemplateContent(EmailType::Welcome->value, 'de');
 
         // Assert
         static::assertSame(['subject' => 'Betreff', 'body' => '<de>body'], $content);
@@ -86,7 +86,7 @@ class EmailTemplateServiceTest extends TestCase
         $service = new EmailTemplateService($repo, $this->createStub(ExtendedFilesystem::class), self::PROJECT_DIR);
 
         // Act
-        $content = $service->getTemplateContent(EmailType::Welcome, 'de');
+        $content = $service->getTemplateContent(EmailType::Welcome->value, 'de');
 
         // Assert
         static::assertSame(['subject' => 'Welcome', 'body' => '<en>body'], $content);
@@ -103,7 +103,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         // Act
-        $service->getTemplateContent(EmailType::Welcome, 'en');
+        $service->getTemplateContent(EmailType::Welcome->value, 'en');
     }
 
     public function testGetTemplateContentThrowsWhenNoTranslationsExist(): void
@@ -119,7 +119,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         // Act
-        $service->getTemplateContent(EmailType::Welcome, 'en');
+        $service->getTemplateContent(EmailType::Welcome->value, 'en');
     }
 
     /**

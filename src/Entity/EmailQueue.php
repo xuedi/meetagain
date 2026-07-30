@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
+use App\Emails\Attachment;
 use App\Enum\EmailQueueStatus;
-use App\Enum\EmailType;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -48,8 +48,11 @@ class EmailQueue
     #[ORM\Column]
     private array $context = [];
 
-    #[ORM\Column(length: 64, nullable: true, enumType: EmailType::class)]
-    private ?EmailType $template = null;
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $template = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $attachments = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $renderedBody = null;
@@ -161,14 +164,32 @@ class EmailQueue
         return $this;
     }
 
-    public function getTemplate(): ?EmailType
+    public function getTemplate(): ?string
     {
         return $this->template;
     }
 
-    public function setTemplate(?EmailType $template): static
+    public function setTemplate(?string $template): static
     {
         $this->template = $template;
+
+        return $this;
+    }
+
+    /** @return list<Attachment> */
+    public function getAttachments(): array
+    {
+        return array_values(array_filter(array_map(
+            Attachment::fromArray(...),
+            $this->attachments ?? [],
+        )));
+    }
+
+    /** @param list<Attachment> $attachments */
+    public function setAttachments(array $attachments): static
+    {
+        $rows = array_map(static fn(Attachment $a): array => $a->toArray(), $attachments);
+        $this->attachments = $rows === [] ? null : $rows;
 
         return $this;
     }

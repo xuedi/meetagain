@@ -2,6 +2,7 @@
 
 namespace App\Service\Email;
 
+use App\Emails\TemplateProviderInterface;
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
 use App\Enum\EmailType;
@@ -9,6 +10,7 @@ use App\ExtendedFilesystem;
 use App\Repository\EmailTemplateRepository;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class EmailTemplateService
 {
@@ -161,32 +163,35 @@ readonly class EmailTemplateService
         ],
     ];
 
+    /** @param iterable<TemplateProviderInterface> $providers */
     public function __construct(
         private EmailTemplateRepository $repo,
         private ExtendedFilesystem $fs,
         #[Autowire('%kernel.project_dir%')]
         private string $projectDir,
+        #[AutowireIterator(TemplateProviderInterface::class)]
+        private iterable $providers = [],
     ) {}
 
-    public function getTemplate(EmailType $identifier): ?EmailTemplate
+    public function getTemplate(string $identifier): ?EmailTemplate
     {
-        return $this->repo->findByIdentifier($identifier->value);
+        return $this->repo->findByIdentifier($identifier);
     }
 
     /**
      * @return array{subject: string, body: string}
      */
-    public function getTemplateContent(EmailType $identifier, string $language): array
+    public function getTemplateContent(string $identifier, string $language): array
     {
-        $template = $this->repo->findByIdentifier($identifier->value);
+        $template = $this->repo->findByIdentifier($identifier);
         if (!$template instanceof EmailTemplate) {
-            throw new RuntimeException(sprintf('Email template "%s" not found in database.', $identifier->value));
+            throw new RuntimeException(sprintf('Email template "%s" not found in database.', $identifier));
         }
 
         $translation = $template->findTranslation($language) ?? $template->findTranslation(self::DEFAULT_LANGUAGE);
 
         if (!$translation instanceof EmailTemplateTranslation) {
-            throw new RuntimeException(sprintf('No translation found for email template "%s".', $identifier->value));
+            throw new RuntimeException(sprintf('No translation found for email template "%s".', $identifier));
         }
 
         return [
@@ -219,22 +224,32 @@ readonly class EmailTemplateService
         foreach (self::VARIABLES as $type => $variables) {
             $templates[$type] = [
                 'subject' => $subjects[$type],
-                'body' => $this->loadTemplateBody(EmailType::from($type), $language),
+                'body' => $this->loadTemplateBody($type, $language),
                 'variables' => $variables,
             ];
+        }
+
+        foreach ($this->providers as $provider) {
+            foreach ($provider->getDefinitions($language) as $definition) {
+                $templates[$definition->identifier] = [
+                    'subject' => $definition->subject,
+                    'body' => $definition->body,
+                    'variables' => $definition->variables,
+                ];
+            }
         }
 
         return $templates;
     }
 
-    private function loadTemplateBody(EmailType $type, string $language = self::DEFAULT_LANGUAGE): string
+    private function loadTemplateBody(string $identifier, string $language = self::DEFAULT_LANGUAGE): string
     {
-        $langPath = $this->projectDir . self::TEMPLATE_PATH . $language . '/' . $type->value . '.html';
+        $langPath = $this->projectDir . self::TEMPLATE_PATH . $language . '/' . $identifier . '.html';
         if ($this->fs->fileExists($langPath)) {
             return $this->fs->getFileContents($langPath) ?: '';
         }
 
-        $defaultPath = $this->projectDir . self::TEMPLATE_PATH . $type->value . '.html';
+        $defaultPath = $this->projectDir . self::TEMPLATE_PATH . $identifier . '.html';
         if ($this->fs->fileExists($defaultPath)) {
             return $this->fs->getFileContents($defaultPath) ?: '';
         }

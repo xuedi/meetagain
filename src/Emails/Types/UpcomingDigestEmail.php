@@ -108,7 +108,7 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
             'lang' => $language,
         ]);
 
-        $this->queue->enqueue($this, $email, EmailType::UpcomingEvents, $context);
+        $this->queue->enqueue($this, $email, $context);
     }
 
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable

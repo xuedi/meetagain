@@ -9,7 +9,6 @@ use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Emails\EmailInterface;
-use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use App\Service\Email\EmailTemplateService;
@@ -46,11 +45,11 @@ final class DebuggingController extends AbstractEmailController implements Admin
     public function debugging(Request $request): Response
     {
         $languages = $this->languageService->getAdminFilteredEnabledCodes();
-        $defaultType = EmailType::cases()[0];
+        $identifiers = $this->knownIdentifiers();
         $defaultLanguage = $languages[0];
 
         $typeValue = $request->query->getString('type');
-        $currentType = $typeValue !== '' ? EmailType::tryFrom($typeValue) ?? $defaultType : $defaultType;
+        $currentType = in_array($typeValue, $identifiers, true) ? $typeValue : $identifiers[0];
 
         $langValue = $request->query->getString('lang');
         $currentLanguage = in_array($langValue, $languages, true) ? $langValue : $defaultLanguage;
@@ -64,7 +63,7 @@ final class DebuggingController extends AbstractEmailController implements Admin
 
         return $this->render('admin/email/debugging/index.html.twig', [
             'active' => 'email',
-            'currentType' => $currentType->value,
+            'currentType' => $currentType,
             'currentLanguage' => $currentLanguage,
             'context' => $context,
             'adminTop' => $adminTop,
@@ -81,8 +80,7 @@ final class DebuggingController extends AbstractEmailController implements Admin
         $context = $request->request->all('context');
 
         try {
-            $type = EmailType::from($emailTypeValue);
-            $templateContent = $this->templateService->getTemplateContent($type, $language);
+            $templateContent = $this->templateService->getTemplateContent($emailTypeValue, $language);
             $subject = $this->templateService->renderContent($templateContent['subject'], $context);
             $body = $this->templateService->renderContent($templateContent['body'], $context);
 
@@ -113,10 +111,10 @@ final class DebuggingController extends AbstractEmailController implements Admin
     /**
      * @return array<string, mixed>
      */
-    private function resolveMockContext(EmailType $type): array
+    private function resolveMockContext(string $identifier): array
     {
         foreach ($this->emailTypes as $emailType) {
-            if ($emailType->getIdentifier() !== $type->value) {
+            if ($emailType->getIdentifier() !== $identifier) {
                 continue;
             }
             $context = $emailType->getDisplayMockData()['context'];
@@ -130,19 +128,19 @@ final class DebuggingController extends AbstractEmailController implements Admin
         return [];
     }
 
-    private function buildTypeDropdown(EmailType $current, string $language): AdminTopActionDropdown
+    private function buildTypeDropdown(string $current, string $language): AdminTopActionDropdown
     {
         $options = [];
-        foreach (EmailType::cases() as $type) {
+        foreach ($this->knownIdentifiers() as $identifier) {
             $options[] = new AdminTopActionDropdownOption(
-                label: $this->humanize($type->value),
-                target: $this->generateUrl('app_admin_email_debugging', ['type' => $type->value, 'lang' => $language]),
-                isActive: $type === $current,
+                label: $this->humanize($identifier),
+                target: $this->generateUrl('app_admin_email_debugging', ['type' => $identifier, 'lang' => $language]),
+                isActive: $identifier === $current,
             );
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf('%s %s', $this->translator->trans('admin_email_debugging.field_email_type') . ':', $this->humanize($current->value)),
+            label: sprintf('%s %s', $this->translator->trans('admin_email_debugging.field_email_type') . ':', $this->humanize($current)),
             options: $options,
             icon: 'envelope',
         );
@@ -151,13 +149,13 @@ final class DebuggingController extends AbstractEmailController implements Admin
     /**
      * @param list<string> $languages
      */
-    private function buildLanguageDropdown(string $current, EmailType $type, array $languages): AdminTopActionDropdown
+    private function buildLanguageDropdown(string $current, string $type, array $languages): AdminTopActionDropdown
     {
         $options = [];
         foreach ($languages as $code) {
             $options[] = new AdminTopActionDropdownOption(
                 label: $code,
-                target: $this->generateUrl('app_admin_email_debugging', ['type' => $type->value, 'lang' => $code]),
+                target: $this->generateUrl('app_admin_email_debugging', ['type' => $type, 'lang' => $code]),
                 isActive: $code === $current,
             );
         }
@@ -172,5 +170,17 @@ final class DebuggingController extends AbstractEmailController implements Admin
     private function humanize(string $value): string
     {
         return ucwords(str_replace('_', ' ', $value));
+    }
+
+    /** @return list<string> */
+    private function knownIdentifiers(): array
+    {
+        $identifiers = [];
+        foreach ($this->emailTypes as $emailType) {
+            $identifiers[] = $emailType->getIdentifier();
+        }
+        sort($identifiers);
+
+        return $identifiers;
     }
 }

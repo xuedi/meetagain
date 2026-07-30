@@ -4,7 +4,6 @@ namespace App\Command;
 
 use App\Entity\EmailTemplate;
 use App\Entity\EmailTemplateTranslation;
-use App\Enum\EmailType;
 use App\Repository\EmailTemplateTranslationRepository;
 use App\Service\Config\LanguageService;
 use App\Service\Email\EmailTemplateService;
@@ -37,8 +36,7 @@ class EmailTemplateSeedCommand extends Command
         $translationsCreated = 0;
 
         foreach ($defaults as $identifier => $data) {
-            $emailType = EmailType::from($identifier);
-            $template = $this->templateService->getTemplate($emailType);
+            $template = $this->templateService->getTemplate($identifier);
 
             if (!$template instanceof EmailTemplate) {
                 $template = new EmailTemplate();

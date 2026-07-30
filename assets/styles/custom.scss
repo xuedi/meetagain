@@ -321,6 +321,13 @@ details.activities-load-more {
     border-bottom: 2px solid #b5b5b5 !important;
 }
 
+// Headerless message: the body is the whole box, so the top edge has to close it.
+.message-body:first-child {
+    border-top: 2px solid #b5b5b5 !important;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
 // Flatpickr: v4.6+ uses .hasTime instead of .showTimeInput — restore time row height.
 .flatpickr-calendar.hasTime .flatpickr-time {
     border-top: 1px solid rgba(10, 10, 10, .1);

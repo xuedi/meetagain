@@ -7,7 +7,6 @@ use App\Emails\EmailInterface;
 use App\Entity\EmailQueue;
 use App\Entity\User;
 use App\Enum\EmailQueueStatus;
-use App\Enum\EmailType;
 use App\Repository\EmailQueueRepository;
 use App\Service\Email\EmailService;
 use App\Service\Email\EmailTemplateService;
@@ -66,7 +65,7 @@ final class EmailServiceTest extends TestCase
         $service = $this->createService(em: $emMock, templateService: $templateService);
 
         // Act
-        $ok = $service->enqueue($this->nullCapSource(), $email, EmailType::VerificationRequest, []);
+        $ok = $service->enqueue($this->nullCapSource(), $email, []);
 
         // Assert
         static::assertTrue($ok);
@@ -98,7 +97,7 @@ final class EmailServiceTest extends TestCase
         $service = $this->createService(em: $emMock);
 
         // Act
-        $service->enqueue($source, $email, EmailType::EventReminder, ['event' => 'stub']);
+        $service->enqueue($source, $email, ['event' => 'stub']);
 
         // Assert
         static::assertSame($cutoff, $capturedQueue->getMaxSendBy());
@@ -120,7 +119,7 @@ final class EmailServiceTest extends TestCase
         $service = $this->createService(em: $emMock);
 
         // Act
-        $service->enqueue($this->nullCapSource(), $email, EmailType::Announcement, [], false);
+        $service->enqueue($this->nullCapSource(), $email, [], false);
     }
 
     public function testEnricherContextKeyAppearsInPersistedEmailQueue(): void
@@ -153,7 +152,7 @@ final class EmailServiceTest extends TestCase
         $email->context([]);
 
         // Act
-        $service->enqueue($this->nullCapSource(), $email, EmailType::Welcome, []);
+        $service->enqueue($this->nullCapSource(), $email, []);
 
         // Assert
         static::assertSame('enriched_value', $capturedQueue->getContext()['custom_key']);

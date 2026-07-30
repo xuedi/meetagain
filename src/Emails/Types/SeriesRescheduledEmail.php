@@ -93,7 +93,7 @@ readonly class SeriesRescheduledEmail extends EmailAbstract
             'newStart' => $event->getStart()->format('Y-m-d H:i'),
         ]);
 
-        $this->queue->enqueue($this, $email, EmailType::SeriesRescheduled, $context);
+        $this->queue->enqueue($this, $email, $context);
     }
 
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
