@@ -39,6 +39,17 @@ class TypeRegistry
         return $this->getActive()[$itemType] ?? null;
     }
 
+    public function providerForIncludingInactive(string $itemType): ?TypeProviderInterface
+    {
+        foreach ($this->providers as $provider) {
+            if ($provider->getKey() === $itemType) {
+                return $provider;
+            }
+        }
+
+        return null;
+    }
+
     /**
      * @return array<string, TypeProviderInterface>
      */

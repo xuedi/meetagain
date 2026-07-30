@@ -6,12 +6,12 @@ use App\Filter\Cms\CmsFilterService;
 use App\Filter\Event\EventFilterService;
 use App\Filter\Member\MemberFilterService;
 use App\Filter\Sitemap\SitemapEventLocaleFilterInterface;
-use App\Filter\Sitemap\SitemapEventVisibilityService;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Config\LanguageService;
 use App\Service\Seo\EventCanonicalResolver;
+use App\Service\Seo\UrlOwnerService;
 use DateTimeImmutable;
 use Override;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -31,8 +31,8 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
         private CmsFilterService $cmsFilterService,
         private MemberFilterService $memberFilterService,
         private EventFilterService $eventFilterService,
-        private SitemapEventVisibilityService $eventVisibilityService,
         private EventCanonicalResolver $canonicalResolver,
+        private UrlOwnerService $urlOwnerService,
         #[AutowireIterator(SitemapEventLocaleFilterInterface::class)]
         private iterable $eventLocaleFilters = [],
     ) {}
@@ -55,7 +55,7 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
             ...$this->collectStaticRoutes($locales),
             ...$this->collectMemberPages($locales),
             ...$this->collectCmsPages($locales),
-            ...($this->eventVisibilityService->shouldEmitEvents() ? $this->collectEvents($locales) : []),
+            ...$this->collectEvents($locales),
         ];
     }
 
@@ -86,6 +86,10 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
                     ['_locale' => $locale, ...$routeConfig['params']],
                     UrlGeneratorInterface::ABSOLUTE_URL,
                 );
+            }
+
+            if (!$this->isServedHere($routeConfig['route'], $routeConfig['params'], $localeUrls)) {
+                continue;
             }
 
             foreach ($locales as $locale) {
@@ -131,6 +135,10 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
                 );
             }
 
+            if (!$this->isServedHere('app_member', ['page' => $page], $localeUrls)) {
+                continue;
+            }
+
             foreach ($locales as $locale) {
                 $urls[] = new SitemapUrl(
                     loc: $localeUrls[$locale],
@@ -169,10 +177,15 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
                 continue;
             }
 
+            $pageLocales = array_values(array_intersect($locales, $page->getLanguages()));
+            if ($pageLocales === []) {
+                continue;
+            }
+
             $lastmod = new DateTimeImmutable($page->getCreatedAt()?->format('Y-m-d') ?? date('Y-m-d'));
 
             $localeUrls = [];
-            foreach ($locales as $locale) {
+            foreach ($pageLocales as $locale) {
                 $localeUrls[$locale] = $this->urlGenerator->generate(
                     'app_catch_all',
                     ['_locale' => $locale, 'page' => $slug],
@@ -180,7 +193,11 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
                 );
             }
 
-            foreach ($locales as $locale) {
+            if (!$this->isServedHere('app_catch_all', ['page' => $slug], $localeUrls)) {
+                continue;
+            }
+
+            foreach ($pageLocales as $locale) {
                 $urls[] = new SitemapUrl(
                     loc: $localeUrls[$locale],
                     lastmod: $lastmod,
@@ -237,6 +254,10 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
                 );
             }
 
+            if (!$this->isServedHere('app_event_details', ['id' => $id], $localeUrls)) {
+                continue;
+            }
+
             foreach ($eventLocales as $locale) {
                 if (($rootIds[$id][$locale] ?? $id) !== $id) {
                     continue;
@@ -255,6 +276,17 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
         }
 
         return $urls;
+    }
+
+    /**
+     * @param array<string, mixed> $parameters
+     * @param array<string, string> $localeUrls
+     */
+    private function isServedHere(string $route, array $parameters, array $localeUrls): bool
+    {
+        $anyUrl = reset($localeUrls);
+
+        return $anyUrl !== false && $this->urlOwnerService->ownsUrl($route, $parameters, $anyUrl);
     }
 
     /**

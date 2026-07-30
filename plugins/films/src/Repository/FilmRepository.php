@@ -54,4 +54,22 @@ class FilmRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['externalId' => $externalId, 'externalSource' => $source]);
     }
+
+    /**
+     * @param list<int>|null $allowedIds null: no restriction; []: block all
+     */
+    public function findOneAllowed(int $id, ?array $allowedIds): ?Film
+    {
+        if ($allowedIds === []) {
+            return null;
+        }
+
+        $qb = $this->createQueryBuilder('f')->andWhere('f.id = :id')->setParameter('id', $id);
+
+        if ($allowedIds !== null) {
+            $qb->andWhere('f.id IN (:ids)')->setParameter('ids', $allowedIds);
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }

@@ -26,7 +26,7 @@ final class ApprovalController extends AbstractGlossaryController
     public function approvalList(int $id): Response
     {
         return $this->renderPage('@Glossary/approval.html.twig', [
-            'editItem' => $this->service->get($id),
+            'editItem' => $this->service->getManaged($id),
         ]);
     }
 
@@ -37,7 +37,7 @@ final class ApprovalController extends AbstractGlossaryController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $item = $this->service->get($id);
+        $item = $this->service->getManaged($id);
         $this->service->approveNew($id);
 
         if ($item !== null) {

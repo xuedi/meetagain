@@ -26,7 +26,7 @@ final class DeleteController extends AbstractGlossaryController
     public function deleteView(int $id): Response
     {
         return $this->renderPage('@Glossary/delete.html.twig', [
-            'editItem' => $this->service->get($id),
+            'editItem' => $this->service->getManaged($id),
         ]);
     }
 
@@ -37,7 +37,7 @@ final class DeleteController extends AbstractGlossaryController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $item = $this->service->get($id);
+        $item = $this->service->getManaged($id);
         $this->service->delete($id);
 
         if ($item !== null) {

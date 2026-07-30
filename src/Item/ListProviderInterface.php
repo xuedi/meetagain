@@ -2,6 +2,7 @@
 
 namespace App\Item;
 
+use DateTimeInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
@@ -28,6 +29,15 @@ interface ListProviderInterface
     /** The type's own list markup for the current request. */
     public function renderList(): string;
 
-    /** Path of the type's clean list page. */
-    public function getListUrl(): string;
+    /** Route name of the type's clean list page. */
+    public function getListRoute(): string;
+
+    /** Route name of the type's detail page, taking an `id` parameter; null when the type has none. */
+    public function getDetailRoute(): ?string;
+
+    /**
+     * @param list<int> $itemIds
+     * @return array<int, DateTimeInterface> item id => last change; ids may be absent
+     */
+    public function getLastmodByItemId(array $itemIds): array;
 }

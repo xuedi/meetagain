@@ -21,10 +21,17 @@ interface TypeProviderInterface
     /** Translation key for the type's label. */
     public function getLabelKey(): string;
 
-    /** Cell rendered on the event detail page for one association; null when the item no longer exists. */
+    /**
+     * Cell rendered on the event detail page for one association; null when the item no longer exists.
+     * The association is the authorization: an attached item is part of the event, so read it without
+     * the visibility narrowing that gates the type's own list and detail pages.
+     */
     public function renderEventCell(int $itemId, EventItemAssociation $association): ?string;
 
-    /** Steward search/pick fragment rendered inside the attach control. */
+    /**
+     * Steward search/pick fragment rendered inside the attach control. Attaching is a management
+     * action, so list what the steward may manage rather than what the serving host displays.
+     */
     public function renderAttachPicker(int $eventId): string;
 
     /** Order in the attach type dropdown (ascending). */

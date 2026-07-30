@@ -31,6 +31,25 @@ class ListRegistry
         return $this->getActive()[$itemType] ?? null;
     }
 
+    public function itemTypeForDetailRouteIncludingInactive(string $route): ?string
+    {
+        foreach ($this->providers as $provider) {
+            if ($provider->getDetailRoute() === $route) {
+                return $provider->getKey();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array<string, ListProviderInterface>
+     */
+    public function activeProviders(): array
+    {
+        return $this->getActive();
+    }
+
     /**
      * @return array<string, ListProviderInterface>
      */

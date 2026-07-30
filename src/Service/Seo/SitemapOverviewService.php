@@ -15,7 +15,7 @@ readonly class SitemapOverviewService
      * Stable canonical order so the section dropdown does not flicker as plugins activate/deactivate.
      * Sections present in the publisher output but not listed here are appended alphabetically.
      */
-    private const array SECTION_ORDER = ['static', 'cms', 'events', 'members', 'groups', 'marketing'];
+    private const array SECTION_ORDER = ['static', 'cms', 'events', 'items', 'members', 'groups', 'marketing'];
 
     public function __construct(
         private SitemapService $sitemapService,

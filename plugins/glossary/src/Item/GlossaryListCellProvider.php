@@ -10,7 +10,6 @@ use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Service\ConfigService;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 final readonly class GlossaryListCellProvider implements ListCellProviderInterface, ListProviderInterface
@@ -21,7 +20,6 @@ final readonly class GlossaryListCellProvider implements ListCellProviderInterfa
         private Environment $twig,
         private ChangeProposalService $changeProposalService,
         private Security $security,
-        private UrlGeneratorInterface $urlGenerator,
     ) {}
 
     #[Override]
@@ -85,8 +83,33 @@ final readonly class GlossaryListCellProvider implements ListCellProviderInterfa
     }
 
     #[Override]
-    public function getListUrl(): string
+    public function getListRoute(): string
     {
-        return $this->urlGenerator->generate('app_plugin_glossary');
+        return 'app_plugin_glossary';
+    }
+
+    #[Override]
+    public function getDetailRoute(): ?string
+    {
+        return 'app_plugin_glossary_show';
+    }
+
+    #[Override]
+    public function getLastmodByItemId(array $itemIds): array
+    {
+        $wanted = array_flip($itemIds);
+
+        $stamps = [];
+        foreach ($this->glossaryService->getList() as $entry) {
+            $id = (int) $entry->getId();
+            $createdAt = $entry->getCreatedAt();
+            if ($createdAt === null || !isset($wanted[$id])) {
+                continue;
+            }
+
+            $stamps[$id] = $createdAt;
+        }
+
+        return $stamps;
     }
 }

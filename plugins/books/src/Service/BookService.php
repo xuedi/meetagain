@@ -5,6 +5,7 @@ namespace Plugin\Books\Service;
 use App\Enum\ImageType;
 use App\Enum\ItemAction;
 use App\Item\ActionDispatcher;
+use App\Item\AdminFilterService;
 use App\Item\FilterService;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
@@ -24,6 +25,7 @@ readonly class BookService
         private IsbnLookupInterface $isbnLookup,
         private CoverImageService $coverImageService,
         private FilterService $itemFilter,
+        private AdminFilterService $adminItemFilter,
         private ActionDispatcher $dispatcher,
         private ImageLocationService $imageLocationService,
     ) {}
@@ -141,9 +143,25 @@ readonly class BookService
         return $this->bookRepo->findAll($this->itemFilter->getAllowedItemIds(self::ITEM_TYPE));
     }
 
+    /** @return Book[] */
+    public function getManagedList(): array
+    {
+        return $this->bookRepo->findAll($this->adminItemFilter->getAllowedItemIds(self::ITEM_TYPE));
+    }
+
     public function get(int $id): ?Book
     {
-        return $this->bookRepo->find($id);
+        return $this->bookRepo->findOneAllowed($id, $this->itemFilter->getAllowedItemIds(self::ITEM_TYPE));
+    }
+
+    public function getManaged(int $id): ?Book
+    {
+        return $this->bookRepo->findOneAllowed($id, $this->adminItemFilter->getAllowedItemIds(self::ITEM_TYPE));
+    }
+
+    public function getAttached(int $id): ?Book
+    {
+        return $this->bookRepo->findOneAllowed($id, null);
     }
 
     public function getByIsbn(string $isbn): ?Book
