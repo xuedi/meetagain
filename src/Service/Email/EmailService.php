@@ -9,7 +9,6 @@ use App\Emails\EmailQueueInterface;
 use App\Entity\EmailQueue;
 use App\Enum\CronTaskStatus;
 use App\Enum\EmailQueueStatus;
-use App\Enum\EmailType;
 use App\Repository\EmailQueueRepository;
 use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
@@ -21,6 +20,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\Part\File;
 
 readonly class EmailService implements CronTaskInterface, EmailQueueInterface
 {
@@ -38,10 +39,11 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         private iterable $enrichers,
     ) {}
 
-    public function enqueue(EmailInterface $source, TemplatedEmail $email, EmailType $type, array $context, bool $flush = true): bool
+    public function enqueue(EmailInterface $source, TemplatedEmail $email, array $context, bool $flush = true): bool
     {
+        $identifier = $source->getIdentifier();
         $locale = $email->getLocale() ?? 'en';
-        $templateContent = $this->templateService->getTemplateContent($type, $locale);
+        $templateContent = $this->templateService->getTemplateContent($identifier, $locale);
 
         $twigContext = array_merge(['greeting' => ''], $email->getContext());
 
@@ -58,7 +60,8 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         $emailQueue->setContext($twigContext);
         $emailQueue->setCreatedAt($now);
         $emailQueue->setMaxSendBy($source->getMaxSendBy($context, $now));
-        $emailQueue->setTemplate($type);
+        $emailQueue->setTemplate($identifier);
+        $emailQueue->setAttachments($source->getAttachments($context));
         $emailQueue->setSubject($this->templateService->renderContent($templateContent['subject'], $twigContext));
         $emailQueue->setRenderedBody($this->templateService->renderContent($templateContent['body'], $twigContext));
 
@@ -104,7 +107,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
                 $mail->setErrorMessage(sprintf('Dispatch cutoff passed: max_send_by=%s, now=%s', $cutoff->format('c'), $now->format('c')));
                 $this->logger->error('Email dispatch skipped: past max_send_by cutoff', [
                     'email_queue_id' => $mail->getId(),
-                    'template' => $mail->getTemplate()?->value,
+                    'template' => $mail->getTemplate(),
                     'recipient' => $mail->getRecipient(),
                     'created_at' => $mail->getCreatedAt()?->format('c'),
                     'max_send_by' => $cutoff->format('c'),
@@ -162,6 +165,18 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         $template->subject($mail->getSubject());
         $template->locale($mail->getLang());
         $template->html($mail->getRenderedBody());
+
+        foreach ($mail->getAttachments() as $attachment) {
+            if (!is_readable($attachment->path)) {
+                $this->logger->warning('Email attachment is missing and was skipped', [
+                    'email_queue_id' => $mail->getId(),
+                    'path' => $attachment->path,
+                ]);
+                continue;
+            }
+
+            $template->addPart(new DataPart(new File($attachment->path), $attachment->filename));
+        }
 
         return $template;
     }

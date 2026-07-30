@@ -73,6 +73,6 @@ readonly class VerificationRequestEmail extends EmailAbstract
             'lang' => $user->getLocale(),
         ]);
 
-        $this->queue->enqueue($this, $email, EmailType::VerificationRequest, $context);
+        $this->queue->enqueue($this, $email, $context);
     }
 }

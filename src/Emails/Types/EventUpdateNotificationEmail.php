@@ -98,7 +98,7 @@ readonly class EventUpdateNotificationEmail extends EmailAbstract
             'changesHtml' => $changesHtml,
         ]);
 
-        $this->queue->enqueue($this, $email, EmailType::EventUpdateNotification, $context);
+        $this->queue->enqueue($this, $email, $context);
     }
 
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable

@@ -86,7 +86,7 @@ readonly class NotificationEventCanceledEmail extends EmailAbstract
             'lang' => $language,
         ]);
 
-        $this->queue->enqueue($this, $email, EmailType::NotificationEventCanceled, $context);
+        $this->queue->enqueue($this, $email, $context);
     }
 
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable

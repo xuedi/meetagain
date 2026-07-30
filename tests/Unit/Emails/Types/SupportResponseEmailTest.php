@@ -36,7 +36,6 @@ class SupportResponseEmailTest extends TestCase
                     $enqueued = $email;
                     return true;
                 }),
-                EmailType::SupportResponse,
                 $this->anything(),
             );
 

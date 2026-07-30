@@ -33,6 +33,14 @@ interface EmailInterface
     public function send(array $context): void;
 
     /**
+     * Files to attach, resolved at enqueue time and read again at dispatch. A file that has since
+     * disappeared is skipped rather than failing the send.
+     *
+     * @return list<Attachment>
+     */
+    public function getAttachments(array $context): array;
+
+    /**
      * Cutoff for queue-level dispatch: if the email-queue cron picks up a row after this moment it will
      * skip the send and mark the row `late`. Return `null` to opt out (default behaviour, no cap).
      */

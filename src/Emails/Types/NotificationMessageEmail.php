@@ -89,7 +89,7 @@ readonly class NotificationMessageEmail extends EmailAbstract
             'lang' => $language,
         ]);
 
-        $this->queue->enqueue($this, $email, EmailType::NotificationMessage, $context);
+        $this->queue->enqueue($this, $email, $context);
     }
 
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
