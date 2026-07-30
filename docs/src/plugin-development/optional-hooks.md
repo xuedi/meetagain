@@ -23,7 +23,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `MetaEnricherInterface`                    | Enrich metadata on all activity types                 | `enrich()`                                                |
 | `MessageInterface`                         | Define a new activity type with display rendering     | `getType()`, `validate()`, `render()`                     |
 | `SitemapPublisherInterface`                | Contribute URLs to `/sitemap.xml`                     | `getPriority()`, `getSitemapUrls()`                       |
-| `SitemapEventVisibilityFilterInterface`    | Suppress event URLs on specific tenants               | `shouldEmitEvents()`                                      |
+| `UrlOwnerProviderInterface`                | Name the host that owns a route                       | `getOwnerHost()`                                          |
 | `FollowerEventNotificationFilterInterface` | Drop follower-RSVP email recipients per event         | `isFollowerAllowed()`                                     |
 | `ImageAttributionFilterInterface`          | Narrow which attributed images `/attributions` shows  | `getVisibleImageIdFilter()`                               |
 | `DataHotfixInterface`                      | Ship a one-off data repair that runs once per DB      | `getIdentifier()`, `execute()`                            |
@@ -399,30 +399,43 @@ host).
 
 ---
 
-### SitemapEventVisibilityFilterInterface
+### UrlOwnerProviderInterface
 
-**Purpose:** Suppress event URLs from `/sitemap.xml` in specific contexts. Core emits events by default; any registered
-filter returning `false` vetoes that.
+**Purpose:** Decide which host owns a route. The owner is the host whose pages declare the canonical URL and the only
+host whose `/sitemap.xml` advertises them. Core resolves ownership to the configured `website_host`, so an installation
+with no implementation keeps every page self-canonical and one complete feed.
 
-**File:** `src/Filter/Sitemap/SitemapEventVisibilityFilterInterface.php`
+**File:** `src/Publisher/UrlOwner/UrlOwnerProviderInterface.php`
 
 **Tag:** Auto-tagged via `#[AutoconfigureTag]` on the interface.
 
-**Example:** The multisite plugin uses this to hide events on whitelabel hosts because events are platform-canonical.
+**Contract:** return an absolute origin (`https://host`, no path) to claim the route for that host, or `null` to defer
+to the next provider. A route no provider claims belongs to whichever host serves it - so only claim a route when it
+genuinely belongs somewhere else, never to restate the obvious.
+
+**Example:** a plugin that serves the same application on several domains, where sign-up should rank on one of them.
 
 ```php
-namespace Plugin\YourPlugin\Filter\Sitemap;
+namespace Plugin\YourPlugin\Seo;
 
-use App\Filter\Sitemap\SitemapEventVisibilityFilterInterface;
+use App\Publisher\UrlOwner\UrlOwnerProviderInterface;
 
-readonly class HideEventsOnSomeTenants implements SitemapEventVisibilityFilterInterface
+readonly class UrlOwnerProvider implements UrlOwnerProviderInterface
 {
-    public function shouldEmitEvents(): bool
+    public function getOwnerHost(string $route, array $parameters): ?string
     {
-        return $this->currentContextAllowsEvents();
+        if (!in_array($route, ['app_login', 'app_register', 'app_reset'], true)) {
+            return null;
+        }
+
+        return $this->isOnTheSignUpDomain() ? null : 'https://signup.example.org';
     }
 }
 ```
+
+**Replaces `SitemapEventVisibilityFilterInterface`.** That interface was an all-or-nothing veto on event URLs and could
+not express "these events, not those". Ownership subsumes it: an event URL is emitted by the host that owns it, so a
+plugin that used the veto to keep events off a secondary domain now claims `app_event_details` for the primary one.
 
 ---
 
@@ -1052,13 +1065,20 @@ list-cell and categorizable seams and skips the event one.
    `renderList()` renders:
 
    ```php
-   public function getItemIds(): array   { /* ids in display order, after your filter chain */ }
-   public function renderList(): string  { /* your templates/item/list_body.html.twig */ }
-   public function getListUrl(): string  { /* path of your clean list page */ }
+   public function getItemIds(): array      { /* ids in display order, after your filter chain */ }
+   public function renderList(): string     { /* your templates/item/list_body.html.twig */ }
+   public function getListRoute(): string   { /* route name of your clean list page */ }
+   public function getDetailRoute(): ?string { /* route name of your detail page, or null */ }
+   public function getLastmodByItemId(array $itemIds): array { /* id => DateTimeInterface */ }
    ```
 
    Do **not** memoise `getItemIds()` per request - core evaluates it a second time with the facets suppressed to work
    out the unfiltered total and the per-option counts.
+
+   Core generates the URLs from the two route names, so it can build absolute per-locale links your plugin never sees.
+   Returning a detail route also enrolls the type in the core item sitemap publisher: every id `getItemIds()` yields
+   gets a `<url>` entry per enabled locale, stamped with whatever `getLastmodByItemId()` reports. Return `null` from
+   `getDetailRoute()` for a type whose items have no indexable page of their own.
 
 5. **Display and filter.** Include `_components/item/list_layout.html.twig` from your list page and name your item type.
    It gives you the two-column page layout, a core-owned sidebar (filter box, view switcher, "about this list"

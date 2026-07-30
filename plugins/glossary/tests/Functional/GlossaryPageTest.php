@@ -113,7 +113,7 @@ class GlossaryPageTest extends WebTestCase
         $approved = $this->entry($client, true);
 
         // Act
-        $client->request('GET', '/en/glossary/' . $approved->getId());
+        $client->request('GET', '/en/glossary/' . $approved->getId(), server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -127,7 +127,7 @@ class GlossaryPageTest extends WebTestCase
         $pending = $this->entry($client, false);
 
         // Act
-        $client->request('GET', '/en/glossary/' . $pending->getId());
+        $client->request('GET', '/en/glossary/' . $pending->getId(), server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         $this->assertResponseStatusCodeSame(404);
@@ -141,7 +141,7 @@ class GlossaryPageTest extends WebTestCase
         $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
 
         // Act
-        $client->request('GET', '/en/glossary/' . $pending->getId());
+        $client->request('GET', '/en/glossary/' . $pending->getId(), server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -155,7 +155,7 @@ class GlossaryPageTest extends WebTestCase
         $client->loginUser($this->user($client, self::MEMBER_EMAIL));
 
         // Act
-        $client->request('GET', '/en/glossary/edit/' . $pending->getId());
+        $client->request('GET', '/en/glossary/edit/' . $pending->getId(), server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         $this->assertResponseStatusCodeSame(404);
@@ -169,7 +169,7 @@ class GlossaryPageTest extends WebTestCase
         $client->loginUser($this->user($client, self::MEMBER_EMAIL));
 
         // Act
-        $client->request('GET', '/en/glossary/edit/' . $approved->getId());
+        $client->request('GET', '/en/glossary/edit/' . $approved->getId(), server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -183,7 +183,7 @@ class GlossaryPageTest extends WebTestCase
         $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
 
         // Act
-        $client->request('GET', '/en/glossary/edit/' . $pending->getId());
+        $client->request('GET', '/en/glossary/edit/' . $pending->getId(), server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         $this->assertResponseIsSuccessful();

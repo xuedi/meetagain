@@ -58,4 +58,22 @@ class BookRepository extends ServiceEntityRepository
     {
         return $this->findOneBy(['isbn' => $isbn]);
     }
+
+    /**
+     * @param list<int>|null $allowedIds null: no restriction; []: block all
+     */
+    public function findOneAllowed(int $id, ?array $allowedIds): ?Book
+    {
+        if ($allowedIds === []) {
+            return null;
+        }
+
+        $qb = $this->createQueryBuilder('b')->andWhere('b.id = :id')->setParameter('id', $id);
+
+        if ($allowedIds !== null) {
+            $qb->andWhere('b.id IN (:ids)')->setParameter('ids', $allowedIds);
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }

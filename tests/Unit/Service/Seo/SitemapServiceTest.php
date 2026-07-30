@@ -47,6 +47,46 @@ class SitemapServiceTest extends TestCase
         self::assertContains('https://example.com/plugin-b', $pluginLocs);
     }
 
+    public function testCollapsesADuplicateLocToTheHigherPriorityPublisher(): void
+    {
+        // Arrange
+        $core = $this->makePublisher(priority: 0, urls: [
+            new SitemapUrl(loc: 'https://example.com/en/', priority: 1.0, section: 'static'),
+        ]);
+        $plugin = $this->makePublisher(priority: 10, urls: [
+            new SitemapUrl(loc: 'https://example.com/en/', priority: 0.9, alternates: ['en' => 'https://example.com/en/'], section: 'marketing'),
+        ]);
+
+        $service = new SitemapService([$core, $plugin]);
+
+        // Act
+        $urls = $service->getUrls();
+
+        // Assert
+        self::assertCount(1, $urls);
+        self::assertSame('marketing', $urls[0]->section);
+        self::assertSame(0.9, $urls[0]->priority);
+        self::assertSame(['en' => 'https://example.com/en/'], $urls[0]->alternates);
+    }
+
+    public function testKeepsDistinctLocsFromTheSamePublisher(): void
+    {
+        // Arrange
+        $service = new SitemapService([
+            $this->makePublisher(priority: 0, urls: [
+                new SitemapUrl(loc: 'https://example.com/en/'),
+                new SitemapUrl(loc: 'https://example.com/de/'),
+                new SitemapUrl(loc: 'https://example.com/en/'),
+            ]),
+        ]);
+
+        // Act
+        $locs = array_map(static fn(SitemapUrl $url) => $url->loc, $service->getUrls());
+
+        // Assert
+        self::assertSame(['https://example.com/en/', 'https://example.com/de/'], $locs);
+    }
+
     public function testRenderXmlProducesWellFormedUrlsetWithAlternates(): void
     {
         // Arrange

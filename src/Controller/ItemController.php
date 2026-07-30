@@ -42,7 +42,7 @@ final class ItemController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $listUrl = $provider->getListUrl();
+        $listUrl = $this->generateUrl($provider->getListRoute());
         if (!$request->isXmlHttpRequest()) {
             return $this->redirect($listUrl);
         }

@@ -53,4 +53,22 @@ class DishRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * @param list<int>|null $allowedIds null: no restriction; []: block all
+     */
+    public function findOneAllowed(int $id, ?array $allowedIds): ?Dish
+    {
+        if ($allowedIds === []) {
+            return null;
+        }
+
+        $qb = $this->createQueryBuilder('d')->andWhere('d.id = :id')->setParameter('id', $id);
+
+        if ($allowedIds !== null) {
+            $qb->andWhere('d.id IN (:ids)')->setParameter('ids', $allowedIds);
+        }
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
 }

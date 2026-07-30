@@ -9,7 +9,6 @@ use App\Item\ListProviderInterface;
 use Override;
 use Plugin\Films\Entity\Film;
 use Plugin\Films\Service\FilmService;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 final readonly class FilmTypeProvider implements TypeProviderInterface, ListCellProviderInterface, ListProviderInterface
@@ -17,7 +16,6 @@ final readonly class FilmTypeProvider implements TypeProviderInterface, ListCell
     public function __construct(
         private FilmService $filmService,
         private Environment $twig,
-        private UrlGeneratorInterface $urlGenerator,
     ) {}
 
     #[Override]
@@ -41,7 +39,7 @@ final readonly class FilmTypeProvider implements TypeProviderInterface, ListCell
     #[Override]
     public function renderEventCell(int $itemId, EventItemAssociation $association): ?string
     {
-        $film = $this->filmService->get($itemId);
+        $film = $this->filmService->getAttached($itemId);
         if ($film === null) {
             return null;
         }
@@ -80,9 +78,34 @@ final readonly class FilmTypeProvider implements TypeProviderInterface, ListCell
     }
 
     #[Override]
-    public function getListUrl(): string
+    public function getListRoute(): string
     {
-        return $this->urlGenerator->generate('app_films_filmlist');
+        return 'app_films_filmlist';
+    }
+
+    #[Override]
+    public function getDetailRoute(): ?string
+    {
+        return 'app_plugin_films_film_show';
+    }
+
+    #[Override]
+    public function getLastmodByItemId(array $itemIds): array
+    {
+        $wanted = array_flip($itemIds);
+
+        $stamps = [];
+        foreach ($this->filmService->getList() as $film) {
+            $id = (int) $film->getId();
+            $createdAt = $film->getCreatedAt();
+            if ($createdAt === null || !isset($wanted[$id])) {
+                continue;
+            }
+
+            $stamps[$id] = $createdAt;
+        }
+
+        return $stamps;
     }
 
     #[Override]
@@ -90,7 +113,7 @@ final readonly class FilmTypeProvider implements TypeProviderInterface, ListCell
     {
         return $this->twig->render('@Films/item/attach_picker.html.twig', [
             'eventId' => $eventId,
-            'films' => $this->filmService->getList(),
+            'films' => $this->filmService->getManagedList(),
         ]);
     }
 

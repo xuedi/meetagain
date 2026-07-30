@@ -28,11 +28,15 @@ final readonly class SitemapService
         $urls = [];
         foreach ($publishers as $publisher) {
             foreach ($publisher->getSitemapUrls() as $url) {
-                $urls[] = $url;
+                if (isset($urls[$url->loc])) {
+                    continue;
+                }
+
+                $urls[$url->loc] = $url;
             }
         }
 
-        return $urls;
+        return array_values($urls);
     }
 
     public function renderXml(): string

@@ -4,8 +4,10 @@ namespace Plugin\Films\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use App\Item\ListRegistry;
 use App\Item\Taxonomy\AssignmentFormHelper;
 use App\Item\Taxonomy\TaxonomyService;
+use App\Service\Seo\BreadcrumbBuilder;
 use Plugin\Films\Activity\Messages\FilmAdded;
 use Plugin\Films\Form\FilmEditType;
 use Plugin\Films\Form\FilmLookupType;
@@ -155,8 +157,12 @@ final class FilmController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_plugin_films_film_show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function show(int $id): Response
+    public function show(int $id, ListRegistry $listRegistry, BreadcrumbBuilder $breadcrumbBuilder): Response
     {
+        if (!$listRegistry->has(FilmService::ITEM_TYPE)) {
+            throw $this->createNotFoundException();
+        }
+
         $film = $this->filmService->get($id);
         if ($film === null) {
             throw $this->createNotFoundException('Film not found');
@@ -164,6 +170,7 @@ final class FilmController extends AbstractController
 
         return $this->render('@Films/film/detail.html.twig', [
             'film' => $film,
+            'breadcrumbs' => $breadcrumbBuilder->build('app_films_filmlist', 'films.menu_main', (string) $film->getTitle()),
         ]);
     }
 
@@ -171,7 +178,7 @@ final class FilmController extends AbstractController
     #[IsGranted('ROLE_STEWARD')]
     public function edit(int $id, Request $request): Response
     {
-        $film = $this->filmService->get($id);
+        $film = $this->filmService->getManaged($id);
         if ($film === null) {
             throw $this->createNotFoundException('Film not found');
         }
@@ -216,7 +223,7 @@ final class FilmController extends AbstractController
     #[IsGranted('ROLE_STEWARD')]
     public function delete(int $id, Request $request): Response
     {
-        $film = $this->filmService->get($id);
+        $film = $this->filmService->getManaged($id);
         if ($film === null) {
             throw $this->createNotFoundException('Film not found');
         }

@@ -5,6 +5,7 @@ namespace Plugin\Films\Service;
 use App\Enum\ImageType;
 use App\Enum\ItemAction;
 use App\Item\ActionDispatcher;
+use App\Item\AdminFilterService;
 use App\Item\FilterService;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
@@ -23,6 +24,7 @@ readonly class FilmService
         private EntityManagerInterface $em,
         private FilmRepository $filmRepo,
         private FilterService $itemFilter,
+        private AdminFilterService $adminItemFilter,
         private ActionDispatcher $dispatcher,
         private PosterImageService $posterImageService,
         private ImageLocationService $imageLocationService,
@@ -150,9 +152,25 @@ readonly class FilmService
         return $this->filmRepo->findAll($this->itemFilter->getAllowedItemIds(self::ITEM_TYPE));
     }
 
+    /** @return Film[] */
+    public function getManagedList(): array
+    {
+        return $this->filmRepo->findAll($this->adminItemFilter->getAllowedItemIds(self::ITEM_TYPE));
+    }
+
     public function get(int $id): ?Film
     {
-        return $this->filmRepo->find($id);
+        return $this->filmRepo->findOneAllowed($id, $this->itemFilter->getAllowedItemIds(self::ITEM_TYPE));
+    }
+
+    public function getManaged(int $id): ?Film
+    {
+        return $this->filmRepo->findOneAllowed($id, $this->adminItemFilter->getAllowedItemIds(self::ITEM_TYPE));
+    }
+
+    public function getAttached(int $id): ?Film
+    {
+        return $this->filmRepo->findOneAllowed($id, null);
     }
 
     public function findByExternalId(string $externalId, ExternalSource $source): ?Film

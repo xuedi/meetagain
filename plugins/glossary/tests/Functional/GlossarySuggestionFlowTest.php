@@ -13,7 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 class GlossarySuggestionFlowTest extends WebTestCase
 {
     private const string MODERATOR_EMAIL = 'Admin@example.org';
-    private const string MEMBER_EMAIL = 'Adem.Lane@example.org';
+    private const string MEMBER_EMAIL = 'Phoenix.Baker@example.org';
+    private const string GLOSSARY_HOST = 'dragon.meetagain.local';
 
     public function testMemberEditCreatesAPendingProposal(): void
     {
@@ -63,14 +64,14 @@ class GlossarySuggestionFlowTest extends WebTestCase
 
         $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
         $proposalId = (int) $this->pendingProposals($client, $id)[0]->getId();
-        $crawler = $client->request('GET', '/en/review/proposals/glossary/' . $id);
+        $crawler = $client->request('GET', '/en/review/proposals/glossary/' . $id, server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
         $this->assertResponseIsSuccessful();
         $token = (string) $crawler->filter('a[href$="/proposal/' . $proposalId . '/apply/explanation"]')->attr('data-csrf-token');
 
         // Act
-        $client->request('POST', '/en/review/proposal/' . $proposalId . '/apply/explanation', ['_token' => $token]);
+        $client->request('POST', '/en/review/proposal/' . $proposalId . '/apply/explanation', ['_token' => $token], server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
         $this->assertResponseRedirects();
-        $client->request('POST', '/en/review/proposal/' . $proposalId . '/deny/phrase', ['_token' => $token]);
+        $client->request('POST', '/en/review/proposal/' . $proposalId . '/deny/phrase', ['_token' => $token], server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
         $this->assertResponseRedirects();
 
         // Assert
@@ -91,12 +92,12 @@ class GlossarySuggestionFlowTest extends WebTestCase
         $this->submitEdit($client, $id, 'to be withdrawn');
         $proposalId = (int) $this->pendingProposals($client, $id)[0]->getId();
 
-        $crawler = $client->request('GET', '/en/review/proposals/glossary/' . $id);
+        $crawler = $client->request('GET', '/en/review/proposals/glossary/' . $id, server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
         $this->assertResponseIsSuccessful();
         $token = (string) $crawler->filter('a[href$="/proposal/' . $proposalId . '/withdraw"]')->attr('data-csrf-token');
 
         // Act
-        $client->request('POST', '/en/review/proposal/' . $proposalId . '/withdraw', ['_token' => $token]);
+        $client->request('POST', '/en/review/proposal/' . $proposalId . '/withdraw', ['_token' => $token], server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         $this->assertResponseRedirects();
@@ -115,11 +116,11 @@ class GlossarySuggestionFlowTest extends WebTestCase
         $this->submitEdit($client, $id, 'a member proposal');
         $proposalId = (int) $this->pendingProposals($client, $id)[0]->getId();
 
-        $crawler = $client->request('GET', '/en/review/proposals/glossary/' . $id);
+        $crawler = $client->request('GET', '/en/review/proposals/glossary/' . $id, server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
         $token = (string) $crawler->filter('a[href$="/proposal/' . $proposalId . '/withdraw"]')->attr('data-csrf-token');
 
         // Act
-        $client->request('POST', '/en/review/proposal/' . $proposalId . '/apply/explanation', ['_token' => $token]);
+        $client->request('POST', '/en/review/proposal/' . $proposalId . '/apply/explanation', ['_token' => $token], server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         $this->assertResponseStatusCodeSame(403);
@@ -140,7 +141,7 @@ class GlossarySuggestionFlowTest extends WebTestCase
         $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
 
         // Act
-        $client->request('POST', '/en/review/proposal/' . $proposalId . '/apply/explanation', ['_token' => 'broken']);
+        $client->request('POST', '/en/review/proposal/' . $proposalId . '/apply/explanation', ['_token' => 'broken'], server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         $this->assertResponseStatusCodeSame(403);
@@ -155,11 +156,11 @@ class GlossarySuggestionFlowTest extends WebTestCase
         $id = (int) $pending->getId();
         $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
 
-        $crawler = $client->request('GET', '/en/glossary/approval/list/' . $id);
+        $crawler = $client->request('GET', '/en/glossary/approval/list/' . $id, server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
         $token = (string) $crawler->filter('a[href$="/approval/approve/' . $id . '"]')->attr('data-csrf-token');
 
         // Act
-        $client->request('POST', '/en/glossary/approval/approve/' . $id, ['_token' => $token]);
+        $client->request('POST', '/en/glossary/approval/approve/' . $id, ['_token' => $token], server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
         $this->assertResponseRedirects();
@@ -168,7 +169,7 @@ class GlossarySuggestionFlowTest extends WebTestCase
 
     private function submitEdit(KernelBrowser $client, int $id, string $explanation, ?string $phrase = null): void
     {
-        $crawler = $client->request('GET', '/en/glossary/edit/' . $id);
+        $crawler = $client->request('GET', '/en/glossary/edit/' . $id, server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
         $this->assertResponseIsSuccessful();
 
         $form = $crawler->filter('.box form')->form();

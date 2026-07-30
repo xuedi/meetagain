@@ -5,6 +5,7 @@ namespace App\Twig;
 use App\Item\ListRegistry;
 use Override;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
@@ -17,6 +18,7 @@ final class ItemListExtension extends AbstractExtension
         private readonly ListRegistry $registry,
         private readonly Environment $twig,
         private readonly RequestStack $requestStack,
+        private readonly UrlGeneratorInterface $urlGenerator,
     ) {}
 
     #[Override]
@@ -42,9 +44,11 @@ final class ItemListExtension extends AbstractExtension
 
     public function listUrl(string $itemType): string
     {
-        return $this->registry->providerFor($itemType)?->getListUrl()
-            ?? $this->requestStack->getCurrentRequest()?->getPathInfo()
-            ?? '';
+        $route = $this->registry->providerFor($itemType)?->getListRoute();
+
+        return $route !== null
+            ? $this->urlGenerator->generate($route)
+            : $this->requestStack->getCurrentRequest()?->getPathInfo() ?? '';
     }
 
     public function listCount(string $itemType): int

@@ -23,6 +23,7 @@ use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\EventService;
 use App\Service\Item\AssociationService;
 use App\Service\Item\AttachControlBuilder;
+use App\Service\Seo\BreadcrumbBuilder;
 use App\Service\Seo\CanonicalUrlService;
 use App\Service\Seo\EventSchemaService;
 use DateTimeImmutable;
@@ -32,7 +33,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -51,6 +51,7 @@ final class EventController extends AbstractController
         private readonly CanonicalUrlService $canonicalUrlService,
         private readonly AssociationService $itemAssociationService,
         private readonly AttachControlBuilder $itemAttachControlBuilder,
+        private readonly BreadcrumbBuilder $breadcrumbBuilder,
         #[AutowireIterator(FeaturedEventProviderInterface::class)]
         private readonly iterable $featuredEventProviders = [],
     ) {}
@@ -138,17 +139,7 @@ final class EventController extends AbstractController
                 'event' => $event,
                 'user' => $this->getUser() instanceof UserInterface ? $this->getAuthedUser() : null,
                 'json_ld' => $this->eventSchemaService->buildSchema($event, $canonicalUrl, $locale),
-                'breadcrumbs' => [
-                    [
-                        'label' => 'Home',
-                        'url' => $this->generateUrl('app_default', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL),
-                    ],
-                    [
-                        'label' => 'Events',
-                        'url' => $this->generateUrl('app_event', ['_locale' => $locale], UrlGeneratorInterface::ABSOLUTE_URL),
-                    ],
-                    ['label' => $event->getTitle($locale)],
-                ],
+                'breadcrumbs' => $this->breadcrumbBuilder->build(self::ROUTE_EVENT, 'chrome.menu_events', $event->getTitle($locale)),
             ],
             $response,
         );

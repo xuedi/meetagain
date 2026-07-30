@@ -13,7 +13,6 @@ use Plugin\Dishes\Repository\DishLikeRepository;
 use Plugin\Dishes\Service\ConfigService;
 use Plugin\Dishes\Service\DishService;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
 
 final readonly class DishTypeProvider implements TypeProviderInterface, ListCellProviderInterface, ListProviderInterface
@@ -21,7 +20,6 @@ final readonly class DishTypeProvider implements TypeProviderInterface, ListCell
     public function __construct(
         private DishService $dishService,
         private Environment $twig,
-        private UrlGeneratorInterface $urlGenerator,
         private ConfigService $configService,
         private DishLikeRepository $dishLikeRepository,
         private Security $security,
@@ -48,7 +46,7 @@ final readonly class DishTypeProvider implements TypeProviderInterface, ListCell
     #[Override]
     public function renderEventCell(int $itemId, EventItemAssociation $association): ?string
     {
-        $dish = $this->dishService->get($itemId);
+        $dish = $this->dishService->getAttached($itemId);
         if ($dish === null) {
             return null;
         }
@@ -92,9 +90,34 @@ final readonly class DishTypeProvider implements TypeProviderInterface, ListCell
     }
 
     #[Override]
-    public function getListUrl(): string
+    public function getListRoute(): string
     {
-        return $this->urlGenerator->generate('app_dishes_dishlist');
+        return 'app_dishes_dishlist';
+    }
+
+    #[Override]
+    public function getDetailRoute(): ?string
+    {
+        return 'app_plugin_dishes_dish_show';
+    }
+
+    #[Override]
+    public function getLastmodByItemId(array $itemIds): array
+    {
+        $wanted = array_flip($itemIds);
+
+        $stamps = [];
+        foreach ($this->dishService->getList() as $dish) {
+            $id = (int) $dish->getId();
+            $createdAt = $dish->getCreatedAt();
+            if ($createdAt === null || !isset($wanted[$id])) {
+                continue;
+            }
+
+            $stamps[$id] = $createdAt;
+        }
+
+        return $stamps;
     }
 
     #[Override]
@@ -102,7 +125,7 @@ final readonly class DishTypeProvider implements TypeProviderInterface, ListCell
     {
         return $this->twig->render('@Dishes/item/attach_picker.html.twig', [
             'eventId' => $eventId,
-            'dishes' => $this->dishService->getList(),
+            'dishes' => $this->dishService->getManagedList(),
         ]);
     }
 

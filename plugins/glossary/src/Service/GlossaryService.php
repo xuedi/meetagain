@@ -6,6 +6,7 @@ use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Enum\ItemAction;
 use App\Item\ActionDispatcher;
+use App\Item\AdminFilterService;
 use App\Item\FilterService;
 use App\Item\Taxonomy\TaxonomyService;
 use App\Review\ChangeProposalService;
@@ -25,6 +26,7 @@ readonly class GlossaryService
         private EntityManagerInterface $em,
         private GlossaryRepository $repo,
         private FilterService $itemFilter,
+        private AdminFilterService $adminItemFilter,
         private EntityActionDispatcher $dispatcher,
         private TaxonomyService $taxonomyService,
         private ActionDispatcher $itemActionDispatcher,
@@ -152,6 +154,11 @@ readonly class GlossaryService
         return $this->repo->findOneAllowed($id, $this->allowedIds(), !$this->canSeeUnapproved());
     }
 
+    public function getManaged(int $id): ?Glossary
+    {
+        return $this->repo->findOneAllowed($id, $this->managedIds(), !$this->canSeeUnapproved());
+    }
+
     /** @return Glossary[] */
     public function getList(): array
     {
@@ -165,13 +172,19 @@ readonly class GlossaryService
 
     private function findIncludingUnapproved(int $id): ?Glossary
     {
-        return $this->repo->findOneAllowed($id, $this->allowedIds());
+        return $this->repo->findOneAllowed($id, $this->managedIds());
     }
 
     /** @return list<int>|null */
     private function allowedIds(): ?array
     {
         return $this->itemFilter->getAllowedItemIds(GlossaryCategorizableTypeProvider::ITEM_TYPE);
+    }
+
+    /** @return list<int>|null */
+    private function managedIds(): ?array
+    {
+        return $this->adminItemFilter->getAllowedItemIds(GlossaryCategorizableTypeProvider::ITEM_TYPE);
     }
 
     private function canSeeUnapproved(): bool
