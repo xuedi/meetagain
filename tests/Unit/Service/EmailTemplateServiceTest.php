@@ -38,7 +38,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->repoStub->method('findByIdentifier')->willReturn($template);
 
         // Act
-        $result = $this->subject->getTemplate(EmailType::Welcome);
+        $result = $this->subject->getTemplate(EmailType::Welcome->value);
 
         // Assert
         static::assertSame($template, $result);
@@ -50,7 +50,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->repoStub->method('findByIdentifier')->willReturn(null);
 
         // Act
-        $result = $this->subject->getTemplate(EmailType::VerificationRequest);
+        $result = $this->subject->getTemplate(EmailType::VerificationRequest->value);
 
         // Assert
         static::assertNull($result);
@@ -63,7 +63,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->repoStub->method('findByIdentifier')->willReturn($template);
 
         // Act
-        $result = $this->subject->getTemplateContent(EmailType::Welcome, 'en');
+        $result = $this->subject->getTemplateContent(EmailType::Welcome->value, 'en');
 
         // Assert
         static::assertSame('Welcome!', $result['subject']);
@@ -77,7 +77,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->repoStub->method('findByIdentifier')->willReturn($template);
 
         // Act
-        $result = $this->subject->getTemplateContent(EmailType::Welcome, 'de');
+        $result = $this->subject->getTemplateContent(EmailType::Welcome->value, 'de');
 
         // Assert
         static::assertSame('Welcome!', $result['subject']);
@@ -94,7 +94,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->expectExceptionMessage('Email template "welcome" not found');
 
         // Act
-        $this->subject->getTemplateContent(EmailType::Welcome, 'en');
+        $this->subject->getTemplateContent(EmailType::Welcome->value, 'en');
     }
 
     public function testGetTemplateContentThrowsWhenNoTranslationFound(): void
@@ -111,7 +111,7 @@ class EmailTemplateServiceTest extends TestCase
         $this->expectExceptionMessage('No translation found for email template');
 
         // Act
-        $this->subject->getTemplateContent(EmailType::Welcome, 'en');
+        $this->subject->getTemplateContent(EmailType::Welcome->value, 'en');
     }
 
     #[DataProvider('renderContentProvider')]

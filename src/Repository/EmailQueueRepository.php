@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\EmailQueue;
 use App\Enum\EmailQueueStatus;
-use App\Enum\EmailType;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -33,7 +32,7 @@ class EmailQueueRepository extends ServiceEntityRepository
     public function findFiltered(
         int $limit,
         ?DateTimeImmutable $since = null,
-        ?EmailType $template = null,
+        ?string $template = null,
         ?string $recipient = null,
         ?array $statuses = null,
     ): array {
@@ -46,7 +45,7 @@ class EmailQueueRepository extends ServiceEntityRepository
     /**
      * @param list<EmailQueueStatus>|null $statuses
      */
-    public function countFiltered(?DateTimeImmutable $since = null, ?EmailType $template = null, ?string $recipient = null, ?array $statuses = null): int
+    public function countFiltered(?DateTimeImmutable $since = null, ?string $template = null, ?string $recipient = null, ?array $statuses = null): int
     {
         $qb = $this->createQueryBuilder('eq')->select('COUNT(eq.id)');
         $this->applyFilters($qb, $since, $template, $recipient, $statuses);
@@ -57,7 +56,7 @@ class EmailQueueRepository extends ServiceEntityRepository
     /**
      * @param list<EmailQueueStatus>|null $statuses
      */
-    private function applyFilters(QueryBuilder $qb, ?DateTimeImmutable $since, ?EmailType $template, ?string $recipient, ?array $statuses): void
+    private function applyFilters(QueryBuilder $qb, ?DateTimeImmutable $since, ?string $template, ?string $recipient, ?array $statuses): void
     {
         if ($since !== null) {
             $qb->andWhere('eq.createdAt >= :since')->setParameter('since', $since);

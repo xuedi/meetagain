@@ -85,7 +85,7 @@ readonly class SupportNotificationEmail extends EmailAbstract
                 'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),
             ]);
 
-            $this->queue->enqueue($this, $email, EmailType::SupportNotification, $context);
+            $this->queue->enqueue($this, $email, $context);
         }
     }
 }

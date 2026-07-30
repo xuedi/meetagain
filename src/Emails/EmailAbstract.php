@@ -17,6 +17,11 @@ abstract readonly class EmailAbstract implements EmailInterface
         return null;
     }
 
+    public function getAttachments(array $context): array
+    {
+        return [];
+    }
+
     public function getGuardRules(): array
     {
         return [];

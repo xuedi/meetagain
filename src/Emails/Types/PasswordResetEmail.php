@@ -71,6 +71,6 @@ readonly class PasswordResetEmail extends EmailAbstract
             'username' => $user->getName(),
         ]);
 
-        $this->queue->enqueue($this, $email, EmailType::PasswordResetRequest, $context);
+        $this->queue->enqueue($this, $email, $context);
     }
 }

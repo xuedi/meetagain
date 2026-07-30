@@ -5,7 +5,6 @@ namespace Tests\Unit\Emails\Types;
 use App\Emails\EmailQueueInterface;
 use App\Emails\Types\VerificationRequestEmail;
 use App\Entity\User;
-use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
@@ -36,7 +35,6 @@ class VerificationRequestEmailTest extends TestCase
                     $capturedEmail = $email;
                     return true;
                 }),
-                EmailType::VerificationRequest,
                 $this->anything(),
             );
 

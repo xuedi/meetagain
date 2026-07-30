@@ -143,7 +143,7 @@ readonly class AnnouncementService
 
     public function renderPreview(Announcement $announcement, string $locale = 'en'): array
     {
-        $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement);
+        $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement->value);
         if (!$dbTemplate instanceof EmailTemplate) {
             throw new RuntimeException('Announcement email template not found in database. Run app:email-templates:seed command.');
         }
