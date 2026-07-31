@@ -119,7 +119,7 @@ final class ItemTaxonomyController extends AbstractController
                 'key' => $axis->value,
                 'headingKey' => $this->headingKey($axis),
                 'emptyKey' => $axis === Axis::Category ? 'item.taxonomy_categories_empty' : 'item.taxonomy_tags_empty',
-                'rows' => $this->suggestionBuilder->rows($taxonomy, $axis, $request->getLocale()),
+                'groups' => $this->suggestionBuilder->groups($taxonomy, $axis, $request->getLocale()),
                 'usage' => $this->usageCounter->counts($provider->getTypeKey(), $axis),
                 'enabled' => $taxonomy->isEnabled($axis),
             ];

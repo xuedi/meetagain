@@ -22,6 +22,24 @@ final readonly class SuggestionBuilder
         return $rows;
     }
 
+    /** @return list<array{label: ?string, rows: array<int, string>}> */
+    public function groups(Config $taxonomy, Axis $axis, string $locale): array
+    {
+        $sourceLocale = $this->languageService->getFilteredDefaultLocale();
+
+        $groups = [];
+        foreach ($taxonomy->groupedDefinitions($axis) as $bucket) {
+            $rows = [];
+            foreach ($bucket['definitions'] as $definition) {
+                $rows[$definition->id] = $definition->labelFor($locale, $sourceLocale);
+            }
+
+            $groups[] = ['label' => $bucket['group']?->labelFor($locale, $sourceLocale), 'rows' => $rows];
+        }
+
+        return $groups;
+    }
+
     /**
      * @param array<array-key, string> $edited definition id => submitted label
      * @param list<string>             $added

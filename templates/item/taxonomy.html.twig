@@ -4,13 +4,15 @@
     Reached from the pencil in the list page's filter box. A manager of the scope this request
     resolves to gets the definition editor (one label column per admin language, collection rows);
     everyone else gets the single-locale suggestion form, whose submit becomes a change proposal.
-    Pending proposals for this vocabulary are listed below either form.
+    Both render the vocabulary grouped exactly as the manager defined it - ungrouped entries first,
+    then one indented block per display group. Pending proposals for this vocabulary are listed
+    below either form.
 
     Rendered by: App\Controller\ItemTaxonomyController
     Parameters:
         - itemType, typeLabelKey (string)
-        - axes (list) -- per supported axis: key, headingKey, emptyKey, rows (id => label),
-                         usage (id => count), enabled
+        - axes (list) -- per supported axis: key, headingKey, emptyKey, enabled, usage (id => count),
+                         groups (list of {label: ?string, rows: id => label})
         - disabledAxisKeys (list<string>), targetType (string), targetId (?int)
         - form (?FormView), canManage (bool), canSuggest (bool), pending (list)
     Depends on: js/admin/collection.js, js/admin/taxonomy-definitions.js; item_list_url()
@@ -50,16 +52,23 @@
                             <input type="hidden" name="_token" value="{{ csrf_token('item_taxonomy_suggest') }}">
                             {% for axis in axes|filter(axis => axis.enabled) %}
                                 <p class="label is-small mb-2">{{ axis.headingKey|trans }}</p>
-                                {% for id, label in axis.rows %}
-                                    <div class="field has-addons">
-                                        <div class="control is-expanded">
-                                            <input class="input" type="text" name="suggest[{{ axis.key }}][edit][{{ id }}]" value="{{ label }}">
-                                        </div>
-                                        {% if axis.usage[id]|default(0) > 0 %}
-                                            <div class="control">
-                                                <span class="button is-static" title="{{ 'item.taxonomy_usage_hint'|trans({'%count%': axis.usage[id]}) }}">{{ axis.usage[id] }}</span>
+                                {% for group in axis.groups %}
+                                    {% if group.label %}
+                                        <p class="is-size-7 has-text-weight-semibold mb-1 mt-3">{{ group.label }}</p>
+                                    {% endif %}
+                                    <div class="{{ group.label ? 'ml-4' }}">
+                                        {% for id, label in group.rows %}
+                                            <div class="field has-addons">
+                                                <div class="control is-expanded">
+                                                    <input class="input" type="text" name="suggest[{{ axis.key }}][edit][{{ id }}]" value="{{ label }}">
+                                                </div>
+                                                {% if axis.usage[id]|default(0) > 0 %}
+                                                    <div class="control">
+                                                        <span class="button is-static" title="{{ 'item.taxonomy_usage_hint'|trans({'%count%': axis.usage[id]}) }}">{{ axis.usage[id] }}</span>
+                                                    </div>
+                                                {% endif %}
                                             </div>
-                                        {% endif %}
+                                        {% endfor %}
                                     </div>
                                 {% endfor %}
                                 <div class="field">
@@ -79,13 +88,18 @@
                         <div class="box">
                             {% for axis in axes|filter(axis => axis.enabled) %}
                                 <p class="label is-small mb-2">{{ axis.headingKey|trans }}</p>
-                                <div class="tags">
-                                    {% for label in axis.rows %}
-                                        <span class="tag is-light">{{ label }}</span>
-                                    {% else %}
-                                        <span class="has-text-grey is-size-7">{{ axis.emptyKey|trans }}</span>
-                                    {% endfor %}
-                                </div>
+                                {% for group in axis.groups %}
+                                    {% if group.label %}
+                                        <p class="is-size-7 has-text-weight-semibold mb-1 mt-3">{{ group.label }}</p>
+                                    {% endif %}
+                                    <div class="tags{{ group.label ? ' ml-4' }}">
+                                        {% for label in group.rows %}
+                                            <span class="tag is-light">{{ label }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <span class="has-text-grey is-size-7">{{ axis.emptyKey|trans }}</span>
+                                {% endfor %}
                             {% endfor %}
                         </div>
                     {% endif %}

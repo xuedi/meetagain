@@ -75,18 +75,22 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
     private function buildGlobalConfig(): PluginSettings
     {
         $labels = [
-            [0, 'Greeting', 'Begrüßung'],
-            [1, 'Swearing', 'Schimpfen'],
-            [2, 'Flirting', 'Flirten'],
-            [3, 'Slang', 'Slang'],
-            [4, 'Abbreviation', 'Abkürzung'],
-            [5, 'Regular', 'Regulär'],
-            [6, 'Idioms', 'Redewendungen'],
+            [0, 'Greeting', 'Begrüßung', null],
+            [1, 'Swearing', 'Schimpfen', 0],
+            [2, 'Flirting', 'Flirten', 0],
+            [3, 'Slang', 'Slang', 0],
+            [4, 'Abbreviation', 'Abkürzung', null],
+            [5, 'Regular', 'Regulär', null],
+            [6, 'Idioms', 'Redewendungen', null],
         ];
 
         $categories = [];
-        foreach ($labels as [$id, $en, $de]) {
-            $categories[] = ['id' => $id, 'labels' => ['en' => $en, 'de' => $de]];
+        foreach ($labels as [$id, $en, $de, $group]) {
+            $row = ['id' => $id, 'labels' => ['en' => $en, 'de' => $de]];
+            if ($group !== null) {
+                $row['group'] = $group;
+            }
+            $categories[] = $row;
         }
 
         $config = new PluginSettings();
@@ -99,6 +103,10 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
             'taxonomy' => [
                 'categoriesEnabled' => true,
                 'tagsEnabled' => false,
+                'categoryGroups' => [
+                    ['id' => 0, 'labels' => ['en' => 'Informal', 'de' => 'Umgangssprache']],
+                ],
+                'tagGroups' => [],
                 'categories' => $categories,
                 'tags' => [],
             ],

@@ -1,9 +1,11 @@
 {#
-    Item Taxonomy form theme -- renders the two halves of the category/tag surface: the enable
-    toggles (TaxonomyConfigType, embedded in each plugin's settings form) and the definition editor
-    (TaxonomyDefinitionsType, rendered on the central taxonomy page). Each definition row shows one
-    label column per enabled admin language; js/admin/taxonomy-definitions.js shows one column at a
-    time. With JavaScript disabled every column stays visible, so every label remains editable.
+    Item Taxonomy form theme -- renders the three halves of the category/tag surface: the enable
+    toggles (TaxonomyConfigType, embedded in each plugin's settings form), the definition editor
+    (TaxonomyDefinitionsType, rendered on the central taxonomy page) and the grouped tag checkbox
+    list on an item edit form. Each definition row shows one label column per enabled admin
+    language plus an optional group select; js/admin/taxonomy-definitions.js shows one column at a
+    time and keeps the group selects in sync with the group rows. With JavaScript disabled every
+    column stays visible, so every label remains editable.
 
     Registered in: config/packages/twig.yaml (form_themes, after _form/bulma.html.twig)
     Depends on:    js/admin/taxonomy-definitions.js; get_admin_language_codes()
@@ -22,7 +24,7 @@
                 <p class="label is-small mb-2">{{ 'item.taxonomy_categories_heading'|trans }}</p>
                 <div data-taxonomy-body>
                     {{ block('taxonomy_locale_toggle') }}
-                    {{ form_row(form.categories, {label: false}) }}
+                    {% with {groups: form.categoryGroups, definitions: form.categories} %}{{ block('taxonomy_axis_rows') }}{% endwith %}
                 </div>
             </div>
         {% endif %}
@@ -32,11 +34,19 @@
                 <p class="label is-small mb-2">{{ 'item.taxonomy_tags_heading'|trans }}</p>
                 <div data-taxonomy-body>
                     {{ block('taxonomy_locale_toggle') }}
-                    {{ form_row(form.tags, {label: false}) }}
+                    {% with {groups: form.tagGroups, definitions: form.tags} %}{{ block('taxonomy_axis_rows') }}{% endwith %}
                 </div>
             </div>
         {% endif %}
     </div>
+{%- endblock -%}
+
+{%- block taxonomy_axis_rows -%}
+    <p class="is-size-7 has-text-weight-semibold mb-1">{{ 'item.taxonomy_groups_heading'|trans }}</p>
+    <p class="help mb-2">{{ 'item.taxonomy_groups_help'|trans }}</p>
+    <div data-taxonomy-groups>{{ form_row(groups, {label: false}) }}</div>
+    <p class="is-size-7 has-text-weight-semibold mb-1 mt-4">{{ 'item.taxonomy_entries_heading'|trans }}</p>
+    {{ form_row(definitions, {label: false}) }}
 {%- endblock -%}
 
 {%- block taxonomy_locale_toggle -%}
@@ -57,6 +67,11 @@
     <div class="taxonomy-row is-flex is-flex-wrap-wrap is-align-items-center" style="gap: 0.5rem;"
          data-taxonomy-usage="{{ usageCount }}"
          data-taxonomy-usage-message="{{ 'item.taxonomy_remove_confirm'|trans({'%count%': usageCount}) }}">
+        {% if form.group is defined %}
+            <div class="taxonomy-group-cell" style="flex: 0 0 10rem;">
+                {{- form_widget(form.group) -}}
+            </div>
+        {% endif %}
         {% for code in get_admin_language_codes() %}
             {%- set missing = isExisting and attribute(form, code).vars.value is empty -%}
             <div class="taxonomy-locale-cell{{ missing ? ' taxonomy-locale-missing' }}" data-taxonomy-locale-cell="{{ code }}" style="flex: 1 1 12rem;">
@@ -66,5 +81,23 @@
         {% if usageCount > 0 %}
             <span class="tag is-light" title="{{ 'item.taxonomy_usage_hint'|trans({'%count%': usageCount}) }}">{{ usageCount }}</span>
         {% endif %}
+    </div>
+{%- endblock -%}
+
+{%- block item_taxonomy_tags_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' control')|trim}) -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for key, choice in form.vars.choices -%}
+            {%- if choice.choices is defined -%}
+                <p class="has-text-weight-semibold mt-2">{{ choice.label }}</p>
+                <div class="ml-4">
+                    {%- for index in choice.choices|keys -%}
+                        {{- form_widget(form.children[index], {translation_domain: choice_translation_domain}) -}}
+                    {%- endfor -%}
+                </div>
+            {%- else -%}
+                {{- form_widget(form.children[key], {translation_domain: choice_translation_domain}) -}}
+            {%- endif -%}
+        {%- endfor -%}
     </div>
 {%- endblock -%}

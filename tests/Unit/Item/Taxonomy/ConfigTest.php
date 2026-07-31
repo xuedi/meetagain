@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Item\Taxonomy;
 
+use App\Item\Taxonomy\Axis;
 use App\Item\Taxonomy\CategoryDefinition;
 use App\Item\Taxonomy\Config;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -96,6 +97,185 @@ class ConfigTest extends TestCase
         static::assertFalse($config->hasCategory(99));
         static::assertTrue($config->hasTag(4));
         static::assertFalse($config->hasTag(99));
+    }
+
+    public function testNormalizeAllocatesGroupIdsIndependentlyOfDefinitionIds(): void
+    {
+        // Arrange
+        $config = (new Config())
+            ->setCategoryGroups([['id' => '', 'labels' => ['en' => 'Meat']]])
+            ->setCategories([['id' => 8, 'labels' => ['en' => 'Chicken']]]);
+
+        // Act
+        $config->normalize();
+
+        // Assert
+        $groups = $config->categoryGroupDefinitions();
+        static::assertCount(1, $groups);
+        static::assertSame(0, $groups[0]->id);
+        static::assertSame(8, $config->categoryDefinitions()[0]->id);
+    }
+
+    public function testNormalizeResolvesAClientTokenIntoTheAllocatedGroupId(): void
+    {
+        // Arrange
+        $config = (new Config())
+            ->setCategoryGroups([
+                ['id' => 4, 'labels' => ['en' => 'Meat']],
+                ['id' => 'n1', 'labels' => ['en' => 'Fish']],
+            ])
+            ->setCategories([
+                ['id' => '', 'labels' => ['en' => 'Salmon'], 'group' => 'n1'],
+                ['id' => '', 'labels' => ['en' => 'Beef'], 'group' => 4],
+            ]);
+
+        // Act
+        $config->normalize();
+
+        // Assert
+        static::assertSame([4, 5], array_column($config->getCategoryGroups(), 'id'));
+        static::assertSame(5, $config->categoryDefinitions()[0]->group);
+        static::assertSame(4, $config->categoryDefinitions()[1]->group);
+    }
+
+    public function testNormalizeDropsAReferenceToANonexistentGroup(): void
+    {
+        // Arrange
+        $config = (new Config())->setCategories([['id' => 1, 'labels' => ['en' => 'Chicken'], 'group' => 9]]);
+
+        // Act
+        $config->normalize();
+
+        // Assert
+        static::assertNull($config->categoryDefinitions()[0]->group);
+    }
+
+    public function testClearingAGroupLabelDeletesItAndDemotesItsMembers(): void
+    {
+        // Arrange
+        $config = (new Config())
+            ->setCategoryGroups([['id' => 0, 'labels' => ['en' => '  ']]])
+            ->setCategories([['id' => 1, 'labels' => ['en' => 'Chicken'], 'group' => 0]]);
+
+        // Act
+        $config->normalize();
+
+        // Assert
+        static::assertSame([], $config->categoryGroupDefinitions());
+        static::assertNull($config->categoryDefinitions()[0]->group);
+    }
+
+    public function testGroupsAreNormalizedPerAxis(): void
+    {
+        // Arrange
+        $config = (new Config())
+            ->setCategoryGroups([['id' => '', 'labels' => ['en' => 'Meat']]])
+            ->setTagGroups([['id' => '', 'labels' => ['en' => 'Heat']]])
+            ->setTags([['id' => '', 'labels' => ['en' => 'Spicy'], 'group' => 0]]);
+
+        // Act
+        $config->normalize();
+
+        // Assert
+        static::assertSame(0, $config->categoryGroupDefinitions()[0]->id);
+        static::assertSame(0, $config->tagGroupDefinitions()[0]->id);
+        static::assertSame(0, $config->tagDefinitions()[0]->group);
+        static::assertSame([], $config->categoryDefinitions());
+    }
+
+    public function testToArrayFromArrayRoundTripsGroups(): void
+    {
+        // Arrange
+        $config = (new Config())
+            ->setCategoryGroups([['id' => 3, 'labels' => ['en' => 'Meat', 'de' => 'Fleisch']]])
+            ->setCategories([
+                ['id' => 0, 'labels' => ['en' => 'Chicken'], 'group' => 3],
+                ['id' => 1, 'labels' => ['en' => 'Soup']],
+            ]);
+
+        // Act
+        $raw = $config->toArray();
+        $restored = Config::fromArray($raw);
+
+        // Assert
+        static::assertSame([['id' => 3, 'labels' => ['en' => 'Meat', 'de' => 'Fleisch']]], $raw['categoryGroups']);
+        static::assertArrayNotHasKey('group', $raw['categories'][1]);
+        static::assertSame('Meat', $restored->categoryGroupDefinitions()[0]->labelFor('en', 'en'));
+        static::assertSame(3, $restored->categoryDefinitions()[0]->group);
+        static::assertNull($restored->categoryDefinitions()[1]->group);
+    }
+
+    public function testAConfigStoredBeforeGroupsExistedStaysValid(): void
+    {
+        // Arrange
+        $raw = [
+            'categoriesEnabled' => true,
+            'tagsEnabled' => false,
+            'categories' => [['id' => 0, 'labels' => ['en' => 'Greeting']]],
+            'tags' => [],
+        ];
+
+        // Act
+        $config = Config::fromArray($raw);
+
+        // Assert
+        static::assertSame([], $config->categoryGroupDefinitions());
+        static::assertNull($config->categoryDefinitions()[0]->group);
+        static::assertEquals([['group' => null, 'definitions' => $config->categoryDefinitions()]], $config->groupedDefinitions(Axis::Category));
+    }
+
+    public function testGroupedDefinitionsPutUngroupedFirstAndSkipEmptyGroups(): void
+    {
+        // Arrange
+        $config = (new Config())
+            ->setCategoryGroups([
+                ['id' => 0, 'labels' => ['en' => 'Meat']],
+                ['id' => 1, 'labels' => ['en' => 'Empty']],
+            ])
+            ->setCategories([
+                ['id' => 5, 'labels' => ['en' => 'Chicken'], 'group' => 0],
+                ['id' => 6, 'labels' => ['en' => 'Soup']],
+                ['id' => 7, 'labels' => ['en' => 'Beef'], 'group' => 0],
+            ]);
+
+        // Act
+        $grouped = $config->groupedDefinitions(Axis::Category);
+
+        // Assert
+        static::assertCount(2, $grouped);
+        static::assertNull($grouped[0]['group']);
+        static::assertSame([6], array_column($grouped[0]['definitions'], 'id'));
+        static::assertSame('Meat', $grouped[1]['group']?->labelFor('en', 'en'));
+        static::assertSame([5, 7], array_column($grouped[1]['definitions'], 'id'));
+    }
+
+    public function testGroupedCategoryOptionsNestGroupedEntriesUnderTheirLabel(): void
+    {
+        // Arrange
+        $config = (new Config())
+            ->setCategoryGroups([['id' => 0, 'labels' => ['en' => 'Meat']]])
+            ->setCategories([
+                ['id' => 5, 'labels' => ['en' => 'Chicken'], 'group' => 0],
+                ['id' => 6, 'labels' => ['en' => 'Soup']],
+            ]);
+
+        // Act
+        $options = $config->groupedCategoryOptions('en', 'en');
+
+        // Assert
+        static::assertSame(['Soup' => 6, 'Meat' => ['Chicken' => 5]], $options);
+    }
+
+    public function testGroupedOptionsStayFlatWithoutGroups(): void
+    {
+        // Arrange
+        $config = (new Config())->setCategories([
+            ['id' => 3, 'labels' => ['en' => 'Slang']],
+            ['id' => 7, 'labels' => ['en' => 'Idioms']],
+        ]);
+
+        // Act + Assert
+        static::assertSame($config->categoryOptions('en', 'en'), $config->groupedCategoryOptions('en', 'en'));
     }
 
     #[DataProvider('labelFallbackCases')]

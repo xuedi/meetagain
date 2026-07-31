@@ -39,8 +39,8 @@ class TaxonomyConfigTypeTest extends TestCase
         static::assertInstanceOf(Config::class, $submitted);
         static::assertTrue($submitted->isCategoriesEnabled());
         static::assertFalse($submitted->isTagsEnabled());
-        static::assertSame([['id' => 0, 'labels' => ['en' => 'Greeting']]], $submitted->getCategories());
-        static::assertSame([['id' => 0, 'labels' => ['en' => 'Formal']]], $submitted->getTags());
+        static::assertSame([['id' => 0, 'labels' => ['en' => 'Greeting'], 'group' => null]], $submitted->getCategories());
+        static::assertSame([['id' => 0, 'labels' => ['en' => 'Formal'], 'group' => null]], $submitted->getTags());
     }
 
     private function factory(): FormFactoryInterface

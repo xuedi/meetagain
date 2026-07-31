@@ -34,7 +34,7 @@ readonly class AssignmentFormHelper
         if ($provider->supportsCategories() && $taxonomy->isCategoriesEnabled()) {
             $builder->add(self::CATEGORY_FIELD, ChoiceType::class, [
                 'label' => 'item.taxonomy_category_label',
-                'choices' => $taxonomy->categoryOptions($locale, $sourceLocale),
+                'choices' => $taxonomy->groupedCategoryOptions($locale, $sourceLocale),
                 'placeholder' => 'item.taxonomy_category_none',
                 'required' => false,
                 'mapped' => false,
@@ -45,7 +45,8 @@ readonly class AssignmentFormHelper
         if ($provider->supportsTags() && $taxonomy->isTagsEnabled()) {
             $builder->add(self::TAGS_FIELD, ChoiceType::class, [
                 'label' => 'item.taxonomy_tags_label',
-                'choices' => $taxonomy->tagOptions($locale, $sourceLocale),
+                'choices' => $taxonomy->groupedTagOptions($locale, $sourceLocale),
+                'block_prefix' => 'item_taxonomy_tags',
                 'required' => false,
                 'multiple' => true,
                 'expanded' => true,

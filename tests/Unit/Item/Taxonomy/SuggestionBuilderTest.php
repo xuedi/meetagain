@@ -25,6 +25,38 @@ class SuggestionBuilderTest extends TestCase
         static::assertSame([1 => 'Gruss', 2 => 'Slang'], $rows);
     }
 
+    public function testGroupsMirrorTheStructureAManagerDefined(): void
+    {
+        // Arrange
+        $taxonomy = (new Config())
+            ->setCategoryGroups([['id' => 0, 'labels' => ['en' => 'Informal', 'de' => 'Umgangssprache']]])
+            ->setCategories([
+                ['id' => 1, 'labels' => ['en' => 'Greeting', 'de' => 'Gruss']],
+                ['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => 0],
+            ]);
+
+        // Act
+        $groups = $this->builder()->groups($taxonomy, Axis::Category, 'de');
+
+        // Assert
+        static::assertSame([
+            ['label' => null, 'rows' => [1 => 'Gruss']],
+            ['label' => 'Umgangssprache', 'rows' => [2 => 'Slang']],
+        ], $groups);
+    }
+
+    public function testGroupsOfAnUngroupedVocabularyAreOneUnlabelledBucket(): void
+    {
+        // Arrange
+        $taxonomy = (new Config())->setCategories([['id' => 1, 'labels' => ['en' => 'Greeting']]]);
+
+        // Act
+        $groups = $this->builder()->groups($taxonomy, Axis::Category, 'en');
+
+        // Assert
+        static::assertSame([['label' => null, 'rows' => [1 => 'Greeting']]], $groups);
+    }
+
     public function testAnEditedLabelBecomesARename(): void
     {
         // Arrange

@@ -4,6 +4,7 @@ namespace App\Form\Item;
 
 use App\Service\Config\LanguageService;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -21,6 +22,16 @@ class TaxonomyDefinitionType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('id', HiddenType::class, ['required' => false]);
+
+        if ($options['group_choices'] !== null) {
+            $builder->add('group', ChoiceType::class, [
+                'label' => false,
+                'required' => false,
+                'placeholder' => 'item.taxonomy_group_none',
+                'choices' => $options['group_choices'],
+                'attr' => ['data-taxonomy-group-select' => ''],
+            ]);
+        }
 
         foreach ($this->languageService->getAdminFilteredEnabledCodes() as $code) {
             $builder->add($code, TextType::class, [
@@ -42,10 +53,12 @@ class TaxonomyDefinitionType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => null,
-            'empty_data' => ['id' => '', 'labels' => []],
+            'empty_data' => ['id' => '', 'labels' => [], 'group' => null],
             'usage' => [],
+            'group_choices' => null,
         ]);
         $resolver->setAllowedTypes('usage', 'array');
+        $resolver->setAllowedTypes('group_choices', ['null', 'array']);
     }
 
     #[\Override]

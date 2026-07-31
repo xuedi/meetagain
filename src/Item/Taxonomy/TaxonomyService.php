@@ -138,22 +138,7 @@ readonly class TaxonomyService
      */
     public function categoryChoices(string $itemType, ?string $locale): array
     {
-        $provider = $this->registry->providerFor($itemType);
-        if ($provider === null || !$provider->supportsCategories()) {
-            return [];
-        }
-
-        $taxonomy = $provider->getTaxonomy();
-        if (!$taxonomy->isCategoriesEnabled()) {
-            return [];
-        }
-
-        $choices = [];
-        foreach ($taxonomy->categoryDefinitions() as $definition) {
-            $choices[$definition->id] = $definition->labelFor($locale, $this->sourceLocale());
-        }
-
-        return $choices;
+        return $this->choices($itemType, Axis::Category, $locale);
     }
 
     /**
@@ -161,22 +146,75 @@ readonly class TaxonomyService
      */
     public function tagChoices(string $itemType, ?string $locale): array
     {
-        $provider = $this->registry->providerFor($itemType);
-        if ($provider === null || !$provider->supportsTags()) {
-            return [];
-        }
+        return $this->choices($itemType, Axis::Tag, $locale);
+    }
 
-        $taxonomy = $provider->getTaxonomy();
-        if (!$taxonomy->isTagsEnabled()) {
+    /** @return list<array{label: ?string, offset: int, choices: array<int, string>}> */
+    public function categoryChoiceGroups(string $itemType, ?string $locale): array
+    {
+        return $this->choiceGroups($itemType, Axis::Category, $locale);
+    }
+
+    /** @return list<array{label: ?string, offset: int, choices: array<int, string>}> */
+    public function tagChoiceGroups(string $itemType, ?string $locale): array
+    {
+        return $this->choiceGroups($itemType, Axis::Tag, $locale);
+    }
+
+    /** @return array<int, string> */
+    private function choices(string $itemType, Axis $axis, ?string $locale): array
+    {
+        $taxonomy = $this->enabledTaxonomy($itemType, $axis);
+        if ($taxonomy === null) {
             return [];
         }
 
         $choices = [];
-        foreach ($taxonomy->tagDefinitions() as $definition) {
+        foreach ($taxonomy->definitions($axis) as $definition) {
             $choices[$definition->id] = $definition->labelFor($locale, $this->sourceLocale());
         }
 
         return $choices;
+    }
+
+    /** @return list<array{label: ?string, offset: int, choices: array<int, string>}> */
+    private function choiceGroups(string $itemType, Axis $axis, ?string $locale): array
+    {
+        $taxonomy = $this->enabledTaxonomy($itemType, $axis);
+        if ($taxonomy === null) {
+            return [];
+        }
+
+        $groups = [];
+        $offset = 0;
+        foreach ($taxonomy->groupedDefinitions($axis) as $bucket) {
+            $choices = [];
+            foreach ($bucket['definitions'] as $definition) {
+                $choices[$definition->id] = $definition->labelFor($locale, $this->sourceLocale());
+            }
+
+            $groups[] = [
+                'label' => $bucket['group']?->labelFor($locale, $this->sourceLocale()),
+                'offset' => $offset,
+                'choices' => $choices,
+            ];
+            $offset += count($choices);
+        }
+
+        return $groups;
+    }
+
+    private function enabledTaxonomy(string $itemType, Axis $axis): ?Config
+    {
+        $provider = $this->registry->providerFor($itemType);
+        $supported = $axis === Axis::Category ? $provider?->supportsCategories() : $provider?->supportsTags();
+        if ($provider === null || $supported !== true) {
+            return null;
+        }
+
+        $taxonomy = $provider->getTaxonomy();
+
+        return $taxonomy->isEnabled($axis) ? $taxonomy : null;
     }
 
     private function taxonomyFor(string $itemType): ?Config

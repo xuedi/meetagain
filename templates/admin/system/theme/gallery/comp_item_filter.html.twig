@@ -3,8 +3,9 @@
 
     Static reproduction of the item-list filter box: one chip row per facet group, the active chip
     filled, an inactive one light, and an option that would yield nothing rendered as a dimmed span
-    instead of a link. The live box is data-driven per item type, so this entry shows the states
-    rather than including the component.
+    instead of a link. A vocabulary with display groups puts a bold heading above an indented chip
+    row, ungrouped chips first. The live box is data-driven per item type, so this entry shows the
+    states rather than including the component.
 
     Used in:    admin/system/theme/gallery/index.html.twig
     Parameters: none
@@ -33,6 +34,11 @@
                     <a href="#" class="tag is-link" rel="nofollow">Starter<span class="ml-1">4</span></a>
                     <a href="#" class="tag is-light" rel="nofollow">Main<span class="ml-1 has-text-grey">7</span></a>
                     <span class="tag is-light has-text-grey-light" title="{{ 'item.facet_zero_hint'|trans }}">Dessert<span class="ml-1">0</span></span>
+                </div>
+                <p class="is-size-7 has-text-weight-semibold mb-1 mt-2" data-item-facet-group>Meat</p>
+                <div class="tags ml-4">
+                    <a href="#" class="tag is-light" rel="nofollow">Chicken<span class="ml-1 has-text-grey">3</span></a>
+                    <a href="#" class="tag is-light" rel="nofollow">Beef<span class="ml-1 has-text-grey">1</span></a>
                 </div>
             </div>
             <div class="field">

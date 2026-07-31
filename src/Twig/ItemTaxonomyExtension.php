@@ -35,6 +35,8 @@ final class ItemTaxonomyExtension extends AbstractExtension
             new TwigFunction('item_tag_labels', $this->tagLabels(...)),
             new TwigFunction('item_taxonomy_category_choices', $this->categoryChoices(...)),
             new TwigFunction('item_taxonomy_tag_choices', $this->tagChoices(...)),
+            new TwigFunction('item_taxonomy_category_groups', $this->categoryChoiceGroups(...)),
+            new TwigFunction('item_taxonomy_tag_groups', $this->tagChoiceGroups(...)),
             new TwigFunction('item_taxonomy_target', $this->changeTarget(...)),
             new TwigFunction('item_facet_current', $this->currentFacets(...)),
             new TwigFunction('item_facet_active', $this->facetsActive(...)),
@@ -104,6 +106,18 @@ final class ItemTaxonomyExtension extends AbstractExtension
     public function tagChoices(string $itemType): array
     {
         return $this->taxonomyService->tagChoices($itemType, $this->locale());
+    }
+
+    /** @return list<array{label: ?string, offset: int, choices: array<int, string>}> */
+    public function categoryChoiceGroups(string $itemType): array
+    {
+        return $this->taxonomyService->categoryChoiceGroups($itemType, $this->locale());
+    }
+
+    /** @return list<array{label: ?string, offset: int, choices: array<int, string>}> */
+    public function tagChoiceGroups(string $itemType): array
+    {
+        return $this->taxonomyService->tagChoiceGroups($itemType, $this->locale());
     }
 
     private function locale(): ?string

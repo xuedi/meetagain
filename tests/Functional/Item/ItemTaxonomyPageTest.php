@@ -82,6 +82,49 @@ class ItemTaxonomyPageTest extends WebTestCase
         static::assertCount(0, $this->pendingProposals($client), 'A manager writes, never proposes');
     }
 
+    public function testAManagerFilesADefinitionUnderAGroup(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $client->loginUser($this->user($client, self::MANAGER_EMAIL));
+        $crawler = $client->request('GET', self::PAGE, server: ['HTTP_HOST' => self::HOST]);
+
+        // Act
+        $form = $crawler->filter('form[name="item_taxonomy_definitions"]')->form();
+        $form['item_taxonomy_definitions[categories][0][group]'] = '0';
+        $client->submit($form);
+
+        // Assert
+        $this->assertResponseRedirects();
+        $reloaded = $client->request('GET', self::PAGE, server: ['HTTP_HOST' => self::HOST]);
+        static::assertSame(
+            '0',
+            $reloaded->filter('select[name="item_taxonomy_definitions[categories][0][group]"] option[selected]')->attr('value'),
+        );
+    }
+
+    public function testAMemberSeesTheGroupsAManagerDefined(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $client->loginUser($this->user($client, self::MEMBER_EMAIL));
+
+        // Act
+        $crawler = $client->request('GET', self::PAGE, server: ['HTTP_HOST' => self::HOST]);
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        static::assertStringContainsString(
+            'Informal',
+            $crawler->filter('form:has(input[name^="suggest["])')->text(),
+        );
+        static::assertCount(
+            3,
+            $crawler->filter('form:has(input[name^="suggest["]) .ml-4 input[name^="suggest[category][edit]"]'),
+            'The three grouped categories sit indented under their heading',
+        );
+    }
+
     public function testMemberSuggestionIsAppliedByAReviewer(): void
     {
         // Arrange

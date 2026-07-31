@@ -111,11 +111,11 @@ class ChangeTargetTest extends TestCase
 
         // Assert
         static::assertSame(
-            [['id' => 1, 'labels' => ['en' => 'Salutation']], ['id' => 2, 'labels' => ['en' => 'Slang']]],
+            [['id' => 1, 'labels' => ['en' => 'Salutation'], 'group' => null], ['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null]],
             $this->taxonomyAt('5')->getCategories(),
         );
         static::assertSame(
-            [['id' => 1, 'labels' => ['en' => 'Greeting']], ['id' => 2, 'labels' => ['en' => 'Slang']]],
+            [['id' => 1, 'labels' => ['en' => 'Greeting'], 'group' => null], ['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null]],
             $this->taxonomyAt(null)->getCategories(),
             'The global vocabulary is untouched',
         );
@@ -131,7 +131,7 @@ class ChangeTargetTest extends TestCase
 
         // Assert
         static::assertSame(
-            [['id' => 1, 'labels' => ['en' => 'Greeting']], ['id' => 2, 'labels' => ['en' => 'Slang']], ['id' => 3, 'labels' => ['en' => 'Idiom']]],
+            [['id' => 1, 'labels' => ['en' => 'Greeting'], 'group' => null], ['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null], ['id' => 3, 'labels' => ['en' => 'Idiom'], 'group' => null]],
             $this->taxonomyAt(null)->getCategories(),
         );
     }
@@ -145,7 +145,7 @@ class ChangeTargetTest extends TestCase
         $target->apply(0, 'category_remove_1', null);
 
         // Assert
-        static::assertSame([['id' => 2, 'labels' => ['en' => 'Slang']]], $this->taxonomyAt(null)->getCategories());
+        static::assertSame([['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null]], $this->taxonomyAt(null)->getCategories());
     }
 
     public function testAnInactiveTypeHasNoLabelSoOrphansStayHidden(): void

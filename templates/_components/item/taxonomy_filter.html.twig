@@ -8,6 +8,10 @@
     renders as a dimmed span instead of a link when that number is zero. Renders nothing when the
     type enables no categories or tags.
 
+    A vocabulary that defines display groups renders one indented chip row per group under a bold
+    group heading, ungrouped chips first with no heading. A group is never selectable and never
+    part of a facet URL.
+
     The header row carries a pencil to the central taxonomy page for any logged-in visitor, with the
     pending-proposal count as a badge for reviewers. It lives inside the swapped fragment, so it
     survives a facet click.
@@ -15,7 +19,8 @@
     Used in:    _components/item/sidebar.html.twig, App\Controller\ItemController::listFragment
     Parameters:
         - itemType (string, required) -- registry key of the item type (e.g. 'dish')
-    Depends on: item_taxonomy_category_choices(), item_taxonomy_tag_choices(), item_facet_current(),
+    Depends on: item_taxonomy_category_choices(), item_taxonomy_tag_choices(),
+                item_taxonomy_category_groups(), item_taxonomy_tag_groups(), item_facet_current(),
                 item_facet_url(), item_facet_counts(), item_taxonomy_target()
                 (ItemTaxonomyExtension); pending_change_proposals() (ChangeProposalExtension);
                 item_list_url() (ItemListExtension); the app_item_taxonomy route;
@@ -68,40 +73,50 @@
             {% if categories is not empty %}
                 <div class="field">
                     <p class="label is-small mb-1">{{ 'item.facet_categories'|trans }}</p>
-                    <div class="tags">
-                        {% for id, label in categories %}
-                            {{ facet.chip(
-                                item_facet_url(baseUrl, selection.withCategory(selection.category is same as(id) ? null : id)),
-                                label,
-                                counts ? counts.forCategory(id) : null,
-                                selection.category is same as(id),
-                                loop.index0 >= visibleChips
-                            ) }}
-                        {% endfor %}
-                        {% if categories|length > visibleChips %}
-                            <button type="button" class="tag is-white has-text-link is-hidden" data-item-facet-more>{{ 'item.facet_show_all'|trans({'%count%': categories|length}) }}</button>
+                    {% for group in item_taxonomy_category_groups(itemType) %}
+                        {% if group.label %}
+                            <p class="is-size-7 has-text-weight-semibold mb-1 mt-2" data-item-facet-group>{{ group.label }}</p>
                         {% endif %}
-                    </div>
+                        <div class="tags{{ group.label ? ' ml-4' }}">
+                            {% for id, label in group.choices %}
+                                {{ facet.chip(
+                                    item_facet_url(baseUrl, selection.withCategory(selection.category is same as(id) ? null : id)),
+                                    label,
+                                    counts ? counts.forCategory(id) : null,
+                                    selection.category is same as(id),
+                                    group.offset + loop.index0 >= visibleChips
+                                ) }}
+                            {% endfor %}
+                            {% if loop.last and categories|length > visibleChips %}
+                                <button type="button" class="tag is-white has-text-link is-hidden" data-item-facet-more>{{ 'item.facet_show_all'|trans({'%count%': categories|length}) }}</button>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                 </div>
             {% endif %}
 
             {% if tags is not empty %}
                 <div class="field">
                     <p class="label is-small mb-1">{{ 'item.facet_tags'|trans }}</p>
-                    <div class="tags">
-                        {% for id, label in tags %}
-                            {{ facet.chip(
-                                item_facet_url(baseUrl, selection.withTagToggled(id)),
-                                label,
-                                counts ? counts.forTag(id) : null,
-                                selection.hasTag(id),
-                                loop.index0 >= visibleChips
-                            ) }}
-                        {% endfor %}
-                        {% if tags|length > visibleChips %}
-                            <button type="button" class="tag is-white has-text-link is-hidden" data-item-facet-more>{{ 'item.facet_show_all'|trans({'%count%': tags|length}) }}</button>
+                    {% for group in item_taxonomy_tag_groups(itemType) %}
+                        {% if group.label %}
+                            <p class="is-size-7 has-text-weight-semibold mb-1 mt-2" data-item-facet-group>{{ group.label }}</p>
                         {% endif %}
-                    </div>
+                        <div class="tags{{ group.label ? ' ml-4' }}">
+                            {% for id, label in group.choices %}
+                                {{ facet.chip(
+                                    item_facet_url(baseUrl, selection.withTagToggled(id)),
+                                    label,
+                                    counts ? counts.forTag(id) : null,
+                                    selection.hasTag(id),
+                                    group.offset + loop.index0 >= visibleChips
+                                ) }}
+                            {% endfor %}
+                            {% if loop.last and tags|length > visibleChips %}
+                                <button type="button" class="tag is-white has-text-link is-hidden" data-item-facet-more>{{ 'item.facet_show_all'|trans({'%count%': tags|length}) }}</button>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                 </div>
             {% endif %}
         </div>

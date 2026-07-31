@@ -45,7 +45,7 @@ class GlossaryType extends AbstractType
 
             $builder->add('category', ChoiceType::class, [
                 'label' => 'glossary.label_category',
-                'choices' => $config->getTaxonomy()->categoryOptions($locale, $sourceLocale),
+                'choices' => $config->getTaxonomy()->groupedCategoryOptions($locale, $sourceLocale),
                 'required' => false,
                 'placeholder' => '',
                 'mapped' => false,
