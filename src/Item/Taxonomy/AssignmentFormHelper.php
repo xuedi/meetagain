@@ -43,9 +43,15 @@ readonly class AssignmentFormHelper
         }
 
         if ($provider->supportsTags() && $taxonomy->isTagsEnabled()) {
+            $tree = $taxonomy->tagTree();
             $builder->add(self::TAGS_FIELD, ChoiceType::class, [
                 'label' => 'item.taxonomy_tags_label',
-                'choices' => $taxonomy->groupedTagOptions($locale, $sourceLocale),
+                'choices' => $taxonomy->tagOptions($locale, $sourceLocale),
+                'choice_attr' => static fn(int $id): array => [
+                    'data-taxonomy-depth' => $tree->depthOf($id),
+                    'data-taxonomy-parent' => (string) $tree->parent($id),
+                ],
+                'attr' => $tree->hasBranches() ? ['data-taxonomy-tree' => ''] : [],
                 'block_prefix' => 'item_taxonomy_tags',
                 'required' => false,
                 'multiple' => true,

@@ -33,6 +33,17 @@ class TaxonomyDefinitionType extends AbstractType
             ]);
         }
 
+        if ($options['parent_choices'] !== null) {
+            $builder->add('parentTag', ChoiceType::class, [
+                'label' => false,
+                'required' => false,
+                'placeholder' => 'item.taxonomy_parent_none',
+                'choices' => $options['parent_choices'],
+                'property_path' => '[parent]',
+                'attr' => ['data-taxonomy-parent-select' => ''],
+            ]);
+        }
+
         foreach ($this->languageService->getAdminFilteredEnabledCodes() as $code) {
             $builder->add($code, TextType::class, [
                 'label' => false,
@@ -46,6 +57,7 @@ class TaxonomyDefinitionType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['usage'] = $options['usage'];
+        $view->vars['depths'] = $options['depths'];
     }
 
     #[\Override]
@@ -53,12 +65,16 @@ class TaxonomyDefinitionType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => null,
-            'empty_data' => ['id' => '', 'labels' => [], 'group' => null],
+            'empty_data' => ['id' => '', 'labels' => [], 'group' => null, 'parent' => null],
             'usage' => [],
+            'depths' => [],
             'group_choices' => null,
+            'parent_choices' => null,
         ]);
         $resolver->setAllowedTypes('usage', 'array');
+        $resolver->setAllowedTypes('depths', 'array');
         $resolver->setAllowedTypes('group_choices', ['null', 'array']);
+        $resolver->setAllowedTypes('parent_choices', ['null', 'array']);
     }
 
     #[\Override]

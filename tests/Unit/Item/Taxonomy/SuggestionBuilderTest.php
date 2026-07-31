@@ -40,8 +40,8 @@ class SuggestionBuilderTest extends TestCase
 
         // Assert
         static::assertSame([
-            ['label' => null, 'rows' => [1 => 'Gruss']],
-            ['label' => 'Umgangssprache', 'rows' => [2 => 'Slang']],
+            ['label' => null, 'rows' => [['id' => 1, 'label' => 'Gruss', 'depth' => 1, 'canAddChild' => false]]],
+            ['label' => 'Umgangssprache', 'rows' => [['id' => 2, 'label' => 'Slang', 'depth' => 1, 'canAddChild' => false]]],
         ], $groups);
     }
 
@@ -54,7 +54,41 @@ class SuggestionBuilderTest extends TestCase
         $groups = $this->builder()->groups($taxonomy, Axis::Category, 'en');
 
         // Assert
-        static::assertSame([['label' => null, 'rows' => [1 => 'Greeting']]], $groups);
+        static::assertSame(
+            [['label' => null, 'rows' => [['id' => 1, 'label' => 'Greeting', 'depth' => 1, 'canAddChild' => false]]]],
+            $groups,
+        );
+    }
+
+    public function testASubTagIsOfferedAChildFieldOnlyWhileTheDepthLimitAllowsOne(): void
+    {
+        // Arrange
+        $taxonomy = (new Config())->setTagDepth(2)->setTags([
+            ['id' => 1, 'labels' => ['en' => 'Meat']],
+            ['id' => 4, 'labels' => ['en' => 'Chicken'], 'parent' => 1],
+        ]);
+
+        // Act
+        $rows = $this->builder()->groups($taxonomy, Axis::Tag, 'en')[0]['rows'];
+
+        // Assert
+        static::assertSame([
+            ['id' => 1, 'label' => 'Meat', 'depth' => 1, 'canAddChild' => true],
+            ['id' => 4, 'label' => 'Chicken', 'depth' => 2, 'canAddChild' => false],
+        ], $rows);
+    }
+
+    public function testASubTagSuggestionCarriesItsParentInTheFieldKey(): void
+    {
+        // Arrange
+        $taxonomy = (new Config())->setTagDepth(2)->setTags([['id' => 0, 'labels' => ['en' => 'Meat']]]);
+
+        // Act
+        $changes = $this->builder()->changes($taxonomy, Axis::Tag, 'en', [], [], [0 => ['Chicken', ' ', 'Pork'], 9 => ['Ghost']]);
+
+        // Assert
+        static::assertSame(['tag_add_0_en_0', 'tag_add_0_en_1'], array_column($changes, 'field'));
+        static::assertSame(['Chicken', 'Pork'], array_column($changes, 'after'));
     }
 
     public function testAnEditedLabelBecomesARename(): void

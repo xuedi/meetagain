@@ -14,6 +14,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TaxonomyDefinitionsType extends AbstractType
 {
+    private const string GROUP_FIELD = 'categoryGroups';
+
     public function __construct(
         private readonly LanguageService $languageService,
     ) {}
@@ -25,18 +27,28 @@ class TaxonomyDefinitionsType extends AbstractType
         $taxonomy = $config instanceof Config ? $config : null;
 
         foreach ($this->axes($options) as $axis) {
-            $builder->add($this->groupField($axis), CollectionType::class, $this->collection($options, $axis, null));
-            $builder->add($this->definitionField($axis), CollectionType::class, $this->collection($options, $axis, $this->groupChoices($taxonomy, $axis)));
+            if ($axis === Axis::Category) {
+                $builder->add(self::GROUP_FIELD, CollectionType::class, $this->collection($options, $axis, null));
+            }
+
+            $builder->add($this->definitionField($axis), CollectionType::class, $this->collection($options, $axis, [
+                'group_choices' => $axis === Axis::Category ? $this->groupChoices($taxonomy) : null,
+                'parent_choices' => $this->parentChoices($taxonomy, $axis),
+                'depths' => $this->depths($taxonomy, $axis),
+            ]));
         }
 
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (PreSubmitEvent $event) use ($options): void {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (PreSubmitEvent $event) use ($options, $taxonomy): void {
             $submitted = (array) $event->getData();
             foreach ($this->axes($options) as $axis) {
-                $event->getForm()->add(
-                    $this->definitionField($axis),
-                    CollectionType::class,
-                    $this->collection($options, $axis, $this->submittedGroupChoices((array) ($submitted[$this->groupField($axis)] ?? []))),
-                );
+                $rows = (array) ($submitted[$this->definitionField($axis)] ?? []);
+                $event->getForm()->add($this->definitionField($axis), CollectionType::class, $this->collection($options, $axis, [
+                    'group_choices' => $axis === Axis::Category
+                        ? $this->submittedRowChoices((array) ($submitted[self::GROUP_FIELD] ?? []))
+                        : null,
+                    'parent_choices' => $this->parentChoices($taxonomy, $axis) === null ? null : $this->submittedRowChoices($rows),
+                    'depths' => $this->depths($taxonomy, $axis),
+                ]));
             }
         });
     }
@@ -63,17 +75,19 @@ class TaxonomyDefinitionsType extends AbstractType
 
     /**
      * @param array<string, mixed> $options
-     * @param array<string, int|string>|null $groupChoices
+     * @param array{group_choices: ?array<string, int|string>, parent_choices: ?array<string, int|string>, depths: array<int, int>}|null $entry
      * @return array<string, mixed>
      */
-    private function collection(array $options, Axis $axis, ?array $groupChoices): array
+    private function collection(array $options, Axis $axis, ?array $entry): array
     {
         return [
             'label' => false,
             'entry_type' => TaxonomyDefinitionType::class,
             'entry_options' => [
-                'usage' => $groupChoices === null ? [] : (array) ($options['usage'][$axis->value] ?? []),
-                'group_choices' => $groupChoices,
+                'usage' => $entry === null ? [] : (array) ($options['usage'][$axis->value] ?? []),
+                'group_choices' => $entry['group_choices'] ?? null,
+                'parent_choices' => $entry['parent_choices'] ?? null,
+                'depths' => $entry['depths'] ?? [],
             ],
             'allow_add' => true,
             'allow_delete' => true,
@@ -84,7 +98,7 @@ class TaxonomyDefinitionsType extends AbstractType
     }
 
     /** @return array<string, int|string> */
-    private function groupChoices(?Config $taxonomy, Axis $axis): array
+    private function groupChoices(?Config $taxonomy): array
     {
         if ($taxonomy === null) {
             return [];
@@ -93,18 +107,59 @@ class TaxonomyDefinitionsType extends AbstractType
         $sourceLocale = $this->languageService->getFilteredDefaultLocale();
 
         $choices = [];
-        foreach ($taxonomy->groupDefinitions($axis) as $group) {
+        foreach ($taxonomy->categoryGroupDefinitions() as $group) {
             $choices[$group->labelFor(null, $sourceLocale)] = $group->id;
         }
 
         return $choices;
     }
 
+    /** @return array<string, int|string>|null */
+    private function parentChoices(?Config $taxonomy, Axis $axis): ?array
+    {
+        if ($axis !== Axis::Tag || $taxonomy === null || $taxonomy->getTagDepth() < 2) {
+            return null;
+        }
+
+        $sourceLocale = $this->languageService->getFilteredDefaultLocale();
+        $tree = $taxonomy->tagTree();
+
+        $choices = [];
+        foreach ($tree->ordered() as $tag) {
+            $depth = $tree->depthOf($tag->id);
+            if ($depth >= $taxonomy->getTagDepth()) {
+                continue;
+            }
+
+            $label = str_repeat('- ', $depth - 1) . $tag->labelFor(null, $sourceLocale);
+            $choices[isset($choices[$label]) ? $label . ' #' . $tag->id : $label] = $tag->id;
+        }
+
+        return $choices;
+    }
+
+    /** @return array<int, int> tag id => how many levels deep it sits */
+    private function depths(?Config $taxonomy, Axis $axis): array
+    {
+        if ($axis !== Axis::Tag || $taxonomy === null) {
+            return [];
+        }
+
+        $tree = $taxonomy->tagTree();
+
+        $depths = [];
+        foreach ($taxonomy->tagDefinitions() as $tag) {
+            $depths[$tag->id] = $tree->depthOf($tag->id);
+        }
+
+        return $depths;
+    }
+
     /**
-     * @param array<array-key, mixed> $rows the axis' submitted group rows, whose ids may be client tokens
+     * @param array<array-key, mixed> $rows submitted rows of one axis, whose ids may be client tokens
      * @return array<string, int|string>
      */
-    private function submittedGroupChoices(array $rows): array
+    private function submittedRowChoices(array $rows): array
     {
         $choices = [];
         foreach ($rows as $row) {
@@ -113,7 +168,7 @@ class TaxonomyDefinitionsType extends AbstractType
                 continue;
             }
 
-            $labels = array_filter(array_map(strval(...), array_diff_key((array) $row, ['id' => null, 'group' => null])));
+            $labels = array_filter(array_map(strval(...), array_diff_key((array) $row, ['id' => null, 'group' => null, 'parentTag' => null])));
             $label = $labels === [] ? $id : reset($labels);
             $choices[isset($choices[$label]) ? $id : $label] = $id;
         }
@@ -136,11 +191,6 @@ class TaxonomyDefinitionsType extends AbstractType
         }
 
         return $axes;
-    }
-
-    private function groupField(Axis $axis): string
-    {
-        return $axis === Axis::Category ? 'categoryGroups' : 'tagGroups';
     }
 
     private function definitionField(Axis $axis): string

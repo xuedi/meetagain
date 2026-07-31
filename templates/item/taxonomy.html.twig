@@ -5,14 +5,15 @@
     resolves to gets the definition editor (one label column per admin language, collection rows);
     everyone else gets the single-locale suggestion form, whose submit becomes a change proposal.
     Both render the vocabulary grouped exactly as the manager defined it - ungrouped entries first,
-    then one indented block per display group. Pending proposals for this vocabulary are listed
-    below either form.
+    then one indented block per display group, a sub-tag indented under the tag it hangs from. Where
+    the depth limit still allows one, the suggestion form offers a field for a new sub-tag. Pending
+    proposals for this vocabulary are listed below either form.
 
     Rendered by: App\Controller\ItemTaxonomyController
     Parameters:
         - itemType, typeLabelKey (string)
         - axes (list) -- per supported axis: key, headingKey, emptyKey, enabled, usage (id => count),
-                         groups (list of {label: ?string, rows: id => label})
+                         groups (list of {label: ?string, rows: list of {id, label, depth, canAddChild}})
         - disabledAxisKeys (list<string>), targetType (string), targetId (?int)
         - form (?FormView), canManage (bool), canSuggest (bool), pending (list)
     Depends on: js/admin/collection.js, js/admin/taxonomy-definitions.js; item_list_url()
@@ -57,17 +58,25 @@
                                         <p class="is-size-7 has-text-weight-semibold mb-1 mt-3">{{ group.label }}</p>
                                     {% endif %}
                                     <div class="{{ group.label ? 'ml-4' }}">
-                                        {% for id, label in group.rows %}
-                                            <div class="field has-addons">
+                                        {% for row in group.rows %}
+                                            <div class="field has-addons" style="padding-left: {{ (row.depth - 1) * 1.5 }}rem;">
                                                 <div class="control is-expanded">
-                                                    <input class="input" type="text" name="suggest[{{ axis.key }}][edit][{{ id }}]" value="{{ label }}">
+                                                    <input class="input" type="text" name="suggest[{{ axis.key }}][edit][{{ row.id }}]" value="{{ row.label }}">
                                                 </div>
-                                                {% if axis.usage[id]|default(0) > 0 %}
+                                                {% if axis.usage[row.id]|default(0) > 0 %}
                                                     <div class="control">
-                                                        <span class="button is-static" title="{{ 'item.taxonomy_usage_hint'|trans({'%count%': axis.usage[id]}) }}">{{ axis.usage[id] }}</span>
+                                                        <span class="button is-static" title="{{ 'item.taxonomy_usage_hint'|trans({'%count%': axis.usage[row.id]}) }}">{{ axis.usage[row.id] }}</span>
                                                     </div>
                                                 {% endif %}
                                             </div>
+                                            {% if row.canAddChild %}
+                                                <div class="field" style="padding-left: {{ row.depth * 1.5 }}rem;">
+                                                    <div class="control">
+                                                        <input class="input is-small" type="text" name="suggest[{{ axis.key }}][addBelow][{{ row.id }}][]"
+                                                               placeholder="{{ 'item.taxonomy_suggest_add_child_placeholder'|trans({'%parent%': row.label}) }}">
+                                                    </div>
+                                                </div>
+                                            {% endif %}
                                         {% endfor %}
                                     </div>
                                 {% endfor %}
@@ -93,8 +102,8 @@
                                         <p class="is-size-7 has-text-weight-semibold mb-1 mt-3">{{ group.label }}</p>
                                     {% endif %}
                                     <div class="tags{{ group.label ? ' ml-4' }}">
-                                        {% for label in group.rows %}
-                                            <span class="tag is-light">{{ label }}</span>
+                                        {% for row in group.rows %}
+                                            <span class="tag is-light" style="margin-left: {{ (row.depth - 1) * 1.5 }}rem;">{{ row.label }}</span>
                                         {% endfor %}
                                     </div>
                                 {% else %}

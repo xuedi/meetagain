@@ -111,11 +111,11 @@ class ChangeTargetTest extends TestCase
 
         // Assert
         static::assertSame(
-            [['id' => 1, 'labels' => ['en' => 'Salutation'], 'group' => null], ['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null]],
+            [['id' => 1, 'labels' => ['en' => 'Salutation'], 'group' => null, 'parent' => null], ['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null, 'parent' => null]],
             $this->taxonomyAt('5')->getCategories(),
         );
         static::assertSame(
-            [['id' => 1, 'labels' => ['en' => 'Greeting'], 'group' => null], ['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null]],
+            [['id' => 1, 'labels' => ['en' => 'Greeting'], 'group' => null, 'parent' => null], ['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null, 'parent' => null]],
             $this->taxonomyAt(null)->getCategories(),
             'The global vocabulary is untouched',
         );
@@ -131,7 +131,7 @@ class ChangeTargetTest extends TestCase
 
         // Assert
         static::assertSame(
-            [['id' => 1, 'labels' => ['en' => 'Greeting'], 'group' => null], ['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null], ['id' => 3, 'labels' => ['en' => 'Idiom'], 'group' => null]],
+            [['id' => 1, 'labels' => ['en' => 'Greeting'], 'group' => null, 'parent' => null], ['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null, 'parent' => null], ['id' => 3, 'labels' => ['en' => 'Idiom'], 'group' => null, 'parent' => null]],
             $this->taxonomyAt(null)->getCategories(),
         );
     }
@@ -145,7 +145,32 @@ class ChangeTargetTest extends TestCase
         $target->apply(0, 'category_remove_1', null);
 
         // Assert
-        static::assertSame([['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null]], $this->taxonomyAt(null)->getCategories());
+        static::assertSame([['id' => 2, 'labels' => ['en' => 'Slang'], 'group' => null, 'parent' => null]], $this->taxonomyAt(null)->getCategories());
+    }
+
+    public function testValidateRejectsASubTagUnderAGoneOrTooDeepParent(): void
+    {
+        // Arrange
+        $target = $this->target();
+
+        // Act + Assert
+        static::assertSame('item.taxonomy_validation_gone', $target->validate(0, 'tag_add_99_en_0', 'Chicken'));
+        static::assertSame('item.taxonomy_validation_depth', $target->validate(0, 'tag_add_2_en_0', 'Wing'));
+        static::assertNull($target->validate(0, 'tag_add_1_en_0', 'Chicken'));
+    }
+
+    public function testApplyHangsAnAddedSubTagUnderItsParent(): void
+    {
+        // Arrange
+        $target = $this->target();
+
+        // Act
+        $target->apply(0, 'tag_add_1_en_0', 'Chicken');
+
+        // Assert
+        $tags = $this->taxonomyAt(null)->tagDefinitions();
+        static::assertSame('Chicken', $tags[2]->labels['en']);
+        static::assertSame(1, $tags[2]->parent);
     }
 
     public function testAnInactiveTypeHasNoLabelSoOrphansStayHidden(): void
@@ -199,10 +224,18 @@ class ChangeTargetTest extends TestCase
     private function settings(): TaxonomyTestSettings
     {
         $settings = new TaxonomyTestSettings();
-        $settings->taxonomy->setCategoriesEnabled(true)->setCategories([
-            ['id' => 1, 'labels' => ['en' => 'Greeting']],
-            ['id' => 2, 'labels' => ['en' => 'Slang']],
-        ]);
+        $settings->taxonomy
+            ->setCategoriesEnabled(true)
+            ->setCategories([
+                ['id' => 1, 'labels' => ['en' => 'Greeting']],
+                ['id' => 2, 'labels' => ['en' => 'Slang']],
+            ])
+            ->setTagsEnabled(true)
+            ->setTagDepth(2)
+            ->setTags([
+                ['id' => 1, 'labels' => ['en' => 'Meat']],
+                ['id' => 2, 'labels' => ['en' => 'Poultry'], 'parent' => 1],
+            ]);
 
         return $settings;
     }

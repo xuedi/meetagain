@@ -106,7 +106,6 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
                 'categoryGroups' => [
                     ['id' => 0, 'labels' => ['en' => 'Informal', 'de' => 'Umgangssprache']],
                 ],
-                'tagGroups' => [],
                 'categories' => $categories,
                 'tags' => [],
             ],

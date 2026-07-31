@@ -165,12 +165,11 @@ class ConfigTest extends TestCase
         static::assertNull($config->categoryDefinitions()[0]->group);
     }
 
-    public function testGroupsAreNormalizedPerAxis(): void
+    public function testTagsCarryNoGroupOfTheirOwn(): void
     {
         // Arrange
         $config = (new Config())
             ->setCategoryGroups([['id' => '', 'labels' => ['en' => 'Meat']]])
-            ->setTagGroups([['id' => '', 'labels' => ['en' => 'Heat']]])
             ->setTags([['id' => '', 'labels' => ['en' => 'Spicy'], 'group' => 0]]);
 
         // Act
@@ -178,9 +177,8 @@ class ConfigTest extends TestCase
 
         // Assert
         static::assertSame(0, $config->categoryGroupDefinitions()[0]->id);
-        static::assertSame(0, $config->tagGroupDefinitions()[0]->id);
-        static::assertSame(0, $config->tagDefinitions()[0]->group);
-        static::assertSame([], $config->categoryDefinitions());
+        static::assertArrayNotHasKey('group', $config->toArray()['tags'][0]);
+        static::assertArrayNotHasKey('tagGroups', $config->toArray());
     }
 
     public function testToArrayFromArrayRoundTripsGroups(): void
@@ -276,6 +274,197 @@ class ConfigTest extends TestCase
 
         // Act + Assert
         static::assertSame($config->categoryOptions('en', 'en'), $config->groupedCategoryOptions('en', 'en'));
+    }
+
+    public function testTagDepthDefaultsToFlatAndIsClamped(): void
+    {
+        // Arrange
+        $config = new Config();
+
+        // Act + Assert
+        static::assertSame(1, $config->getTagDepth());
+        static::assertSame(1, $config->setTagDepth(0)->getTagDepth());
+        static::assertSame(1, $config->setTagDepth(null)->getTagDepth());
+        static::assertSame(Config::MAX_TAG_DEPTH, $config->setTagDepth(99)->getTagDepth());
+        static::assertSame(3, $config->setTagDepth(3)->getTagDepth());
+    }
+
+    public function testNormalizeKeepsAParentWithinTheDepthLimit(): void
+    {
+        // Arrange
+        $config = (new Config())->setTagDepth(2)->setTags([
+            ['id' => 1, 'labels' => ['en' => 'Meat']],
+            ['id' => 4, 'labels' => ['en' => 'Chicken'], 'parent' => 1],
+        ]);
+
+        // Act
+        $config->normalize();
+
+        // Assert
+        static::assertNull($config->tagDefinitions()[0]->parent);
+        static::assertSame(1, $config->tagDefinitions()[1]->parent);
+        static::assertSame(2, $config->tagTree()->depthOf(4));
+        static::assertSame([1], $config->tagTree()->ancestors(4));
+    }
+
+    public function testNormalizeClampsARowBeyondTheDepthLimitToRoot(): void
+    {
+        // Arrange
+        $config = (new Config())->setTagDepth(2)->setTags([
+            ['id' => 1, 'labels' => ['en' => 'Meat']],
+            ['id' => 4, 'labels' => ['en' => 'Chicken'], 'parent' => 1],
+            ['id' => 5, 'labels' => ['en' => 'Wing'], 'parent' => 4],
+        ]);
+
+        // Act
+        $config->normalize();
+
+        // Assert
+        static::assertNull($config->tagDefinitions()[2]->parent);
+        static::assertSame(1, $config->tagTree()->depthOf(5));
+    }
+
+    public function testADepthOfOneFlattensEveryTag(): void
+    {
+        // Arrange
+        $config = (new Config())->setTags([
+            ['id' => 1, 'labels' => ['en' => 'Meat']],
+            ['id' => 4, 'labels' => ['en' => 'Chicken'], 'parent' => 1],
+        ]);
+
+        // Act
+        $config->normalize();
+
+        // Assert
+        static::assertNull($config->tagDefinitions()[1]->parent);
+        static::assertSame([1, 4], array_column($config->tagTree()->ordered(), 'id'));
+    }
+
+    public function testNormalizeBreaksACycleAndDropsAParentThatIsGone(): void
+    {
+        // Arrange
+        $config = (new Config())->setTagDepth(4)->setTags([
+            ['id' => 1, 'labels' => ['en' => 'Meat'], 'parent' => 2],
+            ['id' => 2, 'labels' => ['en' => 'Poultry'], 'parent' => 1],
+            ['id' => 3, 'labels' => ['en' => 'Orphan'], 'parent' => 99],
+            ['id' => 4, 'labels' => ['en' => 'Selfish'], 'parent' => 4],
+        ]);
+
+        // Act
+        $config->normalize();
+
+        // Assert
+        static::assertNull($config->tagDefinitions()[0]->parent);
+        static::assertSame(1, $config->tagDefinitions()[1]->parent);
+        static::assertNull($config->tagDefinitions()[2]->parent);
+        static::assertNull($config->tagDefinitions()[3]->parent);
+    }
+
+    public function testNormalizeResolvesAClientTokenIntoTheAllocatedParentId(): void
+    {
+        // Arrange
+        $config = (new Config())->setTagDepth(2)->setTags([
+            ['id' => 'n1', 'labels' => ['en' => 'Meat']],
+            ['id' => '', 'labels' => ['en' => 'Chicken'], 'parent' => 'n1'],
+        ]);
+
+        // Act
+        $config->normalize();
+
+        // Assert
+        static::assertSame([0, 1], array_column($config->getTags(), 'id'));
+        static::assertSame(0, $config->tagDefinitions()[1]->parent);
+    }
+
+    public function testRemovingAParentPromotesItsChildrenToRoot(): void
+    {
+        // Arrange
+        $config = (new Config())->setTagDepth(2)->setTags([
+            ['id' => 1, 'labels' => ['en' => 'Meat']],
+            ['id' => 4, 'labels' => ['en' => 'Chicken'], 'parent' => 1],
+        ]);
+
+        // Act
+        $config->removeDefinition(Axis::Tag, 1)->normalize();
+
+        // Assert
+        static::assertNull($config->tagDefinitions()[0]->parent);
+    }
+
+    public function testTagTreePutsEveryTagDirectlyAfterItsParent(): void
+    {
+        // Arrange
+        $config = (new Config())->setTagDepth(3)->setTags([
+            ['id' => 1, 'labels' => ['en' => 'Meat']],
+            ['id' => 2, 'labels' => ['en' => 'Fish']],
+            ['id' => 3, 'labels' => ['en' => 'Chicken'], 'parent' => 1],
+            ['id' => 4, 'labels' => ['en' => 'Wing'], 'parent' => 3],
+            ['id' => 5, 'labels' => ['en' => 'Pork'], 'parent' => 1],
+        ]);
+
+        // Act
+        $config->normalize();
+
+        // Assert
+        static::assertSame([1, 3, 4, 5, 2], array_column($config->tagTree()->ordered(), 'id'));
+        static::assertSame([3, 5], array_column($config->tagTree()->children(1), 'id'));
+        static::assertSame([3, 1], $config->tagTree()->ancestors(4));
+    }
+
+    public function testTheTagAxisIsOneUngroupedBucketInTreeOrder(): void
+    {
+        // Arrange
+        $config = (new Config())
+            ->setTagDepth(2)
+            ->setTags([
+                ['id' => 1, 'labels' => ['en' => 'Meat']],
+                ['id' => 5, 'labels' => ['en' => 'Spicy']],
+                ['id' => 4, 'labels' => ['en' => 'Chicken'], 'parent' => 1],
+            ]);
+        $config->normalize();
+
+        // Act
+        $grouped = $config->groupedDefinitions(Axis::Tag);
+
+        // Assert
+        static::assertCount(1, $grouped);
+        static::assertNull($grouped[0]['group']);
+        static::assertSame([1, 4, 5], array_column($grouped[0]['definitions'], 'id'));
+        static::assertSame(['Meat' => 1, 'Chicken' => 4, 'Spicy' => 5], $config->tagOptions('en', 'en'));
+    }
+
+    public function testToArrayFromArrayRoundTripsTheTree(): void
+    {
+        // Arrange
+        $config = (new Config())->setTagDepth(3)->setTags([
+            ['id' => 1, 'labels' => ['en' => 'Meat']],
+            ['id' => 4, 'labels' => ['en' => 'Chicken'], 'parent' => 1],
+        ]);
+
+        // Act
+        $raw = $config->toArray();
+        $restored = Config::fromArray($raw);
+
+        // Assert
+        static::assertSame(3, $raw['tagDepth']);
+        static::assertArrayNotHasKey('parent', $raw['tags'][0]);
+        static::assertSame(1, $raw['tags'][1]['parent']);
+        static::assertSame(3, $restored->getTagDepth());
+        static::assertSame(1, $restored->tagDefinitions()[1]->parent);
+    }
+
+    public function testAConfigStoredBeforeTheTreeExistedStaysFlat(): void
+    {
+        // Arrange
+        $raw = ['tagsEnabled' => true, 'tags' => [['id' => 0, 'labels' => ['en' => 'Spicy']]]];
+
+        // Act
+        $config = Config::fromArray($raw);
+
+        // Assert
+        static::assertSame(1, $config->getTagDepth());
+        static::assertFalse($config->tagTree()->hasBranches());
+        static::assertNull($config->tagDefinitions()[0]->parent);
     }
 
     #[DataProvider('labelFallbackCases')]

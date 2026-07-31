@@ -20,6 +20,7 @@ class ChangeFieldCodecTest extends TestCase
         yield 'add a tag' => [new ChangeField(Axis::Tag, ChangeOperation::Add, locale: 'zh', index: 0), 'tag_add_zh_0'];
         yield 'rename a tag' => [new ChangeField(Axis::Tag, ChangeOperation::Rename, id: 9, locale: 'en'), 'tag_rename_9_en'];
         yield 'remove a tag' => [new ChangeField(Axis::Tag, ChangeOperation::Remove, id: 9), 'tag_remove_9'];
+        yield 'add a sub-tag' => [new ChangeField(Axis::Tag, ChangeOperation::Add, locale: 'en', index: 1, parent: 0), 'tag_add_0_en_1'];
     }
 
     #[DataProvider('fieldProvider')]
@@ -38,6 +39,7 @@ class ChangeFieldCodecTest extends TestCase
         static::assertSame($field->operation, $parsed->operation);
         static::assertSame($field->id, $parsed->id);
         static::assertSame($field->locale, $parsed->locale);
+        static::assertSame($field->parent, $parsed->parent);
     }
 
     /** @return iterable<string, array{string}> */
@@ -67,5 +69,14 @@ class ChangeFieldCodecTest extends TestCase
 
         // Assert
         static::assertSame('item.taxonomy_field_tag_remove', $field->labelKey());
+    }
+
+    public function testLabelKeySeparatesASubTagAddition(): void
+    {
+        // Arrange + Act
+        $field = new ChangeField(Axis::Tag, ChangeOperation::Add, locale: 'en', index: 0, parent: 3);
+
+        // Assert
+        static::assertSame('item.taxonomy_field_tag_add_child', $field->labelKey());
     }
 }

@@ -5,6 +5,7 @@ namespace App\Form\Item;
 use App\Item\Taxonomy\Config;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,6 +20,12 @@ class TaxonomyConfigType extends AbstractType
         ])->add('tagsEnabled', CheckboxType::class, [
             'label' => 'item.taxonomy_tags_enable',
             'required' => false,
+            'attr' => ['data-taxonomy-tags-toggle' => ''],
+        ])->add('tagDepth', IntegerType::class, [
+            'label' => 'item.taxonomy_tag_depth_label',
+            'help' => 'item.taxonomy_tag_depth_help',
+            'required' => false,
+            'attr' => ['min' => 1, 'max' => Config::MAX_TAG_DEPTH],
         ]);
     }
 

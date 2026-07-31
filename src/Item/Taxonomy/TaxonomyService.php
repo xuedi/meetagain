@@ -68,7 +68,13 @@ readonly class TaxonomyService
                 continue;
             }
 
-            $wanted[] = $tagId;
+            foreach ([$tagId, ...$taxonomy->tagTree()->ancestors($tagId)] as $id) {
+                if (in_array($id, $wanted, true)) {
+                    continue;
+                }
+
+                $wanted[] = $id;
+            }
         }
 
         $current = [];
@@ -123,7 +129,7 @@ readonly class TaxonomyService
         }
 
         $labels = [];
-        foreach ($this->getTagIds($itemType, $itemId) as $tagId) {
+        foreach ($taxonomy->tagTree()->leafmost($this->getTagIds($itemType, $itemId)) as $tagId) {
             $label = $taxonomy->tagLabel($tagId, $locale, $this->sourceLocale());
             if ($label !== null && $label !== '') {
                 $labels[] = $label;
@@ -149,13 +155,13 @@ readonly class TaxonomyService
         return $this->choices($itemType, Axis::Tag, $locale);
     }
 
-    /** @return list<array{label: ?string, offset: int, choices: array<int, string>}> */
+    /** @return list<array{label: ?string, levels: list<array{depth: int, offset: int, choices: array<int, string>}>}> */
     public function categoryChoiceGroups(string $itemType, ?string $locale): array
     {
         return $this->choiceGroups($itemType, Axis::Category, $locale);
     }
 
-    /** @return list<array{label: ?string, offset: int, choices: array<int, string>}> */
+    /** @return list<array{label: ?string, levels: list<array{depth: int, offset: int, choices: array<int, string>}>}> */
     public function tagChoiceGroups(string $itemType, ?string $locale): array
     {
         return $this->choiceGroups($itemType, Axis::Tag, $locale);
@@ -177,7 +183,7 @@ readonly class TaxonomyService
         return $choices;
     }
 
-    /** @return list<array{label: ?string, offset: int, choices: array<int, string>}> */
+    /** @return list<array{label: ?string, levels: list<array{depth: int, offset: int, choices: array<int, string>}>}> */
     private function choiceGroups(string $itemType, Axis $axis, ?string $locale): array
     {
         $taxonomy = $this->enabledTaxonomy($itemType, $axis);
@@ -185,20 +191,28 @@ readonly class TaxonomyService
             return [];
         }
 
+        $tree = $taxonomy->tagTree();
+
         $groups = [];
         $offset = 0;
         foreach ($taxonomy->groupedDefinitions($axis) as $bucket) {
-            $choices = [];
+            $levels = [];
             foreach ($bucket['definitions'] as $definition) {
-                $choices[$definition->id] = $definition->labelFor($locale, $this->sourceLocale());
+                $depth = $axis === Axis::Tag ? $tree->depthOf($definition->id) : 1;
+                $level = array_key_last($levels);
+                if ($level === null || $levels[$level]['depth'] !== $depth) {
+                    $levels[] = ['depth' => $depth, 'offset' => $offset, 'choices' => []];
+                    $level = array_key_last($levels);
+                }
+
+                $levels[$level]['choices'][$definition->id] = $definition->labelFor($locale, $this->sourceLocale());
+                $offset++;
             }
 
             $groups[] = [
                 'label' => $bucket['group']?->labelFor($locale, $this->sourceLocale()),
-                'offset' => $offset,
-                'choices' => $choices,
+                'levels' => $levels,
             ];
-            $offset += count($choices);
         }
 
         return $groups;

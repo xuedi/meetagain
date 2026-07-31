@@ -192,12 +192,18 @@ final class ItemTaxonomyController extends AbstractController
             }
 
             $axisInput = (array) ($submitted[$axis->value] ?? []);
+            $addedBelow = [];
+            foreach ((array) ($axisInput['addBelow'] ?? []) as $parent => $labels) {
+                $addedBelow[$parent] = array_values(array_map(strval(...), (array) $labels));
+            }
+
             $changes = [...$changes, ...$this->suggestionBuilder->changes(
                 $taxonomy,
                 $axis,
                 $request->getLocale(),
                 array_map(strval(...), (array) ($axisInput['edit'] ?? [])),
                 array_values(array_map(strval(...), (array) ($axisInput['add'] ?? []))),
+                $addedBelow,
             )];
         }
 

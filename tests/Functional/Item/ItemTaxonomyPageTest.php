@@ -125,6 +125,22 @@ class ItemTaxonomyPageTest extends WebTestCase
         );
     }
 
+    public function testAMemberIsOfferedASubTagFieldOnlyWhereTheDepthLimitAllowsOne(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $client->loginUser($this->user($client, self::MEMBER_EMAIL));
+
+        // Act
+        $crawler = $client->request('GET', '/en/item/film/taxonomy', server: ['HTTP_HOST' => 'cinema.meetagain.local']);
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        static::assertCount(2, $crawler->filter('input[name^="suggest[tag][addBelow]"]'), 'One per root tag');
+        static::assertCount(1, $crawler->filter('input[name="suggest[tag][addBelow][0][]"]'));
+        static::assertCount(0, $crawler->filter('input[name="suggest[tag][addBelow][1][]"]'), 'A tag at the limit takes none');
+    }
+
     public function testMemberSuggestionIsAppliedByAReviewer(): void
     {
         // Arrange

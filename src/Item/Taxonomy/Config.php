@@ -4,19 +4,19 @@ namespace App\Item\Taxonomy;
 
 final class Config
 {
+    public const int MAX_TAG_DEPTH = 5;
+
     private bool $categoriesEnabled = false;
     private bool $tagsEnabled = false;
+    private int $tagDepth = 1;
 
-    /** @var list<array{id: int|string, labels: array<string, string>, group: int|string|null}> */
+    /** @var list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}> */
     private array $categoryGroups = [];
 
-    /** @var list<array{id: int|string, labels: array<string, string>, group: int|string|null}> */
-    private array $tagGroups = [];
-
-    /** @var list<array{id: int|string, labels: array<string, string>, group: int|string|null}> */
+    /** @var list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}> */
     private array $categories = [];
 
-    /** @var list<array{id: int|string, labels: array<string, string>, group: int|string|null}> */
+    /** @var list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}> */
     private array $tags = [];
 
     public function isCategoriesEnabled(): bool
@@ -43,13 +43,25 @@ final class Config
         return $this;
     }
 
-    /** @return list<array{id: int|string, labels: array<string, string>, group: int|string|null}> */
+    public function getTagDepth(): int
+    {
+        return $this->tagDepth;
+    }
+
+    public function setTagDepth(?int $tagDepth): static
+    {
+        $this->tagDepth = max(1, min(self::MAX_TAG_DEPTH, $tagDepth ?? 1));
+
+        return $this;
+    }
+
+    /** @return list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}> */
     public function getCategories(): array
     {
         return $this->categories;
     }
 
-    /** @param iterable<array{id?: int|string|null, labels?: array<string, string>|null, group?: int|string|null}> $categories */
+    /** @param iterable<array{id?: int|string|null, labels?: array<string, string>|null, group?: int|string|null, parent?: int|string|null}> $categories */
     public function setCategories(iterable $categories): static
     {
         $this->categories = $this->ingestRows($categories);
@@ -57,13 +69,13 @@ final class Config
         return $this;
     }
 
-    /** @return list<array{id: int|string, labels: array<string, string>, group: int|string|null}> */
+    /** @return list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}> */
     public function getTags(): array
     {
         return $this->tags;
     }
 
-    /** @param iterable<array{id?: int|string|null, labels?: array<string, string>|null, group?: int|string|null}> $tags */
+    /** @param iterable<array{id?: int|string|null, labels?: array<string, string>|null, group?: int|string|null, parent?: int|string|null}> $tags */
     public function setTags(iterable $tags): static
     {
         $this->tags = $this->ingestRows($tags);
@@ -71,7 +83,7 @@ final class Config
         return $this;
     }
 
-    /** @return list<array{id: int|string, labels: array<string, string>, group: int|string|null}> */
+    /** @return list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}> */
     public function getCategoryGroups(): array
     {
         return $this->categoryGroups;
@@ -81,20 +93,6 @@ final class Config
     public function setCategoryGroups(iterable $categoryGroups): static
     {
         $this->categoryGroups = $this->ingestRows($categoryGroups);
-
-        return $this;
-    }
-
-    /** @return list<array{id: int|string, labels: array<string, string>, group: int|string|null}> */
-    public function getTagGroups(): array
-    {
-        return $this->tagGroups;
-    }
-
-    /** @param iterable<array{id?: int|string|null, labels?: array<string, string>|null}> $tagGroups */
-    public function setTagGroups(iterable $tagGroups): static
-    {
-        $this->tagGroups = $this->ingestRows($tagGroups);
 
         return $this;
     }
@@ -131,21 +129,18 @@ final class Config
         return $axis === Axis::Category ? $this->categoryDefinitions() : $this->tagDefinitions();
     }
 
-    /** @return list<GroupDefinition> */
-    public function groupDefinitions(Axis $axis): array
-    {
-        return array_map(
-            static fn(array $row): GroupDefinition => new GroupDefinition((int) $row['id'], $row['labels']),
-            $this->groupRows($axis),
-        );
-    }
-
     /** @return list<array{group: ?GroupDefinition, definitions: list<AbstractDefinition>}> */
     public function groupedDefinitions(Axis $axis): array
     {
+        if ($axis === Axis::Tag) {
+            $tags = $this->tagTree()->ordered();
+
+            return $tags === [] ? [] : [['group' => null, 'definitions' => $tags]];
+        }
+
         $ungrouped = [];
         $members = [];
-        foreach ($this->definitions($axis) as $definition) {
+        foreach ($this->categoryDefinitions() as $definition) {
             if ($definition->group === null) {
                 $ungrouped[] = $definition;
 
@@ -156,7 +151,7 @@ final class Config
         }
 
         $grouped = $ungrouped === [] ? [] : [['group' => null, 'definitions' => $ungrouped]];
-        foreach ($this->groupDefinitions($axis) as $group) {
+        foreach ($this->categoryGroupDefinitions() as $group) {
             if (!isset($members[$group->id])) {
                 continue;
             }
@@ -183,10 +178,10 @@ final class Config
         return $labels;
     }
 
-    public function addLabel(Axis $axis, string $locale, string $label): static
+    public function addLabel(Axis $axis, string $locale, string $label, ?int $parent = null): static
     {
         $rows = $this->rows($axis);
-        $rows[] = ['id' => '', 'labels' => [$locale => $label], 'group' => null];
+        $rows[] = ['id' => '', 'labels' => [$locale => $label], 'group' => null, 'parent' => $parent];
 
         return $this->setRows($axis, $rows);
     }
@@ -207,10 +202,7 @@ final class Config
 
     public function removeDefinition(Axis $axis, int $id): static
     {
-        $rows = array_values(array_filter(
-            $this->rows($axis),
-            static fn(array $row): bool => !is_numeric($row['id']) || (int) $row['id'] !== $id,
-        ));
+        $rows = array_values(array_filter($this->rows($axis), static fn(array $row): bool => !is_numeric($row['id']) || (int) $row['id'] !== $id));
 
         return $this->setRows($axis, $rows);
     }
@@ -218,25 +210,47 @@ final class Config
     /** @return list<CategoryDefinition> */
     public function categoryDefinitions(): array
     {
-        return array_map(static fn(array $row): CategoryDefinition => new CategoryDefinition((int) $row['id'], $row['labels'], self::groupOf($row)), $this->categories);
+        return array_map(
+            static fn(array $row): CategoryDefinition => new CategoryDefinition((int) $row['id'], $row['labels'], self::groupOf($row)),
+            $this->categories,
+        );
     }
 
     /** @return list<TagDefinition> */
     public function tagDefinitions(): array
     {
-        return array_map(static fn(array $row): TagDefinition => new TagDefinition((int) $row['id'], $row['labels'], self::groupOf($row)), $this->tags);
+        $known = [];
+        foreach ($this->tags as $row) {
+            if (!is_numeric($row['id'])) {
+                continue;
+            }
+
+            $known[(int) $row['id']] = true;
+        }
+
+        return array_map(static function (array $row) use ($known): TagDefinition {
+            $parent = is_numeric($row['parent']) ? (int) $row['parent'] : null;
+
+            return new TagDefinition(
+                (int) $row['id'],
+                $row['labels'],
+                $parent !== null && $parent !== (int) $row['id'] && isset($known[$parent]) ? $parent : null,
+            );
+        }, $this->tags);
+    }
+
+    public function tagTree(): TagTree
+    {
+        return new TagTree($this->tagDefinitions());
     }
 
     /** @return list<GroupDefinition> */
     public function categoryGroupDefinitions(): array
     {
-        return $this->groupDefinitions(Axis::Category);
-    }
-
-    /** @return list<GroupDefinition> */
-    public function tagGroupDefinitions(): array
-    {
-        return $this->groupDefinitions(Axis::Tag);
+        return array_map(
+            static fn(array $row): GroupDefinition => new GroupDefinition((int) $row['id'], $row['labels']),
+            $this->categoryGroups,
+        );
     }
 
     public function categoryLabel(int $id, ?string $locale, string $sourceLocale): ?string
@@ -272,11 +286,11 @@ final class Config
         return $options;
     }
 
-    /** @return array<string, int> label => id, for a ChoiceType */
+    /** @return array<string, int> label => id, depth-first so a sub-tag follows the tag it hangs from */
     public function tagOptions(?string $locale, string $sourceLocale): array
     {
         $options = [];
-        foreach ($this->tagDefinitions() as $definition) {
+        foreach ($this->tagTree()->ordered() as $definition) {
             $options[$definition->labelFor($locale, $sourceLocale)] = $definition->id;
         }
 
@@ -286,47 +300,8 @@ final class Config
     /** @return array<string, int|array<string, int>> label => id, group label => nested options, for a ChoiceType */
     public function groupedCategoryOptions(?string $locale, string $sourceLocale): array
     {
-        return $this->groupedOptions(Axis::Category, $locale, $sourceLocale);
-    }
-
-    /** @return array<string, int|array<string, int>> label => id, group label => nested options, for a ChoiceType */
-    public function groupedTagOptions(?string $locale, string $sourceLocale): array
-    {
-        return $this->groupedOptions(Axis::Tag, $locale, $sourceLocale);
-    }
-
-    /** @return array<string, mixed> */
-    public function toArray(): array
-    {
-        return [
-            'categoriesEnabled' => $this->categoriesEnabled,
-            'tagsEnabled' => $this->tagsEnabled,
-            'categoryGroups' => self::exportRows($this->categoryGroups),
-            'tagGroups' => self::exportRows($this->tagGroups),
-            'categories' => self::exportRows($this->categories),
-            'tags' => self::exportRows($this->tags),
-        ];
-    }
-
-    /** @param array<string, mixed> $raw */
-    public static function fromArray(array $raw): self
-    {
-        $config = new self();
-        $config->categoriesEnabled = (bool) ($raw['categoriesEnabled'] ?? false);
-        $config->tagsEnabled = (bool) ($raw['tagsEnabled'] ?? false);
-        $config->categoryGroups = self::rowsFromArray($raw['categoryGroups'] ?? []);
-        $config->tagGroups = self::rowsFromArray($raw['tagGroups'] ?? []);
-        $config->categories = self::rowsFromArray($raw['categories'] ?? []);
-        $config->tags = self::rowsFromArray($raw['tags'] ?? []);
-
-        return $config;
-    }
-
-    /** @return array<string, int|array<string, int>> */
-    private function groupedOptions(Axis $axis, ?string $locale, string $sourceLocale): array
-    {
         $options = [];
-        foreach ($this->groupedDefinitions($axis) as $bucket) {
+        foreach ($this->groupedDefinitions(Axis::Category) as $bucket) {
             $choices = [];
             foreach ($bucket['definitions'] as $definition) {
                 $choices[$definition->labelFor($locale, $sourceLocale)] = $definition->id;
@@ -344,13 +319,40 @@ final class Config
         return $options;
     }
 
-    /** @return list<array{id: int|string, labels: array<string, string>, group: int|string|null}> */
+    /** @return array<string, mixed> */
+    public function toArray(): array
+    {
+        return [
+            'categoriesEnabled' => $this->categoriesEnabled,
+            'tagsEnabled' => $this->tagsEnabled,
+            'tagDepth' => $this->tagDepth,
+            'categoryGroups' => self::exportRows($this->categoryGroups),
+            'categories' => self::exportRows($this->categories),
+            'tags' => self::exportRows($this->tags),
+        ];
+    }
+
+    /** @param array<string, mixed> $raw */
+    public static function fromArray(array $raw): self
+    {
+        $config = new self();
+        $config->categoriesEnabled = (bool) ($raw['categoriesEnabled'] ?? false);
+        $config->tagsEnabled = (bool) ($raw['tagsEnabled'] ?? false);
+        $config->setTagDepth(isset($raw['tagDepth']) ? (int) $raw['tagDepth'] : null);
+        $config->categoryGroups = self::rowsFromArray($raw['categoryGroups'] ?? []);
+        $config->categories = self::rowsFromArray($raw['categories'] ?? []);
+        $config->tags = self::rowsFromArray($raw['tags'] ?? []);
+
+        return $config;
+    }
+
+    /** @return list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}> */
     private function rows(Axis $axis): array
     {
         return $axis === Axis::Category ? $this->categories : $this->tags;
     }
 
-    /** @param list<array{id: int|string, labels: array<string, string>, group: int|string|null}> $rows */
+    /** @param list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}> $rows */
     private function setRows(Axis $axis, array $rows): static
     {
         if ($axis === Axis::Category) {
@@ -364,27 +366,9 @@ final class Config
         return $this;
     }
 
-    /** @return list<array{id: int|string, labels: array<string, string>, group: int|string|null}> */
-    private function groupRows(Axis $axis): array
-    {
-        return $axis === Axis::Category ? $this->categoryGroups : $this->tagGroups;
-    }
-
-    /** @param list<array{id: int|string, labels: array<string, string>, group: int|string|null}> $rows */
-    private function setGroupRows(Axis $axis, array $rows): void
-    {
-        if ($axis === Axis::Category) {
-            $this->categoryGroups = $rows;
-
-            return;
-        }
-
-        $this->tagGroups = $rows;
-    }
-
     /**
-     * @param iterable<array{id?: int|string|null, labels?: array<string, string>|null, group?: int|string|null}> $rows
-     * @return list<array{id: int|string, labels: array<string, string>, group: int|string|null}>
+     * @param iterable<array{id?: int|string|null, labels?: array<string, string>|null, group?: int|string|null, parent?: int|string|null}> $rows
+     * @return list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}>
      */
     private function ingestRows(iterable $rows): array
     {
@@ -394,7 +378,12 @@ final class Config
             foreach ((array) ($row['labels'] ?? []) as $locale => $label) {
                 $labels[(string) $locale] = (string) ($label ?? '');
             }
-            $clean[] = ['id' => $row['id'] ?? '', 'labels' => $labels, 'group' => $row['group'] ?? null];
+            $clean[] = [
+                'id' => $row['id'] ?? '',
+                'labels' => $labels,
+                'group' => $row['group'] ?? null,
+                'parent' => $row['parent'] ?? null,
+            ];
         }
 
         return $clean;
@@ -402,23 +391,10 @@ final class Config
 
     private function normalizeAxis(Axis $axis): void
     {
-        $groupIds = [];
-        $groups = [];
-        $nextGroupId = self::maxId($this->groupRows($axis));
-        foreach ($this->groupRows($axis) as $row) {
-            $labels = self::trimmedLabels($row['labels']);
-            if ($labels === []) {
-                continue;
-            }
-
-            $id = is_numeric($row['id']) ? (int) $row['id'] : ++$nextGroupId;
-            $groupIds[(string) $row['id']] = $id;
-            $groupIds[(string) $id] = $id;
-            $groups[] = ['id' => $id, 'labels' => $labels, 'group' => null];
-        }
-        unset($groupIds['']);
+        $groupIds = $axis === Axis::Category ? $this->normalizeCategoryGroups() : [];
 
         $definitions = [];
+        $definitionIds = [];
         $nextId = self::maxId($this->rows($axis));
         foreach ($this->rows($axis) as $row) {
             $labels = self::trimmedLabels($row['labels']);
@@ -426,15 +402,76 @@ final class Config
                 continue;
             }
 
+            $id = is_numeric($row['id']) ? (int) $row['id'] : ++$nextId;
+            $definitionIds[(string) $row['id']] = $id;
+            $definitionIds[(string) $id] = $id;
             $definitions[] = [
-                'id' => is_numeric($row['id']) ? (int) $row['id'] : ++$nextId,
+                'id' => $id,
                 'labels' => $labels,
                 'group' => $groupIds[(string) $row['group']] ?? null,
+                'parent' => $axis === Axis::Tag ? $row['parent'] : null,
             ];
         }
+        unset($definitionIds['']);
 
-        $this->setGroupRows($axis, $groups);
-        $this->setRows($axis, $definitions);
+        $this->setRows($axis, self::normalizedForest($definitions, $definitionIds, $this->tagDepth));
+    }
+
+    /** @return array<string, int> submitted id or client token => the id it was allocated */
+    private function normalizeCategoryGroups(): array
+    {
+        $ids = [];
+        $groups = [];
+        $nextId = self::maxId($this->categoryGroups);
+        foreach ($this->categoryGroups as $row) {
+            $labels = self::trimmedLabels($row['labels']);
+            if ($labels === []) {
+                continue;
+            }
+
+            $id = is_numeric($row['id']) ? (int) $row['id'] : ++$nextId;
+            $ids[(string) $row['id']] = $id;
+            $ids[(string) $id] = $id;
+            $groups[] = ['id' => $id, 'labels' => $labels, 'group' => null, 'parent' => null];
+        }
+        unset($ids['']);
+
+        $this->categoryGroups = $groups;
+
+        return $ids;
+    }
+
+    /**
+     * @param list<array{id: int, labels: array<string, string>, group: ?int, parent: int|string|null}> $definitions
+     * @param array<string, int> $ids submitted id or client token => the id it was allocated
+     * @return list<array{id: int, labels: array<string, string>, group: ?int, parent: ?int}>
+     */
+    private static function normalizedForest(array $definitions, array $ids, int $maxDepth): array
+    {
+        $parents = [];
+        foreach ($definitions as $index => $row) {
+            $parent = $ids[(string) $row['parent']] ?? null;
+            $definitions[$index]['parent'] = $parent === $row['id'] ? null : $parent;
+            $parents[$row['id']] = $definitions[$index]['parent'];
+        }
+
+        foreach ($definitions as $index => $row) {
+            $depth = 1;
+            $walked = [$row['id']];
+            for ($ancestor = $parents[$row['id']]; $ancestor !== null; $ancestor = $parents[$ancestor] ?? null) {
+                $depth++;
+                if ($depth > $maxDepth || in_array($ancestor, $walked, true)) {
+                    $definitions[$index]['parent'] = null;
+                    $parents[$row['id']] = null;
+
+                    break;
+                }
+
+                $walked[] = $ancestor;
+            }
+        }
+
+        return $definitions;
     }
 
     /**
@@ -456,7 +493,7 @@ final class Config
         return $trimmed;
     }
 
-    /** @param list<array{id: int|string, labels: array<string, string>, group: int|string|null}> $rows */
+    /** @param list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}> $rows */
     private static function maxId(array $rows): int
     {
         $max = -1;
@@ -471,13 +508,13 @@ final class Config
         return $max;
     }
 
-    /** @param array{id: int|string, labels: array<string, string>, group: int|string|null} $row */
+    /** @param array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null} $row */
     private static function groupOf(array $row): ?int
     {
         return is_numeric($row['group']) ? (int) $row['group'] : null;
     }
 
-    /** @param list<array{id: int|string, labels: array<string, string>, group: int|string|null}> $rows */
+    /** @param list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}> $rows */
     private function hasRow(array $rows, int $id): bool
     {
         foreach ($rows as $row) {
@@ -490,8 +527,8 @@ final class Config
     }
 
     /**
-     * @param list<array{id: int|string, labels: array<string, string>, group: int|string|null}> $rows
-     * @return list<array{id: int|string, labels: array<string, string>, group?: int}>
+     * @param list<array{id: int|string, labels: array<string, string>, group: int|string|null, parent: int|string|null}> $rows
+     * @return list<array{id: int|string, labels: array<string, string>, group?: int, parent?: int}>
      */
     private static function exportRows(array $rows): array
     {
@@ -502,6 +539,9 @@ final class Config
             if ($group !== null) {
                 $export['group'] = $group;
             }
+            if (is_numeric($row['parent'])) {
+                $export['parent'] = (int) $row['parent'];
+            }
             $exported[] = $export;
         }
 
@@ -509,8 +549,8 @@ final class Config
     }
 
     /**
-     * @param iterable<array{id?: int|string|null, labels?: array<string, string>|null, group?: int|string|null}> $raw
-     * @return list<array{id: int, labels: array<string, string>, group: ?int}>
+     * @param iterable<array{id?: int|string|null, labels?: array<string, string>|null, group?: int|string|null, parent?: int|string|null}> $raw
+     * @return list<array{id: int, labels: array<string, string>, group: ?int, parent: ?int}>
      */
     private static function rowsFromArray(iterable $raw): array
     {
@@ -524,6 +564,7 @@ final class Config
                 'id' => (int) ($row['id'] ?? 0),
                 'labels' => $labels,
                 'group' => isset($row['group']) ? (int) $row['group'] : null,
+                'parent' => isset($row['parent']) ? (int) $row['parent'] : null,
             ];
         }
 

@@ -79,6 +79,39 @@ class TaxonomyServiceTest extends KernelTestCase
         static::assertSame([1], $this->service->getTagIds(self::TYPE, 90002));
     }
 
+    public function testTaggingASubTagAlsoPersistsItsAncestors(): void
+    {
+        // Act
+        $this->service->setTags(self::TYPE, 90004, [5]);
+
+        // Assert
+        static::assertEqualsCanonicalizing([3, 4, 5], $this->service->getTagIds(self::TYPE, 90004));
+    }
+
+    public function testDroppingAnAncestorLeavesTheAssignmentUntouched(): void
+    {
+        // Arrange
+        $this->service->setTags(self::TYPE, 90005, [4]);
+
+        // Act
+        $this->service->setTags(self::TYPE, 90005, [4, 1]);
+
+        // Assert
+        static::assertEqualsCanonicalizing([1, 3, 4], $this->service->getTagIds(self::TYPE, 90005));
+    }
+
+    public function testTagLabelsNameTheDeepestTagOfEachBranchOnly(): void
+    {
+        // Arrange
+        $this->service->setTags(self::TYPE, 90006, [5, 1]);
+
+        // Act
+        $labels = $this->service->getTagLabels(self::TYPE, 90006, 'en');
+
+        // Assert
+        static::assertEqualsCanonicalizing(['Vegan', 'Chicken'], $labels, 'Meat and Poultry rode along, but say nothing');
+    }
+
     public function testDeletedActionSweepsAssignments(): void
     {
         // Arrange
@@ -99,8 +132,15 @@ class TaxonomyServiceTest extends KernelTestCase
         $taxonomy = (new Config())
             ->setCategoriesEnabled(true)
             ->setTagsEnabled(true)
+            ->setTagDepth(3)
             ->setCategories([['id' => 1, 'labels' => ['en' => 'Spicy']]])
-            ->setTags([['id' => 1, 'labels' => ['en' => 'Vegan']], ['id' => 2, 'labels' => ['en' => 'Quick']]]);
+            ->setTags([
+                ['id' => 1, 'labels' => ['en' => 'Vegan']],
+                ['id' => 2, 'labels' => ['en' => 'Quick']],
+                ['id' => 3, 'labels' => ['en' => 'Meat']],
+                ['id' => 4, 'labels' => ['en' => 'Poultry'], 'parent' => 3],
+                ['id' => 5, 'labels' => ['en' => 'Chicken'], 'parent' => 4],
+            ]);
 
         $provider = $this->createStub(CategorizableTypeProviderInterface::class);
         $provider->method('getTaxonomy')->willReturn($taxonomy);

@@ -39,8 +39,34 @@ class TaxonomyConfigTypeTest extends TestCase
         static::assertInstanceOf(Config::class, $submitted);
         static::assertTrue($submitted->isCategoriesEnabled());
         static::assertFalse($submitted->isTagsEnabled());
-        static::assertSame([['id' => 0, 'labels' => ['en' => 'Greeting'], 'group' => null]], $submitted->getCategories());
-        static::assertSame([['id' => 0, 'labels' => ['en' => 'Formal'], 'group' => null]], $submitted->getTags());
+        static::assertSame([['id' => 0, 'labels' => ['en' => 'Greeting'], 'group' => null, 'parent' => null]], $submitted->getCategories());
+        static::assertSame([['id' => 0, 'labels' => ['en' => 'Formal'], 'group' => null, 'parent' => null]], $submitted->getTags());
+    }
+
+    public function testTheDepthFieldIsClampedIntoTheAllowedRange(): void
+    {
+        // Arrange
+        $taxonomy = new Config();
+        $form = $this->factory()->create(TaxonomyConfigType::class, $taxonomy);
+
+        // Act
+        $form->submit(['tagsEnabled' => '1', 'tagDepth' => '9']);
+
+        // Assert
+        static::assertSame(Config::MAX_TAG_DEPTH, $taxonomy->getTagDepth());
+    }
+
+    public function testAnEmptyDepthFallsBackToFlat(): void
+    {
+        // Arrange
+        $taxonomy = (new Config())->setTagDepth(3);
+        $form = $this->factory()->create(TaxonomyConfigType::class, $taxonomy);
+
+        // Act
+        $form->submit(['tagsEnabled' => '1', 'tagDepth' => '']);
+
+        // Assert
+        static::assertSame(1, $taxonomy->getTagDepth());
     }
 
     private function factory(): FormFactoryInterface

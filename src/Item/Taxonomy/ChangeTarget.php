@@ -93,6 +93,14 @@ abstract class ChangeTarget implements ChangeTargetProviderInterface
             return $this->translator->trans('item.taxonomy_validation_gone');
         }
 
+        if ($parsed->parent !== null && !$taxonomy->hasDefinition($parsed->axis, $parsed->parent)) {
+            return $this->translator->trans('item.taxonomy_validation_gone');
+        }
+
+        if ($parsed->parent !== null && $taxonomy->tagTree()->depthOf($parsed->parent) >= $taxonomy->getTagDepth()) {
+            return $this->translator->trans('item.taxonomy_validation_depth');
+        }
+
         $label = trim((string) $value);
         if ($label === '') {
             return $this->translator->trans('item.taxonomy_validation_blank');
@@ -120,7 +128,7 @@ abstract class ChangeTarget implements ChangeTargetProviderInterface
 
         $taxonomy = $provider->taxonomyOf($data);
         match ($parsed->operation) {
-            ChangeOperation::Add => $taxonomy->addLabel($parsed->axis, (string) $parsed->locale, trim((string) $value)),
+            ChangeOperation::Add => $taxonomy->addLabel($parsed->axis, (string) $parsed->locale, trim((string) $value), $parsed->parent),
             ChangeOperation::Rename => $taxonomy->setLabel($parsed->axis, (int) $parsed->id, (string) $parsed->locale, trim((string) $value)),
             ChangeOperation::Remove => $taxonomy->removeDefinition($parsed->axis, (int) $parsed->id),
         };

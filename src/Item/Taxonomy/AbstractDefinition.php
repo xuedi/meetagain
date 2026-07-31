@@ -8,7 +8,6 @@ abstract readonly class AbstractDefinition
     public function __construct(
         public int $id,
         public array $labels,
-        public ?int $group = null,
     ) {}
 
     public function labelFor(?string $locale, string $sourceLocale): string

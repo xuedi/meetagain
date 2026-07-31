@@ -1,22 +1,25 @@
 /**
- * Taxonomy Definitions -- language-column toggle, group-select sync and delete guard for the item
- * taxonomy editor
+ * Taxonomy Definitions -- language-column toggle, group/parent-select sync and delete guard for the
+ * item taxonomy editor
  *
  * Enhances the TaxonomyDefinitionsType editor rendered by the _form/taxonomy.html.twig form theme.
  * Within each [data-taxonomy-section] it shows one language's label column at a time behind a
  * button group, and hides the definition collection when the section carries an enable checkbox
- * that is off. The group rows of an axis feed the group select of every definition row in the same
- * section, so a group added or renamed in the DOM is assignable before the first save; a row still
- * without an id gets a client token that normalize() turns into a real id. Newly added collection
- * rows are re-filtered via a MutationObserver. A row whose definition is still assigned to items
- * asks for confirmation before collection.js removes it - the listener runs in the capture phase so
- * cancelling stops that removal. With JavaScript disabled every column stays visible, so every
- * label remains editable.
+ * that is off. The group rows of the category section feed the group select of every category row,
+ * and the tag rows feed each other's parent select (never their own), so a row added or renamed in
+ * the DOM is assignable before the first save; a row still without an id gets a client token that
+ * normalize() turns into a real id. Newly added collection rows are re-filtered
+ * via a MutationObserver. A row whose definition is still assigned to items asks for confirmation
+ * before collection.js removes it - the listener runs in the capture phase so cancelling stops that
+ * removal. On a settings page the tag-depth field is hidden while tags are switched off. With
+ * JavaScript disabled every column stays visible, so every label remains editable.
  *
  * Loaded in: templates/admin/base.html.twig, templates/item/taxonomy.html.twig
  * Used by:   [data-taxonomy-section], [data-taxonomy-body], .taxonomy-locale-button
  *            [data-taxonomy-locale-target], [data-taxonomy-locale-cell], [data-taxonomy-usage]
- *            [data-taxonomy-groups], [data-taxonomy-group-select]
+ *            [data-taxonomy-groups], [data-taxonomy-group-select], [data-taxonomy-definitions],
+ *            [data-taxonomy-parent-select], .taxonomy-config with [data-taxonomy-tags-toggle]
+ *            and [data-taxonomy-depth-gate]
  */
 (function () {
     let tokenCounter = 0;
@@ -44,15 +47,9 @@
         return label;
     }
 
-    function syncGroupSelects(section) {
-        const groups = section.querySelector('[data-taxonomy-groups]');
-        const selects = section.querySelectorAll('[data-taxonomy-group-select]');
-        if (!groups || selects.length === 0) {
-            return;
-        }
-
+    function collectOptions(container) {
         const options = [];
-        groups.querySelectorAll('.js-collection-item').forEach((row) => {
+        container.querySelectorAll('.js-collection-item').forEach((row) => {
             const idField = row.querySelector('input[type="hidden"]');
             const label = rowLabel(row);
             if (!idField || label === '') {
@@ -62,18 +59,57 @@
                 tokenCounter += 1;
                 idField.value = 'n' + tokenCounter;
             }
-            options.push({ value: idField.value, label: label });
+            options.push({ value: idField.value, label: label, row: row });
         });
 
-        selects.forEach((select) => {
-            const selected = select.value;
-            while (select.options.length > 1) {
-                select.remove(1);
-            }
-            options.forEach((option) => {
-                select.add(new Option(option.label, option.value, false, option.value === selected));
-            });
+        return options;
+    }
+
+    function fillSelect(select, options) {
+        const selected = select.value;
+        while (select.options.length > 1) {
+            select.remove(1);
+        }
+        options.forEach((option) => {
+            select.add(new Option(option.label, option.value, false, option.value === selected));
         });
+    }
+
+    function syncGroupSelects(section) {
+        const groups = section.querySelector('[data-taxonomy-groups]');
+        const selects = section.querySelectorAll('[data-taxonomy-group-select]');
+        if (!groups || selects.length === 0) {
+            return;
+        }
+
+        const options = collectOptions(groups);
+        selects.forEach((select) => fillSelect(select, options));
+    }
+
+    function syncParentSelects(section) {
+        const definitions = section.querySelector('[data-taxonomy-definitions]');
+        const selects = section.querySelectorAll('[data-taxonomy-parent-select]');
+        if (!definitions || selects.length === 0) {
+            return;
+        }
+
+        const options = collectOptions(definitions);
+        selects.forEach((select) => {
+            const own = select.closest('.js-collection-item');
+            fillSelect(select, options.filter((option) => option.row !== own));
+        });
+    }
+
+    function gateDepthField(root) {
+        const checkbox = root.querySelector('[data-taxonomy-tags-toggle]');
+        const gate = root.querySelector('[data-taxonomy-depth-gate]');
+        if (!checkbox || !gate) {
+            return;
+        }
+
+        const applyGate = () => gate.classList.toggle('is-hidden', !checkbox.checked);
+        applyGate();
+        checkbox.addEventListener('change', applyGate);
     }
 
     function activateSection(section) {
@@ -93,6 +129,7 @@
                 currentLocale = button.dataset.taxonomyLocaleTarget;
                 activateLocale(section, currentLocale);
                 syncGroupSelects(section);
+                syncParentSelects(section);
             });
         });
 
@@ -106,6 +143,7 @@
             const observer = new MutationObserver(() => {
                 activateLocale(section, currentLocale);
                 syncGroupSelects(section);
+                syncParentSelects(section);
             });
             observer.observe(items, { childList: true });
         });
@@ -114,7 +152,14 @@
         if (groups) {
             groups.addEventListener('input', () => syncGroupSelects(section));
         }
+
+        const definitions = section.querySelector('[data-taxonomy-definitions]');
+        if (definitions) {
+            definitions.addEventListener('input', () => syncParentSelects(section));
+        }
+
         syncGroupSelects(section);
+        syncParentSelects(section);
     }
 
     function guardRemoval(event) {
@@ -139,5 +184,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-taxonomy-section]').forEach(activateSection);
+        document.querySelectorAll('.taxonomy-config').forEach(gateDepthField);
     });
 }());

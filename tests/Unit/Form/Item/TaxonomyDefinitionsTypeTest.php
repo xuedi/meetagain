@@ -46,7 +46,7 @@ class TaxonomyDefinitionsTypeTest extends TestCase
         $taxonomy = $form->getData();
         static::assertInstanceOf(Config::class, $taxonomy);
         static::assertSame(
-            [['id' => '0', 'labels' => ['en' => 'Greeting', 'de' => 'Gruss'], 'group' => null]],
+            [['id' => '0', 'labels' => ['en' => 'Greeting', 'de' => 'Gruss'], 'group' => null, 'parent' => null]],
             $taxonomy->getCategories(),
         );
     }
@@ -61,6 +61,19 @@ class TaxonomyDefinitionsTypeTest extends TestCase
         static::assertTrue($form->has('categoryGroups'));
         static::assertFalse($form->has('tags'));
         static::assertFalse($form->has('tagGroups'));
+    }
+
+    public function testATagRowHasNoGroupSelectAndTheAxisNoGroupCollection(): void
+    {
+        // Arrange
+        $taxonomy = (new Config())->setTags([['id' => 0, 'labels' => ['en' => 'Spicy']]]);
+
+        // Act
+        $form = $this->factory(['en'])->create(TaxonomyDefinitionsType::class, $taxonomy);
+
+        // Assert
+        static::assertFalse($form->has('tagGroups'));
+        static::assertFalse($form->get('tags')->get('0')->has('group'));
     }
 
     public function testTheGroupSelectOffersTheSavedGroupsAndAGroupRowHasNone(): void
@@ -90,7 +103,6 @@ class TaxonomyDefinitionsTypeTest extends TestCase
         $form->submit([
             'categoryGroups' => [['id' => '4', 'en' => 'Meat']],
             'categories' => [['id' => '', 'group' => '4', 'en' => 'Chicken']],
-            'tagGroups' => [],
             'tags' => [],
         ]);
         $taxonomy->normalize();
@@ -124,7 +136,6 @@ class TaxonomyDefinitionsTypeTest extends TestCase
         $form->submit([
             'categoryGroups' => [['id' => 'n1', 'en' => 'Meat']],
             'categories' => [['id' => '', 'group' => 'n1', 'en' => 'Chicken']],
-            'tagGroups' => [],
             'tags' => [],
         ]);
         $taxonomy->normalize();
@@ -144,12 +155,97 @@ class TaxonomyDefinitionsTypeTest extends TestCase
         $form->submit([
             'categoryGroups' => [],
             'categories' => [['id' => '', 'group' => 'n9', 'en' => 'Chicken']],
-            'tagGroups' => [],
             'tags' => [],
         ]);
 
         // Assert
         static::assertFalse($form->isValid());
+    }
+
+    public function testAFlatVocabularyHasNoParentSelect(): void
+    {
+        // Arrange
+        $taxonomy = (new Config())->setTags([['id' => 0, 'labels' => ['en' => 'Spicy']]]);
+
+        // Act
+        $form = $this->factory(['en'])->create(TaxonomyDefinitionsType::class, $taxonomy);
+
+        // Assert
+        static::assertFalse($form->get('tags')->get('0')->has('parentTag'));
+    }
+
+    public function testTheParentSelectOffersOnlyTagsThatMayStillCarryAChild(): void
+    {
+        // Arrange
+        $taxonomy = (new Config())->setTagDepth(2)->setTags([
+            ['id' => 1, 'labels' => ['en' => 'Meat']],
+            ['id' => 4, 'labels' => ['en' => 'Chicken'], 'parent' => 1],
+        ]);
+
+        // Act
+        $form = $this->factory(['en'])->create(TaxonomyDefinitionsType::class, $taxonomy);
+
+        // Assert
+        static::assertSame(
+            ['Meat' => 1],
+            $form->get('tags')->get('0')->get('parentTag')->getConfig()->getOption('choices'),
+        );
+        static::assertFalse($form->get('categories')->has('0'), 'Categories stay flat');
+    }
+
+    public function testTheParentSelectIndentsADeeperTag(): void
+    {
+        // Arrange
+        $taxonomy = (new Config())->setTagDepth(3)->setTags([
+            ['id' => 1, 'labels' => ['en' => 'Meat']],
+            ['id' => 4, 'labels' => ['en' => 'Chicken'], 'parent' => 1],
+        ]);
+
+        // Act
+        $form = $this->factory(['en'])->create(TaxonomyDefinitionsType::class, $taxonomy);
+
+        // Assert
+        static::assertSame(
+            ['Meat' => 1, '- Chicken' => 4],
+            $form->get('tags')->get('0')->get('parentTag')->getConfig()->getOption('choices'),
+        );
+    }
+
+    public function testSubmitFilesATagUnderAParentAddedInTheSameSubmit(): void
+    {
+        // Arrange
+        $taxonomy = (new Config())->setTagDepth(2);
+        $form = $this->factory(['en'])->create(TaxonomyDefinitionsType::class, $taxonomy);
+
+        // Act
+        $form->submit([
+            'categoryGroups' => [],
+            'categories' => [],
+            'tags' => [
+                ['id' => 'n1', 'en' => 'Meat'],
+                ['id' => '', 'parentTag' => 'n1', 'en' => 'Chicken'],
+            ],
+        ]);
+        $taxonomy->normalize();
+
+        // Assert
+        static::assertTrue($form->isValid());
+        static::assertSame(0, $taxonomy->tagDefinitions()[1]->parent);
+    }
+
+    public function testTheRowViewCarriesTheDepthOfItsTag(): void
+    {
+        // Arrange
+        $taxonomy = (new Config())->setTagDepth(2)->setTags([
+            ['id' => 1, 'labels' => ['en' => 'Meat']],
+            ['id' => 4, 'labels' => ['en' => 'Chicken'], 'parent' => 1],
+        ]);
+
+        // Act
+        $view = $this->factory(['en'])->create(TaxonomyDefinitionsType::class, $taxonomy)->createView();
+
+        // Assert
+        static::assertSame([1 => 1, 4 => 2], $view['tags']->children['1']->vars['depths']);
     }
 
     /** @param list<string> $codes */

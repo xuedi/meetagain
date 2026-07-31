@@ -6,6 +6,7 @@ use App\Item\Taxonomy\AssignmentFormHelper;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormView;
 use Twig\Environment;
 
 class AssignmentFormThemeTest extends KernelTestCase
@@ -33,12 +34,47 @@ class AssignmentFormThemeTest extends KernelTestCase
         static::assertSame(1, substr_count($html, '<optgroup'), 'Grouping is one level deep');
     }
 
-    public function testTheTagCheckboxesRenderUnderABoldIndentedGroupHeading(): void
+    public function testAFlatTagListKeepsEveryCheckboxUnwrapped(): void
     {
         // Arrange
-        $form = $this->factory()->createBuilder(options: ['csrf_protection' => false])
+        $form = $this->tagsForm(['Spicy' => 1, 'Sweet' => 2], tree: false);
+
+        // Act
+        $html = $this->render($form);
+
+        // Assert
+        static::assertStringNotContainsString('padding-left', $html);
+    }
+
+    public function testASubTagCheckboxIsIndentedAndNamesItsParent(): void
+    {
+        // Arrange
+        $form = $this->tagsForm(['Meat' => 1, 'Chicken' => 4], tree: true, parents: [1 => null, 4 => 1], depths: [1 => 1, 4 => 2]);
+
+        // Act
+        $html = $this->render($form);
+
+        // Assert
+        static::assertStringContainsString('padding-left: 0rem', $html);
+        static::assertStringContainsString('padding-left: 1.5rem', $html);
+        static::assertMatchesRegularExpression('/data-taxonomy-parent="1"[^>]*value="4"/', $html);
+    }
+
+    /**
+     * @param array<string, int> $choices
+     * @param array<int, ?int>   $parents
+     * @param array<int, int>    $depths
+     */
+    private function tagsForm(array $choices, bool $tree, array $parents = [], array $depths = []): FormView
+    {
+        return $this->factory()->createBuilder(options: ['csrf_protection' => false])
             ->add(AssignmentFormHelper::TAGS_FIELD, ChoiceType::class, [
-                'choices' => self::GROUPED_CHOICES,
+                'choices' => $choices,
+                'choice_attr' => static fn(int $id): array => [
+                    'data-taxonomy-depth' => $depths[$id] ?? 1,
+                    'data-taxonomy-parent' => (string) ($parents[$id] ?? null),
+                ],
+                'attr' => $tree ? ['data-taxonomy-tree' => ''] : [],
                 'block_prefix' => 'item_taxonomy_tags',
                 'multiple' => true,
                 'expanded' => true,
@@ -46,14 +82,13 @@ class AssignmentFormThemeTest extends KernelTestCase
             ])
             ->getForm()
             ->createView();
+    }
 
-        // Act
-        $html = $this->twig()->createTemplate('{{ form_widget(form.' . AssignmentFormHelper::TAGS_FIELD . ') }}')->render(['form' => $form]);
-
-        // Assert
-        static::assertSame(3, substr_count($html, 'type="checkbox"'), 'Every definition keeps its own checkbox');
-        static::assertStringContainsString('<p class="has-text-weight-semibold mt-2">Meat</p>', $html);
-        static::assertMatchesRegularExpression('/Soup.*Meat.*<div class="ml-4">.*Chicken.*Beef/s', $html);
+    private function render(FormView $form): string
+    {
+        return $this->twig()
+            ->createTemplate('{{ form_widget(form.' . AssignmentFormHelper::TAGS_FIELD . ') }}')
+            ->render(['form' => $form]);
     }
 
     private function factory(): FormFactoryInterface

@@ -28,7 +28,7 @@ class AssignmentFormHelperTest extends TestCase
         static::assertSame(['Soup' => 6, 'Meat' => ['Chicken' => 5, 'Beef' => 7]], $choices);
     }
 
-    public function testTheTagCheckboxesCarryTheirGroupingAndTheirOwnWidgetBlock(): void
+    public function testTheTagCheckboxesFollowTheTreeAndCarryTheirOwnWidgetBlock(): void
     {
         // Arrange
         $builder = $this->builder($this->groupedTaxonomy());
@@ -37,7 +37,7 @@ class AssignmentFormHelperTest extends TestCase
         $tags = $builder->get(AssignmentFormHelper::TAGS_FIELD);
 
         // Assert
-        static::assertSame(['Sweet' => 2, 'Heat' => ['Spicy' => 1]], $tags->getOption('choices'));
+        static::assertSame(['Spicy' => 1, 'Mild' => 3, 'Sweet' => 2], $tags->getOption('choices'));
         static::assertSame('item_taxonomy_tags', $tags->getOption('block_prefix'));
         static::assertTrue($tags->getOption('expanded'));
     }
@@ -83,10 +83,11 @@ class AssignmentFormHelperTest extends TestCase
                 ['id' => 6, 'labels' => ['en' => 'Soup']],
                 ['id' => 7, 'labels' => ['en' => 'Beef'], 'group' => 0],
             ])
-            ->setTagGroups([['id' => 0, 'labels' => ['en' => 'Heat']]])
+            ->setTagDepth(2)
             ->setTags([
-                ['id' => 1, 'labels' => ['en' => 'Spicy'], 'group' => 0],
+                ['id' => 1, 'labels' => ['en' => 'Spicy']],
                 ['id' => 2, 'labels' => ['en' => 'Sweet']],
+                ['id' => 3, 'labels' => ['en' => 'Mild'], 'parent' => 1],
             ]);
     }
 

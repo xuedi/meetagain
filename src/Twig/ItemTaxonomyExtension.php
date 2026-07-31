@@ -108,13 +108,13 @@ final class ItemTaxonomyExtension extends AbstractExtension
         return $this->taxonomyService->tagChoices($itemType, $this->locale());
     }
 
-    /** @return list<array{label: ?string, offset: int, choices: array<int, string>}> */
+    /** @return list<array{label: ?string, levels: list<array{depth: int, offset: int, choices: array<int, string>}>}> */
     public function categoryChoiceGroups(string $itemType): array
     {
         return $this->taxonomyService->categoryChoiceGroups($itemType, $this->locale());
     }
 
-    /** @return list<array{label: ?string, offset: int, choices: array<int, string>}> */
+    /** @return list<array{label: ?string, levels: list<array{depth: int, offset: int, choices: array<int, string>}>}> */
     public function tagChoiceGroups(string $itemType): array
     {
         return $this->taxonomyService->tagChoiceGroups($itemType, $this->locale());
