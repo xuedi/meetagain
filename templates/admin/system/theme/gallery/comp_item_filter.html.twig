@@ -19,7 +19,13 @@
         <div class="box taxonomy-filter">
             <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
                 <p class="heading mb-0">{{ 'item.facet_heading'|trans }}</p>
-                <a href="#" class="is-size-7" rel="nofollow">{{ 'item.facet_clear'|trans }}</a>
+                <span class="is-flex is-align-items-center" style="gap: 0.5rem;">
+                    <a href="#" class="is-size-7" rel="nofollow">{{ 'item.facet_clear'|trans }}</a>
+                    <a href="#" class="is-size-7" rel="nofollow" title="{{ 'item.taxonomy_edit_link'|trans }}">
+                        <span class="icon is-small"><i class="fa-solid fa-pen-to-square"></i></span>
+                        <span class="tag is-warning">2</span>
+                    </a>
+                </span>
             </div>
             <div class="field">
                 <p class="label is-small mb-1">{{ 'item.facet_categories'|trans }}</p>

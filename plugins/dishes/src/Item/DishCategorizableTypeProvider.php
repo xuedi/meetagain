@@ -7,6 +7,7 @@ use App\Item\Taxonomy\Config;
 use Override;
 use Plugin\Dishes\Service\ConfigService;
 use Plugin\Dishes\Service\DishService;
+use Plugin\Dishes\ValueObject\Config as DishesConfig;
 
 final readonly class DishCategorizableTypeProvider implements CategorizableTypeProviderInterface
 {
@@ -24,6 +25,12 @@ final readonly class DishCategorizableTypeProvider implements CategorizableTypeP
     public function getTypeKey(): string
     {
         return DishService::ITEM_TYPE;
+    }
+
+    #[Override]
+    public function getSettingsKey(): string
+    {
+        return 'dishes';
     }
 
     #[Override]
@@ -48,5 +55,13 @@ final readonly class DishCategorizableTypeProvider implements CategorizableTypeP
     public function getTaxonomy(): Config
     {
         return $this->configService->getConfig()->getTaxonomy();
+    }
+
+    #[Override]
+    public function taxonomyOf(object $settings): Config
+    {
+        \assert($settings instanceof DishesConfig);
+
+        return $settings->getTaxonomy();
     }
 }

@@ -3,9 +3,7 @@
 namespace Tests\Unit\Form\Item;
 
 use App\Form\Item\TaxonomyConfigType;
-use App\Form\Item\TaxonomyDefinitionType;
 use App\Item\Taxonomy\Config;
-use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
@@ -13,58 +11,42 @@ use Symfony\Component\Form\PreloadedExtension;
 
 class TaxonomyConfigTypeTest extends TestCase
 {
-    public function testPrefillsCategoryLabelsPerLocale(): void
+    public function testCarriesTheEnableTogglesOnly(): void
+    {
+        // Arrange + Act
+        $form = $this->factory()->create(TaxonomyConfigType::class, new Config());
+
+        // Assert
+        static::assertTrue($form->has('categoriesEnabled'));
+        static::assertTrue($form->has('tagsEnabled'));
+        static::assertFalse($form->has('categories'), 'Definitions moved to the central taxonomy page');
+        static::assertFalse($form->has('tags'));
+    }
+
+    public function testSubmitLeavesTheDefinitionsUntouched(): void
     {
         // Arrange
         $taxonomy = (new Config())
-            ->setCategoriesEnabled(true)
-            ->setCategories([['id' => 0, 'labels' => ['en' => 'Greeting', 'de' => 'Gruss']]]);
+            ->setCategories([['id' => 0, 'labels' => ['en' => 'Greeting']]])
+            ->setTags([['id' => 0, 'labels' => ['en' => 'Formal']]]);
+        $form = $this->factory()->create(TaxonomyConfigType::class, $taxonomy);
 
         // Act
-        $form = $this->factory(['en', 'de'])->create(TaxonomyConfigType::class, $taxonomy);
+        $form->submit(['categoriesEnabled' => '1', 'tagsEnabled' => null]);
 
         // Assert
-        $row = $form->get('categories')->get('0');
-        static::assertSame('Greeting', $row->get('en')->getData());
-        static::assertSame('Gruss', $row->get('de')->getData());
+        $submitted = $form->getData();
+        static::assertInstanceOf(Config::class, $submitted);
+        static::assertTrue($submitted->isCategoriesEnabled());
+        static::assertFalse($submitted->isTagsEnabled());
+        static::assertSame([['id' => 0, 'labels' => ['en' => 'Greeting']]], $submitted->getCategories());
+        static::assertSame([['id' => 0, 'labels' => ['en' => 'Formal']]], $submitted->getTags());
     }
 
-    public function testSubmitRoundTripsLabelsIntoTaxonomy(): void
+    private function factory(): FormFactoryInterface
     {
-        // Arrange
-        $form = $this->factory(['en', 'de'])->create(TaxonomyConfigType::class, new Config());
-
-        // Act
-        $form->submit([
-            'categoriesEnabled' => '1',
-            'categories' => [
-                ['id' => '0', 'en' => 'Greeting', 'de' => 'Gruss'],
-            ],
-            'tagsEnabled' => null,
-            'tags' => [],
-        ]);
-
-        // Assert
-        $taxonomy = $form->getData();
-        static::assertInstanceOf(Config::class, $taxonomy);
-        static::assertTrue($taxonomy->isCategoriesEnabled());
-        static::assertSame(
-            [['id' => '0', 'labels' => ['en' => 'Greeting', 'de' => 'Gruss']]],
-            $taxonomy->getCategories(),
-        );
-    }
-
-    /** @param list<string> $codes */
-    private function factory(array $codes): FormFactoryInterface
-    {
-        $languageService = $this->createStub(LanguageService::class);
-        $languageService->method('getAdminFilteredEnabledCodes')->willReturn($codes);
-
         return Forms::createFormFactoryBuilder()
-            ->addExtension(new PreloadedExtension([
-                new TaxonomyConfigType(),
-                new TaxonomyDefinitionType($languageService),
-            ], []))
+            ->addExtension(new PreloadedExtension([new TaxonomyConfigType()], []))
             ->getFormFactory();
     }
 }

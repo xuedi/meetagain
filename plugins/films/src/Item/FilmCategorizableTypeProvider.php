@@ -7,6 +7,7 @@ use App\Item\Taxonomy\Config;
 use Override;
 use Plugin\Films\Service\ConfigService;
 use Plugin\Films\Service\FilmService;
+use Plugin\Films\ValueObject\Config as FilmsConfig;
 
 final readonly class FilmCategorizableTypeProvider implements CategorizableTypeProviderInterface
 {
@@ -24,6 +25,12 @@ final readonly class FilmCategorizableTypeProvider implements CategorizableTypeP
     public function getTypeKey(): string
     {
         return FilmService::ITEM_TYPE;
+    }
+
+    #[Override]
+    public function getSettingsKey(): string
+    {
+        return 'films_taxonomy';
     }
 
     #[Override]
@@ -48,5 +55,13 @@ final readonly class FilmCategorizableTypeProvider implements CategorizableTypeP
     public function getTaxonomy(): Config
     {
         return $this->configService->getConfig()->getTaxonomy();
+    }
+
+    #[Override]
+    public function taxonomyOf(object $settings): Config
+    {
+        \assert($settings instanceof FilmsConfig);
+
+        return $settings->getTaxonomy();
     }
 }

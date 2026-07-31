@@ -1,16 +1,17 @@
 /**
- * Taxonomy Definitions -- language-column toggle and enable gating for the item taxonomy editor
+ * Taxonomy Definitions -- language-column toggle and delete guard for the item taxonomy editor
  *
- * Enhances the TaxonomyConfigType editor rendered by the _form/taxonomy.html.twig form theme.
+ * Enhances the TaxonomyDefinitionsType editor rendered by the _form/taxonomy.html.twig form theme.
  * Within each [data-taxonomy-section] it shows one language's label column at a time behind a
- * button group, and hides the definition collection when the section's enable checkbox is off.
- * Newly added collection rows are re-filtered via a MutationObserver. With JavaScript disabled every
- * column and both collections stay visible, so every label remains editable - this only layers the
- * tab/gating behaviour on top.
+ * button group, and hides the definition collection when the section carries an enable checkbox
+ * that is off. Newly added collection rows are re-filtered via a MutationObserver. A row whose
+ * definition is still assigned to items asks for confirmation before collection.js removes it -
+ * the listener runs in the capture phase so cancelling stops that removal. With JavaScript disabled
+ * every column stays visible, so every label remains editable.
  *
- * Loaded in: templates/admin/base.html.twig
+ * Loaded in: templates/admin/base.html.twig, templates/item/taxonomy.html.twig
  * Used by:   [data-taxonomy-section], [data-taxonomy-body], .taxonomy-locale-button
- *            [data-taxonomy-locale-target], [data-taxonomy-locale-cell]
+ *            [data-taxonomy-locale-target], [data-taxonomy-locale-cell], [data-taxonomy-usage]
  */
 (function () {
     function activateLocale(section, locale) {
@@ -53,6 +54,26 @@
             observer.observe(items, { childList: true });
         }
     }
+
+    function guardRemoval(event) {
+        const button = event.target.closest ? event.target.closest('.js-collection-remove') : null;
+        if (!button) {
+            return;
+        }
+
+        const item = button.closest('.js-collection-item');
+        const row = item ? item.querySelector('[data-taxonomy-usage]') : null;
+        if (!row || parseInt(row.dataset.taxonomyUsage, 10) < 1) {
+            return;
+        }
+
+        if (!window.confirm(row.dataset.taxonomyUsageMessage)) {
+            event.stopPropagation();
+            event.preventDefault();
+        }
+    }
+
+    document.addEventListener('click', guardRemoval, true);
 
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-taxonomy-section]').forEach(activateSection);

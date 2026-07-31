@@ -8,12 +8,18 @@
     renders as a dimmed span instead of a link when that number is zero. Renders nothing when the
     type enables no categories or tags.
 
+    The header row carries a pencil to the central taxonomy page for any logged-in visitor, with the
+    pending-proposal count as a badge for reviewers. It lives inside the swapped fragment, so it
+    survives a facet click.
+
     Used in:    _components/item/sidebar.html.twig, App\Controller\ItemController::listFragment
     Parameters:
         - itemType (string, required) -- registry key of the item type (e.g. 'dish')
     Depends on: item_taxonomy_category_choices(), item_taxonomy_tag_choices(), item_facet_current(),
-                item_facet_url(), item_facet_counts() (ItemTaxonomyExtension); item_list_url()
-                (ItemListExtension); assets/js/item-list.js for the swap and the mobile collapse
+                item_facet_url(), item_facet_counts(), item_taxonomy_target()
+                (ItemTaxonomyExtension); pending_change_proposals() (ChangeProposalExtension);
+                item_list_url() (ItemListExtension); the app_item_taxonomy route;
+                assets/js/item-list.js for the swap and the mobile collapse
 #}
 {% import _self as facet %}
 
@@ -37,9 +43,20 @@
     <div class="box taxonomy-filter mb-4">
         <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
             <p class="heading mb-0">{{ 'item.facet_heading'|trans }}</p>
-            {% if activeCount > 0 %}
-                <a href="{{ baseUrl }}" class="is-size-7" rel="nofollow" data-item-facet>{{ 'item.facet_clear'|trans }}</a>
-            {% endif %}
+            <span class="is-flex is-align-items-center" style="gap: 0.5rem;">
+                {% if activeCount > 0 %}
+                    <a href="{{ baseUrl }}" class="is-size-7" rel="nofollow" data-item-facet>{{ 'item.facet_clear'|trans }}</a>
+                {% endif %}
+                {% if is_granted('ROLE_USER') %}
+                    {% set target = is_granted('ROLE_STEWARD') ? item_taxonomy_target(itemType) : null %}
+                    {% set pendingCount = target ? pending_change_proposals(target.type, target.id) : 0 %}
+                    <a href="{{ path('app_item_taxonomy', {itemType: itemType}) }}"
+                       class="is-size-7" rel="nofollow" title="{{ 'item.taxonomy_edit_link'|trans }}">
+                        <span class="icon is-small"><i class="fa-solid fa-pen-to-square"></i></span>
+                        {% if pendingCount > 0 %}<span class="tag is-warning">{{ pendingCount }}</span>{% endif %}
+                    </a>
+                {% endif %}
+            </span>
         </div>
 
         <button type="button" class="button is-small is-fullwidth mb-2 is-hidden-tablet is-hidden" data-item-facet-toggle>

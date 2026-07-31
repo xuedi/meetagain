@@ -18,6 +18,9 @@ interface CategorizableTypeProviderInterface
     /** Registry key for this item type; the value stored in the assignment tables' item_type column. */
     public function getTypeKey(): string;
 
+    /** Settings key of the dual-scope section whose DTO carries this type's taxonomy. */
+    public function getSettingsKey(): string;
+
     /** Translation key for the type's label. */
     public function getLabelKey(): string;
 
@@ -27,4 +30,7 @@ interface CategorizableTypeProviderInterface
 
     /** The type's effective, scope-resolved taxonomy definitions for the current request. */
     public function getTaxonomy(): Config;
+
+    /** The taxonomy sub-object of a settings DTO loaded at an arbitrary scope, for cross-scope edits. */
+    public function taxonomyOf(object $settings): Config;
 }

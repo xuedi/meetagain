@@ -81,6 +81,70 @@ final class Config
         return $this->hasRow($this->tags, $id);
     }
 
+    public function isEnabled(Axis $axis): bool
+    {
+        return $axis === Axis::Category ? $this->categoriesEnabled : $this->tagsEnabled;
+    }
+
+    public function hasDefinition(Axis $axis, int $id): bool
+    {
+        return $this->hasRow($this->rows($axis), $id);
+    }
+
+    /** @return list<AbstractDefinition> */
+    public function definitions(Axis $axis): array
+    {
+        return $axis === Axis::Category ? $this->categoryDefinitions() : $this->tagDefinitions();
+    }
+
+    /** @return array<int, string> definition id => its label in that locale, skipping rows without one */
+    public function labelsInLocale(Axis $axis, string $locale): array
+    {
+        $labels = [];
+        foreach ($this->rows($axis) as $row) {
+            $label = trim($row['labels'][$locale] ?? '');
+            if ($row['id'] === '' || $label === '') {
+                continue;
+            }
+
+            $labels[(int) $row['id']] = $label;
+        }
+
+        return $labels;
+    }
+
+    public function addLabel(Axis $axis, string $locale, string $label): static
+    {
+        $rows = $this->rows($axis);
+        $rows[] = ['id' => '', 'labels' => [$locale => $label]];
+
+        return $this->setRows($axis, $rows);
+    }
+
+    public function setLabel(Axis $axis, int $id, string $locale, string $label): static
+    {
+        $rows = $this->rows($axis);
+        foreach ($rows as $index => $row) {
+            if ($row['id'] === '' || (int) $row['id'] !== $id) {
+                continue;
+            }
+
+            $rows[$index]['labels'][$locale] = $label;
+        }
+
+        return $this->setRows($axis, $rows);
+    }
+
+    public function removeDefinition(Axis $axis, int $id): static
+    {
+        $rows = array_values(array_filter(
+            $this->rows($axis),
+            static fn(array $row): bool => $row['id'] === '' || (int) $row['id'] !== $id,
+        ));
+
+        return $this->setRows($axis, $rows);
+    }
+
     /** @return list<CategoryDefinition> */
     public function categoryDefinitions(): array
     {
@@ -158,6 +222,26 @@ final class Config
         $config->tags = self::rowsFromArray($raw['tags'] ?? []);
 
         return $config;
+    }
+
+    /** @return list<array{id: int|string, labels: array<string, string>}> */
+    private function rows(Axis $axis): array
+    {
+        return $axis === Axis::Category ? $this->categories : $this->tags;
+    }
+
+    /** @param list<array{id: int|string, labels: array<string, string>}> $rows */
+    private function setRows(Axis $axis, array $rows): static
+    {
+        if ($axis === Axis::Category) {
+            $this->categories = $rows;
+
+            return $this;
+        }
+
+        $this->tags = $rows;
+
+        return $this;
     }
 
     /**

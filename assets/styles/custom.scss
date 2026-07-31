@@ -523,6 +523,12 @@ body.admin-shell-no-scroll {
     pointer-events: none;
 }
 
+// A definition that carries no label for one of the enabled languages - the locale toggle hides the
+// other columns, so without a tint the gap is invisible until you switch to it.
+.taxonomy-locale-cell.taxonomy-locale-missing .input {
+    background-color: rgba(255, 224, 138, 0.35);
+}
+
 // -- Item grid thumbnails --
 
 .item-thumb {

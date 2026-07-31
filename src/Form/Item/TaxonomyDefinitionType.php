@@ -7,6 +7,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TaxonomyDefinitionType extends AbstractType
@@ -30,12 +32,20 @@ class TaxonomyDefinitionType extends AbstractType
     }
 
     #[\Override]
+    public function buildView(FormView $view, FormInterface $form, array $options): void
+    {
+        $view->vars['usage'] = $options['usage'];
+    }
+
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => null,
             'empty_data' => ['id' => '', 'labels' => []],
+            'usage' => [],
         ]);
+        $resolver->setAllowedTypes('usage', 'array');
     }
 
     #[\Override]

@@ -60,7 +60,7 @@ class ItemListSidebarTest extends WebTestCase
         );
     }
 
-    public function testFilterBoxIsTheFirstSidebarBox(): void
+    public function testViewSwitcherIsTheFirstSidebarBox(): void
     {
         // Arrange
         $client = static::createClient();
@@ -69,11 +69,13 @@ class ItemListSidebarTest extends WebTestCase
         $crawler = $client->request('GET', '/en/glossary', server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
-        static::assertStringContainsString(
-            'taxonomy-filter',
-            (string) $crawler->filter('.item-list-sidebar .box')->first()->attr('class'),
-            'Box order is filter -> view -> about',
+        $boxes = $crawler->filter('.item-list-sidebar .box');
+        static::assertCount(
+            1,
+            $boxes->first()->filter('a[href$="/item/glossary/view/list"]'),
+            'Box order is view -> filter -> about',
         );
+        static::assertStringContainsString('taxonomy-filter', (string) $boxes->eq(1)->attr('class'));
     }
 
     public function testEveryFacetOptionIsAChipAndAnEmptyOneIsNotClickable(): void

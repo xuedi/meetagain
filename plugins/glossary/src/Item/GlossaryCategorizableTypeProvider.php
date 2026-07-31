@@ -6,6 +6,7 @@ use App\Item\Taxonomy\CategorizableTypeProviderInterface;
 use App\Item\Taxonomy\Config;
 use Override;
 use Plugin\Glossary\Service\ConfigService;
+use Plugin\Glossary\ValueObject\Config as GlossaryConfig;
 
 final readonly class GlossaryCategorizableTypeProvider implements CategorizableTypeProviderInterface
 {
@@ -25,6 +26,12 @@ final readonly class GlossaryCategorizableTypeProvider implements CategorizableT
     public function getTypeKey(): string
     {
         return self::ITEM_TYPE;
+    }
+
+    #[Override]
+    public function getSettingsKey(): string
+    {
+        return 'glossary';
     }
 
     #[Override]
@@ -49,5 +56,13 @@ final readonly class GlossaryCategorizableTypeProvider implements CategorizableT
     public function getTaxonomy(): Config
     {
         return $this->configService->getConfig()->getTaxonomy();
+    }
+
+    #[Override]
+    public function taxonomyOf(object $settings): Config
+    {
+        \assert($settings instanceof GlossaryConfig);
+
+        return $settings->getTaxonomy();
     }
 }

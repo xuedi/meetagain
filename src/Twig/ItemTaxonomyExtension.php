@@ -3,10 +3,12 @@
 namespace App\Twig;
 
 use App\Item\Taxonomy\CategorizableTypeRegistry;
+use App\Item\Taxonomy\ChangeTarget;
 use App\Item\Taxonomy\FacetCounter;
 use App\Item\Taxonomy\FacetCounts;
 use App\Item\Taxonomy\FacetResolver;
 use App\Item\Taxonomy\FacetSelection;
+use App\Item\Taxonomy\ScopeCodec;
 use App\Item\Taxonomy\TaxonomyService;
 use Override;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -21,6 +23,7 @@ final class ItemTaxonomyExtension extends AbstractExtension
         private readonly RequestStack $requestStack,
         private readonly FacetResolver $facetResolver,
         private readonly FacetCounter $facetCounter,
+        private readonly ScopeCodec $scopeCodec,
     ) {}
 
     #[Override]
@@ -32,7 +35,7 @@ final class ItemTaxonomyExtension extends AbstractExtension
             new TwigFunction('item_tag_labels', $this->tagLabels(...)),
             new TwigFunction('item_taxonomy_category_choices', $this->categoryChoices(...)),
             new TwigFunction('item_taxonomy_tag_choices', $this->tagChoices(...)),
-            new TwigFunction('item_taxonomy_plugin_key', $this->pluginKey(...)),
+            new TwigFunction('item_taxonomy_target', $this->changeTarget(...)),
             new TwigFunction('item_facet_current', $this->currentFacets(...)),
             new TwigFunction('item_facet_active', $this->facetsActive(...)),
             new TwigFunction('item_facet_url', $this->facetUrl(...)),
@@ -60,9 +63,15 @@ final class ItemTaxonomyExtension extends AbstractExtension
         return $this->facetCounter->counts($itemType);
     }
 
-    public function pluginKey(string $itemType): ?string
+    /** @return array{type: string, id: int}|null the change-proposal target of this type's vocabulary at the current scope */
+    public function changeTarget(string $itemType): ?array
     {
-        return $this->registry->providerFor($itemType)?->getPluginKey();
+        $targetId = $this->scopeCodec->currentTargetId();
+        if ($targetId === null || !$this->registry->has($itemType)) {
+            return null;
+        }
+
+        return ['type' => ChangeTarget::TYPE_PREFIX . $itemType, 'id' => $targetId];
     }
 
     public function categoryLabel(string $itemType, int $itemId): ?string
