@@ -18,6 +18,7 @@ use App\Repository\SuspiciousUrlRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -152,7 +153,7 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
     }
 
     #[Route('/{id}/suspicious', name: 'app_admin_not_found_log_suspicious_toggle', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function toggleSuspicious(NotFoundLog $log, Request $request): RedirectResponse
+    public function toggleSuspicious(NotFoundLog $log, Request $request): Response
     {
         if (!$this->isCsrfTokenValid('admin_not_found_log_suspicious' . $log->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
@@ -162,10 +163,16 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
         $existing = $this->suspiciousUrlRepo->findOneByUrl($url);
         if ($existing !== null) {
             $this->entityManager->remove($existing);
+            $suspicious = false;
         } else {
             $this->entityManager->persist((new SuspiciousUrl())->setUrl($url)->setCreatedAt(new DateTimeImmutable()));
+            $suspicious = true;
         }
         $this->entityManager->flush();
+
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['suspicious' => $suspicious]);
+        }
 
         return $this->redirectToRoute('app_admin_not_found_log', $this->listQueryParams($request));
     }

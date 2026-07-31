@@ -1,5 +1,9 @@
 {% extends 'admin/base.html.twig' %}
 
+{% block javascripts %}
+    <script src="{{ asset('js/admin/not-found-suspicious.js') }}" defer></script>
+{% endblock %}
+
 {% block content %}
 
     <div class="container">
@@ -7,7 +11,7 @@
         {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
         {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
-        <table class="table is-fullwidth">
+        <table class="table is-fullwidth" data-suspicious-table>
             <thead>
                 <tr>
                     <th>{{ 'admin_logs.col_time'|trans }}</th>
@@ -20,10 +24,10 @@
             <tbody>
                 {% for entry in recent %}
                     {% set isSuspicious = entry.url in suspiciousUrls %}
-                    <tr>
+                    <tr data-suspicious-url="{{ entry.url }}">
                         <td class="is-nowrap">{{ entry.createdAt|date('Y-m-d H:i:s') }}</td>
                         <td class="is-nowrap">{{ entry.ip }}</td>
-                        <td{% if isSuspicious %} class="has-text-danger"{% endif %}>
+                        <td data-suspicious-cell{% if isSuspicious %} class="has-text-danger"{% endif %}>
                             {{ entry.url|length > 60 ? entry.url|slice(0, 57) ~ '...' : entry.url }}
                         </td>
                         <td>
@@ -37,7 +41,9 @@
                             <a href="{{ path('app_admin_not_found_log_suspicious_toggle', {'id': entry.id}) }}"
                                class="button-as-icon{% if isSuspicious %} has-text-danger{% else %} has-text-grey{% endif %}"
                                title="{{ (isSuspicious ? 'admin_logs.action_unmark_suspicious' : 'admin_logs.action_mark_suspicious')|trans }}"
-                               data-post
+                               data-suspicious-toggle
+                               data-label-mark="{{ 'admin_logs.action_mark_suspicious'|trans }}"
+                               data-label-unmark="{{ 'admin_logs.action_unmark_suspicious'|trans }}"
                                data-csrf-token="{{ csrf_token('admin_not_found_log_suspicious' ~ entry.id) }}">
                                 <span class="icon"><i class="fa fa-flag"></i></span>
                             </a>

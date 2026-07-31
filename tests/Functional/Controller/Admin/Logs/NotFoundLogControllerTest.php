@@ -122,6 +122,34 @@ class NotFoundLogControllerTest extends WebTestCase
         static::assertNull($em->getRepository(SuspiciousUrl::class)->findOneBy(['url' => self::PROBE_URL]));
     }
 
+    public function testAjaxToggleReturnsNewStateAsJson(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $em = $this->loginAsAdmin($client);
+        $log = $this->seedNotFoundLog($em, self::PROBE_URL);
+        $crawler = $client->request('GET', '/en/admin/logs/404');
+        $toggleUrl = '/en/admin/logs/404/' . $log->getId() . '/suspicious';
+        $token = (string) $crawler->filter('a[href="' . $toggleUrl . '"]')->attr('data-csrf-token');
+
+        // Act
+        $client->xmlHttpRequest('POST', $toggleUrl, ['_token' => $token]);
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        static::assertSame(['suspicious' => true], json_decode((string) $client->getResponse()->getContent(), true));
+        $em->clear();
+        static::assertNotNull($em->getRepository(SuspiciousUrl::class)->findOneBy(['url' => self::PROBE_URL]));
+
+        // Act
+        $client->xmlHttpRequest('POST', $toggleUrl, ['_token' => $token]);
+
+        // Assert
+        static::assertSame(['suspicious' => false], json_decode((string) $client->getResponse()->getContent(), true));
+        $em->clear();
+        static::assertNull($em->getRepository(SuspiciousUrl::class)->findOneBy(['url' => self::PROBE_URL]));
+    }
+
     public function testSuspiciousUrlIsSummarizedOnStatisticsPage(): void
     {
         // Arrange
