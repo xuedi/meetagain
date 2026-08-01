@@ -1,0 +1,12 @@
+{% set viewMode = item_view_mode('photo', 'gallery').value %}
+{% if photos is empty and not canAdd %}
+    <p class="has-text-grey">{{ 'photos_photo.list_empty'|trans }}</p>
+{% elseif viewMode == 'tiles' %}
+    {% include '@Photos/views/tiles.html.twig' %}
+{% elseif viewMode == 'grid' %}
+    {% include '@Photos/views/grid.html.twig' %}
+{% elseif viewMode == 'list' %}
+    {% include '@Photos/views/list.html.twig' %}
+{% else %}
+    {% include '@Photos/views/gallery.html.twig' %}
+{% endif %}

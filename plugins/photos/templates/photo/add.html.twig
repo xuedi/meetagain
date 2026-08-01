@@ -1,0 +1,36 @@
+{% extends '@Photos/base_photos.html.twig' %}
+
+{% block title %}{{ 'photos_photo.page_title_add'|trans }}{% endblock %}
+
+{% block photos_body %}
+<h1 class="title">{{ 'photos_photo.page_title_add'|trans }}</h1>
+
+<div class="columns">
+    <div class="column is-8">
+        {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+        <div class="field">
+            {{ form_label(form.photoFile, null, {'label_attr': {'class': 'label'}}) }}
+            <div class="control">{{ form_widget(form.photoFile) }}</div>
+            {{ form_help(form.photoFile) }}
+            {{ form_errors(form.photoFile) }}
+        </div>
+
+        <p class="has-text-grey is-size-7 mb-2">{{ 'photos_photo.hint_translations'|trans }}</p>
+        {% include '_components/item/translation_fields.html.twig' with {'form': form, 'fields': ['title', 'description']} %}
+
+        {% if form.itemTags is defined %}
+            <div class="field">{{ form_row(form.itemTags) }}</div>
+        {% endif %}
+
+        <div class="field is-grouped mt-4">
+            <div class="control">{{ form_widget(form.submit) }}</div>
+            <div class="control">
+                <a href="{{ path('app_photos_photolist') }}" class="button">{{ 'photos_photo.button_cancel'|trans }}</a>
+            </div>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

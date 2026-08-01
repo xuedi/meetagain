@@ -1,0 +1,17 @@
+{% extends '@Photos/base_photos.html.twig' %}
+
+{% block title %}{{ 'photos_photo.browser_title_list'|trans }}{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/vendor/fancybox.umd.js') }}"></script>
+{% endblock %}
+
+{% block photos_body %}
+<h1 class="title mb-4">{{ 'photos_photo.page_title_list'|trans }}</h1>
+
+{% include '_components/item/list_layout.html.twig' with {
+    'itemType': 'photo',
+    'defaultMode': 'gallery',
+    'infoKey': 'photos_photo.sidebar_info'
+} only %}
+{% endblock %}

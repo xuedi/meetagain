@@ -1,0 +1,38 @@
+{% extends '@Photos/base_photos.html.twig' %}
+
+{% set photoTitle = photo.getTranslatedTitle(app.locale) ?: 'photos.untitled'|trans %}
+
+{% block title %}{{ 'photos_photo.page_title_edit'|trans({'%title%': photoTitle}) }}{% endblock %}
+
+{% block photos_body %}
+<h1 class="title">{{ 'photos_photo.page_title_edit'|trans({'%title%': photoTitle}) }}</h1>
+
+{{ form_start(form) }}
+
+<div class="columns">
+    <div class="column is-3-tablet is-12-mobile">
+        <fieldset class="p-4 mb-4" style="border: 1px solid #dbdbdb; border-radius: 4px;">
+            <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'photos_photo.label_image'|trans }}</legend>
+            {% include '_components/image.html.twig' with {'image': photo.visibleImage, 'size': '400x400', 'alt': photoTitle} %}
+            <p class="has-text-grey is-size-7 mt-2">{{ 'photos_photo.help_image_fixed'|trans }}</p>
+        </fieldset>
+    </div>
+    <div class="column is-8">
+        <p class="has-text-grey is-size-7 mb-2">{{ 'photos_photo.hint_translations'|trans }}</p>
+        {% include '_components/item/translation_fields.html.twig' with {'form': form, 'fields': ['title', 'description']} %}
+
+        {% if form.itemTags is defined %}
+            <div class="field">{{ form_row(form.itemTags) }}</div>
+        {% endif %}
+
+        <div class="field is-grouped mt-4">
+            <div class="control">{{ form_widget(form.submit) }}</div>
+            <div class="control">
+                <a href="{{ path('app_plugin_photos_photo_show', {id: photo.id}) }}" class="button">{{ 'photos_photo.button_cancel'|trans }}</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}

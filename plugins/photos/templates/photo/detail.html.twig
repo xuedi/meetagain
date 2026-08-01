@@ -1,0 +1,100 @@
+{% extends '@Photos/base_photos.html.twig' %}
+
+{% set photoTitle = photo.getTranslatedTitle(app.locale) ?: 'photos.untitled'|trans %}
+{% set cameraRows = showCameraMeta ? photo_camera_rows(photo) : [] %}
+
+{% block title %}{{ photoTitle }}{% endblock %}
+
+{% block javascripts %}
+    {% if photo.visibleImage %}
+        <script src="{{ asset('js/vendor/fancybox.umd.js') }}"></script>
+    {% endif %}
+{% endblock %}
+
+{% block photos_body %}
+<div class="columns">
+    <div class="column is-8">
+        <div class="box">
+            <div class="level">
+                <div class="level-left">
+                    <h1 class="title is-3 mb-0">{{ photoTitle }}</h1>
+                </div>
+                <div class="level-right">
+                    {% include '_components/item/detail_back.html.twig' with {'url': path('app_photos_photolist')} only %}
+                </div>
+            </div>
+
+            {% include '_components/item/tag_badges.html.twig' with {'itemType': 'photo', 'itemId': photo.id} only %}
+
+            {% if photo.visibleImage %}
+                {% set reportCaption = 'photos_photo.report_caption'|trans({'%url%': path('app_report_image', {'id': photo.visibleImage.id})}) %}
+                <figure class="image mb-2">
+                    <a data-fancybox="photo-detail" data-caption="{{ reportCaption }}" href="/images/thumbnails/{{ photo.visibleImage.hash }}_w1600.webp">
+                        {% include '_components/image.html.twig' with {'image': photo.visibleImage, 'size': '1024x768', 'alt': photoTitle} %}
+                    </a>
+                </figure>
+            {% else %}
+                <p class="has-text-grey">{{ 'photos_photo.image_unavailable'|trans }}</p>
+            {% endif %}
+
+            {% if photo.getTranslatedDescription(app.locale) %}
+                <div class="content">
+                    <p>{{ photo.getTranslatedDescription(app.locale)|nl2br }}</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="box">
+            {{ comment_section('photo', photo.id) }}
+        </div>
+    </div>
+
+    <div class="column is-4">
+        {% if cameraRows is not empty %}
+            <div class="box">
+                <h3 class="title is-5">{{ 'photos_photo.heading_camera'|trans }}</h3>
+                <table class="table is-fullwidth is-narrow">
+                    <tbody>
+                        {% for row in cameraRows %}
+                            <tr>
+                                <th class="has-text-grey has-text-weight-normal">{{ row.label|trans }}</th>
+                                <td class="has-text-right">{{ row.value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        <div class="box">
+            <h3 class="title is-5">{{ 'photos_photo.heading_info'|trans }}</h3>
+            <p><strong>{{ 'photos_photo.label_added_by'|trans }}</strong> {{ get_user_name(photo.createdBy) }}</p>
+            <p><strong>{{ 'photos_photo.label_added'|trans }}</strong> {{ photo.createdAt|time_diff }}</p>
+            {% if photo.takenAt %}
+                <p><strong>{{ 'photos_photo.label_taken'|trans }}</strong> {{ photo.takenAt|date('Y-m-d H:i') }}</p>
+            {% endif %}
+        </div>
+
+        {% if canManage %}
+            <a href="{{ path('app_plugin_photos_photo_edit', {'id': photo.id}) }}" class="button is-link is-light is-fullwidth mb-2">
+                <span class="icon"><i class="fa-solid fa-pen-to-square"></i></span>
+                <span>{{ 'photos_photo.button_edit'|trans }}</span>
+            </a>
+            <a href="{{ path('app_plugin_photos_photo_delete', {'id': photo.id}) }}"
+               class="button is-danger is-light is-fullwidth"
+               data-post
+               data-csrf-token="{{ csrf_token('app_plugin_photos_photo_delete' ~ photo.id) }}"
+               data-confirm="{{ 'photos_photo.confirm_delete'|trans }}">
+                <span class="icon"><i class="fa fa-trash"></i></span>
+                <span>{{ 'photos_photo.button_delete'|trans }}</span>
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if photo.visibleImage %}
+    <script>
+        Fancybox.bind("[data-fancybox='photo-detail']", {compact: true});
+    </script>
+{% endif %}
+{% endblock %}

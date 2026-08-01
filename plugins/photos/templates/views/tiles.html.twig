@@ -1,0 +1,27 @@
+{# Photos 'tiles' layout - square-style cards with a leading "add" card. #}
+<div class="columns is-multiline">
+    {% if canAdd %}
+        <div class="column is-narrow" style="width: 200px;">
+            <a href="{{ path('app_plugin_photos_photo_add') }}" title="{{ 'photos_views.title_add'|trans }}">
+                <div class="card has-background-link-light" style="height: 100%;">
+                    <div class="card-content has-text-centered" style="padding-top: 2rem;">
+                        <span class="icon is-large has-text-link"><i class="fa-solid fa-plus fa-2x"></i></span>
+                        <p class="mt-3 has-text-link">{{ 'photos_views.button_add'|trans }}</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    {% endif %}
+    {% for item in photos %}
+        <div class="column is-narrow" style="width: 200px;">
+            {% include '_components/item/styles/square.html.twig' with {
+                href: path('app_plugin_photos_photo_show', {'id': item.id}),
+                image: item.visibleImage,
+                imageSize: '400x400',
+                title: item.getTranslatedTitle(app.locale) ?: 'photos.untitled'|trans,
+                subtitle: item.cameraLabel,
+                subtitleIcon: 'camera'
+            } %}
+        </div>
+    {% endfor %}
+</div>

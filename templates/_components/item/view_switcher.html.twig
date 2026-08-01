@@ -9,13 +9,14 @@
 
     Used in:    _components/item/sidebar.html.twig
     Parameters:
-        - itemType (string, required)       -- registry key of the item type (e.g. 'dish')
-        - modes    (list<string>, optional) -- view-mode values to offer; default: all four
+        - itemType    (string, required)       -- registry key of the item type (e.g. 'dish')
+        - modes       (list<string>, optional) -- view-mode values to offer; default: all four
+        - defaultMode (string, optional)       -- mode shown before the visitor picks one; default: 'list'
     Depends on: item_view_mode(), item_view_types() (ItemViewExtension); the app_item_set_view
                 route; assets/js/item-list.js, which turns a click into a fragment swap
 #}
 {% set allowedModes = modes|default([]) %}
-{% set currentValue = item_view_mode(itemType).value %}
+{% set currentValue = item_view_mode(itemType, defaultMode|default(null)).value %}
 {% if allowedModes is not empty and currentValue not in allowedModes %}
     {% set currentValue = allowedModes|first %}
 {% endif %}

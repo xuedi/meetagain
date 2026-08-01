@@ -1,0 +1,5 @@
+{
+  "name": "Photos",
+  "version": "1.0",
+  "description": "Member photo uploads with per-language title and description. Each photo keeps the camera settings read from its EXIF data at upload time; photos attach to events via the core item system and carry a comment section."
+}

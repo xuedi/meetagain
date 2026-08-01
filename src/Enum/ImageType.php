@@ -20,4 +20,5 @@ enum ImageType: int
     case WebsiteImage = 15;
     case DeveloperAppLogo = 16;
     case PluginFilmsPoster = 17;
+    case PluginPhotosPhoto = 18;
 }

@@ -9,6 +9,7 @@ paths = [
     "plugins/films/src/**/*.php",
     "plugins/glossary/src/**/*.php",
     "plugins/karaoke/src/**/*.php",
+    "plugins/photos/src/**/*.php",
     "plugins/voting/src/**/*.php",
     "plugins/wishlist/src/**/*.php",
     "src/",

@@ -10,16 +10,21 @@
 
     Used in:    _components/item/list_layout.html.twig
     Parameters:
-        - itemType (string, required)        -- registry key of the item type (e.g. 'film')
-        - modes     (list<string>, optional) -- view-mode values to offer; default: all four
-        - infoKey   (string, optional)       -- translation key of the blurb;
-                                                default: 'item.sidebar_info_default'
+        - itemType    (string, required)        -- registry key of the item type (e.g. 'film')
+        - modes       (list<string>, optional)  -- view-mode values to offer; default: all four
+        - defaultMode (string, optional)        -- mode shown before the visitor picks one; default: 'list'
+        - infoKey     (string, optional)        -- translation key of the blurb;
+                                                   default: 'item.sidebar_info_default'
     Depends on: _components/item/view_switcher.html.twig, _components/item/tag_filter.html.twig;
                 item_tag_choices() (ItemTagExtension); the app_item_tags route
 #}
 <div class="box mb-4">
     <p class="heading">{{ 'item.sidebar_view_heading'|trans }}</p>
-    {% include '_components/item/view_switcher.html.twig' with {'itemType': itemType, 'modes': modes|default([])} only %}
+    {% include '_components/item/view_switcher.html.twig' with {
+        'itemType': itemType,
+        'modes': modes|default([]),
+        'defaultMode': defaultMode|default(null)
+    } only %}
 </div>
 
 <div data-item-filter>
