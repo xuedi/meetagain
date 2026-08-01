@@ -19,7 +19,7 @@ class CommentRepository extends ServiceEntityRepository
     /**
      * @return array<Comment>
      */
-    public function findByEventWithUser(int $eventId): array
+    public function findForTarget(string $targetType, int $targetId): array
     {
         return $this
             ->createQueryBuilder('c')
@@ -27,33 +27,35 @@ class CommentRepository extends ServiceEntityRepository
             ->addSelect('u')
             ->leftJoin('u.image', 'i')
             ->addSelect('i')
-            ->where('c.event = :eventId')
-            ->setParameter('eventId', $eventId)
-            ->orderBy('c.created_at', 'DESC')
+            ->where('c.targetType = :targetType')
+            ->andWhere('c.targetId = :targetId')
+            ->setParameter('targetType', $targetType)
+            ->setParameter('targetId', $targetId)
+            ->orderBy('c.createdAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
 
     /**
-     * @param array<int>|null $restrictToEventIds null = no restriction
+     * @param array<int>|null $restrictToTargetIds null = no restriction
      * @return array<Comment>
      */
-    public function findRecentAcrossEvents(int $limit, ?array $restrictToEventIds = null): array
+    public function findRecentForTargetType(string $targetType, int $limit, ?array $restrictToTargetIds = null): array
     {
         $qb = $this
             ->createQueryBuilder('c')
             ->leftJoin('c.user', 'u')
             ->addSelect('u')
-            ->leftJoin('c.event', 'e')
-            ->addSelect('e')
-            ->orderBy('c.created_at', 'DESC')
+            ->where('c.targetType = :targetType')
+            ->setParameter('targetType', $targetType)
+            ->orderBy('c.createdAt', 'DESC')
             ->setMaxResults($limit);
 
-        if ($restrictToEventIds !== null) {
-            if ($restrictToEventIds === []) {
+        if ($restrictToTargetIds !== null) {
+            if ($restrictToTargetIds === []) {
                 return [];
             }
-            $qb->andWhere('c.event IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+            $qb->andWhere('c.targetId IN (:targetIds)')->setParameter('targetIds', $restrictToTargetIds);
         }
 
         return $qb->getQuery()->getResult();

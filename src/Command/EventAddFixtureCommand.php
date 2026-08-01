@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Comment\EventTargetProvider;
 use App\Entity\Comment;
 use App\Entity\User;
 use App\Plugin;
@@ -102,7 +103,8 @@ class EventAddFixtureCommand extends Command
             $numComments = random_int($minComments, min($maxComments, count($allUsers)));
             for ($i = 0; $i < $numComments; ++$i) {
                 $comment = new Comment();
-                $comment->setEvent($event);
+                $comment->setTargetType(EventTargetProvider::TYPE);
+                $comment->setTargetId((int) $event->getId());
                 $comment->setUser($this->getRandomUsers($allUsers, 1)[0]);
                 $comment->setContent($this->getRandomComment());
 

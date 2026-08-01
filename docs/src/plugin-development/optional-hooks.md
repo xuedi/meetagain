@@ -30,6 +30,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `SecurityProviderInterface`                | Participate in live security event detection          | `observe()`, `scanRetrospective()`                        |
 | `DescriptorInterface`                      | Add a settings section to your plugin's settings page | `getFormType()`, `createDefault()`, `applyForm()`         |
 | `TaggableTypeProviderInterface`            | Give an item type a tag vocabulary                    | `getPluginKey()`, `getTypeKey()`, `getLabelKey()`         |
+| `Comment\TargetProviderInterface`          | Host the shared comment section on your own pages     | `getTypeKey()`, `getReturnUrl()`, `canComment()`          |
 | `ContributorInterface`                     | Carry an item type through group export and import    | `exportItems()`, `importItems()`                          |
 | `ChangeTargetProviderInterface`            | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()`    |
 | `ConfigPrivacyToggleProviderInterface`     | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                             |
@@ -485,6 +486,79 @@ readonly class CategoryFilterContributor implements EventFilterFormContributorIn
     }
 }
 ```
+
+---
+
+### Comment\TargetProviderInterface
+
+**Purpose:** Make one of your entities commentable, reusing the core comment table, routes, sanitization and
+templates. Anything with a detail page - a photo, a recipe, a book - can host the same discussion surface the
+event page uses.
+
+**File:** `src/Comment/TargetProviderInterface.php`
+
+**Tag:** `#[AutoconfigureTag]` on the interface - implementing it is enough, no manual service config.
+
+**When called:** When a page renders `comment_section()`, and on every POST to the comment routes.
+
+```php
+namespace Plugin\YourPlugin\Comment;
+
+use App\Comment\TargetProviderInterface;
+use App\Entity\Comment;
+use Override;
+use Plugin\YourPlugin\Repository\PhotoRepository;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+final readonly class PhotoTargetProvider implements TargetProviderInterface
+{
+    public function __construct(
+        private PhotoRepository $photos,
+        private UrlGeneratorInterface $urlGenerator,
+    ) {}
+
+    #[Override]
+    public function getTypeKey(): string
+    {
+        return 'photo';
+    }
+
+    #[Override]
+    public function getReturnUrl(int $targetId): ?string
+    {
+        return $this->photos->find($targetId) === null
+            ? null
+            : $this->urlGenerator->generate('app_plugin_yourplugin_photo_show', ['id' => $targetId]);
+    }
+
+    #[Override]
+    public function canComment(int $targetId): bool
+    {
+        return $this->photos->find($targetId)?->isPublished() === true;
+    }
+
+    #[Override]
+    public function onCommentCreated(Comment $comment): void
+    {
+        // optional: log activity, notify the uploader, invalidate a cache
+    }
+}
+```
+
+Then embed the surface in your detail template with one line:
+
+```twig
+{{ comment_section('photo', photo.id) }}
+```
+
+Notes:
+
+- `getReturnUrl()` is also the existence check. Returning `null` makes the controller respond 404, so a POST for a
+  deleted target cannot create an orphan row.
+- Deletion is **not** yours to decide: the comment's author or a `ROLE_ADMIN` may remove it, always.
+- Content is sanitized to plain text on write and re-filtered on render. Do not re-implement either.
+- Your delete path **must** call `CommentService::deleteAllFor('photo', $id)`. Comments carry no foreign key to
+  your table, so nothing cascades for you.
 
 ---
 

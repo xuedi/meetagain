@@ -58,12 +58,6 @@ class Event
     private ?EventType $type = null;
 
     /**
-     * @var Collection<int, Comment>
-     */
-    #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'event')]
-    private Collection $comments;
-
-    /**
      * @var Collection<int, EventTranslation>
      */
     #[ORM\OneToMany(targetEntity: EventTranslation::class, mappedBy: 'event', fetch: 'EAGER')]
@@ -95,7 +89,6 @@ class Event
         $this->host = new ArrayCollection();
         $this->rsvp = new ArrayCollection();
         $this->images = new ArrayCollection();
-        $this->comments = new ArrayCollection();
         $this->translations = new ArrayCollection();
     }
 
@@ -314,33 +307,6 @@ class Event
         }
 
         return $base . ' - ' . $meetingAtLabel . ' ' . $this->start->format('Y-m-d H:i');
-    }
-
-    /**
-     * @return Collection<int, Comment>
-     */
-    public function getComments(): Collection
-    {
-        return $this->comments;
-    }
-
-    public function addComment(Comment $comment): static
-    {
-        if (!$this->comments->contains($comment)) {
-            $this->comments->add($comment);
-            $comment->setEvent($this);
-        }
-
-        return $this;
-    }
-
-    public function removeComment(Comment $comment): static
-    {
-        if ($this->comments->removeElement($comment) && $comment->getEvent() === $this) {
-            $comment->setEvent(null);
-        }
-
-        return $this;
     }
 
     /**

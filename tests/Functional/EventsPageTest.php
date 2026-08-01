@@ -141,7 +141,7 @@ class EventsPageTest extends WebTestCase
         static::assertTrue($client->getResponse()->getStatusCode() >= 400, 'Non-existent event should return error status');
     }
 
-    public function testDeleteCommentRedirectsBack(): void
+    public function testDeleteOfAnUnknownCommentIs404(): void
     {
         $client = static::createClient();
 
@@ -149,12 +149,12 @@ class EventsPageTest extends WebTestCase
 
         $rawToken = 'test-csrf-delete-comment-999';
         $session = $client->getSession();
-        $session->set('_csrf/app_event_delete_comment999', $rawToken);
+        $session->set('_csrf/app_comment_delete999', $rawToken);
         $session->save();
 
-        $client->request('POST', '/en/event/1/deleteComment/999', ['_token' => $rawToken]);
+        $client->request('POST', '/en/comment/event/1/delete/999', ['_token' => $rawToken]);
 
-        $this->assertResponseRedirects();
+        $this->assertResponseStatusCodeSame(404);
     }
 
     private function login($client, string $email, #[\SensitiveParameter] string $password): void

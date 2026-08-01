@@ -34,7 +34,6 @@ class GetRoutesContractTest extends WebTestCase
         'app_admin_email_sendlog_clear_cap' => 'entity lookup before CSRF',
         'app_replace_image_select' => 'entity resolver before CSRF',
         'app_image_rotate' => 'entity resolver before CSRF',
-        'app_event_delete_comment' => 'entity lookup before CSRF',
         'app_plugin_glossary_suggestion_apply' => 'signed-token exception',
         'app_plugin_glossary_suggestion_delete' => 'signed-token exception',
         'app_admin_email_announcements_from_cms' => 'entity lookup before CSRF',
@@ -83,6 +82,8 @@ class GetRoutesContractTest extends WebTestCase
     {
         yield 'default language' => ['/en/language/de'];
         yield 'event toggle rsvp' => ['/en/event/toggleRsvp/1/'];
+        yield 'comment create' => ['/en/comment/event/1'];
+        yield 'comment delete' => ['/en/comment/event/1/delete/1'];
         yield 'profile toggle rsvp' => ['/en/profile/toggleRsvp/1/'];
         yield 'profile config toggle' => ['/en/profile/config/toggle/notification'];
         yield 'profile config toggle notification' => ['/en/profile/config/toggleNotification/notification'];

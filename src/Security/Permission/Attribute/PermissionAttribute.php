@@ -10,7 +10,6 @@ final class PermissionAttribute
     public const string EVENT_VIEW = 'event.view';
     public const string EVENT_RSVP = 'event.rsvp';
     public const string EVENT_COMMENT_CREATE = 'event.comment.create';
-    public const string EVENT_COMMENT_DELETE = 'event.comment.delete';
     public const string EVENT_IMAGE_UPLOAD = 'event.image.upload';
     public const string EVENT_IMAGE_DELETE = 'event.image.delete';
 
