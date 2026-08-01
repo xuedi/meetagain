@@ -13,17 +13,17 @@ through services and repositories:
 
 | Subsystem         | Directory                                                    | Description                                     |
 |-------------------|--------------------------------------------------------------|-------------------------------------------------|
-| **Events**        | `src/Entity/Event*`, `src/Service/EventService.php`          | Event creation, RSVP, recurring rules, comments |
-| **CMS**           | `src/Entity/Cms*`, `src/Service/CmsService.php`              | Content pages, blocks, menu locations           |
-| **Members**       | `src/Entity/User.php`, `src/Service/MemberService.php`       | User profiles, membership status                |
+| **Events**        | `src/Entity/Event*`, `src/Service/Event/EventService.php`    | Event creation, RSVP, recurring rules, comments |
+| **CMS**           | `src/Entity/Cms*`, `src/Service/Cms/CmsService.php`          | Content pages, blocks, menu locations           |
+| **Members**       | `src/Entity/User.php`, `src/Service/Member/UserService.php`  | User profiles, membership status                |
 | **Users & Auth**  | `src/Security/`, `src/Controller/SecurityController.php`     | Login, registration, roles                      |
-| **Email**         | `src/Entity/EmailTemplate*`, `src/Service/EmailService.php`  | Template-based transactional email              |
-| **Config**        | `src/Entity/Config.php`, `src/Service/ConfigService.php`     | Key/value application settings                  |
+| **Email**         | `src/Entity/EmailTemplate*`, `src/Service/Email/EmailService.php` | Template-based transactional email         |
+| **Config**        | `src/Entity/Config.php`, `src/Service/Config/ConfigService.php` | Key/value application settings                |
 | **Plugin System** | `src/Plugin.php`, `src/Filter/`                              | Plugin interface, filter contracts              |
-| **Activity Log**  | `src/Entity/Activity.php`, `src/Service/ActivityService.php` | Audit trail of user actions                     |
+| **Activity Log**  | `src/Entity/Activity.php`, `src/Activity/ActivityService.php` | Audit trail of user actions                    |
 | **Announcements** | `src/Entity/Message.php`                                     | Site-wide announcements                         |
-| **Translations**  | `translations/`, `src/Service/TranslationService.php`        | EN/DE/CN YAML translation files                 |
-| **Hosts**         | `src/Entity/Host.php`, `src/Service/HostService.php`         | Event host/organizer groups                     |
+| **Translations**  | `translations/`                                              | EN/DE/CN YAML translation files                 |
+| **Hosts**         | `src/Entity/Host.php`, `src/Repository/HostRepository.php`   | Event host/organizer groups                     |
 
 ---
 

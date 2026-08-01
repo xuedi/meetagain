@@ -106,7 +106,8 @@ Never put a credential in a `.dist`. That is what the overlay is for.
    workspace, and depends on `toolconfig.workspace = true` if it needs config.
 2. Add the crate to `members` in `bin/tools/Cargo.toml`.
 3. Add `config/tools/<name>.dist`, documenting every key; leave credential keys empty.
-4. `just buildTools` picks it up - the recipe installs every crate that has a `src/main.rs`.
+4. `just buildTools` picks it up - the recipe installs every crate that has a
+   `bin/tools/<name>/src/main.rs`.
 
 A new guard also needs a script in `tests/config/commit-hooks/`; copy
 `01-leak-guard.bash` for the missing-binary warning and the failure banner.

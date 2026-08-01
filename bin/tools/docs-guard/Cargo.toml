@@ -1,0 +1,12 @@
+[package]
+name = "docs-guard"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "docs-guard"
+path = "src/main.rs"
+
+[dependencies]
+toolconfig.workspace = true
+walkdir.workspace = true

@@ -18,7 +18,7 @@ namespace Plugin\YourPlugin\Filter;      // Filter implementations
 ```
 
 The namespace root must match the plugin directory name in PascalCase:
-`plugins/filmclub/` → `Plugin\Filmclub\`
+`plugins/films/` → `Plugin\Films\`
 
 ---
 

@@ -23,12 +23,11 @@ at different complexity levels:
 - `loadPostExtendFixtures` to create votes for recurring events
 - Cron tasks to close expired votes
 - `AdminNavigationInterface` for admin sidebar
-- **See:** `plugins/filmclub/src/Kernel.php`
+- **See:** `plugins/films/src/Kernel.php`
 
 ### Advanced — MultiSite
 
 - `EventFilterInterface` — group-based event visibility
-- `MenuFilterInterface` — domain-context menu filtering
 - `EventActionGuardInterface` — membership-gated RSVP
 - `AdminNavigationInterface` — multi-section admin sidebar
 - `EntityActionInterface` — reacts to member and event lifecycle events
@@ -84,7 +83,6 @@ at different complexity levels:
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag('app.event_filter')]   // For EventFilterInterface
-#[AutoconfigureTag('app.menu_filter')]    // For MenuFilterInterface
 #[AutoconfigureTag('app.cms_filter')]     // For CmsFilterInterface
 #[AutoconfigureTag('app.member_filter')]  // For MemberFilterInterface
 readonly class YourFilter implements EventFilterInterface
