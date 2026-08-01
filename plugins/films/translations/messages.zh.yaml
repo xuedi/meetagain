@@ -289,5 +289,3 @@ films_notifications:
 films_admin_secretbox:
     consumer_settings: '电影俱乐部API密钥'
 
-films_taxonomy:
-    page_title: '电影分类和标签'

@@ -2,6 +2,8 @@
 
 namespace Plugin\Books\Form;
 
+use App\Item\Tag\AssignmentFormHelper;
+use Plugin\Books\Service\BookService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,6 +16,7 @@ class BookIsbnType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {}
 
     #[\Override]
@@ -29,6 +32,8 @@ class BookIsbnType extends AbstractType
                 new Regex(pattern: '/^[\d\-\s X]+$/i', message: 'books_book.error_isbn_invalid'),
             ],
         ]);
+
+        $this->assignmentFormHelper->addAssignmentFields($builder, BookService::ITEM_TYPE, null);
     }
 
     #[\Override]

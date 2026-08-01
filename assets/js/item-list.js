@@ -29,11 +29,11 @@ function itemListInitFilter(scope) {
     }
 
     scope.querySelectorAll('[data-item-facet-more]').forEach((trigger) => {
-        const row = trigger.parentElement;
-        if (!row) {
+        const axis = trigger.closest('.field');
+        if (!axis) {
             return;
         }
-        row.querySelectorAll('.item-facet-extra').forEach((chip) => chip.classList.add('is-hidden'));
+        axis.querySelectorAll('.item-facet-extra').forEach((chip) => chip.classList.add('is-hidden'));
         trigger.classList.remove('is-hidden');
     });
 }
@@ -123,10 +123,11 @@ document.addEventListener('click', (event) => {
     }
 
     const more = event.target.closest('[data-item-facet-more]');
-    if (!more || !more.parentElement) {
+    const axis = more ? more.closest('.field') : null;
+    if (!axis) {
         return;
     }
-    more.parentElement.querySelectorAll('.item-facet-extra').forEach((chip) => chip.classList.remove('is-hidden'));
+    axis.querySelectorAll('.item-facet-extra').forEach((chip) => chip.classList.remove('is-hidden'));
     more.classList.add('is-hidden');
 });
 

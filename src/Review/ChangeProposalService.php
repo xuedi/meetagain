@@ -152,6 +152,11 @@ readonly class ChangeProposalService
         return $this->repo->countPendingForTarget($targetType, $targetId);
     }
 
+    public function countPendingForTargetType(string $targetType): int
+    {
+        return $this->repo->countPendingForTargetType($targetType);
+    }
+
     /** @return list<ChangeProposal> */
     public function pendingReviewableBy(User $user): array
     {

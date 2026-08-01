@@ -1,0 +1,67 @@
+{#
+    Item Tag form theme -- renders the two halves of the tag surface: the vocabulary editor
+    (TagsType, rendered on the item tag page) and the tag checkbox list on an item edit form. Each
+    editor row shows one label column per enabled admin language plus a parent select and an indent
+    per level; js/admin/item-tags.js shows one column at a time and keeps the parent select in sync
+    with the rows currently in the DOM. With JavaScript disabled every column stays visible, so
+    every label remains editable.
+
+    Registered in: config/packages/twig.yaml (form_themes, after _form/bulma.html.twig)
+    Depends on:    js/admin/item-tags.js, js/item-tag-tree.js; get_admin_language_codes()
+#}
+{%- block item_tags_editor_widget -%}
+    <div class="item-tag-editor">
+        <div class="box p-3 mb-4" data-item-tag-section>
+            <div data-item-tag-body>
+                <div class="buttons has-addons mb-2 item-tag-locale-toggle">
+                    {% for code in get_admin_language_codes() %}
+                        <button type="button"
+                                class="button is-small item-tag-locale-button{{ loop.first ? ' is-active' }}"
+                                data-item-tag-locale-target="{{ code }}">{{ code|upper }}</button>
+                    {% endfor %}
+                </div>
+                <div data-item-tag-rows>{{ form_row(form.tags, {label: false}) }}</div>
+            </div>
+        </div>
+    </div>
+{%- endblock -%}
+
+{%- block item_tag_row_widget -%}
+    {%- set rowId = form.id.vars.value -%}
+    {%- set isExisting = rowId is not null and rowId != '' -%}
+    {%- set usageCount = isExisting ? (form.vars.usage[rowId]|default(0)) : 0 -%}
+    {%- set depth = isExisting ? (form.vars.depths[rowId]|default(1)) : 1 -%}
+    {{- form_widget(form.id) -}}
+    <div class="item-tag-row is-flex is-flex-wrap-wrap is-align-items-center" style="gap: 0.5rem; padding-left: {{ (depth - 1) * 1.5 }}rem;"
+         data-item-tag-usage="{{ usageCount }}"
+         data-item-tag-usage-message="{{ 'item.tag_remove_confirm'|trans({'%count%': usageCount}) }}">
+        <div class="item-tag-parent-cell" style="flex: 0 0 10rem;">
+            {{- form_widget(form.parent) -}}
+        </div>
+        {% for code in get_admin_language_codes() %}
+            {%- set missing = isExisting and attribute(form, code).vars.value is empty -%}
+            <div class="item-tag-locale-cell{{ missing ? ' item-tag-locale-missing' }}" data-item-tag-locale-cell="{{ code }}" style="flex: 1 1 12rem;">
+                {{- form_row(attribute(form, code), {label: code|upper, attr: {placeholder: code|upper}}) -}}
+            </div>
+        {% endfor %}
+        {% if usageCount > 0 %}
+            <span class="tag is-light" title="{{ 'item.tag_usage_hint'|trans({'%count%': usageCount}) }}">{{ usageCount }}</span>
+        {% endif %}
+    </div>
+{%- endblock -%}
+
+{%- block item_tags_widget -%}
+    {%- set tree = attr['data-item-tag-tree'] is defined -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' control')|trim}) -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form -%}
+            {%- if tree -%}
+                <div style="padding-left: {{ (child.vars.attr['data-item-tag-depth']|default(1) - 1) * 1.5 }}rem;">
+                    {{- form_widget(child, {translation_domain: choice_translation_domain}) -}}
+                </div>
+            {%- else -%}
+                {{- form_widget(child, {translation_domain: choice_translation_domain}) -}}
+            {%- endif -%}
+        {%- endfor -%}
+    </div>
+{%- endblock -%}

@@ -523,6 +523,12 @@ body.admin-shell-no-scroll {
     pointer-events: none;
 }
 
+// A definition that carries no label for one of the enabled languages - the locale toggle hides the
+// other columns, so without a tint the gap is invisible until you switch to it.
+.taxonomy-locale-cell.taxonomy-locale-missing .input {
+    background-color: rgba(255, 224, 138, 0.35);
+}
+
 // -- Item grid thumbnails --
 
 .item-thumb {
@@ -563,4 +569,49 @@ body.admin-shell-no-scroll {
     align-items: center;
     justify-content: center;
     border-radius: 6px;
+}
+
+// -- Item gallery --
+
+.item-gallery-stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+
+    .item-gallery-frame img {
+        display: block;
+        max-height: 65vh;
+        width: auto;
+        max-width: 100%;
+        border-radius: 6px;
+    }
+}
+
+.item-gallery-thumbs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+
+    .item-gallery-slide img {
+        display: block;
+        height: 8rem;
+        width: auto;
+        border-radius: 4px;
+    }
+
+    .item-gallery-slide.is-active img {
+        outline: 2px solid var(--bulma-link);
+        outline-offset: 2px;
+    }
+}
+
+.item-gallery-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 6rem;
+    height: 8rem;
+    border-radius: 4px;
 }

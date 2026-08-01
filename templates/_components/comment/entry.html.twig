@@ -1,0 +1,66 @@
+{#
+    Comment Entry -- Single comment box with avatar, author name, timestamp, and action links
+
+    Renders a Bulma media card for one comment. Shows a delete link when the viewer may remove
+    the comment, a reply button when viewing someone else's, and a message link to the author.
+    All action links are visible only to authenticated users; an author whose account is gone
+    renders as a deleted-user placeholder.
+
+    Used in:    templates/_components/comment/section.html.twig
+    Parameters:
+        - comment    (Comment, required) -- entity with id, content, createdAt, user
+        - targetType (string, required)  -- comment target key, used to build the delete route
+        - targetId   (int, required)     -- id of the target row, used to build the delete route
+    Depends on: _components/image.html.twig; assets/js/post-link.js (data-post)
+#}
+<div class="box">
+    <article class="media">
+        <div class="media-left">
+            <figure class="image is-64x64">
+                {% include '_components/image.html.twig' with {'image': comment.user ? comment.user.image : null, 'size': '400x400'} %}
+            </figure>
+        </div>
+        <div class="media-content">
+            <div class="content">
+                <nav class="level mb-2">
+                    <div class="level-left">
+                        <strong class="level-item mr-1">{{ comment.user ? comment.user.name : 'comment.deleted_user'|trans }}</strong>
+                        {% if comment.user and app.user and comment.user.id != app.user.id %}
+                        <a class="level-item" href="{{ path('app_profile_messages', {'id': comment.user.id}) }}"
+                           title="{{ 'comment.action_message'|trans }}">
+                            <span class="icon"><i class="fa fa-envelope"></i></span>
+                        </a>
+                        {% endif %}
+                        <small class="level-item">{{ comment.createdAt | time_diff }}</small>
+                    </div>
+                    {% if is_granted('ROLE_USER') %}
+                        <div class="level-right">
+                            {% if comment.user and app.user and comment.user.id != app.user.id %}
+                                <a class="level-item replyButton" data-comment="{{ comment.content }}"
+                                   title="{{ 'comment.action_reply'|trans }}">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-reply" aria-hidden="true"></i>
+                                    </span>
+                                </a>
+                            {% endif %}
+                            {% if (comment.user and app.user and comment.user.id == app.user.id) or is_granted('ROLE_ADMIN') %}
+                                <a href="{{ path('app_comment_delete', {'targetType': targetType, 'targetId': targetId, 'id': comment.id}) }}"
+                                   class="level-item button is-ghost p-0"
+                                   title="{{ 'comment.action_delete'|trans }}"
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('app_comment_delete' ~ comment.id) }}">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                    </span>
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </nav>
+                <p>
+                    {{ comment.content|safe_message }}
+                </p>
+            </div>
+        </div>
+    </article>
+</div>

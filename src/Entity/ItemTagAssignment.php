@@ -22,8 +22,9 @@ class ItemTagAssignment
     #[ORM\Column]
     private ?int $itemId = null;
 
-    #[ORM\Column]
-    private ?int $tagId = null;
+    #[ORM\ManyToOne(targetEntity: ItemTag::class)]
+    #[ORM\JoinColumn(name: 'tag_id', nullable: false, onDelete: 'CASCADE')]
+    private ?ItemTag $tag = null;
 
     public function getId(): ?int
     {
@@ -54,15 +55,20 @@ class ItemTagAssignment
         return $this;
     }
 
-    public function getTagId(): ?int
+    public function getTag(): ?ItemTag
     {
-        return $this->tagId;
+        return $this->tag;
     }
 
-    public function setTagId(int $tagId): static
+    public function setTag(ItemTag $tag): static
     {
-        $this->tagId = $tagId;
+        $this->tag = $tag;
 
         return $this;
+    }
+
+    public function getTagId(): ?int
+    {
+        return $this->tag?->getId();
     }
 }

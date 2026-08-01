@@ -29,7 +29,8 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `DataHotfixInterface`                      | Ship a one-off data repair that runs once per DB      | `getIdentifier()`, `execute()`                            |
 | `SecurityProviderInterface`                | Participate in live security event detection          | `observe()`, `scanRetrospective()`                        |
 | `DescriptorInterface`                      | Add a settings section to your plugin's settings page | `getFormType()`, `createDefault()`, `applyForm()`         |
-| `CategorizableTypeProviderInterface`       | Give an item type categories and tags                 | `getTaxonomy()`, `supportsCategories()`, `supportsTags()` |
+| `TaggableTypeProviderInterface`            | Give an item type a tag vocabulary                    | `getPluginKey()`, `getTypeKey()`, `getLabelKey()`         |
+| `Comment\TargetProviderInterface`          | Host the shared comment section on your own pages     | `getTypeKey()`, `getReturnUrl()`, `canComment()`          |
 | `ContributorInterface`                     | Carry an item type through group export and import    | `exportItems()`, `importItems()`                          |
 | `ChangeTargetProviderInterface`            | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()`    |
 | `ConfigPrivacyToggleProviderInterface`     | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                             |
@@ -485,6 +486,79 @@ readonly class CategoryFilterContributor implements EventFilterFormContributorIn
     }
 }
 ```
+
+---
+
+### Comment\TargetProviderInterface
+
+**Purpose:** Make one of your entities commentable, reusing the core comment table, routes, sanitization and
+templates. Anything with a detail page - a photo, a recipe, a book - can host the same discussion surface the
+event page uses.
+
+**File:** `src/Comment/TargetProviderInterface.php`
+
+**Tag:** `#[AutoconfigureTag]` on the interface - implementing it is enough, no manual service config.
+
+**When called:** When a page renders `comment_section()`, and on every POST to the comment routes.
+
+```php
+namespace Plugin\YourPlugin\Comment;
+
+use App\Comment\TargetProviderInterface;
+use App\Entity\Comment;
+use Override;
+use Plugin\YourPlugin\Repository\PhotoRepository;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+final readonly class PhotoTargetProvider implements TargetProviderInterface
+{
+    public function __construct(
+        private PhotoRepository $photos,
+        private UrlGeneratorInterface $urlGenerator,
+    ) {}
+
+    #[Override]
+    public function getTypeKey(): string
+    {
+        return 'photo';
+    }
+
+    #[Override]
+    public function getReturnUrl(int $targetId): ?string
+    {
+        return $this->photos->find($targetId) === null
+            ? null
+            : $this->urlGenerator->generate('app_plugin_yourplugin_photo_show', ['id' => $targetId]);
+    }
+
+    #[Override]
+    public function canComment(int $targetId): bool
+    {
+        return $this->photos->find($targetId)?->isPublished() === true;
+    }
+
+    #[Override]
+    public function onCommentCreated(Comment $comment): void
+    {
+        // optional: log activity, notify the uploader, invalidate a cache
+    }
+}
+```
+
+Then embed the surface in your detail template with one line:
+
+```twig
+{{ comment_section('photo', photo.id) }}
+```
+
+Notes:
+
+- `getReturnUrl()` is also the existence check. Returning `null` makes the controller respond 404, so a POST for a
+  deleted target cannot create an orphan row.
+- Deletion is **not** yours to decide: the comment's author or a `ROLE_ADMIN` may remove it, always.
+- Content is sanitized to plain text on write and re-filtered on render. Do not re-implement either.
+- Your delete path **must** call `CommentService::deleteAllFor('photo', $id)`. Comments carry no foreign key to
+  your table, so nothing cascades for you.
 
 ---
 
@@ -989,8 +1063,7 @@ final class MyPluginSettingsDescriptor implements DescriptorInterface
 
 `getPluginKey()` names the plugin that owns the section. One plugin may publish more than one section - if yours does,
 give each a distinct `getKey()` and have them all return the same
-`getPluginKey()`. The films plugin does this: `films` holds its global API keys and
-`films_taxonomy` holds its per-scope category and tag definitions.
+`getPluginKey()`.
 
 `isScopable()` says whether the section may be overridden per scope (see **Dual-scope settings**
 below). Return `false` when the record has nowhere per-scope to live - an encrypted API key kept in your own entity, for
@@ -1030,37 +1103,35 @@ record if the active scope has one, else the global record, else your neutral de
 because it reads the same resolver either way. The override-scope machinery lives entirely in the host plugin; core
 registers no scope provider, so an install without such a host always resolves to the global record.
 
-## Item categories and tags
+## Item tags
 
-If your plugin owns an item type (a dish, a book, a film, a glossary term), you can let stewards give each item a single
-**category** and any number of **tags** from a controlled vocabulary you define - useful for classifying and filtering a
-growing collection. Categories and tags are two independent, opt-in features; a real example is the dishes plugin
-classifying dishes by cuisine (category) and dietary flags like "vegan" or "quick" (tags).
+If your plugin owns an item type (a dish, a book, a film, a glossary term), you can let stewards tag each item from a
+controlled vocabulary - useful for classifying and filtering a growing collection. Tags nest, so a vocabulary can carry
+headings that are themselves selectable and filterable; a real example is the dishes plugin classifying dishes by
+cuisine and by dietary flags like "vegan" or "quick".
 
 ### When to implement
 
-Implement `App\Item\Taxonomy\CategorizableTypeProviderInterface` when your item type should carry categories and/or
-tags. This is orthogonal to the other item seams - `TypeProviderInterface` (whether the type attaches to events),
+Implement `App\Item\Tag\TaggableTypeProviderInterface` when your item type should carry tags. This is orthogonal to
+the other item seams - `TypeProviderInterface` (whether the type attaches to events),
 `App\Item\ListCellProviderInterface` (whether the type renders a cell in the shared item list) and
 `App\Item\ListProviderInterface` (whether core can render the type's whole list) - and a type implements any combination
 of them. A glossary-style type that is browsed and classified but never attached to an event implements the list,
-list-cell and categorizable seams and skips the event one.
+list-cell and taggable seams and skips the event one.
 
 ### What you implement
 
-1. **Embed the taxonomy in your settings.** Add a `App\Item\Taxonomy\Config` property to your settings data object and
-   expose `getTaxonomy()`/`setTaxonomy()`; include it in `toArray()` /
-   `fromArray()`. Add `->add('taxonomy', TaxonomyConfigType::class)` to your settings FormType, and call
-   `$data->getTaxonomy()->normalize()` in your descriptor's `applyForm()`. The admin now edits category/tag definitions
-   per enabled language, at global scope and (with a host plugin) per scope.
-2. **Register the provider.** Implement `CategorizableTypeProviderInterface` - `getTypeKey()` is your item-type string,
-   and `getTaxonomy()` returns your settings' `getTaxonomy()` (scope-resolved through your `ConfigService`). Set
-   `supportsCategories()` / `supportsTags()` to what you enable.
-3. **Edit the assignment.** In your item's steward edit form, call
+1. **Register the provider.** Implement `TaggableTypeProviderInterface`: `getPluginKey()`, `getTypeKey()` (your
+   item-type string) and `getLabelKey()` (a translation key for the type's name). There is nothing to configure and
+   nothing to store - the tags themselves are rows core owns, and a type with no rows simply shows no tag UI.
+   Stewards create and nest them on `/item/{itemType}/tags`, reachable from the pencil in the list's filter box;
+   members can propose changes there, which arrive in the review hub.
+2. **Edit the assignment.** In your item's steward edit form, call
    `AssignmentFormHelper::addAssignmentFields($builder, $typeKey, $itemId)`; on save, pass
-   `extractAssignment($form)` to `TaxonomyService::setCategory()` / `setTags()`. Dispatch
-   `ItemAction::Deleted` on item deletion so assignments are cleaned up.
-4. **Hand core your list.** Implement `App\Item\ListProviderInterface` (usually on the class that already implements the
+   `extractAssignment($form)` to `TagService::setTags()`. Dispatch `ItemAction::Deleted` on item deletion so
+   assignments are cleaned up. Tagging with a sub-tag stores every tag above it too, so filtering by a parent finds
+   the whole branch.
+3. **Hand core your list.** Implement `App\Item\ListProviderInterface` (usually on the class that already implements the
    other item seams) and move your list markup into a `templates/item/list_body.html.twig` partial that
    `renderList()` renders:
 
@@ -1080,7 +1151,7 @@ list-cell and categorizable seams and skips the event one.
    gets a `<url>` entry per enabled locale, stamped with whatever `getLastmodByItemId()` reports. Return `null` from
    `getDetailRoute()` for a type whose items have no indexable page of their own.
 
-5. **Display and filter.** Include `_components/item/list_layout.html.twig` from your list page and name your item type.
+4. **Display and filter.** Include `_components/item/list_layout.html.twig` from your list page and name your item type.
    It gives you the two-column page layout, a core-owned sidebar (filter box, view switcher, "about this list"
    box) and, above the list, a result header stating `Showing X of Y` with the active facets as removable chips - so you
    never place the filter, the count or the reload yourself:
@@ -1103,28 +1174,27 @@ list-cell and categorizable seams and skips the event one.
    `{% block item_sidebar_extra %}` adds one more box below the core sidebar boxes, and `{% block item_list_main %}`
    wraps the list region when you need markup around it - call `{{ item_list_body('dish') }}` inside that block and put
    your extra markup outside it, since only what the function emits is re-rendered on a facet click. Include
-   `_components/item/taxonomy_badges.html.twig` on cells and detail pages. If your list service funnels through
-   `FilterService`, category/tag narrowing is automatic.
+   `_components/item/tag_badges.html.twig` on cells and detail pages. If your list service funnels through
+   `FilterService`, tag narrowing is automatic.
 
    A facet click reloads only the list region through the core fragment route; every chip is still a real link, so the
    page works unchanged with JavaScript disabled. If you enhance the rendered list from your own JS (a table plugin, a
    lightbox), bind through a `MutationObserver` on `[data-item-list-body]` - injected markup never runs inline scripts.
 
-Reference implementation: the dishes plugin (`Plugin\Dishes\Item\DishCategorizableTypeProvider`,
-`Plugin\Dishes\Item\DishTypeProvider`, `Plugin\Dishes\ValueObject\Config`,
-`Plugin\Dishes\Controller\DishController::edit`).
+Reference implementation: the dishes plugin (`Plugin\Dishes\Item\DishTaggableTypeProvider`,
+`Plugin\Dishes\Item\DishTypeProvider`, `Plugin\Dishes\Controller\DishController::edit`).
 
 ## Item export and import
 
 A group export ZIP carries locations, users, events, CMS pages - and any item type whose plugin opts in. Without opting
 in, a community that moves to another instance loses its dishes, books, films or glossary entries entirely, along with
-the categories and tags assigned to them.
+the tags assigned to them.
 
 ### When to implement
 
 Implement `App\Item\Portability\ContributorInterface` when your plugin owns an item type whose content is worth carrying
 between instances. It is independent of the other item seams:
-a type can be portable without being event-attachable, categorizable, or list-cell renderable.
+a type can be portable without being event-attachable, taggable, or list-cell renderable.
 
 ### What you implement
 
@@ -1154,8 +1224,8 @@ public function importItems(array $rows, ImportContext $context): ImportResult;
 4. **Do not dispatch `ItemAction`.** An import is not a user action, and the handlers behind those actions (activity
    log, notifications) must stay quiet.
 
-Category and tag assignments are handled by core, keyed by the same `ref` you emitted - you write no taxonomy code.
-Definition ids the target instance does not know are dropped and reported in the import summary.
+Tag assignments are handled by core, keyed by the same `ref` you emitted - you write no tag code. Tag ids the target
+instance does not offer are dropped and reported in the import summary.
 
 Reference implementation: `Plugin\Dishes\Portability\DishContributor` (always creates, carries translations and a
 gallery) and `Plugin\Books\Portability\BookContributor`
@@ -1179,7 +1249,7 @@ it directly, others only propose. If everyone with edit access writes directly, 
 1. **Register the target type.** Implement the interface: `getTargetType()` is a stable string key (stored on every
    proposal row), `getTargetLabel()` / `getTargetUrl()` give the review UI a display name and context link (return null
    for a label when the entity is gone - the UI treats that as 404), `getFieldLabel()` / `formatValue()` turn your field
-   keys and stored values into display strings (e.g. resolving a category id to its label).
+   keys and stored values into display strings (e.g. resolving a tag id to its label).
 2. **Delegate permissions.** `canPropose()` / `canReview()` are called per user and target on every mutation - gate them
    on your roles and your entity's visibility rules.
 3. **Validate and apply.** `validate()` is called before every apply, including again at apply time as a staleness guard

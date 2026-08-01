@@ -2,7 +2,6 @@
 
 namespace Plugin\Glossary\ValueObject;
 
-use App\Item\Taxonomy\Config as TaxonomyConfig;
 use App\Publisher\PluginSettings\Data;
 final class Config implements Data
 {
@@ -10,13 +9,6 @@ final class Config implements Data
     private ?string $secondaryLabel = null;
     private ?string $primaryLabel = null;
     private ?string $definitionLabel = null;
-
-    private TaxonomyConfig $taxonomy;
-
-    public function __construct()
-    {
-        $this->taxonomy = new TaxonomyConfig();
-    }
 
     public function isSecondaryEnabled(): bool
     {
@@ -66,23 +58,6 @@ final class Config implements Data
         return $this;
     }
 
-    public function getTaxonomy(): TaxonomyConfig
-    {
-        return $this->taxonomy;
-    }
-
-    public function setTaxonomy(TaxonomyConfig $taxonomy): static
-    {
-        $this->taxonomy = $taxonomy;
-
-        return $this;
-    }
-
-    public function hasCategories(): bool
-    {
-        return $this->taxonomy->isCategoriesEnabled() && $this->taxonomy->categoryDefinitions() !== [];
-    }
-
     public function toArray(): array
     {
         return [
@@ -90,7 +65,6 @@ final class Config implements Data
             'secondaryLabel' => $this->secondaryLabel,
             'primaryLabel' => $this->primaryLabel,
             'definitionLabel' => $this->definitionLabel,
-            'taxonomy' => $this->taxonomy->toArray(),
         ];
     }
 
@@ -101,7 +75,6 @@ final class Config implements Data
         $config->secondaryLabel = self::trimToNullStatic($raw['secondaryLabel'] ?? null);
         $config->primaryLabel = self::trimToNullStatic($raw['primaryLabel'] ?? null);
         $config->definitionLabel = self::trimToNullStatic($raw['definitionLabel'] ?? null);
-        $config->taxonomy = TaxonomyConfig::fromArray($raw['taxonomy'] ?? []);
 
         return $config;
     }

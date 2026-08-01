@@ -26,7 +26,7 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
     public function tagIdsFor(string $itemType, int $itemId): array
     {
         $rows = $this->createQueryBuilder('a')
-            ->select('a.tagId')
+            ->select('IDENTITY(a.tag) AS tagId')
             ->where('a.itemType = :type')->setParameter('type', $itemType)
             ->andWhere('a.itemId = :id')->setParameter('id', $itemId)
             ->getQuery()
@@ -48,9 +48,9 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
         $rows = $this->createQueryBuilder('a')
             ->select('a.itemId')
             ->where('a.itemType = :type')->setParameter('type', $itemType)
-            ->andWhere('a.tagId IN (:tags)')->setParameter('tags', $tagIds)
+            ->andWhere('a.tag IN (:tags)')->setParameter('tags', $tagIds)
             ->groupBy('a.itemId')
-            ->having('COUNT(DISTINCT a.tagId) = :count')->setParameter('count', count($tagIds))
+            ->having('COUNT(DISTINCT a.tag) = :count')->setParameter('count', count($tagIds))
             ->getQuery()
             ->getScalarResult();
 
@@ -68,10 +68,28 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
         }
 
         $rows = $this->createQueryBuilder('a')
-            ->select('a.tagId AS tagId', 'COUNT(a.itemId) AS total')
+            ->select('IDENTITY(a.tag) AS tagId', 'COUNT(a.itemId) AS total')
             ->where('a.itemType = :type')->setParameter('type', $itemType)
             ->andWhere('a.itemId IN (:ids)')->setParameter('ids', $itemIds)
-            ->groupBy('a.tagId')
+            ->groupBy('a.tag')
+            ->getQuery()
+            ->getScalarResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['tagId']] = (int) $row['total'];
+        }
+
+        return $counts;
+    }
+
+    /** @return array<int, int> tag id => how many items of this type carry it */
+    public function countsForType(string $itemType): array
+    {
+        $rows = $this->createQueryBuilder('a')
+            ->select('IDENTITY(a.tag) AS tagId', 'COUNT(a.itemId) AS total')
+            ->where('a.itemType = :type')->setParameter('type', $itemType)
+            ->groupBy('a.tag')
             ->getQuery()
             ->getScalarResult();
 
@@ -94,7 +112,7 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
         }
 
         $rows = $this->createQueryBuilder('a')
-            ->select('a.itemId', 'a.tagId')
+            ->select('a.itemId', 'IDENTITY(a.tag) AS tagId')
             ->where('a.itemType = :type')->setParameter('type', $itemType)
             ->andWhere('a.itemId IN (:ids)')->setParameter('ids', $itemIds)
             ->getQuery()
@@ -106,6 +124,21 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
         }
 
         return $result;
+    }
+
+    /** @param list<int> $tagIds */
+    public function deleteForTags(string $itemType, array $tagIds): void
+    {
+        if ($tagIds === []) {
+            return;
+        }
+
+        $this->createQueryBuilder('a')
+            ->delete()
+            ->where('a.itemType = :type')->setParameter('type', $itemType)
+            ->andWhere('a.tag IN (:tags)')->setParameter('tags', $tagIds)
+            ->getQuery()
+            ->execute();
     }
 
     public function deleteFor(string $itemType, int $itemId): void

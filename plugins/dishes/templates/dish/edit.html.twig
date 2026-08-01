@@ -35,12 +35,8 @@
             <div class="control">{{ form_widget(form.origin) }}</div>
             {{ form_errors(form.origin) }}
         </div>
-
-        {% if form.taxonomyCategory is defined %}
-            <div class="field">{{ form_row(form.taxonomyCategory) }}</div>
-        {% endif %}
-        {% if form.taxonomyTags is defined %}
-            <div class="field">{{ form_row(form.taxonomyTags) }}</div>
+        {% if form.itemTags is defined %}
+            <div class="field">{{ form_row(form.itemTags) }}</div>
         {% endif %}
 
         <div class="field is-grouped mt-4">

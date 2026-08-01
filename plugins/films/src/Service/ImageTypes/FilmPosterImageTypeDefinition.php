@@ -27,7 +27,7 @@ final class FilmPosterImageTypeDefinition extends AbstractImageTypeDefinition
 
     protected function sizes(): array
     {
-        return [[400, 600], [350, 525], [200, 300], [100, 150]];
+        return [[self::FREE_AXIS, 800], [400, 600], [350, 525], [200, 300], [100, 150]];
     }
 
     public function fitMode(): ImageFitMode

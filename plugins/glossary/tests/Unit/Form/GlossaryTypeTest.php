@@ -2,13 +2,13 @@
 
 namespace Plugin\Glossary\Tests\Unit\Form;
 
-use App\Item\Taxonomy\Config as TaxonomyConfig;
-use App\Service\Config\LanguageService;
+use App\Item\Tag\AssignmentFormHelper;
+use App\Item\Tag\TagService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Form\GlossaryType;
 use Plugin\Glossary\Service\ConfigService;
 use Plugin\Glossary\ValueObject\Config;
-use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -18,13 +18,13 @@ class GlossaryTypeTest extends TestCase
     public function testNeutralConfigBuildsTermAndDefinitionOnly(): void
     {
         // Arrange
-        $form = $this->formFor(new Config());
+        $form = $this->formFor(new Config(), []);
 
         // Assert
         static::assertTrue($form->has('phrase'));
         static::assertTrue($form->has('explanation'));
         static::assertFalse($form->has('pinyin'));
-        static::assertFalse($form->has('category'));
+        static::assertFalse($form->has(AssignmentFormHelper::TAGS_FIELD));
     }
 
     public function testSecondaryEnabledAddsPinyinField(): void
@@ -33,46 +33,41 @@ class GlossaryTypeTest extends TestCase
         $config = (new Config())->setSecondaryEnabled(true)->setSecondaryLabel('Romaji');
 
         // Act
-        $form = $this->formFor($config);
+        $form = $this->formFor($config, []);
 
         // Assert
         static::assertTrue($form->has('pinyin'));
-        static::assertFalse($form->has('category'));
+        static::assertFalse($form->has(AssignmentFormHelper::TAGS_FIELD));
     }
 
-    public function testCategoriesAddCategoryChoiceField(): void
+    public function testAVocabularyAddsTheSharedTagAssignmentField(): void
     {
-        // Arrange
-        $taxonomy = (new TaxonomyConfig())
-            ->setCategoriesEnabled(true)
-            ->setCategories([['id' => 0, 'labels' => ['en' => 'Greeting']]]);
-        $config = (new Config())->setTaxonomy($taxonomy);
-
-        // Act
-        $form = $this->formFor($config);
+        // Arrange + Act
+        $form = $this->formFor(new Config(), [3 => 'Greeting', 4 => 'Greeting / Formal']);
 
         // Assert
-        static::assertTrue($form->has('category'));
+        $tags = $form->get(AssignmentFormHelper::TAGS_FIELD);
+        static::assertTrue($tags->getConfig()->getOption('multiple'));
+        static::assertTrue($tags->getConfig()->getOption('expanded'));
         static::assertFalse($form->has('pinyin'));
     }
 
-    private function formFor(Config $config): \Symfony\Component\Form\FormInterface
+    /** @param array<int, string> $choices */
+    private function formFor(Config $config, array $choices): FormInterface
     {
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getConfig')->willReturn($config);
 
-        return $this->factory($configService)->create(GlossaryType::class);
-    }
+        $tagService = $this->createStub(TagService::class);
+        $tagService->method('getChoices')->willReturn($choices);
+        $tagService->method('getDepths')->willReturn([]);
+        $tagService->method('getParents')->willReturn([]);
 
-    private function factory(ConfigService $configService): FormFactoryInterface
-    {
-        $languageService = $this->createStub(LanguageService::class);
-        $languageService->method('getFilteredDefaultLocale')->willReturn('en');
-
-        $type = new GlossaryType($configService, $languageService, new RequestStack());
-
-        return Forms::createFormFactoryBuilder()
+        $type = new GlossaryType($configService, new AssignmentFormHelper($tagService, new RequestStack()));
+        $factory = Forms::createFormFactoryBuilder()
             ->addExtension(new PreloadedExtension([$type], []))
             ->getFormFactory();
+
+        return $factory->create(GlossaryType::class);
     }
 }

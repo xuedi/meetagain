@@ -3,6 +3,7 @@
 namespace Plugin\Glossary\Item;
 
 use App\Item\ListCellProviderInterface;
+use App\Item\Tag\TagService;
 use App\Item\ListProviderInterface;
 use App\Review\ChangeProposalService;
 use Override;
@@ -17,6 +18,7 @@ final readonly class GlossaryListCellProvider implements ListCellProviderInterfa
     public function __construct(
         private GlossaryService $glossaryService,
         private ConfigService $configService,
+        private TagService $tagService,
         private Environment $twig,
         private ChangeProposalService $changeProposalService,
         private Security $security,
@@ -31,7 +33,7 @@ final readonly class GlossaryListCellProvider implements ListCellProviderInterfa
     #[Override]
     public function getKey(): string
     {
-        return GlossaryCategorizableTypeProvider::ITEM_TYPE;
+        return GlossaryTaggableTypeProvider::ITEM_TYPE;
     }
 
     #[Override]
@@ -45,6 +47,7 @@ final readonly class GlossaryListCellProvider implements ListCellProviderInterfa
         return $this->twig->render('@Glossary/item/list_cell.html.twig', [
             'entry' => $entry,
             'config' => $this->configService->getConfig(),
+            'hasTags' => $this->hasTags(),
         ]);
     }
 
@@ -57,7 +60,7 @@ final readonly class GlossaryListCellProvider implements ListCellProviderInterfa
             return array_values(array_map(static fn(Glossary $entry): int => (int) $entry->getId(), $entries));
         }
 
-        $pendingProposalIds = $this->changeProposalService->pendingTargetIds(GlossaryCategorizableTypeProvider::ITEM_TYPE);
+        $pendingProposalIds = $this->changeProposalService->pendingTargetIds(GlossaryTaggableTypeProvider::ITEM_TYPE);
 
         $needsAttention = [];
         $rest = [];
@@ -79,7 +82,13 @@ final readonly class GlossaryListCellProvider implements ListCellProviderInterfa
         return $this->twig->render('@Glossary/item/list_body.html.twig', [
             'itemIds' => $this->getItemIds(),
             'config' => $this->configService->getConfig(),
+            'hasTags' => $this->hasTags(),
         ]);
+    }
+
+    private function hasTags(): bool
+    {
+        return $this->tagService->getVocabulary(GlossaryTaggableTypeProvider::ITEM_TYPE) !== [];
     }
 
     #[Override]

@@ -47,8 +47,6 @@ final class ConfigDescriptor implements DescriptorInterface
     public function applyForm(object $data, FormInterface $form): void
     {
         \assert($data instanceof Config);
-
-        $data->getTaxonomy()->normalize();
     }
 
     public function getPriority(): int

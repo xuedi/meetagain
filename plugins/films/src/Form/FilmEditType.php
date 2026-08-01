@@ -2,7 +2,7 @@
 
 namespace Plugin\Films\Form;
 
-use App\Item\Taxonomy\AssignmentFormHelper;
+use App\Item\Tag\AssignmentFormHelper;
 use Override;
 use Plugin\Films\Entity\Film;
 use Plugin\Films\Service\FilmService;

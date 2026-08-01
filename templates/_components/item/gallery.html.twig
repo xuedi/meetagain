@@ -1,0 +1,37 @@
+{#
+    Item Gallery - the gallery layout: a JS stage above a strip of lightbox-bound thumbnails
+
+    Embedded, not included: the caller renders the slides into {% block slides %} - each one a
+    styles/slide.html.twig anchor, optionally preceded by a leading "add" tile. The stage (active
+    image big, prev/next buttons, caption) is server-rendered hidden and populated by
+    assets/js/item-gallery.js, so without JavaScript the thumbnails remain plain links to the large
+    image. With `empty` true only the empty hint is rendered. The Fancybox vendor script is loaded
+    by the list page, not here.
+
+    Used in:    _components/item/list.html.twig (gallery mode),
+                plugins/dishes/templates/views/gallery.html.twig
+    Parameters:
+        - empty (bool, optional) -- render only the 'item.gallery_empty' hint; default: false
+    Depends on: assets/js/item-gallery.js; js/vendor/fancybox.umd.js (loaded by the list page)
+#}
+<div class="item-gallery" data-item-gallery>
+    {% if empty|default(false) %}
+        <p class="has-text-grey">{{ 'item.gallery_empty'|trans }}</p>
+    {% else %}
+        <div class="item-gallery-stage is-hidden" data-item-gallery-stage>
+            <button type="button" class="button item-gallery-nav" data-item-gallery-prev title="{{ 'item.gallery_prev'|trans }}">
+                <span class="icon"><i class="fa-solid fa-chevron-left fa-lg"></i></span>
+            </button>
+            <a class="item-gallery-frame" data-item-gallery-open>
+                <img src="" alt="" data-item-gallery-image>
+            </a>
+            <button type="button" class="button item-gallery-nav" data-item-gallery-next title="{{ 'item.gallery_next'|trans }}">
+                <span class="icon"><i class="fa-solid fa-chevron-right fa-lg"></i></span>
+            </button>
+        </div>
+        <p class="has-text-centered mt-2 is-hidden" data-item-gallery-label></p>
+        <div class="item-gallery-thumbs mt-4">
+            {% block slides %}{% endblock %}
+        </div>
+    {% endif %}
+</div>

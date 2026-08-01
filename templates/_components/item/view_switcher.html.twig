@@ -23,11 +23,11 @@
     {% for view in item_view_types() %}
         {% if allowedModes is empty or view.value in allowedModes %}
             <a href="{{ path('app_item_set_view', {'itemType': itemType, 'mode': view.value}) }}"
-               class="button is-small{% if currentValue == view.value %} is-link{% endif %}"
+               class="button is-expanded{% if currentValue == view.value %} is-link{% endif %}"
                data-item-facet
                data-item-mode="{{ view.value }}"
                title="{{ view.label|trans }}">
-                <span class="icon"><i class="fa-solid fa-{{ view.icon }}"></i></span>
+                <span class="icon"><i class="fa-solid fa-{{ view.icon }} fa-lg"></i></span>
             </a>
         {% endif %}
     {% endfor %}

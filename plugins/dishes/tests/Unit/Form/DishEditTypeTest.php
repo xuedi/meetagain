@@ -3,7 +3,7 @@
 namespace Plugin\Dishes\Tests\Unit\Form;
 
 use App\Item\TranslationFormHelper;
-use App\Item\Taxonomy\AssignmentFormHelper;
+use App\Item\Tag\AssignmentFormHelper;
 use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Dishes\Entity\Dish;

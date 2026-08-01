@@ -6,7 +6,8 @@ use App\Review\ChangeProposalService;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
-use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use App\Item\Tag\TagService;
+use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Item\GlossaryListCellProvider;
 use Plugin\Glossary\Service\ConfigService;
 use Plugin\Glossary\Service\GlossaryService;
@@ -26,7 +27,7 @@ class GlossaryListCellProviderTest extends TestCase
         $twig = $this->createMock(Environment::class);
         $twig->expects(self::once())
             ->method('render')
-            ->with('@Glossary/item/list_cell.html.twig', ['entry' => $entry, 'config' => $config])
+            ->with('@Glossary/item/list_cell.html.twig', ['entry' => $entry, 'config' => $config, 'hasTags' => false])
             ->willReturn('<td>你好</td>');
 
         $provider = $this->makeProvider($this->serviceReturning($entry), $this->configReturning($config), $twig);
@@ -64,7 +65,7 @@ class GlossaryListCellProviderTest extends TestCase
 
         // Act & Assert
         self::assertSame('glossary', $provider->getPluginKey());
-        self::assertSame(GlossaryCategorizableTypeProvider::ITEM_TYPE, $provider->getKey());
+        self::assertSame(GlossaryTaggableTypeProvider::ITEM_TYPE, $provider->getKey());
     }
 
     public function testExposesTheIndexAndDetailRoutes(): void
@@ -108,6 +109,7 @@ class GlossaryListCellProviderTest extends TestCase
         return new GlossaryListCellProvider(
             $service,
             $configService,
+            $this->createStub(TagService::class),
             $twig,
             $this->createStub(ChangeProposalService::class),
             $this->createStub(Security::class),

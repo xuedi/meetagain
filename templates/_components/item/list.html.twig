@@ -2,7 +2,9 @@
     Item List - Shared switchable list of item cells with per-type view persistence
 
     Renders any item type's list through one of four layouts: 'list' is a real <table> (each cell
-    emits its own <td> columns), while tiles/grid/gallery wrap each cell in a Bulma column. The
+    emits its own <td> columns), tiles/grid wrap each cell in a Bulma column, and 'gallery' embeds
+    the _components/item/gallery.html.twig layout with the cells as slides (each rendered via the
+    styles/slide.html.twig style; cells without an image render nothing and are dropped). The
     current mode is read from the session keyed by item type, so each list remembers its own mode
     independently; the switcher that writes it lives in the sidebar of
     _components/item/list_layout.html.twig. Each item's inner cell markup comes from the list-cell
@@ -28,7 +30,8 @@
                                                  tiles/grid/gallery layouts (list mode relies on the
                                                  page's own header button). Shown even when empty.
         - addLabel     (string, optional)     -- translation key for the add tile; default: 'item.add'
-    Depends on: item_view_mode(), item_list_cell() (ItemViewExtension)
+    Depends on: item_view_mode(), item_list_cell() (ItemViewExtension); assets/js/item-gallery.js
+                and js/vendor/fancybox.umd.js (loaded by the list page) for the gallery layout
 #}
 {% import _self as itemList %}
 
@@ -91,11 +94,20 @@
             {% endfor %}
         </div>
     {% else %}
-        <div class="columns is-multiline is-mobile">
-            {% if showAdd %}<div class="column is-2 item-cell">{{ itemList.add_tile(addUrl, addLabel) }}</div>{% endif %}
-            {% for id in itemIds %}
-                <div class="column is-2 item-cell">{{ item_list_cell(itemType, id) }}</div>
-            {% endfor %}
-        </div>
+        {% set slides = [] %}
+        {% for id in itemIds %}
+            {% set cell = item_list_cell(itemType, id) %}
+            {% if cell|trim %}{% set slides = slides|merge([cell]) %}{% endif %}
+        {% endfor %}
+        {% embed '_components/item/gallery.html.twig' with {'empty': slides is empty and not showAdd} %}
+            {% block slides %}
+                {% if showAdd %}
+                    <a href="{{ addUrl }}" class="item-gallery-add has-background-link-light has-text-link" title="{{ addLabel|trans }}">
+                        <span class="icon"><i class="fa-solid fa-plus fa-lg"></i></span>
+                    </a>
+                {% endif %}
+                {% for cell in slides %}{{ cell|raw }}{% endfor %}
+            {% endblock %}
+        {% endembed %}
     {% endif %}
 </div>

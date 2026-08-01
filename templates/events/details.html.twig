@@ -47,7 +47,7 @@
                             {% include 'events/details/images.html.twig'%}
                         </div>
                         <div class="mt-5 box">
-                            {% include 'events/details/comments.html.twig'%}
+                            {{ comment_section('event', event.id) }}
                         </div>
                     {% else %}
                         <div class="mt-5">

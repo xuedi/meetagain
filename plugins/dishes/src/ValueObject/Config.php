@@ -2,7 +2,6 @@
 
 namespace Plugin\Dishes\ValueObject;
 
-use App\Item\Taxonomy\Config as TaxonomyConfig;
 use App\Publisher\PluginSettings\Data;
 final class Config implements Data
 {
@@ -10,25 +9,6 @@ final class Config implements Data
     private array $footerText = [];
 
     private bool $phoneticInList = false;
-
-    private TaxonomyConfig $taxonomy;
-
-    public function __construct()
-    {
-        $this->taxonomy = new TaxonomyConfig();
-    }
-
-    public function getTaxonomy(): TaxonomyConfig
-    {
-        return $this->taxonomy;
-    }
-
-    public function setTaxonomy(TaxonomyConfig $taxonomy): static
-    {
-        $this->taxonomy = $taxonomy;
-
-        return $this;
-    }
 
     /** @return array<string, string> */
     public function getFooterText(): array
@@ -74,7 +54,6 @@ final class Config implements Data
         return [
             'footerText' => $this->footerText,
             'phoneticInList' => $this->phoneticInList,
-            'taxonomy' => $this->taxonomy->toArray(),
         ];
     }
 
@@ -86,7 +65,6 @@ final class Config implements Data
             $config->setFooterText($footer);
         }
         $config->setPhoneticInList((bool) ($raw['phoneticInList'] ?? false));
-        $config->taxonomy = TaxonomyConfig::fromArray($raw['taxonomy'] ?? []);
 
         return $config;
     }

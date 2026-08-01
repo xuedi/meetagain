@@ -2,6 +2,8 @@
 
 namespace Plugin\Films\Form;
 
+use App\Item\Tag\AssignmentFormHelper;
+use Plugin\Films\Service\FilmService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -14,6 +16,7 @@ class FilmManualType extends AbstractType
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -34,7 +37,11 @@ class FilmManualType extends AbstractType
             'label' => $this->translator->trans('films_film.label_description'),
             'required' => false,
             'attr' => ['class' => 'textarea', 'rows' => 4],
-        ])->add('submit', SubmitType::class, [
+        ]);
+
+        $this->assignmentFormHelper->addAssignmentFields($builder, FilmService::ITEM_TYPE, null);
+
+        $builder->add('submit', SubmitType::class, [
             'label' => $this->translator->trans('films_film.button_submit'),
             'attr' => ['class' => 'button'],
         ]);

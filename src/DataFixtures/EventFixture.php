@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Comment\EventTargetProvider;
 use App\Entity\Comment;
 use App\Entity\Event;
 use App\Entity\EventSeries;
@@ -38,6 +39,7 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
         $previewImage = $this->imageService->upload($uploadedImage, $this->getRefUser(UserFixture::ADMIN), ImageType::EventTeaser);
         $this->imageService->createThumbnails($previewImage, ImageType::EventTeaser);
 
+        $pendingComments = [];
         foreach ($this->getData() as $data) {
             $event = new Event();
             $event->setInitial(true);
@@ -72,16 +74,22 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
             }
 
             foreach ($data['comments'] as $commentData) {
-                $comment = new Comment();
-                $comment->setEvent($event);
-                $comment->setUser($this->getRefUser($commentData['user']));
-                $comment->setCreatedAt(DateTimeImmutable::createFromMutable($commentData['date']));
-                $comment->setContent($commentData['msg']);
-                $manager->persist($comment);
+                $pendingComments[] = ['event' => $event, 'data' => $commentData];
             }
 
             $manager->persist($event);
             $this->addRefEvent($data['name'], $event);
+        }
+        $manager->flush();
+
+        foreach ($pendingComments as $pending) {
+            $comment = new Comment();
+            $comment->setTargetType(EventTargetProvider::TYPE);
+            $comment->setTargetId((int) $pending['event']->getId());
+            $comment->setUser($this->getRefUser($pending['data']['user']));
+            $comment->setCreatedAt(DateTimeImmutable::createFromMutable($pending['data']['date']));
+            $comment->setContent($pending['data']['msg']);
+            $manager->persist($comment);
         }
         $manager->flush();
         $this->stop();

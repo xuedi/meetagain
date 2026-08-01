@@ -18,12 +18,17 @@
         {% endif %}
     </div>
     <div class="column">
-        <h1 class="title">{{ book.title }}</h1>
-        {% if book.author %}
-        <p class="subtitle has-text-grey">{{ book.author }}</p>
-        {% endif %}
+        <div class="is-flex is-justify-content-space-between is-align-items-flex-start is-gap-2 mb-5">
+            <div>
+                <h1 class="title">{{ book.title }}</h1>
+                {% if book.author %}
+                <p class="subtitle has-text-grey">{{ book.author }}</p>
+                {% endif %}
+            </div>
+            {% include '_components/item/detail_back.html.twig' with {'url': path('app_books_booklist')} only %}
+        </div>
 
-        {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
+        {% include '_components/item/tag_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
 
         <table class="table is-narrow">
             <tr>

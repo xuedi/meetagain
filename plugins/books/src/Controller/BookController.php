@@ -5,8 +5,8 @@ namespace Plugin\Books\Controller;
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Item\ListRegistry;
-use App\Item\Taxonomy\AssignmentFormHelper;
-use App\Item\Taxonomy\TaxonomyService;
+use App\Item\Tag\AssignmentFormHelper;
+use App\Item\Tag\TagService;
 use App\Service\Seo\BreadcrumbBuilder;
 use Plugin\Books\Activity\Messages\BookAdded;
 use Plugin\Books\Form\BookEditType;
@@ -27,7 +27,7 @@ final class BookController extends AbstractController
         private readonly BookService $bookService,
         private readonly ActivityService $activityService,
         private readonly AssignmentFormHelper $assignmentFormHelper,
-        private readonly TaxonomyService $itemTaxonomyService,
+        private readonly TagService $tagService,
     ) {}
 
     #[Route('', name: 'app_books_booklist', methods: ['GET'])]
@@ -53,6 +53,9 @@ final class BookController extends AbstractController
 
                     return $this->redirectToRoute('app_plugin_books_book_manual');
                 }
+
+                $assignment = $this->assignmentFormHelper->extractAssignment($form);
+                $this->tagService->setTags(BookService::ITEM_TYPE, (int) $book->getId(), $assignment);
 
                 $this->activityService->log(BookAdded::TYPE, $user, [
                     'book_id' => $book->getId(),
@@ -91,6 +94,9 @@ final class BookController extends AbstractController
                     publishedYear: $form->get('publishedYear')->getData(),
                     userId: $user->getId(),
                 );
+
+                $assignment = $this->assignmentFormHelper->extractAssignment($form);
+                $this->tagService->setTags(BookService::ITEM_TYPE, (int) $book->getId(), $assignment);
 
                 $this->activityService->log(BookAdded::TYPE, $user, [
                     'book_id' => $book->getId(),
@@ -147,8 +153,7 @@ final class BookController extends AbstractController
                 $this->bookService->update(book: $book, coverFile: $form->get('coverFile')->getData(), userId: $user->getId());
 
                 $assignment = $this->assignmentFormHelper->extractAssignment($form);
-                $this->itemTaxonomyService->setCategory(BookService::ITEM_TYPE, (int) $book->getId(), $assignment['category']);
-                $this->itemTaxonomyService->setTags(BookService::ITEM_TYPE, (int) $book->getId(), $assignment['tags']);
+                $this->tagService->setTags(BookService::ITEM_TYPE, (int) $book->getId(), $assignment);
 
                 $this->addFlash('success', 'books_book.flash_updated');
 

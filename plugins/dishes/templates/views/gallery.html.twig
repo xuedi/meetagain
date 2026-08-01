@@ -1,16 +1,23 @@
-{# Dishes 'gallery' layout - inline thumbnails opening a Fancybox lightbox (fancybox loaded by the
-   list page, bound by plugins/dishes/assets/js/dish_gallery.js). #}
-<div>
-    {% for item in dishes %}
-        {% if item.previewImage is not null %}
-            {% set showUrl = path('app_plugin_dishes_dish_show', {'id': item.id}) %}
-            {% set reportUrl = path('app_report_image', {'id': item.previewImage.id}) %}
-            {% set caption = '<div style="text-align:center"><a href=' ~ showUrl ~ '>' ~ item.getTranslatedName(app.locale) ~ '</a> &middot; You can <a href=' ~ reportUrl ~ '>report</a> this image if there is something wrong.</div>' %}
-            <span class="dish-item" data-dish-id="{{ item.id }}" style="display: {{ loop.first ? 'block' : 'inline-block' }};">
-                <a data-fancybox="dish-gallery" data-caption="{{ caption }}" href="/images/thumbnails/{{ item.previewImage.hash }}_1024x768.webp">
-                    {% include '_components/image.html.twig' with {'image': item.previewImage, 'size': loop.first ? '1024x768' : '100x100', 'alt': item.getTranslatedName(app.locale)} %}
-                </a>
-            </span>
+{# Dishes 'gallery' layout - the shared item gallery over the dish preview images (fancybox loaded
+   by the list page, stage and binding via core assets/js/item-gallery.js). #}
+{% set hasSlides = dishes|filter(item => item.previewImage)|length > 0 %}
+{% embed '_components/item/gallery.html.twig' with {'empty': not hasSlides and not is_granted('ROLE_STEWARD')} %}
+    {% block slides %}
+        {% if is_granted('ROLE_STEWARD') %}
+            <a href="{{ path('app_plugin_dishes_dish_add') }}" class="item-gallery-add has-background-link-light has-text-link" title="{{ 'dishes_views.title_add'|trans }}">
+                <span class="icon"><i class="fa-solid fa-plus fa-lg"></i></span>
+            </a>
         {% endif %}
-    {% endfor %}
-</div>
+        {% for item in dishes %}
+            {% include '_components/item/styles/slide.html.twig' with {
+                group: 'item-gallery-dish',
+                image: item.previewImage,
+                thumbSize: '400x400',
+                bigSize: '1024x768',
+                title: item.getTranslatedName(app.locale) ?: item.getAnyTranslatedName(),
+                subtitle: item.origin,
+                href: path('app_plugin_dishes_dish_show', {'id': item.id})
+            } %}
+        {% endfor %}
+    {% endblock %}
+{% endembed %}

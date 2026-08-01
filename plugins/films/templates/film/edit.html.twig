@@ -66,12 +66,8 @@
             <p class="help">{{ 'films_film.help_genres'|trans }}</p>
             {{ form_errors(form.genresCsv) }}
         </div>
-
-        {% if form.taxonomyCategory is defined %}
-            <div class="field">{{ form_row(form.taxonomyCategory) }}</div>
-        {% endif %}
-        {% if form.taxonomyTags is defined %}
-            <div class="field">{{ form_row(form.taxonomyTags) }}</div>
+        {% if form.itemTags is defined %}
+            <div class="field">{{ form_row(form.itemTags) }}</div>
         {% endif %}
 
         <div class="field is-grouped mt-4">

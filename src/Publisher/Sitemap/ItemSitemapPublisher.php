@@ -4,7 +4,7 @@ namespace App\Publisher\Sitemap;
 
 use App\Item\ListProviderInterface;
 use App\Item\ListRegistry;
-use App\Item\Taxonomy\FacetResolver;
+use App\Item\Tag\FacetService;
 use App\Service\Config\LanguageService;
 use App\Service\Seo\UrlOwnerService;
 use Override;
@@ -14,7 +14,7 @@ final readonly class ItemSitemapPublisher implements SitemapPublisherInterface
 {
     public function __construct(
         private ListRegistry $listRegistry,
-        private FacetResolver $facetResolver,
+        private FacetService $facetService,
         private LanguageService $languageService,
         private UrlGeneratorInterface $urlGenerator,
         private UrlOwnerService $urlOwnerService,
@@ -88,8 +88,8 @@ final readonly class ItemSitemapPublisher implements SitemapPublisherInterface
             return [];
         }
 
-        $itemIds = $this->facetResolver->withoutFacets($provider->getItemIds(...));
-        $lastmodByItemId = $this->facetResolver->withoutFacets(static fn(): array => $provider->getLastmodByItemId($itemIds));
+        $itemIds = $this->facetService->withoutFacets($provider->getItemIds(...));
+        $lastmodByItemId = $this->facetService->withoutFacets(static fn(): array => $provider->getLastmodByItemId($itemIds));
 
         $urls = [];
         foreach ($itemIds as $itemId) {

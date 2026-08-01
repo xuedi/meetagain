@@ -289,5 +289,3 @@ films_notifications:
 films_admin_secretbox:
     consumer_settings: 'Films API-Schlussel'
 
-films_taxonomy:
-    page_title: 'Film-Kategorien & Schlagwörter'

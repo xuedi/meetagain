@@ -44,5 +44,3 @@ books_book:
     flash_already_exists: 'Dieses Buch ist bereits im Katalog.'
     flash_invalid_image: 'Das hochgeladene Bild konnte nicht verarbeitet werden. Bitte JPG oder PNG verwenden.'
 
-books_config:
-    page_title: 'Bücher'

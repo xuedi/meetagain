@@ -1,0 +1,132 @@
+{#
+    Item Tags page - the one place a type's tag vocabulary is edited
+
+    Reached from the pencil in the list page's filter box. A manager gets the definition editor
+    (one label column per admin language, collection rows); everyone else gets the single-locale
+    suggestion form, whose submit becomes one change proposal per tag it touches. Both render the
+    vocabulary in tree order, a sub-tag indented under the tag it hangs from. Where the depth limit
+    still allows one, the suggestion form offers a field for a new sub-tag. Pending proposals for
+    this vocabulary are listed below either form.
+
+    Rendered by: App\Controller\ItemTagController
+    Parameters:
+        - itemType, typeLabelKey (string)
+        - rows (list of {id, label, depth, canAddChild}), usage (tag id => count)
+        - targetType (string)
+        - form (?FormView), canManage (bool), canSuggest (bool), pending (list)
+    Depends on: js/admin/collection.js, js/admin/item-tags.js; item_list_url()
+#}
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'item.tag_page_title'|trans({'%type%': typeLabelKey|trans}) }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-two-thirds">
+
+                    <h1 class="title is-4">{{ 'item.tag_page_title'|trans({'%type%': typeLabelKey|trans}) }}</h1>
+                    <p class="subtitle is-6 has-text-grey">{{ 'item.tag_page_intro'|trans }}</p>
+
+                    {% if canManage %}
+                        <div class="box">
+                            {{ form_start(form) }}
+                            <p class="help mb-2">{{ 'item.tag_tree_help'|trans }}</p>
+                            {{ form_widget(form) }}
+                            <div class="has-text-right">
+                                <a href="{{ item_list_url(itemType) }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                                <button type="submit" class="button is-link">{{ 'global.button_save'|trans }}</button>
+                            </div>
+                            {{ form_end(form) }}
+                        </div>
+                    {% elseif canSuggest %}
+                        <form method="post" class="box">
+                            <input type="hidden" name="_token" value="{{ csrf_token('item_tag_suggest') }}">
+                            {% for row in rows %}
+                                <div class="field has-addons" style="padding-left: {{ (row.depth - 1) * 1.5 }}rem;">
+                                    <div class="control is-expanded">
+                                        <input class="input" type="text" name="suggest[edit][{{ row.id }}]" value="{{ row.label }}">
+                                    </div>
+                                    {% if usage[row.id]|default(0) > 0 %}
+                                        <div class="control">
+                                            <span class="button is-static" title="{{ 'item.tag_usage_hint'|trans({'%count%': usage[row.id]}) }}">{{ usage[row.id] }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                {% if row.canAddChild %}
+                                    <div class="field" style="padding-left: {{ row.depth * 1.5 }}rem;">
+                                        <div class="control">
+                                            <input class="input is-small" type="text" name="suggest[addBelow][{{ row.id }}][]"
+                                                   placeholder="{{ 'item.tag_suggest_add_child_placeholder'|trans({'%parent%': row.label}) }}">
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input" type="text" name="suggest[add][]"
+                                           placeholder="{{ 'item.tag_suggest_add_placeholder'|trans }}">
+                                </div>
+                            </div>
+                            <p class="help mb-4">{{ 'item.tag_suggest_hint'|trans }}</p>
+                            <div class="has-text-right">
+                                <a href="{{ item_list_url(itemType) }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                                <button type="submit" class="button is-link">{{ 'item.tag_button_suggest'|trans }}</button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <div class="box">
+                            <div class="tags">
+                                {% for row in rows %}
+                                    <span class="tag is-light" style="margin-left: {{ (row.depth - 1) * 1.5 }}rem;">{{ row.label }}</span>
+                                {% else %}
+                                    <span class="has-text-grey is-size-7">{{ 'item.tags_empty'|trans }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if pending is not empty %}
+                        <h2 class="title is-5">{{ 'item.tag_pending_heading'|trans }}</h2>
+                        {% for card in pending %}
+                            <div class="box has-background-info-light">
+                                <p class="mb-2">
+                                    <b>{{ card.proposal.proposedBy.name }}</b>
+                                    <span class="has-text-grey">{{ card.proposal.createdAt|time_diff }}</span>
+                                </p>
+                                <ul>
+                                    {% for row in card.rows %}
+                                        <li>
+                                            <b>{{ row.label }}</b>:
+                                            <span class="has-text-grey">{{ row.before|default('-') }}</span>
+                                            <i class="fas fa-arrow-right is-size-7"></i>
+                                            {{ row.after|default('-') }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                {% if canManage or card.isProposer %}
+                                    <a class="is-size-7" href="{{ path('app_review_proposals', {targetType: targetType, targetId: card.targetId}) }}">
+                                        {{ 'item.tag_pending_review_link'|trans }}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <a href="{{ item_list_url(itemType) }}" class="is-size-7">{{ 'item.tag_back_to_list'|trans }}</a>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascripts %}
+    {% if canManage %}
+        <script src="{{ asset('js/admin/collection.js') }}" defer></script>
+        <script src="{{ asset('js/admin/item-tags.js') }}" defer></script>
+    {% endif %}
+{% endblock %}

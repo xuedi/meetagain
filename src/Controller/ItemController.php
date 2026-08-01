@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Enum\ItemViewType;
 use App\Item\ListRegistry;
-use App\Item\Taxonomy\FacetResolver;
+use App\Item\Tag\FacetService;
 use App\Service\Item\ViewResolver;
 use App\Twig\ItemListExtension;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,7 +18,7 @@ final class ItemController extends AbstractController
     public function __construct(
         private readonly ViewResolver $viewResolver,
         private readonly ListRegistry $listRegistry,
-        private readonly FacetResolver $facetResolver,
+        private readonly FacetService $facetService,
     ) {}
 
     #[Route('/item/{itemType}/view/{mode}', name: 'app_item_set_view', methods: ['GET'])]
@@ -53,9 +53,9 @@ final class ItemController extends AbstractController
         }
 
         $response = new JsonResponse([
-            'filter' => $this->renderView('_components/item/taxonomy_filter.html.twig', ['itemType' => $itemType]),
+            'filter' => $this->renderView('_components/item/tag_filter.html.twig', ['itemType' => $itemType]),
             'body' => $this->renderView(ItemListExtension::BODY_TEMPLATE, ['itemType' => $itemType]),
-            'url' => $this->facetResolver->urlFor($listUrl, $this->facetResolver->current()),
+            'url' => $this->facetService->urlFor($listUrl, $this->facetService->current()),
         ]);
         $response->headers->set('X-Robots-Tag', 'noindex');
 

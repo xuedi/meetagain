@@ -3,7 +3,9 @@
 
     Static reproduction of the item-list filter box: one chip row per facet group, the active chip
     filled, an inactive one light, and an option that would yield nothing rendered as a dimmed span
-    instead of a link. The live box is data-driven per item type, so this entry shows the states
+    instead of a link. A vocabulary with display groups puts a bold heading above an indented chip
+    row, ungrouped chips first; a tag that carries sub-tags puts them in a further indented row
+    directly below it. The live box is data-driven per item type, so this entry shows the states
     rather than including the component.
 
     Used in:    admin/system/theme/gallery/index.html.twig
@@ -11,29 +13,45 @@
 #}
 <p class="is-size-7 has-text-grey">
     {{ 'admin_system_gallery.source_of_truth'|trans }}
-    <code>templates/_components/item/taxonomy_filter.html.twig</code>
+    <code>templates/_components/item/tag_filter.html.twig</code>
 </p>
 
 <div class="columns mt-3">
     <div class="column is-narrow" style="width: 16rem;">
-        <div class="box taxonomy-filter">
+        <div class="box item-tag-filter">
             <div class="is-flex is-justify-content-space-between is-align-items-center mb-2">
                 <p class="heading mb-0">{{ 'item.facet_heading'|trans }}</p>
-                <a href="#" class="is-size-7" rel="nofollow">{{ 'item.facet_clear'|trans }}</a>
+                <span class="is-flex is-align-items-center" style="gap: 0.5rem;">
+                    <a href="#" class="is-size-7" rel="nofollow">{{ 'item.facet_clear'|trans }}</a>
+                    <a href="#" class="is-size-7" rel="nofollow" title="{{ 'item.tag_edit_link'|trans }}">
+                        <span class="icon is-small"><i class="fa-solid fa-pen-to-square"></i></span>
+                        <span class="tag is-warning">2</span>
+                    </a>
+                </span>
             </div>
             <div class="field">
-                <p class="label is-small mb-1">{{ 'item.facet_categories'|trans }}</p>
                 <div class="tags">
                     <a href="#" class="tag is-link" rel="nofollow">Starter<span class="ml-1">4</span></a>
                     <a href="#" class="tag is-light" rel="nofollow">Main<span class="ml-1 has-text-grey">7</span></a>
                     <span class="tag is-light has-text-grey-light" title="{{ 'item.facet_zero_hint'|trans }}">Dessert<span class="ml-1">0</span></span>
                 </div>
+                <p class="is-size-7 has-text-weight-semibold mb-1 mt-2" data-item-facet-group>Meat</p>
+                <div class="tags ml-4">
+                    <a href="#" class="tag is-light" rel="nofollow">Chicken<span class="ml-1 has-text-grey">3</span></a>
+                    <a href="#" class="tag is-light" rel="nofollow">Beef<span class="ml-1 has-text-grey">1</span></a>
+                </div>
             </div>
             <div class="field">
-                <p class="label is-small mb-1">{{ 'item.facet_tags'|trans }}</p>
                 <div class="tags">
                     <a href="#" class="tag is-light" rel="nofollow">Spicy<span class="ml-1 has-text-grey">2</span></a>
                     <span class="tag is-light has-text-grey-light" title="{{ 'item.facet_zero_hint'|trans }}">Vegan<span class="ml-1">0</span></span>
+                </div>
+                <div class="tags">
+                    <a href="#" class="tag is-light" rel="nofollow">Meat<span class="ml-1 has-text-grey">6</span></a>
+                </div>
+                <div class="tags" style="padding-left: 1.5rem;">
+                    <a href="#" class="tag is-light" rel="nofollow">Chicken<span class="ml-1 has-text-grey">4</span></a>
+                    <a href="#" class="tag is-light" rel="nofollow">Pork<span class="ml-1 has-text-grey">2</span></a>
                 </div>
             </div>
         </div>

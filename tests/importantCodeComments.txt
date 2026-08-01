@@ -47,9 +47,8 @@ src/EventSubscriber/LocaleSubscriber.php::getSubscribedEvents // priority is pin
 src/EventSubscriber/LocaleValidationSubscriber.php::getSubscribedEvents // must run after LocaleSubscriber, whose priority the number encodes
 src/EventSubscriber/Security/BlockedSessionSubscriber.php::getSubscribedEvents // priority is pinned after SessionListener so the session factory exists
 
-# --- Item taxonomy ---
-src/Item/Portability/TaxonomyPortability.php::import // import is additive by contract: it never overwrites a classification the target already has
-src/Item/Portability/TaxonomyPortability.php::export // legacy rows carry category id 0, which is a sentinel and not a definition id
+# --- Item tags ---
+src/Item/Portability/TagPortability.php::import // import is additive by contract: it never overwrites a classification the target already has
 
 # --- SEO and canonical URLs ---
 src/Publisher/AlternateLinks/EventAlternateLinkProvider.php::getAlternateLinks // search engines void an hreflang cluster whose canonical target is missing from it

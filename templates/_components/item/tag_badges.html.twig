@@ -1,0 +1,26 @@
+{#
+    Item Tag Badges -- the tags of one item as chips.
+
+    Renders each assigned tag as a light Bulma chip, labelled in the guest's locale with
+    source-locale fallback. Only the leaf-most tags are shown, so an ancestor the write-time
+    closure carried along stays out. Renders nothing when the item carries no tags, so callers
+    can include it unconditionally.
+
+    Belongs on surfaces with room for a text row: the list-mode table cell and the detail page.
+    The card layouts (tiles, grid, gallery) leave it out - the filter box already tells the
+    visitor which tags are narrowing the list, and chips under every tile crowd the grid.
+
+    Used in:    dishes / books / films / glossary list cells in list mode, and their detail pages
+    Parameters:
+        - itemType (string, required) -- registry key of the item type (e.g. 'dish')
+        - itemId   (int, required)    -- id of the item whose tags to render
+    Depends on: item_tag_labels() (ItemTagExtension)
+#}
+{% set tags = item_tag_labels(itemType, itemId) %}
+{% if tags is not empty %}
+    <div class="tags item-tag-badges">
+        {% for tag in tags %}
+            <span class="tag is-light">{{ tag }}</span>
+        {% endfor %}
+    </div>
+{% endif %}

@@ -24,11 +24,6 @@ abstract class AbstractGlossaryController extends AbstractSymfonyController
         $this->configService = $configService;
     }
 
-    protected function intOrNull(mixed $value): ?int
-    {
-        return $value === null || $value === '' ? null : (int) $value;
-    }
-
     protected function getAuthedUser(): User
     {
         $user = $this->getUser();

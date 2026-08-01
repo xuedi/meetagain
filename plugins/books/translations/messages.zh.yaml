@@ -44,5 +44,3 @@ books_book:
     flash_already_exists: '该书籍已在目录中。'
     flash_invalid_image: '上传的图片无法处理。请使用 JPG 或 PNG。'
 
-books_config:
-    page_title: '书籍'

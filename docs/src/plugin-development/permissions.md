@@ -87,11 +87,14 @@ Use Symfony's built-in `is_granted()` Twig function:
 To gate event-scoped actions based on plugin-specific logic, implement a Symfony `Voter`
 with an `Event` subject and one of the built-in action attribute strings:
 
-| Attribute       | Triggered by                |
-|-----------------|-----------------------------|
-| `event.rsvp`    | Toggle RSVP on an event     |
-| `event.comment` | Post a comment on an event  |
-| `event.upload`  | Upload images to an event   |
+| Attribute              | Triggered by                |
+|------------------------|-----------------------------|
+| `event.rsvp`           | Toggle RSVP on an event     |
+| `event.comment.create` | Post a comment on an event  |
+| `event.image.upload`   | Upload images to an event   |
+
+Deleting a comment is deliberately absent: the author or a `ROLE_ADMIN` may always remove
+one, and no attribute can widen or narrow that.
 
 ```php
 use App\Entity\Event;
@@ -102,7 +105,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 final class MyEventVoter extends Voter
 {
-    private const SUPPORTED = ['event.rsvp', 'event.comment', 'event.upload'];
+    private const SUPPORTED = ['event.rsvp', 'event.comment.create', 'event.image.upload'];
 
     protected function supports(string $attribute, mixed $subject): bool
     {

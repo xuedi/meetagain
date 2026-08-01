@@ -3,10 +3,8 @@
 namespace App\Controller;
 
 use App\Activity\ActivityService;
-use App\Activity\Messages\CommentedOnEvent;
 use App\Activity\Messages\RsvpNo;
 use App\Activity\Messages\RsvpYes;
-use App\Entity\Comment;
 use App\Entity\Event;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
@@ -15,9 +13,7 @@ use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
 use App\FeaturedEventProviderInterface;
 use App\Filter\Event\EventFilterService;
-use App\Form\CommentType;
 use App\Form\EventFilterType;
-use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\EventService;
@@ -33,7 +29,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class EventController extends AbstractController
@@ -45,7 +40,6 @@ final class EventController extends AbstractController
         private readonly ActivityService $activityService,
         private readonly EventService $eventService,
         private readonly EventRepository $repo,
-        private readonly CommentRepository $comments,
         private readonly EventFilterService $eventFilterService,
         private readonly EventSchemaService $eventSchemaService,
         private readonly CanonicalUrlService $canonicalUrlService,
@@ -87,7 +81,7 @@ final class EventController extends AbstractController
     }
 
     #[Route('/event/{id}', name: 'app_event_details', requirements: ['id' => '\d+'])]
-    public function details(EntityManagerInterface $em, Request $request, int $id): Response
+    public function details(Request $request, int $id): Response
     {
         if (!$this->eventFilterService->isEventAccessible($id)) {
             throw $this->createNotFoundException();
@@ -103,41 +97,17 @@ final class EventController extends AbstractController
             return $this->redirectToRoute(self::ROUTE_EVENT);
         }
 
-        $form = $this->createForm(CommentType::class);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->isGranted(PermissionAttribute::EVENT_COMMENT_CREATE, $event)) {
-                $this->addFlash('warning', 'events.flash_group_only');
-
-                return $this->redirectToRoute('app_event_details', ['id' => $id]);
-            }
-            $comment = new Comment();
-            $comment->setUser($this->getAuthedUser());
-            $comment->setEvent($event);
-            $comment->setContent($form->getData()['comment']);
-            $comment->setCreatedAt(new DateTimeImmutable());
-            $em->persist($comment);
-            $em->flush();
-
-            $this->activityService->log(CommentedOnEvent::TYPE, $this->getAuthedUser(), ['event_id' => $id]);
-
-            $form = $this->createForm(CommentType::class);
-        }
-
         $canonicalUrl = $this->canonicalUrlService->getCanonicalUrl($request);
         $locale = $request->getLocale();
 
         return $this->render(
             'events/details.html.twig',
             [
-                'commentForm' => $form,
                 'itemCells' => $this->eventService->getRenderedItemCells($id),
                 'attachControl' => $this->isGranted('ROLE_ORGANIZER') ? $this->itemAttachControlBuilder->build($id) : null,
                 'pluginTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::Sidebar) : [],
                 'pluginBottomSidebarTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::BottomSidebar) : [],
-                'comments' => $this->comments->findByEventWithUser($id),
                 'event' => $event,
-                'user' => $this->getUser() instanceof UserInterface ? $this->getAuthedUser() : null,
                 'json_ld' => $this->eventSchemaService->buildSchema($event, $canonicalUrl, $locale),
                 'breadcrumbs' => $this->breadcrumbBuilder->build(self::ROUTE_EVENT, 'chrome.menu_events', $event->getTitle($locale)),
             ],
@@ -219,23 +189,6 @@ final class EventController extends AbstractController
 
         $type = $event->hasRsvp($user) ? RsvpYes::TYPE : RsvpNo::TYPE;
         $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
-
-        return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
-    }
-
-    #[IsGranted('ROLE_USER')]
-    #[Route('/event/{event}/deleteComment/{id}', name: 'app_event_delete_comment', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function deleteComment(Request $request, Event $event, EntityManagerInterface $em, ?int $id = null): Response
-    {
-        if (!$this->isCsrfTokenValid('app_event_delete_comment' . $id, (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
-        $commentRepo = $em->getRepository(Comment::class);
-        $comment = $commentRepo->findOneBy(['id' => $id, 'user' => $this->getAuthedUser()]);
-        if ($comment !== null) {
-            $em->remove($comment);
-            $em->flush();
-        }
 
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
     }

@@ -4,7 +4,9 @@ namespace Tests\Unit\Publisher\Sitemap;
 
 use App\Item\ListProviderInterface;
 use App\Item\ListRegistry;
-use App\Item\Taxonomy\FacetResolver;
+use App\Item\Tag\FacetService;
+use App\Item\Tag\TagService;
+use App\Repository\ItemTagAssignmentRepository;
 use App\Publisher\Sitemap\ItemSitemapPublisher;
 use App\Publisher\UrlOwner\UrlOwnerProviderInterface;
 use App\Service\Config\ConfigService;
@@ -123,11 +125,11 @@ class ItemSitemapPublisherTest extends TestCase
     public function testAnActiveFacetDoesNotShrinkTheFeed(): void
     {
         // Arrange
-        $facetResolver = new FacetResolver($this->requestStackWith(new Request(['category' => '9'])));
+        $facetService = $this->makeFacetService($this->requestStackWith(new Request(['tag' => ['9']])));
         $publisher = $this->makePublisher(
             locales: ['en'],
-            providers: ['dish' => $this->facetSensitiveProvider($facetResolver)],
-            facetResolver: $facetResolver,
+            providers: ['dish' => $this->facetSensitiveProvider($facetService)],
+            facetService: $facetService,
         );
 
         // Act
@@ -189,7 +191,7 @@ class ItemSitemapPublisherTest extends TestCase
     private function makePublisher(
         array $locales,
         array $providers,
-        ?FacetResolver $facetResolver = null,
+        ?FacetService $facetService = null,
         array $foreignOwnedRoutes = [],
     ): ItemSitemapPublisher {
         $registry = $this->createStub(ListRegistry::class);
@@ -220,7 +222,7 @@ class ItemSitemapPublisherTest extends TestCase
 
         return new ItemSitemapPublisher(
             $registry,
-            $facetResolver ?? new FacetResolver($this->requestStackWith(null)),
+            $facetService ?? $this->makeFacetService($this->requestStackWith(null)),
             $language,
             $urlGenerator,
             new UrlOwnerService($config, [$ownerProvider]),
@@ -242,17 +244,27 @@ class ItemSitemapPublisherTest extends TestCase
         return $provider;
     }
 
-    private function facetSensitiveProvider(FacetResolver $facetResolver): ListProviderInterface
+    private function facetSensitiveProvider(FacetService $facetService): ListProviderInterface
     {
         $provider = $this->createStub(ListProviderInterface::class);
         $provider->method('getListRoute')->willReturn('app_dish_list');
         $provider->method('getDetailRoute')->willReturn('app_dish_show');
         $provider->method('getItemIds')->willReturnCallback(
-            static fn(): array => $facetResolver->current()->category === null ? [3, 4] : [3],
+            static fn(): array => $facetService->current()->tags === [] ? [3, 4] : [3],
         );
         $provider->method('getLastmodByItemId')->willReturn([]);
 
         return $provider;
+    }
+
+    private function makeFacetService(RequestStack $stack): FacetService
+    {
+        return new FacetService(
+            $stack,
+            $this->createStub(ListRegistry::class),
+            $this->createStub(TagService::class),
+            $this->createStub(ItemTagAssignmentRepository::class),
+        );
     }
 
     private function requestStackWith(?Request $request): RequestStack

@@ -21,7 +21,9 @@ final class AppBundle
         'js/block-user.js',
         'js/post-link.js',
         'js/item-translation-toggle.js',
+        'js/item-tag-tree.js',
         'js/item-list.js',
+        'js/item-gallery.js',
     ];
 
     private ?string $hash = null;

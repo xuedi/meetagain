@@ -3,10 +3,10 @@
 namespace Plugin\Glossary\Review;
 
 use App\Entity\User;
-use App\Item\Taxonomy\TaxonomyService;
+use App\Item\Tag\TagService;
 use App\Review\ChangeTargetProviderInterface;
 use Override;
-use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Service\ConfigService;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -19,12 +19,12 @@ final readonly class GlossaryChangeTarget implements ChangeTargetProviderInterfa
     public const string FIELD_PHRASE = 'phrase';
     public const string FIELD_PINYIN = 'pinyin';
     public const string FIELD_EXPLANATION = 'explanation';
-    public const string FIELD_CATEGORY = 'category';
+    public const string FIELD_TAG = 'tag';
 
     public function __construct(
         private GlossaryService $service,
         private ConfigService $configService,
-        private TaxonomyService $taxonomyService,
+        private TagService $tagService,
         private Security $security,
         private RouterInterface $router,
         private RequestStack $requestStack,
@@ -40,7 +40,7 @@ final readonly class GlossaryChangeTarget implements ChangeTargetProviderInterfa
     #[Override]
     public function getTargetType(): string
     {
-        return GlossaryCategorizableTypeProvider::ITEM_TYPE;
+        return GlossaryTaggableTypeProvider::ITEM_TYPE;
     }
 
     #[Override]
@@ -64,7 +64,7 @@ final readonly class GlossaryChangeTarget implements ChangeTargetProviderInterfa
             self::FIELD_PHRASE => $config->getPrimaryLabel() ?? $this->translator->trans('glossary.label_phrase'),
             self::FIELD_PINYIN => $config->getSecondaryLabel() ?? $this->translator->trans('glossary.label_pinyin'),
             self::FIELD_EXPLANATION => $config->getDefinitionLabel() ?? $this->translator->trans('glossary.label_explanation'),
-            self::FIELD_CATEGORY => $this->translator->trans('glossary.label_category'),
+            self::FIELD_TAG => $this->translator->trans('glossary.label_tag'),
             default => $field,
         };
     }
@@ -76,10 +76,15 @@ final readonly class GlossaryChangeTarget implements ChangeTargetProviderInterfa
             return '';
         }
 
-        if ($field === self::FIELD_CATEGORY) {
+        if ($field === self::FIELD_TAG) {
             $locale = $this->requestStack->getCurrentRequest()?->getLocale();
+            $labels = [];
+            foreach ($this->service->decodeTagIds($value) as $tagId) {
+                $tag = $this->tagService->getManagedTag(GlossaryTaggableTypeProvider::ITEM_TYPE, $tagId);
+                $labels[] = $tag === null ? (string) $tagId : $this->tagService->labelFor($tag, $locale);
+            }
 
-            return $this->taxonomyService->categoryLabelForId(GlossaryCategorizableTypeProvider::ITEM_TYPE, (int) $value, $locale) ?? $value;
+            return implode(', ', $labels);
         }
 
         return $value;
@@ -114,9 +119,14 @@ final readonly class GlossaryChangeTarget implements ChangeTargetProviderInterfa
             return $this->translator->trans('glossary.validation_phrase_blank');
         }
 
-        if ($field === self::FIELD_CATEGORY && $value !== null && $value !== ''
-            && !$this->configService->getConfig()->getTaxonomy()->hasCategory((int) $value)) {
-            return $this->translator->trans('glossary.validation_category_unknown');
+        if ($field === self::FIELD_TAG) {
+            $unknown = array_any(
+                $this->service->decodeTagIds($value),
+                fn(int $tagId): bool => $this->tagService->getManagedTag(GlossaryTaggableTypeProvider::ITEM_TYPE, $tagId) === null,
+            );
+            if ($unknown) {
+                return $this->translator->trans('glossary.validation_tag_unknown');
+            }
         }
 
         return null;

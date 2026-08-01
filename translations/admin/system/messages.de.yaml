@@ -104,7 +104,7 @@ admin_system_import:
     items_created: 'Objekte angelegt (%type%)'
     items_matched: 'Objekte vorhandenen zugeordnet (%type%)'
     item_sections_skipped: 'Objektabschnitte übersprungen (unbekannter oder inaktiver Typ)'
-    taxonomy_dropped: 'Zuordnungen verworfen (Kategorie oder Schlagwort hier nicht definiert)'
+    tag_dropped: 'Zuordnungen verworfen (Schlagwort hier nicht definiert)'
     note: 'Importierte Benutzer haben kein Passwort und müssen "Passwort vergessen" verwenden, um ihr Konto zu aktivieren.'
     failed: 'Import fehlgeschlagen:'
     label_zip_file: 'Export-ZIP-Datei'

@@ -1,12 +1,12 @@
 {#
     Item List Sidebar - the shared side column of an item-list page
 
-    Three stacked boxes for any item type: the category/tag filter (which renders nothing of its own
-    when the type defines no vocabulary), the view-mode switcher, and an "about this list" box
+    Three stacked boxes for any item type: the view-mode switcher, the tag filter (which
+    renders nothing of its own when the type defines no vocabulary), and an "about this list" box
     carrying a plugin-supplied blurb and - for a steward looking at a type with no vocabulary yet -
-    a hint pointing at the plugin settings. The entry count lives in the result header above the
-    list, not here. Everything except the blurb key is read from the core item Twig functions, so a
-    page adopts the whole column by naming its item type.
+    a hint pointing at the tag page. The entry count lives in the result header above
+    the list, not here. Everything except the blurb key is read from the core item Twig functions,
+    so a page adopts the whole column by naming its item type.
 
     Used in:    _components/item/list_layout.html.twig
     Parameters:
@@ -14,32 +14,25 @@
         - modes     (list<string>, optional) -- view-mode values to offer; default: all four
         - infoKey   (string, optional)       -- translation key of the blurb;
                                                 default: 'item.sidebar_info_default'
-    Depends on: _components/item/view_switcher.html.twig, _components/item/taxonomy_filter.html.twig;
-                item_taxonomy_category_choices(), item_taxonomy_tag_choices(),
-                item_taxonomy_plugin_key() (ItemTaxonomyExtension);
-                the app_admin_plugin_settings route
+    Depends on: _components/item/view_switcher.html.twig, _components/item/tag_filter.html.twig;
+                item_tag_choices() (ItemTagExtension); the app_item_tags route
 #}
-<div data-item-filter>
-    {% include '_components/item/taxonomy_filter.html.twig' with {'itemType': itemType} only %}
-</div>
-
 <div class="box mb-4">
     <p class="heading">{{ 'item.sidebar_view_heading'|trans }}</p>
     {% include '_components/item/view_switcher.html.twig' with {'itemType': itemType, 'modes': modes|default([])} only %}
 </div>
 
+<div data-item-filter>
+    {% include '_components/item/tag_filter.html.twig' with {'itemType': itemType} only %}
+</div>
+
 <div class="box">
     <p class="heading">{{ 'item.sidebar_about_heading'|trans }}</p>
     <p class="is-size-7 has-text-grey">{{ (infoKey|default('item.sidebar_info_default'))|trans }}</p>
-    {% if is_granted('ROLE_STEWARD')
-        and item_taxonomy_category_choices(itemType) is empty
-        and item_taxonomy_tag_choices(itemType) is empty %}
-        {% set settingsPluginKey = item_taxonomy_plugin_key(itemType) %}
+    {% if is_granted('ROLE_STEWARD') and item_tag_choices(itemType) is empty %}
         <p class="is-size-7 has-text-grey mt-3">
-            {{ 'item.sidebar_taxonomy_hint'|trans }}
-            {% if is_granted('ROLE_ADMIN') and settingsPluginKey %}
-                <a href="{{ path('app_admin_plugin_settings', {key: settingsPluginKey}) }}">{{ 'item.sidebar_taxonomy_settings_link'|trans }}</a>
-            {% endif %}
+            {{ 'item.sidebar_tag_hint'|trans }}
+            <a href="{{ path('app_item_tags', {itemType: itemType}) }}">{{ 'item.sidebar_tag_settings_link'|trans }}</a>
         </p>
     {% endif %}
 </div>

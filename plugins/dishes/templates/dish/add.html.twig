@@ -51,6 +51,10 @@
             {{ form_errors(form.previewFile) }}
         </div>
 
+        {% if form.itemTags is defined %}
+            <div class="field">{{ form_row(form.itemTags) }}</div>
+        {% endif %}
+
         <div class="field is-grouped mt-4">
             <div class="control">{{ form_widget(form.submit) }}</div>
             <div class="control">

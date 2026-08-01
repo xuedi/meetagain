@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Comment\EventTargetProvider;
 use App\Entity\Comment;
 use App\Entity\Event;
 use App\Entity\Image;
@@ -57,11 +58,30 @@ readonly class TownHallService
     }
 
     /**
-     * @return array<Comment>
+     * @return list<array{comment: Comment, event: Event}>
      */
     public function getLatestEventComments(int $limit = 5): array
     {
-        return $this->commentRepo->findRecentAcrossEvents($limit, $this->resolveEventIds());
+        $comments = $this->commentRepo->findRecentForTargetType(EventTargetProvider::TYPE, $limit, $this->resolveEventIds());
+        if ($comments === []) {
+            return [];
+        }
+
+        $events = [];
+        foreach ($this->eventRepo->findBy(['id' => array_map(static fn(Comment $c): ?int => $c->getTargetId(), $comments)]) as $event) {
+            $events[$event->getId()] = $event;
+        }
+
+        $rows = [];
+        foreach ($comments as $comment) {
+            $event = $events[$comment->getTargetId()] ?? null;
+            if ($event === null) {
+                continue;
+            }
+            $rows[] = ['comment' => $comment, 'event' => $event];
+        }
+
+        return $rows;
     }
 
     /**

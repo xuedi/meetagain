@@ -5,8 +5,8 @@ namespace Plugin\Films\Controller;
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Item\ListRegistry;
-use App\Item\Taxonomy\AssignmentFormHelper;
-use App\Item\Taxonomy\TaxonomyService;
+use App\Item\Tag\AssignmentFormHelper;
+use App\Item\Tag\TagService;
 use App\Service\Seo\BreadcrumbBuilder;
 use Plugin\Films\Activity\Messages\FilmAdded;
 use Plugin\Films\Form\FilmEditType;
@@ -29,7 +29,7 @@ final class FilmController extends AbstractController
         private readonly FilmLookupResolver $lookupResolver,
         private readonly ActivityService $activityService,
         private readonly AssignmentFormHelper $assignmentFormHelper,
-        private readonly TaxonomyService $itemTaxonomyService,
+        private readonly TagService $tagService,
     ) {}
 
     #[Route('', name: 'app_films_filmlist', methods: ['GET'])]
@@ -138,6 +138,9 @@ final class FilmController extends AbstractController
                     userId: $user->getId(),
                 );
 
+                $assignment = $this->assignmentFormHelper->extractAssignment($form);
+                $this->tagService->setTags(FilmService::ITEM_TYPE, (int) $film->getId(), $assignment);
+
                 $this->activityService->log(FilmAdded::TYPE, $user, [
                     'film_id' => $film->getId(),
                     'film_title' => $film->getTitle(),
@@ -202,8 +205,7 @@ final class FilmController extends AbstractController
                 );
 
                 $assignment = $this->assignmentFormHelper->extractAssignment($form);
-                $this->itemTaxonomyService->setCategory(FilmService::ITEM_TYPE, (int) $film->getId(), $assignment['category']);
-                $this->itemTaxonomyService->setTags(FilmService::ITEM_TYPE, (int) $film->getId(), $assignment['tags']);
+                $this->tagService->setTags(FilmService::ITEM_TYPE, (int) $film->getId(), $assignment);
 
                 $this->addFlash('success', 'films_film.flash_updated');
 

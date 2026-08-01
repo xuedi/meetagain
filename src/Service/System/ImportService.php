@@ -25,7 +25,7 @@ use App\Exception\Event\InvalidRecurrencePatternException;
 use App\ExtendedFilesystem;
 use App\Item\Portability\ImportContext;
 use App\Item\Portability\Registry;
-use App\Item\Portability\TaxonomyPortability;
+use App\Item\Portability\TagPortability;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
 use App\ValueObject\RecurrencePattern;
@@ -43,7 +43,7 @@ readonly class ImportService
         private ExtendedFilesystem $fs,
         private PortableImageImporter $imageImporter,
         private Registry $itemRegistry,
-        private TaxonomyPortability $taxonomyPortability,
+        private TagPortability $tagPortability,
     ) {}
 
     public function import(string $zipPath): ImportSummary
@@ -82,7 +82,7 @@ readonly class ImportService
                 'cmsPagesCreated' => 0,
                 'cmsPagesSkipped' => 0,
                 'itemSectionsSkipped' => 0,
-                'taxonomyAssignmentsDropped' => 0,
+                'tagAssignmentsDropped' => 0,
             ];
 
             $locationRefMap = $this->importLocations($data['locations'] ?? [], $systemUser, $counts);
@@ -93,7 +93,7 @@ readonly class ImportService
 
             $this->em->flush();
 
-            // After the flush: a contributor needs the generated ids, and taxonomy re-keying needs its ref map
+            // After the flush: a contributor needs the generated ids, and tag re-keying needs its ref map
             $itemsByType = $this->importItems($data['items'] ?? [], $tempDir, $systemUser, $counts);
 
             return new ImportSummary(
@@ -105,7 +105,7 @@ readonly class ImportService
                 cmsPagesSkipped: $counts['cmsPagesSkipped'],
                 itemsByType: $itemsByType,
                 itemSectionsSkipped: $counts['itemSectionsSkipped'],
-                taxonomyAssignmentsDropped: $counts['taxonomyAssignmentsDropped'],
+                tagAssignmentsDropped: $counts['tagAssignmentsDropped'],
             );
         } finally {
             $this->removeDirectory($tempDir);
@@ -413,7 +413,7 @@ readonly class ImportService
             $result = $contributor->importItems($rows, $context);
 
             $byType[$itemType] = ['created' => $result->created, 'matched' => $result->matched];
-            $counts['taxonomyAssignmentsDropped'] += $this->taxonomyPortability->import(
+            $counts['tagAssignmentsDropped'] += $this->tagPortability->import(
                 $itemType,
                 $block,
                 $result->refToItemId,

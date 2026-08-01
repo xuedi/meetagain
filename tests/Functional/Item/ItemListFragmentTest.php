@@ -33,12 +33,12 @@ class ItemListFragmentTest extends WebTestCase
         $client = static::createClient();
 
         // Act
-        $client->request('GET', '/en/item/glossary/fragment?category=1', server: $this->xhr());
+        $client->request('GET', '/en/item/glossary/fragment?tag%5B%5D=1', server: $this->xhr());
 
         // Assert
         $this->assertResponseIsSuccessful();
         $payload = json_decode((string) $client->getResponse()->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        static::assertSame('/en/glossary?category=1', $payload['url']);
+        static::assertSame('/en/glossary?tag%5B0%5D=1', $payload['url']);
     }
 
     public function testDirectHitRedirectsToTheListPage(): void

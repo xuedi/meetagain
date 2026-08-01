@@ -2,6 +2,10 @@
 
 {% block title %}{{ 'books_book.browser_title_list'|trans }}{% endblock %}
 
+{% block javascripts %}
+    <script src="{{ asset('js/vendor/fancybox.umd.js') }}"></script>
+{% endblock %}
+
 {% block books_body %}
 <div class="level mb-4">
     <div class="level-left">

@@ -16,6 +16,6 @@ readonly class ImportSummary
         public int $cmsPagesSkipped,
         public array $itemsByType = [],
         public int $itemSectionsSkipped = 0,
-        public int $taxonomyAssignmentsDropped = 0,
+        public int $tagAssignmentsDropped = 0,
     ) {}
 }
