@@ -2,22 +2,22 @@
 
 namespace App\Twig;
 
-use App\Service\Member\ConsentService;
+use App\AssetMapper\AppBundle;
 use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
-final class ConsentExtension extends AbstractExtension
+final class AppBundleExtension extends AbstractExtension
 {
     public function __construct(
-        private readonly ConsentService $consentService,
+        private readonly AppBundle $appBundle,
     ) {}
 
     #[Override]
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('show_osm', $this->consentService->getShowOsm(...)),
+            new TwigFunction('get_app_bundle_url', $this->appBundle->url(...)),
         ];
     }
 }

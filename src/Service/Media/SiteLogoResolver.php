@@ -26,11 +26,6 @@ readonly class SiteLogoResolver
         private ThumbnailSizeFormat $thumbnailSizeFormat,
     ) {}
 
-    public function resolveUrl(): string
-    {
-        return $this->resolve()['url'];
-    }
-
     /**
      * @return array{url: string, width: ?int, height: ?int}
      */

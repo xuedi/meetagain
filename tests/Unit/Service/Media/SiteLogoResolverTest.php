@@ -54,7 +54,7 @@ class SiteLogoResolverTest extends TestCase
 
         static::assertSame(
             '/images/thumbnails/groupHash_h120.webp',
-            $this->resolver([$provider])->resolveUrl(),
+            $this->resolver([$provider])->resolve()['url'],
         );
     }
 
@@ -68,7 +68,7 @@ class SiteLogoResolverTest extends TestCase
 
         static::assertSame(
             '/images/thumbnails/abc123_h120.webp',
-            $this->resolver([$provider])->resolveUrl(),
+            $this->resolver([$provider])->resolve()['url'],
         );
     }
 
@@ -81,7 +81,7 @@ class SiteLogoResolverTest extends TestCase
 
         static::assertSame(
             '/images/thumbnails/fallbackHash_h120.webp',
-            $this->resolver([$provider])->resolveUrl(),
+            $this->resolver([$provider])->resolve()['url'],
         );
     }
 
@@ -92,7 +92,7 @@ class SiteLogoResolverTest extends TestCase
         $provider->method('resolveFallbackSiteLogo')->willReturn(null);
         $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
 
-        static::assertSame('/build/images/logo-default.webp', $this->resolver([$provider])->resolveUrl());
+        static::assertSame('/build/images/logo-default.webp', $this->resolver([$provider])->resolve()['url']);
     }
 
     public function testFallsThroughToDefaultAssetWhenConfiguredImageMissing(): void
@@ -100,7 +100,7 @@ class SiteLogoResolverTest extends TestCase
         $this->configServiceStub->method('getSiteLogoId')->willReturn(42);
         $this->imageRepositoryStub->method('find')->willReturn(null);
 
-        static::assertSame('/build/images/logo-default.webp', $this->resolver([])->resolveUrl());
+        static::assertSame('/build/images/logo-default.webp', $this->resolver([])->resolve()['url']);
     }
 
     public function testResolveReportsTheFixedAxisOnlyAndLeavesTheFreeOneNull(): void
