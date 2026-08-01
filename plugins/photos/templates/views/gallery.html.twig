@@ -1,0 +1,23 @@
+{# Photos 'gallery' layout - the default mode: the shared item gallery over the uploaded photos
+   (fancybox loaded by the list page, stage and binding via core assets/js/item-gallery.js). #}
+{% set hasSlides = photos|filter(item => item.visibleImage)|length > 0 %}
+{% embed '_components/item/gallery.html.twig' with {'empty': not hasSlides and not canAdd} %}
+    {% block slides %}
+        {% if canAdd %}
+            <a href="{{ path('app_plugin_photos_photo_add') }}" class="item-gallery-add has-background-link-light has-text-link" title="{{ 'photos_views.title_add'|trans }}">
+                <span class="icon"><i class="fa-solid fa-plus fa-lg"></i></span>
+            </a>
+        {% endif %}
+        {% for item in photos %}
+            {% include '_components/item/styles/slide.html.twig' with {
+                group: 'item-gallery-photo',
+                image: item.visibleImage,
+                thumbSize: '400x400',
+                bigSize: 'w1600',
+                title: item.getTranslatedTitle(app.locale) ?: 'photos.untitled'|trans,
+                subtitle: item.cameraLabel ?: (item.takenAt ? item.takenAt|date('Y-m-d') : ''),
+                href: path('app_plugin_photos_photo_show', {'id': item.id})
+            } %}
+        {% endfor %}
+    {% endblock %}
+{% endembed %}

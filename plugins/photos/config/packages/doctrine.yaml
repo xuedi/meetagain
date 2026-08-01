@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Photos:
+                        dir: "%kernel.project_dir%/plugins/photos/src/Entity"
+                        is_bundle: false
+                        prefix: Plugin\Photos\Entity
+                        alias: Photos
+
+doctrine_migrations:
+    migrations_paths:
+        PluginPhotosMigrations: "%kernel.project_dir%/plugins/photos/migrations"

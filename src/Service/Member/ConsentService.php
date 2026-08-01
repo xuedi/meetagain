@@ -13,16 +13,6 @@ readonly class ConsentService
         private RequestStack $requestStack,
     ) {}
 
-    public function getShowCookieConsent(): bool
-    {
-        $session = $this->requestStack->getCurrentRequest()?->getSession();
-        if (!$session instanceof SessionInterface) {
-            return true;
-        }
-
-        return Consent::getBySession($session)->getCookies() === ConsentType::Unknown;
-    }
-
     public function getShowOsm(): bool
     {
         $session = $this->requestStack->getCurrentRequest()?->getSession();

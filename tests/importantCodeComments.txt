@@ -133,5 +133,4 @@ tests/Unit/Service/RecurringEventServiceTest.php::NOW // the anchor date is a Mo
 tests/Unit/Service/Seo/EventSimilarityServiceTest.php::testFieldsEmptyOnBothSidesDoNotDistortTheWeighting // spells out which weights remain, which is the arithmetic behind the expectation
 tests/Unit/Service/System/CronIntervalCheckServiceTest.php::gapProvider // fixes the reference "now" and the thresholds every provider row is measured against
 tests/Unit/Service/System/HealthCheckServiceTest.php::makeService // why disk-space lookups are stubbed: runAll() would otherwise touch the real filesystem
-tests/Unit/Twig/SafeHtmlExtensionTest.php::testScriptInjectionIsBlocked // the attack only works inside an attribute value, which is what the case encodes
 tests/stubs/imagick.stub.php::ImagickPixel // states the stub's scope: only the API surface the tests touch, so a gap is expected

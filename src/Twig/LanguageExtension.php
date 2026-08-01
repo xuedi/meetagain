@@ -52,11 +52,9 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         return [
             new TwigFunction('get_hreflang_code', static fn(string $code): string => $code),
             new TwigFunction('get_enabled_locales', $this->languageService->getFilteredEnabledCodes(...)),
-            new TwigFunction('get_all_languages', $this->languageService->getAllLanguages(...)),
             new TwigFunction('current_locale', $this->getCurrentLocale(...)),
             new TwigFunction('get_alternative_languages', $this->getLanguageSwitcherOptions(...)),
             new TwigFunction('get_hreflang_languages', $this->getHreflangLanguageCodes(...)),
-            new TwigFunction('get_language_codes', $this->languageService->getFilteredEnabledCodes(...)),
             new TwigFunction('get_admin_language_codes', $this->languageService->getAdminFilteredEnabledCodes(...)),
             new TwigFunction('route_exists', $this->routeExists(...)),
             new TwigFunction('get_canonical_url', $this->getCanonicalUrl(...)),

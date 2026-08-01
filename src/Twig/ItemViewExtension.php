@@ -26,9 +26,9 @@ final class ItemViewExtension extends AbstractExtension
         ];
     }
 
-    public function itemViewMode(string $itemType): ItemViewType
+    public function itemViewMode(string $itemType, ?string $default = null): ItemViewType
     {
-        return $this->viewResolver->get($itemType);
+        return $this->viewResolver->get($itemType, ItemViewType::tryFrom((string) $default) ?? ItemViewType::List);
     }
 
     /** @return list<ItemViewType> */

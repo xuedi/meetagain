@@ -1,0 +1,44 @@
+{# Photos 'list' layout - a table of Photo / Title / Camera / Taken / Uploader with the add link. #}
+<table class="table is-fullwidth is-hoverable">
+    <thead>
+        <tr>
+            <th>{{ 'photos_views.col_image'|trans }}</th>
+            <th>{{ 'photos_views.col_title'|trans }}</th>
+            <th>{{ 'photos_views.col_camera'|trans }}</th>
+            <th>{{ 'photos_views.col_taken'|trans }}</th>
+            <th>{{ 'photos_views.col_uploader'|trans }}</th>
+            <th class="has-text-right">
+                {% if canAdd %}
+                    <a href="{{ path('app_plugin_photos_photo_add') }}" title="{{ 'photos_views.title_add'|trans }}">
+                        <span class="icon"><i class="fa fa-plus"></i></span>
+                    </a>
+                {% endif %}
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in photos %}
+            {% set showUrl = path('app_plugin_photos_photo_show', {'id': item.id}) %}
+            {% set itemTitle = item.getTranslatedTitle(app.locale) ?: 'photos.untitled'|trans %}
+            <tr>
+                <td style="vertical-align: middle;">
+                    <a href="{{ showUrl }}"><figure class="image is-64x64">{% include '_components/image.html.twig' with {'image': item.visibleImage, 'size': '400x400', 'alt': itemTitle} %}</figure></a>
+                </td>
+                <td style="vertical-align: middle;">
+                    <a href="{{ showUrl }}" class="has-text-weight-medium">{{ itemTitle }}</a>
+                    {% include '_components/item/tag_badges.html.twig' with {'itemType': 'photo', 'itemId': item.id} only %}
+                </td>
+                <td style="vertical-align: middle;" class="has-text-grey">{{ item.cameraLabel }}</td>
+                <td style="vertical-align: middle;" class="has-text-grey">{{ item.takenAt ? item.takenAt|date('Y-m-d') : '' }}</td>
+                <td style="vertical-align: middle;" class="has-text-grey">{{ get_user_name(item.createdBy) }}</td>
+                <td style="vertical-align: middle;" class="has-text-right">
+                    {% if is_granted('ROLE_STEWARD') or (app.user and item.createdBy == app.user.id) %}
+                        <a href="{{ path('app_plugin_photos_photo_edit', {'id': item.id}) }}" title="{{ 'photos_photo.button_edit'|trans }}">
+                            <span class="icon"><i class="fa fa-pen-to-square"></i></span>
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

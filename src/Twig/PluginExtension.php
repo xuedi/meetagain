@@ -44,7 +44,6 @@ final class PluginExtension extends AbstractExtension
             ]]),
             new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
             new TwigFunction('warm_event_list_item_tags', $this->warmEventListItemTags(...)),
-            new TwigFunction('is_plugin_enabled', $this->isPluginEnabled(...)),
         ];
     }
 
@@ -56,11 +55,6 @@ final class PluginExtension extends AbstractExtension
         usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
 
         return $links;
-    }
-
-    public function isPluginEnabled(string $pluginKey): bool
-    {
-        return in_array($pluginKey, $this->pluginService->getActiveList(), true);
     }
 
     /**

@@ -17,7 +17,6 @@ final class ConsentExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('show_cookie_consent', $this->consentService->getShowCookieConsent(...)),
             new TwigFunction('show_osm', $this->consentService->getShowOsm(...)),
         ];
     }

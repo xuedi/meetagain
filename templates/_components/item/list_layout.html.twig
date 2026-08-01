@@ -10,12 +10,13 @@
     needing markup around the list overrides {% block item_list_main %} and calls item_list_body()
     inside it. The scope attributes are the hooks assets/js/item-list.js swaps against.
 
-    Used in:    item-list pages of the films / books / dishes / glossary plugins
+    Used in:    item-list pages of the films / books / dishes / glossary / photos plugins
     Parameters:
-        - itemType  (string, required)       -- registry key of the item type (e.g. 'film')
-        - modes     (list<string>, optional) -- view-mode values to offer; default: all four
-        - infoKey   (string, optional)       -- translation key of the sidebar blurb;
-                                                default: 'item.sidebar_info_default'
+        - itemType    (string, required)       -- registry key of the item type (e.g. 'film')
+        - modes       (list<string>, optional) -- view-mode values to offer; default: all four
+        - defaultMode (string, optional)       -- mode shown before the visitor picks one; default: 'list'
+        - infoKey     (string, optional)       -- translation key of the sidebar blurb;
+                                                  default: 'item.sidebar_info_default'
     Blocks:
         - item_list_main     -- the swappable list region; defaults to item_list_body(itemType)
         - item_sidebar_extra -- optional extra box below the shared sidebar boxes
@@ -29,6 +30,7 @@
         {% include '_components/item/sidebar.html.twig' with {
             'itemType': itemType,
             'modes': modes|default([]),
+            'defaultMode': defaultMode|default(null),
             'infoKey': infoKey|default('item.sidebar_info_default')
         } only %}
         {% block item_sidebar_extra %}{% endblock %}

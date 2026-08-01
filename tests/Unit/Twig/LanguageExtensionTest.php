@@ -55,15 +55,14 @@ class LanguageExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(13, $functions);
+        static::assertCount(11, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('get_hreflang_code', $functionNames);
         static::assertContains('get_enabled_locales', $functionNames);
-        static::assertContains('get_all_languages', $functionNames);
         static::assertContains('current_locale', $functionNames);
         static::assertContains('get_alternative_languages', $functionNames);
-        static::assertContains('get_language_codes', $functionNames);
+        static::assertContains('get_hreflang_languages', $functionNames);
         static::assertContains('get_admin_language_codes', $functionNames);
         static::assertContains('route_exists', $functionNames);
         static::assertContains('get_canonical_url', $functionNames);

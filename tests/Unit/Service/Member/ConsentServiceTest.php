@@ -35,30 +35,6 @@ class ConsentServiceTest extends TestCase
         return $session;
     }
 
-    public function testGetShowCookieConsentNoRequestReturnsTrue(): void
-    {
-        // Arrange & Act & Assert
-        static::assertTrue($this->makeService(null)->getShowCookieConsent());
-    }
-
-    public function testGetShowCookieConsentUnknownReturnsTrue(): void
-    {
-        // Arrange
-        static::assertTrue($this->makeService($this->makeSession('unknown', 'unknown'))->getShowCookieConsent());
-    }
-
-    public function testGetShowCookieConsentGrantedReturnsFalse(): void
-    {
-        // Arrange
-        static::assertFalse($this->makeService($this->makeSession('granted', 'unknown'))->getShowCookieConsent());
-    }
-
-    public function testGetShowCookieConsentDeniedReturnsFalse(): void
-    {
-        // Arrange
-        static::assertFalse($this->makeService($this->makeSession('denied', 'unknown'))->getShowCookieConsent());
-    }
-
     public function testGetShowOsmNoRequestReturnsTrue(): void
     {
         // Arrange & Act & Assert
