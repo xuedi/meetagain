@@ -2,7 +2,9 @@
 
 namespace Plugin\Dishes\Form;
 
+use App\Item\Tag\AssignmentFormHelper;
 use App\Service\Config\LanguageService;
+use Plugin\Dishes\Service\DishService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -19,6 +21,7 @@ class DishAddType extends AbstractType
     public function __construct(
         private readonly LanguageService $languageService,
         private readonly TranslatorInterface $translator,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {}
 
     #[\Override]
@@ -63,7 +66,11 @@ class DishAddType extends AbstractType
                 'constraints' => [
                     new File(maxSize: '8000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('dishes_dish.error_invalid_image')),
                 ],
-            ])
+            ]);
+
+        $this->assignmentFormHelper->addAssignmentFields($builder, DishService::ITEM_TYPE, null);
+
+        $builder
             ->add('submit', SubmitType::class, [
                 'label' => 'dishes_dish.button_submit',
                 'attr' => ['class' => 'button is-primary'],

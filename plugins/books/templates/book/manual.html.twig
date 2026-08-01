@@ -14,6 +14,9 @@
     {{ form_errors(field) }}
 </div>
 {% endfor %}
+{% if form.itemTags is defined %}
+    <div class="field">{{ form_row(form.itemTags) }}</div>
+{% endif %}
 <div class="field mt-4">
     {{ form_widget(form.submit, {'attr': {'class': 'button is-primary'}}) }}
     <a href="{{ path('app_books_booklist') }}" class="button ml-2">{{ 'books_book.button_cancel'|trans }}</a>

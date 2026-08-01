@@ -10,7 +10,7 @@ use App\ExtendedFilesystem;
 use App\Item\Portability\ImportResult;
 use App\Item\Portability\ContributorInterface;
 use App\Item\Portability\Registry;
-use App\Item\Portability\TaxonomyPortability;
+use App\Item\Portability\TagPortability;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
 use App\Service\System\ImportService;
@@ -197,7 +197,7 @@ class ImportServiceTest extends TestCase
         static::assertNull($events[0]->getSeries());
     }
 
-    public function testItemStageCollectsPerTypeCountsAndRekeysTaxonomy(): void
+    public function testItemStageCollectsPerTypeCountsAndRekeysTags(): void
     {
         // Arrange
         $contributor = $this->stubContributor('dish', new ImportResult([7 => 91], created: 1, matched: 2));
@@ -207,16 +207,16 @@ class ImportServiceTest extends TestCase
             : null);
 
         $seenMap = null;
-        $taxonomy = $this->createStub(TaxonomyPortability::class);
-        $taxonomy
+        $tagPortability = $this->createStub(TagPortability::class);
+        $tagPortability
             ->method('import')
             ->willReturnCallback(static function (string $type, array $block, array $map) use (&$seenMap): int {
                 $seenMap = $map;
                 return 3;
             });
 
-        $service = $this->buildService($this->createStub(ExtendedFilesystem::class), null, $registry, $taxonomy);
-        $counts = ['itemSectionsSkipped' => 0, 'taxonomyAssignmentsDropped' => 0];
+        $service = $this->buildService($this->createStub(ExtendedFilesystem::class), null, $registry, $tagPortability);
+        $counts = ['itemSectionsSkipped' => 0, 'tagAssignmentsDropped' => 0];
 
         // Act
         $byType = $this->invokeImportItems($service, ['dish' => ['rows' => [['ref' => 7]]]], $counts);
@@ -224,7 +224,7 @@ class ImportServiceTest extends TestCase
         // Assert
         static::assertSame(['dish' => ['created' => 1, 'matched' => 2]], $byType);
         static::assertSame([7 => 91], $seenMap);
-        static::assertSame(3, $counts['taxonomyAssignmentsDropped']);
+        static::assertSame(3, $counts['tagAssignmentsDropped']);
         static::assertSame(0, $counts['itemSectionsSkipped']);
     }
 
@@ -234,7 +234,7 @@ class ImportServiceTest extends TestCase
         $registry = $this->createStub(Registry::class);
         $registry->method('contributorFor')->willReturn(null);
         $service = $this->buildService($this->createStub(ExtendedFilesystem::class), null, $registry);
-        $counts = ['itemSectionsSkipped' => 0, 'taxonomyAssignmentsDropped' => 0];
+        $counts = ['itemSectionsSkipped' => 0, 'tagAssignmentsDropped' => 0];
 
         // Act
         $byType = $this->invokeImportItems($service, ['karaoke' => ['rows' => [['ref' => 1]]]], $counts);
@@ -250,7 +250,7 @@ class ImportServiceTest extends TestCase
         $registry = $this->createStub(Registry::class);
         $registry->method('contributorFor')->willReturn($this->stubContributor('dish', new ImportResult([], 0, 0)));
         $service = $this->buildService($this->createStub(ExtendedFilesystem::class), null, $registry);
-        $counts = ['itemSectionsSkipped' => 0, 'taxonomyAssignmentsDropped' => 0];
+        $counts = ['itemSectionsSkipped' => 0, 'tagAssignmentsDropped' => 0];
 
         // Act
         $byType = $this->invokeImportItems($service, [], $counts);
@@ -258,7 +258,7 @@ class ImportServiceTest extends TestCase
         // Assert
         static::assertSame([], $byType);
         static::assertSame(0, $counts['itemSectionsSkipped']);
-        static::assertSame(0, $counts['taxonomyAssignmentsDropped']);
+        static::assertSame(0, $counts['tagAssignmentsDropped']);
     }
 
     private function stubContributor(string $itemType, ImportResult $result): ContributorInterface
@@ -332,7 +332,7 @@ class ImportServiceTest extends TestCase
         ExtendedFilesystem $fs,
         ?EntityManagerInterface $em = null,
         ?Registry $registry = null,
-        ?TaxonomyPortability $taxonomy = null,
+        ?TagPortability $tagPortability = null,
     ): ImportService {
         return new ImportService(
             em: $em ?? $this->createStub(EntityManagerInterface::class),
@@ -341,7 +341,7 @@ class ImportServiceTest extends TestCase
             fs: $fs,
             imageImporter: $this->createStub(PortableImageImporter::class),
             itemRegistry: $registry ?? $this->createStub(Registry::class),
-            taxonomyPortability: $taxonomy ?? $this->createStub(TaxonomyPortability::class),
+            tagPortability: $tagPortability ?? $this->createStub(TagPortability::class),
         );
     }
 

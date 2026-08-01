@@ -4,8 +4,8 @@ namespace Plugin\Films\DataFixtures;
 
 use App\DataFixtures\AbstractFixture;
 use App\DataFixtures\UserFixture;
+use App\Entity\ItemTag;
 use App\Entity\ItemTagAssignment;
-use App\Entity\PluginSettings;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
@@ -30,7 +30,7 @@ class FilmFixture extends AbstractFixture implements FixtureGroupInterface
             return;
         }
 
-        $manager->persist($this->taxonomySettings());
+        $tags = $this->buildTags($manager);
 
         foreach ($this->getData() as [$title, $originalTitle, $year, $runtime, $genres, $description, $tagIds]) {
             $film = new Film();
@@ -46,11 +46,18 @@ class FilmFixture extends AbstractFixture implements FixtureGroupInterface
             $manager->persist($film);
             $manager->flush();
 
-            foreach ($tagIds as $tagId) {
+            $wanted = [];
+            foreach ($tagIds as $tagKey) {
+                foreach ([$tags[$tagKey], ...$tags[$tagKey]->getAncestors()] as $tag) {
+                    $wanted[(int) $tag->getId()] = $tag;
+                }
+            }
+
+            foreach ($wanted as $tag) {
                 $assignment = new ItemTagAssignment();
                 $assignment->setItemType(FilmService::ITEM_TYPE);
                 $assignment->setItemId((int) $film->getId());
-                $assignment->setTagId($tagId);
+                $assignment->setTag($tag);
                 $manager->persist($assignment);
             }
         }
@@ -59,31 +66,32 @@ class FilmFixture extends AbstractFixture implements FixtureGroupInterface
         echo 'OK' . PHP_EOL;
     }
 
-    private function taxonomySettings(): PluginSettings
+    /** @return array<int, ItemTag> */
+    private function buildTags(ObjectManager $manager): array
     {
-        $settings = new PluginSettings();
-        $settings->setPluginKey('films_taxonomy');
-        $settings->setUpdatedAt(new DateTimeImmutable());
-        $settings->setData([
-            'taxonomy' => [
-                'categoriesEnabled' => true,
-                'tagsEnabled' => true,
-                'tagDepth' => 2,
-                'categoryGroups' => [],
-                'categories' => [
-                    ['id' => 0, 'labels' => ['en' => 'Feature', 'de' => 'Spielfilm']],
-                    ['id' => 1, 'labels' => ['en' => 'Short', 'de' => 'Kurzfilm']],
-                ],
-                'tags' => [
-                    ['id' => 0, 'labels' => ['en' => 'Drama', 'de' => 'Drama']],
-                    ['id' => 1, 'labels' => ['en' => 'Family drama', 'de' => 'Familiendrama'], 'parent' => 0],
-                    ['id' => 2, 'labels' => ['en' => 'Road movie', 'de' => 'Roadmovie'], 'parent' => 0],
-                    ['id' => 3, 'labels' => ['en' => 'Science fiction', 'de' => 'Science-Fiction']],
-                ],
-            ],
-        ]);
+        $rows = [
+            [0, 'Drama', 'Drama', null],
+            [1, 'Family drama', 'Familiendrama', 0],
+            [2, 'Road movie', 'Roadmovie', 0],
+            [3, 'Science fiction', 'Science-Fiction', null],
+            [4, 'Feature', 'Spielfilm', null],
+            [5, 'Short', 'Kurzfilm', null],
+        ];
 
-        return $settings;
+        $tags = [];
+        $position = 0;
+        foreach ($rows as [$key, $en, $de, $parent]) {
+            $tag = new ItemTag();
+            $tag->setItemType(FilmService::ITEM_TYPE);
+            $tag->setLabels(['en' => $en, 'de' => $de]);
+            $tag->setParent($parent === null ? null : ($tags[$parent] ?? null));
+            $tag->setPosition($position++);
+            $manager->persist($tag);
+            $tags[$key] = $tag;
+        }
+        $manager->flush();
+
+        return $tags;
     }
 
     public static function getGroups(): array

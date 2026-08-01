@@ -41,6 +41,10 @@
             {{ form_errors(form.description) }}
         </div>
 
+        {% if form.itemTags is defined %}
+            <div class="field">{{ form_row(form.itemTags) }}</div>
+        {% endif %}
+
         <div class="field">
             <div class="control">
                 {{ form_widget(form.submit) }}

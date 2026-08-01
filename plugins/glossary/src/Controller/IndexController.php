@@ -4,7 +4,7 @@ namespace Plugin\Glossary\Controller;
 
 use App\Item\ListRegistry;
 use App\Service\Seo\BreadcrumbBuilder;
-use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -20,7 +20,7 @@ final class IndexController extends AbstractGlossaryController
     #[Route('/{id}', name: 'app_plugin_glossary_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function detail(int $id, ListRegistry $listRegistry, BreadcrumbBuilder $breadcrumbBuilder): Response
     {
-        if (!$listRegistry->has(GlossaryCategorizableTypeProvider::ITEM_TYPE)) {
+        if (!$listRegistry->has(GlossaryTaggableTypeProvider::ITEM_TYPE)) {
             throw $this->createNotFoundException();
         }
 

@@ -3,11 +3,12 @@
 namespace Plugin\Glossary\Controller;
 
 use App\Entity\User;
+use App\Item\Tag\AssignmentFormHelper;
 use App\Review\ChangeProposalService;
 use App\Review\FieldChange;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Form\GlossaryType;
-use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Review\GlossaryChangeTarget;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,6 +24,7 @@ final class EditController extends AbstractGlossaryController
     public function __construct(
         GlossaryService $service,
         private readonly ChangeProposalService $changeProposalService,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {
         parent::__construct($service);
     }
@@ -36,9 +38,6 @@ final class EditController extends AbstractGlossaryController
         }
 
         $form = $this->createForm(GlossaryType::class, $newGlossary);
-        if ($form->has('category') && !$request->isMethod('POST')) {
-            $form->get('category')->setData($this->service->getCategory($id));
-        }
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $this->service->detach($newGlossary); // detach first: a managed entity would be flushed with the request's changes
@@ -46,16 +45,16 @@ final class EditController extends AbstractGlossaryController
                 throw new AuthenticationException('Only for logged in users');
             }
 
-            $categoryId = $form->has('category') ? $this->intOrNull($form->get('category')->getData()) : null;
+            $tagIds = $this->assignmentFormHelper->extractAssignment($form);
 
             if ($this->isGranted('ROLE_ORGANIZER')) {
-                $this->service->update($newGlossary, $id, $categoryId);
+                $this->service->update($newGlossary, $id, $tagIds);
             } else {
                 $this->changeProposalService->propose(
-                    GlossaryCategorizableTypeProvider::ITEM_TYPE,
+                    GlossaryTaggableTypeProvider::ITEM_TYPE,
                     $id,
                     $this->getAuthedUser(),
-                    $this->buildChanges($newGlossary, $id, $categoryId),
+                    $this->buildChanges($newGlossary, $id, $tagIds),
                 );
             }
 
@@ -63,7 +62,7 @@ final class EditController extends AbstractGlossaryController
         }
 
         $pendingProposals = [];
-        foreach ($this->changeProposalService->pendingForTarget(GlossaryCategorizableTypeProvider::ITEM_TYPE, (int) $id) as $proposal) {
+        foreach ($this->changeProposalService->pendingForTarget(GlossaryTaggableTypeProvider::ITEM_TYPE, (int) $id) as $proposal) {
             $pendingProposals[] = [
                 'proposal' => $proposal,
                 'rows' => $this->changeProposalService->fieldRows($proposal),
@@ -77,24 +76,25 @@ final class EditController extends AbstractGlossaryController
         ]);
     }
 
-    /** @return list<FieldChange> */
-    private function buildChanges(Glossary $submitted, int $id, ?int $categoryId): array
+    /**
+     * @param  list<int>         $tagIds
+     * @return list<FieldChange>
+     */
+    private function buildChanges(Glossary $submitted, int $id, array $tagIds): array
     {
         $current = $this->service->getManaged($id);
         if ($current === null) {
             return [];
         }
 
-        $currentCategory = $this->service->getCategory($id);
-
         return [
             new FieldChange(GlossaryChangeTarget::FIELD_PHRASE, $current->getPhrase(), $submitted->getPhrase()),
             new FieldChange(GlossaryChangeTarget::FIELD_PINYIN, $current->getPinyin(), $submitted->getPinyin()),
             new FieldChange(GlossaryChangeTarget::FIELD_EXPLANATION, $current->getExplanation(), $submitted->getExplanation()),
             new FieldChange(
-                GlossaryChangeTarget::FIELD_CATEGORY,
-                $currentCategory === null ? null : (string) $currentCategory,
-                $categoryId === null ? null : (string) $categoryId,
+                GlossaryChangeTarget::FIELD_TAG,
+                $this->service->encodeTagIds($this->service->getTagIds($id)),
+                $this->service->encodeTagIds($tagIds),
             ),
         ];
     }

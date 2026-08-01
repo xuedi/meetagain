@@ -6,8 +6,8 @@ use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Item\ListRegistry;
 use App\Item\TranslationFormHelper;
-use App\Item\Taxonomy\AssignmentFormHelper;
-use App\Item\Taxonomy\TaxonomyService;
+use App\Item\Tag\AssignmentFormHelper;
+use App\Item\Tag\TagService;
 use App\Service\Seo\BreadcrumbBuilder;
 use Plugin\Dishes\Activity\Messages\DishAdded;
 use Plugin\Dishes\Form\DishAddType;
@@ -32,7 +32,7 @@ final class DishController extends AbstractController
         private readonly ConfigService $configService,
         private readonly TranslationFormHelper $translationFormHelper,
         private readonly AssignmentFormHelper $assignmentFormHelper,
-        private readonly TaxonomyService $itemTaxonomyService,
+        private readonly TagService $tagService,
     ) {}
 
     #[Route('', name: 'app_dishes_dishlist', methods: ['GET'])]
@@ -63,6 +63,9 @@ final class DishController extends AbstractController
                     origin: $form->get('origin')->getData(),
                     userId: $user->getId(),
                 );
+
+                $assignment = $this->assignmentFormHelper->extractAssignment($form);
+                $this->tagService->setTags(DishService::ITEM_TYPE, (int) $dish->getId(), $assignment);
 
                 $previewFile = $form->get('previewFile')->getData();
                 if ($previewFile !== null) {
@@ -134,8 +137,7 @@ final class DishController extends AbstractController
                 $this->dishService->updateTranslations($dish, $this->translationFormHelper->extractTranslations($form, ['name', 'description', 'recipe']));
 
                 $assignment = $this->assignmentFormHelper->extractAssignment($form);
-                $this->itemTaxonomyService->setCategory(DishService::ITEM_TYPE, (int) $dish->getId(), $assignment['category']);
-                $this->itemTaxonomyService->setTags(DishService::ITEM_TYPE, (int) $dish->getId(), $assignment['tags']);
+                $this->tagService->setTags(DishService::ITEM_TYPE, (int) $dish->getId(), $assignment);
 
                 $previewFile = $form->get('previewFile')->getData();
                 if ($previewFile !== null) {

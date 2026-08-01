@@ -2,26 +2,25 @@
 
 namespace Plugin\Glossary\Form;
 
-use App\Service\Config\LanguageService;
+use App\Item\Tag\AssignmentFormHelper;
+use Override;
 use Plugin\Glossary\Entity\Glossary;
+use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Service\ConfigService;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class GlossaryType extends AbstractType
 {
     public function __construct(
         private readonly ConfigService $configService,
-        private readonly LanguageService $languageService,
-        private readonly RequestStack $requestStack,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $config = $this->configService->getConfig();
@@ -39,21 +38,15 @@ class GlossaryType extends AbstractType
             ]);
         }
 
-        if ($config->hasCategories()) {
-            $locale = $this->requestStack->getCurrentRequest()?->getLocale();
-            $sourceLocale = $this->languageService->getFilteredDefaultLocale();
-
-            $builder->add('category', ChoiceType::class, [
-                'label' => 'glossary.label_category',
-                'choices' => $config->getTaxonomy()->groupedCategoryOptions($locale, $sourceLocale),
-                'required' => false,
-                'placeholder' => '',
-                'mapped' => false,
-            ]);
-        }
+        $entry = $builder->getData();
+        $this->assignmentFormHelper->addAssignmentFields(
+            $builder,
+            GlossaryTaggableTypeProvider::ITEM_TYPE,
+            $entry instanceof Glossary ? $entry->getId() : null,
+        );
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

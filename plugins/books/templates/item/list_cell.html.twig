@@ -8,7 +8,7 @@
     </td>
     <td style="vertical-align: middle;">
         <a href="{{ showUrl }}" class="has-text-weight-medium">{{ book.title }}</a>
-        {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
+        {% include '_components/item/tag_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
     </td>
     <td style="vertical-align: middle;" class="has-text-grey">{{ book.author }}</td>
     <td style="vertical-align: middle;" class="has-text-right">
@@ -34,5 +34,5 @@
         title: book.title,
         subtitle: book.author
     } %}
-    {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
+    {% include '_components/item/tag_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
 {% endif %}

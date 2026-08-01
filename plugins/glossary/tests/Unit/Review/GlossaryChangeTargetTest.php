@@ -3,7 +3,8 @@
 namespace Plugin\Glossary\Tests\Unit\Review;
 
 use App\Entity\User;
-use App\Item\Taxonomy\TaxonomyService;
+use App\Entity\ItemTag;
+use App\Item\Tag\TagService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
@@ -38,22 +39,22 @@ class GlossaryChangeTargetTest extends TestCase
         yield 'missing entry fails every field' => [null, GlossaryChangeTarget::FIELD_PHRASE, 'x', 'glossary.validation_entry_missing'];
         yield 'blank phrase is rejected' => [$entry, GlossaryChangeTarget::FIELD_PHRASE, '  ', 'glossary.validation_phrase_blank'];
         yield 'non-blank phrase is fine' => [$entry, GlossaryChangeTarget::FIELD_PHRASE, '你好', null];
-        yield 'unknown category id is rejected' => [$entry, GlossaryChangeTarget::FIELD_CATEGORY, '99', 'glossary.validation_category_unknown'];
-        yield 'known category id is fine' => [$entry, GlossaryChangeTarget::FIELD_CATEGORY, '3', null];
-        yield 'clearing the category is fine' => [$entry, GlossaryChangeTarget::FIELD_CATEGORY, null, null];
+        yield 'unknown tag id is rejected' => [$entry, GlossaryChangeTarget::FIELD_TAG, '99', 'glossary.validation_tag_unknown'];
+        yield 'known tag id is fine' => [$entry, GlossaryChangeTarget::FIELD_TAG, '3', null];
+        yield 'one unknown id in a set rejects the set' => [$entry, GlossaryChangeTarget::FIELD_TAG, '3,99', 'glossary.validation_tag_unknown'];
+        yield 'clearing the tags is fine' => [$entry, GlossaryChangeTarget::FIELD_TAG, null, null];
         yield 'explanation has no constraints' => [$entry, GlossaryChangeTarget::FIELD_EXPLANATION, '', null];
     }
 
-    public function testFormatValueResolvesCategoryLabels(): void
+    public function testFormatValueResolvesTagLabels(): void
     {
         // Arrange
-        $taxonomyService = $this->createStub(TaxonomyService::class);
-        $taxonomyService->method('categoryLabelForId')->willReturn('Slang');
-        $target = $this->makeTarget(taxonomyService: $taxonomyService);
+        $target = $this->makeTarget();
 
         // Act & Assert
-        self::assertSame('Slang', $target->formatValue(GlossaryChangeTarget::FIELD_CATEGORY, '3'));
-        self::assertSame('', $target->formatValue(GlossaryChangeTarget::FIELD_CATEGORY, null));
+        self::assertSame('Slang', $target->formatValue(GlossaryChangeTarget::FIELD_TAG, '3'));
+        self::assertSame('Slang, 99', $target->formatValue(GlossaryChangeTarget::FIELD_TAG, '3,99'));
+        self::assertSame('', $target->formatValue(GlossaryChangeTarget::FIELD_TAG, null));
         self::assertSame('plain', $target->formatValue(GlossaryChangeTarget::FIELD_PHRASE, 'plain'));
     }
 
@@ -113,24 +114,25 @@ class GlossaryChangeTargetTest extends TestCase
     private function makeTarget(
         ?Glossary $entry = null,
         bool $granted = true,
-        ?TaxonomyService $taxonomyService = null,
+        ?TagService $tagService = null,
         ?GlossaryService $service = null,
     ): GlossaryChangeTarget {
         if ($service === null) {
             $service = $this->createStub(GlossaryService::class);
             $service->method('get')->willReturn($entry);
         }
+        $service->method('decodeTagIds')->willReturnCallback(
+            static fn(?string $value): array => $value === null || $value === ''
+                ? []
+                : array_map(intval(...), explode(',', $value)),
+        );
 
         $configService = $this->createStub(ConfigService::class);
-        $configService->method('getConfig')->willReturn(Config::fromArray([
-            'primaryLabel' => 'Term',
-            'taxonomy' => [
-                'categoriesEnabled' => true,
-                'tagsEnabled' => false,
-                'categories' => [['id' => 3, 'labels' => ['en' => 'Slang']]],
-                'tags' => [],
-            ],
-        ]));
+        $configService->method('getConfig')->willReturn(Config::fromArray(['primaryLabel' => 'Term']));
+
+        $slang = new ItemTag();
+        $slang->setItemType('glossary');
+        $slang->setLabels(['en' => 'Slang']);
 
         $security = $this->createStub(Security::class);
         $security->method('isGranted')->willReturn($granted);
@@ -141,11 +143,20 @@ class GlossaryChangeTargetTest extends TestCase
         return new GlossaryChangeTarget(
             $service,
             $configService,
-            $taxonomyService ?? $this->createStub(TaxonomyService::class),
+            $tagService ?? $this->tagServiceWith($slang),
             $security,
             $this->createStub(RouterInterface::class),
             new RequestStack(),
             $translator,
         );
+    }
+
+    private function tagServiceWith(ItemTag $tag): TagService
+    {
+        $tagService = $this->createStub(TagService::class);
+        $tagService->method('getManagedTag')->willReturnCallback(static fn(string $type, int $id): ?ItemTag => $id === 3 ? $tag : null);
+        $tagService->method('labelFor')->willReturn('Slang');
+
+        return $tagService;
     }
 }

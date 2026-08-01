@@ -59,6 +59,19 @@ class ChangeProposalRepository extends ServiceEntityRepository
         return array_map(intval(...), $rows);
     }
 
+    public function countPendingForTargetType(string $targetType): int
+    {
+        return (int) $this
+            ->createQueryBuilder('cp')
+            ->select('COUNT(cp.id)')
+            ->where('cp.status = :status')
+            ->andWhere('cp.targetType = :targetType')
+            ->setParameter('status', ChangeProposalStatus::Pending)
+            ->setParameter('targetType', $targetType)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function countPendingForTarget(string $targetType, int $targetId): int
     {
         return (int) $this

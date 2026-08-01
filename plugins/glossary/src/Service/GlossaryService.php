@@ -8,13 +8,13 @@ use App\Enum\ItemAction;
 use App\Item\ActionDispatcher;
 use App\Item\AdminFilterService;
 use App\Item\FilterService;
-use App\Item\Taxonomy\TaxonomyService;
+use App\Item\Tag\TagService;
 use App\Review\ChangeProposalService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Plugin\Glossary\Entity\Glossary;
-use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Repository\GlossaryRepository;
 use Plugin\Glossary\Review\GlossaryChangeTarget;
 use RuntimeException;
@@ -28,15 +28,34 @@ readonly class GlossaryService
         private FilterService $itemFilter,
         private AdminFilterService $adminItemFilter,
         private EntityActionDispatcher $dispatcher,
-        private TaxonomyService $taxonomyService,
+        private TagService $tagService,
         private ActionDispatcher $itemActionDispatcher,
         private ChangeProposalService $changeProposalService,
         private Security $security,
     ) {}
 
-    public function getCategory(int $id): ?int
+    /** @return list<int> */
+    public function getTagIds(int $id): array
     {
-        return $this->taxonomyService->getCategory(GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
+        return $this->tagService->getTagIds(GlossaryTaggableTypeProvider::ITEM_TYPE, $id);
+    }
+
+    /** @param list<int> $tagIds */
+    public function encodeTagIds(array $tagIds): ?string
+    {
+        sort($tagIds);
+
+        return $tagIds === [] ? null : implode(',', $tagIds);
+    }
+
+    /** @return list<int> */
+    public function decodeTagIds(?string $value): array
+    {
+        if ($value === null || $value === '') {
+            return [];
+        }
+
+        return array_values(array_map(intval(...), array_filter(explode(',', $value), static fn(string $id): bool => trim($id) !== '')));
     }
 
     public function approveNew(int $id): void
@@ -64,8 +83,8 @@ readonly class GlossaryService
         $this->em->remove($item);
         $this->em->flush();
         $this->dispatcher->dispatch(EntityAction::DeleteGlossary, $id);
-        $this->itemActionDispatcher->dispatch(ItemAction::Deleted, GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
-        $this->changeProposalService->removeForTarget(GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
+        $this->itemActionDispatcher->dispatch(ItemAction::Deleted, GlossaryTaggableTypeProvider::ITEM_TYPE, $id);
+        $this->changeProposalService->removeForTarget(GlossaryTaggableTypeProvider::ITEM_TYPE, $id);
     }
 
     public function delete(int $id): void
@@ -78,11 +97,12 @@ readonly class GlossaryService
         $this->em->remove($item);
         $this->em->flush();
         $this->dispatcher->dispatch(EntityAction::DeleteGlossary, $id);
-        $this->itemActionDispatcher->dispatch(ItemAction::Deleted, GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
-        $this->changeProposalService->removeForTarget(GlossaryCategorizableTypeProvider::ITEM_TYPE, $id);
+        $this->itemActionDispatcher->dispatch(ItemAction::Deleted, GlossaryTaggableTypeProvider::ITEM_TYPE, $id);
+        $this->changeProposalService->removeForTarget(GlossaryTaggableTypeProvider::ITEM_TYPE, $id);
     }
 
-    public function update(Glossary $newGlossary, int $id, ?int $categoryId): void
+    /** @param list<int> $tagIds */
+    public function update(Glossary $newGlossary, int $id, array $tagIds): void
     {
         $current = $this->findIncludingUnapproved($id);
         if ($current === null) {
@@ -96,7 +116,7 @@ readonly class GlossaryService
         $this->em->persist($current);
         $this->em->flush();
 
-        $this->taxonomyService->setCategory(GlossaryCategorizableTypeProvider::ITEM_TYPE, $id, $categoryId);
+        $this->setTags($id, $tagIds);
     }
 
     public function applyChange(int $id, string $field, ?string $value): void
@@ -116,12 +136,9 @@ readonly class GlossaryService
             case GlossaryChangeTarget::FIELD_EXPLANATION:
                 $item->setExplanation((string) $value);
                 break;
-            case GlossaryChangeTarget::FIELD_CATEGORY:
-                $this->taxonomyService->setCategory(
-                    GlossaryCategorizableTypeProvider::ITEM_TYPE,
-                    $id,
-                    $value === null || $value === '' ? null : (int) $value,
-                );
+            case GlossaryChangeTarget::FIELD_TAG:
+                $this->setTags($id, $this->decodeTagIds($value));
+
                 return;
             default:
                 throw new InvalidArgumentException(sprintf('Unknown glossary field "%s"', $field));
@@ -132,9 +149,10 @@ readonly class GlossaryService
     }
 
     /**
-     * @param bool $autoApprove Whether to auto-approve (for managers)
+     * @param bool      $autoApprove Whether to auto-approve (for managers)
+     * @param list<int> $tagIds
      */
-    public function create(Glossary $glossary, int $userId, bool $autoApprove = false, ?int $categoryId = null): void
+    public function create(Glossary $glossary, int $userId, bool $autoApprove = false, array $tagIds = []): void
     {
         $glossary->setCreatedBy($userId);
         $glossary->setCreatedAt(new DateTimeImmutable());
@@ -143,10 +161,10 @@ readonly class GlossaryService
         $this->em->persist($glossary);
         $this->em->flush();
 
-        $this->taxonomyService->setCategory(GlossaryCategorizableTypeProvider::ITEM_TYPE, (int) $glossary->getId(), $categoryId);
+        $this->setTags((int) $glossary->getId(), $tagIds);
 
         $this->dispatcher->dispatch(EntityAction::CreateGlossary, (int) $glossary->getId());
-        $this->itemActionDispatcher->dispatch(ItemAction::Created, GlossaryCategorizableTypeProvider::ITEM_TYPE, (int) $glossary->getId());
+        $this->itemActionDispatcher->dispatch(ItemAction::Created, GlossaryTaggableTypeProvider::ITEM_TYPE, (int) $glossary->getId());
     }
 
     public function get(int $id): ?Glossary
@@ -170,6 +188,12 @@ readonly class GlossaryService
         $this->em->detach($newGlossary);
     }
 
+    /** @param list<int> $tagIds */
+    private function setTags(int $id, array $tagIds): void
+    {
+        $this->tagService->setTags(GlossaryTaggableTypeProvider::ITEM_TYPE, $id, $tagIds);
+    }
+
     private function findIncludingUnapproved(int $id): ?Glossary
     {
         return $this->repo->findOneAllowed($id, $this->managedIds());
@@ -178,13 +202,13 @@ readonly class GlossaryService
     /** @return list<int>|null */
     private function allowedIds(): ?array
     {
-        return $this->itemFilter->getAllowedItemIds(GlossaryCategorizableTypeProvider::ITEM_TYPE);
+        return $this->itemFilter->getAllowedItemIds(GlossaryTaggableTypeProvider::ITEM_TYPE);
     }
 
     /** @return list<int>|null */
     private function managedIds(): ?array
     {
-        return $this->adminItemFilter->getAllowedItemIds(GlossaryCategorizableTypeProvider::ITEM_TYPE);
+        return $this->adminItemFilter->getAllowedItemIds(GlossaryTaggableTypeProvider::ITEM_TYPE);
     }
 
     private function canSeeUnapproved(): bool

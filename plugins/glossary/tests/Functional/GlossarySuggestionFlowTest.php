@@ -167,6 +167,32 @@ class GlossarySuggestionFlowTest extends WebTestCase
         self::assertTrue($this->reload($client, $id)->getApproved());
     }
 
+    public function testModeratorEditWritesEveryCheckedTag(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $entry = $this->approvedEntryWithoutProposals($client);
+        $id = (int) $entry->getId();
+        $client->loginUser($this->user($client, self::MODERATOR_EMAIL));
+
+        $crawler = $client->request('GET', '/en/glossary/edit/' . $id, server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
+        $this->assertResponseIsSuccessful();
+        $offered = $crawler->filter('input[name="glossary[itemTags][]"]')->extract(['value']);
+        self::assertGreaterThanOrEqual(2, count($offered));
+        $checked = [$offered[0], $offered[1]];
+
+        // Act
+        $form = $crawler->filter('.box form')->form();
+        $form['glossary[itemTags]'] = $checked;
+        $client->submit($form);
+
+        // Assert
+        $this->assertResponseRedirects();
+        $reopened = $client->request('GET', '/en/glossary/edit/' . $id, server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
+        $stillChecked = $reopened->filter('input[name="glossary[itemTags][]"][checked]')->extract(['value']);
+        self::assertSame($checked, array_values(array_intersect($stillChecked, $checked)));
+    }
+
     private function submitEdit(KernelBrowser $client, int $id, string $explanation, ?string $phrase = null): void
     {
         $crawler = $client->request('GET', '/en/glossary/edit/' . $id, server: ['HTTP_HOST' => self::GLOSSARY_HOST]);

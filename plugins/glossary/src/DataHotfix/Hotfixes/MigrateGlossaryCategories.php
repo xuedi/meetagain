@@ -7,7 +7,7 @@ use App\Service\Config\LanguageService;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
-use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Migration\LegacyGlossaryCategoryConverter;
 
 readonly class MigrateGlossaryCategories implements DataHotfixInterface
@@ -44,14 +44,14 @@ readonly class MigrateGlossaryCategories implements DataHotfixInterface
             $itemId = (int) $row['id'];
             $alreadyAssigned = $connection->fetchOne(
                 'SELECT id FROM item_category_assignment WHERE item_type = ? AND item_id = ?',
-                [GlossaryCategorizableTypeProvider::ITEM_TYPE, $itemId],
+                [GlossaryTaggableTypeProvider::ITEM_TYPE, $itemId],
             );
             if ($alreadyAssigned !== false) {
                 continue;
             }
 
             $connection->insert('item_category_assignment', [
-                'item_type' => GlossaryCategorizableTypeProvider::ITEM_TYPE,
+                'item_type' => GlossaryTaggableTypeProvider::ITEM_TYPE,
                 'item_id' => $itemId,
                 'category_id' => (int) $row['category'],
             ]);

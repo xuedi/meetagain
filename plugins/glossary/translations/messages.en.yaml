@@ -11,7 +11,7 @@ glossary:
     label_phrase: 'Phrase'
     label_pinyin: 'Pinyin'
     label_explanation: 'Explanation'
-    label_category: 'Category'
+    label_tag: 'Tag'
     label_created_by: 'Created by'
     label_created_at: 'Created at'
     button_suggest_new: 'Suggest new'
@@ -25,7 +25,7 @@ glossary:
     button_review_suggestions: 'Review suggestions'
     validation_entry_missing: 'The glossary entry no longer exists.'
     validation_phrase_blank: 'The phrase cannot be empty.'
-    validation_category_unknown: 'This category no longer exists.'
+    validation_tag_unknown: 'This tag no longer exists.'
 glossary_config:
     page_title: 'Glossary configuration'
     primary_label: 'Primary field label'

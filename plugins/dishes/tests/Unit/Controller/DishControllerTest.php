@@ -5,8 +5,8 @@ namespace Plugin\Dishes\Tests\Unit\Controller;
 use App\Activity\ActivityService;
 use App\Item\ListRegistry;
 use App\Service\Seo\BreadcrumbBuilder;
-use App\Item\Taxonomy\AssignmentFormHelper;
-use App\Item\Taxonomy\TaxonomyService;
+use App\Item\Tag\AssignmentFormHelper;
+use App\Item\Tag\TagService;
 use App\Item\TranslationFormHelper;
 use PHPUnit\Framework\TestCase;
 use Plugin\Dishes\Controller\DishController;
@@ -37,7 +37,7 @@ class DishControllerTest extends TestCase
             $this->createStub(ConfigService::class),
             $this->createStub(TranslationFormHelper::class),
             $this->createStub(AssignmentFormHelper::class),
-            $this->createStub(TaxonomyService::class),
+            $this->createStub(TagService::class),
         );
 
         // Assert

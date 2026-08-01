@@ -4,7 +4,8 @@ namespace Plugin\Glossary\DataFixtures;
 
 use App\DataFixtures\AbstractFixture;
 use App\Entity\ChangeProposal;
-use App\Entity\ItemCategoryAssignment;
+use App\Entity\ItemTag;
+use App\Entity\ItemTagAssignment;
 use App\Entity\PluginSettings;
 use App\Entity\User;
 use App\Review\FieldChange;
@@ -12,7 +13,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Persistence\ObjectManager;
 use Plugin\Glossary\Entity\Glossary;
-use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Review\GlossaryChangeTarget;
 
 class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
@@ -23,9 +24,10 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
         echo 'Creating glossary ... ';
 
         $manager->persist($this->buildGlobalConfig());
+        $tags = $this->buildTags($manager);
 
         $assignments = [];
-        foreach ($this->getData() as [$phrase, $pinyin, $explanation, $category, $user, $approved]) {
+        foreach ($this->getData() as [$phrase, $pinyin, $explanation, $tagKey, $user, $approved]) {
             $glossary = new Glossary();
             $glossary->setCreatedAt(new DateTimeImmutable());
             $glossary->setCreatedBy($user);
@@ -35,25 +37,58 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
             $glossary->setExplanation($explanation);
 
             $manager->persist($glossary);
-            $assignments[] = [$glossary, $category];
+            $assignments[] = [$glossary, $tagKey];
         }
         $manager->flush();
 
-        foreach ($assignments as [$glossary, $categoryId]) {
-            $assignment = new ItemCategoryAssignment();
-            $assignment->setItemType(GlossaryCategorizableTypeProvider::ITEM_TYPE);
-            $assignment->setItemId((int) $glossary->getId());
-            $assignment->setCategoryId($categoryId);
-            $manager->persist($assignment);
+        foreach ($assignments as [$glossary, $tagKey]) {
+            foreach ([$tags[$tagKey], ...$tags[$tagKey]->getAncestors()] as $tag) {
+                $assignment = new ItemTagAssignment();
+                $assignment->setItemType(GlossaryTaggableTypeProvider::ITEM_TYPE);
+                $assignment->setItemId((int) $glossary->getId());
+                $assignment->setTag($tag);
+                $manager->persist($assignment);
+            }
         }
         $manager->flush();
 
-        $this->seedPendingProposal($manager, $assignments[0][0]);
+        $this->seedPendingProposal($manager, $assignments[0][0], $tags);
 
         echo 'OK' . PHP_EOL;
     }
 
-    private function seedPendingProposal(ObjectManager $manager, Glossary $entry): void
+    /** @return array<int, ItemTag> */
+    private function buildTags(ObjectManager $manager): array
+    {
+        $rows = [
+            [0, 'Greeting', 'Begrüßung', null],
+            [7, 'Informal', 'Umgangssprache', null],
+            [1, 'Swearing', 'Schimpfen', 7],
+            [2, 'Flirting', 'Flirten', 7],
+            [3, 'Slang', 'Slang', 7],
+            [4, 'Abbreviation', 'Abkürzung', null],
+            [5, 'Regular', 'Regulär', null],
+            [6, 'Idioms', 'Redewendungen', null],
+        ];
+
+        $tags = [];
+        $position = 0;
+        foreach ($rows as [$key, $en, $de, $parent]) {
+            $tag = new ItemTag();
+            $tag->setItemType(GlossaryTaggableTypeProvider::ITEM_TYPE);
+            $tag->setLabels(['en' => $en, 'de' => $de]);
+            $tag->setParent($parent === null ? null : ($tags[$parent] ?? null));
+            $tag->setPosition($position++);
+            $manager->persist($tag);
+            $tags[$key] = $tag;
+        }
+        $manager->flush();
+
+        return $tags;
+    }
+
+    /** @param array<int, ItemTag> $tags */
+    private function seedPendingProposal(ObjectManager $manager, Glossary $entry, array $tags): void
     {
         $member = $manager->getRepository(User::class)->findOneBy(['email' => 'Adem.Lane@example.org']);
         if ($member === null) {
@@ -61,12 +96,12 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
         }
 
         $proposal = new ChangeProposal();
-        $proposal->setTargetType(GlossaryCategorizableTypeProvider::ITEM_TYPE);
+        $proposal->setTargetType(GlossaryTaggableTypeProvider::ITEM_TYPE);
         $proposal->setTargetId((int) $entry->getId());
         $proposal->setProposedBy($member);
         $proposal->setChanges([
             new FieldChange(GlossaryChangeTarget::FIELD_EXPLANATION, $entry->getExplanation(), 'go away (very rude)'),
-            new FieldChange(GlossaryChangeTarget::FIELD_CATEGORY, '1', '3'),
+            new FieldChange(GlossaryChangeTarget::FIELD_TAG, (string) $tags[1]->getId(), (string) $tags[3]->getId()),
         ]);
         $manager->persist($proposal);
         $manager->flush();
@@ -74,25 +109,6 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
 
     private function buildGlobalConfig(): PluginSettings
     {
-        $labels = [
-            [0, 'Greeting', 'Begrüßung', null],
-            [1, 'Swearing', 'Schimpfen', 0],
-            [2, 'Flirting', 'Flirten', 0],
-            [3, 'Slang', 'Slang', 0],
-            [4, 'Abbreviation', 'Abkürzung', null],
-            [5, 'Regular', 'Regulär', null],
-            [6, 'Idioms', 'Redewendungen', null],
-        ];
-
-        $categories = [];
-        foreach ($labels as [$id, $en, $de, $group]) {
-            $row = ['id' => $id, 'labels' => ['en' => $en, 'de' => $de]];
-            if ($group !== null) {
-                $row['group'] = $group;
-            }
-            $categories[] = $row;
-        }
-
         $config = new PluginSettings();
         $config->setPluginKey('glossary');
         $config->setData([
@@ -100,15 +116,6 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
             'secondaryLabel' => 'Pinyin',
             'primaryLabel' => null,
             'definitionLabel' => null,
-            'taxonomy' => [
-                'categoriesEnabled' => true,
-                'tagsEnabled' => false,
-                'categoryGroups' => [
-                    ['id' => 0, 'labels' => ['en' => 'Informal', 'de' => 'Umgangssprache']],
-                ],
-                'categories' => $categories,
-                'tags' => [],
-            ],
         ]);
         $config->setUpdatedAt(new DateTimeImmutable());
 

@@ -9,7 +9,7 @@
     </td>
     {% if config.secondaryEnabled %}<td style="vertical-align: middle;" class="has-text-grey">{{ entry.pinyin }}</td>{% endif %}
     <td style="vertical-align: middle;" class="item-cell-prose">{{ entry.explanation|nl2br }}</td>
-    {% if config.hasCategories %}<td style="vertical-align: middle;">{{ item_category_label('glossary', entry.id)|default('') }}</td>{% endif %}
+    {% if hasTags %}<td style="vertical-align: middle;">{{ item_tag_labels('glossary', entry.id)|join(', ') }}</td>{% endif %}
     {% if is_granted('ROLE_USER') %}
         <td style="vertical-align: middle;" class="has-text-right">
             {% if is_granted('ROLE_ORGANIZER') %}
@@ -49,7 +49,7 @@
                 <p class="subtitle is-6 has-text-grey">{{ entry.pinyin }}</p>
             {% endif %}
             <p>{{ entry.explanation|nl2br }}</p>
-            {% include '_components/item/taxonomy_badges.html.twig' with {'itemType': 'glossary', 'itemId': entry.id} only %}
+            {% include '_components/item/tag_badges.html.twig' with {'itemType': 'glossary', 'itemId': entry.id} only %}
         </div>
     </div>
 {% endif %}

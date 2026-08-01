@@ -3,7 +3,7 @@
 namespace Plugin\Dishes\Form;
 
 use App\Item\TranslationFormHelper;
-use App\Item\Taxonomy\AssignmentFormHelper;
+use App\Item\Tag\AssignmentFormHelper;
 use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Service\DishService;
 use Symfony\Component\Form\AbstractType;

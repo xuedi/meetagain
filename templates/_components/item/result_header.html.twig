@@ -2,16 +2,15 @@
     Item Result Header -- what the current facet selection yields, and how to undo it
 
     Sits above the list body inside the region a facet click swaps: the entry count - narrowed to
-    "Showing X of Y" while a facet is active - the active category and tags as removable chips, and
+    "Showing X of Y" while a facet is active - the active tags as removable chips, and
     a Clear all link. A type with no vocabulary gets the plain count, so every item list states its
     size in the same place.
 
     Used in:    _components/item/list_body.html.twig
     Parameters:
         - itemType (string, required) -- registry key of the item type (e.g. 'dish')
-    Depends on: item_facet_current(), item_facet_url(), item_facet_counts(),
-                item_taxonomy_category_choices(), item_taxonomy_tag_choices()
-                (ItemTaxonomyExtension); item_list_url(), item_list_count() (ItemListExtension)
+    Depends on: item_facet_current(), item_facet_url(), item_facet_counts(), item_tag_choices()
+                (ItemTagExtension); item_list_url(), item_list_count() (ItemListExtension)
 #}
 {% set selection = item_facet_current() %}
 {% set counts = item_facet_counts(itemType) %}
@@ -26,15 +25,8 @@
         {% endif %}
     </p>
     {% if not selection.isEmpty() %}
-        {% set categoryChoices = item_taxonomy_category_choices(itemType) %}
-        {% set tagChoices = item_taxonomy_tag_choices(itemType) %}
+        {% set tagChoices = item_tag_choices(itemType) %}
         <div class="tags mt-2">
-            {% if selection.category is not null %}
-                <a href="{{ item_facet_url(baseUrl, selection.withCategory(null)) }}" class="tag is-link" rel="nofollow" data-item-facet>
-                    {{ categoryChoices[selection.category]|default(selection.category) }}
-                    <span class="icon is-small ml-1"><i class="fa-solid fa-xmark"></i></span>
-                </a>
-            {% endif %}
             {% for tagId in selection.tags %}
                 <a href="{{ item_facet_url(baseUrl, selection.withTagToggled(tagId)) }}" class="tag is-link" rel="nofollow" data-item-facet>
                     {{ tagChoices[tagId]|default(tagId) }}

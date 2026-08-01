@@ -10,7 +10,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Plugin\Glossary\Entity\Glossary;
-use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Repository\GlossaryRepository;
 
 readonly class GlossaryContributor implements ContributorInterface
@@ -29,7 +29,7 @@ readonly class GlossaryContributor implements ContributorInterface
     #[Override]
     public function getItemType(): string
     {
-        return GlossaryCategorizableTypeProvider::ITEM_TYPE;
+        return GlossaryTaggableTypeProvider::ITEM_TYPE;
     }
 
     #[Override]

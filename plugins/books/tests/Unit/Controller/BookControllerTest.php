@@ -5,8 +5,8 @@ namespace Plugin\Books\Tests\Unit\Controller;
 use App\Activity\ActivityService;
 use App\Item\ListRegistry;
 use App\Service\Seo\BreadcrumbBuilder;
-use App\Item\Taxonomy\AssignmentFormHelper;
-use App\Item\Taxonomy\TaxonomyService;
+use App\Item\Tag\AssignmentFormHelper;
+use App\Item\Tag\TagService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Books\Controller\BookController;
 use Plugin\Books\Service\BookService;
@@ -30,7 +30,7 @@ class BookControllerTest extends TestCase
             $bookService,
             $this->createStub(ActivityService::class),
             $this->createStub(AssignmentFormHelper::class),
-            $this->createStub(TaxonomyService::class),
+            $this->createStub(TagService::class),
         );
 
         // Assert

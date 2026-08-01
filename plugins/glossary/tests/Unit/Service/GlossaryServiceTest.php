@@ -7,13 +7,13 @@ use App\Enum\ItemAction;
 use App\Item\ActionDispatcher;
 use App\Item\AdminFilterService;
 use App\Item\FilterService;
-use App\Item\Taxonomy\TaxonomyService;
+use App\Item\Tag\TagService;
 use App\Review\ChangeProposalService;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
-use Plugin\Glossary\Item\GlossaryCategorizableTypeProvider;
+use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Repository\GlossaryRepository;
 use Plugin\Glossary\Review\GlossaryChangeTarget;
 use Plugin\Glossary\Service\GlossaryService;
@@ -110,7 +110,7 @@ class GlossaryServiceTest extends TestCase
         $proposals = $this->createMock(ChangeProposalService::class);
         $proposals->expects(self::once())
             ->method('removeForTarget')
-            ->with(GlossaryCategorizableTypeProvider::ITEM_TYPE, 1);
+            ->with(GlossaryTaggableTypeProvider::ITEM_TYPE, 1);
         $service = $this->makeService($em, $this->repoReturning($item), changeProposalService: $proposals);
 
         // Act
@@ -147,21 +147,34 @@ class GlossaryServiceTest extends TestCase
         self::assertNull($item->getPinyin());
     }
 
-    public function testApplyChangeRoutesCategoryThroughTheTaxonomy(): void
+    public function testApplyChangeRoutesEveryProposedTagThroughTheTagService(): void
     {
         // Arrange
-        $taxonomy = $this->createMock(TaxonomyService::class);
-        $taxonomy->expects(self::once())
-            ->method('setCategory')
-            ->with(GlossaryCategorizableTypeProvider::ITEM_TYPE, 1, 3);
+        $tagService = $this->createMock(TagService::class);
+        $tagService->expects(self::once())
+            ->method('setTags')
+            ->with(GlossaryTaggableTypeProvider::ITEM_TYPE, 1, [3, 7]);
         $service = $this->makeService(
             $this->createStub(EntityManagerInterface::class),
             $this->repoReturning(new Glossary()),
-            taxonomyService: $taxonomy,
+            tagService: $tagService,
         );
 
         // Act
-        $service->applyChange(1, GlossaryChangeTarget::FIELD_CATEGORY, '3');
+        $service->applyChange(1, GlossaryChangeTarget::FIELD_TAG, '3,7');
+    }
+
+    public function testTagIdsRoundTripThroughTheProposalValue(): void
+    {
+        // Arrange
+        $service = $this->makeService($this->createStub(EntityManagerInterface::class), $this->repoReturning(new Glossary()));
+
+        // Act & Assert
+        self::assertSame('3,7', $service->encodeTagIds([7, 3]));
+        self::assertNull($service->encodeTagIds([]));
+        self::assertSame([3, 7], $service->decodeTagIds('3,7'));
+        self::assertSame([], $service->decodeTagIds(null));
+        self::assertSame([], $service->decodeTagIds(''));
     }
 
     public function testApplyChangeRejectsUnknownField(): void
@@ -194,7 +207,7 @@ class GlossaryServiceTest extends TestCase
         $filter = $this->createMock(FilterService::class);
         $filter->expects(self::once())
             ->method('getAllowedItemIds')
-            ->with(GlossaryCategorizableTypeProvider::ITEM_TYPE)
+            ->with(GlossaryTaggableTypeProvider::ITEM_TYPE)
             ->willReturn([4, 7]);
 
         $entry = (new Glossary())->setPhrase('你好');
@@ -282,7 +295,7 @@ class GlossaryServiceTest extends TestCase
         $dispatcher = $this->createMock(ActionDispatcher::class);
         $dispatcher->expects(self::once())
             ->method('dispatch')
-            ->with(ItemAction::Created, GlossaryCategorizableTypeProvider::ITEM_TYPE, 0);
+            ->with(ItemAction::Created, GlossaryTaggableTypeProvider::ITEM_TYPE, 0);
 
         $service = $this->makeService(
             $this->createStub(EntityManagerInterface::class),
@@ -300,7 +313,7 @@ class GlossaryServiceTest extends TestCase
         ?FilterService $filter = null,
         ?AdminFilterService $adminFilter = null,
         ?ActionDispatcher $itemActionDispatcher = null,
-        ?TaxonomyService $taxonomyService = null,
+        ?TagService $tagService = null,
         ?ChangeProposalService $changeProposalService = null,
         ?Security $security = null,
     ): GlossaryService {
@@ -320,7 +333,7 @@ class GlossaryServiceTest extends TestCase
             $filter,
             $adminFilter,
             $this->createStub(EntityActionDispatcher::class),
-            $taxonomyService ?? $this->createStub(TaxonomyService::class),
+            $tagService ?? $this->createStub(TagService::class),
             $itemActionDispatcher ?? $this->createStub(ActionDispatcher::class),
             $changeProposalService ?? $this->createStub(ChangeProposalService::class),
             $security ?? $this->viewer(moderator: false),

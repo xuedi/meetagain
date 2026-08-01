@@ -25,12 +25,25 @@ class ChangeTargetRegistry
 
     public function has(string $targetType): bool
     {
-        return isset($this->getActive()[$targetType]);
+        return $this->providerFor($targetType) !== null;
     }
 
     public function providerFor(string $targetType): ?ChangeTargetProviderInterface
     {
-        return $this->getActive()[$targetType] ?? null;
+        $exact = $this->getActive()[$targetType] ?? null;
+        if ($exact !== null) {
+            return $exact;
+        }
+
+        foreach ($this->providers as $provider) {
+            if (!$provider instanceof ChangeTargetFamilyInterface || !$provider->handlesTargetType($targetType)) {
+                continue;
+            }
+
+            return $provider->forTargetType($targetType);
+        }
+
+        return null;
     }
 
     /**

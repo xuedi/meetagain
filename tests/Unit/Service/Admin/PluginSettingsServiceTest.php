@@ -73,16 +73,16 @@ class PluginSettingsServiceTest extends TestCase
     public function testGetScopableByPluginGroupsSectionsUnderTheirPlugin(): void
     {
         // Arrange
-        $taxonomy = $this->makeProvider('films_taxonomy', pluginKey: 'films');
+        $extra = $this->makeProvider('films_extra', pluginKey: 'films');
         $apiKeys = $this->makeProvider('films', pluginKey: 'films', scopable: false);
         $dishes = $this->makeProvider('dishes');
-        $service = new PluginSettingsService([$taxonomy, $apiKeys, $dishes]);
+        $service = new PluginSettingsService([$extra, $apiKeys, $dishes]);
 
         // Act
         $grouped = $service->getScopableByPlugin();
 
         // Assert
-        static::assertSame([$taxonomy], $grouped['films']);
+        static::assertSame([$extra], $grouped['films']);
         static::assertSame([$dishes], $grouped['dishes']);
     }
 
@@ -101,16 +101,16 @@ class PluginSettingsServiceTest extends TestCase
     public function testGetByPluginReturnsEverySectionOfThatPlugin(): void
     {
         // Arrange
-        $taxonomy = $this->makeProvider('films_taxonomy', pluginKey: 'films');
+        $extra = $this->makeProvider('films_extra', pluginKey: 'films');
         $apiKeys = $this->makeProvider('films', pluginKey: 'films', scopable: false);
         $dishes = $this->makeProvider('dishes');
-        $service = new PluginSettingsService([$taxonomy, $apiKeys, $dishes]);
+        $service = new PluginSettingsService([$extra, $apiKeys, $dishes]);
 
         // Act
         $sections = $service->getByPlugin('films');
 
         // Assert
-        static::assertSame(['films_taxonomy' => $taxonomy, 'films' => $apiKeys], $sections);
+        static::assertSame(['films_extra' => $extra, 'films' => $apiKeys], $sections);
         static::assertSame([], $service->getByPlugin('missing'));
     }
 

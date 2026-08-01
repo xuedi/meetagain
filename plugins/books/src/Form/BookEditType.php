@@ -2,7 +2,7 @@
 
 namespace Plugin\Books\Form;
 
-use App\Item\Taxonomy\AssignmentFormHelper;
+use App\Item\Tag\AssignmentFormHelper;
 use Override;
 use Plugin\Books\Entity\Book;
 use Plugin\Books\Service\BookService;

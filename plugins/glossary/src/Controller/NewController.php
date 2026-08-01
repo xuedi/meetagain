@@ -4,6 +4,7 @@ namespace Plugin\Glossary\Controller;
 
 use App\Activity\ActivityService;
 use App\Entity\User;
+use App\Item\Tag\AssignmentFormHelper;
 use Plugin\Glossary\Activity\Messages\EntryCreated;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Form\GlossaryType;
@@ -21,6 +22,7 @@ final class NewController extends AbstractGlossaryController
     public function __construct(
         GlossaryService $service,
         private readonly ActivityService $activityService,
+        private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {
         parent::__construct($service);
     }
@@ -36,8 +38,8 @@ final class NewController extends AbstractGlossaryController
             if (!$this->getUser() instanceof User) {
                 throw new AuthenticationException('Only for logged in users');
             }
-            $categoryId = $form->has('category') ? $this->intOrNull($form->get('category')->getData()) : null;
-            $this->service->create($glossary, $this->getAuthedUser()->getId(), $this->isGranted('ROLE_ORGANIZER'), $categoryId);
+            $tagIds = $this->assignmentFormHelper->extractAssignment($form);
+            $this->service->create($glossary, $this->getAuthedUser()->getId(), $this->isGranted('ROLE_ORGANIZER'), $tagIds);
 
             $this->activityService->log(EntryCreated::TYPE, $this->getUser(), [
                 'glossary_id' => $glossary->getId(),

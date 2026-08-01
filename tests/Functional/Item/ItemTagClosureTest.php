@@ -3,6 +3,7 @@
 namespace Tests\Functional\Item;
 
 use App\Entity\User;
+use App\Entity\ItemTag;
 use App\Repository\ItemTagAssignmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Films\Entity\Film;
@@ -26,12 +27,15 @@ class ItemTagClosureTest extends WebTestCase
         $crawler = $client->request('GET', '/en/films/' . $film->getId() . '/edit');
         $this->assertResponseIsSuccessful();
 
+        $drama = $this->tag($client, 'Drama');
+        $familyDrama = $this->tag($client, 'Family drama');
+
         // Act
-        $this->submitTags($client, $crawler->filter('form[name="film_edit"]')->form(), ['1']);
+        $this->submitTags($client, $crawler->filter('form[name="film_edit"]')->form(), [(string) $familyDrama]);
 
         // Assert
         $this->assertResponseRedirects();
-        static::assertSame([0, 1], $this->tagIds($client, (int) $film->getId()), 'The parent rides along');
+        static::assertSame($this->sorted([$drama, $familyDrama]), $this->tagIds($client, (int) $film->getId()), 'The parent rides along');
     }
 
     public function testDroppingAParentTagLeavesTheSubTagAssignmentIntact(): void
@@ -41,22 +45,24 @@ class ItemTagClosureTest extends WebTestCase
         $client->setServerParameter('HTTP_HOST', self::HOST);
         $client->loginUser($this->manager($client));
         $film = $this->film($client, self::UNTAGGED_FILM);
+        $drama = $this->tag($client, 'Drama');
+        $familyDrama = $this->tag($client, 'Family drama');
         $crawler = $client->request('GET', '/en/films/' . $film->getId() . '/edit');
-        $this->submitTags($client, $crawler->filter('form[name="film_edit"]')->form(), ['0', '1']);
+        $this->submitTags($client, $crawler->filter('form[name="film_edit"]')->form(), [(string) $drama, (string) $familyDrama]);
 
         // Act
         $crawler = $client->request('GET', '/en/films/' . $film->getId() . '/edit');
-        $this->submitTags($client, $crawler->filter('form[name="film_edit"]')->form(), ['1']);
+        $this->submitTags($client, $crawler->filter('form[name="film_edit"]')->form(), [(string) $familyDrama]);
 
         // Assert
-        static::assertSame([0, 1], $this->tagIds($client, (int) $film->getId()));
+        static::assertSame($this->sorted([$drama, $familyDrama]), $this->tagIds($client, (int) $film->getId()));
     }
 
     /** @param list<string> $tagIds */
     private function submitTags(KernelBrowser $client, Form $form, array $tagIds): void
     {
         $values = $form->getPhpValues();
-        $values['film_edit']['taxonomyTags'] = $tagIds;
+        $values['film_edit']['itemTags'] = $tagIds;
         $client->request('POST', $form->getUri(), $values, $form->getPhpFiles());
     }
 
@@ -65,6 +71,30 @@ class ItemTagClosureTest extends WebTestCase
     {
         $this->em($client)->clear();
         $ids = $client->getContainer()->get(ItemTagAssignmentRepository::class)->tagIdsFor('film', $filmId);
+        sort($ids);
+
+        return $ids;
+    }
+
+    private function tag(KernelBrowser $client, string $label): int
+    {
+        foreach ($this->em($client)->getRepository(ItemTag::class)->findBy(['itemType' => 'film']) as $tag) {
+            if (($tag->getLabels()['en'] ?? '') !== $label) {
+                continue;
+            }
+
+            return (int) $tag->getId();
+        }
+
+        self::fail('Required fixture tag missing: ' . $label);
+    }
+
+    /**
+     * @param  list<int> $ids
+     * @return list<int>
+     */
+    private function sorted(array $ids): array
+    {
         sort($ids);
 
         return $ids;

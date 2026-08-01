@@ -5,7 +5,7 @@
 {% set listHeader = [primaryLabel] %}
 {% if config.secondaryEnabled %}{% set listHeader = listHeader|merge([secondaryLabel]) %}{% endif %}
 {% set listHeader = listHeader|merge([definitionLabel]) %}
-{% if config.hasCategories %}{% set listHeader = listHeader|merge([('glossary.label_category'|trans)]) %}{% endif %}
+{% if hasTags %}{% set listHeader = listHeader|merge([('glossary.label_tag'|trans)]) %}{% endif %}
 {% if is_granted('ROLE_USER') %}{% set listHeader = listHeader|merge(['']) %}{% endif %}
 
 {% include '_components/item/list.html.twig' with {

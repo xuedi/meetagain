@@ -75,7 +75,7 @@ class ItemListSidebarTest extends WebTestCase
             $boxes->first()->filter('a[href$="/item/glossary/view/list"]'),
             'Box order is view -> filter -> about',
         );
-        static::assertStringContainsString('taxonomy-filter', (string) $boxes->eq(1)->attr('class'));
+        static::assertStringContainsString('item-tag-filter', (string) $boxes->eq(1)->attr('class'));
     }
 
     public function testEveryFacetOptionIsAChipAndAnEmptyOneIsNotClickable(): void
@@ -97,7 +97,7 @@ class ItemListSidebarTest extends WebTestCase
         );
     }
 
-    public function testGroupedCategoriesRenderUnderAHeadingWithUngroupedChipsFirst(): void
+    public function testASubTagRendersIndentedBelowItsParent(): void
     {
         // Arrange
         $client = static::createClient();
@@ -106,33 +106,10 @@ class ItemListSidebarTest extends WebTestCase
         $crawler = $client->request('GET', '/en/glossary', server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
 
         // Assert
-        $headings = $crawler->filter('[data-item-filter] [data-item-facet-group]');
-        static::assertCount(1, $headings);
-        static::assertSame('Informal', $headings->text());
-        static::assertCount(
-            7,
-            $crawler->filter('[data-item-filter] .tag:not([data-item-facet-more])'),
-            'Grouping is display only - every definition still renders as its own chip',
-        );
-
-        $rows = $crawler->filter('[data-item-filter] .field:has(.tag) > .tags');
-        static::assertCount(2, $rows);
-        static::assertStringNotContainsString('ml-4', (string) $rows->first()->attr('class'), 'Ungrouped chips come first, unindented');
-        static::assertStringContainsString('ml-4', (string) $rows->last()->attr('class'));
-    }
-
-    public function testAFacetClickKeepsTheGroupedRendering(): void
-    {
-        // Arrange
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/en/glossary', server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
-        $chip = $crawler->filter('[data-item-filter] a.tag[data-item-facet]')->first();
-
-        // Act
-        $faceted = $client->request('GET', (string) $chip->attr('href'), server: ['HTTP_HOST' => self::GLOSSARY_HOST]);
-
-        // Assert
-        static::assertCount(1, $faceted->filter('[data-item-filter] [data-item-facet-group]'));
+        $rows = $crawler->filter('[data-item-facet-axis="tag"] > .tags');
+        static::assertGreaterThan(1, $rows->count(), 'A nested vocabulary renders one row per level');
+        static::assertStringNotContainsString('padding-left', (string) $rows->first()->attr('style'));
+        static::assertStringContainsString('padding-left', (string) $rows->eq(1)->attr('style'));
     }
 
     public function testAFacetedPageNarrowsTheCountAndIsNotIndexed(): void

@@ -1,0 +1,16 @@
+{#
+    Item Detail Back Button -- link from an item detail page back to that type's list.
+
+    Renders the small button every item detail page carries on its title row, right-aligned. A
+    visitor arriving from a search result, a shared link or a tag badge has no list page in their
+    history, so the way back has to be on the page rather than in the browser's back button. The
+    caller supplies the list URL; label and icon are shared so all item types read the same.
+
+    Used in:    dishes / books / films / glossary detail pages
+    Parameters:
+        - url (string, required) -- path of the item type's list page
+#}
+<a href="{{ url }}" class="button is-small is-light">
+    <span class="icon"><i class="fa-solid fa-arrow-left"></i></span>
+    <span>{{ 'global.button_back'|trans }}</span>
+</a>

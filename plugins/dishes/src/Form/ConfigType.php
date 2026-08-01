@@ -2,7 +2,6 @@
 
 namespace Plugin\Dishes\Form;
 
-use App\Form\Item\TaxonomyConfigType;
 use App\Service\Config\LanguageService;
 use Plugin\Dishes\ValueObject\Config;
 use Symfony\Component\Form\AbstractType;
@@ -35,7 +34,6 @@ class ConfigType extends AbstractType
             ]);
         }
 
-        $builder->add('taxonomy', TaxonomyConfigType::class);
     }
 
     #[\Override]
