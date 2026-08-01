@@ -62,7 +62,6 @@
 
         <div data-item-facet-panel>
             <div class="field" data-item-facet-axis="tag">
-                <p class="label is-small mb-1">{{ 'item.facet_tags'|trans }}</p>
                 {% for level in item_tag_levels(itemType) %}
                     <div class="tags"{% if level.depth > 1 %} style="padding-left: {{ (level.depth - 1) * 1.5 }}rem;"{% endif %}>
                         {% for id, label in level.choices %}

@@ -26,6 +26,15 @@
         alt: film.title,
         ratio: 'portrait'
     } %}
+{% elseif mode == 'gallery' %}
+    {% include '_components/item/styles/slide.html.twig' with {
+        group: 'item-gallery-film',
+        image: film.posterImage,
+        thumbSize: '200x300',
+        title: film.title,
+        subtitle: film.year,
+        href: showUrl
+    } %}
 {% else %}
     {% include '_components/item/styles/portrait.html.twig' with {
         href: showUrl,
@@ -34,5 +43,4 @@
         title: film.title,
         subtitle: film.year
     } %}
-    {% include '_components/item/tag_badges.html.twig' with {'itemType': 'film', 'itemId': film.id} only %}
 {% endif %}

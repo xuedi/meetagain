@@ -23,6 +23,7 @@ final class AppBundle
         'js/item-translation-toggle.js',
         'js/item-tag-tree.js',
         'js/item-list.js',
+        'js/item-gallery.js',
     ];
 
     private ?string $hash = null;

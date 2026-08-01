@@ -1,0 +1,33 @@
+{#
+    Item tile style: slide - a lightbox-bound thumbnail for the gallery layout of the shared item
+    list. Renders a Fancybox anchor whose href is a large free-axis rendition of the image; the
+    gallery stage in _components/item/list.html.twig reads the data attributes to show the active
+    slide big with prev/next navigation. Items without an image render nothing.
+
+    Used in:    plugin item cell templates in gallery mode (e.g.
+                plugins/books/templates/item/list_cell.html.twig) and
+                plugins/dishes/templates/views/gallery.html.twig
+    Parameters:
+        - group     (string, required)     -- Fancybox group name, one per item type
+        - image     (Image|null, required) -- the item's image; null renders nothing
+        - thumbSize (string, required)     -- thumbnail dimensions 'WxH' for the strip
+        - title     (string, required)     -- item label, used as alt, tooltip and stage caption
+        - href      (string, required)     -- the item's detail page, linked from the stage caption
+        - subtitle  (string, optional)     -- secondary stage caption text (e.g. author, year)
+        - bigSize   (string, optional)     -- size token of the lightbox rendition; default: 'h800'
+    Depends on: _components/image.html.twig; assets/js/item-gallery.js (stage + Fancybox binding)
+#}
+{% if image %}
+    {% set caption = '<div style="text-align:center"><a href="' ~ href ~ '">' ~ title ~ '</a> &middot; ' ~ 'item.gallery_report_caption'|trans({'%url%': path('app_report_image', {'id': image.id})}) ~ '</div>' %}
+    <a data-fancybox="{{ group }}"
+       data-caption="{{ caption }}"
+       href="/images/thumbnails/{{ image.hash }}_{{ bigSize|default('h800') }}.webp"
+       class="item-gallery-slide"
+       title="{{ title }}"
+       data-item-gallery-slide
+       data-item-gallery-title="{{ title }}"
+       {% if subtitle is defined and subtitle %}data-item-gallery-subtitle="{{ subtitle }}"{% endif %}
+       data-item-gallery-url="{{ href }}">
+        {% include '_components/image.html.twig' with {'image': image, 'size': thumbSize, 'alt': title} %}
+    </a>
+{% endif %}

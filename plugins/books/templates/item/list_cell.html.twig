@@ -26,6 +26,15 @@
         alt: book.title,
         ratio: 'portrait'
     } %}
+{% elseif mode == 'gallery' %}
+    {% include '_components/item/styles/slide.html.twig' with {
+        group: 'item-gallery-book',
+        image: book.coverImage,
+        thumbSize: '200x250',
+        title: book.title,
+        subtitle: book.author,
+        href: showUrl
+    } %}
 {% else %}
     {% include '_components/item/styles/portrait.html.twig' with {
         href: showUrl,
@@ -34,5 +43,4 @@
         title: book.title,
         subtitle: book.author
     } %}
-    {% include '_components/item/tag_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
 {% endif %}

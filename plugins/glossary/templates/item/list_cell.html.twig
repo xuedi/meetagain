@@ -49,7 +49,6 @@
                 <p class="subtitle is-6 has-text-grey">{{ entry.pinyin }}</p>
             {% endif %}
             <p>{{ entry.explanation|nl2br }}</p>
-            {% include '_components/item/tag_badges.html.twig' with {'itemType': 'glossary', 'itemId': entry.id} only %}
         </div>
     </div>
 {% endif %}
