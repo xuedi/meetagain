@@ -7,7 +7,7 @@
     <div class="container">
         {% include 'town_hall/_header.html.twig' with { active: 'forum' } %}
 
-        <div class="columns item-list-layout">
+        <div class="columns item-list-layout town-hall-forum-layout">
             <div class="column is-narrow item-list-sidebar">
                 {% include 'town_hall/_topic_sidebar.html.twig' with {
                     childrenByParent: childrenByParent,
@@ -15,6 +15,7 @@
                     activeId: activeId,
                     maxDepth: maxDepth,
                 } only %}
+                {% block forum_sidebar_extra %}{% endblock %}
             </div>
             <div class="column item-list-main">
                 {% block forum_main %}{% endblock %}

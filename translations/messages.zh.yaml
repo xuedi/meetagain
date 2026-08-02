@@ -595,7 +595,6 @@ town_hall:
     forum_activity_empty: '这里还没有人发言。'
     forum_pick_hint: '从列表中选择一个话题来阅读和参与讨论。'
     forum_started_by: '由 %name% 发起'
-    forum_subtopics_heading: '子话题'
     forum_title_label: '标题'
     forum_create_submit: '创建话题'
     forum_button_rename: '重命名'

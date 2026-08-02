@@ -2,20 +2,9 @@
 
 {% block title %}{{ topic.title }}{% endblock %}
 
-{% block forum_main %}
-    <nav class="breadcrumb is-small" aria-label="breadcrumbs">
-        <ul>
-            <li><a href="{{ path('app_townhall_forum', { _locale: app.request.locale }) }}">{{ 'town_hall.forum_page_title'|trans }}</a></li>
-            {% for node in breadcrumb %}
-                <li class="{{ loop.last ? 'is-active' : '' }}">
-                    <a href="{{ path('app_townhall_forum_topic', { _locale: app.request.locale, topicId: node.id }) }}">{{ node.title }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </nav>
-
+{% block forum_sidebar_extra %}
     <div class="box">
-        <h2 class="title is-4">{{ topic.title }}</h2>
+        <h2 class="title is-5">{{ topic.title }}</h2>
         <p class="is-size-7 has-text-grey">
             {{ 'town_hall.forum_started_by'|trans({'%name%': topic.author ? topic.author.name : 'town_hall.deleted_user'|trans}) }}
             &middot;
@@ -54,20 +43,19 @@
             </div>
         {% endif %}
     </div>
+{% endblock %}
 
-    {% set subtopics = childrenByParent[topic.id]|default([]) %}
-    {% if subtopics is not empty %}
-        <div class="box">
-            <h3 class="title is-6">{{ 'town_hall.forum_subtopics_heading'|trans }}</h3>
-            <div class="tags">
-                {% for child in subtopics %}
-                    <a class="tag is-light" href="{{ path('app_townhall_forum_topic', { _locale: app.request.locale, topicId: child.id }) }}">
-                        {{ child.title }}
-                    </a>
-                {% endfor %}
-            </div>
-        </div>
-    {% endif %}
+{% block forum_main %}
+    <nav class="breadcrumb is-small" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="{{ path('app_townhall_forum', { _locale: app.request.locale }) }}">{{ 'town_hall.forum_page_title'|trans }}</a></li>
+            {% for node in breadcrumb %}
+                <li class="{{ loop.last ? 'is-active' : '' }}">
+                    <a href="{{ path('app_townhall_forum_topic', { _locale: app.request.locale, topicId: node.id }) }}">{{ node.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
 
-    {{ comment_section('topic', topic.id) }}
+    {{ comment_section('topic', topic.id, false) }}
 {% endblock %}

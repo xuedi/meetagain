@@ -512,6 +512,14 @@ body.admin-shell-no-scroll {
     }
 }
 
+// The forum sidebar carries an indented topic tree plus the topic header box, so it needs more
+// room than the item-list sidebar it otherwise shares its layout with.
+@media (min-width: 769px) {
+    .item-list-layout.town-hall-forum-layout > .item-list-sidebar {
+        width: 22rem;
+    }
+}
+
 // JSTable's vendor CSS forces white-space:nowrap on every cell; prose columns opt back out.
 .item-list .dt-table td.item-cell-prose {
     white-space: normal;

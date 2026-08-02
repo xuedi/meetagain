@@ -595,7 +595,6 @@ town_hall:
     forum_activity_empty: 'Hier wurde noch nichts geschrieben.'
     forum_pick_hint: 'Wähle links ein Thema aus, um mitzulesen und mitzureden.'
     forum_started_by: 'Eröffnet von %name%'
-    forum_subtopics_heading: 'Unterthemen'
     forum_title_label: 'Titel'
     forum_create_submit: 'Thema erstellen'
     forum_button_rename: 'Umbenennen'

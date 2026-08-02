@@ -13,25 +13,24 @@
         - comments   (array, required)  -- Comment entities, newest first
         - canComment (bool, required)   -- provider verdict on adding a comment
         - maxLength  (int, required)    -- character cap enforced server-side
+        - showHeading (bool, optional)  -- render the "Comments" heading; default: true
     Depends on: _components/comment/entry.html.twig; assets/js/event-details.js (#replyInput)
 #}
-<h2 class="title is-4">{{ 'comment.heading'|trans }}</h2>
-<div class="columns">
-    <div class="column is-four-fifths">
-        {% for comment in comments %}
-            {% include '_components/comment/entry.html.twig' with {'comment': comment, 'targetType': targetType, 'targetId': targetId} %}
-        {% endfor %}
-        {% if canComment and is_granted('ROLE_USER') %}
-            <form method="post" action="{{ path('app_comment_create', {'targetType': targetType, 'targetId': targetId}) }}">
-                <input type="hidden" name="_token" value="{{ csrf_token('app_comment_create' ~ targetType ~ targetId) }}">
-                <div class="field">
-                    <div class="control">
-                        <textarea class="textarea" id="replyInput" name="content" rows="3" maxlength="{{ maxLength }}"
-                                  placeholder="{{ 'comment.input_placeholder'|trans }}" required></textarea>
-                    </div>
-                </div>
-                <button class="button is-link">{{ 'comment.button_add'|trans }}</button>
-            </form>
-        {% endif %}
-    </div>
-</div>
+{% if showHeading is not defined or showHeading %}
+    <h2 class="title is-4">{{ 'comment.heading'|trans }}</h2>
+{% endif %}
+{% for comment in comments %}
+    {% include '_components/comment/entry.html.twig' with {'comment': comment, 'targetType': targetType, 'targetId': targetId} %}
+{% endfor %}
+{% if canComment and is_granted('ROLE_USER') %}
+    <form method="post" action="{{ path('app_comment_create', {'targetType': targetType, 'targetId': targetId}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('app_comment_create' ~ targetType ~ targetId) }}">
+        <div class="field">
+            <div class="control">
+                <textarea class="textarea" id="replyInput" name="content" rows="3" maxlength="{{ maxLength }}"
+                          placeholder="{{ 'comment.input_placeholder'|trans }}" required></textarea>
+            </div>
+        </div>
+        <button class="button is-link">{{ 'comment.button_add'|trans }}</button>
+    </form>
+{% endif %}

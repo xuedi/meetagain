@@ -605,7 +605,6 @@ town_hall:
     forum_activity_empty: 'Nothing has been said here yet.'
     forum_pick_hint: 'Pick a topic from the list to read it and join in.'
     forum_started_by: 'Started by %name%'
-    forum_subtopics_heading: 'Subtopics'
     forum_title_label: 'Title'
     forum_create_submit: 'Create topic'
     forum_button_rename: 'Rename'
