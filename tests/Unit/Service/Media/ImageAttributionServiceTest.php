@@ -46,4 +46,25 @@ class ImageAttributionServiceTest extends TestCase
         // Assert
         static::assertTrue($result);
     }
+
+    public function testTheFilterChainRunsOnceEvenWhenBothReadersAreCalled(): void
+    {
+        // Arrange
+        $filterService = $this->createMock(ImageAttributionFilterService::class);
+        $filterService->expects($this->once())->method('getVisibleImageIdFilter')->willReturn([1, 2]);
+
+        $repository = $this->createStub(ImageRepository::class);
+        $repository->method('hasAttributed')->willReturn(true);
+        $repository->method('findAttributed')->willReturn([]);
+
+        $service = new ImageAttributionService($repository, $filterService);
+
+        // Act
+        $service->hasAny();
+        $service->hasAny();
+        $service->getVisibleAttributedImages();
+
+        // Assert
+        static::assertTrue($service->hasAny());
+    }
 }

@@ -180,6 +180,21 @@ class ImageRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /** @return list<int> */
+    public function findAttributedIds(): array
+    {
+        $rows = $this
+            ->createQueryBuilder('i')
+            ->select('i.id')
+            ->where('i.attribution IS NOT NULL')
+            ->andWhere("i.attribution != ''")
+            ->andWhere('i.attributionNotRequired = false')
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_map(static fn(array $row): int => (int) $row['id'], $rows);
+    }
+
     /**
      * @param array<int>|null $restrictToIds null = no restriction, [] = block all
      */

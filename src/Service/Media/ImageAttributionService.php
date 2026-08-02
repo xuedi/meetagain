@@ -6,11 +6,15 @@ use App\Entity\Image;
 use App\Filter\Attribution\ImageAttributionFilterService;
 use App\Repository\ImageRepository;
 
-readonly class ImageAttributionService
+class ImageAttributionService
 {
+    /** @var array<int>|null */
+    private ?array $visibleIds = null;
+    private bool $visibleIdsResolved = false;
+
     public function __construct(
-        private ImageRepository $imageRepository,
-        private ImageAttributionFilterService $filterService,
+        private readonly ImageRepository $imageRepository,
+        private readonly ImageAttributionFilterService $filterService,
     ) {}
 
     /**
@@ -18,11 +22,24 @@ readonly class ImageAttributionService
      */
     public function getVisibleAttributedImages(): array
     {
-        return $this->imageRepository->findAttributed($this->filterService->getVisibleImageIdFilter());
+        return $this->imageRepository->findAttributed($this->resolveVisibleIds());
     }
 
     public function hasAny(): bool
     {
-        return $this->imageRepository->hasAttributed($this->filterService->getVisibleImageIdFilter());
+        return $this->imageRepository->hasAttributed($this->resolveVisibleIds());
+    }
+
+    /**
+     * @return array<int>|null
+     */
+    private function resolveVisibleIds(): ?array
+    {
+        if (!$this->visibleIdsResolved) {
+            $this->visibleIds = $this->filterService->getVisibleImageIdFilter();
+            $this->visibleIdsResolved = true;
+        }
+
+        return $this->visibleIds;
     }
 }
