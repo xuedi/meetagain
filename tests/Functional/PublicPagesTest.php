@@ -76,8 +76,10 @@ class PublicPagesTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         static::assertStringContainsString('User-agent: *', $content);
-        static::assertStringContainsString('Disallow: /api/v1/admin/', $content);
-        static::assertStringContainsString('Disallow: /api/v1/me/', $content);
+        static::assertStringContainsString('Disallow: /api/v1/', $content);
+        static::assertStringNotContainsString('/api/openapi.', $content);
+        static::assertStringNotContainsString('Disallow: /api/schema', $content);
+        static::assertStringNotContainsString("Disallow: /api/\n", $content);
         static::assertMatchesRegularExpression('#Sitemap: https?://[^/]+/sitemap\.xml#', $content);
     }
 

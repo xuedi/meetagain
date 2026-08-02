@@ -16,10 +16,7 @@ final class RobotsController extends AbstractController
 
         $lines = [
             'User-agent: *',
-            'Disallow: /api/v1/admin/',
-            'Disallow: /api/v1/me/',
-            'Disallow: /api/openapi.json',
-            'Disallow: /api/openapi.yaml',
+            'Disallow: /api/v1/',
             '',
         ];
 
