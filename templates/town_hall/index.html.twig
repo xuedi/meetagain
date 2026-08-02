@@ -8,13 +8,23 @@
         {% include 'town_hall/_header.html.twig' with { active: 'dashboard' } %}
         {% include 'town_hall/_stats_strip.html.twig' with { stats: stats } %}
 
+        {% for tile in tiles.fullWidth|default([]) %}
+            {% include tile.partial with tile.context only %}
+        {% endfor %}
+
         <div class="columns">
             <div class="column is-8">
+                {% for tile in tiles.main|default([]) %}
+                    {% include tile.partial with tile.context only %}
+                {% endfor %}
                 {% include 'town_hall/_tile_conversations.html.twig' with { conversations: conversations } %}
                 {% include 'town_hall/_tile_images.html.twig' with { images: images } %}
             </div>
 
             <div class="column is-4">
+                {% for tile in tiles.sidebar|default([]) %}
+                    {% include tile.partial with tile.context only %}
+                {% endfor %}
                 {% if upcomingEvents|length > 0 %}
                     {% include 'town_hall/_tile_upcoming.html.twig' with { events: upcomingEvents } %}
                 {% endif %}

@@ -6,6 +6,7 @@ use App\Entity\Topic;
 use App\Entity\User;
 use App\Service\TownHall\AccessService;
 use App\Service\TownHall\InvalidTopicException;
+use App\Service\TownHall\TileCollector;
 use App\Service\TownHall\TopicService;
 use App\Service\TownHallService;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,6 +20,7 @@ final class TownHallController extends AbstractController
         private readonly AccessService $accessService,
         private readonly TownHallService $townHallService,
         private readonly TopicService $topicService,
+        private readonly TileCollector $tileCollector,
     ) {}
 
     #[Route('/townhall', name: 'app_townhall', methods: ['GET'])]
@@ -34,6 +36,7 @@ final class TownHallController extends AbstractController
             'pastEvents' => $this->townHallService->getRecentPastEvents(),
             'newMembers' => $this->townHallService->getNewMembersThisMonth(),
             'stats' => $this->townHallService->getStats(),
+            'tiles' => $this->tileCollector->collectByLocation(),
         ]);
     }
 
