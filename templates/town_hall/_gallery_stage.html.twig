@@ -1,0 +1,15 @@
+{% embed '_components/item/gallery.html.twig' with { 'empty': images is empty } %}
+    {% block slides %}
+        {% for image in images %}
+            {% include '_components/item/styles/slide.html.twig' with {
+                group: 'item-gallery-townhall',
+                image: image,
+                thumbSize: '350x263',
+                bigSize: '1024x768',
+                title: image.event.title(app.locale),
+                subtitle: image.createdAt|date(get_date_format()),
+                href: path('app_event_details', { _locale: app.request.locale, id: image.event.id })
+            } %}
+        {% endfor %}
+    {% endblock %}
+{% endembed %}

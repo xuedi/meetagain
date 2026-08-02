@@ -1,0 +1,30 @@
+<div class="box">
+    <div class="level is-mobile mb-3">
+        <div class="level-left">
+            <div class="level-item">
+                <h2 class="title is-5 mb-0">{{ 'town_hall.forum_sidebar_heading'|trans }}</h2>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <a class="button is-small is-link is-light"
+                   href="{{ path('app_townhall_forum_new', { _locale: app.request.locale }) }}">
+                    {{ 'town_hall.forum_new_topic'|trans }}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if childrenByParent[0]|default([]) is empty %}
+        <p class="has-text-grey">{{ 'town_hall.forum_empty_tree'|trans }}</p>
+    {% else %}
+        {% include 'town_hall/_topic_tree.html.twig' with {
+            childrenByParent: childrenByParent,
+            commentCounts: commentCounts,
+            activeId: activeId,
+            parentId: 0,
+            depth: 1,
+            maxDepth: maxDepth,
+        } only %}
+    {% endif %}
+</div>

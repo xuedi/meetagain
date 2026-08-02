@@ -22,8 +22,8 @@ enum EntityAction: string
     case CreateImage = 'create_image';
     case CreateHost = 'create_host';
     case DeleteHost = 'delete_host';
-    case CreateWallPost = 'create_wall_post';
-    case DeleteWallPost = 'delete_wall_post';
+    case CreateTopic = 'create_topic';
+    case DeleteTopic = 'delete_topic';
     case CreateGlossary = 'create_glossary';
     case DeleteGlossary = 'delete_glossary';
     case CreateEventItemAssociation = 'create_event_item_association';

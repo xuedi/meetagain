@@ -36,6 +36,54 @@ class CommentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function deleteForTarget(string $targetType, int $targetId): int
+    {
+        return (int) $this
+            ->createQueryBuilder('c')
+            ->delete()
+            ->where('c.targetType = :targetType')
+            ->andWhere('c.targetId = :targetId')
+            ->setParameter('targetType', $targetType)
+            ->setParameter('targetId', $targetId)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function countForTarget(string $targetType, int $targetId): int
+    {
+        return (int) $this
+            ->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.targetType = :targetType')
+            ->andWhere('c.targetId = :targetId')
+            ->setParameter('targetType', $targetType)
+            ->setParameter('targetId', $targetId)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @return array<int, int> comment count keyed by target id
+     */
+    public function countPerTargetForType(string $targetType): array
+    {
+        $rows = $this
+            ->createQueryBuilder('c')
+            ->select('c.targetId AS targetId, COUNT(c.id) AS total')
+            ->where('c.targetType = :targetType')
+            ->setParameter('targetType', $targetType)
+            ->groupBy('c.targetId')
+            ->getQuery()
+            ->getScalarResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['targetId']] = (int) $row['total'];
+        }
+
+        return $counts;
+    }
+
     /**
      * @param array<int>|null $restrictToTargetIds null = no restriction
      * @return array<Comment>

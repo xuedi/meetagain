@@ -1,0 +1,31 @@
+<div class="box">
+    <h2 class="title is-5">{{ 'town_hall.tile_conversations_heading'|trans }}</h2>
+    {% if conversations is empty %}
+        <p class="has-text-grey">{{ 'town_hall.empty_state'|trans }}</p>
+    {% else %}
+        {% for row in conversations %}
+            <article class="media">
+                <div class="media-content">
+                    <div class="content">
+                        <p>
+                            <strong>{{ row.comment.user ? row.comment.user.name : 'town_hall.deleted_user'|trans }}</strong>
+                            <small class="has-text-grey">{{ row.comment.createdAt|date(get_date_format()) }}</small>
+                            <br>
+                            {{ row.comment.content|striptags|u.truncate(180, '...') }}
+                            <br>
+                            {% if row.event %}
+                                <a class="is-size-7" href="{{ path('app_event_details', { _locale: app.request.locale, id: row.event.id }) }}">
+                                    {{ row.event.title(app.locale) }}
+                                </a>
+                            {% else %}
+                                <a class="is-size-7" href="{{ path('app_townhall_forum_topic', { _locale: app.request.locale, topicId: row.topic.id }) }}">
+                                    {% for node in row.topicPath %}{% if not loop.first %} &rsaquo; {% endif %}{{ node.title }}{% endfor %}
+                                </a>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    {% endif %}
+</div>

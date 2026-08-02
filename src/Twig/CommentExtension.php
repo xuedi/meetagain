@@ -28,7 +28,7 @@ final class CommentExtension extends AbstractExtension
         ];
     }
 
-    public function section(string $targetType, int $targetId): string
+    public function section(string $targetType, int $targetId, bool $showHeading = true): string
     {
         $provider = $this->registry->providerFor($targetType);
         if ($provider === null) {
@@ -41,6 +41,7 @@ final class CommentExtension extends AbstractExtension
             'comments' => $this->commentService->getFor($targetType, $targetId),
             'canComment' => $provider->canComment($targetId),
             'maxLength' => Comment::MAX_CONTENT_LENGTH,
+            'showHeading' => $showHeading,
         ]);
     }
 }

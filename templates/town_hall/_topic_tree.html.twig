@@ -1,0 +1,27 @@
+<ul class="{{ depth > 1 ? 'ml-4' : '' }}">
+    {% for node in childrenByParent[parentId]|default([]) %}
+        <li class="mb-1">
+            <a href="{{ path('app_townhall_forum_topic', { _locale: app.request.locale, topicId: node.id }) }}"
+               class="{{ node.id == activeId ? 'has-text-weight-bold' : '' }}">
+                {{ node.title }}
+            </a>
+            {% if commentCounts[node.id]|default(0) > 0 %}
+                <span class="tag is-light is-rounded">{{ commentCounts[node.id] }}</span>
+            {% endif %}
+            {% if depth < maxDepth %}
+                <a class="is-size-7 has-text-grey"
+                   title="{{ 'town_hall.forum_new_subtopic'|trans({'%topic%': node.title}) }}"
+                   href="{{ path('app_townhall_forum_new', { _locale: app.request.locale, parent: node.id }) }}">+</a>
+            {% endif %}
+
+            {% include 'town_hall/_topic_tree.html.twig' with {
+                childrenByParent: childrenByParent,
+                commentCounts: commentCounts,
+                activeId: activeId,
+                parentId: node.id,
+                depth: depth + 1,
+                maxDepth: maxDepth,
+            } only %}
+        </li>
+    {% endfor %}
+</ul>
