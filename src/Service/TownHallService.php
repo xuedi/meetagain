@@ -6,82 +6,56 @@ use App\Comment\EventTargetProvider;
 use App\Entity\Comment;
 use App\Entity\Event;
 use App\Entity\Image;
+use App\Entity\Topic;
 use App\Entity\User;
-use App\Entity\WallPost;
+use App\Filter\TownHall\ScopeIntersection;
 use App\Filter\TownHall\TownHallEventScopeFilterInterface;
-use App\Filter\TownHall\WallScopeFilterInterface;
 use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
-use App\Repository\WallPostRepository;
+use App\Service\TownHall\TopicService;
 use DateTimeImmutable;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class TownHallService
 {
     /**
-     * @param iterable<WallScopeFilterInterface> $wallFilters
      * @param iterable<TownHallEventScopeFilterInterface> $eventFilters
      */
     public function __construct(
-        private WallPostRepository $wallPostRepo,
         private CommentRepository $commentRepo,
         private ImageRepository $imageRepo,
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
-        #[AutowireIterator(WallScopeFilterInterface::class)]
-        private iterable $wallFilters,
+        private TopicService $topicService,
+        private ScopeIntersection $scopeIntersection,
         #[AutowireIterator(TownHallEventScopeFilterInterface::class)]
         private iterable $eventFilters,
     ) {}
 
     /**
-     * @return array<WallPost>
+     * @return list<array{comment: Comment, event: ?Event, topic: ?Topic, topicPath: list<Topic>}>
      */
-    public function getRecentWallPosts(int $limit = 5): array
+    public function getLatestConversations(int $limit = 6): array
     {
-        return $this->wallPostRepo->findRecent($limit, $this->resolveWallPostIds());
-    }
-
-    /**
-     * @return array<WallPost>
-     */
-    public function getPaginatedWallPosts(int $page, int $perPage): array
-    {
-        return $this->wallPostRepo->findPaginated($page, $perPage, $this->resolveWallPostIds());
-    }
-
-    public function countWallPosts(): int
-    {
-        return $this->wallPostRepo->countAll($this->resolveWallPostIds());
-    }
-
-    /**
-     * @return list<array{comment: Comment, event: Event}>
-     */
-    public function getLatestEventComments(int $limit = 5): array
-    {
-        $comments = $this->commentRepo->findRecentForTargetType(EventTargetProvider::TYPE, $limit, $this->resolveEventIds());
-        if ($comments === []) {
-            return [];
-        }
-
-        $events = [];
-        foreach ($this->eventRepo->findBy(['id' => array_map(static fn(Comment $c): ?int => $c->getTargetId(), $comments)]) as $event) {
-            $events[$event->getId()] = $event;
-        }
+        $eventComments = $this->commentRepo->findRecentForTargetType(EventTargetProvider::TYPE, $limit, $this->resolveEventIds());
+        $events = $this->indexById($this->eventRepo->findBy(['id' => $this->targetIds($eventComments)]));
 
         $rows = [];
-        foreach ($comments as $comment) {
+        foreach ($eventComments as $comment) {
             $event = $events[$comment->getTargetId()] ?? null;
-            if ($event === null) {
-                continue;
+            if ($event instanceof Event) {
+                $rows[] = ['comment' => $comment, 'event' => $event, 'topic' => null, 'topicPath' => []];
             }
-            $rows[] = ['comment' => $comment, 'event' => $event];
+        }
+        foreach ($this->topicService->getRecentActivity($limit) as $row) {
+            $rows[] = ['comment' => $row['comment'], 'event' => null, 'topic' => $row['topic'], 'topicPath' => $row['topicPath']];
         }
 
-        return $rows;
+        usort($rows, static fn(array $a, array $b): int => $b['comment']->getCreatedAt() <=> $a['comment']->getCreatedAt());
+
+        return array_slice($rows, 0, $limit);
     }
 
     /**
@@ -127,42 +101,17 @@ readonly class TownHallService
     }
 
     /**
-     * @return array{memberCount: int, eventCount: int, wallPostCount: int}
+     * @return array{memberCount: int, eventCount: int, topicCount: int}
      */
     public function getStats(): array
     {
         $eventIds = $this->resolveEventIds();
-        $userIds = $this->resolveUserIds();
-        $wallIds = $this->resolveWallPostIds();
 
         return [
-            'memberCount' => $this->userRepo->getNumberOfActiveMembers([], $userIds),
+            'memberCount' => $this->userRepo->getNumberOfActiveMembers([], $this->resolveUserIds()),
             'eventCount' => $eventIds === null ? $this->countAllPublishedEvents() : count($eventIds),
-            'wallPostCount' => $this->wallPostRepo->countAll($wallIds),
+            'topicCount' => $this->topicService->countVisible(),
         ];
-    }
-
-    /**
-     * @return array<int>|null
-     */
-    private function resolveWallPostIds(): ?array
-    {
-        $result = null;
-        foreach ($this->wallFilters as $filter) {
-            $ids = $filter->getWallPostIdFilter();
-            if ($ids === null) {
-                continue;
-            }
-            if ($ids === []) {
-                return [];
-            }
-            $result = $result === null ? $ids : array_values(array_intersect($result, $ids));
-            if ($result === []) {
-                return [];
-            }
-        }
-
-        return $result;
     }
 
     /**
@@ -170,22 +119,12 @@ readonly class TownHallService
      */
     private function resolveEventIds(): ?array
     {
-        $result = null;
+        $lists = [];
         foreach ($this->eventFilters as $filter) {
-            $ids = $filter->getEventIdFilter();
-            if ($ids === null) {
-                continue;
-            }
-            if ($ids === []) {
-                return [];
-            }
-            $result = $result === null ? $ids : array_values(array_intersect($result, $ids));
-            if ($result === []) {
-                return [];
-            }
+            $lists[] = $filter->getEventIdFilter();
         }
 
-        return $result;
+        return $this->scopeIntersection->of($lists);
     }
 
     /**
@@ -193,22 +132,35 @@ readonly class TownHallService
      */
     private function resolveUserIds(): ?array
     {
-        $result = null;
+        $lists = [];
         foreach ($this->eventFilters as $filter) {
-            $ids = $filter->getUserIdFilter();
-            if ($ids === null) {
-                continue;
-            }
-            if ($ids === []) {
-                return [];
-            }
-            $result = $result === null ? $ids : array_values(array_intersect($result, $ids));
-            if ($result === []) {
-                return [];
-            }
+            $lists[] = $filter->getUserIdFilter();
         }
 
-        return $result;
+        return $this->scopeIntersection->of($lists);
+    }
+
+    /**
+     * @param array<Comment> $comments
+     * @return list<int>
+     */
+    private function targetIds(array $comments): array
+    {
+        return array_values(array_map(static fn(Comment $c): int => (int) $c->getTargetId(), $comments));
+    }
+
+    /**
+     * @param array<Event> $events
+     * @return array<int, Event>
+     */
+    private function indexById(array $events): array
+    {
+        $indexed = [];
+        foreach ($events as $event) {
+            $indexed[(int) $event->getId()] = $event;
+        }
+
+        return $indexed;
     }
 
     private function countAllPublishedEvents(): int

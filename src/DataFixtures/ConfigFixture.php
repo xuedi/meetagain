@@ -60,7 +60,7 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
             ],
             [
                 'show_town_hall',
-                'false',
+                'true',
                 ConfigType::Boolean,
             ],
             [

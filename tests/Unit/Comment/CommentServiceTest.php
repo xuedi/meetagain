@@ -122,14 +122,15 @@ class CommentServiceTest extends TestCase
         self::assertFalse($result);
     }
 
-    public function testDeleteAllForRemovesEveryCommentOnTheTarget(): void
+    public function testDeleteAllForClearsTheTargetWithoutHydratingAuthors(): void
     {
         // Arrange
-        $repository = $this->createStub(CommentRepository::class);
-        $repository->method('findForTarget')->willReturn([new Comment(), new Comment()]);
+        $repository = $this->createMock(CommentRepository::class);
+        $repository->expects(self::once())->method('deleteForTarget')->with('event', 42)->willReturn(2);
+        $repository->expects(self::never())->method('findForTarget');
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::exactly(2))->method('remove');
-        $em->expects(self::once())->method('flush');
+        $em->expects(self::never())->method('remove');
+        $em->expects(self::never())->method('flush');
         $service = $this->makeService($em, repository: $repository);
 
         // Act

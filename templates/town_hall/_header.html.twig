@@ -1,0 +1,25 @@
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title is-3">{{ 'town_hall.page_title'|trans }}</h1>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="level-item">
+            <div class="buttons has-addons">
+                <a class="button {{ active == 'dashboard' ? 'is-link is-selected' : '' }}"
+                   href="{{ path('app_townhall', { _locale: app.request.locale }) }}">
+                    {{ 'town_hall.nav_dashboard'|trans }}
+                </a>
+                <a class="button {{ active == 'forum' ? 'is-link is-selected' : '' }}"
+                   href="{{ path('app_townhall_forum', { _locale: app.request.locale }) }}">
+                    {{ 'town_hall.nav_forum'|trans }}
+                </a>
+                <a class="button {{ active == 'gallery' ? 'is-link is-selected' : '' }}"
+                   href="{{ path('app_townhall_gallery', { _locale: app.request.locale }) }}">
+                    {{ 'town_hall.nav_gallery'|trans }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

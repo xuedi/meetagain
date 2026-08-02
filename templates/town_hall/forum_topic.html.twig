@@ -1,0 +1,73 @@
+{% extends 'town_hall/forum_base.html.twig' %}
+
+{% block title %}{{ topic.title }}{% endblock %}
+
+{% block forum_main %}
+    <nav class="breadcrumb is-small" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="{{ path('app_townhall_forum', { _locale: app.request.locale }) }}">{{ 'town_hall.forum_page_title'|trans }}</a></li>
+            {% for node in breadcrumb %}
+                <li class="{{ loop.last ? 'is-active' : '' }}">
+                    <a href="{{ path('app_townhall_forum_topic', { _locale: app.request.locale, topicId: node.id }) }}">{{ node.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+    <div class="box">
+        <h2 class="title is-4">{{ topic.title }}</h2>
+        <p class="is-size-7 has-text-grey">
+            {{ 'town_hall.forum_started_by'|trans({'%name%': topic.author ? topic.author.name : 'town_hall.deleted_user'|trans}) }}
+            &middot;
+            {{ topic.createdAt|date(get_date_format()) }}
+        </p>
+
+        {% if canRename or canDelete %}
+            <div class="buttons are-small mt-3">
+                {% if canRename %}
+                    <details>
+                        <summary class="button is-small">{{ 'town_hall.forum_button_rename'|trans }}</summary>
+                        <form method="post" class="mt-2"
+                              action="{{ path('app_townhall_forum_rename', { _locale: app.request.locale, topicId: topic.id }) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('town_hall_topic_rename_' ~ topic.id) }}">
+                            <div class="field has-addons">
+                                <div class="control">
+                                    <input class="input is-small" type="text" name="title" value="{{ topic.title }}"
+                                           maxlength="{{ maxTitleLength }}" required>
+                                </div>
+                                <div class="control">
+                                    <button type="submit" class="button is-small is-link">{{ 'town_hall.forum_rename_submit'|trans }}</button>
+                                </div>
+                            </div>
+                        </form>
+                    </details>
+                {% endif %}
+                {% if canDelete %}
+                    <a class="button is-small is-danger is-light"
+                       href="{{ path('app_townhall_forum_delete', { _locale: app.request.locale, topicId: topic.id }) }}"
+                       data-post
+                       data-csrf-token="{{ csrf_token('town_hall_topic_delete_' ~ topic.id) }}"
+                       data-confirm="{{ 'town_hall.forum_delete_confirm'|trans }}">
+                        {{ 'town_hall.forum_button_delete'|trans }}
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% set subtopics = childrenByParent[topic.id]|default([]) %}
+    {% if subtopics is not empty %}
+        <div class="box">
+            <h3 class="title is-6">{{ 'town_hall.forum_subtopics_heading'|trans }}</h3>
+            <div class="tags">
+                {% for child in subtopics %}
+                    <a class="tag is-light" href="{{ path('app_townhall_forum_topic', { _locale: app.request.locale, topicId: child.id }) }}">
+                        {{ child.title }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    {{ comment_section('topic', topic.id) }}
+{% endblock %}

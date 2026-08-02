@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'town_hall.forum_page_title'|trans }}{% endblock %}
+
+{% block body %}
+<section class="section">
+    <div class="container">
+        {% include 'town_hall/_header.html.twig' with { active: 'forum' } %}
+
+        <div class="columns item-list-layout">
+            <div class="column is-narrow item-list-sidebar">
+                {% include 'town_hall/_topic_sidebar.html.twig' with {
+                    childrenByParent: childrenByParent,
+                    commentCounts: commentCounts,
+                    activeId: activeId,
+                    maxDepth: maxDepth,
+                } only %}
+            </div>
+            <div class="column item-list-main">
+                {% block forum_main %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

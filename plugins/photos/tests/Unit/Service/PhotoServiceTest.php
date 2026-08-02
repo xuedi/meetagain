@@ -108,7 +108,7 @@ class PhotoServiceTest extends TestCase
     {
         // Arrange
         $comments = $this->createMock(CommentRepository::class);
-        $comments->expects(static::once())->method('findForTarget')->with('photo', 0)->willReturn([]);
+        $comments->expects(static::once())->method('deleteForTarget')->with('photo', 0)->willReturn(0);
         $locations = $this->createMock(ImageLocationService::class);
         $locations->expects(static::once())->method('removeLocation')->with(0, ImageType::PluginPhotosPhoto, 0);
         $dispatcher = $this->createMock(ActionDispatcher::class);

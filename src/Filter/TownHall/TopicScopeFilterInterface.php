@@ -5,14 +5,14 @@ namespace App\Filter\TownHall;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Narrows the wall posts the town hall shows: null = no opinion, [] = block all,
+ * Narrows the topics the town hall forum shows: null = no opinion, [] = block all,
  * [id, ...] = allow-list.
  */
 #[AutoconfigureTag]
-interface WallScopeFilterInterface
+interface TopicScopeFilterInterface
 {
     /**
      * @return array<int>|null
      */
-    public function getWallPostIdFilter(): ?array;
+    public function getTopicIdFilter(): ?array;
 }

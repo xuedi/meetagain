@@ -1,0 +1,33 @@
+{% extends 'town_hall/forum_base.html.twig' %}
+
+{% block forum_main %}
+    <div class="box">
+        <h2 class="title is-5">
+            {% if parent %}
+                {{ 'town_hall.forum_new_subtopic'|trans({'%topic%': parent.title}) }}
+            {% else %}
+                {{ 'town_hall.forum_new_topic'|trans }}
+            {% endif %}
+        </h2>
+
+        <form method="post" action="{{ path('app_townhall_forum_new', { _locale: app.request.locale, parent: parent ? parent.id : null }) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('town_hall_topic_new') }}">
+            <div class="field">
+                <label class="label" for="topic-title">{{ 'town_hall.forum_title_label'|trans }}</label>
+                <div class="control">
+                    <input class="input" id="topic-title" type="text" name="title" maxlength="{{ maxTitleLength }}" required autofocus>
+                </div>
+            </div>
+            <div class="field is-grouped">
+                <div class="control">
+                    <button type="submit" class="button is-link">{{ 'town_hall.forum_create_submit'|trans }}</button>
+                </div>
+                <div class="control">
+                    <a class="button is-light" href="{{ path('app_townhall_forum', { _locale: app.request.locale }) }}">
+                        {{ 'global.cancel'|trans }}
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

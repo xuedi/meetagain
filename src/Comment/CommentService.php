@@ -68,9 +68,6 @@ final readonly class CommentService
 
     public function deleteAllFor(string $targetType, int $targetId): void
     {
-        foreach ($this->repository->findForTarget($targetType, $targetId) as $comment) {
-            $this->em->remove($comment);
-        }
-        $this->em->flush();
+        $this->repository->deleteForTarget($targetType, $targetId);
     }
 }
