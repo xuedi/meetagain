@@ -1,0 +1,23 @@
+# docs-guard resolves every repository path written as inline code in markdown, so a path that
+# rots after a refactor fails the commit instead of misleading a reader.
+#
+# Extend this through the optional config/tools/docs-guard.local overlay: every key here is a
+# list key, so an overlay entry adds to these rather than replacing them.
+
+# Markdown roots scanned when no path argument is given, and the prefixes `--staged` keeps.
+# Files as well as directories are accepted.
+SCAN_PATHS=docs/src,README.md
+
+# A token in an inline code span is treated as a repository path when its first segment is one
+# of these. Anything else - a URL, a namespace, a schema.org type - is left alone.
+PATH_PREFIXES=src,templates,plugins,config,bin,tests,assets,migrations,public,docs
+
+# Substrings marking a path as deliberately illustrative rather than real. Tokens that cannot
+# be a literal path are exempt without being listed here: those containing a glob or
+# placeholder character (`*`, `<`, `$`), brace expansion, an `...` elision, a `Class::MEMBER`
+# reference, or whitespace (a shell invocation rather than a path).
+PLACEHOLDERS=your-plugin,my-plugin,plugin-name,XXX,VersionYYYY
+
+# Path prefixes whose existence is never checked: build output and generated reports, which are
+# absent on a clean checkout and would fail for everyone who has not run a build.
+IGNORE=public/media,public/assets,public/build,tests/reports,var

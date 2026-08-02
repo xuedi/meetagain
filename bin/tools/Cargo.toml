@@ -5,6 +5,7 @@ members = [
     "bing",
     "bugsink",
     "comment-guard",
+    "docs-guard",
     "gsc",
     "leak-guard",
     "mermaid-guard",

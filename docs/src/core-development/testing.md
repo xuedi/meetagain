@@ -27,8 +27,8 @@ tests/
     └── junit.xml                 ← JUnit results
 ```
 
-`tests/Unit/` mirrors `src/` — if you add `src/Service/RatingService.php`, the test lives
-at `tests/Unit/Service/RatingServiceTest.php`.
+`tests/Unit/` mirrors `src/` — `src/Service/System/HealthCheckService.php` is tested at
+`tests/Unit/Service/System/HealthCheckServiceTest.php`.
 
 ---
 

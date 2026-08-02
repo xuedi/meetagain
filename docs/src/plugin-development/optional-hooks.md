@@ -12,7 +12,6 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `Plugin` (base interface)                  | Serve CSS/JS assets from your plugin                  | `getStylesheets()`, `getJavascripts()`                    |
 | `AdminNavigationInterface`                 | Add sections and links to the admin sidebar           | `getAdminNavigation()`                                    |
 | `EventFilterInterface`                     | Control which events are visible                      | `getEventIdFilter()`                                      |
-| `MenuFilterInterface`                      | Filter or modify navigation links                     | `filterMenuLinks()`                                       |
 | `CmsFilterInterface`                       | Control which CMS pages are visible                   | `getCmsPageSlugs()`                                       |
 | `ReservedSlugProviderInterface`            | Reserve slugs the CMS editor must refuse to assign    | `getReservedSlugs()`                                      |
 | `MemberFilterInterface`                    | Filter which members appear in lists                  | `getUserIds()`                                            |
@@ -106,7 +105,7 @@ From `plugins/your-plugin/assets/styles/myplugin.css`, images are at `../images/
 **Purpose:** Add sections and links to the admin sidebar (the modern approach — replaces the deprecated
 `getAdminSystemLinks()`).
 
-**File:** `src/Controller/Admin/AdminNavigationInterface.php`
+**File:** `src/Admin/Navigation/AdminNavigationInterface.php`
 
 **When called:** When rendering any admin page.
 
@@ -203,41 +202,6 @@ readonly class PrivateEventFilter implements EventFilterInterface
 ```
 
 **Use cases:** Private/public event visibility, group-based access control.
-
----
-
-### MenuFilterInterface
-
-**Purpose:** Filter or modify navigation links based on context (e.g. active domain, user role).
-
-**File:** `src/Filter/Menu/MenuFilterInterface.php`
-
-**Tag:** `#[AutoconfigureTag('app.menu_filter')]`
-
-**When called:** When rendering the navigation menu.
-
-```php
-namespace Plugin\YourPlugin\Filter;
-
-use App\Filter\Menu\MenuFilterInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-
-#[AutoconfigureTag('app.menu_filter')]
-readonly class ContextMenuFilter implements MenuFilterInterface
-{
-    public function getPriority(): int
-    {
-        return 100;
-    }
-
-    public function filterMenuLinks(array $links): array
-    {
-        return array_filter($links, fn($link) => $this->shouldShowLink($link));
-    }
-}
-```
-
-**Use cases:** Multi-tenant menu filtering, hiding links by domain or role.
 
 ---
 
@@ -674,7 +638,7 @@ readonly class MyReviewProvider implements ReviewNotificationProviderInterface
 
 **Purpose:** React to core entity lifecycle events — creation, update, deletion.
 
-**File:** `src/Entity/Action/EntityActionInterface.php`
+**File:** `src/EntityActionInterface.php`
 
 **Tag:** `#[AutoconfigureTag('app.entity_action')]`
 
@@ -1132,7 +1096,7 @@ list-cell and taggable seams and skips the event one.
    assignments are cleaned up. Tagging with a sub-tag stores every tag above it too, so filtering by a parent finds
    the whole branch.
 3. **Hand core your list.** Implement `App\Item\ListProviderInterface` (usually on the class that already implements the
-   other item seams) and move your list markup into a `templates/item/list_body.html.twig` partial that
+   other item seams) and move your list markup into a `plugins/<name>/templates/item/list_body.html.twig` partial that
    `renderList()` renders:
 
    ```php

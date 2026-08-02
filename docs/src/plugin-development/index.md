@@ -20,7 +20,6 @@ event filters, authorization, notifications, and more.
 | `runCronTasks()`                              | Schedule periodic background tasks                   | filmclub                |
 | `AdminNavigationInterface`                    | Add sections and links to the admin sidebar          | filmclub, bookclub      |
 | `EventFilterInterface`                        | Filter which events are visible                      | (custom)                |
-| `MenuFilterInterface`                         | Filter navigation links by context                   | (custom)                |
 | `CmsFilterInterface`                          | Filter which CMS pages are visible                   | (custom)                |
 | `MemberFilterInterface`                       | Filter which members appear in lists                 | (custom)                |
 | `PermissionVoterInterface`                    | Override or veto any permission decision             | multisite               |
