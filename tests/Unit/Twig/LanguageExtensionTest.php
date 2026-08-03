@@ -4,6 +4,7 @@ namespace Tests\Unit\Twig;
 
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
+use App\Service\Config\LanguageTileService;
 use App\Service\Seo\CanonicalUrlService;
 use App\Twig\LanguageExtension;
 use App\Twig\MetaDescriptionProviderInterface;
@@ -15,6 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LanguageExtensionTest extends TestCase
 {
@@ -38,6 +40,7 @@ class LanguageExtensionTest extends TestCase
             $this->routerStub,
             $this->configServiceStub,
             $this->canonicalUrlServiceStub,
+            new LanguageTileService($this->createStub(TranslatorInterface::class)),
         );
     }
 
@@ -55,7 +58,7 @@ class LanguageExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(11, $functions);
+        static::assertCount(12, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('get_hreflang_code', $functionNames);
@@ -253,6 +256,7 @@ class LanguageExtensionTest extends TestCase
             $this->routerStub,
             $this->configServiceStub,
             $this->canonicalUrlServiceStub,
+            new LanguageTileService($this->createStub(TranslatorInterface::class)),
             [$provider],
         );
 

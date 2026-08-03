@@ -48,10 +48,23 @@ readonly class EventService
         EventRsvpFilter $rsvp,
         ?UserInterface $user = null,
         ?array $restrictToEventIds = null,
+        ?string $translatedIn = null,
     ): array {
-        $result = $this->repo->findByFilters($time, $sort, $type, $user, $rsvp, $restrictToEventIds);
+        $result = $this->repo->findByFilters($time, $sort, $type, $user, $rsvp, $restrictToEventIds, $translatedIn);
 
         return $this->structureList($result);
+    }
+
+    /**
+     * @param array<Event> $events
+     * @return array<Event>
+     */
+    public function keepTranslatedIn(array $events, string $locale): array
+    {
+        return array_values(array_filter(
+            $events,
+            static fn(Event $event): bool => $event->findTranslation($locale) !== null,
+        ));
     }
 
     public function updateRecurringEvents(Event $event, ?DateTimeInterface $syncFrom = null): int

@@ -7,6 +7,7 @@ use App\Publisher\AlternateLinks\AlternateLinkProviderInterface;
 use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
+use App\Service\Config\LanguageTileService;
 use App\Service\Seo\CanonicalUrlService;
 use Exception;
 use Override;
@@ -28,6 +29,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         private readonly RouterInterface $router,
         private readonly ConfigService $configService,
         private readonly CanonicalUrlService $canonicalUrlService,
+        private readonly LanguageTileService $languageTileService,
         #[AutowireIterator(MetaDescriptionProviderInterface::class)]
         private readonly iterable $metaDescriptionProviders = [],
         #[AutowireIterator(OrganizationSchemaProviderInterface::class)]
@@ -61,6 +63,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             new TwigFunction('get_meta_description', $this->getMetaDescription(...)),
             new TwigFunction('get_organization_schema', $this->getOrganizationSchema(...), ['is_safe' => ['html']]),
             new TwigFunction('is_frontpage', $this->isFrontpage(...)),
+            new TwigFunction('get_language_tile_text', $this->languageTileService->getText(...)),
         ];
     }
 
