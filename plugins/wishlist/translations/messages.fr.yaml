@@ -1,0 +1,31 @@
+wishlist:
+    menu_main: 'Liste de souhaits'
+
+wishlist_attach:
+    pick_from_wishlist: 'Choisir dans la liste de souhaits'
+
+wishlist_entry:
+    page_title_mine: 'Ma liste de souhaits'
+    page_title_group: 'Liste de souhaits du groupe'
+    button_mine: 'Ma liste de souhaits'
+    button_group: 'Liste de souhaits du groupe'
+    button_remove: 'Retirer'
+    empty_mine: 'Ta liste de souhaits est vide.'
+    empty_group: 'Personne n''a encore rien mis sur sa liste de souhaits.'
+    col_item: 'Élément'
+    col_priority: 'Priorité'
+    col_since: 'Ajouté'
+    priority_label: 'vieilli %count%x'
+    waiting_since: 'attendu %count% événements'
+    flash_added: 'Ajouté à ta liste de souhaits.'
+    flash_removed: 'Retiré de ta liste de souhaits.'
+
+wishlist_pick:
+    page_title: 'Choisir dans la liste de souhaits'
+    intro: 'Les éléments les plus demandés d''abord. En attacher un fait vieillir le reste de l''arriéré.'
+    empty: 'Il n''y a encore rien à choisir dans la liste de souhaits.'
+    col_item: 'Élément'
+    col_wanters: 'Demandé par'
+    col_priority: 'Priorité'
+    wanted_by_members: 'demandé par %count% membres'
+    button_attach: 'Attacher'

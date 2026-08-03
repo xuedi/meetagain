@@ -2,6 +2,9 @@
 
 namespace Tests\Functional;
 
+use App\Entity\Language;
+use App\Service\Config\LanguageService;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -69,6 +72,7 @@ class TranslatorSmokeTest extends WebTestCase
     {
         // Arrange
         $client = static::createClient();
+        self::enableLocale($locale);
 
         // Act
         $client->request('GET', "/{$locale}{$route}");
@@ -111,11 +115,25 @@ class TranslatorSmokeTest extends WebTestCase
             '/imprint',
             '/privacy',
         ];
-        foreach (['en', 'de', 'zh'] as $locale) {
+        foreach (['en', 'de', 'zh', 'fr', 'es'] as $locale) {
             foreach ($routes as $route) {
                 yield "{$locale} {$route}" => [$route, $locale];
             }
         }
+    }
+
+    private static function enableLocale(string $locale): void
+    {
+        $container = static::getContainer();
+        $em = $container->get(EntityManagerInterface::class);
+        $language = $em->getRepository(Language::class)->findOneBy(['code' => $locale]);
+        if ($language === null || $language->isEnabled()) {
+            return;
+        }
+
+        $language->setEnabled(true);
+        $em->flush();
+        $container->get(LanguageService::class)->invalidateCache();
     }
 
     private static function extractVisibleText(string $html): string

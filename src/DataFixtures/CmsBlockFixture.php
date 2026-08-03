@@ -47,6 +47,7 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
 
                 if ($type !== CmsBlockType::Gallery) {
                     $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::CmsBlock);
+                    $manager->flush();
                     $this->imageService->createThumbnails($image, ImageType::CmsBlock);
                     $block->setImage($image);
                     $manager->persist($block);
@@ -138,6 +139,44 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 null,
             ],
             [
+                CmsFixture::IMPRINT,
+                LanguageFixture::FRENCH,
+                CmsBlockType::Headline,
+                [
+                    'title' => 'Mentions légales',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::IMPRINT,
+                LanguageFixture::FRENCH,
+                CmsBlockType::Text,
+                [
+                    'title' => '1. Paragraphe',
+                    'content' => 'Un peu de texte p1',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::IMPRINT,
+                LanguageFixture::SPANISH,
+                CmsBlockType::Headline,
+                [
+                    'title' => 'Aviso legal',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::IMPRINT,
+                LanguageFixture::SPANISH,
+                CmsBlockType::Text,
+                [
+                    'title' => '1. Párrafo',
+                    'content' => 'Un poco de texto p1',
+                ],
+                null,
+            ],
+            [
                 CmsFixture::ABOUT,
                 LanguageFixture::ENGLISH,
                 CmsBlockType::Headline,
@@ -188,6 +227,42 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 CmsBlockType::Text,
                 [
                     'content' => $this->getText('about_zh'),
+                ],
+                null,
+            ],
+            [
+                CmsFixture::ABOUT,
+                LanguageFixture::FRENCH,
+                CmsBlockType::Headline,
+                [
+                    'title' => 'À propos',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::ABOUT,
+                LanguageFixture::FRENCH,
+                CmsBlockType::Text,
+                [
+                    'content' => $this->getText('about_fr'),
+                ],
+                null,
+            ],
+            [
+                CmsFixture::ABOUT,
+                LanguageFixture::SPANISH,
+                CmsBlockType::Headline,
+                [
+                    'title' => 'Sobre nosotros',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::ABOUT,
+                LanguageFixture::SPANISH,
+                CmsBlockType::Text,
+                [
+                    'content' => $this->getText('about_es'),
                 ],
                 null,
             ],
@@ -265,6 +340,54 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
             ],
             [
                 CmsFixture::INDEX,
+                LanguageFixture::FRENCH,
+                CmsBlockType::Hero,
+                [
+                    'headline' => 'Club de weiqi international',
+                    'subHeadline' => 'apprendre, jouer et s\'amuser',
+                    'text' => $this->getText('index_hero_fr'),
+                    'buttonLink' => '/register',
+                    'buttonText' => 'Rejoins-nous',
+                    'color' => '#0700da',
+                ],
+                'hero-en.jpg',
+            ],
+            [
+                CmsFixture::INDEX,
+                LanguageFixture::FRENCH,
+                CmsBlockType::EventTeaser,
+                [
+                    'headline' => 'Bienvenue',
+                    'text' => $this->getText('index_events_lorem'),
+                ],
+                'group-en.jpg',
+            ],
+            [
+                CmsFixture::INDEX,
+                LanguageFixture::SPANISH,
+                CmsBlockType::Hero,
+                [
+                    'headline' => 'Club de weiqi internacional',
+                    'subHeadline' => 'aprender, jugar y divertirse',
+                    'text' => $this->getText('index_hero_es'),
+                    'buttonLink' => '/register',
+                    'buttonText' => 'Únete',
+                    'color' => '#0700da',
+                ],
+                'hero-en.jpg',
+            ],
+            [
+                CmsFixture::INDEX,
+                LanguageFixture::SPANISH,
+                CmsBlockType::EventTeaser,
+                [
+                    'headline' => 'Bienvenido',
+                    'text' => $this->getText('index_events_lorem'),
+                ],
+                'group-en.jpg',
+            ],
+            [
+                CmsFixture::INDEX,
                 LanguageFixture::ENGLISH,
                 CmsBlockType::FactsRow,
                 [
@@ -304,6 +427,36 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                         ['icon' => 'fa fa-globe', 'label' => '全球棋手'],
                         ['icon' => 'fa fa-graduation-cap', 'label' => '适合初学者'],
                         ['icon' => 'fa fa-trophy', 'label' => '定期比赛'],
+                    ],
+                ],
+                null,
+            ],
+            [
+                CmsFixture::INDEX,
+                LanguageFixture::FRENCH,
+                CmsBlockType::FactsRow,
+                [
+                    'headline' => 'Pourquoi jouer avec nous',
+                    'facts' => [
+                        ['icon' => 'fa fa-users', 'label' => 'Communauté active'],
+                        ['icon' => 'fa fa-globe', 'label' => 'Joueurs dans le monde entier'],
+                        ['icon' => 'fa fa-graduation-cap', 'label' => 'Adapté aux débutants'],
+                        ['icon' => 'fa fa-trophy', 'label' => 'Tournois réguliers'],
+                    ],
+                ],
+                null,
+            ],
+            [
+                CmsFixture::INDEX,
+                LanguageFixture::SPANISH,
+                CmsBlockType::FactsRow,
+                [
+                    'headline' => 'Por qué jugar con nosotros',
+                    'facts' => [
+                        ['icon' => 'fa fa-users', 'label' => 'Comunidad activa'],
+                        ['icon' => 'fa fa-globe', 'label' => 'Jugadores de todo el mundo'],
+                        ['icon' => 'fa fa-graduation-cap', 'label' => 'Apto para principiantes'],
+                        ['icon' => 'fa fa-trophy', 'label' => 'Torneos regulares'],
                     ],
                 ],
                 null,
@@ -395,6 +548,64 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 ],
                 null,
             ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::FRENCH,
+                CmsBlockType::Headline,
+                [
+                    'title' => 'Règles du jeu',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::FRENCH,
+                CmsBlockType::Text,
+                [
+                    'title' => 'Introduction au Go',
+                    'content' => 'Le Go (Weiqi en chinois, Baduk en coréen) est un ancien jeu de plateau pour deux joueurs, originaire de Chine il y a plus de 2 500 ans. Le jeu se joue sur une grille de 19×19, bien que les débutants commencent souvent avec des plateaux plus petits de 9×9 ou 13×13.',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::FRENCH,
+                CmsBlockType::Text,
+                [
+                    'title' => 'Règles de base',
+                    'content' => '1. Les joueurs placent à tour de rôle des pierres sur les intersections vides\n2. Les pierres sont capturées lorsqu\'elles sont encerclées (plus de libertés)\n3. La partie se termine lorsque les deux joueurs passent\n4. Le gagnant est déterminé par le territoire contrôlé plus les captures\n\nPour des règles détaillées et des guides de stratégie, rejoins nos ateliers pour débutants !',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::SPANISH,
+                CmsBlockType::Headline,
+                [
+                    'title' => 'Reglas del juego',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::SPANISH,
+                CmsBlockType::Text,
+                [
+                    'title' => 'Introducción al Go',
+                    'content' => 'El Go (Weiqi en chino, Baduk en coreano) es un antiguo juego de tablero para dos jugadores originado en China hace más de 2.500 años. El juego se juega en un tablero de 19×19, aunque los principiantes a menudo empiezan con tableros más pequeños de 9×9 o 13×13.',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::RULES,
+                LanguageFixture::SPANISH,
+                CmsBlockType::Text,
+                [
+                    'title' => 'Reglas básicas',
+                    'content' => '1. Los jugadores colocan piedras por turnos en las intersecciones vacías\n2. Las piedras se capturan cuando están rodeadas (sin libertades)\n3. La partida termina cuando ambos jugadores pasan\n4. El ganador se determina por el territorio controlado más las capturas\n\n¡Para reglas detalladas y guías de estrategia, únete a nuestros talleres para principiantes!',
+                ],
+                null,
+            ],
 
             [
                 CmsFixture::ANNOUNCEMENT,
@@ -443,6 +654,38 @@ class CmsBlockFixture extends AbstractFixture implements DependentFixtureInterfa
                 CmsBlockType::Gallery,
                 ['title' => '', 'images' => []],
                 'screenshot-zh.png',
+            ],
+            [
+                CmsFixture::ANNOUNCEMENT,
+                LanguageFixture::FRENCH,
+                CmsBlockType::Text,
+                [
+                    'content' => 'Nous sommes ravis d\'annoncer le lancement de la nouvelle version de notre site web. Profite d\'une meilleure expérience et de nouvelles fonctionnalités !',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::ANNOUNCEMENT,
+                LanguageFixture::FRENCH,
+                CmsBlockType::Gallery,
+                ['title' => '', 'images' => []],
+                'screenshot-en.png',
+            ],
+            [
+                CmsFixture::ANNOUNCEMENT,
+                LanguageFixture::SPANISH,
+                CmsBlockType::Text,
+                [
+                    'content' => '¡Estamos encantados de anunciar el lanzamiento de la nueva versión de nuestro sitio web! ¡Disfruta de una mejor experiencia y de nuevas funciones!',
+                ],
+                null,
+            ],
+            [
+                CmsFixture::ANNOUNCEMENT,
+                LanguageFixture::SPANISH,
+                CmsBlockType::Gallery,
+                ['title' => '', 'images' => []],
+                'screenshot-en.png',
             ],
         ];
     }

@@ -114,9 +114,13 @@ class PhotoFixture extends AbstractFixture implements FixtureGroupInterface
             ['harbour-morning.jpg', [
                 'en' => ['title' => 'Harbour, just after sunrise', 'description' => 'The first ferry of the day leaving the old pier.'],
                 'de' => ['title' => 'Hafen kurz nach Sonnenaufgang', 'description' => 'Die erste Fähre des Tages legt am alten Pier ab.'],
+                'fr' => ['title' => 'Le port, juste après le lever du soleil', 'description' => 'Le premier ferry de la journée quitte la vieille jetée.'],
+                'es' => ['title' => 'El puerto, justo después del amanecer', 'description' => 'El primer ferri del día sale del viejo muelle.'],
             ]],
             ['winter-forest.jpg', [
                 'en' => ['title' => 'Winter forest', 'description' => 'Cold enough that the tripod head stopped moving.'],
+                'fr' => ['title' => 'Forêt d\'hiver', 'description' => 'Il faisait si froid que la rotule du trépied s\'est bloquée.'],
+                'es' => ['title' => 'Bosque invernal', 'description' => 'Hacía tanto frío que la rótula del trípode dejó de moverse.'],
             ]],
         ];
     }
