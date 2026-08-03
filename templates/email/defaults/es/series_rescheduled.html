@@ -1,0 +1,24 @@
+<h1>¡Hola {{username}}!</h1>
+
+<p>
+    La serie recurrente <b>{{eventTitle}}</b> ha pasado a un nuevo horario a partir del <b>{{newStart}}</b>.
+</p>
+
+<p>
+    Como te habías apuntado a fechas concretas, se han eliminado tus confirmaciones de asistencia para las siguientes fechas:
+</p>
+
+{{removedDatesHtml}}
+
+<p>
+    Si las nuevas fechas te vienen bien, <a href="{{host}}/{{lang}}/event/{{eventId}}">confirma tu asistencia de nuevo aquí</a>.
+</p>
+<p>
+    Si no quieres recibir esta notificación, puedes<br>
+    desactivarla en tus <a href="{{host}}/{{lang}}/profile/config/">ajustes</a>
+</p>
+
+<p>
+    Saludos,<br>
+    {{greeting}}
+</p>

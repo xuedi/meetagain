@@ -1,0 +1,24 @@
+<h1>Bonjour {{username}} !</h1>
+
+<p>
+    La série récurrente <b>{{eventTitle}}</b> passe à un nouveau calendrier à partir du <b>{{newStart}}</b>.
+</p>
+
+<p>
+    Comme tu avais choisi des dates précises, tes inscriptions aux dates suivantes ont été supprimées :
+</p>
+
+{{removedDatesHtml}}
+
+<p>
+    Si les nouvelles dates te conviennent, <a href="{{host}}/{{lang}}/event/{{eventId}}">inscris-toi à nouveau ici</a>.
+</p>
+<p>
+    Si tu ne souhaites plus recevoir cette notification, tu peux<br>
+    la désactiver dans tes <a href="{{host}}/{{lang}}/profile/config/">paramètres</a>
+</p>
+
+<p>
+    À bientôt,<br>
+    {{greeting}}
+</p>

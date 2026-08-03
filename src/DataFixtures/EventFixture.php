@@ -163,6 +163,16 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                         'teaser' => $this->getText('wednesday_meetup_teaser_zh'),
                         'description' => $this->getText('wednesday_meetup_description_zh'),
                     ],
+                    'fr' => [
+                        'title' => 'Groupe d\'étude de Go hebdomadaire',
+                        'teaser' => $this->getText('wednesday_meetup_teaser_fr'),
+                        'description' => $this->getText('wednesday_meetup_description_fr'),
+                    ],
+                    'es' => [
+                        'title' => 'Grupo de estudio de Go semanal',
+                        'teaser' => $this->getText('wednesday_meetup_teaser_es'),
+                        'description' => $this->getText('wednesday_meetup_description_es'),
+                    ],
                 ],
                 'comments' => [
                     [
@@ -229,6 +239,16 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                         'teaser' => '年度城市锦标赛，所有水平均可参加。麦克马洪配对系统，5轮比赛。',
                         'description' => '参加年度柏林围棋锦标赛！对所有水平开放，设有不同组别。麦克马洪配对系统确保公平对局。参赛费：15欧元含午餐。各组别前三名有奖。',
                     ],
+                    'fr' => [
+                        'title' => 'Tournoi de Go de Berlin 2026',
+                        'teaser' => 'Championnat annuel de la ville pour tous les niveaux. Système d\'appariement McMahon, 5 rondes.',
+                        'description' => 'Rejoins-nous pour le tournoi de Go annuel de Berlin ! Ouvert à tous les niveaux avec des divisions séparées. Le système d\'appariement McMahon garantit des parties équitables. Droits d\'inscription : 15 €, déjeuner inclus. Des prix pour les 3 premiers de chaque division.',
+                    ],
+                    'es' => [
+                        'title' => 'Torneo de Go de Berlín 2026',
+                        'teaser' => 'Campeonato anual de la ciudad para todos los niveles. Sistema de emparejamiento McMahon, 5 rondas.',
+                        'description' => '¡Únete al torneo anual de Go de Berlín! Abierto a todos los niveles con divisiones separadas. El sistema de emparejamiento McMahon garantiza partidas justas. Cuota de inscripción: 15 € con comida incluida. Premios para los 3 primeros de cada división.',
+                    ],
                 ],
                 'comments' => [
                     [
@@ -286,6 +306,16 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                         'teaser' => '为零基础初学者提供的完整围棋入门。免费活动，提供所有材料。',
                         'description' => '从未下过围棋？太好了！本工作坊涵盖基本规则、策略基础和您在9路棋盘上的首局对弈。我们的认证教练将逐步指导。提供所有材料，无需经验。免费活动！',
                     ],
+                    'fr' => [
+                        'title' => 'Atelier débutants : apprendre le Go',
+                        'teaser' => 'Introduction complète au Go pour les grands débutants. Événement gratuit, tout le matériel fourni.',
+                        'description' => 'Tu n\'as jamais joué au Go ? Parfait ! Cet atelier couvre les règles de base, les fondamentaux de la stratégie et tes premières parties sur un goban 9x9. Nos instructeurs certifiés te guident pas à pas. Tout le matériel est fourni, aucune expérience requise. Événement gratuit !',
+                    ],
+                    'es' => [
+                        'title' => 'Taller para principiantes: aprender Go',
+                        'teaser' => 'Introducción completa al Go para principiantes absolutos. Evento gratuito, todos los materiales incluidos.',
+                        'description' => '¿Nunca has jugado al Go? ¡Perfecto! Este taller cubre las reglas básicas, los fundamentos de estrategia y tus primeras partidas en un tablero de 9x9. Nuestros instructores certificados te guiarán paso a paso. Todos los materiales incluidos, no se necesita experiencia. ¡Evento gratuito!',
+                    ],
                 ],
                 'comments' => [],
             ],
@@ -328,6 +358,16 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                         'title' => '与5段棋手的在线联棋',
                         'teaser' => '观看5段棋手同时对抗多名对手。包含解说！',
                         'description' => '体验强者的力量！我们的常驻5段棋手将同时与6名参与者对弈，并提供现场解说。这是理解高水平思维的绝佳学习机会。通过OGS平台在线进行。',
+                    ],
+                    'fr' => [
+                        'title' => 'Partie simultanée en ligne avec un 5-dan',
+                        'teaser' => 'Regarde un joueur 5-dan affronter plusieurs adversaires à la fois. Commentaires inclus !',
+                        'description' => 'Découvre la puissance d\'un joueur de haut niveau ! Notre 5-dan résident jouera des parties simultanées contre 6 participants avec des commentaires en direct. Une excellente occasion d\'apprendre à comprendre la réflexion de haut niveau. En ligne via la plateforme OGS.',
+                    ],
+                    'es' => [
+                        'title' => 'Partida simultánea en línea con un 5-dan',
+                        'teaser' => 'Mira a un jugador 5-dan enfrentarse a varios oponentes a la vez. ¡Con comentarios!',
+                        'description' => '¡Vive la potencia de un jugador fuerte! Nuestro 5-dan residente jugará partidas simultáneas contra 6 participantes con comentarios en directo. Una gran oportunidad para entender el pensamiento de alto nivel. En línea a través de la plataforma OGS.',
                     ],
                 ],
                 'comments' => [
@@ -385,6 +425,16 @@ class EventFixture extends AbstractFixture implements DependentFixtureInterface
                         'title' => '周末围棋静修',
                         'teaser' => '在大自然中进行的密集训练周末。讲座、棋局复盘和大量对弈时间。',
                         'description' => '加入我们在美丽的格鲁内瓦尔德森林度过沉浸式围棋周末！包括住宿、餐饮、结构化训练课程、专业讲座和充足的对弈时间。欢迎所有水平。限20名参与者。',
+                    ],
+                    'fr' => [
+                        'title' => 'Retraite Go du week-end',
+                        'teaser' => 'Week-end d\'entraînement intensif dans la nature. Conférences, analyses de parties et beaucoup de temps de jeu.',
+                        'description' => 'Rejoins-nous pour un week-end de Go immersif dans la belle forêt de Grunewald ! Hébergement et repas inclus, sessions d\'entraînement structurées, conférences professionnelles et beaucoup de temps pour jouer. Tous les niveaux sont les bienvenus. Limité à 20 participants.',
+                    ],
+                    'es' => [
+                        'title' => 'Retiro de Go de fin de semana',
+                        'teaser' => 'Fin de semana de entrenamiento intensivo en la naturaleza. Charlas, revisiones de partidas y mucho tiempo de juego.',
+                        'description' => '¡Únete a nosotros para un fin de semana de Go inmersivo en el hermoso bosque de Grunewald! Incluye alojamiento, comidas, sesiones de entrenamiento estructuradas, charlas profesionales y mucho tiempo para jugar. Todos los niveles son bienvenidos. Limitado a 20 participantes.',
                     ],
                 ],
                 'comments' => [],

@@ -16,6 +16,8 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
     public const string ENGLISH = 'en';
     public const string GERMAN = 'de';
     public const string CHINESE = 'zh';
+    public const string FRENCH = 'fr';
+    public const string SPANISH = 'es';
 
     private const array LANGUAGES = [
         ['code' => 'en', 'name' => 'English', 'sortOrder' => 1, 'enabled' => true, 'image' => 'en.jpg'],

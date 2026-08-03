@@ -1,0 +1,31 @@
+wishlist:
+    menu_main: 'Lista de deseos'
+
+wishlist_attach:
+    pick_from_wishlist: 'Elegir de la lista de deseos'
+
+wishlist_entry:
+    page_title_mine: 'Mi lista de deseos'
+    page_title_group: 'Lista de deseos del grupo'
+    button_mine: 'Mi lista de deseos'
+    button_group: 'Lista de deseos del grupo'
+    button_remove: 'Quitar'
+    empty_mine: 'Tu lista de deseos está vacía.'
+    empty_group: 'Nadie ha añadido nada a la lista de deseos todavía.'
+    col_item: 'Elemento'
+    col_priority: 'Prioridad'
+    col_since: 'Añadido'
+    priority_label: 'envejecido %count%x'
+    waiting_since: 'esperó %count% eventos'
+    flash_added: 'Añadido a tu lista de deseos.'
+    flash_removed: 'Quitado de tu lista de deseos.'
+
+wishlist_pick:
+    page_title: 'Elegir de la lista de deseos'
+    intro: 'Los elementos más deseados primero. Adjuntar uno envejece el resto del retraso.'
+    empty: 'Todavía no hay nada en la lista de deseos para elegir.'
+    col_item: 'Elemento'
+    col_wanters: 'Deseado por'
+    col_priority: 'Prioridad'
+    wanted_by_members: 'deseado por %count% miembros'
+    button_attach: 'Adjuntar'
