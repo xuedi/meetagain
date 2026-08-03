@@ -18,6 +18,7 @@
         <script src="{{ asset('js/vendor/fancybox.umd.js') }}" ></script>
     {% endif %}
     <script src="{{ asset('js/event-details.js') }}" defer></script>
+    <script src="{{ asset('js/event-share.js') }}" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -74,6 +75,12 @@
                     <a class="button is-fullwidth mt-4" href="{{ path('app_event_calendar_download', {'id': event.id}) }}">
                         <span class="icon"><i class="fa-regular fa-calendar-plus"></i></span>
                         <span>{{ 'events.button_add_to_calendar'|trans }}</span>
+                    </a>
+                    <a class="button is-fullwidth mt-2 modalTrigger"
+                       href="{{ path('app_event_share', {'id': event.id}) }}"
+                       data-modal-url="{{ path('app_event_share_modal', {'id': event.id}) }}">
+                        <span class="icon"><i class="fa-solid fa-share-nodes"></i></span>
+                        <span>{{ 'events.button_share'|trans }}</span>
                     </a>
                 </div>
             </div>

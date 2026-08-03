@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'events.share_page_title'|trans }} - {{ share.title }}{% endblock %}
+{% block meta_description %}{{ share.teaser }}{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex,follow">{% endblock %}
+
+{% block javascripts %}
+    {% if event.hasMap and show_osm() %}
+        <script src="{{ asset('js/vendor/leaflet.js') }}"></script>
+        <script src="{{ asset('js/osm-map.js') }}" defer></script>
+    {% endif %}
+    <script src="{{ asset('js/event-share.js') }}" defer></script>
+{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <div class="box">
+                {% include 'events/_share_sheet.html.twig' %}
+            </div>
+            <p class="mt-4 event-share-actions">
+                <a href="{{ path('app_event_details', {'id': event.id}) }}">{{ 'events.share_back_to_event'|trans }}</a>
+            </p>
+        </div>
+    </section>
+{% endblock %}

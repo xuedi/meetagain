@@ -20,7 +20,7 @@
 <div class="box mt-5">
     <strong>{{ event.start|date('d. F Y') }}</strong>
     <p>
-        {{ event.start|date('H:i') }} to {{ event.stop|date('H:i') }}<br>
+        {{ 'events.time_range'|trans({'%from%': event.start|date('H:i'), '%to%': event.stop|date('H:i')}) }}<br>
         {% if event.series and event.series.rule %}
             {{ 'events.label_recurring'|trans }}
             {{ recurrence_label(event.series.rule, event.series.ruleSpec, event.start) }}
@@ -49,6 +49,7 @@
     {% endif %}
     {% if event.hasMap and show_osm() %}
         <div class="mt-3" id="osm-map"
+             data-osm-map
              data-lat="{{ event.location.latitude }}"
              data-lng="{{ event.location.longitude }}"
              data-marker-icon="{{ asset('images/leaflet/marker-icon.png') }}"
