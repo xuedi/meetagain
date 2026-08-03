@@ -71,16 +71,14 @@ final class EventController extends AbstractController
 
         $filterResult = $this->eventFilterService->getEventIdFilter();
         $allowedEventIds = $filterResult->getEventIds();
-
-        $providedFeatured = $this->getProvidedFeaturedEvents();
-        $hasFeatured = $providedFeatured !== null ? $providedFeatured !== [] : $this->repo->findFeatured($allowedEventIds) !== [];
+        $locale = $request->getLocale();
 
         return $this->render(
             'events/index.html.twig',
             [
-                'structuredList' => $this->eventService->getFilteredList($time, $sort, $type, $rsvp, $this->getUser(), $allowedEventIds),
+                'structuredList' => $this->eventService->getFilteredList($time, $sort, $type, $rsvp, $this->getUser(), $allowedEventIds, $locale),
                 'filter' => $form,
-                'hasFeatured' => $hasFeatured,
+                'hasFeatured' => $this->getFeaturedEvents($allowedEventIds, $locale) !== [],
             ],
             $response,
         );
@@ -162,28 +160,36 @@ final class EventController extends AbstractController
     }
 
     #[Route('/event/featured/', name: self::ROUTE_FEATURED)]
-    public function featured(): Response
+    public function featured(Request $request): Response
     {
         $response = $this->getResponse();
 
-        $featuredEvents = $this->getProvidedFeaturedEvents();
-
         $filterResult = $this->eventFilterService->getEventIdFilter();
         $allowedEventIds = $filterResult->getEventIds();
-        $lastEvents = $this->repo->getPastEvents(3, $allowedEventIds);
-
-        if ($featuredEvents === null) {
-            $featuredEvents = $this->repo->findFeatured($allowedEventIds);
-        }
+        $locale = $request->getLocale();
 
         return $this->render(
             'events/featured.html.twig',
             [
-                'featured' => $featuredEvents,
-                'last' => $lastEvents,
+                'featured' => $this->getFeaturedEvents($allowedEventIds, $locale),
+                'last' => $this->repo->getPastEvents(3, $allowedEventIds, $locale),
             ],
             $response,
         );
+    }
+
+    /**
+     * @param array<int>|null $allowedEventIds
+     * @return array<Event>
+     */
+    private function getFeaturedEvents(?array $allowedEventIds, string $locale): array
+    {
+        $provided = $this->getProvidedFeaturedEvents();
+        if ($provided === null) {
+            return $this->repo->findFeatured($allowedEventIds, $locale);
+        }
+
+        return $this->eventService->keepTranslatedIn($provided, $locale);
     }
 
     /**

@@ -12,7 +12,9 @@ use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
 use DateTime;
 use DateTimeInterface;
+use App\Entity\EventTranslation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -26,6 +28,19 @@ class EventRepository extends ServiceEntityRepository
         parent::__construct($registry, Event::class);
     }
 
+    private function restrictToTranslated(QueryBuilder $qb, string $language): void
+    {
+        $translated = $this
+            ->getEntityManager()
+            ->createQueryBuilder()
+            ->select('1')
+            ->from(EventTranslation::class, 'tl')
+            ->where('tl.event = e')
+            ->andWhere('tl.language = :translatedIn');
+
+        $qb->andWhere($qb->expr()->exists($translated->getDQL()))->setParameter('translatedIn', $language);
+    }
+
     /**
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return Event[]
@@ -37,6 +52,7 @@ class EventRepository extends ServiceEntityRepository
         ?UserInterface $user = null,
         ?EventRsvpFilter $rsvp = null,
         ?array $restrictToEventIds = null,
+        ?string $translatedIn = null,
     ): array {
         $qb = $this
             ->createQueryBuilder('e')
@@ -71,6 +87,10 @@ class EventRepository extends ServiceEntityRepository
                 return [];
             }
             $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        if ($translatedIn !== null) {
+            $this->restrictToTranslated($qb, $translatedIn);
         }
 
         $qb->orderBy('e.start', $sort->value);
@@ -261,7 +281,7 @@ class EventRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return array<Event>
      */
-    public function getPastEvents(int $number = 3, ?array $restrictToEventIds = null): array
+    public function getPastEvents(int $number = 3, ?array $restrictToEventIds = null, ?string $translatedIn = null): array
     {
         // Two-step query so setMaxResults applies to distinct events, not to the
         // post-join row count. Fetch-joining translations + rsvp inflates the row
@@ -281,6 +301,10 @@ class EventRepository extends ServiceEntityRepository
 
         if ($restrictToEventIds !== null) {
             $idsQb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        if ($translatedIn !== null) {
+            $this->restrictToTranslated($idsQb, $translatedIn);
         }
 
         $ids = $idsQb->getQuery()->getSingleColumnResult();
@@ -601,7 +625,7 @@ class EventRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToEventIds Optional event ID filter
      * @return array<Event>
      */
-    public function findFeatured(?array $restrictToEventIds = null): array
+    public function findFeatured(?array $restrictToEventIds = null, ?string $translatedIn = null): array
     {
         if ($restrictToEventIds === []) {
             return [];
@@ -621,6 +645,10 @@ class EventRepository extends ServiceEntityRepository
 
         if ($restrictToEventIds !== null) {
             $qb->andWhere('e.id IN (:ids)')->setParameter('ids', $restrictToEventIds);
+        }
+
+        if ($translatedIn !== null) {
+            $this->restrictToTranslated($qb, $translatedIn);
         }
 
         return $qb->getQuery()->getResult();
