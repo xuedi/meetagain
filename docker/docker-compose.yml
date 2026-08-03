@@ -102,7 +102,7 @@ services:
 
   # Page speed analyzer (run via: just testPerformance)
   sitespeed:
-    image: sitespeedio/sitespeed.io:42.4.0@sha256:45e1bc0cc21864a026f89eb454810388dcb04a2a05eac02d89f055d883e71b65
+    image: sitespeedio/sitespeed.io:42.5.1@sha256:2e6bb729031c5186308fdce3032955ed98a9381086d1ce51cc16857340c7fcbf
     container_name: "ma-sitespeed"
     network_mode: "host"
     environment:
