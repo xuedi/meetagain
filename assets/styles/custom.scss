@@ -623,3 +623,60 @@ body.admin-shell-no-scroll {
     height: 8rem;
     border-radius: 4px;
 }
+
+// -- Event share sheet --
+
+.event-share-map {
+    height: 220px;
+    border-radius: 6px;
+}
+
+.event-share-qr {
+    background: #ffffff;
+    border: 1px solid #dbdbdb;
+    border-radius: 6px;
+
+    svg {
+        display: block;
+        width: 100%;
+        max-width: 220px;
+        height: auto;
+    }
+}
+
+.event-share-print-url {
+    display: none;
+    word-break: break-all;
+}
+
+@media print {
+    body {
+        background: #ffffff;
+    }
+
+    .navbar,
+    .footer,
+    .modal-background,
+    .modal-close,
+    .flashNotification,
+    .event-share-actions {
+        display: none !important;
+    }
+
+    .event-share-sheet {
+        color: #000000;
+
+        .heading,
+        .has-text-grey {
+            color: #000000 !important;
+        }
+    }
+
+    .event-share-print-url {
+        display: block;
+    }
+
+    .event-share-map {
+        display: none;
+    }
+}

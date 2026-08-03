@@ -28,6 +28,7 @@
     "doctrine/doctrine-fixtures-bundle": "^4",
     "doctrine/doctrine-migrations-bundle": "^4",
     "doctrine/orm": "^3.3",
+    "endroid/qr-code": "^6.0",
     "knplabs/knp-time-bundle": "^2.4",
     "matthiasmullie/minify": "^1.3",
     "nikic/php-parser": "^5",

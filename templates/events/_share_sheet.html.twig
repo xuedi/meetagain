@@ -1,0 +1,136 @@
+{#
+    Event share sheet -- summary of one event with share targets, map and QR code
+
+    Rendered into the global modal from the event detail page and as the body of the
+    standalone share page, so both surfaces always show the same summary. Everything it
+    renders comes off the EventShareSheet value object; it knows no routes of its own
+    apart from the printable-version link.
+
+    Used in:    templates/events/share.html.twig, App\Controller\EventShareController::modal
+    Parameters: event (Event), share (EventShareSheet), inModal (bool, optional; default false)
+    Depends on: assets/js/event-share.js, assets/js/osm-map.js (when the map is shown)
+#}
+{% set inModal = inModal|default(false) %}
+{% set showMap = event.hasMap and show_osm() %}
+
+<div class="event-share-sheet">
+
+    <h1 class="title is-4 mb-2">{{ share.title }}</h1>
+    {% if event.canceled %}
+        <span class="tag is-danger mb-3">{{ 'events.tag_canceled'|trans }}</span>
+    {% endif %}
+    {% if share.teaser %}
+        <p class="mb-4">{{ share.teaser }}</p>
+    {% endif %}
+
+    <div class="columns">
+        <div class="column">
+
+            <p class="heading">{{ 'events.share_when'|trans }}</p>
+            <p class="mb-4">
+                <strong>{{ event.start|date('d. F Y') }}</strong><br>
+                {% if event.stop %}
+                    {{ 'events.time_range'|trans({'%from%': event.start|date('H:i'), '%to%': event.stop|date('H:i')}) }}
+                {% else %}
+                    {{ event.start|date('H:i') }}
+                {% endif %}
+                {% if event.series and event.series.rule %}
+                    <br>{{ 'events.label_recurring'|trans }}
+                    {{ recurrence_label(event.series.rule, event.series.ruleSpec, event.start) }}
+                {% endif %}
+            </p>
+
+            {% if event.location %}
+                <p class="heading">{{ 'events.share_where'|trans }}</p>
+                <p>
+                    <strong>{{ event.location.name }}</strong><br>
+                    {{ event.location.street }}<br>
+                    {{ event.location.postcode }} {{ event.location.city }}
+                </p>
+                {% if event.location.description %}
+                    <p class="heading mt-4">{{ 'events.share_directions'|trans }}</p>
+                    <p>{{ event.location.description }}</p>
+                {% endif %}
+                {% if share.mapLinks is not empty %}
+                    <div class="buttons are-small mt-3 event-share-actions">
+                        {% for link in share.mapLinks %}
+                            <a class="button is-light" href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
+                                <span class="icon"><i class="{{ link.icon }}"></i></span>
+                                <span>{{ link.label|trans }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endif %}
+
+        </div>
+        <div class="column">
+            {% if showMap %}
+                <div class="event-share-map mb-4"
+                     data-osm-map
+                     data-lat="{{ event.location.latitude }}"
+                     data-lng="{{ event.location.longitude }}"
+                     data-marker-icon="{{ asset('images/leaflet/marker-icon.png') }}"
+                     data-marker-shadow="{{ asset('images/leaflet/marker-shadow.png') }}"></div>
+            {% endif %}
+            <div class="has-text-centered">
+                <div class="event-share-qr is-inline-block p-3">{{ share.qrSvg|raw }}</div>
+                <p class="is-size-7 has-text-grey mt-2">{{ 'events.share_qr_hint'|trans }}</p>
+                <p class="event-share-print-url is-size-7">{{ share.shareUrl }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="field has-addons event-share-actions">
+        <div class="control is-expanded">
+            <input class="input" type="text" readonly
+                   data-share-link
+                   value="{{ share.shareUrl }}"
+                   aria-label="{{ 'events.share_link_aria'|trans }}">
+        </div>
+        <div class="control">
+            <button class="button is-link" type="button"
+                    data-share-copy
+                    data-copied-label="{{ 'events.share_copy_done'|trans }}">
+                <span class="icon"><i class="fa-solid fa-copy"></i></span>
+                <span>{{ 'events.share_copy_link'|trans }}</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="buttons are-small event-share-actions">
+        <button class="button is-link is-light" type="button" hidden
+                data-share-native
+                data-share-title="{{ share.title }}"
+                data-share-text="{{ share.teaser }}"
+                data-share-url="{{ share.shareUrl }}">
+            <span class="icon"><i class="fa-solid fa-share-nodes"></i></span>
+            <span>{{ 'events.share_native'|trans }}</span>
+        </button>
+        {% for target in share.shareTargets %}
+            <a class="button is-light" href="{{ target.url }}" target="_blank" rel="noopener noreferrer">
+                {% if target.icon %}<span class="icon"><i class="{{ target.icon }}"></i></span>{% endif %}
+                <span>{{ target.label|trans }}</span>
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="buttons are-small event-share-actions">
+        {% if inModal %}
+            <a class="button is-light" href="{{ path('app_event_share', {'id': event.id}) }}" target="_blank" rel="noopener">
+                <span class="icon"><i class="fa-solid fa-print"></i></span>
+                <span>{{ 'events.share_printable'|trans }}</span>
+            </a>
+        {% else %}
+            <button class="button is-light" type="button" hidden data-share-print>
+                <span class="icon"><i class="fa-solid fa-print"></i></span>
+                <span>{{ 'events.share_print'|trans }}</span>
+            </button>
+        {% endif %}
+        <a class="button is-light" href="{{ share.qrPngUrl }}">
+            <span class="icon"><i class="fa-solid fa-qrcode"></i></span>
+            <span>{{ 'events.share_download_qr'|trans }}</span>
+        </a>
+    </div>
+
+</div>

@@ -1,20 +1,23 @@
 /**
- * OSM Map — Leaflet init for the #osm-map element.
+ * OSM Map — Leaflet init for every [data-osm-map] element.
  *
- * Initialises a Leaflet map on the first #osm-map element on the page if the
- * Leaflet library has loaded. Coordinates and marker icon URLs are read from
- * data-* attributes on the map element.
+ * Initialises a Leaflet map on each [data-osm-map] element if the Leaflet library has
+ * loaded. Coordinates and marker icon URLs are read from data-* attributes on the map
+ * element. Elements injected after load — the event share sheet inside the global modal —
+ * are picked up through a MutationObserver; a map built into a container that was hidden
+ * a moment earlier keeps a stale size until invalidateSize() runs.
  *
- * Loaded in:  templates/events/details.html.twig, templates/admin/location/edit.html.twig
- * Used by:    #osm-map
+ * Loaded in:  templates/events/details.html.twig, templates/events/share.html.twig,
+ *             templates/admin/location/edit.html.twig
+ * Used by:    [data-osm-map]
  * Depends on: leaflet.js (L)
  */
 
-document.addEventListener('DOMContentLoaded', function () {
-    const mapEl = document.getElementById('osm-map');
-    if (!mapEl || typeof L === 'undefined') {
+function initOsmMap(mapEl) {
+    if (typeof L === 'undefined' || mapEl.dataset.osmMapReady) {
         return;
     }
+    mapEl.dataset.osmMapReady = '1';
 
     mapEl.style.height = '220px';
     const map = L.map(mapEl, {attributionControl: false});
@@ -36,4 +39,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const target = L.latLng(mapEl.dataset.lat, mapEl.dataset.lng);
     map.setView(target, 16);
     L.marker(target, {icon: iconMarker}).addTo(map);
+
+    setTimeout(function () {
+        map.invalidateSize();
+    }, 0);
+}
+
+function initOsmMaps(root) {
+    root.querySelectorAll('[data-osm-map]').forEach(initOsmMap);
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    initOsmMaps(document);
+
+    const modalContent = document.getElementById('globalImageModalContent');
+    if (!modalContent) return;
+
+    new MutationObserver(function () {
+        initOsmMaps(modalContent);
+    }).observe(modalContent, {childList: true});
 });
