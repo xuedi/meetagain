@@ -12,5 +12,5 @@ toolconfig.workspace = true
 clap.workspace = true
 ureq.workspace = true
 serde_json.workspace = true
-jsonwebtoken = "9"
+jsonwebtoken = "11"
 base64 = "0.23"
