@@ -54,6 +54,36 @@ readonly class ConfigService
         return $this->getInt('event_canonical_threshold', 20);
     }
 
+    public function getSiteName(): string
+    {
+        return $this->getString('site_name', 'meetAgain');
+    }
+
+    public function getSecurityContact(): string
+    {
+        return $this->getString('security_contact', '');
+    }
+
+    public function getSecurityEncryptionUrl(): string
+    {
+        return $this->getString('security_encryption_url', '');
+    }
+
+    public function getSecurityPreferredLanguages(): string
+    {
+        return $this->getString('security_preferred_languages', '');
+    }
+
+    public function getTdmPolicyUrl(): string
+    {
+        return $this->getString('tdm_policy_url', '');
+    }
+
+    public function isTdmReservationEnabled(): bool
+    {
+        return $this->getBoolean('tdm_reservation', true);
+    }
+
     public function getSystemUserId(): int
     {
         return $this->getInt('system_user_id', 1);

@@ -122,6 +122,7 @@ admin_system_config:
     option_send_upcoming_digest: 'Wochen-Digest-E-Mails'
     option_email_delivery_sync_enabled: 'E-Mail-Zustellstatus synchronisieren'
     option_send_admin_notification: 'Admin Benachrichtigungen'
+    option_tdm_reservation: 'Inhalte gegen KI-Training vorbehalten'
     field_url: 'Website-URL'
     field_host: 'Server-Host'
     field_sender_name: 'Absendername'

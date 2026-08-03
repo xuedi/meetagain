@@ -24,6 +24,10 @@ robots:
     type: attribute
     resource: ../src/Controller/NonLocale/RobotsController.php
 
+well_known:
+    type: attribute
+    resource: ../src/Controller/NonLocale/WellKnownController.php
+
 sitemap:
     type: attribute
     resource: ../src/Controller/NonLocale/SitemapController.php
