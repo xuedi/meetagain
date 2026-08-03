@@ -263,7 +263,7 @@ language_tile:
     intro_en: 'A community platform for local events and groups. Chronological, ad-free, open source.'
     intro_de: 'Eine Community-Plattform für lokale Veranstaltungen und Gruppen. Chronologisch, werbefrei, Open Source.'
     intro_zh: '一个面向本地活动和社群的平台。按时间排序、无广告、开源。'
-    intro_fr: 'Une plateforme communautaire pour des événements et des groupes locaux. Chronologique, sans publicité, open source.'
+    intro_fr: 'Une plateforme communautaire pour des événements et groupes locaux. Chronologique, sans pub, open source.'
     intro_es: 'Una plataforma comunitaria para eventos y grupos locales. Cronológica, sin publicidad, de código abierto.'
     tile_alt_en: 'Continue in English (%language%)'
     tile_alt_de: 'Auf Deutsch fortfahren (%language%)'
