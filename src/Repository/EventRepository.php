@@ -718,6 +718,42 @@ class EventRepository extends ServiceEntityRepository
     /**
      * @return Event[]
      */
+    /**
+     * @return Event[]
+     */
+    public function findForCalendarFeed(DateTimeInterface $from, DateTimeInterface $until, int $limit): array
+    {
+        $ids = $this
+            ->createQueryBuilder('e')
+            ->select('e.id')
+            ->where('e.status IN (:statuses)')
+            ->andWhere('COALESCE(e.stop, e.start) >= :from')
+            ->andWhere('e.start <= :until')
+            ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
+            ->setParameter('from', $from)
+            ->setParameter('until', $until)
+            ->orderBy('e.start', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        if ($ids === []) {
+            return [];
+        }
+
+        return $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->leftJoin('e.location', 'l')
+            ->addSelect('l')
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->orderBy('e.start', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findForSitemap(): array
     {
         return $this

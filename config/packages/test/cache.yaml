@@ -8,3 +8,5 @@ framework:
                 adapter: cache.adapter.array
             cache.app_state:
                 adapter: cache.adapter.array
+            cache.calendar_feed:
+                adapter: cache.adapter.array
