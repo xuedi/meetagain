@@ -122,6 +122,7 @@ admin_system_config:
     option_send_upcoming_digest: 'Weekly events digest'
     option_email_delivery_sync_enabled: 'Email delivery status sync'
     option_send_admin_notification: 'Admin Notifications'
+    option_tdm_reservation: 'Reserve content against AI training'
     field_url: 'Site URL'
     field_host: 'Site Host'
     field_sender_name: 'Sender Name'

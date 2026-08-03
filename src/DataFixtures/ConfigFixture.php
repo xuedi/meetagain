@@ -118,6 +118,11 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
                 'Y-m-d H:i',
                 ConfigType::String,
             ],
+            [
+                'tdm_reservation',
+                'true',
+                ConfigType::Boolean,
+            ],
         ];
     }
 }

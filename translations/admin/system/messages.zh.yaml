@@ -122,6 +122,7 @@ admin_system_config:
     option_send_upcoming_digest: '每周摘要邮件'
     option_email_delivery_sync_enabled: '邮件投递状态同步'
     option_send_admin_notification: '管理员通知'
+    option_tdm_reservation: '保留内容权利，禁止用于AI训练'
     field_url: '网站URL'
     field_host: '服务器主机'
     field_sender_name: '发件人名称'

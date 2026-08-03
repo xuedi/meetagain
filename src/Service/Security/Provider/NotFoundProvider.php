@@ -41,7 +41,6 @@ final class NotFoundProvider extends AbstractSecurityProvider
         '/admin.php',
         '/config.php',
         '/setup.php',
-        '/.well-known/security',
     ];
 
     public function __construct(

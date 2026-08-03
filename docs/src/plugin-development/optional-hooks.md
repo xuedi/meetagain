@@ -22,6 +22,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `MetaEnricherInterface`                    | Enrich metadata on all activity types                 | `enrich()`                                                |
 | `MessageInterface`                         | Define a new activity type with display rendering     | `getType()`, `validate()`, `render()`                     |
 | `SitemapPublisherInterface`                | Contribute URLs to `/sitemap.xml`                     | `getPriority()`, `getSitemapUrls()`                       |
+| `WellKnownProviderInterface`               | Serve a document under `/.well-known/`                | `getSuffix()`, `getPriority()`, `provide()`               |
 | `UrlOwnerProviderInterface`                | Name the host that owns a route                       | `getOwnerHost()`                                          |
 | `FollowerEventNotificationFilterInterface` | Drop follower-RSVP email recipients per event         | `isFollowerAllowed()`                                     |
 | `ImageAttributionFilterInterface`          | Narrow which attributed images `/attributions` shows  | `getVisibleImageIdFilter()`                               |
@@ -361,6 +362,67 @@ host).
 - Detail pages should carry a `lastmod` (use the entity's `updatedAt` or `createdAt`); index pages rarely need one.
 - Respect tenant filters: if your plugin has a multisite group filter (e.g. `getApprovedList()` already applies one),
   reuse that path so whitelabel sitemaps only list content the tenant can actually serve.
+
+---
+
+### WellKnownProviderInterface
+
+**Purpose:** Serve a discovery document under `/.well-known/` - the namespace RFC 8615 reserves for machine-readable
+site metadata. Typical uses are app-association files (`assetlinks.json`, `apple-app-site-association`), federation
+discovery (`nodeinfo`, `webfinger`), or a protocol manifest your plugin actually implements.
+
+**File:** `src/Publisher/WellKnown/WellKnownProviderInterface.php`
+
+**Tag:** Auto-tagged via `#[AutoconfigureTag]` on the interface.
+
+**When called:** On a `GET /.well-known/{suffix}` request whose suffix matches `getSuffix()`. Providers sharing a
+suffix are tried highest priority first, and the first non-null `WellKnownDocument` wins. Core uses priority `0`;
+use `100` to override a core document.
+
+```php
+namespace Plugin\YourPlugin\Publisher\WellKnown;
+
+use App\Publisher\WellKnown\WellKnownDocument;
+use App\Publisher\WellKnown\WellKnownProviderInterface;
+use Symfony\Component\HttpFoundation\Request;
+
+readonly class AssetLinksProvider implements WellKnownProviderInterface
+{
+    public function getSuffix(): string
+    {
+        return 'assetlinks.json';
+    }
+
+    public function getPriority(): int
+    {
+        return 0;
+    }
+
+    public function provide(Request $request): ?WellKnownDocument
+    {
+        return WellKnownDocument::json([
+            [
+                'relation' => ['delegate_permission/common.handle_all_urls'],
+                'target' => ['namespace' => 'android_app', 'package_name' => 'org.example.app'],
+            ],
+        ]);
+    }
+}
+```
+
+`WellKnownDocument` has three factories: `of($body, $contentType, $maxAge)` for arbitrary content,
+`json($data, $contentType, $maxAge)`, and `redirect($url)` for documents specified as a redirect.
+
+**Rules:**
+
+- Return `null` to decline - the next provider runs, and a fully unclaimed suffix stays a 404. That 404 is load-bearing:
+  core scores `/.well-known/*` probes as scanner activity, so never claim a suffix just to return an empty 200.
+- Only advertise what exists. A manifest describing an endpoint your plugin does not actually serve is worse than no
+  manifest at all.
+- Generate per-request from `$request` rather than returning a constant, so multi-domain installations get the right
+  host in every URL.
+- Plugins can only contribute under `/.well-known/`. Root-level files such as `llms.txt` need a core route, because the
+  site root is shared with the CMS slug router.
 
 ---
 
