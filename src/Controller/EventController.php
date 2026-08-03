@@ -16,6 +16,7 @@ use App\Filter\Event\EventFilterService;
 use App\Form\EventFilterType;
 use App\Repository\EventRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use App\Service\Event\CalendarFeedService;
 use App\Service\Event\EventService;
 use App\Service\Item\AssociationService;
 use App\Service\Item\AttachControlBuilder;
@@ -35,10 +36,15 @@ final class EventController extends AbstractController
 {
     public const string ROUTE_EVENT = 'app_event';
     public const string ROUTE_FEATURED = 'app_event_featured';
+    public const string ROUTE_CALENDAR_FEED = 'app_event_calendar_feed';
+    public const string ROUTE_CALENDAR_EVENT = 'app_event_calendar_download';
+
+    private const int CALENDAR_MAX_AGE = 3600;
 
     public function __construct(
         private readonly ActivityService $activityService,
         private readonly EventService $eventService,
+        private readonly CalendarFeedService $calendarFeedService,
         private readonly EventRepository $repo,
         private readonly EventFilterService $eventFilterService,
         private readonly EventSchemaService $eventSchemaService,
@@ -113,6 +119,46 @@ final class EventController extends AbstractController
             ],
             $response,
         );
+    }
+
+    #[Route('/events.ics', name: self::ROUTE_CALENDAR_FEED, methods: ['GET'])]
+    public function calendarFeed(Request $request): Response
+    {
+        $body = $this->calendarFeedService->renderFeed($request->getHost(), $request->getLocale());
+
+        $response = new Response($body, Response::HTTP_OK, [
+            'Content-Type' => 'text/calendar; charset=UTF-8',
+            'Content-Disposition' => 'inline; filename="events.ics"',
+        ]);
+        $response->setPublic();
+        $response->setMaxAge(self::CALENDAR_MAX_AGE);
+        $response->setEtag(hash('xxh128', $body));
+        $response->isNotModified($request);
+
+        return $response;
+    }
+
+    #[Route('/event/{id}.ics', name: self::ROUTE_CALENDAR_EVENT, requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function calendarEvent(Request $request, int $id): Response
+    {
+        if (!$this->eventFilterService->isEventAccessible($id)) {
+            throw $this->createNotFoundException();
+        }
+
+        $event = $this->repo->findOneForDetails($id);
+        if (!$event instanceof Event) {
+            throw $this->createNotFoundException();
+        }
+
+        $body = $this->calendarFeedService->renderEvent($event, $request->getHost(), $request->getLocale());
+        if ($body === null) {
+            throw $this->createNotFoundException();
+        }
+
+        return new Response($body, Response::HTTP_OK, [
+            'Content-Type' => 'text/calendar; charset=UTF-8',
+            'Content-Disposition' => sprintf('attachment; filename="event-%d.ics"', $id),
+        ]);
     }
 
     #[Route('/event/featured/', name: self::ROUTE_FEATURED)]

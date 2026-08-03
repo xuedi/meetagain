@@ -15,3 +15,6 @@ framework:
             cache.image_alt_status:
                 adapter: cache.adapter.redis_tag_aware
                 default_lifetime: 86400
+            cache.calendar_feed:
+                adapter: cache.adapter.redis_tag_aware
+                default_lifetime: 3600

@@ -6,6 +6,7 @@
 {% block og_image %}{% if event.previewImage %}<meta property="og:image" content="{{ json_ld.image[0]|default('') }}"/><meta property="og:image:alt" content="{{ event.title(app.locale) }}"/>{% endif %}{% endblock %}
 {% block twitter_image %}{% if event.previewImage %}<meta name="twitter:image" content="{{ json_ld.image[0]|default('') }}"/>{% endif %}{% endblock %}
 {% block json_ld %}<script type="application/ld+json">{{ json_ld|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_PRETTY_PRINT'))|raw }}</script>{% endblock %}
+{% block calendar_link %}<link rel="alternate" type="text/calendar" title="{{ 'events.calendar_feed_title'|trans }}" href="{{ url('app_event_calendar_feed') }}" />{% endblock %}
 
 
 {% block javascripts %}
@@ -70,6 +71,10 @@
                 </div>
                 <div class="column is-3">
                     {% include 'events/details/sidepanel.html.twig'%}
+                    <a class="button is-fullwidth mt-4" href="{{ path('app_event_calendar_download', {'id': event.id}) }}">
+                        <span class="icon"><i class="fa-regular fa-calendar-plus"></i></span>
+                        <span>{{ 'events.button_add_to_calendar'|trans }}</span>
+                    </a>
                 </div>
             </div>
 
