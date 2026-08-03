@@ -6,15 +6,16 @@
      - column_class: Bulma column-width class (e.g. 'is-4'). Default 'is-4'.
      - with_intro: bool, render the intro paragraph below the greeting. Default false.
 #}
+{% set tile = get_language_tile_text(language) %}
 <section class="column {{ column_class|default('is-4') }} landing-column" lang="{{ language.code }}">
     <a href="/{{ language.code }}/" hreflang="{{ language.code }}" class="card">
         <div class="card-content has-text-centered">
             <h2 class="title is-3">
-                {{ ('language_tile.greeting_' ~ language.code)|trans({}, 'messages', language.code) }}
+                {{ tile.greeting }}
             </h2>
-            {% if with_intro|default(false) %}
+            {% if with_intro|default(false) and tile.intro is not empty %}
                 <p class="subtitle is-5">
-                    {{ ('language_tile.intro_' ~ language.code)|trans({}, 'messages', language.code) }}
+                    {{ tile.intro }}
                 </p>
             {% endif %}
             {% if language.tileImage %}
@@ -22,12 +23,12 @@
                     {% include '_components/image.html.twig' with {
                         'image': language.tileImage,
                         'size': '600x400',
-                        'alt': ('language_tile.tile_alt_' ~ language.code)|trans({'%language%': language.name}, 'messages', language.code),
+                        'alt': tile.alt,
                     } %}
                 </figure>
             {% endif %}
             <span class="button is-link is-medium mt-4">
-                {{ ('language_tile.cta_continue_' ~ language.code)|trans({}, 'messages', language.code) }}
+                {{ tile.cta }}
             </span>
         </div>
     </a>
