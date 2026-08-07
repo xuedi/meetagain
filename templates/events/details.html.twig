@@ -19,6 +19,9 @@
     {% endif %}
     <script src="{{ asset('js/event-details.js') }}" defer></script>
     <script src="{{ asset('js/event-share.js') }}" defer></script>
+    {% if is_granted('ROLE_USER') %}
+        <script src="{{ asset('js/rsvp-guests.js') }}" defer></script>
+    {% endif %}
 {% endblock %}
 
 {% block body %}

@@ -183,7 +183,7 @@ Error: 'Erreur'
 'Please upload a valid image, preferable a 4:3 format': 'Téléverse une image valide, de préférence au format 4:3'
 
 # Security namespace - i18n hardening plan, phase 3 (page-scoped validator messages)
-'security.validator_username_max': 'Les noms d''utilisateur ne peuvent pas dépasser 64 caractères (moins pour les caractères chinois).'
+'security.validator_username_max': 'Les noms d''utilisateur ne peuvent pas dépasser {{ limit }} caractères.'
 'security.validator_email_max': 'Les adresses e-mail ne peuvent pas dépasser 180 caractères.'
 'security.validator_email_unique': 'Un compte existe déjà avec cette adresse e-mail.'
 'security.validator_email_blank': 'Entre ton adresse e-mail.'

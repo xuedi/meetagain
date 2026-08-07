@@ -183,7 +183,7 @@ Error: Error
 'Please upload a valid image, preferable a 4:3 format': 'Please upload a valid image, preferably in 4:3 format'
 
 # Security namespace - i18n hardening plan, phase 3 (page-scoped validator messages)
-'security.validator_username_max': 'Usernames cannot be longer than 64 characters (less with Chinese).'
+'security.validator_username_max': 'Usernames cannot be longer than {{ limit }} characters.'
 'security.validator_email_max': 'Emails cannot be longer than 180 characters.'
 'security.validator_email_unique': 'There is already an account with this email.'
 'security.validator_email_blank': 'Please enter your email address.'

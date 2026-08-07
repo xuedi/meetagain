@@ -12,8 +12,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProfileType extends AbstractType
@@ -46,6 +48,7 @@ class ProfileType extends AbstractType
             'label' => 'profile.form_label_username',
             'constraints' => [
                 new Length(max: 64, maxMessage: 'security.validator_username_max'),
+                $this->cappedOnlyWhenRenamed((string) $user->getName()),
             ],
         ])->add('public', ChoiceType::class, [
             'data' => $user->isPublic(),
@@ -66,6 +69,19 @@ class ProfileType extends AbstractType
             'mapped' => false,
             'label' => 'profile.form_label_bio',
         ]);
+    }
+
+    private function cappedOnlyWhenRenamed(string $originalName): Callback
+    {
+        return new Callback(static function (?string $value, ExecutionContextInterface $context) use ($originalName): void {
+            if ($value === null || $value === $originalName || mb_strlen($value) <= User::NAME_MAX_LENGTH) {
+                return;
+            }
+
+            $context->buildViolation('security.validator_username_max')
+                ->setParameter('{{ limit }}', (string) User::NAME_MAX_LENGTH)
+                ->addViolation();
+        });
     }
 
     #[Override]

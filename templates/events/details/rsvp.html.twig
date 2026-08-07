@@ -27,9 +27,44 @@
     </div>
 </nav>
 <div class="columns is-multiline mt-2">
+    {% set rsvpActive = not event.canceled and event.start > date() %}
     {% for rsvp in event.rsvp %}
+        {% set guests = rsvp_guest_count(event, rsvp) %}
+        {% set ownTile = app.user is not null and rsvp.id == app.user.id %}
+        {% set showControls = ownTile and rsvpActive %}
         <div class="column is-2">
-            {% include '_components/usercard.html.twig' with {'user': rsvp} %}
+            {% embed '_components/usercard.html.twig' with {'user': rsvp} %}
+                {% block footer %}
+                    {% if showControls or guests > 0 %}
+                        <footer class="card-footer rsvp-guest-footer">
+                            {% if showControls %}
+                                <a href="{{ path('app_event_rsvp_guests', {'event': event.id, 'direction': 'remove'}) }}"
+                                   class="card-footer-item rsvp-guest-btn{% if guests == 0 %} is-hidden{% endif %}"
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('app_event_rsvp_guests' ~ event.id) }}"
+                                   data-rsvp-guests="remove"
+                                   title="{{ 'events.rsvp_guest_remove'|trans }}"
+                                   aria-label="{{ 'events.rsvp_guest_remove'|trans }}">
+                                    <span class="icon is-small"><i class="fa fa-minus"></i></span>
+                                </a>
+                            {% endif %}
+                            <span class="card-footer-item rsvp-guest-count"
+                                  title="{{ 'events.rsvp_guests_badge'|trans({'%count%': guests}) }}">+{{ guests }}</span>
+                            {% if showControls %}
+                                <a href="{{ path('app_event_rsvp_guests', {'event': event.id, 'direction': 'add'}) }}"
+                                   class="card-footer-item rsvp-guest-btn"
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('app_event_rsvp_guests' ~ event.id) }}"
+                                   data-rsvp-guests="add"
+                                   title="{{ 'events.rsvp_guest_add'|trans }}"
+                                   aria-label="{{ 'events.rsvp_guest_add'|trans }}">
+                                    <span class="icon is-small"><i class="fa fa-plus"></i></span>
+                                </a>
+                            {% endif %}
+                        </footer>
+                    {% endif %}
+                {% endblock %}
+            {% endembed %}
         </div>
     {% endfor %}
 </div>

@@ -66,6 +66,37 @@ class MembersPageTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
+    public function testMemberTilesClampTheNameToOneLine(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/en/members/1');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('.usercard-name[data-tooltip]', 'Names carry the full-name tooltip wrapper');
+    }
+
+    public function testBadgesRenderAsAnOverlayOnTheAvatar(): void
+    {
+        $client = static::createClient();
+
+        $this->login($client, self::USER_EMAIL, self::USER_PASSWORD);
+        $client->request('GET', '/en/members/1');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorExists('.card-image .usercard-badges .usercard-badge[data-tooltip]');
+    }
+
+    public function testBadgesAreHiddenFromAnonymousVisitors(): void
+    {
+        $client = static::createClient();
+
+        $client->request('GET', '/en/members/1');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorNotExists('.usercard-badges');
+    }
+
     public function testMembersPagination(): void
     {
         $client = static::createClient();

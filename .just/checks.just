@@ -1,7 +1,7 @@
 # Linters, static analysis and accessibility checks.
 
 # Run all tests and checks
-[group('testing')]
+[group('checks')]
 check: checkMago checkMagoAnalyze checkMagoGuard
     {{PHP}} composer validate --strict
     {{PHP}} php bin/check-get-routes.php

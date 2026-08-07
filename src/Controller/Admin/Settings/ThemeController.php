@@ -63,6 +63,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
         ['key' => 'danger_zone', 'partial' => 'danger_zone', 'category' => 'feedback'],
         ['key' => 'sidebar_concept', 'partial' => 'sidebar_concept', 'category' => 'frontend'],
         ['key' => 'item_filter', 'partial' => 'comp_item_filter', 'category' => 'frontend'],
+        ['key' => 'comp_usercard', 'partial' => 'comp_usercard', 'category' => 'frontend'],
     ];
 
     public function __construct(

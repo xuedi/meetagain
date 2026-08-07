@@ -1,19 +1,16 @@
 {#
-    Username — User display name with optional role/status badges
+    Username - One-line user display name link
 
-    Renders the user's name as a profile link followed by zero or more icon badges.
-    Badges are coloured Font Awesome icons with a tooltip title, sourced from the
-    user_badges() Twig function.
+    Renders the user's name as a profile link clamped to a single line. The link is the
+    clipping element and ellipsises; the wrapper stays unclipped and carries the CSS
+    tooltip, which is what lets the full name expand past the tile boundary on hover.
 
     Used in:    templates/_components/usercard.html.twig
     Parameters:
-        - link   (string, required)        — URL to the user's profile page
-        - name   (string, required)        — display name shown as the link text
-        - badges (UserBadge[], required)   — list of UserBadge DTOs with color, icon, title
+        - link (string, required) - URL to the user's profile page
+        - name (string, required) - display name shown as the link text
+    Depends on: .has-tooltip and .usercard-name in assets/styles/custom.scss
 #}
-<a href="{{ link }}">{{ name }}</a>
-{% for badge in badges %}
-    <span class="icon {{ badge.color }}" title="{{ badge.title }}">
-        <i class="{{ badge.icon }}"></i>
-    </span>
-{% endfor %}
+<span class="usercard-name has-tooltip" data-tooltip="{{ name }}">
+    <a href="{{ link }}">{{ name }}</a>
+</span>
