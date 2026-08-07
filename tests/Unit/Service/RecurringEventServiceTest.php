@@ -11,6 +11,7 @@ use App\Enum\RealignmentOutcome;
 use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
 use App\Repository\EventSeriesRepository;
+use App\Repository\RsvpGuestRepository;
 use App\Service\Cms\CmsService;
 use App\Service\Event\OccurrenceCalculator;
 use App\Service\Event\RecurrenceResolver;
@@ -59,6 +60,7 @@ class RecurringEventServiceTest extends TestCase
         return new RecurringEventService(
             repo: $repo,
             seriesRepo: $seriesRepo ?? $this->createStub(EventSeriesRepository::class),
+            rsvpGuestRepo: $this->createStub(RsvpGuestRepository::class),
             em: $em,
             entityActionDispatcher: $this->createStub(EntityActionDispatcher::class),
             cmsBlockRepository: $this->createStub(CmsBlockRepository::class),

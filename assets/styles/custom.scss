@@ -649,6 +649,26 @@ body.admin-shell-no-scroll {
     word-break: break-all;
 }
 
+// -- RSVP guest counter --
+
+.rsvp-guest-footer {
+    .card-footer-item {
+        padding: 0.1rem 0.5rem;
+        font-size: 0.8rem;
+        line-height: 1.2;
+        min-height: 0;
+    }
+
+    a.card-footer-item:hover {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    .rsvp-guest-count {
+        flex-grow: 2;
+        cursor: default;
+    }
+}
+
 @media print {
     body {
         background: #ffffff;

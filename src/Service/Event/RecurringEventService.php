@@ -15,6 +15,7 @@ use App\Enum\RealignmentOutcome;
 use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
 use App\Repository\EventSeriesRepository;
+use App\Repository\RsvpGuestRepository;
 use App\Service\Cms\CmsService;
 use App\ValueObject\CronTaskResult;
 use App\ValueObject\RealignmentItem;
@@ -33,6 +34,7 @@ readonly class RecurringEventService implements CronTaskInterface
     public function __construct(
         private EventRepository $repo,
         private EventSeriesRepository $seriesRepo,
+        private RsvpGuestRepository $rsvpGuestRepo,
         private EntityManagerInterface $em,
         private EntityActionDispatcher $entityActionDispatcher,
         private CmsBlockRepository $cmsBlockRepository,
@@ -211,6 +213,7 @@ readonly class RecurringEventService implements CronTaskInterface
                 $removedAttendees[$userId] ??= ['user' => $attendee, 'dates' => []];
                 $removedAttendees[$userId]['dates'][] = $item->currentStart;
                 $event->removeRsvp($attendee);
+                $this->rsvpGuestRepo->deleteFor($event, $attendee);
             }
             $event->setRsvpNotificationSentAt(null);
             $event->setEventReminderSentAt(null);

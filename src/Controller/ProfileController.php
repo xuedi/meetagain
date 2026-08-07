@@ -12,6 +12,7 @@ use App\Form\ProfileType;
 use App\Repository\EventRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
+use App\Service\Event\RsvpGuestService;
 use App\Service\Member\BlockingService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -83,7 +84,7 @@ final class ProfileController extends AbstractController
     }
 
     #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp', methods: ['POST'])]
-    public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em): Response
+    public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em, RsvpGuestService $rsvpGuestService): Response
     {
         if (!$this->isCsrfTokenValid('app_profile_toggle_rsvp' . $event->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
@@ -101,6 +102,9 @@ final class ProfileController extends AbstractController
 
         $type = $status ? RsvpYes::TYPE : RsvpNo::TYPE;
         $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
+        if (!$status) {
+            $rsvpGuestService->onRsvpRemoved($event, $user);
+        }
 
         if ($request->isXmlHttpRequest()) {
             return new JsonResponse(['newStatus' => $status]);

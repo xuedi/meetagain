@@ -1,42 +1,42 @@
 {#
-    Usercard — User profile card with avatar and name link
+    Usercard - User profile card with avatar and name link
 
     Renders a Bulma card with the user's avatar and display name. When the viewer is
     authenticated the avatar and name link to the member profile and badges are shown;
     for anonymous visitors the card is non-interactive and shows the name as plain text.
+    An optional `footer` block (via embed) docks extra content at the card bottom as a
+    Bulma card-footer strip.
 
     Used in:    templates/member/index.html.twig
-                templates/events/details/rsvp.html.twig
+                templates/events/details/rsvp.html.twig (embed with footer block)
     Parameters:
-        - user (User, required) — entity with id, name, image properties
+        - user (User, required) - entity with id, name, image properties
+    Blocks:
+        - footer (optional) - rendered as the card's bottom footer strip
     Depends on: _components/image.html.twig, _components/username.html.twig
 #}
-{% if is_granted('ROLE_USER') %}
-    <div class="card">
-        <div class="card-image">
-            <figure class="image">
+<div class="card">
+    <div class="card-image">
+        <figure class="image">
+            {% if is_granted('ROLE_USER') %}
                 <a href="{{ path('app_member_view', {'id': user.id}) }}">
                     {% include '_components/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
                 </a>
-            </figure>
-        </div>
-        <div class="card-content p-3 has-text-centered">
+            {% else %}
+                {% include '_components/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
+            {% endif %}
+        </figure>
+    </div>
+    <div class="card-content p-3 has-text-centered">
+        {% if is_granted('ROLE_USER') %}
             {% include '_components/username.html.twig' with {
                 'link': path('app_member_view', {'id': user.id}),
                 'badges': user_badges(user.id),
                 'name': user.name
             } %}
-        </div>
-    </div>
-{% else %}
-    <div class="card">
-        <div class="card-image">
-            <figure class="image">
-                {% include '_components/image.html.twig' with {'image': user.image, 'size': '400x400'} %}
-            </figure>
-        </div>
-        <div class="card-content p-3 has-text-centered">
+        {% else %}
             {{ user.name }}
-        </div>
+        {% endif %}
     </div>
-{% endif %}
+    {% block footer %}{% endblock %}
+</div>

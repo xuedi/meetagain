@@ -6,6 +6,7 @@ use App\Activity\ActivityService;
 use App\Activity\Messages\RsvpNo;
 use App\Activity\Messages\RsvpYes;
 use App\Entity\Event;
+use App\Entity\RsvpGuest;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTileLocation;
@@ -18,6 +19,7 @@ use App\Repository\EventRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\CalendarFeedService;
 use App\Service\Event\EventService;
+use App\Service\Event\RsvpGuestService;
 use App\Service\Item\AssociationService;
 use App\Service\Item\AttachControlBuilder;
 use App\Service\Seo\BreadcrumbBuilder;
@@ -26,6 +28,7 @@ use App\Service\Seo\EventSchemaService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -214,7 +217,7 @@ final class EventController extends AbstractController
 
     #[IsGranted('ROLE_USER')]
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp', methods: ['POST'])]
-    public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em): Response
+    public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em, RsvpGuestService $rsvpGuestService): Response
     {
         if (!$this->isCsrfTokenValid('app_event_toggle_rsvp' . $event->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
@@ -241,6 +244,52 @@ final class EventController extends AbstractController
 
         $type = $event->hasRsvp($user) ? RsvpYes::TYPE : RsvpNo::TYPE;
         $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
+        if (!$event->hasRsvp($user)) {
+            $rsvpGuestService->onRsvpRemoved($event, $user);
+        }
+
+        return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
+    }
+
+    #[IsGranted('ROLE_USER')]
+    #[Route('/event/rsvpGuests/{event}/{direction}/', name: 'app_event_rsvp_guests', requirements: ['direction' => 'add|remove'], methods: ['POST'])]
+    public function rsvpGuests(Request $request, Event $event, string $direction, RsvpGuestService $rsvpGuestService): Response
+    {
+        if (!$this->isCsrfTokenValid('app_event_rsvp_guests' . $event->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+        if ($event->isCanceled()) {
+            $this->addFlash('error', 'events.flash_rsvp_canceled');
+
+            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
+        }
+        if ($event->getStart() < new DateTimeImmutable()) {
+            $this->addFlash('error', 'events.flash_rsvp_past');
+
+            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
+        }
+        if (!$this->isGranted(PermissionAttribute::EVENT_RSVP, $event)) {
+            $this->addFlash('warning', 'events.flash_group_only');
+
+            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
+        }
+
+        $count = $rsvpGuestService->change($event, $this->getAuthedUser(), $direction);
+        if ($request->isXmlHttpRequest()) {
+            if ($count === null) {
+                return new JsonResponse(['error' => 'not_rsvpd'], Response::HTTP_CONFLICT);
+            }
+
+            return new JsonResponse([
+                'count' => $count,
+                'capped' => $direction === 'add' && $count === RsvpGuest::MAX_GUESTS,
+            ]);
+        }
+        if ($count === null) {
+            $this->addFlash('warning', 'events.flash_rsvp_guests_requires_rsvp');
+        } elseif ($direction === 'add' && $count === RsvpGuest::MAX_GUESTS) {
+            $this->addFlash('warning', 'events.flash_rsvp_guests_limit');
+        }
 
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
     }
