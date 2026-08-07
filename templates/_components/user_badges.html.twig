@@ -1,0 +1,26 @@
+{#
+    User badges - Floating badge strip pinned to the user card avatar
+
+    Renders one round chip per badge in the top-right corner of the nearest positioned
+    ancestor (the usercard's .card-image). Chips lay out side by side, so an additional
+    badge provider appends without any layout change. Each chip carries a CSS tooltip with
+    the badge's translated meaning plus a screen-reader-only copy of the same text, and
+    the whole strip is skipped when the user has no badges.
+
+    Used in:    templates/_components/usercard.html.twig
+    Parameters:
+        - badges (UserBadge[], required) - list of UserBadge DTOs with color, icon, and
+                                           title, where title is a translation key
+    Depends on: .has-tooltip and .usercard-badges in assets/styles/custom.scss
+#}
+{% if badges is not empty %}
+    <div class="usercard-badges">
+        {% for badge in badges %}
+            {% set label = badge.title|trans %}
+            <span class="usercard-badge has-tooltip has-tooltip-end {{ badge.color }}" data-tooltip="{{ label }}">
+                <i class="{{ badge.icon }}" aria-hidden="true"></i>
+                <span class="is-sr-only">{{ label }}</span>
+            </span>
+        {% endfor %}
+    </div>
+{% endif %}

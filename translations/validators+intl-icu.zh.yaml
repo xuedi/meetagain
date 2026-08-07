@@ -14,7 +14,7 @@
 Error: 错误
 
 # Security namespace - i18n hardening plan, phase 3 (page-scoped validator messages)
-'security.validator_username_max': '用户名不能超过64个字符（中文更短）。'
+'security.validator_username_max': '用户名不能超过 {limit} 个字符。'
 'security.validator_email_max': '电子邮件地址不能超过180个字符。'
 'security.validator_email_unique': '该电子邮件地址已被注册。'
 'security.validator_email_blank': '请输入您的电子邮件地址。'

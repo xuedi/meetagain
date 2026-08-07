@@ -22,8 +22,9 @@ class RegistrationType extends AbstractType
     {
         $builder->add('name', TextType::class, [
             'label' => 'security.label_username',
+            'attr' => ['maxlength' => User::NAME_MAX_LENGTH],
             'constraints' => [
-                new Length(max: 64, maxMessage: 'security.validator_username_max'),
+                new Length(max: User::NAME_MAX_LENGTH, maxMessage: 'security.validator_username_max'),
             ],
         ])->add('email', EmailType::class, [
             'constraints' => [

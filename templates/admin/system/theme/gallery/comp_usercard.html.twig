@@ -1,0 +1,44 @@
+{#
+    Gallery: Usercard component - Badge overlay and one-line name
+
+    Source: templates/_components/usercard.html.twig.
+    The card shell is rebuilt here with synthetic data because the real component takes a
+    User entity; the two sub-components it composes are included as-is.
+    Anchor: g-comp-usercard.
+
+    Used in:    admin/system/theme/gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/image.html.twig, _components/username.html.twig,
+                _components/user_badges.html.twig
+#}
+{% set verifiedBadge = {'color': 'has-text-success', 'icon': 'fa-regular fa-user-check', 'title': 'member.badge_verified'} %}
+{% set demoBadge = {'color': 'has-text-danger', 'icon': 'fa-solid fa-star', 'title': 'admin_system_gallery.usercard_demo_badge'} %}
+
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/usercard.html.twig</code>
+</p>
+
+{# .admin-section-body clips - leave room below for the hover bubbles. #}
+<div class="columns mt-3 mb-6">
+    {% for variant in [
+        {'heading': 'no badges', 'badges': [], 'name': 'Ada Lovelace'},
+        {'heading': 'one badge', 'badges': [verifiedBadge], 'name': 'Grace Hopper'},
+        {'heading': 'two badges, name too long for the tile', 'badges': [verifiedBadge, demoBadge], 'name': 'Maximiliane von Habsburg-Lothringen'}
+    ] %}
+        <div class="column is-2">
+            <p class="heading">{{ variant.heading }}</p>
+            <div class="card">
+                <div class="card-image">
+                    <figure class="image">
+                        {% include '_components/image.html.twig' with {'image': null, 'size': '400x400'} %}
+                    </figure>
+                    {% include '_components/user_badges.html.twig' with {'badges': variant.badges} %}
+                </div>
+                <div class="card-content p-3 has-text-centered">
+                    {% include '_components/username.html.twig' with {'link': '#', 'name': variant.name} %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>

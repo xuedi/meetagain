@@ -669,6 +669,82 @@ body.admin-shell-no-scroll {
     }
 }
 
+// -- Tooltip --
+
+// Never put overflow: hidden on .has-tooltip itself - it clips the bubble away.
+.has-tooltip {
+    position: relative;
+
+    &::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        top: calc(100% + 0.4rem);
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 30;
+        max-width: 14rem;
+        width: max-content;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        background: var(--bulma-scheme-invert);
+        color: var(--bulma-scheme-main);
+        font-size: 0.75rem;
+        font-weight: 400;
+        line-height: 1.3;
+        text-align: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.12s ease-in-out;
+    }
+
+    &:hover::after,
+    &:focus-visible::after,
+    &:focus-within::after {
+        opacity: 1;
+    }
+}
+
+.has-tooltip-end::after {
+    left: auto;
+    right: 0;
+    transform: none;
+}
+
+// -- User card --
+
+.usercard-badges {
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+    display: flex;
+    gap: 0.25rem;
+}
+
+.usercard-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 9999px;
+    background: var(--bulma-scheme-main);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    font-size: 0.8rem;
+}
+
+.usercard-name {
+    display: block;
+    max-width: 100%;
+
+    > a,
+    > span {
+        display: block;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+}
+
 @media print {
     body {
         background: #ffffff;

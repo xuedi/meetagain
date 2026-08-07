@@ -27,6 +27,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     protected ?int $id = null;
 
+    public const int NAME_MAX_LENGTH = 32;
+
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $name = null;
 
