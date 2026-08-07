@@ -39,10 +39,11 @@
                         <footer class="card-footer rsvp-guest-footer">
                             {% if showControls %}
                                 <a href="{{ path('app_event_rsvp_guests', {'event': event.id, 'direction': 'remove'}) }}"
-                                   class="card-footer-item rsvp-guest-btn{% if guests == 0 %} is-hidden{% endif %}"
+                                   class="card-footer-item rsvp-guest-btn{% if guests == 0 %} is-disabled{% endif %}"
                                    data-post
                                    data-csrf-token="{{ csrf_token('app_event_rsvp_guests' ~ event.id) }}"
                                    data-rsvp-guests="remove"
+                                   {% if guests == 0 %}aria-disabled="true" tabindex="-1"{% endif %}
                                    title="{{ 'events.rsvp_guest_remove'|trans }}"
                                    aria-label="{{ 'events.rsvp_guest_remove'|trans }}">
                                     <span class="icon is-small"><i class="fa fa-minus"></i></span>

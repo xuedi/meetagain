@@ -663,6 +663,14 @@ body.admin-shell-no-scroll {
         background: rgba(0, 0, 0, 0.05);
     }
 
+    a.card-footer-item.is-disabled {
+        background: none;
+        color: var(--bulma-text-weak);
+        cursor: default;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
     .rsvp-guest-count {
         flex-grow: 2;
         cursor: default;
