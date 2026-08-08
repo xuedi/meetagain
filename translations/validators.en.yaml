@@ -218,3 +218,7 @@ Error: Error
 
 # Admin system SEO namespace - series canonical threshold
 'admin_seo_canonical.validator_threshold_range': 'The threshold must be between {{ min }} and {{ max }} percent.'
+
+# Admin location namespace - venue form
+'admin_location.validator_blank': 'This field cannot be empty.'
+'admin_location.validator_too_long': 'This value is too long, maximum {{ limit }} characters.'

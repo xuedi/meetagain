@@ -218,3 +218,7 @@ Error: 'Error'
 
 # Admin system SEO namespace - series canonical threshold
 'admin_seo_canonical.validator_threshold_range': 'El umbral debe estar entre {{ min }} y {{ max }} por ciento.'
+
+# Admin location namespace - venue form
+'admin_location.validator_blank': 'Este campo no puede estar vacío.'
+'admin_location.validator_too_long': 'Este valor es demasiado largo, máximo {{ limit }} caracteres.'
