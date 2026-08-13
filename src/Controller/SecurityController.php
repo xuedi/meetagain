@@ -132,6 +132,14 @@ final class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $blocklistEntry = $this->emailBlocklistRepository->findByEmail((string) $user->getEmail());
+            if ($blocklistEntry !== null) {
+                return $this->render('security/register_blocked.html.twig', [
+                    'reason' => $blocklistEntry->getReason(),
+                    'supportPath' => $this->generateUrl('app_contact'),
+                ]);
+            }
+
             $plainPassword = $form->get('plainPassword')->getData();
 
             $user->setPassword($this->hasher->hashPassword($user, $plainPassword));

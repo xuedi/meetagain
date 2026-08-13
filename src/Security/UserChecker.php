@@ -30,13 +30,6 @@ readonly class UserChecker implements UserCheckerInterface
     #[Override]
     public function checkPreAuth(UserInterface $user): void
     {
-        if (!$user instanceof User) {
-            return;
-        }
-
-        if ($user->getStatus() !== UserStatus::Active) {
-            throw new CustomUserMessageAccountStatusException('The user is not anymore or not jet active');
-        }
     }
 
     #[Override]
@@ -44,6 +37,11 @@ readonly class UserChecker implements UserCheckerInterface
     {
         if (!$user instanceof User) {
             return;
+        }
+
+        $status = $user->getStatus();
+        if ($status !== UserStatus::Active) {
+            throw new CustomUserMessageAccountStatusException($this->statusMessage($status));
         }
 
         $request = $this->requestStack->getCurrentRequest();
@@ -62,5 +60,16 @@ readonly class UserChecker implements UserCheckerInterface
         if ($this->msgRepo->hasNewMessages($user)) {
             $request->getSession()->set('hasNewMessage', true);
         }
+    }
+
+    private function statusMessage(?UserStatus $status): string
+    {
+        return match ($status) {
+            UserStatus::Registered => 'security.account_status_registered',
+            UserStatus::EmailVerified => 'security.account_status_email_verified',
+            UserStatus::Blocked => 'security.account_status_blocked',
+            UserStatus::Denied => 'security.account_status_denied',
+            default => 'security.account_status_inactive',
+        };
     }
 }
