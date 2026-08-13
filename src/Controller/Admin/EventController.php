@@ -35,6 +35,7 @@ use App\Enum\Weekday;
 use App\Exception\Event\InvalidRecurrencePatternException;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
+use App\Form\LocationType;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
@@ -616,6 +617,7 @@ final class EventController extends AbstractController implements AdminNavigatio
             ]),
             'notifiableAttendeeCount' => $this->countNotifiableAttendees($event),
             'recurrence' => $this->buildRecurrenceContext($event),
+            'venueForm' => $this->createForm(LocationType::class),
         ]);
     }
 
@@ -861,6 +863,7 @@ final class EventController extends AbstractController implements AdminNavigatio
             'form' => $form,
             'adminTop' => $this->buildBackOnlyTop(),
             'recurrence' => $this->buildRecurrenceContext(null),
+            'venueForm' => $this->createForm(LocationType::class),
         ]);
     }
 

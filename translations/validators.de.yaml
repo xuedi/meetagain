@@ -218,3 +218,7 @@ Error: Fehler
 
 # Admin system SEO namespace - series canonical threshold
 'admin_seo_canonical.validator_threshold_range': 'Der Schwellenwert muss zwischen {{ min }} und {{ max }} Prozent liegen.'
+
+# Admin location namespace - venue form
+'admin_location.validator_blank': 'Dieses Feld darf nicht leer sein.'
+'admin_location.validator_too_long': 'Dieser Wert ist zu lang, maximal {{ limit }} Zeichen.'

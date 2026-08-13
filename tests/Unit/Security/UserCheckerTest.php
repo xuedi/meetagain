@@ -8,6 +8,7 @@ use App\Enum\UserStatus;
 use App\Repository\MessageRepository;
 use App\Security\UserChecker;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -42,20 +43,53 @@ class UserCheckerTest extends TestCase
         static::assertTrue(true);
     }
 
-    public function testCheckPreAuthThrowsExceptionForNonActiveUsers(): void
+    #[DataProvider('inactiveStatusProvider')]
+    public function testCheckPreAuthNeverRevealsStatusBeforeCredentialsAreVerified(UserStatus $status): void
     {
         // Arrange
-        $nonActiveUser = $this->createStub(User::class);
-        $nonActiveUser->method('getStatus')->willReturn(UserStatus::Registered);
+        $inactiveUser = $this->createStub(User::class);
+        $inactiveUser->method('getStatus')->willReturn($status);
+
+        $subject = $this->createSubject();
+
+        // Act & Assert
+        $subject->checkPreAuth($inactiveUser);
+        static::assertTrue(true);
+    }
+
+    #[DataProvider('statusMessageProvider')]
+    public function testCheckPostAuthRejectsInactiveUsersWithItsOwnMessage(UserStatus $status, string $expected): void
+    {
+        // Arrange
+        $inactiveUser = $this->createStub(User::class);
+        $inactiveUser->method('getStatus')->willReturn($status);
 
         $subject = $this->createSubject();
 
         // Assert
         $this->expectException(CustomUserMessageAccountStatusException::class);
-        $this->expectExceptionMessage('The user is not anymore or not jet active');
+        $this->expectExceptionMessage($expected);
 
         // Act
-        $subject->checkPreAuth($nonActiveUser);
+        $subject->checkPostAuth($inactiveUser);
+    }
+
+    public static function inactiveStatusProvider(): iterable
+    {
+        yield 'awaiting email confirmation' => [UserStatus::Registered];
+        yield 'awaiting admin approval' => [UserStatus::EmailVerified];
+        yield 'blocked' => [UserStatus::Blocked];
+        yield 'deleted' => [UserStatus::Deleted];
+        yield 'denied' => [UserStatus::Denied];
+    }
+
+    public static function statusMessageProvider(): iterable
+    {
+        yield 'awaiting email confirmation' => [UserStatus::Registered, 'security.account_status_registered'];
+        yield 'awaiting admin approval' => [UserStatus::EmailVerified, 'security.account_status_email_verified'];
+        yield 'blocked' => [UserStatus::Blocked, 'security.account_status_blocked'];
+        yield 'denied' => [UserStatus::Denied, 'security.account_status_denied'];
+        yield 'deleted falls back to the generic message' => [UserStatus::Deleted, 'security.account_status_inactive'];
     }
 
     public function testCheckPostAuthSkipsNonUserObjects(): void
@@ -79,7 +113,7 @@ class UserCheckerTest extends TestCase
         $subject = $this->createSubject(requestStack: $requestStackStub);
 
         // Act & Assert
-        $subject->checkPostAuth($this->createStub(User::class));
+        $subject->checkPostAuth($this->createActiveUser());
         static::assertTrue(true);
     }
 
@@ -116,7 +150,7 @@ class UserCheckerTest extends TestCase
         $subject = $this->createSubject(activityService: $activityServiceMock, em: $emMock, requestStack: $requestStackStub, msgRepo: $msgRepoMock);
 
         // Act
-        $subject->checkPostAuth($this->createStub(User::class));
+        $subject->checkPostAuth($this->createActiveUser());
     }
 
     public function testCheckPostAuthDoesNotSetNewMessageFlagWhenNoNewMessages(): void
@@ -138,7 +172,15 @@ class UserCheckerTest extends TestCase
         $subject = $this->createSubject(requestStack: $requestStackStub, msgRepo: $msgRepoStub);
 
         // Act
-        $subject->checkPostAuth($this->createStub(User::class));
+        $subject->checkPostAuth($this->createActiveUser());
+    }
+
+    private function createActiveUser(): User
+    {
+        $user = $this->createStub(User::class);
+        $user->method('getStatus')->willReturn(UserStatus::Active);
+
+        return $user;
     }
 
     private function createSubject(

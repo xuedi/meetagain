@@ -19,6 +19,9 @@ use App\Security\Permission\Attribute\PermissionAttribute;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -167,6 +170,73 @@ final class LocationController extends AbstractController implements AdminNaviga
             'events_using_location' => [],
             'adminTop' => $this->buildEditTop($location, 0),
         ]);
+    }
+
+    #[Route('/quick-create', name: 'app_admin_location_quick_create', methods: ['POST'])]
+    public function quickCreate(Request $request, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::LOCATION_CREATE);
+
+        $location = new Location();
+        $form = $this->createForm(LocationType::class, $location);
+        $form->handleRequest($request);
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return $this->json([
+                'errors' => $this->collectFieldErrors($form),
+                'global' => $this->collectGlobalErrors($form),
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $location->setCreatedAt(new DateTimeImmutable());
+        $location->setUser($this->getUser());
+
+        $entityManager->persist($location);
+        $entityManager->flush();
+
+        $this->entityActionDispatcher->dispatch(EntityAction::CreateLocation, $location->getId());
+
+        return $this->json([
+            'id' => $location->getId(),
+            'name' => $location->getName(),
+        ], Response::HTTP_CREATED);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function collectFieldErrors(FormInterface $form): array
+    {
+        $errors = [];
+        foreach ($form->all() as $name => $child) {
+            foreach ($child->getErrors(true) as $error) {
+                if (!$error instanceof FormError) {
+                    continue;
+                }
+
+                $errors[$name] = $error->getMessage();
+                break;
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function collectGlobalErrors(FormInterface $form): array
+    {
+        $errors = [];
+        foreach ($form->getErrors() as $error) {
+            if (!$error instanceof FormError) {
+                continue;
+            }
+
+            $errors[] = $error->getMessage();
+        }
+
+        return $errors;
     }
 
     private function buildEditTop(Location $location, int $eventsUsingCount): AdminTop

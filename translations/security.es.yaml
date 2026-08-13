@@ -17,3 +17,8 @@
 'Invalid or expired login link.': 'Enlace de inicio de sesión no válido o caducado.'
 'Too many failed login attempts, please try again in %minutes% minute.': 'Demasiados intentos de inicio de sesión fallidos, inténtalo de nuevo en %minutes% minuto.'
 'Too many failed login attempts, please try again in %minutes% minutes.': 'Demasiados intentos de inicio de sesión fallidos, inténtalo de nuevo en %minutes% minutos.'
+'security.account_status_registered': 'Confirma primero tu dirección de correo electrónico. Te enviamos un enlace al registrarte.'
+'security.account_status_email_verified': 'Tu dirección de correo electrónico está confirmada. Un administrador todavía tiene que activar tu cuenta.'
+'security.account_status_blocked': 'Esta cuenta ha sido bloqueada. Ponte en contacto con soporte si crees que es un error.'
+'security.account_status_denied': 'Este registro fue rechazado.'
+'security.account_status_inactive': 'Esta cuenta no se puede usar para iniciar sesión.'

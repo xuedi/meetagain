@@ -26,7 +26,7 @@ services:
 
   # Database server
   mariadb:
-    image: mariadb:12.3.2@sha256:628f228f0fd5913a220438693576b29b6fe4dc1fa0a1298c0e98579fae28635f
+    image: mariadb:12.3.2@sha256:759869cb6f003234a95c6384cdee245b4bce7de26913fe607a8110362c0c007d
     container_name: "ma-db"
     volumes:
       - ma-mysql-data:/var/lib/mysql
@@ -102,7 +102,7 @@ services:
 
   # Page speed analyzer (run via: just testPerformance)
   sitespeed:
-    image: sitespeedio/sitespeed.io:42.5.1@sha256:2e6bb729031c5186308fdce3032955ed98a9381086d1ce51cc16857340c7fcbf
+    image: sitespeedio/sitespeed.io:42.6.0@sha256:075311541bfd68e299f0ae451c4520bd2ea1e00bc3f5d416514bae8784159b6b
     container_name: "ma-sitespeed"
     network_mode: "host"
     environment:

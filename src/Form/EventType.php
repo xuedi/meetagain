@@ -102,6 +102,7 @@ class EventType extends AbstractType
             ->add('location', EntityType::class, [
                 'class' => Location::class,
                 'choice_label' => 'name',
+                'label' => $this->translator->trans('admin_event.form_label_location'),
                 'required' => true,
                 'mapped' => false,
                 'query_builder' => function () {

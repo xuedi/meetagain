@@ -57,9 +57,15 @@
         {{ form_end(form) }}
 
         {% include 'admin/event/_recurrence_modal.html.twig' %}
+        {% if is_granted('location.create') %}
+            {% include 'admin/event/_venue_modal.html.twig' %}
+        {% endif %}
     </div>
 
     <script src="{{ asset('js/recurrence-builder.js') }}" defer></script>
+    {% if is_granted('location.create') %}
+        <script src="{{ asset('js/admin/venue-quick-create.js') }}" defer></script>
+    {% endif %}
 
     <script type="text/javascript">
 

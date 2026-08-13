@@ -49,3 +49,7 @@ Error: 错误
 
 # Admin system SEO namespace - series canonical threshold
 'admin_seo_canonical.validator_threshold_range': '阈值必须介于 {min} 和 {max} 百分比之间。'
+
+# Admin location namespace - venue form
+'admin_location.validator_blank': '此字段不能为空。'
+'admin_location.validator_too_long': '此值过长，最多 {limit} 个字符。'

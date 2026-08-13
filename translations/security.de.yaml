@@ -17,3 +17,8 @@
 'Invalid or expired login link.': 'Ungültiger oder abgelaufener Anmelde-Link.'
 'Too many failed login attempts, please try again in %minutes% minute.': 'Zu viele fehlgeschlagene Anmeldeversuche, bitte versuchen Sie es in einer Minute noch einmal.'
 'Too many failed login attempts, please try again in %minutes% minutes.': 'Zu viele fehlgeschlagene Anmeldeversuche, bitte versuchen Sie es in %minutes% Minuten noch einmal.'
+'security.account_status_registered': 'Bitte bestätige zuerst deine E-Mail-Adresse. Wir haben dir bei der Registrierung einen Link geschickt.'
+'security.account_status_email_verified': 'Deine E-Mail-Adresse ist bestätigt. Ein Administrator muss dein Konto noch freischalten.'
+'security.account_status_blocked': 'Dieses Konto wurde gesperrt. Bitte wende dich an den Support, wenn das ein Fehler ist.'
+'security.account_status_denied': 'Diese Registrierung wurde abgelehnt.'
+'security.account_status_inactive': 'Mit diesem Konto ist keine Anmeldung möglich.'

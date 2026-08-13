@@ -22,15 +22,13 @@
 
                     {{ form_row(form.name) }}
                     {{ form_row(form.email) }}
-                    {{ form_row(form.plainPassword, {
-                        label: 'Password'
-                    }) }}
+                    {{ form_row(form.plainPassword) }}
                     {{ form_row(form.agreeTerms) }}
 
                     <div class="field is-grouped mt-4">
                         <div class="control">
                             <button class="button is-primary">{{ "security.button_register" | trans }}</button>
-                            <a class="button is-light" href="/{{ app.request.locale }}/terms" target="_blank" rel="noopener">{{ "security.button_terms" | trans }}</a>
+                            <a class="button is-light" href="{{ path('app_catch_all', {'page': 'terms'}) }}" target="_blank" rel="noopener">{{ "security.button_terms" | trans }}</a>
                         </div>
                     </div>
                     {{ form_end(form) }}

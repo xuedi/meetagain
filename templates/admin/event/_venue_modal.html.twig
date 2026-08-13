@@ -1,0 +1,64 @@
+{#
+    Venue quick-create -- modal for adding a venue without leaving the event form
+
+    Overlays the event form, so nothing navigates and no entered event data is lost.
+    The <form> below IS the .modal-card: wrapping it around the card instead would make the
+    form the only flex child and collapse Bulma's modal layout.
+    Sits after form_end() of the event form -- nested forms are invalid HTML.
+
+    Used in:    admin/event/edit.html.twig, admin/event/new.html.twig
+    Parameters: venueForm (LocationType), form (EventType, for the target select id)
+    Depends on: assets/js/admin/venue-quick-create.js
+#}
+<div class="modal"
+     id="venue-modal"
+     data-create-url="{{ path('app_admin_location_quick_create') }}"
+     data-target-select="{{ form.location.vars.id }}"
+     data-new-label="{{ 'admin_event.venue_option_new'|trans }}"
+     data-error-generic="{{ 'admin_event.venue_error_generic'|trans }}">
+    <div class="modal-background" data-venue-close></div>
+    {{ form_start(venueForm, {'action': path('app_admin_location_quick_create'), 'attr': {'class': 'modal-card'}}) }}
+        <header class="modal-card-head">
+            <p class="modal-card-title">{{ 'admin_event.venue_modal_title'|trans }}</p>
+            <button class="delete" aria-label="close" type="button" data-venue-close></button>
+        </header>
+        <section class="modal-card-body">
+
+            <div class="notification is-danger is-light is-hidden" data-venue-global-error></div>
+
+            {{ form_row(venueForm.name) }}
+            {{ form_row(venueForm.description) }}
+
+            <div class="columns">
+                <div class="column is-8">
+                    {{ form_row(venueForm.street) }}
+                </div>
+                <div class="column is-4">
+                    {{ form_row(venueForm.postcode) }}
+                </div>
+            </div>
+
+            <div class="columns">
+                <div class="column is-6">
+                    {{ form_row(venueForm.city) }}
+                </div>
+                <div class="column is-3">
+                    {{ form_row(venueForm.longitude) }}
+                </div>
+                <div class="column is-3">
+                    {{ form_row(venueForm.latitude) }}
+                </div>
+            </div>
+
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-primary" type="submit">
+                <span class="icon"><i class="fa fa-plus"></i></span>
+                <span>{{ 'admin_event.venue_button_apply'|trans }}</span>
+            </button>
+            <button class="button ml-3" type="button" data-venue-close>
+                {{ 'global.button_cancel'|trans }}
+            </button>
+        </footer>
+    {{ form_end(venueForm) }}
+</div>

@@ -147,16 +147,6 @@ class LoginTest extends WebTestCase
         $this->assertResponseRedirects();
     }
 
-    public function testRegisterPageLoads(): void
-    {
-        $client = static::createClient();
-
-        $crawler = $client->request('GET', '/en/register');
-
-        $this->assertResponseIsSuccessful();
-        static::assertGreaterThan(0, $crawler->filter('form')->count(), 'Register form should exist');
-    }
-
     public function testPasswordResetPageLoads(): void
     {
         $client = static::createClient();

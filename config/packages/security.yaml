@@ -27,6 +27,7 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+                form_only: true
             user_checker: App\Security\UserChecker
             login_throttling:
                 max_attempts: 10
