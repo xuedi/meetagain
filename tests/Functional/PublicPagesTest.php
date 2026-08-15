@@ -112,7 +112,7 @@ class PublicPagesTest extends WebTestCase
 
         // Assert
         static::assertSame(1, substr_count($content, '<h1'), 'Frontpage must have exactly one <h1>');
-        static::assertMatchesRegularExpression('#<a [^>]*href="/en/"[^>]*hreflang="en"#', $content, 'English language link must carry hreflang="en"');
+        static::assertMatchesRegularExpression('#<link rel="alternate" hreflang="en" href="https?://[^"]+/en/"#', $content, 'English alternate link must point at the locale-pinned landing');
     }
 
     public function testFrontpageEmitsWebSiteJsonLdAndCustomMetaDescription(): void
@@ -130,7 +130,7 @@ class PublicPagesTest extends WebTestCase
 
         // Assert
         static::assertMatchesRegularExpression(
-            '#<meta name="description" content="meetAgain is a community platform[^"]+">#',
+            '#<meta name="description" content="MeetAgain is the open source community platform[^"]+">#',
             $content,
             'Frontpage must override meta_description with the frontpage-specific value',
         );

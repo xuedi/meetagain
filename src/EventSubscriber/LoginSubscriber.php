@@ -5,11 +5,16 @@ namespace App\EventSubscriber;
 use App\Entity\Session\Consent;
 use App\Entity\User;
 use App\Enum\ConsentType;
+use App\Service\Config\LocaleCookieService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
-class LoginSubscriber implements EventSubscriberInterface
+readonly class LoginSubscriber implements EventSubscriberInterface
 {
+    public function __construct(
+        private LocaleCookieService $localeCookieService,
+    ) {}
+
     public static function getSubscribedEvents(): array
     {
         return [LoginSuccessEvent::class => 'onLoginSuccess'];
@@ -24,6 +29,12 @@ class LoginSubscriber implements EventSubscriberInterface
             return;
         }
         $session->set('_locale', $user->getLocale());
+
+        $response = $event->getResponse();
+        if ($response !== null && $this->localeCookieService->isConsentGranted($request)) {
+            $response->headers->setCookie($this->localeCookieService->createCookie($user->getLocale()));
+        }
+
         if (!$user->isOsmConsent()) {
             return;
         }
@@ -33,7 +44,6 @@ class LoginSubscriber implements EventSubscriberInterface
         $session->set('consent', $consent);
         $consent->save($request->getSession());
 
-        $response = $event->getResponse();
         if ($response === null) {
             return;
         }

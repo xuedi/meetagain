@@ -13,7 +13,6 @@
                 <th>{{ 'admin_system_language.col_flag'|trans }}</th>
                 <th>{{ 'admin_system_language.col_code'|trans }}</th>
                 <th>{{ 'admin_system_language.col_name'|trans }}</th>
-                <th>{{ 'admin_system_language.col_has_tile'|trans }}</th>
                 <th>{{ 'admin_system_language.col_status'|trans }}</th>
                 <th>{{ 'admin_system_language.col_sort_order'|trans }}</th>
                 <th>
@@ -31,13 +30,6 @@
                     </td>
                     <td>{{ language.code }}</td>
                     <td>{{ language.name }}</td>
-                    <td>
-                        {% if language.tileImage %}
-                            <span class="has-text-success">{{ 'global.button_yes'|trans }}</span>
-                        {% else %}
-                            <span class="has-text-grey">{{ 'global.button_no'|trans }}</span>
-                        {% endif %}
-                    </td>
                     <td>
                         <a href="{{ path('app_admin_language_toggle', {'id': language.id}) }}"
                            class="button-as-icon"

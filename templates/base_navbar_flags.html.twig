@@ -1,25 +1,12 @@
-{# Build the list of {code, href} entries from the right source.
-   On the frontpage `/` the URL has no locale segment to swap, so we POST-style
-   write to the session via `app_set_session_locale` and redirect back. On
-   every other page we use the path-rewrite alternates produced by
-   `get_alternative_languages()`. #}
+{# Build the list of {code, href} entries from the path-rewrite alternates produced by
+   `get_alternative_languages()`. On the frontpage `/` there is no locale segment to swap,
+   so the alternates fall back to `/{code}/` - the locale-pinned version of the page. #}
 {% set entries = [] %}
-{% if is_frontpage() %}
-    {% for code in get_enabled_locales() %}
-        {% if code != app.request.locale %}
-            {% set entries = entries|merge([{
-                'code': code,
-                'href': path('app_set_session_locale', {'locale': code}),
-            }]) %}
-        {% endif %}
-    {% endfor %}
-{% elseif app.request.attributes.get('_route_params') is not null %}
-    {% for code, link in get_alternative_languages() %}
-        {% if code != app.request.locale %}
-            {% set entries = entries|merge([{'code': code, 'href': link}]) %}
-        {% endif %}
-    {% endfor %}
-{% endif %}
+{% for code, link in get_alternative_languages() %}
+    {% if code != app.request.locale %}
+        {% set entries = entries|merge([{'code': code, 'href': link}]) %}
+    {% endif %}
+{% endfor %}
 
 {% if entries|length > 0 %}
     <div class="navbar-item dropdown is-hoverable pl-0">

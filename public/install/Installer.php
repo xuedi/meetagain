@@ -325,7 +325,6 @@ ENV;
 
         $configs = [
             ['automatic_registration', 'false', 'boolean'],
-            ['show_frontpage', 'false', 'boolean'],
             ['email_sender_mail', $data['admin_email'] ?? 'email@localhost', 'string'],
             ['email_sender_name', $data['site_name'] ?? 'MeetAgain', 'string'],
             ['website_url', $data['site_url'] ?? 'localhost', 'string'],

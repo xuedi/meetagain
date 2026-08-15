@@ -9,7 +9,6 @@ enum ImageType: int
     case EventUpload = 3;
     case CmsBlock = 4;
     case PluginDishesPreview = 5;
-    case LanguageTile = 7;
     case PluginBooksCover = 8;
     case CmsGallery = 9;
     case CmsCardImage = 10;

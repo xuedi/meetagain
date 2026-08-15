@@ -7,7 +7,6 @@ use App\Publisher\AlternateLinks\AlternateLinkProviderInterface;
 use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
-use App\Service\Config\LanguageTileService;
 use App\Service\Seo\CanonicalUrlService;
 use Exception;
 use Override;
@@ -29,7 +28,6 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         private readonly RouterInterface $router,
         private readonly ConfigService $configService,
         private readonly CanonicalUrlService $canonicalUrlService,
-        private readonly LanguageTileService $languageTileService,
         #[AutowireIterator(MetaDescriptionProviderInterface::class)]
         private readonly iterable $metaDescriptionProviders = [],
         #[AutowireIterator(OrganizationSchemaProviderInterface::class)]
@@ -62,19 +60,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             new TwigFunction('get_canonical_url', $this->getCanonicalUrl(...)),
             new TwigFunction('get_meta_description', $this->getMetaDescription(...)),
             new TwigFunction('get_organization_schema', $this->getOrganizationSchema(...), ['is_safe' => ['html']]),
-            new TwigFunction('is_frontpage', $this->isFrontpage(...)),
-            new TwigFunction('get_language_tile_text', $this->languageTileService->getText(...)),
         ];
-    }
-
-    public function isFrontpage(): bool
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        if (!$request instanceof Request) {
-            return false;
-        }
-
-        return $request->attributes->get('_route') === 'app_frontpage';
     }
 
     public function getCurrentLocale(): string
@@ -121,7 +107,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         // The language switcher lists the other languages; an hreflang cluster must also name the
         // page itself, otherwise search engines discard the whole cluster.
         $altLangList = $this->languageService->getAltLangList($request->getLocale(), $currentUri);
-        $altLangList[$request->getLocale()] = $currentUri;
+        $altLangList[$request->getLocale()] = $this->languageService->replaceUriLanguageCode($currentUri, $request->getLocale());
 
         $host = rtrim($this->configService->getHost(), '/');
         $localeUrls = array_map(static fn(string $path) => $host . $path, $altLangList);

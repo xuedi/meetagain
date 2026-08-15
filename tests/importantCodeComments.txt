@@ -44,6 +44,7 @@ src/Enum/RecurrencePeriod.php::lookaheadModifier // the window must span a full 
 src/EventSubscriber/CanonicalLinkHeaderSubscriber.php::getSubscribedEvents // priority is pinned relative to Symfony's ResponseListener, which fills Content-Type
 src/EventSubscriber/CanonicalLinkHeaderSubscriber.php::onKernelResponse // append, never set: asset preload links share this header and must survive
 src/EventSubscriber/LocaleSubscriber.php::getSubscribedEvents // priority is pinned between SessionListener and RouterListener, and both matter
+src/EventSubscriber/LocaleSubscriber.php::onKernelRequest // the four-way precedence chain breaks silently if a branch is reordered or its guard dropped
 src/EventSubscriber/LocaleValidationSubscriber.php::getSubscribedEvents // must run after LocaleSubscriber, whose priority the number encodes
 src/EventSubscriber/Security/BlockedSessionSubscriber.php::getSubscribedEvents // priority is pinned after SessionListener so the session factory exists
 
@@ -67,7 +68,6 @@ src/Repository/UserRepository.php::findAnnouncementSubscribers // the announceme
 # --- Caching and config ---
 src/Service/Cache/RedisCacheService.php::intResult // upstream behaviour: phpredis returns the client itself inside MULTI/PIPELINE
 src/Service/Config/LanguageService.php::invalidateCache // deliberate swallow: a failed invalidation self-heals on the next request
-src/Service/Config/LanguageService.php::getAllLanguages // never app-cached: deserializing detaches the tileImage proxy and image.hash reads null
 src/Service/Config/LanguageService.php::getFilteredEnabledCodes // an empty filter result must fall back to all codes, or the site loses every language
 src/Service/Config/LanguageService.php::getAdminFilteredEnabledCodes // an empty filter result must fall back to all codes, or admin loses every language
 src/Service/Config/PluginService.php::getPluginConfig // deliberate fallthrough: a corrupt environment config must degrade to plugins.php
@@ -126,7 +126,6 @@ tests/Unit/Service/Event/OccurrenceCalculatorTest.php::testABiweeklyRuleCountsWe
 tests/Unit/Service/Event/RecurringEventExtensionTest.php::NOW // the anchor date is a Monday, which is what makes the weekday maths readable
 tests/Unit/Service/Event/RecurringEventExtensionTest.php::testExtendKeepsTheFirstOccurrenceWhenTheAnchorIsOffPattern // records the regression: dropping the head by position ate a real date
 tests/Unit/Service/ImageServiceTest.php::testGetObsoleteThumbnails // labels which fixture rows are valid vs obsolete, and why the size check is limited
-tests/Unit/Service/LanguageServiceTest.php::testGetAllLanguagesQueriesRepoEachCall // records why entities are not cached, which is the behaviour under test
 tests/Unit/Service/Notification/User/MissingAltImageNotificationProviderTest.php::testEmitsItemPerIncompleteImageWithMissingLanguageCount // shows how each fixture row adds up to its expected missing-language count
 tests/Unit/Service/PasswordResetServiceTest.php::testRequestResetSetsRegcodeAndPersistsUser // magic constant: 64 is bin2hex(random_bytes(32)), not an arbitrary length
 tests/Unit/Service/RecurringEventServiceTest.php::NOW // the anchor date is a Monday, which is what makes the weekday maths readable

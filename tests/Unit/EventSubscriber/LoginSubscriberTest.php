@@ -4,7 +4,9 @@ namespace Tests\Unit\EventSubscriber;
 
 use App\Entity\User;
 use App\EventSubscriber\LoginSubscriber;
+use App\Service\Config\LocaleCookieService;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -13,6 +15,17 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 class LoginSubscriberTest extends TestCase
 {
+    private function createSubscriber(bool $consentGranted = false): LoginSubscriber
+    {
+        $cookieService = $this->createStub(LocaleCookieService::class);
+        $cookieService->method('isConsentGranted')->willReturn($consentGranted);
+        $cookieService->method('createCookie')->willReturnCallback(
+            static fn(string $locale): Cookie => new Cookie(LocaleCookieService::COOKIE_NAME, $locale),
+        );
+
+        return new LoginSubscriber($cookieService);
+    }
+
     private function createLoginEvent(UserInterface $user, SessionInterface $session, ?Response $response = null): LoginSuccessEvent
     {
         $request = new Request();
@@ -37,7 +50,7 @@ class LoginSubscriberTest extends TestCase
 
     public function testOnLoginSuccessReturnsEarlyWhenUserNotUserInstance(): void
     {
-        $subscriber = new LoginSubscriber();
+        $subscriber = $this->createSubscriber();
 
         $nonUserMock = $this->createStub(UserInterface::class);
         $sessionMock = $this->createMock(SessionInterface::class);
@@ -50,7 +63,7 @@ class LoginSubscriberTest extends TestCase
 
     public function testOnLoginSuccessSetsSessionLocaleFromUser(): void
     {
-        $subscriber = new LoginSubscriber();
+        $subscriber = $this->createSubscriber();
 
         $user = new User();
         $user->setLocale('de');
@@ -66,7 +79,7 @@ class LoginSubscriberTest extends TestCase
 
     public function testOnLoginSuccessReturnsEarlyWhenUserHasNoOsmConsent(): void
     {
-        $subscriber = new LoginSubscriber();
+        $subscriber = $this->createSubscriber();
 
         $user = new User();
         $user->setLocale('en');
@@ -83,9 +96,28 @@ class LoginSubscriberTest extends TestCase
         static::assertEmpty($response->headers->getCookies());
     }
 
+    public function testOnLoginSuccessSetsLocaleCookieWhenConsentGranted(): void
+    {
+        $subscriber = $this->createSubscriber(consentGranted: true);
+
+        $user = new User();
+        $user->setLocale('de');
+        $user->setOsmConsent(false);
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+
+        $response = new Response();
+        $event = $this->createLoginEvent($user, $sessionStub, $response);
+
+        $subscriber->onLoginSuccess($event);
+
+        $cookieNames = array_map(static fn($c) => $c->getName(), $response->headers->getCookies());
+        static::assertContains(LocaleCookieService::COOKIE_NAME, $cookieNames);
+    }
+
     public function testOnLoginSuccessSetsConsentCookiesWhenUserHasOsmConsent(): void
     {
-        $subscriber = new LoginSubscriber();
+        $subscriber = $this->createSubscriber();
 
         $user = new User();
         $user->setLocale('en');
@@ -110,7 +142,7 @@ class LoginSubscriberTest extends TestCase
     public function testOnLoginSuccessReturnsEarlyWhenResponseIsNull(): void
     {
         // Arrange
-        $subscriber = new LoginSubscriber();
+        $subscriber = $this->createSubscriber();
 
         $user = new User();
         $user->setLocale('en');

@@ -33,6 +33,7 @@ final class PluginExtension extends AbstractExtension
     {
         return [
             new TwigFunction('get_plugins_links', $this->getPluginsLinks(...)),
+            new TwigFunction('get_leading_plugin_links', $this->getLeadingPluginLinks(...)),
             new TwigFunction('get_plugin_stylesheets', $this->getPluginStylesheets(...)),
             new TwigFunction('get_plugin_javascripts', $this->getPluginJavascripts(...)),
             new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
@@ -51,6 +52,16 @@ final class PluginExtension extends AbstractExtension
     {
         /** @var list<Link> $links */
         $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getNavLinks());
+
+        usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
+
+        return $links;
+    }
+
+    public function getLeadingPluginLinks(): array
+    {
+        /** @var list<Link> $links */
+        $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getLeadingNavLinks());
 
         usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
 

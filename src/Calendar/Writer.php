@@ -9,7 +9,7 @@ final readonly class Writer
 {
     private const int FOLD_OCTETS = 75;
     private const string LINE_BREAK = "\r\n";
-    private const string PRODID = '-//meetAgain//Calendar//EN';
+    private const string PRODID = '-//MeetAgain//Calendar//EN';
 
     /**
      * @param list<Entry> $entries

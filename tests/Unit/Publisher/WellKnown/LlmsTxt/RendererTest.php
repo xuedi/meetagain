@@ -19,11 +19,11 @@ class RendererTest extends TestCase
         ];
 
         // Act
-        $output = $renderer->render('meetAgain', 'An event platform.', $sections);
+        $output = $renderer->render('MeetAgain', 'An event platform.', $sections);
 
         // Assert
         self::assertSame(
-            "# meetAgain\n"
+            "# MeetAgain\n"
             . "\n"
             . "> An event platform.\n"
             . "\n"
@@ -44,10 +44,10 @@ class RendererTest extends TestCase
         $renderer = new Renderer();
 
         // Act
-        $output = $renderer->render('meetAgain', '', [new Section('Pages', [])]);
+        $output = $renderer->render('MeetAgain', '', [new Section('Pages', [])]);
 
         // Assert
-        self::assertSame("# meetAgain\n", $output);
+        self::assertSame("# MeetAgain\n", $output);
     }
 
     public function testMultilineSummaryCollapsesToOneBlockquoteLine(): void
@@ -56,9 +56,9 @@ class RendererTest extends TestCase
         $renderer = new Renderer();
 
         // Act
-        $output = $renderer->render('meetAgain', "Line one.\n\nLine two.", []);
+        $output = $renderer->render('MeetAgain', "Line one.\n\nLine two.", []);
 
         // Assert
-        self::assertSame("# meetAgain\n\n> Line one. Line two.\n", $output);
+        self::assertSame("# MeetAgain\n\n> Line one. Line two.\n", $output);
     }
 }

@@ -110,27 +110,6 @@ class ConfigServiceTest extends TestCase
         static::assertSame('Example Sender', $address->getName());
     }
 
-    public function testIsShowFrontpageReturnsTrueByDefault(): void
-    {
-        $this->configRepoStub->method('findOneBy')->willReturn(null);
-
-        static::assertTrue($this->subject->isShowFrontpage());
-    }
-
-    public function testIsShowFrontpageReturnsTrueWhenEnabled(): void
-    {
-        $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('true'));
-
-        static::assertTrue($this->subject->isShowFrontpage());
-    }
-
-    public function testIsShowFrontpageReturnsFalseWhenDisabled(): void
-    {
-        $this->configRepoStub->method('findOneBy')->willReturn(new Config()->setValue('false'));
-
-        static::assertFalse($this->subject->isShowFrontpage());
-    }
-
     public function testIsSendRsvpNotificationsReturnsTrueByDefault(): void
     {
         $this->configRepoStub->method('findOneBy')->willReturn(null);

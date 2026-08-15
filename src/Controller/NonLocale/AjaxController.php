@@ -5,6 +5,7 @@ namespace App\Controller\NonLocale;
 use App\Controller\AbstractController;
 use App\Entity\Session\Consent;
 use App\Enum\ConsentType;
+use App\Service\Config\LocaleCookieService;
 use App\Service\Member\CaptchaService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,6 +17,7 @@ final class AjaxController extends AbstractController
 {
     public function __construct(
         private readonly CaptchaService $captchaService,
+        private readonly LocaleCookieService $localeCookieService,
     ) {}
 
     #[Route('/ajax/', name: 'app_ajax', methods: ['GET'])]
@@ -40,6 +42,7 @@ final class AjaxController extends AbstractController
         foreach ($consent->getHtmlCookies() as $cookie) {
             $response->headers->setCookie($cookie);
         }
+        $response->headers->setCookie($this->localeCookieService->createCookie($request->getLocale()));
 
         return $response;
     }

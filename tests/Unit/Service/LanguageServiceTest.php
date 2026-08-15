@@ -111,9 +111,6 @@ class LanguageServiceTest extends TestCase
         $langEn = new Language();
         $this->languageRepo->method('findAllOrdered')->willReturn([$langEn]);
 
-        // Doctrine entities are not cached (proxy associations break across
-        // serialize/unserialize); the service is expected to delegate to the
-        // repository directly.
         static::assertEquals([$langEn], $this->service->getAllLanguages());
         static::assertEquals([$langEn], $this->service->getAllLanguages());
     }
@@ -377,5 +374,17 @@ class LanguageServiceTest extends TestCase
 
         // Act & Assert
         static::assertSame('/some/path', $this->service->replaceUriLanguageCode('/some/path', 'zh'));
+    }
+
+    public function testReplaceUriLanguageCodeMapsRootToLocaleIndex(): void
+    {
+        // Arrange
+        $this->appCache = $this->createStub(TagAwareCacheInterface::class);
+        $this->appCache->method('get')->willReturnCallback(fn($key, $callback) => $callback($this->createStub(ItemInterface::class)));
+        $this->languageRepo->method('getEnabledCodes')->willReturn(['en', 'zh']);
+        $this->service = new LanguageService($this->languageRepo, $this->appCache, $this->languageFilterService, $this->adminLanguageFilterService);
+
+        // Act & Assert
+        static::assertSame('/zh/', $this->service->replaceUriLanguageCode('/', 'zh'));
     }
 }
