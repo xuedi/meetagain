@@ -7,24 +7,15 @@ use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
-use App\Entity\Image;
 use App\Entity\Language;
-use App\Entity\User;
-use App\Enum\ImageType;
 use App\Form\LanguageType;
 use App\Repository\LanguageRepository;
 use App\Service\Config\LanguageService;
-use App\Service\Media\ImageAltStatusCache;
-use App\Service\Media\ImageLocationService;
-use App\Service\Media\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -36,9 +27,6 @@ final class LanguageController extends AbstractSettingsController implements Adm
         private readonly LanguageRepository $repo,
         private readonly EntityManagerInterface $em,
         private readonly LanguageService $languageService,
-        private readonly ImageService $imageService,
-        private readonly ImageLocationService $imageLocationService,
-        private readonly ImageAltStatusCache $imageAltStatusCache,
     ) {
         parent::__construct($translator, 'language');
     }
@@ -77,18 +65,10 @@ final class LanguageController extends AbstractSettingsController implements Adm
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->handleImageUpload($form, $language);
-
             $this->em->persist($language);
             $this->em->flush();
 
-            $newTile = $language->getTileImage();
-            if ($newTile !== null) {
-                $this->imageLocationService->addLocation($newTile->getId(), ImageType::LanguageTile, $language->getId());
-            }
-
             $this->languageService->invalidateCache();
-            $this->imageAltStatusCache->invalidateAll();
 
             $this->addFlash('success', $this->translator->trans('admin_system_language.flash_added'));
 
@@ -112,21 +92,9 @@ final class LanguageController extends AbstractSettingsController implements Adm
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $oldTileId = $language->getTileImage()?->getId();
-            $this->handleImageUpload($form, $language);
-
             $this->em->flush();
 
-            $newTile = $language->getTileImage();
-            if ($newTile !== null && $newTile->getId() !== $oldTileId) {
-                if ($oldTileId !== null) {
-                    $this->imageLocationService->removeLocation($oldTileId, ImageType::LanguageTile, $language->getId());
-                }
-                $this->imageLocationService->addLocation($newTile->getId(), ImageType::LanguageTile, $language->getId());
-            }
-
             $this->languageService->invalidateCache();
-            $this->imageAltStatusCache->invalidateAll();
 
             $this->addFlash('success', $this->translator->trans('admin_system_language.flash_updated'));
 
@@ -153,7 +121,6 @@ final class LanguageController extends AbstractSettingsController implements Adm
         $language->setEnabled(!$language->isEnabled());
         $this->em->flush();
         $this->languageService->invalidateCache();
-        $this->imageAltStatusCache->invalidateAll();
 
         return $this->redirectToRoute('app_admin_language');
     }
@@ -179,24 +146,5 @@ final class LanguageController extends AbstractSettingsController implements Adm
                 icon: 'arrow-left',
             ),
         ]);
-    }
-
-    private function handleImageUpload(FormInterface $form, Language $language): void
-    {
-        $imageData = $form->get('tileImage')->getData();
-        if (!$imageData instanceof UploadedFile) {
-            return;
-        }
-
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw new AuthenticationCredentialsNotFoundException();
-        }
-
-        $image = $this->imageService->upload($imageData, $user, ImageType::LanguageTile);
-        if ($image instanceof Image) {
-            $language->setTileImage($image);
-            $this->imageService->createThumbnails($image, ImageType::LanguageTile);
-        }
     }
 }

@@ -59,7 +59,6 @@ readonly class LanguageService
         return $codes === [] ? 'en' : implode('|', $codes);
     }
 
-    // Never app-cached: deserializing detaches the tileImage proxy, so image.hash reads back null
     /** @return Language[] */
     public function getAllLanguages(): array
     {
@@ -170,7 +169,7 @@ readonly class LanguageService
         $languages = $this->getEnabledCodes();
         $trimmedLink = trim($link, '/');
 
-        if (in_array($trimmedLink, $languages, true)) {
+        if ($trimmedLink === '' || in_array($trimmedLink, $languages, true)) {
             return sprintf('/%s/', $newCode);
         }
 

@@ -9,36 +9,10 @@
 
         {{ form_start(form) }}
 
-        <div class="columns">
-            <div class="column is-8">
-                {{ form_row(form.code) }}
-                {{ form_row(form.name) }}
-                {{ form_row(form.enabled) }}
-                {{ form_row(form.sortOrder) }}
-
-                <h4 class="subtitle is-5 mt-5">{{ 'admin_system_language.heading_tile_text'|trans }}</h4>
-                <p class="has-text-grey mb-3">{{ 'admin_system_language.help_tile_text'|trans }}</p>
-                {{ form_row(form.tileGreeting) }}
-                {{ form_row(form.tileIntro) }}
-                {{ form_row(form.tileCta) }}
-                {{ form_row(form.tileImageAlt) }}
-            </div>
-            <div class="column is-4">
-                <div class="box">
-                    <h4 class="subtitle is-5">{{ 'admin_system_language.heading_tile_image'|trans }}</h4>
-                    {% if language.tileImage %}
-                        <div class="mb-3">
-                            {% include '_components/image.html.twig' with {'image': language.tileImage, 'size': '300x200'} %}
-                        </div>
-                    {% else %}
-                        <div class="mb-3 has-text-grey">
-                            <em>{{ 'admin_system_images.no_image_uploaded'|trans }}</em>
-                        </div>
-                    {% endif %}
-                    {{ form_row(form.tileImage) }}
-                </div>
-            </div>
-        </div>
+        {{ form_row(form.code) }}
+        {{ form_row(form.name) }}
+        {{ form_row(form.enabled) }}
+        {{ form_row(form.sortOrder) }}
 
         <button class="button is-primary">{{ 'global.button_save'|trans }}</button>
         {{ form_end(form) }}

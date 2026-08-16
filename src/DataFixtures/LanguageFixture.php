@@ -3,13 +3,10 @@
 namespace App\DataFixtures;
 
 use App\Entity\Language;
-use App\Enum\ImageType;
 use App\Service\Config\LanguageService;
-use App\Service\Media\ImageService;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, DependentFixtureInterface
 {
@@ -20,9 +17,9 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
     public const string SPANISH = 'es';
 
     private const array LANGUAGES = [
-        ['code' => 'en', 'name' => 'English', 'sortOrder' => 1, 'enabled' => true, 'image' => 'en.jpg'],
-        ['code' => 'de', 'name' => 'German', 'sortOrder' => 2, 'enabled' => true, 'image' => 'de.jpg'],
-        ['code' => 'zh', 'name' => 'Chinese', 'sortOrder' => 3, 'enabled' => true, 'image' => 'zh.jpg'],
+        ['code' => 'en', 'name' => 'English', 'sortOrder' => 1, 'enabled' => true],
+        ['code' => 'de', 'name' => 'German', 'sortOrder' => 2, 'enabled' => true],
+        ['code' => 'zh', 'name' => 'Chinese', 'sortOrder' => 3, 'enabled' => true],
 
         ['code' => 'fr', 'name' => 'French', 'sortOrder' => 10],
         ['code' => 'es', 'name' => 'Spanish', 'sortOrder' => 11],
@@ -89,14 +86,12 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
     ];
 
     public function __construct(
-        private readonly ImageService $imageService,
         private readonly LanguageService $languageService,
     ) {}
 
     public function load(ObjectManager $manager): void
     {
         $this->start();
-        $importUser = $this->getRefUser(SystemUserFixture::IMPORT);
 
         foreach (self::LANGUAGES as $data) {
             $language = new Language();
@@ -104,16 +99,6 @@ class LanguageFixture extends AbstractFixture implements FixtureGroupInterface, 
             $language->setName($data['name']);
             $language->setEnabled($data['enabled'] ?? false);
             $language->setSortOrder($data['sortOrder']);
-
-            if (isset($data['image'])) {
-                $imageFile = __DIR__ . '/Language/' . $data['image'];
-                if (file_exists($imageFile)) {
-                    $uploadedImage = new UploadedFile($imageFile, $data['image'], null, null, true);
-                    $image = $this->imageService->upload($uploadedImage, $importUser, ImageType::LanguageTile);
-                    $this->imageService->createThumbnails($image, ImageType::LanguageTile);
-                    $language->setTileImage($image);
-                }
-            }
 
             $manager->persist($language);
         }

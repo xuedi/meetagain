@@ -6,13 +6,10 @@ use App\Entity\Language;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -42,29 +39,6 @@ class LanguageType extends AbstractType
             'required' => false,
         ])->add('sortOrder', IntegerType::class, [
             'label' => 'admin_system_language.col_sort_order',
-        ])->add('tileGreeting', TextType::class, [
-            'label' => 'admin_system_language.col_tile_greeting',
-            'required' => false,
-            'constraints' => [new Length(max: 255)],
-        ])->add('tileIntro', TextareaType::class, [
-            'label' => 'admin_system_language.col_tile_intro',
-            'required' => false,
-            'attr' => ['rows' => 3],
-        ])->add('tileCta', TextType::class, [
-            'label' => 'admin_system_language.col_tile_cta',
-            'required' => false,
-            'constraints' => [new Length(max: 255)],
-        ])->add('tileImageAlt', TextType::class, [
-            'label' => 'admin_system_language.col_tile_image_alt',
-            'required' => false,
-            'constraints' => [new Length(max: 255)],
-        ])->add('tileImage', FileType::class, [
-            'mapped' => false,
-            'required' => false,
-            'label' => 'admin_system_language.heading_tile_image',
-            'constraints' => [
-                new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: 'shared.form_image_upload_mime_error'),
-            ],
         ]);
     }
 

@@ -4,10 +4,13 @@ namespace Tests\Unit\EventSubscriber;
 
 use App\EventSubscriber\LocaleSubscriber;
 use App\Service\Config\LanguageService;
+use App\Service\Config\LocaleCookieService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -22,6 +25,14 @@ class LocaleSubscriberTest extends TestCase
         return $languageService;
     }
 
+    private function createCookieServiceStub(?string $validLocale = null): LocaleCookieService
+    {
+        $cookieService = $this->createStub(LocaleCookieService::class);
+        $cookieService->method('getValidLocale')->willReturn($validLocale);
+
+        return $cookieService;
+    }
+
     /**
      * @param SessionInterface&\PHPUnit\Framework\MockObject\Stub $session
      */
@@ -34,33 +45,24 @@ class LocaleSubscriberTest extends TestCase
         return $request;
     }
 
-    public function testGetSubscribedEventsReturnsKernelRequest(): void
+    private function createRequestEvent(Request $request): RequestEvent
+    {
+        return new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+    }
+
+    public function testGetSubscribedEventsReturnsKernelRequestAndResponse(): void
     {
         $events = LocaleSubscriber::getSubscribedEvents();
 
         static::assertArrayHasKey(KernelEvents::REQUEST, $events);
+        static::assertArrayHasKey(KernelEvents::RESPONSE, $events);
         static::assertEquals([['onKernelRequest', 20]], $events[KernelEvents::REQUEST]);
-    }
-
-    public function testOnKernelRequestReturnsEarlyWhenNoPreviousSession(): void
-    {
-        $languageService = $this->createLanguageServiceStub('en');
-        $subscriber = new LocaleSubscriber($languageService);
-
-        $request = new Request();
-
-        $kernelMock = $this->createStub(HttpKernelInterface::class);
-        $event = new RequestEvent($kernelMock, $request, HttpKernelInterface::MAIN_REQUEST);
-
-        $subscriber->onKernelRequest($event);
-
-        static::assertTrue(true);
+        static::assertEquals([['onKernelResponse', 0]], $events[KernelEvents::RESPONSE]);
     }
 
     public function testOnKernelRequestSavesLocaleToSessionWhenAttributePresent(): void
     {
-        $languageService = $this->createLanguageServiceStub('en');
-        $subscriber = new LocaleSubscriber($languageService);
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub());
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->once())->method('set')->with('_locale', 'de');
@@ -68,16 +70,24 @@ class LocaleSubscriberTest extends TestCase
         $request = $this->createRequestWithSession($sessionMock);
         $request->attributes->set('_locale', 'de');
 
-        $kernelMock = $this->createStub(HttpKernelInterface::class);
-        $event = new RequestEvent($kernelMock, $request, HttpKernelInterface::MAIN_REQUEST);
+        $subscriber->onKernelRequest($this->createRequestEvent($request));
+    }
 
-        $subscriber->onKernelRequest($event);
+    public function testOnKernelRequestSkipsSessionWriteWhenAttributePresentButNoSession(): void
+    {
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub());
+
+        $request = new Request();
+        $request->attributes->set('_locale', 'de');
+
+        $subscriber->onKernelRequest($this->createRequestEvent($request));
+
+        static::assertTrue(true);
     }
 
     public function testOnKernelRequestRestoresLocaleFromSessionWhenNoAttribute(): void
     {
-        $languageService = $this->createLanguageServiceStub('en');
-        $subscriber = new LocaleSubscriber($languageService);
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('de'));
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('has')->willReturn(true);
@@ -85,18 +95,40 @@ class LocaleSubscriberTest extends TestCase
 
         $request = $this->createRequestWithSession($sessionStub);
 
-        $kernelStub = $this->createStub(HttpKernelInterface::class);
-        $event = new RequestEvent($kernelStub, $request, HttpKernelInterface::MAIN_REQUEST);
-
-        $subscriber->onKernelRequest($event);
+        $subscriber->onKernelRequest($this->createRequestEvent($request));
 
         static::assertSame('fr', $request->getLocale());
     }
 
-    public function testOnKernelRequestUsesAcceptLanguageHintWhenSessionEmpty(): void
+    public function testOnKernelRequestUsesCookieLocaleWhenSessionEmpty(): void
+    {
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('de'));
+
+        $sessionStub = $this->createStub(SessionInterface::class);
+        $sessionStub->method('has')->willReturn(false);
+
+        $request = $this->createRequestWithSession($sessionStub);
+
+        $subscriber->onKernelRequest($this->createRequestEvent($request));
+
+        static::assertSame('de', $request->getLocale());
+    }
+
+    public function testOnKernelRequestUsesCookieLocaleWithoutSession(): void
+    {
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('zh'));
+
+        $request = new Request();
+
+        $subscriber->onKernelRequest($this->createRequestEvent($request));
+
+        static::assertSame('zh', $request->getLocale());
+    }
+
+    public function testOnKernelRequestUsesAcceptLanguageHintWhenSessionAndCookieEmpty(): void
     {
         $languageService = $this->createLanguageServiceStub('en', ['en', 'de', 'zh']);
-        $subscriber = new LocaleSubscriber($languageService);
+        $subscriber = new LocaleSubscriber($languageService, $this->createCookieServiceStub());
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->method('getName')->willReturn('PHPSESSID');
@@ -107,10 +139,7 @@ class LocaleSubscriberTest extends TestCase
         $request->setSession($sessionMock);
         $request->headers->set('Accept-Language', 'fr, es;q=0.5, de;q=0.1');
 
-        $kernelStub = $this->createStub(HttpKernelInterface::class);
-        $event = new RequestEvent($kernelStub, $request, HttpKernelInterface::MAIN_REQUEST);
-
-        $subscriber->onKernelRequest($event);
+        $subscriber->onKernelRequest($this->createRequestEvent($request));
 
         static::assertSame('de', $request->getLocale());
     }
@@ -118,7 +147,7 @@ class LocaleSubscriberTest extends TestCase
     public function testOnKernelRequestFallsBackToFilteredDefaultWhenAcceptLanguageHasNoMatch(): void
     {
         $languageService = $this->createLanguageServiceStub('en', ['en', 'de', 'zh']);
-        $subscriber = new LocaleSubscriber($languageService);
+        $subscriber = new LocaleSubscriber($languageService, $this->createCookieServiceStub());
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('has')->willReturn(false);
@@ -126,13 +155,46 @@ class LocaleSubscriberTest extends TestCase
         $request = $this->createRequestWithSession($sessionStub);
         $request->headers->set('Accept-Language', 'ja');
 
-        $kernelStub = $this->createStub(HttpKernelInterface::class);
-        $event = new RequestEvent($kernelStub, $request, HttpKernelInterface::MAIN_REQUEST);
-
-        $subscriber->onKernelRequest($event);
+        $subscriber->onKernelRequest($this->createRequestEvent($request));
 
         // Symfony's getPreferredLanguage returns the first locale in the list
         // when none match, which is 'en' here.
         static::assertSame('en', $request->getLocale());
+    }
+
+    public function testOnKernelResponseAttachesCookieWhenLocaleAttributePresent(): void
+    {
+        $cookieService = $this->createMock(LocaleCookieService::class);
+        $cookieService->expects($this->once())->method('attachIfConsentGranted');
+
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $cookieService);
+
+        $request = new Request();
+        $request->attributes->set('_locale', 'de');
+        $event = new ResponseEvent(
+            $this->createStub(HttpKernelInterface::class),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST,
+            new Response(),
+        );
+
+        $subscriber->onKernelResponse($event);
+    }
+
+    public function testOnKernelResponseSkipsCookieWhenNoLocaleAttribute(): void
+    {
+        $cookieService = $this->createMock(LocaleCookieService::class);
+        $cookieService->expects($this->never())->method('attachIfConsentGranted');
+
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $cookieService);
+
+        $event = new ResponseEvent(
+            $this->createStub(HttpKernelInterface::class),
+            new Request(),
+            HttpKernelInterface::MAIN_REQUEST,
+            new Response(),
+        );
+
+        $subscriber->onKernelResponse($event);
     }
 }

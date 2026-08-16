@@ -16,12 +16,12 @@
     {% endif %}
     {% block calendar_link %}{% endblock %}
 
-    <title>{% block title %}meetAgain{% endblock %}</title>
+    <title>{% block title %}MeetAgain{% endblock %}</title>
     <meta property="og:title" content="{% block og_title %}{{ block('title') }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ block('meta_description') }}{% endblock %}">
     <meta property="og:url" content="{{ get_canonical_url() }}">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
-    <meta property="og:site_name" content="meetAgain">
+    <meta property="og:site_name" content="MeetAgain">
     {% set ogImage = get_og_image() %}
     {% block og_image %}{% if ogImage %}<meta property="og:image" content="{{ ogImage.absoluteUrl }}">
     <meta property="og:image:width" content="{{ ogImage.width }}">
@@ -73,9 +73,7 @@
     {% block javascripts %}{% endblock %}
 </head>
 <body id="body" class="has-navbar-fixed-top mt-5">
-{% if not (chrome_disabled|default(false)) %}
-    {% include 'base_navbar.html.twig' %}
-{% endif %}
+{% include 'base_navbar.html.twig' %}
 {% block body %}{% endblock %}
 {% for message in app.flashes('success') %}
     <div class="notification is-success flashNotification">
@@ -95,11 +93,8 @@
         {{ message|trans }}
     </div>
 {% endfor %}
-{% if not (chrome_disabled|default(false)) %}
-    {% include 'base_footer.html.twig' %}
-{% endif %}
-<div id="globalImageModal" class="modal">
-    <div class="modal-background"></div>
+{% include 'base_footer.html.twig' %}
+<div id="globalImageModal" class="modal">    <div class="modal-background"></div>
     <div class="modal-content"><div class="box" id="globalImageModalContent"></div></div>
     <div class="modal-close is-large" aria-label="close"></div>
 </div>

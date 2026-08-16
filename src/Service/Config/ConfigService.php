@@ -56,7 +56,7 @@ readonly class ConfigService
 
     public function getSiteName(): string
     {
-        return $this->getString('site_name', 'meetAgain');
+        return $this->getString('site_name', 'MeetAgain');
     }
 
     public function getSecurityContact(): string
@@ -116,11 +116,6 @@ readonly class ConfigService
     public function getMailerAddress(): Address
     {
         return new Address($this->getString('email_sender_mail', 'sender@email.com'), $this->getString('email_sender_name', 'email sender'));
-    }
-
-    public function isShowFrontpage(): bool
-    {
-        return $this->getBoolean('show_frontpage', true);
     }
 
     public function isShowTownHall(): bool

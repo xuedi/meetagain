@@ -4,9 +4,6 @@ namespace App\Controller\NonLocale;
 
 use App\Controller\AbstractController;
 use App\Publisher\Frontpage\FrontpageProviderInterface;
-use App\Service\Config\ConfigService;
-use App\Service\Config\LanguageService;
-use App\Service\Frontpage\ThinPickerLayoutResolver;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,10 +17,7 @@ final class FrontpageController extends AbstractController
      * @param iterable<FrontpageProviderInterface> $frontpageProviders
      */
     public function __construct(
-        private readonly ConfigService $configService,
         private readonly RouterInterface $router,
-        private readonly LanguageService $languageService,
-        private readonly ThinPickerLayoutResolver $thinPickerLayoutResolver,
         #[AutowireIterator(FrontpageProviderInterface::class)]
         private readonly iterable $frontpageProviders = [],
     ) {}
@@ -38,17 +32,7 @@ final class FrontpageController extends AbstractController
             }
         }
 
-        if ($this->configService->isShowFrontpage() === false) {
-            return new RedirectResponse($this->router->generate('app_default'));
-        }
-
-        $languages = $this->languageService->getEnabledLanguages();
-
-        return $this->render('cms/frontpage.html.twig', [
-            'languages' => $languages,
-            'chrome_disabled' => true,
-            'layout' => $this->thinPickerLayoutResolver->resolve(count($languages)),
-        ]);
+        return new RedirectResponse($this->router->generate('app_default'));
     }
 
     #[Route('/install', name: 'app_install')]

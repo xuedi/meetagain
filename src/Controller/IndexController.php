@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Service\Cms\CmsService;
+use App\Service\Config\LocaleCookieService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,6 +15,7 @@ final class IndexController extends AbstractController
 {
     public function __construct(
         private readonly CmsService $cms,
+        private readonly LocaleCookieService $localeCookieService,
     ) {}
 
     #[Route('/', name: 'app_default')]
@@ -39,6 +41,9 @@ final class IndexController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->forward('App\Controller\IndexController::index'); // TODO: add proper route instead
+        $response = $this->forward('App\Controller\IndexController::index'); // TODO: add proper route instead
+        $this->localeCookieService->attachIfConsentGranted($request, $response, $locale);
+
+        return $response;
     }
 }

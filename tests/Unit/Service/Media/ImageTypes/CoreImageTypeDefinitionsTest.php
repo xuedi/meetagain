@@ -5,21 +5,18 @@ namespace Tests\Unit\Service\Media\ImageTypes;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
 use App\Entity\Image;
-use App\Entity\Language;
 use App\Entity\User;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
 use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageLocationRepository;
-use App\Repository\LanguageRepository;
 use App\Repository\UserRepository;
 use App\Service\Media\ImageTypes\CmsBlockImageTypeDefinition;
 use App\Service\Media\ImageTypes\CmsCardImageImageTypeDefinition;
 use App\Service\Media\ImageTypes\CmsGalleryImageTypeDefinition;
 use App\Service\Media\ImageTypes\EventTeaserImageTypeDefinition;
 use App\Service\Media\ImageTypes\EventUploadImageTypeDefinition;
-use App\Service\Media\ImageTypes\LanguageTileImageTypeDefinition;
 use App\Service\Media\ImageTypes\ProfilePictureImageTypeDefinition;
 use App\Service\Media\ImageTypes\SiteLogoImageTypeDefinition;
 use App\Service\Media\ImageTypes\WebsiteImageImageTypeDefinition;
@@ -250,32 +247,6 @@ class CoreImageTypeDefinitionsTest extends TestCase
         static::assertSame(ImageType::CmsGallery, $definition->getType());
         static::assertSame([[1024, 768], [350, 263], [210, 140], [100, 100], [50, 50]], $definition->thumbnailSizes());
         static::assertSame([['imageId' => 10, 'locationId' => 7], ['imageId' => 11, 'locationId' => 7]], $definition->discoverImageIds());
-    }
-
-    public function testLanguageTileIdentitySizesAndEditLink(): void
-    {
-        $definition = new LanguageTileImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $this->createStub(LanguageRepository::class));
-
-        static::assertSame(ImageType::LanguageTile, $definition->getType());
-        static::assertSame([[600, 400], [350, 233], [300, 200], [100, 100], [50, 50]], $definition->thumbnailSizes());
-        static::assertSame(['route' => 'app_admin_language_edit', 'params' => ['id' => 9]], $definition->getEditLink(9));
-    }
-
-    public function testLanguageTileLocateResolvesLanguage(): void
-    {
-        $language = $this->createStub(Language::class);
-        $language->method('getName')->willReturn('German');
-        $language->method('getId')->willReturn(2);
-
-        $languageRepo = $this->createStub(LanguageRepository::class);
-        $languageRepo->method('findOneBy')->willReturn($language);
-
-        $definition = new LanguageTileImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $languageRepo);
-
-        static::assertSame(
-            ['label' => 'Language tile: German', 'route' => 'app_admin_language_edit', 'params' => ['id' => 2]],
-            $definition->locate($this->createStub(Image::class)),
-        );
     }
 
     public function testSiteLogoIdentitySizesAndFitMode(): void

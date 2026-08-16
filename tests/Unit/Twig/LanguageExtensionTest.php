@@ -4,7 +4,6 @@ namespace Tests\Unit\Twig;
 
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
-use App\Service\Config\LanguageTileService;
 use App\Service\Seo\CanonicalUrlService;
 use App\Twig\LanguageExtension;
 use App\Twig\MetaDescriptionProviderInterface;
@@ -16,7 +15,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LanguageExtensionTest extends TestCase
 {
@@ -40,7 +38,6 @@ class LanguageExtensionTest extends TestCase
             $this->routerStub,
             $this->configServiceStub,
             $this->canonicalUrlServiceStub,
-            new LanguageTileService($this->createStub(TranslatorInterface::class)),
         );
     }
 
@@ -58,7 +55,7 @@ class LanguageExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(12, $functions);
+        static::assertCount(10, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('get_hreflang_code', $functionNames);
@@ -71,32 +68,6 @@ class LanguageExtensionTest extends TestCase
         static::assertContains('get_canonical_url', $functionNames);
         static::assertContains('get_meta_description', $functionNames);
         static::assertContains('get_organization_schema', $functionNames);
-        static::assertContains('is_frontpage', $functionNames);
-    }
-
-    public function testIsFrontpageReturnsTrueForFrontpageRoute(): void
-    {
-        $request = new Request();
-        $request->attributes->set('_route', 'app_frontpage');
-        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
-
-        static::assertTrue($this->subject->isFrontpage());
-    }
-
-    public function testIsFrontpageReturnsFalseForOtherRoutes(): void
-    {
-        $request = new Request();
-        $request->attributes->set('_route', 'app_default');
-        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
-
-        static::assertFalse($this->subject->isFrontpage());
-    }
-
-    public function testIsFrontpageReturnsFalseWhenNoRequest(): void
-    {
-        $this->requestStackStub->method('getCurrentRequest')->willReturn(null);
-
-        static::assertFalse($this->subject->isFrontpage());
     }
 
     public function testGetCurrentLocaleReturnsRequestLocale(): void
@@ -256,7 +227,6 @@ class LanguageExtensionTest extends TestCase
             $this->routerStub,
             $this->configServiceStub,
             $this->canonicalUrlServiceStub,
-            new LanguageTileService($this->createStub(TranslatorInterface::class)),
             [$provider],
         );
 

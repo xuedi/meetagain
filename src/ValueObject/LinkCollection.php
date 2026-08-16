@@ -7,6 +7,7 @@ use App\Entity\Link;
 readonly class LinkCollection
 {
     /**
+     * @param list<Link>                $leadingNavLinks      rendered before all other navbar-start entries
      * @param list<Link>                $navLinks
      * @param array<string, list<Link>> $footerLinks         keyed by column name
      * @param array<string, string>     $footerColumnTitles  keyed by column name
@@ -15,6 +16,7 @@ readonly class LinkCollection
      * @param list<string>              $navbarPillsHtml      pre-rendered HTML fragments injected next to the user dropdown
      */
     public function __construct(
+        private array $leadingNavLinks = [],
         private array $navLinks = [],
         private array $footerLinks = [],
         private array $footerColumnTitles = [],
@@ -26,6 +28,12 @@ readonly class LinkCollection
     public static function empty(): self
     {
         return new self();
+    }
+
+    /** @return list<Link> */
+    public function getLeadingNavLinks(): array
+    {
+        return $this->leadingNavLinks;
     }
 
     /** @return list<Link> */
@@ -58,9 +66,15 @@ readonly class LinkCollection
     }
 
     /** @param list<Link> $links */
+    public function withLeadingNavLinks(array $links): self
+    {
+        return new self($links, $this->navLinks, $this->footerLinks, $this->footerColumnTitles, $this->profileDropdownLinks, $this->profileConfigLinks, $this->navbarPillsHtml);
+    }
+
+    /** @param list<Link> $links */
     public function withNavLinks(array $links): self
     {
-        return new self($links, $this->footerLinks, $this->footerColumnTitles, $this->profileDropdownLinks, $this->profileConfigLinks, $this->navbarPillsHtml);
+        return new self($this->leadingNavLinks, $links, $this->footerLinks, $this->footerColumnTitles, $this->profileDropdownLinks, $this->profileConfigLinks, $this->navbarPillsHtml);
     }
 
     /** @param list<Link> $links */
@@ -70,6 +84,7 @@ readonly class LinkCollection
         $footerLinks[$column] = $links;
 
         return new self(
+            $this->leadingNavLinks,
             $this->navLinks,
             $footerLinks,
             $this->footerColumnTitles,
@@ -84,19 +99,19 @@ readonly class LinkCollection
         $titles = $this->footerColumnTitles;
         $titles[$column] = $title;
 
-        return new self($this->navLinks, $this->footerLinks, $titles, $this->profileDropdownLinks, $this->profileConfigLinks, $this->navbarPillsHtml);
+        return new self($this->leadingNavLinks, $this->navLinks, $this->footerLinks, $titles, $this->profileDropdownLinks, $this->profileConfigLinks, $this->navbarPillsHtml);
     }
 
     /** @param list<Link> $links */
     public function withProfileDropdownLinks(array $links): self
     {
-        return new self($this->navLinks, $this->footerLinks, $this->footerColumnTitles, $links, $this->profileConfigLinks, $this->navbarPillsHtml);
+        return new self($this->leadingNavLinks, $this->navLinks, $this->footerLinks, $this->footerColumnTitles, $links, $this->profileConfigLinks, $this->navbarPillsHtml);
     }
 
     /** @param list<Link> $links */
     public function withProfileConfigLinks(array $links): self
     {
-        return new self($this->navLinks, $this->footerLinks, $this->footerColumnTitles, $this->profileDropdownLinks, $links, $this->navbarPillsHtml);
+        return new self($this->leadingNavLinks, $this->navLinks, $this->footerLinks, $this->footerColumnTitles, $this->profileDropdownLinks, $links, $this->navbarPillsHtml);
     }
 
     /** @return list<string> */
@@ -108,6 +123,6 @@ readonly class LinkCollection
     /** @param list<string> $html */
     public function withNavbarPillsHtml(array $html): self
     {
-        return new self($this->navLinks, $this->footerLinks, $this->footerColumnTitles, $this->profileDropdownLinks, $this->profileConfigLinks, $html);
+        return new self($this->leadingNavLinks, $this->navLinks, $this->footerLinks, $this->footerColumnTitles, $this->profileDropdownLinks, $this->profileConfigLinks, $html);
     }
 }

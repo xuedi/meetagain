@@ -54,11 +54,6 @@ class ConfigFixture extends AbstractFixture implements DependentFixtureInterface
                 ConfigType::Boolean,
             ],
             [
-                'show_frontpage',
-                'true',
-                ConfigType::Boolean,
-            ],
-            [
                 'show_town_hall',
                 'true',
                 ConfigType::Boolean,
