@@ -87,7 +87,8 @@ fn http_get(url: &str) -> Value {
     ureq::get(url)
         .call()
         .unwrap_or_else(|e| panic!("GET {} failed: {}", url, e))
-        .into_json()
+        .body_mut()
+        .read_json()
         .unwrap_or_else(|e| panic!("GET {} JSON parse failed: {}", url, e))
 }
 

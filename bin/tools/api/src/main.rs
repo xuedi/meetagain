@@ -163,18 +163,20 @@ fn get_client_token(cfg: &mut Config) -> String {
     let url = format!("{}{}", cfg.require("API_URL"), TOKEN_PATH);
     let client_id = cfg.require("OAUTH_CLIENT_ID");
     let client_secret = cfg.require("OAUTH_CLIENT_SECRET");
-    let resp = ureq::post(&url).send_form(&[
+    let resp = status_blind_agent().post(&url).send_form([
         ("grant_type", "client_credentials"),
         ("client_id", &client_id),
         ("client_secret", &client_secret),
         ("scope", "api"),
     ]);
     let body: Value = match resp {
-        Ok(r) => r
-            .into_json()
+        Ok(mut r) if r.status().is_success() => r
+            .body_mut()
+            .read_json()
             .unwrap_or_else(|e| panic!("client_credentials response parse failed: {}", e)),
-        Err(ureq::Error::Status(code, r)) => {
-            let body = r.into_string().unwrap_or_default();
+        Ok(mut r) => {
+            let code = r.status().as_u16();
+            let body = r.body_mut().read_to_string().unwrap_or_default();
             eprintln!("error: client_credentials grant returned HTTP {}", code);
             eprintln!("{}", body);
             std::process::exit(1);
@@ -210,18 +212,20 @@ fn get_user_token(cfg: &mut Config) -> String {
     let url = format!("{}{}", cfg.require("API_URL"), TOKEN_PATH);
     let client_id = cfg.require("OAUTH_CLIENT_ID");
     let client_secret = cfg.require("OAUTH_CLIENT_SECRET");
-    let resp = ureq::post(&url).send_form(&[
+    let resp = status_blind_agent().post(&url).send_form([
         ("grant_type", "refresh_token"),
         ("refresh_token", &refresh),
         ("client_id", &client_id),
         ("client_secret", &client_secret),
     ]);
     let body: Value = match resp {
-        Ok(r) => r
-            .into_json()
+        Ok(mut r) if r.status().is_success() => r
+            .body_mut()
+            .read_json()
             .unwrap_or_else(|e| panic!("refresh_token response parse failed: {}", e)),
-        Err(ureq::Error::Status(code, r)) => {
-            let body = r.into_string().unwrap_or_default();
+        Ok(mut r) => {
+            let code = r.status().as_u16();
+            let body = r.body_mut().read_to_string().unwrap_or_default();
             eprintln!("error: refresh_token grant returned HTTP {}", code);
             eprintln!("{}", body);
             eprintln!("hint: refresh token may have expired or been revoked; re-run the authorization_code flow.");
@@ -264,6 +268,16 @@ fn fetch_token(cfg: &mut Config, kind: TokenKind) -> Option<String> {
     }
 }
 
+// HTTP error statuses must surface as Ok responses so callers can read the
+// body and run the 401 retry; only transport failures become Err.
+fn status_blind_agent() -> ureq::Agent {
+    ureq::Agent::new_with_config(
+        ureq::Agent::config_builder()
+            .http_status_as_error(false)
+            .build(),
+    )
+}
+
 fn send_once(
     base: &str,
     token: Option<&str>,
@@ -272,24 +286,29 @@ fn send_once(
     body: Option<&str>,
 ) -> Result<(u16, String), String> {
     let url = format!("{}{}", base, path);
-    let mut req = ureq::request(method, &url);
+    let mut builder = ureq::http::Request::builder().method(method).uri(&url);
     if let Some(t) = token {
-        req = req.set("Authorization", &format!("Bearer {}", t));
+        builder = builder.header("Authorization", format!("Bearer {}", t));
     }
-    let resp = if let Some(b) = body {
-        req.set("Content-Type", "application/json").send_string(b)
-    } else {
-        req.call()
+    let agent = status_blind_agent();
+    let resp = match body {
+        Some(b) => {
+            let req = builder
+                .header("Content-Type", "application/json")
+                .body(b.to_string())
+                .map_err(|e| format!("{}", e))?;
+            agent.run(req)
+        }
+        None => {
+            let req = builder.body(()).map_err(|e| format!("{}", e))?;
+            agent.run(req)
+        }
     };
     match resp {
-        Ok(r) => {
-            let status = r.status();
-            let text = r.into_string().unwrap_or_default();
+        Ok(mut r) => {
+            let status = r.status().as_u16();
+            let text = r.body_mut().read_to_string().unwrap_or_default();
             Ok((status, text))
-        }
-        Err(ureq::Error::Status(code, r)) => {
-            let text = r.into_string().unwrap_or_default();
-            Ok((code, text))
         }
         Err(e) => Err(format!("{}", e)),
     }
