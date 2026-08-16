@@ -47,10 +47,11 @@ fn load_config() -> Config {
 
 fn get(url: &str, token: &str) -> Value {
     ureq::get(url)
-        .set("Authorization", &format!("Bearer {}", token))
+        .header("Authorization", &format!("Bearer {}", token))
         .call()
         .unwrap_or_else(|e| panic!("HTTP request failed for {}: {}", url, e))
-        .into_json()
+        .body_mut()
+        .read_json()
         .unwrap_or_else(|e| panic!("JSON parse failed for {}: {}", url, e))
 }
 
@@ -151,10 +152,11 @@ fn cmd_show(cfg: &Config, uuid: &str) {
                 cfg.url, event_id
             );
             let st_body = ureq::get(&st_url)
-                .set("Authorization", &format!("Bearer {}", cfg.token))
+                .header("Authorization", &format!("Bearer {}", cfg.token))
                 .call()
                 .unwrap_or_else(|e| panic!("stacktrace request failed: {}", e))
-                .into_string()
+                .body_mut()
+                .read_to_string()
                 .unwrap_or_else(|e| panic!("stacktrace read failed: {}", e));
 
             println!();

@@ -117,13 +117,13 @@ fn mint_jwt(sa: &ServiceAccount, scope: &str, now: u64) -> String {
 
 fn exchange_token(jwt: &str, token_uri: &str) -> String {
     let resp: Value = ureq::post(token_uri)
-        .set("Content-Type", "application/x-www-form-urlencoded")
-        .send_form(&[
+        .send_form([
             ("grant_type", "urn:ietf:params:oauth:grant-type:jwt-bearer"),
             ("assertion", jwt),
         ])
         .unwrap_or_else(|e| panic!("token exchange failed: {}", e))
-        .into_json()
+        .body_mut()
+        .read_json()
         .unwrap_or_else(|e| panic!("token response not JSON: {}", e));
 
     resp["access_token"]
@@ -143,20 +143,21 @@ fn get_access_token(sa: &ServiceAccount) -> String {
 
 fn http_get(url: &str, token: &str) -> Value {
     ureq::get(url)
-        .set("Authorization", &format!("Bearer {}", token))
+        .header("Authorization", &format!("Bearer {}", token))
         .call()
         .unwrap_or_else(|e| panic!("GET {} failed: {}", url, e))
-        .into_json()
+        .body_mut()
+        .read_json()
         .unwrap_or_else(|e| panic!("GET {} JSON parse failed: {}", url, e))
 }
 
 fn http_post(url: &str, token: &str, body: &Value) -> Value {
     ureq::post(url)
-        .set("Authorization", &format!("Bearer {}", token))
-        .set("Content-Type", "application/json")
-        .send_json(body.clone())
+        .header("Authorization", &format!("Bearer {}", token))
+        .send_json(body)
         .unwrap_or_else(|e| panic!("POST {} failed: {}", url, e))
-        .into_json()
+        .body_mut()
+        .read_json()
         .unwrap_or_else(|e| panic!("POST {} JSON parse failed: {}", url, e))
 }
 
