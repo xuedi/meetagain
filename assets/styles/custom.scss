@@ -283,6 +283,15 @@ details.activities-load-more {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.landing-event-card__teaser {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    overflow: hidden;
+    line-height: 1.5em;
+    height: 6em;
+}
 
 // Event filter — inline layout for filter controls in the event list sidebar.
 #eventFilter {
