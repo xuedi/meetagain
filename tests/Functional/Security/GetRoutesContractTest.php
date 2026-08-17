@@ -80,7 +80,6 @@ class GetRoutesContractTest extends WebTestCase
 
     public static function provideUserRoutes(): iterable
     {
-        yield 'default language' => ['/en/language/de'];
         yield 'event toggle rsvp' => ['/en/event/toggleRsvp/1/'];
         yield 'comment create' => ['/en/comment/event/1'];
         yield 'comment delete' => ['/en/comment/event/1/delete/1'];

@@ -2,48 +2,20 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
 use App\Service\Cms\CmsService;
-use App\Service\Config\LocaleCookieService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class IndexController extends AbstractController
 {
     public function __construct(
         private readonly CmsService $cms,
-        private readonly LocaleCookieService $localeCookieService,
     ) {}
 
     #[Route('/', name: 'app_default')]
     public function index(Request $request): Response
     {
         return $this->cms->handle($request->getLocale(), 'index', $this->getResponse());
-    }
-
-    #[Route('/language/{locale}', name: 'app_default_language', methods: ['POST'])]
-    public function setLanguage(Request $request, EntityManagerInterface $entityManager, string $locale): Response
-    {
-        if (!$this->isCsrfTokenValid('app_default_language' . $locale, (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
-
-        $session = $request->getSession();
-        $session->set('_locale', $locale);
-
-        $user = $this->getUser();
-        if ($user instanceof User) {
-            $user->setLocale($locale);
-            $entityManager->persist($user);
-            $entityManager->flush();
-        }
-
-        $response = $this->forward('App\Controller\IndexController::index'); // TODO: add proper route instead
-        $this->localeCookieService->attachIfConsentGranted($request, $response, $locale);
-
-        return $response;
     }
 }

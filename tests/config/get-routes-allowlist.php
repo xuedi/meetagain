@@ -1,7 +1,9 @@
 <?php declare(strict_types=1);
 
+use App\Controller\SecurityController;
+
 return [
-    'App\\Controller\\SecurityController::verifyUserEmail' => [
+    SecurityController::class . '::verifyUserEmail' => [
         'route' => 'app_register_confirm_email',
         'reason' => 'Email-link account activation. 256-bit token (bin2hex(random_bytes(32))), 24h TTL via regcodeExpiresAt, single-use (setRegcode(null) on success), entity-bound. See architecture/security/get-routes.md exception #1.',
     ],
