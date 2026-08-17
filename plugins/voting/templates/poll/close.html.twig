@@ -20,7 +20,7 @@
             <label class="radio" style="display: flex; align-items: center; gap: 1rem; cursor: pointer">
                 <input type="radio" name="chosen_item_id" value="{{ itemId }}" required>
                 <div>
-                    {{ item_list_cell(poll.itemType, itemId) }}
+                    {{ item_list_cell(poll.itemType, itemId, 'row') }}
                     {% if voteCounts[itemId] is defined %}
                     <p class="is-size-7 has-text-grey">{{ voteCounts[itemId] }} {{ 'voting_poll.col_votes'|trans }}</p>
                     {% endif %}

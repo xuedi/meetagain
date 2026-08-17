@@ -1,8 +1,18 @@
 {# Photo cell for the shared item-list component. The photos list page renders its own
    plugins/photos/templates/views/* layouts instead; this remains for the provider contract. #}
 {% set photoTitle = photo.getTranslatedTitle(app.locale) ?: 'photos.untitled'|trans %}
+{% if (viewMode ?? null) == 'row' %}
+    {% include '_components/item/styles/row.html.twig' with {
+        href: path('app_plugin_photos_photo_show', {id: photo.id}),
+        image: photo.visibleImage,
+        imageSize: '100x100',
+        title: photoTitle,
+        subtitle: photo.cameraLabel
+    } %}
+{% else %}
 <a href="{{ path('app_plugin_photos_photo_show', {id: photo.id}) }}" class="is-block has-text-centered">
     {% include '_components/image.html.twig' with {'image': photo.visibleImage, 'size': '400x400', 'alt': photoTitle} %}
     <p class="title is-6 mt-2 mb-0">{{ photoTitle }}</p>
     {% if photo.cameraLabel %}<p class="subtitle is-7 has-text-grey">{{ photo.cameraLabel }}</p>{% endif %}
 </a>
+{% endif %}

@@ -3,6 +3,7 @@
 namespace Plugin\Books\Item;
 
 use App\Entity\EventItemAssociation;
+use App\Enum\ItemViewType;
 use App\Item\TypeProviderInterface;
 use App\Item\ListCellProviderInterface;
 use App\Item\ListProviderInterface;
@@ -51,7 +52,7 @@ final readonly class BookTypeProvider implements TypeProviderInterface, ListCell
     }
 
     #[Override]
-    public function renderListCell(int $itemId): ?string
+    public function renderListCell(int $itemId, ?ItemViewType $mode = null): ?string
     {
         $book = $this->bookService->get($itemId);
         if ($book === null) {
@@ -60,6 +61,7 @@ final readonly class BookTypeProvider implements TypeProviderInterface, ListCell
 
         return $this->twig->render('@Books/item/list_cell.html.twig', [
             'book' => $book,
+            'viewMode' => $mode?->value,
         ]);
     }
 

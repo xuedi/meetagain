@@ -2,6 +2,7 @@
 
 namespace App\Item;
 
+use App\Enum\ItemViewType;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
@@ -18,6 +19,9 @@ interface ListCellProviderInterface
     /** Registry key for this item type. */
     public function getKey(): string;
 
-    /** Per-item cell markup the shared list component wraps in the chosen layout; null when the item is gone. */
-    public function renderListCell(int $itemId): ?string;
+    /**
+     * Per-item cell markup the shared list component wraps in the chosen layout; null when the item is gone.
+     * A non-null mode overrides the visitor's session view mode, for callers rendering outside that list.
+     */
+    public function renderListCell(int $itemId, ?ItemViewType $mode = null): ?string;
 }

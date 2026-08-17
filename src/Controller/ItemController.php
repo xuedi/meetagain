@@ -24,6 +24,10 @@ final class ItemController extends AbstractController
     #[Route('/item/{itemType}/view/{mode}', name: 'app_item_set_view', methods: ['GET'])]
     public function setView(string $itemType, ItemViewType $mode, Request $request): RedirectResponse
     {
+        if (!in_array($mode, ItemViewType::switchable(), true)) {
+            throw $this->createNotFoundException();
+        }
+
         $this->viewResolver->set($itemType, $mode);
 
         $referer = $request->headers->get('referer');
@@ -48,7 +52,7 @@ final class ItemController extends AbstractController
         }
 
         $mode = ItemViewType::tryFrom($request->query->getString('mode'));
-        if ($mode !== null) {
+        if ($mode !== null && in_array($mode, ItemViewType::switchable(), true)) {
             $this->viewResolver->set($itemType, $mode);
         }
 

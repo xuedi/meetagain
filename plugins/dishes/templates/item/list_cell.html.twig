@@ -1,7 +1,17 @@
 {# Dish cell for the shared item-list component. The dishes list page renders its own
    plugins/dishes/templates/views/* layouts instead; this remains for the provider contract. #}
+{% if (viewMode ?? null) == 'row' %}
+    {% include '_components/item/styles/row.html.twig' with {
+        href: path('app_plugin_dishes_dish_show', {id: dish.id}),
+        image: dish.previewImage,
+        imageSize: '100x100',
+        title: dish.getTranslatedName(app.locale),
+        subtitle: dish.origin
+    } %}
+{% else %}
 <a href="{{ path('app_plugin_dishes_dish_show', {id: dish.id}) }}" class="dish-cell is-block has-text-centered">
     {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '400x400', 'alt': dish.getTranslatedName(app.locale)} %}
     <p class="title is-6 mt-2 mb-0">{{ dish.getTranslatedName(app.locale) }}</p>
     {% if dish.origin %}<p class="subtitle is-7 has-text-grey">{{ dish.origin }}</p>{% endif %}
 </a>
+{% endif %}

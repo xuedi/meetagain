@@ -139,7 +139,7 @@ class Kernel implements Plugin
 
     public function getStylesheets(): array
     {
-        return [];
+        return ['styles/voting.css'];
     }
 
     public function getJavascripts(): array

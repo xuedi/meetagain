@@ -1,5 +1,5 @@
 {# Book cell rendered by the shared item-list component (core wraps it in the chosen layout). #}
-{% set mode = item_view_mode('book').value %}
+{% set mode = viewMode ?? item_view_mode('book').value %}
 {% set showUrl = path('app_plugin_books_book_show', {id: book.id}) %}
 
 {% if mode == 'list' %}
@@ -18,6 +18,14 @@
             </a>
         {% endif %}
     </td>
+{% elseif mode == 'row' %}
+    {% include '_components/item/styles/row.html.twig' with {
+        href: showUrl,
+        image: book.coverImage,
+        imageSize: '100x150',
+        title: book.title,
+        subtitle: book.author
+    } %}
 {% elseif mode == 'grid' %}
     {% include '_components/item/styles/thumb.html.twig' with {
         href: showUrl,

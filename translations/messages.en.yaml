@@ -670,6 +670,7 @@ item:
     view_tiles: 'Tiles'
     view_grid: 'Grid'
     view_gallery: 'Gallery'
+    view_row: 'Row'
     gallery_prev: 'Previous image'
     gallery_next: 'Next image'
     gallery_report_caption: 'You can <a href="%url%">report</a> an image if there is something wrong.'

@@ -1,0 +1,94 @@
+/* Poll tables: dates and counts stay as narrow as their content so the winner column takes the
+   slack, and every cell centres against the winner row's thumbnail. */
+
+.poll-table td,
+.poll-table th {
+    vertical-align: middle;
+}
+
+.poll-table__tight {
+    width: 1%;
+    white-space: nowrap;
+}
+
+/* Poll options: item cards act as the selection control, so the native input is hidden and the
+   card itself carries the checked state. A fixed track width keeps the ballot readable at any
+   option count, rather than stretching a few posters across the full row. */
+
+.poll-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.poll-option {
+    position: relative;
+    display: block;
+    cursor: pointer;
+    border-radius: 8px;
+    outline: 2px solid transparent;
+    outline-offset: 3px;
+    transition: outline-color 120ms ease-out, transform 120ms ease-out;
+}
+
+.poll-option:hover {
+    transform: translateY(-2px);
+}
+
+.poll-option__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* The item cell links to the item's detail page; on a ballot the card must select, not navigate. */
+.poll-option__card a {
+    pointer-events: none;
+}
+
+.poll-option__overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: hsl(171deg 100% 29% / 65%);
+    color: #fff;
+    opacity: 0;
+    transition: opacity 120ms ease-out;
+}
+
+.poll-option__input:checked ~ .poll-option__overlay {
+    opacity: 1;
+}
+
+.poll-option__input:checked ~ .poll-option__card {
+    filter: saturate(0.6);
+}
+
+.poll-option:has(.poll-option__input:checked) {
+    outline-color: hsl(171deg 100% 29%);
+}
+
+.poll-option__input:focus-visible ~ .poll-option__overlay {
+    opacity: 0.35;
+}
+
+.poll-option:has(.poll-option__input:focus-visible) {
+    outline-color: hsl(217deg 71% 53%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .poll-option,
+    .poll-option__overlay {
+        transition: none;
+    }
+
+    .poll-option:hover {
+        transform: none;
+    }
+}

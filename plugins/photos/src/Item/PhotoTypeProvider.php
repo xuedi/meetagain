@@ -3,6 +3,7 @@
 namespace Plugin\Photos\Item;
 
 use App\Entity\EventItemAssociation;
+use App\Enum\ItemViewType;
 use App\Item\ListCellProviderInterface;
 use App\Item\ListProviderInterface;
 use App\Item\TypeProviderInterface;
@@ -55,7 +56,7 @@ final readonly class PhotoTypeProvider implements TypeProviderInterface, ListCel
     }
 
     #[Override]
-    public function renderListCell(int $itemId): ?string
+    public function renderListCell(int $itemId, ?ItemViewType $mode = null): ?string
     {
         $photo = $this->photoService->get($itemId);
         if ($photo === null) {
@@ -64,6 +65,7 @@ final readonly class PhotoTypeProvider implements TypeProviderInterface, ListCel
 
         return $this->twig->render('@Photos/item/list_cell.html.twig', [
             'photo' => $photo,
+            'viewMode' => $mode?->value,
         ]);
     }
 

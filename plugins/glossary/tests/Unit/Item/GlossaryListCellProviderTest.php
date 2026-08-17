@@ -27,7 +27,7 @@ class GlossaryListCellProviderTest extends TestCase
         $twig = $this->createMock(Environment::class);
         $twig->expects(self::once())
             ->method('render')
-            ->with('@Glossary/item/list_cell.html.twig', ['entry' => $entry, 'config' => $config, 'hasTags' => false])
+            ->with('@Glossary/item/list_cell.html.twig', ['entry' => $entry, 'config' => $config, 'hasTags' => false, 'viewMode' => null])
             ->willReturn('<td>你好</td>');
 
         $provider = $this->makeProvider($this->serviceReturning($entry), $this->configReturning($config), $twig);

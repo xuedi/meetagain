@@ -4,6 +4,7 @@ namespace Plugin\Dishes\Item;
 
 use App\Entity\EventItemAssociation;
 use App\Entity\User;
+use App\Enum\ItemViewType;
 use App\Item\TypeProviderInterface;
 use App\Item\ListCellProviderInterface;
 use App\Item\ListProviderInterface;
@@ -59,7 +60,7 @@ final readonly class DishTypeProvider implements TypeProviderInterface, ListCell
     }
 
     #[Override]
-    public function renderListCell(int $itemId): ?string
+    public function renderListCell(int $itemId, ?ItemViewType $mode = null): ?string
     {
         $dish = $this->dishService->get($itemId);
         if ($dish === null) {
@@ -68,6 +69,7 @@ final readonly class DishTypeProvider implements TypeProviderInterface, ListCell
 
         return $this->twig->render('@Dishes/item/list_cell.html.twig', [
             'dish' => $dish,
+            'viewMode' => $mode?->value,
         ]);
     }
 

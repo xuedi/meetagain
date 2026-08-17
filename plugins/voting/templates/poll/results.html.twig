@@ -16,7 +16,7 @@
 {% if poll.winningItemId %}
 <div class="notification">
     <p class="mb-2"><strong>{{ 'voting_poll.winner_label'|trans }}</strong></p>
-    {{ item_list_cell(poll.itemType, poll.winningItemId) }}
+    {{ item_list_cell(poll.itemType, poll.winningItemId, 'row') }}
 </div>
 {% elseif poll.status.value != 1 and poll.tiedItemIds is not empty %}
 <div class="notification is-warning">
@@ -44,7 +44,7 @@
         {% set voteCount = voteCounts[itemId] ?? 0 %}
         <tr{% if poll.winningItemId == itemId %} style="font-weight: bold"{% endif %}>
             <td>
-                {{ item_list_cell(poll.itemType, itemId) }}
+                {{ item_list_cell(poll.itemType, itemId, 'row') }}
                 {% if itemId in userVotedItemIds %}
                 <span class="tag is-light ml-1">{{ 'voting_poll.your_vote'|trans }}</span>
                 {% endif %}

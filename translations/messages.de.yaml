@@ -660,6 +660,7 @@ item:
     view_tiles: 'Kacheln'
     view_grid: 'Raster'
     view_gallery: 'Galerie'
+    view_row: 'Zeile'
     gallery_prev: 'Vorheriges Bild'
     gallery_next: 'Nächstes Bild'
     gallery_report_caption: 'Du kannst ein Bild <a href="%url%">melden</a>, falls etwas nicht stimmt.'

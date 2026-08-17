@@ -2,6 +2,7 @@
 
 namespace Plugin\Glossary\Item;
 
+use App\Enum\ItemViewType;
 use App\Item\ListCellProviderInterface;
 use App\Item\Tag\TagService;
 use App\Item\ListProviderInterface;
@@ -37,7 +38,7 @@ final readonly class GlossaryListCellProvider implements ListCellProviderInterfa
     }
 
     #[Override]
-    public function renderListCell(int $itemId): ?string
+    public function renderListCell(int $itemId, ?ItemViewType $mode = null): ?string
     {
         $entry = $this->glossaryService->get($itemId);
         if ($entry === null) {
@@ -46,6 +47,7 @@ final readonly class GlossaryListCellProvider implements ListCellProviderInterfa
 
         return $this->twig->render('@Glossary/item/list_cell.html.twig', [
             'entry' => $entry,
+            'viewMode' => $mode?->value,
             'config' => $this->configService->getConfig(),
             'hasTags' => $this->hasTags(),
         ]);

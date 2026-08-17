@@ -8,6 +8,13 @@ enum ItemViewType: string
     case Tiles = 'tiles';
     case Grid = 'grid';
     case Gallery = 'gallery';
+    case Row = 'row';
+
+    /** @return list<self> */
+    public static function switchable(): array
+    {
+        return [self::List, self::Tiles, self::Grid, self::Gallery];
+    }
 
     public function icon(): string
     {
@@ -16,6 +23,7 @@ enum ItemViewType: string
             self::Tiles => 'grip',
             self::Grid => 'table-cells',
             self::Gallery => 'images',
+            self::Row => 'minus',
         };
     }
 
@@ -26,6 +34,7 @@ enum ItemViewType: string
             self::Tiles => 'item.view_tiles',
             self::Grid => 'item.view_grid',
             self::Gallery => 'item.view_gallery',
+            self::Row => 'item.view_row',
         };
     }
 }
