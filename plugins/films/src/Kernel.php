@@ -10,8 +10,14 @@ use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Item\AssociationService;
 use App\ValueObject\LinkCollection;
+use Plugin\Films\Entity\ExternalSource;
+use Plugin\Films\Entity\Settings;
+use Plugin\Films\Repository\SettingsRepository;
 use Plugin\Films\Service\FilmService;
+use Plugin\Films\Service\SettingsService;
+use SensitiveParameter;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Kernel implements Plugin
@@ -22,6 +28,14 @@ class Kernel implements Plugin
         private readonly AssociationService $itemAssociations,
         private readonly EventRepository $eventRepository,
         private readonly UserRepository $userRepository,
+        private readonly SettingsRepository $settingsRepository,
+        private readonly SettingsService $settingsService,
+        #[Autowire('%env(default::TMDB_API_KEY)%')]
+        #[SensitiveParameter]
+        private readonly ?string $tmdbApiKey,
+        #[Autowire('%env(default::OMDB_API_KEY)%')]
+        #[SensitiveParameter]
+        private readonly ?string $omdbApiKey,
     ) {}
 
     public function getPluginKey(): string
@@ -94,7 +108,29 @@ class Kernel implements Plugin
 
     public function preFixtures(OutputInterface $output): void {}
 
-    public function postFixtures(OutputInterface $output): void {}
+    public function postFixtures(OutputInterface $output): void
+    {
+        $tmdbKey = $this->tmdbApiKey ?: null;
+        $omdbKey = $this->omdbApiKey ?: null;
+        if ($tmdbKey === null && $omdbKey === null) {
+            return;
+        }
+
+        $settings = $this->settingsRepository->findGlobal() ?? new Settings();
+        if ($tmdbKey !== null) {
+            $settings->setEncryptedTmdbKey($this->settingsService->encryptKey($tmdbKey));
+            $settings->setAdapter(ExternalSource::Tmdb);
+        }
+        if ($omdbKey !== null) {
+            $settings->setEncryptedOmdbKey($this->settingsService->encryptKey($omdbKey));
+            if ($settings->getAdapter() === null) {
+                $settings->setAdapter(ExternalSource::Omdb);
+            }
+        }
+        $this->settingsService->save($settings);
+
+        $output->writeln('<info>Films: seeded metadata lookup settings from environment keys.</info>');
+    }
 
     public function getFooterAbout(): ?string
     {
