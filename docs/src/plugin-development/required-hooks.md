@@ -290,6 +290,10 @@ public function postFixtures(OutputInterface $output): void
 }
 ```
 
+!!! tip "Re-seeding a developer's API key"
+    A key your plugin stores in the database is gone after every dev reset. Read it back here
+    from the gitignored `.env.local`, which a reset does not touch.
+
 ---
 
 ## Maintenance hook
