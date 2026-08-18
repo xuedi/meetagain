@@ -35,7 +35,7 @@
             <div class="column is-2">
                 {{ form_row(form.published) }}
             </div>
-            <div class="column is-2">
+            <div class="column is-narrow">
                 <div class="buttons has-addons">
                     {% for locale in get_admin_language_codes() %}
                         {% set link = path('app_admin_cms_edit', {'id': cms.id, 'locale': locale}) %}
