@@ -9,6 +9,7 @@ use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EntityAction;
 use App\Repository\CmsBlockRepository;
 use App\Service\Cms\BlockHydrator;
+use App\Service\Cms\RichTextNormalizer;
 use App\Service\Cms\CmsBlockService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -31,7 +32,7 @@ class CmsBlockServiceTest extends TestCase
             }
         };
 
-        return new BlockHydrator($sanitizer);
+        return new BlockHydrator($sanitizer, new RichTextNormalizer());
     }
 
     private function makePage(int $id): Cms

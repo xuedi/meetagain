@@ -13,6 +13,7 @@ readonly class BlockHydrator
 {
     public function __construct(
         private HtmlSanitizerInterface $cmsContent,
+        private RichTextNormalizer $richTextNormalizer,
     ) {}
 
     /**
@@ -42,7 +43,9 @@ readonly class BlockHydrator
             };
 
             if ($field->richText && is_string($resolved[$field->name])) {
-                $resolved[$field->name] = $this->cmsContent->sanitize($resolved[$field->name]);
+                $resolved[$field->name] = $this->richTextNormalizer->toStorage(
+                    $this->cmsContent->sanitize($resolved[$field->name]),
+                );
             }
         }
 
