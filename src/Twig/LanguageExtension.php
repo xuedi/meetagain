@@ -36,6 +36,8 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         private readonly iterable $alternateLinkFilters = [],
         #[AutowireIterator(AlternateLinkProviderInterface::class)]
         private readonly iterable $alternateLinkProviders = [],
+        #[AutowireIterator(SiteNameProviderInterface::class)]
+        private readonly iterable $siteNameProviders = [],
     ) {}
 
     #[Override]
@@ -58,6 +60,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             new TwigFunction('get_admin_language_codes', $this->languageService->getAdminFilteredEnabledCodes(...)),
             new TwigFunction('route_exists', $this->routeExists(...)),
             new TwigFunction('get_canonical_url', $this->getCanonicalUrl(...)),
+            new TwigFunction('get_site_name', $this->getSiteName(...)),
             new TwigFunction('get_meta_description', $this->getMetaDescription(...)),
             new TwigFunction('get_organization_schema', $this->getOrganizationSchema(...), ['is_safe' => ['html']]),
         ];
@@ -158,6 +161,18 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
             'members' => 'Meet the members of this community.',
             default => 'A community platform for local events and meetups.',
         };
+    }
+
+    public function getSiteName(): string
+    {
+        foreach ($this->siteNameProviders as $provider) {
+            $value = $provider->getSiteName();
+            if ($value !== null && $value !== '') {
+                return $value;
+            }
+        }
+
+        return $this->configService->getSiteName();
     }
 
     public function getCanonicalUrl(): string

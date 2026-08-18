@@ -21,7 +21,7 @@
     <meta property="og:description" content="{% block og_description %}{{ block('meta_description') }}{% endblock %}">
     <meta property="og:url" content="{{ get_canonical_url() }}">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
-    <meta property="og:site_name" content="MeetAgain">
+    <meta property="og:site_name" content="{{ get_site_name() }}">
     {% set ogImage = get_og_image() %}
     {% block og_image %}{% if ogImage %}<meta property="og:image" content="{{ ogImage.absoluteUrl }}">
     <meta property="og:image:width" content="{{ ogImage.width }}">
