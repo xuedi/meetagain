@@ -7,7 +7,7 @@
     <div class="column is-4-tablet is-12-mobile">
         {% if book.coverImage %}
         <figure class="image" style="border: 1px solid #e0e0e0">
-            {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '400x500', 'alt': book.title} %}
+            {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '400x600', 'alt': book.title} %}
         </figure>
         {% else %}
         <figure class="image is-2by3">

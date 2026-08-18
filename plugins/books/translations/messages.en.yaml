@@ -22,7 +22,7 @@ books_book:
     confirm_delete: 'Delete this book?'
     link_manual_entry: 'Add manually instead'
     list_empty: 'No books yet.'
-    sidebar_info: 'Every book the club has read or put on the shelf, newest first.'
+    sidebar_info: 'Every book the club has read or put on the shelf, listed by title.'
     no_cover: 'No cover available'
     field_isbn: 'ISBN'
     field_isbn_placeholder: 'e.g. 978-0143105428'

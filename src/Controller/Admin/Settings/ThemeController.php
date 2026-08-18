@@ -52,6 +52,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
         ['key' => 'tooltips', 'partial' => 'tooltips_titles', 'category' => 'general'],
         ['key' => 'comp_image', 'partial' => 'comp_image', 'category' => 'general'],
         ['key' => 'comp_toggle', 'partial' => 'comp_toggle', 'category' => 'general'],
+        ['key' => 'comp_approve_deny', 'partial' => 'comp_approve_deny', 'category' => 'general'],
         ['key' => 'admin_top_infobar', 'partial' => 'admin_top_infobar', 'category' => 'admin'],
         ['key' => 'admin_list', 'partial' => 'admin_list', 'category' => 'admin'],
         ['key' => 'tags_status', 'partial' => 'tags_status', 'category' => 'admin'],

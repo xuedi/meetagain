@@ -22,7 +22,7 @@ books_book:
     confirm_delete: '¿Eliminar este libro?'
     link_manual_entry: 'Añadir manualmente en su lugar'
     list_empty: 'Todavía no hay libros.'
-    sidebar_info: 'Todos los libros que el club ha leído o ha puesto en la estantería, los más recientes primero.'
+    sidebar_info: 'Todos los libros que el club ha leído o ha puesto en la estantería, ordenados por título.'
     no_cover: 'No hay portada disponible'
     field_isbn: 'ISBN'
     field_isbn_placeholder: 'p. ej. 978-0143105428'

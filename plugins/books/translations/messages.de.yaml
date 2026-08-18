@@ -22,7 +22,7 @@ books_book:
     confirm_delete: 'Dieses Buch löschen?'
     link_manual_entry: 'Stattdessen manuell hinzufügen'
     list_empty: 'Noch keine Bücher.'
-    sidebar_info: 'Alle Bücher, die der Club gelesen oder ins Regal gestellt hat, neueste zuerst.'
+    sidebar_info: 'Alle Bücher, die der Club gelesen oder ins Regal gestellt hat, nach Titel sortiert.'
     no_cover: 'Kein Cover verfügbar'
     field_isbn: 'ISBN'
     field_isbn_placeholder: 'z. B. 978-0143105428'

@@ -3,29 +3,38 @@
 {% block title %}{{ 'voting_poll.page_title_vote'|trans }}{% endblock %}
 
 {% block voting_body %}
-<h1 class="title">{{ 'voting_poll.page_title_vote'|trans }}</h1>
+<div class="poll-ballot">
 
-<p class="has-text-grey mb-4">
-    {{ 'voting_poll.poll_closes_on'|trans({'%date%': poll.endDate|date('Y-m-d')}) }}
-</p>
+    <h1 class="title has-text-centered">{{ 'voting_poll.page_title_vote'|trans }}</h1>
 
-<form method="POST" action="{{ path('app_voting_poll_vote', {id: poll.id}) }}">
-    <input type="hidden" name="_token" value="{{ csrf_token('voting_poll_vote' ~ poll.id) }}">
+    <p class="has-text-grey has-text-centered mb-5">
+        {{ 'voting_poll.poll_closes_on'|trans({'%date%': poll.endDate|date('Y-m-d')}) }}
+    </p>
 
-    <div class="poll-options">
-        {% for itemId in poll.optionItemIds %}
-            <label class="poll-option">
-                <input type="{{ singleChoice ? 'radio' : 'checkbox' }}" name="items[]" value="{{ itemId }}"
-                       class="poll-option__input" {{ itemId in userVotedItemIds ? 'checked' : '' }}>
-                <span class="poll-option__card">{{ item_list_cell(poll.itemType, itemId, 'tiles') }}</span>
-                <span class="poll-option__overlay" aria-hidden="true">
-                    <span class="icon is-large"><i class="fa-solid fa-circle-check fa-3x"></i></span>
-                </span>
-            </label>
-        {% endfor %}
-    </div>
+    <form method="POST" action="{{ path('app_voting_poll_vote', {id: poll.id}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('voting_poll_vote' ~ poll.id) }}">
 
-    <button type="submit" class="button is-primary">{{ 'voting_poll.button_cast_votes'|trans }}</button>
-    <a href="{{ path('app_voting_poll_show', {id: poll.id}) }}" class="button ml-2">{{ 'voting_poll.button_view_results'|trans }}</a>
-</form>
+        <div class="poll-options">
+            {% for itemId in poll.optionItemIds %}
+                {% set cell = item_list_cell(poll.itemType, itemId, 'tiles') %}
+                {% if cell is not empty %}
+                    <label class="poll-option">
+                        <input type="{{ singleChoice ? 'radio' : 'checkbox' }}" name="items[]" value="{{ itemId }}"
+                               class="poll-option__input" {{ itemId in userVotedItemIds ? 'checked' : '' }}>
+                        <span class="poll-option__card">{{ cell|raw }}</span>
+                        <span class="poll-option__overlay" aria-hidden="true">
+                            <span class="icon is-large"><i class="fa-solid fa-circle-check fa-3x"></i></span>
+                        </span>
+                    </label>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="buttons is-centered mt-5">
+            <button type="submit" class="button is-primary">{{ 'voting_poll.button_cast_votes'|trans }}</button>
+            <a href="{{ path('app_voting_poll_show', {id: poll.id}) }}" class="button">{{ 'voting_poll.button_view_results'|trans }}</a>
+        </div>
+    </form>
+
+</div>
 {% endblock %}

@@ -43,7 +43,7 @@ readonly class OpenLibraryIsbnLookup implements IsbnLookupInterface
                 title: $bookInfo['title'] ?? '',
                 author: $this->extractAuthors($bookInfo),
                 description: $this->extractDescription($bookInfo),
-                pageCount: $bookInfo['number_of_pages'] ?? null,
+                pageCount: $this->extractPageCount($bookInfo),
                 publishedYear: $this->extractYear($bookInfo),
                 coverUrl: $this->getCoverUrl($isbn),
             );
@@ -82,6 +82,20 @@ readonly class OpenLibraryIsbnLookup implements IsbnLookupInterface
         return null;
     }
 
+    private function extractPageCount(array $data): ?int
+    {
+        if (isset($data['number_of_pages']) && is_numeric($data['number_of_pages'])) {
+            return (int) $data['number_of_pages'];
+        }
+
+        $matches = [];
+        if (isset($data['pagination']) && is_string($data['pagination']) && preg_match('/\d+/', $data['pagination'], $matches)) {
+            return (int) $matches[0];
+        }
+
+        return null;
+    }
+
     private function extractYear(array $data): ?int
     {
         if (!isset($data['publish_date'])) {
@@ -98,6 +112,6 @@ readonly class OpenLibraryIsbnLookup implements IsbnLookupInterface
 
     private function getCoverUrl(string $isbn): string
     {
-        return self::COVERS_URL . $isbn . '-L.jpg';
+        return self::COVERS_URL . $isbn . '-L.jpg?default=false';
     }
 }

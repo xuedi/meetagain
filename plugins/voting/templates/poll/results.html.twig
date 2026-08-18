@@ -14,8 +14,8 @@
 </p>
 
 {% if poll.winningItemId %}
-<div class="notification">
-    <p class="mb-2"><strong>{{ 'voting_poll.winner_label'|trans }}</strong></p>
+<div class="poll-winner">
+    <p class="poll-winner__label">{{ 'voting_poll.winner_label'|trans }}</p>
     {{ item_list_cell(poll.itemType, poll.winningItemId, 'row') }}
 </div>
 {% elseif poll.status.value != 1 and poll.tiedItemIds is not empty %}
@@ -31,7 +31,7 @@
 
 {% set maxVotes = voteCounts is not empty ? max(voteCounts) : 0 %}
 
-<table class="table is-fullwidth">
+<table class="table is-fullwidth poll-table">
     <thead>
         <tr>
             <th>{{ 'voting_poll.col_candidate'|trans }}</th>
@@ -42,17 +42,17 @@
     <tbody>
         {% for itemId in poll.optionItemIds %}
         {% set voteCount = voteCounts[itemId] ?? 0 %}
-        <tr{% if poll.winningItemId == itemId %} style="font-weight: bold"{% endif %}>
+        <tr{% if poll.winningItemId == itemId %} class="is-winning-row"{% endif %}>
             <td>
                 {{ item_list_cell(poll.itemType, itemId, 'row') }}
                 {% if itemId in userVotedItemIds %}
                 <span class="tag is-light ml-1">{{ 'voting_poll.your_vote'|trans }}</span>
                 {% endif %}
             </td>
-            <td>{{ voteCount }}</td>
-            <td>
+            <td class="poll-table__tight has-text-weight-semibold">{{ voteCount }}</td>
+            <td class="poll-table__bar">
                 {% if maxVotes > 0 %}
-                <progress class="progress" value="{{ voteCount }}" max="{{ maxVotes }}" style="background: #e8e8e8; color: #555"></progress>
+                <progress class="progress is-primary" value="{{ voteCount }}" max="{{ maxVotes }}"></progress>
                 {% endif %}
             </td>
         </tr>

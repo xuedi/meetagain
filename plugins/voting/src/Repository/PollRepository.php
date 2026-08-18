@@ -90,4 +90,26 @@ class PollRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * @param list<int> $eventIds
+     *
+     * @return list<int>
+     */
+    public function findIdsForEvents(array $eventIds): array
+    {
+        if ($eventIds === []) {
+            return [];
+        }
+
+        $rows = $this
+            ->createQueryBuilder('p')
+            ->select('p.id')
+            ->where('p.event IN (:eventIds)')
+            ->setParameter('eventIds', $eventIds)
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_map(static fn(array $row): int => (int) $row['id'], $rows);
+    }
 }

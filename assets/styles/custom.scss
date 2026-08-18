@@ -606,6 +606,65 @@ body.admin-shell-no-scroll {
     border-radius: 6px;
 }
 
+// Poster/cover tile: crop to the requested thumbnail ratio so a row of tiles aligns, and give
+// every card the same height so the titles sit on one baseline.
+.item-portrait {
+    height: 100%;
+
+    .card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    &__media {
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+// A flat tag vocabulary is a handful of short labels, so it reads as a row of chips rather than a
+// column of bare checkboxes. The tree variant keeps its own indented column layout.
+.item-tag-choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    .checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        border: 1px solid #dfe3ea;
+        border-radius: 999px;
+        padding: 0.3rem 0.85rem;
+        line-height: 1.2;
+        background: #fff;
+        transition: border-color 120ms ease-out, background-color 120ms ease-out;
+
+        &:hover {
+            border-color: hsl(171deg 100% 29%);
+            background: hsl(171deg 100% 29% / 6%);
+        }
+
+        &:has(input:checked) {
+            border-color: hsl(171deg 100% 29%);
+            background: hsl(171deg 100% 29% / 10%);
+            font-weight: 600;
+        }
+    }
+}
+
 // One item named inline, outside an item list (poll winner, wishlist entry).
 .item-row {
     display: inline-flex;

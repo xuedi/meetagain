@@ -11,15 +11,68 @@
     white-space: nowrap;
 }
 
+/* The bar column is fixed so the bars form one readable axis instead of drifting with the
+   widest candidate name. */
+.poll-table__bar {
+    width: 14rem;
+}
+
+.poll-table__bar .progress {
+    margin-bottom: 0;
+}
+
+.poll-table .is-winning-row {
+    background-color: hsl(171deg 100% 29% / 7%);
+    font-weight: 600;
+}
+
+/* The result of a closed poll is the point of the page, so it gets stated rather than tucked
+   into a grey notification. */
+.poll-winner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    border: 1px solid hsl(171deg 100% 29% / 35%);
+    border-left: 4px solid hsl(171deg 100% 29%);
+    border-radius: 8px;
+    background: hsl(171deg 100% 29% / 6%);
+    padding: 1.1rem 1.35rem;
+    margin-bottom: 2rem;
+}
+
+.poll-winner__label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: hsl(171deg 100% 24%);
+}
+
+.poll-winner .item-row__thumb {
+    width: 3.25rem;
+}
+
+.poll-winner .item-row__title {
+    font-size: 1.35rem;
+    font-weight: 600;
+}
+
 /* Poll options: item cards act as the selection control, so the native input is hidden and the
    card itself carries the checked state. A fixed track width keeps the ballot readable at any
    option count, rather than stretching a few posters across the full row. */
 
+/* A ballot is a form, not a page: constraining it keeps a three-option poll from drifting in a
+   full-width column, and a sixteen-option poll still wraps into a tidy block. */
+.poll-ballot {
+    max-width: 46rem;
+    margin: 0 auto;
+}
+
 .poll-options {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(8.75rem, 1fr));
+    justify-content: center;
     gap: 1.25rem;
-    margin-bottom: 1.5rem;
 }
 
 .poll-option {

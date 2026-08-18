@@ -194,13 +194,16 @@ readonly class ImageService
         ));
     }
 
-    public function regenerateAllThumbnails(): int
+    public function regenerateAllThumbnails(?ImageType $only = null): int
     {
         $typesByImageId = $this->imageLocationRepo->findTypesPerImageId();
 
         $cnt = 0;
         foreach ($this->imageRepo->findAll() as $image) {
             foreach ($this->usedTypes($image, $typesByImageId) as $type) {
+                if ($only !== null && $type !== $only) {
+                    continue;
+                }
                 $cnt += $this->createThumbnails($image, $type);
             }
         }

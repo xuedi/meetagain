@@ -100,8 +100,8 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
         $proposal->setTargetId((int) $entry->getId());
         $proposal->setProposedBy($member);
         $proposal->setChanges([
-            new FieldChange(GlossaryChangeTarget::FIELD_EXPLANATION, $entry->getExplanation(), 'go away (very rude)'),
-            new FieldChange(GlossaryChangeTarget::FIELD_TAG, (string) $tags[1]->getId(), (string) $tags[3]->getId()),
+            new FieldChange(GlossaryChangeTarget::FIELD_EXPLANATION, $entry->getExplanation(), 'Hello. The everyday greeting - say 您好 to someone older or senior.'),
+            new FieldChange(GlossaryChangeTarget::FIELD_TAG, (string) $tags[0]->getId(), (string) $tags[5]->getId()),
         ]);
         $manager->persist($proposal);
         $manager->flush();
@@ -128,10 +128,18 @@ class GlossaryFixture extends AbstractFixture implements FixtureGroupInterface
     private function getData(): array
     {
         return [
-            ['草泥马',     'cǎo ní mǎ',     'fuck off',                                                                  1, 1, true],
-            ['干嘛',       'gàn má',        'how is it going?',                                                          0, 2, true],
-            ['你吃了吗？', 'nǐ chī le ma?', 'have you heating?',                                                         0, 2, true],
-            ['你好',       'nĭ hăo',        'hello nobody uses anymore, you can use when seeing your ex after 10 years', 0, 2, false],
+            ['你好',       'nǐ hǎo',        'Hello - the standard greeting, safe in any situation.',                 0, 2, true],
+            ['您好',       'nín hǎo',       'Hello, polite form. Use with elders, teachers and strangers.',          0, 2, true],
+            ['早上好',     'zǎo shang hǎo', 'Good morning.',                                                         0, 2, true],
+            ['干嘛',       'gàn má',        'What are you up to? Casual, between friends.',                          0, 2, true],
+            ['你吃了吗？', 'nǐ chī le ma?', 'Have you eaten? Used as a friendly greeting, not a real question.',      6, 2, true],
+            ['马马虎虎',   'mǎ ma hū hū',   'So-so, nothing special. Literally "horse horse tiger tiger".',           6, 1, true],
+            ['加油',       'jiā yóu',       'Keep going, you can do it. Shouted at races and exams alike.',           6, 2, true],
+            ['随便',       'suí biàn',      'Whatever you like, up to you. Common when nobody wants to choose.',      3, 1, true],
+            ['靠',         'kào',           'Damn. Mild but impolite - not for the office.',                         1, 1, true],
+            ['没事',       'méi shì',       'No problem / never mind. Answer to an apology or a thank you.',          5, 2, true],
+            ['不好意思',   'bù hǎo yì si',  'Sorry / excuse me. Softer than a formal apology.',                       5, 2, true],
+            ['厉害',       'lì hai',        'Impressive, formidable. A compliment about skill.',                      3, 2, false],
         ];
     }
 

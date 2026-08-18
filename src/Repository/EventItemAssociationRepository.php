@@ -52,4 +52,20 @@ class EventItemAssociationRepository extends ServiceEntityRepository
 
         return array_values(array_map(static fn($id): int => (int) $id, $ids));
     }
+
+    /** @return list<int> event ids carrying this item type, richest first */
+    public function findEventIdsByType(string $itemType): array
+    {
+        $rows = $this
+            ->createQueryBuilder('a')
+            ->select('IDENTITY(a.event) AS eventId, COUNT(a.id) AS total')
+            ->where('a.itemType = :type')
+            ->setParameter('type', $itemType)
+            ->groupBy('a.event')
+            ->orderBy('total', 'DESC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_values(array_map(static fn(array $row): int => (int) $row['eventId'], $rows));
+    }
 }

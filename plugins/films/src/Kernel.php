@@ -9,6 +9,7 @@ use App\Plugin;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Item\AssociationService;
+use App\Service\Item\SeedEventScope;
 use App\ValueObject\LinkCollection;
 use Plugin\Films\Entity\ExternalSource;
 use Plugin\Films\Entity\Settings;
@@ -29,6 +30,7 @@ class Kernel implements Plugin
         private readonly AssociationService $itemAssociations,
         private readonly EventRepository $eventRepository,
         private readonly UserRepository $userRepository,
+        private readonly SeedEventScope $seedEventScope,
         private readonly SettingsRepository $settingsRepository,
         private readonly SettingsService $settingsService,
         private readonly FixturePosterService $fixturePosterService,
@@ -103,9 +105,9 @@ class Kernel implements Plugin
             $created[] = $film;
         }
 
-        $events = $this->eventRepository->getPastEvents(6);
+        $events = $this->seedEventScope->filter($this->eventRepository->getPastEvents(6), $this->getPluginKey());
         if ($events === []) {
-            $events = $this->eventRepository->getUpcomingEvents(6);
+            $events = $this->seedEventScope->filter($this->eventRepository->getUpcomingEvents(6), $this->getPluginKey());
         }
         $attached = 0;
         foreach ($created as $index => $film) {

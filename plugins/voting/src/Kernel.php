@@ -2,6 +2,7 @@
 
 namespace Plugin\Voting;
 
+use App\Entity\Event;
 use App\Entity\Link;
 use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
@@ -10,6 +11,7 @@ use App\Repository\EventItemAssociationRepository;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\ValueObject\LinkCollection;
+use Plugin\Voting\Repository\PollRepository;
 use Plugin\Voting\Service\PollService;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -19,6 +21,7 @@ class Kernel implements Plugin
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly PollService $pollService,
+        private readonly PollRepository $pollRepository,
         private readonly EventRepository $eventRepository,
         private readonly EventItemAssociationRepository $associations,
         private readonly UserRepository $userRepository,
@@ -43,15 +46,8 @@ class Kernel implements Plugin
 
     public function loadPostExtendFixtures(OutputInterface $output): void
     {
-        if ($this->pollService->getActivePolls() !== [] || $this->pollService->getClosedPolls() !== []) {
+        if ($this->pollRepository->count([]) > 0) {
             $output->writeln('<comment>Voting: already seeded, skipping.</comment>');
-
-            return;
-        }
-
-        [$itemType, $itemIds] = $this->richestSeededItemType();
-        if (count($itemIds) < 2) {
-            $output->writeln('<comment>Voting: no seeded items to vote on, skipping.</comment>');
 
             return;
         }
@@ -65,46 +61,74 @@ class Kernel implements Plugin
         $adminId = (int) $admin->getId();
         $voterIds = $this->voterIds(8);
 
-        $candidates = array_slice($itemIds, 0, 5);
+        $seeded = [];
+        foreach (['film', 'book', 'dish'] as $itemType) {
+            $itemIds = $this->associations->findItemIdsByType($itemType);
+            if (count($itemIds) < 2) {
+                continue;
+            }
 
-        $pastEvents = $this->eventRepository->getPastEvents(1);
-        if ($pastEvents !== []) {
-            $poll = $this->pollService->create($pastEvents[0], $itemType, $candidates, 7, $adminId);
-            foreach ($voterIds as $i => $voterId) {
-                $this->pollService->castVote($voterId, $poll, [$candidates[$i % count($candidates)]]);
+            $candidates = array_slice($itemIds, 0, 5);
+            $events = $this->eventsCarrying($itemType);
+            if ($events === []) {
+                continue;
             }
-            $closure = $this->pollService->close($poll);
-            if ($closure->isTie()) {
-                $this->pollService->commitOutcome($poll, $closure->tiedItemIds[0]);
-            }
+
+            $this->seedClosedPoll($events[0], $itemType, $candidates, $adminId, $voterIds);
+            $this->seedOpenPoll($events[0], $itemType, $candidates, $adminId, $voterIds);
+
+            $seeded[] = $itemType;
         }
 
-        $nextEventId = $this->eventRepository->getNextEventId();
-        $nextEvent = $nextEventId !== null ? $this->eventRepository->find($nextEventId) : null;
-        if ($nextEvent !== null) {
-            $poll = $this->pollService->create($nextEvent, $itemType, $candidates, 7, $adminId);
-            foreach (array_slice($voterIds, 0, 3) as $i => $voterId) {
-                $this->pollService->castVote($voterId, $poll, [$candidates[$i % count($candidates)]]);
-            }
+        if ($seeded === []) {
+            $output->writeln('<comment>Voting: no seeded items to vote on, skipping.</comment>');
+
+            return;
         }
 
-        $output->writeln(sprintf('<info>Voting: seeded polls over %s items.</info>', $itemType));
+        $output->writeln(sprintf('<info>Voting: seeded polls over %s items.</info>', implode(', ', $seeded)));
     }
 
     /**
-     * @return array{0: string, 1: list<int>} the item type with the most events-attached items, and its ids
+     * @param list<int> $candidates
+     * @param list<int> $voterIds
      */
-    private function richestSeededItemType(): array
+    private function seedClosedPoll(Event $event, string $itemType, array $candidates, int $adminId, array $voterIds): void
     {
-        $best = ['film', []];
-        foreach (['film', 'book', 'dish'] as $itemType) {
-            $ids = $this->associations->findItemIdsByType($itemType);
-            if (count($ids) > count($best[1])) {
-                $best = [$itemType, $ids];
+        $poll = $this->pollService->create($event, $itemType, $candidates, 7, $adminId);
+        foreach ($voterIds as $i => $voterId) {
+            $this->pollService->castVote($voterId, $poll, [$candidates[$i % count($candidates)]]);
+        }
+        $closure = $this->pollService->close($poll);
+        if ($closure->isTie()) {
+            $this->pollService->commitOutcome($poll, $closure->tiedItemIds[0]);
+        }
+    }
+
+    /**
+     * @param list<int> $candidates
+     * @param list<int> $voterIds
+     */
+    private function seedOpenPoll(Event $event, string $itemType, array $candidates, int $adminId, array $voterIds): void
+    {
+        $poll = $this->pollService->create($event, $itemType, $candidates, 7, $adminId);
+        foreach (array_slice($voterIds, 0, 3) as $i => $voterId) {
+            $this->pollService->castVote($voterId, $poll, [$candidates[$i % count($candidates)]]);
+        }
+    }
+
+    /** @return list<Event> */
+    private function eventsCarrying(string $itemType): array
+    {
+        $events = [];
+        foreach ($this->associations->findEventIdsByType($itemType) as $eventId) {
+            $event = $this->eventRepository->find($eventId);
+            if ($event !== null) {
+                $events[] = $event;
             }
         }
 
-        return $best;
+        return $events;
     }
 
     /** @return list<int> */

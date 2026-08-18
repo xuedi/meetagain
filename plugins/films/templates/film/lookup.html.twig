@@ -15,7 +15,7 @@
             {{ form_widget(form.year, {'attr': {'class': 'input'}}) }}
         </div>
         <div class="control">
-            <button type="submit" class="button">{{ 'films_film.button_search'|trans }}</button>
+            {{ form_widget(form.search, {'attr': {'class': 'button is-primary'}}) }}
         </div>
     </div>
     {{ form_end(form) }}
