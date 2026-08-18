@@ -55,7 +55,7 @@ class LanguageExtensionTest extends TestCase
     {
         $functions = $this->subject->getFunctions();
 
-        static::assertCount(10, $functions);
+        static::assertCount(11, $functions);
 
         $functionNames = array_map(static fn($f) => $f->getName(), $functions);
         static::assertContains('get_hreflang_code', $functionNames);
@@ -68,6 +68,7 @@ class LanguageExtensionTest extends TestCase
         static::assertContains('get_canonical_url', $functionNames);
         static::assertContains('get_meta_description', $functionNames);
         static::assertContains('get_organization_schema', $functionNames);
+        static::assertContains('get_site_name', $functionNames);
     }
 
     public function testGetCurrentLocaleReturnsRequestLocale(): void
