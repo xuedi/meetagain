@@ -95,11 +95,11 @@
                         {{ form_start(form) }}
                         {% for flash_error in app.flashes('error') %}
                             <div class="notification is-danger">
-                                <button class="delete"></button>{{ flash_error }}</div>
+                                <button class="delete"></button>{{ flash_error|trans }}</div>
                         {% endfor %}
                         {% for flash_success in app.flashes('success') %}
                             <div class="notification is-success">
-                                <button class="delete"></button>{{ flash_success }}</div>
+                                <button class="delete"></button>{{ flash_success|trans }}</div>
                         {% endfor %}
                         {{ form_errors(form) }}
 

@@ -7,10 +7,10 @@
     <h1 class="title">{{ 'profile_review.page_title'|trans }}</h1>
 
     {% for flash in app.flashes('success') %}
-        <div class="notification is-success">{{ flash }}</div>
+        <div class="notification is-success">{{ flash|trans }}</div>
     {% endfor %}
     {% for flash in app.flashes('error') %}
-        <div class="notification is-danger">{{ flash }}</div>
+        <div class="notification is-danger">{{ flash|trans }}</div>
     {% endfor %}
 
     {% if providers is empty %}
