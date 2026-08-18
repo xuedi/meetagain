@@ -21,7 +21,7 @@
             {% if book.coverImage %}
                 <p class="has-text-grey-light is-size-7 mb-2">{{ 'books_book.current_cover_label'|trans }}</p>
                 <figure class="image mb-3">
-                    {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x250', 'alt': book.title} %}
+                    {% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x300', 'alt': book.title} %}
                 </figure>
             {% else %}
                 <p class="has-text-grey-light is-size-7 mb-2">{{ 'books_book.no_cover'|trans }}</p>

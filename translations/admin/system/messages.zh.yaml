@@ -222,6 +222,8 @@ admin_system_gallery:
     section_comp_image_caption: '带尺寸选择和占位回退的缩略图渲染器。'
     section_comp_toggle_title: 'Toggle 组件'
     section_comp_toggle_caption: '布尔设置使用的 是/否 按钮对；展示开/关变体。'
+    section_comp_approve_deny_title: '批准/拒绝 组件'
+    section_comp_approve_deny_caption: '用于单个待处理条目的接受/拒绝连体按钮；提供小号与常规尺寸，以及垃圾桶拒绝变体。'
     section_admin_top_infobar_title: 'AdminTop 顶栏'
     section_admin_top_infobar_caption: '每个后台页面顶部的标签条 + 顶栏；列表与详情两种变体。'
     section_admin_list_title: '后台列表表格'

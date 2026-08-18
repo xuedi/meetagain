@@ -1,0 +1,33 @@
+{#
+    Gallery: Approve/Deny component -- accept or reject one pending thing
+
+    Source: templates/_components/approve_deny.html.twig.
+    Default and large sizes, plus the trash-icon deny variant used by glossary approval.
+
+    Used in:    admin/system/theme/gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/approve_deny.html.twig
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/approve_deny.html.twig</code>
+</p>
+
+<div class="mt-3">
+    <p class="heading">default (is-small)</p>
+    {% include '_components/approve_deny.html.twig' with {
+        approveUrl: '#',
+        denyUrl: '#',
+        csrfToken: 'gallery_demo',
+    } only %}
+</div>
+<div class="mt-3">
+    <p class="heading">full size, trash deny icon</p>
+    {% include '_components/approve_deny.html.twig' with {
+        approveUrl: '#',
+        denyUrl: '#',
+        csrfToken: 'gallery_demo',
+        denyIcon: 'fa-trash',
+        size: '',
+    } only %}
+</div>

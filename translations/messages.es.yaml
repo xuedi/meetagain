@@ -670,6 +670,7 @@ item:
     view_tiles: 'Mosaicos'
     view_grid: 'Cuadrícula'
     view_gallery: 'Galería'
+    view_row: 'Fila'
     gallery_prev: 'Imagen anterior'
     gallery_next: 'Imagen siguiente'
     gallery_report_caption: 'Puedes <a href="%url%">reportar</a> una imagen si hay algo que no va bien.'

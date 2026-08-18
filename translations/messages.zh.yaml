@@ -660,6 +660,7 @@ item:
     view_tiles: '磁贴'
     view_grid: '网格'
     view_gallery: '画廊'
+    view_row: '行'
     gallery_prev: '上一张'
     gallery_next: '下一张'
     gallery_report_caption: '如果有问题，你可以 <a href="%url%">举报</a> 图片。'

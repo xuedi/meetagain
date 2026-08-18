@@ -27,7 +27,7 @@
         <div class="box mb-2">
             <label class="checkbox" style="display: flex; align-items: center; gap: 1rem; cursor: pointer">
                 <input type="checkbox" name="items[]" value="{{ itemId }}" checked>
-                <div>{{ item_list_cell(itemType, itemId) }}</div>
+                <div>{{ item_list_cell(itemType, itemId, 'row') }}</div>
             </label>
         </div>
         {% endfor %}

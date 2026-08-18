@@ -26,7 +26,7 @@ final class BookCoverImageTypeDefinition extends AbstractImageTypeDefinition
 
     protected function sizes(): array
     {
-        return [[self::FREE_AXIS, 800], [400, 500], [350, 438], [200, 250]];
+        return [[self::FREE_AXIS, 800], [400, 600], [350, 525], [200, 300], [100, 150]];
     }
 
     public function getEditLink(int $locationId): ?array

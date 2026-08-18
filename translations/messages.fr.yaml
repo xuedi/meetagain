@@ -670,6 +670,7 @@ item:
     view_tiles: 'Tuiles'
     view_grid: 'Grille'
     view_gallery: 'Galerie'
+    view_row: 'Ligne'
     gallery_prev: 'Image précédente'
     gallery_next: 'Image suivante'
     gallery_report_caption: 'Tu peux <a href="%url%">signaler</a> une image si quelque chose ne va pas.'

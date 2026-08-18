@@ -11,6 +11,7 @@ use Plugin\Voting\Entity\Poll;
 use Plugin\Voting\Entity\PollOption;
 use Plugin\Voting\Entity\PollStatus;
 use Plugin\Voting\Entity\Vote;
+use Plugin\Voting\Filter\PollFilterService;
 use Plugin\Voting\Repository\PollRepository;
 use Plugin\Voting\Repository\VoteRepository;
 use Plugin\Voting\ValueObject\PollClosure;
@@ -28,6 +29,7 @@ readonly class PollService
         private VoteRepository $voteRepo,
         private AssociationService $itemAssociations,
         private ConfigService $config,
+        private PollFilterService $pollFilter,
         #[AutowireIterator(CandidateProviderInterface::class)]
         private iterable $candidateProviders,
     ) {}
@@ -162,17 +164,21 @@ readonly class PollService
     /** @return Poll[] */
     public function getActivePolls(): array
     {
-        return $this->pollRepo->findActive();
+        return $this->pollRepo->findActive($this->pollFilter->getAllowedPollIds());
     }
 
     /** @return Poll[] */
     public function getClosedPolls(): array
     {
-        return $this->pollRepo->findClosed();
+        return $this->pollRepo->findClosed($this->pollFilter->getAllowedPollIds());
     }
 
     public function get(int $id): ?Poll
     {
+        if (!$this->pollFilter->isAllowed($id)) {
+            return null;
+        }
+
         return $this->pollRepo->find($id);
     }
 

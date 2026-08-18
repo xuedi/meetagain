@@ -22,7 +22,7 @@ books_book:
     confirm_delete: '删除这本书？'
     link_manual_entry: '改为手动添加'
     list_empty: '暂无书籍。'
-    sidebar_info: '俱乐部读过或已上架的全部书籍，最新的排在前面。'
+    sidebar_info: '俱乐部读过或已上架的全部书籍，按标题排序。'
     no_cover: '暂无封面'
     field_isbn: 'ISBN'
     field_isbn_placeholder: '例如 978-0143105428'

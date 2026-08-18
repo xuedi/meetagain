@@ -1,16 +1,18 @@
 {# Book cell rendered by the shared item-list component (core wraps it in the chosen layout). #}
-{% set mode = item_view_mode('book').value %}
+{% set mode = viewMode ?? item_view_mode('book').value %}
 {% set showUrl = path('app_plugin_books_book_show', {id: book.id}) %}
 
 {% if mode == 'list' %}
     <td style="vertical-align: middle;">
-        <a href="{{ showUrl }}"><figure class="image" style="width: 48px;">{% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x250', 'alt': book.title} %}</figure></a>
+        <a href="{{ showUrl }}"><figure class="image" style="width: 48px;">{% include '_components/image.html.twig' with {'image': book.coverImage, 'size': '200x300', 'alt': book.title} %}</figure></a>
     </td>
     <td style="vertical-align: middle;">
         <a href="{{ showUrl }}" class="has-text-weight-medium">{{ book.title }}</a>
         {% include '_components/item/tag_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
     </td>
     <td style="vertical-align: middle;" class="has-text-grey">{{ book.author }}</td>
+    <td style="vertical-align: middle;" class="has-text-grey">{{ book.publishedYear }}</td>
+    <td style="vertical-align: middle;" class="has-text-grey">{{ book.pageCount ? book.pageCount ~ ' p.' : '' }}</td>
     <td style="vertical-align: middle;" class="has-text-right">
         {% if is_granted('ROLE_STEWARD') %}
             <a href="{{ path('app_plugin_books_book_edit', {'id': book.id}) }}" title="{{ 'books_book.button_edit'|trans }}">
@@ -18,11 +20,19 @@
             </a>
         {% endif %}
     </td>
+{% elseif mode == 'row' %}
+    {% include '_components/item/styles/row.html.twig' with {
+        href: showUrl,
+        image: book.coverImage,
+        imageSize: '100x150',
+        title: book.title,
+        subtitle: book.author
+    } %}
 {% elseif mode == 'grid' %}
     {% include '_components/item/styles/thumb.html.twig' with {
         href: showUrl,
         image: book.coverImage,
-        imageSize: '200x250',
+        imageSize: '200x300',
         alt: book.title,
         ratio: 'portrait'
     } %}
@@ -30,7 +40,7 @@
     {% include '_components/item/styles/slide.html.twig' with {
         group: 'item-gallery-book',
         image: book.coverImage,
-        thumbSize: '200x250',
+        thumbSize: '200x300',
         title: book.title,
         subtitle: book.author,
         href: showUrl
@@ -39,7 +49,7 @@
     {% include '_components/item/styles/portrait.html.twig' with {
         href: showUrl,
         image: book.coverImage,
-        imageSize: '200x250',
+        imageSize: '200x300',
         title: book.title,
         subtitle: book.author
     } %}

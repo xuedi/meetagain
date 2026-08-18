@@ -222,6 +222,8 @@ admin_system_gallery:
     section_comp_image_caption: 'Renderizador de miniaturas con selección de tamaño y marcador de posición de respaldo.'
     section_comp_toggle_title: 'Componente de alternancia'
     section_comp_toggle_caption: 'Par de botones Sí/No para ajustes booleanos; se muestran las variantes on/off.'
+    section_comp_approve_deny_title: 'Componente aprobar/denegar'
+    section_comp_approve_deny_caption: 'Par unido de aceptar y rechazar para un elemento pendiente; tamaño pequeño y completo, con la variante de papelera.'
     section_admin_top_infobar_title: 'Barra de información AdminTop'
     section_admin_top_infobar_caption: 'Tira de pestañas + barra de información superior mostrada en cada página de administración; variantes de lista y detalle.'
     section_admin_list_title: 'Tabla de lista de administración'

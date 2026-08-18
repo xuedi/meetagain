@@ -34,16 +34,16 @@ final class ItemViewExtension extends AbstractExtension
     /** @return list<ItemViewType> */
     public function itemViewTypes(): array
     {
-        return ItemViewType::cases();
+        return ItemViewType::switchable();
     }
 
-    public function itemListCell(string $itemType, int $itemId): string
+    public function itemListCell(string $itemType, int $itemId, ?string $mode = null): string
     {
         $provider = $this->registry->providerFor($itemType);
         if ($provider === null) {
             return '';
         }
 
-        return $provider->renderListCell($itemId) ?? '';
+        return $provider->renderListCell($itemId, ItemViewType::tryFrom((string) $mode)) ?? '';
     }
 }

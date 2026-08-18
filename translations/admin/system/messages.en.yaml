@@ -222,6 +222,8 @@ admin_system_gallery:
     section_comp_image_caption: 'Thumbnail renderer with size selection and placeholder fallback.'
     section_comp_toggle_title: 'Toggle component'
     section_comp_toggle_caption: 'Yes/No button pair for boolean settings; on/off variants shown.'
+    section_comp_approve_deny_title: 'Approve/Deny component'
+    section_comp_approve_deny_caption: 'Joined accept/reject pair for one pending item; small and full size, with the trash deny variant.'
     section_admin_top_infobar_title: 'AdminTop infobar'
     section_admin_top_infobar_caption: 'Tab strip + page-top infobar shown on every admin page; list and detail variants.'
     section_admin_list_title: 'Admin list table'

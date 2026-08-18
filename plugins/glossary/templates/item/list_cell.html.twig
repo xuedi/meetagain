@@ -1,9 +1,15 @@
 {# Glossary cell rendered by the shared item-list component (core wraps it in the chosen layout). #}
-{% set mode = item_view_mode('glossary').value %}
-{% if mode not in ['list', 'tiles'] %}{% set mode = 'list' %}{% endif %}
+{% set mode = viewMode ?? item_view_mode('glossary').value %}
+{% if mode not in ['list', 'tiles', 'row'] %}{% set mode = 'list' %}{% endif %}
 {% set showUrl = path('app_plugin_glossary_show', {id: entry.id}) %}
 
-{% if mode == 'list' %}
+{% if mode == 'row' %}
+    {% include '_components/item/styles/row.html.twig' with {
+        href: showUrl,
+        title: entry.phrase,
+        subtitle: config.secondaryEnabled ? entry.pinyin : null
+    } %}
+{% elseif mode == 'list' %}
     <td style="vertical-align: middle;">
         <a href="{{ showUrl }}" class="has-text-weight-medium">{{ entry.phrase }}</a>
     </td>

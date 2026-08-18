@@ -454,6 +454,37 @@ class ImageServiceTest extends TestCase
         static::assertSame([240, 120], $this->thumbnailSize($workspace, 'shared_h120'));
     }
 
+    public function testRegenerateAllThumbnailsRestrictedToOneTypeSkipsTheOtherUsages(): void
+    {
+        // Arrange
+        $workspace = $this->createWorkspace();
+        $this->writeSourceImage($workspace, 'shared', 400, 200);
+
+        $imageRepo = $this->createStub(ImageRepository::class);
+        $imageRepo->method('findAll')->willReturn([$this->storedImage(7, 'shared', ImageType::GroupPreview)]);
+
+        $registry = new ImageTypeRegistry([
+            $this->definition(ImageType::GroupPreview, [[400, 400]], ImageFitMode::Crop),
+            $this->definition(ImageType::GroupLogo, [[self::FREE, 120]]),
+        ], new ThumbnailSizeFormat());
+
+        $subject = $this->createService(
+            imageRepo: $imageRepo,
+            imageTypeRegistry: $registry,
+            filesystemService: $this->missingThumbnails(),
+            kernelProjectDir: $workspace,
+            imageLocationRepo: $this->locationRepoFor([7 => [ImageType::GroupLogo]]),
+        );
+
+        // Act
+        $created = $subject->regenerateAllThumbnails(ImageType::GroupLogo);
+
+        // Assert
+        static::assertSame(1, $created);
+        static::assertSame([240, 120], $this->thumbnailSize($workspace, 'shared_h120'));
+        static::assertFileDoesNotExist($workspace . '/public/images/thumbnails/shared_400x400.webp');
+    }
+
     public function testTheRowTypeOwnsTheFitModeWhenTwoUsagesDeclareTheSameSize(): void
     {
         // Arrange

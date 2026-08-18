@@ -174,6 +174,11 @@ just devModeMinimal
 
 ---
 
+!!! note "Local API keys survive a reset"
+    A reset drops the database but leaves the gitignored `.env.local` alone. A plugin that
+    stores a key in the database can re-seed it from there in `postFixtures()`, so a dev key
+    only has to be entered once. The films plugin does this for its metadata lookup.
+
 !!! note "Fixture hooks for plugins"
 Plugins can run code before and after fixture loading via `preFixtures()`,
 `loadPostExtendFixtures()`, and `postFixtures()` in their `Kernel.php`.

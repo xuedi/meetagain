@@ -222,6 +222,8 @@ admin_system_gallery:
     section_comp_image_caption: 'Moteur de rendu de miniatures avec sélection de taille et repli sur placeholder.'
     section_comp_toggle_title: 'Composant interrupteur'
     section_comp_toggle_caption: 'Paire de boutons Oui/Non pour les paramètres booléens ; variantes on/off affichées.'
+    section_comp_approve_deny_title: 'Composant approuver/refuser'
+    section_comp_approve_deny_caption: 'Paire jointe accepter/refuser pour un élément en attente ; petite taille et taille normale, avec la variante corbeille.'
     section_admin_top_infobar_title: 'Barre d''info AdminTop'
     section_admin_top_infobar_caption: 'Bandeau d''onglets + barre d''info en haut de page affichée sur chaque page admin ; variantes liste et détail.'
     section_admin_list_title: 'Tableau de liste admin'

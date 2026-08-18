@@ -22,7 +22,7 @@ books_book:
     confirm_delete: 'Supprimer ce livre ?'
     link_manual_entry: 'Ajouter manuellement à la place'
     list_empty: 'Aucun livre pour le moment.'
-    sidebar_info: 'Tous les livres que le club a lus ou mis sur l''étagère, les plus récents d''abord.'
+    sidebar_info: 'Tous les livres que le club a lus ou mis sur l''étagère, classés par titre.'
     no_cover: 'Aucune couverture disponible'
     field_isbn: 'ISBN'
     field_isbn_placeholder: 'ex. 978-0143105428'

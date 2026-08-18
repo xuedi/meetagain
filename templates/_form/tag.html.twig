@@ -52,7 +52,7 @@
 
 {%- block item_tags_widget -%}
     {%- set tree = attr['data-item-tag-tree'] is defined -%}
-    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' control')|trim}) -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' control' ~ (tree ? '' : ' item-tag-choices'))|trim}) -%}
     <div {{ block('widget_container_attributes') }}>
         {%- for child in form -%}
             {%- if tree -%}
@@ -60,7 +60,7 @@
                     {{- form_widget(child, {translation_domain: choice_translation_domain}) -}}
                 </div>
             {%- else -%}
-                {{- form_widget(child, {translation_domain: choice_translation_domain}) -}}
+                {{- form_widget(child, {translation_domain: choice_translation_domain, inline_choice: true}) -}}
             {%- endif -%}
         {%- endfor -%}
     </div>

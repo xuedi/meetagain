@@ -26,7 +26,7 @@ final class DishPreviewImageTypeDefinition extends AbstractImageTypeDefinition
 
     protected function sizes(): array
     {
-        return [[1024, 768], [600, 400], [400, 400], [350, 263]];
+        return [[1024, 768], [600, 400], [400, 400], [350, 263], [100, 100]];
     }
 
     public function getEditLink(int $locationId): ?array

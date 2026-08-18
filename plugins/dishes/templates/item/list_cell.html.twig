@@ -1,7 +1,40 @@
 {# Dish cell for the shared item-list component. The dishes list page renders its own
    plugins/dishes/templates/views/* layouts instead; this remains for the provider contract. #}
-<a href="{{ path('app_plugin_dishes_dish_show', {id: dish.id}) }}" class="dish-cell is-block has-text-centered">
-    {% include '_components/image.html.twig' with {'image': dish.previewImage, 'size': '400x400', 'alt': dish.getTranslatedName(app.locale)} %}
-    <p class="title is-6 mt-2 mb-0">{{ dish.getTranslatedName(app.locale) }}</p>
-    {% if dish.origin %}<p class="subtitle is-7 has-text-grey">{{ dish.origin }}</p>{% endif %}
-</a>
+{% set mode = viewMode ?? item_view_mode('dish').value %}
+{% set showUrl = path('app_plugin_dishes_dish_show', {id: dish.id}) %}
+{% set dishName = dish.getTranslatedName(app.locale) %}
+
+{% if mode == 'row' %}
+    {% include '_components/item/styles/row.html.twig' with {
+        href: showUrl,
+        image: dish.previewImage,
+        imageSize: '100x100',
+        title: dishName,
+        subtitle: dish.origin
+    } %}
+{% elseif mode == 'grid' %}
+    {% include '_components/item/styles/thumb.html.twig' with {
+        href: showUrl,
+        image: dish.previewImage,
+        imageSize: '400x400',
+        alt: dishName,
+        ratio: 'square'
+    } %}
+{% elseif mode == 'gallery' %}
+    {% include '_components/item/styles/slide.html.twig' with {
+        group: 'item-gallery-dish',
+        image: dish.previewImage,
+        thumbSize: '400x400',
+        title: dishName,
+        subtitle: dish.origin,
+        href: showUrl
+    } %}
+{% else %}
+    {% include '_components/item/styles/portrait.html.twig' with {
+        href: showUrl,
+        image: dish.previewImage,
+        imageSize: '350x263',
+        title: dishName,
+        subtitle: dish.origin
+    } %}
+{% endif %}

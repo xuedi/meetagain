@@ -1,0 +1,26 @@
+{#
+    Item tile style: row - one compact inline element: an optional small thumbnail, the title, and an
+    optional muted subtitle beside it. For pages naming a single item outside an item list (a poll
+    winner, a wishlist entry), where the 'list' style cannot be used because it emits its own <td>
+    columns and would break the host table's alignment.
+
+    Used in:    plugin item cell templates, 'row' mode
+    Parameters:
+        - href      (string, required)     -- link target for the whole row
+        - title     (string, required)     -- primary label
+        - image     (Image|null, optional) -- thumbnail; omit the key entirely for a text-only type,
+                                              pass null to show the placeholder
+        - imageSize (string, optional)     -- thumbnail dimensions 'WxH'; default '100x150'
+        - alt       (string, optional)     -- image alt; default: title
+        - subtitle  (string, optional)     -- muted secondary text beside the title (e.g. year)
+    Depends on: _components/image.html.twig; the .item-row rules in custom.scss
+#}
+<a href="{{ href }}" class="item-row">
+    {% if image is defined %}
+        <span class="item-row__thumb">
+            {% include '_components/image.html.twig' with {'image': image, 'size': imageSize|default('100x150'), 'alt': alt|default(title)} %}
+        </span>
+    {% endif %}
+    <span class="item-row__title">{{ title }}</span>
+    {% if subtitle is defined and subtitle %}<span class="item-row__subtitle has-text-grey">{{ subtitle }}</span>{% endif %}
+</a>

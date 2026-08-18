@@ -1,0 +1,36 @@
+{#
+    Approve/Deny — accept or reject one pending thing
+
+    Renders the two actions as a joined addons pair so they read as one control and never
+    wrap onto separate lines in a narrow table cell. Both are data-post anchors carrying a
+    CSRF token; the deny side may use a different token when the route expects one.
+
+    Used in:    templates/review/_proposal_card.html.twig
+                plugins/glossary/templates/approval.html.twig
+    Parameters:
+        - approveUrl   (string, required) — URL for the approve action
+        - denyUrl      (string, required) — URL for the deny action
+        - csrfToken    (string, required) — rendered CSRF token for approve
+        - denyCsrfToken(string, optional) — rendered CSRF token for deny; defaults to csrfToken
+        - denyIcon     (string, optional) — deny icon class; defaults to fa-times
+        - size         (string, optional) — Bulma size modifier, e.g. is-small; defaults to is-small
+        - approveTitle (string, optional) — tooltip for approve
+        - denyTitle    (string, optional) — tooltip for deny
+#}
+{% set size = size|default('is-small') %}
+<div class="buttons has-addons is-right is-flex-wrap-nowrap mb-0">
+    <a href="{{ approveUrl }}"
+       class="button is-success {{ size }}"
+       {% if approveTitle is defined %}title="{{ approveTitle }}"{% endif %}
+       data-post
+       data-csrf-token="{{ csrfToken }}">
+        <span class="icon"><i class="fas fa-check"></i></span>
+    </a>
+    <a href="{{ denyUrl }}"
+       class="button is-danger {{ size }}"
+       {% if denyTitle is defined %}title="{{ denyTitle }}"{% endif %}
+       data-post
+       data-csrf-token="{{ denyCsrfToken|default(csrfToken) }}">
+        <span class="icon"><i class="fas {{ denyIcon|default('fa-times') }}"></i></span>
+    </a>
+</div>

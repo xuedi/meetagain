@@ -11,6 +11,7 @@ use App\Plugin;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Item\AssociationService;
+use App\Service\Item\SeedEventScope;
 use App\ValueObject\LinkCollection;
 use Plugin\Photos\Service\PhotoService;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -27,6 +28,7 @@ class Kernel implements Plugin
         private readonly AssociationService $itemAssociations,
         private readonly EventRepository $eventRepository,
         private readonly UserRepository $userRepository,
+        private readonly SeedEventScope $seedEventScope,
     ) {}
 
     public function getPluginKey(): string
@@ -48,7 +50,7 @@ class Kernel implements Plugin
 
     public function loadPostExtendFixtures(OutputInterface $output): void
     {
-        $pastEvents = $this->eventRepository->getPastEvents(1);
+        $pastEvents = $this->seedEventScope->filter($this->eventRepository->getPastEvents(1), $this->getPluginKey());
         if ($pastEvents === []) {
             $output->writeln('<comment>Photos: no past event to attach to, skipping.</comment>');
 
