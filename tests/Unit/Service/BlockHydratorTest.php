@@ -8,6 +8,7 @@ use App\Entity\BlockType\Text;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Exception\BlockValidationException;
 use App\Service\Cms\BlockHydrator;
+use App\Service\Cms\RichTextNormalizer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 
@@ -17,7 +18,7 @@ class BlockHydratorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->hydrator = new BlockHydrator($this->makeSanitizer());
+        $this->hydrator = new BlockHydrator($this->makeSanitizer(), new RichTextNormalizer());
     }
 
     private function makeSanitizer(string $prefix = ''): HtmlSanitizerInterface
@@ -139,7 +140,7 @@ class BlockHydratorTest extends TestCase
     public function testSanitizesRichTextFields(): void
     {
         // Arrange
-        $hydrator = new BlockHydrator($this->makeSanitizer('SANITIZED:'));
+        $hydrator = new BlockHydrator($this->makeSanitizer('SANITIZED:'), new RichTextNormalizer());
         $payload = ['content' => '<p>Body</p>'];
 
         // Act
@@ -152,7 +153,7 @@ class BlockHydratorTest extends TestCase
     public function testDoesNotSanitizePlainFields(): void
     {
         // Arrange
-        $hydrator = new BlockHydrator($this->makeSanitizer('SANITIZED:'));
+        $hydrator = new BlockHydrator($this->makeSanitizer('SANITIZED:'), new RichTextNormalizer());
         $payload = ['title' => 'Plain Title', 'content' => 'Body'];
 
         // Act
@@ -160,5 +161,18 @@ class BlockHydratorTest extends TestCase
 
         // Assert
         static::assertSame('Plain Title', $result->title);
+    }
+
+    public function testNormalizesRichTextIntoTheStorageLineModelAfterSanitizing(): void
+    {
+        // Arrange
+        $hydrator = new BlockHydrator($this->makeSanitizer(), new RichTextNormalizer());
+        $payload = ['content' => '<p>MeetAgain UG</p><p>Urbanstrasse 96</p><p></p><p>Second</p>'];
+
+        // Act
+        $result = $hydrator->hydrate(CmsBlockType::Text, $payload);
+
+        // Assert
+        static::assertSame('<p>MeetAgain UG<br>Urbanstrasse 96</p><p>Second</p>', $result->content);
     }
 }
