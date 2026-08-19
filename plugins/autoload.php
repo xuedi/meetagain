@@ -16,3 +16,9 @@ foreach (glob(__DIR__ . '/*/src', GLOB_ONLYDIR) as $dir) {
     $namespace = 'Plugin\\' . ucfirst($pluginName) . '\\';
     $loader->addPsr4($namespace, $dir . '/');
 }
+
+foreach (glob(__DIR__ . '/*/tests', GLOB_ONLYDIR) as $dir) {
+    $pluginName = basename(dirname($dir));
+    $namespace = 'Plugin\\' . ucfirst($pluginName) . '\\Tests\\';
+    $loader->addPsr4($namespace, $dir . '/');
+}
