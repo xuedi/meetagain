@@ -19,6 +19,7 @@ readonly class ConfigService
 {
     private const string CACHE_KEY_THEME_COLORS = 'theme_colors';
     private const string CACHE_KEY_PREFIX = 'config_';
+    private const array FOOTER_COLUMN_KEYS = ['footer_col1_title', 'footer_col2_title', 'footer_col3_title', 'footer_col4_title'];
 
     public function __construct(
         private ConfigRepository $repo,
@@ -187,7 +188,7 @@ readonly class ConfigService
 
     public function getFooterColumnTitle(string $column): string
     {
-        return $this->appState->get('footer_' . $column . '_title') ?? '';
+        return $this->appState->getMany(self::FOOTER_COLUMN_KEYS)['footer_' . $column . '_title'] ?? '';
     }
 
     public function saveForm(array $formData): void

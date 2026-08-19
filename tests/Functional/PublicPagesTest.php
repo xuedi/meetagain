@@ -56,12 +56,12 @@ class PublicPagesTest extends WebTestCase
         $client = static::createClient();
 
         // Act
-        $client->request('GET', '/sitemap.xml', server: ['HTTP_HOST' => 'supper.meetagain.local']);
+        $client->request('GET', '/sitemap.xml', server: ['HTTP_HOST' => 'cinema.meetagain.local']);
         $locs = $this->sitemapLocs($client);
 
         // Assert
-        static::assertNotEmpty(preg_grep('#/en/dishes$#', $locs), 'The dish list page is missing');
-        static::assertNotEmpty(preg_grep('#/en/dishes/\d+$#', $locs), 'No dish entry page is advertised');
+        static::assertNotEmpty(preg_grep('#/en/films$#', $locs), 'The film list page is missing');
+        static::assertNotEmpty(preg_grep('#/en/films/\d+$#', $locs), 'No film entry page is advertised');
     }
 
     public function testSitemapAdvertisesTheListButNotTheDetailPagesOfATypeThatOptsOut(): void

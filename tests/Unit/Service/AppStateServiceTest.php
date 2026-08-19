@@ -9,8 +9,8 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -28,7 +28,7 @@ class AppStateServiceTest extends TestCase
         $this->cache = new ArrayAdapter();
     }
 
-    private function makeService(?EntityManagerInterface $em = null, ?CacheInterface $cache = null, ?LoggerInterface $logger = null): AppStateService
+    private function makeService(?EntityManagerInterface $em = null, (CacheInterface&CacheItemPoolInterface)|null $cache = null, ?LoggerInterface $logger = null): AppStateService
     {
         return new AppStateService(
             $this->repository,
@@ -208,9 +208,7 @@ class AppStateServiceTest extends TestCase
         $entry = new AppState('fallback_key', 'fallback_value', new DateTimeImmutable());
         $this->repository->method('findByKey')->willReturn($entry);
 
-        /** @var CacheInterface&Stub $cache */
-        $cache = $this->createStub(CacheInterface::class);
-        $cache->method('get')->willThrowException(new RuntimeException('valkey down'));
+        $cache = $this->makeFailingCache();
 
         /** @var LoggerInterface&MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
@@ -231,9 +229,7 @@ class AppStateServiceTest extends TestCase
         $entry = new AppState('flap_key', 'value', new DateTimeImmutable());
         $this->repository->method('findByKey')->willReturn($entry);
 
-        /** @var CacheInterface&Stub $cache */
-        $cache = $this->createStub(CacheInterface::class);
-        $cache->method('get')->willThrowException(new RuntimeException('valkey down'));
+        $cache = $this->makeFailingCache();
 
         /** @var LoggerInterface&MockObject $logger */
         $logger = $this->createMock(LoggerInterface::class);
@@ -245,5 +241,127 @@ class AppStateServiceTest extends TestCase
         $service->get('flap_key');
         $service->get('flap_key');
         $service->get('flap_key');
+    }
+
+    public function testGetManyReadsEveryMissingKeyInOneRepositoryCall(): void
+    {
+        // Arrange
+        $this->repository->expects($this->never())->method('findByKey');
+        $this->repository
+            ->expects($this->once())
+            ->method('findValuesByKeys')
+            ->with(['a_key', 'b_key'])
+            ->willReturn(['a_key' => 'a_value']);
+        $service = $this->makeService();
+
+        // Act
+        $result = $service->getMany(['a_key', 'b_key']);
+
+        // Assert
+        static::assertSame(['a_key' => 'a_value', 'b_key' => null], $result);
+    }
+
+    public function testGetManyServesRepeatedCallsFromTheMemo(): void
+    {
+        // Arrange
+        $this->repository->expects($this->once())->method('findValuesByKeys')->willReturn(['memo_key' => 'memo_value']);
+        $service = $this->makeService();
+
+        // Act
+        $first = $service->getMany(['memo_key']);
+        $second = $service->getMany(['memo_key']);
+        $single = $service->get('memo_key');
+
+        // Assert
+        static::assertSame(['memo_key' => 'memo_value'], $first);
+        static::assertSame($first, $second);
+        static::assertSame('memo_value', $single);
+    }
+
+    public function testGetManyOnlyResolvesKeysThatAreNotMemoizedYet(): void
+    {
+        // Arrange
+        $this->repository->method('findByKey')->willReturn(new AppState('primed', 'primed_value', new DateTimeImmutable()));
+        $this->repository
+            ->expects($this->once())
+            ->method('findValuesByKeys')
+            ->with(['fresh'])
+            ->willReturn(['fresh' => 'fresh_value']);
+        $service = $this->makeService();
+
+        // Act
+        $service->get('primed');
+        $result = $service->getMany(['primed', 'fresh']);
+
+        // Assert
+        static::assertSame(['primed' => 'primed_value', 'fresh' => 'fresh_value'], $result);
+    }
+
+    public function testGetManyFallsBackToRepositoryWhenCacheThrows(): void
+    {
+        // Arrange
+        $this->repository->expects($this->once())->method('findValuesByKeys')->with(['down_key'])->willReturn(['down_key' => 'down_value']);
+
+        /** @var LoggerInterface&MockObject $logger */
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('warning');
+
+        $service = $this->makeService(cache: $this->makeFailingCache(), logger: $logger);
+
+        // Act
+        $result = $service->getMany(['down_key']);
+
+        // Assert
+        static::assertSame(['down_key' => 'down_value'], $result);
+    }
+
+    public function testSetDropsTheMemoizedValue(): void
+    {
+        // Arrange
+        $entry = new AppState('memo_invalidated', 'old_value', new DateTimeImmutable());
+        $this->repository->method('findValuesByKeys')->willReturn(['memo_invalidated' => 'old_value']);
+        $this->repository->method('findByKey')->willReturn($entry);
+
+        /** @var EntityManagerInterface&MockObject $em */
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('flush');
+        $service = $this->makeService($em);
+
+        // Act
+        $primed = $service->getMany(['memo_invalidated'])['memo_invalidated'];
+        $service->set('memo_invalidated', 'new_value');
+        $afterSet = $service->get('memo_invalidated');
+
+        // Assert
+        static::assertSame('old_value', $primed);
+        static::assertSame('new_value', $afterSet);
+    }
+
+    public function testResetDropsTheMemoSoTheNextReadResolvesAgain(): void
+    {
+        // Arrange
+        $this->repository->method('findValuesByKeys')->willReturnOnConsecutiveCalls(['reset_key' => 'first'], ['reset_key' => 'second']);
+        $service = $this->makeService();
+
+        // Act
+        $primed = $service->getMany(['reset_key'])['reset_key'];
+        $this->cache->deleteItem('app_state.reset_key');
+        $stillMemoized = $service->getMany(['reset_key'])['reset_key'];
+        $service->reset();
+        $afterReset = $service->getMany(['reset_key'])['reset_key'];
+
+        // Assert
+        static::assertSame('first', $primed);
+        static::assertSame('first', $stillMemoized);
+        static::assertSame('second', $afterReset);
+    }
+
+    private function makeFailingCache(): CacheInterface&CacheItemPoolInterface
+    {
+        $cache = $this->createStubForIntersectionOfInterfaces([CacheInterface::class, CacheItemPoolInterface::class]);
+        $cache->method('get')->willThrowException(new RuntimeException('valkey down'));
+        $cache->method('getItems')->willThrowException(new RuntimeException('valkey down'));
+
+        return $cache;
     }
 }
