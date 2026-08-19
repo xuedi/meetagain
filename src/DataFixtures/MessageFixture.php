@@ -212,6 +212,56 @@ class MessageFixture extends AbstractFixture implements DependentFixtureInterfac
                 'Did you bring the goban?',
                 true,
             ],
+
+            [
+                '2025-03-04 18:40:00',
+                UserFixture::BELLE_WOODS,
+                UserFixture::LANA_STEINER,
+                'Is the Wednesday screening still at the Arsenal, or did it move?',
+                true,
+            ],
+            [
+                '2025-03-04 19:02:00',
+                UserFixture::LANA_STEINER,
+                UserFixture::BELLE_WOODS,
+                'Still the Arsenal. Doors at 19:30, film starts twenty minutes later.',
+                true,
+            ],
+            [
+                '2025-03-04 19:05:00',
+                UserFixture::BELLE_WOODS,
+                UserFixture::LANA_STEINER,
+                'Perfect. I will bring a friend, she voted for the same film.',
+                true,
+            ],
+            [
+                '2025-03-04 19:11:00',
+                UserFixture::LANA_STEINER,
+                UserFixture::BELLE_WOODS,
+                'Bring her along. Add her as a guest on the event so we book enough seats.',
+                true,
+            ],
+            [
+                new DateTimeImmutable('-3 days')->format('Y-m-d H:i:s'),
+                UserFixture::CANDICE_WU,
+                UserFixture::BELLE_WOODS,
+                'We are short one person for the box night on Friday. Any chance you can make it?',
+                true,
+            ],
+            [
+                new DateTimeImmutable('-2 days')->format('Y-m-d H:i:s'),
+                UserFixture::BELLE_WOODS,
+                UserFixture::CANDICE_WU,
+                'I can! Put me down for the late slot, I finish work at eight.',
+                true,
+            ],
+            [
+                new DateTimeImmutable('-1 day')->format('Y-m-d H:i:s'),
+                UserFixture::CANDICE_WU,
+                UserFixture::BELLE_WOODS,
+                'Done. Room is booked from nine, we usually run until midnight.',
+                false,
+            ],
         ];
     }
 

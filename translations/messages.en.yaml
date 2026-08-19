@@ -555,6 +555,8 @@ image_type:
     websiteimage: 'Website image'
     developerapplogo: 'Developer app logo'
     pluginfilmsposter: 'Film poster'
+    pluginphotosphoto: 'Photo'
+    grouppromotionfacebook: 'Group promotion (Facebook)'
 cookie:
     page_title: 'Cookie Settings'
     meta_description: 'Manage your cookie preferences for this site. Control which optional features are enabled.'

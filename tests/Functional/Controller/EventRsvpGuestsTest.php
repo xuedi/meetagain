@@ -5,6 +5,7 @@ namespace Tests\Functional\Controller;
 use App\Entity\Event;
 use App\Entity\RsvpGuest;
 use App\Entity\User;
+use App\Service\Event\RsvpGuestService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -130,7 +131,7 @@ class EventRsvpGuestsTest extends WebTestCase
         // Assert
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('.rsvp-guest-count');
-        $this->assertSelectorTextContains('.rsvp-guest-count', '+1');
+        $this->assertSelectorTextContains('[data-rsvp-guests="remove"] + .rsvp-guest-count', '+1');
         $this->assertSelectorExists('[data-rsvp-guests="add"]');
         $this->assertSelectorExists('[data-rsvp-guests="remove"]');
     }
@@ -172,6 +173,9 @@ class EventRsvpGuestsTest extends WebTestCase
         $event = $em->find(Event::class, self::EVENT_ID);
         $event->setStart(new DateTime('+5 days'));
         $user = $em->getRepository(User::class)->findOneBy(['email' => self::USER_EMAIL]);
+
+        $client->getContainer()->get(RsvpGuestService::class)->onRsvpRemoved($event, $user);
+
         if ($attending) {
             $event->addRsvp($user);
         } else {
