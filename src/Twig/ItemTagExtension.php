@@ -6,6 +6,7 @@ use App\Item\Tag\ChangeTarget;
 use App\Item\Tag\FacetSelection;
 use App\Item\Tag\FacetService;
 use App\Item\Tag\TagService;
+use App\Item\ListRegistry;
 use App\Item\Tag\TypeRegistry;
 use App\Review\ChangeProposalService;
 use Override;
@@ -21,6 +22,7 @@ final class ItemTagExtension extends AbstractExtension
         private readonly RequestStack $requestStack,
         private readonly FacetService $facetService,
         private readonly ChangeProposalService $changeProposals,
+        private readonly ListRegistry $listRegistry,
     ) {}
 
     #[Override]
@@ -33,9 +35,17 @@ final class ItemTagExtension extends AbstractExtension
             new TwigFunction('item_tag_pending', $this->pendingCount(...)),
             new TwigFunction('item_facet_current', $this->currentFacets(...)),
             new TwigFunction('item_facet_active', $this->facetsActive(...)),
+            new TwigFunction('item_detail_noindex', $this->detailNoindex(...)),
             new TwigFunction('item_facet_url', $this->facetUrl(...)),
             new TwigFunction('item_facet_counts', $this->facetCounts(...)),
         ];
+    }
+
+    public function detailNoindex(): bool
+    {
+        $route = $this->requestStack->getCurrentRequest()?->attributes->get('_route');
+
+        return is_string($route) && !$this->listRegistry->isDetailRouteIndexable($route);
     }
 
     public function currentFacets(): FacetSelection

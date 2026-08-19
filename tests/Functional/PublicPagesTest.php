@@ -56,12 +56,45 @@ class PublicPagesTest extends WebTestCase
         $client = static::createClient();
 
         // Act
+        $client->request('GET', '/sitemap.xml', server: ['HTTP_HOST' => 'supper.meetagain.local']);
+        $locs = $this->sitemapLocs($client);
+
+        // Assert
+        static::assertNotEmpty(preg_grep('#/en/dishes$#', $locs), 'The dish list page is missing');
+        static::assertNotEmpty(preg_grep('#/en/dishes/\d+$#', $locs), 'No dish entry page is advertised');
+    }
+
+    public function testSitemapAdvertisesTheListButNotTheDetailPagesOfATypeThatOptsOut(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
         $client->request('GET', '/sitemap.xml', server: ['HTTP_HOST' => 'dragon.meetagain.local']);
         $locs = $this->sitemapLocs($client);
 
         // Assert
-        static::assertNotEmpty(preg_grep('#/en/glossary$#', $locs), 'The glossary list page is missing');
-        static::assertNotEmpty(preg_grep('#/en/glossary/\d+$#', $locs), 'No glossary entry page is advertised');
+        static::assertNotEmpty(preg_grep('#/en/glossary$#', $locs), 'The glossary list page must stay indexable');
+        static::assertSame([], preg_grep('#/en/glossary/\d+$#', $locs), 'Glossary entry pages must not be advertised');
+    }
+
+    public function testADetailPageOfATypeThatOptsOutIsNoindexWhileItsListPageIsNot(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $host = ['HTTP_HOST' => 'dragon.meetagain.local'];
+
+        // Act
+        $client->request('GET', '/en/glossary', server: $host);
+        $list = (string) $client->getResponse()->getContent();
+        $crawler = $client->request('GET', '/en/glossary', server: $host);
+        $firstEntry = $crawler->filter('a[href*="/en/glossary/"]')->first()->attr('href');
+        $client->request('GET', (string) $firstEntry, server: $host);
+        $detail = (string) $client->getResponse()->getContent();
+
+        // Assert
+        static::assertStringNotContainsString('name="robots"', $list, 'The list page must stay indexable');
+        static::assertStringContainsString('<meta name="robots" content="noindex,follow">', $detail);
     }
 
     public function testRobotsTxtDisallowsApiPathsAndAdvertisesSitemap(): void

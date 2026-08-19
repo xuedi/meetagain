@@ -229,15 +229,41 @@ class ItemSitemapPublisherTest extends TestCase
         );
     }
 
+    public function testATypeThatOptsOutEmitsItsListPageButNoDetailPages(): void
+    {
+        // Arrange
+        $publisher = $this->makePublisher(
+            locales: ['en', 'de', 'zh'],
+            providers: [
+                'glossary' => $this->makeProvider('app_glossary_list', 'app_glossary_show', [7, 8], [], false),
+            ],
+        );
+
+        // Act
+        $urls = $publisher->getSitemapUrls();
+
+        // Assert
+        self::assertCount(3, $urls, 'Only the list page, once per locale');
+        foreach ($urls as $url) {
+            self::assertStringNotContainsString('/glossary/', $url->loc);
+        }
+    }
+
     /**
      * @param list<int> $itemIds
      * @param array<int, DateTimeInterface> $lastmods
      */
-    private function makeProvider(string $listRoute, ?string $detailRoute, array $itemIds, array $lastmods = []): ListProviderInterface
-    {
+    private function makeProvider(
+        string $listRoute,
+        ?string $detailRoute,
+        array $itemIds,
+        array $lastmods = [],
+        bool $detailIndexable = true,
+    ): ListProviderInterface {
         $provider = $this->createStub(ListProviderInterface::class);
         $provider->method('getListRoute')->willReturn($listRoute);
         $provider->method('getDetailRoute')->willReturn($detailRoute);
+        $provider->method('isDetailIndexable')->willReturn($detailIndexable);
         $provider->method('getItemIds')->willReturn($itemIds);
         $provider->method('getLastmodByItemId')->willReturn($lastmods);
 
@@ -249,6 +275,7 @@ class ItemSitemapPublisherTest extends TestCase
         $provider = $this->createStub(ListProviderInterface::class);
         $provider->method('getListRoute')->willReturn('app_dish_list');
         $provider->method('getDetailRoute')->willReturn('app_dish_show');
+        $provider->method('isDetailIndexable')->willReturn(true);
         $provider->method('getItemIds')->willReturnCallback(
             static fn(): array => $facetService->current()->tags === [] ? [3, 4] : [3],
         );

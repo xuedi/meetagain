@@ -6,7 +6,7 @@
     <meta name="description" content="{% block meta_description %}{{ get_meta_description('default') }}{% endblock %}">
 
     <link rel="canonical" href="{{ get_canonical_url() }}" />
-    {% block meta_robots %}{% if item_facet_active() %}<meta name="robots" content="noindex,follow">{% endif %}{% endblock %}
+    {% block meta_robots %}{% if item_facet_active() or item_detail_noindex() %}<meta name="robots" content="noindex,follow">{% endif %}{% endblock %}
 
     {% for altLangCode, altLangLink in get_hreflang_languages() %}
         <link rel="alternate" hreflang="{{ get_hreflang_code(altLangCode) }}" href="{{ altLangLink }}" />

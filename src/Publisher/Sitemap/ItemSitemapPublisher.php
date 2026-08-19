@@ -84,7 +84,7 @@ final readonly class ItemSitemapPublisher implements SitemapPublisherInterface
     private function collectDetailPages(string $itemType, ListProviderInterface $provider, array $locales): array
     {
         $route = $provider->getDetailRoute();
-        if ($route === null) {
+        if ($route === null || !$provider->isDetailIndexable()) {
             return [];
         }
 

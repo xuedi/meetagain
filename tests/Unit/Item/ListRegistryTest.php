@@ -5,6 +5,7 @@ namespace Tests\Unit\Item;
 use App\Item\ListProviderInterface;
 use App\Item\ListRegistry;
 use App\Service\Config\PluginService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ListRegistryTest extends TestCase
@@ -57,6 +58,46 @@ class ListRegistryTest extends TestCase
         self::assertSame($glossary, $registry->providerFor('glossary'));
     }
 
+    #[DataProvider('detailRouteProvider')]
+    public function testDetailRouteIndexabilityFollowsTheOwningProvider(string $route, bool $expected): void
+    {
+        // Arrange
+        $indexable = $this->provider('books', 'book', 'app_book_show', true);
+        $notIndexable = $this->provider('glossary', 'glossary', 'app_glossary_show', false);
+        $registry = $this->makeRegistry([$indexable, $notIndexable], ['books', 'glossary']);
+
+        // Act
+        $result = $registry->isDetailRouteIndexable($route);
+
+        // Assert
+        self::assertSame($expected, $result);
+    }
+
+    /**
+     * @return iterable<string, array{string, bool}>
+     */
+    public static function detailRouteProvider(): iterable
+    {
+        yield 'a provider that opts out makes its detail route non-indexable' => ['app_glossary_show', false];
+        yield 'a provider that opts in keeps its detail route indexable' => ['app_book_show', true];
+        yield 'a route no provider claims stays indexable' => ['app_event_details', true];
+    }
+
+    public function testAnInactivePluginStillAnswersForItsDetailRoute(): void
+    {
+        // Arrange
+        $registry = $this->makeRegistry(
+            [$this->provider('glossary', 'glossary', 'app_glossary_show', false)],
+            ['books'],
+        );
+
+        // Act
+        $result = $registry->isDetailRouteIndexable('app_glossary_show');
+
+        // Assert
+        self::assertFalse($result, 'The robots meta must not depend on the plugin being active for this host');
+    }
+
     /**
      * @param list<ListProviderInterface> $providers
      * @param list<string>                $activePlugins
@@ -69,11 +110,17 @@ class ListRegistryTest extends TestCase
         return new ListRegistry($providers, $pluginService);
     }
 
-    private function provider(string $pluginKey, string $key): ListProviderInterface
-    {
+    private function provider(
+        string $pluginKey,
+        string $key,
+        ?string $detailRoute = null,
+        bool $detailIndexable = true,
+    ): ListProviderInterface {
         $provider = $this->createStub(ListProviderInterface::class);
         $provider->method('getPluginKey')->willReturn($pluginKey);
         $provider->method('getKey')->willReturn($key);
+        $provider->method('getDetailRoute')->willReturn($detailRoute);
+        $provider->method('isDetailIndexable')->willReturn($detailIndexable);
 
         return $provider;
     }
