@@ -11,7 +11,7 @@ chrome:
     menu_profile_messages: 'Meine Nachrichten'
     menu_profile_social: 'Meine Aktivitäten'
     menu_profile_images: 'Meine Bilder'
-    menu_profile_config: 'Einstellungen'
+    menu_profile_config: 'Einstellungen & Privatsphäre'
     menu_profile_logout: 'Abmelden'
     footer_col_help: 'Hilfe'
     footer_col_platform: 'Plattform'
@@ -434,8 +434,8 @@ profile_notifications:
     empty_state: 'Keine neuen Benachrichtigungen'
     table_header_notification: 'Benachrichtigung'
 profile_review:
-    page_title: 'Ausstehende Ueberpruefungen'
-    empty_state: 'Keine Elemente zur Ueberpruefung vorhanden.'
+    page_title: 'Ausstehende Überprüfungen'
+    empty_state: 'Keine Elemente zur Überprüfung vorhanden.'
     button_approve: 'Genehmigen'
     button_deny: 'Ablehnen'
     flash_invalid_csrf: 'Ungültiges CSRF-Token.'
@@ -555,6 +555,8 @@ image_type:
     websiteimage: 'Website-Bild'
     developerapplogo: 'Entwickler-App-Logo'
     pluginfilmsposter: 'Filmplakat'
+    pluginphotosphoto: 'Foto'
+    grouppromotionfacebook: 'Gruppen-Werbebild (Facebook)'
 cookie:
     page_title: 'Cookie-Einstellungen'
     meta_description: 'Verwalte deine Cookie-Einstellungen. Lege fest, welche optionalen Funktionen aktiviert sind.'
@@ -608,7 +610,7 @@ global:
     button_yes: 'Ja'
     button_no: 'Nein'
     flash_invalid_csrf: 'Ungueltiges CSRF-Token.'
-'notification.review.pending_count': '%count% Element wartet auf Ihre Ueberpruefung|%count% Elemente warten auf Ihre Ueberpruefung'
+'notification.review.pending_count': '%count% Element wartet auf Ihre Überprüfung|%count% Elemente warten auf Ihre Überprüfung'
 email_event_update:
     line_start: 'Beginn geändert von <b>%before%</b> auf <b>%after%</b>.'
     line_location: 'Veranstaltungsort geändert von <b>%before%</b> auf <b>%after%</b>.'

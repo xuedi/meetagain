@@ -555,6 +555,8 @@ image_type:
     websiteimage: '网站图片'
     developerapplogo: '开发者应用标志'
     pluginfilmsposter: '电影海报'
+    pluginphotosphoto: '照片'
+    grouppromotionfacebook: '群组推广图（Facebook）'
 cookie:
     page_title: '网站Cookie'
     meta_description: '管理您的Cookie偏好设置。控制哪些可选功能已启用。'

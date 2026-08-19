@@ -224,7 +224,7 @@ admin_event:
     warning_uncancel_button: 'Yes, Uncancel Event'
     notice_attendees_rsvpd: '%count% people have already decided to attend this event. Please consider this when changing the date or time, and consider sending them a notification.'
     danger_notify_attendees: 'Notify %count% members'
-    hint_other_languages: 'Dont forget the other languages'
+    hint_other_languages: 'Don''t forget the other languages'
     danger_zone: 'Danger Zone'
     danger_update_all_following: 'Update all following'
     danger_uncancel_event: 'Uncancel Event'
