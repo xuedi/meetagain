@@ -29,6 +29,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const sentinel = document.createElement('option');
     sentinel.value = SENTINEL;
     sentinel.textContent = modal.dataset.newLabel;
+
+    // A group with no venue yet renders an empty select, which would auto-select the sentinel and leave nothing to change to.
+    if (select.options.length === 0) {
+        select.appendChild(new Option('', ''));
+    }
+
     select.appendChild(sentinel);
 
     function openModal() {

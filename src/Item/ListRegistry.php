@@ -42,6 +42,17 @@ class ListRegistry
         return null;
     }
 
+    public function isDetailRouteIndexable(string $route): bool
+    {
+        foreach ($this->providers as $provider) {
+            if ($provider->getDetailRoute() === $route) {
+                return $provider->isDetailIndexable();
+            }
+        }
+
+        return true;
+    }
+
     /**
      * @return array<string, ListProviderInterface>
      */

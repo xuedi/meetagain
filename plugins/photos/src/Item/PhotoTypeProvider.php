@@ -106,6 +106,12 @@ final readonly class PhotoTypeProvider implements TypeProviderInterface, ListCel
     }
 
     #[Override]
+    public function isDetailIndexable(): bool
+    {
+        return true;
+    }
+
+    #[Override]
     public function getLastmodByItemId(array $itemIds): array
     {
         $wanted = array_flip($itemIds);

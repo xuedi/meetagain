@@ -298,7 +298,7 @@ class ConfigServiceTest extends TestCase
     {
         // Arrange
         $appStateStub = $this->createStub(AppStateService::class);
-        $appStateStub->method('get')->willReturn('News');
+        $appStateStub->method('getMany')->willReturn(['footer_col1_title' => 'News']);
 
         $subject = new ConfigService(
             repo: $this->configRepoStub,
@@ -317,7 +317,7 @@ class ConfigServiceTest extends TestCase
     {
         // Arrange
         $appStateStub = $this->createStub(AppStateService::class);
-        $appStateStub->method('get')->willReturn(null);
+        $appStateStub->method('getMany')->willReturn(['footer_col1_title' => null]);
 
         $subject = new ConfigService(
             repo: $this->configRepoStub,

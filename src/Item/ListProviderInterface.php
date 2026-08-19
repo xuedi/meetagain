@@ -36,6 +36,12 @@ interface ListProviderInterface
     public function getDetailRoute(): ?string;
 
     /**
+     * Whether the type's detail pages belong in a search index. False omits them from the sitemap
+     * and emits `noindex,follow` on the page, so the feed and the robots meta cannot disagree.
+     */
+    public function isDetailIndexable(): bool;
+
+    /**
      * @param list<int> $itemIds
      * @return array<int, DateTimeInterface> item id => last change; ids may be absent
      */

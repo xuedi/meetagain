@@ -92,6 +92,12 @@ final readonly class FilmTypeProvider implements TypeProviderInterface, ListCell
     }
 
     #[Override]
+    public function isDetailIndexable(): bool
+    {
+        return true;
+    }
+
+    #[Override]
     public function getLastmodByItemId(array $itemIds): array
     {
         $wanted = array_flip($itemIds);

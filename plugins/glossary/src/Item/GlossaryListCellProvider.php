@@ -106,6 +106,12 @@ final readonly class GlossaryListCellProvider implements ListCellProviderInterfa
     }
 
     #[Override]
+    public function isDetailIndexable(): bool
+    {
+        return false;
+    }
+
+    #[Override]
     public function getLastmodByItemId(array $itemIds): array
     {
         $wanted = array_flip($itemIds);
