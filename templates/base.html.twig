@@ -16,7 +16,7 @@
     {% endif %}
     {% block calendar_link %}{% endblock %}
 
-    <title>{% block title %}MeetAgain{% endblock %}</title>
+    <title>{% block title %}{{ get_site_name() }}{% endblock %}</title>
     <meta property="og:title" content="{% block og_title %}{{ block('title') }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ block('meta_description') }}{% endblock %}">
     <meta property="og:url" content="{{ get_canonical_url() }}">
