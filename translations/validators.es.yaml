@@ -193,10 +193,6 @@ Error: 'Error'
 'security.validator_agree_terms': 'Debes aceptar nuestras condiciones.'
 
 # Support namespace - phase 18 (page-scoped validator messages)
-'support.validator_name_blank': 'Introduce tu nombre.'
-'support.validator_name_max': 'El nombre no puede tener más de {{ limit }} caracteres.'
-'support.validator_email_blank': 'Introduce tu dirección de correo electrónico.'
-'support.validator_email_format': 'Introduce una dirección de correo electrónico válida.'
 'support.validator_message_blank': 'Introduce un mensaje.'
 'support.validator_message_max': 'El mensaje no puede tener más de {{ limit }} caracteres.'
 'admin_support.validator_response_blank': 'Introduce una respuesta.'

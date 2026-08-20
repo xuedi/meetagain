@@ -43,6 +43,8 @@ admin_email_templates:
     trigger_upcoming_events: 'Sunday 12:00'
     trigger_event_update_notification: 'when admin edits event start, location or cancellation'
     trigger_series_rescheduled: 'Recurring series rescheduled - attendee RSVPs removed'
+    trigger_support_email_verify: 'someone asks for support-answer notifications by email'
+    trigger_support_invitation: 'a steward invites the administrators into a request'
 admin_email_sendlog:
     col_subject: 'Subject'
     page_title: 'Email Send Log'

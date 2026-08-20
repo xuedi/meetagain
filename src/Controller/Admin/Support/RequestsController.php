@@ -10,16 +10,17 @@ use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
+use App\Emails\Types\SupportInvitationEmail;
 use App\Emails\Types\SupportResponseEmail;
 use App\Entity\Message;
 use App\Entity\SupportRequest;
 use App\Entity\User;
-use App\Enum\SupportReplyChannel;
+use App\Enum\SupportChannel;
 use App\Enum\SupportRequestStatus;
 use App\Form\SupportReplyType;
 use App\Repository\SupportRequestRepository;
-use App\Repository\UserRepository;
-use App\Service\Security\ContentSanitizer;
+use App\Service\Support\ThreadService;
+use App\Service\Support\VisibilityResolver;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,17 +30,18 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/support')]
+#[IsGranted('ROLE_STEWARD'), Route('/admin/support')]
 final class RequestsController extends AbstractSupportController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(
         TranslatorInterface $translator,
         private readonly SupportRequestRepository $supportRequestRepo,
-        private readonly UserRepository $userRepository,
         private readonly EntityManagerInterface $em,
         private readonly SupportResponseEmail $supportResponseEmail,
+        private readonly SupportInvitationEmail $supportInvitationEmail,
         private readonly ActivityService $activityService,
-        private readonly ContentSanitizer $contentSanitizer,
+        private readonly ThreadService $threadService,
+        private readonly VisibilityResolver $visibilityResolver,
     ) {
         parent::__construct($translator, 'requests');
     }
@@ -47,7 +49,7 @@ final class RequestsController extends AbstractSupportController implements Admi
     #[Route('', name: 'app_admin_support_list')]
     public function list(): Response
     {
-        $requests = $this->supportRequestRepo->createQueryBuilder('sr')->orderBy('sr.createdAt', 'DESC')->getQuery()->getResult();
+        $requests = $this->visibilityResolver->getVisibleRequests();
 
         $newCount = 0;
         foreach ($requests as $request) {
@@ -83,28 +85,19 @@ final class RequestsController extends AbstractSupportController implements Admi
     #[Route('/{id}', name: 'app_admin_support_request_show', requirements: ['id' => '\d+'])]
     public function show(int $id): Response
     {
-        $request = $this->supportRequestRepo->find($id);
-        if (!$request instanceof SupportRequest) {
-            throw $this->createNotFoundException();
-        }
-
-        [$statusVariant, $statusKey] = match (true) {
-            $request->isNew() => ['is-warning', 'admin_support.status_new'],
-            $request->isReplied() => ['is-success', 'admin_support.status_replied'],
-            default => ['is-light', 'admin_support.status_read'],
-        };
+        $request = $this->requireRequest($id);
 
         $info = [
             new AdminTopInfoHtml(sprintf('<strong>%s</strong>', $request->getCreatedAt()->format('Y-m-d H:i:s'))),
             new AdminTopInfoHtml(sprintf('<span class="tag is-light is-medium">%s</span>', htmlspecialchars(
-                $this->translator->trans($request->getContactType()->label()),
+                $this->translator->trans($request->getAudience()->label()),
                 ENT_QUOTES | ENT_HTML5,
                 'UTF-8',
             ))),
             new AdminTopInfoHtml(sprintf(
                 '<span class="tag %s is-medium">%s</span>',
-                $statusVariant,
-                htmlspecialchars($this->translator->trans($statusKey), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+                $request->getStatus()->tagVariant(),
+                htmlspecialchars($this->translator->trans($request->getStatus()->label()), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             )),
         ];
 
@@ -118,6 +111,31 @@ final class RequestsController extends AbstractSupportController implements Admi
                 variant: 'is-warning',
             );
         }
+        $actions[] = $request->isResolved()
+            ? new AdminTopActionForm(
+                label: $this->translator->trans('admin_support.button_reopen_thread'),
+                target: $this->generateUrl('app_admin_support_reopen', ['id' => $request->getId()]),
+                csrfTokenId: 'app_admin_support_reopen' . $request->getId(),
+                icon: 'rotate-left',
+                variant: 'is-warning',
+            )
+            : new AdminTopActionForm(
+                label: $this->translator->trans('admin_support.button_resolve_thread'),
+                target: $this->generateUrl('app_admin_support_resolve', ['id' => $request->getId()]),
+                csrfTokenId: 'app_admin_support_resolve' . $request->getId(),
+                icon: 'circle-check',
+                variant: 'is-warning',
+            );
+        if ($request->canInviteAdmins() && !$this->isGranted('ROLE_ADMIN')) {
+            $actions[] = new AdminTopActionForm(
+                label: $this->translator->trans('admin_support.button_invite_admins'),
+                target: $this->generateUrl('app_admin_support_invite_admins', ['id' => $request->getId()]),
+                csrfTokenId: 'app_admin_support_invite_admins' . $request->getId(),
+                icon: 'user-plus',
+                variant: 'is-warning',
+                confirm: $this->translator->trans('admin_support.warning_invite_admins_confirm'),
+            );
+        }
         $actions[] = new AdminTopActionButton(
             label: $this->translator->trans('admin_support.button_back'),
             target: $this->generateUrl('app_admin_support_list'),
@@ -126,97 +144,119 @@ final class RequestsController extends AbstractSupportController implements Admi
 
         $adminTop = new AdminTop(info: $info, actions: $actions);
 
-        $matchedUser = $this->userRepository->findOneBy(['email' => $request->getEmail()]);
-        $replyMode = $matchedUser instanceof User ? 'message' : 'email';
-
         return $this->render('admin/support/request_show.html.twig', [
             'active' => 'support',
             'request' => $request,
+            'messages' => $this->threadService->getThread($request),
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
-            'replyMode' => $replyMode,
             'replyForm' => $this->createForm(SupportReplyType::class),
         ]);
     }
 
     #[Route('/mark-read/{id}', name: 'app_admin_support_mark_read', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function markRead(Request $request, int $id): Response
+    public function markRead(Request $httpRequest, int $id): Response
     {
-        if (!$this->isCsrfTokenValid('app_admin_support_mark_read' . $id, (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
-        $request = $this->supportRequestRepo->find($id);
-        if ($request instanceof SupportRequest) {
-            $this->markRequestRead($request);
-        }
+        $request = $this->requireRequest($id);
+        $this->requireCsrf($httpRequest, 'app_admin_support_mark_read' . $id);
+
+        $request->setStatus(SupportRequestStatus::Read);
+        $this->em->persist($request);
+        $this->em->flush();
 
         return $this->redirectToRoute('app_admin_support_list');
     }
 
-    #[Route('/{id}/reply-email', name: 'app_admin_support_reply_email', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function replyEmail(Request $httpRequest, int $id): Response
+    #[Route('/{id}/reply', name: 'app_admin_support_reply', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function reply(Request $httpRequest, int $id): Response
     {
-        $request = $this->supportRequestRepo->find($id);
-        if (!$request instanceof SupportRequest) {
-            throw $this->createNotFoundException();
-        }
-        if ($request->isReplied()) {
-            $this->addFlash('error', 'admin_support.flash_reply_already');
-            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
-        }
-
-        $form = $this->createForm(SupportReplyType::class);
-        $form->handleRequest($httpRequest);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            $this->addFlash('error', 'admin_support.flash_reply_invalid');
-            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
-        }
-
-        $response = $this->contentSanitizer->basic((string) $form->get('response')->getData());
-        $this->supportResponseEmail->send(['request' => $request, 'response' => $response]);
-        $this->markRequestReplied($request, $response, SupportReplyChannel::Email);
-        $this->addFlash('success', 'admin_support.flash_reply_email_sent');
-
-        return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
-    }
-
-    #[Route('/{id}/reply-message', name: 'app_admin_support_reply_message', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function replyMessage(Request $httpRequest, int $id): Response
-    {
-        $request = $this->supportRequestRepo->find($id);
-        if (!$request instanceof SupportRequest) {
-            throw $this->createNotFoundException();
-        }
-        if ($request->isReplied()) {
-            $this->addFlash('error', 'admin_support.flash_reply_already');
-            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
-        }
-
-        $receiver = $this->userRepository->findOneBy(['email' => $request->getEmail()]);
-        if (!$receiver instanceof User) {
-            $this->addFlash('error', 'admin_support.flash_reply_no_user');
-            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
-        }
-
-        $form = $this->createForm(SupportReplyType::class);
-        $form->handleRequest($httpRequest);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            $this->addFlash('error', 'admin_support.flash_reply_invalid');
-            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
-        }
+        $request = $this->requireRequest($id);
 
         $actingAdmin = $this->getUser();
         if (!$actingAdmin instanceof User) {
             throw $this->createAccessDeniedException();
         }
 
-        $response = $this->contentSanitizer->basic((string) $form->get('response')->getData());
+        $form = $this->createForm(SupportReplyType::class);
+        $form->handleRequest($httpRequest);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            $this->addFlash('error', 'admin_support.flash_reply_invalid');
+            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+        }
+
+        $isFirstResponse = !$request->getRespondedBy() instanceof User;
+        $message = $this->threadService->postAdminMessage($request, (string) $form->get('response')->getData(), $actingAdmin);
+
+        if ($request->getChannel() === SupportChannel::Message) {
+            $this->mirrorToInbox($request, $message->getContent(), $isFirstResponse);
+        }
+
+        if ($request->getChannel() === SupportChannel::Thread && $request->isEmailVerified()) {
+            $this->supportResponseEmail->send(['request' => $request, 'response' => $message->getContent()]);
+        }
+
+        return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+    }
+
+    #[Route('/{id}/resolve', name: 'app_admin_support_resolve', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function resolve(Request $httpRequest, int $id): Response
+    {
+        $request = $this->requireRequest($id);
+        $this->requireCsrf($httpRequest, 'app_admin_support_resolve' . $id);
+
+        $this->threadService->resolve($request);
+
+        return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+    }
+
+    #[Route('/{id}/reopen', name: 'app_admin_support_reopen', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function reopen(Request $httpRequest, int $id): Response
+    {
+        $request = $this->requireRequest($id);
+        $this->requireCsrf($httpRequest, 'app_admin_support_reopen' . $id);
+
+        $this->threadService->reopen($request);
+
+        return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+    }
+
+    #[Route('/{id}/invite-admins', name: 'app_admin_support_invite_admins', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function inviteAdmins(Request $httpRequest, int $id): Response
+    {
+        $request = $this->requireRequest($id);
+        $this->requireCsrf($httpRequest, 'app_admin_support_invite_admins' . $id);
+
+        $steward = $this->getUser();
+        if (!$steward instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if (!$request->canInviteAdmins()) {
+            return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+        }
+
+        $this->threadService->inviteAdmins($request, $steward);
+        $this->supportInvitationEmail->send(['request' => $request]);
+
+        $this->addFlash('success', 'admin_support.flash_admins_invited');
+
+        return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+    }
+
+    private function mirrorToInbox(SupportRequest $request, string $response, bool $isFirstResponse): void
+    {
+        $receiver = $request->getRequester();
+        if (!$receiver instanceof User) {
+            $this->addFlash('error', 'admin_support.flash_reply_no_user');
+            return;
+        }
 
         $owner = $request->getRespondedBy();
-        $isFirstResponse = !$owner instanceof User;
-        if ($isFirstResponse) {
-            $owner = $actingAdmin;
+        if (!$owner instanceof User) {
+            return;
+        }
 
+        if ($isFirstResponse) {
             $question = new Message();
             $question->setDeleted(false);
             $question->setWasRead(true);
@@ -235,30 +275,25 @@ final class RequestsController extends AbstractSupportController implements Admi
         $answer->setCreatedAt(new DateTimeImmutable());
         $answer->setContent($response);
         $this->em->persist($answer);
-
-        $request->setRespondedBy($owner);
-        $this->markRequestReplied($request, $response, SupportReplyChannel::Message);
+        $this->em->flush();
 
         $this->activityService->log(SendMessage::TYPE, $owner, ['user_id' => $receiver->getId()]);
-
-        $this->addFlash('success', 'admin_support.flash_reply_message_sent');
-
-        return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
     }
 
-    private function markRequestRead(SupportRequest $request): void
+    private function requireRequest(int $id): SupportRequest
     {
-        $request->setStatus(SupportRequestStatus::Read);
-        $this->em->persist($request);
-        $this->em->flush();
+        $request = $this->supportRequestRepo->find($id);
+        if (!$request instanceof SupportRequest || !$this->visibilityResolver->canView($request)) {
+            throw $this->createNotFoundException();
+        }
+
+        return $request;
     }
 
-    private function markRequestReplied(SupportRequest $request, string $response, SupportReplyChannel $channel): void
+    private function requireCsrf(Request $httpRequest, string $intention): void
     {
-        $request->setStatus(SupportRequestStatus::Replied);
-        $request->setResponse($response);
-        $request->setReplyChannel($channel);
-        $this->em->persist($request);
-        $this->em->flush();
+        if (!$this->isCsrfTokenValid($intention, (string) $httpRequest->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
     }
 }

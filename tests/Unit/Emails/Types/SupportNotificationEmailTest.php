@@ -6,8 +6,8 @@ use App\Emails\EmailQueueInterface;
 use App\Emails\Types\SupportNotificationEmail;
 use App\Entity\SupportRequest;
 use App\Entity\User;
-use App\Enum\ContactType;
-use App\Repository\UserRepository;
+use App\Enum\SupportAudience;
+use App\Service\Support\RecipientResolver;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use DateTimeImmutable;
@@ -19,7 +19,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SupportNotificationEmailTest extends TestCase
 {
-    public function testSendEnqueuesOneEmailPerAdmin(): void
+    public function testSendEnqueuesOneEmailPerResolvedRecipient(): void
     {
         // Arrange
         $config = $this->createStub(ConfigService::class);
@@ -31,8 +31,8 @@ class SupportNotificationEmailTest extends TestCase
         $admin2 = $this->createStub(User::class);
         $admin2->method('getEmail')->willReturn('admin2@example.com');
 
-        $userRepo = $this->createStub(UserRepository::class);
-        $userRepo->method('findAdminUsers')->willReturn([$admin1, $admin2]);
+        $resolver = $this->createStub(RecipientResolver::class);
+        $resolver->method('resolve')->willReturn([$admin1, $admin2]);
 
         $enqueuedEmails = [];
         $queue = $this->createMock(EmailQueueInterface::class);
@@ -51,13 +51,13 @@ class SupportNotificationEmailTest extends TestCase
         $request = $this->makeRequest();
 
         $translator = $this->createStub(TranslatorInterface::class);
-        $translator->method('trans')->willReturn('General inquiry');
+        $translator->method('trans')->willReturn('The organizers');
 
         $emailType = new SupportNotificationEmail(
             $this->createStub(BlocklistCheckerInterface::class),
             $queue,
             $config,
-            $userRepo,
+            $resolver,
             $this->createStub(LoggerInterface::class),
             $translator,
         );
@@ -69,23 +69,23 @@ class SupportNotificationEmailTest extends TestCase
         static::assertCount(2, $enqueuedEmails);
         static::assertSame('admin1@example.com', $enqueuedEmails[0]->getTo()[0]->getAddress());
         static::assertSame('admin2@example.com', $enqueuedEmails[1]->getTo()[0]->getAddress());
-        static::assertSame('General inquiry', $enqueuedEmails[0]->getContext()['contactType']);
+        static::assertSame('The organizers', $enqueuedEmails[0]->getContext()['audience']);
     }
 
-    public function testSendLogsWarningAndEnqueuesNothingWhenNoAdmins(): void
+    public function testSendLogsWarningAndEnqueuesNothingWhenNobodyIsResolved(): void
     {
         // Arrange
         $config = $this->createStub(ConfigService::class);
         $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
 
-        $userRepo = $this->createStub(UserRepository::class);
-        $userRepo->method('findAdminUsers')->willReturn([]);
+        $resolver = $this->createStub(RecipientResolver::class);
+        $resolver->method('resolve')->willReturn([]);
 
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->never())->method('enqueue');
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('warning')->with('Support ticket received but no active admin recipients found', $this->anything());
+        $logger->expects($this->once())->method('warning')->with('Support ticket received but no recipients could be resolved', $this->anything());
 
         $request = $this->makeRequest();
 
@@ -93,7 +93,7 @@ class SupportNotificationEmailTest extends TestCase
             $this->createStub(BlocklistCheckerInterface::class),
             $queue,
             $config,
-            $userRepo,
+            $resolver,
             $logger,
             $this->createStub(TranslatorInterface::class),
         );
@@ -106,8 +106,8 @@ class SupportNotificationEmailTest extends TestCase
     {
         $request = $this->createStub(SupportRequest::class);
         $request->method('getId')->willReturn(42);
-        $request->method('getContactType')->willReturn(ContactType::General);
-        $request->method('getName')->willReturn('John');
+        $request->method('getAudience')->willReturn(SupportAudience::Organizer);
+        $request->method('getRequesterLabel')->willReturn('John');
         $request->method('getEmail')->willReturn('john@example.com');
         $request->method('getMessage')->willReturn('Help!');
         $request->method('getCreatedAt')->willReturn(new DateTimeImmutable('2026-01-01'));

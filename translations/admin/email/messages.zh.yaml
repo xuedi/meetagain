@@ -43,6 +43,8 @@ admin_email_templates:
     trigger_upcoming_events: '周日 12:00'
     trigger_event_update_notification: '管理员修改活动开始时间、地点或取消状态时'
     trigger_series_rescheduled: '系列活动时间调整 - 报名已移除'
+    trigger_support_email_verify: '有人申请通过邮件接收支持答复通知时'
+    trigger_support_invitation: '协管员邀请管理员参与某条请求时'
 admin_email_sendlog:
     col_subject: '主题'
     page_title: '邮件发送日志'

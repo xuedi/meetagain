@@ -8,7 +8,7 @@ use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
 use App\Emails\Guard\Rule\SupportRequestPresentRule;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
-use App\Repository\UserRepository;
+use App\Service\Support\RecipientResolver;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use Psr\Log\LoggerInterface;
@@ -21,7 +21,7 @@ readonly class SupportNotificationEmail extends EmailAbstract
         BlocklistCheckerInterface $blocklist,
         private EmailQueueInterface $queue,
         private ConfigService $config,
-        private UserRepository $userRepository,
+        private RecipientResolver $recipientResolver,
         private LoggerInterface $logger,
         private TranslatorInterface $translator,
     ) {
@@ -43,6 +43,7 @@ readonly class SupportNotificationEmail extends EmailAbstract
         return [
             'subject' => 'New Support Request from John Doe',
             'context' => [
+                'audience' => 'Organizers',
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.org',
                 'message' => 'I need help with my account.',
@@ -64,22 +65,22 @@ readonly class SupportNotificationEmail extends EmailAbstract
         /** @var SupportRequest $request */
         $request = $context['request'];
 
-        $admins = $this->userRepository->findAdminUsers();
-        if ($admins === []) {
-            $this->logger->warning('Support ticket received but no active admin recipients found', [
+        $recipients = $this->recipientResolver->resolve($request);
+        if ($recipients === []) {
+            $this->logger->warning('Support ticket received but no recipients could be resolved', [
                 'support_request_id' => $request->getId(),
             ]);
             return;
         }
 
-        foreach ($admins as $admin) {
+        foreach ($recipients as $recipient) {
             $email = new TemplatedEmail();
             $email->from($this->config->getMailerAddress());
-            $email->to((string) $admin->getEmail());
+            $email->to((string) $recipient->getEmail());
             $email->locale('en');
             $email->context([
-                'contactType' => $this->translator->trans($request->getContactType()->label(), [], null, 'en'),
-                'name' => $request->getName(),
+                'audience' => $this->translator->trans($request->getAudience()->label(), [], null, 'en'),
+                'name' => $request->getRequesterLabel(),
                 'email' => $request->getEmail(),
                 'message' => $request->getMessage(),
                 'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),

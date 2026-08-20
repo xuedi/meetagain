@@ -28,7 +28,6 @@ src/Controller/AbstractController.php::getResponse // app.js is built by MediaCo
 
 # --- Controllers ---
 src/Controller/Admin/EventController.php::edit // realignment rules: a confirmed rule change realigns without allFollowing, and closing a series never does
-src/Controller/SupportController.php::index // deliberately not a PRG redirect, because the confirmation carries no replayable form
 src/Controller/CookieController.php::index // legal constraint: a rejection must be persisted too, or the banner reappears forever
 src/Controller/ProfileController.php::toggleRsvp // the redirect is load-bearing: the flash message only renders on a fresh request
 

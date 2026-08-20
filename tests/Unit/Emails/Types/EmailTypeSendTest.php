@@ -20,10 +20,11 @@ use App\Entity\Location;
 use App\Entity\NotificationSettings;
 use App\Entity\SupportRequest;
 use App\Entity\User;
-use App\Enum\ContactType;
+use App\Enum\SupportAudience;
 use App\Filter\Event\FollowerEventNotificationFilterInterface;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
+use App\Service\Support\RecipientResolver;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
@@ -158,21 +159,21 @@ class EmailTypeSendTest extends TestCase
         $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything());
 
         $request = $this->createStub(SupportRequest::class);
-        $request->method('getContactType')->willReturn(ContactType::General);
-        $request->method('getName')->willReturn('John');
+        $request->method('getAudience')->willReturn(SupportAudience::Organizer);
+        $request->method('getRequesterLabel')->willReturn('John');
         $request->method('getEmail')->willReturn('john@example.com');
         $request->method('getMessage')->willReturn('Help!');
         $request->method('getCreatedAt')->willReturn(new DateTimeImmutable('2026-01-01'));
 
         $admin = $this->makeUser('admin@example.com', 'Admin', id: 99);
-        $userRepo = $this->createStub(UserRepository::class);
-        $userRepo->method('findAdminUsers')->willReturn([$admin]);
+        $resolver = $this->createStub(RecipientResolver::class);
+        $resolver->method('resolve')->willReturn([$admin]);
 
         new SupportNotificationEmail(
             $this->blocklist,
             $queue,
             $this->config,
-            $userRepo,
+            $resolver,
             $this->createStub(LoggerInterface::class),
             $this->createStub(TranslatorInterface::class),
         )->send([

@@ -18,6 +18,7 @@ use App\Emails\Types\WelcomeEmail;
 use App\Entity\Event;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
+use App\Service\Support\RecipientResolver;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
@@ -240,7 +241,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(BlocklistCheckerInterface::class),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
-            $this->createStub(UserRepository::class),
+            $this->createStub(RecipientResolver::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(TranslatorInterface::class),
         );

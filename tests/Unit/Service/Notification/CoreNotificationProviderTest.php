@@ -4,7 +4,7 @@ namespace Tests\Unit\Service\Notification;
 
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
-use App\Repository\SupportRequestRepository;
+use App\Service\Support\VisibilityResolver;
 use App\Service\Notification\User\CoreNotificationProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -18,15 +18,15 @@ class CoreNotificationProviderTest extends TestCase
         $emailRepoStub = $this->createStub(EmailQueueRepository::class);
         $emailRepoStub->method('getStaleCount')->willReturn($staleEmails);
 
-        $supportRepoStub = $this->createStub(SupportRequestRepository::class);
-        $supportRepoStub->method('getNewCount')->willReturn($newSupportRequests);
+        $visibilityStub = $this->createStub(VisibilityResolver::class);
+        $visibilityStub->method('countNew')->willReturn($newSupportRequests);
 
         $securityStub = $this->createStub(Security::class);
         $securityStub->method('isGranted')->willReturn($isAdmin);
 
         return new CoreNotificationProvider(
             emailRepo: $emailRepoStub,
-            supportRequestRepo: $supportRepoStub,
+            visibilityResolver: $visibilityStub,
             security: $securityStub,
             translator: new IdentityTranslator(),
         );
@@ -62,7 +62,7 @@ class CoreNotificationProviderTest extends TestCase
 
     public static function getNotificationsProvider(): iterable
     {
-        yield 'non-admin user → empty array' => [
+        yield 'user below steward → empty array' => [
             'isAdmin' => false,
             'staleEmails' => 3,
             'newSupportRequests' => 1,
@@ -110,8 +110,8 @@ class CoreNotificationProviderTest extends TestCase
             'newSupportRequests' => 1,
             'expectedCount' => 2,
             'expectedLabelFragments' => [
-                'chrome.notification_stale_emails',
                 'chrome.notification_new_support_requests',
+                'chrome.notification_stale_emails',
             ],
         ];
     }

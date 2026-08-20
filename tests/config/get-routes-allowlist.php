@@ -1,11 +1,16 @@
 <?php declare(strict_types=1);
 
 use App\Controller\SecurityController;
+use App\Controller\SupportController;
 
 return [
     SecurityController::class . '::verifyUserEmail' => [
         'route' => 'app_register_confirm_email',
         'reason' => 'Email-link account activation. 256-bit token (bin2hex(random_bytes(32))), 24h TTL via regcodeExpiresAt, single-use (setRegcode(null) on success), entity-bound. See architecture/security/get-routes.md exception #1.',
+    ],
+    SupportController::class . '::verifyEmail' => [
+        'route' => 'app_support_email_verify',
+        'reason' => 'Email-link address confirmation for support-thread notifications. 256-bit token (bin2hex(random_bytes(32))), 24h TTL via emailVerifyExpiresAt, single-use (token nulled on success), entity-bound, unique index. Activation-style, so no confirm interstitial. See architecture/security/get-routes.md exception #1.',
     ],
     'Plugin\\Multisite\\Controller\\NonLocale\\JumpLandingController::land' => [
         'route' => 'app_jump_landing',

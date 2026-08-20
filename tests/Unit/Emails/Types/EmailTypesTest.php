@@ -19,6 +19,7 @@ use App\Emails\Types\WelcomeEmail;
 use App\Enum\EmailType;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
+use App\Service\Support\RecipientResolver;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
@@ -74,7 +75,7 @@ class EmailTypesTest extends TestCase
                 $this->blocklist,
                 $this->queue,
                 $this->config,
-                $this->createStub(UserRepository::class),
+                $this->createStub(RecipientResolver::class),
                 $this->createStub(LoggerInterface::class),
                 $this->createStub(TranslatorInterface::class),
             ),
@@ -172,7 +173,7 @@ class EmailTypesTest extends TestCase
             $this->blocklist,
             $this->queue,
             $this->config,
-            $this->createStub(UserRepository::class),
+            $this->createStub(RecipientResolver::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(TranslatorInterface::class),
         )->guardCheck([]);

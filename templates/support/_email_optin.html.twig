@@ -1,0 +1,33 @@
+{#
+    Support email opt-in -- offer to notify a proven address when the thread gets an answer
+
+    Rendered in the sidebar of the thread page, the only page that holds the cleartext token.
+    Posting an address only starts a double opt-in; the confirm mail carries the site name and a
+    confirm link and nothing the requester wrote, so an unproven address never receives
+    attacker-chosen content. The response is identical whatever the address, so the form is not an
+    address-existence oracle.
+
+    Used in:    templates/support/thread.html.twig
+    Parameters:
+        - token (string, required)    -- the cleartext thread token, the form's POST target
+        - verified (bool, required)   -- true once an address passed the double opt-in; hides the form
+        - prefill (string, optional)  -- address the requester already typed, still unproven
+#}
+<h2 class="title is-6">{{ 'support.optin_heading'|trans }}</h2>
+{% if verified %}
+    <p class="is-size-7 has-text-grey">{{ 'support.optin_already_verified'|trans }}</p>
+{% else %}
+    <p class="has-text-grey is-size-7 mb-3">{{ 'support.optin_intro'|trans }}</p>
+    <form method="post" action="{{ path('app_support_thread_subscribe', {'token': token}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('app_support_thread_subscribe' ~ token) }}">
+        <div class="field">
+            <div class="control">
+                <input class="input is-small" type="email" name="support_optin_email" required
+                       value="{{ prefill|default('') }}"
+                       placeholder="{{ 'support.optin_label_email'|trans }}"
+                       aria-label="{{ 'support.optin_label_email'|trans }}">
+            </div>
+        </div>
+        <button class="button is-small">{{ 'support.optin_button'|trans }}</button>
+    </form>
+{% endif %}

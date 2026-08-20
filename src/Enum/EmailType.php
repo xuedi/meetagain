@@ -13,6 +13,8 @@ enum EmailType: string
     case Announcement = 'announcement';
     case SupportNotification = 'support_notification';
     case SupportResponse = 'support_response';
+    case SupportEmailVerify = 'support_email_verify';
+    case SupportInvitation = 'support_invitation';
     case AdminNotification = 'admin_notification';
     case EventReminder = 'event_reminder';
     case UpcomingEvents = 'upcoming_events';

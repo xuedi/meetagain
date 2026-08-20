@@ -21,6 +21,7 @@ use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
+use App\Service\Support\RecipientResolver;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
@@ -171,7 +172,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->blockingChecker,
             $this->createStub(EmailQueueInterface::class),
             $this->config,
-            $this->createStub(UserRepository::class),
+            $this->createStub(RecipientResolver::class),
             $this->createStub(LoggerInterface::class),
             $this->createStub(TranslatorInterface::class),
         );

@@ -11,8 +11,8 @@
             <thead>
             <tr>
                 <th>{{ 'admin_support.col_date'|trans }}</th>
-                <th>{{ 'admin_support.col_type'|trans }}</th>
-                <th>{{ 'admin_support.col_name'|trans }}</th>
+                <th>{{ 'admin_support.col_audience'|trans }}</th>
+                <th>{{ 'admin_support.col_requester'|trans }}</th>
                 <th>{{ 'admin_support.col_email'|trans }}</th>
                 <th>{{ 'admin_support.col_status'|trans }}</th>
                 <th></th>
@@ -22,20 +22,20 @@
             {% for request in requests %}
                 <tr>
                     <td class="is-nowrap">{{ request.createdAt|date('Y-m-d H:i:s') }}</td>
-                    <td><span class="tag is-light">{{ request.contactType.label()|trans }}</span></td>
+                    <td><span class="tag is-light">{{ request.audience.label()|trans }}</span></td>
                     <td>
                         {% if request.isNew() %}<strong>{% endif %}
-                        {{ request.name }}
+                        {{ request.requesterLabel ?? 'admin_support.requester_guest'|trans }}
                         {% if request.isNew() %}</strong>{% endif %}
                     </td>
-                    <td>{{ request.email }}</td>
+                    <td>{{ request.email ?? '' }}</td>
                     <td>
-                        {% if request.isNew() %}
-                            <span class="tag is-warning">{{ 'admin_support.status_new'|trans }}</span>
-                        {% elseif request.isReplied() %}
-                            <span class="tag is-success">{{ 'admin_support.status_replied'|trans }}</span>
-                        {% else %}
-                            <span class="tag is-light">{{ 'admin_support.status_read'|trans }}</span>
+                        <span class="tag {{ request.status.tagVariant() }}">{{ request.status.label()|trans }}</span>
+                        {% if request.hasInvitedAdmins() %}
+                            <span class="tag is-info is-light" title="{{ 'admin_support.admins_invited_by'|trans({
+                                '%name%': request.invitedAdminsBy ? request.invitedAdminsBy.name : 'admin_support.invited_by_unknown'|trans,
+                                '%date%': request.invitedAdminsAt|date('Y-m-d H:i'),
+                            }) }}">{{ 'admin_support.tag_admins_invited'|trans }}</span>
                         {% endif %}
                     </td>
                     <td>

@@ -10,7 +10,27 @@ framework:
             interval: '1 hour'
         support:
             policy: 'fixed_window'
+            limit: 100
+            interval: '1 hour'
+        support_thread_view:
+            policy: 'fixed_window'
+            limit: 120
+            interval: '1 hour'
+        support_thread_miss:
+            policy: 'fixed_window'
             limit: 10
+            interval: '1 hour'
+        support_thread_reply:
+            policy: 'fixed_window'
+            limit: 10
+            interval: '1 hour'
+        support_email_verify:
+            policy: 'fixed_window'
+            limit: 3
+            interval: '1 day'
+        support_email_optin:
+            policy: 'fixed_window'
+            limit: 8
             interval: '1 hour'
 
 when@test:
@@ -25,6 +45,26 @@ when@test:
                 limit: 999999
                 interval: '1 hour'
             support:
+                policy: 'fixed_window'
+                limit: 999999
+                interval: '1 hour'
+            support_thread_view:
+                policy: 'fixed_window'
+                limit: 999999
+                interval: '1 hour'
+            support_thread_miss:
+                policy: 'fixed_window'
+                limit: 999999
+                interval: '1 hour'
+            support_thread_reply:
+                policy: 'fixed_window'
+                limit: 999999
+                interval: '1 hour'
+            support_email_verify:
+                policy: 'fixed_window'
+                limit: 999999
+                interval: '1 day'
+            support_email_optin:
                 policy: 'fixed_window'
                 limit: 999999
                 interval: '1 hour'
