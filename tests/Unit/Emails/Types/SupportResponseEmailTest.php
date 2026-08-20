@@ -5,7 +5,7 @@ namespace Tests\Unit\Emails\Types;
 use App\Emails\EmailQueueInterface;
 use App\Emails\Types\SupportResponseEmail;
 use App\Entity\SupportRequest;
-use App\Enum\ContactType;
+use App\Enum\SupportAudience;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
@@ -85,14 +85,46 @@ class SupportResponseEmailTest extends TestCase
         static::assertSame(EmailType::SupportResponse->value, $emailType->getIdentifier());
     }
 
-    private function makeRequest(): SupportRequest
+    public function testSendSkipsWhenTheAddressWasNeverConfirmed(): void
+    {
+        // Arrange
+        $config = $this->createStub(ConfigService::class);
+        $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
+
+        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklist->method('isBlocked')->willReturn(false);
+
+        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue->expects($this->never())->method('enqueue');
+
+        $emailType = new SupportResponseEmail($blocklist, $queue, $config);
+
+        // Act
+        $emailType->send(['request' => $this->makeRequest(verified: false), 'response' => 'Here is your answer.']);
+    }
+
+    public function testGuardSkipsWhenTheAddressWasNeverConfirmed(): void
+    {
+        // Arrange
+        $emailType = new SupportResponseEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(ConfigService::class),
+        );
+
+        // Act & Assert
+        static::assertFalse($emailType->guardCheck(['request' => $this->makeRequest(verified: false)]));
+    }
+
+    private function makeRequest(bool $verified = true): SupportRequest
     {
         $request = $this->createStub(SupportRequest::class);
-        $request->method('getContactType')->willReturn(ContactType::General);
-        $request->method('getName')->willReturn('John');
+        $request->method('getAudience')->willReturn(SupportAudience::Organizer);
+        $request->method('getRequesterLabel')->willReturn('John');
         $request->method('getEmail')->willReturn('john@example.com');
         $request->method('getMessage')->willReturn('Help!');
         $request->method('getCreatedAt')->willReturn(new DateTimeImmutable('2026-01-01'));
+        $request->method('isEmailVerified')->willReturn($verified);
 
         return $request;
     }

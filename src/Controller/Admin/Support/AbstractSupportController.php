@@ -19,25 +19,30 @@ abstract class AbstractSupportController extends AbstractController
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(section: 'admin_shell.section_system', links: [
-            new AdminLink(label: 'admin_shell.menu_support', route: 'app_admin_support_list', active: 'support', role: 'ROLE_ADMIN'),
+            new AdminLink(label: 'admin_shell.menu_support', route: 'app_admin_support_list', active: 'support', role: 'ROLE_STEWARD'),
         ]);
     }
 
     final public function getTabs(): AdminTabs
     {
-        return new AdminTabs([
+        $tabs = [
             new AdminTab(
                 label: $this->translator->trans('admin_support.tab_requests'),
                 target: $this->generateUrl('app_admin_support_list'),
                 icon: 'life-ring',
                 isActive: $this->activeSupportTab === 'requests',
             ),
-            new AdminTab(
+        ];
+
+        if ($this->isGranted('ROLE_ADMIN')) {
+            $tabs[] = new AdminTab(
                 label: $this->translator->trans('admin_support.tab_reports'),
                 target: $this->generateUrl('app_admin_support_reports'),
                 icon: 'flag',
                 isActive: $this->activeSupportTab === 'reports',
-            ),
-        ]);
+            );
+        }
+
+        return new AdminTabs($tabs);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Emails\Types;
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
+use App\Emails\Guard\Rule\SupportRequestEmailVerifiedRule;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
@@ -47,6 +48,7 @@ readonly class SupportResponseEmail extends EmailAbstract
     public function getGuardRules(): array
     {
         return [
+            new SupportRequestEmailVerifiedRule(),
             new OutboundMailerNotBlocklistedRule($this->blocklist, $this->config),
         ];
     }
@@ -57,16 +59,16 @@ readonly class SupportResponseEmail extends EmailAbstract
         $request = $context['request'];
         $response = (string) $context['response'];
 
-        if ($this->blocklist->isBlocked($request->getEmail())) {
+        if (!$request->isEmailVerified() || $this->blocklist->isBlocked((string) $request->getEmail())) {
             return;
         }
 
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
-        $email->to($request->getEmail());
+        $email->to((string) $request->getEmail());
         $email->locale('en');
         $email->context([
-            'name' => $request->getName(),
+            'name' => $request->getRequesterLabel(),
             'originalMessage' => $request->getMessage(),
             'response' => $response,
             'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),

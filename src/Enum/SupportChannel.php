@@ -2,15 +2,15 @@
 
 namespace App\Enum;
 
-enum SupportReplyChannel: string
+enum SupportChannel: string
 {
-    case Email = 'email';
+    case Thread = 'thread';
     case Message = 'message';
 
     public function label(): string
     {
         return match ($this) {
-            self::Email => 'admin_support.channel_email',
+            self::Thread => 'admin_support.channel_thread',
             self::Message => 'admin_support.channel_message',
         };
     }

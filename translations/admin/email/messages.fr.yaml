@@ -43,6 +43,8 @@ admin_email_templates:
     trigger_upcoming_events: 'dimanche 12:00'
     trigger_event_update_notification: 'quand un admin modifie le début, le lieu ou l''annulation d''un événement'
     trigger_series_rescheduled: 'Série récurrente reprogrammée - RSVP des participants supprimés'
+    trigger_support_email_verify: 'quelqu''un demande à être averti par e-mail des réponses du support'
+    trigger_support_invitation: 'un steward invite les administrateurs sur une demande'
 admin_email_sendlog:
     col_subject: 'Objet'
     page_title: 'Journal d''envoi des e-mails'

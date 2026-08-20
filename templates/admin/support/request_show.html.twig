@@ -8,7 +8,7 @@
         {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <div class="columns">
-            <div class="column">
+            <div class="column is-5">
                 <table class="table is-fullwidth">
                     <tbody>
                         <tr>
@@ -20,61 +20,107 @@
                             <td>{{ request.createdAt|date('Y-m-d H:i:s') }}</td>
                         </tr>
                         <tr>
-                            <th>{{ 'admin_support.col_type'|trans }}</th>
-                            <td><span class="tag is-light">{{ request.contactType.label()|trans }}</span></td>
+                            <th>{{ 'admin_support.col_audience'|trans }}</th>
+                            <td><span class="tag is-light">{{ request.audience.label()|trans }}</span></td>
                         </tr>
                         <tr>
-                            <th>{{ 'admin_support.col_name'|trans }}</th>
-                            <td>{{ request.name }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ 'admin_support.col_email'|trans }}</th>
-                            <td><a href="mailto:{{ request.email }}">{{ request.email }}</a></td>
-                        </tr>
-                        <tr>
-                            <th>{{ 'admin_support.col_message'|trans }}</th>
-                            <td>{{ request.message|safe_message }}</td>
-                        </tr>
-                        <tr>
-                            <th>{{ 'admin_support.col_status'|trans }}</th>
+                            <th>{{ 'admin_support.col_requester'|trans }}</th>
                             <td>
-                                {% if request.isNew() %}
-                                    <span class="tag is-warning">{{ 'admin_support.status_new'|trans }}</span>
-                                {% elseif request.isReplied() %}
-                                    <span class="tag is-success">{{ 'admin_support.status_replied'|trans }}</span>
-                                {% else %}
-                                    <span class="tag is-light">{{ 'admin_support.status_read'|trans }}</span>
+                                {{ request.requesterLabel ?? 'admin_support.requester_guest'|trans }}
+                                {% if request.requester %}
+                                    <span class="tag is-info is-light">{{ 'admin_support.requester_member'|trans }}</span>
                                 {% endif %}
                             </td>
                         </tr>
+                        <tr>
+                            <th>{{ 'admin_support.col_email'|trans }}</th>
+                            <td>
+                                {% if request.email is null %}
+                                    <span class="has-text-grey">{{ 'admin_support.email_none'|trans }}</span>
+                                {% elseif request.isEmailVerified() %}
+                                    <a href="mailto:{{ request.email }}">{{ request.email }}</a>
+                                    <span class="tag is-success">{{ 'admin_support.email_verified'|trans({'%date%': request.emailVerifiedAt|date('Y-m-d')}) }}</span>
+                                {% else %}
+                                    {{ request.email }}
+                                    <span class="tag is-warning">{{ 'admin_support.email_unverified'|trans }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_support.col_channel'|trans }}</th>
+                            <td>{{ request.channel.label()|trans }}</td>
+                        </tr>
+                        {% if request.token %}
+                            <tr>
+                                <th>{{ 'admin_support.col_external'|trans }}</th>
+                                <td>
+                                    <a href="{{ url('app_support_thread', {'token': request.token}) }}"
+                                       class="button is-small" target="_blank" rel="noopener">
+                                        <span class="icon"><i class="fa fa-external-link"></i></span>
+                                        <span>{{ 'admin_support.link_open_user_thread'|trans }}</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <th>{{ 'admin_support.col_status'|trans }}</th>
+                            <td>
+                                <span class="tag {{ request.status.tagVariant() }}">{{ request.status.label()|trans }}</span>
+                            </td>
+                        </tr>
+                        {% if request.hasInvitedAdmins() %}
+                            <tr>
+                                <th>{{ 'admin_support.col_admins_invited'|trans }}</th>
+                                <td>
+                                    {{ 'admin_support.admins_invited_by'|trans({
+                                        '%name%': request.invitedAdminsBy ? request.invitedAdminsBy.name : 'admin_support.invited_by_unknown'|trans,
+                                        '%date%': request.invitedAdminsAt|date('Y-m-d H:i'),
+                                    }) }}
+                                </td>
+                            </tr>
+                        {% endif %}
                     </tbody>
                 </table>
+
+                {% if request.canInviteAdmins() %}
+                    <p class="has-text-grey is-size-7">{{ 'admin_support.invite_admins_hint'|trans }}</p>
+                {% endif %}
+                {% if request.email is not null and not request.isEmailVerified() %}
+                    <p class="has-text-grey is-size-7 mt-2">{{ 'admin_support.email_unverified_note'|trans }}</p>
+                {% endif %}
             </div>
 
             <div class="column">
-                {% if request.isReplied() %}
-                    <h2 class="title is-6">{{ 'admin_support.replied_heading'|trans }}</h2>
-                    <p class="has-text-grey mb-4">{{ 'admin_support.replied_note'|trans({'%channel%': request.replyChannel.label()|trans}) }}</p>
-                    <div class="field">
-                        <label class="label">{{ 'admin_support.reply_label'|trans }}</label>
-                        <div class="control">
-                            <div class="box">{{ request.response|safe_message }}</div>
-                        </div>
+                <h2 class="title is-6">{{ 'admin_support.thread_heading'|trans }}</h2>
+
+                {% for message in messages %}
+                    <div class="box">
+                        <p class="is-size-7 has-text-grey mb-2">
+                            {% if message.isFromAdmin() %}
+                                <strong>{{ message.authorUser ? message.authorUser.name : 'admin_support.thread_author_team'|trans }}</strong>
+                            {% else %}
+                                <strong>{{ request.requesterLabel ?? 'admin_support.requester_guest'|trans }}</strong>
+                            {% endif %}
+                            &middot; {{ message.createdAt|date('Y-m-d H:i:s') }}
+                        </p>
+                        <div>{{ message.content|safe_message }}</div>
                     </div>
-                {% else %}
-                    {% if replyMode == 'message' %}
-                        <h2 class="title is-6">{{ 'admin_support.reply_message_heading'|trans }}</h2>
-                        <p class="has-text-grey mb-4">{{ 'admin_support.reply_message_note'|trans }}</p>
-                        {{ form_start(replyForm, {'action': path('app_admin_support_reply_message', {'id': request.id})}) }}
-                    {% else %}
-                        <h2 class="title is-6">{{ 'admin_support.reply_email_heading'|trans }}</h2>
-                        <p class="has-text-grey mb-4">{{ 'admin_support.reply_email_note'|trans }}</p>
-                        {{ form_start(replyForm, {'action': path('app_admin_support_reply_email', {'id': request.id})}) }}
-                    {% endif %}
-                    {{ form_row(replyForm.response) }}
-                    <button class="button is-primary mt-2">{{ 'admin_support.button_reply_send'|trans }}</button>
-                    {{ form_end(replyForm) }}
+                {% endfor %}
+
+                {% if request.hasInvitedAdmins() %}
+                    <p class="has-text-grey is-size-7 mb-4">
+                        <span class="icon is-small"><i class="fa fa-user-plus"></i></span>
+                        {{ 'admin_support.admins_invited_by'|trans({
+                            '%name%': request.invitedAdminsBy ? request.invitedAdminsBy.name : 'admin_support.invited_by_unknown'|trans,
+                            '%date%': request.invitedAdminsAt|date('Y-m-d H:i'),
+                        }) }}
+                    </p>
                 {% endif %}
+
+                {{ form_start(replyForm, {'action': path('app_admin_support_reply', {'id': request.id})}) }}
+                {{ form_row(replyForm.response) }}
+                <button class="button is-primary mt-2">{{ 'admin_support.button_reply_send'|trans }}</button>
+                {{ form_end(replyForm) }}
             </div>
         </div>
 

@@ -7,19 +7,27 @@ use App\EntityActionDispatcher;
 use App\Enum\CronTaskStatus;
 use App\Enum\EntityAction;
 use App\Repository\ImageRepository;
+use App\Repository\SupportRequestRepository;
 use App\Repository\UserRepository;
+use App\Service\Support\ThreadService;
 use App\ValueObject\CronTaskResult;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 readonly class CleanupService implements CronTaskInterface
 {
+    public const int SUPPORT_THREAD_STALE_DAYS = 180;
+
     public function __construct(
         private ImageRepository $imageRepo,
         private UserRepository $userRepo,
+        private SupportRequestRepository $supportRequestRepo,
+        private ThreadService $threadService,
         private EntityManagerInterface $entityManager,
         private EntityActionDispatcher $entityActionDispatcher,
+        private ClockInterface $clock,
         private LoggerInterface $logger,
     ) {}
 
@@ -39,7 +47,21 @@ readonly class CleanupService implements CronTaskInterface
             $output->writeln('Clean registrations: ' . $regCount);
             $this->logger->info('Ghosted registrations removed', ['count' => $regCount]);
 
-            $message = sprintf('image_cache: %d, registrations: %d', $imageCount, $regCount);
+            $autoResolvedCount = $this->autoResolveStaleSupportThreads();
+            $output->writeln('Auto-resolve support threads: ' . $autoResolvedCount);
+            $this->logger->info('Stale support threads auto-resolved', ['count' => $autoResolvedCount]);
+
+            $verifyCount = $this->expireSupportEmailVerifications();
+            $output->writeln('Expire support email verifications: ' . $verifyCount);
+            $this->logger->info('Expired support email verifications cleared', ['count' => $verifyCount]);
+
+            $message = sprintf(
+                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d',
+                $imageCount,
+                $regCount,
+                $autoResolvedCount,
+                $verifyCount,
+            );
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
         } catch (\Throwable $e) {
@@ -56,6 +78,31 @@ readonly class CleanupService implements CronTaskInterface
         foreach ($images as $image) {
             $image->setUpdatedAt(null);
             $this->entityManager->persist($image);
+            $count++;
+        }
+        $this->entityManager->flush();
+
+        return $count;
+    }
+
+    public function autoResolveStaleSupportThreads(): int
+    {
+        $cutoff = $this->clock->now()->modify(sprintf('-%d days', self::SUPPORT_THREAD_STALE_DAYS));
+
+        $count = 0;
+        foreach ($this->supportRequestRepo->findStaleUnresolved($cutoff) as $request) {
+            $this->threadService->resolve($request);
+            $count++;
+        }
+
+        return $count;
+    }
+
+    public function expireSupportEmailVerifications(): int
+    {
+        $count = 0;
+        foreach ($this->supportRequestRepo->findExpiredEmailVerifications($this->clock->now()) as $request) {
+            $this->threadService->clearEmailVerification($request);
             $count++;
         }
         $this->entityManager->flush();

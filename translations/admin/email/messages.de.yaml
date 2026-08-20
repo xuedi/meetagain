@@ -43,6 +43,8 @@ admin_email_templates:
     trigger_upcoming_events: 'Sonntag 12:00'
     trigger_event_update_notification: 'wenn Admin Beginn, Ort oder Absage eines Events ändert'
     trigger_series_rescheduled: 'Terminserie verschoben - Zusagen entfernt'
+    trigger_support_email_verify: 'jemand möchte Antwortbenachrichtigungen per E-Mail'
+    trigger_support_invitation: 'ein Steward holt die Administratoren dazu'
 admin_email_sendlog:
     col_subject: 'Betreff'
     page_title: 'E-Mail-Sendeprotokoll'

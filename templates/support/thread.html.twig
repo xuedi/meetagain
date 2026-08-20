@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'support.thread_title'|trans }}{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex,nofollow">
+    <meta name="referrer" content="no-referrer">{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+            <div class="columns mt-5">
+
+                <div class="column">
+
+                    <h1 class="title is-5">{{ 'support.thread_title'|trans }}</h1>
+                    <p class="has-text-grey is-size-7">
+                        {{ 'support.thread_opened_on'|trans }} {{ supportRequest.createdAt|date('Y-m-d H:i') }}
+                        &middot; {{ supportRequest.audience.label()|trans }}
+                    </p>
+
+                    {% for message in messages %}
+                        <article class="box mt-4">
+                            <p class="is-size-7 has-text-grey mb-2">
+                                {% if message.isFromAdmin() %}
+                                    <strong>{{ 'support.thread_author_team'|trans }}</strong>
+                                {% else %}
+                                    <strong>{{ 'support.thread_author_you'|trans }}</strong>
+                                {% endif %}
+                                &middot; {{ message.createdAt|date('Y-m-d H:i') }}
+                            </p>
+                            <div>{{ message.content|safe_message }}</div>
+                        </article>
+                    {% endfor %}
+
+                    {% if canReply %}
+                        <h2 class="title is-6 mt-5">{{ 'support.thread_reply_heading'|trans }}</h2>
+                        {{ form_start(replyForm, {'action': path('app_support_thread_reply', {'token': token})}) }}
+                        {{ form_row(replyForm.message) }}
+                        <button class="button is-primary mt-2">{{ 'support.thread_reply_button'|trans }}</button>
+                        {{ form_end(replyForm) }}
+                    {% else %}
+                        <div class="notification mt-5">
+                            <p>{{ 'support.thread_closed_notice'|trans }}</p>
+                            <a class="button is-primary mt-3" href="{{ path('app_contact') }}">{{ 'support.thread_closed_new_request'|trans }}</a>
+                        </div>
+                    {% endif %}
+
+                </div>
+
+                <div class="column is-5-tablet is-4-desktop">
+
+                    <div class="box has-background-warning-light" data-thread-link-sheet>
+                        <h2 class="title is-6">{{ 'support.thread_link_title'|trans }}</h2>
+                        <div class="content">
+                            <p class="is-size-7">{{ 'support.thread_link_body'|trans }}</p>
+                        </div>
+                        <div class="field">
+                            <label class="label is-small" for="threadUrl">{{ 'support.thread_link_label'|trans }}</label>
+                            <div class="control">
+                                <input class="input is-small is-family-monospace" id="threadUrl" type="text" readonly
+                                       value="{{ url('app_support_thread', {'token': token}) }}" data-thread-link>
+                            </div>
+                        </div>
+                        <button class="button is-small" type="button"
+                                data-thread-copy data-copied-label="{{ 'support.thread_link_copied'|trans }}">
+                            <span class="icon"><i class="fa fa-copy"></i></span>
+                            <span>{{ 'support.thread_link_copy'|trans }}</span>
+                        </button>
+                    </div>
+
+                    <div class="box mt-4">
+                        {% include 'support/_email_optin.html.twig' with {
+                            'token': token,
+                            'verified': supportRequest.isEmailVerified(),
+                            'prefill': supportRequest.email ?? ''
+                        } only %}
+                    </div>
+
+                    <p class="is-size-7 has-text-grey mt-4">{{ 'support.response_time'|trans }}</p>
+
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/support-thread.js') }}" defer></script>
+{% endblock %}

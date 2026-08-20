@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
-use App\Enum\ContactType;
-use App\Enum\SupportReplyChannel;
+use App\Enum\SupportAudience;
+use App\Enum\SupportChannel;
 use App\Enum\SupportRequestStatus;
 use App\Repository\SupportRequestRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use SensitiveParameter;
 
 #[ORM\Entity(repositoryClass: SupportRequestRepository::class)]
 class SupportRequest
@@ -18,11 +19,12 @@ class SupportRequest
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100)]
-    private string $name = '';
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $requester = null;
 
-    #[ORM\Column(length: 180)]
-    private string $email = '';
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $email = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private string $message = '';
@@ -33,8 +35,8 @@ class SupportRequest
     #[ORM\Column(length: 10, enumType: SupportRequestStatus::class)]
     private SupportRequestStatus $status = SupportRequestStatus::New;
 
-    #[ORM\Column(length: 20, enumType: ContactType::class)]
-    private ContactType $contactType = ContactType::General;
+    #[ORM\Column(length: 10, enumType: SupportAudience::class)]
+    private SupportAudience $audience = SupportAudience::Organizer;
 
     #[ORM\Column(length: 45, nullable: true)]
     private ?string $ipAddress = null;
@@ -43,35 +45,57 @@ class SupportRequest
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $respondedBy = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $response = null;
+    #[ORM\Column(length: 10, enumType: SupportChannel::class)]
+    private SupportChannel $channel = SupportChannel::Thread;
 
-    #[ORM\Column(length: 10, enumType: SupportReplyChannel::class, nullable: true)]
-    private ?SupportReplyChannel $replyChannel = null;
+    #[ORM\Column(length: 64, unique: true, nullable: true)]
+    private ?string $token = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $resolvedAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $lastActivityAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $emailVerifiedAt = null;
+
+    #[ORM\Column(length: 64, unique: true, nullable: true)]
+    private ?string $emailVerifyToken = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $emailVerifyExpiresAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $invitedAdminsAt = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $invitedAdminsBy = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getName(): string
+    public function getRequester(): ?User
     {
-        return $this->name;
+        return $this->requester;
     }
 
-    public function setName(string $name): static
+    public function setRequester(?User $requester): static
     {
-        $this->name = $name;
+        $this->requester = $requester;
 
         return $this;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(?string $email): static
     {
         $this->email = $email;
 
@@ -114,14 +138,14 @@ class SupportRequest
         return $this;
     }
 
-    public function getContactType(): ContactType
+    public function getAudience(): SupportAudience
     {
-        return $this->contactType;
+        return $this->audience;
     }
 
-    public function setContactType(ContactType $contactType): static
+    public function setAudience(SupportAudience $audience): static
     {
-        $this->contactType = $contactType;
+        $this->audience = $audience;
 
         return $this;
     }
@@ -150,28 +174,122 @@ class SupportRequest
         return $this;
     }
 
-    public function getResponse(): ?string
+    public function getChannel(): SupportChannel
     {
-        return $this->response;
+        return $this->channel;
     }
 
-    public function setResponse(?string $response): static
+    public function setChannel(SupportChannel $channel): static
     {
-        $this->response = $response;
+        $this->channel = $channel;
 
         return $this;
     }
 
-    public function getReplyChannel(): ?SupportReplyChannel
+    public function getToken(): ?string
     {
-        return $this->replyChannel;
+        return $this->token;
     }
 
-    public function setReplyChannel(?SupportReplyChannel $replyChannel): static
+    public function setToken(#[SensitiveParameter] ?string $token): static
     {
-        $this->replyChannel = $replyChannel;
+        $this->token = $token;
 
         return $this;
+    }
+
+    public function getResolvedAt(): ?DateTimeImmutable
+    {
+        return $this->resolvedAt;
+    }
+
+    public function setResolvedAt(?DateTimeImmutable $resolvedAt): static
+    {
+        $this->resolvedAt = $resolvedAt;
+
+        return $this;
+    }
+
+    public function getLastActivityAt(): ?DateTimeImmutable
+    {
+        return $this->lastActivityAt;
+    }
+
+    public function setLastActivityAt(?DateTimeImmutable $lastActivityAt): static
+    {
+        $this->lastActivityAt = $lastActivityAt;
+
+        return $this;
+    }
+
+    public function getEmailVerifiedAt(): ?DateTimeImmutable
+    {
+        return $this->emailVerifiedAt;
+    }
+
+    public function setEmailVerifiedAt(?DateTimeImmutable $emailVerifiedAt): static
+    {
+        $this->emailVerifiedAt = $emailVerifiedAt;
+
+        return $this;
+    }
+
+    public function getEmailVerifyToken(): ?string
+    {
+        return $this->emailVerifyToken;
+    }
+
+    public function setEmailVerifyToken(#[SensitiveParameter] ?string $emailVerifyToken): static
+    {
+        $this->emailVerifyToken = $emailVerifyToken;
+
+        return $this;
+    }
+
+    public function getEmailVerifyExpiresAt(): ?DateTimeImmutable
+    {
+        return $this->emailVerifyExpiresAt;
+    }
+
+    public function setEmailVerifyExpiresAt(?DateTimeImmutable $emailVerifyExpiresAt): static
+    {
+        $this->emailVerifyExpiresAt = $emailVerifyExpiresAt;
+
+        return $this;
+    }
+
+    public function getInvitedAdminsAt(): ?DateTimeImmutable
+    {
+        return $this->invitedAdminsAt;
+    }
+
+    public function setInvitedAdminsAt(?DateTimeImmutable $invitedAdminsAt): static
+    {
+        $this->invitedAdminsAt = $invitedAdminsAt;
+
+        return $this;
+    }
+
+    public function getInvitedAdminsBy(): ?User
+    {
+        return $this->invitedAdminsBy;
+    }
+
+    public function setInvitedAdminsBy(?User $invitedAdminsBy): static
+    {
+        $this->invitedAdminsBy = $invitedAdminsBy;
+
+        return $this;
+    }
+
+    public function hasInvitedAdmins(): bool
+    {
+        return $this->invitedAdminsAt instanceof DateTimeImmutable;
+    }
+
+    public function canInviteAdmins(): bool
+    {
+        return $this->audience === SupportAudience::Organizer && !$this->hasInvitedAdmins();
     }
 
     public function isNew(): bool
@@ -187,5 +305,30 @@ class SupportRequest
     public function isReplied(): bool
     {
         return $this->status === SupportRequestStatus::Replied;
+    }
+
+    public function isReopened(): bool
+    {
+        return $this->status === SupportRequestStatus::Reopened;
+    }
+
+    public function isResolved(): bool
+    {
+        return $this->status === SupportRequestStatus::Resolved;
+    }
+
+    public function isOpenForRequester(): bool
+    {
+        return $this->status !== SupportRequestStatus::Resolved;
+    }
+
+    public function getRequesterLabel(): ?string
+    {
+        return $this->requester?->getName() ?? $this->email;
+    }
+
+    public function isEmailVerified(): bool
+    {
+        return $this->emailVerifiedAt instanceof DateTimeImmutable && $this->email !== null;
     }
 }

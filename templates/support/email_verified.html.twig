@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'support.verified_title'|trans }}{% endblock %}
+{% block meta_robots %}<meta name="robots" content="noindex,nofollow">{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered mt-5">
+                <div class="column is-6-tablet is-5-desktop">
+
+                    <h1 class="title is-5">{{ 'support.verified_title'|trans }}</h1>
+                    <p>{{ 'support.verified_body'|trans }}</p>
+                    <p class="has-text-grey is-size-7 mt-3">{{ 'support.verified_bookmark_hint'|trans }}</p>
+                    <a class="button is-primary mt-4" href="{{ path('app_frontpage') }}">{{ 'support.confirm_back'|trans }}</a>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
