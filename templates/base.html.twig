@@ -69,6 +69,8 @@
         <script src="{{ asset(javascriptPath) }}" defer></script>
     {% endfor %}
 
+    {{ get_head_html() }}
+
     {% block stylesheets %}{% endblock %}
     {% block javascripts %}{% endblock %}
 </head>
