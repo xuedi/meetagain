@@ -14,6 +14,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `EventFilterInterface`                     | Control which events are visible                      | `getEventIdFilter()`                                      |
 | `CmsFilterInterface`                       | Control which CMS pages are visible                   | `getCmsPageSlugs()`                                       |
 | `ReservedSlugProviderInterface`            | Reserve slugs the CMS editor must refuse to assign    | `getReservedSlugs()`                                      |
+| `HeadHtmlProviderInterface`                | Add markup to the document `<head>`                   | `getHeadHtml()`                                           |
 | `MemberFilterInterface`                    | Filter which members appear in lists                  | `getUserIds()`                                            |
 | `EventFilterFormContributorInterface`      | Add fields to the event filter form                   | `addFields()`                                             |
 | `NotificationProviderInterface`            | Add informational items to the notification bell      | `getNotifications()`                                      |
@@ -265,6 +266,48 @@ final readonly class MyRouteSlugProvider implements ReservedSlugProviderInterfac
     {
         // Slugs your plugin's fixed routes claim. Keep in sync with your routes.
         return ['pricing', 'features'];
+    }
+}
+```
+
+---
+
+### HeadHtmlProviderInterface
+
+**Purpose:** Contribute markup to the document `<head>` on every page. Use it for anything that has to live in the head
+and cannot be expressed as a plain asset path - a tag carrying `data-*` attributes, a `<link>` with computed
+attributes, structured data. Plain CSS and JS files belong in `getStylesheets()` / `getJavascripts()` instead.
+
+**File:** `src/Publisher/HeadHtml/HeadHtmlProviderInterface.php`
+
+**Tag:** auto-applied by `#[AutoconfigureTag]` on the interface - just implement it, no attribute needed.
+
+**When called:** Once per rendered page, from `base.html.twig`. All providers are unioned; returning `null` or an empty
+string contributes nothing, so gate inside the method and stay silent when your conditions are not met.
+
+**The output is rendered unescaped.** Escape every value you interpolate - a value that reaches an attribute
+unescaped is an XSS hole on every page of the site.
+
+```php
+namespace Plugin\YourPlugin\Publisher\HeadHtml;
+
+use App\Publisher\HeadHtml\HeadHtmlProviderInterface;
+
+final readonly class MyHeadProvider implements HeadHtmlProviderInterface
+{
+    public function __construct(private MySettings $settings) {}
+
+    public function getHeadHtml(): ?string
+    {
+        $value = $this->settings->getValue();
+        if ($value === null) {
+            return null;
+        }
+
+        return sprintf(
+            '<meta name="my-plugin" content="%s">',
+            htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+        );
     }
 }
 ```
