@@ -584,7 +584,7 @@ cookie:
     meta_description: 'Verwalte deine Cookie-Einstellungen. Lege fest, welche optionalen Funktionen aktiviert sind.'
     consent_button: 'Cookie Zustimmung'
     consent_headline: 'Diese Webseite benutzt Cookies'
-    consent_text: 'Diese Webseite selber benutzt keinerlei Tracking oder cookies, nur die GDPR-konforme und nicht personenbezogene Session.'
+    consent_text: 'Diese Webseite nutzt keine Werbung und kein Drittanbieter-Tracking. Gespeichert werden nur die technisch notwendige Session und Ihre Cookie-Auswahl.'
     option_osm: 'Open Street maps'
     option_osm_text: 'Dieser Cookie wird nicht von uns gesetzt aber durch die Einbindung von OpenStreetMaps, wenn nicht gesetzt gibt es keine Karte auf der Event detail Seite.'
     button_accept: 'Akzeptieren'

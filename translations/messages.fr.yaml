@@ -584,7 +584,7 @@ cookie:
     meta_description: 'Gère tes préférences de cookies pour ce site. Contrôle quelles fonctionnalités optionnelles sont activées.'
     consent_button: 'Consentement aux cookies'
     consent_headline: 'Ce site web utilise des cookies'
-    consent_text: 'Ce site web n''utilise lui-même aucun suivi ni cookie, seulement la session conforme au RGPD et non personnalisée.'
+    consent_text: 'Ce site n''utilise aucune publicité ni aucun pistage tiers. Nous ne stockons que la session techniquement nécessaire et votre choix de cookies.'
     option_osm: 'OpenStreetMap'
     option_osm_text: 'Ce cookie est déposé par le serveur OpenStreetMap et est nécessaire pour afficher la carte sur la page de détail de l''événement. S''il n''est pas autorisé, l''adresse restera affichée, mais sans la carte.'
     button_accept: 'Accepter'

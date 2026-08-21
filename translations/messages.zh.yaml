@@ -584,7 +584,7 @@ cookie:
     meta_description: '管理您的Cookie偏好设置。控制哪些可选功能已启用。'
     consent_button: '(饼干)同意'
     consent_headline: '本网站使用(饼干)'
-    consent_text: '本网站本身不使用任何跟踪功能，仅使用符合 GDPR 的非个性化会话。'
+    consent_text: '本网站不使用广告，也不使用任何第三方跟踪。我们仅存储技术上必要的会话和您的 Cookie 选择。'
     option_osm: '开放式街道地图'
     option_osm_text: '该(饼干)不是由我们设置的，而是通过集成(OpenStreetMaps)设置的，如果未设置，则活动详情页上没有地图。'
     button_accept: '接受'
