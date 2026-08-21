@@ -34,6 +34,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         private EmailQueueRepository $mailRepo,
         private EntityManagerInterface $em,
         private EmailTemplateService $templateService,
+        private LayoutRenderer $layoutRenderer,
         private LoggerInterface $logger,
         #[AutowireIterator(EmailContextEnricherInterface::class)]
         private iterable $enrichers,
@@ -50,6 +51,8 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         foreach ($this->enrichers as $enricher) {
             $twigContext = $enricher->enrich($twigContext, $locale);
         }
+
+        $twigContext[LayoutRenderer::CONTEXT_KEY] = $this->layoutRenderer->capture($locale);
 
         $now = new DateTimeImmutable();
 
@@ -164,7 +167,12 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         $template->addTo($mail->getRecipient());
         $template->subject($mail->getSubject());
         $template->locale($mail->getLang());
-        $template->html($mail->getRenderedBody());
+
+        $layout = $this->layoutRenderer->wrap($mail);
+        $template->html($layout->html);
+        if ($layout->inlineLogo !== null) {
+            $template->addPart($layout->inlineLogo);
+        }
 
         foreach ($mail->getAttachments() as $attachment) {
             if (!is_readable($attachment->path)) {

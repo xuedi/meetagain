@@ -384,6 +384,30 @@ readonly class ImageService
         }
     }
 
+    public function renderPng(string $sourcePath, int $maxHeight): ?string
+    {
+        if (!$this->filesystem->fileExists($sourcePath)) {
+            return null;
+        }
+
+        try {
+            $imagick = new Imagick();
+            $imagick->readImage($sourcePath);
+            $imagick->autoOrient();
+            if ($imagick->getImageHeight() > $maxHeight) {
+                $imagick->thumbnailImage(self::FREE_AXIS_CEILING, $maxHeight, true);
+            }
+            $imagick->stripImage();
+            $imagick->setImageFormat('png');
+
+            return $imagick->getImageBlob();
+        } catch (ImagickException $e) {
+            $this->logger->error(sprintf("Error rendering PNG for '%s': %s", $sourcePath, $e->getMessage()));
+
+            return null;
+        }
+    }
+
     private function getThumbnailFile(Image $image, int $width, int $height): string
     {
         return $this->getThumbnailDir() . sprintf('%s_%s.webp', $image->getHash(), $this->thumbnailSizeFormat->format($width, $height));

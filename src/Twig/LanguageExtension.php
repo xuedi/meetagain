@@ -7,6 +7,7 @@ use App\Publisher\AlternateLinks\AlternateLinkProviderInterface;
 use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
+use App\Service\Config\SiteNameResolver;
 use App\Service\Seo\CanonicalUrlService;
 use Exception;
 use Override;
@@ -28,6 +29,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         private readonly RouterInterface $router,
         private readonly ConfigService $configService,
         private readonly CanonicalUrlService $canonicalUrlService,
+        private readonly SiteNameResolver $siteNameResolver,
         #[AutowireIterator(MetaDescriptionProviderInterface::class)]
         private readonly iterable $metaDescriptionProviders = [],
         #[AutowireIterator(OrganizationSchemaProviderInterface::class)]
@@ -36,8 +38,6 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
         private readonly iterable $alternateLinkFilters = [],
         #[AutowireIterator(AlternateLinkProviderInterface::class)]
         private readonly iterable $alternateLinkProviders = [],
-        #[AutowireIterator(SiteNameProviderInterface::class)]
-        private readonly iterable $siteNameProviders = [],
     ) {}
 
     #[Override]
@@ -165,14 +165,7 @@ final class LanguageExtension extends AbstractExtension implements GlobalsInterf
 
     public function getSiteName(): string
     {
-        foreach ($this->siteNameProviders as $provider) {
-            $value = $provider->getSiteName();
-            if ($value !== null && $value !== '') {
-                return $value;
-            }
-        }
-
-        return $this->configService->getSiteName();
+        return $this->siteNameResolver->resolve();
     }
 
     public function getCanonicalUrl(): string

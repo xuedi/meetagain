@@ -7,6 +7,7 @@ use App\Enum\ImageType;
 use App\Publisher\SiteLogo\SiteLogoProviderInterface;
 use App\Repository\ImageRepository;
 use App\Service\Config\ConfigService;
+use App\Service\Http\RequestHostResolver;
 use App\Service\Media\SiteLogoResolver;
 use App\Service\Media\ThumbnailSizeFormat;
 use PHPUnit\Framework\TestCase;
@@ -17,6 +18,7 @@ class SiteLogoResolverTest extends TestCase
     private ConfigService $configServiceStub;
     private ImageRepository $imageRepositoryStub;
     private Packages $packagesStub;
+    private RequestHostResolver $hostResolverStub;
 
     protected function setUp(): void
     {
@@ -24,6 +26,8 @@ class SiteLogoResolverTest extends TestCase
         $this->imageRepositoryStub = $this->createStub(ImageRepository::class);
         $this->packagesStub = $this->createStub(Packages::class);
         $this->packagesStub->method('getUrl')->willReturn('/build/images/logo-default.webp');
+        $this->hostResolverStub = $this->createStub(RequestHostResolver::class);
+        $this->hostResolverStub->method('getSchemeAndHost')->willReturn('https://example.org');
     }
 
     private function logo(string $hash): Image
@@ -43,6 +47,7 @@ class SiteLogoResolverTest extends TestCase
             imageRepository: $this->imageRepositoryStub,
             assetPackages: $this->packagesStub,
             thumbnailSizeFormat: new ThumbnailSizeFormat(),
+            hostResolver: $this->hostResolverStub,
         );
     }
 
@@ -122,5 +127,45 @@ class SiteLogoResolverTest extends TestCase
             ['url' => '/build/images/logo-default.webp', 'width' => null, 'height' => null],
             $this->resolver([])->resolve(),
         );
+    }
+
+    public function testResolveAbsolutePrefixesTheHostOnAProviderOverride(): void
+    {
+        $provider = $this->createStub(SiteLogoProviderInterface::class);
+        $provider->method('resolveSiteLogo')->willReturn($this->logo('groupHash'));
+        $this->configServiceStub->method('getSiteLogoId')->willReturn(99);
+
+        static::assertSame(
+            'https://example.org/images/thumbnails/groupHash_h120.webp',
+            $this->resolver([$provider])->resolveAbsolute()['url'],
+        );
+    }
+
+    public function testResolveAbsolutePrefixesTheHostOnTheDefaultAsset(): void
+    {
+        $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
+
+        static::assertSame(
+            ['url' => 'https://example.org/build/images/logo-default.webp', 'height' => null, 'imageId' => null],
+            $this->resolver([])->resolveAbsolute(),
+        );
+    }
+
+    public function testResolveAbsoluteLeavesAnAlreadyAbsoluteAssetUrlAlone(): void
+    {
+        $packages = $this->createStub(Packages::class);
+        $packages->method('getUrl')->willReturn('https://cdn.example.net/logo.webp');
+        $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
+
+        $resolver = new SiteLogoResolver(
+            providers: [],
+            configService: $this->configServiceStub,
+            imageRepository: $this->imageRepositoryStub,
+            assetPackages: $packages,
+            thumbnailSizeFormat: new ThumbnailSizeFormat(),
+            hostResolver: $this->hostResolverStub,
+        );
+
+        static::assertSame('https://cdn.example.net/logo.webp', $resolver->resolveAbsolute()['url']);
     }
 }

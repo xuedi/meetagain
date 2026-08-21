@@ -646,6 +646,9 @@ global:
     button_no: 'No'
     flash_invalid_csrf: 'Token CSRF no válido.'
 'notification.review.pending_count': '%count% elemento pendiente de tu revisión|%count% elementos pendientes de tu revisión'
+email_layout:
+    footer_sent_by: 'Enviado por %site%'
+    footer_no_reply: 'Por favor, no respondas a este correo - este buzón no se revisa. Usa el formulario de contacto de la web para escribirnos.'
 email_event_update:
     line_start: 'La hora de inicio cambió de <b>%before%</b> a <b>%after%</b>.'
     line_location: 'La ubicación cambió de <b>%before%</b> a <b>%after%</b>.'

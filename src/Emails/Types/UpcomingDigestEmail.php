@@ -62,7 +62,7 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
             'subject' => 'Upcoming events this week',
             'context' => [
                 'username' => 'John Doe',
-                'eventsHtml' => '<div style="margin-bottom:16px;padding:12px;border:1px solid #ddd;"><p><b>Go tournament afterparty</b></p><p>2025-01-01 19:00 - NightBar 64</p><p><a href="https://localhost/en/event/1">More Info</a> &nbsp; <a href="https://localhost/en/event/1#rsvp">I Want to Go</a></p></div>',
+                'eventsHtml' => '<div class="card"><p><strong>Go tournament afterparty</strong></p><p>2025-01-01 19:00 - NightBar 64</p><p><a href="https://localhost/en/event/1">More Info</a> &nbsp; <a href="https://localhost/en/event/1#rsvp">I Want to Go</a></p></div>',
                 'host' => 'https://localhost',
                 'lang' => 'en',
             ],
@@ -240,8 +240,8 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
             $url = sprintf('%s/%s/event/%s', $host, $lang, $event->getId());
 
             $html .= sprintf(
-                '<div style="margin-bottom:16px;padding:12px;border:1px solid #ddd;">'
-                . '<p><b>%s</b></p><p>%s - %s</p>'
+                '<div class="card">'
+                . '<p><strong>%s</strong></p><p>%s - %s</p>'
                 . '<p><a href="%s">More Info</a> &nbsp; <a href="%s#rsvp">I Want to Go</a></p>'
                 . '</div>',
                 $title,

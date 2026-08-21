@@ -10,6 +10,8 @@ use App\Enum\EmailQueueStatus;
 use App\Repository\EmailQueueRepository;
 use App\Service\Email\EmailService;
 use App\Service\Email\EmailTemplateService;
+use App\Service\Email\LayoutRenderer;
+use App\Service\Email\RenderedLayout;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +22,8 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Part\DataPart;
+use Symfony\Component\Mime\RawMessage;
 
 final class EmailServiceTest extends TestCase
 {
@@ -353,6 +357,114 @@ final class EmailServiceTest extends TestCase
         static::assertSame('1 (Failed: 1)', $result);
     }
 
+    public function testEnqueueStoresTheBareFragmentWithoutWrappingIt(): void
+    {
+        // Arrange
+        $email = new TemplatedEmail();
+        $email->from(new Address('sender@email.com', 'Sender'));
+        $email->to('user@example.com');
+        $email->locale('en');
+        $email->context([]);
+
+        $capturedQueue = null;
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(static function (EmailQueue $q) use (&$capturedQueue) {
+                $capturedQueue = $q;
+                return true;
+            }));
+
+        $layoutRendererMock = $this->createMock(LayoutRenderer::class);
+        $layoutRendererMock->expects($this->once())->method('capture')->with('en')->willReturn(['siteName' => 'Example']);
+        $layoutRendererMock->expects($this->never())->method('wrap');
+
+        $service = $this->createService(em: $emMock, layoutRenderer: $layoutRendererMock);
+
+        // Act
+        $service->enqueue($this->nullCapSource(), $email, []);
+
+        // Assert
+        static::assertSame('<p>Test Body</p>', $capturedQueue->getRenderedBody());
+        static::assertSame(['siteName' => 'Example'], $capturedQueue->getContext()[LayoutRenderer::CONTEXT_KEY]);
+    }
+
+    public function testARowQueuedBeforeTheLayoutExistedIsStillWrappedWhenItIsSent(): void
+    {
+        // Arrange
+        $queued = new EmailQueue()
+            ->setSender('"email sender" <sender@email.com>')
+            ->setRecipient('user@example.com')
+            ->setSubject('Subject')
+            ->setRenderedBody('<p>queued long ago</p>')
+            ->setLang('en')
+            ->setContext([]);
+
+        $mailRepoStub = $this->createStub(EmailQueueRepository::class);
+        $mailRepoStub->method('findBy')->willReturn([$queued]);
+
+        $captured = null;
+        $sentMessage = $this->createStub(SentMessage::class);
+        $sentMessage->method('getMessageId')->willReturn('id');
+        $mailerStub = $this->createStub(TransportInterface::class);
+        $mailerStub->method('send')->willReturnCallback(static function (RawMessage $message) use (&$captured, $sentMessage) {
+            $captured = $message;
+            return $sentMessage;
+        });
+
+        $layoutRendererStub = $this->createStub(LayoutRenderer::class);
+        $layoutRendererStub
+            ->method('wrap')
+            ->willReturn(new RenderedLayout('<html><body><p>queued long ago</p></body></html>'));
+
+        $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, layoutRenderer: $layoutRendererStub);
+
+        // Act
+        $service->sendQueue();
+
+        // Assert
+        static::assertSame('<html><body><p>queued long ago</p></body></html>', $captured->getHtmlBody());
+    }
+
+    public function testAnInlineLogoIsAttachedToTheSentMessage(): void
+    {
+        // Arrange
+        $queued = new EmailQueue()
+            ->setSender('"email sender" <sender@email.com>')
+            ->setRecipient('user@example.com')
+            ->setSubject('Subject')
+            ->setRenderedBody('<p>body</p>')
+            ->setLang('en')
+            ->setContext([]);
+
+        $mailRepoStub = $this->createStub(EmailQueueRepository::class);
+        $mailRepoStub->method('findBy')->willReturn([$queued]);
+
+        $captured = null;
+        $sentMessage = $this->createStub(SentMessage::class);
+        $sentMessage->method('getMessageId')->willReturn('id');
+        $mailerStub = $this->createStub(TransportInterface::class);
+        $mailerStub->method('send')->willReturnCallback(static function (RawMessage $message) use (&$captured, $sentMessage) {
+            $captured = $message;
+            return $sentMessage;
+        });
+
+        $logo = new DataPart('png-bytes', 'site-logo', 'image/png')->asInline();
+        $layoutRendererStub = $this->createStub(LayoutRenderer::class);
+        $layoutRendererStub
+            ->method('wrap')
+            ->willReturn(new RenderedLayout('<html><body><img src="cid:site-logo"></body></html>', $logo));
+
+        $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, layoutRenderer: $layoutRendererStub);
+
+        // Act
+        $service->sendQueue();
+
+        // Assert
+        static::assertSame([$logo], $captured->getAttachments());
+    }
+
     public function testRunCronTaskWritesQueueCountToOutput(): void
     {
         // Arrange
@@ -382,6 +494,7 @@ final class EmailServiceTest extends TestCase
         ?EmailTemplateService $templateService = null,
         ?LoggerInterface $logger = null,
         iterable $enrichers = [],
+        ?LayoutRenderer $layoutRenderer = null,
     ): EmailService {
         if ($templateService === null) {
             $templateService = $this->createStub(EmailTemplateService::class);
@@ -394,11 +507,20 @@ final class EmailServiceTest extends TestCase
             $templateService->method('renderContent')->willReturnCallback(static fn(string $content, array $context) => $content);
         }
 
+        if ($layoutRenderer === null) {
+            $layoutRenderer = $this->createStub(LayoutRenderer::class);
+            $layoutRenderer->method('capture')->willReturn([]);
+            $layoutRenderer
+                ->method('wrap')
+                ->willReturnCallback(static fn(EmailQueue $mail) => new RenderedLayout('<html><body>' . $mail->getRenderedBody() . '</body></html>'));
+        }
+
         return new EmailService(
             transport: $mailer ?? $this->createStub(TransportInterface::class),
             mailRepo: $mailRepo ?? $this->createStub(EmailQueueRepository::class),
             em: $em ?? $this->createStub(EntityManagerInterface::class),
             templateService: $templateService,
+            layoutRenderer: $layoutRenderer,
             logger: $logger ?? $this->createStub(LoggerInterface::class),
             enrichers: $enrichers,
         );

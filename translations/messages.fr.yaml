@@ -646,6 +646,9 @@ global:
     button_no: 'Non'
     flash_invalid_csrf: 'Jeton CSRF invalide.'
 'notification.review.pending_count': '%count% élément en attente de ta vérification|%count% éléments en attente de ta vérification'
+email_layout:
+    footer_sent_by: 'Envoyé par %site%'
+    footer_no_reply: 'Merci de ne pas répondre à cet e-mail - cette boîte n''est pas relevée. Utilise le formulaire de contact du site pour nous joindre.'
 email_event_update:
     line_start: 'L''heure de début est passée de <b>%before%</b> à <b>%after%</b>.'
     line_location: 'Le lieu est passé de <b>%before%</b> à <b>%after%</b>.'

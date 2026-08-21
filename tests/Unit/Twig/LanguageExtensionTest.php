@@ -4,6 +4,7 @@ namespace Tests\Unit\Twig;
 
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
+use App\Service\Config\SiteNameResolver;
 use App\Service\Seo\CanonicalUrlService;
 use App\Twig\LanguageExtension;
 use App\Twig\MetaDescriptionProviderInterface;
@@ -23,6 +24,7 @@ class LanguageExtensionTest extends TestCase
     private Stub&RouterInterface $routerStub;
     private Stub&ConfigService $configServiceStub;
     private Stub&CanonicalUrlService $canonicalUrlServiceStub;
+    private Stub&SiteNameResolver $siteNameResolverStub;
     private LanguageExtension $subject;
 
     protected function setUp(): void
@@ -32,12 +34,14 @@ class LanguageExtensionTest extends TestCase
         $this->routerStub = $this->createStub(RouterInterface::class);
         $this->configServiceStub = $this->createStub(ConfigService::class);
         $this->canonicalUrlServiceStub = $this->createStub(CanonicalUrlService::class);
+        $this->siteNameResolverStub = $this->createStub(SiteNameResolver::class);
         $this->subject = new LanguageExtension(
             $this->languageServiceStub,
             $this->requestStackStub,
             $this->routerStub,
             $this->configServiceStub,
             $this->canonicalUrlServiceStub,
+            $this->siteNameResolverStub,
         );
     }
 
@@ -228,6 +232,7 @@ class LanguageExtensionTest extends TestCase
             $this->routerStub,
             $this->configServiceStub,
             $this->canonicalUrlServiceStub,
+            $this->siteNameResolverStub,
             [$provider],
         );
 

@@ -130,7 +130,7 @@
                     <h3 class="subtitle">{{ 'admin_email_sendlog.context_variables'|trans }}</h3>
                     <table class="table is-narrow is-bordered is-fullwidth">
                         <tbody>
-                            {% for key, value in email.context %}
+                            {% for key, value in email.context|filter((v, k) => k|slice(0, 1) != '_') %}
                                 <tr>
                                     <th>{{ key }}</th>
                                     <td>{% if value is iterable %}{{ value|json_encode }}{% else %}{{ value }}{% endif %}</td>

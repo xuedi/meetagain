@@ -636,6 +636,9 @@ global:
     button_no: 'Nein'
     flash_invalid_csrf: 'Ungueltiges CSRF-Token.'
 'notification.review.pending_count': '%count% Element wartet auf Ihre Überprüfung|%count% Elemente warten auf Ihre Überprüfung'
+email_layout:
+    footer_sent_by: 'Gesendet von %site%'
+    footer_no_reply: 'Bitte antworte nicht auf diese E-Mail - dieses Postfach wird nicht gelesen. Nutze das Kontaktformular auf der Website, um uns zu erreichen.'
 email_event_update:
     line_start: 'Beginn geändert von <b>%before%</b> auf <b>%after%</b>.'
     line_location: 'Veranstaltungsort geändert von <b>%before%</b> auf <b>%after%</b>.'

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Twig;
+namespace App\Publisher\SiteName;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
