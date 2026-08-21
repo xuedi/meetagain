@@ -44,6 +44,27 @@ class CmsBlockRepository extends ServiceEntityRepository
         return array_map(static fn(array $row): int => (int) $row['page_id'], $rows);
     }
 
+    /**
+     * @return array<int, array<string, int>> Block count per language, keyed by page ID
+     */
+    public function countPerPageAndLanguage(): array
+    {
+        $rows = $this
+            ->createQueryBuilder('cb')
+            ->select('IDENTITY(cb.page) as page_id, cb.language as language, COUNT(cb.id) as block_count')
+            ->groupBy('cb.page')
+            ->addGroupBy('cb.language')
+            ->getQuery()
+            ->getScalarResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['page_id']][(string) $row['language']] = (int) $row['block_count'];
+        }
+
+        return $counts;
+    }
+
     public function getBlocks(int $pageId, string $locale)
     {
         return $this

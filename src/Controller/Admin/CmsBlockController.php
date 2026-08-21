@@ -2,8 +2,13 @@
 
 namespace App\Controller\Admin;
 
+use App\Activity\ActivityService;
+use App\Activity\Messages\AdminCmsBlockCreated;
+use App\Activity\Messages\AdminCmsBlockDeleted;
+use App\Activity\Messages\AdminCmsBlockUpdated;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
+use App\Entity\CmsBlock;
 use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\CmsBlock\CmsBlockType;
@@ -47,6 +52,7 @@ final class CmsBlockController extends AbstractController
         private readonly ValidatorInterface $validator,
         private readonly ImageLocationService $imageLocationService,
         private readonly TranslatorInterface $translator,
+        private readonly ActivityService $activityService,
     ) {}
 
     #[Route('/block/{blockId}/edit', name: 'app_admin_cms_block_edit', methods: ['GET'])]
@@ -176,6 +182,7 @@ final class CmsBlockController extends AbstractController
 
         try {
             $block = $this->blockService->createBlock($cmsPage, $locale, $blockType, $request->getPayload()->all());
+            $this->logBlockActivity(AdminCmsBlockCreated::TYPE, $block);
         } catch (BlockValidationException $e) {
             $this->addFlash('error', $this->translator->trans('admin_cms.flash_block_validation_error'));
 
@@ -233,7 +240,8 @@ final class CmsBlockController extends AbstractController
         $type = CmsBlockType::from((int) $request->request->get('blockType'));
 
         try {
-            $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
+            $block = $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
+            $this->logBlockActivity(AdminCmsBlockUpdated::TYPE, $block);
         } catch (BlockValidationException $e) {
             $this->addFlash('error', $this->translator->trans('admin_cms.flash_block_validation_error'));
         }
@@ -250,6 +258,12 @@ final class CmsBlockController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
+        $block = $this->blockRepo->find($blockId);
+        if ($block === null) {
+            throw $this->createNotFoundException('Block not found');
+        }
+
+        $this->logBlockActivity(AdminCmsBlockDeleted::TYPE, $block);
         $this->blockService->deleteBlock($blockId);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
@@ -451,6 +465,22 @@ final class CmsBlockController extends AbstractController
         return $this->redirectToRoute('app_admin_cms_edit', [
             'id' => $block->getPage()->getId(),
             'locale' => $block->getLanguage(),
+        ]);
+    }
+
+    private function logBlockActivity(string $type, CmsBlock $block): void
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return;
+        }
+
+        $page = $block->getPage();
+        $this->activityService->log($type, $user, [
+            'cms_id' => (int) $page?->getId(),
+            'cms_slug' => $page?->getSlug(),
+            'block_id' => (int) $block->getId(),
+            'block_type' => $block->getType()->name,
         ]);
     }
 }

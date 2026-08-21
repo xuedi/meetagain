@@ -26,6 +26,7 @@ final class PermissionAttribute
     public const string LOCATION_UPDATE = 'location.update';
     public const string LOCATION_DELETE = 'location.delete';
 
+    public const string CMS_PAGE_READ = 'cms.page.read';
     public const string CMS_PAGE_CREATE = 'cms.page.create';
     public const string CMS_PAGE_UPDATE = 'cms.page.update';
     public const string CMS_PAGE_DELETE = 'cms.page.delete';

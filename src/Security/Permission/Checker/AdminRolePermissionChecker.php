@@ -21,6 +21,7 @@ final class AdminRolePermissionChecker implements CheckerInterface
         Attr::LOCATION_CREATE,
         Attr::LOCATION_UPDATE,
         Attr::LOCATION_DELETE,
+        Attr::CMS_PAGE_READ,
         Attr::CMS_PAGE_CREATE,
         Attr::CMS_PAGE_UPDATE,
         Attr::CMS_PAGE_DELETE,
