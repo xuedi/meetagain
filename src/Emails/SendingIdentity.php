@@ -9,8 +9,6 @@ final readonly class SendingIdentity
         public string $siteName,
         public string $siteUrl,
         public ?string $logoUrl = null,
-        public ?int $logoHeight = null,
-        public ?int $logoImageId = null,
         public string $greeting = '',
         public array $links = [],
         public ?string $attribution = null,

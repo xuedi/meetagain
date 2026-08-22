@@ -11,7 +11,6 @@ use App\Repository\EmailQueueRepository;
 use App\Service\Email\EmailService;
 use App\Service\Email\EmailTemplateService;
 use App\Service\Email\LayoutRenderer;
-use App\Service\Email\RenderedLayout;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -103,7 +102,7 @@ class CoreOnlySendingIdentityTest extends TestCase
         $layoutRenderer = $this->createStub(LayoutRenderer::class);
         $layoutRenderer->method('captureIdentity')->willReturn($identity);
         $layoutRenderer->method('snapshot')->willReturn(['siteName' => self::SITE, 'siteUrl' => self::HOST]);
-        $layoutRenderer->method('wrap')->willReturn(new RenderedLayout('<html></html>'));
+        $layoutRenderer->method('wrap')->willReturn('<html></html>');
 
         return new EmailService(
             transport: $this->createStub(TransportInterface::class),

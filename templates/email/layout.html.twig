@@ -36,13 +36,13 @@
     <tr>
         <td align="center" style="padding:24px 12px;">
             <table role="presentation" class="shell" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px; background-color:#ffffff; border:1px solid #e3e6ec; border-radius:6px;">
-                {% if logoCid or logoUrl %}
+                {% if logoUrl %}
                     <tr>
                         <td class="gutter" align="center" style="padding:28px 32px 20px; border-bottom:1px solid #eef0f4;">
                             <a href="{{ siteUrl }}" style="text-decoration:none;">
-                                <img src="{{ logoCid ? 'cid:' ~ logoCid : logoUrl }}"
+                                <img src="{{ logoUrl }}"
                                      alt="{{ siteName }}"
-                                     {% if logoHeight %}height="{{ logoHeight // 2 }}"{% endif %}
+                                     height="60"
                                      style="display:inline-block; max-height:60px; width:auto;">
                             </a>
                         </td>

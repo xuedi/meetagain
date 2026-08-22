@@ -34,7 +34,7 @@ class EmailPreviewCommandTest extends KernelTestCase
         $layoutRenderer = $container->get(LayoutRenderer::class);
         foreach ($rows as $row) {
             static::assertArrayHasKey(LayoutRenderer::CONTEXT_KEY, $row->getContext(), 'the layout snapshot is taken at enqueue');
-            static::assertStringContainsString('<html', $layoutRenderer->wrap($row)->html);
+            static::assertStringContainsString('<html', $layoutRenderer->wrap($row));
         }
     }
 

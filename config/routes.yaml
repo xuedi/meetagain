@@ -20,6 +20,10 @@ robots:
     type: attribute
     resource: ../src/Controller/NonLocale/RobotsController.php
 
+site_logo:
+    type: attribute
+    resource: ../src/Controller/NonLocale/SiteLogoController.php
+
 well_known:
     type: attribute
     resource: ../src/Controller/NonLocale/WellKnownController.php

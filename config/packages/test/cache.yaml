@@ -2,6 +2,9 @@ framework:
     cache:
         app: cache.adapter.array
         pools:
+            cache.cms_page_cache:
+                adapter: cache.adapter.array
+                tags: true
             cache.image_alt_status:
                 adapter: cache.adapter.array
             cache.config:

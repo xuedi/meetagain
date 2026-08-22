@@ -13,7 +13,6 @@ use App\Repository\EmailQueueRepository;
 use App\Service\Email\EmailService;
 use App\Service\Email\EmailTemplateService;
 use App\Service\Email\LayoutRenderer;
-use App\Service\Email\RenderedLayout;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -535,7 +534,7 @@ final class EmailServiceTest extends TestCase
         $layoutRendererStub = $this->createStub(LayoutRenderer::class);
         $layoutRendererStub
             ->method('wrap')
-            ->willReturn(new RenderedLayout('<html><body><p>queued long ago</p></body></html>'));
+            ->willReturn('<html><body><p>queued long ago</p></body></html>');
 
         $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, layoutRenderer: $layoutRendererStub);
 
@@ -546,7 +545,7 @@ final class EmailServiceTest extends TestCase
         static::assertSame('<html><body><p>queued long ago</p></body></html>', $captured->getHtmlBody());
     }
 
-    public function testAnInlineLogoIsAttachedToTheSentMessage(): void
+    public function testTheLogoTravelsAsAUrlSoTheMessageCarriesNoPartsOfItsOwn(): void
     {
         // Arrange
         $queued = new EmailQueue()
@@ -569,11 +568,10 @@ final class EmailServiceTest extends TestCase
             return $sentMessage;
         });
 
-        $logo = new DataPart('png-bytes', 'site-logo', 'image/png')->asInline();
         $layoutRendererStub = $this->createStub(LayoutRenderer::class);
         $layoutRendererStub
             ->method('wrap')
-            ->willReturn(new RenderedLayout('<html><body><img src="cid:site-logo"></body></html>', $logo));
+            ->willReturn('<html><body><img src="https://example.org/logo.png"></body></html>');
 
         $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, layoutRenderer: $layoutRendererStub);
 
@@ -581,7 +579,8 @@ final class EmailServiceTest extends TestCase
         $service->sendQueue();
 
         // Assert
-        static::assertSame([$logo], $captured->getAttachments());
+        static::assertSame([], $captured->getAttachments());
+        static::assertStringContainsString('src="https://example.org/logo.png"', (string) $captured->getHtmlBody());
     }
 
     public function testRunCronTaskWritesQueueCountToOutput(): void
@@ -645,7 +644,7 @@ final class EmailServiceTest extends TestCase
             $layoutRenderer->method('snapshot')->willReturn([]);
             $layoutRenderer
                 ->method('wrap')
-                ->willReturnCallback(static fn(EmailQueue $mail) => new RenderedLayout('<html><body>' . $mail->getRenderedBody() . '</body></html>'));
+                ->willReturnCallback(static fn(EmailQueue $mail) => '<html><body>' . $mail->getRenderedBody() . '</body></html>');
         }
 
         return new EmailService(
