@@ -73,6 +73,11 @@
                                     <i class="fa fa-bullhorn"></i>
                                 </span>
                             {% endif %}
+                            {% if page.emailFooter %}
+                                <span class="icon has-text-grey-light" title="{{ 'admin_cms.email_footer' | trans }}">
+                                    <i class="fa fa-envelope"></i>
+                                </span>
+                            {% endif %}
                         </span>
                     </td>
                     <td>{{ page.blocks|length }}</td>
@@ -99,6 +104,10 @@
             <span class="icon-text ml-4">
                 <span class="icon has-text-grey-light"><i class="fas fa-bullhorn"></i></span>
                 <span class="has-text-grey-light">{{ 'admin_cms.icon_title_has_announcement' | trans }}</span>
+            </span>
+            <span class="icon-text ml-4">
+                <span class="icon has-text-grey-light"><i class="fas fa-envelope"></i></span>
+                <span class="has-text-grey-light">{{ 'admin_cms.email_footer' | trans }}</span>
             </span>
         </div>
 

@@ -35,6 +35,9 @@ class Cms
     #[ORM\Column]
     private ?bool $locked = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $emailFooter = false;
+
     /**
      * @var Collection<int, CmsMenuLocation>
      */
@@ -129,6 +132,18 @@ class Cms
     public function setLocked(bool $locked): static
     {
         $this->locked = $locked;
+
+        return $this;
+    }
+
+    public function isEmailFooter(): bool
+    {
+        return $this->emailFooter;
+    }
+
+    public function setEmailFooter(bool $emailFooter): static
+    {
+        $this->emailFooter = $emailFooter;
 
         return $this;
     }

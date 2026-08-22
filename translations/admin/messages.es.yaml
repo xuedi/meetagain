@@ -167,6 +167,8 @@ admin_cms:
     flash_success_sent: 'Anuncio enviado a %count% destinatario(s).'
     flash_error_cannot_delete_sent: 'Los anuncios enviados no se pueden eliminar.'
     status_locked_help: 'Las páginas bloqueadas son visibles en todas partes (p. ej., aviso legal, privacidad)'
+    email_footer: 'Enlace en el pie de los correos'
+    email_footer_help: 'Cada correo enlaza a esta página en su pie. Independiente de las columnas del pie del sitio - por eso el aviso legal aparece en su correo.'
     field_page_title: 'Título de la página'
     field_page_title_help: 'Título mostrado en el navegador y en el contenido de la página'
     field_link_name: 'Nombre del enlace de menú'

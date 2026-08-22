@@ -167,6 +167,8 @@ admin_cms:
     flash_success_sent: 'Annonce envoyée à %count% destinataire(s).'
     flash_error_cannot_delete_sent: 'Les annonces envoyées ne peuvent pas être supprimées.'
     status_locked_help: 'Les pages verrouillées sont visibles partout (p. ex. mentions légales, confidentialité)'
+    email_footer: 'Lien dans le pied de page des e-mails'
+    email_footer_help: 'Chaque e-mail renvoie vers cette page dans son pied de page. Indépendant des colonnes de pied de page du site - c''est pourquoi les mentions légales apparaissent dans votre courrier.'
     field_page_title: 'Titre de la page'
     field_page_title_help: 'Titre affiché dans le navigateur et le contenu de la page'
     field_link_name: 'Nom du lien de menu'

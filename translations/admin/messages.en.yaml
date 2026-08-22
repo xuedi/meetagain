@@ -167,6 +167,8 @@ admin_cms:
     flash_success_sent: 'Announcement sent to %count% recipient(s).'
     flash_error_cannot_delete_sent: 'Sent announcements cannot be deleted.'
     status_locked_help: 'Locked pages are visible everywhere (e.g., imprint, privacy)'
+    email_footer: 'Link in email footer'
+    email_footer_help: 'Every email carries a link to this page in its footer. Independent of the site''s own footer columns - this is why the imprint shows up in your mail.'
     field_page_title: 'Page Title'
     field_page_title_help: 'Title shown in browser and page content'
     field_link_name: 'Menu Link Name'

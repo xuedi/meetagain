@@ -4,7 +4,6 @@ namespace App\Service\Email;
 
 use App\Emails\SendingIdentity;
 use App\Entity\EmailQueue;
-use App\Service\Cms\MenuService;
 use App\Service\Config\ConfigService;
 use App\Service\Config\SiteNameResolver;
 use App\Service\Http\RequestHostResolver;
@@ -18,7 +17,6 @@ readonly class LayoutRenderer
     public const string CONTEXT_KEY = '_layout';
 
     private const string TEMPLATE = 'email/layout.html.twig';
-    private const string LEGAL_MENU = 'col4';
     private const string DEFAULT_ACCENT = '#2f6fd0';
 
     public function __construct(
@@ -27,7 +25,7 @@ readonly class LayoutRenderer
         private SiteNameResolver $siteNameResolver,
         private RequestHostResolver $hostResolver,
         private SiteLogoResolver $logoResolver,
-        private MenuService $menuService,
+        private EmailFooterLinkResolver $footerLinks,
         private InlineLogoFactory $inlineLogoFactory,
         private LoggerInterface $logger,
     ) {}
@@ -44,7 +42,7 @@ readonly class LayoutRenderer
             logoHeight: $logo['height'],
             logoImageId: $logo['imageId'],
             greeting: $siteName,
-            links: $this->legalLinks($locale),
+            links: $this->footerLinks->resolve($this->hostResolver->getSchemeAndHost(), $locale),
         );
     }
 
@@ -113,20 +111,5 @@ readonly class LayoutRenderer
         }
 
         return new RenderedLayout($html, $inlineLogo);
-    }
-
-    /**
-     * @return list<array{label: string, url: string}>
-     */
-    private function legalLinks(string $locale): array
-    {
-        $host = rtrim($this->hostResolver->getSchemeAndHost(), '/');
-
-        $links = [];
-        foreach ($this->menuService->getMenuForContext(self::LEGAL_MENU, null, $locale) as $item) {
-            $links[] = ['label' => $item->name, 'url' => $host . '/' . ltrim($item->slug, '/')];
-        }
-
-        return $links;
     }
 }

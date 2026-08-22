@@ -3,16 +3,18 @@
 namespace Tests\Unit\Service\Email;
 
 use App\Entity\EmailQueue;
-use App\Service\Cms\MenuItem;
 use App\Service\Cms\MenuService;
 use App\Service\Config\ConfigService;
 use App\Service\Config\SiteNameResolver;
+use App\Service\Email\EmailFooterLinkResolver;
 use App\Service\Email\InlineLogoFactory;
 use App\Service\Email\LayoutRenderer;
 use App\Service\Http\RequestHostResolver;
 use App\Service\Media\SiteLogoResolver;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
+use ReflectionParameter;
 use RuntimeException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
@@ -168,6 +170,36 @@ final class LayoutRendererTest extends TestCase
         static::assertSame([['label' => 'Imprint', 'url' => 'https://example.org/en/imprint']], $snapshot['links']);
     }
 
+    public function testTheEmailFooterIsNoLongerResolvedThroughTheRequestScopedSiteMenu(): void
+    {
+        // Act
+        $dependencies = array_map(
+            static fn(ReflectionParameter $parameter): string => (string) $parameter->getType(),
+            new ReflectionMethod(LayoutRenderer::class, '__construct')->getParameters(),
+        );
+
+        // Assert
+        static::assertNotContains(MenuService::class, $dependencies);
+        static::assertContains(EmailFooterLinkResolver::class, $dependencies);
+    }
+
+    public function testTheCapturedFooterAsksForTheRequestHostAndTheWholeFlaggedSet(): void
+    {
+        // Arrange
+        $footerLinks = $this->createMock(EmailFooterLinkResolver::class);
+        $footerLinks
+            ->expects($this->once())
+            ->method('resolve')
+            ->with('https://example.org', 'de', null)
+            ->willReturn([['label' => 'Impressum', 'url' => 'https://example.org/de/imprint']]);
+
+        // Act
+        $identity = $this->renderer(footerLinks: $footerLinks)->captureIdentity('de');
+
+        // Assert
+        static::assertSame([['label' => 'Impressum', 'url' => 'https://example.org/de/imprint']], $identity->links);
+    }
+
     private function queued(?string $body, array $overrides = []): EmailQueue
     {
         return new EmailQueue()
@@ -230,8 +262,8 @@ final class LayoutRendererTest extends TestCase
         $logoResolver = $this->createStub(SiteLogoResolver::class);
         $logoResolver->method('resolveAbsolute')->willReturnCallback($explode);
 
-        $menuService = $this->createStub(MenuService::class);
-        $menuService->method('getMenuForContext')->willReturnCallback($explode);
+        $footerLinks = $this->createStub(EmailFooterLinkResolver::class);
+        $footerLinks->method('resolve')->willReturnCallback($explode);
 
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getThemeColors')->willReturnCallback($explode);
@@ -248,7 +280,7 @@ final class LayoutRendererTest extends TestCase
             siteNameResolver: $siteNameResolver,
             hostResolver: $hostResolver,
             logoResolver: $logoResolver,
-            menuService: $menuService,
+            footerLinks: $footerLinks,
             inlineLogoFactory: $inlineLogoFactory,
             logger: $this->createStub(LoggerInterface::class),
         );
@@ -258,6 +290,7 @@ final class LayoutRendererTest extends TestCase
         ?Environment $twig = null,
         ?InlineLogoFactory $inlineLogoFactory = null,
         ?LoggerInterface $logger = null,
+        ?EmailFooterLinkResolver $footerLinks = null,
     ): LayoutRenderer {
         if ($twig === null) {
             $twig = new Environment(new FilesystemLoader(dirname(__DIR__, 4) . '/templates'));
@@ -280,8 +313,10 @@ final class LayoutRendererTest extends TestCase
             'imageId' => 7,
         ]);
 
-        $menuService = $this->createStub(MenuService::class);
-        $menuService->method('getMenuForContext')->willReturn([new MenuItem('/en/imprint', 'Imprint', 0.0)]);
+        if ($footerLinks === null) {
+            $footerLinks = $this->createStub(EmailFooterLinkResolver::class);
+            $footerLinks->method('resolve')->willReturn([['label' => 'Imprint', 'url' => 'https://example.org/en/imprint']]);
+        }
 
         if ($inlineLogoFactory === null) {
             $inlineLogoFactory = $this->createStub(InlineLogoFactory::class);
@@ -294,7 +329,7 @@ final class LayoutRendererTest extends TestCase
             siteNameResolver: $siteNameResolver,
             hostResolver: $hostResolver,
             logoResolver: $logoResolver,
-            menuService: $menuService,
+            footerLinks: $footerLinks,
             inlineLogoFactory: $inlineLogoFactory,
             logger: $logger ?? $this->createStub(LoggerInterface::class),
         );
