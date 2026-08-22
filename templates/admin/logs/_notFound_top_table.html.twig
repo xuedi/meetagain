@@ -18,7 +18,7 @@
     <tbody>
         {% for row in rows %}
             <tr>
-                <td title="{{ row.value }}">{{ row.value|length > truncate ? row.value|slice(0, truncate - 3) ~ '...' : row.value }}</td>
+                <td>{{ row.value|shortened(truncate) }}</td>
                 <td class="has-text-right">{{ row.number }}</td>
             </tr>
         {% else %}

@@ -28,7 +28,7 @@
                         <td class="is-nowrap">{{ entry.createdAt|date('Y-m-d H:i:s') }}</td>
                         <td class="is-nowrap">{{ entry.ip }}</td>
                         <td data-suspicious-cell{% if isSuspicious %} class="has-text-danger"{% endif %}>
-                            {{ entry.url|length > 60 ? entry.url|slice(0, 57) ~ '...' : entry.url }}
+                            {{ entry.url|shortened(60) }}
                         </td>
                         <td>
                             {% if entry.incident %}

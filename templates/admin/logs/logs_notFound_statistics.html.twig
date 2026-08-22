@@ -27,8 +27,8 @@
             <tbody>
                 {% for entry in suspicious %}
                     <tr>
-                        <td class="has-text-danger" title="{{ entry.url }}">
-                            {{ entry.url|length > 80 ? entry.url|slice(0, 77) ~ '...' : entry.url }}
+                        <td class="has-text-danger">
+                            {{ entry.url|shortened(80) }}
                         </td>
                         <td class="is-nowrap has-text-grey">{{ entry.createdAt|date('Y-m-d') }}</td>
                         <td class="has-text-right">{{ suspiciousCounts[entry.url]|default(0) }}</td>

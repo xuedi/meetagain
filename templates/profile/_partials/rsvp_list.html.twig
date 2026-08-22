@@ -3,7 +3,7 @@
         <div class="control is-expanded">
             {% set title = event.title(app.locale) %}
             <a class="has-text-dark" href="{{ path('app_event_details', {id: event.id}) }}">
-                {{ title|length > 36 ? title|slice(0, 36) ~ '...' : title }}
+                {{ title|shortened(36) }}
             </a>
             <span class="has-text-grey-light">{{ event.start|time_diff }}</span>
         </div>

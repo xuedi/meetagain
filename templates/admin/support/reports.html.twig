@@ -41,7 +41,7 @@
                         {% endif %}
                     </td>
                     <td><span class="tag is-light">{{ report.reason.label()|trans }}</span></td>
-                    <td>{{ report.remarks|default('')|u.truncate(100) }}</td>
+                    <td>{{ report.remarks|default('')|shortened(100) }}</td>
                     <td>
                         {% if report.isOpen() %}
                             <span class="tag is-warning">{{ 'admin_support.status_open'|trans }}</span>

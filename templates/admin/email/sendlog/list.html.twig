@@ -38,7 +38,7 @@
                         <small class="has-text-grey">{{ email.createdAt|date('H:i:s') }}</small>
                     </td>
                     <td>
-                        {{ email.recipient }}
+                        {{ email.recipient|shortened }}
                         {% if email.recipient and email.recipient != recipientFilter %}
                             {% set filterParams = {'recipient': email.recipient} %}
                             {% if currentRange != defaultRange %}{% set filterParams = filterParams|merge({'range': currentRange}) %}{% endif %}

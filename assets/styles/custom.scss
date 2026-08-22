@@ -223,6 +223,17 @@ details.activities-load-more {
     margin-bottom: 0;
 }
 
+// Emitted by the `|shortened` twig filter: clips one line to `--truncate-ch` characters while the full
+// value stays in the DOM, so table search, sort and copy-paste keep seeing all of it.
+.is-truncated {
+    display: inline-block;
+    max-width: calc(var(--truncate-ch, 30) * 1ch);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
 // Floating action menu — absolute top-right overlay on image/card containers.
 .float-box-menu {
     position: absolute;
