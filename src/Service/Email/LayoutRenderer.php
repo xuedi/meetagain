@@ -26,21 +26,18 @@ readonly class LayoutRenderer
         private RequestHostResolver $hostResolver,
         private SiteLogoResolver $logoResolver,
         private EmailFooterLinkResolver $footerLinks,
-        private InlineLogoFactory $inlineLogoFactory,
         private LoggerInterface $logger,
     ) {}
 
     public function captureIdentity(string $locale): SendingIdentity
     {
-        $logo = $this->logoResolver->resolveAbsolute();
         $siteName = $this->siteNameResolver->resolve();
+        $siteUrl = rtrim($this->hostResolver->getSchemeAndHost(), '/');
 
         return new SendingIdentity(
             siteName: $siteName,
-            siteUrl: rtrim($this->hostResolver->getSchemeAndHost(), '/'),
-            logoUrl: $logo['url'],
-            logoHeight: $logo['height'],
-            logoImageId: $logo['imageId'],
+            siteUrl: $siteUrl,
+            logoUrl: $this->logoResolver->endpointUrl($siteUrl),
             greeting: $siteName,
             links: $this->footerLinks->resolve($this->hostResolver->getSchemeAndHost(), $locale),
         );
@@ -57,8 +54,6 @@ readonly class LayoutRenderer
             'siteName' => $identity->siteName,
             'siteUrl' => $identity->siteUrl,
             'logoUrl' => $identity->logoUrl,
-            'logoHeight' => $identity->logoHeight,
-            'logoImageId' => $identity->logoImageId,
             'accent' => $colors['color_link'] ?? $colors['color_primary'] ?? self::DEFAULT_ACCENT,
             'links' => $identity->links,
         ];
@@ -78,18 +73,9 @@ readonly class LayoutRenderer
         return $this->snapshot($this->captureIdentity($locale));
     }
 
-    public function wrap(EmailQueue $mail): RenderedLayout
+    public function wrap(EmailQueue $mail): string
     {
-        $context = $this->layoutContext($mail);
-        $inlineLogo = $this->inlineLogoFactory->create($context['logoImageId'] ?? null);
-        $html = $this->render($mail, $context, $inlineLogo !== null ? InlineLogoFactory::CID_NAME : null);
-
-        return $html === null ? new RenderedLayout($mail->getRenderedBody() ?? '') : new RenderedLayout($html, $inlineLogo);
-    }
-
-    public function wrapForBrowser(EmailQueue $mail): string
-    {
-        return $this->render($mail, $this->layoutContext($mail), null) ?? $mail->getRenderedBody() ?? '';
+        return $this->render($mail, $this->layoutContext($mail)) ?? $mail->getRenderedBody() ?? '';
     }
 
     /** @return array<string, mixed> */
@@ -109,7 +95,7 @@ readonly class LayoutRenderer
     }
 
     /** @param array<string, mixed> $context */
-    private function render(EmailQueue $mail, array $context, ?string $logoCid): ?string
+    private function render(EmailQueue $mail, array $context): ?string
     {
         try {
             return $this->twig->render(self::TEMPLATE, [
@@ -117,7 +103,6 @@ readonly class LayoutRenderer
                 'locale' => $mail->getLang() ?? 'en',
                 'subject' => $mail->getSubject() ?? '',
                 'body' => $mail->getRenderedBody() ?? '',
-                'logoCid' => $logoCid,
             ]);
         } catch (Throwable $e) {
             $this->logger->error('Email layout rendering failed, sending the bare body', [

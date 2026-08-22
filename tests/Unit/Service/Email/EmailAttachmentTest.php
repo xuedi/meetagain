@@ -11,7 +11,6 @@ use App\Repository\EmailQueueRepository;
 use App\Service\Email\EmailService;
 use App\Service\Email\EmailTemplateService;
 use App\Service\Email\LayoutRenderer;
-use App\Service\Email\RenderedLayout;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -154,7 +153,7 @@ final class EmailAttachmentTest extends TestCase
             ->willReturn(new SendingIdentity(siteName: 'Test Site', siteUrl: 'https://test.example.com'));
         $layoutRenderer
             ->method('wrap')
-            ->willReturnCallback(static fn(EmailQueue $mail) => new RenderedLayout('<html><body>' . $mail->getRenderedBody() . '</body></html>'));
+            ->willReturnCallback(static fn(EmailQueue $mail) => '<html><body>' . $mail->getRenderedBody() . '</body></html>');
 
         return new EmailService(
             transport: $transport ?? $this->createStub(TransportInterface::class),

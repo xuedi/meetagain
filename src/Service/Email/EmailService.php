@@ -201,11 +201,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         $template->subject($mail->getSubject());
         $template->locale($mail->getLang());
 
-        $layout = $this->layoutRenderer->wrap($mail);
-        $template->html($layout->html);
-        if ($layout->inlineLogo !== null) {
-            $template->addPart($layout->inlineLogo);
-        }
+        $template->html($this->layoutRenderer->wrap($mail));
 
         foreach ($mail->getAttachments() as $attachment) {
             if (!is_readable($attachment->path)) {

@@ -117,7 +117,7 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         return $this->render('admin/email/sendlog/show.html.twig', [
             'active' => 'email',
             'email' => $email,
-            'preview' => $this->layoutRenderer->wrapForBrowser($email),
+            'preview' => $this->layoutRenderer->wrap($email),
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);

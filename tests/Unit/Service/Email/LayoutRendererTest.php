@@ -7,7 +7,6 @@ use App\Service\Cms\MenuService;
 use App\Service\Config\ConfigService;
 use App\Service\Config\SiteNameResolver;
 use App\Service\Email\EmailFooterLinkResolver;
-use App\Service\Email\InlineLogoFactory;
 use App\Service\Email\LayoutRenderer;
 use App\Service\Http\RequestHostResolver;
 use App\Service\Media\SiteLogoResolver;
@@ -18,7 +17,6 @@ use ReflectionParameter;
 use RuntimeException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
-use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Translation\Translator;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
@@ -32,7 +30,7 @@ final class LayoutRendererTest extends TestCase
         $mail = $this->queued('<p>Rendered email body</p>');
 
         // Act
-        $html = $this->renderer()->wrap($mail)->html;
+        $html = $this->renderer()->wrap($mail);
 
         // Assert
         static::assertStringStartsWith('<!DOCTYPE html>', $html);
@@ -46,27 +44,38 @@ final class LayoutRendererTest extends TestCase
         $mail = $this->queued('<p>body</p>');
 
         // Act
-        $html = $this->renderer()->wrap($mail)->html;
+        $html = $this->renderer()->wrap($mail);
 
         // Assert
-        static::assertStringContainsString('https://example.org/images/thumbnails/hash_h120.webp', $html);
+        static::assertStringContainsString('https://example.org/logo.png', $html);
         static::assertStringContainsString('alt="Example Site"', $html);
         static::assertStringContainsString('https://example.org/en/imprint', $html);
     }
 
-    public function testAnEmbeddedLogoIsReferencedByContentIdInsteadOfByUrl(): void
+    public function testTheHeaderCarriesNoMimePartOnlyTheSitesOwnLogoEndpoint(): void
     {
         // Arrange
-        $inlineLogoFactory = $this->createStub(InlineLogoFactory::class);
-        $inlineLogoFactory->method('create')->willReturn(new DataPart('png-bytes', InlineLogoFactory::CID_NAME, 'image/png')->asInline());
         $mail = $this->queued('<p>body</p>');
 
         // Act
-        $rendered = $this->renderer(inlineLogoFactory: $inlineLogoFactory)->wrap($mail);
+        $html = $this->renderer()->wrap($mail);
 
         // Assert
-        static::assertStringContainsString('src="cid:' . InlineLogoFactory::CID_NAME . '"', $rendered->html);
-        static::assertNotNull($rendered->inlineLogo);
+        static::assertStringContainsString('src="https://example.org/logo.png"', $html);
+        static::assertStringNotContainsString('cid:', $html);
+    }
+
+    public function testASnapshotWithoutALogoRendersNoImageAtAll(): void
+    {
+        // Arrange
+        $mail = $this->queued('<p>body</p>', ['logoUrl' => null]);
+
+        // Act
+        $html = $this->renderer()->wrap($mail);
+
+        // Assert
+        static::assertStringNotContainsString('<img', $html);
+        static::assertStringContainsString('<p>body</p>', $html);
     }
 
     /**
@@ -87,7 +96,7 @@ final class LayoutRendererTest extends TestCase
         $mail = $this->queued($body);
 
         // Act
-        $html = $this->renderer()->wrap($mail)->html;
+        $html = $this->renderer()->wrap($mail);
 
         // Assert
         static::assertStringStartsWith('<!DOCTYPE html>', $html);
@@ -111,7 +120,7 @@ final class LayoutRendererTest extends TestCase
         );
 
         // Act
-        $html = $this->renderer(logger: $logger)->wrap($mail)->html;
+        $html = $this->renderer(logger: $logger)->wrap($mail);
 
         // Assert
         static::assertStringContainsString('<p>legacy row</p>', $html);
@@ -124,14 +133,14 @@ final class LayoutRendererTest extends TestCase
         $mail = $this->queued('<p>body</p>', [
             'siteName' => 'Second Site',
             'siteUrl' => 'https://second.example',
-            'logoUrl' => 'https://second.example/images/thumbnails/circle_h120.webp',
+            'logoUrl' => 'https://second.example/logo.png',
             'links' => [['label' => 'Imprint', 'url' => 'https://second.example/en/imprint']],
             'attribution' => 'Sent by <a href="https://second.example">Second Site</a>'
                 . ' - a group on the <a href="https://example.org">MeetAgain</a> platform',
         ]);
 
         // Act
-        $html = $this->hostileRenderer()->wrap($mail)->html;
+        $html = $this->hostileRenderer()->wrap($mail);
 
         // Assert
         static::assertStringContainsString('Second Site', $html);
@@ -151,10 +160,10 @@ final class LayoutRendererTest extends TestCase
         $mail = $this->queued('<p>body</p>');
 
         // Act
-        $rendered = $this->renderer(twig: $twig, logger: $loggerMock)->wrap($mail);
+        $html = $this->renderer(twig: $twig, logger: $loggerMock)->wrap($mail);
 
         // Assert
-        static::assertSame('<p>body</p>', $rendered->html);
+        static::assertSame('<p>body</p>', $html);
     }
 
     public function testCaptureSnapshotsTheSendingSite(): void
@@ -165,7 +174,7 @@ final class LayoutRendererTest extends TestCase
         // Assert
         static::assertSame('Example Site', $snapshot['siteName']);
         static::assertSame('https://example.org', $snapshot['siteUrl']);
-        static::assertSame('https://example.org/images/thumbnails/hash_h120.webp', $snapshot['logoUrl']);
+        static::assertSame('https://example.org/logo.png', $snapshot['logoUrl']);
         static::assertSame('#123456', $snapshot['accent']);
         static::assertSame([['label' => 'Imprint', 'url' => 'https://example.org/en/imprint']], $snapshot['links']);
     }
@@ -210,9 +219,7 @@ final class LayoutRendererTest extends TestCase
                 LayoutRenderer::CONTEXT_KEY => [...[
                     'siteName' => 'Example Site',
                     'siteUrl' => 'https://example.org',
-                    'logoUrl' => 'https://example.org/images/thumbnails/hash_h120.webp',
-                    'logoHeight' => 120,
-                    'logoImageId' => 7,
+                    'logoUrl' => 'https://example.org/logo.png',
                     'accent' => '#123456',
                     'links' => [['label' => 'Imprint', 'url' => 'https://example.org/en/imprint']],
                 ], ...$overrides],
@@ -227,7 +234,7 @@ final class LayoutRendererTest extends TestCase
         $mail = $this->queued('<p>body</p>', ['attribution' => $attribution]);
 
         // Act
-        $html = $this->renderer()->wrap($mail)->html;
+        $html = $this->renderer()->wrap($mail);
 
         // Assert
         static::assertStringContainsString($attribution, $html);
@@ -240,7 +247,7 @@ final class LayoutRendererTest extends TestCase
         $mail = $this->queued('<p>body</p>', ['siteName' => '<script>alert(1)</script>']);
 
         // Act
-        $html = $this->renderer()->wrap($mail)->html;
+        $html = $this->renderer()->wrap($mail);
 
         // Assert
         static::assertStringNotContainsString('<script>alert(1)</script>', $html);
@@ -260,16 +267,13 @@ final class LayoutRendererTest extends TestCase
         $hostResolver->method('getSchemeAndHost')->willReturnCallback($explode);
 
         $logoResolver = $this->createStub(SiteLogoResolver::class);
-        $logoResolver->method('resolveAbsolute')->willReturnCallback($explode);
+        $logoResolver->method('endpointUrl')->willReturnCallback($explode);
 
         $footerLinks = $this->createStub(EmailFooterLinkResolver::class);
         $footerLinks->method('resolve')->willReturnCallback($explode);
 
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getThemeColors')->willReturnCallback($explode);
-
-        $inlineLogoFactory = $this->createStub(InlineLogoFactory::class);
-        $inlineLogoFactory->method('create')->willReturn(null);
 
         $twig = new Environment(new FilesystemLoader(dirname(__DIR__, 4) . '/templates'));
         $twig->addExtension(new TranslationExtension(new Translator('en')));
@@ -281,14 +285,12 @@ final class LayoutRendererTest extends TestCase
             hostResolver: $hostResolver,
             logoResolver: $logoResolver,
             footerLinks: $footerLinks,
-            inlineLogoFactory: $inlineLogoFactory,
             logger: $this->createStub(LoggerInterface::class),
         );
     }
 
     private function renderer(
         ?Environment $twig = null,
-        ?InlineLogoFactory $inlineLogoFactory = null,
         ?LoggerInterface $logger = null,
         ?EmailFooterLinkResolver $footerLinks = null,
     ): LayoutRenderer {
@@ -307,20 +309,13 @@ final class LayoutRendererTest extends TestCase
         $hostResolver->method('getSchemeAndHost')->willReturn('https://example.org');
 
         $logoResolver = $this->createStub(SiteLogoResolver::class);
-        $logoResolver->method('resolveAbsolute')->willReturn([
-            'url' => 'https://example.org/images/thumbnails/hash_h120.webp',
-            'height' => 120,
-            'imageId' => 7,
-        ]);
+        $logoResolver->method('endpointUrl')->willReturnCallback(
+            static fn(string $schemeAndHost): string => rtrim($schemeAndHost, '/') . '/logo.png',
+        );
 
         if ($footerLinks === null) {
             $footerLinks = $this->createStub(EmailFooterLinkResolver::class);
             $footerLinks->method('resolve')->willReturn([['label' => 'Imprint', 'url' => 'https://example.org/en/imprint']]);
-        }
-
-        if ($inlineLogoFactory === null) {
-            $inlineLogoFactory = $this->createStub(InlineLogoFactory::class);
-            $inlineLogoFactory->method('create')->willReturn(null);
         }
 
         return new LayoutRenderer(
@@ -330,7 +325,6 @@ final class LayoutRendererTest extends TestCase
             hostResolver: $hostResolver,
             logoResolver: $logoResolver,
             footerLinks: $footerLinks,
-            inlineLogoFactory: $inlineLogoFactory,
             logger: $logger ?? $this->createStub(LoggerInterface::class),
         );
     }
