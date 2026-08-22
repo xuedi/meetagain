@@ -8,6 +8,7 @@ use App\Repository\EmailQueueRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Email\Delivery\Log;
 use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
+use App\Service\Email\Delivery\ProviderChain;
 use App\Service\Email\Delivery\StatusSyncService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -194,7 +195,7 @@ class StatusSyncServiceTest extends TestCase
         ?ConfigService $configService = null,
     ): StatusSyncService {
         return new StatusSyncService(
-            $provider ?? $this->createStub(EmailDeliveryProviderInterface::class),
+            new ProviderChain($provider === null ? [] : [$provider]),
             $repo ?? $this->createStub(EmailQueueRepository::class),
             $em ?? $this->createStub(EntityManagerInterface::class),
             new NullLogger(),

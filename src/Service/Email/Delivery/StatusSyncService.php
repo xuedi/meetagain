@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 final readonly class StatusSyncService implements CronTaskInterface
 {
     public function __construct(
-        private EmailDeliveryProviderInterface $provider,
+        private ProviderChain $provider,
         private EmailQueueRepository $repo,
         private EntityManagerInterface $em,
         private LoggerInterface $logger,

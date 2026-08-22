@@ -3,7 +3,9 @@
 namespace Tests\Functional\Command;
 
 use App\Entity\EmailQueue;
+use App\Enum\EmailQueueStatus;
 use App\Repository\EmailQueueRepository;
+use App\Service\Email\EmailService;
 use App\Service\Config\LanguageService;
 use App\Service\Email\LayoutRenderer;
 use App\Service\Email\PreviewSweepService;
@@ -34,6 +36,29 @@ class EmailPreviewCommandTest extends KernelTestCase
             static::assertArrayHasKey(LayoutRenderer::CONTEXT_KEY, $row->getContext(), 'the layout snapshot is taken at enqueue');
             static::assertStringContainsString('<html', $layoutRenderer->wrap($row)->html);
         }
+    }
+
+    public function testSweepLeavesTheQueuePendingForCronToDispatch(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $container = static::getContainer();
+        $identifier = $container->get(PreviewSweepService::class)->availableIdentifiers()[0];
+        $repository = $container->get(EmailQueueRepository::class);
+
+        // Act
+        $this->commandTester()->execute(['--lang' => ['en'], '--type' => [$identifier]]);
+
+        // Assert
+        $queued = $this->sweptRows($repository);
+        static::assertCount(1, $queued);
+        static::assertSame(EmailQueueStatus::Pending, $queued[0]->getStatus());
+
+        // Act
+        $container->get(EmailService::class)->sendQueue();
+
+        // Assert
+        static::assertSame(EmailQueueStatus::Sent, $this->sweptRows($repository)[0]->getStatus());
     }
 
     public function testSubjectsCarryTheDebugTagUnlessPlainIsPassed(): void

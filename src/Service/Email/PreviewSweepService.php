@@ -3,6 +3,7 @@
 namespace App\Service\Email;
 
 use App\Emails\EmailInterface;
+use App\Emails\EmailQueueInterface;
 use App\Entity\EmailQueue;
 use App\Enum\EmailQueueStatus;
 use App\Repository\EmailQueueRepository;
@@ -27,7 +28,7 @@ readonly class PreviewSweepService
     public function __construct(
         #[AutowireIterator(EmailInterface::class)]
         private iterable $emailTypes,
-        private EmailService $emailService,
+        private EmailQueueInterface $emailQueue,
         private EmailTemplateRepository $templateRepo,
         private EmailQueueRepository $queueRepo,
         private EntityManagerInterface $em,
@@ -93,7 +94,7 @@ readonly class PreviewSweepService
                 $email->locale($locale);
                 $email->context($mockContext);
 
-                $this->emailService->enqueue($emailType, $email, $mockContext, true, $origin);
+                $this->emailQueue->enqueue($emailType, $email, $mockContext, true, $origin);
                 ++$enqueued;
             } catch (Throwable $e) {
                 $errors[$recipient] = $e->getMessage();
@@ -106,7 +107,6 @@ readonly class PreviewSweepService
 
         return new PreviewSweepResult(
             enqueued: $enqueued,
-            sendResult: $this->emailService->sendQueue(),
             identifiers: $identifiers,
             locales: $locales,
             withoutType: $this->templatesWithoutType($typesByIdentifier),

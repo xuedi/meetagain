@@ -80,7 +80,6 @@ admin_email_sendlog:
     filter_by_recipient: 'Filtrer par ce destinataire'
     remove_recipient_filter: 'Retirer le filtre %email%'
     rendered_message: 'Message rendu'
-    rendered_message_error: 'Impossible de rendre le message'
     context_variables: 'Variables de contexte'
 admin_email_planned:
     empty: 'Aucun e-mail planifié dans les 14 prochains jours.'
@@ -127,6 +126,6 @@ admin_email_debugging:
     field_recipient: 'E-mail du destinataire'
     context_variables: 'Variables de contexte'
     button_send_test: 'Envoyer un e-mail de test'
-    flash_sent: 'E-mail de test "%subject%" envoyé à %recipient%'
-    flash_failed: 'Échec de l''envoi de l''e-mail.'
+    flash_queued: 'E-mail de test mis en file pour %recipient% - il partira au prochain passage du cron'
+    flash_blocked: '%recipient% est sur la liste de blocage des e-mails, rien n''a été mis en file.'
     flash_error: 'Une erreur est survenue pendant l''envoi.'

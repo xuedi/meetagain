@@ -55,14 +55,13 @@ class EmailPreviewCommand extends Command
     protected function report(SymfonyStyle $io, PreviewSweepResult $result): int
     {
         $io->success(sprintf(
-            'Enqueued %d (%d templates x %d languages), sent %s',
+            'Queued %d (%d templates x %d languages) - dispatch with: just appCron',
             $result->enqueued,
             count($result->identifiers),
             count($result->locales),
-            $result->sendResult,
         ));
         $io->text(sprintf(
-            'Newest first in the inbox: %s, each language A-Z by identifier',
+            'Newest first in the inbox once dispatched: %s, each language A-Z by identifier',
             implode(', ', $result->locales),
         ));
         $io->text($result->tagged

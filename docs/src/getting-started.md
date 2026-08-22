@@ -51,7 +51,7 @@ Once started, the following services are available:
 | Email       | `ma-mailpit` (Mailpit)        | http://localhost:8025   | Catches all outgoing email |
 | Cache       | `ma-valkey` (Valkey)          | internal                | Redis-compatible cache     |
 
-Mailpit captures every outgoing email — no real mail is sent in dev mode.
+Mail is queued, not sent: `just appCron` dispatches the queue, and Mailpit then captures every outgoing email - no real mail is sent in dev mode.
 
 ---
 

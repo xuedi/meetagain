@@ -80,7 +80,6 @@ admin_email_sendlog:
     filter_by_recipient: 'Filter by this recipient'
     remove_recipient_filter: 'Remove %email% filter'
     rendered_message: 'Rendered Message'
-    rendered_message_error: 'Could not render message'
     context_variables: 'Context Variables'
 admin_email_planned:
     empty: 'No scheduled emails planned in the next 14 days.'
@@ -127,6 +126,6 @@ admin_email_debugging:
     field_recipient: 'Recipient Email'
     context_variables: 'Context Variables'
     button_send_test: 'Send Test Email'
-    flash_sent: 'Test email "%subject%" sent to %recipient%'
-    flash_failed: 'Failed to send email.'
+    flash_queued: 'Test email queued for %recipient% - it goes out with the next cron run'
+    flash_blocked: '%recipient% is on the email blocklist, nothing was queued.'
     flash_error: 'An error occurred while sending.'

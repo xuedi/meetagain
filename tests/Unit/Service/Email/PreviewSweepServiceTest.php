@@ -9,7 +9,7 @@ use App\Repository\EmailQueueRepository;
 use App\Repository\EmailTemplateRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
-use App\Service\Email\EmailService;
+use App\Emails\EmailQueueInterface;
 use App\Service\Email\LayoutRenderer;
 use App\Service\Email\PreviewSweepService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,7 +37,7 @@ class PreviewSweepServiceTest extends TestCase
         // Arrange
         $origin = new stdClass();
         $seen = [];
-        $queue = $this->createStub(EmailService::class);
+        $queue = $this->createStub(EmailQueueInterface::class);
         $queue->method('enqueue')->willReturnCallback(
             static function (EmailInterface $source, TemplatedEmail $email, array $context, bool $flush, ?object $passed) use (&$seen): bool {
                 $seen[] = $passed;
@@ -45,7 +45,7 @@ class PreviewSweepServiceTest extends TestCase
                 return true;
             },
         );
-        $service = $this->makeService(emailService: $queue, locales: ['en']);
+        $service = $this->makeService(emailQueue: $queue, locales: ['en']);
 
         // Act
         $service->sweep(origin: $origin);
@@ -59,7 +59,7 @@ class PreviewSweepServiceTest extends TestCase
     {
         // Arrange
         $seen = [];
-        $queue = $this->createStub(EmailService::class);
+        $queue = $this->createStub(EmailQueueInterface::class);
         $queue->method('enqueue')->willReturnCallback(
             static function (EmailInterface $source, TemplatedEmail $email, array $context, bool $flush, ?object $passed) use (&$seen): bool {
                 $seen[] = $passed;
@@ -67,7 +67,7 @@ class PreviewSweepServiceTest extends TestCase
                 return true;
             },
         );
-        $service = $this->makeService(emailService: $queue, locales: ['en']);
+        $service = $this->makeService(emailQueue: $queue, locales: ['en']);
 
         // Act
         $service->sweep();
@@ -80,7 +80,7 @@ class PreviewSweepServiceTest extends TestCase
     public function testEnqueuesOneMailPerTypeAndLocale(): void
     {
         // Arrange
-        $queue = $this->createStub(EmailService::class);
+        $queue = $this->createStub(EmailQueueInterface::class);
         $recipients = [];
         $queue->method('enqueue')->willReturnCallback(
             static function (EmailInterface $source, TemplatedEmail $email) use (&$recipients): bool {
@@ -89,7 +89,7 @@ class PreviewSweepServiceTest extends TestCase
                 return true;
             },
         );
-        $service = $this->makeService(emailService: $queue, locales: ['en', 'de']);
+        $service = $this->makeService(emailQueue: $queue, locales: ['en', 'de']);
 
         // Act
         $result = $service->sweep();
@@ -107,7 +107,7 @@ class PreviewSweepServiceTest extends TestCase
     public function testCallerTagsBecomeExtraPlusAddressSegments(): void
     {
         // Arrange
-        $queue = $this->createStub(EmailService::class);
+        $queue = $this->createStub(EmailQueueInterface::class);
         $recipients = [];
         $queue->method('enqueue')->willReturnCallback(
             static function (EmailInterface $source, TemplatedEmail $email) use (&$recipients): bool {
@@ -116,7 +116,7 @@ class PreviewSweepServiceTest extends TestCase
                 return true;
             },
         );
-        $service = $this->makeService(emailService: $queue, locales: ['en']);
+        $service = $this->makeService(emailQueue: $queue, locales: ['en']);
 
         // Act
         $service->sweep(['welcome'], recipientTags: ['weiqi-club']);
@@ -233,7 +233,7 @@ class PreviewSweepServiceTest extends TestCase
      * @param list<EmailQueue> $pending
      */
     private function makeService(
-        ?EmailService $emailService = null,
+        ?EmailQueueInterface $emailQueue = null,
         array $locales = ['en'],
         array $templateIdentifiers = ['welcome', 'announcement'],
         string $environment = 'test',
@@ -257,7 +257,7 @@ class PreviewSweepServiceTest extends TestCase
 
         return new PreviewSweepService(
             [$this->emailType('welcome'), $this->emailType('announcement')],
-            $emailService ?? $this->createStub(EmailService::class),
+            $emailQueue ?? $this->createStub(EmailQueueInterface::class),
             $templateRepo,
             $queueRepo,
             $this->createStub(EntityManagerInterface::class),

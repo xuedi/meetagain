@@ -958,8 +958,9 @@ $this->myPluginEmail->send(['user' => $user, ...]);
   English label, the mock keeps it English - the preview sweep exists to make that visible.
 - `MockSampleFactory::create()` returns a shared per-locale sample (people, group, event, dates, sample
   text) so each type composes its context from one table rather than inventing its own.
-- `app:email:preview` sweeps every registered type in every enabled language into the dev mailbox, so a
-  mock that is missing a template variable shows up as a `{{placeholder}}` in a rendered mail.
+- `app:email:preview` queues every registered type in every enabled language for the dev mailbox (run the
+  cron to dispatch), so a mock that is missing a template variable shows up as a `{{placeholder}}` in a
+  rendered mail.
 
 For **scheduled emails** (cron-driven), implement `ScheduledEmailInterface` additionally:
 
