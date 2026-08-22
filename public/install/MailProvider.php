@@ -9,7 +9,7 @@
 interface MailProvider
 {
     /**
-     * Get the unique identifier for this provider (e.g., 'smtp', 'sendgrid', 'mailhog').
+     * Get the unique identifier for this provider (e.g., 'smtp', 'sendgrid', 'mailpit').
      */
     public function getName(): string;
 

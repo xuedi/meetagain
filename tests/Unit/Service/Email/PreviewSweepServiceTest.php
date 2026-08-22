@@ -97,11 +97,32 @@ class PreviewSweepServiceTest extends TestCase
         // Assert
         static::assertSame(4, $result->enqueued);
         static::assertSame([
-            'de-welcome@preview.invalid',
-            'de-announcement@preview.invalid',
-            'en-welcome@preview.invalid',
-            'en-announcement@preview.invalid',
+            'welcome+de@preview.invalid',
+            'announcement+de@preview.invalid',
+            'welcome+en@preview.invalid',
+            'announcement+en@preview.invalid',
         ], $recipients);
+    }
+
+    public function testCallerTagsBecomeExtraPlusAddressSegments(): void
+    {
+        // Arrange
+        $queue = $this->createStub(EmailService::class);
+        $recipients = [];
+        $queue->method('enqueue')->willReturnCallback(
+            static function (EmailInterface $source, TemplatedEmail $email) use (&$recipients): bool {
+                $recipients[] = $email->getTo()[0]->getAddress();
+
+                return true;
+            },
+        );
+        $service = $this->makeService(emailService: $queue, locales: ['en']);
+
+        // Act
+        $service->sweep(['welcome'], recipientTags: ['weiqi-club']);
+
+        // Assert
+        static::assertSame(['welcome+en+weiqi-club@preview.invalid'], $recipients);
     }
 
     public function testNarrowsTheMatrixByTypeAndLanguage(): void
@@ -143,7 +164,7 @@ class PreviewSweepServiceTest extends TestCase
     public function testSubjectsAreTaggedWithIdentifierResolvedSiteAndLanguage(): void
     {
         // Arrange
-        $row = $this->pendingRow('de-welcome@preview.invalid', 'Willkommen!', 'Weiqi Club');
+        $row = $this->pendingRow('welcome+de@preview.invalid', 'Willkommen!', 'Weiqi Club');
         $service = $this->makeService(pending: [$row]);
 
         // Act
@@ -157,7 +178,7 @@ class PreviewSweepServiceTest extends TestCase
     public function testPlainSweepLeavesSubjectsUntouched(): void
     {
         // Arrange
-        $row = $this->pendingRow('de-welcome@preview.invalid', 'Willkommen!', 'Weiqi Club');
+        $row = $this->pendingRow('welcome+de@preview.invalid', 'Willkommen!', 'Weiqi Club');
         $service = $this->makeService(pending: [$row]);
 
         // Act
@@ -184,7 +205,7 @@ class PreviewSweepServiceTest extends TestCase
     public function testATaggedSubjectStaysWithinTheColumnLimit(): void
     {
         // Arrange
-        $row = $this->pendingRow('de-welcome@preview.invalid', str_repeat('a', 250), 'Weiqi Club');
+        $row = $this->pendingRow('welcome+de@preview.invalid', str_repeat('a', 250), 'Weiqi Club');
         $service = $this->makeService(pending: [$row]);
 
         // Act

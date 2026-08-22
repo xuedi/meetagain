@@ -60,6 +60,7 @@ readonly class PreviewSweepService
     /**
      * @param list<string> $requestedIdentifiers
      * @param list<string> $requestedLocales
+     * @param list<string> $recipientTags
      */
     public function sweep(
         array $requestedIdentifiers = [],
@@ -67,6 +68,7 @@ readonly class PreviewSweepService
         string $recipientDomain = self::DEFAULT_RECIPIENT_DOMAIN,
         bool $tagSubjects = true,
         ?object $origin = null,
+        array $recipientTags = [],
     ): PreviewSweepResult {
         $this->guardEnvironment();
 
@@ -79,7 +81,7 @@ readonly class PreviewSweepService
         $errors = [];
 
         foreach ($this->reverseReadingOrder($identifiers, $locales) as [$identifier, $locale]) {
-            $recipient = sprintf('%s-%s@%s', $locale, $identifier, $recipientDomain);
+            $recipient = sprintf('%s@%s', implode('+', [$identifier, $locale, ...$recipientTags]), $recipientDomain);
             $emailType = $typesByIdentifier[$identifier];
 
             try {

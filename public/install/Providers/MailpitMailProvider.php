@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-class MailhogMailProvider implements MailProvider
+class MailpitMailProvider implements MailProvider
 {
     public function getName(): string
     {
-        return 'mailhog';
+        return 'mailpit';
     }
 
     public function getDisplayName(): string
     {
-        return 'MailHog';
+        return 'Mailpit';
     }
 
     public function getDescription(): string
@@ -34,7 +34,7 @@ class MailhogMailProvider implements MailProvider
 
     public function buildDsn(array $config): string
     {
-        return 'smtp://mailhog:1025';
+        return 'smtp://mailpit:1025';
     }
 
     public function requiresConfiguration(): bool
