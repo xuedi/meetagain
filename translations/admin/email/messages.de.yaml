@@ -80,7 +80,6 @@ admin_email_sendlog:
     filter_by_recipient: 'Nach diesem Empfänger filtern'
     remove_recipient_filter: 'Filter %email% entfernen'
     rendered_message: 'Gerenderte Nachricht'
-    rendered_message_error: 'Nachricht konnte nicht gerendert werden'
     context_variables: 'Kontextvariablen'
 admin_email_planned:
     empty: 'Keine geplanten E-Mails in den nächsten 14 Tagen.'
@@ -127,6 +126,6 @@ admin_email_debugging:
     field_recipient: 'Empfänger-E-Mail'
     context_variables: 'Kontextvariablen'
     button_send_test: 'Test-E-Mail senden'
-    flash_sent: 'Test-E-Mail "%subject%" an %recipient% gesendet'
-    flash_failed: 'E-Mail konnte nicht gesendet werden.'
+    flash_queued: 'Test-E-Mail für %recipient% eingereiht - sie geht mit dem nächsten Cron-Lauf raus'
+    flash_blocked: '%recipient% steht auf der E-Mail-Sperrliste, es wurde nichts eingereiht.'
     flash_error: 'Beim Senden ist ein Fehler aufgetreten.'

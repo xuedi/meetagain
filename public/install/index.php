@@ -6,7 +6,7 @@ require_once __DIR__ . '/Installer.php';
 require_once __DIR__ . '/MailProvider.php';
 require_once __DIR__ . '/MailProviderRegistry.php';
 require_once __DIR__ . '/Providers/NullMailProvider.php';
-require_once __DIR__ . '/Providers/MailhogMailProvider.php';
+require_once __DIR__ . '/Providers/MailpitMailProvider.php';
 require_once __DIR__ . '/Providers/SmtpMailProvider.php';
 require_once __DIR__ . '/Providers/SendgridMailProvider.php';
 require_once __DIR__ . '/Providers/MailgunMailProvider.php';

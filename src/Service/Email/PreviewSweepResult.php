@@ -12,7 +12,6 @@ final readonly class PreviewSweepResult
      */
     public function __construct(
         public int $enqueued,
-        public string $sendResult,
         public array $identifiers,
         public array $locales,
         public array $withoutType,

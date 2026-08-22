@@ -9,15 +9,14 @@ use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Emails\EmailInterface;
+use App\Emails\EmailQueueInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
-use App\Service\Email\EmailTemplateService;
+use App\Service\Email\BlocklistCheckerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -33,8 +32,8 @@ final class DebuggingController extends AbstractEmailController implements Admin
         TranslatorInterface $translator,
         #[AutowireIterator(EmailInterface::class)]
         private readonly iterable $emailTypes,
-        private readonly EmailTemplateService $templateService,
-        private readonly MailerInterface $mailer,
+        private readonly EmailQueueInterface $emailQueue,
+        private readonly BlocklistCheckerInterface $blocklist,
         private readonly ConfigService $config,
         private readonly LanguageService $languageService,
     ) {
@@ -79,25 +78,39 @@ final class DebuggingController extends AbstractEmailController implements Admin
         $language = $request->request->getString('language');
         $context = $request->request->all('context');
 
-        try {
-            $templateContent = $this->templateService->getTemplateContent($emailTypeValue, $language);
-            $subject = $this->templateService->renderContent($templateContent['subject'], $context);
-            $body = $this->templateService->renderContent($templateContent['body'], $context);
+        $emailType = $this->findType($emailTypeValue);
+        if (!$emailType instanceof EmailInterface) {
+            $this->addFlash('error', $this->translator->trans('admin_email_debugging.flash_error'));
 
-            $email = new Email()
-                ->from($this->config->getMailerAddress())
-                ->to($recipient)
-                ->subject($subject)
-                ->html($body);
+            return $this->redirectToRoute('app_admin_email_debugging', [
+                'type' => $emailTypeValue,
+                'lang' => $language,
+            ]);
+        }
 
-            $this->mailer->send($email);
-
-            $this->addFlash('success', $this->translator->trans('admin_email_debugging.flash_sent', [
-                '%subject%' => $subject,
+        if ($this->blocklist->isBlocked($recipient)) {
+            $this->addFlash('warning', $this->translator->trans('admin_email_debugging.flash_blocked', [
                 '%recipient%' => $recipient,
             ]));
-        } catch (TransportExceptionInterface $e) {
-            $this->addFlash('error', $this->translator->trans('admin_email_debugging.flash_failed'));
+
+            return $this->redirectToRoute('app_admin_email_debugging', [
+                'type' => $emailTypeValue,
+                'lang' => $language,
+            ]);
+        }
+
+        try {
+            $email = new TemplatedEmail()
+                ->from($this->config->getMailerAddress())
+                ->to($recipient)
+                ->locale($language)
+                ->context($context);
+
+            $this->emailQueue->enqueue($emailType, $email, $context);
+
+            $this->addFlash('success', $this->translator->trans('admin_email_debugging.flash_queued', [
+                '%recipient%' => $recipient,
+            ]));
         } catch (Throwable $e) {
             $this->addFlash('error', $this->translator->trans('admin_email_debugging.flash_error'));
         }
@@ -113,19 +126,28 @@ final class DebuggingController extends AbstractEmailController implements Admin
      */
     private function resolveMockContext(string $identifier, string $locale): array
     {
-        foreach ($this->emailTypes as $emailType) {
-            if ($emailType->getIdentifier() !== $identifier) {
-                continue;
-            }
-            $context = $emailType->getDisplayMockData($locale)['context'];
-            if (!array_key_exists('greeting', $context)) {
-                $context['greeting'] = '';
-            }
-
-            return $context;
+        $emailType = $this->findType($identifier);
+        if (!$emailType instanceof EmailInterface) {
+            return [];
         }
 
-        return [];
+        $context = $emailType->getDisplayMockData($locale)['context'];
+        if (!array_key_exists('greeting', $context)) {
+            $context['greeting'] = '';
+        }
+
+        return $context;
+    }
+
+    private function findType(string $identifier): ?EmailInterface
+    {
+        foreach ($this->emailTypes as $emailType) {
+            if ($emailType->getIdentifier() === $identifier) {
+                return $emailType;
+            }
+        }
+
+        return null;
     }
 
     private function buildTypeDropdown(string $current, string $language): AdminTopActionDropdown

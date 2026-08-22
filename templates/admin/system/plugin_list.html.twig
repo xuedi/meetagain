@@ -26,7 +26,7 @@
                 <tr>
                     <td>{{ plugin.version }}</td>
                     <td>{{ plugin.name }}</td>
-                    <td title="{{ plugin.description }}">{{ plugin.description|u.truncate(70, '...') }}</td>
+                    <td>{{ plugin.description|shortened(70) }}</td>
                     <td class="has-text-right is-nowrap">
                         {% if plugin.installed %}
                             {% if plugin.enabled %}

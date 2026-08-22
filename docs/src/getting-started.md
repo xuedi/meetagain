@@ -48,10 +48,10 @@ Once started, the following services are available:
 |-------------|-------------------------------|-------------------------|----------------------------|
 | Application | `ma-php` (FrankenPHP + Caddy) | https://meetagain.local | The app                    |
 | Database    | `ma-db` (MariaDB 12)          | localhost:3306          | Relational DB              |
-| Email       | `ma-mailhog` (MailHog)        | http://localhost:8025   | Catches all outgoing email |
+| Email       | `ma-mailpit` (Mailpit)        | http://localhost:8025   | Catches all outgoing email |
 | Cache       | `ma-valkey` (Valkey)          | internal                | Redis-compatible cache     |
 
-MailHog captures every outgoing email — no real mail is sent in dev mode.
+Mail is queued, not sent: `just appCron` dispatches the queue, and Mailpit then captures every outgoing email - no real mail is sent in dev mode.
 
 ---
 

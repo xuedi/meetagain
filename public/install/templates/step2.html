@@ -20,8 +20,8 @@
                 <div class="columns is-multiline">
                     <div class="column is-half">
                         <label class="radio box p-3 mb-2 is-block is-clickable">
-                            <input type="radio" name="mail_provider" value="mailhog" {% if provider == 'mailhog' %}checked{% endif %}>
-                            <strong>MailHog</strong>
+                            <input type="radio" name="mail_provider" value="mailpit" {% if provider == 'mailpit' %}checked{% endif %}>
+                            <strong>Mailpit</strong>
                             <span class="tag is-info is-light ml-2">Docker</span>
                             <br>
                             <small class="has-text-grey">Local email testing tool</small>
@@ -72,10 +72,10 @@
             </div>
         </div>
 
-        <!-- MailHog Fields -->
-        <div id="fields-mailhog" class="provider-fields box has-background-light mt-4 is-hidden">
+        <!-- Mailpit Fields -->
+        <div id="fields-mailpit" class="provider-fields box has-background-light mt-4 is-hidden">
             <div class="notification is-info is-light">
-                <strong>MailHog</strong> is a local email testing tool for development.
+                <strong>Mailpit</strong> is a local email testing tool for development.
                 All emails will be captured and viewable at <a href="http://localhost:8025" target="_blank">http://localhost:8025</a>.
                 <br><br>
                 No configuration needed - works automatically in Docker environment.

@@ -80,7 +80,6 @@ admin_email_sendlog:
     filter_by_recipient: '按此收件人筛选'
     remove_recipient_filter: '移除筛选 %email%'
     rendered_message: '渲染后的消息'
-    rendered_message_error: '无法渲染消息'
     context_variables: '上下文变量'
 admin_email_planned:
     empty: '未来14天内无计划邮件。'
@@ -127,6 +126,6 @@ admin_email_debugging:
     field_recipient: '收件人邮箱'
     context_variables: '上下文变量'
     button_send_test: '发送测试邮件'
-    flash_sent: '测试邮件"%subject%"已发送至%recipient%'
-    flash_failed: '邮件发送失败。'
+    flash_queued: '测试邮件已加入队列，收件人 %recipient%，将在下次定时任务运行时发出。'
+    flash_blocked: '%recipient% 在邮件屏蔽名单中，未加入队列。'
     flash_error: '发送时发生错误。'

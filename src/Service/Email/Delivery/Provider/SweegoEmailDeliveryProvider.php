@@ -8,12 +8,10 @@ use App\Service\Email\Delivery\LogFilter;
 use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 
-#[AsAlias(EmailDeliveryProviderInterface::class)]
 final readonly class SweegoEmailDeliveryProvider implements EmailDeliveryProviderInterface
 {
     private const BASE_URL = 'https://api.sweego.io';

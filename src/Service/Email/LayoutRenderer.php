@@ -80,25 +80,44 @@ readonly class LayoutRenderer
 
     public function wrap(EmailQueue $mail): RenderedLayout
     {
-        $locale = $mail->getLang() ?? 'en';
+        $context = $this->layoutContext($mail);
+        $inlineLogo = $this->inlineLogoFactory->create($context['logoImageId'] ?? null);
+        $html = $this->render($mail, $context, $inlineLogo !== null ? InlineLogoFactory::CID_NAME : null);
+
+        return $html === null ? new RenderedLayout($mail->getRenderedBody() ?? '') : new RenderedLayout($html, $inlineLogo);
+    }
+
+    public function wrapForBrowser(EmailQueue $mail): string
+    {
+        return $this->render($mail, $this->layoutContext($mail), null) ?? $mail->getRenderedBody() ?? '';
+    }
+
+    /** @return array<string, mixed> */
+    private function layoutContext(EmailQueue $mail): array
+    {
         $context = $mail->getContext()[self::CONTEXT_KEY] ?? null;
-        if (!is_array($context)) {
-            $this->logger->warning('Email row carries no frozen layout, resolving the sending identity at send time', [
-                'email_queue_id' => $mail->getId(),
-                'template' => $mail->getTemplate(),
-            ]);
-            $context = $this->capture($locale);
+        if (is_array($context)) {
+            return $context;
         }
 
-        $inlineLogo = $this->inlineLogoFactory->create($context['logoImageId'] ?? null);
+        $this->logger->warning('Email row carries no frozen layout, resolving the sending identity at send time', [
+            'email_queue_id' => $mail->getId(),
+            'template' => $mail->getTemplate(),
+        ]);
 
+        return $this->capture($mail->getLang() ?? 'en');
+    }
+
+    /** @param array<string, mixed> $context */
+    private function render(EmailQueue $mail, array $context, ?string $logoCid): ?string
+    {
         try {
-            $html = $this->twig->render(self::TEMPLATE, [
+            return $this->twig->render(self::TEMPLATE, [
                 ...$context,
-                'locale' => $locale,
+                'locale' => $mail->getLang() ?? 'en',
                 'subject' => $mail->getSubject() ?? '',
                 'body' => $mail->getRenderedBody() ?? '',
-                'logoCid' => $inlineLogo !== null ? InlineLogoFactory::CID_NAME : null,
+                'logoCid' => $logoCid,
             ]);
         } catch (Throwable $e) {
             $this->logger->error('Email layout rendering failed, sending the bare body', [
@@ -107,9 +126,7 @@ readonly class LayoutRenderer
                 'error' => $e->getMessage(),
             ]);
 
-            return new RenderedLayout($mail->getRenderedBody() ?? '');
+            return null;
         }
-
-        return new RenderedLayout($html, $inlineLogo);
     }
 }

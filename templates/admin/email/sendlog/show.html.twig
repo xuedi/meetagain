@@ -121,41 +121,33 @@
                         <td class="has-text-danger">{{ email.errorMessage }}</td>
                     </tr>
                 {% endif %}
+                <tr>
+                    <th>{{ 'admin_email_sendlog.context_variables'|trans }}</th>
+                    <td>
+                        {% set variables = email.context|filter((v, k) => k|slice(0, 1) != '_') %}
+                        {% if variables is empty %}
+                            <span class="has-text-grey">-</span>
+                        {% else %}
+                            <table class="table is-narrow is-fullwidth mb-0">
+                                <tbody>
+                                    {% for key, value in variables %}
+                                        <tr>
+                                            <th>{{ key }}</th>
+                                            <td>{% if value is iterable %}{{ value|json_encode|shortened(60) }}{% else %}{{ value|shortened(60) }}{% endif %}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                    </td>
+                </tr>
             </tbody>
         </table>
 
-        <div class="columns">
-            <div class="column">
-                <div class="box">
-                    <h3 class="subtitle">{{ 'admin_email_sendlog.context_variables'|trans }}</h3>
-                    <table class="table is-narrow is-bordered is-fullwidth">
-                        <tbody>
-                            {% for key, value in email.context|filter((v, k) => k|slice(0, 1) != '_') %}
-                                <tr>
-                                    <th>{{ key }}</th>
-                                    <td>{% if value is iterable %}{{ value|json_encode }}{% else %}{{ value }}{% endif %}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="column">
-                {% if renderedBody is not null %}
-                    <div class="box">
-                        <h3 class="subtitle">{{ 'admin_email_sendlog.rendered_message'|trans }}</h3>
-                        <p class="mb-4"><strong>{{ 'admin_email_sendlog.col_subject'|trans }}:</strong> {{ renderedSubject }}</p>
-                        <hr>
-                        <div class="content">
-                            {{ renderedBody|raw }}
-                        </div>
-                    </div>
-                {% elseif renderError is not null %}
-                    <div class="notification is-warning">
-                        {{ 'admin_email_sendlog.rendered_message_error'|trans }}: {{ renderError }}
-                    </div>
-                {% endif %}
-            </div>
+        <div class="box">
+            <h3 class="subtitle">{{ 'admin_email_sendlog.rendered_message'|trans }}</h3>
+            <iframe class="email-preview" title="{{ 'admin_email_sendlog.rendered_message'|trans }}"
+                    sandbox srcdoc="{{ preview|e('html_attr') }}"></iframe>
         </div>
 
     </div>

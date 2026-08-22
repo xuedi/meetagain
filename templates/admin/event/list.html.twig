@@ -23,7 +23,7 @@
             {% for event in events %}
                 <tr>
                     {% set title = event.title(app.locale) %}
-                    <td title="{{ title }}">{{ title|length > 20 ? title|slice(0, 20) ~ '...' : title }}</td>
+                    <td>{{ title|shortened(20) }}</td>
                     <td>
                         {{ event.start|date('Y-m-d H:i') }}
                         {% if event.id == nextEvent and not event.canceled %}
@@ -34,7 +34,7 @@
                         {{ (event.series is null ? 'admin_event.recurring_no' : 'admin_event.recurring_yes')|trans }}
                     </td>
                     {% set locationName = event.location ? event.location.name : '-' %}
-                    <td title="{{ locationName }}">{{ locationName|length > 20 ? locationName|slice(0, 20) ~ '...' : locationName }}</td>
+                    <td>{{ locationName|shortened(20) }}</td>
                     <td>
                         {% if event.canceled %}
                             <span class="icon has-text-danger" title="{{ 'events.tag_canceled'|trans }}"><i class="fa fa-ban"></i></span>

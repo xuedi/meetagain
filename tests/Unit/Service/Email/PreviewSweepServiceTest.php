@@ -9,7 +9,7 @@ use App\Repository\EmailQueueRepository;
 use App\Repository\EmailTemplateRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
-use App\Service\Email\EmailService;
+use App\Emails\EmailQueueInterface;
 use App\Service\Email\LayoutRenderer;
 use App\Service\Email\PreviewSweepService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,7 +37,7 @@ class PreviewSweepServiceTest extends TestCase
         // Arrange
         $origin = new stdClass();
         $seen = [];
-        $queue = $this->createStub(EmailService::class);
+        $queue = $this->createStub(EmailQueueInterface::class);
         $queue->method('enqueue')->willReturnCallback(
             static function (EmailInterface $source, TemplatedEmail $email, array $context, bool $flush, ?object $passed) use (&$seen): bool {
                 $seen[] = $passed;
@@ -45,7 +45,7 @@ class PreviewSweepServiceTest extends TestCase
                 return true;
             },
         );
-        $service = $this->makeService(emailService: $queue, locales: ['en']);
+        $service = $this->makeService(emailQueue: $queue, locales: ['en']);
 
         // Act
         $service->sweep(origin: $origin);
@@ -59,7 +59,7 @@ class PreviewSweepServiceTest extends TestCase
     {
         // Arrange
         $seen = [];
-        $queue = $this->createStub(EmailService::class);
+        $queue = $this->createStub(EmailQueueInterface::class);
         $queue->method('enqueue')->willReturnCallback(
             static function (EmailInterface $source, TemplatedEmail $email, array $context, bool $flush, ?object $passed) use (&$seen): bool {
                 $seen[] = $passed;
@@ -67,7 +67,7 @@ class PreviewSweepServiceTest extends TestCase
                 return true;
             },
         );
-        $service = $this->makeService(emailService: $queue, locales: ['en']);
+        $service = $this->makeService(emailQueue: $queue, locales: ['en']);
 
         // Act
         $service->sweep();
@@ -80,7 +80,7 @@ class PreviewSweepServiceTest extends TestCase
     public function testEnqueuesOneMailPerTypeAndLocale(): void
     {
         // Arrange
-        $queue = $this->createStub(EmailService::class);
+        $queue = $this->createStub(EmailQueueInterface::class);
         $recipients = [];
         $queue->method('enqueue')->willReturnCallback(
             static function (EmailInterface $source, TemplatedEmail $email) use (&$recipients): bool {
@@ -89,7 +89,7 @@ class PreviewSweepServiceTest extends TestCase
                 return true;
             },
         );
-        $service = $this->makeService(emailService: $queue, locales: ['en', 'de']);
+        $service = $this->makeService(emailQueue: $queue, locales: ['en', 'de']);
 
         // Act
         $result = $service->sweep();
@@ -97,11 +97,32 @@ class PreviewSweepServiceTest extends TestCase
         // Assert
         static::assertSame(4, $result->enqueued);
         static::assertSame([
-            'de-welcome@preview.invalid',
-            'de-announcement@preview.invalid',
-            'en-welcome@preview.invalid',
-            'en-announcement@preview.invalid',
+            'welcome+de@preview.invalid',
+            'announcement+de@preview.invalid',
+            'welcome+en@preview.invalid',
+            'announcement+en@preview.invalid',
         ], $recipients);
+    }
+
+    public function testCallerTagsBecomeExtraPlusAddressSegments(): void
+    {
+        // Arrange
+        $queue = $this->createStub(EmailQueueInterface::class);
+        $recipients = [];
+        $queue->method('enqueue')->willReturnCallback(
+            static function (EmailInterface $source, TemplatedEmail $email) use (&$recipients): bool {
+                $recipients[] = $email->getTo()[0]->getAddress();
+
+                return true;
+            },
+        );
+        $service = $this->makeService(emailQueue: $queue, locales: ['en']);
+
+        // Act
+        $service->sweep(['welcome'], recipientTags: ['weiqi-club']);
+
+        // Assert
+        static::assertSame(['welcome+en+weiqi-club@preview.invalid'], $recipients);
     }
 
     public function testNarrowsTheMatrixByTypeAndLanguage(): void
@@ -143,7 +164,7 @@ class PreviewSweepServiceTest extends TestCase
     public function testSubjectsAreTaggedWithIdentifierResolvedSiteAndLanguage(): void
     {
         // Arrange
-        $row = $this->pendingRow('de-welcome@preview.invalid', 'Willkommen!', 'Weiqi Club');
+        $row = $this->pendingRow('welcome+de@preview.invalid', 'Willkommen!', 'Weiqi Club');
         $service = $this->makeService(pending: [$row]);
 
         // Act
@@ -157,7 +178,7 @@ class PreviewSweepServiceTest extends TestCase
     public function testPlainSweepLeavesSubjectsUntouched(): void
     {
         // Arrange
-        $row = $this->pendingRow('de-welcome@preview.invalid', 'Willkommen!', 'Weiqi Club');
+        $row = $this->pendingRow('welcome+de@preview.invalid', 'Willkommen!', 'Weiqi Club');
         $service = $this->makeService(pending: [$row]);
 
         // Act
@@ -184,7 +205,7 @@ class PreviewSweepServiceTest extends TestCase
     public function testATaggedSubjectStaysWithinTheColumnLimit(): void
     {
         // Arrange
-        $row = $this->pendingRow('de-welcome@preview.invalid', str_repeat('a', 250), 'Weiqi Club');
+        $row = $this->pendingRow('welcome+de@preview.invalid', str_repeat('a', 250), 'Weiqi Club');
         $service = $this->makeService(pending: [$row]);
 
         // Act
@@ -212,7 +233,7 @@ class PreviewSweepServiceTest extends TestCase
      * @param list<EmailQueue> $pending
      */
     private function makeService(
-        ?EmailService $emailService = null,
+        ?EmailQueueInterface $emailQueue = null,
         array $locales = ['en'],
         array $templateIdentifiers = ['welcome', 'announcement'],
         string $environment = 'test',
@@ -236,7 +257,7 @@ class PreviewSweepServiceTest extends TestCase
 
         return new PreviewSweepService(
             [$this->emailType('welcome'), $this->emailType('announcement')],
-            $emailService ?? $this->createStub(EmailService::class),
+            $emailQueue ?? $this->createStub(EmailQueueInterface::class),
             $templateRepo,
             $queueRepo,
             $this->createStub(EntityManagerInterface::class),

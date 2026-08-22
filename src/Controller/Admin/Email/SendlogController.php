@@ -14,12 +14,11 @@ use App\Emails\EmailInterface;
 use App\Entity\EmailQueue;
 use App\Enum\EmailQueueStatus;
 use App\Repository\EmailQueueRepository;
-use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
+use App\Service\Email\Delivery\ProviderChain;
 use App\Service\Email\Delivery\StatusSyncService;
-use App\Service\Email\EmailTemplateService;
+use App\Service\Email\LayoutRenderer;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -52,9 +51,9 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         #[AutowireIterator(EmailInterface::class)]
         private readonly iterable $emailTypes,
         private readonly EmailQueueRepository $emailQueueRepo,
-        private readonly EmailDeliveryProviderInterface $provider,
+        private readonly ProviderChain $provider,
         private readonly StatusSyncService $syncService,
-        private readonly EmailTemplateService $templateService,
+        private readonly LayoutRenderer $layoutRenderer,
         private readonly EntityManagerInterface $em,
     ) {
         parent::__construct($translator, 'sendlog');
@@ -113,30 +112,12 @@ final class SendlogController extends AbstractEmailController implements AdminNa
     #[Route('/{id}', name: 'app_admin_email_sendlog_show', requirements: ['id' => '\d+'])]
     public function show(EmailQueue $email): Response
     {
-        $renderedSubject = null;
-        $renderedBody = null;
-        $renderError = null;
-
-        $templateType = $email->getTemplate();
-        if ($templateType !== null) {
-            try {
-                $content = $this->templateService->getTemplateContent($templateType, $email->getLang() ?? 'en');
-                $context = $email->getContext();
-                $renderedSubject = $this->templateService->renderContent($content['subject'], $context);
-                $renderedBody = $this->templateService->renderContent($content['body'], $context);
-            } catch (RuntimeException $e) {
-                $renderError = $e->getMessage();
-            }
-        }
-
         $adminTop = new AdminTop(info: $this->buildShowInfo($email), actions: $this->buildShowActions($email));
 
         return $this->render('admin/email/sendlog/show.html.twig', [
             'active' => 'email',
             'email' => $email,
-            'renderedSubject' => $renderedSubject,
-            'renderedBody' => $renderedBody,
-            'renderError' => $renderError,
+            'preview' => $this->layoutRenderer->wrapForBrowser($email),
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);

@@ -2,7 +2,11 @@
 
 namespace Tests\Functional;
 
+use App\Entity\EmailBlocklistEntry;
+use App\Entity\EmailQueue;
 use App\Entity\EmailTemplate;
+use App\Enum\EmailQueueStatus;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -139,6 +143,64 @@ class AdminEmailTest extends WebTestCase
 
         // Assert
         $this->assertResponseIsSuccessful();
+    }
+
+    public function testDebuggingTestSendQueuesInsteadOfSending(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+        $recipient = 'debug-queued@example.test';
+
+        // Act
+        $client->request('POST', '/en/admin/email/debugging/send', [
+            'emailType' => 'welcome',
+            'recipient' => $recipient,
+            'language' => 'en',
+            'context' => ['name' => 'Test Person'],
+        ]);
+
+        // Assert
+        $this->assertResponseRedirects();
+        $row = $this->findQueueRow($client, $recipient);
+        static::assertInstanceOf(EmailQueue::class, $row, 'The test send must leave a queue row for cron to dispatch');
+        static::assertSame(EmailQueueStatus::Pending, $row->getStatus());
+        static::assertSame('welcome', $row->getTemplate());
+    }
+
+    public function testDebuggingTestSendRefusesABlockedRecipient(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->loginAsAdmin($client);
+        $recipient = 'debug-blocked@example.test';
+        $em = $client->getContainer()->get(EntityManagerInterface::class);
+        $em->persist(new EmailBlocklistEntry()
+            ->setEmail($recipient)
+            ->setReason('functional test')
+            ->setAddedAt(new DateTimeImmutable()));
+        $em->flush();
+
+        // Act
+        $client->request('POST', '/en/admin/email/debugging/send', [
+            'emailType' => 'welcome',
+            'recipient' => $recipient,
+            'language' => 'en',
+            'context' => [],
+        ]);
+
+        // Assert
+        $this->assertResponseRedirects();
+        static::assertNull($this->findQueueRow($client, $recipient), 'A blocked recipient must not be queued');
+    }
+
+    private function findQueueRow($client, string $recipient): ?EmailQueue
+    {
+        return $client
+            ->getContainer()
+            ->get(EntityManagerInterface::class)
+            ->getRepository(EmailQueue::class)
+            ->findOneBy(['recipient' => $recipient]);
     }
 
     private function loginAsAdmin($client): void
