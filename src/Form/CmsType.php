@@ -45,14 +45,12 @@ class CmsType extends AbstractType
                     $this->translator->trans('admin_cms.status_normal') => 0,
                 ],
                 'help' => $this->translator->trans('admin_cms.status_locked_help'),
+            ])->add('emailFooter', CheckboxType::class, [
+                'label' => $this->translator->trans('admin_cms.email_footer'),
+                'required' => false,
+                'help' => $this->translator->trans('admin_cms.email_footer_help'),
             ]);
         }
-
-        $builder->add('emailFooter', CheckboxType::class, [
-            'label' => $this->translator->trans('admin_cms.email_footer'),
-            'required' => false,
-            'help' => $this->translator->trans('admin_cms.email_footer_help'),
-        ]);
 
         $builder->add('pageTitle', TextType::class, [
             'label' => $this->translator->trans('admin_cms.field_page_title'),

@@ -76,7 +76,9 @@
             {{ form_help(form.menuLocations) }}
             {{ form_errors(form.menuLocations) }}
         </div>
-        {{ form_row(form.emailFooter) }}
+        {% if form.emailFooter is defined %}
+            {{ form_row(form.emailFooter) }}
+        {% endif %}
         {{ form_end(form) }}
     </div>
 
