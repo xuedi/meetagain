@@ -6,6 +6,7 @@ use App\Entity\Image;
 use App\Publisher\SiteLogo\SiteLogoProviderInterface;
 use App\Repository\ImageRepository;
 use App\Service\Config\ConfigService;
+use App\Service\Http\RequestHostResolver;
 use App\Service\Media\ImageTypes\ImageTypeDefinitionInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -24,6 +25,7 @@ readonly class SiteLogoResolver
         private ImageRepository $imageRepository,
         private Packages $assetPackages,
         private ThumbnailSizeFormat $thumbnailSizeFormat,
+        private RequestHostResolver $hostResolver,
     ) {}
 
     /**
@@ -37,6 +39,47 @@ readonly class SiteLogoResolver
         }
 
         return ['url' => $this->buildUrl($image), 'width' => null, 'height' => self::SIZE[1]];
+    }
+
+    /**
+     * @return array{url: string, height: ?int, imageId: ?int}
+     */
+    public function resolveAbsolute(): array
+    {
+        $image = $this->resolveImage();
+        if ($image === null) {
+            return [
+                'url' => $this->absolute($this->assetPackages->getUrl('images/logo.webp')),
+                'height' => null,
+                'imageId' => null,
+            ];
+        }
+
+        return [
+            'url' => $this->absolute($this->buildUrl($image)),
+            'height' => self::SIZE[1],
+            'imageId' => $image->getId(),
+        ];
+    }
+
+    /**
+     * @return array{url: string, height: int}
+     */
+    public function resolveFor(Image $image, string $schemeAndHost): array
+    {
+        return [
+            'url' => rtrim($schemeAndHost, '/') . $this->buildUrl($image),
+            'height' => self::SIZE[1],
+        ];
+    }
+
+    private function absolute(string $url): string
+    {
+        if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {
+            return $url;
+        }
+
+        return $this->hostResolver->getSchemeAndHost() . '/' . ltrim($url, '/');
     }
 
     private function resolveImage(): ?Image

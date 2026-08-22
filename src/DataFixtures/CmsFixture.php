@@ -23,13 +23,14 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         $this->start();
-        foreach ($this->getData() as [$slug, $menuLocations]) {
+        foreach ($this->getData() as [$slug, $menuLocations, $emailFooter]) {
             $cms = new Cms();
             $cms->setSlug($slug);
             $cms->setCreatedAt(new DateTimeImmutable());
             $cms->setCreatedBy($this->getRefUser(UserFixture::ADMIN));
             $cms->setPublished(true);
             $cms->setLocked(in_array($slug, [self::PRIVACY, self::IMPRINT, self::INDEX, self::ABOUT, self::RULES, self::ANNOUNCEMENT], true));
+            $cms->setEmailFooter($emailFooter);
             if ($menuLocations !== null) {
                 foreach ($menuLocations as $value) {
                     $location = MenuLocation::from($value);
@@ -153,12 +154,12 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
     private function getData(): array
     {
         return [
-            [self::INDEX, [MenuLocation::BottomCol1->value]],
-            [self::PRIVACY, [MenuLocation::BottomCol4->value]],
-            [self::ABOUT, [MenuLocation::TopBar->value, MenuLocation::BottomCol1->value]],
-            [self::RULES, null],
-            [self::IMPRINT, [MenuLocation::BottomCol4->value]],
-            [self::ANNOUNCEMENT, null],
+            [self::INDEX, [MenuLocation::BottomCol1->value], false],
+            [self::PRIVACY, [MenuLocation::BottomCol4->value], true],
+            [self::ABOUT, [MenuLocation::TopBar->value, MenuLocation::BottomCol1->value], false],
+            [self::RULES, null, false],
+            [self::IMPRINT, [MenuLocation::BottomCol4->value], true],
+            [self::ANNOUNCEMENT, null, false],
         ];
     }
 

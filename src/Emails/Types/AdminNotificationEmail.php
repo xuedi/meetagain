@@ -7,6 +7,7 @@ use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Emails\Guard\Rule\SectionsHtmlPresentRule;
+use App\Emails\MockSampleFactory;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
@@ -19,10 +20,11 @@ readonly class AdminNotificationEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -35,15 +37,17 @@ readonly class AdminNotificationEmail extends EmailAbstract
         return 'admin_email_templates.trigger_admin_notification';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
             'subject' => 'Admin: Items require your attention',
             'context' => [
-                'username' => 'Admin User',
-                'sections' => '<h3>Users Pending Approval</h3><ul><li>Jane Smith (jane@example.org)</li></ul>',
-                'host' => 'https://localhost',
-                'lang' => 'en',
+                'username' => $sample->adminName,
+                'sections' => $this->samples->sectionsHtml(),
+                'host' => $sample->host,
+                'lang' => $locale,
             ],
         ];
     }
@@ -72,7 +76,6 @@ readonly class AdminNotificationEmail extends EmailAbstract
         $email->context([
             'username' => $user->getName(),
             'sections' => $sectionsHtml,
-            'host' => $this->config->getHost(),
             'lang' => $language,
         ]);
 

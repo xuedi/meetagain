@@ -9,12 +9,12 @@ use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
 use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Emails\Guard\Rule\UserNotificationsMasterToggleRule;
+use App\Emails\MockSampleFactory;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
-use App\Service\Http\RequestHostResolver;
 use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -24,12 +24,12 @@ readonly class EventUpdateNotificationEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
         private TranslatorInterface $translator,
-        private RequestHostResolver $host,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -42,17 +42,19 @@ readonly class EventUpdateNotificationEmail extends EmailAbstract
         return 'admin_email_templates.trigger_event_update_notification';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
-            'subject' => 'Update to event: Go tournament afterparty',
+            'subject' => sprintf('Update to event: %s', $sample->eventTitle),
             'context' => [
-                'username' => 'John Doe',
-                'eventId' => 1,
-                'eventTitle' => 'Go tournament afterparty',
-                'host' => 'https://localhost',
-                'lang' => 'en',
-                'changesHtml' => '<ul><li>Start time changed from <b>2026-06-15 19:30</b> to <b>2026-06-15 21:00</b>.</li><li>Location changed from <b>NightBar 64</b> to <b>Library Cafe</b>.</li></ul>',
+                'username' => $sample->recipientName,
+                'eventId' => $sample->eventId,
+                'eventTitle' => $sample->eventTitle,
+                'host' => $sample->host,
+                'lang' => $locale,
+                'changesHtml' => $this->samples->changesHtml($sample),
             ],
         ];
     }
@@ -66,6 +68,13 @@ readonly class EventUpdateNotificationEmail extends EmailAbstract
             new NotificationToggleEnabledRule('attendedEventUpdate'),
             new RecipientNotBlocklistedRule($this->blocklist),
         ];
+    }
+
+    public function getOrigin(array $context): ?object
+    {
+        $event = $context['event'] ?? null;
+
+        return $event instanceof Event ? $event : null;
     }
 
     public function send(array $context): void
@@ -93,7 +102,6 @@ readonly class EventUpdateNotificationEmail extends EmailAbstract
             'username' => $user->getName(),
             'eventId' => $event->getId(),
             'eventTitle' => $event->getTitle($language),
-            'host' => $this->host->getSchemeAndHost(),
             'lang' => $language,
             'changesHtml' => $changesHtml,
         ]);

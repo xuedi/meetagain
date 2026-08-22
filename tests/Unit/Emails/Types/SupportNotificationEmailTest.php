@@ -16,9 +16,12 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Tests\Unit\Emails\SampleFactoryTrait;
 
 class SupportNotificationEmailTest extends TestCase
 {
+    use SampleFactoryTrait;
+
     public function testSendEnqueuesOneEmailPerResolvedRecipient(): void
     {
         // Arrange
@@ -55,6 +58,7 @@ class SupportNotificationEmailTest extends TestCase
 
         $emailType = new SupportNotificationEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $queue,
             $config,
             $resolver,
@@ -91,6 +95,7 @@ class SupportNotificationEmailTest extends TestCase
 
         $emailType = new SupportNotificationEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $queue,
             $config,
             $resolver,

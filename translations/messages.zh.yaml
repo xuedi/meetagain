@@ -636,6 +636,9 @@ global:
     button_no: '否'
     flash_invalid_csrf: 'CSRF 令牌无效。'
 'notification.review.pending_count': '有 %count% 个项目等待您的审核'
+email_layout:
+    footer_sent_by: '由 %site% 发送'
+    footer_no_reply: '请不要回复此邮件 - 该邮箱无人查看。如需联系我们，请使用网站上的联系表单。'
 email_event_update:
     line_start: '开始时间已从 <b>%before%</b> 改为 <b>%after%</b>。'
     line_location: '地点已从 <b>%before%</b> 改为 <b>%after%</b>。'

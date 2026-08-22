@@ -16,6 +16,7 @@ use App\Emails\Types\UpcomingDigestEmail;
 use App\Emails\Types\VerificationRequestEmail;
 use App\Emails\Types\WelcomeEmail;
 use App\Entity\Event;
+use App\Filter\Email\AudienceFilterService;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Support\RecipientResolver;
@@ -30,9 +31,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Tests\Unit\Emails\SampleFactoryTrait;
 
 final class GetMaxSendByTest extends TestCase
 {
+    use SampleFactoryTrait;
+
     private const string NOW = '2026-04-21 10:00:00';
 
     /**
@@ -53,6 +57,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new EventReminderEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
@@ -69,6 +74,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new EventReminderEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
@@ -93,6 +99,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new NotificationEventCanceledEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RequestHostResolver::class),
@@ -109,6 +116,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new EventUpdateNotificationEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(TranslatorInterface::class),
@@ -125,6 +133,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new EventUpdateNotificationEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(TranslatorInterface::class),
@@ -149,6 +158,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new RsvpAggregatedEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
@@ -165,12 +175,14 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new UpcomingDigestEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
             $this->createStub(UserRepository::class),
             $this->createStub(AppStateService::class),
             [],
+            new AudienceFilterService([]),
         );
 
         $now = new DateTimeImmutable(self::NOW);
@@ -183,6 +195,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new NotificationMessageEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             new \Symfony\Component\Clock\MockClock(),
@@ -198,6 +211,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new AdminNotificationEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
         );
@@ -211,6 +225,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new WelcomeEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RequestHostResolver::class),
@@ -225,6 +240,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new AnnouncementEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RequestHostResolver::class),
@@ -239,6 +255,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new SupportNotificationEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RecipientResolver::class),
@@ -253,6 +270,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new PasswordResetEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RequestHostResolver::class),
@@ -265,6 +283,7 @@ final class GetMaxSendByTest extends TestCase
     {
         $email = new VerificationRequestEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RequestHostResolver::class),

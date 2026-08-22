@@ -17,9 +17,15 @@ interface EmailInterface
     public function getTriggerLabel(): string;
 
     /** @return array{subject: string, context: array<string, mixed>} */
-    public function getDisplayMockData(): array;
+    public function getDisplayMockData(string $locale): array;
 
     public function guardCheck(array $context): bool;
+
+    /**
+     * The entity this message is about, or null when nothing in stored data claims it. Used to
+     * resolve the identity the message is sent under, before it reaches the queue.
+     */
+    public function getOrigin(array $context): ?object;
 
     /**
      * Ordered list of guard rules evaluated before send. Cheapest-first; the first non-Pass result

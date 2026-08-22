@@ -6,22 +6,22 @@ use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
+use App\Emails\MockSampleFactory;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
-use App\Service\Http\RequestHostResolver;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class VerificationRequestEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
-        private RequestHostResolver $host,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -42,16 +42,18 @@ readonly class VerificationRequestEmail extends EmailAbstract
         ];
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
             'subject' => 'Please Confirm your Email',
             'context' => [
-                'host' => 'https://localhost/en',
-                'token' => '1234567890',
-                'username' => 'John Doe',
-                'url' => 'https://localhost/en',
-                'lang' => 'en',
+                'host' => $sample->host,
+                'token' => 'a1b2c3d4e5f60718',
+                'username' => $sample->recipientName,
+                'url' => $sample->url,
+                'lang' => $locale,
             ],
         ];
     }
@@ -66,9 +68,7 @@ readonly class VerificationRequestEmail extends EmailAbstract
         $email->to((string) $user->getEmail());
         $email->locale($user->getLocale());
         $email->context([
-            'host' => $this->host->getSchemeAndHost(),
             'token' => $user->getRegcode(),
-            'url' => $this->host->getHost(),
             'username' => $user->getName(),
             'lang' => $user->getLocale(),
         ]);

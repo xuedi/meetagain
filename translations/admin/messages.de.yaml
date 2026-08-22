@@ -167,6 +167,8 @@ admin_cms:
     flash_success_sent: 'Ankündigung an %count% Empfänger gesendet.'
     flash_error_cannot_delete_sent: 'Gesendete Ankündigungen können nicht gelöscht werden.'
     status_locked_help: 'Gesperrte Seiten sind überall sichtbar (z. B. Impressum, Datenschutz)'
+    email_footer: 'Link in der E-Mail-Fusszeile'
+    email_footer_help: 'Jede E-Mail verlinkt diese Seite in ihrer Fusszeile. Unabhängig von den Fusszeilen-Spalten der Website - darum erscheint das Impressum in Ihrer Post.'
     field_page_title: 'Seitentitel'
     field_page_title_help: 'Titel, der im Browser und im Seiteninhalt angezeigt wird'
     field_link_name: 'Menü-Linkname'

@@ -102,28 +102,28 @@ enum Command {
 
 #[derive(Subcommand)]
 enum LogsCommand {
-    /// GET /api/v1/admin/logs/cron
+    /// GET /api/v1/logs/cron
     Cron {
         #[arg(long)]
         limit: Option<u32>,
     },
-    /// GET /api/v1/admin/logs/cron/{id}
+    /// GET /api/v1/logs/cron/{id}
     CronDetail { id: String },
-    /// GET /api/v1/admin/logs/sendlog
+    /// GET /api/v1/logs/sendlog
     Sendlog {
         #[arg(long)]
         limit: Option<u32>,
     },
-    /// GET /api/v1/admin/logs/sendlog/{id}
+    /// GET /api/v1/logs/sendlog/{id}
     SendlogDetail { id: String },
-    /// GET /api/v1/admin/security/incidents
+    /// GET /api/v1/security/incidents
     Incidents {
         #[arg(long)]
         limit: Option<u32>,
         #[arg(long)]
         since: Option<String>,
     },
-    /// GET /api/v1/admin/security/incidents/{id}
+    /// GET /api/v1/security/incidents/{id}
     Incident { id: String },
 }
 
@@ -484,25 +484,25 @@ fn dispatch(cli: Cli, cfg: &mut Config) -> ExitCode {
         Command::Logs { action } => match action {
             LogsCommand::Cron { limit } => {
                 let qs = QueryBuilder::new().add_u32("limit", limit).build();
-                run_get(cfg, TokenKind::User, &format!("/api/v1/admin/logs/cron{}", qs));
+                run_get(cfg, TokenKind::User, &format!("/api/v1/logs/cron{}", qs));
             }
             LogsCommand::CronDetail { id } => run_get(
                 cfg,
                 TokenKind::User,
-                &format!("/api/v1/admin/logs/cron/{}", percent_encode(&id)),
+                &format!("/api/v1/logs/cron/{}", percent_encode(&id)),
             ),
             LogsCommand::Sendlog { limit } => {
                 let qs = QueryBuilder::new().add_u32("limit", limit).build();
                 run_get(
                     cfg,
                     TokenKind::User,
-                    &format!("/api/v1/admin/logs/sendlog{}", qs),
+                    &format!("/api/v1/logs/sendlog{}", qs),
                 );
             }
             LogsCommand::SendlogDetail { id } => run_get(
                 cfg,
                 TokenKind::User,
-                &format!("/api/v1/admin/logs/sendlog/{}", percent_encode(&id)),
+                &format!("/api/v1/logs/sendlog/{}", percent_encode(&id)),
             ),
             LogsCommand::Incidents { limit, since } => {
                 let qs = QueryBuilder::new()
@@ -512,13 +512,13 @@ fn dispatch(cli: Cli, cfg: &mut Config) -> ExitCode {
                 run_get(
                     cfg,
                     TokenKind::User,
-                    &format!("/api/v1/admin/security/incidents{}", qs),
+                    &format!("/api/v1/security/incidents{}", qs),
                 );
             }
             LogsCommand::Incident { id } => run_get(
                 cfg,
                 TokenKind::User,
-                &format!("/api/v1/admin/security/incidents/{}", percent_encode(&id)),
+                &format!("/api/v1/security/incidents/{}", percent_encode(&id)),
             ),
         },
         Command::Me => run_get(cfg, TokenKind::User, "/api/v1/me"),

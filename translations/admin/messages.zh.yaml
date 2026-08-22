@@ -167,6 +167,8 @@ admin_cms:
     flash_success_sent: '公告已发送给%count%位收件人。'
     flash_error_cannot_delete_sent: '已发送的公告无法删除。'
     status_locked_help: '锁定的页面在所有多站点组上可见（例如，版权声明、隐私政策）'
+    email_footer: '在邮件页脚中链接'
+    email_footer_help: '每封邮件都会在页脚链接到此页面。与网站自身的页脚栏无关 - 这就是版权声明出现在邮件中的原因。'
     field_page_title: '页面标题'
     field_page_title_help: '在浏览器和页面内容中显示的标题'
     field_link_name: '菜单链接名称'

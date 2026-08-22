@@ -6,11 +6,12 @@ use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
 use App\Emails\Guard\Rule\SupportRequestPresentRule;
+use App\Emails\MockSampleFactory;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
-use App\Service\Support\RecipientResolver;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
+use App\Service\Support\RecipientResolver;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -19,13 +20,14 @@ readonly class SupportNotificationEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
         private RecipientResolver $recipientResolver,
         private LoggerInterface $logger,
         private TranslatorInterface $translator,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -38,16 +40,19 @@ readonly class SupportNotificationEmail extends EmailAbstract
         return 'admin_email_templates.trigger_support_notification';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
-            'subject' => 'New Support Request from John Doe',
+            'subject' => sprintf('New Support Request from %s', $sample->recipientName),
             'context' => [
                 'audience' => 'Organizers',
-                'name' => 'John Doe',
-                'email' => 'john.doe@example.org',
-                'message' => 'I need help with my account.',
-                'createdAt' => '2025-01-01 12:00:00',
+                'name' => $sample->recipientName,
+                'email' => 'florence.shaw@example.org',
+                'message' => $sample->messageText,
+                'createdAt' => $sample->dates->createdAt,
+                'lang' => $locale,
             ],
         ];
     }

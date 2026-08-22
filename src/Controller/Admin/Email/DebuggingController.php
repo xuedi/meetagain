@@ -54,7 +54,7 @@ final class DebuggingController extends AbstractEmailController implements Admin
         $langValue = $request->query->getString('lang');
         $currentLanguage = in_array($langValue, $languages, true) ? $langValue : $defaultLanguage;
 
-        $context = $this->resolveMockContext($currentType);
+        $context = $this->resolveMockContext($currentType, $currentLanguage);
 
         $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_email_debugging.intro'))], actions: [
             $this->buildTypeDropdown($currentType, $currentLanguage),
@@ -111,13 +111,13 @@ final class DebuggingController extends AbstractEmailController implements Admin
     /**
      * @return array<string, mixed>
      */
-    private function resolveMockContext(string $identifier): array
+    private function resolveMockContext(string $identifier, string $locale): array
     {
         foreach ($this->emailTypes as $emailType) {
             if ($emailType->getIdentifier() !== $identifier) {
                 continue;
             }
-            $context = $emailType->getDisplayMockData()['context'];
+            $context = $emailType->getDisplayMockData($locale)['context'];
             if (!array_key_exists('greeting', $context)) {
                 $context['greeting'] = '';
             }

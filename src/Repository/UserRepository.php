@@ -441,7 +441,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     // notificationSettings.announcements is a JSON column, so that filter runs in PHP downstream
-    /** @return User[] */
+    /** @return list<User> */
     public function findAnnouncementSubscribers(): array
     {
         return $this

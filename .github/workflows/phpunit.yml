@@ -127,9 +127,9 @@ jobs:
           php bin/console app:fixtures:load --no-interaction --append --group=plugin
           php bin/console app:plugin:post-fixtures
 
-      # Smoke tests run under paratest --processes=4, which sets TEST_TOKEN per worker
-      # so each connects to meetAgain_testN. Clone the canonical meetAgain_test (with its
-      # fixtures already loaded) into the four worker DBs, mirroring bin/test-db-clone.sh.
+      # Functional and smoke tests run under paratest --processes=4, which sets TEST_TOKEN
+      # per worker so each connects to meetAgain_testN. Clone the canonical meetAgain_test
+      # (with its fixtures already loaded) into the four worker DBs, mirroring bin/test-db-clone.sh.
       - name: Clone test database for paratest workers
         run: |
           mysqldump -h127.0.0.1 -uroot -proot --no-tablespaces --single-transaction --quick --set-gtid-purged=OFF meetAgain_test > /tmp/test-template.sql
@@ -138,11 +138,12 @@ jobs:
             mysql -h127.0.0.1 -uroot -proot "meetAgain_test${i}" < /tmp/test-template.sql
           done
 
-      - name: Run functional tests
-        run: vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=functional --no-coverage
-
-      - name: Warm cache for smoke tests
+      # Warm once up front: four paratest workers building var/cache/test concurrently race.
+      - name: Warm cache
         run: php bin/console cache:warmup --env=test --quiet
+
+      - name: Run functional tests
+        run: vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=functional --processes=4 --no-coverage
 
       - name: Run smoke tests
         run: vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=smoke --processes=4 --functional --no-coverage

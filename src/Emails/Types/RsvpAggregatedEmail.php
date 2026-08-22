@@ -12,6 +12,7 @@ use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Emails\Guard\Rule\RsvpAttendeeMapPresentRule;
 use App\Emails\Guard\Rule\UserNotificationsMasterToggleRule;
+use App\Emails\MockSampleFactory;
 use App\Emails\ScheduledEmailInterface;
 use App\Emails\ScheduledMailItem;
 use App\Entity\Event;
@@ -32,6 +33,7 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
         private EventRepository $eventRepo,
@@ -39,7 +41,7 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
         #[AutowireIterator(FollowerEventNotificationFilterInterface::class)]
         private iterable $followerFilters = [],
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -52,19 +54,21 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
         return 'admin_email_templates.trigger_notification_rsvp_aggregated';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
             'subject' => 'People you follow plan to attend an event',
             'context' => [
-                'username' => 'John Doe',
-                'attendeeNames' => 'Denis Matrens, Jane Smith',
-                'eventLocation' => 'NightBar 64',
-                'eventDate' => '2025-01-01',
-                'eventId' => 1,
-                'eventTitle' => 'Go tournament afterparty',
-                'host' => 'https://localhost/en',
-                'lang' => 'en',
+                'username' => $sample->recipientName,
+                'attendeeNames' => $sample->attendeeNames,
+                'eventLocation' => $sample->eventLocation,
+                'eventDate' => $sample->eventDate,
+                'eventId' => $sample->eventId,
+                'eventTitle' => $sample->eventTitle,
+                'host' => $sample->host,
+                'lang' => $locale,
             ],
         ];
     }
@@ -80,6 +84,13 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
             new RecipientNotAlreadyRsvpdRule(),
             new RecipientNotBlocklistedRule($this->blocklist),
         ];
+    }
+
+    public function getOrigin(array $context): ?object
+    {
+        $event = $context['event'] ?? null;
+
+        return $event instanceof Event ? $event : null;
     }
 
     public function send(array $context): void
@@ -110,7 +121,6 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
             'eventDate' => $event->getStart()->format('Y-m-d'),
             'eventId' => $event->getId(),
             'eventTitle' => $event->getTitle($language),
-            'host' => $this->config->getHost(),
             'lang' => $language,
         ]);
 

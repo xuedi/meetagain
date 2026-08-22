@@ -54,11 +54,12 @@ final class TemplatesController extends AbstractEmailController implements Admin
     {
         $templates = $this->templateRepo->findAll();
         $templatesByIdentifier = $this->buildTemplatesByMockKey($templates);
+        $language = $this->languageService->getAdminFilteredEnabledCodes()[0];
 
         $emails = [];
         foreach ($this->emailTypes as $emailType) {
             $identifier = $emailType->getIdentifier();
-            $mockData = $emailType->getDisplayMockData();
+            $mockData = $emailType->getDisplayMockData($language);
             $dbTemplate = $templatesByIdentifier[$identifier] ?? null;
             $right = $dbTemplate !== null
                 ? [new AdminSectionLinkItem(
@@ -72,7 +73,7 @@ final class TemplatesController extends AbstractEmailController implements Admin
                 'context' => $mockData['context'],
                 'renderedBody' => $dbTemplate
                     ? $this->templateService->renderContent(
-                        $dbTemplate->getBody($this->languageService->getAdminFilteredEnabledCodes()[0]),
+                        $dbTemplate->getBody($language),
                         $mockData['context'],
                     )
                     : '<p>Template not found. Run app:email-templates:seed</p>',
@@ -177,7 +178,7 @@ final class TemplatesController extends AbstractEmailController implements Admin
     public function templatesPreview(Request $request, EmailTemplate $template): Response
     {
         $language = $request->query->getString('lang', $this->languageService->getAdminFilteredEnabledCodes()[0]);
-        $mockContext = $this->getMockContextForTemplate($template->getIdentifier());
+        $mockContext = $this->getMockContextForTemplate($template->getIdentifier(), $language);
 
         $renderedSubject = $this->templateService->renderContent($template->getSubject($language), $mockContext);
         $renderedBody = $this->templateService->renderContent($template->getBody($language), $mockContext);
@@ -240,11 +241,11 @@ final class TemplatesController extends AbstractEmailController implements Admin
         return $this->redirectToRoute('app_admin_email_templates_edit', ['id' => $template->getId()]);
     }
 
-    private function getMockContextForTemplate(string $identifier): array
+    private function getMockContextForTemplate(string $identifier, string $locale): array
     {
         foreach ($this->emailTypes as $emailType) {
             if ($emailType->getIdentifier() === $identifier) {
-                return $emailType->getDisplayMockData()['context'];
+                return $emailType->getDisplayMockData($locale)['context'];
             }
         }
 

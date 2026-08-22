@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="{{ locale }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <title>{{ subject }}</title>
+    <style>
+        body { margin: 0; padding: 0; width: 100% !important; background-color: #f2f4f7; }
+        table { border-collapse: collapse; }
+        img { border: 0; outline: none; text-decoration: none; display: block; }
+        .content { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #2c3340; }
+        .content h1 { margin: 0 0 16px; font-size: 21px; line-height: 1.3; font-weight: 600; color: #1a1f29; }
+        .content h2 { margin: 24px 0 12px; font-size: 17px; line-height: 1.35; font-weight: 600; color: #1a1f29; }
+        .content h3 { margin: 20px 0 8px; font-size: 15px; line-height: 1.4; font-weight: 600; color: #1a1f29; }
+        .content p { margin: 0 0 16px; }
+        .content ul, .content ol { margin: 0 0 16px; padding-left: 20px; }
+        .content li { margin: 0 0 6px; }
+        .content a { color: {{ accent }}; }
+        .content hr { border: 0; border-top: 1px solid #e3e6ec; margin: 24px 0; }
+        .content blockquote { margin: 0 0 16px; padding: 8px 16px; border-left: 3px solid #e3e6ec; color: #5b6472; }
+        .content .card { margin: 0 0 16px; padding: 12px 16px; border: 1px solid #e3e6ec; border-radius: 4px; }
+        .content .card p:last-child { margin: 0; }
+        .content table { width: 100%; margin: 0 0 16px; }
+        .content table td, .content table th { padding: 6px 8px; text-align: left; vertical-align: top; border-bottom: 1px solid #eef0f4; }
+        .footer { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12px; line-height: 1.6; color: #7b8494; }
+        .footer a { color: #7b8494; }
+        @media only screen and (max-width: 620px) {
+            .shell { width: 100% !important; }
+            .gutter { padding-left: 20px !important; padding-right: 20px !important; }
+        }
+    </style>
+</head>
+<body style="margin:0; padding:0; background-color:#f2f4f7;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f2f4f7;">
+    <tr>
+        <td align="center" style="padding:24px 12px;">
+            <table role="presentation" class="shell" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px; background-color:#ffffff; border:1px solid #e3e6ec; border-radius:6px;">
+                {% if logoCid or logoUrl %}
+                    <tr>
+                        <td class="gutter" align="center" style="padding:28px 32px 20px; border-bottom:1px solid #eef0f4;">
+                            <a href="{{ siteUrl }}" style="text-decoration:none;">
+                                <img src="{{ logoCid ? 'cid:' ~ logoCid : logoUrl }}"
+                                     alt="{{ siteName }}"
+                                     {% if logoHeight %}height="{{ logoHeight // 2 }}"{% endif %}
+                                     style="display:inline-block; max-height:60px; width:auto;">
+                            </a>
+                        </td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td class="content gutter" style="padding:32px;">
+                        {{ body|raw }}
+                    </td>
+                </tr>
+            </table>
+            <table role="presentation" class="shell" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px;">
+                <tr>
+                    <td class="footer gutter" align="center" style="padding:20px 32px 8px;">
+                        {% if attribution|default('') is not empty %}
+                            {{ attribution|raw }}
+                        {% else %}
+                            {{ 'email_layout.footer_sent_by'|trans({'%site%': '<a href="' ~ siteUrl|e ~ '">' ~ siteName|e ~ '</a>'}, 'messages', locale)|raw }}
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="footer gutter" align="center" style="padding:0 32px 8px;">
+                        {{ 'email_layout.footer_no_reply'|trans({}, 'messages', locale) }}
+                    </td>
+                </tr>
+                {% if links %}
+                    <tr>
+                        <td class="footer gutter" align="center" style="padding:0 32px 20px;">
+                            {% for link in links %}
+                                {% if not loop.first %}&middot;{% endif %}
+                                <a href="{{ link.url }}">{{ link.label }}</a>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endif %}
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

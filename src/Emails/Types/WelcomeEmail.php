@@ -6,11 +6,11 @@ use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
+use App\Emails\MockSampleFactory;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
-use App\Service\Http\RequestHostResolver;
 use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -19,11 +19,11 @@ readonly class WelcomeEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
-        private RequestHostResolver $host,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -44,16 +44,25 @@ readonly class WelcomeEmail extends EmailAbstract
         ];
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
             'subject' => 'Welcome!',
             'context' => [
-                'host' => 'https://localhost/en',
-                'url' => 'https://localhost/en',
-                'lang' => 'en',
+                'host' => $sample->host,
+                'url' => $sample->url,
+                'lang' => $locale,
             ],
         ];
+    }
+
+    public function getOrigin(array $context): ?object
+    {
+        $user = $context['user'] ?? null;
+
+        return $user instanceof User ? $user : null;
     }
 
     public function send(array $context): void
@@ -66,8 +75,6 @@ readonly class WelcomeEmail extends EmailAbstract
         $email->to((string) $user->getEmail());
         $email->locale($user->getLocale());
         $email->context([
-            'url' => $this->host->getHost(),
-            'host' => $this->host->getSchemeAndHost(),
             'lang' => $user->getLocale(),
         ]);
 

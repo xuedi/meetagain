@@ -141,6 +141,31 @@ class CmsRepository extends ServiceEntityRepository
     }
 
     /**
+     * @return array<Cms>
+     */
+    public function findForEmailFooter(): array
+    {
+        $ids = $this->cache->get('cms_email_footer', function (ItemInterface $item): array {
+            $item->expiresAfter(self::CACHE_TTL);
+            $item->tag(['cms_menu']);
+
+            return $this
+                ->createQueryBuilder('c')
+                ->select('c.id')
+                ->where('c.emailFooter = true')
+                ->andWhere('c.published = true')
+                ->getQuery()
+                ->getSingleColumnResult();
+        });
+
+        if ($ids === []) {
+            return [];
+        }
+
+        return $this->findBy(['id' => $ids], ['id' => 'ASC']);
+    }
+
+    /**
      * @return array<int>
      */
     public function getLockedCmsIds(): array

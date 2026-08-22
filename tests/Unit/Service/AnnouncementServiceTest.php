@@ -12,6 +12,7 @@ use App\Entity\User;
 use App\Enum\AnnouncementStatus;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EmailType;
+use App\Filter\Email\AudienceFilterService;
 use App\Repository\UserRepository;
 use App\Service\Cms\AnnouncementService;
 use App\Service\Config\ConfigService;
@@ -37,6 +38,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Assert
@@ -61,6 +63,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Assert
@@ -131,6 +134,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $announcementEmailMock,
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Act
@@ -186,6 +190,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $announcementEmailMock,
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Act
@@ -226,6 +231,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Act
@@ -259,6 +265,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Act
@@ -287,6 +294,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Act
@@ -313,6 +321,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $templateServiceMock,
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Assert
@@ -360,6 +369,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $templateServiceMock,
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Act
@@ -404,6 +414,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Act
@@ -450,6 +461,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Act
@@ -490,6 +502,7 @@ class AnnouncementServiceTest extends TestCase
             templateService: $this->createStub(EmailTemplateService::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
         );
 
         // Act

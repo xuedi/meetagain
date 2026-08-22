@@ -35,6 +35,8 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `ContributorInterface`                     | Carry an item type through group export and import    | `exportItems()`, `importItems()`                          |
 | `ChangeTargetProviderInterface`            | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()`    |
 | `ConfigPrivacyToggleProviderInterface`     | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                             |
+| `SendingIdentityProviderInterface`         | Decide the name, logo and links a mail is sent under  | `resolve()`                                               |
+| `AudienceFilterInterface`                  | Narrow who receives installation-wide mail            | `filterInstallationWideAudience()`                        |
 
 ---
 
@@ -890,6 +892,7 @@ namespace Plugin\YourPlugin\Email;
 
 use App\Emails\EmailInterface;
 use App\Emails\EmailQueueInterface;
+use App\Emails\MockSampleFactory;
 use App\Enum\EmailType;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
@@ -898,6 +901,7 @@ readonly class MyPluginEmail implements EmailInterface
     public function __construct(
         private EmailQueueInterface $queue,
         private ConfigService $config,
+        private MockSampleFactory $samples,
     ) {}
 
     public function getIdentifier(): string
@@ -905,11 +909,17 @@ readonly class MyPluginEmail implements EmailInterface
         return 'myplugin_custom_email'; // must match EmailType::* value if using core enum
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
             'subject' => 'My Plugin Notification',
-            'context' => ['username' => 'John Doe', 'host' => 'https://localhost'],
+            'context' => [
+                'username' => $sample->recipientName,
+                'host' => $sample->host,
+                'lang' => $locale,
+            ],
         ];
     }
 
@@ -939,6 +949,18 @@ Call it by injecting the class directly wherever you need to send it:
 $this->myPluginEmail->send(['user' => $user, ...]);
 ```
 
+**Mock data rules:**
+
+- `getDisplayMockData()` receives the locale the viewer selected, and every value it returns must be the
+  one that locale would really produce. `lang` is that locale; names, titles and free text are written in
+  it; hosts, ids, tokens and amounts do not vary.
+- A mock mirrors what the type's `send()` actually produces, defects included. If `send()` hardcodes an
+  English label, the mock keeps it English - the preview sweep exists to make that visible.
+- `MockSampleFactory::create()` returns a shared per-locale sample (people, group, event, dates, sample
+  text) so each type composes its context from one table rather than inventing its own.
+- `app:email:preview` sweeps every registered type in every enabled language into the dev mailbox, so a
+  mock that is missing a template variable shows up as a `{{placeholder}}` in a rendered mail.
+
 For **scheduled emails** (cron-driven), implement `ScheduledEmailInterface` additionally:
 
 - `getDueContexts(DateTimeImmutable $now): DueContext[]` — return what is due now; return `[]` to skip
@@ -952,6 +974,83 @@ For **scheduled emails** (cron-driven), implement `ScheduledEmailInterface` addi
 !!! note Plugin email identifiers must not collide with core `EmailType` enum values. If your email type does not have a
 corresponding `EmailType` entry, you will need to add one or use a string identifier and implement the template system
 separately.
+
+### Who a mail looks like it came from
+
+By default every mail is branded from the live request, which is right for a single-site install but wrong
+for anything cron-driven - cron has no request. Two hooks let a plugin decide it from stored data instead.
+
+`EmailInterface::getOrigin(array $context): ?object` reports **the entity a message is about**, taken from
+the send context. `EmailAbstract` returns `null`, so overriding it is optional; the shipped event mails
+return their `Event`, the welcome mail its `User`.
+
+```php
+public function getOrigin(array $context): ?object
+{
+    $event = $context['event'] ?? null;
+
+    return $event instanceof Event ? $event : null;
+}
+```
+
+`SendingIdentityProviderInterface` turns an origin into the identity the mail is sent under. It is a
+provider chain - the first implementation to return non-null wins, and returning `null` defers.
+
+```php
+namespace Plugin\YourPlugin\Email;
+
+use App\Emails\SendingIdentity;
+use App\Emails\SendingIdentityProviderInterface;
+
+readonly class MySendingIdentityProvider implements SendingIdentityProviderInterface
+{
+    public function resolve(?object $origin, string $locale): ?SendingIdentity
+    {
+        if (!$origin instanceof MyEntity) {
+            return null;
+        }
+
+        return new SendingIdentity(
+            siteName: $origin->getName(),
+            siteUrl: 'https://' . $origin->getDomain(),
+            logoUrl: ..., logoHeight: ..., logoImageId: ...,
+            greeting: 'The ' . $origin->getName() . ' team',
+            links: [['label' => 'Imprint', 'url' => '...']],
+            attribution: null,
+        );
+    }
+}
+```
+
+Three rules that are easy to get wrong:
+
+- **Resolve from repositories, never from the request.** The whole point is that a cron send reaches the
+  same answer as a web send. Injecting `RequestStack` defeats it.
+- **A deferring chain means "ask the request", not "the installation".** If your plugin owns the concept of
+  a site, answer for the installation's own site explicitly instead of deferring, or request-time mail
+  picks up whichever site the sender happened to be browsing.
+- **`attribution` is stored pre-rendered and printed through `|raw`**, so escape every user-supplied part
+  before assembling it. It replaces the layout's default `Sent by` line when set.
+
+The result is frozen onto the queue row at enqueue. Nothing is re-resolved at send time, so a later change
+to the origin does not retro-brand mail that is already queued. `enqueue()` also owns the `host`, `url` and
+`greeting` context keys and takes them from the identity - do not set them in `send()`.
+
+### Who receives installation-wide mail
+
+`AudienceFilterInterface` narrows the recipient list of mail addressed to the installation as a whole -
+announcements and the weekly digest. It is a filter chain: every implementation runs, results intersect,
+and an implementation may only remove recipients.
+
+```php
+public function filterInstallationWideAudience(array $recipients): array
+{
+    return array_values(array_filter($recipients, $this->belongsHere(...)));
+}
+```
+
+With no implementation registered the list passes through untouched, which is the correct answer when
+there is only one site to belong to.
 
 ---
 

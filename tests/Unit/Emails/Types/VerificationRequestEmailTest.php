@@ -11,10 +11,13 @@ use App\Service\Http\RequestHostResolver;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
+use Tests\Unit\Emails\SampleFactoryTrait;
 
 class VerificationRequestEmailTest extends TestCase
 {
-    public function testSendUsesRequestHostNotConfigHost(): void
+    use SampleFactoryTrait;
+
+    public function testSendLeavesHostAndUrlToTheQueue(): void
     {
         // Arrange
         $config = $this->createStub(ConfigService::class);
@@ -44,7 +47,7 @@ class VerificationRequestEmailTest extends TestCase
         $user->method('getRegcode')->willReturn('TOKEN123');
         $user->method('getName')->willReturn('Alice');
 
-        $email = new VerificationRequestEmail($this->createStub(BlocklistCheckerInterface::class), $queue, $config, $host);
+        $email = new VerificationRequestEmail($this->createStub(BlocklistCheckerInterface::class), $this->mockSampleFactory(), $queue, $config, $host);
 
         // Act
         $email->send(['user' => $user]);
@@ -52,7 +55,7 @@ class VerificationRequestEmailTest extends TestCase
         // Assert
         static::assertNotNull($capturedEmail);
         $context = $capturedEmail->getContext();
-        static::assertSame('https://dragondescendants.example.com', $context['host']);
-        static::assertSame('dragondescendants.example.com', $context['url']);
+        static::assertArrayNotHasKey('host', $context);
+        static::assertArrayNotHasKey('url', $context);
     }
 }

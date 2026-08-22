@@ -13,9 +13,12 @@ use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
+use Tests\Unit\Emails\SampleFactoryTrait;
 
 class SupportResponseEmailTest extends TestCase
 {
+    use SampleFactoryTrait;
+
     public function testSendEnqueuesEmailToRequester(): void
     {
         // Arrange
@@ -39,7 +42,7 @@ class SupportResponseEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $emailType = new SupportResponseEmail($blocklist, $queue, $config);
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config);
 
         // Act
         $emailType->send(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
@@ -66,7 +69,7 @@ class SupportResponseEmailTest extends TestCase
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->never())->method('enqueue');
 
-        $emailType = new SupportResponseEmail($blocklist, $queue, $config);
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config);
 
         // Act
         $emailType->send(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
@@ -77,6 +80,7 @@ class SupportResponseEmailTest extends TestCase
         // Arrange
         $emailType = new SupportResponseEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
         );
@@ -97,7 +101,7 @@ class SupportResponseEmailTest extends TestCase
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->never())->method('enqueue');
 
-        $emailType = new SupportResponseEmail($blocklist, $queue, $config);
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config);
 
         // Act
         $emailType->send(['request' => $this->makeRequest(verified: false), 'response' => 'Here is your answer.']);
@@ -108,6 +112,7 @@ class SupportResponseEmailTest extends TestCase
         // Arrange
         $emailType = new SupportResponseEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
         );

@@ -646,6 +646,9 @@ global:
     button_no: 'No'
     flash_invalid_csrf: 'Invalid CSRF token.'
 'notification.review.pending_count': '%count% item pending your review|%count% items pending your review'
+email_layout:
+    footer_sent_by: 'Sent by %site%'
+    footer_no_reply: 'Please do not reply to this email - this mailbox is not monitored. Use the contact form on the website to get in touch.'
 email_event_update:
     line_start: 'Start time changed from <b>%before%</b> to <b>%after%</b>.'
     line_location: 'Location changed from <b>%before%</b> to <b>%after%</b>.'

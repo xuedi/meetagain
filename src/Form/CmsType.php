@@ -9,6 +9,7 @@ use App\Entity\CmsTitle;
 use App\Enum\MenuLocation;
 use Override;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -44,6 +45,10 @@ class CmsType extends AbstractType
                     $this->translator->trans('admin_cms.status_normal') => 0,
                 ],
                 'help' => $this->translator->trans('admin_cms.status_locked_help'),
+            ])->add('emailFooter', CheckboxType::class, [
+                'label' => $this->translator->trans('admin_cms.email_footer'),
+                'required' => false,
+                'help' => $this->translator->trans('admin_cms.email_footer_help'),
             ]);
         }
 
