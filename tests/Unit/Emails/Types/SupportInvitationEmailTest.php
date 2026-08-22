@@ -15,9 +15,12 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
+use Tests\Unit\Emails\SampleFactoryTrait;
 
 class SupportInvitationEmailTest extends TestCase
 {
+    use SampleFactoryTrait;
+
     public function testEveryAdminIsInvitedRegardlessOfWhoOwnsTheRequest(): void
     {
         // Arrange
@@ -93,6 +96,7 @@ class SupportInvitationEmailTest extends TestCase
 
         return new SupportInvitationEmail(
             $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
             $queue,
             $config,
             $resolver,

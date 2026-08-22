@@ -9,12 +9,12 @@ use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
 use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Emails\Guard\Rule\UserNotificationsMasterToggleRule;
+use App\Emails\MockSampleFactory;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
-use App\Service\Http\RequestHostResolver;
 use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -23,11 +23,11 @@ readonly class SeriesRescheduledEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
-        private RequestHostResolver $host,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -40,18 +40,20 @@ readonly class SeriesRescheduledEmail extends EmailAbstract
         return 'admin_email_templates.trigger_series_rescheduled';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
-            'subject' => 'Series rescheduled: Go tournament afterparty',
+            'subject' => sprintf('Series rescheduled: %s', $sample->eventTitle),
             'context' => [
-                'username' => 'John Doe',
-                'eventId' => 1,
-                'eventTitle' => 'Go tournament afterparty',
-                'host' => 'https://localhost',
-                'lang' => 'en',
-                'removedDatesHtml' => '<ul><li>2026-06-15 19:30</li><li>2026-06-22 19:30</li></ul>',
-                'newStart' => '2026-06-17 21:00',
+                'username' => $sample->recipientName,
+                'eventId' => $sample->eventId,
+                'eventTitle' => $sample->eventTitle,
+                'host' => $sample->host,
+                'lang' => $locale,
+                'removedDatesHtml' => $this->samples->removedDatesHtml($sample),
+                'newStart' => $sample->eventStart,
             ],
         ];
     }
@@ -65,6 +67,13 @@ readonly class SeriesRescheduledEmail extends EmailAbstract
             new NotificationToggleEnabledRule('attendedEventUpdate'),
             new RecipientNotBlocklistedRule($this->blocklist),
         ];
+    }
+
+    public function getOrigin(array $context): ?object
+    {
+        $event = $context['event'] ?? null;
+
+        return $event instanceof Event ? $event : null;
     }
 
     public function send(array $context): void
@@ -87,7 +96,6 @@ readonly class SeriesRescheduledEmail extends EmailAbstract
             'username' => $user->getName(),
             'eventId' => $event->getId(),
             'eventTitle' => $event->getTitle($language),
-            'host' => $this->host->getSchemeAndHost(),
             'lang' => $language,
             'removedDatesHtml' => '<ul><li>' . implode('</li><li>', $formattedDates) . '</li></ul>',
             'newStart' => $event->getStart()->format('Y-m-d H:i'),

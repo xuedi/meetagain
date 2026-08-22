@@ -12,6 +12,7 @@ use App\Entity\User;
 use App\Enum\AnnouncementStatus;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EmailType;
+use App\Filter\Email\AudienceFilterService;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Email\EmailTemplateService;
@@ -29,6 +30,7 @@ readonly class AnnouncementService
         private EmailTemplateService $templateService,
         private AnnouncementEmail $announcementEmail,
         private RequestHostResolver $hostResolver,
+        private AudienceFilterService $audience,
     ) {}
 
     public function send(Announcement $announcement): int
@@ -73,7 +75,7 @@ readonly class AnnouncementService
      */
     private function getAnnouncementSubscribers(): array
     {
-        $subscribers = $this->userRepo->findAnnouncementSubscribers();
+        $subscribers = $this->audience->installationWideAudience($this->userRepo->findAnnouncementSubscribers());
 
         return array_filter($subscribers, static fn(User $user) => $user->getNotificationSettings()->isActive('announcements'));
     }

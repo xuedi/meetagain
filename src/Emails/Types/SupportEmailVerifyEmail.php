@@ -5,10 +5,10 @@ namespace App\Emails\Types;
 use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
+use App\Emails\MockSampleFactory;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
-use App\Service\Http\RequestHostResolver;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
@@ -16,11 +16,11 @@ readonly class SupportEmailVerifyEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
-        private RequestHostResolver $host,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -33,16 +33,18 @@ readonly class SupportEmailVerifyEmail extends EmailAbstract
         return 'admin_email_templates.trigger_support_email_verify';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
             'subject' => 'Confirm your email address',
             'context' => [
-                'host' => 'https://localhost',
-                'url' => 'localhost',
-                'lang' => 'en',
+                'host' => $sample->host,
+                'url' => $sample->url,
+                'lang' => $locale,
                 'token' => str_repeat('0', 64),
-                'expiresAt' => '2026-01-02 12:00:00',
+                'expiresAt' => $sample->dates->expiresAt,
             ],
         ];
     }
@@ -70,8 +72,6 @@ readonly class SupportEmailVerifyEmail extends EmailAbstract
         $email->to($recipient);
         $email->locale((string) ($context['lang'] ?? 'en'));
         $email->context([
-            'host' => $this->host->getSchemeAndHost(),
-            'url' => $this->host->getHost(),
             'lang' => (string) ($context['lang'] ?? 'en'),
             'token' => $token,
             'expiresAt' => $expiresAt->format('Y-m-d H:i:s'),

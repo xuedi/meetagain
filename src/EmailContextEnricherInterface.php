@@ -5,8 +5,9 @@ namespace App;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Allows plugins to inject additional variables into the email context before rendering.
- * Implementations are called at queue time, while the HTTP request is still available.
+ * Allows plugins to inject additional variables into the email context before rendering. Called at
+ * queue time, which may be a cron tick with no request; anything about the sending site belongs on
+ * SendingIdentityProviderInterface instead.
  */
 #[AutoconfigureTag]
 interface EmailContextEnricherInterface

@@ -8,11 +8,11 @@ use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
 use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Emails\Guard\Rule\RenderedAnnouncementPresentRule;
+use App\Emails\MockSampleFactory;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
-use App\Service\Http\RequestHostResolver;
 use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -21,11 +21,11 @@ readonly class AnnouncementEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
-        private RequestHostResolver $host,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -38,17 +38,19 @@ readonly class AnnouncementEmail extends EmailAbstract
         return 'admin_email_templates.trigger_announcement';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
-            'subject' => 'Important Community Update',
+            'subject' => $sample->announcementTitle,
             'context' => [
-                'title' => 'Important Community Update',
-                'content' => '<p>We are excited to announce some upcoming changes to our community platform.</p><p>Stay tuned for more details!</p>',
-                'announcementUrl' => 'https://localhost/announcement/abc123def456',
-                'username' => 'John Doe',
-                'host' => 'https://localhost',
-                'lang' => 'en',
+                'title' => $sample->announcementTitle,
+                'content' => $sample->announcementBody,
+                'announcementUrl' => $sample->host . '/announcement/9f4c1ab7d20e5361',
+                'username' => $sample->recipientName,
+                'host' => $sample->host,
+                'lang' => $locale,
             ],
         ];
     }
@@ -81,7 +83,6 @@ readonly class AnnouncementEmail extends EmailAbstract
             'content' => $renderedContent['content'],
             'announcementUrl' => $announcementUrl,
             'username' => $user->getName(),
-            'host' => $this->host->getSchemeAndHost(),
             'lang' => $locale,
         ]);
 

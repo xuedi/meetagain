@@ -6,6 +6,7 @@ use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
 use App\Emails\Guard\Rule\SupportRequestEmailVerifiedRule;
+use App\Emails\MockSampleFactory;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
@@ -16,10 +17,11 @@ readonly class SupportResponseEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -32,15 +34,18 @@ readonly class SupportResponseEmail extends EmailAbstract
         return 'admin_email_templates.trigger_support_response';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
             'subject' => 'Re: your support request',
             'context' => [
-                'name' => 'John Doe',
-                'originalMessage' => 'I need help with my account.',
-                'response' => 'Happy to help - here is what you need to do.',
-                'createdAt' => '2025-01-01 12:00:00',
+                'name' => $sample->recipientName,
+                'originalMessage' => $sample->messageText,
+                'response' => $sample->responseText,
+                'createdAt' => $sample->dates->createdAt,
+                'lang' => $locale,
             ],
         ];
     }

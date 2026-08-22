@@ -6,6 +6,8 @@ use App\CronTaskInterface;
 use App\EmailContextEnricherInterface;
 use App\Emails\EmailInterface;
 use App\Emails\EmailQueueInterface;
+use App\Emails\SendingIdentity;
+use App\Emails\SendingIdentityProviderInterface;
 use App\Entity\EmailQueue;
 use App\Enum\CronTaskStatus;
 use App\Enum\EmailQueueStatus;
@@ -27,6 +29,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
 {
     /**
      * @param iterable<EmailContextEnricherInterface> $enrichers
+     * @param iterable<SendingIdentityProviderInterface> $identityProviders
      */
     public function __construct(
         #[Autowire(service: 'mailer.transports')]
@@ -38,21 +41,32 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         private LoggerInterface $logger,
         #[AutowireIterator(EmailContextEnricherInterface::class)]
         private iterable $enrichers,
+        #[AutowireIterator(SendingIdentityProviderInterface::class)]
+        private iterable $identityProviders,
     ) {}
 
-    public function enqueue(EmailInterface $source, TemplatedEmail $email, array $context, bool $flush = true): bool
-    {
+    public function enqueue(
+        EmailInterface $source,
+        TemplatedEmail $email,
+        array $context,
+        bool $flush = true,
+        ?object $origin = null,
+    ): bool {
         $identifier = $source->getIdentifier();
         $locale = $email->getLocale() ?? 'en';
         $templateContent = $this->templateService->getTemplateContent($identifier, $locale);
 
-        $twigContext = array_merge(['greeting' => ''], $email->getContext());
+        $identity = $this->resolveIdentity($origin ?? $source->getOrigin($context), $locale);
+
+        $twigContext = array_merge(['greeting' => $identity->greeting], $email->getContext());
 
         foreach ($this->enrichers as $enricher) {
             $twigContext = $enricher->enrich($twigContext, $locale);
         }
 
-        $twigContext[LayoutRenderer::CONTEXT_KEY] = $this->layoutRenderer->capture($locale);
+        $twigContext['host'] = $identity->siteUrl;
+        $twigContext['url'] = $this->hostPortion($identity->siteUrl);
+        $twigContext[LayoutRenderer::CONTEXT_KEY] = $this->layoutRenderer->snapshot($identity);
 
         $now = new DateTimeImmutable();
 
@@ -158,6 +172,25 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
 
         $this->logger->info('Email queue processed', ['sent' => $send]);
         return sprintf('%d', $send);
+    }
+
+    private function resolveIdentity(?object $origin, string $locale): SendingIdentity
+    {
+        foreach ($this->identityProviders as $provider) {
+            $identity = $provider->resolve($origin, $locale);
+            if ($identity !== null) {
+                return $identity;
+            }
+        }
+
+        return $this->layoutRenderer->captureIdentity($locale);
+    }
+
+    private function hostPortion(string $siteUrl): string
+    {
+        $host = parse_url($siteUrl, PHP_URL_HOST);
+
+        return is_string($host) ? $host : $siteUrl;
     }
 
     private function queueToTemplate(EmailQueue $mail): TemplatedEmail

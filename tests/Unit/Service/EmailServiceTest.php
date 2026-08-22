@@ -4,6 +4,8 @@ namespace Tests\Unit\Service;
 
 use App\EmailContextEnricherInterface;
 use App\Emails\EmailInterface;
+use App\Emails\SendingIdentity;
+use App\Emails\SendingIdentityProviderInterface;
 use App\Entity\EmailQueue;
 use App\Entity\User;
 use App\Enum\EmailQueueStatus;
@@ -160,6 +162,122 @@ final class EmailServiceTest extends TestCase
 
         // Assert
         static::assertSame('enriched_value', $capturedQueue->getContext()['custom_key']);
+    }
+
+    public function testEnqueueDerivesHostAndUrlFromTheResolvedIdentity(): void
+    {
+        // Arrange
+        $capturedQueue = null;
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(static function (EmailQueue $q) use (&$capturedQueue) {
+                $capturedQueue = $q;
+                return true;
+            }));
+
+        $layoutRenderer = $this->createStub(LayoutRenderer::class);
+        $layoutRenderer->method('captureIdentity')->willReturn(
+            self::identity(siteUrl: 'https://second.example'),
+        );
+        $layoutRenderer->method('snapshot')->willReturn([]);
+
+        $service = $this->createService(em: $emMock, layoutRenderer: $layoutRenderer);
+
+        $email = new TemplatedEmail();
+        $email->from(new Address('sender@email.com', 'Sender'));
+        $email->to('user@example.com');
+        $email->locale('en');
+        $email->context(['host' => 'https://stale.example', 'url' => 'stale.example']);
+
+        // Act
+        $service->enqueue($this->nullCapSource(), $email, []);
+
+        // Assert
+        static::assertSame('https://second.example', $capturedQueue->getContext()['host']);
+        static::assertSame('second.example', $capturedQueue->getContext()['url']);
+    }
+
+    public function testEnqueueSeedsTheSignOffFromTheIdentityAndLetsAnEnricherOverrideIt(): void
+    {
+        // Arrange
+        $layoutRenderer = $this->createStub(LayoutRenderer::class);
+        $layoutRenderer->method('captureIdentity')->willReturn(self::identity(greeting: 'Test Site'));
+        $layoutRenderer->method('snapshot')->willReturn([]);
+
+        $seeded = null;
+        $overridden = null;
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')->with(static::callback(static function (EmailQueue $q) use (&$seeded) {
+            $seeded = $q;
+            return true;
+        }));
+
+        $service = $this->createService(em: $emMock, layoutRenderer: $layoutRenderer);
+        $service->enqueue($this->nullCapSource(), $this->plainEmail(), []);
+
+        $enricher = new class implements EmailContextEnricherInterface {
+            public function enrich(array $context, string $locale): array
+            {
+                $context['greeting'] = 'Second Site';
+                return $context;
+            }
+        };
+        $emOverride = $this->createMock(EntityManagerInterface::class);
+        $emOverride->expects($this->once())->method('persist')->with(static::callback(static function (EmailQueue $q) use (&$overridden) {
+            $overridden = $q;
+            return true;
+        }));
+
+        // Act
+        $this->createService(em: $emOverride, enrichers: [$enricher], layoutRenderer: $layoutRenderer)
+            ->enqueue($this->nullCapSource(), $this->plainEmail(), []);
+
+        // Assert
+        static::assertSame('Test Site', $seeded->getContext()['greeting']);
+        static::assertSame('Second Site', $overridden->getContext()['greeting']);
+    }
+
+    public function testEnqueuePrefersTheFirstProviderThatClaimsTheOrigin(): void
+    {
+        // Arrange
+        $origin = new User();
+
+        $deferring = $this->createMock(SendingIdentityProviderInterface::class);
+        $deferring->expects($this->once())->method('resolve')->with($origin, 'en')->willReturn(null);
+
+        $claiming = $this->createMock(SendingIdentityProviderInterface::class);
+        $claiming
+            ->expects($this->once())
+            ->method('resolve')
+            ->with($origin, 'en')
+            ->willReturn(self::identity(siteName: 'Second Site', siteUrl: 'https://second.example'));
+
+        $capturedQueue = null;
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('persist')->with(static::callback(static function (EmailQueue $q) use (&$capturedQueue) {
+            $capturedQueue = $q;
+            return true;
+        }));
+
+        $layoutRenderer = $this->createStub(LayoutRenderer::class);
+        $layoutRenderer->method('snapshot')->willReturnCallback(
+            static fn(SendingIdentity $identity) => ['siteName' => $identity->siteName],
+        );
+
+        $service = $this->createService(
+            em: $emMock,
+            layoutRenderer: $layoutRenderer,
+            identityProviders: [$deferring, $claiming],
+        );
+
+        // Act
+        $service->enqueue($this->nullCapSource(), $this->plainEmail(), [], true, $origin);
+
+        // Assert
+        static::assertSame('https://second.example', $capturedQueue->getContext()['host']);
+        static::assertSame('Second Site', $capturedQueue->getContext()['_layout']['siteName']);
     }
 
     public function testSendQueueSendsPendingEmailsAndMarksAsSent(): void
@@ -377,7 +495,8 @@ final class EmailServiceTest extends TestCase
             }));
 
         $layoutRendererMock = $this->createMock(LayoutRenderer::class);
-        $layoutRendererMock->expects($this->once())->method('capture')->with('en')->willReturn(['siteName' => 'Example']);
+        $layoutRendererMock->expects($this->once())->method('captureIdentity')->with('en')->willReturn(self::identity());
+        $layoutRendererMock->expects($this->once())->method('snapshot')->willReturn(['siteName' => 'Example']);
         $layoutRendererMock->expects($this->never())->method('wrap');
 
         $service = $this->createService(em: $emMock, layoutRenderer: $layoutRendererMock);
@@ -480,6 +599,17 @@ final class EmailServiceTest extends TestCase
         $service->runCronTask($outputMock);
     }
 
+    private function plainEmail(): TemplatedEmail
+    {
+        $email = new TemplatedEmail();
+        $email->from(new Address('sender@email.com', 'Sender'));
+        $email->to('user@example.com');
+        $email->locale('en');
+        $email->context([]);
+
+        return $email;
+    }
+
     private function nullCapSource(): EmailInterface
     {
         $source = $this->createStub(EmailInterface::class);
@@ -495,6 +625,7 @@ final class EmailServiceTest extends TestCase
         ?LoggerInterface $logger = null,
         iterable $enrichers = [],
         ?LayoutRenderer $layoutRenderer = null,
+        iterable $identityProviders = [],
     ): EmailService {
         if ($templateService === null) {
             $templateService = $this->createStub(EmailTemplateService::class);
@@ -510,6 +641,8 @@ final class EmailServiceTest extends TestCase
         if ($layoutRenderer === null) {
             $layoutRenderer = $this->createStub(LayoutRenderer::class);
             $layoutRenderer->method('capture')->willReturn([]);
+            $layoutRenderer->method('captureIdentity')->willReturn(self::identity());
+            $layoutRenderer->method('snapshot')->willReturn([]);
             $layoutRenderer
                 ->method('wrap')
                 ->willReturnCallback(static fn(EmailQueue $mail) => new RenderedLayout('<html><body>' . $mail->getRenderedBody() . '</body></html>'));
@@ -523,6 +656,15 @@ final class EmailServiceTest extends TestCase
             layoutRenderer: $layoutRenderer,
             logger: $logger ?? $this->createStub(LoggerInterface::class),
             enrichers: $enrichers,
+            identityProviders: $identityProviders,
         );
+    }
+
+    private static function identity(
+        string $siteName = 'Test Site',
+        string $siteUrl = 'https://test.example.com',
+        string $greeting = 'Test Site',
+    ): SendingIdentity {
+        return new SendingIdentity(siteName: $siteName, siteUrl: $siteUrl, greeting: $greeting);
     }
 }

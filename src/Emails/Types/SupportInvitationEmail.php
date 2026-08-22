@@ -6,6 +6,7 @@ use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
 use App\Emails\Guard\Rule\SupportRequestPresentRule;
+use App\Emails\MockSampleFactory;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\EmailType;
@@ -19,12 +20,13 @@ readonly class SupportInvitationEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
         private RecipientResolver $recipientResolver,
         private LoggerInterface $logger,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -37,16 +39,19 @@ readonly class SupportInvitationEmail extends EmailAbstract
         return 'admin_email_templates.trigger_support_invitation';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
-            'subject' => 'Jane Steward asked you to join a support request',
+            'subject' => sprintf('%s asked you to join a support request', $sample->adminName),
             'context' => [
-                'invitedBy' => 'Jane Steward',
-                'name' => 'John Doe',
-                'message' => 'I need help with my account.',
-                'createdAt' => '2025-01-01 12:00:00',
-                'requestId' => '42',
+                'invitedBy' => $sample->adminName,
+                'name' => $sample->recipientName,
+                'message' => $sample->messageText,
+                'createdAt' => $sample->dates->createdAt,
+                'requestId' => '318',
+                'lang' => $locale,
             ],
         ];
     }

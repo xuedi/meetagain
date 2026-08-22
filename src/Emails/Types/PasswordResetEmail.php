@@ -6,22 +6,22 @@ use App\Emails\EmailAbstract;
 use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
+use App\Emails\MockSampleFactory;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
-use App\Service\Http\RequestHostResolver;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class PasswordResetEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
-        private RequestHostResolver $host,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -34,15 +34,17 @@ readonly class PasswordResetEmail extends EmailAbstract
         return 'admin_email_templates.trigger_password_reset_request';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
             'subject' => 'Password reset request',
             'context' => [
-                'host' => 'https://localhost/en',
-                'token' => '1234567890',
-                'lang' => 'en',
-                'username' => 'John Doe',
+                'host' => $sample->host,
+                'token' => 'a1b2c3d4e5f60718',
+                'lang' => $locale,
+                'username' => $sample->recipientName,
             ],
         ];
     }
@@ -65,7 +67,6 @@ readonly class PasswordResetEmail extends EmailAbstract
         $email->to((string) $user->getEmail());
         $email->locale($user->getLocale());
         $email->context([
-            'host' => $this->host->getSchemeAndHost(),
             'token' => $user->getRegcode(),
             'lang' => $user->getLocale(),
             'username' => $user->getName(),

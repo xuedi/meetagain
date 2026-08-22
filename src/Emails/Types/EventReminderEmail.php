@@ -10,6 +10,7 @@ use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
 use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Emails\Guard\Rule\UserNotificationsMasterToggleRule;
+use App\Emails\MockSampleFactory;
 use App\Emails\ScheduledEmailInterface;
 use App\Emails\ScheduledMailItem;
 use App\Entity\Event;
@@ -28,12 +29,13 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
         private EventRepository $eventRepo,
         private EntityManagerInterface $em,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -46,19 +48,21 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
         return 'admin_email_templates.trigger_event_reminder';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
-            'subject' => 'Reminder: Go tournament afterparty is today',
+            'subject' => sprintf('Reminder: %s is today', $sample->eventTitle),
             'context' => [
-                'username' => 'John Doe',
-                'eventTitle' => 'Go tournament afterparty',
-                'eventLocation' => 'NightBar 64',
-                'eventDate' => '2025-01-01',
-                'eventTime' => '19:00',
-                'eventId' => 1,
-                'host' => 'https://localhost',
-                'lang' => 'en',
+                'username' => $sample->recipientName,
+                'eventTitle' => $sample->eventTitle,
+                'eventLocation' => $sample->eventLocation,
+                'eventDate' => $sample->eventDate,
+                'eventTime' => $sample->eventTime,
+                'eventId' => $sample->eventId,
+                'host' => $sample->host,
+                'lang' => $locale,
             ],
         ];
     }
@@ -72,6 +76,13 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
             new NotificationToggleEnabledRule('eventReminder'),
             new RecipientNotBlocklistedRule($this->blocklist),
         ];
+    }
+
+    public function getOrigin(array $context): ?object
+    {
+        $event = $context['event'] ?? null;
+
+        return $event instanceof Event ? $event : null;
     }
 
     public function send(array $context): void
@@ -94,7 +105,6 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
             'eventDate' => $event->getStart()->format('Y-m-d'),
             'eventTime' => $event->getStart()->format('H:i'),
             'eventId' => $event->getId(),
-            'host' => $this->config->getHost(),
             'lang' => $language,
         ]);
 

@@ -12,9 +12,12 @@ use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
+use Tests\Unit\Emails\SampleFactoryTrait;
 
 class SupportEmailVerifyEmailTest extends TestCase
 {
+    use SampleFactoryTrait;
+
     private const string REQUESTER_NAME = 'Mallory Attacker';
     private const string REQUESTER_MESSAGE = 'Click here to claim your prize.';
 
@@ -49,7 +52,7 @@ class SupportEmailVerifyEmailTest extends TestCase
 
         // Assert
         static::assertInstanceOf(TemplatedEmail::class, $enqueued);
-        static::assertSame(['host', 'url', 'lang', 'token', 'expiresAt'], array_keys($enqueued->getContext()));
+        static::assertSame(['lang', 'token', 'expiresAt'], array_keys($enqueued->getContext()));
         static::assertStringNotContainsString(self::REQUESTER_NAME, implode("\n", $enqueued->getContext()));
         static::assertStringNotContainsString(self::REQUESTER_MESSAGE, implode("\n", $enqueued->getContext()));
     }
@@ -86,7 +89,7 @@ class SupportEmailVerifyEmailTest extends TestCase
         $emailType = $this->createEmailType($this->createStub(EmailQueueInterface::class));
 
         // Act
-        $mock = $emailType->getDisplayMockData();
+        $mock = $emailType->getDisplayMockData('en');
 
         // Assert
         static::assertSame(['host', 'url', 'lang', 'token', 'expiresAt'], array_keys($mock['context']));
@@ -104,6 +107,6 @@ class SupportEmailVerifyEmailTest extends TestCase
         $host->method('getSchemeAndHost')->willReturn('https://platform.example.com');
         $host->method('getHost')->willReturn('platform.example.com');
 
-        return new SupportEmailVerifyEmail($blocklist, $queue, $config, $host);
+        return new SupportEmailVerifyEmail($blocklist, $this->mockSampleFactory(), $queue, $config, $host);
     }
 }

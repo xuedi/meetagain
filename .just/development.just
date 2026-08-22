@@ -79,3 +79,10 @@ devResetToFreshCloneState:
 devResetDatabase:
     {{PHP}} php bin/console doctrine:database:drop --force --if-exists
     {{PHP}} php bin/console doctrine:database:create --if-not-exists
+
+# Empty Mailhog, then put every email template x language into it for a visual pass
+[group('development')]
+devEmailPreview *options='':
+    curl -sS -X DELETE http://localhost:8025/api/v1/messages
+    {{PHP}} php bin/console app:email:preview {{options}}
+    @echo "Inbox: http://localhost:8025"

@@ -62,6 +62,17 @@ readonly class SiteLogoResolver
         ];
     }
 
+    /**
+     * @return array{url: string, height: int}
+     */
+    public function resolveFor(Image $image, string $schemeAndHost): array
+    {
+        return [
+            'url' => rtrim($schemeAndHost, '/') . $this->buildUrl($image),
+            'height' => self::SIZE[1],
+        ];
+    }
+
     private function absolute(string $url): string
     {
         if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) {

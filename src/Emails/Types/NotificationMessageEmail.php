@@ -10,11 +10,11 @@ use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientNotRecentlyActiveRule;
 use App\Emails\Guard\Rule\SenderUserPresentRule;
 use App\Emails\Guard\Rule\UserNotificationsMasterToggleRule;
+use App\Emails\MockSampleFactory;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
-use App\Service\Http\RequestHostResolver;
 use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -24,12 +24,12 @@ readonly class NotificationMessageEmail extends EmailAbstract
 {
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
         private ClockInterface $clock,
-        private RequestHostResolver $host,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -42,16 +42,18 @@ readonly class NotificationMessageEmail extends EmailAbstract
         return 'admin_email_templates.trigger_notification_message';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
-            'subject' => 'You received a message from %senderName%',
+            'subject' => sprintf('You received a message from %s', $sample->senderName),
             'context' => [
-                'username' => 'John Doe',
-                'sender' => 'john.doe@example.org',
-                'senderId' => 1,
-                'host' => 'https://localhost/en',
-                'lang' => 'en',
+                'username' => $sample->recipientName,
+                'sender' => $sample->senderName,
+                'senderId' => 41,
+                'host' => $sample->host,
+                'lang' => $locale,
             ],
         ];
     }
@@ -66,6 +68,13 @@ readonly class NotificationMessageEmail extends EmailAbstract
             new RecipientNotRecentlyActiveRule($this->clock, new DateInterval('PT2H'), 'recipient'),
             new RecipientNotBlocklistedRule($this->blocklist, 'recipient'),
         ];
+    }
+
+    public function getOrigin(array $context): ?object
+    {
+        $recipient = $context['recipient'] ?? null;
+
+        return $recipient instanceof User ? $recipient : null;
     }
 
     public function send(array $context): void
@@ -85,7 +94,6 @@ readonly class NotificationMessageEmail extends EmailAbstract
             'username' => $recipient->getName(),
             'sender' => $sender->getName(),
             'senderId' => $sender->getId(),
-            'host' => $this->host->getSchemeAndHost(),
             'lang' => $language,
         ]);
 

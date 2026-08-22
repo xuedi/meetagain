@@ -17,9 +17,12 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Tests\Unit\Emails\SampleFactoryTrait;
 
 class EventUpdateNotificationEmailTest extends TestCase
 {
+    use SampleFactoryTrait;
+
     private ConfigService $config;
     private BlocklistCheckerInterface $blocklist;
     private TranslatorInterface $translator;
@@ -59,7 +62,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -86,7 +89,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -113,7 +116,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -140,7 +143,7 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -157,7 +160,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->never())->method('enqueue');
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->translator, $this->host);
 
         // Act
         $email->send([
@@ -173,6 +176,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         // Arrange
         $email = new EventUpdateNotificationEmail(
             $this->blocklist,
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->config,
             $this->translator,
@@ -192,6 +196,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         // Arrange
         $email = new EventUpdateNotificationEmail(
             $this->blocklist,
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->config,
             $this->translator,
@@ -210,6 +215,7 @@ class EventUpdateNotificationEmailTest extends TestCase
     {
         $email = new EventUpdateNotificationEmail(
             $this->blocklist,
+            $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->config,
             $this->translator,

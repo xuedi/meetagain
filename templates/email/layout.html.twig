@@ -57,7 +57,11 @@
             <table role="presentation" class="shell" width="600" cellpadding="0" cellspacing="0" style="width:600px; max-width:600px;">
                 <tr>
                     <td class="footer gutter" align="center" style="padding:20px 32px 8px;">
-                        {{ 'email_layout.footer_sent_by'|trans({'%site%': '<a href="' ~ siteUrl ~ '">' ~ siteName ~ '</a>'}, 'messages', locale)|raw }}
+                        {% if attribution|default('') is not empty %}
+                            {{ attribution|raw }}
+                        {% else %}
+                            {{ 'email_layout.footer_sent_by'|trans({'%site%': '<a href="' ~ siteUrl|e ~ '">' ~ siteName|e ~ '</a>'}, 'messages', locale)|raw }}
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>

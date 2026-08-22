@@ -10,6 +10,7 @@ abstract readonly class EmailAbstract implements EmailInterface
 {
     public function __construct(
         protected BlocklistCheckerInterface $blocklist,
+        protected MockSampleFactory $samples,
     ) {}
 
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
@@ -20,6 +21,11 @@ abstract readonly class EmailAbstract implements EmailInterface
     public function getAttachments(array $context): array
     {
         return [];
+    }
+
+    public function getOrigin(array $context): ?object
+    {
+        return null;
     }
 
     public function getGuardRules(): array

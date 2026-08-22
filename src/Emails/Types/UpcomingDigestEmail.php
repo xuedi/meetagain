@@ -10,11 +10,13 @@ use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Emails\Guard\Rule\UserHasGroupEventsThisWeekRule;
 use App\Emails\Guard\Rule\WeekStartEndPresentRule;
+use App\Emails\MockSampleFactory;
 use App\Emails\ScheduledEmailInterface;
 use App\Emails\ScheduledMailItem;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Enum\EmailType;
+use App\Filter\Email\AudienceFilterService;
 use App\Filter\Event\UserEventDigestFilterInterface;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
@@ -35,6 +37,7 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
      */
     public function __construct(
         BlocklistCheckerInterface $blocklist,
+        MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
         private EventRepository $eventRepo,
@@ -42,8 +45,9 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
         private AppStateService $appStateService,
         #[AutowireIterator(UserEventDigestFilterInterface::class)]
         private iterable $digestFilters,
+        private AudienceFilterService $audience,
     ) {
-        parent::__construct($blocklist);
+        parent::__construct($blocklist, $samples);
     }
 
     public function getIdentifier(): string
@@ -56,15 +60,17 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
         return 'admin_email_templates.trigger_upcoming_events';
     }
 
-    public function getDisplayMockData(): array
+    public function getDisplayMockData(string $locale): array
     {
+        $sample = $this->samples->create($locale);
+
         return [
             'subject' => 'Upcoming events this week',
             'context' => [
-                'username' => 'John Doe',
-                'eventsHtml' => '<div class="card"><p><strong>Go tournament afterparty</strong></p><p>2025-01-01 19:00 - NightBar 64</p><p><a href="https://localhost/en/event/1">More Info</a> &nbsp; <a href="https://localhost/en/event/1#rsvp">I Want to Go</a></p></div>',
-                'host' => 'https://localhost',
-                'lang' => 'en',
+                'username' => $sample->recipientName,
+                'eventsHtml' => $this->samples->eventsHtml($sample),
+                'host' => $sample->host,
+                'lang' => $locale,
             ],
         ];
     }
@@ -104,7 +110,6 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
         $email->context([
             'username' => $user->getName(),
             'eventsHtml' => $eventsHtml,
-            'host' => $this->config->getHost(),
             'lang' => $language,
         ]);
 
@@ -132,7 +137,7 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
 
         $weekStart = $now->modify('+1 day');
         $weekEnd = $now->modify('+8 days');
-        $allUsers = $this->userRepo->findAnnouncementSubscribers();
+        $allUsers = $this->audience->installationWideAudience($this->userRepo->findAnnouncementSubscribers());
 
         return [new DueContext(['week' => $weekKey, 'weekStart' => $weekStart, 'weekEnd' => $weekEnd], $allUsers)];
     }
@@ -142,7 +147,7 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
         $weekKey = $for->modify('+1 day')->format('W');
         $weekStart = $for->modify('+1 day');
         $weekEnd = $for->modify('+8 days');
-        $allUsers = $this->userRepo->findAnnouncementSubscribers();
+        $allUsers = $this->audience->installationWideAudience($this->userRepo->findAnnouncementSubscribers());
 
         return [new DueContext(['week' => $weekKey, 'weekStart' => $weekStart, 'weekEnd' => $weekEnd], $allUsers)];
     }
@@ -166,7 +171,7 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
 
         $weekStart = $nextSunday->modify('+1 day');
         $weekEnd = $nextSunday->modify('+8 days');
-        $allUsers = $this->userRepo->findAnnouncementSubscribers();
+        $allUsers = $this->audience->installationWideAudience($this->userRepo->findAnnouncementSubscribers());
         $allEvents = $this->eventRepo->findUpcomingEventsWithRsvp($weekStart, $weekEnd);
 
         $eligibleCount = 0;

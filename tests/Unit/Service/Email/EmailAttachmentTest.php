@@ -4,6 +4,7 @@ namespace Tests\Unit\Service\Email;
 
 use App\Emails\Attachment;
 use App\Emails\EmailInterface;
+use App\Emails\SendingIdentity;
 use App\Entity\EmailQueue;
 use App\Enum\EmailQueueStatus;
 use App\Repository\EmailQueueRepository;
@@ -147,6 +148,10 @@ final class EmailAttachmentTest extends TestCase
 
         $layoutRenderer = $this->createStub(LayoutRenderer::class);
         $layoutRenderer->method('capture')->willReturn([]);
+        $layoutRenderer->method('snapshot')->willReturn([]);
+        $layoutRenderer
+            ->method('captureIdentity')
+            ->willReturn(new SendingIdentity(siteName: 'Test Site', siteUrl: 'https://test.example.com'));
         $layoutRenderer
             ->method('wrap')
             ->willReturnCallback(static fn(EmailQueue $mail) => new RenderedLayout('<html><body>' . $mail->getRenderedBody() . '</body></html>'));
@@ -159,6 +164,7 @@ final class EmailAttachmentTest extends TestCase
             layoutRenderer: $layoutRenderer,
             logger: $logger ?? $this->createStub(LoggerInterface::class),
             enrichers: [],
+            identityProviders: [],
         );
     }
 }
