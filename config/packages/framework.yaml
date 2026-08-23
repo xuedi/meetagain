@@ -2,6 +2,9 @@
 framework:
     secret: '%env(APP_SECRET)%'
     csrf_protection: true
+    exceptions:
+        Symfony\Component\HttpKernel\Exception\NotFoundHttpException:
+            log_level: info
     session:
         handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
         cookie_secure: auto
