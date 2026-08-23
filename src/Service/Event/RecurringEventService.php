@@ -217,6 +217,7 @@ readonly class RecurringEventService implements CronTaskInterface
             }
             $event->setRsvpNotificationSentAt(null);
             $event->setEventReminderSentAt(null);
+            $event->setExternalRsvp(0);
             $this->em->persist($event);
             $movedIds[] = $item->eventId;
         }

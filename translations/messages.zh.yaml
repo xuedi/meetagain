@@ -178,6 +178,8 @@ events:
     rsvp_guest_add: '添加同行人'
     rsvp_guest_remove: '移除同行人'
     rsvp_guests_badge: '携带 %count% 位同行人'
+    rsvp_external_badge: '+%count% 位外部报名'
+    rsvp_external_title: '在本站以外报名的参加者'
     flash_rsvp_guests_requires_rsvp: '请先报名活动，然后再添加同行人。'
     flash_rsvp_guests_limit: '你已达到同行人数量上限。'
     status_published: '已发布'

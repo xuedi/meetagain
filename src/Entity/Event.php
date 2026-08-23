@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinTable;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 class Event
@@ -83,6 +84,10 @@ class Event
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $eventReminderSentAt = null;
+
+    #[ORM\Column(options: ['default' => 0])]
+    #[Assert\PositiveOrZero]
+    private int $externalRsvp = 0;
 
     public function __construct()
     {
@@ -432,6 +437,18 @@ class Event
     public function setEventReminderSentAt(?DateTimeImmutable $eventReminderSentAt): static
     {
         $this->eventReminderSentAt = $eventReminderSentAt;
+
+        return $this;
+    }
+
+    public function getExternalRsvp(): int
+    {
+        return $this->externalRsvp;
+    }
+
+    public function setExternalRsvp(int $externalRsvp): static
+    {
+        $this->externalRsvp = $externalRsvp;
 
         return $this;
     }

@@ -23,7 +23,6 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Address;
-use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\RawMessage;
 
 final class EmailServiceTest extends TestCase
@@ -177,9 +176,7 @@ final class EmailServiceTest extends TestCase
             }));
 
         $layoutRenderer = $this->createStub(LayoutRenderer::class);
-        $layoutRenderer->method('captureIdentity')->willReturn(
-            self::identity(siteUrl: 'https://second.example'),
-        );
+        $layoutRenderer->method('captureIdentity')->willReturn(self::identity(siteUrl: 'https://second.example'));
         $layoutRenderer->method('snapshot')->willReturn([]);
 
         $service = $this->createService(em: $emMock, layoutRenderer: $layoutRenderer);
@@ -208,10 +205,13 @@ final class EmailServiceTest extends TestCase
         $seeded = null;
         $overridden = null;
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist')->with(static::callback(static function (EmailQueue $q) use (&$seeded) {
-            $seeded = $q;
-            return true;
-        }));
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(static function (EmailQueue $q) use (&$seeded) {
+                $seeded = $q;
+                return true;
+            }));
 
         $service = $this->createService(em: $emMock, layoutRenderer: $layoutRenderer);
         $service->enqueue($this->nullCapSource(), $this->plainEmail(), []);
@@ -224,14 +224,20 @@ final class EmailServiceTest extends TestCase
             }
         };
         $emOverride = $this->createMock(EntityManagerInterface::class);
-        $emOverride->expects($this->once())->method('persist')->with(static::callback(static function (EmailQueue $q) use (&$overridden) {
-            $overridden = $q;
-            return true;
-        }));
+        $emOverride
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(static function (EmailQueue $q) use (&$overridden) {
+                $overridden = $q;
+                return true;
+            }));
 
         // Act
-        $this->createService(em: $emOverride, enrichers: [$enricher], layoutRenderer: $layoutRenderer)
-            ->enqueue($this->nullCapSource(), $this->plainEmail(), []);
+        $this->createService(em: $emOverride, enrichers: [$enricher], layoutRenderer: $layoutRenderer)->enqueue(
+            $this->nullCapSource(),
+            $this->plainEmail(),
+            [],
+        );
 
         // Assert
         static::assertSame('Test Site', $seeded->getContext()['greeting']);
@@ -255,21 +261,18 @@ final class EmailServiceTest extends TestCase
 
         $capturedQueue = null;
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist')->with(static::callback(static function (EmailQueue $q) use (&$capturedQueue) {
-            $capturedQueue = $q;
-            return true;
-        }));
+        $emMock
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(static function (EmailQueue $q) use (&$capturedQueue) {
+                $capturedQueue = $q;
+                return true;
+            }));
 
         $layoutRenderer = $this->createStub(LayoutRenderer::class);
-        $layoutRenderer->method('snapshot')->willReturnCallback(
-            static fn(SendingIdentity $identity) => ['siteName' => $identity->siteName],
-        );
+        $layoutRenderer->method('snapshot')->willReturnCallback(static fn(SendingIdentity $identity) => ['siteName' => $identity->siteName]);
 
-        $service = $this->createService(
-            em: $emMock,
-            layoutRenderer: $layoutRenderer,
-            identityProviders: [$deferring, $claiming],
-        );
+        $service = $this->createService(em: $emMock, layoutRenderer: $layoutRenderer, identityProviders: [$deferring, $claiming]);
 
         // Act
         $service->enqueue($this->nullCapSource(), $this->plainEmail(), [], true, $origin);
@@ -526,15 +529,15 @@ final class EmailServiceTest extends TestCase
         $sentMessage = $this->createStub(SentMessage::class);
         $sentMessage->method('getMessageId')->willReturn('id');
         $mailerStub = $this->createStub(TransportInterface::class);
-        $mailerStub->method('send')->willReturnCallback(static function (RawMessage $message) use (&$captured, $sentMessage) {
-            $captured = $message;
-            return $sentMessage;
-        });
+        $mailerStub
+            ->method('send')
+            ->willReturnCallback(static function (RawMessage $message) use (&$captured, $sentMessage) {
+                $captured = $message;
+                return $sentMessage;
+            });
 
         $layoutRendererStub = $this->createStub(LayoutRenderer::class);
-        $layoutRendererStub
-            ->method('wrap')
-            ->willReturn('<html><body><p>queued long ago</p></body></html>');
+        $layoutRendererStub->method('wrap')->willReturn('<html><body><p>queued long ago</p></body></html>');
 
         $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, layoutRenderer: $layoutRendererStub);
 
@@ -563,15 +566,15 @@ final class EmailServiceTest extends TestCase
         $sentMessage = $this->createStub(SentMessage::class);
         $sentMessage->method('getMessageId')->willReturn('id');
         $mailerStub = $this->createStub(TransportInterface::class);
-        $mailerStub->method('send')->willReturnCallback(static function (RawMessage $message) use (&$captured, $sentMessage) {
-            $captured = $message;
-            return $sentMessage;
-        });
+        $mailerStub
+            ->method('send')
+            ->willReturnCallback(static function (RawMessage $message) use (&$captured, $sentMessage) {
+                $captured = $message;
+                return $sentMessage;
+            });
 
         $layoutRendererStub = $this->createStub(LayoutRenderer::class);
-        $layoutRendererStub
-            ->method('wrap')
-            ->willReturn('<html><body><img src="https://example.org/logo.png"></body></html>');
+        $layoutRendererStub->method('wrap')->willReturn('<html><body><img src="https://example.org/logo.png"></body></html>');
 
         $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, layoutRenderer: $layoutRendererStub);
 
@@ -642,9 +645,7 @@ final class EmailServiceTest extends TestCase
             $layoutRenderer->method('capture')->willReturn([]);
             $layoutRenderer->method('captureIdentity')->willReturn(self::identity());
             $layoutRenderer->method('snapshot')->willReturn([]);
-            $layoutRenderer
-                ->method('wrap')
-                ->willReturnCallback(static fn(EmailQueue $mail) => '<html><body>' . $mail->getRenderedBody() . '</body></html>');
+            $layoutRenderer->method('wrap')->willReturnCallback(static fn(EmailQueue $mail) => '<html><body>' . $mail->getRenderedBody() . '</body></html>');
         }
 
         return new EmailService(

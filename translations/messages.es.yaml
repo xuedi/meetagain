@@ -178,6 +178,8 @@ events:
     rsvp_guest_add: 'Añadir acompañante'
     rsvp_guest_remove: 'Quitar acompañante'
     rsvp_guests_badge: 'Viene con %count% acompañantes'
+    rsvp_external_badge: '+%count% externos'
+    rsvp_external_title: 'Asistentes que se apuntaron fuera de este sitio'
     flash_rsvp_guests_requires_rsvp: 'Apúntate primero al evento antes de añadir acompañantes.'
     flash_rsvp_guests_limit: 'Has alcanzado el número máximo de acompañantes.'
     status_published: 'Publicado'

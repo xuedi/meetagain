@@ -264,6 +264,8 @@ admin_event:
     page_title_new: 'Crear nuevo evento'
     form_label_status: 'Estado'
     form_label_featured: 'Destacado'
+    form_label_external_rsvp: '+RSVP'
+    form_help_external_rsvp: 'confirmaciones externas añadidas'
     form_label_recurring: 'Recurrente'
     form_placeholder_non_recurring: 'Sin repetición'
     form_label_series_name: 'Nombre de la serie'

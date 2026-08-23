@@ -119,12 +119,18 @@
                                 {% endif %}
                                 #}
                             </p>
-                            <p class="mt-3">
-                                <span class="tag is-warning">RSVP</span>
-                                {% for user in event.rsvp %}
-                                    <span class="tag">{{ user.name }}</span>
-                                {% endfor %}
-                            </p>
+                            <div class="mt-3 is-flex is-justify-content-space-between is-align-items-flex-start">
+                                <div class="tags">
+                                    <span class="tag is-warning">RSVP</span>
+                                    {% for user in event.rsvp %}
+                                        <span class="tag">{{ user.name }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% if event.externalRsvp > 0 %}
+                                    <span class="tag ml-2"
+                                          title="{{ 'events.rsvp_external_title'|trans }}">{{ 'events.rsvp_external_badge'|trans({'%count%': event.externalRsvp}) }}</span>
+                                {% endif %}
+                            </div>
                         </div>
                         <div class="column is-3">
                             <figure class="image is-3by2">

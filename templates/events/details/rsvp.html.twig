@@ -3,6 +3,11 @@
         <div class="level-item">
             <h2 class="title is-4">RSVP</h2>
         </div>
+        {% if event.externalRsvp > 0 %}
+            <div class="level-item">
+                <span class="tag" title="{{ 'events.rsvp_external_title'|trans }}">{{ 'events.rsvp_external_badge'|trans({'%count%': event.externalRsvp}) }}</span>
+            </div>
+        {% endif %}
     </div>
     <div class="level-right">
         {% if event.canceled %}

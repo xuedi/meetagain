@@ -47,7 +47,12 @@
                             <span class="icon has-text-info" title="{{ 'admin_event.manually_edited'|trans }}"><i class="fa fa-user-pen"></i></span>
                         {% endif %}
                     </td>
-                    <td>{{ rsvpCounts[event.id] ?? 0 }}</td>
+                    <td>
+                        {{ rsvpCounts[event.id] ?? 0 }}
+                        {% if event.externalRsvp > 0 %}
+                            <span class="has-text-grey">(+{{ event.externalRsvp }})</span>
+                        {% endif %}
+                    </td>
                     <td>{{ event.type ? event.type.name : '-' }}</td>
                     <td>
                         <a href="{{ path('app_admin_event_edit', {'id': event.id}) }}">
