@@ -264,6 +264,11 @@ cms:
     event_teaser_headline: 'Événements à venir'
     event_teaser_empty: 'Aucun événement à venir'
     event_teaser_edit_event_count_label: 'Nombre d''événements'
+    map_aria_label: 'Carte'
+    map_consent_hint: 'La carte est masquée car OpenStreetMap n''a pas été autorisé.'
+    map_consent_link: 'Autoriser la carte dans les paramètres des cookies'
+    map_open_osm: 'Ouvrir dans OpenStreetMap'
+    map_directions: 'Calculer l''itinéraire'
 member:
     page_title: 'Annuaire des membres'
     page_title_paginated: 'Annuaire des membres - Page %page%'

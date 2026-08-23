@@ -2,6 +2,7 @@
 
 {% block javascripts %}
     <script src="{{ asset('js/vendor/fancybox.umd.js') }}"></script>
+    <script src="{{ asset('js/cms-map.js') }}" defer></script>
 {% endblock %}
 
 {% block title %}{{ title is defined ? title : "cms.page_title_cms"|trans }}{% endblock %}

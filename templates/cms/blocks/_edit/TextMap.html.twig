@@ -1,0 +1,150 @@
+{% set mapPositions = ['left', 'right', 'above', 'below'] %}
+{% set mapWidths = ['third', 'half', 'two_thirds'] %}
+{% set mapHeights = ['small', 'medium', 'large'] %}
+{% set locations = mapLocations is defined ? mapLocations : [] %}
+
+<div class="field">
+    <label class="label">{{ 'admin_cms.text_map_title'|trans }}</label>
+    <div class="control">
+        <input class="input" name="title" type="text" value="{{ block is defined ? block.title : '' }}">
+    </div>
+</div>
+
+<div class="field">
+    <label class="label">{{ 'admin_cms.text_map_content'|trans }}</label>
+    <div class="control">
+        <textarea class="textarea" name="content" rows="12" data-rich="true">{{ (block is defined ? block.content : '')|cms_editor_html }}</textarea>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column is-3">
+        <div class="field">
+            <label class="label">{{ 'admin_cms.text_map_latitude'|trans }}</label>
+            <div class="control">
+                <input class="input" id="text-map-lat" name="latitude" type="text"
+                       value="{{ block is defined and block.latitude is not null ? block.latitude : '' }}">
+            </div>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="field">
+            <label class="label">{{ 'admin_cms.text_map_longitude'|trans }}</label>
+            <div class="control">
+                <input class="input" id="text-map-lng" name="longitude" type="text"
+                       value="{{ block is defined and block.longitude is not null ? block.longitude : '' }}">
+            </div>
+        </div>
+    </div>
+    <div class="column is-2">
+        <div class="field">
+            <label class="label">{{ 'admin_cms.text_map_zoom'|trans }}</label>
+            <div class="control">
+                <input class="input" id="text-map-zoom" name="zoom" type="number" min="1" max="19"
+                       value="{{ block is defined ? block.zoom : 15 }}">
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <div class="field">
+            <label class="label">{{ 'admin_cms.text_map_marker_label'|trans }}</label>
+            <div class="control">
+                <input class="input" name="markerLabel" type="text"
+                       value="{{ block is defined ? block.markerLabel : '' }}">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column is-4">
+        <div class="field">
+            <label class="label">{{ 'admin_cms.text_map_position'|trans }}</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="mapPosition">
+                        {% for position in mapPositions %}
+                            <option value="{{ position }}"
+                                    {% if (block is defined ? block.mapPosition.value : 'right') == position %}selected{% endif %}>
+                                {{ ('admin_cms.text_map_position_' ~ position)|trans }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="column is-4">
+        <div class="field">
+            <label class="label">{{ 'admin_cms.text_map_width'|trans }}</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select name="mapWidth">
+                        {% for width in mapWidths %}
+                            <option value="{{ width }}"
+                                    {% if (block is defined ? block.mapWidth.value : 'third') == width %}selected{% endif %}>
+                                {{ ('admin_cms.text_map_width_' ~ width)|trans }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <p class="help">{{ 'admin_cms.text_map_width_help'|trans }}</p>
+    </div>
+    <div class="column is-4">
+        <div class="field">
+            <label class="label">{{ 'admin_cms.text_map_height'|trans }}</label>
+            <div class="control">
+                <div class="select is-fullwidth">
+                    <select id="text-map-height" name="mapHeight">
+                        {% for height in mapHeights %}
+                            <option value="{{ height }}"
+                                    data-pixels="{{ height == 'small' ? '200px' : (height == 'large' ? '480px' : '320px') }}"
+                                    {% if (block is defined ? block.mapHeight.value : 'medium') == height %}selected{% endif %}>
+                                {{ ('admin_cms.text_map_height_' ~ height)|trans }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if block is defined %}
+    {% if locations|length > 0 %}
+        <div class="field">
+            <label class="label">{{ 'admin_cms.text_map_copy_location'|trans }}</label>
+            <div class="control">
+                <div class="select">
+                    <select id="text-map-location">
+                        <option value="">{{ 'admin_cms.text_map_copy_location_placeholder'|trans }}</option>
+                        {% for location in locations %}
+                            <option value="{{ location.id }}"
+                                    data-lat="{{ location.latitude }}"
+                                    data-lng="{{ location.longitude }}"
+                                    data-name="{{ location.name }}">{{ location.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <p class="help">{{ 'admin_cms.text_map_copy_location_help'|trans }}</p>
+        </div>
+    {% endif %}
+
+    {% if show_osm() %}
+        <div class="field">
+            <label class="label">{{ 'admin_cms.text_map_picker'|trans }}</label>
+            <div id="text-map-picker"
+                 data-default-lat="{{ locations|length > 0 ? locations|first.latitude : 0 }}"
+                 data-default-lng="{{ locations|length > 0 ? locations|first.longitude : 0 }}"
+                 data-default-zoom="{{ locations|length > 0 ? 15 : 2 }}"
+                 data-marker-icon="{{ asset('images/leaflet/marker-icon.png') }}"
+                 data-marker-shadow="{{ asset('images/leaflet/marker-shadow.png') }}"></div>
+            <p class="help">{{ 'admin_cms.text_map_picker_help'|trans }}</p>
+        </div>
+    {% else %}
+        <p class="help">{{ 'admin_cms.text_map_picker_no_consent'|trans }}</p>
+    {% endif %}
+{% endif %}

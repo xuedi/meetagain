@@ -8,7 +8,7 @@
  * a moment earlier keeps a stale size until invalidateSize() runs.
  *
  * Loaded in:  templates/events/details.html.twig, templates/events/share.html.twig,
- *             templates/admin/location/edit.html.twig
+ *             templates/admin/location/edit.html.twig; injected on demand by cms-map.js
  * Used by:    [data-osm-map]
  * Depends on: leaflet.js (L)
  */
@@ -19,7 +19,7 @@ function initOsmMap(mapEl) {
     }
     mapEl.dataset.osmMapReady = '1';
 
-    mapEl.style.height = '220px';
+    mapEl.style.height = mapEl.dataset.osmHeight || '220px';
     const map = L.map(mapEl, {attributionControl: false});
     const attributionControl = L.control.attribution().addTo(map);
     attributionControl.setPrefix('<a href="https://leafletjs.com/">Leaflet</a>');
@@ -37,8 +37,11 @@ function initOsmMap(mapEl) {
     }).addTo(map);
 
     const target = L.latLng(mapEl.dataset.lat, mapEl.dataset.lng);
-    map.setView(target, 16);
-    L.marker(target, {icon: iconMarker}).addTo(map);
+    map.setView(target, Number(mapEl.dataset.zoom) || 16);
+    const marker = L.marker(target, {icon: iconMarker}).addTo(map);
+    if (mapEl.dataset.markerLabel) {
+        marker.bindPopup(mapEl.dataset.markerLabel);
+    }
 
     setTimeout(function () {
         map.invalidateSize();

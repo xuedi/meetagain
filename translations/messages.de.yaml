@@ -264,6 +264,11 @@ cms:
     event_teaser_headline: 'Anstehende Events'
     event_teaser_empty: 'Keine anstehenden Events'
     event_teaser_edit_event_count_label: 'Anzahl Events'
+    map_aria_label: 'Karte'
+    map_consent_hint: 'Die Karte ist ausgeblendet, weil OpenStreetMap nicht erlaubt wurde.'
+    map_consent_link: 'Karte in den Cookie-Einstellungen erlauben'
+    map_open_osm: 'In OpenStreetMap öffnen'
+    map_directions: 'Route berechnen'
 member:
     page_title: 'Mitgliederverzeichnis'
     page_title_paginated: 'Mitgliederverzeichnis - Seite %page%'

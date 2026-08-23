@@ -17,6 +17,7 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
     public const string PRIVACY = 'privacy';
     public const string ABOUT = 'about';
     public const string RULES = 'rules';
+    public const string DIRECTIONS = 'directions';
     public const string IMPRINT = 'imprint';
     public const string ANNOUNCEMENT = '2026-01-new-website';
 
@@ -29,7 +30,7 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             $cms->setCreatedAt(new DateTimeImmutable());
             $cms->setCreatedBy($this->getRefUser(UserFixture::ADMIN));
             $cms->setPublished(true);
-            $cms->setLocked(in_array($slug, [self::PRIVACY, self::IMPRINT, self::INDEX, self::ABOUT, self::RULES, self::ANNOUNCEMENT], true));
+            $cms->setLocked(in_array($slug, [self::PRIVACY, self::IMPRINT, self::INDEX, self::ABOUT, self::RULES, self::DIRECTIONS, self::ANNOUNCEMENT], true));
             $cms->setEmailFooter($emailFooter);
             if ($menuLocations !== null) {
                 foreach ($menuLocations as $value) {
@@ -75,6 +76,11 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             [self::RULES, 'zh', '社区规则'],
             [self::RULES, 'fr', 'Règles de la communauté'],
             [self::RULES, 'es', 'Normas de la comunidad'],
+            [self::DIRECTIONS, 'en', 'How to Find Us'],
+            [self::DIRECTIONS, 'de', 'So findest du uns'],
+            [self::DIRECTIONS, 'zh', '如何找到我们'],
+            [self::DIRECTIONS, 'fr', 'Comment nous trouver'],
+            [self::DIRECTIONS, 'es', 'Cómo encontrarnos'],
             [self::IMPRINT, 'en', 'Imprint'],
             [self::IMPRINT, 'de', 'Impressum'],
             [self::IMPRINT, 'zh', '版本说明'],
@@ -121,6 +127,11 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             [self::RULES, 'zh', '规则'],
             [self::RULES, 'fr', 'Règles'],
             [self::RULES, 'es', 'Normas'],
+            [self::DIRECTIONS, 'en', 'Find us'],
+            [self::DIRECTIONS, 'de', 'Anfahrt'],
+            [self::DIRECTIONS, 'zh', '交通'],
+            [self::DIRECTIONS, 'fr', 'Accès'],
+            [self::DIRECTIONS, 'es', 'Cómo llegar'],
             [self::IMPRINT, 'en', 'Imprint'],
             [self::IMPRINT, 'de', 'Impressum'],
             [self::IMPRINT, 'zh', '版本说明'],
@@ -158,6 +169,7 @@ class CmsFixture extends AbstractFixture implements DependentFixtureInterface
             [self::PRIVACY, [MenuLocation::BottomCol4->value], true],
             [self::ABOUT, [MenuLocation::TopBar->value, MenuLocation::BottomCol1->value], false],
             [self::RULES, null, false],
+            [self::DIRECTIONS, [MenuLocation::TopBar->value], false],
             [self::IMPRINT, [MenuLocation::BottomCol4->value], true],
             [self::ANNOUNCEMENT, null, false],
         ];

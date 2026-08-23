@@ -50,6 +50,7 @@
                     'blockImage': blockImage,
                     'editBlock': block.id,
                     'cmsId': cms.id,
+                    'mapLocations': mapLocations,
                 } only %}
 
                 <div class="buttons mt-4">
@@ -124,7 +125,13 @@
     {% if block.type.name == 'FactsRow' %}
     <script src="{{ asset('js/admin/cms-facts-row-editor.js') }}" defer></script>
     {% endif %}
-    {% if block.type.name == 'Text' %}
+    {% if block.type.name == 'TextMap' %}
+        {% if show_osm() %}
+    <script src="{{ asset('js/vendor/leaflet.js') }}"></script>
+        {% endif %}
+    <script src="{{ asset('js/admin/cms-map-editor.js') }}" defer></script>
+    {% endif %}
+    {% if block.type.hasRichText() %}
     <script src="{{ asset('js/vendor/quill.min.js') }}"></script>
     <script src="{{ asset('js/admin/quill-editor.js') }}" defer></script>
     {% endif %}
