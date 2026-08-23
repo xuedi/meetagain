@@ -11,6 +11,7 @@ use App\Entity\BlockType\Gallery;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Text;
+use App\Entity\BlockType\TextMap;
 use App\Entity\BlockType\TrioCards;
 use LogicException;
 
@@ -25,6 +26,7 @@ enum CmsBlockType: int
     case EventTeaser = 9;
     case TrioCards = 10;
     case FactsRow = 11;
+    case TextMap = 12;
 
     /** @return class-string<BlockType> */
     public function getBlockClass(): string
@@ -37,6 +39,7 @@ enum CmsBlockType: int
             self::EventTeaser => EventTeaser::class,
             self::TrioCards => TrioCards::class,
             self::FactsRow => FactsRow::class,
+            self::TextMap => TextMap::class,
             default => throw new LogicException(sprintf('CmsBlockType::%s is not yet implemented.', $this->name)),
         };
     }

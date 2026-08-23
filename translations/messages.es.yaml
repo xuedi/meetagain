@@ -264,6 +264,11 @@ cms:
     event_teaser_headline: 'Próximos eventos'
     event_teaser_empty: 'No hay próximos eventos'
     event_teaser_edit_event_count_label: 'Número de eventos'
+    map_aria_label: 'Mapa'
+    map_consent_hint: 'El mapa está oculto porque no se ha permitido OpenStreetMap.'
+    map_consent_link: 'Permitir el mapa en la configuración de cookies'
+    map_open_osm: 'Abrir en OpenStreetMap'
+    map_directions: 'Cómo llegar'
 member:
     page_title: 'Directorio de miembros'
     page_title_paginated: 'Directorio de miembros - Página %page%'

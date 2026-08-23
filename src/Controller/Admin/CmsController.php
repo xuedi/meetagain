@@ -20,6 +20,7 @@ use App\Entity\BlockType\Gallery;
 use App\Entity\BlockType\Headline;
 use App\Entity\BlockType\Hero;
 use App\Entity\BlockType\Text;
+use App\Entity\BlockType\TextMap;
 use App\Entity\BlockType\TrioCards;
 use App\Entity\Cms;
 use App\Entity\User;
@@ -168,6 +169,7 @@ final class CmsController extends AbstractController implements AdminNavigationI
             EventTeaser::getType(),
             TrioCards::getType(),
             FactsRow::getType(),
+            TextMap::getType(),
         ];
 
         $linkedAnnouncement = $this->announcementRepo->findByCmsPage($cms->getId());

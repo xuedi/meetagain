@@ -264,6 +264,11 @@ cms:
     event_teaser_headline: '即将举行的活动'
     event_teaser_empty: '暂无即将举行的活动'
     event_teaser_edit_event_count_label: '活动数量'
+    map_aria_label: '地图'
+    map_consent_hint: '尚未允许 OpenStreetMap，因此地图已隐藏。'
+    map_consent_link: '在 Cookie 设置中允许显示地图'
+    map_open_osm: '在 OpenStreetMap 中打开'
+    map_directions: '查看路线'
 member:
     page_title: '成员目录'
     page_title_paginated: '成员目录 - 第 %page% 页'

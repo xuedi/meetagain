@@ -1,0 +1,67 @@
+{% set osmUrl = 'https://www.openstreetmap.org/?mlat=' ~ block.latitude ~ '&mlon=' ~ block.longitude ~ '#map=' ~ block.zoom ~ '/' ~ block.latitude ~ '/' ~ block.longitude %}
+{% set directionsUrl = 'https://www.openstreetmap.org/directions?to=' ~ block.latitude ~ ',' ~ block.longitude %}
+
+{% set textPart %}
+    {% if block.title %}<h2 class="title is-5">{{ block.title }}</h2>{% endif %}
+    <div class="content">{{ block.content|sanitize_html('cms.content') }}</div>
+{% endset %}
+
+{% set mapPart %}
+    {# Cached body, shared across visitors: the OSM consent gate lives in cms-map.js, never here. #}
+    <div data-cms-map
+         data-leaflet-src="{{ asset('js/vendor/leaflet.js') }}"
+         data-osm-map-src="{{ asset('js/osm-map.js') }}">
+        <div data-cms-map-canvas
+             data-osm-map
+             data-lat="{{ block.latitude }}"
+             data-lng="{{ block.longitude }}"
+             data-zoom="{{ block.zoom }}"
+             data-osm-height="{{ block.mapHeight.pixels() }}"
+             data-marker-label="{{ block.markerLabel }}"
+             data-marker-icon="{{ asset('images/leaflet/marker-icon.png') }}"
+             data-marker-shadow="{{ asset('images/leaflet/marker-shadow.png') }}"
+             role="img"
+             aria-label="{{ block.markerLabel ?: 'cms.map_aria_label'|trans }}"></div>
+        <article class="message" data-cms-map-fallback>
+            <div class="message-body is-flex is-flex-direction-column is-justify-content-center"
+                 style="min-height: {{ block.mapHeight.pixels() }}">
+                <p>
+                    <span class="icon"><i class="fa fa-map-marker-alt"></i></span>
+                    <span>{{ 'cms.map_consent_hint'|trans }}</span>
+                </p>
+                <p class="mt-3">
+                    <a href="{{ path('app_cookie') }}">{{ 'cms.map_consent_link'|trans }}</a>
+                </p>
+                <p class="mt-3">
+                    <a href="{{ osmUrl }}" target="_blank" rel="noopener noreferrer">{{ 'cms.map_open_osm'|trans }}</a>
+                    <span class="has-text-grey"> &middot; </span>
+                    <a href="{{ directionsUrl }}" target="_blank" rel="noopener noreferrer">{{ 'cms.map_directions'|trans }}</a>
+                </p>
+            </div>
+        </article>
+    </div>
+{% endset %}
+
+{% if not block.hasMap() %}
+    {{ textPart }}
+{% elseif block.mapPosition.isStacked() %}
+    <div class="mb-5">
+        {% if block.mapPosition.value == 'above' %}
+            <div class="mb-4">{{ mapPart }}</div>
+            {{ textPart }}
+        {% else %}
+            {{ textPart }}
+            <div class="mt-4">{{ mapPart }}</div>
+        {% endif %}
+    </div>
+{% else %}
+    <div class="columns is-vcentered mb-5">
+        {% if block.mapPosition.value == 'left' %}
+            <div class="column {{ block.mapWidth.columnClass() }}">{{ mapPart }}</div>
+        {% endif %}
+        <div class="column">{{ textPart }}</div>
+        {% if block.mapPosition.value == 'right' %}
+            <div class="column {{ block.mapWidth.columnClass() }}">{{ mapPart }}</div>
+        {% endif %}
+    </div>
+{% endif %}

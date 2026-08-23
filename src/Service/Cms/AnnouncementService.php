@@ -6,6 +6,7 @@ use App\Emails\Types\AnnouncementEmail;
 use App\Entity\Announcement;
 use App\Entity\BlockType\Gallery as GalleryType;
 use App\Entity\BlockType\Text as TextType;
+use App\Entity\BlockType\TextMap as TextMapType;
 use App\Entity\Cms;
 use App\Entity\EmailTemplate;
 use App\Entity\User;
@@ -101,6 +102,7 @@ readonly class AnnouncementService
             match ($block->getType()) {
                 CmsBlockType::Text => $contentParts[] = '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
                 CmsBlockType::Gallery => $contentParts[] = $this->renderGalleryBlock(GalleryType::fromJson($block->getJson())),
+                CmsBlockType::TextMap => $contentParts[] = $this->renderTextMapBlock(TextMapType::fromJson($block->getJson())),
                 default => null,
             };
         }
@@ -113,6 +115,29 @@ readonly class AnnouncementService
             'title' => $title,
             'content' => implode("\n", array_filter($contentParts)),
         ];
+    }
+
+    private function renderTextMapBlock(TextMapType $mapBlock): string
+    {
+        $parts = ['<p>' . $mapBlock->content . '</p>'];
+        if ($mapBlock->hasMap()) {
+            $url = sprintf(
+                'https://www.openstreetmap.org/?mlat=%s&amp;mlon=%s#map=%d/%s/%s',
+                $mapBlock->latitude,
+                $mapBlock->longitude,
+                $mapBlock->zoom,
+                $mapBlock->latitude,
+                $mapBlock->longitude,
+            );
+            $label = $mapBlock->markerLabel !== '' ? $mapBlock->markerLabel : 'OpenStreetMap';
+            $parts[] = sprintf(
+                '<p><a href="%s">%s</a></p>',
+                $url,
+                htmlspecialchars($label, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            );
+        }
+
+        return implode("\n", $parts);
     }
 
     private function renderGalleryBlock(GalleryType $galleryBlock): string

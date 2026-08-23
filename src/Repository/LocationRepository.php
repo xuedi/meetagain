@@ -37,6 +37,27 @@ class LocationRepository extends ServiceEntityRepository
 
     /**
      * @param array<int>|null $restrictToLocationIds Optional location ID filter
+     * @return array<Location>
+     */
+    public function findWithCoordinatesForAdmin(?array $restrictToLocationIds = null): array
+    {
+        if ($restrictToLocationIds === []) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('l')
+            ->where('l.latitude IS NOT NULL')
+            ->andWhere('l.longitude IS NOT NULL');
+
+        if ($restrictToLocationIds !== null) {
+            $qb->andWhere('l.id IN (:locationIds)')->setParameter('locationIds', $restrictToLocationIds);
+        }
+
+        return $qb->orderBy('l.name', 'ASC')->getQuery()->getResult();
+    }
+
+    /**
+     * @param array<int>|null $restrictToLocationIds Optional location ID filter
      */
     public function createQueryBuilderForAdmin(?array $restrictToLocationIds = null)
     {

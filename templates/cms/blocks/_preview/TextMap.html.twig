@@ -1,0 +1,16 @@
+<div class="box">
+    {% if block.title %}<h2 class="title is-5">{{ block.title }}</h2>{% endif %}
+    <div class="content">{{ block.content|sanitize_html('cms.content') }}</div>
+    <p class="has-text-grey is-size-7">
+        <span class="icon is-small"><i class="fa fa-map-marker-alt"></i></span>
+        {% if block.hasMap() %}
+            {{ 'admin_cms.text_map_preview_summary'|trans({
+                '%position%': ('admin_cms.text_map_position_' ~ block.mapPosition.value)|trans,
+                '%width%': ('admin_cms.text_map_width_' ~ block.mapWidth.value)|trans,
+                '%height%': ('admin_cms.text_map_height_' ~ block.mapHeight.value)|trans,
+            }) }}
+        {% else %}
+            {{ 'admin_cms.text_map_preview_no_coordinates'|trans }}
+        {% endif %}
+    </p>
+</div>

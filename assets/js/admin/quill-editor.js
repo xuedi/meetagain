@@ -21,7 +21,8 @@
  * toStorage() joins them back on save. Quill's Delta model has no soft break,
  * so this editor never sees or emits a <br> inside a content line.
  *
- * Loaded in:  templates/cms/blocks/_edit/Text.html.twig (the only mount)
+ * Loaded in:  every block edit form whose type reports hasRichText() - today
+ *             templates/cms/blocks/_edit/Text.html.twig and _edit/TextMap.html.twig
  * Used by:    textarea[data-rich="true"]
  * Depends on: vendor/quill.min.js (must be loaded first), Quill global
  */

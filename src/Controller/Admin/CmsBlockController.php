@@ -9,6 +9,7 @@ use App\Activity\Messages\AdminCmsBlockUpdated;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Entity\CmsBlock;
+use App\Entity\Location;
 use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Enum\CmsBlock\CmsBlockType;
@@ -16,9 +17,11 @@ use App\Enum\EntityAction;
 use App\Enum\ImageType;
 use App\Exception\BlockValidationException;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
+use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Form\EventUploadType;
 use App\Repository\CmsBlockRepository;
 use App\Repository\CmsRepository;
+use App\Repository\LocationRepository;
 use App\Service\Cms\CmsBlockService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
@@ -53,6 +56,8 @@ final class CmsBlockController extends AbstractController
         private readonly ImageLocationService $imageLocationService,
         private readonly TranslatorInterface $translator,
         private readonly ActivityService $activityService,
+        private readonly LocationRepository $locationRepo,
+        private readonly AdminLocationListFilterService $locationFilterService,
     ) {}
 
     #[Route('/block/{blockId}/edit', name: 'app_admin_cms_block_edit', methods: ['GET'])]
@@ -96,6 +101,7 @@ final class CmsBlockController extends AbstractController
             'blockObject' => $block->getBlockObject(),
             'blockImage' => $block->getImage(),
             'cms' => $cms,
+            'mapLocations' => $this->findMapLocations($block->getType()),
             'adminTop' => new AdminTop(actions: $actions),
         ]);
     }
@@ -466,6 +472,20 @@ final class CmsBlockController extends AbstractController
             'id' => $block->getPage()->getId(),
             'locale' => $block->getLanguage(),
         ]);
+    }
+
+    /**
+     * @return array<Location>
+     */
+    private function findMapLocations(CmsBlockType $type): array
+    {
+        if ($type !== CmsBlockType::TextMap) {
+            return [];
+        }
+
+        return $this->locationRepo->findWithCoordinatesForAdmin(
+            $this->locationFilterService->getLocationIdFilter()->getLocationIds(),
+        );
     }
 
     private function logBlockActivity(string $type, CmsBlock $block): void
