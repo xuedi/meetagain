@@ -86,7 +86,7 @@
     <div class="container">
         {% for block in blocks %}
             {% set editBlockLink = path('app_admin_cms_block_edit', {'blockId': block.id}) %}
-            <div class="mb-4 is-relative cms-block-preview">
+            <div id="block-{{ block.id }}" class="mb-4 is-relative cms-block-preview">
                 <div class="float-box-menu">
                     <form method="post" action="{{ path('app_admin_cms_edit_block_down') }}" class="is-inline">
                         <input type="hidden" name="id" value="{{ cms.id }}">

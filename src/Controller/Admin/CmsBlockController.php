@@ -250,9 +250,15 @@ final class CmsBlockController extends AbstractController
             $this->logBlockActivity(AdminCmsBlockUpdated::TYPE, $block);
         } catch (BlockValidationException $e) {
             $this->addFlash('error', $this->translator->trans('admin_cms.flash_block_validation_error'));
+
+            return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
         }
 
-        return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
+        return $this->redirectToRoute('app_admin_cms_edit', [
+            'id' => $block->getPage()?->getId(),
+            'locale' => $block->getLanguage(),
+            '_fragment' => 'block-' . $blockId,
+        ]);
     }
 
     #[Route('/block/delete', name: 'app_admin_cms_block_delete', methods: ['POST'])]
