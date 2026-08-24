@@ -4,6 +4,7 @@ namespace Tests\Unit\Service\System;
 
 use App\ExtendedFilesystem;
 use App\Service\System\HealthCheckService;
+use App\Service\System\LogService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -77,6 +78,9 @@ class HealthCheckServiceTest extends TestCase
         $fs->method('getDiskFreeSpace')->willReturn(50.0 * 1024 * 1024 * 1024);
         $fs->method('getDiskTotalSpace')->willReturn(100.0 * 1024 * 1024 * 1024);
 
-        return new HealthCheckService(new TagAwareAdapter(new ArrayAdapter()), $fs, self::PROJECT_DIR);
+        $logService = $this->createStub(LogService::class);
+        $logService->method('getLogFilePath')->willReturn(self::PROJECT_DIR . '/var/log/prod.log');
+
+        return new HealthCheckService(new TagAwareAdapter(new ArrayAdapter()), $fs, self::PROJECT_DIR, $logService);
     }
 }

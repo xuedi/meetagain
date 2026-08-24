@@ -12,6 +12,7 @@ readonly class HealthCheckService
         private TagAwareCacheInterface $appCache,
         private ExtendedFilesystem $fs,
         private string $kernelProjectDir,
+        private LogService $logService,
     ) {}
 
     public function runAll(): array
@@ -41,7 +42,7 @@ readonly class HealthCheckService
 
     private function testLogSize(): array
     {
-        $logFile = $this->kernelProjectDir . '/var/log/dev.log';
+        $logFile = $this->logService->getLogFilePath();
         $maxSize = 50 * 1024 * 1024;
 
         if (!$this->fs->fileExists($logFile)) {
