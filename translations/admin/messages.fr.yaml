@@ -264,6 +264,8 @@ admin_event:
     page_title_new: 'Créer un nouvel événement'
     form_label_status: 'Statut'
     form_label_featured: 'À la une'
+    form_label_external_rsvp: '+RSVP'
+    form_help_external_rsvp: 'inscriptions externes ajoutées'
     form_label_recurring: 'Récurrent'
     form_placeholder_non_recurring: 'Non récurrent'
     form_label_series_name: 'Nom de la série'

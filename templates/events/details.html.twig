@@ -61,6 +61,9 @@
                                 {% for user in event.rsvp %}
                                     <span class="tag">{{ user.name }}</span>
                                 {% endfor %}
+                                {% if event.externalRsvp > 0 %}
+                                    <span class="tag" title="{{ 'events.rsvp_external_title'|trans }}">{{ 'events.rsvp_external_badge'|trans({'%count%': event.externalRsvp}) }}</span>
+                                {% endif %}
                             </div>
                         </div>
                         <div class="notification has-text-centered mt-6 is-warning">

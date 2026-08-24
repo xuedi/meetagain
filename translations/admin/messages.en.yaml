@@ -264,6 +264,8 @@ admin_event:
     page_title_new: 'Create New Event'
     form_label_status: 'Status'
     form_label_featured: 'Featured'
+    form_label_external_rsvp: '+RSVP'
+    form_help_external_rsvp: 'added external RSVPs'
     form_label_recurring: 'Recurring'
     form_placeholder_non_recurring: 'NonRecurring'
     form_label_series_name: 'Series name'

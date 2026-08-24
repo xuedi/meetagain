@@ -23,6 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -61,6 +62,13 @@ class EventType extends AbstractType
                     $this->translator->trans('shared.toggle_yes') => true,
                     $this->translator->trans('shared.toggle_no') => false,
                 ],
+            ])
+            ->add('externalRsvp', IntegerType::class, [
+                'label' => $this->translator->trans('admin_event.form_label_external_rsvp'),
+                'help' => $this->translator->trans('admin_event.form_help_external_rsvp'),
+                'required' => false,
+                'empty_data' => '0',
+                'attr' => ['min' => 0],
             ])
             ->add('start', DateTimeType::class, [
                 'widget' => 'single_text',

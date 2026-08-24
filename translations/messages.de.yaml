@@ -178,6 +178,8 @@ events:
     rsvp_guest_add: 'Gast hinzufügen'
     rsvp_guest_remove: 'Gast entfernen'
     rsvp_guests_badge: 'Kommt mit %count% Gästen'
+    rsvp_external_badge: '+%count% extern'
+    rsvp_external_title: 'Teilnehmer, die sich außerhalb dieser Seite angemeldet haben'
     flash_rsvp_guests_requires_rsvp: 'Bitte sage erst zu, bevor du Gäste hinzufügst.'
     flash_rsvp_guests_limit: 'Du hast die maximale Anzahl an Gästen erreicht.'
     status_published: 'Veröffentlicht'

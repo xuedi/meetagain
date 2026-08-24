@@ -657,6 +657,40 @@ class RecurringEventServiceTest extends TestCase
     }
 
 
+    public function testExecuteRealignmentClearsTheExternalRsvpCountOfAMovedChild(): void
+    {
+        // Arrange
+        $movedChild = $this->makeFutureEvent(2, '2030-01-09 19:00');
+        $movedChild->setExternalRsvp(12);
+
+        $movedItem = new RealignmentItem(
+            eventId: 2,
+            currentStart: new DateTimeImmutable('2030-01-09 19:00'),
+            currentStop: null,
+            newStart: new DateTimeImmutable('2030-01-19 20:00'),
+            newStop: null,
+            rsvpCount: 0,
+            outcome: RealignmentOutcome::Moved,
+        );
+        $plan = new RealignmentPlan(9, 1, EventInterval::Weekly, null, [$movedItem]);
+
+        $repo = $this->createMock(EventRepository::class);
+        $repo->expects($this->once())->method('find')->with(2)->willReturn($movedChild);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())->method('persist')->with($movedChild);
+        $em->expects($this->once())->method('flush');
+
+        $service = $this->createService($repo, $em);
+
+        // Act
+        $service->executeRealignment($plan);
+
+        // Assert
+        static::assertSame(0, $movedChild->getExternalRsvp());
+    }
+
+
     public function testPlanRealignmentReturnsUnmovedItemsWhenTheCustomSpecCannotBeParsed(): void
     {
         // Arrange

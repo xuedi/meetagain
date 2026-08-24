@@ -113,15 +113,20 @@
                         <div class="mt-5">
                             {{ form_row(form.status) }}
                         </div>
-
-                        <div class="mt-5">
-                            {{ form_row(form.featured) }}
-                        </div>
                     </div>
                     <div class="column is-6">
                         <div class="mt-5">
                             {{ form_row(form.host) }}
                         </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column is-6">
+                        {{ form_row(form.featured) }}
+                    </div>
+                    <div class="column is-6">
+                        {{ form_row(form.externalRsvp) }}
                     </div>
                 </div>
 
