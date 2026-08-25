@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Module\Trust\:
+        resource: '../src/'
+        exclude:
+            - '../src/Internal/Entity/'

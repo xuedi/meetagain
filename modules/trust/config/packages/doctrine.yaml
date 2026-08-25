@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Trust:
+                        dir: "%kernel.project_dir%/modules/trust/src/Internal/Entity"
+                        is_bundle: false
+                        prefix: Module\Trust\Internal\Entity
+                        alias: Trust
+
+doctrine_migrations:
+    migrations_paths:
+        ModuleTrustMigrations: "%kernel.project_dir%/modules/trust/migrations"

@@ -1,0 +1,13 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Module\Trust\Tests\Stub\:
+        resource: '../tests/Stub/'
+
+    Module\Trust\Internal\ConfigStore: { public: true }
+    Module\Trust\Internal\ScoreProvider: { public: true }
+    Module\Trust\Internal\TrustService: { public: true }
+    Module\Trust\Contract\TrustInterface: '@Module\Trust\Internal\TrustService'
+    Module\Trust\Tests\Stub\UserLocator: { public: true }

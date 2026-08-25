@@ -1,0 +1,24 @@
+<?php declare(strict_types=1);
+
+$loader = require_once __DIR__ . '/../vendor/autoload.php';
+
+if ($loader === true) {
+    foreach (spl_autoload_functions() as $fn) {
+        if (is_array($fn) && $fn[0] instanceof \Composer\Autoload\ClassLoader) {
+            $loader = $fn[0];
+            break;
+        }
+    }
+}
+
+foreach (glob(__DIR__ . '/*/src', GLOB_ONLYDIR) as $dir) {
+    $moduleName = basename(dirname($dir));
+    $namespace = 'Module\\' . ucfirst($moduleName) . '\\';
+    $loader->addPsr4($namespace, $dir . '/');
+}
+
+foreach (glob(__DIR__ . '/*/tests', GLOB_ONLYDIR) as $dir) {
+    $moduleName = basename(dirname($dir));
+    $namespace = 'Module\\' . ucfirst($moduleName) . '\\Tests\\';
+    $loader->addPsr4($namespace, $dir . '/');
+}

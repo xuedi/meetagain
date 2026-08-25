@@ -1,0 +1,4 @@
+<span class="tag is-light" title="{{ 'trust.badge_title'|trans }}">
+    {{ band.label()|trans }}
+    {%- if vouches > 0 %} &middot; {{ 'trust.vouch_count'|trans({'%count%': vouches}) }}{% endif %}
+</span>

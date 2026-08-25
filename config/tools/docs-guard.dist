@@ -6,11 +6,11 @@
 
 # Markdown roots scanned when no path argument is given, and the prefixes `--staged` keeps.
 # Files as well as directories are accepted.
-SCAN_PATHS=docs/src,README.md
+SCAN_PATHS=docs/src,README.md,modules
 
 # A token in an inline code span is treated as a repository path when its first segment is one
 # of these. Anything else - a URL, a namespace, a schema.org type - is left alone.
-PATH_PREFIXES=src,templates,plugins,config,bin,tests,assets,migrations,public,docs
+PATH_PREFIXES=src,templates,plugins,modules,config,bin,tests,assets,migrations,public,docs
 
 # Substrings marking a path as deliberately illustrative rather than real. Tokens that cannot
 # be a literal path are exempt without being listed here: those containing a glob or

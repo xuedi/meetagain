@@ -1,0 +1,6 @@
+trust_controllers:
+    type: attribute
+    prefix: /{_locale}
+    resource:
+        path: ../src/Internal/Controller/
+        namespace: Module\Trust\Internal\Controller

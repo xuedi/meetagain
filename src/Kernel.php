@@ -75,9 +75,22 @@ class Kernel extends BaseKernel
         }
     }
 
+    /**
+     * @return iterable<string>
+     */
+    public function getModuleConfigDirs(): iterable
+    {
+        foreach (glob($this->getProjectDir() . '/modules/*/config', GLOB_ONLYDIR) ?: [] as $moduleConfigDir) {
+            yield $moduleConfigDir;
+        }
+    }
+
     protected function configureContainer(ContainerConfigurator $container): void
     {
         $this->doConfigureContainer($container, $this->getProjectDir() . '/config');
+        foreach ($this->getModuleConfigDirs() as $moduleConfigDir) {
+            $this->doConfigureContainer($container, $moduleConfigDir);
+        }
         foreach ($this->getPluginConfigDirs() as $pluginConfigDir => $pluginEnabled) {
             $this->doConfigureContainer($container, $pluginConfigDir);
         }
@@ -86,6 +99,9 @@ class Kernel extends BaseKernel
     protected function configureRoutes(RoutingConfigurator $routes): void
     {
         $this->doConfigureRoutes($routes, $this->getConfigDir());
+        foreach ($this->getModuleConfigDirs() as $moduleConfigDir) {
+            $this->doConfigureRoutes($routes, $moduleConfigDir);
+        }
         foreach ($this->getPluginConfigDirs() as $pluginConfigDir => $pluginEnabled) {
             if (!$pluginEnabled) {
                 continue;

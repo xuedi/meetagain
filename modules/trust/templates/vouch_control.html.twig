@@ -1,0 +1,16 @@
+<form method="post" action="{{ path('app_trust_vouch') }}" class="trust-vouch">
+    <input type="hidden" name="_token" value="{{ csrf_token('trust_vouch' ~ userId) }}">
+    <input type="hidden" name="context" value="{{ context }}">
+    <input type="hidden" name="user" value="{{ userId }}">
+    <div class="select is-small">
+        <select name="level" onchange="this.form.submit()" aria-label="{{ 'trust.vouch_label'|trans }}">
+            <option value="">{{ 'trust.vouch_none'|trans }}</option>
+            {% for level in levels %}
+                <option value="{{ level.value }}"{{ current is not null and current.value == level.value ? ' selected' : '' }}>
+                    {{ level.label()|trans }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <noscript><button class="button is-small" type="submit">{{ 'trust.vouch_save'|trans }}</button></noscript>
+</form>
