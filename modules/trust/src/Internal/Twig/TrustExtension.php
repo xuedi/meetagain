@@ -2,8 +2,10 @@
 
 namespace Module\Trust\Internal\Twig;
 
+use Module\Trust\Contract\TrustInterface;
 use Module\Trust\Contract\TrustLevel;
 use Module\Trust\Internal\AccessResolver;
+use Module\Trust\Internal\ActionRegistry;
 use Module\Trust\Internal\ConfigStore;
 use Module\Trust\Internal\ContextRegistry;
 use Module\Trust\Internal\RowBuilder;
@@ -23,6 +25,8 @@ final class TrustExtension extends AbstractExtension
         private readonly ScoreProvider $scoreProvider,
         private readonly ConfigStore $configStore,
         private readonly VouchService $vouchService,
+        private readonly ActionRegistry $actionRegistry,
+        private readonly TrustInterface $trust,
         private readonly Environment $twig,
     ) {}
 
@@ -33,6 +37,8 @@ final class TrustExtension extends AbstractExtension
             new TwigFunction('trust_table', $this->table(...), ['is_safe' => ['html']]),
             new TwigFunction('trust_vouch_control', $this->vouchControl(...), ['is_safe' => ['html']]),
             new TwigFunction('trust_badge', $this->badge(...), ['is_safe' => ['html']]),
+            new TwigFunction('trust_info', $this->info(...), ['is_safe' => ['html']]),
+            new TwigFunction('trust_explanation', $this->explanation(...), ['is_safe' => ['html']]),
         ];
     }
 
@@ -52,6 +58,38 @@ final class TrustExtension extends AbstractExtension
             'levels' => TrustLevel::cases(),
             'minimum' => $this->configStore->get($context)->minimumToParticipate,
         ]);
+    }
+
+    public function info(string $context): string
+    {
+        $viewerId = $this->accessResolver->getViewerId();
+        if ($viewerId === null || !$this->registry->exists($context) || !$this->accessResolver->canView($context, $viewerId)) {
+            return '';
+        }
+
+        $config = $this->configStore->get($context);
+
+        return $this->twig->render('@Trust/info.html.twig', [
+            'levels' => TrustLevel::cases(),
+            'config' => $config,
+            'actions' => array_values($this->actionRegistry->forContext($context)),
+            'minimum' => $config->minimumToParticipate,
+        ]);
+    }
+
+    public function explanation(string $context, ?int $userId = null): string
+    {
+        $viewerId = $this->accessResolver->getViewerId();
+        if ($viewerId === null || !$this->registry->exists($context)) {
+            return '';
+        }
+
+        $explanation = $this->trust->getExplanation($context, $userId ?? $viewerId);
+        if ($explanation === null) {
+            return '';
+        }
+
+        return $this->twig->render('@Trust/explanation.html.twig', ['explanation' => $explanation]);
     }
 
     public function vouchControl(string $context, int $userId): string

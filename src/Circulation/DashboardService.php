@@ -122,6 +122,59 @@ final readonly class DashboardService
     }
 
     /**
+     * @return array{holding: list<CirculationCopy>, donated: list<CirculationCopy>, waiting: list<array{itemId: int, position: int, queueLength: int}>, openHandovers: list<CirculationHandover>, received: int, given: int, donations: int, longestHeld: CirculationCopy|null}
+     */
+    public function getMemberSummary(string $itemType, User $viewer): array
+    {
+        $context = $this->circulation->getContext($itemType);
+        $viewerId = (int) $viewer->getId();
+        $shelf = $this->getShelf($itemType);
+
+        $holding = array_values(array_filter($shelf, static fn(CirculationCopy $copy): bool => $copy->isHeldBy($viewer)));
+        usort(
+            $holding,
+            static fn(CirculationCopy $a, CirculationCopy $b): int => (
+                ($a->getHeldSince()?->getTimestamp() ?? PHP_INT_MAX) <=> ($b->getHeldSince()?->getTimestamp() ?? PHP_INT_MAX)
+            ),
+        );
+
+        $waiting = [];
+        foreach ($this->getWaiting($itemType, $viewer) as $row) {
+            if ($row['viewerPosition'] === null) {
+                continue;
+            }
+            $waiting[] = ['itemId' => $row['itemId'], 'position' => $row['viewerPosition'], 'queueLength' => count($row['queue'])];
+        }
+
+        $openHandovers = array_values(array_filter(
+            $this->handovers->findOpenForUser($viewer),
+            static fn(CirculationHandover $handover): bool => $handover->getCopy()->getContext() === $context
+                && $handover->getCopy()->getItemType() === $itemType,
+        ));
+
+        $received = 0;
+        $given = 0;
+        foreach ($this->entries->findOfType($context, CirculationLedgerEntryType::HandoverCompleted) as $entry) {
+            $received += $entry->getToUserId() === $viewerId ? 1 : 0;
+            $given += $entry->getFromUserId() === $viewerId ? 1 : 0;
+        }
+
+        return [
+            'holding' => $holding,
+            'donated' => array_values(array_filter(
+                $shelf,
+                static fn(CirculationCopy $copy): bool => $copy->getDonatedBy()?->getId() === $viewerId,
+            )),
+            'waiting' => $waiting,
+            'openHandovers' => $openHandovers,
+            'received' => $received,
+            'given' => $given,
+            'donations' => $this->entries->countDonationsPerUser($context)[$viewerId] ?? 0,
+            'longestHeld' => $holding[0] ?? null,
+        ];
+    }
+
+    /**
      * @return array{copies: int, available: int, completedHandovers: int, mostTravelled: array{copy: CirculationCopy, moves: int}|null, medianHoldingDays: int|null, topDonors: list<array{user: User, count: int}>, longestHeld: list<CirculationCopy>}
      */
     public function getStats(string $itemType): array

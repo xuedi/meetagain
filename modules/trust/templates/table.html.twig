@@ -28,9 +28,3 @@
         {% endfor %}
     </tbody>
 </table>
-
-{% if minimum > 0 %}
-    <p class="is-size-7 has-text-grey">{{ 'trust.minimum_notice'|trans({'%minimum%': minimum}) }}</p>
-{% endif %}
-
-{% include '@Trust/info.html.twig' %}

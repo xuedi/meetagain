@@ -5,7 +5,9 @@ namespace Module\Trust\Internal;
 use Module\Trust\Contract\ActionDescriptor;
 use Module\Trust\Contract\ActionSourceInterface;
 use Module\Trust\Contract\RootProviderInterface;
+use Module\Trust\Contract\TrustActionBreakdown;
 use Module\Trust\Contract\TrustConfig;
+use Module\Trust\Contract\TrustExplanation;
 use Module\Trust\Internal\Repository\TrustGrantRepository;
 use Override;
 use Psr\Cache\CacheItemPoolInterface;
@@ -72,6 +74,48 @@ final class ScoreProvider implements ResetInterface
         }
 
         return $this->memo[$context] = $cached['map'];
+    }
+
+    public function explain(string $context, int $userId): ?TrustExplanation
+    {
+        if (!$this->registry->exists($context)) {
+            return null;
+        }
+
+        $config = $this->configStore->get($context);
+        $descriptors = $this->actionRegistry->forContext($context);
+        $quantities = $this->collectQuantities($context, $descriptors)[$userId] ?? [];
+
+        $actions = [];
+        $earned = 0;
+        foreach ($descriptors as $key => $descriptor) {
+            $quantity = $quantities[$key] ?? 0;
+            $cap = $config->capFor($descriptor);
+            $counted = $cap === null ? $quantity : min($cap, $quantity);
+            $points = $config->pointsFor($descriptor);
+            $subtotal = $points * $counted;
+            $earned += $subtotal;
+
+            $actions[] = new TrustActionBreakdown($key, $descriptor->label, $quantity, $counted, $cap, $points, $subtotal);
+        }
+
+        $rootPoints = $this->resolveRootPoints($context, $userId) ?? 0;
+        $basePoints = min($config->maxScore, max(0, $rootPoints + $earned));
+        $total = $this->getMap($context)[$userId] ?? 0;
+
+        return new TrustExplanation(
+            $context,
+            $userId,
+            $rootPoints,
+            $actions,
+            $basePoints,
+            max(0, $total - $basePoints),
+            $this->grants->countIncomingByUser($context)[$userId] ?? 0,
+            $total,
+            $config->bandFor($total),
+            $config->maxScore,
+            $config->minimumToParticipate,
+        );
     }
 
     public function invalidate(string $context): void

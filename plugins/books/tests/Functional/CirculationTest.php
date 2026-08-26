@@ -79,7 +79,7 @@ class CirculationTest extends WebTestCase
         $this->reachAHandover($client, $bookId);
         $this->login($client, self::OWNER_EMAIL);
 
-        foreach (['shelf', 'waiting', 'handovers', 'activity', 'stats'] as $tab) {
+        foreach (['shelf', 'waiting', 'handovers', 'activity', 'stats', 'about'] as $tab) {
             // Act
             $crawler = $client->request('GET', '/en/circulation/book?tab=' . $tab, server: $this->host());
 
@@ -145,6 +145,60 @@ class CirculationTest extends WebTestCase
 
         // Assert
         static::assertStringContainsString('tab=trust', (string) $client->getResponse()->headers->get('location'));
+    }
+
+    public function testTheAboutTabShowsWhatTheViewerHoldsAndWaitsFor(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->enableCirculation($client);
+        $bookId = $this->firstListedBookWithoutCopies($client);
+        $this->reachAHandover($client, $bookId);
+
+        // Act
+        $this->login($client, self::FIRST_IN_LINE_EMAIL);
+        $crawler = $client->request('GET', '/en/circulation/book?tab=about', server: $this->host());
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        static::assertStringContainsString('Handovers under way', $crawler->text());
+        static::assertStringContainsString('Waiting for you to confirm', $crawler->text());
+    }
+
+    public function testTheAboutTabHidesEveryTrustBoxWhileTrustIsOff(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->enableCirculation($client);
+        $this->login($client, self::OWNER_EMAIL);
+
+        // Act
+        $withoutTrust = $client->request('GET', '/en/circulation/book?tab=about', server: $this->host());
+        $this->enableTrust($client);
+        $this->login($client, self::OWNER_EMAIL);
+        $withTrust = $client->request('GET', '/en/circulation/book?tab=about', server: $this->host());
+
+        // Assert
+        static::assertCount(0, $withoutTrust->filter('.column.is-4 .box'), 'The trust sidebar must not render while trust is off.');
+        static::assertCount(1, $withTrust->filter('.column.is-4 .box'), 'The trust sidebar must render as markup, not as escaped text.');
+        static::assertStringContainsString('Your standing', $withTrust->filter('.column.is-4 .box .title')->first()->text());
+        static::assertStringNotContainsString('&lt;div', (string) $client->getResponse()->getContent());
+    }
+
+    public function testTheTrustTabPutsTheExplainerBesideTheTable(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->enableTrust($client);
+        $this->login($client, self::OWNER_EMAIL);
+
+        // Act
+        $crawler = $client->request('GET', '/en/circulation/book?tab=trust', server: $this->host());
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        static::assertCount(1, $crawler->filter('.columns .column.is-8 table'));
+        static::assertStringContainsString('About standing', $crawler->filter('.columns .column.is-4')->text());
     }
 
     public function testTheHandoverChatIsPrivateToItsTwoParticipants(): void

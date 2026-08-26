@@ -39,6 +39,8 @@
     {% include 'circulation/tabs/activity.html.twig' %}
 {% elseif tab == 'stats' %}
     {% include 'circulation/tabs/stats.html.twig' %}
+{% elseif tab == 'about' %}
+    {% include 'circulation/tabs/about.html.twig' %}
 {% elseif extraTabHtml %}
     {{ extraTabHtml|raw }}
 {% endif %}

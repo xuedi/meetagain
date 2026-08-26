@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class CirculationController extends AbstractController
 {
     private const string DEFAULT_TAB = 'shelf';
-    private const array CORE_TABS = ['shelf', 'waiting', 'handovers', 'activity', 'stats'];
+    private const array CORE_TABS = ['shelf', 'waiting', 'handovers', 'activity', 'stats', 'about'];
 
     public function __construct(
         private readonly CirculationService $circulation,
@@ -215,6 +215,7 @@ final class CirculationController extends AbstractController
         return $this->render('circulation/dashboard.html.twig', [
             'itemType' => $itemType,
             'typeLabelKey' => $this->typeLabelKey($itemType),
+            'context' => $context,
             'tab' => $tab,
             'coreTabs' => self::CORE_TABS,
             'extraTabs' => $extraTabs,
@@ -227,6 +228,7 @@ final class CirculationController extends AbstractController
             'completedHandovers' => $tab === 'handovers' ? $this->dashboard->getCompletedHandovers($itemType, 25) : [],
             'activity' => $tab === 'activity' ? $this->dashboard->getActivity($itemType, $request->query->getInt('page', 1)) : null,
             'stats' => $tab === 'stats' ? $this->dashboard->getStats($itemType) : null,
+            'about' => $tab === 'about' ? $this->dashboard->getMemberSummary($itemType, $viewer) : null,
             'viewer' => $viewer,
             'seesAll' => $seesAll,
         ], $this->getResponse());

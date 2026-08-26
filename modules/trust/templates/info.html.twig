@@ -1,5 +1,50 @@
-<p class="is-size-7 has-text-grey">
-    {{ 'trust.info_passes_on'|trans }}
-    {{ 'trust.info_private'|trans }}
-    {{ 'trust.info_reversible'|trans }}
-</p>
+{#
+    Trust Info -- the slim explainer that sits beside the standing table
+
+    States what standing is, how vouching moves it, what stays private, and what each action
+    on this shelf is currently worth. Rendered by trust_info(context), which returns nothing
+    unless the context exists and the viewer may see it - so a caller can place it
+    unconditionally and it disappears with the trust system.
+
+    Used in:    Module\Trust\Internal\Twig\TrustExtension::info
+    Parameters:
+        - levels  (list<TrustLevel>, required)      -- vouch levels and the share each passes on
+        - config  (TrustConfig, required)           -- percentages, ceiling and band thresholds
+        - actions (list<ActionDescriptor>, required)-- the point sources declared for the context
+        - minimum (int, required)                   -- standing needed to join a waiting list
+#}
+<div class="box">
+    <h2 class="title is-6">{{ 'trust.info_heading'|trans }}</h2>
+    <p class="is-size-7">{{ 'trust.info_what'|trans }}</p>
+
+    <h3 class="heading mt-4">{{ 'trust.info_vouching_heading'|trans }}</h3>
+    <p class="is-size-7">{{ 'trust.info_passes_on'|trans }}</p>
+    <ul class="is-size-7 mt-1">
+        {% for level in levels %}
+            <li>{{ level.label()|trans }} <span class="has-text-grey">- {{ 'trust.info_share'|trans({'%percent%': config.percentFor(level)}) }}</span></li>
+        {% endfor %}
+    </ul>
+    <p class="is-size-7 has-text-grey mt-2">
+        {{ 'trust.info_private'|trans }}
+        {{ 'trust.info_reversible'|trans }}
+    </p>
+
+    {% if actions is not empty %}
+        <h3 class="heading mt-4">{{ 'trust.info_earning_heading'|trans }}</h3>
+        <ul class="is-size-7">
+            {% for action in actions %}
+                <li>
+                    {{ action.label|trans }}
+                    <span class="has-text-grey">- {{ 'trust.info_points'|trans({'%points%': config.pointsFor(action)}) }}</span>
+                    {%- if config.capFor(action) is not null %}
+                        <span class="has-text-grey">({{ 'trust.info_capped'|trans({'%cap%': config.capFor(action)}) }})</span>
+                    {%- endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if minimum > 0 %}
+        <p class="is-size-7 mt-4">{{ 'trust.minimum_notice'|trans({'%minimum%': minimum}) }}</p>
+    {% endif %}
+</div>

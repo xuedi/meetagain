@@ -26,6 +26,13 @@ interface TrustInterface
     public function meetsMinimum(string $context, int $userId): bool;
 
     /**
+     * Where a member's standing came from, for showing them why it is what it is. Answered for
+     * the viewer's own id, or for anyone when the viewer may administer the context; null
+     * otherwise, and null for a context nobody describes.
+     */
+    public function getExplanation(string $context, int $userId): ?TrustExplanation;
+
+    /**
      * The context's effective settings, so a root provider can hand out the configured
      * anchor points and a caller can name the minimum it just refused someone against.
      */

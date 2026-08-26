@@ -72,19 +72,28 @@ context with no access provider is therefore visible to operators and to nobody 
 
 `TrustInterface`, and nothing else:
 
-| Method                                 | Returns                                                                               |
-|----------------------------------------|---------------------------------------------------------------------------------------|
-| `getScore($context, int $userId)`      | `int`                                                                                 |
-| `getScores($context)`                  | `array<int,int>` - the whole map for an administrator, the viewer's own row otherwise |
-| `getBand($context, int $userId)`       | `TrustBand`                                                                           |
-| `getVouchCount($context, int $userId)` | `int` - the only edge fact anyone else may see                                        |
-| `meetsMinimum($context, int $userId)`  | `bool`                                                                                |
-| `grant` / `revoke` / `getOutgoing`     | a member managing their own vouches                                                   |
+| Method                                  | Returns                                                                               |
+|-----------------------------------------|---------------------------------------------------------------------------------------|
+| `getScore($context, int $userId)`       | `int`                                                                                 |
+| `getScores($context)`                   | `array<int,int>` - the whole map for an administrator, the viewer's own row otherwise |
+| `getBand($context, int $userId)`        | `TrustBand`                                                                           |
+| `getVouchCount($context, int $userId)`  | `int` - the only edge fact anyone else may see                                        |
+| `meetsMinimum($context, int $userId)`   | `bool`                                                                                |
+| `getExplanation($context, int $userId)` | `TrustExplanation` or `null` - where a score came from                                |
+| `getConfig($context)`                   | `TrustConfig` - the context's effective settings                                      |
+| `grant` / `revoke` / `getOutgoing`      | a member managing their own vouches                                                   |
 
-Value types: `TrustAction`, `ActionDescriptor`, `ContextDescriptor`, `TrustConfig`, and the enums
-`TrustLevel` (`Slight`, `Trusted`, `Absolute`) and `TrustBand`. Those two enums are the only closed
-vocabularies in the contract, and both describe the module's own mechanics rather than any consumer's
-domain.
+Value types: `TrustAction`, `ActionDescriptor`, `ContextDescriptor`, `TrustConfig`, `TrustExplanation`,
+`TrustActionBreakdown`, and the enums `TrustLevel` (`Slight`, `Trusted`, `Absolute`) and `TrustBand`.
+Those two enums are the only closed vocabularies in the contract, and both describe the module's own
+mechanics rather than any consumer's domain.
+
+### Twig
+
+`trust_table(context)`, `trust_badge(context, userId)`, `trust_vouch_control(context, userId)`,
+`trust_info(context)` and `trust_explanation(context [, userId])`. Each returns an empty string when the
+context is not described or the viewer may not see it, so a consumer template can call them
+unconditionally. `trust_table` renders only the table - place `trust_info` yourself.
 
 ## How a score is computed
 
