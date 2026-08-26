@@ -44,3 +44,10 @@ books_book:
     flash_already_exists: 'Dieses Buch ist bereits im Katalog.'
     flash_invalid_image: 'Das hochgeladene Bild konnte nicht verarbeitet werden. Bitte JPG oder PNG verwenden.'
 
+books_config:
+    page_title: 'Bücher'
+    intro_circulation: '<p>Mitglieder stellen ihre eigenen Exemplare in ein gemeinsames Regal. Andere Mitglieder können eines anfragen, sich auf die Warteliste setzen und die Übergabe von Hand zu Hand in einem privaten Chat verabreden; das System hält fest, wer was hat und jede Bewegung, die es je gab.</p><p>Zwei Dinge vorab: Wird die Funktion wieder ausgeschaltet, verschwindet das Regal, die Historie bleibt aber vollständig erhalten - und die Exemplare gehören den Mitgliedern, die sie eingebracht haben, nicht der Gruppe.</p>'
+    field_circulation: 'Mitglieder ihre eigenen Exemplare in Umlauf bringen lassen'
+    help_circulation: 'Fügt jeder Buchseite ein Regal und der Buchliste einen Umlauf-Link hinzu.'
+    field_trust_system: 'Ansehen als Zugang zur Warteliste nutzen'
+    help_trust_system: 'Setzt eingeschalteten Umlauf voraus. Mitglieder erwerben Ansehen, indem sie Exemplare einbringen und Übergaben abschließen; Organisatoren können für Leute bürgen, die sie kennen. Wer für wen gebürgt hat, sieht niemand sonst.'

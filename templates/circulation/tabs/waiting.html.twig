@@ -1,0 +1,28 @@
+{% if waiting is empty %}
+    <div class="notification is-light">{{ 'circulation.waiting_empty'|trans }}</div>
+{% else %}
+    <table class="table is-fullwidth is-striped">
+        <thead>
+        <tr>
+            <th>{{ 'circulation.col_item'|trans }}</th>
+            <th>{{ 'circulation.col_queue'|trans }}</th>
+            <th>{{ 'circulation.col_your_position'|trans }}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in waiting %}
+            <tr class="{{ row.viewerPosition ? 'has-background-info-light' : '' }}">
+                <td>{{ item_list_cell(itemType, row.itemId, 'row') }}</td>
+                <td>{{ 'circulation.waiting_count'|trans({'%count%': row.queue|length}) }}</td>
+                <td>
+                    {% if row.viewerPosition %}
+                        <strong>{{ 'circulation.waiting_position'|trans({'%position%': row.viewerPosition}) }}</strong>
+                    {% else %}
+                        <span class="has-text-grey">-</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

@@ -16,6 +16,7 @@ admin_system_language:
     flash_updated: 'Sprache erfolgreich aktualisiert'
     validator_code_pattern: 'Sprachcode muss aus 2 Kleinbuchstaben bestehen (z. B. en, de, zh).'
 admin_system_plugins:
+    intro_heading: 'Was das bewirkt'
     col_version: 'Version'
     col_plugin_name: 'Name'
     col_description: 'Beschreibung'

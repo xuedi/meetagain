@@ -1,0 +1,105 @@
+{#
+    Circulation Panel -- the shelf block on an item detail page
+
+    Lists every physical copy of the item with its current holder and since when, states
+    how long the waiting list is and where the viewer stands in it, and offers the one
+    action the viewer can take right now: request it, leave the queue, or mark the copy
+    they hold as finished. Any member may add a copy of their own through the donate
+    field at the bottom. When the eligibility chain refuses a request, its reason replaces
+    the request button rather than hiding it silently.
+
+    Used in:    App\Twig\CirculationExtension::panel, called as circulation_panel() from
+                item detail pages
+    Parameters:
+        - itemType   (string, required)                       -- registry key of the item type
+        - itemId     (int, required)                          -- id of the item
+        - summary    (App\Circulation\Summary, required)      -- copy counts and queue position
+        - copies     (array, required)                        -- CirculationCopy rows in circulation
+        - ownRequest (CirculationRequest|null, required)      -- the viewer's open request, if any
+        - verdict    (EligibilityVerdict|null, required)      -- refusal to show instead of the button
+        - viewer     (User|null, required)                    -- the signed-in member
+#}
+<div class="box circulation-panel">
+    <div class="is-flex is-justify-content-space-between is-align-items-center mb-3">
+        <h2 class="title is-5 mb-0">{{ 'circulation.panel_title'|trans }}</h2>
+        {% if circulation_dashboard_url(itemType) %}
+            <a class="is-size-7" href="{{ circulation_dashboard_url(itemType) }}">{{ 'circulation.link_label'|trans }}</a>
+        {% endif %}
+    </div>
+
+    {% if copies is empty %}
+        <p class="has-text-grey">{{ 'circulation.panel_no_copies'|trans }}</p>
+    {% else %}
+        <table class="table is-narrow is-fullwidth">
+            <tbody>
+            {% for copy in copies %}
+                <tr>
+                    <td>
+                        <span class="tag {{ copy.status.tagVariant }} is-light">{{ copy.status.label|trans }}</span>
+                    </td>
+                    <td>{{ copy.label ?? 'circulation.copy_unlabelled'|trans }}</td>
+                    <td class="has-text-grey">
+                        {% if copy.holder %}
+                            <a href="{{ path('app_member_view', {'id': copy.holder.id}) }}">{{ copy.holder.name }}</a>
+                            {% if copy.heldSince %}<span class="is-size-7"> - {{ copy.heldSince|time_diff }}</span>{% endif %}
+                        {% else %}
+                            {{ 'circulation.holder_unknown'|trans }}
+                        {% endif %}
+                    </td>
+                    <td class="has-text-right">
+                        {% if viewer and copy.isHeldBy(viewer) and copy.status.isHeld %}
+                            <form method="post" action="{{ path('app_circulation_copy_finished', {'id': copy.id}) }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_copy_finished' ~ copy.id) }}">
+                                <button class="button is-small is-link is-light">{{ 'circulation.button_finished'|trans }}</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    {% if summary.queueLength > 0 %}
+        <p class="mb-3">
+            {{ 'circulation.panel_queue_length'|trans({'%count%': summary.queueLength}) }}
+            {% if summary.viewerQueuePosition %}
+                <strong>{{ 'circulation.panel_your_position'|trans({'%position%': summary.viewerQueuePosition, '%ahead%': summary.viewerQueuePosition - 1}) }}</strong>
+            {% endif %}
+        </p>
+    {% endif %}
+
+    <div class="buttons">
+        {% if ownRequest %}
+            <form method="post" action="{{ path('app_circulation_request_cancel', {'id': ownRequest.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_request_cancel' ~ ownRequest.id) }}">
+                <button class="button is-small">{{ 'circulation.button_cancel_request'|trans }}</button>
+            </form>
+        {% elseif verdict and not verdict.allowed %}
+            <div class="notification is-warning is-light py-2 px-3 is-size-7">
+                {{ verdict.reasonKey|trans(verdict.reasonParams) }}
+            </div>
+        {% elseif viewer and not summary.viewerHolds %}
+            <form method="post" action="{{ path('app_circulation_request', {'itemType': itemType, 'itemId': itemId}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_request' ~ itemType ~ itemId) }}">
+                <button class="button is-small is-link">{{ 'circulation.button_request'|trans }}</button>
+            </form>
+        {% endif %}
+    </div>
+
+    {% if viewer %}
+        <form method="post" action="{{ path('app_circulation_donate', {'itemType': itemType, 'itemId': itemId}) }}" class="mt-4">
+            <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_donate' ~ itemType ~ itemId) }}">
+            <div class="field has-addons">
+                <div class="control is-expanded">
+                    <input class="input is-small" type="text" name="label" maxlength="255"
+                           placeholder="{{ 'circulation.donate_placeholder'|trans }}">
+                </div>
+                <div class="control">
+                    <button class="button is-small">{{ 'circulation.button_donate'|trans }}</button>
+                </div>
+            </div>
+            <p class="help">{{ 'circulation.donate_help'|trans }}</p>
+        </form>
+    {% endif %}
+</div>

@@ -15,6 +15,12 @@
         {% for key, provider in providers %}
             <fieldset class="p-4 mb-4" style="border: 1px solid #dbdbdb; border-radius: 4px;">
                 <legend class="px-2 has-text-weight-semibold is-size-7">{{ provider.titleKey|trans }}</legend>
+                {% if provider.introKey %}
+                    <article class="message is-info">
+                        <div class="message-header"><p>{{ 'admin_system_plugins.intro_heading'|trans }}</p></div>
+                        <div class="message-body content">{{ provider.introKey|trans|raw }}</div>
+                    </article>
+                {% endif %}
                 {{ form_start(forms[key], {'action': path('app_admin_plugin_settings', {'key': pluginKey, 'section': key})}) }}
                 {{ form_widget(forms[key]) }}
                 <div class="field">

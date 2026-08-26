@@ -34,6 +34,11 @@ final readonly class SettingsDescriptor implements DescriptorInterface
         return 'films_settings.page_title';
     }
 
+    public function getIntroKey(): ?string
+    {
+        return null;
+    }
+
     public function getFormType(): string
     {
         return SettingsType::class;

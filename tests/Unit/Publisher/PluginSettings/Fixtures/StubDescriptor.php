@@ -34,6 +34,11 @@ final class StubDescriptor implements DescriptorInterface
         return 'stub.title';
     }
 
+    public function getIntroKey(): ?string
+    {
+        return null;
+    }
+
     public function getFormType(): string
     {
         return 'StubFormType';

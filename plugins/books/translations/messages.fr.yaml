@@ -43,3 +43,11 @@ books_book:
     flash_isbn_not_found: 'Aucun livre trouvé pour cet ISBN. Tu peux l''ajouter manuellement.'
     flash_already_exists: 'Ce livre est déjà dans le catalogue.'
     flash_invalid_image: 'L''image téléversée n''a pas pu être traitée. Utilise un JPG ou un PNG.'
+
+books_config:
+    page_title: 'Livres'
+    intro_circulation: '<p>Les membres posent leurs propres exemplaires sur une étagère commune. D''autres membres peuvent en demander un, s''inscrire sur la liste d''attente et convenir d''une remise en main propre dans une discussion privée ; le système garde trace de qui détient quoi et de chaque mouvement passé.</p><p>Deux points à connaître avant d''activer : désactiver ensuite masque l''étagère mais conserve tout l''historique, et les exemplaires appartiennent aux membres qui les ont apportés, pas au groupe.</p>'
+    field_circulation: 'Laisser les membres faire circuler leurs exemplaires'
+    help_circulation: 'Ajoute une étagère à chaque page de livre et un lien Circulation à la liste des livres.'
+    field_trust_system: 'Conditionner la liste d''attente à la réputation'
+    help_trust_system: 'Nécessite la circulation activée. Les membres gagnent en réputation en apportant des exemplaires et en terminant des remises, et un organisateur peut se porter garant de personnes qu''il connaît ; qui s''est porté garant de qui n''est jamais montré à quiconque.'

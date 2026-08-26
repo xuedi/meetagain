@@ -1,0 +1,65 @@
+<div class="level mb-4">
+    <div class="level-left">
+        <div class="field has-addons">
+            <div class="control">
+                <input class="input is-small" type="search" data-circulation-search
+                       placeholder="{{ 'circulation.shelf_search_placeholder'|trans }}" hidden>
+            </div>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="buttons are-small">
+            <a class="button {{ statusFilter is null ? 'is-link' : '' }}"
+               href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': 'shelf'}) }}">{{ 'circulation.shelf_filter_all'|trans }}</a>
+            {% for status in statuses %}
+                <a class="button {{ statusFilter == status ? 'is-link' : '' }}"
+                   href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': 'shelf', 'status': status.value}) }}">{{ status.label|trans }}</a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% if shelf is empty %}
+    <div class="notification is-light">{{ 'circulation.shelf_empty'|trans }}</div>
+{% else %}
+    <table class="table is-fullwidth is-striped" data-circulation-shelf>
+        <thead>
+        <tr>
+            <th>{{ 'circulation.col_item'|trans }}</th>
+            <th>{{ 'circulation.col_label'|trans }}</th>
+            <th>{{ 'circulation.col_donor'|trans }}</th>
+            <th>{{ 'circulation.col_holder'|trans }}</th>
+            <th>{{ 'circulation.col_status'|trans }}</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for copy in shelf %}
+            <tr>
+                <td>{{ item_list_cell(itemType, copy.itemId, 'row') }}</td>
+                <td class="has-text-grey">{{ copy.label ?? 'circulation.copy_unlabelled'|trans }}</td>
+                <td class="has-text-grey">{{ copy.donatedBy ? copy.donatedBy.name : 'circulation.holder_unknown'|trans }}</td>
+                <td class="has-text-grey">
+                    {% if copy.holder %}
+                        <a href="{{ path('app_member_view', {'id': copy.holder.id}) }}">{{ copy.holder.name }}</a>
+                        {% if copy.heldSince %}<br><span class="is-size-7">{{ copy.heldSince|time_diff }}</span>{% endif %}
+                    {% else %}
+                        {{ 'circulation.holder_unknown'|trans }}
+                    {% endif %}
+                </td>
+                <td><span class="tag {{ copy.status.tagVariant }} is-light">{{ copy.status.label|trans }}</span></td>
+                <td class="has-text-right">
+                    {% if seesAll and copy.status.isCirculating %}
+                        <form method="post" action="{{ path('app_circulation_copy_retire', {'id': copy.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_copy_retire' ~ copy.id) }}">
+                            <button class="button is-small is-light" title="{{ 'circulation.button_retire'|trans }}">
+                                <span class="icon"><i class="fa fa-box-archive"></i></span>
+                            </button>
+                        </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

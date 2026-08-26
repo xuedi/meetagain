@@ -1,0 +1,34 @@
+{% if activity.entries is empty %}
+    <div class="notification is-light">{{ 'circulation.activity_empty'|trans }}</div>
+{% else %}
+    <table class="table is-fullwidth is-narrow is-striped">
+        <tbody>
+        {% for entry in activity.entries %}
+            <tr>
+                <td style="width: 2rem;">
+                    <span class="icon has-text-grey"><i class="fa {{ entry.entryType.icon }}" aria-hidden="true"></i></span>
+                </td>
+                <td>{{ entry.entryType.label|trans }}</td>
+                <td>{{ item_list_cell(itemType, entry.itemId, 'row') }}</td>
+                <td class="has-text-grey is-size-7">{{ entry.occurredAt|time_diff }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {% if activity.pages > 1 %}
+        <nav class="pagination is-small" role="navigation" aria-label="{{ 'circulation.activity_pagination'|trans }}">
+            {% if activity.page > 1 %}
+                <a class="pagination-previous"
+                   href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': 'activity', 'page': activity.page - 1}) }}">{{ 'circulation.activity_previous'|trans }}</a>
+            {% endif %}
+            {% if activity.page < activity.pages %}
+                <a class="pagination-next"
+                   href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': 'activity', 'page': activity.page + 1}) }}">{{ 'circulation.activity_next'|trans }}</a>
+            {% endif %}
+            <ul class="pagination-list">
+                <li><span class="pagination-link is-current">{{ 'circulation.activity_page_of'|trans({'%page%': activity.page, '%pages%': activity.pages}) }}</span></li>
+            </ul>
+        </nav>
+    {% endif %}
+{% endif %}

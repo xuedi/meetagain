@@ -31,6 +31,12 @@ interface DescriptorInterface
     /** Translation key for the section title. */
     public function getTitleKey(): string;
 
+    /**
+     * Translation key for an explanatory blurb rendered above the form, or null for a
+     * section whose fields speak for themselves.
+     */
+    public function getIntroKey(): ?string;
+
     /** FQCN of the Symfony FormType the form is built from. */
     public function getFormType(): string;
 

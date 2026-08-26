@@ -1,0 +1,77 @@
+<div class="columns is-multiline">
+    <div class="column is-3">
+        <div class="box has-text-centered">
+            <p class="heading">{{ 'circulation.stat_copies'|trans }}</p>
+            <p class="title">{{ stats.copies }}</p>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="box has-text-centered">
+            <p class="heading">{{ 'circulation.stat_available'|trans }}</p>
+            <p class="title">{{ stats.available }}</p>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="box has-text-centered">
+            <p class="heading">{{ 'circulation.stat_handovers'|trans }}</p>
+            <p class="title">{{ stats.completedHandovers }}</p>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="box has-text-centered">
+            <p class="heading">{{ 'circulation.stat_median_holding'|trans }}</p>
+            <p class="title">{{ stats.medianHoldingDays is null ? '-' : stats.medianHoldingDays }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column is-6">
+        <div class="box">
+            <h2 class="title is-6">{{ 'circulation.stat_most_travelled'|trans }}</h2>
+            {% if stats.mostTravelled %}
+                {{ item_list_cell(itemType, stats.mostTravelled.copy.itemId, 'row') }}
+                <p class="has-text-grey is-size-7 mt-2">{{ 'circulation.stat_moves'|trans({'%count%': stats.mostTravelled.moves}) }}</p>
+            {% else %}
+                <p class="has-text-grey">{{ 'circulation.stat_none'|trans }}</p>
+            {% endif %}
+        </div>
+
+        <div class="box">
+            <h2 class="title is-6">{{ 'circulation.stat_top_donors'|trans }}</h2>
+            {% if stats.topDonors is empty %}
+                <p class="has-text-grey">{{ 'circulation.stat_none'|trans }}</p>
+            {% else %}
+                <ul>
+                    {% for donor in stats.topDonors %}
+                        <li>
+                            <a href="{{ path('app_member_view', {'id': donor.user.id}) }}">{{ donor.user.name }}</a>
+                            <span class="has-text-grey">- {{ 'circulation.stat_donations'|trans({'%count%': donor.count}) }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="column is-6">
+        <div class="box">
+            <h2 class="title is-6">{{ 'circulation.stat_longest_held'|trans }}</h2>
+            {% if stats.longestHeld is empty %}
+                <p class="has-text-grey">{{ 'circulation.stat_none'|trans }}</p>
+            {% else %}
+                <table class="table is-narrow is-fullwidth">
+                    <tbody>
+                    {% for copy in stats.longestHeld %}
+                        <tr>
+                            <td>{{ item_list_cell(itemType, copy.itemId, 'row') }}</td>
+                            <td class="has-text-grey">{{ copy.holder ? copy.holder.name : 'circulation.holder_unknown'|trans }}</td>
+                            <td class="has-text-grey is-size-7">{{ copy.heldSince ? copy.heldSince|time_diff : '' }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+</div>

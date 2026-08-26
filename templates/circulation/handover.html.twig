@@ -1,0 +1,102 @@
+{% extends 'circulation/base_circulation.html.twig' %}
+
+{% block title %}{{ 'circulation.handover_browser_title'|trans }}{% endblock %}
+
+{% block circulation_body %}
+<h1 class="title">{{ 'circulation.handover_page_title'|trans }}</h1>
+<p class="subtitle is-6 has-text-grey">
+    <span class="tag {{ handover.status.tagVariant }}">{{ handover.status.label|trans }}</span>
+</p>
+
+<div class="columns">
+    <div class="column is-7">
+        {% if isParticipant %}
+            {{ comment_section('circulation_handover', handover.id, false) }}
+        {% else %}
+            <div class="notification is-light">{{ 'circulation.handover_chat_private'|trans }}</div>
+        {% endif %}
+    </div>
+
+    <div class="column is-5">
+        <div class="box circulation-handover-sidebar">
+            <div class="mb-4">
+                {{ item_list_cell(itemType, copy.itemId, 'row') }}
+                {% if copy.label %}
+                    <p class="is-size-7 has-text-grey mt-2">{{ copy.label }}</p>
+                {% endif %}
+            </div>
+
+            <table class="table is-narrow is-fullwidth">
+                <tr>
+                    <th>{{ 'circulation.handover_from'|trans }}</th>
+                    <td>
+                        {% if handover.fromUser %}
+                            <a href="{{ path('app_member_view', {'id': handover.fromUser.id}) }}">{{ handover.fromUser.name }}</a>
+                        {% else %}
+                            {{ 'circulation.holder_unknown'|trans }}
+                        {% endif %}
+                    </td>
+                    <td class="has-text-right">
+                        {% if handover.fromConfirmedAt %}
+                            <span class="icon has-text-success" title="{{ 'circulation.handover_confirmed'|trans }}"><i class="fa fa-check"></i></span>
+                        {% else %}
+                            <span class="icon has-text-grey-light" title="{{ 'circulation.handover_pending'|trans }}"><i class="fa fa-hourglass-half"></i></span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>{{ 'circulation.handover_to'|trans }}</th>
+                    <td><a href="{{ path('app_member_view', {'id': handover.toUser.id}) }}">{{ handover.toUser.name }}</a></td>
+                    <td class="has-text-right">
+                        {% if handover.toConfirmedAt %}
+                            <span class="icon has-text-success" title="{{ 'circulation.handover_confirmed'|trans }}"><i class="fa fa-check"></i></span>
+                        {% else %}
+                            <span class="icon has-text-grey-light" title="{{ 'circulation.handover_pending'|trans }}"><i class="fa fa-hourglass-half"></i></span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>{{ 'circulation.handover_opened'|trans }}</th>
+                    <td colspan="2" class="has-text-grey">{{ handover.openedAt|time_diff }}</td>
+                </tr>
+            </table>
+
+            {% if isParticipant and handover.status.isOpen %}
+                <div class="buttons mt-4">
+                    {% if not handover.hasConfirmed(app.user) %}
+                        <form method="post" action="{{ path('app_circulation_handover_confirm', {'id': handover.id}) }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_handover_confirm' ~ handover.id) }}">
+                            <button class="button is-link">
+                                <span class="icon"><i class="fa fa-handshake"></i></span>
+                                <span>{{ 'circulation.button_confirm'|trans }}</span>
+                            </button>
+                        </form>
+                    {% endif %}
+                    <form method="post" action="{{ path('app_circulation_handover_cancel', {'id': handover.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_handover_cancel' ~ handover.id) }}">
+                        <button class="button is-light">{{ 'circulation.button_cancel_handover'|trans }}</button>
+                    </form>
+                </div>
+            {% endif %}
+
+            <article class="message is-info is-small mt-4">
+                <div class="message-header">
+                    <p>{{ 'circulation.handover_help_title'|trans }}</p>
+                </div>
+                <div class="message-body content is-small">
+                    <ul>
+                        <li>{{ 'circulation.handover_help_place'|trans }}</li>
+                        <li>
+                            {{ 'circulation.handover_help_event'|trans }}
+                            {% if nextEvent %}
+                                <a href="{{ path('app_event_details', {'id': nextEvent.id}) }}">{{ nextEvent.title(app.locale) }}</a>
+                            {% endif %}
+                        </li>
+                        <li>{{ 'circulation.handover_help_confirm'|trans }}</li>
+                    </ul>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>
+{% endblock %}

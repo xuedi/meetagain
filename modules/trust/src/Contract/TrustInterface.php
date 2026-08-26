@@ -25,6 +25,12 @@ interface TrustInterface
 
     public function meetsMinimum(string $context, int $userId): bool;
 
+    /**
+     * The context's effective settings, so a root provider can hand out the configured
+     * anchor points and a caller can name the minimum it just refused someone against.
+     */
+    public function getConfig(string $context): TrustConfig;
+
     public function grant(string $context, int $fromUserId, int $toUserId, TrustLevel $level): void;
 
     public function revoke(string $context, int $fromUserId, int $toUserId): void;
