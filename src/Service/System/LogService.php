@@ -24,13 +24,10 @@ readonly class LogService
     public function getRecentEntries(int $limit = 100, ?string $level = null, ?string $channel = null): array
     {
         $limit = min(max($limit, 1), self::MAX_LIMIT);
-        $logFile = $this->getLogFilePath();
 
-        if (!$this->fs->fileExists($logFile)) {
-            return [];
-        }
+        $entries = $this->getAllEntries();
+        usort($entries, static fn(LogEntry $a, LogEntry $b): int => $b->getDate() <=> $a->getDate());
 
-        $entries = array_reverse($this->readEntriesFrom($logFile));
         $result = [];
         foreach ($entries as $entry) {
             if ($level !== null && strtoupper($entry->getLevel()) !== strtoupper($level)) {
@@ -48,19 +45,31 @@ readonly class LogService
         return $result;
     }
 
-    public function countLines(): int
+    public function countAllLines(): int
     {
-        $logFile = $this->getLogFilePath();
-        if (!$this->fs->fileExists($logFile)) {
-            return 0;
+        $lines = 0;
+        foreach ($this->getLogFiles() as $file) {
+            $content = $this->fs->getFileContents($file);
+            if ($content === false || $content === '') {
+                continue;
+            }
+            $lines += substr_count($content, "\n") + (str_ends_with($content, "\n") ? 0 : 1);
         }
 
-        $content = $this->fs->getFileContents($logFile);
-        if ($content === false || $content === '') {
-            return 0;
+        return $lines;
+    }
+
+    public function getTotalSize(): int
+    {
+        $bytes = 0;
+        foreach ($this->getLogFiles() as $file) {
+            $size = $this->fs->getFileSize($file);
+            if ($size !== false) {
+                $bytes += $size;
+            }
         }
 
-        return substr_count($content, "\n") + (str_ends_with($content, "\n") ? 0 : 1);
+        return $bytes;
     }
 
     public function getLatestTimestamp(): ?DateTimeImmutable
@@ -91,7 +100,7 @@ readonly class LogService
     public function getAllEntries(): array
     {
         $entries = [];
-        foreach ($this->resolveAllLogFiles() as $file) {
+        foreach ($this->getLogFiles() as $file) {
             foreach ($this->readEntriesFrom($file) as $entry) {
                 $entries[] = $entry;
             }
@@ -146,21 +155,11 @@ readonly class LogService
     /**
      * @return int number of deleted files
      */
-    public function deleteOlderThan(DateTimeImmutable $cutoff): int
+    public function clear(): int
     {
         $deleted = 0;
-        $pattern = '/^' . preg_quote($this->environment, '/') . '-(\d{4}-\d{2}-\d{2})\.log$/';
-        foreach ($this->resolveAllLogFiles() as $file) {
-            $m = [];
-            if (!preg_match($pattern, basename($file), $m)) {
-                continue;
-            }
-            try {
-                $fileDate = new DateTimeImmutable($m[1]);
-            } catch (Throwable) {
-                continue;
-            }
-            if ($fileDate < $cutoff && $this->fs->fileExists($file) && $this->fs->deleteFile($file)) {
+        foreach ($this->getLogFiles() as $file) {
+            if ($this->fs->deleteFile($file)) {
                 $deleted++;
             }
         }
@@ -171,7 +170,7 @@ readonly class LogService
     /**
      * @return list<string>
      */
-    private function resolveAllLogFiles(): array
+    public function getLogFiles(): array
     {
         $files = [];
         $single = $this->logsDir . '/' . $this->environment . '.log';

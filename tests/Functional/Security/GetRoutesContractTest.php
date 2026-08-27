@@ -54,7 +54,7 @@ class GetRoutesContractTest extends WebTestCase
         yield 'access denied log clear' => ['/en/admin/logs/access-denied/clear'];
         yield 'cron log clear' => ['/en/admin/logs/cron/clear'];
         yield 'not found log clear' => ['/en/admin/logs/404/clear'];
-        yield 'system log cleanup' => ['/en/admin/logs/system/cleanup'];
+        yield 'system log clear' => ['/en/admin/logs/system/clear'];
         yield 'security blocked clear' => ['/en/admin/security/blocked/clear'];
         yield 'security incidents clear' => ['/en/admin/security/incidents/clear'];
         yield 'security incidents unblock' => ['/en/admin/security/incidents/1/unblock'];

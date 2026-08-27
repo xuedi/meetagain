@@ -42,17 +42,8 @@ readonly class HealthCheckService
 
     private function testLogSize(): array
     {
-        $logFile = $this->logService->getLogFilePath();
         $maxSize = 50 * 1024 * 1024;
-
-        if (!$this->fs->fileExists($logFile)) {
-            return ['ok' => true, 'size' => 0, 'maxSize' => $maxSize];
-        }
-
-        $size = $this->fs->getFileSize($logFile);
-        if ($size === false) {
-            $size = 0;
-        }
+        $size = $this->logService->getTotalSize();
 
         return [
             'ok' => $size < $maxSize,
