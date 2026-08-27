@@ -1,0 +1,45 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        {% if contexts is empty %}
+            <p>{{ 'trust.admin_empty'|trans }}</p>
+        {% else %}
+            <table id="filteredTable" class="table is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>{{ 'trust.admin_col_context'|trans }}</th>
+                        <th>{{ 'trust.admin_col_members'|trans }}</th>
+                        <th>{{ 'trust.admin_col_configured'|trans }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in contexts %}
+                        <tr>
+                            <td>{{ row.descriptor.label }}</td>
+                            <td>{{ row.members }}</td>
+                            <td>
+                                {% if row.configured %}
+                                    <span class="has-text-success">{{ 'trust.admin_configured_yes'|trans }}</span>
+                                {% else %}
+                                    <span class="has-text-grey">{{ 'trust.admin_configured_no'|trans }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ path('app_admin_trust_context', {'context': row.descriptor.context}) }}">
+                                    <span class="icon"><i class="fa fa-eye"></i></span>
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+    </div>
+{% endblock %}

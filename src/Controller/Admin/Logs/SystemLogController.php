@@ -74,9 +74,11 @@ final class SystemLogController extends AbstractLogsController implements AdminN
         $adminTop = new AdminTop(info: $this->buildInfo($totalCount, $allEntries, $since), actions: [
             new AdminTopActionForm(
                 label: $this->translator->trans('global.button_clear'),
-                target: $this->generateUrl('app_admin_system_log_cleanup'),
-                csrfTokenId: 'admin_system_log_cleanup',
+                target: $this->generateUrl('app_admin_system_log_clear'),
+                csrfTokenId: 'admin_system_log_clear',
                 icon: 'trash',
+                variant: 'is-danger is-light',
+                confirm: $this->translator->trans('admin_logs.confirm_clear'),
             ),
             $this->buildLevelDropdown($level, $range, $allEntries, $since),
             $this->buildRangeDropdown($range, $level, $allEntries, $levels),
@@ -120,15 +122,15 @@ final class SystemLogController extends AbstractLogsController implements AdminN
         ]);
     }
 
-    #[Route('/cleanup', name: 'app_admin_system_log_cleanup', methods: ['POST'])]
-    public function cleanup(Request $request): Response
+    #[Route('/clear', name: 'app_admin_system_log_clear', methods: ['POST'])]
+    public function clear(Request $request): Response
     {
-        if (!$this->isCsrfTokenValid('admin_system_log_cleanup', (string) $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('admin_system_log_clear', (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $deleted = $this->systemLogService->deleteOlderThan(new DateTimeImmutable('-1 month'));
-        $this->addFlash('success', $this->translator->trans('admin_logs.flash_cleanup_done', ['%count%' => $deleted]));
+        $deleted = $this->systemLogService->clear();
+        $this->addFlash('success', $this->translator->trans('admin_logs.flash_clear_done', ['%count%' => $deleted]));
 
         return $this->redirectToRoute('app_admin_system_log');
     }

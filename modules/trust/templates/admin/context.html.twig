@@ -1,0 +1,115 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        {{ trust_table(descriptor.context) }}
+
+        <form method="post" action="{{ path('app_admin_trust_context_save') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('trust_context_save') }}">
+            <input type="hidden" name="context" value="{{ descriptor.context }}">
+
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="label" for="maxScore">{{ 'trust.field_max_score'|trans }}</label>
+                        <div class="control"><input class="input" type="number" id="maxScore" name="maxScore" value="{{ config.maxScore }}"></div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="rootPointsPrimary">{{ 'trust.field_root_primary'|trans }}</label>
+                        <div class="control"><input class="input" type="number" id="rootPointsPrimary" name="rootPointsPrimary" value="{{ config.rootPointsPrimary }}"></div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="rootPointsSecondary">{{ 'trust.field_root_secondary'|trans }}</label>
+                        <div class="control"><input class="input" type="number" id="rootPointsSecondary" name="rootPointsSecondary" value="{{ config.rootPointsSecondary }}"></div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="minimumToParticipate">{{ 'trust.field_minimum'|trans }}</label>
+                        <div class="control"><input class="input" type="number" id="minimumToParticipate" name="minimumToParticipate" value="{{ config.minimumToParticipate }}"></div>
+                        {% if minimumUnreachable %}
+                            <p class="help has-text-danger">{{ 'trust.field_minimum_unreachable'|trans }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="field">
+                        <label class="label" for="percentSlight">{{ 'trust.field_percent_slight'|trans }}</label>
+                        <div class="control"><input class="input" type="number" id="percentSlight" name="percentSlight" value="{{ config.percentSlight }}"></div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="percentTrusted">{{ 'trust.field_percent_trusted'|trans }}</label>
+                        <div class="control"><input class="input" type="number" id="percentTrusted" name="percentTrusted" value="{{ config.percentTrusted }}"></div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="percentAbsolute">{{ 'trust.field_percent_absolute'|trans }}</label>
+                        <div class="control"><input class="input" type="number" id="percentAbsolute" name="percentAbsolute" value="{{ config.percentAbsolute }}"></div>
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="field">
+                        <label class="label" for="bandKnown">{{ 'trust.field_band_known'|trans }}</label>
+                        <div class="control"><input class="input" type="number" id="bandKnown" name="bandKnown" value="{{ config.bandThresholds[0] }}"></div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="bandTrusted">{{ 'trust.field_band_trusted'|trans }}</label>
+                        <div class="control"><input class="input" type="number" id="bandTrusted" name="bandTrusted" value="{{ config.bandThresholds[1] }}"></div>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="bandHighly">{{ 'trust.field_band_highly'|trans }}</label>
+                        <div class="control"><input class="input" type="number" id="bandHighly" name="bandHighly" value="{{ config.bandThresholds[2] }}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="title is-6">{{ 'trust.actions_heading'|trans }}</h2>
+
+            {% if actions is empty %}
+                <p class="has-text-grey">{{ 'trust.actions_empty'|trans }}</p>
+            {% else %}
+                <table class="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>{{ 'trust.actions_col_action'|trans }}</th>
+                            <th>{{ 'trust.actions_col_points'|trans }}</th>
+                            <th>{{ 'trust.actions_col_cap'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for index, action in actions %}
+                            <tr>
+                                <td>
+                                    <input type="hidden" name="actions[{{ index }}][key]" value="{{ action.key }}">
+                                    {{ action.label|trans }}
+                                    <span class="has-text-grey is-size-7">{{ action.key }}</span>
+                                </td>
+                                <td>
+                                    <input class="input" type="number" name="actions[{{ index }}][points]" value="{{ action.points }}"
+                                           aria-label="{{ 'trust.actions_col_points'|trans }}">
+                                </td>
+                                <td>
+                                    <input class="input" type="number" name="actions[{{ index }}][cap]" value="{{ action.cap }}"
+                                           placeholder="{{ 'trust.actions_cap_none'|trans }}"
+                                           aria-label="{{ 'trust.actions_col_cap'|trans }}">
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+
+            {% if undeclared is not empty %}
+                <p class="has-text-danger is-size-7">
+                    {{ 'trust.actions_undeclared'|trans({'%keys%': undeclared|join(', ')}) }}
+                </p>
+            {% endif %}
+
+            <button class="button is-primary" type="submit">{{ 'trust.button_save'|trans }}</button>
+        </form>
+
+    </div>
+{% endblock %}

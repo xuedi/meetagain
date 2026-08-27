@@ -1,0 +1,54 @@
+<h2 class="title is-5">{{ 'circulation.handovers_open_title'|trans }}</h2>
+{% if openHandovers is empty %}
+    <div class="notification is-light">{{ 'circulation.handovers_none_open'|trans }}</div>
+{% else %}
+    <table class="table is-fullwidth is-striped">
+        <thead>
+        <tr>
+            <th>{{ 'circulation.col_item'|trans }}</th>
+            <th>{{ 'circulation.handover_from'|trans }}</th>
+            <th>{{ 'circulation.handover_to'|trans }}</th>
+            <th>{{ 'circulation.handover_opened'|trans }}</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for handover in openHandovers %}
+            <tr>
+                <td>{{ item_list_cell(itemType, handover.copy.itemId, 'row') }}</td>
+                <td class="has-text-grey">
+                    {{ handover.fromUser ? handover.fromUser.name : 'circulation.holder_unknown'|trans }}
+                    {% if handover.fromConfirmedAt %}<span class="icon has-text-success"><i class="fa fa-check"></i></span>{% endif %}
+                </td>
+                <td class="has-text-grey">
+                    {{ handover.toUser.name }}
+                    {% if handover.toConfirmedAt %}<span class="icon has-text-success"><i class="fa fa-check"></i></span>{% endif %}
+                </td>
+                <td class="has-text-grey">{{ handover.openedAt|time_diff }}</td>
+                <td class="has-text-right">
+                    <a class="button is-small is-link is-light" href="{{ path('app_circulation_handover', {'id': handover.id}) }}">
+                        {{ 'circulation.button_open_handover'|trans }}
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+<h2 class="title is-5 mt-6">{{ 'circulation.handovers_history_title'|trans }}</h2>
+{% if completedHandovers is empty %}
+    <div class="notification is-light">{{ 'circulation.handovers_none_completed'|trans }}</div>
+{% else %}
+    <table class="table is-fullwidth is-narrow">
+        <tbody>
+        {% for entry in completedHandovers %}
+            <tr>
+                <td class="has-text-grey">{{ entry.occurredAt|time_diff }}</td>
+                <td>{{ item_list_cell(itemType, entry.itemId, 'row') }}</td>
+                <td class="has-text-grey">{{ entry.entryType.label|trans }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

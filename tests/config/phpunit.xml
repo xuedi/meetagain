@@ -22,10 +22,12 @@
         <testsuite name="default">
             <directory>../Unit</directory>
             <directory>../../plugins/*/tests/Unit</directory>
+            <directory>../../modules/*/tests/Unit</directory>
         </testsuite>
         <testsuite name="functional">
             <directory>../Functional</directory>
             <directory>../../plugins/*/tests/Functional</directory>
+            <directory>../../modules/*/tests/Functional</directory>
         </testsuite>
         <testsuite name="smoke">
             <directory>../Smoke</directory>
@@ -40,6 +42,7 @@
     <source>
         <include>
             <directory>../../src</directory>
+            <directory>../../modules/*/src</directory>
         </include>
         <exclude>
             <directory>../../src/DataFixtures</directory>
@@ -48,6 +51,8 @@
             <directory>../../src/Repository</directory>
             <directory>../../src/Entity</directory>
             <directory>../../src/Command</directory>
+            <directory>../../modules/*/src/Internal/Entity</directory>
+            <directory>../../modules/*/src/Internal/Repository</directory>
         </exclude>
     </source>
     <coverage>

@@ -1,0 +1,47 @@
+{% extends 'circulation/base_circulation.html.twig' %}
+
+{% block title %}{{ 'circulation.dashboard_browser_title'|trans({'%type%': typeLabelKey ? typeLabelKey|trans : ''}) }}{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/circulation-shelf.js') }}" defer></script>
+{% endblock %}
+
+{% block circulation_body %}
+<h1 class="title">{{ 'circulation.dashboard_page_title'|trans({'%type%': typeLabelKey ? typeLabelKey|trans : ''}) }}</h1>
+
+<div class="tabs is-boxed">
+    <ul>
+        {% for key in coreTabs %}
+            <li class="{{ tab == key ? 'is-active' : '' }}">
+                <a href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': key}) }}">
+                    <span>{{ ('circulation.tab_' ~ key)|trans }}</span>
+                </a>
+            </li>
+        {% endfor %}
+        {% for extra in extraTabs %}
+            <li class="{{ tab == extra.key ? 'is-active' : '' }}">
+                <a href="{{ path('app_circulation_dashboard', {'itemType': itemType, 'tab': extra.key}) }}">
+                    <span class="icon is-small"><i class="fa {{ extra.icon }}" aria-hidden="true"></i></span>
+                    <span>{{ extra.labelKey|trans }}</span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% if tab == 'shelf' %}
+    {% include 'circulation/tabs/shelf.html.twig' %}
+{% elseif tab == 'waiting' %}
+    {% include 'circulation/tabs/waiting.html.twig' %}
+{% elseif tab == 'handovers' %}
+    {% include 'circulation/tabs/handovers.html.twig' %}
+{% elseif tab == 'activity' %}
+    {% include 'circulation/tabs/activity.html.twig' %}
+{% elseif tab == 'stats' %}
+    {% include 'circulation/tabs/stats.html.twig' %}
+{% elseif tab == 'about' %}
+    {% include 'circulation/tabs/about.html.twig' %}
+{% elseif extraTabHtml %}
+    {{ extraTabHtml|raw }}
+{% endif %}
+{% endblock %}

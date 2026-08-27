@@ -4,6 +4,8 @@ php-version = "8.4"
 
 [source]
 paths = [
+    "modules/*/src/**/*.php",
+    "modules/*/tests/**/*.php",
     "plugins/books/src/**/*.php",
     "plugins/dishes/src/**/*.php",
     "plugins/films/src/**/*.php",
@@ -124,6 +126,7 @@ excludes = [
     "tests/Functional/",
     "tests/Smoke/",
     "tests/bootstrap.php",
+    "modules/trust/tests/",
 ]
 
 ignore = [
@@ -194,3 +197,69 @@ ignore = [
 ]
 
 [guard]
+
+# Inbound: nothing outside the module may reach past its Contract namespace.
+#
+# Restrictions AND together, so the generic backstop and the per-module entry both bind. The
+# backstop closes the boundary against core, plugins and tests for every module, including one
+# whose specific entry someone forgot to add; the two `*` in it do NOT correlate, so on its own it
+# would still let one module reach into another's internals. The per-module entries below are what
+# narrow it to the owning module. Both are needed - keep adding a specific entry per module.
+[[guard.perimeter.restrictions]]
+dependency = "Module\\*\\Internal\\**"
+allow-from = ["Module\\*\\**"]
+
+[[guard.perimeter.restrictions]]
+dependency = "Module\\Trust\\Internal\\**"
+allow-from = ["Module\\Trust\\**"]
+
+# Outbound: `[[guard.perimeter.rules]]` puts the whole project into allowlist mode, so every
+# namespace below needs an entry or all of its dependencies are reported as unruled. The three
+# `**` catch-alls state the current reality: core and plugins are not perimeter-guarded yet.
+# The most specific matching rule wins, which is what makes the Trust entry bite.
+[[guard.perimeter.rules]]
+namespace = "@global"
+permit = ["**"]
+
+[[guard.perimeter.rules]]
+namespace = "App\\"
+permit = ["**"]
+
+[[guard.perimeter.rules]]
+namespace = "Plugin\\"
+permit = ["**"]
+
+[[guard.perimeter.rules]]
+namespace = "Tests\\"
+permit = ["**"]
+
+[[guard.perimeter.rules]]
+namespace = "Module\\Trust\\"
+permit = [
+    "Module\\Trust\\**",
+    "@global",                              # DateTimeImmutable, Override, PHP's own functions
+    "App\\Entity\\User",                    # the grant FK - the one sanctioned core entity
+    "App\\Controller\\AbstractController",  # module controllers extend core's, as plugin controllers do
+    "App\\Admin\\**",                       # the self-owned admin area speaks the shell's own value objects
+    "Doctrine\\**",
+    "Symfony\\**",
+    "Twig\\**",
+    "Psr\\**",
+]
+
+# A module's own test suite is allowed the test toolchain and core fixture data; the perimeter
+# it proves is the one on the production namespace above, not on itself.
+[[guard.perimeter.rules]]
+namespace = "Module\\Trust\\Tests\\"
+permit = ["Module\\Trust\\**", "@global", "App\\**", "PHPUnit\\**", "Doctrine\\**", "Symfony\\**", "Psr\\**"]
+
+# Shape: the contract carries interfaces, enums and readonly value objects, nothing else.
+[[guard.structural.rules]]
+on = "Module\\*\\Contract\\**"
+must-be = ["interface", "enum", "class"]
+
+[[guard.structural.rules]]
+on = "Module\\*\\Contract\\**"
+target = "class"
+must-be-final = true
+must-be-readonly = true

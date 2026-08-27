@@ -1,0 +1,5 @@
+framework:
+    cache:
+        pools:
+            cache.trust:
+                adapter: cache.adapter.redis_tag_aware

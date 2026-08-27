@@ -4,6 +4,7 @@ namespace Tests\Unit\Service\System;
 
 use App\ExtendedFilesystem;
 use App\Service\System\HealthCheckService;
+use App\Service\System\LogService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -14,10 +15,10 @@ class HealthCheckServiceTest extends TestCase
     private const string PROJECT_DIR = '/app';
     private const int MAX_SIZE = 50 * 1024 * 1024;
 
-    public function testTestLogSizeReportsZeroSizeWhenLogFileMissing(): void
+    public function testTestLogSizeReportsZeroSizeWhenNoLogFileExists(): void
     {
         // Arrange
-        $service = $this->makeService(logExists: false);
+        $service = $this->makeService(logSize: 0);
 
         // Act
         $result = $service->runAll()['logSize'];
@@ -35,7 +36,7 @@ class HealthCheckServiceTest extends TestCase
     public function testTestLogSizeReportsCorrectOkFlagForSize(int $size, bool $expectedOk): void
     {
         // Arrange
-        $service = $this->makeService(logExists: true, logSize: $size);
+        $service = $this->makeService(logSize: $size);
 
         // Act
         $result = $service->runAll()['logSize'];
@@ -54,29 +55,17 @@ class HealthCheckServiceTest extends TestCase
         yield 'empty file' => [0, true];
     }
 
-    public function testTestLogSizeTreatsFalseSizeAsZero(): void
-    {
-        // Arrange
-        $service = $this->makeService(logExists: true, logSize: false);
-
-        // Act
-        $result = $service->runAll()['logSize'];
-
-        // Assert
-        static::assertTrue($result['ok']);
-        static::assertSame(0, $result['size']);
-    }
-
-    private function makeService(bool $logExists, int|false $logSize = 0): HealthCheckService
+    private function makeService(int $logSize): HealthCheckService
     {
         $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('fileExists')->willReturn($logExists);
-        $fs->method('getFileSize')->willReturn($logSize);
         // Stub disk-space lookups so runAll() never touches the real filesystem
         // (PROJECT_DIR is a sentinel that may not exist on the test host).
         $fs->method('getDiskFreeSpace')->willReturn(50.0 * 1024 * 1024 * 1024);
         $fs->method('getDiskTotalSpace')->willReturn(100.0 * 1024 * 1024 * 1024);
 
-        return new HealthCheckService(new TagAwareAdapter(new ArrayAdapter()), $fs, self::PROJECT_DIR);
+        $logService = $this->createStub(LogService::class);
+        $logService->method('getTotalSize')->willReturn($logSize);
+
+        return new HealthCheckService(new TagAwareAdapter(new ArrayAdapter()), $fs, self::PROJECT_DIR, $logService);
     }
 }

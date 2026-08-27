@@ -9,6 +9,7 @@
     <td style="vertical-align: middle;">
         <a href="{{ showUrl }}" class="has-text-weight-medium">{{ book.title }}</a>
         {% include '_components/item/tag_badges.html.twig' with {'itemType': 'book', 'itemId': book.id} only %}
+        {{ circulation_badge('book', book.id) }}
     </td>
     <td style="vertical-align: middle;" class="has-text-grey">{{ book.author }}</td>
     <td style="vertical-align: middle;" class="has-text-grey">{{ book.publishedYear }}</td>

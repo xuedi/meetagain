@@ -43,3 +43,11 @@ books_book:
     flash_isbn_not_found: 'No se encontró ningún libro con ese ISBN. Puedes añadirlo manualmente.'
     flash_already_exists: 'Este libro ya está en el catálogo.'
     flash_invalid_image: 'No se pudo procesar la imagen subida. Usa un JPG o PNG.'
+
+books_config:
+    page_title: 'Libros'
+    intro_circulation: '<p>Los miembros ponen sus propios ejemplares en una estantería compartida. Otros miembros pueden pedir uno, apuntarse a la lista de espera y quedar para una entrega en mano en un chat privado; el sistema registra quién tiene qué y todos los movimientos que ha habido.</p><p>Dos cosas antes de activarlo: volver a desactivarlo oculta la estantería pero conserva el historial completo, y los ejemplares pertenecen a los miembros que los aportaron, no al grupo.</p>'
+    field_circulation: 'Permitir que los miembros pongan sus ejemplares en circulación'
+    help_circulation: 'Añade una estantería a cada página de libro y un enlace de Circulación a la lista de libros.'
+    field_trust_system: 'Condicionar la lista de espera a la reputación'
+    help_trust_system: 'Requiere la circulación activada. Los miembros ganan reputación aportando ejemplares y completando entregas, y un organizador puede avalar a personas que conoce; quién avaló a quién no se muestra nunca a nadie más.'

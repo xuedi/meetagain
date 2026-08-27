@@ -1,0 +1,154 @@
+{#
+    Circulation Dashboard -- About me tab
+
+    The stats tab narrowed to one member: what the viewer holds and has held, where they stand
+    in every queue they joined, the handovers waiting on them, and - when the trust system is
+    on for this shelf - their standing with the arithmetic behind it. Everything here is scoped
+    to the serving group's shelf, so a member of two clubs sees two different pages.
+
+    The trust column renders nothing at all when the trust system is off, leaving the personal
+    figures full width.
+
+    Rendered by:  App\Controller\CirculationController::dashboard
+    Parameters:
+        - about    (array, required)  -- App\Circulation\DashboardService::getMemberSummary
+        - itemType (string, required) -- registry key of the item type on screen
+        - context  (string, required) -- the circulation context, for the trust breakdown
+        - viewer   (User, required)   -- the signed-in member
+#}
+{% set trustBox = trust_explanation(context) %}
+
+<div class="columns is-multiline">
+    <div class="column is-3">
+        <div class="box has-text-centered">
+            <p class="heading">{{ 'circulation.about_holding'|trans }}</p>
+            <p class="title">{{ about.holding|length }}</p>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="box has-text-centered">
+            <p class="heading">{{ 'circulation.about_donated'|trans }}</p>
+            <p class="title">{{ about.donations }}</p>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="box has-text-centered">
+            <p class="heading">{{ 'circulation.about_received'|trans }}</p>
+            <p class="title">{{ about.received }}</p>
+        </div>
+    </div>
+    <div class="column is-3">
+        <div class="box has-text-centered">
+            <p class="heading">{{ 'circulation.about_given'|trans }}</p>
+            <p class="title">{{ about.given }}</p>
+        </div>
+    </div>
+</div>
+
+<div class="columns">
+    <div class="column {{ trustBox ? 'is-8' : 'is-12' }}">
+        {% if about.openHandovers is not empty %}
+            <div class="box">
+                <h2 class="title is-6">{{ 'circulation.about_open_handovers'|trans }}</h2>
+                <table class="table is-narrow is-fullwidth">
+                    <tbody>
+                    {% for handover in about.openHandovers %}
+                        <tr>
+                            <td>{{ item_list_cell(itemType, handover.copy.itemId, 'row') }}</td>
+                            <td class="has-text-grey is-size-7">
+                                {{ (handover.toUser.id == viewer.id ? 'circulation.about_incoming' : 'circulation.about_outgoing')|trans }}
+                            </td>
+                            <td class="has-text-grey is-size-7">
+                                {{ (handover.hasConfirmed(viewer) ? 'circulation.about_you_confirmed' : 'circulation.about_awaiting_you')|trans }}
+                            </td>
+                            <td class="has-text-right">
+                                <a class="button is-small" href="{{ path('app_circulation_handover', {'id': handover.id}) }}">
+                                    {{ 'circulation.button_open_handover'|trans }}
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        <div class="box">
+            <h2 class="title is-6">{{ 'circulation.about_you_hold'|trans }}</h2>
+            {% if about.holding is empty %}
+                <p class="has-text-grey">{{ 'circulation.about_hold_none'|trans }}</p>
+            {% else %}
+                <table class="table is-narrow is-fullwidth">
+                    <tbody>
+                    {% for copy in about.holding %}
+                        <tr>
+                            <td>{{ item_list_cell(itemType, copy.itemId, 'row') }}</td>
+                            <td class="has-text-grey is-size-7">{{ copy.heldSince ? copy.heldSince|time_diff : '' }}</td>
+                            <td class="has-text-right">
+                                {% if copy.finishedAt %}
+                                    <span class="tag is-light">{{ 'circulation.about_marked_finished'|trans }}</span>
+                                {% elseif copy.status.isHeld %}
+                                    <form method="post" action="{{ path('app_circulation_copy_finished', {'id': copy.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('app_circulation_copy_finished' ~ copy.id) }}">
+                                        <button class="button is-small is-link is-light">{{ 'circulation.button_finished'|trans }}</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+
+        <div class="box">
+            <h2 class="title is-6">{{ 'circulation.about_you_wait_for'|trans }}</h2>
+            {% if about.waiting is empty %}
+                <p class="has-text-grey">{{ 'circulation.about_wait_none'|trans }}</p>
+            {% else %}
+                <table class="table is-narrow is-fullwidth">
+                    <tbody>
+                    {% for row in about.waiting %}
+                        <tr>
+                            <td>{{ item_list_cell(itemType, row.itemId, 'row') }}</td>
+                            <td class="has-text-grey is-size-7">
+                                {{ 'circulation.about_position'|trans({'%position%': row.position, '%total%': row.queueLength}) }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+
+        <div class="box">
+            <h2 class="title is-6">{{ 'circulation.about_your_copies'|trans }}</h2>
+            {% if about.donated is empty %}
+                <p class="has-text-grey">{{ 'circulation.about_donated_none'|trans }}</p>
+            {% else %}
+                <table class="table is-narrow is-fullwidth">
+                    <tbody>
+                    {% for copy in about.donated %}
+                        <tr>
+                            <td>{{ item_list_cell(itemType, copy.itemId, 'row') }}</td>
+                            <td class="has-text-grey is-size-7">{{ copy.label ?? 'circulation.copy_unlabelled'|trans }}</td>
+                            <td><span class="tag {{ copy.status.tagVariant }} is-light">{{ copy.status.label|trans }}</span></td>
+                            <td class="has-text-grey is-size-7">
+                                {% if copy.holder and not copy.isHeldBy(viewer) %}
+                                    {{ 'circulation.about_now_with'|trans({'%member%': copy.holder.name}) }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if trustBox %}
+        <div class="column is-4">
+            {{ trustBox|raw }}
+        </div>
+    {% endif %}
+</div>

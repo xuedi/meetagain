@@ -16,6 +16,7 @@ admin_system_language:
     flash_updated: '语言更新成功'
     validator_code_pattern: '语言代码必须是 2 个小写字母（例如 en、de、zh）。'
 admin_system_plugins:
+    intro_heading: '这个功能做什么'
     col_version: '版本'
     col_plugin_name: '名称'
     col_description: '描述'

@@ -1,0 +1,83 @@
+{#
+    Trust Explanation -- one member's standing, and the arithmetic that produced it
+
+    Shows the total and its band, then every line that fed it: anchor points for an organiser,
+    each point source with the number of times the member did it, and the share that arrived
+    through vouches. Vouches are counted, never named. Closes with the actions still worth
+    points, so the member knows what raises the number.
+
+    Rendered by trust_explanation(context [, userId]), which returns nothing when the trust
+    system is off or the viewer may not see that member's figures.
+
+    Used in:    Module\Trust\Internal\Twig\TrustExtension::explanation
+    Parameters:
+        - explanation (TrustExplanation, required) -- the breakdown to render
+#}
+{% set e = explanation %}
+<div class="box">
+    <div class="is-flex is-justify-content-space-between is-align-items-baseline mb-3">
+        <h2 class="title is-6 mb-0">{{ 'trust.explain_heading'|trans }}</h2>
+        <span class="tag is-medium">{{ e.band.label()|trans }}</span>
+    </div>
+
+    <p class="title is-2 mb-0">{{ e.total }}</p>
+    <p class="heading">{{ 'trust.explain_of_max'|trans({'%max%': e.maxScore}) }}</p>
+
+    <table class="table is-narrow is-fullwidth mt-4">
+        <tbody>
+        {% if e.rootPoints > 0 %}
+            <tr>
+                <td>{{ 'trust.explain_root'|trans }}</td>
+                <td class="has-text-grey"></td>
+                <td class="has-text-right">+{{ e.rootPoints }}</td>
+            </tr>
+        {% endif %}
+        {% for action in e.actions %}
+            {% if action.quantity > 0 %}
+                <tr>
+                    <td>{{ action.label|trans }}</td>
+                    <td class="has-text-grey is-size-7">
+                        {{ 'trust.explain_times'|trans({'%count%': action.countedQuantity, '%points%': action.pointsPerUnit}) }}
+                        {%- if action.isCapped() %} <span class="tag is-light is-small">{{ 'trust.explain_capped_at'|trans({'%cap%': action.cap}) }}</span>{% endif %}
+                    </td>
+                    <td class="has-text-right">+{{ action.subtotal }}</td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+        {% if e.vouchedPoints > 0 %}
+            <tr>
+                <td>{{ 'trust.explain_from_vouches'|trans }}</td>
+                <td class="has-text-grey is-size-7">{{ 'trust.explain_vouch_count'|trans({'%count%': e.vouchCount}) }}</td>
+                <td class="has-text-right">+{{ e.vouchedPoints }}</td>
+            </tr>
+        {% endif %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>{{ 'trust.explain_total'|trans }}</th>
+                <th></th>
+                <th class="has-text-right">{{ e.total }}{% if e.isAtCeiling() %} <span class="tag is-light is-small">{{ 'trust.explain_at_ceiling'|trans }}</span>{% endif %}</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    {% if e.minimumToParticipate > 0 %}
+        <p class="is-size-7 {{ e.meetsMinimum() ? 'has-text-grey' : 'has-text-danger' }}">
+            {{ (e.meetsMinimum() ? 'trust.explain_minimum_met' : 'trust.explain_minimum_short')|trans({
+                '%minimum%': e.minimumToParticipate,
+                '%short%': e.minimumToParticipate - e.total,
+            }) }}
+        </p>
+    {% endif %}
+
+    {% set open = e.unearnedActions() %}
+    {% if open is not empty and not e.isAtCeiling() %}
+        <h3 class="heading mt-4">{{ 'trust.explain_how_to_raise'|trans }}</h3>
+        <ul class="is-size-7">
+            {% for action in open %}
+                <li>{{ action.label|trans }} <span class="has-text-grey">- {{ 'trust.info_points'|trans({'%points%': action.pointsPerUnit}) }}</span></li>
+            {% endfor %}
+            <li class="has-text-grey">{{ 'trust.explain_how_vouches'|trans }}</li>
+        </ul>
+    {% endif %}
+</div>

@@ -94,6 +94,7 @@
       "src/Service/Security/LoadtestBypass.php"
     ],
     "files": [
+      "modules/autoload.php",
       "plugins/autoload.php"
     ]
   },

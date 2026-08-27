@@ -44,3 +44,10 @@ books_book:
     flash_already_exists: '该书籍已在目录中。'
     flash_invalid_image: '上传的图片无法处理。请使用 JPG 或 PNG。'
 
+books_config:
+    page_title: '书籍'
+    intro_circulation: '<p>成员把自己的实体书放到共享书架上。其他成员可以提出借阅、排队等待，并在私密对话中约好当面交接；系统会记录每一本在谁手上，以及它经历过的每一次流转。</p><p>开启前有两点需要知道：再次关闭只会隐藏书架，全部历史记录仍然保留；书本属于投入它们的成员，而不属于小组。</p>'
+    field_circulation: '允许成员让自己的书进入流转'
+    help_circulation: '在每个书籍页面加上共享书架，并在书籍列表加上流转入口。'
+    field_trust_system: '用信誉限制等待名单'
+    help_trust_system: '需要先开启流转。成员通过投入实物和完成交接积累信誉，组织者可以为自己认识的人背书；谁为谁背书永远不会对其他人显示。'

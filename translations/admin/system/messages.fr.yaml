@@ -16,6 +16,7 @@ admin_system_language:
     flash_updated: 'Langue mise à jour avec succès'
     validator_code_pattern: 'Le code de langue doit comporter 2 lettres minuscules (p. ex. en, de, zh).'
 admin_system_plugins:
+    intro_heading: 'Ce que cela fait'
     col_version: 'Version'
     col_plugin_name: 'Nom'
     col_description: 'Description'

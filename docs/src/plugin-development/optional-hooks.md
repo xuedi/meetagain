@@ -7,36 +7,40 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 
 ## Capabilities at a glance
 
-| Interface                                  | When to use it                                        | Key method                                                |
-|--------------------------------------------|-------------------------------------------------------|-----------------------------------------------------------|
-| `Plugin` (base interface)                  | Serve CSS/JS assets from your plugin                  | `getStylesheets()`, `getJavascripts()`                    |
-| `AdminNavigationInterface`                 | Add sections and links to the admin sidebar           | `getAdminNavigation()`                                    |
-| `EventFilterInterface`                     | Control which events are visible                      | `getEventIdFilter()`                                      |
-| `CmsFilterInterface`                       | Control which CMS pages are visible                   | `getCmsPageSlugs()`                                       |
-| `ReservedSlugProviderInterface`            | Reserve slugs the CMS editor must refuse to assign    | `getReservedSlugs()`                                      |
-| `HeadHtmlProviderInterface`                | Add markup to the document `<head>`                   | `getHeadHtml()`                                           |
-| `MemberFilterInterface`                    | Filter which members appear in lists                  | `getUserIds()`                                            |
-| `EventFilterFormContributorInterface`      | Add fields to the event filter form                   | `addFields()`                                             |
-| `NotificationProviderInterface`            | Add informational items to the notification bell      | `getNotifications()`                                      |
-| `ReviewNotificationProviderInterface`      | Add approve/deny items to the review page             | `getReviewItems()`, `approveItem()`, `denyItem()`         |
-| `EntityActionInterface`                    | React to core entity lifecycle events                 | `handleEntityAction()`                                    |
-| `MetaEnricherInterface`                    | Enrich metadata on all activity types                 | `enrich()`                                                |
-| `MessageInterface`                         | Define a new activity type with display rendering     | `getType()`, `validate()`, `render()`                     |
-| `SitemapPublisherInterface`                | Contribute URLs to `/sitemap.xml`                     | `getPriority()`, `getSitemapUrls()`                       |
-| `WellKnownProviderInterface`               | Serve a document under `/.well-known/`                | `getSuffix()`, `getPriority()`, `provide()`               |
-| `UrlOwnerProviderInterface`                | Name the host that owns a route                       | `getOwnerHost()`                                          |
-| `FollowerEventNotificationFilterInterface` | Drop follower-RSVP email recipients per event         | `isFollowerAllowed()`                                     |
-| `ImageAttributionFilterInterface`          | Narrow which attributed images `/attributions` shows  | `getVisibleImageIdFilter()`                               |
-| `DataHotfixInterface`                      | Ship a one-off data repair that runs once per DB      | `getIdentifier()`, `execute()`                            |
-| `SecurityProviderInterface`                | Participate in live security event detection          | `observe()`, `scanRetrospective()`                        |
-| `DescriptorInterface`                      | Add a settings section to your plugin's settings page | `getFormType()`, `createDefault()`, `applyForm()`         |
-| `TaggableTypeProviderInterface`            | Give an item type a tag vocabulary                    | `getPluginKey()`, `getTypeKey()`, `getLabelKey()`         |
-| `Comment\TargetProviderInterface`          | Host the shared comment section on your own pages     | `getTypeKey()`, `getReturnUrl()`, `canComment()`          |
-| `ContributorInterface`                     | Carry an item type through group export and import    | `exportItems()`, `importItems()`                          |
-| `ChangeTargetProviderInterface`            | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()`    |
-| `ConfigPrivacyToggleProviderInterface`     | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                             |
-| `SendingIdentityProviderInterface`         | Decide the name, logo and links a mail is sent under  | `resolve()`                                               |
-| `AudienceFilterInterface`                  | Narrow who receives installation-wide mail            | `filterInstallationWideAudience()`                        |
+| Interface                                    | When to use it                                        | Key method                                             |
+|----------------------------------------------|-------------------------------------------------------|--------------------------------------------------------|
+| `Plugin` (base interface)                    | Serve CSS/JS assets from your plugin                  | `getStylesheets()`, `getJavascripts()`                 |
+| `AdminNavigationInterface`                   | Add sections and links to the admin sidebar           | `getAdminNavigation()`                                 |
+| `EventFilterInterface`                       | Control which events are visible                      | `getEventIdFilter()`                                   |
+| `CmsFilterInterface`                         | Control which CMS pages are visible                   | `getCmsPageSlugs()`                                    |
+| `ReservedSlugProviderInterface`              | Reserve slugs the CMS editor must refuse to assign    | `getReservedSlugs()`                                   |
+| `HeadHtmlProviderInterface`                  | Add markup to the document `<head>`                   | `getHeadHtml()`                                        |
+| `MemberFilterInterface`                      | Filter which members appear in lists                  | `getUserIds()`                                         |
+| `EventFilterFormContributorInterface`        | Add fields to the event filter form                   | `addFields()`                                          |
+| `NotificationProviderInterface`              | Add informational items to the notification bell      | `getNotifications()`                                   |
+| `ReviewNotificationProviderInterface`        | Add approve/deny items to the review page             | `getReviewItems()`, `approveItem()`, `denyItem()`      |
+| `EntityActionInterface`                      | React to core entity lifecycle events                 | `handleEntityAction()`                                 |
+| `MetaEnricherInterface`                      | Enrich metadata on all activity types                 | `enrich()`                                             |
+| `MessageInterface`                           | Define a new activity type with display rendering     | `getType()`, `validate()`, `render()`                  |
+| `SitemapPublisherInterface`                  | Contribute URLs to `/sitemap.xml`                     | `getPriority()`, `getSitemapUrls()`                    |
+| `WellKnownProviderInterface`                 | Serve a document under `/.well-known/`                | `getSuffix()`, `getPriority()`, `provide()`            |
+| `UrlOwnerProviderInterface`                  | Name the host that owns a route                       | `getOwnerHost()`                                       |
+| `FollowerEventNotificationFilterInterface`   | Drop follower-RSVP email recipients per event         | `isFollowerAllowed()`                                  |
+| `ImageAttributionFilterInterface`            | Narrow which attributed images `/attributions` shows  | `getVisibleImageIdFilter()`                            |
+| `DataHotfixInterface`                        | Ship a one-off data repair that runs once per DB      | `getIdentifier()`, `execute()`                         |
+| `SecurityProviderInterface`                  | Participate in live security event detection          | `observe()`, `scanRetrospective()`                     |
+| `DescriptorInterface`                        | Add a settings section to your plugin's settings page | `getFormType()`, `createDefault()`, `applyForm()`      |
+| `TaggableTypeProviderInterface`              | Give an item type a tag vocabulary                    | `getPluginKey()`, `getTypeKey()`, `getLabelKey()`      |
+| `Comment\TargetProviderInterface`            | Host the shared comment section on your own pages     | `getTypeKey()`, `getReturnUrl()`, `canComment()`       |
+| `Circulation\ParticipationProviderInterface` | Let your item type circulate as physical copies       | `isEnabled()`                                          |
+| `Circulation\ContextProviderInterface`       | Decide which shelf circulation rows are filed under   | `getContext()`, `getPriority()`                        |
+| `Circulation\EligibilityProviderInterface`   | Decide who may join a circulation waiting list        | `canRequest()`                                         |
+| `Circulation\DashboardTabInterface`          | Add a tab to the circulation dashboard                | `supports()`, `render()`                               |
+| `ContributorInterface`                       | Carry an item type through group export and import    | `exportItems()`, `importItems()`                       |
+| `ChangeTargetProviderInterface`              | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()` |
+| `ConfigPrivacyToggleProviderInterface`       | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                          |
+| `SendingIdentityProviderInterface`           | Decide the name, logo and links a mail is sent under  | `resolve()`                                            |
+| `AudienceFilterInterface`                    | Narrow who receives installation-wide mail            | `filterInstallationWideAudience()`                     |
 
 ---
 
@@ -630,6 +634,70 @@ Notes:
 - Content is sanitized to plain text on write and re-filtered on render. Do not re-implement either.
 - Your delete path **must** call `CommentService::deleteAllFor('photo', $id)`. Comments carry no foreign key to
   your table, so nothing cascades for you.
+
+---
+
+### Circulation seams
+
+**Purpose:** Turn your item type into something members lend each other in person. Core owns the copies, the
+per-title waiting list, the two-sided handover with its own private chat, and the append-only ledger that
+records every move; your plugin supplies three answers.
+
+**Files:** `src/Circulation/ParticipationProviderInterface.php`,
+`src/Circulation/ContextProviderInterface.php`, `src/Circulation/EligibilityProviderInterface.php`,
+`src/Circulation/DashboardTabInterface.php`
+
+**Tag:** `#[AutoconfigureTag]` on each interface - implementing one is enough.
+
+**`ParticipationProviderInterface`** is the switch. The chain takes the first non-null answer, so return
+`null` for every type that is not yours. With no implementation anywhere, nothing circulates.
+
+```php
+namespace Plugin\YourPlugin\Circulation;
+
+use App\Circulation\ParticipationProviderInterface;
+use Override;
+use Plugin\YourPlugin\Service\ConfigService;
+
+final readonly class ParticipationProvider implements ParticipationProviderInterface
+{
+    public function __construct(private ConfigService $config) {}
+
+    #[Override]
+    public function isEnabled(string $itemType): ?bool
+    {
+        return $itemType === 'recipe' ? $this->config->getConfig()->isCirculation() : null;
+    }
+}
+```
+
+Wire the surfaces into your templates and you are done - all three Twig functions return nothing while the
+switch is off, so they need no guard:
+
+```twig
+{{ circulation_warm('recipe', itemIds) }}   {# once per list page, before the loop #}
+{{ circulation_badge('recipe', recipe.id) }}
+{{ circulation_panel('recipe', recipe.id) }}
+<a href="{{ circulation_dashboard_url('recipe') }}">…</a>
+```
+
+**`ContextProviderInterface`** mints the opaque string every circulation row is filed under - one shelf per
+string. Core registers a fallback returning the item type key at the lowest priority, so implement this only
+when one installation needs several separate shelves for the same type. Return the highest priority you want
+to win; circulation never parses what you return.
+
+**`EligibilityProviderInterface`** narrows who may join a waiting list. Verdicts compose with AND, `null`
+abstains, and a refusal carries the translation key that explains itself to the member:
+
+```php
+return EligibilityVerdict::refused('your_plugin.circulation_refused', ['%needed%' => 3]);
+```
+
+It is consulted when someone *requests*, not when the copy changes hands, so a refused member is told before
+they ever join the queue.
+
+**`DashboardTabInterface`** appends a tab to `/circulation/{itemType}`. Return your own markup from
+`render()` and decide in `supports()` whether the tab applies to the item type and context on screen.
 
 ---
 

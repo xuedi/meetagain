@@ -1,0 +1,26 @@
+{#
+    Circulation Badge -- one-line standing of an item on the shared shelf
+
+    Renders how many physical copies of an item exist, how many are free right now, and
+    how many members are queued for it, as Bulma chips. When the viewer holds one of the
+    copies that fact replaces the availability chip, because it is the only one they act
+    on. Renders nothing when the item has no copies, so a list cell can call it
+    unconditionally.
+
+    Used in:    App\Twig\CirculationExtension::badge, called as circulation_badge() from
+                item list cells and item detail headers
+    Parameters:
+        - summary (App\Circulation\Summary, required) -- copy counts and the viewer's position
+#}
+<span class="tags circulation-badge">
+    {% if summary.viewerHolds %}
+        <span class="tag is-info is-light">{{ 'circulation.badge_with_you'|trans }}</span>
+    {% elseif summary.isAnyAvailable %}
+        <span class="tag is-success is-light">{{ 'circulation.badge_available'|trans({'%available%': summary.availableCopies, '%total%': summary.totalCopies}) }}</span>
+    {% else %}
+        <span class="tag is-light">{{ 'circulation.badge_on_loan'|trans({'%total%': summary.totalCopies}) }}</span>
+    {% endif %}
+    {% if summary.queueLength > 0 %}
+        <span class="tag is-warning is-light">{{ 'circulation.badge_waiting'|trans({'%count%': summary.queueLength}) }}</span>
+    {% endif %}
+</span>

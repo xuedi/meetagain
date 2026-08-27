@@ -29,6 +29,11 @@ final class ConfigDescriptor implements DescriptorInterface
         return 'dishes_config.page_title';
     }
 
+    public function getIntroKey(): ?string
+    {
+        return null;
+    }
+
     public function getFormType(): string
     {
         return ConfigType::class;

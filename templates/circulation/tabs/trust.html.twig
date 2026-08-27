@@ -1,0 +1,19 @@
+{#
+    Circulation Dashboard -- Trust tab
+
+    The standing table for everyone on this shelf, with the explainer beside it. Both come from
+    the trust module and both render nothing when the trust system is off for this context, so
+    the tab is empty rather than broken if it is ever reached with trust disabled.
+
+    Rendered by:  App\Circulation\Trust\DashboardTab
+    Parameters:
+        - context (string, required) -- the circulation context whose standing is shown
+#}
+<div class="columns">
+    <div class="column is-8">
+        {{ trust_table(context) }}
+    </div>
+    <div class="column is-4">
+        {{ trust_info(context) }}
+    </div>
+</div>

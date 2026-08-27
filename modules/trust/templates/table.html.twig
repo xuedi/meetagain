@@ -1,0 +1,30 @@
+<table class="table is-fullwidth">
+    <thead>
+        <tr>
+            <th>{{ 'trust.col_member'|trans }}</th>
+            <th>{{ 'trust.col_standing'|trans }}</th>
+            <th>{{ 'trust.col_vouches'|trans }}</th>
+            {% if isAdministrator %}<th>{{ 'trust.col_score'|trans }}</th>{% endif %}
+            <th>{{ 'trust.col_your_vouch'|trans }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+            <tr>
+                <td>{{ row.name }}</td>
+                <td>{{ row.band.label()|trans }}</td>
+                <td>{{ row.vouches }}</td>
+                {% if isAdministrator %}<td>{{ row.score }}</td>{% endif %}
+                <td>
+                    {%- if row.self %}
+                        <span class="has-text-grey">{{ row.score is not null ? row.score : '' }}</span>
+                    {%- else %}
+                        {{ trust_vouch_control(context, row.userId) }}
+                    {%- endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="{{ isAdministrator ? 5 : 4 }}">{{ 'trust.table_empty'|trans }}</td></tr>
+        {% endfor %}
+    </tbody>
+</table>

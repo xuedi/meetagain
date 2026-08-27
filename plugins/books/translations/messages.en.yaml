@@ -44,3 +44,10 @@ books_book:
     flash_already_exists: 'This book is already in the catalog.'
     flash_invalid_image: 'The uploaded image could not be processed. Please use a JPG or PNG.'
 
+books_config:
+    page_title: 'Books'
+    intro_circulation: '<p>Members put their own physical copies on a shared shelf. Other members can request one, queue for it, and arrange a face-to-face handover in a private chat; the system records who has what and every move it ever made.</p><p>Two things worth knowing before you switch this on: turning it off again hides the shelf but keeps the full history, and the copies belong to the members who donated them, not to the group.</p>'
+    field_circulation: 'Let members circulate their own copies'
+    help_circulation: 'Adds a shelf to every book page and a Circulation link to the book list.'
+    field_trust_system: 'Use standing to gate the waiting list'
+    help_trust_system: 'Needs circulation switched on. Members earn standing by donating copies and completing handovers, and an organiser can vouch for people they know; who vouched for whom is never shown to anyone else.'

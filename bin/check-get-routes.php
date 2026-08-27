@@ -21,6 +21,7 @@ if (isset($argv[1])) {
     $scanDirs = array_filter([
         $root . '/src/Controller',
         ...glob($root . '/plugins/*/src/Controller') ?: [],
+        ...glob($root . '/modules/*/src/Internal/Controller') ?: [],
     ], 'is_dir');
 }
 
