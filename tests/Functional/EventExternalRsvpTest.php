@@ -13,6 +13,10 @@ class EventExternalRsvpTest extends WebTestCase
 {
     private const string USER_EMAIL = 'Crystal.Liu@example.org';
     private const string USER_PASSWORD = '1234';
+    private const string ADMIN_EMAIL = 'Admin@example.org';
+    private const string ADMIN_PASSWORD = '1234';
+    private const string MEMBER_EMAIL = 'Aliah.Lane@example.org';
+    private const string MEMBER_PASSWORD = '1234';
     private const int EVENT_ID = 1;
 
     public function testBadgeRendersOnTheEventListForAnonymousUsers(): void
@@ -85,6 +89,154 @@ class EventExternalRsvpTest extends WebTestCase
         $this->assertSelectorTextNotContains('body', 'external');
     }
 
+    public function testTheMicroformRendersForAViewerWhoMayEditTheEvent(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->setExternalRsvp($client, 0);
+        $this->login($client, self::ADMIN_EMAIL, self::ADMIN_PASSWORD);
+
+        // Act
+        $crawler = $client->request('GET', '/en/event/' . self::EVENT_ID);
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        static::assertCount(1, $crawler->filter('form[action$="/event/externalRsvp/' . self::EVENT_ID . '/"]'));
+    }
+
+    public function testTheMicroformIsHiddenFromAPlainMember(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->login($client, self::MEMBER_EMAIL, self::MEMBER_PASSWORD);
+
+        // Act
+        $crawler = $client->request('GET', '/en/event/' . self::EVENT_ID);
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        static::assertCount(0, $crawler->filter('form[action$="/event/externalRsvp/' . self::EVENT_ID . '/"]'));
+    }
+
+    public function testSubmittingTheMicroformStoresTheNewCount(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->setExternalRsvp($client, 0);
+        $this->login($client, self::ADMIN_EMAIL, self::ADMIN_PASSWORD);
+        $crawler = $client->request('GET', '/en/event/' . self::EVENT_ID);
+        $form = $crawler->filter('form[action$="/event/externalRsvp/' . self::EVENT_ID . '/"]')->form();
+
+        try {
+            // Act
+            $client->submit($form, ['external_rsvp' => '14']);
+
+            // Assert
+            $this->assertResponseRedirects();
+            $client->followRedirect();
+            $this->assertSelectorTextContains('body', '+14 external');
+            static::assertSame(14, $this->readExternalRsvp($client));
+        } finally {
+            $this->setExternalRsvp($client, 0);
+        }
+    }
+
+    public function testAnInvalidCountIsRejected(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->setExternalRsvp($client, 5);
+        $this->login($client, self::ADMIN_EMAIL, self::ADMIN_PASSWORD);
+        $crawler = $client->request('GET', '/en/event/' . self::EVENT_ID);
+        $form = $crawler->filter('form[action$="/event/externalRsvp/' . self::EVENT_ID . '/"]')->form();
+
+        try {
+            // Act
+            $client->submit($form, ['external_rsvp' => '-3']);
+
+            // Assert
+            $this->assertResponseRedirects();
+            static::assertSame(5, $this->readExternalRsvp($client));
+        } finally {
+            $this->setExternalRsvp($client, 0);
+        }
+    }
+
+    public function testACountAboveTheMaximumIsRejected(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->setExternalRsvp($client, 5);
+        $this->login($client, self::ADMIN_EMAIL, self::ADMIN_PASSWORD);
+        $crawler = $client->request('GET', '/en/event/' . self::EVENT_ID);
+        $form = $crawler->filter('form[action$="/event/externalRsvp/' . self::EVENT_ID . '/"]')->form();
+
+        try {
+            // Act
+            $client->submit($form, ['external_rsvp' => (string) (Event::MAX_EXTERNAL_RSVP + 1)]);
+
+            // Assert
+            $this->assertResponseRedirects();
+            static::assertSame(5, $this->readExternalRsvp($client));
+        } finally {
+            $this->setExternalRsvp($client, 0);
+        }
+    }
+
+    public function testAnInvalidCsrfTokenIsRejected(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->setExternalRsvp($client, 5);
+        $this->login($client, self::ADMIN_EMAIL, self::ADMIN_PASSWORD);
+
+        try {
+            // Act
+            $client->request('POST', '/en/event/externalRsvp/' . self::EVENT_ID . '/', [
+                '_token' => 'not-a-valid-token',
+                'external_rsvp' => '20',
+            ]);
+
+            // Assert
+            $this->assertResponseStatusCodeSame(400);
+            static::assertSame(5, $this->readExternalRsvp($client));
+        } finally {
+            $this->setExternalRsvp($client, 0);
+        }
+    }
+
+    public function testAPlainMemberCannotWriteTheCount(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $this->setExternalRsvp($client, 5);
+        $this->login($client, self::MEMBER_EMAIL, self::MEMBER_PASSWORD);
+
+        try {
+            // Act
+            $client->request('POST', '/en/event/externalRsvp/' . self::EVENT_ID . '/', [
+                '_token' => 'irrelevant',
+                'external_rsvp' => '20',
+            ]);
+
+            // Assert
+            $this->assertResponseStatusCodeSame(403);
+            static::assertSame(5, $this->readExternalRsvp($client));
+        } finally {
+            $this->setExternalRsvp($client, 0);
+        }
+    }
+
+    private function readExternalRsvp(KernelBrowser $client): int
+    {
+        $em = $client->getContainer()->get(EntityManagerInterface::class);
+        $em->clear();
+        $event = $em->getRepository(Event::class)->find(self::EVENT_ID);
+        static::assertInstanceOf(Event::class, $event);
+
+        return $event->getExternalRsvp();
+    }
+
     private function setExternalRsvp(KernelBrowser $client, int $count): void
     {
         $em = $client->getContainer()->get(EntityManagerInterface::class);
@@ -103,7 +255,8 @@ class EventExternalRsvpTest extends WebTestCase
     private function findUpcomingEvent(KernelBrowser $client): Event
     {
         $em = $client->getContainer()->get(EntityManagerInterface::class);
-        $event = $em->createQueryBuilder()
+        $event = $em
+            ->createQueryBuilder()
             ->select('e')
             ->from(Event::class, 'e')
             ->where('e.start > :now')
@@ -120,14 +273,14 @@ class EventExternalRsvpTest extends WebTestCase
         return $event;
     }
 
-    private function login(KernelBrowser $client): void
+    private function login(KernelBrowser $client, string $email = self::USER_EMAIL, #[\SensitiveParameter] string $password = self::USER_PASSWORD): void
     {
         $crawler = $client->request('GET', '/en/login');
         $form = $crawler
             ->selectButton('Login')
             ->form([
-                '_username' => self::USER_EMAIL,
-                '_password' => self::USER_PASSWORD,
+                '_username' => $email,
+                '_password' => $password,
             ]);
         $client->submit($form);
         $client->followRedirect();

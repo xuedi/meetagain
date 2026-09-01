@@ -16,6 +16,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity]
 class Event
 {
+    public const int MAX_EXTERNAL_RSVP = 9999;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
