@@ -1,0 +1,60 @@
+<?php declare(strict_types=1);
+
+namespace Tests\Unit\Twig;
+
+use App\Entity\User;
+use App\Service\Cms\MenuService;
+use App\Twig\MenuRuntime;
+use PHPUnit\Framework\MockObject\Stub;
+use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+
+class MenuRuntimeTest extends TestCase
+{
+    private Stub&RequestStack $requestStackStub;
+    private Stub&MenuService $menuServiceStub;
+    private Stub&Security $securityStub;
+    private MenuRuntime $subject;
+
+    protected function setUp(): void
+    {
+        $this->requestStackStub = $this->createStub(RequestStack::class);
+        $this->menuServiceStub = $this->createStub(MenuService::class);
+        $this->securityStub = $this->createStub(Security::class);
+        $this->subject = new MenuRuntime($this->requestStackStub, $this->menuServiceStub, $this->securityStub);
+    }
+
+    public function testGetMenuDelegatesToMenuService(): void
+    {
+        $request = $this->createStub(Request::class);
+        $request->method('getLocale')->willReturn('de');
+        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
+
+        $user = $this->createStub(User::class);
+        $this->securityStub->method('getUser')->willReturn($user);
+
+        $expectedMenu = [
+            ['label' => 'Home', 'url' => '/de/'],
+            ['label' => 'Events', 'url' => '/de/events'],
+        ];
+        $this->menuServiceStub->method('getMenuForContext')->willReturn($expectedMenu);
+
+        $result = $this->subject->getMenu('main');
+
+        static::assertSame($expectedMenu, $result);
+    }
+
+    public function testGetMenuUsesEnglishWhenNoRequest(): void
+    {
+        $this->requestStackStub->method('getCurrentRequest')->willReturn(null);
+        $this->securityStub->method('getUser')->willReturn(null);
+
+        $this->menuServiceStub->method('getMenuForContext')->willReturn([]);
+
+        $result = $this->subject->getMenu('main');
+
+        static::assertSame([], $result);
+    }
+}

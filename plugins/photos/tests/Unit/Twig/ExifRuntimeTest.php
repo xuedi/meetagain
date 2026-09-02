@@ -5,18 +5,18 @@ namespace Plugin\Photos\Tests\Unit\Twig;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plugin\Photos\Entity\Photo;
-use Plugin\Photos\Twig\ExifExtension;
+use Plugin\Photos\Twig\ExifRuntime;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExifExtensionTest extends TestCase
+class ExifRuntimeTest extends TestCase
 {
     public function testFormatsTheWholeCuratedSetInPanelOrder(): void
     {
         // Arrange
-        $extension = $this->extension();
+        $runtime = $this->runtime();
 
         // Act
-        $rows = $extension->rows($this->photo([
+        $rows = $runtime->rows($this->photo([
             'make' => 'FUJIFILM',
             'model' => 'X-T5',
             'lens' => 'XF23mmF1.4 R LM WR',
@@ -54,7 +54,7 @@ class ExifExtensionTest extends TestCase
     public function testYieldsNoRows(?array $meta): void
     {
         // Act + Assert
-        static::assertSame([], $this->extension()->rows($this->photo($meta)));
+        static::assertSame([], $this->runtime()->rows($this->photo($meta)));
     }
 
     /** @return iterable<string, array{0: array<string, scalar>|null}> */
@@ -69,14 +69,14 @@ class ExifExtensionTest extends TestCase
     public function testAPhotoThatIsGoneYieldsNoRows(): void
     {
         // Act + Assert
-        static::assertSame([], $this->extension()->rows(null));
+        static::assertSame([], $this->runtime()->rows(null));
     }
 
     public function testASignedExposureBiasKeepsItsSign(): void
     {
         // Act
-        $positive = $this->extension()->rows($this->photo(['exposureBias' => 0.67]));
-        $zero = $this->extension()->rows($this->photo(['exposureBias' => 0.0]));
+        $positive = $this->runtime()->rows($this->photo(['exposureBias' => 0.67]));
+        $zero = $this->runtime()->rows($this->photo(['exposureBias' => 0.0]));
 
         // Assert
         static::assertSame('+0.67 EV', $positive[0]['value']);
@@ -89,11 +89,11 @@ class ExifExtensionTest extends TestCase
         return new Photo()->setMeta($meta);
     }
 
-    private function extension(): ExifExtension
+    private function runtime(): ExifRuntime
     {
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
 
-        return new ExifExtension($translator);
+        return new ExifRuntime($translator);
     }
 }

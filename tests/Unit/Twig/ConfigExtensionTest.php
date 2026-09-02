@@ -2,82 +2,25 @@
 
 namespace Tests\Unit\Twig;
 
-use App\Service\Config\ConfigService;
-use App\Service\Media\ImageAttributionService;
-use App\Service\Media\SiteLogoResolver;
 use App\Twig\ConfigExtension;
-use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 class ConfigExtensionTest extends TestCase
 {
-    private Stub&ConfigService $configServiceStub;
-    private Stub&SiteLogoResolver $siteLogoResolverStub;
-    private Stub&ImageAttributionService $imageAttributionServiceStub;
-    private ConfigExtension $subject;
-
-    protected function setUp(): void
-    {
-        $this->configServiceStub = $this->createStub(ConfigService::class);
-        $this->siteLogoResolverStub = $this->createStub(SiteLogoResolver::class);
-        $this->imageAttributionServiceStub = $this->createStub(ImageAttributionService::class);
-        $this->subject = new ConfigExtension($this->configServiceStub, $this->siteLogoResolverStub, $this->imageAttributionServiceStub);
-    }
-
     public function testGetFunctionsReturnsExpectedFunctions(): void
     {
-        $functions = $this->subject->getFunctions();
+        // Arrange
+        $subject = new ConfigExtension();
 
-        static::assertCount(5, $functions);
+        // Act
+        $functionNames = array_map(static fn($f) => $f->getName(), $subject->getFunctions());
 
-        $functionNames = array_map(static fn($f) => $f->getName(), $functions);
+        // Assert
+        static::assertCount(5, $functionNames);
         static::assertContains('get_date_format', $functionNames);
         static::assertContains('get_date_format_flatpickr', $functionNames);
         static::assertContains('get_footer_column_title', $functionNames);
         static::assertContains('site_logo', $functionNames);
         static::assertContains('has_image_attributions', $functionNames);
-    }
-
-    public function testHasImageAttributionsDelegatesToService(): void
-    {
-        $this->imageAttributionServiceStub->method('hasAny')->willReturn(true);
-
-        $functions = $this->subject->getFunctions();
-        $fn = $this->findFunction($functions, 'has_image_attributions');
-
-        static::assertTrue($fn->getCallable()());
-    }
-
-    public function testGetDateFormatDelegatesToConfigService(): void
-    {
-        $this->configServiceStub->method('getDateFormat')->willReturn('d.m.Y H:i');
-
-        $functions = $this->subject->getFunctions();
-        $getDateFormat = $this->findFunction($functions, 'get_date_format');
-
-        static::assertSame('d.m.Y H:i', $getDateFormat->getCallable()());
-    }
-
-    public function testGetDateFormatFlatpickrDelegatesToConfigService(): void
-    {
-        $this->configServiceStub->method('getDateFormatFlatpickr')->willReturn('d.m.Y H:i');
-
-        $functions = $this->subject->getFunctions();
-        $getDateFormat = $this->findFunction($functions, 'get_date_format_flatpickr');
-
-        static::assertSame('d.m.Y H:i', $getDateFormat->getCallable()());
-    }
-
-    private function findFunction(array $functions, string $name): ?\Twig\TwigFunction
-    {
-        foreach ($functions as $function) {
-            if ($function->getName() !== $name) {
-                continue;
-            }
-
-            return $function;
-        }
-
-        return null;
     }
 }
