@@ -9,6 +9,27 @@
             </div>
         {% endif %}
     </div>
+    {% if canEditExternalRsvp %}
+        <div class="level-item">
+            <form method="post" action="{{ path('app_event_external_rsvp', {'event': event.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('app_event_external_rsvp' ~ event.id) }}">
+                <div class="field has-addons mb-0">
+                    <p class="control">
+                        <span class="button is-small is-static">{{ 'events.label_external_rsvp'|trans }}</span>
+                    </p>
+                    <p class="control">
+                        <input class="input is-small rsvp-external-input" type="number" name="external_rsvp"
+                               min="0" max="{{ constant('App\\Entity\\Event::MAX_EXTERNAL_RSVP') }}"
+                               value="{{ event.externalRsvp }}"
+                               aria-label="{{ 'events.rsvp_external_title'|trans }}">
+                    </p>
+                    <p class="control">
+                        <button class="button is-small is-info">{{ 'events.button_external_rsvp_save'|trans }}</button>
+                    </p>
+                </div>
+            </form>
+        </div>
+    {% endif %}
     <div class="level-right">
         {% if event.canceled %}
             <span class="tag is-danger is-light">{{ "events.tag_event_canceled"|trans }}</span>

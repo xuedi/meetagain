@@ -159,9 +159,11 @@ readonly class LogService
     {
         $deleted = 0;
         foreach ($this->getLogFiles() as $file) {
-            if ($this->fs->deleteFile($file)) {
-                $deleted++;
+            if (!$this->fs->deleteFile($file)) {
+                continue;
             }
+
+            $deleted++;
         }
 
         return $deleted;

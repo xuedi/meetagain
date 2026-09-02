@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Activity\ActivityService;
+use App\Activity\Messages\AdminEventEdited;
 use App\Activity\Messages\RsvpNo;
 use App\Activity\Messages\RsvpYes;
 use App\Entity\Event;
@@ -117,6 +118,7 @@ final class EventController extends AbstractController
                 'event' => $event,
                 'json_ld' => $this->eventSchemaService->buildSchema($event, $canonicalUrl, $locale),
                 'breadcrumbs' => $this->breadcrumbBuilder->build(self::ROUTE_EVENT, 'chrome.menu_events', $event->getTitle($locale)),
+                'canEditExternalRsvp' => $this->isGranted(PermissionAttribute::EVENT_UPDATE, $event),
             ],
             $response,
         );
@@ -290,6 +292,35 @@ final class EventController extends AbstractController
         } elseif ($direction === 'add' && $count === RsvpGuest::MAX_GUESTS) {
             $this->addFlash('warning', 'events.flash_rsvp_guests_limit');
         }
+
+        return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
+    }
+
+    #[IsGranted('ROLE_ORGANIZER')]
+    #[Route('/event/externalRsvp/{event}/', name: 'app_event_external_rsvp', methods: ['POST'])]
+    public function externalRsvp(Request $request, Event $event, EntityManagerInterface $em): Response
+    {
+        if (!$this->isCsrfTokenValid('app_event_external_rsvp' . $event->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+        $this->denyAccessUnlessGranted(PermissionAttribute::EVENT_UPDATE, $event);
+        if (!$this->eventFilterService->isEventAccessible($event->getId())) {
+            throw $this->createNotFoundException();
+        }
+
+        $submitted = trim((string) $request->request->get('external_rsvp'));
+        if (preg_match('/^\d+$/', $submitted) !== 1 || (int) $submitted > Event::MAX_EXTERNAL_RSVP) {
+            $this->addFlash('error', 'events.flash_external_rsvp_invalid');
+
+            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
+        }
+
+        $event->setExternalRsvp((int) $submitted);
+        $em->persist($event);
+        $em->flush();
+
+        $this->activityService->log(AdminEventEdited::TYPE, $this->getAuthedUser(), ['event_id' => $event->getId()]);
+        $this->addFlash('success', 'events.flash_external_rsvp_saved');
 
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
     }

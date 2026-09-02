@@ -70,7 +70,7 @@ final class ProfileController extends AbstractController
         return $this->render(
             'profile/index.html.twig',
             [
-                'lastLogin' => $request->getSession()->get('lastLogin', '-'),
+                'lastLogin' => $request->getSession()->get('lastLogin', null),
                 'messageCount' => $this->msgRepo->getMessageCount($user),
                 'socialCounts' => $this->userRepo->getSocialCounts($user),
                 'blockedCount' => count($this->blockingService->getBlockedUsers($user)),

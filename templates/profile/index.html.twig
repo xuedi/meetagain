@@ -37,7 +37,13 @@
                     <div class="box">
                         <h2 class="title is-5">{{ 'profile.section_info'|trans }}</h2>
                         <p>{{ 'profile.label_joined'|trans }}: {{ user.createdAt|date('Y-m-d') }}</p>
-                        <p>{{ 'profile.label_last_login'|trans }}: {{ lastLogin|date('Y-m-d') }}</p>
+                        <p>{{ 'profile.label_last_login'|trans }}:
+                            {% if lastLogin %}
+                                {{ lastLogin|date('Y-m-d') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </p>
                         <p>{{ 'profile.label_email'|trans }}: {{ user.email }}</p>
                         <p>{{ 'profile.label_following'|trans }}: {{ socialCounts.following }}</p>
                         <p>{{ 'profile.label_followers'|trans }}: {{ socialCounts.followers }}</p>
