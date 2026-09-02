@@ -13,6 +13,11 @@ class ListRegistry
     private ?array $active = null;
 
     /**
+     * @var array<string, ListProviderInterface>|null
+     */
+    private ?array $byDetailRoute = null;
+
+    /**
      * @param iterable<ListProviderInterface> $providers
      */
     public function __construct(
@@ -33,24 +38,16 @@ class ListRegistry
 
     public function itemTypeForDetailRouteIncludingInactive(string $route): ?string
     {
-        foreach ($this->providers as $provider) {
-            if ($provider->getDetailRoute() === $route) {
-                return $provider->getKey();
-            }
-        }
+        $provider = $this->getByDetailRoute()[$route] ?? null;
 
-        return null;
+        return $provider?->getKey();
     }
 
     public function isDetailRouteIndexable(string $route): bool
     {
-        foreach ($this->providers as $provider) {
-            if ($provider->getDetailRoute() === $route) {
-                return $provider->isDetailIndexable();
-            }
-        }
+        $provider = $this->getByDetailRoute()[$route] ?? null;
 
-        return true;
+        return $provider?->isDetailIndexable() ?? true;
     }
 
     /**
@@ -59,6 +56,26 @@ class ListRegistry
     public function activeProviders(): array
     {
         return $this->getActive();
+    }
+
+    /**
+     * @return array<string, ListProviderInterface>
+     */
+    private function getByDetailRoute(): array
+    {
+        if ($this->byDetailRoute !== null) {
+            return $this->byDetailRoute;
+        }
+
+        $map = [];
+        foreach ($this->providers as $provider) {
+            $route = $provider->getDetailRoute();
+            if ($route !== null) {
+                $map[$route] = $provider;
+            }
+        }
+
+        return $this->byDetailRoute = $map;
     }
 
     /**

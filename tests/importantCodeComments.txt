@@ -55,7 +55,7 @@ src/Publisher/AlternateLinks/EventAlternateLinkProvider.php::getAlternateLinks /
 src/Publisher/CanonicalUrl/EventCanonicalUrlProvider.php::getCanonicalUrl // security constraint: an alternate host must not be able to dictate the canonical
 src/Service/Seo/EventSimilarityService.php::DESCRIPTION_LENGTH_CAP // magic constant: similar_text() is quadratic, so article-sized input has to be capped
 src/Service/Seo/SitemapOverviewService.php::SECTION_ORDER // fixed order so the section dropdown does not reshuffle as plugins are toggled
-src/Twig/LanguageExtension.php::getHreflangLanguageCodes // an hreflang cluster must name the current language too, unlike the language switcher
+src/Twig/LanguageRuntime.php::getHreflangLanguageCodes // an hreflang cluster must name the current language too, unlike the language switcher
 
 # --- Repositories: query shape is the constraint ---
 src/Repository/CmsRepository.php::findByMenuLocation // only ids are cached, because caching entities would serialize Doctrine proxies into Valkey
@@ -95,7 +95,7 @@ src/Service/Security/LoadtestBypass.php::isActive // env and header must both ho
 src/Service/Security/ContentSanitizer.php::escape // htmlspecialchars, not the sanitizer: the sanitizer drops tags together with their text
 src/Service/Security/Provider/NotFoundProvider.php::processEvent // asset 404s are normal after a redeploy and must not count towards a block
 src/Service/Security/SecurityService.php::event // one high-priority provider can blow the fuse, which is what stops a write-amplified DOS
-src/Twig/ContentExtension.php::safeMessage // re-applies the allow-list on output so pre-sanitizer rows cannot inject
+src/Twig/ContentRuntime.php::safeMessage // re-applies the allow-list on output so pre-sanitizer rows cannot inject
 
 # --- System ---
 src/DataHotfix/Hotfixes/RemoveOrphanedClubPluginTables.php::execute // FK checks are disabled so the interdependent tables drop in any order

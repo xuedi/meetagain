@@ -3,10 +3,10 @@
 namespace Tests\Unit\Twig;
 
 use App\Review\ChangeProposalService;
-use App\Twig\ChangeProposalExtension;
+use App\Twig\ChangeProposalRuntime;
 use PHPUnit\Framework\TestCase;
 
-class ChangeProposalExtensionTest extends TestCase
+class ChangeProposalRuntimeTest extends TestCase
 {
     public function testPendingCountDelegatesToTheService(): void
     {
@@ -16,10 +16,10 @@ class ChangeProposalExtensionTest extends TestCase
             ->method('countPendingForTarget')
             ->with('glossary', 4)
             ->willReturn(2);
-        $extension = new ChangeProposalExtension($service);
+        $runtime = new ChangeProposalRuntime($service);
 
         // Act
-        $count = $extension->pendingCount('glossary', 4);
+        $count = $runtime->pendingCount('glossary', 4);
 
         // Assert
         self::assertSame(2, $count);

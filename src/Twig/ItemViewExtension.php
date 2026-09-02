@@ -2,48 +2,19 @@
 
 namespace App\Twig;
 
-use App\Enum\ItemViewType;
-use App\Item\ListCellRegistry;
-use App\Service\Item\ViewResolver;
 use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 final class ItemViewExtension extends AbstractExtension
 {
-    public function __construct(
-        private readonly ViewResolver $viewResolver,
-        private readonly ListCellRegistry $registry,
-    ) {}
-
     #[Override]
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('item_view_mode', $this->itemViewMode(...)),
-            new TwigFunction('item_view_types', $this->itemViewTypes(...)),
-            new TwigFunction('item_list_cell', $this->itemListCell(...), ['is_safe' => ['html']]),
+            new TwigFunction('item_view_mode', [ItemViewRuntime::class, 'itemViewMode']),
+            new TwigFunction('item_view_types', [ItemViewRuntime::class, 'itemViewTypes']),
+            new TwigFunction('item_list_cell', [ItemViewRuntime::class, 'itemListCell'], ['is_safe' => ['html']]),
         ];
-    }
-
-    public function itemViewMode(string $itemType, ?string $default = null): ItemViewType
-    {
-        return $this->viewResolver->get($itemType, ItemViewType::tryFrom((string) $default) ?? ItemViewType::List);
-    }
-
-    /** @return list<ItemViewType> */
-    public function itemViewTypes(): array
-    {
-        return ItemViewType::switchable();
-    }
-
-    public function itemListCell(string $itemType, int $itemId, ?string $mode = null): string
-    {
-        $provider = $this->registry->providerFor($itemType);
-        if ($provider === null) {
-            return '';
-        }
-
-        return $provider->renderListCell($itemId, ItemViewType::tryFrom((string) $mode)) ?? '';
     }
 }

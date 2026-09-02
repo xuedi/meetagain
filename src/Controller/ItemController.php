@@ -6,7 +6,7 @@ use App\Enum\ItemViewType;
 use App\Item\ListRegistry;
 use App\Item\Tag\FacetService;
 use App\Service\Item\ViewResolver;
-use App\Twig\ItemListExtension;
+use App\Twig\ItemListRuntime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,7 +58,7 @@ final class ItemController extends AbstractController
 
         $response = new JsonResponse([
             'filter' => $this->renderView('_components/item/tag_filter.html.twig', ['itemType' => $itemType]),
-            'body' => $this->renderView(ItemListExtension::BODY_TEMPLATE, ['itemType' => $itemType]),
+            'body' => $this->renderView(ItemListRuntime::BODY_TEMPLATE, ['itemType' => $itemType]),
             'url' => $this->facetService->urlFor($listUrl, $this->facetService->current()),
         ]);
         $response->headers->set('X-Robots-Tag', 'noindex');

@@ -2,247 +2,34 @@
 
 namespace App\Twig;
 
-use App\Entity\EventListItemTag;
-use App\Entity\Link;
-use App\Enum\WarmCacheType;
-use App\Plugin;
-use App\Service\Config\PluginService;
 use Override;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use Throwable;
-use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 final class PluginExtension extends AbstractExtension
 {
-    /**
-     * @var array<int, list<EventListItemTag>>
-     */
-    private array $tagCache = [];
-
-    public function __construct(
-        #[AutowireIterator(Plugin::class)]
-        private readonly iterable $plugins,
-        private readonly PluginService $pluginService,
-        private readonly Environment $twig,
-    ) {}
-
     #[Override]
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('get_plugins_links', $this->getPluginsLinks(...)),
-            new TwigFunction('get_leading_plugin_links', $this->getLeadingPluginLinks(...)),
-            new TwigFunction('get_plugin_stylesheets', $this->getPluginStylesheets(...)),
-            new TwigFunction('get_plugin_javascripts', $this->getPluginJavascripts(...)),
-            new TwigFunction('get_plugin_footer_about', $this->getPluginFooterAbout(...)),
-            new TwigFunction('get_plugin_footer_links', $this->getPluginFooterLinks(...)),
-            new TwigFunction('get_plugin_profile_dropdown_links', $this->getPluginProfileDropdownLinks(...)),
-            new TwigFunction('get_plugin_profile_config_links', $this->getPluginProfileConfigLinks(...)),
-            new TwigFunction('get_plugin_navbar_pills_html', $this->getPluginNavbarPillsHtml(...), ['is_safe' => [
-                'html',
-            ]]),
-            new TwigFunction('event_list_item_tags', $this->getEventListItemTags(...), ['is_safe' => ['html']]),
-            new TwigFunction('warm_event_list_item_tags', $this->warmEventListItemTags(...)),
+            new TwigFunction('get_plugins_links', [PluginRuntime::class, 'getPluginsLinks']),
+            new TwigFunction('get_leading_plugin_links', [PluginRuntime::class, 'getLeadingPluginLinks']),
+            new TwigFunction('get_plugin_stylesheets', [PluginRuntime::class, 'getPluginStylesheets']),
+            new TwigFunction('get_plugin_javascripts', [PluginRuntime::class, 'getPluginJavascripts']),
+            new TwigFunction('get_plugin_footer_about', [PluginRuntime::class, 'getPluginFooterAbout']),
+            new TwigFunction('get_plugin_footer_links', [PluginRuntime::class, 'getPluginFooterLinks']),
+            new TwigFunction('get_plugin_profile_dropdown_links', [
+                PluginRuntime::class,
+                'getPluginProfileDropdownLinks',
+            ]),
+            new TwigFunction('get_plugin_profile_config_links', [PluginRuntime::class, 'getPluginProfileConfigLinks']),
+            new TwigFunction('get_plugin_navbar_pills_html', [PluginRuntime::class, 'getPluginNavbarPillsHtml'], [
+                'is_safe' => ['html'],
+            ]),
+            new TwigFunction('event_list_item_tags', [PluginRuntime::class, 'getEventListItemTags'], [
+                'is_safe' => ['html'],
+            ]),
+            new TwigFunction('warm_event_list_item_tags', [PluginRuntime::class, 'warmEventListItemTags']),
         ];
-    }
-
-    public function getPluginsLinks(): array
-    {
-        /** @var list<Link> $links */
-        $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getNavLinks());
-
-        usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
-
-        return $links;
-    }
-
-    public function getLeadingPluginLinks(): array
-    {
-        /** @var list<Link> $links */
-        $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getLeadingNavLinks());
-
-        usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
-
-        return $links;
-    }
-
-    /**
-     * @return list<string>
-     */
-    public function getPluginStylesheets(): array
-    {
-        return $this->collectFromPlugins(static fn(Plugin $plugin) => array_map(
-            static fn(string $path) => 'plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/'),
-            $plugin->getStylesheets(),
-        ));
-    }
-
-    /**
-     * @return list<string>
-     */
-    public function getPluginJavascripts(): array
-    {
-        return $this->collectFromPlugins(static fn(Plugin $plugin) => array_map(
-            static fn(string $path) => 'plugins/' . $plugin->getPluginKey() . '/' . ltrim($path, '/'),
-            $plugin->getJavascripts(),
-        ));
-    }
-
-    public function getPluginFooterAbout(): ?string
-    {
-        return $this->findFirstFromPlugins(static fn(Plugin $p) => $p->getFooterAbout());
-    }
-
-    public function getPluginFooterLinks(string $column): array
-    {
-        return $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getFooterLinks($column));
-    }
-
-    public function getPluginProfileDropdownLinks(): array
-    {
-        /** @var list<Link> $links */
-        $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getProfileDropdownLinks());
-
-        usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
-
-        return $links;
-    }
-
-    /**
-     * @return list<Link>
-     */
-    public function getPluginProfileConfigLinks(): array
-    {
-        /** @var list<Link> $links */
-        $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getProfileConfigLinks());
-
-        usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
-
-        return $links;
-    }
-
-    public function getPluginNavbarPillsHtml(): string
-    {
-        /** @var list<string> $fragments */
-        $fragments = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getNavbarPillsHtml());
-
-        return implode('', $fragments);
-    }
-
-    /**
-     * @param array<int> $eventIds
-     */
-    public function warmEventListItemTags(array $eventIds): void
-    {
-        $enabledPlugins = $this->pluginService->getActiveList();
-
-        foreach ($this->plugins as $plugin) {
-            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
-                continue;
-            }
-
-            try {
-                $plugin->warmCache(WarmCacheType::EventListItemTags, $eventIds);
-            } catch (Throwable) {
-                continue;
-            }
-        }
-    }
-
-    public function getEventListItemTags(int $eventId): string
-    {
-        if (isset($this->tagCache[$eventId])) {
-            return $this->renderTags($this->tagCache[$eventId]);
-        }
-
-        /** @var list<EventListItemTag> $tags */
-        $tags = $this->collectFromPlugins(static function (Plugin $plugin) use ($eventId) {
-            $validTags = [];
-            foreach ($plugin->getEventListItemTags($eventId) as $tag) {
-                $validTags[] = $tag;
-            }
-            return $validTags;
-        });
-
-        $this->tagCache[$eventId] = $tags;
-
-        return $this->renderTags($tags);
-    }
-
-    /**
-     * @template T
-     * @param callable(Plugin): (T|list<T>|null) $callback
-     * @return list<T>
-     */
-    private function collectFromPlugins(callable $callback): array
-    {
-        $enabledPlugins = $this->pluginService->getActiveList();
-        $results = [];
-
-        foreach ($this->plugins as $plugin) {
-            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
-                continue;
-            }
-
-            try {
-                $result = $callback($plugin);
-                if ($result !== null) {
-                    if (is_array($result)) {
-                        foreach ($result as $item) {
-                            $results[] = $item;
-                        }
-                        continue;
-                    }
-                    $results[] = $result;
-                }
-            } catch (Throwable) {
-                continue;
-            }
-        }
-
-        return $results;
-    }
-
-    /**
-     * @template T
-     * @param callable(Plugin): ?T $callback
-     * @return ?T
-     */
-    private function findFirstFromPlugins(callable $callback): mixed
-    {
-        $enabledPlugins = $this->pluginService->getActiveList();
-
-        foreach ($this->plugins as $plugin) {
-            if (!in_array($plugin->getPluginKey(), $enabledPlugins, true)) {
-                continue;
-            }
-
-            try {
-                $result = $callback($plugin);
-                if ($result !== null) {
-                    return $result;
-                }
-            } catch (Throwable) {
-                continue;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * @param list<EventListItemTag> $tags
-     */
-    private function renderTags(array $tags): string
-    {
-        if ($tags === []) {
-            return '';
-        }
-
-        return $this->twig->render('_components/event_list_item_tags.html.twig', [
-            'tags' => $tags,
-        ]);
     }
 }
