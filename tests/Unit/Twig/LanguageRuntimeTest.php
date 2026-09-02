@@ -4,10 +4,7 @@ namespace Tests\Unit\Twig;
 
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
-use App\Service\Config\SiteNameResolver;
-use App\Service\Seo\CanonicalUrlService;
 use App\Twig\LanguageRuntime;
-use App\Twig\MetaDescriptionProviderInterface;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -23,8 +20,6 @@ class LanguageRuntimeTest extends TestCase
     private Stub&RequestStack $requestStackStub;
     private Stub&RouterInterface $routerStub;
     private Stub&ConfigService $configServiceStub;
-    private Stub&CanonicalUrlService $canonicalUrlServiceStub;
-    private Stub&SiteNameResolver $siteNameResolverStub;
     private LanguageRuntime $subject;
 
     protected function setUp(): void
@@ -33,19 +28,13 @@ class LanguageRuntimeTest extends TestCase
         $this->requestStackStub = $this->createStub(RequestStack::class);
         $this->routerStub = $this->createStub(RouterInterface::class);
         $this->configServiceStub = $this->createStub(ConfigService::class);
-        $this->canonicalUrlServiceStub = $this->createStub(CanonicalUrlService::class);
-        $this->siteNameResolverStub = $this->createStub(SiteNameResolver::class);
         $this->subject = new LanguageRuntime(
             $this->languageServiceStub,
             $this->requestStackStub,
             $this->routerStub,
             $this->configServiceStub,
-            $this->canonicalUrlServiceStub,
-            $this->siteNameResolverStub,
         );
     }
-
-
 
     public function testGetCurrentLocaleReturnsRequestLocale(): void
     {
@@ -165,77 +154,4 @@ class LanguageRuntimeTest extends TestCase
         static::assertTrue($result);
     }
 
-    public function testGetCanonicalUrlDelegatesToCanonicalUrlService(): void
-    {
-        // Arrange
-        $request = $this->createStub(Request::class);
-        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
-        $this->canonicalUrlServiceStub->method('getCanonicalUrl')->willReturn('https://meetagain.local/en/events');
-
-        // Act
-        $result = $this->subject->getCanonicalUrl();
-
-        // Assert
-        static::assertSame('https://meetagain.local/en/events', $result);
-    }
-
-    public function testGetCanonicalUrlReturnsFallbackWhenNoRequest(): void
-    {
-        // Arrange
-        $this->requestStackStub->method('getCurrentRequest')->willReturn(null);
-        $this->configServiceStub->method('getHost')->willReturn('https://meetagain.local/');
-
-        // Act
-        $result = $this->subject->getCanonicalUrl();
-
-        // Assert
-        static::assertSame('https://meetagain.local/', $result);
-    }
-
-    public function testGetMetaDescriptionReturnsProviderValueWhenAvailable(): void
-    {
-        // Arrange
-        $provider = $this->createStub(MetaDescriptionProviderInterface::class);
-        $provider->method('getMetaDescription')->willReturn('Weiqi club upcoming events');
-
-        $subject = new LanguageRuntime(
-            $this->languageServiceStub,
-            $this->requestStackStub,
-            $this->routerStub,
-            $this->configServiceStub,
-            $this->canonicalUrlServiceStub,
-            $this->siteNameResolverStub,
-            [$provider],
-        );
-
-        // Act
-        $result = $subject->getMetaDescription('events');
-
-        // Assert
-        static::assertSame('Weiqi club upcoming events', $result);
-    }
-
-    public function testGetMetaDescriptionFallsBackToSystemConfigWhenNoProviderValue(): void
-    {
-        // Arrange
-        $this->configServiceStub->method('getSeoDescription')->willReturn('System events description');
-
-        // Act
-        $result = $this->subject->getMetaDescription('events');
-
-        // Assert
-        static::assertSame('System events description', $result);
-    }
-
-    public function testGetMetaDescriptionFallsBackToHardcodedWhenNothingConfigured(): void
-    {
-        // Arrange
-        $this->configServiceStub->method('getSeoDescription')->willReturn('');
-
-        // Act
-        $result = $this->subject->getMetaDescription('members');
-
-        // Assert
-        static::assertSame('Meet the members of this community.', $result);
-    }
 }

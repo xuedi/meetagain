@@ -4,11 +4,8 @@ namespace App\Twig;
 
 use App\Filter\Language\AlternateLinkFilterInterface;
 use App\Publisher\AlternateLinks\AlternateLinkProviderInterface;
-use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
-use App\Service\Config\SiteNameResolver;
-use App\Service\Seo\CanonicalUrlService;
 use Exception;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -20,17 +17,15 @@ use Twig\Extension\RuntimeExtensionInterface;
 
 final readonly class LanguageRuntime implements RuntimeExtensionInterface
 {
+    /**
+     * @param iterable<AlternateLinkFilterInterface>   $alternateLinkFilters
+     * @param iterable<AlternateLinkProviderInterface> $alternateLinkProviders
+     */
     public function __construct(
         private LanguageService $languageService,
         private RequestStack $requestStack,
         private RouterInterface $router,
         private ConfigService $configService,
-        private CanonicalUrlService $canonicalUrlService,
-        private SiteNameResolver $siteNameResolver,
-        #[AutowireIterator(MetaDescriptionProviderInterface::class)]
-        private iterable $metaDescriptionProviders = [],
-        #[AutowireIterator(OrganizationSchemaProviderInterface::class)]
-        private iterable $organizationProviders = [],
         #[AutowireIterator(AlternateLinkFilterInterface::class)]
         private iterable $alternateLinkFilters = [],
         #[AutowireIterator(AlternateLinkProviderInterface::class)]
@@ -123,69 +118,6 @@ final readonly class LanguageRuntime implements RuntimeExtensionInterface
         }
 
         return $altLangList;
-    }
-
-    public function getMetaDescription(string $context = 'default'): string
-    {
-        foreach ($this->metaDescriptionProviders as $provider) {
-            $value = $provider->getMetaDescription($context);
-            if ($value !== null && $value !== '') {
-                return $value;
-            }
-        }
-
-        $systemValue = $this->configService->getSeoDescription($context);
-        if ($systemValue !== '') {
-            return $systemValue;
-        }
-
-        return match ($context) {
-            'events' => 'Browse upcoming events and meetups.',
-            'members' => 'Meet the members of this community.',
-            default => 'A community platform for local events and meetups.',
-        };
-    }
-
-    public function getSiteName(): string
-    {
-        return $this->siteNameResolver->resolve();
-    }
-
-    public function getCanonicalUrl(): string
-    {
-        $request = $this->requestStack->getCurrentRequest();
-        if (!$request instanceof Request) {
-            return rtrim($this->configService->getHost(), '/') . '/';
-        }
-
-        return $this->canonicalUrlService->getCanonicalUrl($request);
-    }
-
-    public function getOrganizationSchema(): string
-    {
-        foreach ($this->organizationProviders as $provider) {
-            $schema = $provider->getOrganizationSchema();
-            if ($schema !== null) {
-                return (
-                    json_encode(
-                        array_merge(['@context' => 'https://schema.org'], is_array($schema) ? $schema : []),
-                        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
-                    ) ?: ''
-                );
-            }
-        }
-
-        $host = rtrim($this->configService->getHost(), '/');
-
-        return (
-            json_encode([
-                '@context' => 'https://schema.org',
-                '@type' => 'Organization',
-                '@id' => $host . '/#organization',
-                'name' => 'MeetAgain',
-                'url' => $host,
-            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''
-        );
     }
 
     public function routeExists(string $name): bool

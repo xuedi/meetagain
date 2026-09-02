@@ -2,10 +2,7 @@
 
 namespace App\Twig;
 
-use App\Item\ListRegistry;
 use App\Item\Tag\ChangeTarget;
-use App\Item\Tag\FacetSelection;
-use App\Item\Tag\FacetService;
 use App\Item\Tag\TagService;
 use App\Item\Tag\TypeRegistry;
 use App\Review\ChangeProposalService;
@@ -18,38 +15,8 @@ final readonly class ItemTagRuntime implements RuntimeExtensionInterface
         private TagService $tagService,
         private TypeRegistry $registry,
         private RequestStack $requestStack,
-        private FacetService $facetService,
         private ChangeProposalService $changeProposals,
-        private ListRegistry $listRegistry,
     ) {}
-
-    public function detailNoindex(): bool
-    {
-        $route = $this->requestStack->getCurrentRequest()?->attributes->get('_route');
-
-        return is_string($route) && !$this->listRegistry->isDetailRouteIndexable($route);
-    }
-
-    public function currentFacets(): FacetSelection
-    {
-        return $this->facetService->current();
-    }
-
-    public function facetsActive(): bool
-    {
-        return !$this->facetService->current()->isEmpty();
-    }
-
-    public function facetUrl(string $baseUrl, FacetSelection $selection): string
-    {
-        return $this->facetService->urlFor($baseUrl, $selection);
-    }
-
-    /** @return array{tags: array<int, int>, total: int, shown: int}|null */
-    public function facetCounts(string $itemType): ?array
-    {
-        return $this->facetService->counts($itemType);
-    }
 
     /** @return list<string> */
     public function tagLabels(string $itemType, int $itemId): array
