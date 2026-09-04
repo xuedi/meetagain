@@ -105,7 +105,7 @@ boardgames_tile:
     button_decline: 'Rechazar'
     no_bringable: 'Todos los juegos de tu estanteria ya estan prometidos o no estan marcados como disponibles para llevar.'
     rsvp_first: 'Apuntate a este evento para prometer un juego.'
-    open_requests: '%count% peticiones abiertas para este evento.'
+    open_requests: '%count% petición abierta para este evento.|%count% peticiones abiertas para este evento.'
     heading_requests_for_you: 'Alguien te ha pedido que lleves un juego'
     request_line: '%requester% ha pedido %game%'
     page_title_ask: 'Pedir a alguien que lleve un juego'

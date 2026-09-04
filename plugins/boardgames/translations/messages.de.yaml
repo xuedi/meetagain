@@ -105,7 +105,7 @@ boardgames_tile:
     button_decline: 'Ablehnen'
     no_bringable: 'Alle Spiele in deinem Regal sind bereits zugesagt oder nicht als mitbringbar markiert.'
     rsvp_first: 'Sage zuerst für dieses Event zu, um ein Spiel mitzubringen.'
-    open_requests: '%count% offene Anfragen für dieses Event.'
+    open_requests: '%count% offene Anfrage für dieses Event.|%count% offene Anfragen für dieses Event.'
     heading_requests_for_you: 'Jemand hat dich um ein Spiel gebeten'
     request_line: '%requester% fragt nach %game%'
     page_title_ask: 'Jemanden um ein Spiel bitten'

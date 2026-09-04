@@ -105,7 +105,7 @@ boardgames_tile:
     button_decline: 'Refuser'
     no_bringable: 'Tous les jeux de votre etagere sont deja promis ou ne sont pas marques comme a apporter.'
     rsvp_first: 'Inscrivez-vous a cet evenement pour promettre un jeu.'
-    open_requests: '%count% demandes en attente pour cet evenement.'
+    open_requests: '%count% demande en attente pour cet événement.|%count% demandes en attente pour cet événement.'
     heading_requests_for_you: 'Quelqu''un vous demande d''apporter un jeu'
     request_line: '%requester% demande %game%'
     page_title_ask: 'Demander a quelqu''un d''apporter un jeu'

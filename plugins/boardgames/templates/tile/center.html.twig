@@ -89,7 +89,7 @@
                     {{ 'boardgames_tile.request_line'|trans({'%requester%': request.requestedBy.name, '%game%': request.game.name}) }}
                     {% if request.message %}<span class="has-text-grey is-size-7">- {{ request.message }}</span>{% endif %}
                 </span>
-                <span class="buttons">
+                <span class="buttons is-flex-shrink-0 is-flex-wrap-nowrap ml-4 mb-0">
                     <a href="{{ path('app_plugin_boardgames_request_accept', {id: request.id}) }}"
                        class="button is-small is-success"
                        data-post

@@ -105,7 +105,7 @@ boardgames_tile:
     button_decline: 'Decline'
     no_bringable: 'Every game on your shelf is either already pledged or not marked as willing to bring.'
     rsvp_first: 'RSVP to this event to pledge a game.'
-    open_requests: '%count% open bring requests for this event.'
+    open_requests: '%count% open bring request for this event.|%count% open bring requests for this event.'
     heading_requests_for_you: 'Someone asked you to bring a game'
     request_line: '%requester% asked for %game%'
     page_title_ask: 'Ask someone to bring a game'
