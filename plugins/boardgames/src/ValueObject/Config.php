@@ -4,6 +4,7 @@ namespace Plugin\Boardgames\ValueObject;
 
 use App\Publisher\PluginSettings\Data;
 use Plugin\Boardgames\Enum\ExternalSource;
+use SensitiveParameter;
 
 final class Config implements Data
 {
@@ -32,7 +33,7 @@ final class Config implements Data
         return $this->encryptedBggToken;
     }
 
-    public function setEncryptedBggToken(?string $encryptedBggToken): static
+    public function setEncryptedBggToken(#[SensitiveParameter] ?string $encryptedBggToken): static
     {
         $this->encryptedBggToken = $encryptedBggToken === '' ? null : $encryptedBggToken;
 

@@ -6,6 +6,7 @@ php-version = "8.4"
 paths = [
     "modules/*/src/**/*.php",
     "modules/*/tests/**/*.php",
+    "plugins/boardgames/src/**/*.php",
     "plugins/books/src/**/*.php",
     "plugins/dishes/src/**/*.php",
     "plugins/films/src/**/*.php",

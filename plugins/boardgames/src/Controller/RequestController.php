@@ -34,7 +34,7 @@ final class RequestController extends AbstractController
     public function ask(int $eventId, Request $request): Response
     {
         $event = $this->requireEvent($eventId);
-        $term = trim((string) $request->query->get('q', ''));
+        $term = trim($request->query->get('q', ''));
 
         $candidates = [];
         if ($term !== '') {

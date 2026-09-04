@@ -25,7 +25,7 @@ class WikidataLookup implements GameMetadataLookupInterface
     {
         $rows = $this->query($this->buildSearchQuery($query));
 
-        return array_values(array_map(fn(array $row): GameMetadata => $this->mapRow($row), $rows));
+        return array_values(array_map($this->mapRow(...), $rows));
     }
 
     public function fetchById(string $externalId): ?GameMetadata
