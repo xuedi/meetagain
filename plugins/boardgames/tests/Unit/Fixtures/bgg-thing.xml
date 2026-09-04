@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items termsofuse="https://boardgamegeek.com/xmlapi/termsofuse">
+    <item type="boardgame" id="13">
+        <image>https://cf.geekdo-images.com/catan.jpg</image>
+        <name type="primary" sortindex="1" value="CATAN"/>
+        <name type="alternate" sortindex="1" value="Die Siedler von Catan"/>
+        <description>Picture a rugged&amp;#10;island.</description>
+        <yearpublished value="1995"/>
+        <minplayers value="3"/>
+        <maxplayers value="4"/>
+        <poll name="suggested_numplayers" title="User Suggested Number of Players" totalvotes="1000">
+            <results numplayers="3">
+                <result value="Best" numvotes="120"/>
+                <result value="Recommended" numvotes="500"/>
+            </results>
+            <results numplayers="4">
+                <result value="Best" numvotes="800"/>
+                <result value="Recommended" numvotes="150"/>
+            </results>
+        </poll>
+        <playingtime value="120"/>
+        <minplaytime value="60"/>
+        <maxplaytime value="120"/>
+        <minage value="10"/>
+        <statistics page="1">
+            <ratings>
+                <averageweight value="2.2986"/>
+            </ratings>
+        </statistics>
+    </item>
+</items>

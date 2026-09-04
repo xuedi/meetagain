@@ -1,0 +1,4 @@
+boardgames_game:
+    validator_name_blank: 'Merci d''indiquer un nom pour le jeu de societe.'
+    validator_players_positive: 'Le nombre de joueurs doit etre un nombre positif.'
+    validator_weight_range: 'La complexite doit etre comprise entre {{ min }} et {{ max }}.'

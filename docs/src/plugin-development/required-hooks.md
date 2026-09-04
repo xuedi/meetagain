@@ -107,24 +107,32 @@ public function getMenuLinks(): array
 
 ---
 
-### `getEventTile(int $eventId): ?string`
+### `getEventTile(int $eventId, EventTileLocation $location): ?string`
 
 **Purpose:** Render a custom tile/box on the event detail page.
 
-**When called:** When rendering `/event/{id}`.
+**When called:** Once per location when rendering `/event/{id}`.
 
-**Returns:** Rendered HTML string, or `null` if this plugin has nothing to show.
+**Locations:** `EventTileLocation::Sidebar` and `EventTileLocation::BottomSidebar` render in the
+narrow right column; `EventTileLocation::Center` renders in the wide column between the event
+description and the RSVP box, and is only rendered for logged-in visitors.
+
+**Returns:** Rendered HTML string, or `null` if this plugin has nothing to show for that location.
 
 ```php
-public function getEventTile(int $eventId): ?string
+public function getEventTile(int $eventId, EventTileLocation $location): ?string
 {
+    if ($location !== EventTileLocation::Center) {
+        return null;
+    }
+
     $vote = $this->voteRepository->findByEventId($eventId);
 
     if ($vote === null) {
         return null;
     }
 
-    return $this->twig->render('@Filmclub/tile/event.html.twig', [
+    return $this->twig->render('@Example/tile/event.html.twig', [
         'vote' => $vote,
         'eventId' => $eventId,
     ]);

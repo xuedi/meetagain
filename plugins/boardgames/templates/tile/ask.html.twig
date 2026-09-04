@@ -1,0 +1,65 @@
+{% extends '@Boardgames/base_boardgames.html.twig' %}
+
+{% block title %}{{ 'boardgames_tile.page_title_ask'|trans }}{% endblock %}
+
+{% block boardgames_body %}
+<h1 class="title">{{ 'boardgames_tile.page_title_ask'|trans }}</h1>
+<p class="subtitle is-6 has-text-grey">{{ event.title(app.locale) }}</p>
+
+<div class="box">
+    <form method="get" action="{{ path('app_plugin_boardgames_request_ask', {eventId: event.id}) }}">
+        <div class="field is-grouped">
+            <div class="control is-expanded">
+                <input type="search" name="q" value="{{ term }}" class="input"
+                       placeholder="{{ 'boardgames_tile.ask_search_placeholder'|trans }}">
+            </div>
+            <div class="control">
+                <button type="submit" class="button is-primary">{{ 'boardgames_game.button_search'|trans }}</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% if candidates is empty %}
+    <p class="has-text-grey">{{ term ? 'boardgames_tile.ask_no_owners'|trans : 'boardgames_tile.ask_intro'|trans }}</p>
+{% else %}
+    {% for candidate in candidates %}
+        <div class="box">
+            <div class="is-flex is-align-items-flex-start" style="gap: 1rem;">
+                <figure class="image is-64x64">
+                    {% include '_components/image.html.twig' with {'image': candidate.game.boxImage, 'size': '200x200', 'alt': candidate.game.name} %}
+                </figure>
+                <div class="is-flex-grow-1">
+                    <p class="has-text-weight-semibold">
+                        <a href="{{ path('app_plugin_boardgames_game_show', {id: candidate.game.id}) }}">{{ candidate.game.name }}</a>
+                    </p>
+                    {% for ownership in candidate.owners %}
+                        <form method="post" action="{{ path('app_plugin_boardgames_request_create', {eventId: event.id}) }}" class="mt-2">
+                            <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_boardgames_request_create' ~ event.id) }}">
+                            <input type="hidden" name="game_id" value="{{ candidate.game.id }}">
+                            <input type="hidden" name="owner_id" value="{{ ownership.user.id }}">
+                            <div class="field has-addons">
+                                <div class="control">
+                                    <span class="button is-small is-static">{{ ownership.user.name }}</span>
+                                </div>
+                                <div class="control is-expanded">
+                                    <input type="text" name="message" class="input is-small"
+                                           maxlength="255"
+                                           placeholder="{{ 'boardgames_tile.ask_message_placeholder'|trans }}">
+                                </div>
+                                <div class="control">
+                                    <button type="submit" class="button is-small is-link">{{ 'boardgames_tile.button_ask_owner'|trans }}</button>
+                                </div>
+                            </div>
+                        </form>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<p class="mt-4">
+    <a href="{{ path('app_event_details', {id: event.id}) }}">{{ 'boardgames_tile.back_to_event'|trans }}</a>
+</p>
+{% endblock %}

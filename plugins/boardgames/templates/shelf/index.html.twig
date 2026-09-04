@@ -1,0 +1,95 @@
+{% extends '@Boardgames/base_boardgames.html.twig' %}
+
+{% block title %}{{ 'boardgames_shelf.page_title'|trans }}{% endblock %}
+
+{% block boardgames_body %}
+<div class="level mb-4">
+    <div class="level-left">
+        <h1 class="title mb-0">{{ 'boardgames_shelf.page_title'|trans }}</h1>
+    </div>
+    <div class="level-right">
+        <a href="{{ path('app_boardgames_gamelist') }}" class="button">
+            <span class="icon"><i class="fa fa-list"></i></span>
+            <span>{{ 'boardgames_shelf.button_browse_catalog'|trans }}</span>
+        </a>
+    </div>
+</div>
+
+{% if shelf is empty %}
+    <p class="has-text-grey">{{ 'boardgames_shelf.empty'|trans }}</p>
+{% else %}
+    {% for ownership in shelf %}
+        <div class="box">
+            <div class="is-flex is-align-items-flex-start" style="gap: 1rem;">
+                <figure class="image is-64x64">
+                    {% include '_components/image.html.twig' with {'image': ownership.game.boxImage, 'size': '200x200', 'alt': ownership.game.name} %}
+                </figure>
+                <div class="is-flex-grow-1">
+                    <div class="is-flex is-justify-content-space-between is-align-items-flex-start">
+                        <p class="has-text-weight-semibold">
+                            <a href="{{ path('app_plugin_boardgames_game_show', {id: ownership.game.id}) }}">{{ ownership.game.name }}</a>
+                        </p>
+                        <a href="{{ path('app_plugin_boardgames_shelf_remove', {id: ownership.id}) }}"
+                           class="button is-small is-danger is-light"
+                           data-post
+                           data-csrf-token="{{ csrf_token('app_plugin_boardgames_shelf_remove' ~ ownership.id) }}"
+                           data-confirm="{{ 'boardgames_shelf.confirm_remove'|trans }}">
+                            <span class="icon"><i class="fa fa-trash"></i></span>
+                            <span>{{ 'boardgames_shelf.button_remove'|trans }}</span>
+                        </a>
+                    </div>
+
+                    <form method="post" action="{{ path('app_plugin_boardgames_shelf_update', {id: ownership.id}) }}" class="mt-2">
+                        <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_boardgames_shelf_update' ~ ownership.id) }}">
+                        <div class="field is-grouped is-grouped-multiline">
+                            <div class="control">
+                                <label class="label is-small" for="lang-{{ ownership.id }}">{{ 'boardgames_shelf.col_language'|trans }}</label>
+                                <input id="lang-{{ ownership.id }}" type="text" name="copy_language" value="{{ ownership.copyLanguage }}"
+                                       class="input is-small" style="width: 6rem;" maxlength="8">
+                            </div>
+                            <div class="control">
+                                <label class="label is-small" for="cond-{{ ownership.id }}">{{ 'boardgames_shelf.col_condition'|trans }}</label>
+                                <div class="select is-small">
+                                    <select id="cond-{{ ownership.id }}" name="condition">
+                                        <option value="">-</option>
+                                        {% for case in conditions %}
+                                            <option value="{{ case.value }}" {{ ownership.copyCondition == case ? 'selected' : '' }}>{{ case.label()|trans }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <label class="label is-small" for="notes-{{ ownership.id }}">{{ 'boardgames_shelf.col_notes'|trans }}</label>
+                                <input id="notes-{{ ownership.id }}" type="text" name="notes" value="{{ ownership.notes }}" class="input is-small" maxlength="255">
+                            </div>
+                        </div>
+                        <div class="field is-grouped is-grouped-multiline mt-2">
+                            <div class="control">
+                                <label class="checkbox is-small">
+                                    <input type="checkbox" name="can_teach" value="1" {{ ownership.canTeach ? 'checked' : '' }}>
+                                    {{ 'boardgames_shelf.col_can_teach'|trans }}
+                                </label>
+                            </div>
+                            <div class="control">
+                                <label class="checkbox is-small">
+                                    <input type="checkbox" name="willing_to_bring" value="1" {{ ownership.willingToBring ? 'checked' : '' }}>
+                                    {{ 'boardgames_shelf.col_willing_to_bring'|trans }}
+                                </label>
+                            </div>
+                            <div class="control">
+                                <label class="checkbox is-small">
+                                    <input type="checkbox" name="is_public" value="1" {{ ownership.isPublic ? 'checked' : '' }}>
+                                    {{ 'boardgames_shelf.col_public'|trans }}
+                                </label>
+                            </div>
+                            <div class="control">
+                                <button type="submit" class="button is-small is-link">{{ 'boardgames_shelf.button_save'|trans }}</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

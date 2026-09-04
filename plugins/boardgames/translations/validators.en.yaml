@@ -1,0 +1,4 @@
+boardgames_game:
+    validator_name_blank: 'Please enter a name for the board game.'
+    validator_players_positive: 'The player count must be a positive number.'
+    validator_weight_range: 'The weight must be between {{ min }} and {{ max }}.'

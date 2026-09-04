@@ -1,0 +1,18 @@
+{#
+    BGG Attribution - the "Powered by BoardGameGeek" mark required of public-facing applications
+
+    Rendered only for a row whose metadata actually came from BoardGameGeek, so an install running
+    on Wikidata or manual entry never claims a relationship it does not have.
+
+    Used in:    plugins/boardgames/templates/game/detail.html.twig
+                plugins/boardgames/templates/game/lookup.html.twig
+    Parameters:
+        - source (ExternalSource|null, optional) - the row's metadata source; only 'bgg' renders
+#}
+{% if source is defined and source and source.value == 'bgg' %}
+    <p class="mt-3 is-size-7 has-text-grey">
+        <a href="https://boardgamegeek.com" rel="noopener" target="_blank">
+            {{ 'boardgames.powered_by_bgg'|trans }}
+        </a>
+    </p>
+{% endif %}

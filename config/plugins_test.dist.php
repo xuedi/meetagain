@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 return [
+    'boardgames' => true,
     'books' => true,
     'dishes' => true,
     'films' => true,

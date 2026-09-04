@@ -114,6 +114,7 @@ final class EventController extends AbstractController
                 'itemCells' => $this->eventService->getRenderedItemCells($id),
                 'attachControl' => $this->isGranted('ROLE_ORGANIZER') ? $this->itemAttachControlBuilder->build($id) : null,
                 'pluginTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::Sidebar) : [],
+                'pluginCenterTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::Center) : [],
                 'pluginBottomSidebarTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::BottomSidebar) : [],
                 'event' => $event,
                 'json_ld' => $this->eventSchemaService->buildSchema($event, $canonicalUrl, $locale),

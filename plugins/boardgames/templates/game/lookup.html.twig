@@ -1,0 +1,59 @@
+{% extends '@Boardgames/base_boardgames.html.twig' %}
+
+{% block title %}{{ 'boardgames_game.page_title_lookup'|trans }}{% endblock %}
+
+{% block boardgames_body %}
+<h1 class="title">{{ 'boardgames_game.page_title_lookup'|trans }}</h1>
+
+<div class="box">
+    {{ form_start(form, {'method': 'GET', 'action': path('app_plugin_boardgames_game_lookup')}) }}
+    <div class="field is-grouped">
+        <div class="control is-expanded">
+            {{ form_widget(form.query, {'attr': {'class': 'input'}}) }}
+        </div>
+        <div class="control">
+            {{ form_widget(form.search, {'attr': {'class': 'button is-primary'}}) }}
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>
+
+{% if results is not empty %}
+<h2 class="subtitle">{{ 'boardgames_game.heading_results'|trans }}</h2>
+<div class="columns is-multiline">
+    {% for result in results %}
+    <div class="column is-6">
+        <div class="box">
+            <div class="is-flex is-align-items-flex-start" style="gap: 1rem">
+                {% if result.boxImageUrl %}
+                <img src="{{ result.boxImageUrl }}" alt="{{ result.name }}" style="width: 80px; flex-shrink: 0">
+                {% endif %}
+                <div class="is-flex-grow-1">
+                    <p class="has-text-weight-semibold">{{ result.name }}</p>
+                    {% if result.yearPublished %}<p class="is-size-7">{{ result.yearPublished }}</p>{% endif %}
+                    {% if result.playerRange %}<p class="is-size-7">{{ 'boardgames_game.players_short'|trans({'%range%': result.playerRange}) }}</p>{% endif %}
+
+                    <form method="POST" action="{{ path('app_plugin_boardgames_game_import') }}" class="mt-2">
+                        <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_boardgames_game_import') }}">
+                        <input type="hidden" name="externalId" value="{{ result.externalId }}">
+                        <input type="hidden" name="source" value="{{ result.source.value }}">
+                        <button type="submit" class="button is-small">
+                            {{ 'boardgames_game.button_import'|trans }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% elseif form.vars.submitted %}
+<p class="has-text-grey">{{ 'boardgames_game.no_results'|trans }}</p>
+{% endif %}
+
+{% include '@Boardgames/game/attribution.html.twig' with {'source': adapterSource} only %}
+
+<p class="mt-4">
+    <a href="{{ path('app_plugin_boardgames_game_manual') }}">{{ 'boardgames_game.link_manual_entry'|trans }}</a>
+</p>
+{% endblock %}

@@ -1,0 +1,29 @@
+{#
+    Owner Strip - avatars of the members whose ownership row for a board game is public
+
+    Renders one small round avatar per public ownership row, linking to the member profile,
+    with a graduation-cap marker on the members who set the "I can teach this" flag. A row
+    the owner kept private never reaches this template.
+
+    Used in:    plugins/boardgames/templates/item/list_cell.html.twig
+                plugins/boardgames/templates/game/detail.html.twig
+    Parameters:
+        - owners (list<GameOwnership>, required) - public ownership rows, already filtered
+    Depends on: _components/image.html.twig
+#}
+{% if owners is not empty %}
+    <div class="is-flex is-flex-wrap-wrap is-align-items-center" style="gap: 0.25rem;">
+        {% for ownership in owners %}
+            <a href="{{ path('app_member_view', {'id': ownership.user.id}) }}"
+               title="{{ ownership.canTeach ? 'boardgames_shelf.owner_can_teach'|trans({'%name%': ownership.user.name}) : ownership.user.name }}"
+               class="is-flex is-align-items-center">
+                <figure class="image is-24x24">
+                    {% include '_components/image.html.twig' with {'image': ownership.user.image, 'size': '50x50', 'alt': ownership.user.name} %}
+                </figure>
+                {% if ownership.canTeach %}
+                    <span class="icon is-small has-text-link"><i class="fa-solid fa-graduation-cap"></i></span>
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
+{% endif %}

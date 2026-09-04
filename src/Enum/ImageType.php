@@ -21,4 +21,5 @@ enum ImageType: int
     case PluginFilmsPoster = 17;
     case PluginPhotosPhoto = 18;
     case GroupPromotionFacebook = 19;
+    case PluginBoardgamesBox = 20;
 }

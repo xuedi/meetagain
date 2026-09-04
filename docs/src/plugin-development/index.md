@@ -11,7 +11,7 @@ event filters, authorization, notifications, and more.
 | Hook / Interface                              | Purpose                                              | Example plugin          |
 |-----------------------------------------------|------------------------------------------------------|-------------------------|
 | `getMenuLinks()`                              | Add links to the main navigation                     | dishes, filmclub        |
-| `getEventTile()`                              | Render a custom box on event detail pages            | filmclub (voting tile)  |
+| `getEventTile()`                              | Render a custom box on event detail pages            | boardgames (games tile) |
 | `getEventListItemTags()`                      | Add badges to events in list views                   | dishes (vegetarian tag) |
 | `getMemberPageTop()`                          | Inject content above the admin member list           | filmclub                |
 | `getFooterAbout()`                            | Add content to the footer's About section            | filmclub                |

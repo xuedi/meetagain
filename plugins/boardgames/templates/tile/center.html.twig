@@ -1,0 +1,147 @@
+{#
+    Board Games Event Tile - what is arriving at this event, and who is bringing it
+
+    Renders in the center column of the event detail page: the pledged games grouped by the member
+    bringing them, each with a fit badge computed against the event's live headcount, plus the
+    controls to pledge from one's own shelf, withdraw a pledge, and ask an owner to bring a title.
+
+    Used in:    Plugin\Boardgames\Kernel::getEventTile(), EventTileLocation::Center
+    Parameters:
+        - event          (Event, required)                -- the event being viewed
+        - headcount      (int, required)                  -- RSVP members plus guests plus external RSVPs
+        - groups         (list, required)                 -- pledges grouped by bringer
+        - hasRsvp        (bool, required)                 -- whether the viewer has RSVP'd
+        - bringable      (list<GameOwnership>, required)  -- the viewer's shelf rows still pledgeable here
+        - openRequests   (list<BringRequest>, required)   -- every open bring request for this event
+        - myOpenRequests (list<BringRequest>, required)   -- open requests addressed to the viewer
+        - user           (User, required)                 -- the viewer
+    Depends on: _components/image.html.twig
+#}
+<h2 class="title is-5">
+    <span class="icon"><i class="fa-solid fa-dice"></i></span>
+    {{ 'boardgames_tile.heading'|trans }}
+</h2>
+<p class="is-size-7 has-text-grey mb-4">{{ 'boardgames_tile.headcount'|trans({'%count%': headcount}) }}</p>
+
+{% if groups is empty %}
+    <p class="has-text-grey">{{ 'boardgames_tile.empty'|trans }}</p>
+{% else %}
+    {% for group in groups %}
+        <div class="mb-4">
+            <p class="has-text-weight-semibold mb-2">
+                <a href="{{ path('app_member_view', {'id': group.user.id}) }}">{{ group.user.name }}</a>
+                <span class="has-text-grey is-size-7">{{ 'boardgames_tile.brings'|trans }}</span>
+            </p>
+            <div class="columns is-multiline">
+                {% for entry in group.pledges %}
+                    {% set game = entry.pledge.game %}
+                    <div class="column is-6">
+                        <div class="media">
+                            <div class="media-left">
+                                <figure class="image is-64x64">
+                                    {% include '_components/image.html.twig' with {'image': game.boxImage, 'size': '200x200', 'alt': game.name} %}
+                                </figure>
+                            </div>
+                            <div class="media-content">
+                                <p class="is-size-6 mb-1">
+                                    <a href="{{ path('app_plugin_boardgames_game_show', {id: game.id}) }}">{{ game.name }}</a>
+                                </p>
+                                <p class="is-size-7 has-text-grey">
+                                    {% if game.playerRange %}{{ 'boardgames_game.players_short'|trans({'%range%': game.playerRange}) }}{% endif %}
+                                    {% if game.playtimeRange %} &middot; {{ game.playtimeRange }} min{% endif %}
+                                    {% if game.weight %} &middot; {{ 'boardgames_game.weight_short'|trans({'%weight%': game.weight}) }}{% endif %}
+                                </p>
+                                <div class="tags mt-1">
+                                    <span class="tag is-small {{ entry.fitClass }}">{{ entry.fit|trans }}</span>
+                                    {% if entry.ownership and entry.ownership.copyLanguage %}
+                                        <span class="tag is-small">{{ entry.ownership.copyLanguage|upper }}</span>
+                                    {% endif %}
+                                    {% if entry.ownership and entry.ownership.canTeach %}
+                                        <span class="tag is-small is-info is-light">
+                                            <span class="icon is-small"><i class="fa-solid fa-graduation-cap"></i></span>
+                                            <span>{{ 'boardgames_tile.can_teach'|trans }}</span>
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                {% if group.user.id == user.id %}
+                                    <a href="{{ path('app_plugin_boardgames_pledge_withdraw', {id: entry.pledge.id}) }}"
+                                       class="button is-small is-light mt-1"
+                                       data-post
+                                       data-csrf-token="{{ csrf_token('app_plugin_boardgames_pledge_withdraw' ~ entry.pledge.id) }}">
+                                        {{ 'boardgames_tile.button_withdraw'|trans }}
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if myOpenRequests is not empty %}
+    <div class="notification is-info is-light">
+        <p class="has-text-weight-semibold mb-2">{{ 'boardgames_tile.heading_requests_for_you'|trans }}</p>
+        {% for request in myOpenRequests %}
+            <div class="is-flex is-align-items-center is-justify-content-space-between mb-2">
+                <span>
+                    {{ 'boardgames_tile.request_line'|trans({'%requester%': request.requestedBy.name, '%game%': request.game.name}) }}
+                    {% if request.message %}<span class="has-text-grey is-size-7">- {{ request.message }}</span>{% endif %}
+                </span>
+                <span class="buttons">
+                    <a href="{{ path('app_plugin_boardgames_request_accept', {id: request.id}) }}"
+                       class="button is-small is-success"
+                       data-post
+                       data-csrf-token="{{ csrf_token('app_plugin_boardgames_request_accept' ~ request.id) }}">
+                        {{ 'boardgames_tile.button_accept'|trans }}
+                    </a>
+                    <a href="{{ path('app_plugin_boardgames_request_decline', {id: request.id}) }}"
+                       class="button is-small"
+                       data-post
+                       data-csrf-token="{{ csrf_token('app_plugin_boardgames_request_decline' ~ request.id) }}">
+                        {{ 'boardgames_tile.button_decline'|trans }}
+                    </a>
+                </span>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if openRequests is not empty %}
+    <p class="is-size-7 has-text-grey mb-3">
+        {{ 'boardgames_tile.open_requests'|trans({'%count%': openRequests|length}) }}
+    </p>
+{% endif %}
+
+{% if hasRsvp %}
+    <div class="is-flex is-flex-wrap-wrap is-align-items-flex-end" style="gap: 1rem;">
+        {% if bringable is not empty %}
+            <form method="post" action="{{ path('app_plugin_boardgames_pledge_create', {eventId: event.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_boardgames_pledge_create' ~ event.id) }}">
+                <div class="field has-addons mb-0">
+                    <div class="control">
+                        <div class="select is-small">
+                            <select name="game_id">
+                                {% for ownership in bringable %}
+                                    <option value="{{ ownership.game.id }}">{{ ownership.game.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control">
+                        <button type="submit" class="button is-small is-link">{{ 'boardgames_tile.button_pledge'|trans }}</button>
+                    </div>
+                </div>
+            </form>
+        {% else %}
+            <p class="is-size-7 has-text-grey">{{ 'boardgames_tile.no_bringable'|trans }}</p>
+        {% endif %}
+        <a class="button is-small" href="{{ path('app_plugin_boardgames_request_ask', {eventId: event.id}) }}">
+            <span class="icon"><i class="fa-solid fa-hand"></i></span>
+            <span>{{ 'boardgames_tile.button_ask'|trans }}</span>
+        </a>
+    </div>
+{% else %}
+    <p class="is-size-7 has-text-grey">{{ 'boardgames_tile.rsvp_first'|trans }}</p>
+{% endif %}
