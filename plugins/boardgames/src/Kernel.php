@@ -333,7 +333,7 @@ class Kernel implements Plugin
         return $rows;
     }
 
-    /** @return list<array{0: string, 1: int, 2: int, 3: int, 4: int, 5: int, 6: string, 7: string, 8: list<string>, 9: string}> */
+    /** @return list<array{0: string, 1: int|null, 2: int, 3: int, 4: int, 5: int, 6: string, 7: string, 8: list<string>, 9: string}> */
     private function catalog(): array
     {
         return [
@@ -346,15 +346,15 @@ class Kernel implements Plugin
             ['Azul', 2017, 2, 4, 30, 45, '1.80', 'Tile drafting for the walls of the Royal Palace of Evora.', ['abstract', 'family'], 'azul-2017.jpg'],
             ['Wingspan', 2019, 1, 5, 40, 70, '2.40', 'A bird collection engine builder set in forest, grassland and wetland.', ['strategy'], 'wingspan-2019.jpg'],
             ['Codenames', 2015, 2, 8, 15, 15, '1.30', 'Two spymasters give one-word clues to contact their agents first.', ['party', 'wordgame'], 'codenames-2015.jpg'],
-            ['The Crew', 2019, 2, 5, 20, 20, '2.00', 'A cooperative trick-taking campaign to the ninth planet.', ['cooperative'], 'the-crew-2019.jpg'],
-            ['Splendor', 2014, 2, 4, 30, 30, '1.80', 'Renaissance merchants collect gem tokens and buy development cards.', ['strategy', 'family'], 'splendor-2014.jpg'],
+            ['Halma', 1883, 2, 4, 20, 30, '1.40', 'Pieces hop across the board in chains to reach the opposite camp first.', ['abstract', 'strategy'], 'halma-1883.jpg'],
+            ['Crokinole', 1876, 2, 4, 20, 30, '1.20', 'Wooden discs are flicked at the centre hole past a ring of pegs.', ['family', 'abstract'], 'crokinole-1876.jpg'],
             ['Scythe', 2016, 1, 5, 90, 115, '3.40', 'Five factions compete for a war-torn 1920s Eastern Europe.', ['area-control', 'strategy'], 'scythe-2016.jpg'],
             ['Terraforming Mars', 2016, 1, 5, 120, 120, '3.20', 'Corporations raise the temperature, oxygen and oceans of Mars.', ['strategy'], 'terraforming-mars-2016.jpg'],
             ['Agricola', 2007, 1, 5, 30, 150, '3.60', 'A farming family expands its house, fields and pastures.', ['worker-placement', 'strategy'], 'agricola-2007.jpg'],
             ['Everdell', 2018, 1, 4, 40, 80, '2.80', 'Woodland critters build a city of cards through the four seasons.', ['worker-placement', 'strategy'], 'everdell-2018.jpg'],
-            ['The Resistance: Avalon', 2012, 5, 10, 30, 30, '1.80', 'Loyal servants of Arthur hunt the minions of Mordred among them.', ['hidden-roles', 'party'], 'avalon-2012.jpg'],
+            ['The Werewolves of Millers Hollow', 2001, 8, 18, 30, 30, '1.20', 'The village votes someone out each morning while the werewolves hunt each night.', ['hidden-roles', 'party'], 'werewolves-millers-hollow-2001.jpg'],
             ['Just One', 2018, 3, 7, 20, 20, '1.10', 'Everyone writes a one-word clue, and matching clues cancel out.', ['party', 'wordgame'], 'just-one-2018.jpg'],
-            ['Patchwork', 2014, 2, 2, 15, 30, '1.60', 'Two quilters buy fabric patches against a shared time track.', ['abstract'], 'patchwork-2014.jpg'],
+            ['Backgammon', null, 2, 2, 20, 40, '1.80', 'Two players race their fifteen checkers home across twenty-four points.', ['abstract', 'strategy'], 'backgammon.jpg'],
             ['Hive', 2001, 2, 2, 20, 20, '2.30', 'Insect tiles surround the opposing queen bee on an open board.', ['abstract'], 'hive-2001.jpg'],
             ['Spirit Island', 2017, 1, 4, 90, 120, '4.00', 'Island spirits push back colonial invaders before the island is spoiled.', ['cooperative', 'strategy'], 'spirit-island-2017.jpg'],
         ];
