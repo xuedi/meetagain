@@ -1,0 +1,68 @@
+{% extends '@Photos/base_photos.html.twig' %}
+
+{% block title %}{{ 'photos_contest.browser_title'|trans }}{% endblock %}
+
+{% block photos_body %}
+<div class="level mb-4">
+    <div class="level-left">
+        <h1 class="title mb-0">{{ 'photos_contest.page_title'|trans }}</h1>
+    </div>
+    <div class="level-right">
+        <a href="{{ path('app_photos_photolist') }}" class="button">
+            <span class="icon"><i class="fa-regular fa-images"></i></span>
+            <span>{{ 'photos_stream.button_all_photos'|trans }}</span>
+        </a>
+    </div>
+</div>
+
+<div class="box">
+    {% if openContest %}
+        <h2 class="title is-5">{{ 'photos_contest.heading_open'|trans }}</h2>
+        <p class="content">{{ 'photos_contest.open_body'|trans({'%date%': openContest.endDate|date(get_date_format())}) }}</p>
+        <a class="button is-primary" href="{{ path('app_voting_poll_show', {id: openContest.id}) }}">
+            <span class="icon"><i class="fa-solid fa-check-to-slot"></i></span>
+            <span>{{ 'photos_contest.button_vote'|trans }}</span>
+        </a>
+    {% else %}
+        <h2 class="title is-5">{{ 'photos_contest.heading_queue'|trans }}</h2>
+        <p class="content">{{ 'photos_contest.queue_body'|trans({'%count%': queued}) }}</p>
+        {% if canStart %}
+            <form method="post" action="{{ path('app_plugin_photos_contest_start') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_photos_contest_start') }}">
+                <button type="submit" class="button is-primary" {{ queued == 0 ? 'disabled' : '' }}>
+                    <span class="icon"><i class="fa-solid fa-flag-checkered"></i></span>
+                    <span>{{ 'photos_contest.button_start'|trans }}</span>
+                </button>
+            </form>
+        {% endif %}
+    {% endif %}
+</div>
+
+<h2 class="title is-5 mt-5">{{ 'photos_contest.heading_winners'|trans }}</h2>
+{% if winners is empty %}
+    <p class="has-text-grey">{{ 'photos_contest.winners_empty'|trans }}</p>
+{% else %}
+    <div class="columns is-multiline">
+        {% for winner in winners %}
+            <div class="column is-3">
+                <div class="card">
+                    <div class="card-image">
+                        <a href="{{ path('app_plugin_photos_photo_show', {id: winner.photo.id}) }}">
+                            {% include '_components/image.html.twig' with {'image': winner.photo.visibleImage, 'size': '400x400'} %}
+                        </a>
+                    </div>
+                    <div class="card-content">
+                        <p class="title is-6">{{ winner.photo.getTranslatedTitle(app.locale) ?: 'photos.untitled'|trans }}</p>
+                        <p class="is-size-7 has-text-grey">
+                            {{ 'photos_contest.winner_meta'|trans({
+                                '%name%': get_user_name(winner.photo.createdBy),
+                                '%date%': winner.poll.closedAt|date(get_date_format()),
+                            }) }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

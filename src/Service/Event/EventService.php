@@ -36,6 +36,8 @@ readonly class EventService
         private TypeRegistry $itemTypeRegistry,
         #[AutowireIterator(Plugin::class)]
         private iterable $plugins,
+        #[AutowireIterator(ImageBoxProviderInterface::class)]
+        private iterable $imageBoxProviders,
     ) {}
 
     /**
@@ -147,6 +149,23 @@ readonly class EventService
         }
 
         return $cells;
+    }
+
+    public function getPluginImageBox(int $id): ?string
+    {
+        $enabledPlugins = $this->pluginService->getActiveList();
+        foreach ($this->imageBoxProviders as $provider) {
+            if (!in_array($provider->getPluginKey(), $enabledPlugins, true)) {
+                continue;
+            }
+
+            $box = $provider->renderImageBox($id);
+            if ($box !== null) {
+                return $box;
+            }
+        }
+
+        return null;
     }
 
     public function getPluginEventTiles(int $id, EventTileLocation $location): array

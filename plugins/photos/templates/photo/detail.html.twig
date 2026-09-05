@@ -50,6 +50,21 @@
     </div>
 
     <div class="column is-4">
+        <div class="box">
+            <h3 class="title is-5">{{ 'photos_photo.heading_info'|trans }}</h3>
+            <p><strong>{{ 'photos_photo.label_added_by'|trans }}</strong> {{ get_user_name(photo.createdBy) }}</p>
+            <p><strong>{{ 'photos_photo.label_added'|trans }}</strong> {{ photo.createdAt|time_diff }}</p>
+            {% if photo.takenAt %}
+                <p><strong>{{ 'photos_photo.label_taken'|trans }}</strong> {{ photo.takenAt|date('Y-m-d H:i') }}</p>
+            {% endif %}
+            {% if event %}
+                <p>
+                    <strong>{{ 'photos_photo.label_event'|trans }}</strong>
+                    <a href="{{ path('app_event_details', {'id': event.id}) }}">{{ event.title(app.locale) }}</a>
+                </p>
+            {% endif %}
+        </div>
+
         {% if cameraRows is not empty %}
             <div class="box">
                 <h3 class="title is-5">{{ 'photos_photo.heading_camera'|trans }}</h3>
@@ -66,14 +81,26 @@
             </div>
         {% endif %}
 
-        <div class="box">
-            <h3 class="title is-5">{{ 'photos_photo.heading_info'|trans }}</h3>
-            <p><strong>{{ 'photos_photo.label_added_by'|trans }}</strong> {{ get_user_name(photo.createdBy) }}</p>
-            <p><strong>{{ 'photos_photo.label_added'|trans }}</strong> {{ photo.createdAt|time_diff }}</p>
-            {% if photo.takenAt %}
-                <p><strong>{{ 'photos_photo.label_taken'|trans }}</strong> {{ photo.takenAt|date('Y-m-d H:i') }}</p>
-            {% endif %}
-        </div>
+        {% if contest.live and contest.owner %}
+            <div class="box">
+                <h3 class="title is-5">{{ 'photos_contest.heading_photo'|trans }}</h3>
+                {% if photo.contestSubmitted %}
+                    <p class="content is-size-7">{{ 'photos_contest.photo_submitted'|trans }}</p>
+                    <form method="post" action="{{ path('app_plugin_photos_contest_withdraw', {'id': photo.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_photos_contest_withdraw' ~ photo.id) }}">
+                        <button type="submit" class="button is-light is-fullwidth">{{ 'photos_contest.button_withdraw'|trans }}</button>
+                    </form>
+                {% else %}
+                    <p class="content is-size-7">{{ 'photos_contest.photo_remaining'|trans({'%count%': contest.remaining}) }}</p>
+                    <form method="post" action="{{ path('app_plugin_photos_contest_submit', {'id': photo.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_photos_contest_submit' ~ photo.id) }}">
+                        <button type="submit" class="button is-primary is-fullwidth" {{ contest.remaining == 0 ? 'disabled' : '' }}>
+                            {{ 'photos_contest.button_submit'|trans }}
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endif %}
 
         {% if canManage %}
             <a href="{{ path('app_plugin_photos_photo_edit', {'id': photo.id}) }}" class="button is-link is-light is-fullwidth mb-2">

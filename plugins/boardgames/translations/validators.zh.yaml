@@ -1,0 +1,4 @@
+boardgames_game:
+    validator_name_blank: '请输入桌游名称。'
+    validator_players_positive: '人数必须是正数。'
+    validator_weight_range: '复杂度必须在 {{ min }} 和 {{ max }} 之间。'

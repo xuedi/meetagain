@@ -1,0 +1,9 @@
+<h3 class="title is-5">{{ 'photos_event.tile_title'|trans }}</h3>
+<p>{{ 'photos_event.tile_count'|trans({'%count%': count}) }}</p>
+<p class="is-size-7 has-text-grey">
+    {{ 'photos_event.tile_uploaders'|trans({'%names%': uploaders|map(id => get_user_name(id))|join(', ')}) }}
+</p>
+<a class="button is-small is-fullwidth mt-3" href="{{ url }}">
+    <span class="icon"><i class="fa-regular fa-images"></i></span>
+    <span>{{ 'photos_event.tile_link'|trans }}</span>
+</a>

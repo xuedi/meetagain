@@ -1,0 +1,14 @@
+{
+  "results": {
+    "bindings": [
+      {
+        "game": {"type": "uri", "value": "http://www.wikidata.org/entity/Q170436"},
+        "gameLabel": {"type": "literal", "value": "Carcassonne"},
+        "year": {"type": "literal", "value": "2000-01-01T00:00:00Z"},
+        "minPlayers": {"type": "literal", "value": "2"},
+        "maxPlayers": {"type": "literal", "value": "5"},
+        "bggId": {"type": "literal", "value": "822"}
+      }
+    ]
+  }
+}

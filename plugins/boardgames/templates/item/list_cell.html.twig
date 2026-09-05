@@ -1,0 +1,60 @@
+{# Board game cell rendered by the shared item-list component (core wraps it in the chosen layout). #}
+{% set mode = viewMode ?? item_view_mode('boardgame').value %}
+{% set showUrl = path('app_plugin_boardgames_game_show', {id: game.id}) %}
+
+{% if mode == 'list' %}
+    <td style="vertical-align: middle;">
+        <a href="{{ showUrl }}"><figure class="image" style="width: 48px;">{% include '_components/image.html.twig' with {'image': game.boxImage, 'size': '200x200', 'alt': game.name} %}</figure></a>
+    </td>
+    <td style="vertical-align: middle;">
+        <a href="{{ showUrl }}" class="has-text-weight-medium">{{ game.name }}</a>
+        {% include '_components/item/tag_badges.html.twig' with {'itemType': 'boardgame', 'itemId': game.id} only %}
+        {{ circulation_badge('boardgame', game.id) }}
+    </td>
+    <td style="vertical-align: middle;" class="has-text-grey">{{ game.playerRange }}</td>
+    <td style="vertical-align: middle;" class="has-text-grey">{{ game.playtimeRange ? game.playtimeRange ~ ' min' : '' }}</td>
+    <td style="vertical-align: middle;">
+        {% include '@Boardgames/item/owner_strip.html.twig' with {'owners': owners} only %}
+    </td>
+    <td style="vertical-align: middle;" class="has-text-right">
+        {% if is_granted('ROLE_STEWARD') %}
+            <a href="{{ path('app_plugin_boardgames_game_edit', {'id': game.id}) }}" title="{{ 'boardgames_game.button_edit'|trans }}">
+                <span class="icon"><i class="fa fa-pen-to-square"></i></span>
+            </a>
+        {% endif %}
+    </td>
+{% elseif mode == 'row' %}
+    {% include '_components/item/styles/row.html.twig' with {
+        href: showUrl,
+        image: game.boxImage,
+        imageSize: '200x200',
+        title: game.name,
+        subtitle: game.playerRange
+    } %}
+{% elseif mode == 'grid' %}
+    {% include '_components/item/styles/thumb.html.twig' with {
+        href: showUrl,
+        image: game.boxImage,
+        imageSize: '200x200',
+        alt: game.name,
+        ratio: 'square'
+    } %}
+{% elseif mode == 'gallery' %}
+    {% include '_components/item/styles/slide.html.twig' with {
+        group: 'item-gallery-boardgame',
+        image: game.boxImage,
+        thumbSize: '200x200',
+        title: game.name,
+        subtitle: game.playerRange,
+        href: showUrl
+    } %}
+{% else %}
+    {% include '_components/item/styles/square.html.twig' with {
+        href: showUrl,
+        image: game.boxImage,
+        imageSize: '400x400',
+        title: game.name,
+        subtitle: game.playerRange,
+        subtitleIcon: 'users'
+    } %}
+{% endif %}

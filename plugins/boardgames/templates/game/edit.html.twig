@@ -1,0 +1,59 @@
+{% extends '@Boardgames/base_boardgames.html.twig' %}
+
+{% block title %}{{ 'boardgames_game.page_title_edit'|trans({'%name%': game.name}) }}{% endblock %}
+
+{% block boardgames_body %}
+<style>
+    .box-file-input input[type="file"] { color: transparent; width: 100%; }
+    .box-file-input input[type="file"]::file-selector-button { color: initial; }
+    .box-file-input input[type="file"]::-webkit-file-upload-button { color: initial; }
+</style>
+
+<h1 class="title">{{ 'boardgames_game.page_title_edit'|trans({'%name%': game.name}) }}</h1>
+
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+{{ form_errors(form) }}
+
+<div class="columns">
+    <div class="column is-3-tablet is-12-mobile">
+        <fieldset class="p-4 mb-4" style="border: 1px solid #dbdbdb; border-radius: 4px;">
+            <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'boardgames_game.label_box'|trans }}</legend>
+            {% if game.boxImage %}
+                <p class="has-text-grey-light is-size-7 mb-2">{{ 'boardgames_game.current_box_label'|trans }}</p>
+                <figure class="image mb-3">
+                    {% include '_components/image.html.twig' with {'image': game.boxImage, 'size': '200x200', 'alt': game.name} %}
+                </figure>
+            {% else %}
+                <p class="has-text-grey-light is-size-7 mb-2">{{ 'boardgames_game.no_box'|trans }}</p>
+            {% endif %}
+            <div class="box-file-input">
+                {{ form_row(form.boxFile, {'label': false}) }}
+            </div>
+            <p class="has-text-grey is-size-7 mt-2">{{ 'boardgames_game.help_box'|trans }}</p>
+        </fieldset>
+    </div>
+    <div class="column is-8">
+        {% for field in [form.name, form.originalName, form.yearPublished, form.minPlayers, form.maxPlayers, form.bestPlayerCount, form.minPlaytime, form.maxPlaytime, form.minAge, form.weight, form.description] %}
+            <div class="field">
+                {{ form_label(field, null, {'label_attr': {'class': 'label'}}) }}
+                <div class="control">{{ form_widget(field) }}</div>
+                {{ form_errors(field) }}
+            </div>
+        {% endfor %}
+        {% if form.itemTags is defined %}
+            <div class="field">{{ form_row(form.itemTags) }}</div>
+        {% endif %}
+
+        <div class="field is-grouped mt-4">
+            <div class="control">{{ form_widget(form.submit) }}</div>
+            <div class="control">
+                <a href="{{ path('app_plugin_boardgames_game_show', {id: game.id}) }}" class="button">
+                    {{ 'boardgames_game.button_cancel'|trans }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}

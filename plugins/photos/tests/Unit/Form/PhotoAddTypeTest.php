@@ -55,7 +55,7 @@ class PhotoAddTypeTest extends TestCase
     private function formFor(array $choices): FormInterface
     {
         $tagService = $this->createStub(TagService::class);
-        $tagService->method('getChoices')->willReturn($choices);
+        $tagService->method('getAssignableChoices')->willReturn($choices);
         $tagService->method('getDepths')->willReturn([]);
         $tagService->method('getParents')->willReturn([]);
 

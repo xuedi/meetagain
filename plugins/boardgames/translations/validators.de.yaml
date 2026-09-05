@@ -1,0 +1,4 @@
+boardgames_game:
+    validator_name_blank: 'Bitte gib einen Namen für das Brettspiel ein.'
+    validator_players_positive: 'Die Spielerzahl muss eine positive Zahl sein.'
+    validator_weight_range: 'Die Komplexität muss zwischen {{ min }} und {{ max }} liegen.'

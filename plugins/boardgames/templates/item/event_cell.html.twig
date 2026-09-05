@@ -1,0 +1,25 @@
+{# Board game cell rendered for one EventItemAssociation on the event detail page. #}
+<div class="media">
+    <div class="media-left">
+        <a href="{{ path('app_plugin_boardgames_game_show', {id: game.id}) }}">
+            {% include '_components/image.html.twig' with {'image': game.boxImage, 'size': '100x100', 'alt': game.name} %}
+        </a>
+    </div>
+    <div class="media-content">
+        <p class="title is-6 mb-1">
+            <a href="{{ path('app_plugin_boardgames_game_show', {id: game.id}) }}">{{ game.name }}</a>
+        </p>
+        {% if game.playerRange %}<p class="subtitle is-7 has-text-grey">{{ 'boardgames_game.players_short'|trans({'%range%': game.playerRange}) }}</p>{% endif %}
+        {% if is_granted('ROLE_ORGANIZER') %}
+            <form method="post" action="{{ path('app_item_detach', {id: association.event.id}) }}" class="mt-2">
+                <input type="hidden" name="_token" value="{{ csrf_token('app_item_detach' ~ association.event.id) }}">
+                <input type="hidden" name="item_type" value="boardgame">
+                <input type="hidden" name="item_id" value="{{ game.id }}">
+                <button type="submit" class="button is-small is-danger is-light">
+                    <span class="icon"><i class="fa fa-times"></i></span>
+                    <span>{{ 'boardgames.detach'|trans }}</span>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</div>

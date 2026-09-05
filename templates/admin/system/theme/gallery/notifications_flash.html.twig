@@ -1,7 +1,7 @@
 {#
     Gallery: Notifications & flash messages -- when NOT to use them in admin
 
-    `architecture/ux-admin.md` Design Rules: notifications and flash messages exist for
+    `architecture/ux/ux-admin.md` Design Rules: notifications and flash messages exist for
     invisible-after-reload signals only (queued background jobs, validation failures).
     `notification` and `message` are otherwise on the avoid list. For counts, use
     `AdminTopInfoHtml` in the topbar; for instructions, use a single `AdminTopInfoText`.
@@ -11,7 +11,7 @@
 #}
 <p class="is-size-7 has-text-grey">
     {{ 'admin_system_gallery.source_of_truth'|trans }}
-    architecture/ux-admin.md ("No flash messages when the result is visible after reload")
+    architecture/ux/ux-admin.md ("No flash messages when the result is visible after reload")
 </p>
 
 <p class="mt-3">{{ 'admin_system_gallery.notifications_intro'|trans }}</p>

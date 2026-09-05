@@ -12,6 +12,7 @@ use App\Item\TypeRegistry;
 use App\Repository\EventRepository;
 use App\Service\Config\PluginService;
 use App\Service\Event\EventService;
+use App\Service\Event\ImageBoxProviderInterface;
 use App\Service\Event\RecurringEventService;
 use App\Service\Item\AssociationService;
 use DateTime;
@@ -57,6 +58,7 @@ class EventServiceTest extends TestCase
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
+            imageBoxProviders: [],
         );
 
         // Act
@@ -93,6 +95,7 @@ class EventServiceTest extends TestCase
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
+            imageBoxProviders: [],
         );
 
         // Act
@@ -140,6 +143,7 @@ class EventServiceTest extends TestCase
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
+            imageBoxProviders: [],
         );
 
         // Act
@@ -172,6 +176,7 @@ class EventServiceTest extends TestCase
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
+            imageBoxProviders: [],
         );
 
         // Act
@@ -206,6 +211,7 @@ class EventServiceTest extends TestCase
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
+            imageBoxProviders: [],
         );
 
         // Act
@@ -234,6 +240,7 @@ class EventServiceTest extends TestCase
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
+            imageBoxProviders: [],
         );
 
         // Act
@@ -260,6 +267,7 @@ class EventServiceTest extends TestCase
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
+            imageBoxProviders: [],
         );
 
         // Act & Assert
@@ -290,6 +298,7 @@ class EventServiceTest extends TestCase
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
+            imageBoxProviders: [],
         );
 
         // Act & Assert
@@ -323,6 +332,7 @@ class EventServiceTest extends TestCase
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
+            imageBoxProviders: [],
         );
 
         // Act & Assert
@@ -354,6 +364,7 @@ class EventServiceTest extends TestCase
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
+            imageBoxProviders: [],
         );
 
         // Act & Assert
@@ -384,9 +395,64 @@ class EventServiceTest extends TestCase
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
+            imageBoxProviders: [],
         );
 
         // Act & Assert
         static::assertSame(0, $subject->updateRecurringEvents($child));
+    }
+
+    public function testTheFirstActivePluginClaimingTheImageBoxWins(): void
+    {
+        // Arrange
+        $subject = $this->serviceWithImageBoxProviders(
+            ['photos', 'films'],
+            $this->imageBoxProvider('films', '<div>films</div>'),
+            $this->imageBoxProvider('photos', '<div>photos</div>'),
+        );
+
+        // Act & Assert
+        static::assertSame('<div>films</div>', $subject->getPluginImageBox(4));
+    }
+
+    public function testAnInactivePluginNeverClaimsTheImageBox(): void
+    {
+        // Arrange
+        $subject = $this->serviceWithImageBoxProviders(
+            ['films'],
+            $this->imageBoxProvider('photos', '<div>photos</div>'),
+            $this->imageBoxProvider('films', null),
+        );
+
+        // Act & Assert
+        static::assertNull($subject->getPluginImageBox(4));
+    }
+
+    private function imageBoxProvider(string $pluginKey, ?string $markup): ImageBoxProviderInterface
+    {
+        $provider = $this->createStub(ImageBoxProviderInterface::class);
+        $provider->method('getPluginKey')->willReturn($pluginKey);
+        $provider->method('renderImageBox')->willReturn($markup);
+
+        return $provider;
+    }
+
+    /** @param list<string> $activePlugins */
+    private function serviceWithImageBoxProviders(array $activePlugins, ImageBoxProviderInterface ...$providers): EventService
+    {
+        $pluginService = $this->createStub(PluginService::class);
+        $pluginService->method('getActiveList')->willReturn($activePlugins);
+
+        return new EventService(
+            repo: $this->createStub(EventRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
+            notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
+            pluginService: $pluginService,
+            recurringEventService: $this->createStub(RecurringEventService::class),
+            itemAssociationService: $this->createStub(AssociationService::class),
+            itemTypeRegistry: $this->createStub(TypeRegistry::class),
+            plugins: [],
+            imageBoxProviders: $providers,
+        );
     }
 }

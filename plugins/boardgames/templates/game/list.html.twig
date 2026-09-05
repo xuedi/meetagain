@@ -1,0 +1,43 @@
+{% extends '@Boardgames/base_boardgames.html.twig' %}
+
+{% block title %}{{ 'boardgames_game.browser_title_list'|trans }}{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/vendor/fancybox.umd.js') }}"></script>
+{% endblock %}
+
+{% block boardgames_body %}
+<div class="level mb-4">
+    <div class="level-left">
+        <h1 class="title mb-0">{{ 'boardgames_game.page_title_list'|trans }}</h1>
+    </div>
+    <div class="level-right">
+        <div class="buttons">
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_plugin_boardgames_shelf') }}" class="button">
+                    <span class="icon"><i class="fa fa-box-archive"></i></span>
+                    <span>{{ 'boardgames_shelf.link_label'|trans }}</span>
+                </a>
+            {% endif %}
+            {% if circulation_dashboard_url('boardgame') %}
+                <a href="{{ circulation_dashboard_url('boardgame') }}" class="button">
+                    <span class="icon"><i class="fa fa-right-left"></i></span>
+                    <span>{{ 'circulation.link_label'|trans }}</span>
+                </a>
+            {% endif %}
+            {% if is_granted('ROLE_STEWARD') %}
+                <a href="{{ path('app_plugin_boardgames_game_lookup') }}" class="button is-link">
+                    <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
+                    <span>{{ 'boardgames_game.button_lookup'|trans }}</span>
+                </a>
+                <a href="{{ path('app_plugin_boardgames_game_manual') }}" class="button">
+                    <span class="icon"><i class="fa fa-plus"></i></span>
+                    <span>{{ 'boardgames_game.button_manual'|trans }}</span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% include '_components/item/list_layout.html.twig' with {'itemType': 'boardgame', 'infoKey': 'boardgames_game.sidebar_info'} only %}
+{% endblock %}

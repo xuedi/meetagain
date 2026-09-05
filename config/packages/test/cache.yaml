@@ -13,3 +13,6 @@ framework:
                 adapter: cache.adapter.array
             cache.calendar_feed:
                 adapter: cache.adapter.array
+            cache.image_attribution:
+                adapter: cache.adapter.array
+                tags: true

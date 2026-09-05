@@ -1,0 +1,53 @@
+{% extends '@Photos/base_photos.html.twig' %}
+
+{% block title %}{{ 'photos_stream.browser_title_show'|trans({'%name%': streamUser.name}) }}{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/vendor/fancybox.umd.js') }}"></script>
+{% endblock %}
+
+{% block photos_body %}
+<div class="level mb-4">
+    <div class="level-left">
+        <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
+            <figure class="image is-48x48 is-flex-shrink-0">
+                {% include '_components/image.html.twig' with {'image': streamUser.image, 'size': '100x100', 'alt': streamUser.name} %}
+            </figure>
+            <div>
+                <h1 class="title is-4 mb-0">{{ 'photos_stream.page_title_show'|trans({'%name%': streamUser.name}) }}</h1>
+                <p class="is-size-7 has-text-grey">{{ 'photos_stream.photo_count'|trans({'%count%': photos|length}) }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="level-right">
+        <div class="buttons">
+            {% if is_granted('ROLE_USER') %}
+                <a href="{{ path('app_member_view', {id: streamUser.id}) }}" class="button">
+                    <span class="icon"><i class="fa fa-user"></i></span>
+                    <span>{{ 'photos_stream.link_profile'|trans }}</span>
+                </a>
+            {% endif %}
+            <a href="{{ path('app_plugin_photos_streams') }}" class="button">
+                <span class="icon"><i class="fa fa-users"></i></span>
+                <span>{{ 'photos_stream.button_all_streams'|trans }}</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+{% embed '_components/item/gallery.html.twig' %}
+    {% block slides %}
+        {% for photo in photos %}
+            {% include '_components/item/styles/slide.html.twig' with {
+                group: 'item-gallery-photo-stream',
+                image: photo.visibleImage,
+                thumbSize: '400x400',
+                bigSize: 'w1600',
+                title: photo.getTranslatedTitle(app.locale) ?: 'photos.untitled'|trans,
+                subtitle: photo.cameraLabel ?: (photo.takenAt ? photo.takenAt|date('Y-m-d') : ''),
+                href: path('app_plugin_photos_photo_show', {'id': photo.id})
+            } %}
+        {% endfor %}
+    {% endblock %}
+{% endembed %}
+{% endblock %}

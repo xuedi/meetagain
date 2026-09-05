@@ -1,0 +1,131 @@
+{% extends '@Boardgames/base_boardgames.html.twig' %}
+
+{% block title %}{{ game.name }}{% endblock %}
+
+{% block boardgames_body %}
+<div class="columns">
+    <div class="column is-4-tablet is-12-mobile">
+        {% if game.boxImage %}
+        <figure class="image" style="border: 1px solid #e0e0e0">
+            {% include '_components/image.html.twig' with {'image': game.boxImage, 'size': '400x400', 'alt': game.name} %}
+        </figure>
+        {% else %}
+        <figure class="image is-1by1">
+            <div class="box has-text-centered has-text-grey" style="height: 100%; display:flex; align-items:center; justify-content:center">
+                <span>{{ 'boardgames_game.no_box'|trans }}</span>
+            </div>
+        </figure>
+        {% endif %}
+        {% include '@Boardgames/game/attribution.html.twig' with {'source': game.externalSource} only %}
+    </div>
+    <div class="column">
+        <div class="is-flex is-justify-content-space-between is-align-items-flex-start is-gap-2 mb-5">
+            <div>
+                <h1 class="title">{{ game.name }}</h1>
+                {% if game.originalName and game.originalName != game.name %}
+                <p class="subtitle has-text-grey">{{ game.originalName }}</p>
+                {% endif %}
+            </div>
+            {% include '_components/item/detail_back.html.twig' with {'url': path('app_boardgames_gamelist')} only %}
+        </div>
+
+        {% include '_components/item/tag_badges.html.twig' with {'itemType': 'boardgame', 'itemId': game.id} only %}
+        {{ circulation_badge('boardgame', game.id) }}
+
+        <table class="table is-narrow">
+            {% if game.yearPublished %}
+            <tr>
+                <th>{{ 'boardgames_game.col_year'|trans }}</th>
+                <td>{{ game.yearPublished }}</td>
+            </tr>
+            {% endif %}
+            {% if game.playerRange %}
+            <tr>
+                <th>{{ 'boardgames_game.col_players'|trans }}</th>
+                <td>
+                    {{ game.playerRange }}
+                    {% if game.bestPlayerCount %}
+                        <span class="has-text-grey">{{ 'boardgames_game.best_at'|trans({'%count%': game.bestPlayerCount}) }}</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endif %}
+            {% if game.playtimeRange %}
+            <tr>
+                <th>{{ 'boardgames_game.col_playtime'|trans }}</th>
+                <td>{{ game.playtimeRange }} min</td>
+            </tr>
+            {% endif %}
+            {% if game.minAge %}
+            <tr>
+                <th>{{ 'boardgames_game.col_min_age'|trans }}</th>
+                <td>{{ game.minAge }}+</td>
+            </tr>
+            {% endif %}
+            {% if game.weight %}
+            <tr>
+                <th>{{ 'boardgames_game.col_weight'|trans }}</th>
+                <td>{{ game.weight }} / 5</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <th>{{ 'boardgames_game.col_owners'|trans }}</th>
+                <td>{% include '@Boardgames/item/owner_strip.html.twig' with {'owners': owners} only %}</td>
+            </tr>
+        </table>
+
+        {% if game.description %}
+        <p class="mt-3">{{ game.description }}</p>
+        {% endif %}
+
+        {% if is_granted('ROLE_USER') %}
+            <div class="mt-4">
+                {% if ownership %}
+                    <a href="{{ path('app_plugin_boardgames_shelf_remove', {id: ownership.id}) }}"
+                       class="button is-small"
+                       data-post
+                       data-csrf-token="{{ csrf_token('app_plugin_boardgames_shelf_remove' ~ ownership.id) }}">
+                        <span class="icon"><i class="fa fa-box-open"></i></span>
+                        <span>{{ 'boardgames_shelf.button_remove'|trans }}</span>
+                    </a>
+                    <a href="{{ path('app_plugin_boardgames_shelf') }}" class="button is-small ml-2">
+                        <span class="icon"><i class="fa fa-sliders"></i></span>
+                        <span>{{ 'boardgames_shelf.button_edit_row'|trans }}</span>
+                    </a>
+                {% else %}
+                    <a href="{{ path('app_plugin_boardgames_shelf_add', {id: game.id}) }}"
+                       class="button is-small is-link"
+                       data-post
+                       data-csrf-token="{{ csrf_token('app_plugin_boardgames_shelf_add' ~ game.id) }}">
+                        <span class="icon"><i class="fa fa-box-archive"></i></span>
+                        <span>{{ 'boardgames_shelf.button_add'|trans }}</span>
+                    </a>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {{ circulation_panel('boardgame', game.id) }}
+
+        {% if is_granted('ROLE_STEWARD') %}
+        <div class="mt-4 buttons">
+            <a href="{{ path('app_plugin_boardgames_game_edit', {id: game.id}) }}" class="button is-small">
+                <span class="icon"><i class="fa fa-edit"></i></span>
+                <span>{{ 'boardgames_game.button_edit'|trans }}</span>
+            </a>
+            <a href="{{ path('app_plugin_boardgames_game_delete', {id: game.id}) }}"
+               class="button is-small is-danger is-light"
+               data-post
+               data-csrf-token="{{ csrf_token('app_plugin_boardgames_game_delete' ~ game.id) }}"
+               data-confirm="{{ 'boardgames_game.confirm_delete'|trans }}">
+                <span class="icon"><i class="fa fa-trash"></i></span>
+                <span>{{ 'boardgames_game.button_delete'|trans }}</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="mt-5 box">
+    {{ comment_section('boardgame', game.id) }}
+</div>
+{% endblock %}

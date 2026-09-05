@@ -8,6 +8,15 @@ install: buildTools
     cp tests/config/commit-hooks/*.bash bin/commit-hooks/
     chmod +x bin/commit-hooks/*.bash
     @echo "Pre-commit dispatcher activated. Scripts in bin/commit-hooks/ will run on every commit."
+    @echo "Next, once per machine: just devCerts"
+
+# Issue the local TLS certificate and trust it in the browser and system stores
+[group('development')]
+devCerts:
+    @command -v mkcert >/dev/null || { echo "mkcert is not installed - see docker/certs/README.md"; exit 1; }
+    mkcert -install
+    mkcert -cert-file docker/certs/meetagain.local.crt -key-file docker/certs/meetagain.local.key meetagain.local "*.meetagain.local"
+    {{JUST}} dockerRestart
 
 # Shared reset sequence used by devModeFixtures and devModeMinimal
 [group('development')]

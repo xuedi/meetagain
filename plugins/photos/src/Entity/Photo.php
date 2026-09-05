@@ -38,6 +38,9 @@ class Photo
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $meta = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $contestSubmitted = false;
+
     public function __construct()
     {
         $this->translations = new ArrayCollection();
@@ -46,6 +49,18 @@ class Photo
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function isContestSubmitted(): bool
+    {
+        return $this->contestSubmitted;
+    }
+
+    public function setContestSubmitted(bool $contestSubmitted): static
+    {
+        $this->contestSubmitted = $contestSubmitted;
+
+        return $this;
     }
 
     public function getImage(): ?Image

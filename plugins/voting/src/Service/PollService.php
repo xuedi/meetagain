@@ -37,7 +37,7 @@ readonly class PollService
     /**
      * @param list<int> $itemIds candidate item ids for the ballot
      */
-    public function create(Event $event, string $itemType, array $itemIds, int $durationDays, int $createdBy): Poll
+    public function create(?Event $event, string $itemType, array $itemIds, int $durationDays, int $createdBy): Poll
     {
         $itemIds = array_values(array_unique(array_filter($itemIds)));
         if ($itemIds === []) {
@@ -143,7 +143,12 @@ readonly class PollService
         $this->em->persist($poll);
         $this->em->flush();
 
-        $this->itemAssociations->attach((int) $poll->getEventId(), (string) $poll->getItemType(), $chosenItemId, (int) $poll->getCreatedBy());
+        $eventId = $poll->getEventId();
+        if ($eventId === null) {
+            return;
+        }
+
+        $this->itemAssociations->attach($eventId, (string) $poll->getItemType(), $chosenItemId, (int) $poll->getCreatedBy());
     }
 
     /**

@@ -1,0 +1,10 @@
+{{ circulation_warm('boardgame', itemIds) }}
+{% include '_components/item/list.html.twig' with {
+    'itemType': 'boardgame',
+    'itemIds': itemIds,
+    'emptyMessage': 'boardgames_game.list_empty',
+    'addUrl': path('app_plugin_boardgames_game_manual'),
+    'addLabel': 'boardgames_game.button_manual',
+    'gridRatio': 'square',
+    'listHeader': ['boardgames_game.label_box', 'boardgames_game.label_name', 'boardgames_game.col_players', 'boardgames_game.col_playtime', 'boardgames_game.col_owners', '']
+} only %}

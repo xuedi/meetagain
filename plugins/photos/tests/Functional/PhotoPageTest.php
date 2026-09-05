@@ -9,6 +9,7 @@ use Plugin\Photos\Entity\Photo;
 use Plugin\Photos\ValueObject\Config;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Crawler;
 
 class PhotoPageTest extends WebTestCase
 {
@@ -229,6 +230,123 @@ class PhotoPageTest extends WebTestCase
         // Assert
         $this->assertResponseRedirects();
         static::assertNull($this->em($client)->getRepository(Photo::class)->find($photoId));
+    }
+
+    public function testTheStreamIndexIsPublicAndListsEveryUploaderWithTheirCount(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $photo = $this->listedPhoto($client);
+        $uploader = $this->owner($client, $photo);
+
+        // Act
+        $crawler = $client->request('GET', '/en/photos/streams', server: $this->host());
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        static::assertStringContainsString((string) $uploader->getName(), $crawler->text());
+        static::assertCount(1, $crawler->filter('a[href$="/photos/streams/' . $uploader->getId() . '"]'));
+    }
+
+    public function testAMembersStreamShowsTheirOwnPhotosOnly(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $photo = $this->listedPhoto($client);
+        $uploader = $this->owner($client, $photo);
+
+        // Act
+        $crawler = $client->request('GET', '/en/photos/streams/' . $uploader->getId(), server: $this->host());
+
+        // Assert
+        $this->assertResponseIsSuccessful();
+        static::assertCount(1, $crawler->filter('[data-item-gallery-url$="/en/photos/' . $photo->getId() . '"]'));
+        static::assertStringContainsString((string) $uploader->getName(), $crawler->filter('h1')->text());
+        foreach ($this->shownPhotos($client, $crawler) as $shown) {
+            static::assertSame($uploader->getId(), $shown->getCreatedBy());
+        }
+    }
+
+    public function testAMemberWithoutAPhotoHasNoStreamPage(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $client->request('GET', '/en/photos/streams/' . $this->user($client, self::STRANGER_EMAIL)->getId(), server: $this->host());
+
+        // Assert
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testTheListOffersTheStreamsWhileTheSettingIsOn(): void
+    {
+        // Arrange
+        $client = static::createClient();
+
+        // Act
+        $crawler = $client->request('GET', '/en/photos', server: $this->host());
+
+        // Assert
+        static::assertCount(1, $crawler->filter('a[href$="/en/photos/streams"]'));
+    }
+
+    public function testTheStreamsDisappearEntirelyWhenTheSettingIsOff(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $uploader = $this->owner($client, $this->listedPhoto($client));
+        $this->storeConfig($client, new Config()->setMemberStreams(false));
+
+        // Act
+        $list = $client->request('GET', '/en/photos', server: $this->host());
+        $client->request('GET', '/en/photos/streams', server: $this->host());
+        $indexStatus = $client->getResponse()->getStatusCode();
+        $client->request('GET', '/en/photos/streams/' . $uploader->getId(), server: $this->host());
+
+        // Assert
+        static::assertCount(0, $list->filter('a[href$="/en/photos/streams"]'));
+        static::assertSame(404, $indexStatus);
+        $this->assertResponseStatusCodeSame(404);
+    }
+
+    public function testTheMemberPageCarriesTheStreamSectionOnlyWhileTheSettingIsOn(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $uploader = $this->owner($client, $this->listedPhoto($client));
+        $client->loginUser($this->user($client, self::STRANGER_EMAIL));
+
+        // Act
+        $withSetting = $client->request('GET', '/en/members/view/' . $uploader->getId(), server: $this->host());
+        $this->storeConfig($client, new Config()->setMemberStreams(false));
+        $withoutSetting = $client->request('GET', '/en/members/view/' . $uploader->getId(), server: $this->host());
+
+        // Assert
+        static::assertCount(1, $withSetting->filter('a[href$="/photos/streams/' . $uploader->getId() . '"]'));
+        static::assertCount(0, $withoutSetting->filter('a[href$="/photos/streams/' . $uploader->getId() . '"]'));
+    }
+
+    /** @return list<Photo> */
+    private function shownPhotos(KernelBrowser $client, Crawler $crawler): array
+    {
+        $photos = [];
+        foreach ($crawler->filter('[data-item-gallery-slide]') as $node) {
+            if (preg_match('#/en/photos/(\\d+)$#', (string) $node->getAttribute('data-item-gallery-url'), $matches) !== 1) {
+                continue;
+            }
+
+            $photo = $this->em($client)->getRepository(Photo::class)->find((int) $matches[1]);
+            if ($photo instanceof Photo) {
+                $photos[] = $photo;
+            }
+        }
+
+        if ($photos === []) {
+            self::fail('The stream page showed no photo');
+        }
+
+        return $photos;
     }
 
     private function listedPhoto(KernelBrowser $client): Photo

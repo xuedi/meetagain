@@ -122,6 +122,40 @@ readonly class PhotoService
         return $this->photoRepo->findAll($this->adminItemFilter->getAllowedItemIds(self::ITEM_TYPE));
     }
 
+    /** @return Photo[] */
+    public function getStream(int $userId, ?int $limit = null): array
+    {
+        return $this->photoRepo->findByCreator($userId, $this->itemFilter->getAllowedItemIds(self::ITEM_TYPE), $limit);
+    }
+
+    /**
+     * @param list<int> $userIds
+     *
+     * @return array<int, list<Photo>> user id => their most recent photos
+     */
+    public function getStreams(array $userIds, int $limit): array
+    {
+        $allowedIds = $this->itemFilter->getAllowedItemIds(self::ITEM_TYPE);
+
+        $streams = [];
+        foreach ($userIds as $userId) {
+            $streams[$userId] = $this->photoRepo->findByCreator($userId, $allowedIds, $limit);
+        }
+
+        return $streams;
+    }
+
+    /** @return array<int, int> user id => photo count, highest count first */
+    public function getStreamAuthors(): array
+    {
+        return $this->photoRepo->countByCreator($this->itemFilter->getAllowedItemIds(self::ITEM_TYPE));
+    }
+
+    public function hasStream(int $userId): bool
+    {
+        return $this->getStream($userId, 1) !== [];
+    }
+
     public function get(int $id): ?Photo
     {
         return $this->photoRepo->findOneAllowed($id, $this->itemFilter->getAllowedItemIds(self::ITEM_TYPE));
