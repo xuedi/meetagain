@@ -1,5 +1,8 @@
 {
   "name": "Photos",
   "version": "1.0",
+  "requires": [
+    "voting"
+  ],
   "description": "Member photo uploads with per-language title and description. Each photo keeps the camera settings read from its EXIF data at upload time; uploading into an event page's photo box links the picture to that event, and every photo carries a comment section."
 }
