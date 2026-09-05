@@ -1,0 +1,39 @@
+<h2 class="title is-4">{{ 'photos_event.box_title'|trans }}</h2>
+
+<p class="content is-size-7 has-text-grey">{{ 'photos_event.box_intro'|trans }}</p>
+
+{% if photos is empty %}
+    <p class="has-text-grey">{{ 'photos_event.list_empty'|trans }}</p>
+{% else %}
+    <div class="columns is-multiline mt-2">
+        {% for photo in photos %}
+            <div class="column is-2">
+                <a href="{{ path('app_plugin_photos_photo_show', {id: photo.id}) }}"
+                   title="{{ photo.anyTranslatedTitle ?: 'photos.untitled'|trans }}">
+                    {% include '_components/image.html.twig' with {'image': photo.visibleImage, 'size': '350x263'} %}
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% if uploadForm is not null %}
+    {{ form(uploadForm) }}
+{% endif %}
+
+{% set legacyImages = event.images|filter(image => image.reported is null) %}
+{% if legacyImages is not empty %}
+    <h3 class="title is-6 mt-5">{{ 'photos_event.legacy_title'|trans }}</h3>
+    <p class="content is-size-7 has-text-grey">{{ 'photos_event.legacy_intro'|trans }}</p>
+    <div class="columns is-multiline mt-2">
+        {% for image in legacyImages %}
+            <div class="column is-2">
+                <a data-fancybox="gallery"
+                   data-caption="{{ 'events.image_report_caption'|trans({'%url%': path('app_report_image', {'id': image.id})}) }}"
+                   href="{{ '/images/thumbnails/' ~ image.hash ~ '_1024x768.webp' }}">
+                    {% include '_components/image.html.twig' with {'image': image, 'size': '210x140'} %}
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

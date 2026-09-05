@@ -18,13 +18,13 @@ readonly class AssignmentFormHelper
 
     public function addAssignmentFields(FormBuilderInterface $builder, string $typeKey, ?int $itemId): void
     {
-        $choices = $this->tagService->getChoices($typeKey, $this->requestStack->getCurrentRequest()?->getLocale());
+        $choices = $this->tagService->getAssignableChoices($typeKey, $this->requestStack->getCurrentRequest()?->getLocale());
         if ($choices === []) {
             return;
         }
 
         $depths = $this->tagService->getDepths($typeKey);
-        $parents = $this->tagService->getParents($typeKey);
+        $parents = array_intersect_key($this->tagService->getParents($typeKey), $choices);
         $nested = array_any($parents, static fn(?int $parent): bool => $parent !== null);
 
         $builder->add(self::TAGS_FIELD, ChoiceType::class, [
@@ -40,7 +40,7 @@ readonly class AssignmentFormHelper
             'multiple' => true,
             'expanded' => true,
             'mapped' => false,
-            'data' => $itemId !== null ? $this->tagService->getTagIds($typeKey, $itemId) : [],
+            'data' => $itemId !== null ? $this->assigned($typeKey, $itemId, $choices) : [],
         ]);
     }
 
@@ -52,5 +52,16 @@ readonly class AssignmentFormHelper
         }
 
         return array_map('intval', array_values($form->get(self::TAGS_FIELD)->getData() ?? []));
+    }
+
+    /**
+     * @param  array<int, string> $choices
+     * @return list<int>
+     */
+    private function assigned(string $typeKey, int $itemId, array $choices): array
+    {
+        $assigned = $this->tagService->getTagIds($typeKey, $itemId);
+
+        return array_values(array_filter($assigned, static fn(int $id): bool => isset($choices[$id])));
     }
 }

@@ -1,0 +1,22 @@
+<div class="mt-4">
+    <p class="heading">{{ 'photos_stream.member_section_heading'|trans }}</p>
+    <div class="is-flex is-flex-wrap-wrap" style="gap: 0.5rem;">
+        {% for photo in photos %}
+            {% if photo.visibleImage %}
+                <a href="{{ path('app_plugin_photos_photo_show', {id: photo.id}) }}"
+                   title="{{ photo.getTranslatedTitle(app.locale) ?: 'photos.untitled'|trans }}">
+                    <figure class="image is-64x64">
+                        {% include '_components/image.html.twig' with {
+                            'image': photo.visibleImage,
+                            'size': '400x400',
+                            'alt': photo.getTranslatedTitle(app.locale) ?: 'photos.untitled'|trans
+                        } %}
+                    </figure>
+                </a>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <p class="mt-2">
+        <a href="{{ path('app_plugin_photos_stream', {id: target.id}) }}">{{ 'photos_stream.member_section_link'|trans }}</a>
+    </p>
+</div>

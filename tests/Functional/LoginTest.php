@@ -161,6 +161,8 @@ class LoginTest extends WebTestCase
     {
         // Arrange
         $client = static::createClient();
+        $client->disableReboot();
+        $client->request('GET', '/en/login');
 
         // Act
         $client->request('GET', '/en/login');

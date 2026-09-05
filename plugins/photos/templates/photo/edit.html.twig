@@ -21,6 +21,8 @@
         <p class="has-text-grey is-size-7 mb-2">{{ 'photos_photo.hint_translations'|trans }}</p>
         {% include '_components/item/translation_fields.html.twig' with {'form': form, 'fields': ['title', 'description']} %}
 
+        <div class="field">{{ form_row(form.event) }}</div>
+
         {% if form.itemTags is defined %}
             <div class="field">{{ form_row(form.itemTags) }}</div>
         {% endif %}

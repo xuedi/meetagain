@@ -96,6 +96,29 @@ class PollRepository extends ServiceEntityRepository
      *
      * @return list<int>
      */
+    /**
+     * @return array<int, array{itemType: string, itemIds: list<int>}> poll id => its type and every option
+     */
+    public function findEventlessOptionSets(): array
+    {
+        $rows = $this
+            ->createQueryBuilder('p')
+            ->select('p.id', 'p.itemType', 'o.itemId')
+            ->join('p.options', 'o')
+            ->where('p.event IS NULL')
+            ->getQuery()
+            ->getScalarResult();
+
+        $sets = [];
+        foreach ($rows as $row) {
+            $pollId = (int) $row['id'];
+            $sets[$pollId]['itemType'] = (string) $row['itemType'];
+            $sets[$pollId]['itemIds'][] = (int) $row['itemId'];
+        }
+
+        return $sets;
+    }
+
     public function findIdsForEvents(array $eventIds): array
     {
         if ($eventIds === []) {

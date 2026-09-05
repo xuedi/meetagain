@@ -2,24 +2,20 @@
 
 namespace Plugin\Photos\Item;
 
-use App\Entity\EventItemAssociation;
 use App\Enum\ItemViewType;
 use App\Item\ListCellProviderInterface;
 use App\Item\ListProviderInterface;
-use App\Item\TypeProviderInterface;
 use Override;
 use Plugin\Photos\Entity\Photo;
 use Plugin\Photos\Service\ConfigService;
 use Plugin\Photos\Service\PhotoService;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Environment;
 
-final readonly class PhotoTypeProvider implements TypeProviderInterface, ListCellProviderInterface, ListProviderInterface
+final readonly class PhotoListCellProvider implements ListCellProviderInterface, ListProviderInterface
 {
     public function __construct(
         private PhotoService $photoService,
         private ConfigService $configService,
-        private AuthorizationCheckerInterface $authorizationChecker,
         private Environment $twig,
     ) {}
 
@@ -33,26 +29,6 @@ final readonly class PhotoTypeProvider implements TypeProviderInterface, ListCel
     public function getKey(): string
     {
         return PhotoService::ITEM_TYPE;
-    }
-
-    #[Override]
-    public function getLabelKey(): string
-    {
-        return 'photos.item_label';
-    }
-
-    #[Override]
-    public function renderEventCell(int $itemId, EventItemAssociation $association): ?string
-    {
-        $photo = $this->photoService->getAttached($itemId);
-        if ($photo === null) {
-            return null;
-        }
-
-        return $this->twig->render('@Photos/item/event_cell.html.twig', [
-            'photo' => $photo,
-            'association' => $association,
-        ]);
     }
 
     #[Override]
@@ -80,17 +56,8 @@ final readonly class PhotoTypeProvider implements TypeProviderInterface, ListCel
     {
         return $this->twig->render('@Photos/item/list_body.html.twig', [
             'photos' => $this->photoService->getList(),
-            'canAdd' => $this->canAdd(),
+            'canAdd' => $this->configService->canUpload(),
         ]);
-    }
-
-    public function canAdd(): bool
-    {
-        if ($this->authorizationChecker->isGranted('ROLE_STEWARD')) {
-            return true;
-        }
-
-        return $this->authorizationChecker->isGranted('ROLE_USER') && $this->configService->getConfig()->isMemberUploads();
     }
 
     #[Override]
@@ -128,20 +95,5 @@ final readonly class PhotoTypeProvider implements TypeProviderInterface, ListCel
         }
 
         return $stamps;
-    }
-
-    #[Override]
-    public function renderAttachPicker(int $eventId): string
-    {
-        return $this->twig->render('@Photos/item/attach_picker.html.twig', [
-            'eventId' => $eventId,
-            'photos' => $this->photoService->getManagedList(),
-        ]);
-    }
-
-    #[Override]
-    public function getPriority(): int
-    {
-        return 40;
     }
 }

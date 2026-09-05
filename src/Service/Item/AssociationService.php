@@ -76,4 +76,10 @@ readonly class AssociationService
     {
         return $this->repository->findByEvent($eventId);
     }
+
+    /** @return list<int> the events this item is attached to, oldest attachment first */
+    public function eventIdsForItem(string $itemType, int $itemId): array
+    {
+        return $this->repository->findEventIdsByItem($itemType, $itemId);
+    }
 }

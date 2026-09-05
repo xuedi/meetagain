@@ -3,6 +3,7 @@
 namespace Plugin\Photos\Tests\Unit\Service;
 
 use App\Publisher\PluginSettings\Resolver;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use PHPUnit\Framework\TestCase;
 use Plugin\Photos\Service\ConfigService;
 use Plugin\Photos\ValueObject\Config;
@@ -15,7 +16,7 @@ class ConfigServiceTest extends TestCase
         $config = new Config()->setMemberUploads(false);
         $resolver = $this->createStub(Resolver::class);
         $resolver->method('resolve')->willReturn($config);
-        $service = new ConfigService($resolver);
+        $service = new ConfigService($resolver, $this->createStub(AuthorizationCheckerInterface::class));
 
         // Act + Assert
         static::assertSame($config, $service->getConfig());
@@ -26,7 +27,7 @@ class ConfigServiceTest extends TestCase
         // Arrange
         $resolver = $this->createMock(Resolver::class);
         $resolver->expects(static::once())->method('resolve')->willReturn(new Config());
-        $service = new ConfigService($resolver);
+        $service = new ConfigService($resolver, $this->createStub(AuthorizationCheckerInterface::class));
 
         // Act
         $first = $service->getConfig();

@@ -4,6 +4,7 @@ namespace Plugin\Photos\Service;
 
 use App\Publisher\PluginSettings\Resolver;
 use Plugin\Photos\ValueObject\Config;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ConfigService
 {
@@ -11,6 +12,7 @@ class ConfigService
 
     public function __construct(
         private readonly Resolver $resolver,
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
     ) {}
 
     public function getConfig(): Config
@@ -23,5 +25,14 @@ class ConfigService
         \assert($config instanceof Config);
 
         return $this->memo = $config;
+    }
+
+    public function canUpload(): bool
+    {
+        if ($this->authorizationChecker->isGranted('ROLE_STEWARD')) {
+            return true;
+        }
+
+        return $this->authorizationChecker->isGranted('ROLE_USER') && $this->getConfig()->isMemberUploads();
     }
 }

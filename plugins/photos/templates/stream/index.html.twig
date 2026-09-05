@@ -1,0 +1,58 @@
+{% extends '@Photos/base_photos.html.twig' %}
+
+{% block title %}{{ 'photos_stream.browser_title_index'|trans }}{% endblock %}
+
+{% block photos_body %}
+<div class="level mb-4">
+    <div class="level-left">
+        <h1 class="title mb-0">{{ 'photos_stream.page_title_index'|trans }}</h1>
+    </div>
+    <div class="level-right">
+        <a href="{{ path('app_photos_photolist') }}" class="button">
+            <span class="icon"><i class="fa fa-images"></i></span>
+            <span>{{ 'photos_stream.button_all_photos'|trans }}</span>
+        </a>
+    </div>
+</div>
+
+{% if authors is empty %}
+    <p class="has-text-grey">{{ 'photos_stream.empty_index'|trans }}</p>
+{% else %}
+    <div class="columns is-multiline">
+        {% for author in authors %}
+            <div class="column is-4">
+                <div class="box" style="height: 100%;">
+                    <div class="is-flex is-align-items-center mb-4" style="gap: 0.75rem;">
+                        <figure class="image is-48x48 is-flex-shrink-0">
+                            {% include '_components/image.html.twig' with {'image': author.user.image, 'size': '100x100', 'alt': author.user.name} %}
+                        </figure>
+                        <div>
+                            <p class="has-text-weight-semibold mb-0">
+                                <a href="{{ path('app_plugin_photos_stream', {id: author.user.id}) }}">{{ author.user.name }}</a>
+                            </p>
+                            <p class="is-size-7 has-text-grey">
+                                {{ 'photos_stream.photo_count'|trans({'%count%': author.count}) }}
+                                {% if is_granted('ROLE_USER') %}
+                                    &middot; <a href="{{ path('app_member_view', {id: author.user.id}) }}">{{ 'photos_stream.link_profile'|trans }}</a>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="is-flex is-flex-wrap-wrap" style="gap: 0.4rem;">
+                        {% for photo in author.photos %}
+                            {% if photo.visibleImage %}
+                                {% set photoTitle = photo.getTranslatedTitle(app.locale) ?: 'photos.untitled'|trans %}
+                                <a href="{{ path('app_plugin_photos_photo_show', {id: photo.id}) }}" title="{{ photoTitle }}">
+                                    <figure class="image is-96x96">
+                                        {% include '_components/image.html.twig' with {'image': photo.visibleImage, 'size': '400x400', 'alt': photoTitle} %}
+                                    </figure>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

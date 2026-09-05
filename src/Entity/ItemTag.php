@@ -32,6 +32,9 @@ class ItemTag
     #[ORM\Column(type: Types::JSON)]
     private array $labels = [];
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $managed = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -111,6 +114,18 @@ class ItemTag
         }
 
         return '';
+    }
+
+    public function isManaged(): bool
+    {
+        return $this->managed;
+    }
+
+    public function setManaged(bool $managed): static
+    {
+        $this->managed = $managed;
+
+        return $this;
     }
 
     /** @return list<self> nearest parent first */

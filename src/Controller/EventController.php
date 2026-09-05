@@ -116,6 +116,7 @@ final class EventController extends AbstractController
                 'pluginTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::Sidebar) : [],
                 'pluginCenterTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::Center) : [],
                 'pluginBottomSidebarTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::BottomSidebar) : [],
+                'pluginImageBox' => $this->eventService->getPluginImageBox($id),
                 'event' => $event,
                 'json_ld' => $this->eventSchemaService->buildSchema($event, $canonicalUrl, $locale),
                 'breadcrumbs' => $this->breadcrumbBuilder->build(self::ROUTE_EVENT, 'chrome.menu_events', $event->getTitle($locale)),

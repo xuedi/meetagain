@@ -479,6 +479,49 @@ class EventRepository extends ServiceEntityRepository
         return null;
     }
 
+    /**
+     * @param  array<int>|null    $restrictToEventIds
+     * @return array<string, int> "YYYY-MM-DD - title" => event id, most recent first
+     */
+    public function getOccurrenceChoices(string $locale, ?array $restrictToEventIds, int $limit): array
+    {
+        if ($restrictToEventIds === []) {
+            return [];
+        }
+
+        $idsQb = $this
+            ->createQueryBuilder('e')
+            ->select('e.id')
+            ->orderBy('e.start', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($restrictToEventIds !== null) {
+            $idsQb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+
+        $ids = $idsQb->getQuery()->getSingleColumnResult();
+        if ($ids === []) {
+            return [];
+        }
+
+        $events = $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->where('e.id IN (:ids)')->setParameter('ids', $ids)
+            ->orderBy('e.start', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        $choices = [];
+        foreach ($events as $event) {
+            $label = sprintf('%s - %s', (string) $event->getStart()?->format('Y-m-d'), $event->getTitle($locale));
+            $choices[$label] = (int) $event->getId();
+        }
+
+        return $choices;
+    }
+
     public function getChoices(string $locale): array
     {
         $events = $this

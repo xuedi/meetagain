@@ -19,6 +19,7 @@ readonly class TagService implements ActionInterface
      * @param iterable<FilterInterface>          $filters
      * @param iterable<AdminFilterInterface>     $adminFilters
      * @param iterable<CreationHandlerInterface> $creationHandlers
+     * @param iterable<DeletionHandlerInterface>  $deletionHandlers
      */
     public function __construct(
         private EntityManagerInterface $em,
@@ -32,6 +33,8 @@ readonly class TagService implements ActionInterface
         private iterable $adminFilters,
         #[AutowireIterator(CreationHandlerInterface::class)]
         private iterable $creationHandlers,
+        #[AutowireIterator(DeletionHandlerInterface::class)]
+        private iterable $deletionHandlers,
     ) {}
 
     /** @return list<ItemTag> depth-first, every tag directly after its parent */
@@ -43,7 +46,9 @@ readonly class TagService implements ActionInterface
     /** @return list<ItemTag> depth-first, every tag directly after its parent */
     public function getManagedVocabulary(string $itemType): array
     {
-        return $this->vocabulary($itemType, $this->allowedIds($itemType, $this->adminFilters));
+        $vocabulary = $this->vocabulary($itemType, $this->allowedIds($itemType, $this->adminFilters));
+
+        return array_values(array_filter($vocabulary, static fn(ItemTag $tag): bool => !$tag->isManaged()));
     }
 
     public function getManagedTag(string $itemType, int $tagId): ?ItemTag
@@ -73,7 +78,7 @@ readonly class TagService implements ActionInterface
 
         $wantedTags = [];
         foreach (array_unique($tagIds) as $tagId) {
-            if (!isset($known[$tagId])) {
+            if (!isset($known[$tagId]) || $known[$tagId]->isManaged()) {
                 continue;
             }
 
@@ -89,7 +94,7 @@ readonly class TagService implements ActionInterface
         }
 
         foreach ($current as $tagId => $assignment) {
-            if (in_array($tagId, $wanted, true)) {
+            if (in_array($tagId, $wanted, true) || ($known[$tagId] ?? null)?->isManaged() === true) {
                 continue;
             }
 
@@ -161,6 +166,21 @@ readonly class TagService implements ActionInterface
         return $choices;
     }
 
+    /** @return array<int, string> tag id => label, depth-first, managed rows left out */
+    public function getAssignableChoices(string $itemType, ?string $locale): array
+    {
+        $choices = [];
+        foreach ($this->getVocabulary($itemType) as $tag) {
+            if ($tag->isManaged()) {
+                continue;
+            }
+
+            $choices[(int) $tag->getId()] = $tag->getLabel($locale, $this->sourceLocale());
+        }
+
+        return $choices;
+    }
+
     /** @return array<int, int> tag id => how many levels deep it sits */
     public function getDepths(string $itemType): array
     {
@@ -210,12 +230,13 @@ readonly class TagService implements ActionInterface
     }
 
     /** @param array<string, string> $labels */
-    public function addTag(string $itemType, array $labels, ?ItemTag $parent): ItemTag
+    public function addTag(string $itemType, array $labels, ?ItemTag $parent, bool $managed = false): ItemTag
     {
         $tag = new ItemTag();
         $tag->setItemType($itemType);
         $tag->setLabels($this->trimmedLabels($labels));
         $tag->setParent($parent);
+        $tag->setManaged($managed);
         $tag->setPosition($this->tagRepo->nextPosition($itemType));
 
         $this->em->persist($tag);
@@ -255,6 +276,7 @@ readonly class TagService implements ActionInterface
         $this->assignmentRepo->deleteForTags((string) $tag->getItemType(), $ids);
 
         foreach ($this->tagRepo->findBy(['id' => $ids]) as $doomed) {
+            $this->announceDeletion($doomed);
             $this->em->remove($doomed);
         }
         $this->em->flush();
@@ -412,6 +434,13 @@ readonly class TagService implements ActionInterface
     {
         foreach ($this->creationHandlers as $handler) {
             $handler->onTagCreated($tag);
+        }
+    }
+
+    private function announceDeletion(ItemTag $tag): void
+    {
+        foreach ($this->deletionHandlers as $handler) {
+            $handler->onTagDeleted($tag);
         }
     }
 

@@ -18,7 +18,7 @@ class Poll
     private ?int $id = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Event $event = null;
 
     #[ORM\Column(length: 50)]
@@ -68,7 +68,7 @@ class Poll
         return $this->event;
     }
 
-    public function setEvent(Event $event): static
+    public function setEvent(?Event $event): static
     {
         $this->event = $event;
 

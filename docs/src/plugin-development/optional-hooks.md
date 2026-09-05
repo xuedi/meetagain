@@ -31,6 +31,10 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `SecurityProviderInterface`                  | Participate in live security event detection          | `observe()`, `scanRetrospective()`                     |
 | `DescriptorInterface`                        | Add a settings section to your plugin's settings page | `getFormType()`, `createDefault()`, `applyForm()`      |
 | `TaggableTypeProviderInterface`              | Give an item type a tag vocabulary                    | `getPluginKey()`, `getTypeKey()`, `getLabelKey()`      |
+| `Tag\CreationHandlerInterface`               | Claim a tag row the moment it is created              | `onTagCreated()`                                       |
+| `Tag\DeletionHandlerInterface`               | Release what you attached before a tag row is removed | `onTagDeleted()`                                       |
+| `Event\ImageBoxProviderInterface`            | Replace the event page's image box with your own      | `getPluginKey()`, `renderImageBox()`                   |
+| `Event\EventScopeProviderInterface`          | Run request-less work under an event's own narrowing  | `runForEvent()`                                        |
 | `Comment\TargetProviderInterface`            | Host the shared comment section on your own pages     | `getTypeKey()`, `getReturnUrl()`, `canComment()`       |
 | `Circulation\ParticipationProviderInterface` | Let your item type circulate as physical copies       | `isEnabled()`                                          |
 | `Circulation\ContextProviderInterface`       | Decide which shelf circulation rows are filed under   | `getContext()`, `getPriority()`                        |
@@ -245,6 +249,80 @@ readonly class CmsContextFilter implements CmsFilterInterface
     }
 }
 ```
+
+---
+
+### Event\ImageBoxProviderInterface
+
+**Purpose:** Take over the image box on the event detail page and render your own in its place. Unlike `getEventTile()`,
+which *adds* a box, this *replaces* one that already exists - so your surface inherits the position core gave the image
+box instead of appearing somewhere else on the page. The photos plugin uses it to turn a plain image upload into a real
+photo album for that event.
+
+**File:** `src/Service/Event/ImageBoxProviderInterface.php`
+
+**Tag:** auto-applied by `#[AutoconfigureTag]` on the interface - just implement it, no attribute needed.
+
+**When called:** Once per event detail page, for signed-in visitors only. Providers are tried in order and the **first**
+one returning a non-null string wins; core's own image box renders when nobody claims the slot. `getPluginKey()` must
+return your plugin's key - a provider whose plugin is not active for the request is skipped before it is asked.
+
+**Return `null` whenever you do not want the slot**, including when your own setting is off. That is what lets an
+installation switch the takeover back off and get core's box again.
+
+```php
+namespace Plugin\YourPlugin\Event;
+
+use App\Service\Event\ImageBoxProviderInterface;
+use Override;
+
+final readonly class ImageBoxProvider implements ImageBoxProviderInterface
+{
+    public function __construct(
+        private ConfigService $configService,
+        private Environment $twig,
+    ) {}
+
+    #[Override]
+    public function getPluginKey(): string
+    {
+        return 'your-plugin';
+    }
+
+    #[Override]
+    public function renderImageBox(int $eventId): ?string
+    {
+        if (!$this->configService->getConfig()->isEventBox()) {
+            return null;
+        }
+
+        return $this->twig->render('@YourPlugin/event/image_box.html.twig', ['eventId' => $eventId]);
+    }
+}
+```
+
+**If the box you replace can already hold content, keep showing it.** Core's image box lists images uploaded before your
+plugin existed; suppressing the box must not hide them, so render what is there read-only underneath your own surface.
+
+---
+
+### Event\EventScopeProviderInterface
+
+**Purpose:** Let request-less code read an event's world the way a visitor of that event would. A cron task, a fixture
+seeder, a data hotfix and a test all run without a request, so anything your installation narrows by - host, language,
+whatever else - has nothing to narrow by, and reads come back either empty or from the wrong place.
+
+**File:** `src/Service/Event/EventScopeProviderInterface.php`
+
+**Consumed through:** `App\Service\Event\EventScope::runForEvent(int $eventId, callable $work): mixed` - inject that,
+not the interface. Every registered provider is nested around the callback; with none registered the callback simply
+runs, which is why a plugin may call it unconditionally.
+
+```php
+$photoIds = $this->eventScope->runForEvent($eventId, fn(): array => $this->photoService->getListIds());
+```
+
+Implement the interface only if your plugin *is* the thing that narrows. Everyone else consumes `EventScope`.
 
 ---
 
@@ -1417,6 +1495,25 @@ list-cell and taggable seams and skips the event one.
    A facet click reloads only the list region through the core fragment route; every chip is still a real link, so the
    page works unchanged with JavaScript disabled. If you enhance the rendered list from your own JS (a table plugin, a
    lightbox), bind through a `MutationObserver` on `[data-item-list-body]` - injected markup never runs inline scripts.
+
+### Tags your plugin maintains itself
+
+Sometimes a tag is not a classification a steward picks but a fact your plugin already knows - the photos plugin tags
+every picture with the date of the event it belongs to, so its list can narrow to one event through the facet machinery
+that is already there. Such a row is **managed**, and `App\Item\Tag\ManagedWriter` is how you write one:
+
+- `resolve($itemType, $labels, $parent)` returns the row and creates it on first use; pass `null` as the parent for a
+  root of your own.
+- `assign($tag, $itemId)` and `unassign($tag, $itemId)` write and withdraw the assignment, materialising and unwinding
+  the ancestor closure for you.
+- A managed row facets, badges and filters exactly like any other, but it never appears as a checkbox
+  (`getAssignableChoices()` leaves it out) and never in the steward's vocabulary editor, so nobody can rename,
+  re-parent or delete it.
+- `TagService::setTags()` protects it from both sides: saving an item's own tags neither drops a managed assignment nor
+  accepts one that was submitted by hand.
+
+You own the whole lifecycle in return. Whatever creates the assignment must withdraw it when the fact stops holding, and
+remove the row once nothing carries it any more.
 
 Reference implementation: the dishes plugin (`Plugin\Dishes\Item\DishTaggableTypeProvider`,
 `Plugin\Dishes\Item\DishTypeProvider`, `Plugin\Dishes\Controller\DishController::edit`).

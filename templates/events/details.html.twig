@@ -54,7 +54,11 @@
                             {% include 'events/details/rsvp.html.twig'%}
                         </div>
                         <div class="mt-5 box">
-                            {% include 'events/details/images.html.twig'%}
+                            {% if pluginImageBox %}
+                                {{ pluginImageBox|raw }}
+                            {% else %}
+                                {% include 'events/details/images.html.twig'%}
+                            {% endif %}
                         </div>
                         <div class="mt-5 box">
                             {{ comment_section('event', event.id) }}

@@ -21,6 +21,7 @@ use App\Service\Media\AltLocaleRequirementResolver;
 use App\Service\Media\ImageAltService;
 use App\Service\Media\ImageAltStatusCache;
 use App\Service\Media\ImageLocationService;
+use App\Service\Media\ImageAttributionService;
 use App\Service\Media\ImageService;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
 use DateTimeImmutable;
@@ -58,6 +59,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         private readonly AltLocaleRequirementResolver $altLocaleRequirementResolver,
         private readonly ImageAltService $imageAltService,
         private readonly ImageAltStatusCache $imageAltStatusCache,
+        private readonly ImageAttributionService $attributionService,
     ) {
         parent::__construct($translator, 'images');
     }
@@ -206,6 +208,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         $image->setAttributionNotRequired($request->request->getBoolean('attribution_not_required'));
         $image->setUpdatedAt(new DateTimeImmutable());
         $this->entityManager->flush();
+        $this->attributionService->invalidate();
 
         $this->addFlash('success', $this->translator->trans('admin_system_images.flash_attribution_saved'));
 

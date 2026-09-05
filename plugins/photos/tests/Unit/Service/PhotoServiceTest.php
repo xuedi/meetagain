@@ -135,6 +135,61 @@ class PhotoServiceTest extends TestCase
         $service->getList();
     }
 
+    public function testGetStreamNarrowsThroughTheFrontendFilterChain(): void
+    {
+        // Arrange
+        $filter = $this->createStub(FilterService::class);
+        $filter->method('getAllowedItemIds')->willReturn([4, 9]);
+        $repository = $this->createMock(PhotoRepository::class);
+        $repository->expects(static::once())->method('findByCreator')->with(7, [4, 9], 6)->willReturn([]);
+        $service = $this->service(repository: $repository, filter: $filter);
+
+        // Act
+        $service->getStream(7, 6);
+    }
+
+    public function testGetStreamsResolvesTheAllowListOnceForEveryAuthor(): void
+    {
+        // Arrange
+        $filter = $this->createMock(FilterService::class);
+        $filter->expects(static::once())->method('getAllowedItemIds')->with('photo')->willReturn([4, 9]);
+        $repository = $this->createMock(PhotoRepository::class);
+        $repository->expects(static::exactly(3))->method('findByCreator')->willReturn([]);
+        $service = $this->service(repository: $repository, filter: $filter);
+
+        // Act
+        $streams = $service->getStreams([7, 8, 9], 6);
+
+        // Assert
+        static::assertSame([7, 8, 9], array_keys($streams));
+    }
+
+    public function testGetStreamAuthorsNarrowsThroughTheFrontendFilterChain(): void
+    {
+        // Arrange
+        $filter = $this->createStub(FilterService::class);
+        $filter->method('getAllowedItemIds')->willReturn([4, 9]);
+        $repository = $this->createMock(PhotoRepository::class);
+        $repository->expects(static::once())->method('countByCreator')->with([4, 9])->willReturn([7 => 2]);
+        $service = $this->service(repository: $repository, filter: $filter);
+
+        // Act + Assert
+        static::assertSame([7 => 2], $service->getStreamAuthors());
+    }
+
+    public function testHasStreamAsksForASinglePhotoOnly(): void
+    {
+        // Arrange
+        $repository = $this->createMock(PhotoRepository::class);
+        $repository->expects(static::exactly(2))->method('findByCreator')
+            ->willReturnOnConsecutiveCalls([new Photo()], []);
+        $service = $this->service(repository: $repository);
+
+        // Act + Assert
+        static::assertTrue($service->hasStream(7));
+        static::assertFalse($service->hasStream(8));
+    }
+
     public function testIsOwnedByComparesTheUploaderId(): void
     {
         // Arrange

@@ -36,5 +36,9 @@ class ConfigDescriptorTest extends TestCase
         static::assertInstanceOf(Config::class, $default);
         static::assertTrue($default->isMemberUploads());
         static::assertTrue($default->isShowCameraMeta());
+        static::assertTrue($default->isMemberStreams());
+        static::assertTrue($default->isEventBox());
+        static::assertFalse($default->isContest());
+        static::assertSame(1, $default->getContestSubmissionsPerMember());
     }
 }
