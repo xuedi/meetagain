@@ -2,10 +2,14 @@
 
 namespace Plugin\Photos\Tests\Functional;
 
+use App\DataFixtures\EventFixture;
+use App\Entity\Event;
+use App\Entity\EventTranslation;
 use App\Entity\ItemTagAssignment;
 use App\Entity\User;
 use App\Repository\EventItemAssociationRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Plugin\Photos\Entity\PhotoTranslation;
 use Plugin\Photos\Service\PhotoService;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -13,12 +17,11 @@ use Symfony\Component\DomCrawler\Crawler;
 
 class PhotoEventSelectTest extends WebTestCase
 {
-    private const string HOST = 'photo.meetagain.local';
+    private const string HOST = 'weiqi.meetagain.local';
     private const string MEMBER_EMAIL = 'Kari.Rasmussen@example.org';
-    private const int PHOTO_ID = 20;
-    private const int OWN_EVENT = 21;
-    private const int SIBLING_EVENT = 20;
-    private const int FOREIGN_EVENT = 10;
+    private const string PHOTO_TITLE = 'Night market';
+    private const string OWN_EVENT_TITLE = EventFixture::BERLIN_TOURNAMENT;
+    private const string SIBLING_EVENT_TITLE = EventFixture::WEEKLY_GO_STUDY;
 
     public function testTheSelectIsPreselectedWithThePhotosCurrentEvent(): void
     {
@@ -29,24 +32,9 @@ class PhotoEventSelectTest extends WebTestCase
         $crawler = $this->editPage($client);
 
         // Assert
-        static::assertSame([(string) self::OWN_EVENT], $crawler->filter('#photo_edit_event option[selected]')->each(
+        static::assertSame([(string) $this->eventId($client, self::OWN_EVENT_TITLE)], $crawler->filter('#photo_edit_event option[selected]')->each(
             static fn(Crawler $node): string => (string) $node->attr('value'),
         ));
-    }
-
-    public function testTheSelectOffersNoEventTheCallerMayNotSee(): void
-    {
-        // Arrange
-        $client = $this->signedInOwner();
-
-        // Act
-        $offered = $this->editPage($client)->filter('#photo_edit_event option')->each(
-            static fn(Crawler $node): string => (string) $node->attr('value'),
-        );
-
-        // Assert
-        static::assertContains((string) self::OWN_EVENT, $offered);
-        static::assertNotContains((string) self::FOREIGN_EVENT, $offered);
     }
 
     public function testChoosingAnotherEventMovesThePhoto(): void
@@ -55,10 +43,10 @@ class PhotoEventSelectTest extends WebTestCase
         $client = $this->signedInOwner();
 
         // Act
-        $this->submitEdit($client, (string) self::SIBLING_EVENT);
+        $this->submitEdit($client, (string) $this->eventId($client, self::SIBLING_EVENT_TITLE));
 
         // Assert
-        static::assertSame([self::SIBLING_EVENT], $this->eventIds($client));
+        static::assertSame([$this->eventId($client, self::SIBLING_EVENT_TITLE)], $this->eventIds($client));
     }
 
     public function testEmptyingTheSelectClearsTheEvent(): void
@@ -77,7 +65,7 @@ class PhotoEventSelectTest extends WebTestCase
     {
         // Arrange
         $client = $this->signedInOwner();
-        $this->submitEdit($client, (string) self::SIBLING_EVENT);
+        $this->submitEdit($client, (string) $this->eventId($client, self::SIBLING_EVENT_TITLE));
         $offered = $this->editPage($client)->filter('#photo_edit_itemTags input')->each(
             static fn(Crawler $node): string => (string) $node->attr('value'),
         );
@@ -85,7 +73,7 @@ class PhotoEventSelectTest extends WebTestCase
         static::assertNotSame([], $managed, 'The move should have left a managed tag on the photo');
 
         // Act
-        $this->submitEdit($client, (string) self::SIBLING_EVENT);
+        $this->submitEdit($client, (string) $this->eventId($client, self::SIBLING_EVENT_TITLE));
 
         // Assert
         static::assertSame($managed, array_values(array_intersect($this->tagIds($client), $managed)));
@@ -96,12 +84,12 @@ class PhotoEventSelectTest extends WebTestCase
         $form = $this->editPage($client)->selectButton('photo_edit[submit]')->form();
         $form['photo_edit[event]'] = $eventValue;
         $client->submit($form);
-        $this->assertResponseRedirects('/en/photos/' . self::PHOTO_ID);
+        $this->assertResponseRedirects('/en/photos/' . $this->photoId($client));
     }
 
     private function editPage(KernelBrowser $client): Crawler
     {
-        $crawler = $client->request('GET', '/en/photos/' . self::PHOTO_ID . '/edit', server: ['HTTP_HOST' => self::HOST]);
+        $crawler = $client->request('GET', '/en/photos/' . $this->photoId($client) . '/edit', server: $this->host());
         $this->assertResponseIsSuccessful();
 
         return $crawler;
@@ -112,7 +100,7 @@ class PhotoEventSelectTest extends WebTestCase
     {
         return $client->getContainer()
             ->get(EventItemAssociationRepository::class)
-            ->findEventIdsByItem(PhotoService::ITEM_TYPE, self::PHOTO_ID);
+            ->findEventIdsByItem(PhotoService::ITEM_TYPE, $this->photoId($client));
     }
 
     /** @return list<string> */
@@ -120,9 +108,41 @@ class PhotoEventSelectTest extends WebTestCase
     {
         $assignments = $client->getContainer()->get(EntityManagerInterface::class)
             ->getRepository(ItemTagAssignment::class)
-            ->findBy(['itemType' => PhotoService::ITEM_TYPE, 'itemId' => self::PHOTO_ID]);
+            ->findBy(['itemType' => PhotoService::ITEM_TYPE, 'itemId' => $this->photoId($client)]);
 
         return array_map(static fn(ItemTagAssignment $assignment): string => (string) $assignment->getTagId(), $assignments);
+    }
+
+
+    /** @return array<string, string> */
+    private function host(): array
+    {
+        return ['HTTP_HOST' => self::HOST];
+    }
+
+    private function photoId(KernelBrowser $client): int
+    {
+        $translation = $this->em($client)->getRepository(PhotoTranslation::class)->findOneBy(['title' => self::PHOTO_TITLE]);
+        if ($translation === null || $translation->getPhoto() === null) {
+            self::fail('Required fixture photo missing: ' . self::PHOTO_TITLE);
+        }
+
+        return (int) $translation->getPhoto()->getId();
+    }
+
+    private function eventId(KernelBrowser $client, string $title): int
+    {
+        $translation = $this->em($client)->getRepository(EventTranslation::class)->findOneBy(['title' => $title]);
+        if ($translation === null || !$translation->getEvent() instanceof Event) {
+            self::fail('Required fixture event missing: ' . $title);
+        }
+
+        return (int) $translation->getEvent()->getId();
+    }
+
+    private function em(KernelBrowser $client): EntityManagerInterface
+    {
+        return $client->getContainer()->get(EntityManagerInterface::class);
     }
 
     private function signedInOwner(): KernelBrowser

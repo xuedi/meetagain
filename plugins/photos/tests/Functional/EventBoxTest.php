@@ -2,6 +2,9 @@
 
 namespace Plugin\Photos\Tests\Functional;
 
+use App\DataFixtures\EventFixture;
+use App\Entity\Event;
+use App\Entity\EventTranslation;
 use App\Entity\ItemTag;
 use App\Entity\ItemTagAssignment;
 use App\Entity\User;
@@ -17,10 +20,9 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class EventBoxTest extends WebTestCase
 {
-    private const string HOST = 'cinema.meetagain.local';
-    private const int EVENT_ID = 10;
-    private const string EVENT_DATE = '2026-08-14';
-    private const string MEMBER_EMAIL = 'Drew.Cano@example.org';
+    private const string HOST = 'weiqi.meetagain.local';
+    private const string EVENT_TITLE = EventFixture::BEGINNER_WORKSHOP;
+    private const string MEMBER_EMAIL = 'Maxwell.Tan@example.org';
 
     public function testThePluginBoxTakesOverTheEventImageBox(): void
     {
@@ -29,12 +31,12 @@ class EventBoxTest extends WebTestCase
         $client->loginUser($this->user($client, self::MEMBER_EMAIL));
 
         // Act
-        $client->request('GET', '/en/event/' . self::EVENT_ID, server: $this->host());
+        $client->request('GET', '/en/event/' . $this->eventId($client), server: $this->host());
 
         // Assert
         $content = (string) $client->getResponse()->getContent();
-        static::assertStringContainsString('/photos/event/' . self::EVENT_ID . '/upload', $content);
-        static::assertStringNotContainsString('/image/event/' . self::EVENT_ID . '/modal', $content);
+        static::assertStringContainsString('/photos/event/' . $this->eventId($client) . '/upload', $content);
+        static::assertStringNotContainsString('/image/event/' . $this->eventId($client) . '/modal', $content);
     }
 
     public function testTheCoreImageBoxComesBackWhenTheEventBoxIsSwitchedOff(): void
@@ -45,12 +47,12 @@ class EventBoxTest extends WebTestCase
         $client->loginUser($this->user($client, self::MEMBER_EMAIL));
 
         // Act
-        $client->request('GET', '/en/event/' . self::EVENT_ID, server: $this->host());
+        $client->request('GET', '/en/event/' . $this->eventId($client), server: $this->host());
 
         // Assert
         $content = (string) $client->getResponse()->getContent();
-        static::assertStringContainsString('/image/event/' . self::EVENT_ID . '/modal', $content);
-        static::assertStringNotContainsString('/photos/event/' . self::EVENT_ID . '/upload', $content);
+        static::assertStringContainsString('/image/event/' . $this->eventId($client) . '/modal', $content);
+        static::assertStringNotContainsString('/photos/event/' . $this->eventId($client) . '/upload', $content);
     }
 
     public function testAnUploadCreatesThePhotoTheAssociationAndTheDateTagAtOnce(): void
@@ -64,13 +66,13 @@ class EventBoxTest extends WebTestCase
 
         // Assert
         static::assertContains(
-            self::EVENT_ID,
+            $this->eventId($client),
             $client->getContainer()->get(EventItemAssociationRepository::class)->findEventIdsByItem(PhotoService::ITEM_TYPE, $photoId),
         );
         $tag = $this->dateTag($client);
         static::assertNotNull($tag);
         static::assertTrue($tag->isManaged());
-        static::assertSame(self::EVENT_DATE, $tag->getLabel('en', 'en'));
+        static::assertSame($this->eventDate($client), $tag->getLabel('en', 'en'));
         static::assertContains((int) $tag->getId(), $this->assignedTagIds($client, $photoId));
     }
 
@@ -101,7 +103,7 @@ class EventBoxTest extends WebTestCase
         $client->loginUser($this->user($client, self::MEMBER_EMAIL));
 
         // Act
-        $client->request('POST', '/en/photos/event/' . self::EVENT_ID . '/upload', server: $this->host());
+        $client->request('POST', '/en/photos/event/' . $this->eventId($client) . '/upload', server: $this->host());
 
         // Assert
         static::assertResponseStatusCodeSame(403);
@@ -109,17 +111,17 @@ class EventBoxTest extends WebTestCase
 
     private function upload(KernelBrowser $client): int
     {
-        $crawler = $client->request('GET', '/en/event/' . self::EVENT_ID, server: $this->host());
+        $crawler = $client->request('GET', '/en/event/' . $this->eventId($client), server: $this->host());
         $token = (string) $crawler->filter('input[name="event_upload[_token]"]')->attr('value');
 
         $client->request(
             'POST',
-            '/en/photos/event/' . self::EVENT_ID . '/upload',
+            '/en/photos/event/' . $this->eventId($client) . '/upload',
             ['event_upload' => ['_token' => $token]],
             ['event_upload' => ['files' => [new UploadedFile($this->picture(), 'harbour.jpg', 'image/jpeg', null, true)]]],
             $this->host(),
         );
-        $this->assertResponseRedirects('/en/event/' . self::EVENT_ID);
+        $this->assertResponseRedirects('/en/event/' . $this->eventId($client));
 
         $photo = $this->em($client)->getRepository(Photo::class)->findOneBy([], ['id' => 'DESC']);
         static::assertInstanceOf(Photo::class, $photo);
@@ -141,7 +143,7 @@ class EventBoxTest extends WebTestCase
     private function dateTag(KernelBrowser $client): ?ItemTag
     {
         foreach ($this->em($client)->getRepository(ItemTag::class)->findBy(['itemType' => PhotoService::ITEM_TYPE, 'managed' => true]) as $tag) {
-            if ($tag->getLabel('en', 'en') === self::EVENT_DATE) {
+            if ($tag->getLabel('en', 'en') === $this->eventDate($client)) {
                 return $tag;
             }
         }
@@ -180,9 +182,30 @@ class EventBoxTest extends WebTestCase
         return $client->getContainer()->get(EntityManagerInterface::class);
     }
 
+
     /** @return array<string, string> */
     private function host(): array
     {
         return ['HTTP_HOST' => self::HOST];
+    }
+
+    private function eventId(KernelBrowser $client): int
+    {
+        return (int) $this->event($client)->getId();
+    }
+
+    private function eventDate(KernelBrowser $client): string
+    {
+        return $this->event($client)->getStart()->format('Y-m-d');
+    }
+
+    private function event(KernelBrowser $client): Event
+    {
+        $translation = $this->em($client)->getRepository(EventTranslation::class)->findOneBy(['title' => self::EVENT_TITLE]);
+        if ($translation === null || !$translation->getEvent() instanceof Event) {
+            self::fail('Required fixture event missing: ' . self::EVENT_TITLE);
+        }
+
+        return $translation->getEvent();
     }
 }

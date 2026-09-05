@@ -2,6 +2,9 @@
 
 namespace Plugin\Photos\Tests\Functional;
 
+use App\DataFixtures\EventFixture;
+use App\Entity\Event;
+use App\Entity\EventTranslation;
 use App\Entity\User;
 use App\Item\TypeRegistry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,11 +14,9 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ItemBoxExitTest extends WebTestCase
 {
-    private const string HOST = 'cinema.meetagain.local';
+    private const string HOST = 'weiqi.meetagain.local';
     private const string ORGANIZER_EMAIL = 'admin@example.org';
-    private const int EVENT_ID = 10;
-    private const int PHOTO_ID = 3;
-    private const int FILM_ID = 16;
+    private const string EVENT_TITLE = EventFixture::ONLINE_SIMULTANEOUS;
 
     public function testPhotosAreNoLongerAnOfferedItemType(): void
     {
@@ -37,7 +38,7 @@ class ItemBoxExitTest extends WebTestCase
         $client = $this->signedInOrganizer();
 
         // Act
-        $client->request('GET', '/en/event/' . self::EVENT_ID, server: $this->host());
+        $client->request('GET', '/en/event/' . $this->eventId($client), server: $this->host());
 
         // Assert
         $this->assertResponseIsSuccessful();
@@ -52,10 +53,10 @@ class ItemBoxExitTest extends WebTestCase
         $client = $this->signedInOrganizer();
 
         // Act & Assert
-        $this->addToWishlist($client, 'film', self::FILM_ID);
+        $this->addToWishlist($client, 'film', $this->filmId($client));
         static::assertResponseRedirects();
 
-        $this->addToWishlist($client, PhotoService::ITEM_TYPE, self::PHOTO_ID);
+        $this->addToWishlist($client, PhotoService::ITEM_TYPE, $this->photoId($client));
         static::assertResponseStatusCodeSame(404);
     }
 
@@ -65,10 +66,10 @@ class ItemBoxExitTest extends WebTestCase
         $client = $this->signedInOrganizer();
 
         // Act & Assert
-        $client->request('GET', '/en/voting/poll/create/' . self::EVENT_ID . '/film', server: $this->host());
+        $client->request('GET', '/en/voting/poll/create/' . $this->eventId($client) . '/film', server: $this->host());
         $this->assertResponseIsSuccessful();
 
-        $client->request('GET', '/en/voting/poll/create/' . self::EVENT_ID . '/photo', server: $this->host());
+        $client->request('GET', '/en/voting/poll/create/' . $this->eventId($client) . '/photo', server: $this->host());
         static::assertResponseStatusCodeSame(404);
     }
 
@@ -102,9 +103,45 @@ class ItemBoxExitTest extends WebTestCase
         return $client;
     }
 
+
     /** @return array<string, string> */
     private function host(): array
     {
         return ['HTTP_HOST' => self::HOST];
+    }
+
+    private function eventId(KernelBrowser $client): int
+    {
+        $translation = $this->em($client)->getRepository(EventTranslation::class)->findOneBy(['title' => self::EVENT_TITLE]);
+        if ($translation === null || !$translation->getEvent() instanceof Event) {
+            self::fail('Required fixture event missing: ' . self::EVENT_TITLE);
+        }
+
+        return (int) $translation->getEvent()->getId();
+    }
+
+    private function filmId(KernelBrowser $client): int
+    {
+        $id = $this->em($client)->getConnection()->fetchOne('SELECT MIN(id) FROM plg_films_film');
+        if ($id === false || $id === null) {
+            self::fail('Required fixture film missing');
+        }
+
+        return (int) $id;
+    }
+
+    private function photoId(KernelBrowser $client): int
+    {
+        $id = $this->em($client)->getConnection()->fetchOne('SELECT MIN(id) FROM plg_photos_photo');
+        if ($id === false || $id === null) {
+            self::fail('Required fixture photo missing');
+        }
+
+        return (int) $id;
+    }
+
+    private function em(KernelBrowser $client): EntityManagerInterface
+    {
+        return $client->getContainer()->get(EntityManagerInterface::class);
     }
 }
