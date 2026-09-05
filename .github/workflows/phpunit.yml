@@ -148,6 +148,35 @@ jobs:
       - name: Run smoke tests
         run: vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=smoke --processes=4 --functional --no-coverage
 
+  isolation:
+    name: Plugin Isolation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.4'
+          extensions: bcmath, gd, apcu, intl, redis
+
+      - name: Cache Composer packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-php-
+
+      - name: Setup config
+        run: |
+          cp config/plugins.dist.php config/plugins.php
+          cp .env.dist .env
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-scripts
+
+      - name: Leave-one-out container compile
+        run: php bin/check-plugin-isolation.php
+
   checks:
     name: Code Quality
     runs-on: ubuntu-latest

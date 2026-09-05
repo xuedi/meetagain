@@ -2,7 +2,7 @@
 
 # Run all tests and checks
 [group('checks')]
-check: checkMago checkMagoAnalyze checkMagoGuard
+check: checkMago checkMagoAnalyze checkMagoGuard checkPluginIsolation
     {{PHP}} composer validate --strict
     {{PHP}} php bin/check-get-routes.php
     echo "All tests and checks passed successfully"
@@ -32,3 +32,13 @@ checkMagoAll: checkMago checkMagoAnalyze checkMagoGuard
 checkA11y url='http://meetagain.local/':
     {{DOCKER}} build pa11y -q
     {{DOCKER}} run --rm pa11y {{url}} --reporter cli --standard WCAG2AA
+
+# Compile the production container once per installed plugin, each time with one plugin removed
+[group('checks')]
+checkPluginIsolation:
+    {{PHP}} php bin/check-plugin-isolation.php
+
+# Check config/plugins.php against the plugins on disk (run before deploying)
+[group('checks')]
+checkPluginConfig:
+    {{PHP}} php bin/check-plugin-config.php

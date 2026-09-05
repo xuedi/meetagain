@@ -6,6 +6,7 @@ installed.lock
 /config/secrets/prod/prod.decrypt.private.php
 /config/plugins.php
 /config/plugins_test.php
+/config/plugins_prod.php
 /config/plugins-post-fixtures.sh
 /bin/tools/bin/
 /bin/tools/target/
