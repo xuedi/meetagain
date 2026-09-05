@@ -5,3 +5,25 @@ services:
 
     Plugin\Photos\:
         resource: '../src/'
+        exclude:
+            - '../src/DataFixtures/'
+
+# Fixtures are dev and test artefacts: registering them in the production container
+# would make every service they inject a production dependency.
+when@dev:
+    services:
+        _defaults:
+            autowire: true
+            autoconfigure: true
+
+        Plugin\Photos\DataFixtures\:
+            resource: '../src/DataFixtures/'
+
+when@test:
+    services:
+        _defaults:
+            autowire: true
+            autoconfigure: true
+
+        Plugin\Photos\DataFixtures\:
+            resource: '../src/DataFixtures/'

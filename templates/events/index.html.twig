@@ -158,22 +158,28 @@
     {% set calendarFeedUrl = url('app_event_calendar_feed') %}
     <section class="section py-5">
         <div class="container">
-            <article class="message">
-                <div class="message-header">
-                    <p>{{ 'events.calendar_subscribe_heading'|trans }}</p>
+            <div class="columns is-centered">
+                <div class="column is-half">
+                    <article class="message">
+                        <div class="message-body">
+                            <p class="has-text-weight-semibold">{{ 'events.calendar_subscribe_heading'|trans }}</p>
+                            <p class="mb-4">{{ 'events.calendar_subscribe_intro'|trans }}</p>
+                            <div class="columns is-vcentered">
+                                <div class="column is-narrow">
+                                    <a class="button is-link" href="{{ calendarFeedUrl|replace({'https://': 'webcal://', 'http://': 'webcal://'}) }}">
+                                        <span class="icon"><i class="fa-regular fa-calendar-plus"></i></span>
+                                        <span>{{ 'events.button_subscribe_calendar'|trans }}</span>
+                                    </a>
+                                </div>
+                                <div class="column">
+                                    <label class="label is-small mb-1" for="calendarFeedUrl">{{ 'events.calendar_subscribe_manual'|trans }}</label>
+                                    <input class="input is-small" id="calendarFeedUrl" type="text" readonly value="{{ calendarFeedUrl }}">
+                                </div>
+                            </div>
+                        </div>
+                    </article>
                 </div>
-                <div class="message-body">
-                    <p class="mb-4">{{ 'events.calendar_subscribe_intro'|trans }}</p>
-                    <a class="button is-link" href="{{ calendarFeedUrl|replace({'https://': 'webcal://', 'http://': 'webcal://'}) }}">
-                        <span class="icon"><i class="fa-regular fa-calendar-plus"></i></span>
-                        <span>{{ 'events.button_subscribe_calendar'|trans }}</span>
-                    </a>
-                    <div class="mt-4">
-                        <label class="label is-small" for="calendarFeedUrl">{{ 'events.calendar_subscribe_manual'|trans }}</label>
-                        <input class="input is-small" id="calendarFeedUrl" type="text" readonly value="{{ calendarFeedUrl }}">
-                    </div>
-                </div>
-            </article>
+            </div>
         </div>
     </section>
 

@@ -17,6 +17,7 @@ services:
         resource: '../src/'
         exclude:
             - '../src/Kernel.php'
+            - '../src/DataFixtures/'
             - '../src/Activity/UnknownMessage.php'
             - '../src/Service/Security/LoadtestBypass.php'
             - '../src/Entity/'
@@ -67,13 +68,6 @@ services:
         arguments:
             - '@Redis'
 
-    App\DataFixtures\:
-        resource: '../src/DataFixtures/'
-        exclude:
-            - '../src/DataFixtures/AbstractFixture.php'
-        tags:
-            - { name: 'doctrine.fixture.orm.class' }
-
     Sentry\SentryBundle\Monolog\LogsHandler:
         arguments:
             - !php/const Monolog\Logger::INFO
@@ -90,3 +84,31 @@ services:
         arguments:
             $passwordResetLimiter: '@limiter.password_reset'
             $registrationLimiter: '@limiter.registration'
+
+# Fixtures are dev and test artefacts: registering them in the production container
+# would make every service they inject a production dependency.
+when@dev:
+    services:
+        _defaults:
+            autowire: true
+            autoconfigure: true
+
+        App\DataFixtures\:
+            resource: '../src/DataFixtures/'
+            exclude:
+                - '../src/DataFixtures/AbstractFixture.php'
+            tags:
+                - { name: 'doctrine.fixture.orm.class' }
+
+when@test:
+    services:
+        _defaults:
+            autowire: true
+            autoconfigure: true
+
+        App\DataFixtures\:
+            resource: '../src/DataFixtures/'
+            exclude:
+                - '../src/DataFixtures/AbstractFixture.php'
+            tags:
+                - { name: 'doctrine.fixture.orm.class' }
