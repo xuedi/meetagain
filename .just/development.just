@@ -16,7 +16,15 @@ devCerts:
     @command -v mkcert >/dev/null || { echo "mkcert is not installed - see docker/certs/README.md"; exit 1; }
     mkcert -install
     mkcert -cert-file docker/certs/meetagain.local.crt -key-file docker/certs/meetagain.local.key meetagain.local "*.meetagain.local"
+    {{JUST}} devCertsFirefox
     {{JUST}} dockerRestart
+
+# Trust the mkcert CA in every Firefox profile, including the XDG paths mkcert does not scan
+[group('development')]
+devCertsFirefox:
+    @command -v certutil >/dev/null || { echo "certutil is missing - install the nss package to trust the CA in Firefox"; exit 1; }
+    @CA="$(mkcert -CAROOT)/rootCA.pem"; found=0; for p in ~/.mozilla/firefox/*/ ~/.config/mozilla/firefox/*/; do [ -f "$p/cert9.db" ] || continue; found=1; certutil -d sql:"$p" -D -n "mkcert development CA" >/dev/null 2>&1 || true; certutil -d sql:"$p" -A -t "C,," -n "mkcert development CA" -i "$CA" && echo "trusted in $p"; done; [ "$found" = 1 ] || echo "no Firefox profile found - nothing to do"
+    @echo "Restart Firefox to pick this up."
 
 # Shared reset sequence used by devModeFixtures and devModeMinimal
 [group('development')]
