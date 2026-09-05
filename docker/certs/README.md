@@ -1,90 +1,58 @@
-# SSL Certificates for Local Development
+# TLS Certificates for Local Development
 
-This directory contains self-signed SSL certificates for `*.meetagain.local` domains.
+The dev stack serves `meetagain.local` and every `*.meetagain.local` subdomain over HTTPS. The certificate is issued
+locally by [mkcert](https://github.com/FiloSottile/mkcert), which also registers its own root CA in the browser and
+system trust stores - so the browser shows no warning interstitial.
 
-## Files
+**Nothing in this directory is committed.** The certificate and key are per-machine and gitignored. A fresh clone has
+no certificate until you run the setup below.
 
-- `meetagain.local.crt` - Certificate (public)
-- `meetagain.local.key` - Private key
-- `meetagain.local.pem` - Combined certificate + key
-- `generate-cert.sh` - Script to regenerate certificates
+## Setup
 
-## Certificate Coverage
-
-The wildcard certificate covers:
-- `meetagain.local`
-- `*.meetagain.local` (all subdomains)
-
-## Trust the Certificate in Firefox
-
-Firefox uses its own certificate store and doesn't trust system certificates by default.
-
-### Method 1: Import into Firefox (Recommended)
-
-1. Open Firefox
-2. Go to `Settings` → `Privacy & Security`
-3. Scroll down to `Certificates` → Click `View Certificates`
-4. Click the `Authorities` tab
-5. Click `Import...`
-6. Navigate to the `docker/certs/` directory in this project
-7. Select `meetagain.local.crt`
-8. Check: ✅ `Trust this CA to identify websites`
-9. Click `OK`
-
-Now all `*.meetagain.local` domains will work without warnings!
-
-### Method 2: System-wide Trust (Linux)
-
-Run from the project root:
+Install mkcert (Arch: `pacman -S mkcert`, Debian/Ubuntu: `apt install mkcert`, macOS: `brew install mkcert`), then:
 
 ```bash
-# Copy certificate to system store
-sudo cp docker/certs/meetagain.local.crt /usr/local/share/ca-certificates/
-
-# Update certificate store
-sudo update-ca-certificates
+just devCerts
 ```
 
-Note: This works for most browsers except Firefox (which needs Method 1).
+That runs `mkcert -install` (creates the root CA and adds it to the trust stores), issues the wildcard certificate into
+this directory, and restarts the containers so Caddy picks it up. It prompts for your password once, because writing to
+the system trust store needs root.
 
-### Method 3: System-wide Trust (macOS)
+Restart the browser afterwards if pages still show a warning.
 
-Run from the project root:
+## What gets issued
+
+| Name                | Covers                                                            |
+|---------------------|-------------------------------------------------------------------|
+| `meetagain.local`   | the platform host                                                 |
+| `*.meetagain.local` | every group subdomain - one level only, not `a.b.meetagain.local` |
+
+`docker/php/Caddyfile` reads `meetagain.local.crt` and `meetagain.local.key` from here. `http://localhost` stays on
+plain HTTP and needs no certificate.
+
+The root CA lives in `$(mkcert -CAROOT)` and is shared by every project on the machine, so a second clone needs no
+second CA. The leaf certificate expires after roughly 27 months; re-run `just devCerts` to reissue it.
+
+## Firefox
+
+`mkcert -install` handles Firefox automatically when the profile exists at install time. A profile created later needs
+a re-run of `just devCerts`.
+
+## Verify
 
 ```bash
-sudo security add-trusted-cert -d -r trustRoot \
-    -k /Library/Keychains/System.keychain \
-    docker/certs/meetagain.local.crt
+# certificate chain and names
+openssl x509 -in docker/certs/meetagain.local.crt -noout -issuer -dates -ext subjectAltName
+
+# end-to-end, using the system trust store
+curl -sS -o /dev/null -w '%{http_code} verify=%{ssl_verify_result}\n' https://meetagain.local/
 ```
 
-## Regenerating Certificates
+`verify=0` means the chain validated.
 
-If certificates expire or you need new ones:
+## Removing the CA
 
 ```bash
-bash docker/certs/generate-cert.sh
-just stop
-just start
+mkcert -uninstall   # drops it from the trust stores, keeps the files in $(mkcert -CAROOT)
 ```
-
-The certificates are valid for 10 years by default.
-
-## Verify Certificate
-
-```bash
-# Check certificate details
-openssl x509 -in docker/certs/meetagain.local.crt -noout -text
-
-# Test HTTPS connection
-curl -v https://meetagain.local 2>&1 | grep "subject"
-```
-
-## URLs Using HTTPS
-
-- `https://meetagain.local` - Main portal
-- `https://tech.meetagain.local/manage` - Tech group
-- `https://books.meetagain.local/manage` - Books group
-- `https://photo.meetagain.local/manage` - Photo group
-- `https://birds.meetagain.local/manage` - Birds group
-- `https://weiqi.meetagain.local/manage` - Weiqi group
-- `http://localhost` - Still uses HTTP (no certificate needed)

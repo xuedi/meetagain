@@ -9,6 +9,9 @@ installed.lock
 /config/plugins-post-fixtures.sh
 /bin/tools/bin/
 /bin/tools/target/
+/docker/certs/*.crt
+/docker/certs/*.key
+/docker/certs/*.pem
 /public/bundles/
 /tests/reports/clover.xml
 /tests/reports/junit.xml
