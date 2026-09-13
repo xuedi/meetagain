@@ -1,0 +1,1746 @@
+{
+    "format": "meetagain-group-export",
+    "version": "2.0",
+    "exported_at": "2026-01-05T00:00:00+01:00",
+    "plugins": [
+        "boardgames",
+        "wishlist"
+    ],
+    "site": {
+        "slug": "hamburg-board-game-club",
+        "name": "Hamburg Board Game Club",
+        "description": "A board game club meeting every other Thursday in the Schanzenviertel. Members bring what is on their own shelf, the group picks what fits the table that night, and anyone who wants a game taught gets it taught. From twenty-minute fillers to the heavy stuff.",
+        "languages": [
+            "de",
+            "en"
+        ],
+        "theme_colors": [],
+        "settings": {
+            "send_event_reminders": true,
+            "send_rsvp_notifications": true,
+            "send_upcoming_digest": true,
+            "show_town_hall": false
+        },
+        "plugin_settings": {
+            "boardgames": {
+                "adapter": null,
+                "circulation": false,
+                "trustSystem": false
+            }
+        },
+        "logo_file": "images/2d8518626c3c71ebec0bc188f847b9b7c4fc516c.png"
+    },
+    "locations": [
+        {
+            "ref": 18,
+            "title": "Würfelwerk Schanze",
+            "latitude": "53.5620",
+            "longitude": "9.9635",
+            "city": "Hamburg",
+            "country": ""
+        }
+    ],
+    "users": [
+        {
+            "email": "admin@example.org",
+            "name": "admin",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
+            "public": true,
+            "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
+        },
+        {
+            "email": "Ammar.Foley@example.org",
+            "name": "Ammar Foley",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Lover of all things quirky! When I'm not busy mastering languages, you can find me debating the best pizza toppings while juggling three hobbies at once! #PolyglotLife #HobbyJuggler 🍕🎉",
+            "public": true,
+            "image_file": "images/7e8261d73c08f19033c8955fb0480869291d3239.jpg"
+        },
+        {
+            "email": "Aston.Hood@example.org",
+            "name": "Aston Hood",
+            "locale": "en",
+            "role": "admin",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
+            "public": true,
+            "image_file": "images/078bb7912005f175f0521568ab5b06ba15d1b4ec.jpg"
+        },
+        {
+            "email": "Bec.Ferguson@example.org",
+            "name": "Bec Ferguson",
+            "locale": "zh",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Coffee-fueled creative by day, amateur ninja at night - watch out for my decorative sock collection! 🚀☕️ #WorkHardPlayHarder #SockGoals",
+            "public": true,
+            "image_file": "images/a032558d5090218d7dbeef68217b4cd3def21916.jpg"
+        },
+        {
+            "email": "Cameron.Yang@example.org",
+            "name": "Cameron Yang",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about turning words into bridges, I thrive on the magic of languages at work! 💼✨ Let's connect through communication! #LanguageLover #WorkJoy",
+            "public": true,
+            "image_file": "images/cca6d1999853fa706775b5856a2830e436e24396.jpg"
+        },
+        {
+            "email": "Danyal.Lester@example.org",
+            "name": "Danyal Lester",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
+            "public": true,
+            "image_file": "images/60b832260b4cfc1e3277b5f92ad3bacbed8220a6.jpg"
+        },
+        {
+            "email": "Elsie.Roy@example.org",
+            "name": "Elsie Roy",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Coffee-fueled creative by day, amateur ninja at night - watch out for my decorative sock collection! 🚀☕️ #WorkHardPlayHarder #SockGoals",
+            "public": true,
+            "image_file": "images/05e5d6c554a3089511bfb61cf08635410f163ee8.jpg"
+        },
+        {
+            "email": "Erica.Wyatt@example.org",
+            "name": "Erica Wyatt",
+            "locale": "en",
+            "role": "organizer",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Lover of adventure and creativity, I dive into painting and hiking when I'm not crafting magic in marketing! 🌟✨ #HobbyistHeart #WorkAndPlay",
+            "public": true,
+            "image_file": "images/7a81bdba28dde865f459120c44256e97077f8235.jpg"
+        }
+    ],
+    "hosts": [
+        {
+            "ref": 18,
+            "name": "GamesMerle",
+            "email": null
+        },
+        {
+            "ref": 19,
+            "name": "GamesHenning",
+            "email": null
+        }
+    ],
+    "series": [
+        {
+            "ref": 15,
+            "name": "Board Game Night - Past",
+            "rule": "BiMonthly",
+            "ruleSpec": null
+        },
+        {
+            "ref": 16,
+            "name": "Board Game Night",
+            "rule": "BiMonthly",
+            "ruleSpec": null
+        }
+    ],
+    "events": [
+        {
+            "ref": 105,
+            "initial": true,
+            "titles": {
+                "de": "Spieleabend - Vergangen",
+                "en": "Board Game Night - Past"
+            },
+            "descriptions": {
+                "de": "Wir hatten den Hinterraum im Würfelwerk, haben zwei Tische aufgemacht und gespielt, was mitgebracht wurde. Die Zusagen hängen noch am Termin, damit man sieht, was wirklich auf dem Tisch lag.",
+                "en": "We took over the back room at Würfelwerk, split into two tables, and played what people had brought. The pledges are still on the event so anyone can see what actually hit the table."
+            },
+            "teasers": {
+                "de": "Beim letzten Mal: zwei Tische, ein Legespiel, das ausuferte, und ein Absacker ohne Ende.",
+                "en": "Last time out: two tables, a tile game that ran long, and a filler that would not end."
+            },
+            "start": "2025-12-25T19:00:00+01:00",
+            "stop": "2025-12-25T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 15,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                18
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Aston.Hood@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 106,
+            "initial": true,
+            "titles": {
+                "de": "Spieleabend",
+                "en": "Board Game Night"
+            },
+            "descriptions": {
+                "de": "Einlass 19:00 Uhr im Würfelwerk. Sag aus deinem Regal zu, damit niemand ein doppeltes Spiel durch die Stadt schleppt, und vergleiche die Spielerzahlen mit der Teilnehmerzahl, bevor du packst.",
+                "en": "Doors at 19:00 at Würfelwerk. Pledge from your shelf so nobody carries a duplicate across town, and check the player counts against the headcount before you pack."
+            },
+            "teasers": {
+                "de": "Sag zu, was du mitbringst, frag jemanden nach einem Titel, und schau, was zur Runde passt.",
+                "en": "Say what you are bringing, ask an owner for a title you want played, and see what fits the table."
+            },
+            "start": "2026-01-22T19:00:00+01:00",
+            "stop": "2026-01-22T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 16,
+            "featured": true,
+            "location_ref": 18,
+            "host_refs": [
+                19
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Erica.Wyatt@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 107,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend - Vergangen",
+                "en": "Board Game Night - Past"
+            },
+            "descriptions": {
+                "de": "Wir hatten den Hinterraum im Würfelwerk, haben zwei Tische aufgemacht und gespielt, was mitgebracht wurde. Die Zusagen hängen noch am Termin, damit man sieht, was wirklich auf dem Tisch lag.",
+                "en": "We took over the back room at Würfelwerk, split into two tables, and played what people had brought. The pledges are still on the event so anyone can see what actually hit the table."
+            },
+            "teasers": {
+                "de": "Beim letzten Mal: zwei Tische, ein Legespiel, das ausuferte, und ein Absacker ohne Ende.",
+                "en": "Last time out: two tables, a tile game that ran long, and a filler that would not end."
+            },
+            "start": "2026-01-08T19:00:00+01:00",
+            "stop": "2026-01-08T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 15,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                18
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Aston.Hood@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 108,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend - Vergangen",
+                "en": "Board Game Night - Past"
+            },
+            "descriptions": {
+                "de": "Wir hatten den Hinterraum im Würfelwerk, haben zwei Tische aufgemacht und gespielt, was mitgebracht wurde. Die Zusagen hängen noch am Termin, damit man sieht, was wirklich auf dem Tisch lag.",
+                "en": "We took over the back room at Würfelwerk, split into two tables, and played what people had brought. The pledges are still on the event so anyone can see what actually hit the table."
+            },
+            "teasers": {
+                "de": "Beim letzten Mal: zwei Tische, ein Legespiel, das ausuferte, und ein Absacker ohne Ende.",
+                "en": "Last time out: two tables, a tile game that ran long, and a filler that would not end."
+            },
+            "start": "2026-01-22T19:00:00+01:00",
+            "stop": "2026-01-22T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 15,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                18
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Aston.Hood@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 109,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend - Vergangen",
+                "en": "Board Game Night - Past"
+            },
+            "descriptions": {
+                "de": "Wir hatten den Hinterraum im Würfelwerk, haben zwei Tische aufgemacht und gespielt, was mitgebracht wurde. Die Zusagen hängen noch am Termin, damit man sieht, was wirklich auf dem Tisch lag.",
+                "en": "We took over the back room at Würfelwerk, split into two tables, and played what people had brought. The pledges are still on the event so anyone can see what actually hit the table."
+            },
+            "teasers": {
+                "de": "Beim letzten Mal: zwei Tische, ein Legespiel, das ausuferte, und ein Absacker ohne Ende.",
+                "en": "Last time out: two tables, a tile game that ran long, and a filler that would not end."
+            },
+            "start": "2026-02-05T19:00:00+01:00",
+            "stop": "2026-02-05T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 15,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                18
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Aston.Hood@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 110,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend - Vergangen",
+                "en": "Board Game Night - Past"
+            },
+            "descriptions": {
+                "de": "Wir hatten den Hinterraum im Würfelwerk, haben zwei Tische aufgemacht und gespielt, was mitgebracht wurde. Die Zusagen hängen noch am Termin, damit man sieht, was wirklich auf dem Tisch lag.",
+                "en": "We took over the back room at Würfelwerk, split into two tables, and played what people had brought. The pledges are still on the event so anyone can see what actually hit the table."
+            },
+            "teasers": {
+                "de": "Beim letzten Mal: zwei Tische, ein Legespiel, das ausuferte, und ein Absacker ohne Ende.",
+                "en": "Last time out: two tables, a tile game that ran long, and a filler that would not end."
+            },
+            "start": "2026-02-19T19:00:00+01:00",
+            "stop": "2026-02-19T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 15,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                18
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Aston.Hood@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 111,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend - Vergangen",
+                "en": "Board Game Night - Past"
+            },
+            "descriptions": {
+                "de": "Wir hatten den Hinterraum im Würfelwerk, haben zwei Tische aufgemacht und gespielt, was mitgebracht wurde. Die Zusagen hängen noch am Termin, damit man sieht, was wirklich auf dem Tisch lag.",
+                "en": "We took over the back room at Würfelwerk, split into two tables, and played what people had brought. The pledges are still on the event so anyone can see what actually hit the table."
+            },
+            "teasers": {
+                "de": "Beim letzten Mal: zwei Tische, ein Legespiel, das ausuferte, und ein Absacker ohne Ende.",
+                "en": "Last time out: two tables, a tile game that ran long, and a filler that would not end."
+            },
+            "start": "2026-03-05T19:00:00+01:00",
+            "stop": "2026-03-05T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 15,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                18
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Aston.Hood@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 112,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend - Vergangen",
+                "en": "Board Game Night - Past"
+            },
+            "descriptions": {
+                "de": "Wir hatten den Hinterraum im Würfelwerk, haben zwei Tische aufgemacht und gespielt, was mitgebracht wurde. Die Zusagen hängen noch am Termin, damit man sieht, was wirklich auf dem Tisch lag.",
+                "en": "We took over the back room at Würfelwerk, split into two tables, and played what people had brought. The pledges are still on the event so anyone can see what actually hit the table."
+            },
+            "teasers": {
+                "de": "Beim letzten Mal: zwei Tische, ein Legespiel, das ausuferte, und ein Absacker ohne Ende.",
+                "en": "Last time out: two tables, a tile game that ran long, and a filler that would not end."
+            },
+            "start": "2026-03-19T19:00:00+01:00",
+            "stop": "2026-03-19T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 15,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                18
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Aston.Hood@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 113,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend - Vergangen",
+                "en": "Board Game Night - Past"
+            },
+            "descriptions": {
+                "de": "Wir hatten den Hinterraum im Würfelwerk, haben zwei Tische aufgemacht und gespielt, was mitgebracht wurde. Die Zusagen hängen noch am Termin, damit man sieht, was wirklich auf dem Tisch lag.",
+                "en": "We took over the back room at Würfelwerk, split into two tables, and played what people had brought. The pledges are still on the event so anyone can see what actually hit the table."
+            },
+            "teasers": {
+                "de": "Beim letzten Mal: zwei Tische, ein Legespiel, das ausuferte, und ein Absacker ohne Ende.",
+                "en": "Last time out: two tables, a tile game that ran long, and a filler that would not end."
+            },
+            "start": "2026-04-02T19:00:00+02:00",
+            "stop": "2026-04-02T23:00:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 15,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                18
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Aston.Hood@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 114,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend",
+                "en": "Board Game Night"
+            },
+            "descriptions": {
+                "de": "Einlass 19:00 Uhr im Würfelwerk. Sag aus deinem Regal zu, damit niemand ein doppeltes Spiel durch die Stadt schleppt, und vergleiche die Spielerzahlen mit der Teilnehmerzahl, bevor du packst.",
+                "en": "Doors at 19:00 at Würfelwerk. Pledge from your shelf so nobody carries a duplicate across town, and check the player counts against the headcount before you pack."
+            },
+            "teasers": {
+                "de": "Sag zu, was du mitbringst, frag jemanden nach einem Titel, und schau, was zur Runde passt.",
+                "en": "Say what you are bringing, ask an owner for a title you want played, and see what fits the table."
+            },
+            "start": "2026-02-05T19:00:00+01:00",
+            "stop": "2026-02-05T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 16,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                19
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Erica.Wyatt@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 115,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend",
+                "en": "Board Game Night"
+            },
+            "descriptions": {
+                "de": "Einlass 19:00 Uhr im Würfelwerk. Sag aus deinem Regal zu, damit niemand ein doppeltes Spiel durch die Stadt schleppt, und vergleiche die Spielerzahlen mit der Teilnehmerzahl, bevor du packst.",
+                "en": "Doors at 19:00 at Würfelwerk. Pledge from your shelf so nobody carries a duplicate across town, and check the player counts against the headcount before you pack."
+            },
+            "teasers": {
+                "de": "Sag zu, was du mitbringst, frag jemanden nach einem Titel, und schau, was zur Runde passt.",
+                "en": "Say what you are bringing, ask an owner for a title you want played, and see what fits the table."
+            },
+            "start": "2026-02-19T19:00:00+01:00",
+            "stop": "2026-02-19T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 16,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                19
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Erica.Wyatt@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 116,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend",
+                "en": "Board Game Night"
+            },
+            "descriptions": {
+                "de": "Einlass 19:00 Uhr im Würfelwerk. Sag aus deinem Regal zu, damit niemand ein doppeltes Spiel durch die Stadt schleppt, und vergleiche die Spielerzahlen mit der Teilnehmerzahl, bevor du packst.",
+                "en": "Doors at 19:00 at Würfelwerk. Pledge from your shelf so nobody carries a duplicate across town, and check the player counts against the headcount before you pack."
+            },
+            "teasers": {
+                "de": "Sag zu, was du mitbringst, frag jemanden nach einem Titel, und schau, was zur Runde passt.",
+                "en": "Say what you are bringing, ask an owner for a title you want played, and see what fits the table."
+            },
+            "start": "2026-03-05T19:00:00+01:00",
+            "stop": "2026-03-05T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 16,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                19
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Erica.Wyatt@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 117,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend",
+                "en": "Board Game Night"
+            },
+            "descriptions": {
+                "de": "Einlass 19:00 Uhr im Würfelwerk. Sag aus deinem Regal zu, damit niemand ein doppeltes Spiel durch die Stadt schleppt, und vergleiche die Spielerzahlen mit der Teilnehmerzahl, bevor du packst.",
+                "en": "Doors at 19:00 at Würfelwerk. Pledge from your shelf so nobody carries a duplicate across town, and check the player counts against the headcount before you pack."
+            },
+            "teasers": {
+                "de": "Sag zu, was du mitbringst, frag jemanden nach einem Titel, und schau, was zur Runde passt.",
+                "en": "Say what you are bringing, ask an owner for a title you want played, and see what fits the table."
+            },
+            "start": "2026-03-19T19:00:00+01:00",
+            "stop": "2026-03-19T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 16,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                19
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Erica.Wyatt@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 118,
+            "initial": false,
+            "titles": {
+                "de": "Spieleabend",
+                "en": "Board Game Night"
+            },
+            "descriptions": {
+                "de": "Einlass 19:00 Uhr im Würfelwerk. Sag aus deinem Regal zu, damit niemand ein doppeltes Spiel durch die Stadt schleppt, und vergleiche die Spielerzahlen mit der Teilnehmerzahl, bevor du packst.",
+                "en": "Doors at 19:00 at Würfelwerk. Pledge from your shelf so nobody carries a duplicate across town, and check the player counts against the headcount before you pack."
+            },
+            "teasers": {
+                "de": "Sag zu, was du mitbringst, frag jemanden nach einem Titel, und schau, was zur Runde passt.",
+                "en": "Say what you are bringing, ask an owner for a title you want played, and see what fits the table."
+            },
+            "start": "2026-04-02T19:00:00+02:00",
+            "stop": "2026-04-02T23:00:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 16,
+            "featured": false,
+            "location_ref": 18,
+            "host_refs": [
+                19
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Erica.Wyatt@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        }
+    ],
+    "rsvps": [
+        {
+            "event_ref": 105,
+            "email": "Ammar.Foley@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 105,
+            "email": "Aston.Hood@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 105,
+            "email": "Cameron.Yang@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 105,
+            "email": "Elsie.Roy@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 105,
+            "email": "Erica.Wyatt@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 106,
+            "email": "Ammar.Foley@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 106,
+            "email": "Aston.Hood@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 106,
+            "email": "Bec.Ferguson@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 106,
+            "email": "Cameron.Yang@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 106,
+            "email": "Danyal.Lester@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 106,
+            "email": "Erica.Wyatt@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 106,
+            "email": "admin@example.org",
+            "guests": 0
+        }
+    ],
+    "cms_pages": [
+        {
+            "ref": 16,
+            "slug": "index",
+            "published": true,
+            "titles": {
+                "de": "Hamburg Board Game Club",
+                "en": "Hamburg Board Game Club"
+            },
+            "link_names": {
+                "de": "Startseite",
+                "en": "Home"
+            },
+            "menu_locations": [],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 1,
+                    "priority": 1,
+                    "json": {
+                        "title": "Bring what is on your shelf"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 1,
+                    "priority": 2,
+                    "json": {
+                        "title": "Bring mit, was in deinem Regal steht"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 3,
+                    "json": {
+                        "title": "How the night works",
+                        "content": "Every other Thursday we take the back room at Würfelwerk. Members keep their own shelf here, say beforehand what they are bringing, and the player counts are checked against the headcount before anyone packs a box. Nobody carries three copies of the same game across town again."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 4,
+                    "json": {
+                        "title": "So läuft der Abend",
+                        "content": "Alle zwei Wochen donnerstags haben wir den Hinterraum im Würfelwerk. Mitglieder pflegen hier ihr eigenes Regal, sagen vorher zu, was sie mitbringen, und die Spielerzahlen werden mit der Teilnehmerzahl abgeglichen, bevor jemand eine Schachtel einpackt. Nie wieder drei Exemplare desselben Spiels quer durch die Stadt."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 5,
+                    "json": {
+                        "title": "Ask for a title",
+                        "content": "The catalog shows who owns what and who is happy to teach it. If a game you want played is on somebody else's shelf, ask them to bring it - the request lands in their notifications and they accept or decline in one click. New players are welcome; there is always someone teaching a first round."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 6,
+                    "json": {
+                        "title": "Nach einem Titel fragen",
+                        "content": "Im Katalog steht, wem was gehört und wer es gerne erklärt. Steht ein Spiel, das du spielen willst, in einem fremden Regal, frag einfach danach - die Anfrage landet in den Benachrichtigungen und wird mit einem Klick angenommen oder abgelehnt. Neue Leute sind willkommen, eine Erklärrunde findet sich immer."
+                    },
+                    "image_file": null
+                }
+            ]
+        }
+    ],
+    "announcements": [],
+    "tags": [
+        {
+            "ref": 38,
+            "item_type": "boardgame",
+            "parent_ref": null,
+            "position": 0,
+            "labels": {
+                "de": "Mechaniken",
+                "en": "Mechanics",
+                "es": "Mecanicas",
+                "fr": "Mecaniques",
+                "zh": "机制"
+            },
+            "managed": false
+        },
+        {
+            "ref": 39,
+            "item_type": "boardgame",
+            "parent_ref": null,
+            "position": 1,
+            "labels": {
+                "de": "Kategorien",
+                "en": "Categories",
+                "es": "Categorias",
+                "fr": "Categories",
+                "zh": "类别"
+            },
+            "managed": false
+        },
+        {
+            "ref": 40,
+            "item_type": "boardgame",
+            "parent_ref": 38,
+            "position": 2,
+            "labels": {
+                "de": "Deckbau",
+                "en": "Deck building",
+                "es": "Construccion de mazos",
+                "fr": "Construction de deck",
+                "zh": "构筑牌组"
+            },
+            "managed": false
+        },
+        {
+            "ref": 41,
+            "item_type": "boardgame",
+            "parent_ref": 38,
+            "position": 3,
+            "labels": {
+                "de": "Arbeitereinsatz",
+                "en": "Worker placement",
+                "es": "Colocacion de trabajadores",
+                "fr": "Placement d'ouvriers",
+                "zh": "工人放置"
+            },
+            "managed": false
+        },
+        {
+            "ref": 42,
+            "item_type": "boardgame",
+            "parent_ref": 38,
+            "position": 4,
+            "labels": {
+                "de": "Plättchenlegen",
+                "en": "Tile laying",
+                "es": "Colocacion de losetas",
+                "fr": "Pose de tuiles",
+                "zh": "版图拼放"
+            },
+            "managed": false
+        },
+        {
+            "ref": 43,
+            "item_type": "boardgame",
+            "parent_ref": 38,
+            "position": 5,
+            "labels": {
+                "de": "Gebietskontrolle",
+                "en": "Area control",
+                "es": "Control de area",
+                "fr": "Controle de zone",
+                "zh": "区域控制"
+            },
+            "managed": false
+        },
+        {
+            "ref": 44,
+            "item_type": "boardgame",
+            "parent_ref": 38,
+            "position": 6,
+            "labels": {
+                "de": "Kooperativ",
+                "en": "Cooperative",
+                "es": "Cooperativo",
+                "fr": "Cooperatif",
+                "zh": "合作"
+            },
+            "managed": false
+        },
+        {
+            "ref": 45,
+            "item_type": "boardgame",
+            "parent_ref": 38,
+            "position": 7,
+            "labels": {
+                "de": "Handel",
+                "en": "Trading",
+                "es": "Comercio",
+                "fr": "Commerce",
+                "zh": "交易"
+            },
+            "managed": false
+        },
+        {
+            "ref": 46,
+            "item_type": "boardgame",
+            "parent_ref": 38,
+            "position": 8,
+            "labels": {
+                "de": "Verdeckte Rollen",
+                "en": "Hidden roles",
+                "es": "Roles ocultos",
+                "fr": "Roles caches",
+                "zh": "隐藏身份"
+            },
+            "managed": false
+        },
+        {
+            "ref": 47,
+            "item_type": "boardgame",
+            "parent_ref": 39,
+            "position": 9,
+            "labels": {
+                "de": "Partyspiel",
+                "en": "Party game",
+                "es": "Juego de fiesta",
+                "fr": "Jeu d'ambiance",
+                "zh": "聚会游戏"
+            },
+            "managed": false
+        },
+        {
+            "ref": 48,
+            "item_type": "boardgame",
+            "parent_ref": 39,
+            "position": 10,
+            "labels": {
+                "de": "Strategie",
+                "en": "Strategy",
+                "es": "Estrategia",
+                "fr": "Strategie",
+                "zh": "策略"
+            },
+            "managed": false
+        },
+        {
+            "ref": 49,
+            "item_type": "boardgame",
+            "parent_ref": 39,
+            "position": 11,
+            "labels": {
+                "de": "Familie",
+                "en": "Family",
+                "es": "Familiar",
+                "fr": "Famille",
+                "zh": "家庭"
+            },
+            "managed": false
+        },
+        {
+            "ref": 50,
+            "item_type": "boardgame",
+            "parent_ref": 39,
+            "position": 12,
+            "labels": {
+                "de": "Abstrakt",
+                "en": "Abstract",
+                "es": "Abstracto",
+                "fr": "Abstrait",
+                "zh": "抽象"
+            },
+            "managed": false
+        },
+        {
+            "ref": 51,
+            "item_type": "boardgame",
+            "parent_ref": 39,
+            "position": 13,
+            "labels": {
+                "de": "Wortspiel",
+                "en": "Word game",
+                "es": "Juego de palabras",
+                "fr": "Jeu de mots",
+                "zh": "文字游戏"
+            },
+            "managed": false
+        }
+    ],
+    "items": {
+        "boardgame": {
+            "rows": [
+                {
+                    "ref": 1,
+                    "name": "Catan",
+                    "original_name": null,
+                    "year_published": 1995,
+                    "min_players": 3,
+                    "max_players": 4,
+                    "best_player_count": null,
+                    "min_playtime": 60,
+                    "max_playtime": 120,
+                    "min_age": null,
+                    "weight": "2.30",
+                    "description": "Settlers trade and build on an island whose resources never quite line up.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/0f870d38cba8cd46e1c31435c7b295cfc1e1a7ce.jpg"
+                },
+                {
+                    "ref": 2,
+                    "name": "Carcassonne",
+                    "original_name": null,
+                    "year_published": 2000,
+                    "min_players": 2,
+                    "max_players": 5,
+                    "best_player_count": null,
+                    "min_playtime": 30,
+                    "max_playtime": 45,
+                    "min_age": null,
+                    "weight": "1.90",
+                    "description": "Players lay tiles to build a medieval landscape and claim its features.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/4b400cd4b7e4fb6bb8a3a0d4fdc1e083a0e24b0c.jpg"
+                },
+                {
+                    "ref": 3,
+                    "name": "Ticket to Ride",
+                    "original_name": null,
+                    "year_published": 2004,
+                    "min_players": 2,
+                    "max_players": 5,
+                    "best_player_count": null,
+                    "min_playtime": 30,
+                    "max_playtime": 60,
+                    "min_age": null,
+                    "weight": "1.80",
+                    "description": "Collect train cards and claim railway routes across a continent.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/d4be009decb090cb7969ec3561399551cf9514be.jpg"
+                },
+                {
+                    "ref": 4,
+                    "name": "Pandemic",
+                    "original_name": null,
+                    "year_published": 2008,
+                    "min_players": 2,
+                    "max_players": 4,
+                    "best_player_count": null,
+                    "min_playtime": 45,
+                    "max_playtime": 45,
+                    "min_age": null,
+                    "weight": "2.40",
+                    "description": "A team of specialists races four diseases around the world.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/47d7116d5dd1c1d7630235577fafbb76400ba443.jpg"
+                },
+                {
+                    "ref": 5,
+                    "name": "7 Wonders",
+                    "original_name": null,
+                    "year_published": 2010,
+                    "min_players": 3,
+                    "max_players": 7,
+                    "best_player_count": null,
+                    "min_playtime": 30,
+                    "max_playtime": 30,
+                    "min_age": null,
+                    "weight": "2.30",
+                    "description": "Three ages of card drafting build a wonder of the ancient world.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/15afb22ec2f350c6c43a6a68e764dcad3a89b760.jpg"
+                },
+                {
+                    "ref": 6,
+                    "name": "Dominion",
+                    "original_name": null,
+                    "year_published": 2008,
+                    "min_players": 2,
+                    "max_players": 4,
+                    "best_player_count": null,
+                    "min_playtime": 30,
+                    "max_playtime": 30,
+                    "min_age": null,
+                    "weight": "2.40",
+                    "description": "Every player builds a deck from a shared supply of kingdom cards.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/03a7cdef86e11c040d657c57337c2fcacd95520d.jpg"
+                },
+                {
+                    "ref": 7,
+                    "name": "Azul",
+                    "original_name": null,
+                    "year_published": 2017,
+                    "min_players": 2,
+                    "max_players": 4,
+                    "best_player_count": null,
+                    "min_playtime": 30,
+                    "max_playtime": 45,
+                    "min_age": null,
+                    "weight": "1.80",
+                    "description": "Tile drafting for the walls of the Royal Palace of Evora.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/5448b170b1a417d77ea0262e27157a9123e0e494.jpg"
+                },
+                {
+                    "ref": 8,
+                    "name": "Wingspan",
+                    "original_name": null,
+                    "year_published": 2019,
+                    "min_players": 1,
+                    "max_players": 5,
+                    "best_player_count": null,
+                    "min_playtime": 40,
+                    "max_playtime": 70,
+                    "min_age": null,
+                    "weight": "2.40",
+                    "description": "A bird collection engine builder set in forest, grassland and wetland.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/1ee9a5a446322611805d27b212b3597eb96ccdc1.jpg"
+                },
+                {
+                    "ref": 9,
+                    "name": "Codenames",
+                    "original_name": null,
+                    "year_published": 2015,
+                    "min_players": 2,
+                    "max_players": 8,
+                    "best_player_count": null,
+                    "min_playtime": 15,
+                    "max_playtime": 15,
+                    "min_age": null,
+                    "weight": "1.30",
+                    "description": "Two spymasters give one-word clues to contact their agents first.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/8673f38d5edc03245dda77b26367be954e4c8154.jpg"
+                },
+                {
+                    "ref": 10,
+                    "name": "Halma",
+                    "original_name": null,
+                    "year_published": 1883,
+                    "min_players": 2,
+                    "max_players": 4,
+                    "best_player_count": null,
+                    "min_playtime": 20,
+                    "max_playtime": 30,
+                    "min_age": null,
+                    "weight": "1.40",
+                    "description": "Pieces hop across the board in chains to reach the opposite camp first.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/4fc7949d9129a8241d9301f9bbdfdbd66be51485.jpg"
+                },
+                {
+                    "ref": 11,
+                    "name": "Crokinole",
+                    "original_name": null,
+                    "year_published": 1876,
+                    "min_players": 2,
+                    "max_players": 4,
+                    "best_player_count": null,
+                    "min_playtime": 20,
+                    "max_playtime": 30,
+                    "min_age": null,
+                    "weight": "1.20",
+                    "description": "Wooden discs are flicked at the centre hole past a ring of pegs.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/a9dfc3351719448a9171a1c69932e05018c0254b.jpg"
+                },
+                {
+                    "ref": 12,
+                    "name": "Scythe",
+                    "original_name": null,
+                    "year_published": 2016,
+                    "min_players": 1,
+                    "max_players": 5,
+                    "best_player_count": null,
+                    "min_playtime": 90,
+                    "max_playtime": 115,
+                    "min_age": null,
+                    "weight": "3.40",
+                    "description": "Five factions compete for a war-torn 1920s Eastern Europe.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/769f29c7ff9225dc519e97e0c56de3c5a067d5b0.jpg"
+                },
+                {
+                    "ref": 13,
+                    "name": "Terraforming Mars",
+                    "original_name": null,
+                    "year_published": 2016,
+                    "min_players": 1,
+                    "max_players": 5,
+                    "best_player_count": null,
+                    "min_playtime": 120,
+                    "max_playtime": 120,
+                    "min_age": null,
+                    "weight": "3.20",
+                    "description": "Corporations raise the temperature, oxygen and oceans of Mars.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/6350df941e51739c4070b79286b51d7778ba135b.jpg"
+                },
+                {
+                    "ref": 14,
+                    "name": "Agricola",
+                    "original_name": null,
+                    "year_published": 2007,
+                    "min_players": 1,
+                    "max_players": 5,
+                    "best_player_count": null,
+                    "min_playtime": 30,
+                    "max_playtime": 150,
+                    "min_age": null,
+                    "weight": "3.60",
+                    "description": "A farming family expands its house, fields and pastures.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/be604e7c531b03af8bacac85b66dcace0db89170.jpg"
+                },
+                {
+                    "ref": 15,
+                    "name": "Everdell",
+                    "original_name": null,
+                    "year_published": 2018,
+                    "min_players": 1,
+                    "max_players": 4,
+                    "best_player_count": null,
+                    "min_playtime": 40,
+                    "max_playtime": 80,
+                    "min_age": null,
+                    "weight": "2.80",
+                    "description": "Woodland critters build a city of cards through the four seasons.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/51ecf03c70aa670b54d1d6d947daea61130a357c.jpg"
+                },
+                {
+                    "ref": 16,
+                    "name": "The Werewolves of Millers Hollow",
+                    "original_name": null,
+                    "year_published": 2001,
+                    "min_players": 8,
+                    "max_players": 18,
+                    "best_player_count": null,
+                    "min_playtime": 30,
+                    "max_playtime": 30,
+                    "min_age": null,
+                    "weight": "1.20",
+                    "description": "The village votes someone out each morning while the werewolves hunt each night.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/e72183382332ad6f8e20f478c9fbc7443b20c9bd.jpg"
+                },
+                {
+                    "ref": 17,
+                    "name": "Just One",
+                    "original_name": null,
+                    "year_published": 2018,
+                    "min_players": 3,
+                    "max_players": 7,
+                    "best_player_count": null,
+                    "min_playtime": 20,
+                    "max_playtime": 20,
+                    "min_age": null,
+                    "weight": "1.10",
+                    "description": "Everyone writes a one-word clue, and matching clues cancel out.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/faff881ccd7915d779ed47c5537fd24940fa5950.jpg"
+                },
+                {
+                    "ref": 18,
+                    "name": "Backgammon",
+                    "original_name": null,
+                    "year_published": null,
+                    "min_players": 2,
+                    "max_players": 2,
+                    "best_player_count": null,
+                    "min_playtime": 20,
+                    "max_playtime": 40,
+                    "min_age": null,
+                    "weight": "1.80",
+                    "description": "Two players race their fifteen checkers home across twenty-four points.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/12a65348397057332bb2df0250c8bbbfc184eb14.jpg"
+                },
+                {
+                    "ref": 19,
+                    "name": "Hive",
+                    "original_name": null,
+                    "year_published": 2001,
+                    "min_players": 2,
+                    "max_players": 2,
+                    "best_player_count": null,
+                    "min_playtime": 20,
+                    "max_playtime": 20,
+                    "min_age": null,
+                    "weight": "2.30",
+                    "description": "Insect tiles surround the opposing queen bee on an open board.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/467e96b4ee52f5cb5e70669c59e42bb91a73d2fb.jpg"
+                },
+                {
+                    "ref": 20,
+                    "name": "Spirit Island",
+                    "original_name": null,
+                    "year_published": 2017,
+                    "min_players": 1,
+                    "max_players": 4,
+                    "best_player_count": null,
+                    "min_playtime": 90,
+                    "max_playtime": 120,
+                    "min_age": null,
+                    "weight": "4.00",
+                    "description": "Island spirits push back colonial invaders before the island is spoiled.",
+                    "external_source": "manual",
+                    "external_id": null,
+                    "box_image": "images/159bf57f528e6500383304c225bc05f87ea62e13.jpg"
+                }
+            ],
+            "tags": {
+                "1": [
+                    38,
+                    39,
+                    45,
+                    48
+                ],
+                "2": [
+                    38,
+                    39,
+                    42,
+                    49
+                ],
+                "3": [
+                    39,
+                    48,
+                    49
+                ],
+                "4": [
+                    38,
+                    39,
+                    44,
+                    48
+                ],
+                "5": [
+                    39,
+                    48
+                ],
+                "6": [
+                    38,
+                    39,
+                    40,
+                    48
+                ],
+                "7": [
+                    39,
+                    49,
+                    50
+                ],
+                "8": [
+                    39,
+                    48
+                ],
+                "9": [
+                    39,
+                    47,
+                    51
+                ],
+                "10": [
+                    39,
+                    48,
+                    50
+                ],
+                "11": [
+                    39,
+                    49,
+                    50
+                ],
+                "12": [
+                    38,
+                    39,
+                    43,
+                    48
+                ],
+                "13": [
+                    39,
+                    48
+                ],
+                "14": [
+                    38,
+                    39,
+                    41,
+                    48
+                ],
+                "15": [
+                    38,
+                    39,
+                    41,
+                    48
+                ],
+                "16": [
+                    38,
+                    39,
+                    46,
+                    47
+                ],
+                "17": [
+                    39,
+                    47,
+                    51
+                ],
+                "18": [
+                    39,
+                    48,
+                    50
+                ],
+                "19": [
+                    39,
+                    50
+                ],
+                "20": [
+                    38,
+                    39,
+                    44,
+                    48
+                ]
+            }
+        }
+    },
+    "event_items": [
+        {
+            "event_ref": 105,
+            "item_type": "boardgame",
+            "item_ref": 7,
+            "position": 0,
+            "section_label": null,
+            "created_by_email": "Aston.Hood@example.org",
+            "created_at": "2025-11-27T19:00:00+01:00"
+        },
+        {
+            "event_ref": 105,
+            "item_type": "boardgame",
+            "item_ref": 2,
+            "position": 1,
+            "section_label": null,
+            "created_by_email": "Aston.Hood@example.org",
+            "created_at": "2025-11-27T19:00:00+01:00"
+        },
+        {
+            "event_ref": 105,
+            "item_type": "boardgame",
+            "item_ref": 9,
+            "position": 2,
+            "section_label": null,
+            "created_by_email": "Aston.Hood@example.org",
+            "created_at": "2025-11-27T19:00:00+01:00"
+        }
+    ],
+    "topics": [],
+    "circulation": [],
+    "comments": [],
+    "change_proposals": [],
+    "trust": [],
+    "boardgames": {
+        "ownerships": [
+            {
+                "game_ref": 1,
+                "email": "Aston.Hood@example.org",
+                "copy_language": "de",
+                "copy_condition": "played",
+                "notes": "Seafarers expansion in the same box",
+                "can_teach": true,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 5,
+                "email": "Aston.Hood@example.org",
+                "copy_language": "de",
+                "copy_condition": "good",
+                "notes": "Sleeved cards, please handle with care",
+                "can_teach": true,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 13,
+                "email": "Aston.Hood@example.org",
+                "copy_language": "en",
+                "copy_condition": "good",
+                "notes": null,
+                "can_teach": false,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 12,
+                "email": "Aston.Hood@example.org",
+                "copy_language": "en",
+                "copy_condition": "mint",
+                "notes": "Heavy box - only if I come by bike",
+                "can_teach": false,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 9,
+                "email": "Erica.Wyatt@example.org",
+                "copy_language": "de",
+                "copy_condition": "played",
+                "notes": "I always have it in my bag",
+                "can_teach": true,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 7,
+                "email": "Erica.Wyatt@example.org",
+                "copy_language": "de",
+                "copy_condition": "good",
+                "notes": null,
+                "can_teach": false,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 17,
+                "email": "Erica.Wyatt@example.org",
+                "copy_language": "en",
+                "copy_condition": "worn",
+                "notes": null,
+                "can_teach": false,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 16,
+                "email": "Ammar.Foley@example.org",
+                "copy_language": "en",
+                "copy_condition": "played",
+                "notes": "Needs at least eight people to be any fun",
+                "can_teach": false,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 2,
+                "email": "Ammar.Foley@example.org",
+                "copy_language": "de",
+                "copy_condition": "good",
+                "notes": null,
+                "can_teach": false,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 19,
+                "email": "Ammar.Foley@example.org",
+                "copy_language": "en",
+                "copy_condition": "mint",
+                "notes": "A gift, not leaving the flat yet",
+                "can_teach": false,
+                "willing_to_bring": true,
+                "is_public": false,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 3,
+                "email": "Bec.Ferguson@example.org",
+                "copy_language": "de",
+                "copy_condition": "good",
+                "notes": "Too bulky for the bike, but come play at mine",
+                "can_teach": false,
+                "willing_to_bring": false,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 10,
+                "email": "Bec.Ferguson@example.org",
+                "copy_language": "de",
+                "copy_condition": "worn",
+                "notes": null,
+                "can_teach": false,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 15,
+                "email": "Cameron.Yang@example.org",
+                "copy_language": "en",
+                "copy_condition": "mint",
+                "notes": "Happy to teach, the tree takes a minute to build",
+                "can_teach": true,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 20,
+                "email": "Cameron.Yang@example.org",
+                "copy_language": "en",
+                "copy_condition": "good",
+                "notes": null,
+                "can_teach": false,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 14,
+                "email": "Danyal.Lester@example.org",
+                "copy_language": "de",
+                "copy_condition": "played",
+                "notes": null,
+                "can_teach": false,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 18,
+                "email": "Danyal.Lester@example.org",
+                "copy_language": "de",
+                "copy_condition": "worn",
+                "notes": null,
+                "can_teach": false,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 8,
+                "email": "admin@example.org",
+                "copy_language": "en",
+                "copy_condition": "good",
+                "notes": null,
+                "can_teach": true,
+                "willing_to_bring": true,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "game_ref": 4,
+                "email": "admin@example.org",
+                "copy_language": "en",
+                "copy_condition": "incomplete",
+                "notes": "Two role cards missing since 2019",
+                "can_teach": false,
+                "willing_to_bring": false,
+                "is_public": true,
+                "acquired_at": "2025-01-06",
+                "created_at": "2025-01-06T00:00:00+01:00"
+            }
+        ],
+        "pledges": [
+            {
+                "event_ref": 106,
+                "game_ref": 5,
+                "email": "Aston.Hood@example.org",
+                "status": "pledged",
+                "created_at": "2026-01-01T19:00:00+01:00"
+            },
+            {
+                "event_ref": 106,
+                "game_ref": 1,
+                "email": "Aston.Hood@example.org",
+                "status": "pledged",
+                "created_at": "2026-01-01T19:00:00+01:00"
+            },
+            {
+                "event_ref": 106,
+                "game_ref": 9,
+                "email": "Erica.Wyatt@example.org",
+                "status": "pledged",
+                "created_at": "2026-01-01T19:00:00+01:00"
+            },
+            {
+                "event_ref": 106,
+                "game_ref": 16,
+                "email": "Ammar.Foley@example.org",
+                "status": "pledged",
+                "created_at": "2026-01-01T19:00:00+01:00"
+            },
+            {
+                "event_ref": 106,
+                "game_ref": 13,
+                "email": "Aston.Hood@example.org",
+                "status": "pledged",
+                "created_at": "2026-01-01T19:00:00+01:00"
+            }
+        ],
+        "requests": [
+            {
+                "event_ref": 106,
+                "game_ref": 13,
+                "requested_by_email": "Danyal.Lester@example.org",
+                "owner_email": "Aston.Hood@example.org",
+                "status": "accepted",
+                "message": "Would love to finally learn this one - can you bring it and teach the first round?",
+                "created_at": "2026-01-01T19:00:00+01:00",
+                "responded_at": "2026-01-02T19:00:00+01:00"
+            },
+            {
+                "event_ref": 106,
+                "game_ref": 8,
+                "requested_by_email": "Bec.Ferguson@example.org",
+                "owner_email": "admin@example.org",
+                "status": "open",
+                "message": "We have four people who have never played it. Any chance you can bring your copy?",
+                "created_at": "2026-01-01T19:00:00+01:00",
+                "responded_at": null
+            }
+        ]
+    },
+    "wishlist": [],
+    "ballots": [],
+    "images": {
+        "images/03a7cdef86e11c040d657c57337c2fcacd95520d.jpg": {
+            "attribution": "Moroboshi, CC BY-SA 3.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/0f870d38cba8cd46e1c31435c7b295cfc1e1a7ce.jpg": {
+            "attribution": "Yonghokim, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/12a65348397057332bb2df0250c8bbbfc184eb14.jpg": {
+            "attribution": "Tim Reckmann from Hamm, Deutschland, CC BY 2.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/159bf57f528e6500383304c225bc05f87ea62e13.jpg": {
+            "attribution": "Mathias N, CC0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/15afb22ec2f350c6c43a6a68e764dcad3a89b760.jpg": {
+            "attribution": "Marcin Wichary, CC BY 2.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/1ee9a5a446322611805d27b212b3597eb96ccdc1.jpg": {
+            "attribution": "Pongrácz Zsolt, CC BY-SA 3.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/467e96b4ee52f5cb5e70669c59e42bb91a73d2fb.jpg": {
+            "attribution": "Alberto, CC0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/47d7116d5dd1c1d7630235577fafbb76400ba443.jpg": {
+            "attribution": "Padaguan, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/4b400cd4b7e4fb6bb8a3a0d4fdc1e083a0e24b0c.jpg": {
+            "attribution": "L'Éclipse, CC BY 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/4fc7949d9129a8241d9301f9bbdfdbd66be51485.jpg": {
+            "attribution": "Marnanel, CC BY-SA 3.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/51ecf03c70aa670b54d1d6d947daea61130a357c.jpg": {
+            "attribution": "Daniel Mizieliński, CC BY-SA 3.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/5448b170b1a417d77ea0262e27157a9123e0e494.jpg": {
+            "attribution": "Gepsimos, CC0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/6350df941e51739c4070b79286b51d7778ba135b.jpg": {
+            "attribution": "Mshuang2, CC0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/769f29c7ff9225dc519e97e0c56de3c5a067d5b0.jpg": {
+            "attribution": "Charlestpt, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/8673f38d5edc03245dda77b26367be954e4c8154.jpg": {
+            "attribution": "JIP, CC BY-SA 3.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/a9dfc3351719448a9171a1c69932e05018c0254b.jpg": {
+            "attribution": "Alessio Sbarbaro (User:Yoggysot), CC BY-SA 3.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/be604e7c531b03af8bacac85b66dcace0db89170.jpg": {
+            "attribution": "Pifoyde, CC BY-SA 3.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/d4be009decb090cb7969ec3561399551cf9514be.jpg": {
+            "attribution": "JIP, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/e72183382332ad6f8e20f478c9fbc7443b20c9bd.jpg": {
+            "attribution": "Paterm, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/faff881ccd7915d779ed47c5537fd24940fa5950.jpg": {
+            "attribution": "Harrison Keely, CC BY 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        }
+    }
+}

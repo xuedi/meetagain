@@ -26,7 +26,12 @@ final readonly class SettingsStore implements StoreInterface
     {
         \assert($data instanceof Settings);
 
-        $this->settingsService->save($data);
+        $global = $this->settingsService->getOrCreateGlobal();
+        $global->setAdapter($data->getAdapter());
+        $global->setEncryptedTmdbKey($data->getEncryptedTmdbKey());
+        $global->setEncryptedOmdbKey($data->getEncryptedOmdbKey());
+
+        $this->settingsService->save($global);
     }
 
     public function getPriority(): int

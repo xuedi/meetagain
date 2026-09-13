@@ -1,0 +1,592 @@
+{
+    "format": "meetagain-group-export",
+    "version": "2.0",
+    "exported_at": "2026-01-05T00:00:00+01:00",
+    "plugins": [
+        "karaoke",
+        "wishlist"
+    ],
+    "site": {
+        "slug": "berlin-karaoke-crew",
+        "name": "Berlin Karaoke Crew",
+        "description": "A judgment-free karaoke night for everyone - from confident frontrunners to first-time singers. We rent a private room twice a month, take turns picking songs, and keep the energy up until last call.",
+        "languages": [
+            "en",
+            "de"
+        ],
+        "theme_colors": [],
+        "settings": {
+            "send_event_reminders": true,
+            "send_rsvp_notifications": true,
+            "send_upcoming_digest": true,
+            "show_town_hall": false
+        },
+        "plugin_settings": [],
+        "logo_file": "images/fffdc1ec31587a16ea78f39b26775a88511f7775.png"
+    },
+    "locations": [
+        {
+            "ref": 15,
+            "title": "Karaoke Box Friedrichshain",
+            "latitude": "52.5121",
+            "longitude": "13.4566",
+            "city": "Berlin",
+            "country": ""
+        },
+        {
+            "ref": 16,
+            "title": "Mitte Stage & Mic",
+            "latitude": "52.5275",
+            "longitude": "13.3978",
+            "city": "Berlin",
+            "country": ""
+        }
+    ],
+    "users": [
+        {
+            "email": "admin@example.org",
+            "name": "admin",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
+            "public": true,
+            "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
+        },
+        {
+            "email": "Belle.Woods@example.org",
+            "name": "Belle Woods",
+            "locale": "zh",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Lover of adventure and creativity, I dive into painting and hiking when I'm not crafting magic in marketing! 🌟✨ #HobbyistHeart #WorkAndPlay",
+            "public": true,
+            "image_file": "images/6d10ed55842a62725ad954d7fa56fe1e735feb14.jpg"
+        },
+        {
+            "email": "Candice.Wu@example.org",
+            "name": "Candice Wu",
+            "locale": "en",
+            "role": "admin",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about bridging cultures through the magic of languages, I thrive in diverse workplaces where every conversation is an adventure! 🌍✨ #LanguageLover #WorkLifeJoy",
+            "public": true,
+            "image_file": "images/490bfc684f9830da9ba9b43e3de6d7d15d674a95.jpg"
+        }
+    ],
+    "hosts": [
+        {
+            "ref": 15,
+            "name": "KaraokeMiko",
+            "email": null
+        },
+        {
+            "ref": 16,
+            "name": "KaraokeToni",
+            "email": null
+        }
+    ],
+    "series": [
+        {
+            "ref": 11,
+            "name": "Biweekly Karaoke Box Night",
+            "rule": "BiMonthly",
+            "ruleSpec": null
+        },
+        {
+            "ref": 12,
+            "name": "Open-Mic Karaoke - Mitte Stage Night",
+            "rule": "Monthly",
+            "ruleSpec": null
+        }
+    ],
+    "events": [
+        {
+            "ref": 80,
+            "initial": true,
+            "titles": {
+                "de": "Karaoke-Box-Abend (zweiwöchentlich)",
+                "en": "Biweekly Karaoke Box Night"
+            },
+            "descriptions": {
+                "de": "Wir reservieren den Raum ab 20 Uhr bis zum letzten Drink. Songs vorbereiten - und einen Notfall-Klassiker für den Fall der Fälle.",
+                "en": "We reserve the room for 20:00 and run it until last call. Bring your hopeful song picks and a backup ballad. Drinks at the bar attached to the box."
+            },
+            "teasers": {
+                "de": "Vier Stunden Karaoke-Box ganz für uns. Kosten und Songs werden geteilt - kein Urteil, keine Scham.",
+                "en": "Private karaoke box for four hours. We split the cost, we split the songs, no judgment, no shame."
+            },
+            "start": "2026-01-01T20:00:00+01:00",
+            "stop": "2026-01-01T23:59:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 11,
+            "featured": true,
+            "location_ref": 15,
+            "host_refs": [
+                15
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 81,
+            "initial": true,
+            "titles": {
+                "de": "Open-Mic Karaoke - Mitte Stage Night",
+                "en": "Open-Mic Karaoke - Mitte Stage Night"
+            },
+            "descriptions": {
+                "de": "Anmeldung an der Tür ab 20 Uhr, erstes Set um 20:30. Hauseigene Songauswahl plus eigene Wünsche. Danach noch ein Bier an der Bar.",
+                "en": "Sign-up at the door from 20:00, first set at 20:30. House karaoke list plus your own song requests. Stay for the post-show drinks at the bar."
+            },
+            "teasers": {
+                "de": "Echte Bühne, echtes Mikro, freundliches Publikum. Unsere monatliche Wir-gehen-wirklich-raus-Karaoke.",
+                "en": "A real stage, a real mic, and a friendly crowd. The monthly we-actually-go-out karaoke night."
+            },
+            "start": "2026-01-22T20:30:00+01:00",
+            "stop": "2026-01-22T23:59:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 12,
+            "featured": false,
+            "location_ref": 16,
+            "host_refs": [
+                16
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 82,
+            "initial": false,
+            "titles": {
+                "de": "Karaoke-Box-Abend (zweiwöchentlich)",
+                "en": "Biweekly Karaoke Box Night"
+            },
+            "descriptions": {
+                "de": "Wir reservieren den Raum ab 20 Uhr bis zum letzten Drink. Songs vorbereiten - und einen Notfall-Klassiker für den Fall der Fälle.",
+                "en": "We reserve the room for 20:00 and run it until last call. Bring your hopeful song picks and a backup ballad. Drinks at the bar attached to the box."
+            },
+            "teasers": {
+                "de": "Vier Stunden Karaoke-Box ganz für uns. Kosten und Songs werden geteilt - kein Urteil, keine Scham.",
+                "en": "Private karaoke box for four hours. We split the cost, we split the songs, no judgment, no shame."
+            },
+            "start": "2026-01-15T20:00:00+01:00",
+            "stop": "2026-01-15T23:59:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 11,
+            "featured": false,
+            "location_ref": 15,
+            "host_refs": [
+                15
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 83,
+            "initial": false,
+            "titles": {
+                "de": "Karaoke-Box-Abend (zweiwöchentlich)",
+                "en": "Biweekly Karaoke Box Night"
+            },
+            "descriptions": {
+                "de": "Wir reservieren den Raum ab 20 Uhr bis zum letzten Drink. Songs vorbereiten - und einen Notfall-Klassiker für den Fall der Fälle.",
+                "en": "We reserve the room for 20:00 and run it until last call. Bring your hopeful song picks and a backup ballad. Drinks at the bar attached to the box."
+            },
+            "teasers": {
+                "de": "Vier Stunden Karaoke-Box ganz für uns. Kosten und Songs werden geteilt - kein Urteil, keine Scham.",
+                "en": "Private karaoke box for four hours. We split the cost, we split the songs, no judgment, no shame."
+            },
+            "start": "2026-01-29T20:00:00+01:00",
+            "stop": "2026-01-29T23:59:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 11,
+            "featured": false,
+            "location_ref": 15,
+            "host_refs": [
+                15
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 84,
+            "initial": false,
+            "titles": {
+                "de": "Karaoke-Box-Abend (zweiwöchentlich)",
+                "en": "Biweekly Karaoke Box Night"
+            },
+            "descriptions": {
+                "de": "Wir reservieren den Raum ab 20 Uhr bis zum letzten Drink. Songs vorbereiten - und einen Notfall-Klassiker für den Fall der Fälle.",
+                "en": "We reserve the room for 20:00 and run it until last call. Bring your hopeful song picks and a backup ballad. Drinks at the bar attached to the box."
+            },
+            "teasers": {
+                "de": "Vier Stunden Karaoke-Box ganz für uns. Kosten und Songs werden geteilt - kein Urteil, keine Scham.",
+                "en": "Private karaoke box for four hours. We split the cost, we split the songs, no judgment, no shame."
+            },
+            "start": "2026-02-12T20:00:00+01:00",
+            "stop": "2026-02-12T23:59:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 11,
+            "featured": false,
+            "location_ref": 15,
+            "host_refs": [
+                15
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 85,
+            "initial": false,
+            "titles": {
+                "de": "Karaoke-Box-Abend (zweiwöchentlich)",
+                "en": "Biweekly Karaoke Box Night"
+            },
+            "descriptions": {
+                "de": "Wir reservieren den Raum ab 20 Uhr bis zum letzten Drink. Songs vorbereiten - und einen Notfall-Klassiker für den Fall der Fälle.",
+                "en": "We reserve the room for 20:00 and run it until last call. Bring your hopeful song picks and a backup ballad. Drinks at the bar attached to the box."
+            },
+            "teasers": {
+                "de": "Vier Stunden Karaoke-Box ganz für uns. Kosten und Songs werden geteilt - kein Urteil, keine Scham.",
+                "en": "Private karaoke box for four hours. We split the cost, we split the songs, no judgment, no shame."
+            },
+            "start": "2026-02-26T20:00:00+01:00",
+            "stop": "2026-02-26T23:59:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 11,
+            "featured": false,
+            "location_ref": 15,
+            "host_refs": [
+                15
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 86,
+            "initial": false,
+            "titles": {
+                "de": "Karaoke-Box-Abend (zweiwöchentlich)",
+                "en": "Biweekly Karaoke Box Night"
+            },
+            "descriptions": {
+                "de": "Wir reservieren den Raum ab 20 Uhr bis zum letzten Drink. Songs vorbereiten - und einen Notfall-Klassiker für den Fall der Fälle.",
+                "en": "We reserve the room for 20:00 and run it until last call. Bring your hopeful song picks and a backup ballad. Drinks at the bar attached to the box."
+            },
+            "teasers": {
+                "de": "Vier Stunden Karaoke-Box ganz für uns. Kosten und Songs werden geteilt - kein Urteil, keine Scham.",
+                "en": "Private karaoke box for four hours. We split the cost, we split the songs, no judgment, no shame."
+            },
+            "start": "2026-03-12T20:00:00+01:00",
+            "stop": "2026-03-12T23:59:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 11,
+            "featured": false,
+            "location_ref": 15,
+            "host_refs": [
+                15
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 87,
+            "initial": false,
+            "titles": {
+                "de": "Karaoke-Box-Abend (zweiwöchentlich)",
+                "en": "Biweekly Karaoke Box Night"
+            },
+            "descriptions": {
+                "de": "Wir reservieren den Raum ab 20 Uhr bis zum letzten Drink. Songs vorbereiten - und einen Notfall-Klassiker für den Fall der Fälle.",
+                "en": "We reserve the room for 20:00 and run it until last call. Bring your hopeful song picks and a backup ballad. Drinks at the bar attached to the box."
+            },
+            "teasers": {
+                "de": "Vier Stunden Karaoke-Box ganz für uns. Kosten und Songs werden geteilt - kein Urteil, keine Scham.",
+                "en": "Private karaoke box for four hours. We split the cost, we split the songs, no judgment, no shame."
+            },
+            "start": "2026-03-26T20:00:00+01:00",
+            "stop": "2026-03-26T23:59:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 11,
+            "featured": false,
+            "location_ref": 15,
+            "host_refs": [
+                15
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 88,
+            "initial": false,
+            "titles": {
+                "de": "Open-Mic Karaoke - Mitte Stage Night",
+                "en": "Open-Mic Karaoke - Mitte Stage Night"
+            },
+            "descriptions": {
+                "de": "Anmeldung an der Tür ab 20 Uhr, erstes Set um 20:30. Hauseigene Songauswahl plus eigene Wünsche. Danach noch ein Bier an der Bar.",
+                "en": "Sign-up at the door from 20:00, first set at 20:30. House karaoke list plus your own song requests. Stay for the post-show drinks at the bar."
+            },
+            "teasers": {
+                "de": "Echte Bühne, echtes Mikro, freundliches Publikum. Unsere monatliche Wir-gehen-wirklich-raus-Karaoke.",
+                "en": "A real stage, a real mic, and a friendly crowd. The monthly we-actually-go-out karaoke night."
+            },
+            "start": "2026-02-22T20:30:00+01:00",
+            "stop": "2026-02-22T23:59:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 12,
+            "featured": false,
+            "location_ref": 16,
+            "host_refs": [
+                16
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 89,
+            "initial": false,
+            "titles": {
+                "de": "Open-Mic Karaoke - Mitte Stage Night",
+                "en": "Open-Mic Karaoke - Mitte Stage Night"
+            },
+            "descriptions": {
+                "de": "Anmeldung an der Tür ab 20 Uhr, erstes Set um 20:30. Hauseigene Songauswahl plus eigene Wünsche. Danach noch ein Bier an der Bar.",
+                "en": "Sign-up at the door from 20:00, first set at 20:30. House karaoke list plus your own song requests. Stay for the post-show drinks at the bar."
+            },
+            "teasers": {
+                "de": "Echte Bühne, echtes Mikro, freundliches Publikum. Unsere monatliche Wir-gehen-wirklich-raus-Karaoke.",
+                "en": "A real stage, a real mic, and a friendly crowd. The monthly we-actually-go-out karaoke night."
+            },
+            "start": "2026-03-22T20:30:00+01:00",
+            "stop": "2026-03-22T23:59:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 12,
+            "featured": false,
+            "location_ref": 16,
+            "host_refs": [
+                16
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 90,
+            "initial": false,
+            "titles": {
+                "de": "Open-Mic Karaoke - Mitte Stage Night",
+                "en": "Open-Mic Karaoke - Mitte Stage Night"
+            },
+            "descriptions": {
+                "de": "Anmeldung an der Tür ab 20 Uhr, erstes Set um 20:30. Hauseigene Songauswahl plus eigene Wünsche. Danach noch ein Bier an der Bar.",
+                "en": "Sign-up at the door from 20:00, first set at 20:30. House karaoke list plus your own song requests. Stay for the post-show drinks at the bar."
+            },
+            "teasers": {
+                "de": "Echte Bühne, echtes Mikro, freundliches Publikum. Unsere monatliche Wir-gehen-wirklich-raus-Karaoke.",
+                "en": "A real stage, a real mic, and a friendly crowd. The monthly we-actually-go-out karaoke night."
+            },
+            "start": "2026-04-22T20:30:00+02:00",
+            "stop": "2026-04-22T23:59:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 12,
+            "featured": false,
+            "location_ref": 16,
+            "host_refs": [
+                16
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 91,
+            "initial": false,
+            "titles": {
+                "de": "Open-Mic Karaoke - Mitte Stage Night",
+                "en": "Open-Mic Karaoke - Mitte Stage Night"
+            },
+            "descriptions": {
+                "de": "Anmeldung an der Tür ab 20 Uhr, erstes Set um 20:30. Hauseigene Songauswahl plus eigene Wünsche. Danach noch ein Bier an der Bar.",
+                "en": "Sign-up at the door from 20:00, first set at 20:30. House karaoke list plus your own song requests. Stay for the post-show drinks at the bar."
+            },
+            "teasers": {
+                "de": "Echte Bühne, echtes Mikro, freundliches Publikum. Unsere monatliche Wir-gehen-wirklich-raus-Karaoke.",
+                "en": "A real stage, a real mic, and a friendly crowd. The monthly we-actually-go-out karaoke night."
+            },
+            "start": "2026-05-22T20:30:00+02:00",
+            "stop": "2026-05-22T23:59:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 12,
+            "featured": false,
+            "location_ref": 16,
+            "host_refs": [
+                16
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 92,
+            "initial": false,
+            "titles": {
+                "de": "Open-Mic Karaoke - Mitte Stage Night",
+                "en": "Open-Mic Karaoke - Mitte Stage Night"
+            },
+            "descriptions": {
+                "de": "Anmeldung an der Tür ab 20 Uhr, erstes Set um 20:30. Hauseigene Songauswahl plus eigene Wünsche. Danach noch ein Bier an der Bar.",
+                "en": "Sign-up at the door from 20:00, first set at 20:30. House karaoke list plus your own song requests. Stay for the post-show drinks at the bar."
+            },
+            "teasers": {
+                "de": "Echte Bühne, echtes Mikro, freundliches Publikum. Unsere monatliche Wir-gehen-wirklich-raus-Karaoke.",
+                "en": "A real stage, a real mic, and a friendly crowd. The monthly we-actually-go-out karaoke night."
+            },
+            "start": "2026-06-22T20:30:00+02:00",
+            "stop": "2026-06-22T23:59:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 12,
+            "featured": false,
+            "location_ref": 16,
+            "host_refs": [
+                16
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Candice.Wu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        }
+    ],
+    "rsvps": [
+        {
+            "event_ref": 80,
+            "email": "Belle.Woods@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 80,
+            "email": "Candice.Wu@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 81,
+            "email": "Belle.Woods@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 81,
+            "email": "Candice.Wu@example.org",
+            "guests": 0
+        }
+    ],
+    "cms_pages": [
+        {
+            "ref": 14,
+            "slug": "index",
+            "published": true,
+            "titles": {
+                "de": "Berliner Karaoke Crew",
+                "en": "Berlin Karaoke Crew"
+            },
+            "link_names": {
+                "de": "Startseite",
+                "en": "Home"
+            },
+            "menu_locations": [],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 1,
+                    "priority": 1,
+                    "json": {
+                        "title": "Twice a month, one private room, no judgment"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 1,
+                    "priority": 2,
+                    "json": {
+                        "title": "Zweimal im Monat, ein privater Raum, kein Urteil"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 3,
+                    "json": {
+                        "title": "How it works",
+                        "content": "We rent a private karaoke room twice a month and take turns picking songs. First-time singers go whenever they feel ready - nobody is pushed on stage, and duets are always an option."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 4,
+                    "json": {
+                        "title": "So funktioniert es",
+                        "content": "Wir mieten zweimal im Monat einen privaten Karaokeraum und wählen abwechselnd Lieder aus. Wer zum ersten Mal singt, macht das, wenn es sich richtig anfühlt - niemand wird gedrängt, und Duette gehen immer."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 5,
+                    "json": {
+                        "title": "What to expect",
+                        "content": "Drinks, a shared songbook, and an audience that cheers for everyone. Come alone or bring a friend - most people arrive not knowing anybody and leave with a list of songs for next time."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 6,
+                    "json": {
+                        "title": "Was dich erwartet",
+                        "content": "Getränke, ein gemeinsames Liederbuch und ein Publikum, das für jeden klatscht. Komm allein oder bring jemanden mit - die meisten kennen anfangs niemanden und gehen mit einer Songliste für das nächste Mal."
+                    },
+                    "image_file": null
+                }
+            ]
+        }
+    ],
+    "announcements": [],
+    "tags": [],
+    "items": [],
+    "event_items": [],
+    "topics": [],
+    "circulation": [],
+    "comments": [],
+    "change_proposals": [],
+    "trust": [],
+    "wishlist": [],
+    "ballots": [],
+    "images": []
+}

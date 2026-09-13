@@ -54,7 +54,7 @@ class AppProfileQueriesCommand extends Command
             $output->writeln('STATUS: ERROR');
             $output->writeln('---');
             $output->writeln('This command requires the test environment (profiler + KernelBrowser login).');
-            $output->writeln('Run via `just appProfileQueries` (which sets --env=test) instead of `just app`.');
+            $output->writeln('Run it with --env=test against a test database that holds data.');
             return Command::FAILURE;
         }
 

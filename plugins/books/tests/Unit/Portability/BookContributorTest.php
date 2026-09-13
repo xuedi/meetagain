@@ -4,10 +4,10 @@ namespace Plugin\Books\Tests\Unit\Portability;
 
 use App\Entity\Image;
 use App\Entity\User;
-use App\Item\Portability\ImportContext;
-use App\Item\Portability\PortableImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\ImageWriterInterface;
 use App\Service\Media\ImageLocationService;
-use App\Service\System\PortableImageImporter;
+use App\Portability\ImageImporter;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -22,13 +22,13 @@ class BookContributorTest extends TestCase
     {
         // Arrange
         $book = $this->book(4, '9781234567897', 'Dune');
-        $book->setCoverImage(new Image());
+        $book->setCoverImage(new Image()->setHash('cover'));
 
         $repo = $this->createStub(BookRepository::class);
         $repo->method('findBy')->willReturn([$book]);
 
-        $images = $this->createStub(PortableImageWriterInterface::class);
-        $images->method('addImage')->willReturnCallback(static fn(Image $image, string $hint): string => $hint . '.jpg');
+        $images = $this->createStub(ImageWriterInterface::class);
+        $images->method('addImage')->willReturnCallback(static fn(Image $image): string => 'images/' . $image->getHash() . '.jpg');
 
         $contributor = $this->contributor($this->createStub(EntityManagerInterface::class), $repo);
 
@@ -39,7 +39,7 @@ class BookContributorTest extends TestCase
         self::assertSame(4, $rows[0]['ref']);
         self::assertSame('9781234567897', $rows[0]['isbn']);
         self::assertSame('Dune', $rows[0]['title']);
-        self::assertSame('images/books/4/cover.jpg', $rows[0]['cover_image']);
+        self::assertSame('images/cover.jpg', $rows[0]['cover_image']);
     }
 
     public function testCollidingIsbnResolvesToTheExistingBook(): void
@@ -106,7 +106,7 @@ class BookContributorTest extends TestCase
 
     private function context(): ImportContext
     {
-        return new ImportContext($this->createStub(PortableImageImporter::class), '/tmp', new User());
+        return new ImportContext($this->createStub(ImageImporter::class), '/tmp', new User());
     }
 
     private function contributor(EntityManagerInterface $em, BookRepository $repo): BookContributor

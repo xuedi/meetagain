@@ -1,0 +1,1121 @@
+{
+    "format": "meetagain-group-export",
+    "version": "2.0",
+    "exported_at": "2026-01-05T00:00:00+01:00",
+    "plugins": [
+        "dishes",
+        "wishlist"
+    ],
+    "site": {
+        "slug": "berlin-supper-club",
+        "name": "Berlin Supper Club",
+        "description": "A monthly supper club where home cooks host themed dinners for a small group of guests. Seasonal menus, shared tables, and recipes you can take home. Anyone who cooks - or just loves to eat - is welcome.",
+        "languages": [
+            "de",
+            "en"
+        ],
+        "theme_colors": [],
+        "settings": {
+            "send_event_reminders": true,
+            "send_rsvp_notifications": true,
+            "send_upcoming_digest": true,
+            "show_town_hall": false
+        },
+        "plugin_settings": {
+            "dishes": {
+                "footerText": [],
+                "phoneticInList": false
+            }
+        },
+        "logo_file": "images/84b747966d39924acfc290cb056719d95c292b28.png"
+    },
+    "locations": [
+        {
+            "ref": 13,
+            "title": "Neukölln Loft Kitchen",
+            "latitude": "52.4793",
+            "longitude": "13.4407",
+            "city": "Berlin",
+            "country": ""
+        },
+        {
+            "ref": 14,
+            "title": "Schöneberg Garden House",
+            "latitude": "52.4823",
+            "longitude": "13.3631",
+            "city": "Berlin",
+            "country": ""
+        }
+    ],
+    "users": [
+        {
+            "email": "admin@example.org",
+            "name": "admin",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
+            "public": true,
+            "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
+        },
+        {
+            "email": "Crystal.Liu@example.org",
+            "name": "Crystal Liu",
+            "locale": "zh",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
+            "public": true,
+            "image_file": "images/c79532c476e00a2400292babd40d98ac7dff9997.jpg"
+        },
+        {
+            "email": "Koray.Okumus@example.org",
+            "name": "Koray Okumus",
+            "locale": "zh",
+            "role": "organizer",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting and hiking, I find inspiration in nature's beauty. Balancing my love for creativity with a career in graphic design keeps my heart and mind alive! #ArtLover #NatureEnthusiast #CreativeCareer",
+            "public": true,
+            "image_file": "images/9ae42276e31626b998318c1887cc1ec2c72b041d.jpg"
+        },
+        {
+            "email": "Natali.Craig@example.org",
+            "name": "Natali Craig",
+            "locale": "en",
+            "role": "admin",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about crafting captivating stories by day, I immerse myself in the world of photography and hiking by night. Balancing work with exploration fuels my creative spirit. #Storyteller #NatureLover",
+            "public": true,
+            "image_file": "images/cdac98998c90f96526373b774ef80741763f4a50.jpg"
+        },
+        {
+            "email": "Olivia.Rhye@example.org",
+            "name": "Olivia Rhye",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about bridging cultures through language, I thrive in dynamic work environments that challenge my communication skills. Embracing every opportunity to learn, I'm dedicated to fostering understanding and connection across diverse communities. #LanguageLover #CulturalBridge",
+            "public": true,
+            "image_file": "images/08a3b47613f2d0f6aced2c3c467602e3aa1638f1.jpg"
+        },
+        {
+            "email": "Phoenix.Baker@example.org",
+            "name": "Phoenix Baker",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker with a passion for painting and hiking. Catch me exploring the great outdoors or getting lost in colors! #Wanderlust #ArtLover 🎨⛰️",
+            "public": true,
+            "image_file": "images/da483b78e3e3bfd30953876637bcdaf2fe97ef89.jpg"
+        }
+    ],
+    "hosts": [
+        {
+            "ref": 13,
+            "name": "SupperPaula",
+            "email": null
+        },
+        {
+            "ref": 14,
+            "name": "SupperRavi",
+            "email": null
+        }
+    ],
+    "series": [
+        {
+            "ref": 9,
+            "name": "Monthly Supper Club - Sicilian Edition",
+            "rule": "Monthly",
+            "ruleSpec": null
+        },
+        {
+            "ref": 10,
+            "name": "Garden Supper Club - South Indian Thali",
+            "rule": "Monthly",
+            "ruleSpec": null
+        }
+    ],
+    "events": [
+        {
+            "ref": 70,
+            "initial": true,
+            "titles": {
+                "de": "Monatlicher Supper Club - Sizilianische Edition",
+                "en": "Monthly Supper Club - Sicilian Edition"
+            },
+            "descriptions": {
+                "de": "Unser Host hat in Palermo gelernt und führt uns durch Arancini, Caponata, Sarde a Beccafico, Pasta alla Norma, Granita und Cannoli.",
+                "en": "Our host trained in Palermo and walked us through arancini, caponata, sarde a beccafico, pasta alla Norma, granita, and cannoli. Bring an appetite and a willingness to chop garlic."
+            },
+            "teasers": {
+                "de": "Sechs-Gänge-Menü aus Sizilien, live gekocht, mit Weinbegleitung und einem Rezeptheft zum Mitnehmen.",
+                "en": "A six-course Sicilian menu cooked in front of you, with wine pairings and a recipe booklet to take home."
+            },
+            "start": "2025-12-13T19:00:00+01:00",
+            "stop": "2025-12-13T23:30:00+01:00",
+            "status": "published",
+            "type": "Dinner",
+            "series_ref": 9,
+            "featured": true,
+            "location_ref": 13,
+            "host_refs": [
+                13
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Natali.Craig@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 71,
+            "initial": true,
+            "titles": {
+                "de": "Garten Supper Club - Südindisches Thali",
+                "en": "Garden Supper Club - South Indian Thali"
+            },
+            "descriptions": {
+                "de": "Sambar, Rasam, drei Chutneys, zwei Currys, Reis, Parotta und Payasam zum Nachtisch. Cash-Bar im Gartenhaus.",
+                "en": "Sambar, rasam, three chutneys, two curries, rice, parotta, and payasam for dessert. Cash bar inside the garden house."
+            },
+            "teasers": {
+                "de": "Langtisch-Thali im Gartenhaus. Vegetarisch, auf Bananenblättern serviert, bis nichts mehr da ist.",
+                "en": "A long-table thali dinner in the garden house. Vegetarian, hand-served on banana leaves, served until the food runs out."
+            },
+            "start": "2026-01-31T18:30:00+01:00",
+            "stop": "2026-01-31T23:00:00+01:00",
+            "status": "published",
+            "type": "Dinner",
+            "series_ref": 10,
+            "featured": false,
+            "location_ref": 14,
+            "host_refs": [
+                14
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Koray.Okumus@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 72,
+            "initial": false,
+            "titles": {
+                "de": "Monatlicher Supper Club - Sizilianische Edition",
+                "en": "Monthly Supper Club - Sicilian Edition"
+            },
+            "descriptions": {
+                "de": "Unser Host hat in Palermo gelernt und führt uns durch Arancini, Caponata, Sarde a Beccafico, Pasta alla Norma, Granita und Cannoli.",
+                "en": "Our host trained in Palermo and walked us through arancini, caponata, sarde a beccafico, pasta alla Norma, granita, and cannoli. Bring an appetite and a willingness to chop garlic."
+            },
+            "teasers": {
+                "de": "Sechs-Gänge-Menü aus Sizilien, live gekocht, mit Weinbegleitung und einem Rezeptheft zum Mitnehmen.",
+                "en": "A six-course Sicilian menu cooked in front of you, with wine pairings and a recipe booklet to take home."
+            },
+            "start": "2026-01-13T19:00:00+01:00",
+            "stop": "2026-01-13T23:30:00+01:00",
+            "status": "published",
+            "type": "Dinner",
+            "series_ref": 9,
+            "featured": false,
+            "location_ref": 13,
+            "host_refs": [
+                13
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Natali.Craig@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 73,
+            "initial": false,
+            "titles": {
+                "de": "Monatlicher Supper Club - Sizilianische Edition",
+                "en": "Monthly Supper Club - Sicilian Edition"
+            },
+            "descriptions": {
+                "de": "Unser Host hat in Palermo gelernt und führt uns durch Arancini, Caponata, Sarde a Beccafico, Pasta alla Norma, Granita und Cannoli.",
+                "en": "Our host trained in Palermo and walked us through arancini, caponata, sarde a beccafico, pasta alla Norma, granita, and cannoli. Bring an appetite and a willingness to chop garlic."
+            },
+            "teasers": {
+                "de": "Sechs-Gänge-Menü aus Sizilien, live gekocht, mit Weinbegleitung und einem Rezeptheft zum Mitnehmen.",
+                "en": "A six-course Sicilian menu cooked in front of you, with wine pairings and a recipe booklet to take home."
+            },
+            "start": "2026-02-13T19:00:00+01:00",
+            "stop": "2026-02-13T23:30:00+01:00",
+            "status": "published",
+            "type": "Dinner",
+            "series_ref": 9,
+            "featured": false,
+            "location_ref": 13,
+            "host_refs": [
+                13
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Natali.Craig@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 74,
+            "initial": false,
+            "titles": {
+                "de": "Monatlicher Supper Club - Sizilianische Edition",
+                "en": "Monthly Supper Club - Sicilian Edition"
+            },
+            "descriptions": {
+                "de": "Unser Host hat in Palermo gelernt und führt uns durch Arancini, Caponata, Sarde a Beccafico, Pasta alla Norma, Granita und Cannoli.",
+                "en": "Our host trained in Palermo and walked us through arancini, caponata, sarde a beccafico, pasta alla Norma, granita, and cannoli. Bring an appetite and a willingness to chop garlic."
+            },
+            "teasers": {
+                "de": "Sechs-Gänge-Menü aus Sizilien, live gekocht, mit Weinbegleitung und einem Rezeptheft zum Mitnehmen.",
+                "en": "A six-course Sicilian menu cooked in front of you, with wine pairings and a recipe booklet to take home."
+            },
+            "start": "2026-03-13T19:00:00+01:00",
+            "stop": "2026-03-13T23:30:00+01:00",
+            "status": "published",
+            "type": "Dinner",
+            "series_ref": 9,
+            "featured": false,
+            "location_ref": 13,
+            "host_refs": [
+                13
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Natali.Craig@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 75,
+            "initial": false,
+            "titles": {
+                "de": "Monatlicher Supper Club - Sizilianische Edition",
+                "en": "Monthly Supper Club - Sicilian Edition"
+            },
+            "descriptions": {
+                "de": "Unser Host hat in Palermo gelernt und führt uns durch Arancini, Caponata, Sarde a Beccafico, Pasta alla Norma, Granita und Cannoli.",
+                "en": "Our host trained in Palermo and walked us through arancini, caponata, sarde a beccafico, pasta alla Norma, granita, and cannoli. Bring an appetite and a willingness to chop garlic."
+            },
+            "teasers": {
+                "de": "Sechs-Gänge-Menü aus Sizilien, live gekocht, mit Weinbegleitung und einem Rezeptheft zum Mitnehmen.",
+                "en": "A six-course Sicilian menu cooked in front of you, with wine pairings and a recipe booklet to take home."
+            },
+            "start": "2026-04-13T19:00:00+02:00",
+            "stop": "2026-04-13T23:30:00+02:00",
+            "status": "published",
+            "type": "Dinner",
+            "series_ref": 9,
+            "featured": false,
+            "location_ref": 13,
+            "host_refs": [
+                13
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Natali.Craig@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 76,
+            "initial": false,
+            "titles": {
+                "de": "Monatlicher Supper Club - Sizilianische Edition",
+                "en": "Monthly Supper Club - Sicilian Edition"
+            },
+            "descriptions": {
+                "de": "Unser Host hat in Palermo gelernt und führt uns durch Arancini, Caponata, Sarde a Beccafico, Pasta alla Norma, Granita und Cannoli.",
+                "en": "Our host trained in Palermo and walked us through arancini, caponata, sarde a beccafico, pasta alla Norma, granita, and cannoli. Bring an appetite and a willingness to chop garlic."
+            },
+            "teasers": {
+                "de": "Sechs-Gänge-Menü aus Sizilien, live gekocht, mit Weinbegleitung und einem Rezeptheft zum Mitnehmen.",
+                "en": "A six-course Sicilian menu cooked in front of you, with wine pairings and a recipe booklet to take home."
+            },
+            "start": "2026-05-13T19:00:00+02:00",
+            "stop": "2026-05-13T23:30:00+02:00",
+            "status": "published",
+            "type": "Dinner",
+            "series_ref": 9,
+            "featured": false,
+            "location_ref": 13,
+            "host_refs": [
+                13
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Natali.Craig@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 77,
+            "initial": false,
+            "titles": {
+                "de": "Monatlicher Supper Club - Sizilianische Edition",
+                "en": "Monthly Supper Club - Sicilian Edition"
+            },
+            "descriptions": {
+                "de": "Unser Host hat in Palermo gelernt und führt uns durch Arancini, Caponata, Sarde a Beccafico, Pasta alla Norma, Granita und Cannoli.",
+                "en": "Our host trained in Palermo and walked us through arancini, caponata, sarde a beccafico, pasta alla Norma, granita, and cannoli. Bring an appetite and a willingness to chop garlic."
+            },
+            "teasers": {
+                "de": "Sechs-Gänge-Menü aus Sizilien, live gekocht, mit Weinbegleitung und einem Rezeptheft zum Mitnehmen.",
+                "en": "A six-course Sicilian menu cooked in front of you, with wine pairings and a recipe booklet to take home."
+            },
+            "start": "2026-06-13T19:00:00+02:00",
+            "stop": "2026-06-13T23:30:00+02:00",
+            "status": "published",
+            "type": "Dinner",
+            "series_ref": 9,
+            "featured": false,
+            "location_ref": 13,
+            "host_refs": [
+                13
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Natali.Craig@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 78,
+            "initial": false,
+            "titles": {
+                "de": "Garten Supper Club - Südindisches Thali",
+                "en": "Garden Supper Club - South Indian Thali"
+            },
+            "descriptions": {
+                "de": "Sambar, Rasam, drei Chutneys, zwei Currys, Reis, Parotta und Payasam zum Nachtisch. Cash-Bar im Gartenhaus.",
+                "en": "Sambar, rasam, three chutneys, two curries, rice, parotta, and payasam for dessert. Cash bar inside the garden house."
+            },
+            "teasers": {
+                "de": "Langtisch-Thali im Gartenhaus. Vegetarisch, auf Bananenblättern serviert, bis nichts mehr da ist.",
+                "en": "A long-table thali dinner in the garden house. Vegetarian, hand-served on banana leaves, served until the food runs out."
+            },
+            "start": "2026-03-31T18:30:00+02:00",
+            "stop": "2026-03-31T23:00:00+02:00",
+            "status": "published",
+            "type": "Dinner",
+            "series_ref": 10,
+            "featured": false,
+            "location_ref": 14,
+            "host_refs": [
+                14
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Koray.Okumus@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 79,
+            "initial": false,
+            "titles": {
+                "de": "Garten Supper Club - Südindisches Thali",
+                "en": "Garden Supper Club - South Indian Thali"
+            },
+            "descriptions": {
+                "de": "Sambar, Rasam, drei Chutneys, zwei Currys, Reis, Parotta und Payasam zum Nachtisch. Cash-Bar im Gartenhaus.",
+                "en": "Sambar, rasam, three chutneys, two curries, rice, parotta, and payasam for dessert. Cash bar inside the garden house."
+            },
+            "teasers": {
+                "de": "Langtisch-Thali im Gartenhaus. Vegetarisch, auf Bananenblättern serviert, bis nichts mehr da ist.",
+                "en": "A long-table thali dinner in the garden house. Vegetarian, hand-served on banana leaves, served until the food runs out."
+            },
+            "start": "2026-05-31T18:30:00+02:00",
+            "stop": "2026-05-31T23:00:00+02:00",
+            "status": "published",
+            "type": "Dinner",
+            "series_ref": 10,
+            "featured": false,
+            "location_ref": 14,
+            "host_refs": [
+                14
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Koray.Okumus@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        }
+    ],
+    "rsvps": [
+        {
+            "event_ref": 70,
+            "email": "Crystal.Liu@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 70,
+            "email": "Koray.Okumus@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 70,
+            "email": "Natali.Craig@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 70,
+            "email": "Olivia.Rhye@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 70,
+            "email": "Phoenix.Baker@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 71,
+            "email": "Koray.Okumus@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 71,
+            "email": "Natali.Craig@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 71,
+            "email": "Phoenix.Baker@example.org",
+            "guests": 0
+        }
+    ],
+    "cms_pages": [
+        {
+            "ref": 13,
+            "slug": "index",
+            "published": true,
+            "titles": {
+                "de": "Berliner Supper Club",
+                "en": "Berlin Supper Club"
+            },
+            "link_names": {
+                "de": "Startseite",
+                "en": "Home"
+            },
+            "menu_locations": [],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 1,
+                    "priority": 1,
+                    "json": {
+                        "title": "Shared tables, seasonal menus"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 1,
+                    "priority": 2,
+                    "json": {
+                        "title": "Gemeinsame Tafel, saisonale Menüs"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 3,
+                    "json": {
+                        "title": "How it works",
+                        "content": "Once a month a member opens their kitchen and cooks a themed menu for a small group of guests. Seats are limited, everyone eats at one table, and the recipes go home with you."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 4,
+                    "json": {
+                        "title": "So funktioniert es",
+                        "content": "Einmal im Monat öffnet ein Mitglied seine Küche und kocht ein Themenmenü für eine kleine Gruppe. Die Plätze sind begrenzt, gegessen wird an einem Tisch, und die Rezepte nimmst du mit nach Hause."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 5,
+                    "json": {
+                        "title": "Host a dinner",
+                        "content": "Anyone can host - you pick the theme, we help with the guest list and the logistics. If you would rather just eat, that is fine too: grab a seat at the next supper and see how it goes."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 6,
+                    "json": {
+                        "title": "Selbst kochen",
+                        "content": "Gastgeber kann jeder werden - du wählst das Thema, wir helfen bei Gästeliste und Organisation. Wer lieber nur essen möchte, sichert sich einfach einen Platz beim nächsten Dinner."
+                    },
+                    "image_file": null
+                }
+            ]
+        }
+    ],
+    "announcements": [],
+    "tags": [
+        {
+            "ref": 24,
+            "item_type": "dish",
+            "parent_ref": null,
+            "position": 0,
+            "labels": {
+                "de": "Vorspeisen",
+                "en": "Antipasti"
+            },
+            "managed": false
+        },
+        {
+            "ref": 25,
+            "item_type": "dish",
+            "parent_ref": null,
+            "position": 1,
+            "labels": {
+                "de": "Erste Gänge",
+                "en": "Primi"
+            },
+            "managed": false
+        },
+        {
+            "ref": 26,
+            "item_type": "dish",
+            "parent_ref": null,
+            "position": 2,
+            "labels": {
+                "de": "Hauptgänge",
+                "en": "Secondi"
+            },
+            "managed": false
+        },
+        {
+            "ref": 27,
+            "item_type": "dish",
+            "parent_ref": null,
+            "position": 3,
+            "labels": {
+                "de": "Desserts",
+                "en": "Dolci"
+            },
+            "managed": false
+        }
+    ],
+    "items": {
+        "dish": {
+            "rows": [
+                {
+                    "ref": 1,
+                    "translations": {
+                        "en": {
+                            "name": "Arancini",
+                            "description": "Fried saffron rice balls stuffed with ragù and mozzarella.",
+                            "recipe": null
+                        },
+                        "de": {
+                            "name": "Arancini",
+                            "description": "Frittierte Safranreisbällchen, gefüllt mit Ragù und Mozzarella.",
+                            "recipe": null
+                        }
+                    },
+                    "phonetic": null,
+                    "origin": "Sicily",
+                    "pronunciation": null,
+                    "preview_image": "images/bbdba4ad8a3aa04af373dabe795bcf772a3cbea4.jpg"
+                },
+                {
+                    "ref": 2,
+                    "translations": {
+                        "en": {
+                            "name": "Caponata",
+                            "description": "Sweet-and-sour aubergine stew with celery, capers, and olives.",
+                            "recipe": null
+                        },
+                        "de": {
+                            "name": "Caponata",
+                            "description": "Süß-saurer Aubergineneintopf mit Sellerie, Kapern und Oliven.",
+                            "recipe": null
+                        }
+                    },
+                    "phonetic": null,
+                    "origin": "Sicily",
+                    "pronunciation": null,
+                    "preview_image": "images/e827d32b41ee24f9a600fc9f02c8f7882eaaeff9.jpg"
+                },
+                {
+                    "ref": 3,
+                    "translations": {
+                        "en": {
+                            "name": "Pasta alla Norma",
+                            "description": "Pasta with tomato, fried aubergine, basil, and salted ricotta.",
+                            "recipe": null
+                        },
+                        "de": {
+                            "name": "Pasta alla Norma",
+                            "description": "Pasta mit Tomate, gebratener Aubergine, Basilikum und Ricotta salata.",
+                            "recipe": null
+                        }
+                    },
+                    "phonetic": null,
+                    "origin": "Sicily",
+                    "pronunciation": null,
+                    "preview_image": "images/874899d615c761eb7429a65e6abb4b44ae417e81.jpg"
+                },
+                {
+                    "ref": 4,
+                    "translations": {
+                        "en": {
+                            "name": "Sarde a Beccafico",
+                            "description": "Rolled sardines stuffed with breadcrumbs, pine nuts, and raisins.",
+                            "recipe": null
+                        },
+                        "de": {
+                            "name": "Sarde a Beccafico",
+                            "description": "Gerollte Sardinen, gefüllt mit Semmelbröseln, Pinienkernen und Rosinen.",
+                            "recipe": null
+                        }
+                    },
+                    "phonetic": null,
+                    "origin": "Sicily",
+                    "pronunciation": null,
+                    "preview_image": "images/ffd214dfb436c63caee16e02c9c6fb784efbe529.jpg"
+                },
+                {
+                    "ref": 5,
+                    "translations": {
+                        "en": {
+                            "name": "Granita con Brioche",
+                            "description": "Almond granita served with a warm sweet brioche.",
+                            "recipe": null
+                        },
+                        "de": {
+                            "name": "Granita con Brioche",
+                            "description": "Mandelgranita, serviert mit einer warmen süßen Brioche.",
+                            "recipe": null
+                        }
+                    },
+                    "phonetic": null,
+                    "origin": "Sicily",
+                    "pronunciation": null,
+                    "preview_image": "images/f386d054d483938ceecc41282d9ea18e217ee5d9.jpg"
+                },
+                {
+                    "ref": 6,
+                    "translations": {
+                        "en": {
+                            "name": "Cannoli",
+                            "description": "Crisp pastry tubes filled with sweet ricotta and candied peel.",
+                            "recipe": null
+                        },
+                        "de": {
+                            "name": "Cannoli",
+                            "description": "Knusprige Teigröllchen, gefüllt mit süßer Ricotta und kandierten Früchten.",
+                            "recipe": null
+                        }
+                    },
+                    "phonetic": null,
+                    "origin": "Sicily",
+                    "pronunciation": null,
+                    "preview_image": "images/30e0d99cf9b47dcaa7d1fd71d663cd85a3b5911a.jpg"
+                }
+            ],
+            "tags": {
+                "1": [
+                    24
+                ],
+                "2": [
+                    24
+                ],
+                "3": [
+                    25
+                ],
+                "4": [
+                    26
+                ],
+                "5": [
+                    27
+                ],
+                "6": [
+                    27
+                ]
+            }
+        }
+    },
+    "event_items": [
+        {
+            "event_ref": 70,
+            "item_type": "dish",
+            "item_ref": 1,
+            "position": 1,
+            "section_label": "Antipasti",
+            "created_by_email": "Natali.Craig@example.org",
+            "created_at": "2025-11-15T19:00:00+01:00"
+        },
+        {
+            "event_ref": 70,
+            "item_type": "dish",
+            "item_ref": 2,
+            "position": 2,
+            "section_label": "Antipasti",
+            "created_by_email": "Natali.Craig@example.org",
+            "created_at": "2025-11-15T19:00:00+01:00"
+        },
+        {
+            "event_ref": 70,
+            "item_type": "dish",
+            "item_ref": 3,
+            "position": 3,
+            "section_label": "Primi",
+            "created_by_email": "Natali.Craig@example.org",
+            "created_at": "2025-11-15T19:00:00+01:00"
+        },
+        {
+            "event_ref": 70,
+            "item_type": "dish",
+            "item_ref": 4,
+            "position": 4,
+            "section_label": "Secondi",
+            "created_by_email": "Natali.Craig@example.org",
+            "created_at": "2025-11-15T19:00:00+01:00"
+        },
+        {
+            "event_ref": 70,
+            "item_type": "dish",
+            "item_ref": 5,
+            "position": 5,
+            "section_label": "Dolci",
+            "created_by_email": "Natali.Craig@example.org",
+            "created_at": "2025-11-15T19:00:00+01:00"
+        },
+        {
+            "event_ref": 70,
+            "item_type": "dish",
+            "item_ref": 6,
+            "position": 6,
+            "section_label": "Dolci",
+            "created_by_email": "Natali.Craig@example.org",
+            "created_at": "2025-11-15T19:00:00+01:00"
+        }
+    ],
+    "topics": [],
+    "circulation": [],
+    "comments": [],
+    "change_proposals": [],
+    "trust": [],
+    "dishes": {
+        "likes": [
+            {
+                "dish_ref": 1,
+                "email": "Natali.Craig@example.org"
+            },
+            {
+                "dish_ref": 1,
+                "email": "Koray.Okumus@example.org"
+            },
+            {
+                "dish_ref": 1,
+                "email": "Olivia.Rhye@example.org"
+            },
+            {
+                "dish_ref": 1,
+                "email": "Phoenix.Baker@example.org"
+            },
+            {
+                "dish_ref": 2,
+                "email": "Koray.Okumus@example.org"
+            },
+            {
+                "dish_ref": 2,
+                "email": "Crystal.Liu@example.org"
+            },
+            {
+                "dish_ref": 3,
+                "email": "Natali.Craig@example.org"
+            },
+            {
+                "dish_ref": 3,
+                "email": "Koray.Okumus@example.org"
+            },
+            {
+                "dish_ref": 3,
+                "email": "Olivia.Rhye@example.org"
+            },
+            {
+                "dish_ref": 3,
+                "email": "Phoenix.Baker@example.org"
+            },
+            {
+                "dish_ref": 3,
+                "email": "Crystal.Liu@example.org"
+            },
+            {
+                "dish_ref": 4,
+                "email": "Olivia.Rhye@example.org"
+            },
+            {
+                "dish_ref": 5,
+                "email": "Natali.Craig@example.org"
+            },
+            {
+                "dish_ref": 5,
+                "email": "Koray.Okumus@example.org"
+            },
+            {
+                "dish_ref": 5,
+                "email": "Olivia.Rhye@example.org"
+            },
+            {
+                "dish_ref": 5,
+                "email": "Phoenix.Baker@example.org"
+            },
+            {
+                "dish_ref": 5,
+                "email": "Crystal.Liu@example.org"
+            },
+            {
+                "dish_ref": 5,
+                "email": "admin@example.org"
+            },
+            {
+                "dish_ref": 6,
+                "email": "Koray.Okumus@example.org"
+            },
+            {
+                "dish_ref": 6,
+                "email": "Olivia.Rhye@example.org"
+            },
+            {
+                "dish_ref": 6,
+                "email": "Phoenix.Baker@example.org"
+            },
+            {
+                "dish_ref": 6,
+                "email": "Crystal.Liu@example.org"
+            },
+            {
+                "dish_ref": 6,
+                "email": "admin@example.org"
+            }
+        ],
+        "gallery": [
+            {
+                "dish_ref": 1,
+                "image_file": "images/bbdba4ad8a3aa04af373dabe795bcf772a3cbea4.jpg",
+                "uploader_email": "Natali.Craig@example.org",
+                "sort_order": 0,
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "dish_ref": 2,
+                "image_file": "images/e827d32b41ee24f9a600fc9f02c8f7882eaaeff9.jpg",
+                "uploader_email": "Natali.Craig@example.org",
+                "sort_order": 0,
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "dish_ref": 3,
+                "image_file": "images/874899d615c761eb7429a65e6abb4b44ae417e81.jpg",
+                "uploader_email": "Natali.Craig@example.org",
+                "sort_order": 0,
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "dish_ref": 4,
+                "image_file": "images/ffd214dfb436c63caee16e02c9c6fb784efbe529.jpg",
+                "uploader_email": "Natali.Craig@example.org",
+                "sort_order": 0,
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "dish_ref": 5,
+                "image_file": "images/f386d054d483938ceecc41282d9ea18e217ee5d9.jpg",
+                "uploader_email": "Natali.Craig@example.org",
+                "sort_order": 0,
+                "created_at": "2025-01-06T00:00:00+01:00"
+            },
+            {
+                "dish_ref": 6,
+                "image_file": "images/30e0d99cf9b47dcaa7d1fd71d663cd85a3b5911a.jpg",
+                "uploader_email": "Natali.Craig@example.org",
+                "sort_order": 0,
+                "created_at": "2025-01-06T00:00:00+01:00"
+            }
+        ]
+    },
+    "wishlist": [
+        {
+            "email": "Koray.Okumus@example.org",
+            "item_type": "dish",
+            "item_ref": 6,
+            "priority_counter": 0,
+            "created_at": "2025-11-30T20:00:00+01:00"
+        },
+        {
+            "email": "Koray.Okumus@example.org",
+            "item_type": "dish",
+            "item_ref": 1,
+            "priority_counter": 0,
+            "created_at": "2025-11-30T20:00:00+01:00"
+        },
+        {
+            "email": "Phoenix.Baker@example.org",
+            "item_type": "dish",
+            "item_ref": 4,
+            "priority_counter": 0,
+            "created_at": "2025-11-30T20:00:00+01:00"
+        },
+        {
+            "email": "Crystal.Liu@example.org",
+            "item_type": "dish",
+            "item_ref": 6,
+            "priority_counter": 0,
+            "created_at": "2025-11-30T20:00:00+01:00"
+        },
+        {
+            "email": "Crystal.Liu@example.org",
+            "item_type": "dish",
+            "item_ref": 3,
+            "priority_counter": 0,
+            "created_at": "2025-11-30T20:00:00+01:00"
+        }
+    ],
+    "ballots": [
+        {
+            "purpose": "event.item.dish",
+            "title": null,
+            "subject_type": "event",
+            "subject_ref": 70,
+            "status": "tallied",
+            "tally_mode": "single",
+            "settlement_mode": "automatic",
+            "deadline": "2025-12-12T19:00:00+01:00",
+            "opened_by_email": "Natali.Craig@example.org",
+            "winning_key": "3",
+            "tied_keys": [],
+            "settled_by_email": null,
+            "settled_at": null,
+            "created_at": "2025-11-15T19:00:00+01:00",
+            "candidates": [
+                {
+                    "key": "3",
+                    "label": "Pasta alla Norma Sicily"
+                },
+                {
+                    "key": "1",
+                    "label": "Arancini Sicily"
+                },
+                {
+                    "key": "2",
+                    "label": "Caponata Sicily"
+                },
+                {
+                    "key": "4",
+                    "label": "Sarde a Beccafico Sicily"
+                }
+            ],
+            "votes": [
+                {
+                    "email": "Crystal.Liu@example.org",
+                    "keys": [
+                        "2"
+                    ]
+                },
+                {
+                    "email": "Koray.Okumus@example.org",
+                    "keys": [
+                        "3"
+                    ]
+                },
+                {
+                    "email": "Natali.Craig@example.org",
+                    "keys": [
+                        "3"
+                    ]
+                },
+                {
+                    "email": "Olivia.Rhye@example.org",
+                    "keys": [
+                        "3"
+                    ]
+                },
+                {
+                    "email": "Phoenix.Baker@example.org",
+                    "keys": [
+                        "1"
+                    ]
+                }
+            ]
+        },
+        {
+            "purpose": "event.item.dish",
+            "title": null,
+            "subject_type": "event",
+            "subject_ref": 71,
+            "status": "open",
+            "tally_mode": "single",
+            "settlement_mode": "automatic",
+            "deadline": "2026-01-30T18:30:00+01:00",
+            "opened_by_email": "Natali.Craig@example.org",
+            "winning_key": null,
+            "tied_keys": [],
+            "settled_by_email": null,
+            "settled_at": null,
+            "created_at": "2026-01-03T18:30:00+01:00",
+            "candidates": [
+                {
+                    "key": "1",
+                    "label": "Arancini Sicily"
+                },
+                {
+                    "key": "2",
+                    "label": "Caponata Sicily"
+                },
+                {
+                    "key": "4",
+                    "label": "Sarde a Beccafico Sicily"
+                },
+                {
+                    "key": "5",
+                    "label": "Granita con Brioche Sicily"
+                }
+            ],
+            "votes": [
+                {
+                    "email": "Koray.Okumus@example.org",
+                    "keys": [
+                        "2"
+                    ]
+                },
+                {
+                    "email": "Natali.Craig@example.org",
+                    "keys": [
+                        "1"
+                    ]
+                },
+                {
+                    "email": "Olivia.Rhye@example.org",
+                    "keys": [
+                        "4"
+                    ]
+                }
+            ]
+        }
+    ],
+    "images": {
+        "images/30e0d99cf9b47dcaa7d1fd71d663cd85a3b5911a.jpg": {
+            "attribution": "Stefano Mortellaro from Catania, Italy, CC BY 2.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/874899d615c761eb7429a65e6abb4b44ae417e81.jpg": {
+            "attribution": "8w9d, CC0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/bbdba4ad8a3aa04af373dabe795bcf772a3cbea4.jpg": {
+            "attribution": "Gmelfi, Public domain, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/e827d32b41ee24f9a600fc9f02c8f7882eaaeff9.jpg": {
+            "attribution": "Luca Nebuloni from Milan, Italy, CC BY 2.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/f386d054d483938ceecc41282d9ea18e217ee5d9.jpg": {
+            "attribution": "Eli6179, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/ffd214dfb436c63caee16e02c9c6fb784efbe529.jpg": {
+            "attribution": "franzconde from Amsterdam, The Netherlands, CC BY 2.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        }
+    }
+}

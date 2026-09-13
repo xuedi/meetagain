@@ -40,7 +40,9 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `Circulation\ContextProviderInterface`       | Decide which shelf circulation rows are filed under   | `getContext()`, `getPriority()`                        |
 | `Circulation\EligibilityProviderInterface`   | Decide who may join a circulation waiting list        | `canRequest()`                                         |
 | `Circulation\DashboardTabInterface`          | Add a tab to the circulation dashboard                | `supports()`, `render()`                               |
-| `ContributorInterface`                       | Carry an item type through group export and import    | `exportItems()`, `importItems()`                       |
+| `ContributorInterface`                       | Carry an item type through export archives            | `exportItems()`, `importItems()`                       |
+| `UploadsInterface`                           | Leave out uploads their uploader did not share        | `getUploaderIds()`                                     |
+| `PluginSectionInterface`                     | Carry your plugin's member data through archives      | `export()`, `import()`                                 |
 | `ChangeTargetProviderInterface`              | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()` |
 | `ConfigPrivacyToggleProviderInterface`       | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                          |
 | `SendingIdentityProviderInterface`           | Decide the name, logo and links a mail is sent under  | `resolve()`                                            |
@@ -308,8 +310,8 @@ plugin existed; suppressing the box must not hide them, so render what is there 
 
 ### Event\EventScopeProviderInterface
 
-**Purpose:** Let request-less code read an event's world the way a visitor of that event would. A cron task, a fixture
-seeder, a data hotfix and a test all run without a request, so anything your installation narrows by - host, language,
+**Purpose:** Let request-less code read an event's world the way a visitor of that event would. A cron task, an
+import, a data hotfix and a test all run without a request, so anything your installation narrows by - host, language,
 whatever else - has nothing to narrow by, and reads come back either empty or from the wrong place.
 
 **File:** `src/Service/Event/EventScopeProviderInterface.php`
@@ -1403,6 +1405,11 @@ See
 `plugins/films/src/Publisher/PluginSettings/SettingsDescriptor.php` (descriptor) and
 `SettingsStore.php` (custom store keeping an entity + encrypted key) for a working reference.
 
+A key a developer keeps in the gitignored `.env.local` makes a good runtime fallback: the films and board games plugins
+read `TMDB_API_KEY`, `OMDB_API_KEY` and `BGG_API_TOKEN` whenever their settings store no key, so a local key survives
+every database reset. A key or lookup source saved on the settings page always wins. See
+`plugins/films/src/Service/FilmLookupResolver.php`.
+
 ### Reading the effective value
 
 Inject `Resolver` and call `resolve('my_plugin')` to get the effective data object for the current request. Memoise it
@@ -1518,15 +1525,16 @@ remove the row once nothing carries it any more.
 Reference implementation: the dishes plugin (`Plugin\Dishes\Item\DishTaggableTypeProvider`,
 `Plugin\Dishes\Item\DishTypeProvider`, `Plugin\Dishes\Controller\DishController::edit`).
 
-## Item export and import
+## Export and import
 
-A group export ZIP carries locations, users, events, CMS pages - and any item type whose plugin opts in. Without opting
-in, a community that moves to another instance loses its dishes, books, films or glossary entries entirely, along with
-the tags assigned to them.
+An export archive carries the core data - members, venues, events, RSVPs, pages, comments, tags - and any plugin data
+whose plugin opts in. Without opting in, a community that moves to another instance loses its dishes, books, films or
+glossary entries entirely, along with the tags assigned to them. The same archives build every development instance
+(see [Demo Data](../core-development/demo-data.md)), so a plugin that opts in also gets its demo data carried for free.
 
 ### When to implement
 
-Implement `App\Item\Portability\ContributorInterface` when your plugin owns an item type whose content is worth carrying
+Implement `App\Portability\Item\ContributorInterface` when your plugin owns an item type whose content is worth carrying
 between instances. It is independent of the other item seams:
 a type can be portable without being event-attachable, taggable, or list-cell renderable.
 
@@ -1535,15 +1543,17 @@ a type can be portable without being event-attachable, taggable, or list-cell re
 One class with both directions on it, because export and import must agree on the row shape:
 
 ```php
-public function exportItems(array $itemIds, PortableImageWriterInterface $images): array;
+public function allItemIds(): array;
+public function exportItems(array $itemIds, ImageWriterInterface $images): array;
 public function importItems(array $rows, ImportContext $context): ImportResult;
 ```
 
 1. **Export.** You are handed the ids to serialize - never ask who owns them; that is the caller's job and is what keeps
    your plugin usable in any deployment. Emit one row per item, each carrying
    `'ref' => $item->getId()`. The rest of the row is yours; nothing outside your plugin reads it. Write every image
-   through `$images->addImage($image, 'images/dishes/12/preview')` and store the returned archive path (or `null` when
-   the file is gone).
+   through `$images->addImage($image)` and store the returned archive path (or `null` when the file is gone). Core
+   stores each image once, named by its content hash, together with its attribution. `allItemIds()` returns the id of
+   every item of your type; the whole-instance export (`app:export`) hands those back to `exportItems()`.
 2. **Import.** Rebuild your entities from the rows, using
    `$context->importImage($row['preview_image'], ImageType::PluginDishesPreview)` for images and
    `$context->getSystemUser()` as the creator. Persist and **flush before returning** - the ids in your result map must
@@ -1564,6 +1574,50 @@ instance does not offer are dropped and reported in the import summary.
 Reference implementation: `Plugin\Dishes\Portability\DishContributor` (always creates, carries translations and a
 gallery) and `Plugin\Books\Portability\BookContributor`
 (mandatory ISBN dedup).
+
+### Uploads members made
+
+When your item type's rows are member uploads - photos, say - also implement `App\Portability\Item\UploadsInterface`
+on the contributor:
+
+```php
+public function getUploaderIds(array $itemIds): array; // item id => uploader user id, or null
+```
+
+The exporter leaves out every row whose uploader did not agree to share their uploads, before any section reads the
+scope, so no comment, tag or event link can point at a missing upload. Reference implementation:
+`plugins/photos/src/Portability/PhotoContributor.php`.
+
+### Member data your plugin keeps
+
+Data a member keeps next to your items - a shelf, a wishlist, trainer progress - is not an item row. It travels as a
+section of its own: implement `App\Portability\PluginSectionInterface`.
+
+```php
+public function getKey(): string;          // the archive block your rows live under
+public function getOrder(): int;           // imports run in ascending order
+public function getPluginKey(): string;
+public function getKindLabels(): array;    // kind => translation key, for the import summary
+public function export(Scope $scope, ImageWriterInterface $images): array;
+public function import(array $rows, ImportContext $context): void;
+```
+
+1. **Export reads only what the scope names.** `$scope->itemIds` holds the ids per item type and `$scope->users` the
+   members that travel. Before writing a row that belongs to a member, ask
+   `$scope->grantsId($userId, DataCategory::Collections)` - or whichever of `Profile`, `Attendance`, `Interactions`,
+   `Collections` and `Uploads` fits the row - and leave the row out when the answer is no. The whole-instance export
+   grants every category.
+2. **Name members by email and items by their `ref`.** Database ids do not survive the move.
+3. **Import resolves and counts.** `$context->resolveRef(User::class, $email)` and
+   `$context->resolveItem($itemType, $ref)` return what earlier sections mapped, so pick a `getOrder()` above the core
+   sections you depend on (100 is safe for data hanging off members and items). Report every row with
+   `$context->count($this->getKey(), Outcome::Created)` - or `Matched`, `Skipped`, `Dropped`. The importer flushes
+   after each section.
+4. **Your section runs only with your plugin.** It exports when the archive lists your plugin and imports while the
+   plugin is active; otherwise its rows count as skipped, and `app:import --strict` fails.
+
+Reference implementations: `plugins/wishlist/src/Portability/EntriesSection.php` (entries keyed by member and item)
+and `plugins/boardgames/src/Portability/ShelfSection.php` (member shelves, pledges and bring requests).
 
 ## Member change proposals
 

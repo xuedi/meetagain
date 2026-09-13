@@ -56,3 +56,6 @@ dishes_dish:
     flash_added: 'Gericht zum Katalog hinzugefügt.'
     flash_updated: 'Gericht aktualisiert.'
     flash_deleted: 'Gericht gelöscht.'
+dishes_portability:
+    kind_likes: 'Likes für Gerichte'
+    kind_gallery: 'Galeriebilder von Gerichten'

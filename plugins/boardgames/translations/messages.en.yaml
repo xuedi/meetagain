@@ -159,3 +159,8 @@ boardgames_activity:
 
 boardgames_notifications:
     bring_request: '%requester% asked you to bring %game%'
+
+boardgames_portability:
+    kind_ownerships: 'Board game shelves'
+    kind_pledges: 'Board game pledges'
+    kind_requests: 'Board game bring requests'

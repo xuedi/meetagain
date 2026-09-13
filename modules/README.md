@@ -32,7 +32,6 @@ modules/
     templates/
     translations/
     tests/Unit/
-    tests/Functional/
 ```
 
 `App\Kernel::getModuleConfigDirs()` globs `modules/*/config` and feeds it to `configureContainer()`

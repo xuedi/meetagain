@@ -143,6 +143,6 @@ Every plugin should have a `README.md` at its root. Minimum content:
 - **Purpose** — what problem this plugin solves
 - **Interfaces implemented** — which optional hooks are used
 - **Configuration** — any settings or environment variables required
-- **Quick start** — how to enable and load fixtures
+- **Quick start** - how to enable it on a dev instance
 
 This is especially important for plugins that are published or shared with other developers.

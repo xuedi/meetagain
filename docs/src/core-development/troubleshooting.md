@@ -112,32 +112,27 @@ public function findAllWithLocation(): array
 
 ---
 
-## Fixture reference not found
+## Archive import fails with `--strict`
 
-**Symptom:** `RuntimeException: Error retrieving reference 'Event::some-name'`
+**Symptom:** `app:import ... --strict` exits non-zero and the summary lists rows as skipped or
+dropped.
 
 **Causes:**
 
-1. **Wrong reference name** — use the fixture class constants:
-   ```php
-   // ✅ Use the constant
-   $event = $this->getRefEvent(EventFixture::WEEKLY_GO_STUDY);
-
-   // ❌ Typo-prone string
-   $event = $this->getRefEvent('Weekly Go Study Group');
+1. **A plugin the archive needs is not enabled** - its rows count as skipped. List what the
+   archive needs, enable it and migrate:
+   ```bash
+   just app "app:import:inspect src/DataImportFixtures/weiqi-club --format=plugins"
+   just plugin-enable films
+   just appMigrate
    ```
+   `just devModeImport` does all of this for you.
 
-2. **Load order** — the fixture that calls `addRefXxx()` must run *before* the fixture that
-   calls `getRefXxx()`. Declare dependencies:
-   ```php
-   public function getDependencies(): array
-   {
-       return [EventFixture::class];
-   }
-   ```
+2. **A row points at something that did not import** - a comment on a skipped item, for
+   instance, is dropped with it. The summary names the kind; fix the first cause and the rest
+   usually follows.
 
-3. **Wrong group** — ensure both fixtures are in the same group (or the dependency's group
-   is a subset of the dependent's group).
+The rows that did import stay in the database, so reset before retrying.
 
 ---
 

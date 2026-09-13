@@ -14,9 +14,6 @@ Every plugin must implement `App\Plugin`. This page is the full reference for ea
 | `getEventListItemTags()`   | `array<EventListItemTag>` | Event list rendering            | Yes              |
 | `getMemberPageTop()`       | `?string`                 | Admin member list render        | Yes              |
 | `getFooterAbout()`         | `?string`                 | Every page load (footer)        | Yes              |
-| `preFixtures()`            | `void`                    | Before fixture loading          | Yes              |
-| `loadPostExtendFixtures()` | `void`                    | After event recurring extension | Yes              |
-| `postFixtures()`           | `void`                    | After all fixtures loaded       | Yes              |
 | `runCronTasks()`           | `void`                    | Every cron run (~5 min)         | Yes              |
 | `getAdminSystemLinks()`    | `?AdminSection`           | Admin page render               | Yes (deprecated) |
 
@@ -222,85 +219,11 @@ public function getFooterAbout(): ?string
 
 ---
 
-## Fixture hooks
+## Demo data
 
-See [Data Fixtures](../core-development/fixtures.md) for a full guide on timing, groups, and cross-fixture references.
-
-### `preFixtures(OutputInterface $output): void`
-
-**Purpose:** Run tasks **before** plugin fixtures are loaded.
-
-**When called:** By `app:plugin:pre-fixtures` command, after base fixtures load.
-
-**Use case:** Data migration, schema preparation.
-
-```php
-public function preFixtures(OutputInterface $output): void
-{
-    $output->writeln('Running migration...');
-    // Run your migration logic here
-}
-```
-
-Leave empty if not needed:
-
-```php
-public function preFixtures(OutputInterface $output): void
-{
-    // No pre-fixture tasks
-}
-```
-
----
-
-### `loadPostExtendFixtures(OutputInterface $output): void`
-
-**Purpose:** Create fixture data that depends on recurring event instances.
-
-**When called:** By `app:event:add-fixture` command, after events have been extended.
-
-**Use case:** Votes, RSVPs, or other data tied to future event occurrences.
-
-```php
-public function loadPostExtendFixtures(OutputInterface $output): void
-{
-    $pastEvents = $this->eventRepository->getPastEvents(10);
-
-    foreach ($pastEvents as $event) {
-        $vote = new Vote();
-        $vote->setEventId($event->getId());
-        $vote->setClosesAt(new DateTimeImmutable(
-            $event->getStart()->format('Y-m-d H:i:s') . ' -1 day'
-        ));
-        $this->em->persist($vote);
-    }
-
-    $this->em->flush();
-    $output->writeln('<info>Created votes for past events</info>');
-}
-```
-
----
-
-### `postFixtures(OutputInterface $output): void`
-
-**Purpose:** Run tasks **after** all fixtures are loaded.
-
-**When called:** By `app:plugin:post-fixtures` command, after `doctrine:fixtures:load`.
-
-**Use case:** Set configuration defaults, post-processing, cleanup.
-
-```php
-public function postFixtures(OutputInterface $output): void
-{
-    $this->configService->set('plugin_enabled', true);
-    $output->writeln('<info>Plugin configuration initialized</info>');
-}
-```
-
-!!! tip "Re-seeding a developer's API key"
-    A key your plugin stores in the database is gone after every dev reset. Read it back here
-    from the gitignored `.env.local`, which a reset does not touch.
+The `Plugin` interface has no data-loading hooks. Development data comes from the demo archives (see
+[Demo Data](../core-development/demo-data.md)); make your plugin's data travel in them through the
+export and import seams in [Optional Hooks](optional-hooks.md#export-and-import).
 
 ---
 

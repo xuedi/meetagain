@@ -61,11 +61,6 @@ readonly class WishlistService
         return $this->scopeEntries($this->wishlistRepo->findByUser($userId));
     }
 
-    public function hasEntries(): bool
-    {
-        return $this->wishlistRepo->hasAny();
-    }
-
     /**
      * @return array<array{itemId: int, wanterCount: int, totalPriority: int}> demand for one type, most-wanted first
      */

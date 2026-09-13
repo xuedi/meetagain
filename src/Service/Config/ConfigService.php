@@ -330,6 +330,21 @@ readonly class ConfigService
         $this->cache->delete(self::CACHE_KEY_PREFIX . $name);
     }
 
+    public function setBoolean(string $name, bool $value): void
+    {
+        $setting = $this->repo->findOneBy(['name' => $name]);
+        if ($setting === null) {
+            $setting = new Config();
+            $setting->setName($name);
+            $setting->setType(ConfigType::Boolean);
+        }
+        $setting->setValue($value ? 'true' : 'false');
+
+        $this->em->persist($setting);
+        $this->em->flush();
+        $this->cache->delete(self::CACHE_KEY_PREFIX . $name);
+    }
+
     public function getInt(string $name, int $default): int
     {
         $value = $this->getCachedValue($name);

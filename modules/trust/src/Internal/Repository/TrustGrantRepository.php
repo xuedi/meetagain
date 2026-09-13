@@ -37,6 +37,20 @@ class TrustGrantRepository extends ServiceEntityRepository
         return $edges;
     }
 
+    /**
+     * @param list<string> $contexts
+     * @return list<TrustGrant>
+     */
+    public function findForContexts(array $contexts): array
+    {
+        return array_values($this->createQueryBuilder('g')
+            ->where('g.context IN (:contexts)')
+            ->setParameter('contexts', $contexts)
+            ->orderBy('g.id', 'ASC')
+            ->getQuery()
+            ->getResult());
+    }
+
     public function findEdge(string $context, int $fromUserId, int $toUserId): ?TrustGrant
     {
         return $this->createQueryBuilder('g')

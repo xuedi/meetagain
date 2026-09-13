@@ -22,13 +22,6 @@ readonly class ContestService
     public const string PURPOSE = 'photo.contest';
     public const int DURATION_DAYS = 14;
     private const int MINIMUM_ENTRIES = 2;
-    private const int DEMO_PHOTOS_NEEDED = 8;
-    private const int DEMO_VOTERS_NEEDED = 3;
-    private const int DEMO_ROUND = 3;
-    private const int DEMO_FINISHED_MAX = 2;
-    private const int DEMO_OPEN_MIN = 3;
-    private const int DEMO_OPEN_MAX = 4;
-    private const int DEMO_QUEUED = 2;
 
     public function __construct(
         private PhotoRepository $photoRepo,
@@ -117,78 +110,6 @@ readonly class ContestService
         return $ballotId;
     }
 
-    public function isSeedable(): bool
-    {
-        return $this->getOpenContest() === null && $this->getFinishedContests() === [];
-    }
-
-    /** @param list<int> $photoIds */
-    public function seedDemo(array $photoIds): bool
-    {
-        $voters = $this->distinctCreators($photoIds);
-        if (count($photoIds) < self::DEMO_PHOTOS_NEEDED || count($voters) < self::DEMO_VOTERS_NEEDED) {
-            return false;
-        }
-
-        $rest = array_slice($photoIds, 0, -self::DEMO_QUEUED);
-        $rounds = min(self::DEMO_FINISHED_MAX, intdiv(count($rest) - self::DEMO_OPEN_MIN, self::DEMO_ROUND));
-        for ($round = 0; $round < $rounds; $round++) {
-            $this->seedFinished(array_slice($rest, $round * self::DEMO_ROUND, self::DEMO_ROUND), $voters);
-        }
-
-        $this->seedOpen(array_slice($rest, $rounds * self::DEMO_ROUND, self::DEMO_OPEN_MAX), $voters);
-        $this->seedQueue(array_slice($photoIds, -self::DEMO_QUEUED));
-
-        return true;
-    }
-
-    /**
-     * @param list<int> $options
-     * @param list<int> $voters
-     */
-    private function seedFinished(array $options, array $voters): void
-    {
-        $ballotId = $this->ballots->open($this->request($options, $voters[0]));
-
-        $runnerUp = array_key_last($voters);
-        foreach ($voters as $index => $userId) {
-            $this->ballots->cast($ballotId, $userId, [(string) $options[$index === $runnerUp ? 1 : 0]]);
-        }
-
-        $outcome = $this->ballots->tally($ballotId);
-        if ($outcome->winningKey === null) {
-            return;
-        }
-
-        $this->ballots->settle($ballotId, $outcome->winningKey, $voters[0]);
-    }
-
-    /**
-     * @param list<int> $options
-     * @param list<int> $voters
-     */
-    private function seedOpen(array $options, array $voters): void
-    {
-        $ballotId = $this->ballots->open($this->request($options, $voters[0]));
-
-        foreach (array_slice($voters, 0, 3) as $index => $userId) {
-            $this->ballots->cast($ballotId, $userId, [(string) $options[$index === 0 ? 0 : 1]]);
-        }
-    }
-
-    /** @param list<int> $photoIds */
-    private function seedQueue(array $photoIds): void
-    {
-        foreach ($photoIds as $photoId) {
-            $photo = $this->photoRepo->find($photoId);
-            if ($photo instanceof Photo) {
-                $photo->setContestSubmitted(true);
-            }
-        }
-
-        $this->em->flush();
-    }
-
     /**
      * @return list<BallotView>
      */
@@ -217,23 +138,6 @@ readonly class ContestService
             SettlementMode::Automatic,
             $this->translator->trans('photos_contest.ballot_title'),
         );
-    }
-
-    /**
-     * @param  list<int> $photoIds
-     * @return list<int> distinct uploader ids, in the order their photos appear
-     */
-    private function distinctCreators(array $photoIds): array
-    {
-        $creators = [];
-        foreach ($photoIds as $photoId) {
-            $createdBy = $this->photoRepo->find($photoId)?->getCreatedBy();
-            if ($createdBy !== null) {
-                $creators[$createdBy] = true;
-            }
-        }
-
-        return array_map(intval(...), array_keys($creators));
     }
 
     /** @return list<int>|null */

@@ -16,8 +16,8 @@ event filters, authorization, notifications, and more.
 | `getEventListItemTags()`                      | Add badges to events in list views                   | dishes (vegetarian tag) |
 | `getMemberPageTop()`                          | Inject content above the admin member list           | filmclub                |
 | `getFooterAbout()`                            | Add content to the footer's About section            | filmclub                |
-| `preFixtures()` / `postFixtures()`            | Run setup tasks around fixture loading               | filmclub                |
-| `loadPostExtendFixtures()`                    | Create data tied to recurring event instances        | filmclub                |
+| `Item\ContributorInterface`                   | Carry an item type through export archives           | books, dishes           |
+| `PluginSectionInterface`                      | Carry your plugin's member data through archives     | wishlist, boardgames    |
 | `runCronTasks()`                              | Schedule periodic background tasks                   | filmclub                |
 | `AdminNavigationInterface`                    | Add sections and links to the admin sidebar          | filmclub, bookclub      |
 | `EventFilterInterface`                        | Filter which events are visible                      | (custom)                |
@@ -37,9 +37,9 @@ event filters, authorization, notifications, and more.
 1. **Create the skeleton** — directory structure, `Kernel.php`, config files
 2. **Implement `Kernel.php`** — at minimum, fill every method in the `Plugin` interface
 3. **Choose optional interfaces** — add only the hooks your plugin needs
-4. **Add fixtures** — extend `AbstractFixture` for type-safe test data
-5. **Test** — unit-test services in isolation, functional-test key flows
-6. **Enable** — run `just plugin-enable your-plugin` and `just devModeFixtures`
+4. **Make it portable** - implement an item contributor or a plugin section, so export archives carry your data
+5. **Test** - unit-test services in isolation
+6. **Enable** - build an instance with `just devModeImport <archive>`, then run `just plugin-enable your-plugin`
 
 ---
 
@@ -48,7 +48,7 @@ event filters, authorization, notifications, and more.
 | Level        | Example     | Interfaces used                                                          |
 |--------------|-------------|--------------------------------------------------------------------------|
 | Simple       | `dishes`    | `Plugin` only — one menu link, no tiles                                  |
-| Intermediate | `filmclub`  | `Plugin` + `AdminNavigationInterface` — event tiles, cron, fixtures      |
+| Intermediate | `filmclub`  | `Plugin` + `AdminNavigationInterface` - event tiles, cron, portability   |
 | Advanced     | `multisite` | `Plugin` + 6 optional interfaces — multi-tenant filtering, authorization |
 
 ---
@@ -63,6 +63,6 @@ event filters, authorization, notifications, and more.
 | [Permissions](permissions.md)                    | Defining actions, default rules, custom voters, and templates |
 | [Architecture](architecture.md)                  | Namespaces, services, routes, templates, DB conventions       |
 | [Best Practices](best-practices.md)              | Coding patterns that keep plugins safe and removable          |
-| [Data Fixtures](../core-development/fixtures.md) | Cross-fixture references, fixture groups, hook timing         |
-| [Testing](testing.md)                            | Unit and functional testing guide for plugin code             |
+| [Demo Data](../core-development/demo-data.md)    | Build a dev instance from a demo archive, the import CLI      |
+| [Testing](testing.md)                            | Unit testing guide for plugin code                            |
 | [Troubleshooting](troubleshooting.md)            | Common problems and solutions                                 |

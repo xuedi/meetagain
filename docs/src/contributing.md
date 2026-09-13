@@ -13,7 +13,7 @@ then run the full test suite to confirm everything is green:
 just test
 ```
 
-This runs unit tests, functional tests, and all Mago static analysis checks.
+This runs the unit tests and all Mago static analysis checks.
 
 ---
 
@@ -51,9 +51,6 @@ just test
 
 # Unit tests only
 just testUnit
-
-# Functional tests only
-just testFunctional
 
 # Specific test file
 just testUnit plugins/dishes/tests/Unit/SomeServiceTest.php
@@ -101,14 +98,14 @@ just app "app:translation:scan events.button_save"
 ## Plugin Contributions
 
 If you are contributing a new bundled plugin, read the
-[Plugin Development Guide](plugin-development.md) first.
+[Plugin Development Guide](plugin-development/index.md) first.
 
 Plugins must:
 
 - Not modify core entities
 - Use junction tables for any relationship to core entities (store IDs as INT, not foreign keys)
 - Work correctly when disabled (core must function without them)
-- Include fixtures in the `plugin` group
+- Carry their data through the export and import seams, so archives stay complete
 - Include at least basic unit tests
 
 ---

@@ -182,3 +182,7 @@ glossary_import:
     flash_done: '导入完成：新建 %created% 条，更新 %updated% 条，跳过 %skipped% 条。'
     flash_unknown_tags: '以下标签没有匹配到已有标签，已被忽略：%tags%'
     activity_imported: '导入了术语表词汇：新建 %created% 条，更新 %updated% 条，跳过 %skipped% 条'
+glossary_portability:
+    kind_cards: '术语表练习卡片'
+    kind_days: '术语表练习日'
+    kind_change_proposals: '待处理的术语表修改建议'

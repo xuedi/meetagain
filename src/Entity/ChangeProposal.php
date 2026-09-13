@@ -186,6 +186,13 @@ class ChangeProposal
         return $this->createdAt;
     }
 
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
     public function getReviewedAt(): ?DateTimeImmutable
     {
         return $this->reviewedAt;

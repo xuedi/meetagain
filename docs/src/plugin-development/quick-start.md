@@ -24,7 +24,7 @@ plugins/
       Entity/            # Doctrine entities
       Repository/        # Repositories
       Service/           # Business logic
-      DataFixtures/      # Fixture classes
+      Portability/       # Export and import of your plugin's data
     templates/           # Twig templates
     README.md            # Plugin documentation
 ```
@@ -42,9 +42,9 @@ that implements the `App\Plugin` interface.
 namespace Plugin\YourPlugin;
 
 use App\Plugin;
+use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\ValueObject\LinkCollection;
-use Symfony\Component\Console\Output\OutputInterface;
 
 readonly class Kernel implements Plugin
 {
@@ -55,10 +55,10 @@ readonly class Kernel implements Plugin
 
     public function getLinkCollection(): LinkCollection
     {
-        return new LinkCollection();
+        return LinkCollection::empty();
     }
 
-    public function getEventTile(int $eventId): ?string
+    public function getEventTile(int $eventId, EventTileLocation $location): ?string
     {
         return null;
     }
@@ -70,11 +70,6 @@ readonly class Kernel implements Plugin
 
     public function warmCache(WarmCacheType $type, array $ids): void
     {
-    }
-
-    public function getMemberPageTop(): ?string
-    {
-        return null;
     }
 
     public function getFooterAbout(): ?string
@@ -90,18 +85,6 @@ readonly class Kernel implements Plugin
     public function getJavascripts(): array
     {
         return []; // e.g. ['js/myplugin.js'] — relative to assets/
-    }
-
-    public function preFixtures(OutputInterface $output): void
-    {
-    }
-
-    public function loadPostExtendFixtures(OutputInterface $output): void
-    {
-    }
-
-    public function postFixtures(OutputInterface $output): void
-    {
     }
 }
 ```
@@ -140,11 +123,13 @@ readonly class Kernel implements Plugin
        prefix: /your-plugin
    ```
 
-5. **Enable the plugin and load fixtures:**
+5. **Build a dev instance and enable the plugin:**
    ```bash
+   just devModeImport weiqi-club
    just plugin-enable your-plugin
-   just devModeFixtures
+   just appMigrate
    ```
+   Any demo archive works - see [Demo Data](../core-development/demo-data.md).
 
 6. **Verify:** Open the app in your browser — your plugin should be active.
 

@@ -4,10 +4,10 @@ namespace Plugin\Books\Portability;
 
 use App\Entity\Image;
 use App\Enum\ImageType;
-use App\Item\Portability\ImportContext;
-use App\Item\Portability\ImportResult;
-use App\Item\Portability\ContributorInterface;
-use App\Item\Portability\PortableImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\Item\ImportResult;
+use App\Portability\Item\ContributorInterface;
+use App\Portability\ImageWriterInterface;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,7 +37,13 @@ readonly class BookContributor implements ContributorInterface
     }
 
     #[Override]
-    public function exportItems(array $itemIds, PortableImageWriterInterface $images): array
+    public function allItemIds(): array
+    {
+        return array_map(intval(...), $this->bookRepo->createQueryBuilder('b')->select('b.id')->orderBy('b.id')->getQuery()->getSingleColumnResult());
+    }
+
+    #[Override]
+    public function exportItems(array $itemIds, ImageWriterInterface $images): array
     {
         $rows = [];
 
@@ -51,7 +57,7 @@ readonly class BookContributor implements ContributorInterface
                 'page_count' => $book->getPageCount(),
                 'published_year' => $book->getPublishedYear(),
                 'cover_image' => $book->getCoverImage() instanceof Image
-                    ? $images->addImage($book->getCoverImage(), 'images/books/' . $book->getId() . '/cover')
+                    ? $images->addImage($book->getCoverImage())
                     : null,
             ];
         }

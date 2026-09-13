@@ -24,27 +24,12 @@ class Kernel extends BaseKernel
      */
     public function registerBundles(): iterable
     {
-        yield from $this->doRegisterBundles($this->getConfigDir() . '/bundles.php');
+        $bundles = $this->readBundles($this->getConfigDir() . '/bundles.php');
         foreach ($this->getPluginConfigDirs() as $pluginConfigDir => $pluginEnabled) {
-            $bundlesFile = $pluginConfigDir . '/bundles.php';
-            if (!file_exists($bundlesFile)) {
-                continue;
-            }
-            yield from $this->doRegisterBundles($bundlesFile);
+            $bundles += $this->readBundles($pluginConfigDir . '/bundles.php');
         }
-    }
 
-    /**
-     * @return iterable<BundleInterface>
-     */
-    private function doRegisterBundles(string $bundlesFile): iterable
-    {
-        if (!file_exists($bundlesFile)) {
-            return;
-        }
-        /** @var array<class-string<BundleInterface>, array<string, bool>> $contents */
-        $contents = require $bundlesFile;
-        foreach ($contents as $class => $envs) {
+        foreach ($bundles as $class => $envs) {
             if (!($envs[$this->environment] ?? $envs['all'] ?? false)) {
                 continue;
             }
@@ -56,6 +41,18 @@ class Kernel extends BaseKernel
             // @mago-expect analyzer:unsafe-instantiation
             yield new $class();
         }
+    }
+
+    /**
+     * @return array<class-string<BundleInterface>, array<string, bool>>
+     */
+    private function readBundles(string $bundlesFile): array
+    {
+        if (!file_exists($bundlesFile)) {
+            return [];
+        }
+
+        return require $bundlesFile;
     }
 
     public function getPluginConfigDirs(): iterable

@@ -56,3 +56,6 @@ dishes_dish:
     flash_added: '菜肴已添加到目录。'
     flash_updated: '菜肴已更新。'
     flash_deleted: '菜肴已删除。'
+dishes_portability:
+    kind_likes: '菜肴点赞'
+    kind_gallery: '菜肴相册图片'

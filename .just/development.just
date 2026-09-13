@@ -1,12 +1,16 @@
 # One-time setup and the dev-environment reset modes.
 
-# Run once per clone
+# Run once per clone, and again when a plugin adds recipes or commit hooks
 [group('development')]
 install: buildTools
     git config core.hooksPath .githooks
     mkdir -p bin/commit-hooks
+    rm -f bin/commit-hooks/*.bash
     cp tests/config/commit-hooks/*.bash bin/commit-hooks/
+    for hook in plugins/*/commit-hooks/*.bash; do if [ -f "$hook" ]; then cp "$hook" bin/commit-hooks/; fi; done
     chmod +x bin/commit-hooks/*.bash
+    cat /dev/null > .just/local.just
+    for recipes in plugins/*/just/*.just; do if [ -f "$recipes" ]; then cat "$recipes" >> .just/local.just; fi; done
     @echo "Pre-commit dispatcher activated. Scripts in bin/commit-hooks/ will run on every commit."
     @echo "Next, once per machine: just devCerts"
 
@@ -26,7 +30,7 @@ devCertsFirefox:
     @CA="$(mkcert -CAROOT)/rootCA.pem"; found=0; for p in ~/.mozilla/firefox/*/ ~/.config/mozilla/firefox/*/; do [ -f "$p/cert9.db" ] || continue; found=1; certutil -d sql:"$p" -D -n "mkcert development CA" >/dev/null 2>&1 || true; certutil -d sql:"$p" -A -t "C,," -n "mkcert development CA" -i "$CA" && echo "trusted in $p"; done; [ "$found" = 1 ] || echo "no Firefox profile found - nothing to do"
     @echo "Restart Firefox to pick this up."
 
-# Shared reset sequence used by devModeFixtures and devModeMinimal
+# Shared reset sequence used by devModeImport and the recipes plugins contribute
 [group('development')]
 devModeReset plugins='':
     {{JUST}} dockerStop
@@ -42,31 +46,29 @@ devModeReset plugins='':
     {{PHP}} php bin/console cache:clear -q
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
-    {{PHP}} php bin/console doctrine:fixtures:load -q --group=install
+    {{PHP}} php bin/console app:install:seed -q
     {{PHP}} php bin/console app:security:reset-state
 
-# Full dev environment with demo data (base + plugin fixtures) — complete sample content for testing
+# Dev environment built from an archive in src/DataImportFixtures - without an argument, lists the archives
 [group('development')]
-devModeFixtures plugins='':
-    {{JUST}} devModeReset {{plugins}}
-    {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=base
-    {{PHP}} php bin/console app:plugin:pre-fixtures
-    {{PHP}} php bin/console app:fixtures:load -q --append --group=plugin
-    {{PHP}} php bin/console app:plugin:post-fixtures
-    {{JUST}} appCron
-    {{PHP}} php bin/console app:event:add-fixture
-    {{JUST}} appClearCache
-
-# Full dev environment with ALL plugins active — ideal for testing plugin interactions
-[group('development')]
-devModeMax:
-    {{JUST}} devModeFixtures all
-
-# Minimal dev environment with install fixtures only (no sample content) — ideal for testing imports
-[group('development')]
-devModeMinimal plugins='':
-    {{JUST}} devModeReset {{plugins}}
-    {{PHP}} php bin/console doctrine:fixtures:load -q --append --group=minimal
+devModeImport archive='':
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if [ -z "{{archive}}" ]; then
+        {{PHP}} php bin/console app:import:inspect src/DataImportFixtures/*/ --format=table
+        exit 0
+    fi
+    archive="src/DataImportFixtures/{{archive}}"
+    if [ ! -f "$archive/export.json" ]; then
+        echo "No archive at $archive - run 'just devModeImport' to list them"
+        exit 1
+    fi
+    {{JUST}} devModeReset
+    {{PHP}} php bin/console app:plugin enable $({{PHP}} php bin/console app:import:inspect "$archive" --format=plugins)
+    {{PHP}} php bin/console cache:clear -q
+    {{JUST}} appMigrate
+    {{PHP}} php bin/console app:import "$archive" --shift-dates --site-settings --strict
+    {{JUST}} appAssets
     {{JUST}} appClearCache
 
 # Switch to installer mode

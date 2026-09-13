@@ -1,0 +1,4405 @@
+{
+    "format": "meetagain-group-export",
+    "version": "2.0",
+    "exported_at": "2026-01-05T00:00:00+01:00",
+    "plugins": [
+        "glossary",
+        "wishlist"
+    ],
+    "site": {
+        "slug": "dragon-descendants",
+        "name": "Dragon Descendants",
+        "description": "A Chinese-language community (龙的传人) collecting everyday Chinese phrases with pinyin and a categorised glossary. The group whose glossary keeps the original pinyin + category shape.",
+        "languages": [
+            "zh",
+            "en"
+        ],
+        "theme_colors": [],
+        "settings": {
+            "send_event_reminders": true,
+            "send_rsvp_notifications": true,
+            "send_upcoming_digest": true,
+            "show_town_hall": false
+        },
+        "plugin_settings": {
+            "glossary": {
+                "secondaryEnabled": true,
+                "secondaryLabel": "Pinyin",
+                "primaryLabel": null,
+                "definitionLabel": null,
+                "termLanguage": "zh",
+                "trainerEnabled": true,
+                "sessionSize": 20,
+                "newCardsPerDay": 10,
+                "directions": [
+                    "term_to_definition",
+                    "definition_to_term",
+                    "secondary_to_term"
+                ],
+                "defaultAnswerMode": "flip",
+                "leaderboardEnabled": true
+            }
+        },
+        "logo_file": "images/e1e0db56f64760f209bab36c57bd7cfe4482ad50.png"
+    },
+    "locations": [
+        {
+            "ref": 17,
+            "title": "Long Jing Teahouse",
+            "latitude": "52.5058",
+            "longitude": "13.3169",
+            "city": "Berlin",
+            "country": ""
+        }
+    ],
+    "users": [
+        {
+            "email": "Crystal.Liu@example.org",
+            "name": "Crystal Liu",
+            "locale": "zh",
+            "role": "admin",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
+            "public": true,
+            "image_file": "images/c79532c476e00a2400292babd40d98ac7dff9997.jpg"
+        },
+        {
+            "email": "Demi.Wilkinson@example.org",
+            "name": "Demi Wilkinson",
+            "locale": "en",
+            "role": "organizer",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
+            "public": true,
+            "image_file": "images/b6b859060d93009c9b742ad6608501d73e67166c.jpg"
+        },
+        {
+            "email": "Kate.Morrison@example.org",
+            "name": "Kate Morrison",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "In the delicate crunch of every cookie lies a harmony of flavors that awakens my senses and brings solace to my soul. My passion for cookies transcends mere indulgence; it is an art form that celebrates life's sweetest moments. #CookieLover #SweetObsessions",
+            "public": true,
+            "image_file": "images/527282946faef1b7c4efbd61fb4be58f0f84fc73.jpg"
+        },
+        {
+            "email": "Phoenix.Baker@example.org",
+            "name": "Phoenix Baker",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker with a passion for painting and hiking. Catch me exploring the great outdoors or getting lost in colors! #Wanderlust #ArtLover 🎨⛰️",
+            "public": true,
+            "image_file": "images/da483b78e3e3bfd30953876637bcdaf2fe97ef89.jpg"
+        }
+    ],
+    "hosts": [
+        {
+            "ref": 17,
+            "name": "DragonWei",
+            "email": null
+        }
+    ],
+    "series": [
+        {
+            "ref": 13,
+            "name": "Chinese Phrase Exchange",
+            "rule": "BiMonthly",
+            "ruleSpec": null
+        },
+        {
+            "ref": 14,
+            "name": "Chinese Phrase Exchange - Idioms Special",
+            "rule": "BiMonthly",
+            "ruleSpec": null
+        }
+    ],
+    "events": [
+        {
+            "ref": 93,
+            "initial": true,
+            "titles": {
+                "en": "Chinese Phrase Exchange",
+                "zh": "中文短语交流会"
+            },
+            "descriptions": {
+                "en": "We meet at the teahouse, each bring a favourite everyday phrase with its pinyin, and add the best ones to our shared glossary.",
+                "zh": "我们在茶馆见面，每人带一个喜欢的日常短语和拼音，把最好的加入我们的共享词库。"
+            },
+            "teasers": {
+                "en": "A relaxed afternoon of everyday Chinese over tea. Bring a phrase, leave with ten.",
+                "zh": "在茶馆里轻松地聊日常中文。带一个短语来，带十个走。"
+            },
+            "start": "2025-12-21T15:00:00+01:00",
+            "stop": "2025-12-21T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 13,
+            "featured": false,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 94,
+            "initial": true,
+            "titles": {
+                "en": "Chinese Phrase Exchange - Idioms Special",
+                "zh": "中文短语交流会 - 成语专场"
+            },
+            "descriptions": {
+                "en": "Each member brings one idiom, its literal meaning, and when to actually use it. We add the keepers to the glossary under the Idioms category.",
+                "zh": "每位成员带一个成语、它的字面意思以及实际的用法。我们把好的收录到词库的成语分类里。"
+            },
+            "teasers": {
+                "en": "This edition is all about chengyu - four-character idioms and the stories behind them.",
+                "zh": "本期专攻成语 - 四字成语及其背后的故事。"
+            },
+            "start": "2026-02-01T15:00:00+01:00",
+            "stop": "2026-02-01T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 14,
+            "featured": true,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Demi.Wilkinson@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 95,
+            "initial": false,
+            "titles": {
+                "en": "Chinese Phrase Exchange",
+                "zh": "中文短语交流会"
+            },
+            "descriptions": {
+                "en": "We meet at the teahouse, each bring a favourite everyday phrase with its pinyin, and add the best ones to our shared glossary.",
+                "zh": "我们在茶馆见面，每人带一个喜欢的日常短语和拼音，把最好的加入我们的共享词库。"
+            },
+            "teasers": {
+                "en": "A relaxed afternoon of everyday Chinese over tea. Bring a phrase, leave with ten.",
+                "zh": "在茶馆里轻松地聊日常中文。带一个短语来，带十个走。"
+            },
+            "start": "2026-01-18T15:00:00+01:00",
+            "stop": "2026-01-18T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 13,
+            "featured": false,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 96,
+            "initial": false,
+            "titles": {
+                "en": "Chinese Phrase Exchange",
+                "zh": "中文短语交流会"
+            },
+            "descriptions": {
+                "en": "We meet at the teahouse, each bring a favourite everyday phrase with its pinyin, and add the best ones to our shared glossary.",
+                "zh": "我们在茶馆见面，每人带一个喜欢的日常短语和拼音，把最好的加入我们的共享词库。"
+            },
+            "teasers": {
+                "en": "A relaxed afternoon of everyday Chinese over tea. Bring a phrase, leave with ten.",
+                "zh": "在茶馆里轻松地聊日常中文。带一个短语来，带十个走。"
+            },
+            "start": "2026-02-01T15:00:00+01:00",
+            "stop": "2026-02-01T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 13,
+            "featured": false,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 97,
+            "initial": false,
+            "titles": {
+                "en": "Chinese Phrase Exchange",
+                "zh": "中文短语交流会"
+            },
+            "descriptions": {
+                "en": "We meet at the teahouse, each bring a favourite everyday phrase with its pinyin, and add the best ones to our shared glossary.",
+                "zh": "我们在茶馆见面，每人带一个喜欢的日常短语和拼音，把最好的加入我们的共享词库。"
+            },
+            "teasers": {
+                "en": "A relaxed afternoon of everyday Chinese over tea. Bring a phrase, leave with ten.",
+                "zh": "在茶馆里轻松地聊日常中文。带一个短语来，带十个走。"
+            },
+            "start": "2026-02-15T15:00:00+01:00",
+            "stop": "2026-02-15T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 13,
+            "featured": false,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 98,
+            "initial": false,
+            "titles": {
+                "en": "Chinese Phrase Exchange",
+                "zh": "中文短语交流会"
+            },
+            "descriptions": {
+                "en": "We meet at the teahouse, each bring a favourite everyday phrase with its pinyin, and add the best ones to our shared glossary.",
+                "zh": "我们在茶馆见面，每人带一个喜欢的日常短语和拼音，把最好的加入我们的共享词库。"
+            },
+            "teasers": {
+                "en": "A relaxed afternoon of everyday Chinese over tea. Bring a phrase, leave with ten.",
+                "zh": "在茶馆里轻松地聊日常中文。带一个短语来，带十个走。"
+            },
+            "start": "2026-03-01T15:00:00+01:00",
+            "stop": "2026-03-01T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 13,
+            "featured": false,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 99,
+            "initial": false,
+            "titles": {
+                "en": "Chinese Phrase Exchange",
+                "zh": "中文短语交流会"
+            },
+            "descriptions": {
+                "en": "We meet at the teahouse, each bring a favourite everyday phrase with its pinyin, and add the best ones to our shared glossary.",
+                "zh": "我们在茶馆见面，每人带一个喜欢的日常短语和拼音，把最好的加入我们的共享词库。"
+            },
+            "teasers": {
+                "en": "A relaxed afternoon of everyday Chinese over tea. Bring a phrase, leave with ten.",
+                "zh": "在茶馆里轻松地聊日常中文。带一个短语来，带十个走。"
+            },
+            "start": "2026-03-15T15:00:00+01:00",
+            "stop": "2026-03-15T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 13,
+            "featured": false,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 100,
+            "initial": false,
+            "titles": {
+                "en": "Chinese Phrase Exchange",
+                "zh": "中文短语交流会"
+            },
+            "descriptions": {
+                "en": "We meet at the teahouse, each bring a favourite everyday phrase with its pinyin, and add the best ones to our shared glossary.",
+                "zh": "我们在茶馆见面，每人带一个喜欢的日常短语和拼音，把最好的加入我们的共享词库。"
+            },
+            "teasers": {
+                "en": "A relaxed afternoon of everyday Chinese over tea. Bring a phrase, leave with ten.",
+                "zh": "在茶馆里轻松地聊日常中文。带一个短语来，带十个走。"
+            },
+            "start": "2026-03-29T15:00:00+02:00",
+            "stop": "2026-03-29T17:30:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 13,
+            "featured": false,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 101,
+            "initial": false,
+            "titles": {
+                "en": "Chinese Phrase Exchange - Idioms Special",
+                "zh": "中文短语交流会 - 成语专场"
+            },
+            "descriptions": {
+                "en": "Each member brings one idiom, its literal meaning, and when to actually use it. We add the keepers to the glossary under the Idioms category.",
+                "zh": "每位成员带一个成语、它的字面意思以及实际的用法。我们把好的收录到词库的成语分类里。"
+            },
+            "teasers": {
+                "en": "This edition is all about chengyu - four-character idioms and the stories behind them.",
+                "zh": "本期专攻成语 - 四字成语及其背后的故事。"
+            },
+            "start": "2026-02-15T15:00:00+01:00",
+            "stop": "2026-02-15T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 14,
+            "featured": false,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Demi.Wilkinson@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 102,
+            "initial": false,
+            "titles": {
+                "en": "Chinese Phrase Exchange - Idioms Special",
+                "zh": "中文短语交流会 - 成语专场"
+            },
+            "descriptions": {
+                "en": "Each member brings one idiom, its literal meaning, and when to actually use it. We add the keepers to the glossary under the Idioms category.",
+                "zh": "每位成员带一个成语、它的字面意思以及实际的用法。我们把好的收录到词库的成语分类里。"
+            },
+            "teasers": {
+                "en": "This edition is all about chengyu - four-character idioms and the stories behind them.",
+                "zh": "本期专攻成语 - 四字成语及其背后的故事。"
+            },
+            "start": "2026-03-01T15:00:00+01:00",
+            "stop": "2026-03-01T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 14,
+            "featured": false,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Demi.Wilkinson@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 103,
+            "initial": false,
+            "titles": {
+                "en": "Chinese Phrase Exchange - Idioms Special",
+                "zh": "中文短语交流会 - 成语专场"
+            },
+            "descriptions": {
+                "en": "Each member brings one idiom, its literal meaning, and when to actually use it. We add the keepers to the glossary under the Idioms category.",
+                "zh": "每位成员带一个成语、它的字面意思以及实际的用法。我们把好的收录到词库的成语分类里。"
+            },
+            "teasers": {
+                "en": "This edition is all about chengyu - four-character idioms and the stories behind them.",
+                "zh": "本期专攻成语 - 四字成语及其背后的故事。"
+            },
+            "start": "2026-03-15T15:00:00+01:00",
+            "stop": "2026-03-15T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 14,
+            "featured": false,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Demi.Wilkinson@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 104,
+            "initial": false,
+            "titles": {
+                "en": "Chinese Phrase Exchange - Idioms Special",
+                "zh": "中文短语交流会 - 成语专场"
+            },
+            "descriptions": {
+                "en": "Each member brings one idiom, its literal meaning, and when to actually use it. We add the keepers to the glossary under the Idioms category.",
+                "zh": "每位成员带一个成语、它的字面意思以及实际的用法。我们把好的收录到词库的成语分类里。"
+            },
+            "teasers": {
+                "en": "This edition is all about chengyu - four-character idioms and the stories behind them.",
+                "zh": "本期专攻成语 - 四字成语及其背后的故事。"
+            },
+            "start": "2026-03-29T15:00:00+02:00",
+            "stop": "2026-03-29T17:30:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 14,
+            "featured": false,
+            "location_ref": 17,
+            "host_refs": [
+                17
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Demi.Wilkinson@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        }
+    ],
+    "rsvps": [
+        {
+            "event_ref": 93,
+            "email": "Crystal.Liu@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 93,
+            "email": "Demi.Wilkinson@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 93,
+            "email": "Kate.Morrison@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 94,
+            "email": "Crystal.Liu@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 94,
+            "email": "Demi.Wilkinson@example.org",
+            "guests": 0
+        }
+    ],
+    "cms_pages": [
+        {
+            "ref": 15,
+            "slug": "index",
+            "published": true,
+            "titles": {
+                "en": "Dragon Descendants",
+                "zh": "龙的传人"
+            },
+            "link_names": {
+                "en": "Home",
+                "zh": "首页"
+            },
+            "menu_locations": [],
+            "blocks": [
+                {
+                    "language": "zh",
+                    "type": 1,
+                    "priority": 1,
+                    "json": {
+                        "title": "每天一句地道中文"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 1,
+                    "priority": 2,
+                    "json": {
+                        "title": "Everyday Chinese, one phrase at a time"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "zh",
+                    "type": 2,
+                    "priority": 3,
+                    "json": {
+                        "title": "我们做什么",
+                        "content": "我们收集日常生活中真正用得上的中文表达，配上拼音和分类，整理成一份大家都能查的词汇表。每个词条都由成员提交，经过审核后加入。"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 4,
+                    "json": {
+                        "title": "What we do",
+                        "content": "We collect the Chinese phrases people actually use day to day, add pinyin and a category, and keep them in a glossary anyone can look through. Entries are submitted by members and reviewed before they go in."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "zh",
+                    "type": 2,
+                    "priority": 5,
+                    "json": {
+                        "title": "欢迎加入",
+                        "content": "不管你是母语者还是刚开始学中文，都可以参加。我们定期见面聊天、整理词条，也欢迎你直接提交自己听到的说法。"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 6,
+                    "json": {
+                        "title": "Everyone is welcome",
+                        "content": "Native speakers and beginners alike. We meet regularly to talk and to sort through new entries, and you can submit a phrase you picked up somewhere at any time."
+                    },
+                    "image_file": null
+                }
+            ]
+        }
+    ],
+    "announcements": [],
+    "tags": [
+        {
+            "ref": 28,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 0,
+            "labels": {
+                "de": "Begrüßung",
+                "en": "Greeting"
+            },
+            "managed": false
+        },
+        {
+            "ref": 29,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 1,
+            "labels": {
+                "de": "Umgangssprache",
+                "en": "Informal"
+            },
+            "managed": false
+        },
+        {
+            "ref": 30,
+            "item_type": "glossary",
+            "parent_ref": 29,
+            "position": 2,
+            "labels": {
+                "de": "Schimpfen",
+                "en": "Swearing"
+            },
+            "managed": false
+        },
+        {
+            "ref": 31,
+            "item_type": "glossary",
+            "parent_ref": 29,
+            "position": 3,
+            "labels": {
+                "de": "Flirten",
+                "en": "Flirting"
+            },
+            "managed": false
+        },
+        {
+            "ref": 32,
+            "item_type": "glossary",
+            "parent_ref": 29,
+            "position": 4,
+            "labels": {
+                "de": "Slang",
+                "en": "Slang"
+            },
+            "managed": false
+        },
+        {
+            "ref": 33,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 5,
+            "labels": {
+                "de": "Abkürzung",
+                "en": "Abbreviation"
+            },
+            "managed": false
+        },
+        {
+            "ref": 34,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 6,
+            "labels": {
+                "de": "Regulär",
+                "en": "Regular"
+            },
+            "managed": false
+        },
+        {
+            "ref": 35,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 7,
+            "labels": {
+                "de": "Redewendungen",
+                "en": "Idioms"
+            },
+            "managed": false
+        },
+        {
+            "ref": 36,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 8,
+            "labels": {
+                "en": "HSK 1",
+                "zh": "HSK 1"
+            },
+            "managed": false
+        },
+        {
+            "ref": 37,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 9,
+            "labels": {
+                "en": "HSK 2",
+                "zh": "HSK 2"
+            },
+            "managed": false
+        }
+    ],
+    "items": {
+        "glossary": {
+            "rows": [
+                {
+                    "ref": 14,
+                    "phrase": "你好",
+                    "secondary": "nǐ hǎo",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "Hello - the standard greeting, safe in any situation.",
+                        "de": "Hallo - der Standardgruß, passt immer."
+                    }
+                },
+                {
+                    "ref": 15,
+                    "phrase": "您好",
+                    "secondary": "nín hǎo",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "Hello, polite form. Use with elders, teachers and strangers.",
+                        "de": "Hallo, höfliche Form. Für Ältere, Lehrer und Fremde."
+                    }
+                },
+                {
+                    "ref": 16,
+                    "phrase": "早上好",
+                    "secondary": "zǎo shang hǎo",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "Good morning.",
+                        "de": "Guten Morgen."
+                    }
+                },
+                {
+                    "ref": 17,
+                    "phrase": "干嘛",
+                    "secondary": "gàn má",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "What are you up to? Casual, between friends."
+                    }
+                },
+                {
+                    "ref": 18,
+                    "phrase": "你吃了吗？",
+                    "secondary": "nǐ chī le ma?",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "Have you eaten? Used as a friendly greeting, not a real question."
+                    }
+                },
+                {
+                    "ref": 19,
+                    "phrase": "马马虎虎",
+                    "secondary": "mǎ ma hū hū",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "So-so, nothing special. Literally \"horse horse tiger tiger\".",
+                        "de": "Geht so, nichts Besonderes. Wörtlich \"Pferd Pferd Tiger Tiger\"."
+                    }
+                },
+                {
+                    "ref": 20,
+                    "phrase": "加油",
+                    "secondary": "jiā yóu",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "Keep going, you can do it. Shouted at races and exams alike."
+                    }
+                },
+                {
+                    "ref": 21,
+                    "phrase": "随便",
+                    "secondary": "suí biàn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "Whatever you like, up to you. Common when nobody wants to choose."
+                    }
+                },
+                {
+                    "ref": 22,
+                    "phrase": "靠",
+                    "secondary": "kào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "Damn. Mild but impolite - not for the office."
+                    }
+                },
+                {
+                    "ref": 23,
+                    "phrase": "没事",
+                    "secondary": "méi shì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "No problem / never mind. Answer to an apology or a thank you.",
+                        "de": "Kein Problem / macht nichts. Antwort auf eine Entschuldigung oder Dank."
+                    }
+                },
+                {
+                    "ref": 24,
+                    "phrase": "不好意思",
+                    "secondary": "bù hǎo yì si",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "Sorry / excuse me. Softer than a formal apology."
+                    }
+                },
+                {
+                    "ref": 25,
+                    "phrase": "爱",
+                    "secondary": "ài",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to love; to be fond of; to like; affection"
+                    }
+                },
+                {
+                    "ref": 26,
+                    "phrase": "八",
+                    "secondary": "bā",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "eight; 8"
+                    }
+                },
+                {
+                    "ref": 27,
+                    "phrase": "爸爸",
+                    "secondary": "bà ba",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(coll.) father; dad"
+                    }
+                },
+                {
+                    "ref": 28,
+                    "phrase": "杯子",
+                    "secondary": "bēi zi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "cup; glass"
+                    }
+                },
+                {
+                    "ref": 29,
+                    "phrase": "北京",
+                    "secondary": "Běi jīng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "Beijing, capital of the People's Republic of China"
+                    }
+                },
+                {
+                    "ref": 30,
+                    "phrase": "本",
+                    "secondary": "běn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "root; stem; origin; source"
+                    }
+                },
+                {
+                    "ref": 31,
+                    "phrase": "不",
+                    "secondary": "bù",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "no; not so; (bound form) not; un-"
+                    }
+                },
+                {
+                    "ref": 32,
+                    "phrase": "不客气",
+                    "secondary": "bù kè qi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "you're welcome; don't mention it; impolite; rude"
+                    }
+                },
+                {
+                    "ref": 33,
+                    "phrase": "菜",
+                    "secondary": "cài",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "dish (type of food); vegetable; cuisine; (coll.) (one's) type"
+                    }
+                },
+                {
+                    "ref": 34,
+                    "phrase": "茶",
+                    "secondary": "chá",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "tea; tea plant"
+                    }
+                },
+                {
+                    "ref": 35,
+                    "phrase": "吃",
+                    "secondary": "chī",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to eat; to consume; to eat at (a cafeteria etc); to eradicate"
+                    }
+                },
+                {
+                    "ref": 36,
+                    "phrase": "出租车",
+                    "secondary": "chū zū chē",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "taxi; rental car"
+                    }
+                },
+                {
+                    "ref": 37,
+                    "phrase": "打电话",
+                    "secondary": "dǎ diàn huà",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to make a telephone call"
+                    }
+                },
+                {
+                    "ref": 38,
+                    "phrase": "大",
+                    "secondary": "dà",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "big; large; great; older (than another person)"
+                    }
+                },
+                {
+                    "ref": 39,
+                    "phrase": "的",
+                    "secondary": "de",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "of; ~'s (possessive particle); (used after an attribute); (used to form a nominal expression)"
+                    }
+                },
+                {
+                    "ref": 40,
+                    "phrase": "点",
+                    "secondary": "diǎn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "point; dot; drop; speck"
+                    }
+                },
+                {
+                    "ref": 41,
+                    "phrase": "电脑",
+                    "secondary": "diàn nǎo",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "computer"
+                    }
+                },
+                {
+                    "ref": 42,
+                    "phrase": "电视",
+                    "secondary": "diàn shì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "television; TV"
+                    }
+                },
+                {
+                    "ref": 43,
+                    "phrase": "电影",
+                    "secondary": "diàn yǐng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "movie; film"
+                    }
+                },
+                {
+                    "ref": 44,
+                    "phrase": "东西",
+                    "secondary": "dōng xi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "thing; stuff; person"
+                    }
+                },
+                {
+                    "ref": 45,
+                    "phrase": "都",
+                    "secondary": "dōu",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "all; both; entirely; (used for emphasis) even"
+                    }
+                },
+                {
+                    "ref": 46,
+                    "phrase": "读",
+                    "secondary": "dú",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to read out; to read aloud; to read; to attend (school)"
+                    }
+                },
+                {
+                    "ref": 47,
+                    "phrase": "对不起",
+                    "secondary": "duì bu qǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "I'm sorry; excuse me; I beg your pardon; to let (sb) down"
+                    }
+                },
+                {
+                    "ref": 48,
+                    "phrase": "多",
+                    "secondary": "duō",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "many; much; too many; in excess"
+                    }
+                },
+                {
+                    "ref": 49,
+                    "phrase": "多少",
+                    "secondary": "duō shao",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "how much?; how many?; (phone number, student ID etc) what number?"
+                    }
+                },
+                {
+                    "ref": 50,
+                    "phrase": "儿子",
+                    "secondary": "ér zi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "son"
+                    }
+                },
+                {
+                    "ref": 51,
+                    "phrase": "二",
+                    "secondary": "èr",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "two; 2; (Beijing dialect) stupid"
+                    }
+                },
+                {
+                    "ref": 52,
+                    "phrase": "饭馆",
+                    "secondary": "fàn guǎn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "restaurant"
+                    }
+                },
+                {
+                    "ref": 53,
+                    "phrase": "飞机",
+                    "secondary": "fēi jī",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "airplane"
+                    }
+                },
+                {
+                    "ref": 54,
+                    "phrase": "分钟",
+                    "secondary": "fēn zhōng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "minute"
+                    }
+                },
+                {
+                    "ref": 55,
+                    "phrase": "高兴",
+                    "secondary": "gāo xìng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "happy; glad; willing (to do sth); in a cheerful mood"
+                    }
+                },
+                {
+                    "ref": 56,
+                    "phrase": "个",
+                    "secondary": "gè",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(classifier used before a noun that has no specific classifier); (bound form) individual"
+                    }
+                },
+                {
+                    "ref": 57,
+                    "phrase": "工作",
+                    "secondary": "gōng zuò",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to work; (of a machine) to operate; job; work"
+                    }
+                },
+                {
+                    "ref": 58,
+                    "phrase": "狗",
+                    "secondary": "gǒu",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "dog"
+                    }
+                },
+                {
+                    "ref": 59,
+                    "phrase": "汉语",
+                    "secondary": "Hàn yǔ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "Chinese language"
+                    }
+                },
+                {
+                    "ref": 60,
+                    "phrase": "好",
+                    "secondary": "hǎo",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "good; appropriate; proper; all right!"
+                    }
+                },
+                {
+                    "ref": 61,
+                    "phrase": "喝",
+                    "secondary": "hē",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to drink"
+                    }
+                },
+                {
+                    "ref": 62,
+                    "phrase": "和",
+                    "secondary": "hé",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(joining two nouns) and; together with; with; (math.) sum"
+                    }
+                },
+                {
+                    "ref": 63,
+                    "phrase": "很",
+                    "secondary": "hěn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(adverb of degree); quite; very; awfully"
+                    }
+                },
+                {
+                    "ref": 64,
+                    "phrase": "后面",
+                    "secondary": "hòu mian",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "the back; the rear; the last bit; behind"
+                    }
+                },
+                {
+                    "ref": 65,
+                    "phrase": "回",
+                    "secondary": "huí",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to circle; to go back; to turn around; to answer"
+                    }
+                },
+                {
+                    "ref": 66,
+                    "phrase": "会",
+                    "secondary": "huì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "can; to have the skill; to know how to; to be likely to"
+                    }
+                },
+                {
+                    "ref": 67,
+                    "phrase": "火车站",
+                    "secondary": "huǒ chē zhàn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "train station"
+                    }
+                },
+                {
+                    "ref": 68,
+                    "phrase": "几",
+                    "secondary": "jǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "how much; how many; several; a few"
+                    }
+                },
+                {
+                    "ref": 69,
+                    "phrase": "家",
+                    "secondary": "jiā",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "home; family; (polite) my (sister, uncle etc); classifier for families or businesses"
+                    }
+                },
+                {
+                    "ref": 70,
+                    "phrase": "叫",
+                    "secondary": "jiào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to shout; to call; to order; to ask"
+                    }
+                },
+                {
+                    "ref": 71,
+                    "phrase": "今天",
+                    "secondary": "jīn tiān",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "today; at the present; now"
+                    }
+                },
+                {
+                    "ref": 72,
+                    "phrase": "九",
+                    "secondary": "jiǔ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "nine; 9"
+                    }
+                },
+                {
+                    "ref": 73,
+                    "phrase": "开",
+                    "secondary": "kāi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to open (transitive or intransitive); (of ships, vehicles, troops etc) to start; to turn on; to put in operation"
+                    }
+                },
+                {
+                    "ref": 74,
+                    "phrase": "看",
+                    "secondary": "kàn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to see; to look at; to read; to watch"
+                    }
+                },
+                {
+                    "ref": 75,
+                    "phrase": "看见",
+                    "secondary": "kàn jiàn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to see; to catch sight of"
+                    }
+                },
+                {
+                    "ref": 76,
+                    "phrase": "块",
+                    "secondary": "kuài",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "lump; chunk; piece; classifier for pieces of cloth, cake, soap etc"
+                    }
+                },
+                {
+                    "ref": 77,
+                    "phrase": "来",
+                    "secondary": "lái",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to come; (used as a substitute for a more specific verb); hither (directional complement for motion toward the speaker, as in 回来); ever since (as in 自古以来)"
+                    }
+                },
+                {
+                    "ref": 78,
+                    "phrase": "老师",
+                    "secondary": "lǎo shī",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "teacher"
+                    }
+                },
+                {
+                    "ref": 79,
+                    "phrase": "了",
+                    "secondary": "le",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(completed action marker); (modal particle indicating change of state, situation now); (modal particle intensifying preceding clause)"
+                    }
+                },
+                {
+                    "ref": 80,
+                    "phrase": "冷",
+                    "secondary": "lěng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "cold"
+                    }
+                },
+                {
+                    "ref": 81,
+                    "phrase": "里",
+                    "secondary": "lǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "lining; interior; inside; internal"
+                    }
+                },
+                {
+                    "ref": 82,
+                    "phrase": "零",
+                    "secondary": "líng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "zero; nought; zero sign; fractional"
+                    }
+                },
+                {
+                    "ref": 83,
+                    "phrase": "六",
+                    "secondary": "liù",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "six; 6"
+                    }
+                },
+                {
+                    "ref": 84,
+                    "phrase": "妈妈",
+                    "secondary": "mā ma",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "mama; mommy; mother"
+                    }
+                },
+                {
+                    "ref": 85,
+                    "phrase": "吗",
+                    "secondary": "ma",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(question particle for 'yes-no' questions)"
+                    }
+                },
+                {
+                    "ref": 86,
+                    "phrase": "买",
+                    "secondary": "mǎi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to buy; to purchase"
+                    }
+                },
+                {
+                    "ref": 87,
+                    "phrase": "猫",
+                    "secondary": "māo",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "cat; (coll.) modem"
+                    }
+                },
+                {
+                    "ref": 88,
+                    "phrase": "没",
+                    "secondary": "méi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(negative prefix for verbs) have not; not"
+                    }
+                },
+                {
+                    "ref": 89,
+                    "phrase": "没关系",
+                    "secondary": "méi guān xi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "it doesn't matter"
+                    }
+                },
+                {
+                    "ref": 90,
+                    "phrase": "米饭",
+                    "secondary": "mǐ fàn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(cooked) rice"
+                    }
+                },
+                {
+                    "ref": 91,
+                    "phrase": "名字",
+                    "secondary": "míng zi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "name (of a person or thing)"
+                    }
+                },
+                {
+                    "ref": 92,
+                    "phrase": "明天",
+                    "secondary": "míng tiān",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "tomorrow"
+                    }
+                },
+                {
+                    "ref": 93,
+                    "phrase": "哪",
+                    "secondary": "nǎ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "how; which"
+                    }
+                },
+                {
+                    "ref": 94,
+                    "phrase": "那",
+                    "secondary": "nà",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(specifier) that; the; those (colloquial pr. [nèi]); (pronoun) that (referring to persons, things or situations)"
+                    }
+                },
+                {
+                    "ref": 95,
+                    "phrase": "呢",
+                    "secondary": "ne",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "question particle ('What about ...?', 'And ...?'); particle for inquiring about location ('Where is ...?'); particle indicating strong affirmation"
+                    }
+                },
+                {
+                    "ref": 96,
+                    "phrase": "能",
+                    "secondary": "néng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "can; to be able to; might possibly; ability"
+                    }
+                },
+                {
+                    "ref": 97,
+                    "phrase": "你",
+                    "secondary": "nǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "you (informal, as opposed to courteous 您)"
+                    }
+                },
+                {
+                    "ref": 98,
+                    "phrase": "年",
+                    "secondary": "nián",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "grain; harvest (old)"
+                    }
+                },
+                {
+                    "ref": 99,
+                    "phrase": "女儿",
+                    "secondary": "nǚ ér",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "daughter"
+                    }
+                },
+                {
+                    "ref": 100,
+                    "phrase": "朋友",
+                    "secondary": "péng you",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "friend"
+                    }
+                },
+                {
+                    "ref": 101,
+                    "phrase": "漂亮",
+                    "secondary": "piào liang",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "pretty; beautiful"
+                    }
+                },
+                {
+                    "ref": 102,
+                    "phrase": "苹果",
+                    "secondary": "píng guǒ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "apple"
+                    }
+                },
+                {
+                    "ref": 103,
+                    "phrase": "七",
+                    "secondary": "qī",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "seven; 7"
+                    }
+                },
+                {
+                    "ref": 104,
+                    "phrase": "前面",
+                    "secondary": "qián miàn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "ahead; in front; preceding; above"
+                    }
+                },
+                {
+                    "ref": 105,
+                    "phrase": "钱",
+                    "secondary": "qián",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "coin; money; unit of weight, one tenth of a tael 两"
+                    }
+                },
+                {
+                    "ref": 106,
+                    "phrase": "请",
+                    "secondary": "qǐng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to ask; to invite; please (do sth); to treat (to a meal etc)"
+                    }
+                },
+                {
+                    "ref": 107,
+                    "phrase": "去",
+                    "secondary": "qù",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to go; to go to (a place); (of a time etc) last; just passed"
+                    }
+                },
+                {
+                    "ref": 108,
+                    "phrase": "热",
+                    "secondary": "rè",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to warm up; to heat up; hot (of weather); heat"
+                    }
+                },
+                {
+                    "ref": 109,
+                    "phrase": "人",
+                    "secondary": "rén",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "person; people"
+                    }
+                },
+                {
+                    "ref": 110,
+                    "phrase": "认识",
+                    "secondary": "rèn shi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to know; to recognize; to be familiar with; to get acquainted with sb"
+                    }
+                },
+                {
+                    "ref": 111,
+                    "phrase": "日",
+                    "secondary": "rì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "sun; day; date, day of the month"
+                    }
+                },
+                {
+                    "ref": 112,
+                    "phrase": "三",
+                    "secondary": "sān",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "three; 3"
+                    }
+                },
+                {
+                    "ref": 113,
+                    "phrase": "商店",
+                    "secondary": "shāng diàn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "store; shop"
+                    }
+                },
+                {
+                    "ref": 114,
+                    "phrase": "上",
+                    "secondary": "shàng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(bound form) up; upper; above; previous"
+                    }
+                },
+                {
+                    "ref": 115,
+                    "phrase": "上午",
+                    "secondary": "shàng wǔ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "morning"
+                    }
+                },
+                {
+                    "ref": 116,
+                    "phrase": "少",
+                    "secondary": "shǎo",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "few; less; to lack; to be missing"
+                    }
+                },
+                {
+                    "ref": 117,
+                    "phrase": "什么",
+                    "secondary": "shén me",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "what?; something; anything"
+                    }
+                },
+                {
+                    "ref": 118,
+                    "phrase": "十",
+                    "secondary": "shí",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "ten; 10"
+                    }
+                },
+                {
+                    "ref": 119,
+                    "phrase": "时候",
+                    "secondary": "shí hou",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "time; length of time; moment; period"
+                    }
+                },
+                {
+                    "ref": 120,
+                    "phrase": "是",
+                    "secondary": "shì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to be (followed by substantives only); correct; right; true"
+                    }
+                },
+                {
+                    "ref": 121,
+                    "phrase": "书",
+                    "secondary": "shū",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "book; letter; document; to write"
+                    }
+                },
+                {
+                    "ref": 122,
+                    "phrase": "谁",
+                    "secondary": "shéi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "who; also pr. [shuí]"
+                    }
+                },
+                {
+                    "ref": 123,
+                    "phrase": "水",
+                    "secondary": "shuǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "water; river; liquid; beverage"
+                    }
+                },
+                {
+                    "ref": 124,
+                    "phrase": "水果",
+                    "secondary": "shuǐ guǒ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "fruit"
+                    }
+                },
+                {
+                    "ref": 125,
+                    "phrase": "睡觉",
+                    "secondary": "shuì jiào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to go to bed; to sleep"
+                    }
+                },
+                {
+                    "ref": 126,
+                    "phrase": "说话",
+                    "secondary": "shuō huà",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to speak; to say; to talk; to gossip"
+                    }
+                },
+                {
+                    "ref": 127,
+                    "phrase": "四",
+                    "secondary": "sì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "four; 4"
+                    }
+                },
+                {
+                    "ref": 128,
+                    "phrase": "岁",
+                    "secondary": "suì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "classifier for years (of age); year; year (of crop harvests)"
+                    }
+                },
+                {
+                    "ref": 129,
+                    "phrase": "他",
+                    "secondary": "tā",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "he; him (used for either sex when the sex is unknown or unimportant); (used before sb's name for emphasis); (used as a meaningless mock object)"
+                    }
+                },
+                {
+                    "ref": 130,
+                    "phrase": "她",
+                    "secondary": "tā",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "she"
+                    }
+                },
+                {
+                    "ref": 131,
+                    "phrase": "太",
+                    "secondary": "tài",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "highest; greatest; too (much); very"
+                    }
+                },
+                {
+                    "ref": 132,
+                    "phrase": "天气",
+                    "secondary": "tiān qì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "weather"
+                    }
+                },
+                {
+                    "ref": 133,
+                    "phrase": "听",
+                    "secondary": "tīng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to listen to; to hear; to heed; to obey"
+                    }
+                },
+                {
+                    "ref": 134,
+                    "phrase": "同学",
+                    "secondary": "tóng xué",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to study at the same school; fellow student; classmate"
+                    }
+                },
+                {
+                    "ref": 135,
+                    "phrase": "喂",
+                    "secondary": "wèi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "hey; to feed (an animal, baby, invalid etc)"
+                    }
+                },
+                {
+                    "ref": 136,
+                    "phrase": "我",
+                    "secondary": "wǒ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "I; me; my"
+                    }
+                },
+                {
+                    "ref": 137,
+                    "phrase": "我们",
+                    "secondary": "wǒ men",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "we; us; ourselves; our"
+                    }
+                },
+                {
+                    "ref": 138,
+                    "phrase": "五",
+                    "secondary": "wǔ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "five; 5"
+                    }
+                },
+                {
+                    "ref": 139,
+                    "phrase": "喜欢",
+                    "secondary": "xǐ huan",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to like; to be fond of"
+                    }
+                },
+                {
+                    "ref": 140,
+                    "phrase": "下",
+                    "secondary": "xià",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "down; downwards; below; lower"
+                    }
+                },
+                {
+                    "ref": 141,
+                    "phrase": "下午",
+                    "secondary": "xià wǔ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "afternoon; p.m."
+                    }
+                },
+                {
+                    "ref": 142,
+                    "phrase": "下雨",
+                    "secondary": "xià yǔ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to rain"
+                    }
+                },
+                {
+                    "ref": 143,
+                    "phrase": "先生",
+                    "secondary": "xiān sheng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "teacher; gentleman; sir; mister (Mr.)"
+                    }
+                },
+                {
+                    "ref": 144,
+                    "phrase": "现在",
+                    "secondary": "xiàn zài",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "now; at present; at the moment; modern"
+                    }
+                },
+                {
+                    "ref": 145,
+                    "phrase": "想",
+                    "secondary": "xiǎng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to think (about); to think of; to devise; to think (that)"
+                    }
+                },
+                {
+                    "ref": 146,
+                    "phrase": "小",
+                    "secondary": "xiǎo",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "small; tiny; few; young"
+                    }
+                },
+                {
+                    "ref": 147,
+                    "phrase": "小姐",
+                    "secondary": "xiǎo jie",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "young lady; miss; (slang) prostitute"
+                    }
+                },
+                {
+                    "ref": 148,
+                    "phrase": "些",
+                    "secondary": "xiē",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "classifier indicating a small amount or small number greater than 1: some, a few, several"
+                    }
+                },
+                {
+                    "ref": 149,
+                    "phrase": "写",
+                    "secondary": "xiě",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to write"
+                    }
+                },
+                {
+                    "ref": 150,
+                    "phrase": "谢谢",
+                    "secondary": "xiè xie",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to thank; thanks; thank you"
+                    }
+                },
+                {
+                    "ref": 151,
+                    "phrase": "星期",
+                    "secondary": "xīng qī",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "week; day of the week; Sunday"
+                    }
+                },
+                {
+                    "ref": 152,
+                    "phrase": "学生",
+                    "secondary": "xué sheng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "student; schoolchild"
+                    }
+                },
+                {
+                    "ref": 153,
+                    "phrase": "学习",
+                    "secondary": "xué xí",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to learn; to study"
+                    }
+                },
+                {
+                    "ref": 154,
+                    "phrase": "学校",
+                    "secondary": "xué xiào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "school"
+                    }
+                },
+                {
+                    "ref": 155,
+                    "phrase": "一",
+                    "secondary": "yī",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "one; single; a (article); as soon as"
+                    }
+                },
+                {
+                    "ref": 156,
+                    "phrase": "衣服",
+                    "secondary": "yī fu",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "clothes"
+                    }
+                },
+                {
+                    "ref": 157,
+                    "phrase": "医生",
+                    "secondary": "yī shēng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "doctor"
+                    }
+                },
+                {
+                    "ref": 158,
+                    "phrase": "医院",
+                    "secondary": "yī yuàn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "hospital"
+                    }
+                },
+                {
+                    "ref": 159,
+                    "phrase": "椅子",
+                    "secondary": "yǐ zi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "chair"
+                    }
+                },
+                {
+                    "ref": 160,
+                    "phrase": "有",
+                    "secondary": "yǒu",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to have; there is; (bound form) having; with"
+                    }
+                },
+                {
+                    "ref": 161,
+                    "phrase": "月",
+                    "secondary": "yuè",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "moon; month; monthly"
+                    }
+                },
+                {
+                    "ref": 162,
+                    "phrase": "再见",
+                    "secondary": "zài jiàn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "goodbye"
+                    }
+                },
+                {
+                    "ref": 163,
+                    "phrase": "在",
+                    "secondary": "zài",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to exist; to be alive; (of sb or sth) to be (located) at; (used before a verb to indicate an action in progress)"
+                    }
+                },
+                {
+                    "ref": 164,
+                    "phrase": "怎么",
+                    "secondary": "zěn me",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "how?; what?; why?"
+                    }
+                },
+                {
+                    "ref": 165,
+                    "phrase": "怎么样",
+                    "secondary": "zěn me yàng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "how?; how about?; how was it?; how are things?"
+                    }
+                },
+                {
+                    "ref": 166,
+                    "phrase": "这",
+                    "secondary": "zhè",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(pronoun) this; these; (bound form) this; the (followed by a noun)"
+                    }
+                },
+                {
+                    "ref": 167,
+                    "phrase": "中国",
+                    "secondary": "Zhōng guó",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "China"
+                    }
+                },
+                {
+                    "ref": 168,
+                    "phrase": "中午",
+                    "secondary": "zhōng wǔ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "noon; midday"
+                    }
+                },
+                {
+                    "ref": 169,
+                    "phrase": "住",
+                    "secondary": "zhù",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to live; to dwell; to stay; to reside"
+                    }
+                },
+                {
+                    "ref": 170,
+                    "phrase": "桌子",
+                    "secondary": "zhuō zi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "table; desk"
+                    }
+                },
+                {
+                    "ref": 171,
+                    "phrase": "字",
+                    "secondary": "zì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "letter; symbol; character; word"
+                    }
+                },
+                {
+                    "ref": 172,
+                    "phrase": "昨天",
+                    "secondary": "zuó tiān",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "yesterday"
+                    }
+                },
+                {
+                    "ref": 173,
+                    "phrase": "坐",
+                    "secondary": "zuò",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to sit; to take a seat; to take (a bus, airplane etc); to bear fruit"
+                    }
+                },
+                {
+                    "ref": 174,
+                    "phrase": "做",
+                    "secondary": "zuò",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to make; to produce; to write; to compose"
+                    }
+                },
+                {
+                    "ref": 175,
+                    "phrase": "吧",
+                    "secondary": "ba",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(modal particle indicating suggestion or surmise); ...right?; ...OK?; ...I presume."
+                    }
+                },
+                {
+                    "ref": 176,
+                    "phrase": "白",
+                    "secondary": "bái",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "white; snowy; pure; bright"
+                    }
+                },
+                {
+                    "ref": 177,
+                    "phrase": "百",
+                    "secondary": "bǎi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "hundred; numerous; all kinds of"
+                    }
+                },
+                {
+                    "ref": 178,
+                    "phrase": "帮助",
+                    "secondary": "bāng zhù",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "assistance; aid; to help; to assist"
+                    }
+                },
+                {
+                    "ref": 179,
+                    "phrase": "报纸",
+                    "secondary": "bào zhǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "newspaper; newsprint"
+                    }
+                },
+                {
+                    "ref": 180,
+                    "phrase": "比",
+                    "secondary": "bǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to compare; (followed by a noun and adjective) more {adj.} than {noun}; ratio; to gesture"
+                    }
+                },
+                {
+                    "ref": 181,
+                    "phrase": "便宜",
+                    "secondary": "pián yi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "cheap; inexpensive; small advantages; to let sb off lightly"
+                    }
+                },
+                {
+                    "ref": 182,
+                    "phrase": "别",
+                    "secondary": "bié",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "don't ...!; to leave; to part (from); (literary) to differentiate"
+                    }
+                },
+                {
+                    "ref": 183,
+                    "phrase": "唱歌",
+                    "secondary": "chàng gē",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to sing a song"
+                    }
+                },
+                {
+                    "ref": 184,
+                    "phrase": "出",
+                    "secondary": "chū",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to go out; to come out; to occur; to produce"
+                    }
+                },
+                {
+                    "ref": 185,
+                    "phrase": "穿",
+                    "secondary": "chuān",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to wear; to put on; to dress; to bore through"
+                    }
+                },
+                {
+                    "ref": 186,
+                    "phrase": "船",
+                    "secondary": "chuán",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "boat; vessel; ship"
+                    }
+                },
+                {
+                    "ref": 187,
+                    "phrase": "次",
+                    "secondary": "cì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "next in sequence; second; the second (day, time etc); secondary"
+                    }
+                },
+                {
+                    "ref": 188,
+                    "phrase": "从",
+                    "secondary": "cóng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "from; through; via; to follow"
+                    }
+                },
+                {
+                    "ref": 189,
+                    "phrase": "错",
+                    "secondary": "cuò",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "mistake; wrong; bad; interlocking"
+                    }
+                },
+                {
+                    "ref": 190,
+                    "phrase": "打篮球",
+                    "secondary": "dǎ lán qiú",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to play basketball"
+                    }
+                },
+                {
+                    "ref": 191,
+                    "phrase": "大家",
+                    "secondary": "dà jiā",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "everyone; influential family; great expert"
+                    }
+                },
+                {
+                    "ref": 192,
+                    "phrase": "但是",
+                    "secondary": "dàn shì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "but; however"
+                    }
+                },
+                {
+                    "ref": 193,
+                    "phrase": "到",
+                    "secondary": "dào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to reach; to arrive; to leave for; to go to"
+                    }
+                },
+                {
+                    "ref": 194,
+                    "phrase": "得",
+                    "secondary": "de",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "structural particle: used after a verb (or adjective as main verb), linking it to following phrase indicating effect, degree, possibility etc"
+                    }
+                },
+                {
+                    "ref": 195,
+                    "phrase": "弟弟",
+                    "secondary": "dì di",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "younger brother"
+                    }
+                },
+                {
+                    "ref": 196,
+                    "phrase": "第一",
+                    "secondary": "dì yī",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "first; number one; primary"
+                    }
+                },
+                {
+                    "ref": 197,
+                    "phrase": "懂",
+                    "secondary": "dǒng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to understand; to comprehend"
+                    }
+                },
+                {
+                    "ref": 198,
+                    "phrase": "房间",
+                    "secondary": "fáng jiān",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "room"
+                    }
+                },
+                {
+                    "ref": 199,
+                    "phrase": "非常",
+                    "secondary": "fēi cháng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "very; really; unusual; extraordinary"
+                    }
+                },
+                {
+                    "ref": 200,
+                    "phrase": "服务员",
+                    "secondary": "fú wù yuán",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "waiter; waitress; attendant; customer service personnel"
+                    }
+                },
+                {
+                    "ref": 201,
+                    "phrase": "高",
+                    "secondary": "gāo",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "high; tall; above average; loud"
+                    }
+                },
+                {
+                    "ref": 202,
+                    "phrase": "告诉",
+                    "secondary": "gào su",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to tell; to inform; to let know"
+                    }
+                },
+                {
+                    "ref": 203,
+                    "phrase": "哥哥",
+                    "secondary": "gē ge",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "older brother"
+                    }
+                },
+                {
+                    "ref": 204,
+                    "phrase": "给",
+                    "secondary": "gěi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to; for; for the benefit of; to give"
+                    }
+                },
+                {
+                    "ref": 205,
+                    "phrase": "公共汽车",
+                    "secondary": "gōng gòng qì chē",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "bus"
+                    }
+                },
+                {
+                    "ref": 206,
+                    "phrase": "公斤",
+                    "secondary": "gōng jīn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "kilogram (kg)"
+                    }
+                },
+                {
+                    "ref": 207,
+                    "phrase": "公司",
+                    "secondary": "gōng sī",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "company; firm; corporation"
+                    }
+                },
+                {
+                    "ref": 208,
+                    "phrase": "贵",
+                    "secondary": "guì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "expensive; noble; precious; (honorific) your"
+                    }
+                },
+                {
+                    "ref": 209,
+                    "phrase": "还",
+                    "secondary": "hái",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "still; still in progress; still more; yet"
+                    }
+                },
+                {
+                    "ref": 210,
+                    "phrase": "孩子",
+                    "secondary": "hái zi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "child"
+                    }
+                },
+                {
+                    "ref": 211,
+                    "phrase": "好吃",
+                    "secondary": "hǎo chī",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "tasty; delicious"
+                    }
+                },
+                {
+                    "ref": 212,
+                    "phrase": "号",
+                    "secondary": "hào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "ordinal number; day of a month; mark; sign"
+                    }
+                },
+                {
+                    "ref": 213,
+                    "phrase": "黑",
+                    "secondary": "hēi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "black; dark; sinister; secret"
+                    }
+                },
+                {
+                    "ref": 214,
+                    "phrase": "红",
+                    "secondary": "hóng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "red; popular; revolutionary; bonus"
+                    }
+                },
+                {
+                    "ref": 215,
+                    "phrase": "欢迎",
+                    "secondary": "huān yíng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to welcome; welcome"
+                    }
+                },
+                {
+                    "ref": 216,
+                    "phrase": "回答",
+                    "secondary": "huí dá",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to reply; to answer; reply; answer"
+                    }
+                },
+                {
+                    "ref": 217,
+                    "phrase": "机场",
+                    "secondary": "jī chǎng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "airport; airfield"
+                    }
+                },
+                {
+                    "ref": 218,
+                    "phrase": "鸡蛋",
+                    "secondary": "jī dàn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(chicken) egg; hen's egg"
+                    }
+                },
+                {
+                    "ref": 219,
+                    "phrase": "件",
+                    "secondary": "jiàn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "item; component; classifier for events, things, clothes etc"
+                    }
+                },
+                {
+                    "ref": 220,
+                    "phrase": "教室",
+                    "secondary": "jiào shì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "classroom"
+                    }
+                },
+                {
+                    "ref": 221,
+                    "phrase": "介绍",
+                    "secondary": "jiè shào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to introduce (sb to sb); to give a presentation; to present (sb for a job etc); introduction"
+                    }
+                },
+                {
+                    "ref": 222,
+                    "phrase": "姐姐",
+                    "secondary": "jiě jie",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "older sister"
+                    }
+                },
+                {
+                    "ref": 223,
+                    "phrase": "近",
+                    "secondary": "jìn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "near; close to; approximately"
+                    }
+                },
+                {
+                    "ref": 224,
+                    "phrase": "进",
+                    "secondary": "jìn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to go forward; to advance; to go in; to enter"
+                    }
+                },
+                {
+                    "ref": 225,
+                    "phrase": "就",
+                    "secondary": "jiù",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(after a suppositional clause) in that case; then; (after a clause of action) as soon as; immediately after"
+                    }
+                },
+                {
+                    "ref": 226,
+                    "phrase": "觉得",
+                    "secondary": "jué de",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to think that ...; to feel that ...; to feel (uncomfortable etc)"
+                    }
+                },
+                {
+                    "ref": 227,
+                    "phrase": "咖啡",
+                    "secondary": "kā fēi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "coffee (loanword)"
+                    }
+                },
+                {
+                    "ref": 228,
+                    "phrase": "开始",
+                    "secondary": "kāi shǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to begin; beginning; to start; initial"
+                    }
+                },
+                {
+                    "ref": 229,
+                    "phrase": "考试",
+                    "secondary": "kǎo shì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to take an exam; exam"
+                    }
+                },
+                {
+                    "ref": 230,
+                    "phrase": "可能",
+                    "secondary": "kě néng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "might (happen); possible; probable; possibility"
+                    }
+                },
+                {
+                    "ref": 231,
+                    "phrase": "可以",
+                    "secondary": "kě yǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "can; may; possible; able to"
+                    }
+                },
+                {
+                    "ref": 232,
+                    "phrase": "课",
+                    "secondary": "kè",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "subject; course; class; lesson"
+                    }
+                },
+                {
+                    "ref": 233,
+                    "phrase": "快",
+                    "secondary": "kuài",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "rapid; quick; speed; rate"
+                    }
+                },
+                {
+                    "ref": 234,
+                    "phrase": "快乐",
+                    "secondary": "kuài lè",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "happy; joyful"
+                    }
+                },
+                {
+                    "ref": 235,
+                    "phrase": "累",
+                    "secondary": "lèi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "tired; weary; to strain; to wear out"
+                    }
+                },
+                {
+                    "ref": 236,
+                    "phrase": "离",
+                    "secondary": "lí",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to leave; to part from; to be away from; (in giving distances) from"
+                    }
+                },
+                {
+                    "ref": 237,
+                    "phrase": "两",
+                    "secondary": "liǎng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "two; both; some; a few"
+                    }
+                },
+                {
+                    "ref": 238,
+                    "phrase": "路",
+                    "secondary": "lù",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "road; journey; route; line (bus etc)"
+                    }
+                },
+                {
+                    "ref": 239,
+                    "phrase": "旅游",
+                    "secondary": "lǚ yóu",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "trip; journey; tourism; travel"
+                    }
+                },
+                {
+                    "ref": 240,
+                    "phrase": "卖",
+                    "secondary": "mài",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to sell; to betray; to spare no effort; to show off or flaunt"
+                    }
+                },
+                {
+                    "ref": 241,
+                    "phrase": "慢",
+                    "secondary": "màn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "slow"
+                    }
+                },
+                {
+                    "ref": 242,
+                    "phrase": "忙",
+                    "secondary": "máng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "busy; hurriedly; to hurry; to rush"
+                    }
+                },
+                {
+                    "ref": 243,
+                    "phrase": "每",
+                    "secondary": "měi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "each; every"
+                    }
+                },
+                {
+                    "ref": 244,
+                    "phrase": "妹妹",
+                    "secondary": "mèi mei",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "younger sister; young woman"
+                    }
+                },
+                {
+                    "ref": 245,
+                    "phrase": "门",
+                    "secondary": "mén",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "gate; door; gateway; doorway"
+                    }
+                },
+                {
+                    "ref": 246,
+                    "phrase": "男人",
+                    "secondary": "nán rén",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "a man; a male; men"
+                    }
+                },
+                {
+                    "ref": 247,
+                    "phrase": "您",
+                    "secondary": "nín",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "you (courteous, as opposed to informal 你)"
+                    }
+                },
+                {
+                    "ref": 248,
+                    "phrase": "牛奶",
+                    "secondary": "niú nǎi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "cow's milk"
+                    }
+                },
+                {
+                    "ref": 249,
+                    "phrase": "女人",
+                    "secondary": "nǚ rén",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "woman"
+                    }
+                },
+                {
+                    "ref": 250,
+                    "phrase": "旁边",
+                    "secondary": "páng biān",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "side; adjacent place"
+                    }
+                },
+                {
+                    "ref": 251,
+                    "phrase": "跑步",
+                    "secondary": "pǎo bù",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to run; to jog; (military) to march at the double"
+                    }
+                },
+                {
+                    "ref": 252,
+                    "phrase": "票",
+                    "secondary": "piào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "ticket; ballot; banknote; person held for ransom"
+                    }
+                },
+                {
+                    "ref": 253,
+                    "phrase": "妻子",
+                    "secondary": "qī zi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "wife"
+                    }
+                },
+                {
+                    "ref": 254,
+                    "phrase": "起床",
+                    "secondary": "qǐ chuáng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to get out of bed; to get up"
+                    }
+                },
+                {
+                    "ref": 255,
+                    "phrase": "千",
+                    "secondary": "qiān",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "thousand"
+                    }
+                },
+                {
+                    "ref": 256,
+                    "phrase": "晴",
+                    "secondary": "qíng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "clear; fine (weather)"
+                    }
+                },
+                {
+                    "ref": 257,
+                    "phrase": "去年",
+                    "secondary": "qù nián",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "last year"
+                    }
+                },
+                {
+                    "ref": 258,
+                    "phrase": "让",
+                    "secondary": "ràng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to yield; to permit; to let sb do sth; to have sb do sth"
+                    }
+                },
+                {
+                    "ref": 259,
+                    "phrase": "上班",
+                    "secondary": "shàng bān",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to go to work; to be on duty; to start work; to go to the office"
+                    }
+                },
+                {
+                    "ref": 260,
+                    "phrase": "身体",
+                    "secondary": "shēn tǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "the body; one's health; in person"
+                    }
+                },
+                {
+                    "ref": 261,
+                    "phrase": "生病",
+                    "secondary": "shēng bìng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to fall ill"
+                    }
+                },
+                {
+                    "ref": 262,
+                    "phrase": "生日",
+                    "secondary": "shēng rì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "birthday"
+                    }
+                },
+                {
+                    "ref": 263,
+                    "phrase": "时间",
+                    "secondary": "shí jiān",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "time; period"
+                    }
+                },
+                {
+                    "ref": 264,
+                    "phrase": "事情",
+                    "secondary": "shì qing",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "affair; matter; thing; business"
+                    }
+                },
+                {
+                    "ref": 265,
+                    "phrase": "手表",
+                    "secondary": "shǒu biǎo",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "wristwatch"
+                    }
+                },
+                {
+                    "ref": 266,
+                    "phrase": "手机",
+                    "secondary": "shǒu jī",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "cell phone; mobile phone"
+                    }
+                },
+                {
+                    "ref": 267,
+                    "phrase": "送",
+                    "secondary": "sòng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to send; to deliver; to transmit; to give (as a present)"
+                    }
+                },
+                {
+                    "ref": 268,
+                    "phrase": "所以",
+                    "secondary": "suǒ yǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "therefore; as a result; so; the reason why"
+                    }
+                },
+                {
+                    "ref": 269,
+                    "phrase": "它",
+                    "secondary": "tā",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "it"
+                    }
+                },
+                {
+                    "ref": 270,
+                    "phrase": "踢",
+                    "secondary": "tī",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to kick; to play (e.g. soccer); (slang) butch (in a lesbian relationship)"
+                    }
+                },
+                {
+                    "ref": 271,
+                    "phrase": "题",
+                    "secondary": "tí",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "topic; problem for discussion; exam question; subject"
+                    }
+                },
+                {
+                    "ref": 272,
+                    "phrase": "跳舞",
+                    "secondary": "tiào wǔ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to dance"
+                    }
+                },
+                {
+                    "ref": 273,
+                    "phrase": "外",
+                    "secondary": "wài",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "outside; in addition; foreign; external"
+                    }
+                },
+                {
+                    "ref": 274,
+                    "phrase": "完",
+                    "secondary": "wán",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to finish; to be over; whole; complete"
+                    }
+                },
+                {
+                    "ref": 275,
+                    "phrase": "玩",
+                    "secondary": "wán",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to play; to have fun; to trifle with; toy"
+                    }
+                },
+                {
+                    "ref": 276,
+                    "phrase": "晚上",
+                    "secondary": "wǎn shang",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "evening; night; in the evening"
+                    }
+                },
+                {
+                    "ref": 277,
+                    "phrase": "为",
+                    "secondary": "wèi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "because of; for; to"
+                    }
+                },
+                {
+                    "ref": 278,
+                    "phrase": "问",
+                    "secondary": "wèn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to ask; to inquire"
+                    }
+                },
+                {
+                    "ref": 279,
+                    "phrase": "问题",
+                    "secondary": "wèn tí",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "question; problem; issue; topic"
+                    }
+                },
+                {
+                    "ref": 280,
+                    "phrase": "希望",
+                    "secondary": "xī wàng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to hope; a hope; a wish"
+                    }
+                },
+                {
+                    "ref": 281,
+                    "phrase": "洗",
+                    "secondary": "xǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to wash; to bathe; to develop (photographs); to shuffle (cards etc)"
+                    }
+                },
+                {
+                    "ref": 282,
+                    "phrase": "西瓜",
+                    "secondary": "xī guā",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "watermelon"
+                    }
+                },
+                {
+                    "ref": 283,
+                    "phrase": "向",
+                    "secondary": "xiàng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "towards; to face; to turn towards; direction"
+                    }
+                },
+                {
+                    "ref": 284,
+                    "phrase": "小时",
+                    "secondary": "xiǎo shí",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "hour"
+                    }
+                },
+                {
+                    "ref": 285,
+                    "phrase": "笑",
+                    "secondary": "xiào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to laugh; to smile; to laugh at"
+                    }
+                },
+                {
+                    "ref": 286,
+                    "phrase": "新",
+                    "secondary": "xīn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "new; newly; meso- (chemistry)"
+                    }
+                },
+                {
+                    "ref": 287,
+                    "phrase": "姓",
+                    "secondary": "xìng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "family name; surname; to be surnamed"
+                    }
+                },
+                {
+                    "ref": 288,
+                    "phrase": "休息",
+                    "secondary": "xiū xi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "rest; to rest"
+                    }
+                },
+                {
+                    "ref": 289,
+                    "phrase": "雪",
+                    "secondary": "xuě",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "snow; (literary) to wipe away (a humiliation etc)"
+                    }
+                },
+                {
+                    "ref": 290,
+                    "phrase": "颜色",
+                    "secondary": "yán sè",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "color; countenance; appearance; facial expression"
+                    }
+                },
+                {
+                    "ref": 291,
+                    "phrase": "眼睛",
+                    "secondary": "yǎn jing",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "eye"
+                    }
+                },
+                {
+                    "ref": 292,
+                    "phrase": "羊肉",
+                    "secondary": "yáng ròu",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "mutton; goat meat"
+                    }
+                },
+                {
+                    "ref": 293,
+                    "phrase": "药",
+                    "secondary": "yào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "medicine; drug; substance used for a specific purpose (e.g. poisoning, explosion, fermenting); to poison"
+                    }
+                },
+                {
+                    "ref": 294,
+                    "phrase": "要",
+                    "secondary": "yào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to want; to need; to ask for; will"
+                    }
+                },
+                {
+                    "ref": 295,
+                    "phrase": "也",
+                    "secondary": "yě",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "(adverb) also; both ... and ... (before predicates only); (literary) particle having functions similar to 啊"
+                    }
+                },
+                {
+                    "ref": 296,
+                    "phrase": "一起",
+                    "secondary": "yī qǐ",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "in the same place; together; with; altogether (in total)"
+                    }
+                },
+                {
+                    "ref": 297,
+                    "phrase": "已经",
+                    "secondary": "yǐ jīng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "already"
+                    }
+                },
+                {
+                    "ref": 298,
+                    "phrase": "意思",
+                    "secondary": "yì si",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "idea; opinion; meaning; wish"
+                    }
+                },
+                {
+                    "ref": 299,
+                    "phrase": "因为",
+                    "secondary": "yīn wèi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "because; owing to; on account of"
+                    }
+                },
+                {
+                    "ref": 300,
+                    "phrase": "阴",
+                    "secondary": "yīn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "overcast (weather); cloudy; shady; Yin (the negative principle of Yin and Yang)"
+                    }
+                },
+                {
+                    "ref": 301,
+                    "phrase": "游泳",
+                    "secondary": "yóu yǒng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "swimming; to swim"
+                    }
+                },
+                {
+                    "ref": 302,
+                    "phrase": "右边",
+                    "secondary": "yòu bian",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "right side; right, to the right"
+                    }
+                },
+                {
+                    "ref": 303,
+                    "phrase": "鱼",
+                    "secondary": "yú",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "fish"
+                    }
+                },
+                {
+                    "ref": 304,
+                    "phrase": "元",
+                    "secondary": "yuán",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "currency unit (esp. Chinese yuan); first; original; primary"
+                    }
+                },
+                {
+                    "ref": 305,
+                    "phrase": "远",
+                    "secondary": "yuǎn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "far; distant; remote; (intensifier in a comparison) by far"
+                    }
+                },
+                {
+                    "ref": 306,
+                    "phrase": "运动",
+                    "secondary": "yùn dòng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to move; to exercise; sports; exercise"
+                    }
+                },
+                {
+                    "ref": 307,
+                    "phrase": "再",
+                    "secondary": "zài",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "again; once more; re-; second"
+                    }
+                },
+                {
+                    "ref": 308,
+                    "phrase": "早上",
+                    "secondary": "zǎo shang",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "early morning"
+                    }
+                },
+                {
+                    "ref": 309,
+                    "phrase": "张",
+                    "secondary": "zhāng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to open up; to spread; sheet of paper; classifier for flat objects, sheet"
+                    }
+                },
+                {
+                    "ref": 310,
+                    "phrase": "长",
+                    "secondary": "cháng",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "length; long; forever; always"
+                    }
+                },
+                {
+                    "ref": 311,
+                    "phrase": "丈夫",
+                    "secondary": "zhàng fu",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "husband"
+                    }
+                },
+                {
+                    "ref": 312,
+                    "phrase": "找",
+                    "secondary": "zhǎo",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to try to find; to look for; to call on sb; to find"
+                    }
+                },
+                {
+                    "ref": 313,
+                    "phrase": "着",
+                    "secondary": "zhe",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "aspect particle indicating action in progress or ongoing state"
+                    }
+                },
+                {
+                    "ref": 314,
+                    "phrase": "真",
+                    "secondary": "zhēn",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "really; truly; indeed; real"
+                    }
+                },
+                {
+                    "ref": 315,
+                    "phrase": "正在",
+                    "secondary": "zhèng zài",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "just at (that time); right in (that place); right in the middle of (doing sth)"
+                    }
+                },
+                {
+                    "ref": 316,
+                    "phrase": "知道",
+                    "secondary": "zhī dào",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to know; to become aware of; also pr. [zhī dao]"
+                    }
+                },
+                {
+                    "ref": 317,
+                    "phrase": "准备",
+                    "secondary": "zhǔn bèi",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "preparation; to prepare; to intend; to be about to"
+                    }
+                },
+                {
+                    "ref": 318,
+                    "phrase": "自行车",
+                    "secondary": "zì xíng chē",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "bicycle; bike"
+                    }
+                },
+                {
+                    "ref": 319,
+                    "phrase": "走",
+                    "secondary": "zǒu",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "to walk; to go; to run; to move (of vehicle)"
+                    }
+                },
+                {
+                    "ref": 320,
+                    "phrase": "最",
+                    "secondary": "zuì",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "most; the most; -est (superlative suffix)"
+                    }
+                },
+                {
+                    "ref": 321,
+                    "phrase": "左边",
+                    "secondary": "zuǒ bian",
+                    "term_language": "zh",
+                    "definitions": {
+                        "en": "left; the left side; to the left of"
+                    }
+                }
+            ],
+            "tags": {
+                "14": [
+                    28
+                ],
+                "15": [
+                    28
+                ],
+                "16": [
+                    28
+                ],
+                "17": [
+                    28
+                ],
+                "18": [
+                    35
+                ],
+                "19": [
+                    35
+                ],
+                "20": [
+                    35
+                ],
+                "21": [
+                    29,
+                    32
+                ],
+                "22": [
+                    29,
+                    30
+                ],
+                "23": [
+                    34
+                ],
+                "24": [
+                    34
+                ],
+                "25": [
+                    36
+                ],
+                "26": [
+                    36
+                ],
+                "27": [
+                    36
+                ],
+                "28": [
+                    36
+                ],
+                "29": [
+                    36
+                ],
+                "30": [
+                    36
+                ],
+                "31": [
+                    36
+                ],
+                "32": [
+                    36
+                ],
+                "33": [
+                    36
+                ],
+                "34": [
+                    36
+                ],
+                "35": [
+                    36
+                ],
+                "36": [
+                    36
+                ],
+                "37": [
+                    36
+                ],
+                "38": [
+                    36
+                ],
+                "39": [
+                    36
+                ],
+                "40": [
+                    36
+                ],
+                "41": [
+                    36
+                ],
+                "42": [
+                    36
+                ],
+                "43": [
+                    36
+                ],
+                "44": [
+                    36
+                ],
+                "45": [
+                    36
+                ],
+                "46": [
+                    36
+                ],
+                "47": [
+                    36
+                ],
+                "48": [
+                    36
+                ],
+                "49": [
+                    36
+                ],
+                "50": [
+                    36
+                ],
+                "51": [
+                    36
+                ],
+                "52": [
+                    36
+                ],
+                "53": [
+                    36
+                ],
+                "54": [
+                    36
+                ],
+                "55": [
+                    36
+                ],
+                "56": [
+                    36
+                ],
+                "57": [
+                    36
+                ],
+                "58": [
+                    36
+                ],
+                "59": [
+                    36
+                ],
+                "60": [
+                    36
+                ],
+                "61": [
+                    36
+                ],
+                "62": [
+                    36
+                ],
+                "63": [
+                    36
+                ],
+                "64": [
+                    36
+                ],
+                "65": [
+                    36
+                ],
+                "66": [
+                    36
+                ],
+                "67": [
+                    36
+                ],
+                "68": [
+                    36
+                ],
+                "69": [
+                    36
+                ],
+                "70": [
+                    36
+                ],
+                "71": [
+                    36
+                ],
+                "72": [
+                    36
+                ],
+                "73": [
+                    36
+                ],
+                "74": [
+                    36
+                ],
+                "75": [
+                    36
+                ],
+                "76": [
+                    36
+                ],
+                "77": [
+                    36
+                ],
+                "78": [
+                    36
+                ],
+                "79": [
+                    36
+                ],
+                "80": [
+                    36
+                ],
+                "81": [
+                    36
+                ],
+                "82": [
+                    36
+                ],
+                "83": [
+                    36
+                ],
+                "84": [
+                    36
+                ],
+                "85": [
+                    36
+                ],
+                "86": [
+                    36
+                ],
+                "87": [
+                    36
+                ],
+                "88": [
+                    36
+                ],
+                "89": [
+                    36
+                ],
+                "90": [
+                    36
+                ],
+                "91": [
+                    36
+                ],
+                "92": [
+                    36
+                ],
+                "93": [
+                    36
+                ],
+                "94": [
+                    36
+                ],
+                "95": [
+                    36
+                ],
+                "96": [
+                    36
+                ],
+                "97": [
+                    36
+                ],
+                "98": [
+                    36
+                ],
+                "99": [
+                    36
+                ],
+                "100": [
+                    36
+                ],
+                "101": [
+                    36
+                ],
+                "102": [
+                    36
+                ],
+                "103": [
+                    36
+                ],
+                "104": [
+                    36
+                ],
+                "105": [
+                    36
+                ],
+                "106": [
+                    36
+                ],
+                "107": [
+                    36
+                ],
+                "108": [
+                    36
+                ],
+                "109": [
+                    36
+                ],
+                "110": [
+                    36
+                ],
+                "111": [
+                    36
+                ],
+                "112": [
+                    36
+                ],
+                "113": [
+                    36
+                ],
+                "114": [
+                    36
+                ],
+                "115": [
+                    36
+                ],
+                "116": [
+                    36
+                ],
+                "117": [
+                    36
+                ],
+                "118": [
+                    36
+                ],
+                "119": [
+                    36
+                ],
+                "120": [
+                    36
+                ],
+                "121": [
+                    36
+                ],
+                "122": [
+                    36
+                ],
+                "123": [
+                    36
+                ],
+                "124": [
+                    36
+                ],
+                "125": [
+                    36
+                ],
+                "126": [
+                    36
+                ],
+                "127": [
+                    36
+                ],
+                "128": [
+                    36
+                ],
+                "129": [
+                    36
+                ],
+                "130": [
+                    36
+                ],
+                "131": [
+                    36
+                ],
+                "132": [
+                    36
+                ],
+                "133": [
+                    36
+                ],
+                "134": [
+                    36
+                ],
+                "135": [
+                    36
+                ],
+                "136": [
+                    36
+                ],
+                "137": [
+                    36
+                ],
+                "138": [
+                    36
+                ],
+                "139": [
+                    36
+                ],
+                "140": [
+                    36
+                ],
+                "141": [
+                    36
+                ],
+                "142": [
+                    36
+                ],
+                "143": [
+                    36
+                ],
+                "144": [
+                    36
+                ],
+                "145": [
+                    36
+                ],
+                "146": [
+                    36
+                ],
+                "147": [
+                    36
+                ],
+                "148": [
+                    36
+                ],
+                "149": [
+                    36
+                ],
+                "150": [
+                    36
+                ],
+                "151": [
+                    36
+                ],
+                "152": [
+                    36
+                ],
+                "153": [
+                    36
+                ],
+                "154": [
+                    36
+                ],
+                "155": [
+                    36
+                ],
+                "156": [
+                    36
+                ],
+                "157": [
+                    36
+                ],
+                "158": [
+                    36
+                ],
+                "159": [
+                    36
+                ],
+                "160": [
+                    36
+                ],
+                "161": [
+                    36
+                ],
+                "162": [
+                    36
+                ],
+                "163": [
+                    36
+                ],
+                "164": [
+                    36
+                ],
+                "165": [
+                    36
+                ],
+                "166": [
+                    36
+                ],
+                "167": [
+                    36
+                ],
+                "168": [
+                    36
+                ],
+                "169": [
+                    36
+                ],
+                "170": [
+                    36
+                ],
+                "171": [
+                    36
+                ],
+                "172": [
+                    36
+                ],
+                "173": [
+                    36
+                ],
+                "174": [
+                    36
+                ],
+                "175": [
+                    37
+                ],
+                "176": [
+                    37
+                ],
+                "177": [
+                    37
+                ],
+                "178": [
+                    37
+                ],
+                "179": [
+                    37
+                ],
+                "180": [
+                    37
+                ],
+                "181": [
+                    37
+                ],
+                "182": [
+                    37
+                ],
+                "183": [
+                    37
+                ],
+                "184": [
+                    37
+                ],
+                "185": [
+                    37
+                ],
+                "186": [
+                    37
+                ],
+                "187": [
+                    37
+                ],
+                "188": [
+                    37
+                ],
+                "189": [
+                    37
+                ],
+                "190": [
+                    37
+                ],
+                "191": [
+                    37
+                ],
+                "192": [
+                    37
+                ],
+                "193": [
+                    37
+                ],
+                "194": [
+                    37
+                ],
+                "195": [
+                    37
+                ],
+                "196": [
+                    37
+                ],
+                "197": [
+                    37
+                ],
+                "198": [
+                    37
+                ],
+                "199": [
+                    37
+                ],
+                "200": [
+                    37
+                ],
+                "201": [
+                    37
+                ],
+                "202": [
+                    37
+                ],
+                "203": [
+                    37
+                ],
+                "204": [
+                    37
+                ],
+                "205": [
+                    37
+                ],
+                "206": [
+                    37
+                ],
+                "207": [
+                    37
+                ],
+                "208": [
+                    37
+                ],
+                "209": [
+                    37
+                ],
+                "210": [
+                    37
+                ],
+                "211": [
+                    37
+                ],
+                "212": [
+                    37
+                ],
+                "213": [
+                    37
+                ],
+                "214": [
+                    37
+                ],
+                "215": [
+                    37
+                ],
+                "216": [
+                    37
+                ],
+                "217": [
+                    37
+                ],
+                "218": [
+                    37
+                ],
+                "219": [
+                    37
+                ],
+                "220": [
+                    37
+                ],
+                "221": [
+                    37
+                ],
+                "222": [
+                    37
+                ],
+                "223": [
+                    37
+                ],
+                "224": [
+                    37
+                ],
+                "225": [
+                    37
+                ],
+                "226": [
+                    37
+                ],
+                "227": [
+                    37
+                ],
+                "228": [
+                    37
+                ],
+                "229": [
+                    37
+                ],
+                "230": [
+                    37
+                ],
+                "231": [
+                    37
+                ],
+                "232": [
+                    37
+                ],
+                "233": [
+                    37
+                ],
+                "234": [
+                    37
+                ],
+                "235": [
+                    37
+                ],
+                "236": [
+                    37
+                ],
+                "237": [
+                    37
+                ],
+                "238": [
+                    37
+                ],
+                "239": [
+                    37
+                ],
+                "240": [
+                    37
+                ],
+                "241": [
+                    37
+                ],
+                "242": [
+                    37
+                ],
+                "243": [
+                    37
+                ],
+                "244": [
+                    37
+                ],
+                "245": [
+                    37
+                ],
+                "246": [
+                    37
+                ],
+                "247": [
+                    37
+                ],
+                "248": [
+                    37
+                ],
+                "249": [
+                    37
+                ],
+                "250": [
+                    37
+                ],
+                "251": [
+                    37
+                ],
+                "252": [
+                    37
+                ],
+                "253": [
+                    37
+                ],
+                "254": [
+                    37
+                ],
+                "255": [
+                    37
+                ],
+                "256": [
+                    37
+                ],
+                "257": [
+                    37
+                ],
+                "258": [
+                    37
+                ],
+                "259": [
+                    37
+                ],
+                "260": [
+                    37
+                ],
+                "261": [
+                    37
+                ],
+                "262": [
+                    37
+                ],
+                "263": [
+                    37
+                ],
+                "264": [
+                    37
+                ],
+                "265": [
+                    37
+                ],
+                "266": [
+                    37
+                ],
+                "267": [
+                    37
+                ],
+                "268": [
+                    37
+                ],
+                "269": [
+                    37
+                ],
+                "270": [
+                    37
+                ],
+                "271": [
+                    37
+                ],
+                "272": [
+                    37
+                ],
+                "273": [
+                    37
+                ],
+                "274": [
+                    37
+                ],
+                "275": [
+                    37
+                ],
+                "276": [
+                    37
+                ],
+                "277": [
+                    37
+                ],
+                "278": [
+                    37
+                ],
+                "279": [
+                    37
+                ],
+                "280": [
+                    37
+                ],
+                "281": [
+                    37
+                ],
+                "282": [
+                    37
+                ],
+                "283": [
+                    37
+                ],
+                "284": [
+                    37
+                ],
+                "285": [
+                    37
+                ],
+                "286": [
+                    37
+                ],
+                "287": [
+                    37
+                ],
+                "288": [
+                    37
+                ],
+                "289": [
+                    37
+                ],
+                "290": [
+                    37
+                ],
+                "291": [
+                    37
+                ],
+                "292": [
+                    37
+                ],
+                "293": [
+                    37
+                ],
+                "294": [
+                    37
+                ],
+                "295": [
+                    37
+                ],
+                "296": [
+                    37
+                ],
+                "297": [
+                    37
+                ],
+                "298": [
+                    37
+                ],
+                "299": [
+                    37
+                ],
+                "300": [
+                    37
+                ],
+                "301": [
+                    37
+                ],
+                "302": [
+                    37
+                ],
+                "303": [
+                    37
+                ],
+                "304": [
+                    37
+                ],
+                "305": [
+                    37
+                ],
+                "306": [
+                    37
+                ],
+                "307": [
+                    37
+                ],
+                "308": [
+                    37
+                ],
+                "309": [
+                    37
+                ],
+                "310": [
+                    37
+                ],
+                "311": [
+                    37
+                ],
+                "312": [
+                    37
+                ],
+                "313": [
+                    37
+                ],
+                "314": [
+                    37
+                ],
+                "315": [
+                    37
+                ],
+                "316": [
+                    37
+                ],
+                "317": [
+                    37
+                ],
+                "318": [
+                    37
+                ],
+                "319": [
+                    37
+                ],
+                "320": [
+                    37
+                ],
+                "321": [
+                    37
+                ]
+            }
+        }
+    },
+    "event_items": [],
+    "topics": [],
+    "circulation": [],
+    "comments": [],
+    "change_proposals": [],
+    "trust": [],
+    "glossary": [],
+    "wishlist": [],
+    "ballots": [],
+    "images": []
+}

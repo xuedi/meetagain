@@ -1,5 +1,4 @@
-// Test credentials drawn from src/DataFixtures/UserFixture.php and MinimalAdminFixture.php.
-// All fixture users share password '1234'. Run `just devModeFixtures` to seed.
+// Credentials of the dev database's sample users; all of them share password '1234'.
 
 export const ADMIN = {
     email: 'admin@example.org',

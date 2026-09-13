@@ -123,8 +123,6 @@ enabled = false
 # visible to the analyzer.
 excludes = [
     "tests/Unit/",
-    "tests/Functional/",
-    "tests/Smoke/",
     "tests/bootstrap.php",
     "modules/trust/tests/",
     "modules/ballot/tests/",

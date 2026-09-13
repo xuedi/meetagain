@@ -7,6 +7,7 @@ use App\Entity\Image;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\EntityActionDispatcher;
+use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
 use App\Repository\SupportRequestRepository;
 use App\Repository\UserRepository;
@@ -32,6 +33,7 @@ class CleanupServiceTest extends TestCase
         ?SupportRequestRepository $supportRequestRepo = null,
         ?ThreadService $threadService = null,
         ?ClockInterface $clock = null,
+        ?ExtendedFilesystem $fs = null,
     ): CleanupService {
         return new CleanupService(
             imageRepo: $imageRepo ?? $this->createStub(ImageRepository::class),
@@ -42,7 +44,30 @@ class CleanupServiceTest extends TestCase
             entityActionDispatcher: $entityActionDispatcher ?? $this->createStub(EntityActionDispatcher::class),
             clock: $clock ?? new MockClock('2026-08-19 12:00:00', 'UTC'),
             logger: $logger ?? $this->createStub(LoggerInterface::class),
+            fs: $fs ?? $this->createStub(ExtendedFilesystem::class),
+            pendingImportDir: '/app/var/import',
         );
+    }
+
+    public function testRemoveStaleImportArchivesDeletesUploadsWaitingLongerThanADay(): void
+    {
+        // Arrange
+        $now = new DateTimeImmutable('2026-08-19 12:00:00', new DateTimeZone('UTC'));
+        $fs = $this->createMock(ExtendedFilesystem::class);
+        $fs->expects($this->once())->method('glob')->with('/app/var/import/*.zip')->willReturn(['/app/var/import/stale.zip', '/app/var/import/fresh.zip']);
+        $fs->expects($this->exactly(2))->method('getFileModifiedTime')->willReturnMap([
+            ['/app/var/import/stale.zip', $now->modify('-25 hours')->getTimestamp()],
+            ['/app/var/import/fresh.zip', $now->modify('-1 hour')->getTimestamp()],
+        ]);
+        $fs->expects($this->once())->method('deleteFile')->with('/app/var/import/stale.zip')->willReturn(true);
+
+        $subject = $this->createService(fs: $fs);
+
+        // Act
+        $count = $subject->removeStaleImportArchives();
+
+        // Assert
+        static::assertSame(1, $count);
     }
 
     public function testRemoveImageCacheUpdatesOldImagesAndPersists(): void

@@ -2,10 +2,10 @@
 
 namespace Plugin\Glossary\Portability;
 
-use App\Item\Portability\ContributorInterface;
-use App\Item\Portability\ImportContext;
-use App\Item\Portability\ImportResult;
-use App\Item\Portability\PortableImageWriterInterface;
+use App\Portability\Item\ContributorInterface;
+use App\Portability\ImportContext;
+use App\Portability\Item\ImportResult;
+use App\Portability\ImageWriterInterface;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -35,7 +35,13 @@ readonly class GlossaryContributor implements ContributorInterface
     }
 
     #[Override]
-    public function exportItems(array $itemIds, PortableImageWriterInterface $images): array
+    public function allItemIds(): array
+    {
+        return array_map(intval(...), $this->glossaryRepo->createQueryBuilder('g')->select('g.id')->orderBy('g.id')->getQuery()->getSingleColumnResult());
+    }
+
+    #[Override]
+    public function exportItems(array $itemIds, ImageWriterInterface $images): array
     {
         $rows = [];
 

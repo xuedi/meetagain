@@ -4,10 +4,10 @@ namespace Plugin\Dishes\Tests\Unit\Portability;
 
 use App\Entity\Image;
 use App\Entity\User;
-use App\Item\Portability\ImportContext;
-use App\Item\Portability\PortableImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\ImageWriterInterface;
 use App\Service\Media\ImageLocationService;
-use App\Service\System\PortableImageImporter;
+use App\Portability\ImageImporter;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -26,11 +26,11 @@ class DishContributorTest extends TestCase
         $dish = $this->dish(12, 'Arancini');
         $dish->setPhonetic('a-ran-chi-ni');
         $dish->setOrigin('Sicily');
-        $dish->setPreviewImage(new Image());
+        $dish->setPreviewImage(new Image()->setHash('preview'));
 
         $galleryImage = new DishImage();
         $galleryImage->setDish($dish);
-        $galleryImage->setImage(new Image());
+        $galleryImage->setImage(new Image()->setHash('gallery'));
         $galleryImage->setSortOrder(4);
         $galleryImage->setCreatedAt(new DateTimeImmutable());
         $dish->getGalleryImages()->add($galleryImage);
@@ -38,8 +38,8 @@ class DishContributorTest extends TestCase
         $repo = $this->createStub(DishRepository::class);
         $repo->method('findBy')->willReturn([$dish]);
 
-        $images = $this->createStub(PortableImageWriterInterface::class);
-        $images->method('addImage')->willReturnCallback(static fn(Image $image, string $hint): string => $hint . '.jpg');
+        $images = $this->createStub(ImageWriterInterface::class);
+        $images->method('addImage')->willReturnCallback(static fn(Image $image): string => 'images/' . $image->getHash() . '.jpg');
 
         $contributor = $this->contributor($this->createStub(EntityManagerInterface::class), $repo);
 
@@ -51,8 +51,31 @@ class DishContributorTest extends TestCase
         self::assertSame(12, $rows[0]['ref']);
         self::assertSame(['en' => ['name' => 'Arancini', 'description' => 'Fried', 'recipe' => null]], $rows[0]['translations']);
         self::assertSame('a-ran-chi-ni', $rows[0]['phonetic']);
-        self::assertSame('images/dishes/12/preview.jpg', $rows[0]['preview_image']);
-        self::assertSame([['file' => 'images/dishes/12/gallery-0.jpg', 'sort_order' => 4]], $rows[0]['gallery']);
+        self::assertSame('images/preview.jpg', $rows[0]['preview_image']);
+        self::assertArrayNotHasKey('gallery', $rows[0]);
+    }
+
+    public function testAnOlderArchiveStillBringsItsGalleryAlong(): void
+    {
+        // Arrange
+        $persisted = [];
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist')->willReturnCallback(static function (object $entity) use (&$persisted): void {
+            $persisted[] = $entity;
+        });
+        $imageImporter = $this->createStub(ImageImporter::class);
+        $imageImporter->method('import')->willReturn(new Image());
+
+        $contributor = $this->contributor($em, $this->createStub(DishRepository::class));
+        $row = ['ref' => 12, 'translations' => ['en' => ['name' => 'Arancini', 'description' => '']], 'gallery' => [['file' => 'images/g.jpg', 'sort_order' => 3]]];
+
+        // Act
+        $contributor->importItems([$row], new ImportContext($imageImporter, '/tmp', new User()));
+
+        // Assert
+        $galleryImages = array_values(array_filter($persisted, static fn(object $e): bool => $e instanceof DishImage));
+        self::assertCount(1, $galleryImages);
+        self::assertSame(3, $galleryImages[0]->getSortOrder());
     }
 
     public function testImportAlwaysCreatesAndMapsTheRef(): void
@@ -136,7 +159,7 @@ class DishContributorTest extends TestCase
 
     private function context(): ImportContext
     {
-        return new ImportContext($this->createStub(PortableImageImporter::class), '/tmp', new User());
+        return new ImportContext($this->createStub(ImageImporter::class), '/tmp', new User());
     }
 
     private function contributor(EntityManagerInterface $em, DishRepository $repo): DishContributor

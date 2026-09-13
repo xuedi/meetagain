@@ -1,0 +1,1927 @@
+{
+    "format": "meetagain-group-export",
+    "version": "2.0",
+    "exported_at": "2026-01-05T00:00:00+01:00",
+    "plugins": [
+        "photos",
+        "wishlist"
+    ],
+    "site": {
+        "slug": "hamburg-shutter-club",
+        "name": "Hamburg Shutter Club",
+        "description": "A photo club that walks Hamburg. Every few weeks we pick a theme, meet at a start point, and shoot it together for three hours. Afterwards everyone drops their keepers into the album for that walk, the camera settings travel with the picture, and the critique happens under the photo instead of in a group chat.",
+        "languages": [
+            "en",
+            "de"
+        ],
+        "theme_colors": [],
+        "settings": {
+            "send_event_reminders": true,
+            "send_rsvp_notifications": true,
+            "send_upcoming_digest": true,
+            "show_town_hall": false
+        },
+        "plugin_settings": {
+            "photos": {
+                "memberUploads": true,
+                "showCameraMeta": true,
+                "memberStreams": true,
+                "eventBox": true,
+                "contest": true,
+                "contestSubmissionsPerMember": 2
+            }
+        },
+        "logo_file": "images/7158a15c8f0a36d8e74467f680bc23abfdc1b24e.png"
+    },
+    "locations": [
+        {
+            "ref": 19,
+            "title": "Landungsbrücken Meeting Point",
+            "latitude": "53.5459",
+            "longitude": "9.9695",
+            "city": "Hamburg",
+            "country": ""
+        },
+        {
+            "ref": 20,
+            "title": "Poggenmühlenbrücke",
+            "latitude": "53.5445",
+            "longitude": "10.0003",
+            "city": "Hamburg",
+            "country": ""
+        },
+        {
+            "ref": 21,
+            "title": "Ottensen Darkroom & Clubroom",
+            "latitude": "53.5522",
+            "longitude": "9.9245",
+            "city": "Hamburg",
+            "country": ""
+        }
+    ],
+    "users": [
+        {
+            "email": "admin@example.org",
+            "name": "admin",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
+            "public": true,
+            "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
+        },
+        {
+            "email": "Kari.Rasmussen@example.org",
+            "name": "Kari Rasmussen",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about bridging cultures through the power of language, I thrive in environments where communication flourishes. Work is a canvas, and languages are the vibrant hues that bring it to life. #LanguageLover #CulturalConnector",
+            "public": true,
+            "image_file": "images/05673bb181f1d0df26d1c1381a11fcd591c2b0ea.jpg"
+        },
+        {
+            "email": "Loki.Bright@example.org",
+            "name": "Loki Bright",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "When I'm not exploring new worlds through books, I'm diving into the beauty of languages - each one a key to a different culture. Join me on this journey of connection and discovery! #LanguageLover #HobbyExplorer",
+            "public": true,
+            "image_file": "images/c6c7d0c7eed7b0c8638a5ce7747fe42c17dc7e61.jpg"
+        },
+        {
+            "email": "Marco.Gross@example.org",
+            "name": "Marco Gross",
+            "locale": "de",
+            "role": "admin",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
+            "public": true,
+            "image_file": "images/1cb88fdd277342edede632f00e75546c7b57b2d6.jpg"
+        },
+        {
+            "email": "Noah.Pierre@example.org",
+            "name": "Noah Pierre",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about turning words into bridges, I thrive on the magic of languages at work! 💼✨ Let's connect through communication! #LanguageLover #WorkJoy",
+            "public": true,
+            "image_file": "images/7f2b24b36cf125c97bb87dda8ec3b9b7c1693b0a.jpg"
+        },
+        {
+            "email": "Orlando.Diggs@example.org",
+            "name": "Orlando Diggs",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "In the delicate crunch of every cookie lies a harmony of flavors that awakens my senses and brings solace to my soul. My passion for cookies transcends mere indulgence; it is an art form that celebrates life's sweetest moments. #CookieLover #SweetObsessions",
+            "public": true,
+            "image_file": "images/f37410c71a6296c18ef39596a17f15ddc1a938bb.jpg"
+        },
+        {
+            "email": "Rene.Wells@example.org",
+            "name": "Rene Wells",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Coffee-fueled creative by day, amateur ninja at night - watch out for my decorative sock collection! 🚀☕️ #WorkHardPlayHarder #SockGoals",
+            "public": true,
+            "image_file": "images/1a1b82265cbbd9011e0e7061a93d44f03633300f.jpg"
+        },
+        {
+            "email": "Sienna.Hewitt@example.org",
+            "name": "Sienna Hewitt",
+            "locale": "en",
+            "role": "organizer",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about bridging cultures through the magic of languages, I thrive in diverse workplaces where every conversation is an adventure! 🌍✨ #LanguageLover #WorkLifeJoy",
+            "public": true,
+            "image_file": "images/36c9b12d796dc787478edc2292ebce89bfe61053.jpg"
+        },
+        {
+            "email": "Zahra.Christensen@example.org",
+            "name": "Zahra Christensen",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
+            "public": true,
+            "image_file": "images/e2b2b601faed7510cab8549fab682f68eba9bbf9.jpg"
+        }
+    ],
+    "hosts": [
+        {
+            "ref": 20,
+            "name": "ShutterMarco",
+            "email": null
+        },
+        {
+            "ref": 21,
+            "name": "ShutterSienna",
+            "email": null
+        }
+    ],
+    "series": [],
+    "events": [
+        {
+            "ref": 119,
+            "initial": true,
+            "titles": {
+                "de": "Fototour - Kräne und Container",
+                "en": "Photo Walk - Cranes and Containers"
+            },
+            "descriptions": {
+                "de": "Treffpunkt Brücke 3, dann am Kai entlang Richtung Baakenhafen, fotografiert wurden die Containerbrücken und die Stapel dahinter. Die Aufgabe war Geometrie: sich wiederholende Kräne, die Schattenkante, an der die Sonne einen Rumpf teilt, und keine weiten Postkartenansichten der Elbphilharmonie. Alles von der Tour liegt im Album.",
+                "en": "We met at Bridge 3 and worked east along the quay towards the Baakenhafen, shooting the container gantries and the stacks behind them. The brief was geometry: repeating cranes, the shadow line where the sun cuts a hull, and no wide postcard views of the Elbphilharmonie. Everything from the walk is in the album."
+            },
+            "teasers": {
+                "de": "Hartes Nachmittagslicht über dem Arbeitshafen: Wiederholung, Schattenkanten und so viel Stahl im Bild, wie hineinpasste.",
+                "en": "Hard afternoon light over the working harbour: repetition, shadow edges, and as much steel in frame as would fit."
+            },
+            "start": "2025-11-01T14:00:00+01:00",
+            "stop": "2025-11-01T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": null,
+            "featured": false,
+            "location_ref": 19,
+            "host_refs": [
+                20
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Marco.Gross@example.org",
+            "image_file": "images/f18d84a78e41c8b761289028cc6ee8e8a79d1ada.jpg"
+        },
+        {
+            "ref": 120,
+            "initial": true,
+            "titles": {
+                "de": "Fototour - Blaue Stunde in der Speicherstadt",
+                "en": "Photo Walk - Blue Hour in the Speicherstadt"
+            },
+            "descriptions": {
+                "de": "Treffpunkt war die Brücke, zwanzig Minuten vor Sonnenuntergang, fotografiert wurde, bis das Blau aus dem Himmel war. Stativ war Pflicht. Jede und jeder hat ein Bild langsamer als zwei Sekunden abgegeben, und die Aufnahmedaten im Album zeigen, wie unterschiedlich die Wege dorthin waren.",
+                "en": "We met on the bridge twenty minutes before sunset and shot until the blue had gone out of the sky. Bring-a-tripod was not optional. Everyone submitted one frame slower than two seconds, and the EXIF on the album shows how differently people got there."
+            },
+            "teasers": {
+                "de": "Stative auf der Poggenmühlenbrücke von der Dämmerung bis in die Nacht - Backstein, Spiegelungen im Fleet und je eine sehr lange Belichtung.",
+                "en": "Tripods on the Poggenmühlenbrücke from dusk into full dark - brick, canal reflections, and one very long exposure each."
+            },
+            "start": "2025-12-19T19:30:00+01:00",
+            "stop": "2025-12-19T23:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": null,
+            "featured": false,
+            "location_ref": 20,
+            "host_refs": [
+                21
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Sienna.Hewitt@example.org",
+            "image_file": "images/5517f25b3ecefbf12817940ddf41a222f43d227a.jpg"
+        },
+        {
+            "ref": 121,
+            "initial": true,
+            "titles": {
+                "de": "Fototour - Portraits bei vorhandenem Licht",
+                "en": "Photo Walk - Available Light Portraits"
+            },
+            "descriptions": {
+                "de": "Wir wechseln uns im Clubraum vor und hinter der Kamera ab und arbeiten nur mit dem Nordfenster. Lichtstarke Objektive helfen, sind aber keine Pflicht; ein Leihgehäuse steht bereit, falls deins in Reparatur ist. Danach wird gemeinsam entwickelt und je ein Bild fürs Album ausgewählt.",
+                "en": "We take turns in front of and behind the camera in the clubroom, working with the north window only. Fast glass helps but is not required; there is a body to borrow if yours is in for repair. Afterwards we edit together and pick one frame each for the album."
+            },
+            "teasers": {
+                "de": "Kein Blitz, keine Reflektoren - ein Fenster, ein Modell und was der Nachmittag hergibt.",
+                "en": "No flash, no reflectors - one window, one sitter, and whatever the afternoon gives us."
+            },
+            "start": "2026-01-31T15:00:00+01:00",
+            "stop": "2026-01-31T18:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": null,
+            "featured": true,
+            "location_ref": 21,
+            "host_refs": [
+                20
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Marco.Gross@example.org",
+            "image_file": "images/198cf2b5455173d8672a4291a30eb9698c394639.jpg"
+        }
+    ],
+    "rsvps": [
+        {
+            "event_ref": 119,
+            "email": "Marco.Gross@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 119,
+            "email": "Noah.Pierre@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 119,
+            "email": "Orlando.Diggs@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 119,
+            "email": "Rene.Wells@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 119,
+            "email": "Sienna.Hewitt@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 119,
+            "email": "Zahra.Christensen@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 120,
+            "email": "Kari.Rasmussen@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 120,
+            "email": "Loki.Bright@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 120,
+            "email": "Marco.Gross@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 120,
+            "email": "Noah.Pierre@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 120,
+            "email": "Rene.Wells@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 120,
+            "email": "Sienna.Hewitt@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 120,
+            "email": "Zahra.Christensen@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 120,
+            "email": "admin@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 121,
+            "email": "Kari.Rasmussen@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 121,
+            "email": "Loki.Bright@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 121,
+            "email": "Marco.Gross@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 121,
+            "email": "Orlando.Diggs@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 121,
+            "email": "Sienna.Hewitt@example.org",
+            "guests": 0
+        }
+    ],
+    "cms_pages": [
+        {
+            "ref": 17,
+            "slug": "index",
+            "published": true,
+            "titles": {
+                "de": "Hamburg Shutter Club",
+                "en": "Hamburg Shutter Club"
+            },
+            "link_names": {
+                "de": "Startseite",
+                "en": "Home"
+            },
+            "menu_locations": [],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 8,
+                    "priority": 1,
+                    "json": {
+                        "headline": "Hamburg Shutter Club",
+                        "subHeadline": "A photo club that walks Hamburg",
+                        "text": "Pick a theme, meet at the start point, shoot it together for three hours.",
+                        "buttonLink": "/events",
+                        "buttonText": "Next Walk",
+                        "color": "#1F3A5F"
+                    },
+                    "image_file": "images/59bb7e5486b41690ca51eaba279f72eb5081a7f3.jpg"
+                },
+                {
+                    "language": "de",
+                    "type": 8,
+                    "priority": 2,
+                    "json": {
+                        "headline": "Hamburg Shutter Club",
+                        "subHeadline": "Ein Fotoclub, der durch Hamburg läuft",
+                        "text": "Ein Thema, ein Treffpunkt, drei Stunden gemeinsam fotografieren.",
+                        "buttonLink": "/events",
+                        "buttonText": "Nächste Tour",
+                        "color": "#1F3A5F"
+                    },
+                    "image_file": "images/59bb7e5486b41690ca51eaba279f72eb5081a7f3.jpg"
+                },
+                {
+                    "language": "en",
+                    "type": 1,
+                    "priority": 3,
+                    "json": {
+                        "title": "One album per walk, one stream per member"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 1,
+                    "priority": 4,
+                    "json": {
+                        "title": "Ein Album pro Tour, ein Stream pro Mitglied"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 5,
+                    "json": {
+                        "title": "How a walk works",
+                        "content": "Every few weeks we set a theme and a start point. Three hours of shooting, then everyone drops their keepers into the album attached to that walk - no organiser collecting files from six different cloud links. The camera settings travel with each picture, so when somebody asks how a frame was made, the answer is already on the page."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 6,
+                    "json": {
+                        "title": "So läuft eine Tour",
+                        "content": "Alle paar Wochen legen wir ein Thema und einen Treffpunkt fest. Drei Stunden fotografieren, danach lädt jede und jeder die eigenen Favoriten in das Album zur Tour - niemand muss Dateien aus sechs Cloud-Links einsammeln. Die Aufnahmedaten hängen am Bild, wer also fragt, wie eine Aufnahme entstanden ist, findet die Antwort direkt auf der Seite."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 7,
+                    "json": {
+                        "title": "Critique under the photo",
+                        "content": "Every shot has its own comment thread, so a note about a crop stays attached to the crop it is about instead of scrolling away in a group chat. Each member also has a stream of their own work across every walk they came to - which is the honest way to see whether you are getting better."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 8,
+                    "json": {
+                        "title": "Kritik direkt am Bild",
+                        "content": "Jede Aufnahme hat ihren eigenen Kommentarbereich, eine Anmerkung zum Schnitt bleibt also bei dem Bild, um das es geht, statt im Gruppenchat wegzuscrollen. Zusätzlich hat jedes Mitglied einen eigenen Stream über alle Touren hinweg - der ehrlichste Weg zu sehen, ob man besser wird."
+                    },
+                    "image_file": null
+                }
+            ]
+        }
+    ],
+    "announcements": [],
+    "tags": [
+        {
+            "ref": 52,
+            "item_type": "photo",
+            "parent_ref": null,
+            "position": 0,
+            "labels": {
+                "de": "Motiv",
+                "en": "Subject"
+            },
+            "managed": false
+        },
+        {
+            "ref": 53,
+            "item_type": "photo",
+            "parent_ref": 52,
+            "position": 1,
+            "labels": {
+                "de": "Architektur",
+                "en": "Architecture"
+            },
+            "managed": false
+        },
+        {
+            "ref": 54,
+            "item_type": "photo",
+            "parent_ref": 52,
+            "position": 2,
+            "labels": {
+                "de": "Industrie",
+                "en": "Industry"
+            },
+            "managed": false
+        },
+        {
+            "ref": 55,
+            "item_type": "photo",
+            "parent_ref": 52,
+            "position": 3,
+            "labels": {
+                "de": "Wasser",
+                "en": "Water"
+            },
+            "managed": false
+        },
+        {
+            "ref": 56,
+            "item_type": "photo",
+            "parent_ref": 52,
+            "position": 4,
+            "labels": {
+                "de": "Detail",
+                "en": "Detail"
+            },
+            "managed": false
+        },
+        {
+            "ref": 57,
+            "item_type": "photo",
+            "parent_ref": null,
+            "position": 5,
+            "labels": {
+                "de": "Technik",
+                "en": "Technique"
+            },
+            "managed": false
+        },
+        {
+            "ref": 58,
+            "item_type": "photo",
+            "parent_ref": 57,
+            "position": 6,
+            "labels": {
+                "de": "Langzeitbelichtung",
+                "en": "Long exposure"
+            },
+            "managed": false
+        },
+        {
+            "ref": 59,
+            "item_type": "photo",
+            "parent_ref": 57,
+            "position": 7,
+            "labels": {
+                "de": "Vorhandenes Licht",
+                "en": "Available light"
+            },
+            "managed": false
+        },
+        {
+            "ref": 60,
+            "item_type": "photo",
+            "parent_ref": 57,
+            "position": 8,
+            "labels": {
+                "de": "Schwarzweiss",
+                "en": "Monochrome"
+            },
+            "managed": false
+        },
+        {
+            "ref": 61,
+            "item_type": "photo",
+            "parent_ref": null,
+            "position": 9,
+            "labels": {
+                "de": "Licht",
+                "en": "Light"
+            },
+            "managed": false
+        },
+        {
+            "ref": 62,
+            "item_type": "photo",
+            "parent_ref": 61,
+            "position": 10,
+            "labels": {
+                "de": "Hartes Licht",
+                "en": "Hard light"
+            },
+            "managed": false
+        },
+        {
+            "ref": 63,
+            "item_type": "photo",
+            "parent_ref": 61,
+            "position": 11,
+            "labels": {
+                "de": "Blaue Stunde",
+                "en": "Blue hour"
+            },
+            "managed": false
+        },
+        {
+            "ref": 64,
+            "item_type": "photo",
+            "parent_ref": 61,
+            "position": 12,
+            "labels": {
+                "de": "Nacht",
+                "en": "Night"
+            },
+            "managed": false
+        }
+    ],
+    "items": {
+        "photo": {
+            "rows": [
+                {
+                    "ref": 9,
+                    "translations": {
+                        "en": {
+                            "title": "From up on the gantry",
+                            "description": "Leaned over the rail with the strap doubled round my wrist. The van gives it the scale."
+                        },
+                        "de": {
+                            "title": "Oben von der Containerbrücke",
+                            "description": "Über das Geländer gelehnt, den Gurt doppelt ums Handgelenk. Der Transporter gibt den Maßstab."
+                        }
+                    },
+                    "meta": {
+                        "make": "FUJIFILM",
+                        "model": "X-T5",
+                        "lens": "XF23mmF1.4 R LM WR",
+                        "exposureTime": "1/640",
+                        "fNumber": 8,
+                        "iso": 200,
+                        "focalLength": 23,
+                        "focalLength35": 35,
+                        "exposureBias": -0.33,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-06-27 15:12:44",
+                        "width": 1600,
+                        "height": 1067
+                    },
+                    "taken_at": "2026-06-27 15:12:44",
+                    "image": "images/8eaa1f0fad6e7dcb08feeeee3dfa934c10a744f9.jpg",
+                    "uploader_email": "Marco.Gross@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 10,
+                    "translations": {
+                        "en": {
+                            "title": "Nine of them, all the same",
+                            "description": "The whole point of the walk in one frame: stand somewhere the repetition does the work for you."
+                        },
+                        "de": {
+                            "title": "Neun Stück, alle gleich",
+                            "description": "Die ganze Tour in einem Bild: so stehen, dass die Wiederholung die Arbeit macht."
+                        }
+                    },
+                    "meta": {
+                        "make": "Canon",
+                        "model": "Canon EOS R6",
+                        "lens": "RF24-70mm F2.8 L IS USM",
+                        "exposureTime": "1/500",
+                        "fNumber": 7.1,
+                        "iso": 100,
+                        "focalLength": 35,
+                        "focalLength35": 35,
+                        "exposureBias": 0,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-06-27 14:47:03",
+                        "width": 1600,
+                        "height": 1067
+                    },
+                    "taken_at": "2026-06-27 14:47:03",
+                    "image": "images/8a2e67e5add965db4c7fae7a13d96054cbfa354d.jpg",
+                    "uploader_email": "Sienna.Hewitt@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 11,
+                    "translations": {
+                        "en": {
+                            "title": "Colour blocks",
+                            "description": "Two hundred millimetres from the far bank. Flattens everything into stripes, which is what I was after."
+                        },
+                        "de": {
+                            "title": "Farbflächen",
+                            "description": "Zweihundert Millimeter vom anderen Ufer. Presst alles zu Streifen zusammen, genau darum ging es mir."
+                        }
+                    },
+                    "meta": {
+                        "make": "SONY",
+                        "model": "ILCE-7M3",
+                        "lens": "FE 70-200mm F4 G OSS",
+                        "exposureTime": "1/800",
+                        "fNumber": 8,
+                        "iso": 200,
+                        "focalLength": 200,
+                        "focalLength35": 200,
+                        "exposureBias": -0.67,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 3,
+                        "takenAt": "2026-06-27 15:40:19",
+                        "width": 1600,
+                        "height": 1063
+                    },
+                    "taken_at": "2026-06-27 15:40:19",
+                    "image": "images/9566489121321d711bcfad249ffd863d593d805d.jpg",
+                    "uploader_email": "Orlando.Diggs@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 12,
+                    "translations": {
+                        "en": {
+                            "title": "Hatch cover coming off",
+                            "description": "Waited about ten minutes for it to swing clear of the white superstructure."
+                        },
+                        "de": {
+                            "title": "Lukendeckel kommt hoch",
+                            "description": "Etwa zehn Minuten gewartet, bis er frei vor dem weißen Aufbau hing."
+                        }
+                    },
+                    "meta": {
+                        "make": "NIKON CORPORATION",
+                        "model": "NIKON Z 6",
+                        "lens": "NIKKOR Z 24-70mm f/4 S",
+                        "exposureTime": "1/1000",
+                        "fNumber": 6.3,
+                        "iso": 100,
+                        "focalLength": 70,
+                        "focalLength35": 70,
+                        "exposureBias": 0,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-06-27 16:05:51",
+                        "width": 1600,
+                        "height": 1067
+                    },
+                    "taken_at": "2026-06-27 16:05:51",
+                    "image": "images/01b68c4b7f46de5bf05225435e8d3e58ce92099a.jpg",
+                    "uploader_email": "Rene.Wells@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 13,
+                    "translations": {
+                        "en": {
+                            "title": "Green",
+                            "description": "Cropped upright because the bow wanted to be tall. No filter, that is just the paint."
+                        },
+                        "de": {
+                            "title": "Grün",
+                            "description": "Hochkant beschnitten, weil der Bug hoch sein wollte. Kein Filter, das ist einfach die Farbe."
+                        }
+                    },
+                    "meta": {
+                        "make": "RICOH IMAGING COMPANY, LTD.",
+                        "model": "PENTAX K-1",
+                        "lens": "HD PENTAX-D FA 28-105mmF3.5-5.6",
+                        "exposureTime": "1/640",
+                        "fNumber": 9,
+                        "iso": 100,
+                        "focalLength": 28,
+                        "focalLength35": 28,
+                        "exposureBias": -0.33,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-06-27 16:22:37",
+                        "width": 960,
+                        "height": 1280
+                    },
+                    "taken_at": "2026-06-27 16:22:37",
+                    "image": "images/97ec8a0638e3ba66bce943ebf144983b618f1308.jpg",
+                    "uploader_email": "Zahra.Christensen@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 14,
+                    "translations": {
+                        "en": {
+                            "title": "The whole wall of it",
+                            "description": "One of those where you back up until it fits and then it is a completely different picture."
+                        }
+                    },
+                    "meta": {
+                        "make": "SONY",
+                        "model": "ILCE-7M3",
+                        "lens": "FE 70-200mm F4 G OSS",
+                        "exposureTime": "1/1250",
+                        "fNumber": 8,
+                        "iso": 200,
+                        "focalLength": 135,
+                        "focalLength35": 135,
+                        "exposureBias": -0.33,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 3,
+                        "takenAt": "2026-06-27 16:48:12",
+                        "width": 1600,
+                        "height": 900
+                    },
+                    "taken_at": "2026-06-27 16:48:12",
+                    "image": "images/191d1290c4ff176e56600fccfa534105162d0a33.jpg",
+                    "uploader_email": "Orlando.Diggs@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 15,
+                    "translations": {
+                        "en": {
+                            "title": "Coming down",
+                            "description": "Sixteen hundredth to freeze it. There is a lot less movement in these than you expect."
+                        },
+                        "de": {
+                            "title": "Kommt runter",
+                            "description": "Eine Sechzehnhundertstel, um es einzufrieren. Die bewegen sich viel langsamer, als man denkt."
+                        }
+                    },
+                    "meta": {
+                        "make": "OM Digital Solutions",
+                        "model": "OM-1",
+                        "lens": "M.Zuiko Digital ED 12-40mm F2.8 Pro",
+                        "exposureTime": "1/1600",
+                        "fNumber": 5.6,
+                        "iso": 200,
+                        "focalLength": 40,
+                        "focalLength35": 80,
+                        "exposureBias": 0,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-06-27 15:55:28",
+                        "width": 960,
+                        "height": 1280
+                    },
+                    "taken_at": "2026-06-27 15:55:28",
+                    "image": "images/c663dfaee07f7c2ceb25bae8e693ede42695c662.jpg",
+                    "uploader_email": "Noah.Pierre@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 16,
+                    "translations": {
+                        "en": {
+                            "title": "Square on",
+                            "description": "The 56 is far too long for this and I had to stand in a silly place, but nothing else gets it flat."
+                        },
+                        "de": {
+                            "title": "Frontal",
+                            "description": "Das 56er ist viel zu lang dafür und ich stand ziemlich albern, aber flacher bekommt man es nicht."
+                        }
+                    },
+                    "meta": {
+                        "make": "FUJIFILM",
+                        "model": "X-T5",
+                        "lens": "XF56mmF1.2 R WR",
+                        "exposureTime": "1/1000",
+                        "fNumber": 4,
+                        "iso": 160,
+                        "focalLength": 56,
+                        "focalLength35": 85,
+                        "exposureBias": 0,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-06-27 17:02:09",
+                        "width": 1600,
+                        "height": 1067
+                    },
+                    "taken_at": "2026-06-27 17:02:09",
+                    "image": "images/2b67cae017070f3c0e50b01bcfe428dc8a4bddc9.jpg",
+                    "uploader_email": "Marco.Gross@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 17,
+                    "translations": {
+                        "en": {
+                            "title": "Two by two",
+                            "description": "Almost no colour in it at all. I kept it square because cropping it wider ruined the symmetry."
+                        },
+                        "de": {
+                            "title": "Zwei mal zwei",
+                            "description": "Fast keine Farbe drin. Quadratisch gelassen, breiter beschnitten war die Symmetrie hin."
+                        }
+                    },
+                    "meta": {
+                        "make": "Canon",
+                        "model": "Canon EOS R6",
+                        "lens": "RF24-70mm F2.8 L IS USM",
+                        "exposureTime": "1/400",
+                        "fNumber": 8,
+                        "iso": 100,
+                        "focalLength": 50,
+                        "focalLength35": 50,
+                        "exposureBias": -0.67,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-06-27 14:33:55",
+                        "width": 1600,
+                        "height": 1600
+                    },
+                    "taken_at": "2026-06-27 14:33:55",
+                    "image": "images/9f074b921ba89d596835752dbedb37567aa4e628.jpg",
+                    "uploader_email": "Sienna.Hewitt@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 18,
+                    "translations": {
+                        "en": {
+                            "title": "Last light on the way back",
+                            "description": "Shot through the green beam on purpose. Everyone else had packed up by then."
+                        },
+                        "de": {
+                            "title": "Letztes Licht auf dem Rückweg",
+                            "description": "Bewusst am grünen Träger vorbei fotografiert. Alle anderen hatten schon eingepackt."
+                        }
+                    },
+                    "meta": {
+                        "make": "OM Digital Solutions",
+                        "model": "OM-1",
+                        "lens": "M.Zuiko Digital ED 12-40mm F2.8 Pro",
+                        "exposureTime": "1/320",
+                        "fNumber": 5.6,
+                        "iso": 400,
+                        "focalLength": 12,
+                        "focalLength35": 24,
+                        "exposureBias": -1,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-06-27 17:18:41",
+                        "width": 1600,
+                        "height": 1067
+                    },
+                    "taken_at": "2026-06-27 17:18:41",
+                    "image": "images/9f3f79545d3e8c0a20cb44da769d882fdd7cc386.jpg",
+                    "uploader_email": "Noah.Pierre@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 19,
+                    "translations": {
+                        "en": {
+                            "title": "Before the lights came on",
+                            "description": "Two and a half seconds, which was already enough to flatten the water. Worth arriving early for."
+                        },
+                        "de": {
+                            "title": "Bevor die Lichter angingen",
+                            "description": "Zweieinhalb Sekunden, das reichte schon, um das Wasser glatt zu ziehen. Dafür lohnt sich früh kommen."
+                        }
+                    },
+                    "meta": {
+                        "make": "NIKON CORPORATION",
+                        "model": "NIKON Z 6",
+                        "lens": "NIKKOR Z 24-70mm f/4 S",
+                        "exposureTime": "2.5",
+                        "fNumber": 9,
+                        "iso": 100,
+                        "focalLength": 24,
+                        "focalLength35": 24,
+                        "exposureBias": 0,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-08-14 20:36:14",
+                        "width": 1600,
+                        "height": 900
+                    },
+                    "taken_at": "2026-08-14 20:36:14",
+                    "image": "images/c17e7b923ef3ace18708a7d3b2c715d07ff5ad2d.jpg",
+                    "uploader_email": "Rene.Wells@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 20,
+                    "translations": {
+                        "en": {
+                            "title": "Through the girders",
+                            "description": "Everyone was lined up along the rail so I shot the rail instead. Tripod low, legs through the gap."
+                        },
+                        "de": {
+                            "title": "Durch die Träger",
+                            "description": "Alle standen am Geländer aufgereiht, also habe ich das Geländer fotografiert. Stativ tief, Beine durch die Lücke."
+                        }
+                    },
+                    "meta": {
+                        "make": "FUJIFILM",
+                        "model": "X-T5",
+                        "lens": "XF23mmF1.4 R LM WR",
+                        "exposureTime": "8",
+                        "fNumber": 8,
+                        "iso": 125,
+                        "focalLength": 23,
+                        "focalLength35": 35,
+                        "exposureBias": 0,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-08-14 21:02:33",
+                        "width": 1600,
+                        "height": 1067
+                    },
+                    "taken_at": "2026-08-14 21:02:33",
+                    "image": "images/bf90b8a5ae23109c2a056fb35abd24cf63351e49.jpg",
+                    "uploader_email": "Marco.Gross@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 21,
+                    "translations": {
+                        "en": {
+                            "title": "The one everybody takes",
+                            "description": "Thirteen seconds at f/11. Yes it is the postcard. It is the postcard because it works."
+                        },
+                        "de": {
+                            "title": "Das Bild, das alle machen",
+                            "description": "Dreizehn Sekunden bei f/11. Ja, es ist die Postkarte. Es ist die Postkarte, weil es funktioniert."
+                        }
+                    },
+                    "meta": {
+                        "make": "Canon",
+                        "model": "Canon EOS R6",
+                        "lens": "RF24-70mm F2.8 L IS USM",
+                        "exposureTime": "13",
+                        "fNumber": 11,
+                        "iso": 100,
+                        "focalLength": 24,
+                        "focalLength35": 24,
+                        "exposureBias": -0.33,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-08-14 21:14:06",
+                        "width": 1600,
+                        "height": 900
+                    },
+                    "taken_at": "2026-08-14 21:14:06",
+                    "image": "images/58f8e1e03f04a184b0f0f61dc496dae1a38371e5.jpg",
+                    "uploader_email": "Sienna.Hewitt@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 22,
+                    "translations": {
+                        "en": {
+                            "title": "Down the wall",
+                            "description": "Stood in a doorway to get the dark edge on the left. Six seconds, no filter."
+                        },
+                        "de": {
+                            "title": "Die Wand entlang",
+                            "description": "In einem Türrahmen gestanden, um links die dunkle Kante zu bekommen. Sechs Sekunden, kein Filter."
+                        }
+                    },
+                    "meta": {
+                        "make": "RICOH IMAGING COMPANY, LTD.",
+                        "model": "PENTAX K-1",
+                        "lens": "HD PENTAX-D FA 28-105mmF3.5-5.6",
+                        "exposureTime": "6",
+                        "fNumber": 8,
+                        "iso": 100,
+                        "focalLength": 28,
+                        "focalLength35": 28,
+                        "exposureBias": -0.33,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-08-14 21:27:22",
+                        "width": 1600,
+                        "height": 1067
+                    },
+                    "taken_at": "2026-08-14 21:27:22",
+                    "image": "images/4b779b35268a2cdea58fa00acdfb5a47e298c90b.jpg",
+                    "uploader_email": "Zahra.Christensen@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 23,
+                    "translations": {
+                        "en": {
+                            "title": "Thirty seconds",
+                            "description": "Converted because the colour was doing nothing the shapes were not already doing better."
+                        },
+                        "de": {
+                            "title": "Dreißig Sekunden",
+                            "description": "Umgewandelt, weil die Farbe nichts beitrug, was die Formen nicht schon besser gemacht hätten."
+                        }
+                    },
+                    "meta": {
+                        "make": "Leica Camera AG",
+                        "model": "LEICA Q2",
+                        "lens": "Summilux 1:1.7/28 ASPH.",
+                        "exposureTime": "30",
+                        "fNumber": 11,
+                        "iso": 50,
+                        "focalLength": 28,
+                        "focalLength35": 28,
+                        "exposureBias": -0.67,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-08-14 21:41:50",
+                        "width": 1600,
+                        "height": 1548
+                    },
+                    "taken_at": "2026-08-14 21:41:50",
+                    "image": "images/ea4a0c498172efb7856281e934d98b00064d9d58.jpg",
+                    "uploader_email": "Kari.Rasmussen@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 24,
+                    "translations": {
+                        "en": {
+                            "title": "Twenty seconds, further in",
+                            "description": "Walked past the crowd until there was nobody in the frame. Took about fifteen minutes."
+                        }
+                    },
+                    "meta": {
+                        "make": "Leica Camera AG",
+                        "model": "LEICA Q2",
+                        "lens": "Summilux 1:1.7/28 ASPH.",
+                        "exposureTime": "20",
+                        "fNumber": 8,
+                        "iso": 50,
+                        "focalLength": 28,
+                        "focalLength35": 28,
+                        "exposureBias": -0.33,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-08-14 21:55:38",
+                        "width": 1600,
+                        "height": 1067
+                    },
+                    "taken_at": "2026-08-14 21:55:38",
+                    "image": "images/7f056ad61957ace5dad8259838babfa2f6ce0d41.jpg",
+                    "uploader_email": "Kari.Rasmussen@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 26,
+                    "translations": [],
+                    "meta": {
+                        "make": "OM Digital Solutions",
+                        "model": "OM-1",
+                        "lens": "M.Zuiko Digital ED 12-40mm F2.8 Pro",
+                        "exposureTime": "15",
+                        "fNumber": 8,
+                        "iso": 200,
+                        "focalLength": 25,
+                        "focalLength35": 50,
+                        "exposureBias": -0.33,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-08-14 22:18:11",
+                        "width": 1200,
+                        "height": 1600
+                    },
+                    "taken_at": "2026-08-14 22:18:11",
+                    "image": "images/5a4f907aec93f6af8e24b58e74908f3457f88c4c.jpg",
+                    "uploader_email": "Noah.Pierre@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 27,
+                    "translations": {
+                        "en": {
+                            "title": "Where the colour is",
+                            "description": "Round the corner from where everyone was standing. All those signs land in the water."
+                        },
+                        "de": {
+                            "title": "Wo die Farbe ist",
+                            "description": "Um die Ecke von der Stelle, an der alle standen. Die ganzen Schilder landen im Wasser."
+                        }
+                    },
+                    "meta": {
+                        "make": "NIKON CORPORATION",
+                        "model": "NIKON Z 6",
+                        "lens": "NIKKOR Z 24-70mm f/4 S",
+                        "exposureTime": "6",
+                        "fNumber": 8,
+                        "iso": 100,
+                        "focalLength": 24,
+                        "focalLength35": 24,
+                        "exposureBias": 0,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-08-14 22:34:29",
+                        "width": 1600,
+                        "height": 1083
+                    },
+                    "taken_at": "2026-08-14 22:34:29",
+                    "image": "images/ff1107406023abb35cc1a1bdfe8beb289068ce4b.jpg",
+                    "uploader_email": "Rene.Wells@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 28,
+                    "translations": {
+                        "en": {
+                            "title": "Grey on grey",
+                            "description": "Not from a club walk. Went back on my own because the flat light suits these better."
+                        },
+                        "de": {
+                            "title": "Grau auf grau",
+                            "description": "Nicht von einer Clubtour. Allein noch mal hin, weil das flache Licht diesen Motiven besser steht."
+                        }
+                    },
+                    "meta": {
+                        "make": "FUJIFILM",
+                        "model": "X-T5",
+                        "lens": "XF56mmF1.2 R WR",
+                        "exposureTime": "1/250",
+                        "fNumber": 5.6,
+                        "iso": 320,
+                        "focalLength": 56,
+                        "focalLength35": 85,
+                        "exposureBias": -0.33,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-05-09 18:24:02",
+                        "width": 1600,
+                        "height": 1200
+                    },
+                    "taken_at": "2026-05-09 18:24:02",
+                    "image": "images/03b68d5aa16ab672f67b6932825d54864664a40c.jpg",
+                    "uploader_email": "Marco.Gross@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 29,
+                    "translations": {
+                        "en": {
+                            "title": "The little one at Bubendey",
+                            "description": "Sunday walk, nothing to do with the club. Somebody asked where this is - it is west of the terminal."
+                        }
+                    },
+                    "meta": {
+                        "make": "NIKON CORPORATION",
+                        "model": "NIKON Z 6",
+                        "lens": "NIKKOR Z 24-70mm f/4 S",
+                        "exposureTime": "1/500",
+                        "fNumber": 8,
+                        "iso": 100,
+                        "focalLength": 48,
+                        "focalLength35": 48,
+                        "exposureBias": 0,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-07-19 11:08:37",
+                        "width": 1600,
+                        "height": 1200
+                    },
+                    "taken_at": "2026-07-19 11:08:37",
+                    "image": "images/2c2f62276a6050d7b0ec57955b56f7eb05835329.jpg",
+                    "uploader_email": "Rene.Wells@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 30,
+                    "translations": [],
+                    "meta": {
+                        "make": "RICOH IMAGING COMPANY, LTD.",
+                        "model": "PENTAX K-1",
+                        "lens": "HD PENTAX-D FA 28-105mmF3.5-5.6",
+                        "exposureTime": "1/320",
+                        "fNumber": 7.1,
+                        "iso": 100,
+                        "focalLength": 35,
+                        "focalLength35": 35,
+                        "exposureBias": 0,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-04-25 13:52:16",
+                        "width": 1600,
+                        "height": 1200
+                    },
+                    "taken_at": "2026-04-25 13:52:16",
+                    "image": "images/830f9fa27df55a3f303188c7626df931fad3c2e4.jpg",
+                    "uploader_email": "Zahra.Christensen@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 31,
+                    "translations": {
+                        "en": {
+                            "title": "While we waited for the light",
+                            "description": "Half an hour early with nothing to do. Wide open at f/1.7 so the fleet goes to mush."
+                        },
+                        "de": {
+                            "title": "Während wir aufs Licht warteten",
+                            "description": "Eine halbe Stunde zu früh und nichts zu tun. Offenblende f/1.7, damit das Fleet zu Brei wird."
+                        }
+                    },
+                    "meta": {
+                        "make": "Leica Camera AG",
+                        "model": "LEICA Q2",
+                        "lens": "Summilux 1:1.7/28 ASPH.",
+                        "exposureTime": "1/125",
+                        "fNumber": 1.7,
+                        "iso": 100,
+                        "focalLength": 28,
+                        "focalLength35": 28,
+                        "exposureBias": -0.33,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-08-14 20:09:55",
+                        "width": 1600,
+                        "height": 1200
+                    },
+                    "taken_at": "2026-08-14 20:09:55",
+                    "image": "images/a0cca18dbfb80d84c3644e4ed89131d9f1cb97f5.jpg",
+                    "uploader_email": "Kari.Rasmussen@example.org",
+                    "contest_submitted": false
+                }
+            ],
+            "tags": {
+                "9": [
+                    52,
+                    54,
+                    61,
+                    62
+                ],
+                "10": [
+                    52,
+                    54,
+                    61,
+                    62
+                ],
+                "11": [
+                    52,
+                    54,
+                    55
+                ],
+                "12": [
+                    52,
+                    54,
+                    56
+                ],
+                "13": [
+                    52,
+                    54,
+                    61,
+                    62
+                ],
+                "14": [
+                    52,
+                    54,
+                    55
+                ],
+                "15": [
+                    52,
+                    54,
+                    56
+                ],
+                "16": [
+                    52,
+                    56,
+                    61,
+                    62
+                ],
+                "17": [
+                    52,
+                    54,
+                    56
+                ],
+                "18": [
+                    52,
+                    54,
+                    55,
+                    61,
+                    62
+                ],
+                "19": [
+                    52,
+                    53,
+                    55,
+                    57,
+                    58
+                ],
+                "20": [
+                    52,
+                    53,
+                    57,
+                    58,
+                    61,
+                    63
+                ],
+                "21": [
+                    52,
+                    53,
+                    55,
+                    57,
+                    58,
+                    61,
+                    63
+                ],
+                "22": [
+                    52,
+                    53,
+                    57,
+                    58,
+                    61,
+                    64
+                ],
+                "23": [
+                    52,
+                    53,
+                    57,
+                    58,
+                    60
+                ],
+                "24": [
+                    52,
+                    53,
+                    57,
+                    58,
+                    61,
+                    64
+                ],
+                "26": [
+                    52,
+                    53,
+                    61,
+                    64
+                ],
+                "27": [
+                    52,
+                    53,
+                    55,
+                    61,
+                    64
+                ],
+                "28": [
+                    52,
+                    54,
+                    55
+                ],
+                "29": [
+                    52,
+                    54,
+                    55
+                ],
+                "30": [
+                    52,
+                    53,
+                    55
+                ],
+                "31": [
+                    52,
+                    56
+                ]
+            }
+        }
+    },
+    "event_items": [
+        {
+            "event_ref": 119,
+            "item_type": "photo",
+            "item_ref": 9,
+            "position": 1,
+            "section_label": null,
+            "created_by_email": "Marco.Gross@example.org",
+            "created_at": "2025-11-02T20:14:00+01:00"
+        },
+        {
+            "event_ref": 119,
+            "item_type": "photo",
+            "item_ref": 10,
+            "position": 2,
+            "section_label": null,
+            "created_by_email": "Sienna.Hewitt@example.org",
+            "created_at": "2025-11-02T11:02:00+01:00"
+        },
+        {
+            "event_ref": 119,
+            "item_type": "photo",
+            "item_ref": 11,
+            "position": 3,
+            "section_label": null,
+            "created_by_email": "Orlando.Diggs@example.org",
+            "created_at": "2025-11-03T09:41:00+01:00"
+        },
+        {
+            "event_ref": 119,
+            "item_type": "photo",
+            "item_ref": 12,
+            "position": 4,
+            "section_label": null,
+            "created_by_email": "Rene.Wells@example.org",
+            "created_at": "2025-11-02T18:33:00+01:00"
+        },
+        {
+            "event_ref": 119,
+            "item_type": "photo",
+            "item_ref": 13,
+            "position": 5,
+            "section_label": null,
+            "created_by_email": "Zahra.Christensen@example.org",
+            "created_at": "2025-11-02T21:47:00+01:00"
+        },
+        {
+            "event_ref": 119,
+            "item_type": "photo",
+            "item_ref": 14,
+            "position": 6,
+            "section_label": null,
+            "created_by_email": "Orlando.Diggs@example.org",
+            "created_at": "2025-11-03T09:44:00+01:00"
+        },
+        {
+            "event_ref": 119,
+            "item_type": "photo",
+            "item_ref": 15,
+            "position": 7,
+            "section_label": null,
+            "created_by_email": "Noah.Pierre@example.org",
+            "created_at": "2025-11-01T22:58:00+01:00"
+        },
+        {
+            "event_ref": 119,
+            "item_type": "photo",
+            "item_ref": 16,
+            "position": 8,
+            "section_label": null,
+            "created_by_email": "Marco.Gross@example.org",
+            "created_at": "2025-11-02T20:16:00+01:00"
+        },
+        {
+            "event_ref": 119,
+            "item_type": "photo",
+            "item_ref": 17,
+            "position": 9,
+            "section_label": null,
+            "created_by_email": "Sienna.Hewitt@example.org",
+            "created_at": "2025-11-02T11:05:00+01:00"
+        },
+        {
+            "event_ref": 119,
+            "item_type": "photo",
+            "item_ref": 18,
+            "position": 10,
+            "section_label": null,
+            "created_by_email": "Noah.Pierre@example.org",
+            "created_at": "2025-11-01T23:02:00+01:00"
+        },
+        {
+            "event_ref": 120,
+            "item_type": "photo",
+            "item_ref": 19,
+            "position": 1,
+            "section_label": null,
+            "created_by_email": "Rene.Wells@example.org",
+            "created_at": "2025-12-20T10:12:00+01:00"
+        },
+        {
+            "event_ref": 120,
+            "item_type": "photo",
+            "item_ref": 20,
+            "position": 2,
+            "section_label": null,
+            "created_by_email": "Marco.Gross@example.org",
+            "created_at": "2025-12-20T09:28:00+01:00"
+        },
+        {
+            "event_ref": 120,
+            "item_type": "photo",
+            "item_ref": 21,
+            "position": 3,
+            "section_label": null,
+            "created_by_email": "Sienna.Hewitt@example.org",
+            "created_at": "2025-12-20T08:50:00+01:00"
+        },
+        {
+            "event_ref": 120,
+            "item_type": "photo",
+            "item_ref": 22,
+            "position": 4,
+            "section_label": null,
+            "created_by_email": "Zahra.Christensen@example.org",
+            "created_at": "2025-12-20T12:19:00+01:00"
+        },
+        {
+            "event_ref": 120,
+            "item_type": "photo",
+            "item_ref": 23,
+            "position": 5,
+            "section_label": null,
+            "created_by_email": "Kari.Rasmussen@example.org",
+            "created_at": "2025-12-21T17:05:00+01:00"
+        },
+        {
+            "event_ref": 120,
+            "item_type": "photo",
+            "item_ref": 24,
+            "position": 6,
+            "section_label": null,
+            "created_by_email": "Kari.Rasmussen@example.org",
+            "created_at": "2025-12-21T17:08:00+01:00"
+        },
+        {
+            "event_ref": 120,
+            "item_type": "photo",
+            "item_ref": 26,
+            "position": 8,
+            "section_label": null,
+            "created_by_email": "Noah.Pierre@example.org",
+            "created_at": "2025-12-20T19:31:00+01:00"
+        },
+        {
+            "event_ref": 120,
+            "item_type": "photo",
+            "item_ref": 27,
+            "position": 9,
+            "section_label": null,
+            "created_by_email": "Rene.Wells@example.org",
+            "created_at": "2025-12-20T10:15:00+01:00"
+        }
+    ],
+    "topics": [],
+    "circulation": [],
+    "comments": [
+        {
+            "target_type": "photo",
+            "target_ref": 9,
+            "email": "Sienna.Hewitt@example.org",
+            "created_at": "2025-11-02T21:30:00+01:00",
+            "content": "How far up were you for this? I did not see anyone go past the second platform."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 9,
+            "email": "Marco.Gross@example.org",
+            "created_at": "2025-11-02T22:04:00+01:00",
+            "content": "Second platform is exactly where I was. Anything higher and the van disappears."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 9,
+            "email": "Noah.Pierre@example.org",
+            "created_at": "2025-11-03T08:12:00+01:00",
+            "content": "The van is the whole picture. Without it this is just a grey deck."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 10,
+            "email": "Orlando.Diggs@example.org",
+            "created_at": "2025-11-02T12:40:00+01:00",
+            "content": "I would cut the sky here. Everything interesting is in the bottom two thirds."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 10,
+            "email": "Sienna.Hewitt@example.org",
+            "created_at": "2025-11-02T13:05:00+01:00",
+            "content": "Tried that and it stopped reading as a road. The sky is what tells you how long the row is."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 11,
+            "email": "Zahra.Christensen@example.org",
+            "created_at": "2025-11-03T11:20:00+01:00",
+            "content": "This is my favourite from the whole walk and none of us were standing anywhere near you."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 11,
+            "email": "Rene.Wells@example.org",
+            "created_at": "2025-11-03T12:02:00+01:00",
+            "content": "Two hundred is cheating a bit. Good cheating though."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 12,
+            "email": "Marco.Gross@example.org",
+            "created_at": "2025-11-03T09:15:00+01:00",
+            "content": "The white superstructure on the left is doing a lot of work holding this together."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 13,
+            "email": "Noah.Pierre@example.org",
+            "created_at": "2025-11-03T07:55:00+01:00",
+            "content": "That green is unreal. Did you touch the saturation at all?"
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 13,
+            "email": "Zahra.Christensen@example.org",
+            "created_at": "2025-11-03T08:41:00+01:00",
+            "content": "Not a bit. Evergreen hulls really are that colour, it is a shock in person too."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 13,
+            "email": "Sienna.Hewitt@example.org",
+            "created_at": "2025-11-03T10:33:00+01:00",
+            "content": "Upright was the right call."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 15,
+            "email": "Rene.Wells@example.org",
+            "created_at": "2025-11-02T09:22:00+01:00",
+            "content": "You could have gone a lot slower than 1/1600 here and kept it sharp."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 15,
+            "email": "Noah.Pierre@example.org",
+            "created_at": "2025-11-02T10:01:00+01:00",
+            "content": "Probably. I had no idea how fast they drop and did not want to find out the hard way."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 17,
+            "email": "Kari.Rasmussen@example.org",
+            "created_at": "2025-11-03T14:50:00+01:00",
+            "content": "Square suits this. I would have ruined it by cropping wide."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 18,
+            "email": "Marco.Gross@example.org",
+            "created_at": "2025-11-02T20:20:00+01:00",
+            "content": "I walked straight past this beam. Annoyed about it."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 21,
+            "email": "Loki.Bright@example.org",
+            "created_at": "2025-12-20T12:04:00+01:00",
+            "content": "Six of us stood in a row and got six versions of this. Yours is the one."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 21,
+            "email": "Kari.Rasmussen@example.org",
+            "created_at": "2025-12-20T13:31:00+01:00",
+            "content": "It is the reflection. You were a step further left than the rest of us and it lines up."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 20,
+            "email": "Sienna.Hewitt@example.org",
+            "created_at": "2025-12-20T12:10:00+01:00",
+            "content": "This is the smarter picture and you know it."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 20,
+            "email": "Zahra.Christensen@example.org",
+            "created_at": "2025-12-20T14:47:00+01:00",
+            "content": "Agreed. Everyone else photographed the view, Marco photographed the place we were standing."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 23,
+            "email": "Rene.Wells@example.org",
+            "created_at": "2025-12-21T19:12:00+01:00",
+            "content": "The mono conversion makes the sky look like weather rather than noise. Nicely done."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 23,
+            "email": "Marco.Gross@example.org",
+            "created_at": "2025-12-21T20:40:00+01:00",
+            "content": "ISO 50 and thirty seconds. There is nothing left to go wrong at that point."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 19,
+            "email": "Noah.Pierre@example.org",
+            "created_at": "2025-12-20T11:33:00+01:00",
+            "content": "Proof that turning up early is worth more than any filter."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 22,
+            "email": "Kari.Rasmussen@example.org",
+            "created_at": "2025-12-20T16:08:00+01:00",
+            "content": "The dark edge on the left is what makes it. Without it the eye falls straight out of the frame."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 27,
+            "email": "Zahra.Christensen@example.org",
+            "created_at": "2025-12-20T15:21:00+01:00",
+            "content": "Did not even notice this corner existed and I walked past it twice."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 29,
+            "email": "Orlando.Diggs@example.org",
+            "created_at": "2025-11-24T10:14:00+01:00",
+            "content": "Where is this exactly? I have looked at the map twice and still cannot place it."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 29,
+            "email": "Rene.Wells@example.org",
+            "created_at": "2025-11-24T11:47:00+01:00",
+            "content": "Bubendeyufer, west of the terminal. Easiest from the ferry stop, then about fifteen minutes on foot."
+        },
+        {
+            "target_type": "photo",
+            "target_ref": 31,
+            "email": "Sienna.Hewitt@example.org",
+            "created_at": "2025-12-20T13:55:00+01:00",
+            "content": "So this is what you were doing while the rest of us were setting up tripods."
+        }
+    ],
+    "change_proposals": [],
+    "trust": [],
+    "wishlist": [],
+    "ballots": [],
+    "images": {
+        "images/01b68c4b7f46de5bf05225435e8d3e58ce92099a.jpg": {
+            "attribution": "Raimond Spekking, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/03b68d5aa16ab672f67b6932825d54864664a40c.jpg": {
+            "attribution": "Matti Blume, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/191d1290c4ff176e56600fccfa534105162d0a33.jpg": {
+            "attribution": "Raimond Spekking, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/198cf2b5455173d8672a4291a30eb9698c394639.jpg": {
+            "attribution": "Oxfordian Kissuth, CC BY-SA 3.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/2b67cae017070f3c0e50b01bcfe428dc8a4bddc9.jpg": {
+            "attribution": "Raimond Spekking, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/2c2f62276a6050d7b0ec57955b56f7eb05835329.jpg": {
+            "attribution": "GeorgHH, Public domain, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/4b779b35268a2cdea58fa00acdfb5a47e298c90b.jpg": {
+            "attribution": "Frank Schulenburg, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/5517f25b3ecefbf12817940ddf41a222f43d227a.jpg": {
+            "attribution": "Carsten Frenzl from Obernburg, Deutschland, CC BY 2.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/58f8e1e03f04a184b0f0f61dc496dae1a38371e5.jpg": {
+            "attribution": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/5a4f907aec93f6af8e24b58e74908f3457f88c4c.jpg": {
+            "attribution": "Ad Meskens, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/7f056ad61957ace5dad8259838babfa2f6ce0d41.jpg": {
+            "attribution": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/830f9fa27df55a3f303188c7626df931fad3c2e4.jpg": {
+            "attribution": "NutzerAusBerlin, CC0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/8a2e67e5add965db4c7fae7a13d96054cbfa354d.jpg": {
+            "attribution": "Eduard47, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/8eaa1f0fad6e7dcb08feeeee3dfa934c10a744f9.jpg": {
+            "attribution": "Eduard47, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/9566489121321d711bcfad249ffd863d593d805d.jpg": {
+            "attribution": "Ajepbah, CC BY-SA 3.0 de, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/97ec8a0638e3ba66bce943ebf144983b618f1308.jpg": {
+            "attribution": "Raimond Spekking, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/9f074b921ba89d596835752dbedb37567aa4e628.jpg": {
+            "attribution": "Klaus Friese, CC BY-SA 2.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/9f3f79545d3e8c0a20cb44da769d882fdd7cc386.jpg": {
+            "attribution": "Eduard47, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/a0cca18dbfb80d84c3644e4ed89131d9f1cb97f5.jpg": {
+            "attribution": "NutzerAusBerlin, CC0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/bf90b8a5ae23109c2a056fb35abd24cf63351e49.jpg": {
+            "attribution": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/c17e7b923ef3ace18708a7d3b2c715d07ff5ad2d.jpg": {
+            "attribution": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/c663dfaee07f7c2ceb25bae8e693ede42695c662.jpg": {
+            "attribution": "Raimond Spekking, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/ea4a0c498172efb7856281e934d98b00064d9d58.jpg": {
+            "attribution": "Matthias Süßen, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/f18d84a78e41c8b761289028cc6ee8e8a79d1ada.jpg": {
+            "attribution": "JoachimKohler-HB, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/ff1107406023abb35cc1a1bdfe8beb289068ce4b.jpg": {
+            "attribution": "Dietmar Rabich, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        }
+    }
+}

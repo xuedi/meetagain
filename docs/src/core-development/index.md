@@ -69,8 +69,8 @@ See [Architecture](architecture.md) for the full dependency rules and plugin sys
 | [Architecture](architecture.md)       | Layer rules, plugin system, Symfony events, directory tour |
 | [Patterns](patterns.md)               | Service, Repository, Entity, Form, Command code examples   |
 | [Frontend](frontend.md)               | Twig templates, Bulma CSS, admin UI, translations          |
-| [Data Fixtures](fixtures.md)          | AbstractFixture, cross-references, fixture groups          |
-| [Testing](testing.md)                 | AAA pattern, test doubles, functional tests, running tests |
+| [Demo Data](demo-data.md)             | Demo archives, `devModeImport`, the import and export CLI  |
+| [Testing](testing.md)                 | AAA pattern, test doubles, running tests                   |
 | [Best Practices](best-practices.md)   | Readonly services, N+1, enums, HTML sanitization           |
 | [Developer Tooling](tooling.md)       | The commit-hook guards, `just buildTools`, tool config     |
 | [Troubleshooting](troubleshooting.md) | Common problems and how to fix them                        |

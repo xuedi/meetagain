@@ -1,0 +1,1393 @@
+{
+    "format": "meetagain-group-export",
+    "version": "2.0",
+    "exported_at": "2026-01-05T00:00:00+01:00",
+    "plugins": [
+        "films",
+        "photos",
+        "wishlist"
+    ],
+    "site": {
+        "slug": "berlin-cinephile-club",
+        "name": "Berlin Cinephile Club",
+        "description": "A film club for movie lovers in Berlin. We pick a film by member vote every two weeks, watch it together at an arthouse cinema, and stay afterwards to talk about what we just saw. From classics to current festival hits.",
+        "languages": [
+            "de",
+            "en"
+        ],
+        "theme_colors": [],
+        "settings": {
+            "send_event_reminders": true,
+            "send_rsvp_notifications": true,
+            "send_upcoming_digest": true,
+            "show_town_hall": true
+        },
+        "plugin_settings": {
+            "films": {
+                "adapter": null
+            },
+            "photos": {
+                "memberUploads": true,
+                "showCameraMeta": true,
+                "memberStreams": true,
+                "eventBox": true,
+                "contest": false,
+                "contestSubmissionsPerMember": 1
+            }
+        },
+        "logo_file": "images/cb951a327688ce6c9821f1a7ce552e5c5f7a255e.png"
+    },
+    "locations": [
+        {
+            "ref": 11,
+            "title": "Kino Central",
+            "latitude": "52.5252",
+            "longitude": "13.4017",
+            "city": "Berlin",
+            "country": ""
+        }
+    ],
+    "users": [
+        {
+            "email": "admin@example.org",
+            "name": "admin",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
+            "public": true,
+            "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
+        },
+        {
+            "email": "Crystal.Liu@example.org",
+            "name": "Crystal Liu",
+            "locale": "zh",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
+            "public": true,
+            "image_file": "images/c79532c476e00a2400292babd40d98ac7dff9997.jpg"
+        },
+        {
+            "email": "Belle.Woods@example.org",
+            "name": "Belle Woods",
+            "locale": "zh",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Lover of adventure and creativity, I dive into painting and hiking when I'm not crafting magic in marketing! 🌟✨ #HobbyistHeart #WorkAndPlay",
+            "public": true,
+            "image_file": "images/6d10ed55842a62725ad954d7fa56fe1e735feb14.jpg"
+        },
+        {
+            "email": "Drew.Cano@example.org",
+            "name": "Drew Cano",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker and creative soul, I explore the world through hiking trails and paintbrush strokes. Join me on my journey of discovery! #HikingAdventures #ArtisticLife",
+            "public": true,
+            "image_file": "images/6bfd89ee2dda2c5201ce92bce759705f5ff2b894.jpg"
+        },
+        {
+            "email": "Eduard.Franz@example.org",
+            "name": "Eduard Franz",
+            "locale": "de",
+            "role": "admin",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting and hiking, I find inspiration in nature's beauty. Balancing my love for creativity with a career in graphic design keeps my heart and mind alive! #ArtLover #NatureEnthusiast #CreativeCareer",
+            "public": true,
+            "image_file": "images/d46c6eeb1acfdf34977f6795275a285750326133.jpg"
+        },
+        {
+            "email": "Lana.Steiner@example.org",
+            "name": "Lana Steiner",
+            "locale": "en",
+            "role": "organizer",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker by day, crafting wizard by night! When I'm not doodling my dreams, you'll catch me hiking or whipping up some delicious treats! 🌟🏞️ #Wanderlust #CreativeSoul",
+            "public": true,
+            "image_file": "images/bd95fda4637e37c983d108f9de761c50b4cd2462.jpg"
+        },
+        {
+            "email": "Phoenix.Baker@example.org",
+            "name": "Phoenix Baker",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker with a passion for painting and hiking. Catch me exploring the great outdoors or getting lost in colors! #Wanderlust #ArtLover 🎨⛰️",
+            "public": true,
+            "image_file": "images/da483b78e3e3bfd30953876637bcdaf2fe97ef89.jpg"
+        }
+    ],
+    "hosts": [
+        {
+            "ref": 11,
+            "name": "CinemaMarie",
+            "email": null
+        }
+    ],
+    "series": [
+        {
+            "ref": 7,
+            "name": "Biweekly Movie Night - Past",
+            "rule": "BiMonthly",
+            "ruleSpec": null
+        },
+        {
+            "ref": 8,
+            "name": "Biweekly Movie Night - Upcoming",
+            "rule": "BiMonthly",
+            "ruleSpec": null
+        }
+    ],
+    "events": [
+        {
+            "ref": 56,
+            "initial": true,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Vergangen",
+                "en": "Biweekly Movie Night - Past"
+            },
+            "descriptions": {
+                "de": "Die Mitglieder haben den Film zwei Wochen vor der Vorführung per Abstimmung ausgewählt. Wir trafen uns im Kino Central für einen Abend Originalfassung mit anschließender Diskussion.",
+                "en": "Members picked the film through a poll two weeks before the screening. We met at Kino Central for an evening of original-language cinema followed by a moderated discussion."
+            },
+            "teasers": {
+                "de": "Unsere letzte Vorführung - gewählt, geschaut und bei einem Glas Wein heftig diskutiert.",
+                "en": "Our last screening - we voted, we watched, we argued about it afterwards over a glass of wine."
+            },
+            "start": "2025-12-12T20:00:00+01:00",
+            "stop": "2025-12-12T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 7,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 57,
+            "initial": true,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Kommend",
+                "en": "Biweekly Movie Night - Upcoming"
+            },
+            "descriptions": {
+                "de": "Stimmt vor der Deadline für einen der Vorschläge ab. Treffpunkt Kino Central, ab 19:30 Uhr Getränke an der Bar.",
+                "en": "Cast your vote on the suggestions thread before the deadline. We meet at Kino Central, drinks at the bar from 19:30."
+            },
+            "teasers": {
+                "de": "Unsere nächste Vorführung. Die Abstimmung läuft - entscheidet mit, was wir gemeinsam schauen.",
+                "en": "Our next screening. Voting is open now - pick what we watch together."
+            },
+            "start": "2026-01-16T20:00:00+01:00",
+            "stop": "2026-01-16T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 8,
+            "featured": true,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 58,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Vergangen",
+                "en": "Biweekly Movie Night - Past"
+            },
+            "descriptions": {
+                "de": "Die Mitglieder haben den Film zwei Wochen vor der Vorführung per Abstimmung ausgewählt. Wir trafen uns im Kino Central für einen Abend Originalfassung mit anschließender Diskussion.",
+                "en": "Members picked the film through a poll two weeks before the screening. We met at Kino Central for an evening of original-language cinema followed by a moderated discussion."
+            },
+            "teasers": {
+                "de": "Unsere letzte Vorführung - gewählt, geschaut und bei einem Glas Wein heftig diskutiert.",
+                "en": "Our last screening - we voted, we watched, we argued about it afterwards over a glass of wine."
+            },
+            "start": "2026-01-09T20:00:00+01:00",
+            "stop": "2026-01-09T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 7,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 59,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Vergangen",
+                "en": "Biweekly Movie Night - Past"
+            },
+            "descriptions": {
+                "de": "Die Mitglieder haben den Film zwei Wochen vor der Vorführung per Abstimmung ausgewählt. Wir trafen uns im Kino Central für einen Abend Originalfassung mit anschließender Diskussion.",
+                "en": "Members picked the film through a poll two weeks before the screening. We met at Kino Central for an evening of original-language cinema followed by a moderated discussion."
+            },
+            "teasers": {
+                "de": "Unsere letzte Vorführung - gewählt, geschaut und bei einem Glas Wein heftig diskutiert.",
+                "en": "Our last screening - we voted, we watched, we argued about it afterwards over a glass of wine."
+            },
+            "start": "2026-01-23T20:00:00+01:00",
+            "stop": "2026-01-23T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 7,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 60,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Vergangen",
+                "en": "Biweekly Movie Night - Past"
+            },
+            "descriptions": {
+                "de": "Die Mitglieder haben den Film zwei Wochen vor der Vorführung per Abstimmung ausgewählt. Wir trafen uns im Kino Central für einen Abend Originalfassung mit anschließender Diskussion.",
+                "en": "Members picked the film through a poll two weeks before the screening. We met at Kino Central for an evening of original-language cinema followed by a moderated discussion."
+            },
+            "teasers": {
+                "de": "Unsere letzte Vorführung - gewählt, geschaut und bei einem Glas Wein heftig diskutiert.",
+                "en": "Our last screening - we voted, we watched, we argued about it afterwards over a glass of wine."
+            },
+            "start": "2026-02-06T20:00:00+01:00",
+            "stop": "2026-02-06T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 7,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 61,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Vergangen",
+                "en": "Biweekly Movie Night - Past"
+            },
+            "descriptions": {
+                "de": "Die Mitglieder haben den Film zwei Wochen vor der Vorführung per Abstimmung ausgewählt. Wir trafen uns im Kino Central für einen Abend Originalfassung mit anschließender Diskussion.",
+                "en": "Members picked the film through a poll two weeks before the screening. We met at Kino Central for an evening of original-language cinema followed by a moderated discussion."
+            },
+            "teasers": {
+                "de": "Unsere letzte Vorführung - gewählt, geschaut und bei einem Glas Wein heftig diskutiert.",
+                "en": "Our last screening - we voted, we watched, we argued about it afterwards over a glass of wine."
+            },
+            "start": "2026-02-20T20:00:00+01:00",
+            "stop": "2026-02-20T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 7,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 62,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Vergangen",
+                "en": "Biweekly Movie Night - Past"
+            },
+            "descriptions": {
+                "de": "Die Mitglieder haben den Film zwei Wochen vor der Vorführung per Abstimmung ausgewählt. Wir trafen uns im Kino Central für einen Abend Originalfassung mit anschließender Diskussion.",
+                "en": "Members picked the film through a poll two weeks before the screening. We met at Kino Central for an evening of original-language cinema followed by a moderated discussion."
+            },
+            "teasers": {
+                "de": "Unsere letzte Vorführung - gewählt, geschaut und bei einem Glas Wein heftig diskutiert.",
+                "en": "Our last screening - we voted, we watched, we argued about it afterwards over a glass of wine."
+            },
+            "start": "2026-03-06T20:00:00+01:00",
+            "stop": "2026-03-06T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 7,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 63,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Vergangen",
+                "en": "Biweekly Movie Night - Past"
+            },
+            "descriptions": {
+                "de": "Die Mitglieder haben den Film zwei Wochen vor der Vorführung per Abstimmung ausgewählt. Wir trafen uns im Kino Central für einen Abend Originalfassung mit anschließender Diskussion.",
+                "en": "Members picked the film through a poll two weeks before the screening. We met at Kino Central for an evening of original-language cinema followed by a moderated discussion."
+            },
+            "teasers": {
+                "de": "Unsere letzte Vorführung - gewählt, geschaut und bei einem Glas Wein heftig diskutiert.",
+                "en": "Our last screening - we voted, we watched, we argued about it afterwards over a glass of wine."
+            },
+            "start": "2026-03-20T20:00:00+01:00",
+            "stop": "2026-03-20T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 7,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 64,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Vergangen",
+                "en": "Biweekly Movie Night - Past"
+            },
+            "descriptions": {
+                "de": "Die Mitglieder haben den Film zwei Wochen vor der Vorführung per Abstimmung ausgewählt. Wir trafen uns im Kino Central für einen Abend Originalfassung mit anschließender Diskussion.",
+                "en": "Members picked the film through a poll two weeks before the screening. We met at Kino Central for an evening of original-language cinema followed by a moderated discussion."
+            },
+            "teasers": {
+                "de": "Unsere letzte Vorführung - gewählt, geschaut und bei einem Glas Wein heftig diskutiert.",
+                "en": "Our last screening - we voted, we watched, we argued about it afterwards over a glass of wine."
+            },
+            "start": "2026-04-03T20:00:00+02:00",
+            "stop": "2026-04-03T23:30:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 7,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 65,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Kommend",
+                "en": "Biweekly Movie Night - Upcoming"
+            },
+            "descriptions": {
+                "de": "Stimmt vor der Deadline für einen der Vorschläge ab. Treffpunkt Kino Central, ab 19:30 Uhr Getränke an der Bar.",
+                "en": "Cast your vote on the suggestions thread before the deadline. We meet at Kino Central, drinks at the bar from 19:30."
+            },
+            "teasers": {
+                "de": "Unsere nächste Vorführung. Die Abstimmung läuft - entscheidet mit, was wir gemeinsam schauen.",
+                "en": "Our next screening. Voting is open now - pick what we watch together."
+            },
+            "start": "2026-01-30T20:00:00+01:00",
+            "stop": "2026-01-30T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 8,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 66,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Kommend",
+                "en": "Biweekly Movie Night - Upcoming"
+            },
+            "descriptions": {
+                "de": "Stimmt vor der Deadline für einen der Vorschläge ab. Treffpunkt Kino Central, ab 19:30 Uhr Getränke an der Bar.",
+                "en": "Cast your vote on the suggestions thread before the deadline. We meet at Kino Central, drinks at the bar from 19:30."
+            },
+            "teasers": {
+                "de": "Unsere nächste Vorführung. Die Abstimmung läuft - entscheidet mit, was wir gemeinsam schauen.",
+                "en": "Our next screening. Voting is open now - pick what we watch together."
+            },
+            "start": "2026-02-13T20:00:00+01:00",
+            "stop": "2026-02-13T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 8,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 67,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Kommend",
+                "en": "Biweekly Movie Night - Upcoming"
+            },
+            "descriptions": {
+                "de": "Stimmt vor der Deadline für einen der Vorschläge ab. Treffpunkt Kino Central, ab 19:30 Uhr Getränke an der Bar.",
+                "en": "Cast your vote on the suggestions thread before the deadline. We meet at Kino Central, drinks at the bar from 19:30."
+            },
+            "teasers": {
+                "de": "Unsere nächste Vorführung. Die Abstimmung läuft - entscheidet mit, was wir gemeinsam schauen.",
+                "en": "Our next screening. Voting is open now - pick what we watch together."
+            },
+            "start": "2026-02-27T20:00:00+01:00",
+            "stop": "2026-02-27T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 8,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 68,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Kommend",
+                "en": "Biweekly Movie Night - Upcoming"
+            },
+            "descriptions": {
+                "de": "Stimmt vor der Deadline für einen der Vorschläge ab. Treffpunkt Kino Central, ab 19:30 Uhr Getränke an der Bar.",
+                "en": "Cast your vote on the suggestions thread before the deadline. We meet at Kino Central, drinks at the bar from 19:30."
+            },
+            "teasers": {
+                "de": "Unsere nächste Vorführung. Die Abstimmung läuft - entscheidet mit, was wir gemeinsam schauen.",
+                "en": "Our next screening. Voting is open now - pick what we watch together."
+            },
+            "start": "2026-03-13T20:00:00+01:00",
+            "stop": "2026-03-13T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 8,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 69,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentlicher Filmabend - Kommend",
+                "en": "Biweekly Movie Night - Upcoming"
+            },
+            "descriptions": {
+                "de": "Stimmt vor der Deadline für einen der Vorschläge ab. Treffpunkt Kino Central, ab 19:30 Uhr Getränke an der Bar.",
+                "en": "Cast your vote on the suggestions thread before the deadline. We meet at Kino Central, drinks at the bar from 19:30."
+            },
+            "teasers": {
+                "de": "Unsere nächste Vorführung. Die Abstimmung läuft - entscheidet mit, was wir gemeinsam schauen.",
+                "en": "Our next screening. Voting is open now - pick what we watch together."
+            },
+            "start": "2026-03-27T20:00:00+01:00",
+            "stop": "2026-03-27T23:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 8,
+            "featured": false,
+            "location_ref": 11,
+            "host_refs": [
+                11
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        }
+    ],
+    "rsvps": [
+        {
+            "event_ref": 56,
+            "email": "Belle.Woods@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 56,
+            "email": "Crystal.Liu@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 56,
+            "email": "Drew.Cano@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 56,
+            "email": "Eduard.Franz@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 56,
+            "email": "Lana.Steiner@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 56,
+            "email": "Phoenix.Baker@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 57,
+            "email": "Belle.Woods@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 57,
+            "email": "Drew.Cano@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 57,
+            "email": "Eduard.Franz@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 57,
+            "email": "Lana.Steiner@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 57,
+            "email": "Phoenix.Baker@example.org",
+            "guests": 0
+        }
+    ],
+    "cms_pages": [
+        {
+            "ref": 12,
+            "slug": "index",
+            "published": true,
+            "titles": {
+                "de": "Berliner Cinephilenclub",
+                "en": "Berlin Cinephile Club"
+            },
+            "link_names": {
+                "de": "Startseite",
+                "en": "Home"
+            },
+            "menu_locations": [],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 1,
+                    "priority": 1,
+                    "json": {
+                        "title": "Cinema together, every other Friday"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 1,
+                    "priority": 2,
+                    "json": {
+                        "title": "Kino zusammen, jeden zweiten Freitag"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 3,
+                    "json": {
+                        "title": "How it works",
+                        "content": "Every two weeks we pick a film together through an open poll. We meet at an arthouse cinema in Berlin, watch the film in its original language, and stay afterwards for drinks and a moderated discussion. Newcomers are very welcome."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 4,
+                    "json": {
+                        "title": "So funktioniert es",
+                        "content": "Alle zwei Wochen wählen wir gemeinsam per Abstimmung einen Film. Wir treffen uns in einem Berliner Programmkino, schauen den Film in Originalfassung und bleiben anschließend zusammen für Getränke und eine moderierte Diskussion. Neue Gesichter herzlich willkommen."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 5,
+                    "json": {
+                        "title": "Suggest a film",
+                        "content": "Members can suggest films at any time. Once a suggestion is approved by an organizer it joins the next biweekly poll. The winning film becomes our next screening - simple as that."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 6,
+                    "json": {
+                        "title": "Einen Film vorschlagen",
+                        "content": "Mitglieder können jederzeit Filme vorschlagen. Nach Freigabe durch einen Organisator landet der Vorschlag in der nächsten Abstimmung. Der Gewinner wird beim nächsten Filmabend gezeigt - so einfach ist das."
+                    },
+                    "image_file": null
+                }
+            ]
+        }
+    ],
+    "announcements": [],
+    "tags": [
+        {
+            "ref": 18,
+            "item_type": "film",
+            "parent_ref": null,
+            "position": 0,
+            "labels": {
+                "de": "Drama",
+                "en": "Drama"
+            },
+            "managed": false
+        },
+        {
+            "ref": 19,
+            "item_type": "film",
+            "parent_ref": 18,
+            "position": 1,
+            "labels": {
+                "de": "Familiendrama",
+                "en": "Family drama"
+            },
+            "managed": false
+        },
+        {
+            "ref": 20,
+            "item_type": "film",
+            "parent_ref": 18,
+            "position": 2,
+            "labels": {
+                "de": "Roadmovie",
+                "en": "Road movie"
+            },
+            "managed": false
+        },
+        {
+            "ref": 21,
+            "item_type": "film",
+            "parent_ref": null,
+            "position": 3,
+            "labels": {
+                "de": "Science-Fiction",
+                "en": "Science fiction"
+            },
+            "managed": false
+        },
+        {
+            "ref": 22,
+            "item_type": "film",
+            "parent_ref": null,
+            "position": 4,
+            "labels": {
+                "de": "Spielfilm",
+                "en": "Feature"
+            },
+            "managed": false
+        },
+        {
+            "ref": 23,
+            "item_type": "film",
+            "parent_ref": null,
+            "position": 5,
+            "labels": {
+                "de": "Kurzfilm",
+                "en": "Short"
+            },
+            "managed": false
+        }
+    ],
+    "items": {
+        "film": {
+            "rows": [
+                {
+                    "ref": 16,
+                    "title": "Parasite",
+                    "original_title": "기생충",
+                    "year": 2019,
+                    "runtime": 132,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A poor family schemes to become employed by a wealthy household and infiltrate their lives one by one.",
+                    "genres": [
+                        "Drama",
+                        "Thriller"
+                    ],
+                    "poster_image": "images/c73808a7d7c7d3ea115e3cf92ab7154a26a8eaa8.jpg"
+                },
+                {
+                    "ref": 17,
+                    "title": "In the Mood for Love",
+                    "original_title": "花樣年華",
+                    "year": 2000,
+                    "runtime": 98,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "Two neighbours form a bond after both suspect their spouses of infidelity, in 1960s Hong Kong.",
+                    "genres": [
+                        "Drama",
+                        "Romance"
+                    ],
+                    "poster_image": "images/eada1a75da8b9dccdcde88cbf519eb0f40367a75.jpg"
+                },
+                {
+                    "ref": 18,
+                    "title": "Drive My Car",
+                    "original_title": "ドライブ・マイ・カー",
+                    "year": 2021,
+                    "runtime": 179,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A grieving stage director forms a quiet bond with the young woman assigned to be his driver.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/79cd74699bd8110f501efe6b21223dee167c3b4d.jpg"
+                },
+                {
+                    "ref": 19,
+                    "title": "The Zone of Interest",
+                    "original_title": null,
+                    "year": 2023,
+                    "runtime": 105,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "The commandant of Auschwitz and his wife build a dream life in a house next to the camp wall.",
+                    "genres": [
+                        "Drama",
+                        "History"
+                    ],
+                    "poster_image": "images/3d2b75f7017339fb1975b3f1020d72cdb69fef75.jpg"
+                },
+                {
+                    "ref": 20,
+                    "title": "Perfect Days",
+                    "original_title": null,
+                    "year": 2023,
+                    "runtime": 124,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A Tokyo toilet cleaner finds contentment in routine, music, books, and the small beauty of everyday life.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/a685151134a83b96106e9d7bc42a625f77ef6fe0.jpg"
+                },
+                {
+                    "ref": 21,
+                    "title": "Aftersun",
+                    "original_title": null,
+                    "year": 2022,
+                    "runtime": 102,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A woman recalls a holiday with her young father twenty years earlier, piecing together who he was.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/e4ebc4473c9f52c5c01c9c8d0fedec23bf1de5e8.jpg"
+                },
+                {
+                    "ref": 22,
+                    "title": "Past Lives",
+                    "original_title": null,
+                    "year": 2023,
+                    "runtime": 105,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "Two childhood friends separated by emigration meet again in New York twenty-four years later.",
+                    "genres": [
+                        "Drama",
+                        "Romance"
+                    ],
+                    "poster_image": "images/86b8fda5644dbeee8336cd8a28743557ec0aabbf.jpg"
+                },
+                {
+                    "ref": 23,
+                    "title": "Anatomy of a Fall",
+                    "original_title": "Anatomie d'une chute",
+                    "year": 2023,
+                    "runtime": 151,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A writer stands trial for her husband's death, with their half-blind son as the only witness.",
+                    "genres": [
+                        "Drama",
+                        "Crime"
+                    ],
+                    "poster_image": "images/09446ea3f44945f26a39124051980555f6d67c66.jpg"
+                },
+                {
+                    "ref": 24,
+                    "title": "Burning",
+                    "original_title": "버닝",
+                    "year": 2018,
+                    "runtime": 148,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A young writer suspects the wealthy stranger who befriended him of something he cannot prove.",
+                    "genres": [
+                        "Drama",
+                        "Mystery"
+                    ],
+                    "poster_image": "images/3ac8f4ccde99d1a554265c89a92f6c655f1b4966.jpg"
+                },
+                {
+                    "ref": 25,
+                    "title": "Shoplifters",
+                    "original_title": "万引き家族",
+                    "year": 2018,
+                    "runtime": 121,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A makeshift Tokyo family living off petty theft takes in a neglected girl, and their secrets unravel.",
+                    "genres": [
+                        "Drama",
+                        "Crime"
+                    ],
+                    "poster_image": "images/8f0961a2c3c7713175eb450849bde64abfc337df.jpg"
+                },
+                {
+                    "ref": 26,
+                    "title": "Portrait of a Lady on Fire",
+                    "original_title": "Portrait de la jeune fille en feu",
+                    "year": 2019,
+                    "runtime": 122,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A painter sent to a Breton island must paint a reluctant bride without her ever sitting for it.",
+                    "genres": [
+                        "Drama",
+                        "Romance"
+                    ],
+                    "poster_image": "images/f0089e272461524f7b63d85d1d5e2c7bcdb638e3.jpg"
+                },
+                {
+                    "ref": 27,
+                    "title": "The Handmaiden",
+                    "original_title": "아가씨",
+                    "year": 2016,
+                    "runtime": 145,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A pickpocket is planted as maid to a Japanese heiress in a con that keeps changing hands.",
+                    "genres": [
+                        "Drama",
+                        "Thriller"
+                    ],
+                    "poster_image": "images/194862eff1ef9436606c0c41d9198e93d2d8d4dd.jpg"
+                },
+                {
+                    "ref": 28,
+                    "title": "Roma",
+                    "original_title": null,
+                    "year": 2018,
+                    "runtime": 135,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A year in the life of a live-in housekeeper for a middle-class family in 1970s Mexico City.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/78a939453a49ed97d5b9d27602205229ee838184.jpg"
+                },
+                {
+                    "ref": 29,
+                    "title": "Cold War",
+                    "original_title": "Zimna wojna",
+                    "year": 2018,
+                    "runtime": 89,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "Two musicians love each other badly across two decades and both sides of the Iron Curtain.",
+                    "genres": [
+                        "Drama",
+                        "Romance"
+                    ],
+                    "poster_image": "images/64b3b07ff10e503abdeeda982b07e8eb7a24cfc7.jpg"
+                },
+                {
+                    "ref": 30,
+                    "title": "First Cow",
+                    "original_title": null,
+                    "year": 2019,
+                    "runtime": 122,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "Two drifters in 1820s Oregon build a small fortune on milk quietly taken from the territory's only cow.",
+                    "genres": [
+                        "Drama",
+                        "Western"
+                    ],
+                    "poster_image": "images/6354789f4fbb792ce712b4488880e468e04f0785.jpg"
+                },
+                {
+                    "ref": 31,
+                    "title": "Petite Maman",
+                    "original_title": null,
+                    "year": 2021,
+                    "runtime": 73,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "Clearing out her grandmother's house, an eight-year-old meets a girl her own age in the woods.",
+                    "genres": [
+                        "Drama",
+                        "Fantasy"
+                    ],
+                    "poster_image": "images/d4f7d9bc16b69c2c917750aec99d16c8b1e052e1.jpg"
+                }
+            ],
+            "tags": {
+                "16": [
+                    18,
+                    19
+                ],
+                "17": [
+                    18
+                ],
+                "18": [
+                    18,
+                    20
+                ],
+                "19": [
+                    21
+                ],
+                "21": [
+                    18,
+                    19
+                ],
+                "22": [
+                    18
+                ],
+                "23": [
+                    18,
+                    19
+                ],
+                "24": [
+                    18
+                ],
+                "25": [
+                    18,
+                    19
+                ],
+                "26": [
+                    18
+                ],
+                "27": [
+                    18
+                ],
+                "28": [
+                    18,
+                    19
+                ],
+                "29": [
+                    18
+                ],
+                "30": [
+                    18
+                ],
+                "31": [
+                    18,
+                    19
+                ]
+            }
+        },
+        "photo": {
+            "rows": [
+                {
+                    "ref": 6,
+                    "translations": {
+                        "en": {
+                            "title": "Foyer before the screening",
+                            "description": "Half the club still arguing about the shortlist."
+                        },
+                        "de": {
+                            "title": "Foyer vor der Vorstellung",
+                            "description": "Der halbe Club streitet noch über die Shortlist."
+                        }
+                    },
+                    "meta": {
+                        "make": "SONY",
+                        "model": "ILCE-6400",
+                        "lens": "E 16-55mm F2.8 G",
+                        "exposureTime": "1/40",
+                        "fNumber": 2.8,
+                        "iso": 6400,
+                        "focalLength": 24,
+                        "focalLength35": 36,
+                        "exposureBias": -0.67,
+                        "flash": false,
+                        "whiteBalance": 1,
+                        "meteringMode": 2,
+                        "takenAt": "2026-07-23 21:34:12",
+                        "width": 1600,
+                        "height": 1067
+                    },
+                    "taken_at": "2026-07-23 21:34:12",
+                    "image": "images/d3b324cfa991d2b2584f7c7aa4388562fe8a0a92.jpg",
+                    "uploader_email": "Drew.Cano@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 7,
+                    "translations": {
+                        "en": {
+                            "title": "The projector",
+                            "description": "Still a 35mm machine, still louder than the trailers."
+                        }
+                    },
+                    "meta": {
+                        "make": "Apple",
+                        "model": "iPhone 14",
+                        "lens": "iPhone 14 back dual wide camera 5.7mm f/1.5",
+                        "exposureTime": "1/120",
+                        "fNumber": 1.5,
+                        "iso": 500,
+                        "focalLength": 5.7,
+                        "focalLength35": 26,
+                        "exposureBias": 0,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-07-23 22:08:55",
+                        "width": 1400,
+                        "height": 1400
+                    },
+                    "taken_at": "2026-07-23 22:08:55",
+                    "image": "images/e8a3f6a74e2202713e5728cc2c5aaa8b883928cc.jpg",
+                    "uploader_email": "Drew.Cano@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 8,
+                    "translations": [],
+                    "meta": {
+                        "make": "Canon",
+                        "model": "Canon EOS R8",
+                        "lens": "RF35mm F1.8 MACRO IS STM",
+                        "exposureTime": "1/30",
+                        "fNumber": 1.8,
+                        "iso": 12800,
+                        "focalLength": 35,
+                        "focalLength35": 35,
+                        "exposureBias": 0.33,
+                        "flash": true,
+                        "whiteBalance": 1,
+                        "meteringMode": 3,
+                        "takenAt": "2026-07-23 23:47:02",
+                        "width": 1800,
+                        "height": 1200
+                    },
+                    "taken_at": "2026-07-23 23:47:02",
+                    "image": "images/2e061932bf26c75e0438c6b260102ec90e06a53a.jpg",
+                    "uploader_email": "Drew.Cano@example.org",
+                    "contest_submitted": false
+                }
+            ],
+            "tags": []
+        }
+    },
+    "event_items": [
+        {
+            "event_ref": 56,
+            "item_type": "film",
+            "item_ref": 16,
+            "position": null,
+            "section_label": null,
+            "created_by_email": "Eduard.Franz@example.org",
+            "created_at": "2025-11-14T20:00:00+01:00"
+        },
+        {
+            "event_ref": 56,
+            "item_type": "photo",
+            "item_ref": 6,
+            "position": 1,
+            "section_label": null,
+            "created_by_email": "Drew.Cano@example.org",
+            "created_at": "2025-12-13T10:00:00+01:00"
+        },
+        {
+            "event_ref": 56,
+            "item_type": "photo",
+            "item_ref": 7,
+            "position": 2,
+            "section_label": null,
+            "created_by_email": "Drew.Cano@example.org",
+            "created_at": "2025-12-13T10:05:00+01:00"
+        },
+        {
+            "event_ref": 56,
+            "item_type": "photo",
+            "item_ref": 8,
+            "position": 3,
+            "section_label": null,
+            "created_by_email": "Drew.Cano@example.org",
+            "created_at": "2025-12-13T10:10:00+01:00"
+        }
+    ],
+    "topics": [
+        {
+            "ref": 6,
+            "parent_ref": null,
+            "title": "Screening suggestions",
+            "author_email": "Eduard.Franz@example.org",
+            "created_at": "2025-12-15T18:00:00+01:00"
+        },
+        {
+            "ref": 7,
+            "parent_ref": 6,
+            "title": "classics",
+            "author_email": "Lana.Steiner@example.org",
+            "created_at": "2025-12-15T18:00:00+01:00"
+        },
+        {
+            "ref": 8,
+            "parent_ref": null,
+            "title": "off topic",
+            "author_email": "Belle.Woods@example.org",
+            "created_at": "2025-12-15T18:00:00+01:00"
+        }
+    ],
+    "circulation": [],
+    "comments": [
+        {
+            "target_type": "topic",
+            "target_ref": 6,
+            "email": "Drew.Cano@example.org",
+            "created_at": "2025-12-27T00:00:00+01:00",
+            "content": "Seconded, and the arthouse near the canal shows his restorations."
+        },
+        {
+            "target_type": "topic",
+            "target_ref": 7,
+            "email": "Crystal.Liu@example.org",
+            "created_at": "2025-12-26T00:00:00+01:00",
+            "content": "Anything pre-1960 counts here, no arguing about the exact year."
+        },
+        {
+            "target_type": "topic",
+            "target_ref": 8,
+            "email": "Drew.Cano@example.org",
+            "created_at": "2025-12-26T00:00:00+01:00",
+            "content": "Where is everyone going after the screening?"
+        }
+    ],
+    "change_proposals": [],
+    "trust": [],
+    "wishlist": [
+        {
+            "email": "Lana.Steiner@example.org",
+            "item_type": "film",
+            "item_ref": 20,
+            "priority_counter": 0,
+            "created_at": "2025-11-30T20:00:00+01:00"
+        },
+        {
+            "email": "Lana.Steiner@example.org",
+            "item_type": "film",
+            "item_ref": 21,
+            "priority_counter": 0,
+            "created_at": "2025-11-30T20:00:00+01:00"
+        },
+        {
+            "email": "Belle.Woods@example.org",
+            "item_type": "film",
+            "item_ref": 21,
+            "priority_counter": 0,
+            "created_at": "2025-11-30T20:00:00+01:00"
+        },
+        {
+            "email": "Belle.Woods@example.org",
+            "item_type": "film",
+            "item_ref": 19,
+            "priority_counter": 0,
+            "created_at": "2025-11-30T20:00:00+01:00"
+        },
+        {
+            "email": "Drew.Cano@example.org",
+            "item_type": "film",
+            "item_ref": 20,
+            "priority_counter": 0,
+            "created_at": "2025-11-30T20:00:00+01:00"
+        },
+        {
+            "email": "Drew.Cano@example.org",
+            "item_type": "film",
+            "item_ref": 17,
+            "priority_counter": 0,
+            "created_at": "2025-11-30T20:00:00+01:00"
+        }
+    ],
+    "ballots": [
+        {
+            "purpose": "event.item.film",
+            "title": null,
+            "subject_type": "event",
+            "subject_ref": 56,
+            "status": "tallied",
+            "tally_mode": "single",
+            "settlement_mode": "automatic",
+            "deadline": "2025-12-11T20:00:00+01:00",
+            "opened_by_email": "Eduard.Franz@example.org",
+            "winning_key": "16",
+            "tied_keys": [],
+            "settled_by_email": null,
+            "settled_at": null,
+            "created_at": "2025-11-14T20:00:00+01:00",
+            "candidates": [
+                {
+                    "key": "16",
+                    "label": "Parasite 2019"
+                },
+                {
+                    "key": "17",
+                    "label": "In the Mood for Love 2000"
+                },
+                {
+                    "key": "18",
+                    "label": "Drive My Car 2021"
+                },
+                {
+                    "key": "19",
+                    "label": "The Zone of Interest 2023"
+                }
+            ],
+            "votes": [
+                {
+                    "email": "Belle.Woods@example.org",
+                    "keys": [
+                        "16"
+                    ]
+                },
+                {
+                    "email": "Crystal.Liu@example.org",
+                    "keys": [
+                        "19"
+                    ]
+                },
+                {
+                    "email": "Drew.Cano@example.org",
+                    "keys": [
+                        "18"
+                    ]
+                },
+                {
+                    "email": "Eduard.Franz@example.org",
+                    "keys": [
+                        "16"
+                    ]
+                },
+                {
+                    "email": "Lana.Steiner@example.org",
+                    "keys": [
+                        "16"
+                    ]
+                }
+            ]
+        },
+        {
+            "purpose": "event.item.film",
+            "title": null,
+            "subject_type": "event",
+            "subject_ref": 57,
+            "status": "open",
+            "tally_mode": "single",
+            "settlement_mode": "automatic",
+            "deadline": "2026-01-15T20:00:00+01:00",
+            "opened_by_email": "Eduard.Franz@example.org",
+            "winning_key": null,
+            "tied_keys": [],
+            "settled_by_email": null,
+            "settled_at": null,
+            "created_at": "2025-12-19T20:00:00+01:00",
+            "candidates": [
+                {
+                    "key": "20",
+                    "label": "Perfect Days 2023"
+                },
+                {
+                    "key": "21",
+                    "label": "Aftersun 2022"
+                },
+                {
+                    "key": "18",
+                    "label": "Drive My Car 2021"
+                }
+            ],
+            "votes": [
+                {
+                    "email": "Belle.Woods@example.org",
+                    "keys": [
+                        "18"
+                    ]
+                },
+                {
+                    "email": "Eduard.Franz@example.org",
+                    "keys": [
+                        "20"
+                    ]
+                },
+                {
+                    "email": "Lana.Steiner@example.org",
+                    "keys": [
+                        "21"
+                    ]
+                }
+            ]
+        }
+    ],
+    "images": []
+}

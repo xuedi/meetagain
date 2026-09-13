@@ -31,6 +31,25 @@ class CirculationLedgerEntryRepository extends ServiceEntityRepository
     }
 
     /**
+     * @return array<string, string> context => item type
+     */
+    public function findContextItemTypes(): array
+    {
+        $rows = $this->createQueryBuilder('l')
+            ->select('DISTINCT l.context, l.itemType')
+            ->orderBy('l.context', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        $itemTypes = [];
+        foreach ($rows as $row) {
+            $itemTypes[(string) $row['context']] = (string) $row['itemType'];
+        }
+
+        return $itemTypes;
+    }
+
+    /**
      * @param list<int>|null $allowedItemIds
      * @return list<CirculationLedgerEntry> newest first
      */

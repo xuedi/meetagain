@@ -53,23 +53,6 @@ class EventItemAssociationRepository extends ServiceEntityRepository
         return $this->findOneBy(['event' => $eventId, 'itemType' => $itemType, 'itemId' => $itemId]);
     }
 
-    /**
-     * @return list<int>
-     */
-    public function findItemIdsByType(string $itemType): array
-    {
-        $ids = $this
-            ->createQueryBuilder('a')
-            ->select('DISTINCT a.itemId')
-            ->where('a.itemType = :type')
-            ->setParameter('type', $itemType)
-            ->orderBy('a.itemId', 'ASC')
-            ->getQuery()
-            ->getSingleColumnResult();
-
-        return array_values(array_map(static fn($id): int => (int) $id, $ids));
-    }
-
     /** @return list<int> event ids carrying this item type, richest first */
     public function findEventIdsByType(string $itemType): array
     {

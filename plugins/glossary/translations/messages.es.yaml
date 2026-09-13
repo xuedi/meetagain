@@ -182,3 +182,7 @@ glossary_import:
     flash_done: 'Importación terminada: %created% creadas, %updated% actualizadas, %skipped% saltadas.'
     flash_unknown_tags: 'Estas etiquetas no coinciden con ninguna existente y se omitieron: %tags%'
     activity_imported: 'Palabras del glosario importadas: %created% creadas, %updated% actualizadas, %skipped% saltadas'
+glossary_portability:
+    kind_cards: 'Tarjetas de práctica del glosario'
+    kind_days: 'Días de práctica del glosario'
+    kind_change_proposals: 'Propuestas de cambio abiertas del glosario'

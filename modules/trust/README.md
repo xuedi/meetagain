@@ -83,6 +83,10 @@ context with no access provider is therefore visible to operators and to nobody 
 | `getConfig($context)`                   | `TrustConfig` - the context's effective settings                                      |
 | `grant` / `revoke` / `getOutgoing`      | a member managing their own vouches                                                   |
 
+`GrantTransferInterface` is the second outbound interface and serves data movers only: `exportGrants()` returns the
+vouches of the given contexts as `PortableGrant` values, and `restoreGrant()` writes one back with its dates. It stays
+off `TrustInterface` because that surface must never hand anyone another member's edges.
+
 Value types: `TrustAction`, `ActionDescriptor`, `ContextDescriptor`, `TrustConfig`, `TrustExplanation`,
 `TrustActionBreakdown`, and the enums `TrustLevel` (`Slight`, `Trusted`, `Absolute`) and `TrustBand`.
 Those two enums are the only closed vocabularies in the contract, and both describe the module's own
@@ -199,8 +203,8 @@ primary anchor. That is the reasoning behind the two root defaults.
 3. Place the Twig fragments on your own page.
 4. Call `TrustInterface` where a decision depends on standing.
 
-`modules/trust/tests/Stub/` is a complete four-interface consumer in about eighty lines, registered
-through `config/services_test.yaml` in the test environment only. It is the reference to copy.
+The bundled reference is `src/Circulation/Trust/`: circulation's context describer, action source and
+access provider, each a few dozen lines.
 
 ## Out of scope
 

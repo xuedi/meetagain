@@ -20,7 +20,6 @@ at different complexity levels:
 
 - Multiple menu links with priorities
 - Event tiles (voting box on event detail page)
-- `loadPostExtendFixtures` to create votes for recurring events
 - Cron tasks to close expired votes
 - `AdminNavigationInterface` for admin sidebar
 - **See:** `plugins/films/src/Kernel.php`
@@ -63,11 +62,14 @@ at different complexity levels:
 
 ---
 
-### Fixtures not loading
+### Your data is missing after an import
 
-1. Ensure fixture classes extend `App\DataFixtures\AbstractFixture`
-2. Check the class is in `plugins/your-plugin/src/DataFixtures/`
-3. Re-run: `just devModeFixtures`
+**Symptom:** The import summary counts your plugin's rows as skipped, or your items never arrive.
+
+1. The plugin must be enabled on the importing instance - a section of an inactive plugin is skipped.
+2. `getPluginKey()` on your contributor or section must return the key listed in `config/plugins.php`.
+3. Every exported item row needs a `ref` equal to the source item id, and `importItems()` must flush
+   before returning - see [Optional Hooks](optional-hooks.md#export-and-import).
 
 ---
 
@@ -127,7 +129,7 @@ readonly class YourHandler implements EntityActionInterface
 1. Migration files must be in `plugins/your-plugin/migrations/`
 2. The plugin's `config/packages/doctrine_migrations.yaml` must point to that directory
 3. Run: `just app doctrine:migrations:migrate`
-4. For dev reset: `just devModeFixtures` runs migrations automatically
+4. For a dev reset: `just devModeImport <archive>` runs migrations automatically
 
 ---
 

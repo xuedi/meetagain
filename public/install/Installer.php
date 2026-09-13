@@ -224,19 +224,24 @@ ENV;
 
     public function runMigrations(): bool
     {
+        return $this->runConsole('doctrine:migrations:migrate --no-interaction', 'Migrations failed');
+    }
+
+    public function runInstallSeed(): bool
+    {
+        return $this->runConsole('app:install:seed --no-interaction', 'Seeding the install data failed');
+    }
+
+    private function runConsole(string $arguments, string $failure): bool
+    {
         $projectRoot = realpath(__DIR__ . '/../../');
         $output = [];
         $returnCode = 0;
 
-        $command = sprintf(
-            'cd %s && php bin/console doctrine:migrations:migrate --no-interaction 2>&1',
-            escapeshellarg($projectRoot)
-        );
-
-        exec($command, $output, $returnCode);
+        exec(sprintf('cd %s && php bin/console %s 2>&1', escapeshellarg($projectRoot), $arguments), $output, $returnCode);
 
         if ($returnCode !== 0) {
-            $this->addError('Migrations failed: ' . implode("\n", $output));
+            $this->addError($failure . ': ' . implode("\n", $output));
 
             return false;
         }
@@ -252,7 +257,7 @@ ENV;
         $defaults = [
             'name' => 'User',
             'email' => 'user@localhost',
-            'roles' => ['ROLE_USER'],
+            'role' => 'USER',
             'password' => '',
             'locale' => 'en',
             'status' => 2, // Active
@@ -271,14 +276,14 @@ ENV;
         }
 
         $stmt = $pdo->prepare(<<<SQL
-            INSERT INTO `user` (name, email, roles, password, created_at, last_login, locale, status, public, verified, restricted, osm_consent, tagging, notification)
+            INSERT INTO `user` (name, email, role, password, created_at, last_login, locale, status, public, verified, restricted, osm_consent, tagging, notification)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         SQL);
 
         $stmt->execute([
             $data['name'],
             $data['email'],
-            json_encode($data['roles']),
+            $data['role'],
             $data['password'],
             $now,
             $now,
@@ -295,41 +300,27 @@ ENV;
         return (int) $pdo->lastInsertId();
     }
 
-    public function createSystemUser(PDO $pdo): int
-    {
-        return $this->createUser($pdo, [
-            'name' => 'System',
-            'email' => 'system@localhost',
-            'roles' => ['ROLE_SYSTEM'],
-            'password' => '',
-            'public' => 0,
-            'tagging' => 0,
-        ]);
-    }
-
     public function createAdminUser(PDO $pdo, string $email, string $password, string $name): int
     {
         return $this->createUser($pdo, [
             'name' => $name,
             'email' => $email,
-            'roles' => ['ROLE_ADMIN', 'ROLE_USER'],
+            'role' => 'ADMIN',
             'password' => $password,
             'public' => 1,
             'tagging' => 1,
         ]);
     }
 
-    public function createDefaultConfig(PDO $pdo, int $systemUserId): void
+    public function createSiteConfig(PDO $pdo): void
     {
         $data = $this->getAllSessionData();
 
         $configs = [
-            ['automatic_registration', 'false', 'boolean'],
             ['email_sender_mail', $data['admin_email'] ?? 'email@localhost', 'string'],
             ['email_sender_name', $data['site_name'] ?? 'MeetAgain', 'string'],
             ['website_url', $data['site_url'] ?? 'localhost', 'string'],
             ['website_host', $data['site_url'] ?? 'https://localhost', 'string'],
-            ['system_user_id', (string) $systemUserId, 'integer'],
         ];
 
         $stmt = $pdo->prepare('INSERT INTO config (name, value, type) VALUES (?, ?, ?)');
@@ -399,15 +390,18 @@ ENV;
         try {
             $pdo->beginTransaction();
 
-            $systemUserId = $this->createSystemUser($pdo);
             $this->createAdminUser($pdo, $data['admin_email'], $data['admin_password'], $data['admin_name']);
-            $this->createDefaultConfig($pdo, $systemUserId);
+            $this->createSiteConfig($pdo);
 
             $pdo->commit();
         } catch (Exception $e) {
             $pdo->rollBack();
-            $this->addError('Failed to create users/config: ' . $e->getMessage());
+            $this->addError('Failed to create the admin user and site config: ' . $e->getMessage());
 
+            return false;
+        }
+
+        if (!$this->runInstallSeed()) {
             return false;
         }
 

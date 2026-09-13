@@ -182,3 +182,7 @@ glossary_import:
     flash_done: 'Import abgeschlossen: %created% angelegt, %updated% aktualisiert, %skipped% übersprungen.'
     flash_unknown_tags: 'Diese Tags passten zu keinem vorhandenen Tag und wurden weggelassen: %tags%'
     activity_imported: 'Glossarwörter importiert: %created% angelegt, %updated% aktualisiert, %skipped% übersprungen'
+glossary_portability:
+    kind_cards: 'Glossar-Trainerkarten'
+    kind_days: 'Glossar-Trainingstage'
+    kind_change_proposals: 'Offene Änderungsvorschläge zum Glossar'
