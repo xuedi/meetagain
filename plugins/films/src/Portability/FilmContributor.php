@@ -4,10 +4,10 @@ namespace Plugin\Films\Portability;
 
 use App\Entity\Image;
 use App\Enum\ImageType;
-use App\Item\Portability\ImportContext;
-use App\Item\Portability\ImportResult;
-use App\Item\Portability\ContributorInterface;
-use App\Item\Portability\PortableImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\Item\ImportResult;
+use App\Portability\Item\ContributorInterface;
+use App\Portability\ImageWriterInterface;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,7 +38,13 @@ readonly class FilmContributor implements ContributorInterface
     }
 
     #[Override]
-    public function exportItems(array $itemIds, PortableImageWriterInterface $images): array
+    public function allItemIds(): array
+    {
+        return array_map(intval(...), $this->filmRepo->createQueryBuilder('f')->select('f.id')->orderBy('f.id')->getQuery()->getSingleColumnResult());
+    }
+
+    #[Override]
+    public function exportItems(array $itemIds, ImageWriterInterface $images): array
     {
         $rows = [];
 
@@ -54,7 +60,7 @@ readonly class FilmContributor implements ContributorInterface
                 'description' => $film->getDescription(),
                 'genres' => $film->getGenres(),
                 'poster_image' => $film->getPosterImage() instanceof Image
-                    ? $images->addImage($film->getPosterImage(), 'images/films/' . $film->getId() . '/poster')
+                    ? $images->addImage($film->getPosterImage())
                     : null,
             ];
         }

@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Service\Config;
 
+use App\Entity\Config;
+use App\Enum\ConfigType;
 use App\ExtendedFilesystem;
 use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
@@ -152,14 +154,50 @@ class ConfigServiceTest extends TestCase
         static::assertSame(0, $putCalls);
     }
 
-    private function buildService(ExtendedFilesystem $fs): ConfigService
+    public function testSetBooleanFlipsAnExistingRow(): void
+    {
+        // Arrange
+        $row = new Config();
+        $row->setName('show_town_hall');
+        $row->setType(ConfigType::Boolean);
+        $row->setValue('false');
+        $repo = $this->createStub(ConfigRepository::class);
+        $repo->method('findOneBy')->willReturn($row);
+
+        // Act
+        $this->buildService($this->createStub(ExtendedFilesystem::class), $repo)->setBoolean('show_town_hall', true);
+
+        // Assert
+        static::assertSame('true', $row->getValue());
+    }
+
+    public function testSetBooleanCreatesAMissingRowAsBoolean(): void
+    {
+        // Arrange
+        $persisted = null;
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist')->willReturnCallback(static function (object $entity) use (&$persisted): void {
+            $persisted = $entity;
+        });
+
+        // Act
+        $this->buildService($this->createStub(ExtendedFilesystem::class), em: $em)->setBoolean('send_upcoming_digest', false);
+
+        // Assert
+        static::assertInstanceOf(Config::class, $persisted);
+        static::assertSame('send_upcoming_digest', $persisted->getName());
+        static::assertSame(ConfigType::Boolean, $persisted->getType());
+        static::assertSame('false', $persisted->getValue());
+    }
+
+    private function buildService(ExtendedFilesystem $fs, ?ConfigRepository $repo = null, ?EntityManagerInterface $em = null): ConfigService
     {
         $kernel = $this->createStub(KernelInterface::class);
         $kernel->method('getProjectDir')->willReturn('/app');
 
         return new ConfigService(
-            repo: $this->createStub(ConfigRepository::class),
-            em: $this->createStub(EntityManagerInterface::class),
+            repo: $repo ?? $this->createStub(ConfigRepository::class),
+            em: $em ?? $this->createStub(EntityManagerInterface::class),
             cache: new ArrayAdapter(),
             kernel: $kernel,
             appState: $this->createStub(AppStateService::class),

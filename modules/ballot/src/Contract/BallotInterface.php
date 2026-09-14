@@ -45,4 +45,14 @@ interface BallotInterface
     public function mayVote(int $ballotId, int $userId): bool;
 
     public function countOpenFor(int $viewerUserId): int;
+
+    /**
+     * Every ballot with its options, outcome and votes, oldest first, visibility ignored.
+     *
+     * @return list<PortableBallot>
+     */
+    public function exportAll(): array;
+
+    /** Writes a ballot exactly as given, never tallying it and never notifying a listener. */
+    public function restore(PortableBallot $ballot): int;
 }

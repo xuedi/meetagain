@@ -4,7 +4,8 @@
     Renders two small Bulma buttons as an addons group. The active state is colour-coded:
     yes is highlighted green when true, no is highlighted red when false. By default both
     buttons submit a POST with CSRF token via the AJAX toggle handler; passing noAjax
-    renders data-post anchors that do a full-page POST instead.
+    renders a data-post anchor for the inactive side only, so the full-page POST always
+    flips to the side clicked. Passing disabled renders both buttons inert.
 
     Used in:    templates/admin/system/config/index.html.twig
                 templates/profile/_partials/rsvp_list.html.twig
@@ -14,18 +15,29 @@
         - status      (bool, required)   — current value; drives active button highlight
         - csrfTokenId (string, required) — CSRF token intention string
         - noAjax      (any, optional)    — when defined, renders a plain POST form instead of AJAX
+        - disabled    (bool, optional)   — renders both buttons disabled; default: false
     Depends on: assets/js/block-user.js (.triggerToggleBlock)
 #}
-{% if noAjax is defined %}
+{% if disabled|default(false) %}
     <div class="buttons has-addons is-right">
-        <a href="{{ link }}"
-           class="button is-small {% if status %}is-success{% endif %}"
-           data-post
-           data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_yes"|trans }}</a>
-        <a href="{{ link }}"
-           class="button is-small {% if not status %}is-danger{% endif %}"
-           data-post
-           data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_no"|trans }}</a>
+        <button type="button" class="button is-small {% if status %}is-success{% endif %}" disabled>{{ "shared.toggle_yes"|trans }}</button>
+        <button type="button" class="button is-small {% if not status %}is-danger{% endif %}" disabled>{{ "shared.toggle_no"|trans }}</button>
+    </div>
+{% elseif noAjax is defined %}
+    <div class="buttons has-addons is-right">
+        {% if status %}
+            <span class="button is-small is-success">{{ "shared.toggle_yes"|trans }}</span>
+            <a href="{{ link }}"
+               class="button is-small"
+               data-post
+               data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_no"|trans }}</a>
+        {% else %}
+            <a href="{{ link }}"
+               class="button is-small"
+               data-post
+               data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_yes"|trans }}</a>
+            <span class="button is-small is-danger">{{ "shared.toggle_no"|trans }}</span>
+        {% endif %}
     </div>
 {% else %}
     <div class="buttons has-addons is-right triggerToggleBlock">

@@ -25,12 +25,10 @@
             <directory>../../modules/*/tests/Unit</directory>
         </testsuite>
         <testsuite name="functional">
-            <directory>../Functional</directory>
             <directory>../../plugins/*/tests/Functional</directory>
-            <directory>../../modules/*/tests/Functional</directory>
         </testsuite>
         <testsuite name="smoke">
-            <directory>../Smoke</directory>
+            <directory>../../plugins/*/tests/Smoke</directory>
         </testsuite>
     </testsuites>
     <php>
@@ -45,7 +43,6 @@
             <directory>../../modules/*/src</directory>
         </include>
         <exclude>
-            <directory>../../src/DataFixtures</directory>
             <directory>../../src/Enum</directory>
             <directory>../../src/Exception</directory>
             <directory>../../src/Repository</directory>

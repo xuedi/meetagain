@@ -7,7 +7,6 @@ use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\Plugin;
 use App\ValueObject\LinkCollection;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Kernel implements Plugin
@@ -31,16 +30,6 @@ class Kernel implements Plugin
     public function getEventTile(int $eventId, EventTileLocation $location): ?string
     {
         return null;
-    }
-
-    public function loadPostExtendFixtures(OutputInterface $output): void {}
-
-    public function preFixtures(OutputInterface $output): void
-    {
-    }
-
-    public function postFixtures(OutputInterface $output): void
-    {
     }
 
     public function getFooterAbout(): ?string

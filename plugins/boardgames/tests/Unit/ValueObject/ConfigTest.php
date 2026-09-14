@@ -64,4 +64,17 @@ class ConfigTest extends TestCase
         // Assert
         static::assertFalse($config->isTrustActive());
     }
+
+    public function testTheEncryptedTokenIsTheOnlySecretKey(): void
+    {
+        // Arrange
+        $config = new Config()->setEncryptedBggToken('cipher');
+
+        // Act
+        $secretKeys = $config->getSecretKeys();
+
+        // Assert
+        static::assertSame(['encryptedBggToken'], $secretKeys);
+        static::assertArrayHasKey('encryptedBggToken', $config->toArray());
+    }
 }

@@ -68,6 +68,11 @@ final class RebuildCommand extends Command
                 $io->section($descriptor->label);
             }
 
+            $undeclared = $this->scoreProvider->findUndeclaredActions($descriptor->context);
+            if ($undeclared !== []) {
+                $io->warning(sprintf('Recorded but never declared, so they score nothing: %s', implode(', ', $undeclared)));
+            }
+
             $rows = [];
             foreach ($fresh as $userId => $score) {
                 $rows[] = [$userId, $score];

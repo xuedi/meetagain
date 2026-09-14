@@ -1,0 +1,1161 @@
+{
+    "format": "meetagain-group-export",
+    "version": "2.0",
+    "exported_at": "2026-01-05T00:00:00+01:00",
+    "plugins": [
+        "glossary",
+        "wishlist"
+    ],
+    "site": {
+        "slug": "berlin-spanish-circle",
+        "name": "Berlin Spanish Circle",
+        "description": "A friendly language exchange group for everyone learning Spanish in Berlin. We meet weekly for conversation practice, cultural evenings, and film nights. All levels welcome - from complete beginners to near-fluent speakers.",
+        "languages": [
+            "en",
+            "de",
+            "es"
+        ],
+        "theme_colors": [],
+        "settings": {
+            "send_event_reminders": true,
+            "send_rsvp_notifications": true,
+            "send_upcoming_digest": true,
+            "show_town_hall": false
+        },
+        "plugin_settings": {
+            "glossary": {
+                "secondaryEnabled": false,
+                "secondaryLabel": null,
+                "primaryLabel": "Spanish",
+                "definitionLabel": "Meaning",
+                "termLanguage": "es",
+                "trainerEnabled": true,
+                "sessionSize": 20,
+                "newCardsPerDay": 10,
+                "directions": [
+                    "term_to_definition",
+                    "definition_to_term"
+                ],
+                "defaultAnswerMode": "choice",
+                "leaderboardEnabled": false
+            }
+        },
+        "logo_file": "images/230ac60ae6d3031a2b5b8abf3686236c42db4389.png"
+    },
+    "locations": [
+        {
+            "ref": 10,
+            "title": "Bar La Esquina",
+            "latitude": "52.4905",
+            "longitude": "13.4093",
+            "city": "Berlin",
+            "country": ""
+        },
+        {
+            "ref": 9,
+            "title": "Instituto Hispano Berlin",
+            "latitude": "52.5223",
+            "longitude": "13.4022",
+            "city": "Berlin",
+            "country": ""
+        }
+    ],
+    "users": [
+        {
+            "email": "Belle.Woods@example.org",
+            "name": "Belle Woods",
+            "locale": "zh",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Lover of adventure and creativity, I dive into painting and hiking when I'm not crafting magic in marketing! 🌟✨ #HobbyistHeart #WorkAndPlay",
+            "public": true,
+            "image_file": "images/6d10ed55842a62725ad954d7fa56fe1e735feb14.jpg"
+        },
+        {
+            "email": "Eduard.Franz@example.org",
+            "name": "Eduard Franz",
+            "locale": "de",
+            "role": "organizer",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting and hiking, I find inspiration in nature's beauty. Balancing my love for creativity with a career in graphic design keeps my heart and mind alive! #ArtLover #NatureEnthusiast #CreativeCareer",
+            "public": true,
+            "image_file": "images/d46c6eeb1acfdf34977f6795275a285750326133.jpg"
+        },
+        {
+            "email": "Lana.Steiner@example.org",
+            "name": "Lana Steiner",
+            "locale": "en",
+            "role": "admin",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker by day, crafting wizard by night! When I'm not doodling my dreams, you'll catch me hiking or whipping up some delicious treats! 🌟🏞️ #Wanderlust #CreativeSoul",
+            "public": true,
+            "image_file": "images/bd95fda4637e37c983d108f9de761c50b4cd2462.jpg"
+        }
+    ],
+    "hosts": [
+        {
+            "ref": 9,
+            "name": "SpanishCarmen",
+            "email": null
+        },
+        {
+            "ref": 10,
+            "name": "SpanishDiego",
+            "email": null
+        }
+    ],
+    "series": [
+        {
+            "ref": 5,
+            "name": "Wednesday Spanish Conversation Table",
+            "rule": "Weekly",
+            "ruleSpec": null
+        },
+        {
+            "ref": 6,
+            "name": "Spanish Cultural Evening",
+            "rule": "Monthly",
+            "ruleSpec": null
+        }
+    ],
+    "events": [
+        {
+            "ref": 36,
+            "initial": true,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2025-12-17T19:00:00+01:00",
+            "stop": "2025-12-17T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 37,
+            "initial": true,
+            "titles": {
+                "de": "Spanischer Kulturabend",
+                "en": "Spanish Cultural Evening",
+                "es": "Velada cultural española"
+            },
+            "descriptions": {
+                "de": "Jeden Monat wählen wir ein Thema aus der spanischsprachigen Welt und gestalten den Abend darum herum, mit kurzer Einführung und anschließenden offenen Gesprächstischen für jedes Niveau.",
+                "en": "Each month we pick a theme from the Spanish-speaking world and build the evening around it, with a short introduction and then open conversation tables for every level.",
+                "es": "Cada mes elegimos un tema del mundo hispanohablante y construimos la velada a su alrededor, con una breve introducción y después mesas de conversación abiertas para todos los niveles."
+            },
+            "teasers": {
+                "de": "Ein Themenabend im Kulturzentrum - Musik, ein Kurzvortrag und viel Konversation auf Spanisch.",
+                "en": "A themed evening at the cultural center - music, a short talk, and plenty of conversation in Spanish.",
+                "es": "Una velada temática en el centro cultural - música, una charla breve y mucha conversación en español."
+            },
+            "start": "2026-01-23T19:30:00+01:00",
+            "stop": "2026-01-23T22:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 6,
+            "featured": true,
+            "location_ref": 9,
+            "host_refs": [
+                10
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 38,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-01-07T19:00:00+01:00",
+            "stop": "2026-01-07T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 39,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-01-14T19:00:00+01:00",
+            "stop": "2026-01-14T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 40,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-01-21T19:00:00+01:00",
+            "stop": "2026-01-21T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 41,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-01-28T19:00:00+01:00",
+            "stop": "2026-01-28T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 42,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-02-04T19:00:00+01:00",
+            "stop": "2026-02-04T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 43,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-02-11T19:00:00+01:00",
+            "stop": "2026-02-11T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 44,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-02-18T19:00:00+01:00",
+            "stop": "2026-02-18T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 45,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-02-25T19:00:00+01:00",
+            "stop": "2026-02-25T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 46,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-03-04T19:00:00+01:00",
+            "stop": "2026-03-04T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 47,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-03-11T19:00:00+01:00",
+            "stop": "2026-03-11T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 48,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-03-18T19:00:00+01:00",
+            "stop": "2026-03-18T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 49,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-03-25T19:00:00+01:00",
+            "stop": "2026-03-25T21:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 50,
+            "initial": false,
+            "titles": {
+                "de": "Mittwoch Spanisch-Gesprächsrunde",
+                "en": "Wednesday Spanish Conversation Table",
+                "es": "Mesa de conversación en español los miércoles"
+            },
+            "descriptions": {
+                "de": "Wir teilen uns in zwei oder drei Tische nach Sprachniveau auf. Keine Anmeldung nötig - einfach vorbeikommen.",
+                "en": "We split into two or three tables by level so beginners get patient partners and advanced speakers can dig into politics, films, or whatever else. No registration needed - just turn up.",
+                "es": "Nos repartimos en dos o tres mesas por nivel, para que quienes empiezan encuentren compañía paciente y quienes ya hablan bien puedan meterse en política, cine o lo que surja. No hace falta inscribirse - basta con venir."
+            },
+            "teasers": {
+                "de": "Entspannter Abend mit Spanisch-Konversation bei Tapas und einem Glas Wein. Alle Niveaus willkommen.",
+                "en": "Drop in for a relaxed evening of Spanish conversation over tapas and a glass of wine. All levels welcome.",
+                "es": "Una velada tranquila de conversación en español con tapas y una copa de vino. Todos los niveles son bienvenidos."
+            },
+            "start": "2026-04-01T19:00:00+02:00",
+            "stop": "2026-04-01T21:30:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 5,
+            "featured": false,
+            "location_ref": 10,
+            "host_refs": [
+                9
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Lana.Steiner@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 51,
+            "initial": false,
+            "titles": {
+                "de": "Spanischer Kulturabend",
+                "en": "Spanish Cultural Evening",
+                "es": "Velada cultural española"
+            },
+            "descriptions": {
+                "de": "Jeden Monat wählen wir ein Thema aus der spanischsprachigen Welt und gestalten den Abend darum herum, mit kurzer Einführung und anschließenden offenen Gesprächstischen für jedes Niveau.",
+                "en": "Each month we pick a theme from the Spanish-speaking world and build the evening around it, with a short introduction and then open conversation tables for every level.",
+                "es": "Cada mes elegimos un tema del mundo hispanohablante y construimos la velada a su alrededor, con una breve introducción y después mesas de conversación abiertas para todos los niveles."
+            },
+            "teasers": {
+                "de": "Ein Themenabend im Kulturzentrum - Musik, ein Kurzvortrag und viel Konversation auf Spanisch.",
+                "en": "A themed evening at the cultural center - music, a short talk, and plenty of conversation in Spanish.",
+                "es": "Una velada temática en el centro cultural - música, una charla breve y mucha conversación en español."
+            },
+            "start": "2026-02-23T19:30:00+01:00",
+            "stop": "2026-02-23T22:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 6,
+            "featured": false,
+            "location_ref": 9,
+            "host_refs": [
+                10
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 52,
+            "initial": false,
+            "titles": {
+                "de": "Spanischer Kulturabend",
+                "en": "Spanish Cultural Evening",
+                "es": "Velada cultural española"
+            },
+            "descriptions": {
+                "de": "Jeden Monat wählen wir ein Thema aus der spanischsprachigen Welt und gestalten den Abend darum herum, mit kurzer Einführung und anschließenden offenen Gesprächstischen für jedes Niveau.",
+                "en": "Each month we pick a theme from the Spanish-speaking world and build the evening around it, with a short introduction and then open conversation tables for every level.",
+                "es": "Cada mes elegimos un tema del mundo hispanohablante y construimos la velada a su alrededor, con una breve introducción y después mesas de conversación abiertas para todos los niveles."
+            },
+            "teasers": {
+                "de": "Ein Themenabend im Kulturzentrum - Musik, ein Kurzvortrag und viel Konversation auf Spanisch.",
+                "en": "A themed evening at the cultural center - music, a short talk, and plenty of conversation in Spanish.",
+                "es": "Una velada temática en el centro cultural - música, una charla breve y mucha conversación en español."
+            },
+            "start": "2026-03-23T19:30:00+01:00",
+            "stop": "2026-03-23T22:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 6,
+            "featured": false,
+            "location_ref": 9,
+            "host_refs": [
+                10
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 53,
+            "initial": false,
+            "titles": {
+                "de": "Spanischer Kulturabend",
+                "en": "Spanish Cultural Evening",
+                "es": "Velada cultural española"
+            },
+            "descriptions": {
+                "de": "Jeden Monat wählen wir ein Thema aus der spanischsprachigen Welt und gestalten den Abend darum herum, mit kurzer Einführung und anschließenden offenen Gesprächstischen für jedes Niveau.",
+                "en": "Each month we pick a theme from the Spanish-speaking world and build the evening around it, with a short introduction and then open conversation tables for every level.",
+                "es": "Cada mes elegimos un tema del mundo hispanohablante y construimos la velada a su alrededor, con una breve introducción y después mesas de conversación abiertas para todos los niveles."
+            },
+            "teasers": {
+                "de": "Ein Themenabend im Kulturzentrum - Musik, ein Kurzvortrag und viel Konversation auf Spanisch.",
+                "en": "A themed evening at the cultural center - music, a short talk, and plenty of conversation in Spanish.",
+                "es": "Una velada temática en el centro cultural - música, una charla breve y mucha conversación en español."
+            },
+            "start": "2026-04-23T19:30:00+02:00",
+            "stop": "2026-04-23T22:00:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 6,
+            "featured": false,
+            "location_ref": 9,
+            "host_refs": [
+                10
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 54,
+            "initial": false,
+            "titles": {
+                "de": "Spanischer Kulturabend",
+                "en": "Spanish Cultural Evening",
+                "es": "Velada cultural española"
+            },
+            "descriptions": {
+                "de": "Jeden Monat wählen wir ein Thema aus der spanischsprachigen Welt und gestalten den Abend darum herum, mit kurzer Einführung und anschließenden offenen Gesprächstischen für jedes Niveau.",
+                "en": "Each month we pick a theme from the Spanish-speaking world and build the evening around it, with a short introduction and then open conversation tables for every level.",
+                "es": "Cada mes elegimos un tema del mundo hispanohablante y construimos la velada a su alrededor, con una breve introducción y después mesas de conversación abiertas para todos los niveles."
+            },
+            "teasers": {
+                "de": "Ein Themenabend im Kulturzentrum - Musik, ein Kurzvortrag und viel Konversation auf Spanisch.",
+                "en": "A themed evening at the cultural center - music, a short talk, and plenty of conversation in Spanish.",
+                "es": "Una velada temática en el centro cultural - música, una charla breve y mucha conversación en español."
+            },
+            "start": "2026-05-23T19:30:00+02:00",
+            "stop": "2026-05-23T22:00:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 6,
+            "featured": false,
+            "location_ref": 9,
+            "host_refs": [
+                10
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 55,
+            "initial": false,
+            "titles": {
+                "de": "Spanischer Kulturabend",
+                "en": "Spanish Cultural Evening",
+                "es": "Velada cultural española"
+            },
+            "descriptions": {
+                "de": "Jeden Monat wählen wir ein Thema aus der spanischsprachigen Welt und gestalten den Abend darum herum, mit kurzer Einführung und anschließenden offenen Gesprächstischen für jedes Niveau.",
+                "en": "Each month we pick a theme from the Spanish-speaking world and build the evening around it, with a short introduction and then open conversation tables for every level.",
+                "es": "Cada mes elegimos un tema del mundo hispanohablante y construimos la velada a su alrededor, con una breve introducción y después mesas de conversación abiertas para todos los niveles."
+            },
+            "teasers": {
+                "de": "Ein Themenabend im Kulturzentrum - Musik, ein Kurzvortrag und viel Konversation auf Spanisch.",
+                "en": "A themed evening at the cultural center - music, a short talk, and plenty of conversation in Spanish.",
+                "es": "Una velada temática en el centro cultural - música, una charla breve y mucha conversación en español."
+            },
+            "start": "2026-06-23T19:30:00+02:00",
+            "stop": "2026-06-23T22:00:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 6,
+            "featured": false,
+            "location_ref": 9,
+            "host_refs": [
+                10
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Eduard.Franz@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        }
+    ],
+    "rsvps": [
+        {
+            "event_ref": 36,
+            "email": "Belle.Woods@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 36,
+            "email": "Eduard.Franz@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 36,
+            "email": "Lana.Steiner@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 37,
+            "email": "Belle.Woods@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 37,
+            "email": "Eduard.Franz@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 37,
+            "email": "Lana.Steiner@example.org",
+            "guests": 0
+        }
+    ],
+    "cms_pages": [
+        {
+            "ref": 11,
+            "slug": "index",
+            "published": true,
+            "titles": {
+                "de": "Berliner Spanisch-Zirkel",
+                "en": "Berlin Spanish Circle"
+            },
+            "link_names": {
+                "de": "Startseite",
+                "en": "Home"
+            },
+            "menu_locations": [],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 1,
+                    "priority": 1,
+                    "json": {
+                        "title": "Spanish in Berlin, every week"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 1,
+                    "priority": 2,
+                    "json": {
+                        "title": "Spanisch in Berlin, jede Woche"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 3,
+                    "json": {
+                        "title": "How it works",
+                        "content": "We meet once a week for relaxed conversation practice in small tables by level. No lessons, no homework - just people talking. Bring a topic if you have one, otherwise we hand out cards to get things going."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 4,
+                    "json": {
+                        "title": "So funktioniert es",
+                        "content": "Wir treffen uns einmal pro Woche zum entspannten Sprechen an kleinen Tischen nach Niveau. Kein Unterricht, keine Hausaufgaben - einfach reden. Wer ein Thema mitbringt, umso besser, sonst gibt es Karten als Gesprächsstarter."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 5,
+                    "json": {
+                        "title": "All levels welcome",
+                        "content": "From complete beginners to near-fluent speakers - everyone finds a table. We also run cultural evenings and film nights, and the shared glossary collects the phrases that come up along the way."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 6,
+                    "json": {
+                        "title": "Alle Niveaus willkommen",
+                        "content": "Von absoluten Anfängern bis zu fast fließenden Sprechern - für alle ist ein Tisch dabei. Dazu gibt es Kulturabende und Filmnächte, und das gemeinsame Glossar sammelt die Ausdrücke, die dabei auftauchen."
+                    },
+                    "image_file": null
+                }
+            ]
+        }
+    ],
+    "announcements": [],
+    "tags": [
+        {
+            "ref": 13,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 0,
+            "labels": {
+                "de": "Begrüßung",
+                "en": "Greeting"
+            },
+            "managed": false
+        },
+        {
+            "ref": 14,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 1,
+            "labels": {
+                "de": "Substantiv",
+                "en": "Noun"
+            },
+            "managed": false
+        },
+        {
+            "ref": 15,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 2,
+            "labels": {
+                "de": "Verb",
+                "en": "Verb"
+            },
+            "managed": false
+        },
+        {
+            "ref": 16,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 3,
+            "labels": {
+                "de": "Redewendung",
+                "en": "Phrase"
+            },
+            "managed": false
+        },
+        {
+            "ref": 17,
+            "item_type": "glossary",
+            "parent_ref": null,
+            "position": 4,
+            "labels": {
+                "de": "Adjektiv",
+                "en": "Adjective"
+            },
+            "managed": false
+        }
+    ],
+    "items": {
+        "glossary": {
+            "rows": [
+                {
+                    "ref": 1,
+                    "phrase": "¡Hola!",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "Hello / hi - the everyday greeting."
+                    }
+                },
+                {
+                    "ref": 2,
+                    "phrase": "Buenos días",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "Good morning. Used until roughly lunchtime."
+                    }
+                },
+                {
+                    "ref": 3,
+                    "phrase": "Buenas tardes",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "Good afternoon / good evening, until it gets dark."
+                    }
+                },
+                {
+                    "ref": 4,
+                    "phrase": "¿Qué tal?",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "How are you? / how is it going?"
+                    }
+                },
+                {
+                    "ref": 5,
+                    "phrase": "la biblioteca",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "The library."
+                    }
+                },
+                {
+                    "ref": 6,
+                    "phrase": "el barrio",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "The neighbourhood - also the people who live in it."
+                    }
+                },
+                {
+                    "ref": 7,
+                    "phrase": "la sobremesa",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "The talk that keeps everyone at the table after the meal."
+                    }
+                },
+                {
+                    "ref": 8,
+                    "phrase": "aprender",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "To learn."
+                    }
+                },
+                {
+                    "ref": 9,
+                    "phrase": "quedar",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "To arrange to meet up. \"¿Quedamos el jueves?\""
+                    }
+                },
+                {
+                    "ref": 10,
+                    "phrase": "echar de menos",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "To miss someone or something."
+                    }
+                },
+                {
+                    "ref": 11,
+                    "phrase": "tener ganas de",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "To be looking forward to something."
+                    }
+                },
+                {
+                    "ref": 12,
+                    "phrase": "estupendo",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "Great / wonderful."
+                    }
+                },
+                {
+                    "ref": 13,
+                    "phrase": "majo",
+                    "secondary": null,
+                    "term_language": "es",
+                    "definitions": {
+                        "en": "Nice, likeable. Very common in Spain, rare in Latin America."
+                    }
+                }
+            ],
+            "tags": {
+                "1": [
+                    13
+                ],
+                "2": [
+                    13
+                ],
+                "3": [
+                    13
+                ],
+                "4": [
+                    16
+                ],
+                "5": [
+                    14
+                ],
+                "6": [
+                    14
+                ],
+                "7": [
+                    14
+                ],
+                "8": [
+                    15
+                ],
+                "9": [
+                    15
+                ],
+                "10": [
+                    16
+                ],
+                "11": [
+                    16
+                ],
+                "12": [
+                    17
+                ],
+                "13": [
+                    17
+                ]
+            }
+        }
+    },
+    "event_items": [],
+    "topics": [
+        {
+            "ref": 1,
+            "parent_ref": null,
+            "title": "Language",
+            "author_email": "Lana.Steiner@example.org",
+            "created_at": "2025-12-15T18:00:00+01:00"
+        },
+        {
+            "ref": 2,
+            "parent_ref": 1,
+            "title": "looking for tandem",
+            "author_email": "Belle.Woods@example.org",
+            "created_at": "2025-12-15T18:00:00+01:00"
+        },
+        {
+            "ref": 3,
+            "parent_ref": 1,
+            "title": "learn materials",
+            "author_email": "Eduard.Franz@example.org",
+            "created_at": "2025-12-15T18:00:00+01:00"
+        },
+        {
+            "ref": 4,
+            "parent_ref": null,
+            "title": "Help",
+            "author_email": "Lana.Steiner@example.org",
+            "created_at": "2025-12-15T18:00:00+01:00"
+        },
+        {
+            "ref": 5,
+            "parent_ref": null,
+            "title": "off topic",
+            "author_email": "Belle.Woods@example.org",
+            "created_at": "2025-12-15T18:00:00+01:00"
+        }
+    ],
+    "circulation": [],
+    "comments": [
+        {
+            "target_type": "topic",
+            "target_ref": 1,
+            "email": "Eduard.Franz@example.org",
+            "created_at": "2025-12-26T00:00:00+01:00",
+            "content": "Anything grammar related goes in here, subtopics below."
+        },
+        {
+            "target_type": "topic",
+            "target_ref": 2,
+            "email": "Belle.Woods@example.org",
+            "created_at": "2025-12-26T00:00:00+01:00",
+            "content": "B1 here, looking for someone to practice with on weekday evenings."
+        },
+        {
+            "target_type": "topic",
+            "target_ref": 3,
+            "email": "Lana.Steiner@example.org",
+            "created_at": "2025-12-26T00:00:00+01:00",
+            "content": "The Dreyer grammar workbook is still the best one I have used."
+        }
+    ],
+    "change_proposals": [],
+    "trust": [],
+    "glossary": [],
+    "wishlist": [],
+    "ballots": [],
+    "images": []
+}

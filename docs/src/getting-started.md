@@ -31,12 +31,13 @@ Accept the certificate warning in your browser on first visit.
 
 ```bash
 git clone https://github.com/xuedi/meetAgain.git && cd meetAgain
-just devModeFixtures
+just devModeImport weiqi-club
 # Open https://meetagain.local
 ```
 
-`just devModeFixtures` resets the database, loads sample fixtures (events, users, CMS pages),
-and starts all Docker containers. Default admin credentials: `admin@example.org` / `1234`
+`just devModeImport weiqi-club` starts all Docker containers, resets the database and imports the
+Weiqi Club demo archive (members, events, CMS pages, films, photos). Log in as `Crystal.Liu@example.org`
+with the password `1234`. See [Demo Data](core-development/demo-data.md) for the other archives.
 
 ---
 
@@ -58,9 +59,9 @@ Mail is queued, not sent: `just appCron` dispatches the queue, and Mailpit then 
 ## Reset variants
 
 ```bash
-just devModeFixtures             # Full environment with fixture data
-just devModeMinimal              # Install fixtures only (useful for testing imports)
-just devModeFixtures multisite   # Full environment with the multisite plugin enabled
+just devModeImport               # List the demo archives
+just devModeImport <archive>     # Fresh instance built from one demo archive
+just devModeInstaller            # Empty instance, set up through the web installer
 ```
 
 ---

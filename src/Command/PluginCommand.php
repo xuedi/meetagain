@@ -23,9 +23,9 @@ class PluginCommand extends Command
     protected function configure(): void
     {
         $this->addArgument('action', InputArgument::OPTIONAL, 'Action: enable or disable')->addArgument(
-            'plugin',
-            InputArgument::OPTIONAL,
-            'Plugin key or "all"',
+            'plugins',
+            InputArgument::IS_ARRAY,
+            'Plugin keys or "all"',
         );
     }
 
@@ -33,7 +33,7 @@ class PluginCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $action = $input->getArgument('action');
-        $plugin = $input->getArgument('plugin');
+        $plugins = array_values(array_filter(array_map(strval(...), (array) $input->getArgument('plugins')), static fn(string $plugin): bool => $plugin !== ''));
 
         if ($action === null) {
             return Command::SUCCESS;
@@ -43,47 +43,41 @@ class PluginCommand extends Command
             return Command::FAILURE;
         }
 
-        if ($plugin === null || $plugin === '') {
+        if ($plugins === []) {
             return Command::SUCCESS;
         }
 
         if ($action === 'enable') {
-            return $this->enablePlugins($plugin);
+            return $this->enablePlugins($plugins);
         }
 
-        return $this->disablePlugins($plugin);
+        return $this->disablePlugins($plugins);
     }
 
-    private function enablePlugins(string $plugin): int
+    /**
+     * @param list<string> $plugins
+     */
+    private function enablePlugins(array $plugins): int
     {
-        if ($plugin === 'all') {
-            return $this->enableAllPlugins();
+        foreach (in_array('all', $plugins, true) ? $this->getAvailablePluginKeys() : $plugins as $key) {
+            $this->pluginService->install($key);
+            $this->pluginService->enable($key);
         }
-
-        $this->pluginService->install($plugin);
-        $this->pluginService->enable($plugin);
 
         return Command::SUCCESS;
     }
 
-    private function disablePlugins(string $plugin): int
+    /**
+     * @param list<string> $plugins
+     */
+    private function disablePlugins(array $plugins): int
     {
-        if ($plugin === 'all') {
+        if (in_array('all', $plugins, true)) {
             return $this->disableAllPlugins();
         }
 
-        $this->pluginService->disable($plugin);
-
-        return Command::SUCCESS;
-    }
-
-    private function enableAllPlugins(): int
-    {
-        $pluginKeys = $this->getAvailablePluginKeys();
-
-        foreach ($pluginKeys as $key) {
-            $this->pluginService->install($key);
-            $this->pluginService->enable($key);
+        foreach ($plugins as $key) {
+            $this->pluginService->disable($key);
         }
 
         return Command::SUCCESS;

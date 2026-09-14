@@ -84,25 +84,6 @@ final readonly class TrustConfig
         };
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function toArray(): array
-    {
-        return [
-            'maxScore' => $this->maxScore,
-            'percentSlight' => $this->percentSlight,
-            'percentTrusted' => $this->percentTrusted,
-            'percentAbsolute' => $this->percentAbsolute,
-            'rootPointsPrimary' => $this->rootPointsPrimary,
-            'rootPointsSecondary' => $this->rootPointsSecondary,
-            'pointsPerAction' => $this->pointsPerAction,
-            'capsPerAction' => $this->capsPerAction,
-            'minimumToParticipate' => $this->minimumToParticipate,
-            'bandThresholds' => array_values($this->bandThresholds),
-        ];
-    }
-
     private function assertActionKey(mixed $key): void
     {
         if (!is_string($key) || $key === '') {

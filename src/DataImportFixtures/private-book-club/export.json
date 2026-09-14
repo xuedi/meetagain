@@ -1,0 +1,2350 @@
+{
+    "format": "meetagain-group-export",
+    "version": "2.0",
+    "exported_at": "2026-01-05T00:00:00+01:00",
+    "plugins": [
+        "books",
+        "wishlist"
+    ],
+    "site": {
+        "slug": "private-book-club",
+        "name": "Private Book Club",
+        "description": "An intimate book club for close friends. We read a wide variety of genres and meet every two weeks to discuss our latest read over coffee.",
+        "languages": [
+            "de",
+            "en"
+        ],
+        "theme_colors": [],
+        "settings": {
+            "send_event_reminders": true,
+            "send_rsvp_notifications": true,
+            "send_upcoming_digest": true,
+            "show_town_hall": false
+        },
+        "plugin_settings": {
+            "books": {
+                "circulation": true,
+                "trustSystem": true
+            }
+        },
+        "logo_file": "images/a9f1440f5b3767daa7735bb42b430b904fb90b16.png"
+    },
+    "locations": [
+        {
+            "ref": 7,
+            "title": "Chapter One Bookstore Café",
+            "latitude": "52.4927",
+            "longitude": "13.3897",
+            "city": "Berlin",
+            "country": ""
+        },
+        {
+            "ref": 8,
+            "title": "Stadtbibliothek Meeting Room",
+            "latitude": "52.5163",
+            "longitude": "13.4060",
+            "city": "Berlin",
+            "country": ""
+        }
+    ],
+    "users": [
+        {
+            "email": "Elisa.Nishikawa@example.org",
+            "name": "Elisa Nishikawa",
+            "locale": "en",
+            "role": "organizer",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker by day, crafting wizard by night! When I'm not doodling my dreams, you'll catch me hiking or whipping up some delicious treats! 🌟🏞️ #Wanderlust #CreativeSoul",
+            "public": true,
+            "image_file": "images/a9f1ba959d132b402a90d1882e82c3f90513d724.jpg"
+        },
+        {
+            "email": "Florence.Shaw@example.org",
+            "name": "Florence Shaw",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about turning words into bridges, I thrive on the magic of languages at work! 💼✨ Let's connect through communication! #LanguageLover #WorkJoy",
+            "public": true,
+            "image_file": "images/99df1febf5ee4ef8decd9763ed9c703deba4a973.jpg"
+        },
+        {
+            "email": "Freya.Browning@example.org",
+            "name": "Freya Browning",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about bridging cultures through the power of language, I thrive in environments where communication flourishes. Work is a canvas, and languages are the vibrant hues that bring it to life. #LanguageLover #CulturalConnector",
+            "public": true,
+            "image_file": "images/32f8037274694041c189b3c18fa01a1a40324d4c.jpg"
+        },
+        {
+            "email": "Genevieve.Mclean@example.org",
+            "name": "Genevieve Mclean",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "In the delicate crunch of every cookie lies a harmony of flavors that awakens my senses and brings solace to my soul. My passion for cookies transcends mere indulgence; it is an art form that celebrates life's sweetest moments. #CookieLover #SweetObsessions",
+            "public": true,
+            "image_file": "images/2a255be71539e0a6bca544b14ffd918bf015e63a.jpg"
+        },
+        {
+            "email": "Kaden.Scott@example.org",
+            "name": "Kaden Scott",
+            "locale": "de",
+            "role": "admin",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about bridging cultures through the magic of languages, I thrive in diverse workplaces where every conversation is an adventure! 🌍✨ #LanguageLover #WorkLifeJoy",
+            "public": true,
+            "image_file": "images/4825416464c7733ef269200a90c2ed5c6cd3a1e7.jpg"
+        }
+    ],
+    "hosts": [
+        {
+            "ref": 7,
+            "name": "BookElena",
+            "email": null
+        },
+        {
+            "ref": 8,
+            "name": "BookThomas",
+            "email": null
+        }
+    ],
+    "series": [
+        {
+            "ref": 3,
+            "name": "Biweekly Book Discussion",
+            "rule": "BiMonthly",
+            "ruleSpec": null
+        },
+        {
+            "ref": 4,
+            "name": "Next Book Discussion",
+            "rule": "BiMonthly",
+            "ruleSpec": null
+        }
+    ],
+    "events": [
+        {
+            "ref": 23,
+            "initial": true,
+            "titles": {
+                "de": "Zweiwöchentliche Buchdiskussion",
+                "en": "Biweekly Book Discussion"
+            },
+            "descriptions": {
+                "de": "Ein gemütliches Treffen, bei dem wir tief in unser ausgewähltes Buch eintauchen.",
+                "en": "A cozy gathering where we dive deep into our selected book. This fortnight we discussed contemporary fiction with complex characters and thought-provoking themes."
+            },
+            "teasers": {
+                "de": "Unser intimer Buchclub trifft sich alle zwei Wochen, um bei Kaffee und Gebäck über unsere aktuelle Lektüre zu diskutieren.",
+                "en": "Our intimate book club meets every two weeks to discuss our current read over coffee and pastries."
+            },
+            "start": "2025-12-06T15:00:00+01:00",
+            "stop": "2025-12-06T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 3,
+            "featured": false,
+            "location_ref": 7,
+            "host_refs": [
+                7
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Kaden.Scott@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 24,
+            "initial": true,
+            "titles": {
+                "de": "Nächste Buchdiskussion",
+                "en": "Next Book Discussion"
+            },
+            "descriptions": {
+                "de": "Treffpunkt ist der Bibliotheks-Meetingraum. Bring deine Notizen und Lieblingsstellen mit - und bleib danach auf einen Kaffee.",
+                "en": "Meet at the library meeting room. Bring your notes and your favourite passages - and stay for coffee afterwards."
+            },
+            "teasers": {
+                "de": "Unser nächstes Treffen. Wir besprechen das beim letzten Mal gewählte Buch.",
+                "en": "The next fortnightly meeting. We pick up the book chosen at the last session and talk it through."
+            },
+            "start": "2026-01-24T15:00:00+01:00",
+            "stop": "2026-01-24T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 4,
+            "featured": false,
+            "location_ref": 8,
+            "host_refs": [
+                8
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Elisa.Nishikawa@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 25,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentliche Buchdiskussion",
+                "en": "Biweekly Book Discussion"
+            },
+            "descriptions": {
+                "de": "Ein gemütliches Treffen, bei dem wir tief in unser ausgewähltes Buch eintauchen.",
+                "en": "A cozy gathering where we dive deep into our selected book. This fortnight we discussed contemporary fiction with complex characters and thought-provoking themes."
+            },
+            "teasers": {
+                "de": "Unser intimer Buchclub trifft sich alle zwei Wochen, um bei Kaffee und Gebäck über unsere aktuelle Lektüre zu diskutieren.",
+                "en": "Our intimate book club meets every two weeks to discuss our current read over coffee and pastries."
+            },
+            "start": "2026-01-17T15:00:00+01:00",
+            "stop": "2026-01-17T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 3,
+            "featured": false,
+            "location_ref": 7,
+            "host_refs": [
+                7
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Kaden.Scott@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 26,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentliche Buchdiskussion",
+                "en": "Biweekly Book Discussion"
+            },
+            "descriptions": {
+                "de": "Ein gemütliches Treffen, bei dem wir tief in unser ausgewähltes Buch eintauchen.",
+                "en": "A cozy gathering where we dive deep into our selected book. This fortnight we discussed contemporary fiction with complex characters and thought-provoking themes."
+            },
+            "teasers": {
+                "de": "Unser intimer Buchclub trifft sich alle zwei Wochen, um bei Kaffee und Gebäck über unsere aktuelle Lektüre zu diskutieren.",
+                "en": "Our intimate book club meets every two weeks to discuss our current read over coffee and pastries."
+            },
+            "start": "2026-01-31T15:00:00+01:00",
+            "stop": "2026-01-31T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 3,
+            "featured": false,
+            "location_ref": 7,
+            "host_refs": [
+                7
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Kaden.Scott@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 27,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentliche Buchdiskussion",
+                "en": "Biweekly Book Discussion"
+            },
+            "descriptions": {
+                "de": "Ein gemütliches Treffen, bei dem wir tief in unser ausgewähltes Buch eintauchen.",
+                "en": "A cozy gathering where we dive deep into our selected book. This fortnight we discussed contemporary fiction with complex characters and thought-provoking themes."
+            },
+            "teasers": {
+                "de": "Unser intimer Buchclub trifft sich alle zwei Wochen, um bei Kaffee und Gebäck über unsere aktuelle Lektüre zu diskutieren.",
+                "en": "Our intimate book club meets every two weeks to discuss our current read over coffee and pastries."
+            },
+            "start": "2026-02-14T15:00:00+01:00",
+            "stop": "2026-02-14T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 3,
+            "featured": false,
+            "location_ref": 7,
+            "host_refs": [
+                7
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Kaden.Scott@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 28,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentliche Buchdiskussion",
+                "en": "Biweekly Book Discussion"
+            },
+            "descriptions": {
+                "de": "Ein gemütliches Treffen, bei dem wir tief in unser ausgewähltes Buch eintauchen.",
+                "en": "A cozy gathering where we dive deep into our selected book. This fortnight we discussed contemporary fiction with complex characters and thought-provoking themes."
+            },
+            "teasers": {
+                "de": "Unser intimer Buchclub trifft sich alle zwei Wochen, um bei Kaffee und Gebäck über unsere aktuelle Lektüre zu diskutieren.",
+                "en": "Our intimate book club meets every two weeks to discuss our current read over coffee and pastries."
+            },
+            "start": "2026-02-28T15:00:00+01:00",
+            "stop": "2026-02-28T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 3,
+            "featured": false,
+            "location_ref": 7,
+            "host_refs": [
+                7
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Kaden.Scott@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 29,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentliche Buchdiskussion",
+                "en": "Biweekly Book Discussion"
+            },
+            "descriptions": {
+                "de": "Ein gemütliches Treffen, bei dem wir tief in unser ausgewähltes Buch eintauchen.",
+                "en": "A cozy gathering where we dive deep into our selected book. This fortnight we discussed contemporary fiction with complex characters and thought-provoking themes."
+            },
+            "teasers": {
+                "de": "Unser intimer Buchclub trifft sich alle zwei Wochen, um bei Kaffee und Gebäck über unsere aktuelle Lektüre zu diskutieren.",
+                "en": "Our intimate book club meets every two weeks to discuss our current read over coffee and pastries."
+            },
+            "start": "2026-03-14T15:00:00+01:00",
+            "stop": "2026-03-14T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 3,
+            "featured": false,
+            "location_ref": 7,
+            "host_refs": [
+                7
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Kaden.Scott@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 30,
+            "initial": false,
+            "titles": {
+                "de": "Zweiwöchentliche Buchdiskussion",
+                "en": "Biweekly Book Discussion"
+            },
+            "descriptions": {
+                "de": "Ein gemütliches Treffen, bei dem wir tief in unser ausgewähltes Buch eintauchen.",
+                "en": "A cozy gathering where we dive deep into our selected book. This fortnight we discussed contemporary fiction with complex characters and thought-provoking themes."
+            },
+            "teasers": {
+                "de": "Unser intimer Buchclub trifft sich alle zwei Wochen, um bei Kaffee und Gebäck über unsere aktuelle Lektüre zu diskutieren.",
+                "en": "Our intimate book club meets every two weeks to discuss our current read over coffee and pastries."
+            },
+            "start": "2026-03-28T15:00:00+01:00",
+            "stop": "2026-03-28T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 3,
+            "featured": false,
+            "location_ref": 7,
+            "host_refs": [
+                7
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Kaden.Scott@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 31,
+            "initial": false,
+            "titles": {
+                "de": "Nächste Buchdiskussion",
+                "en": "Next Book Discussion"
+            },
+            "descriptions": {
+                "de": "Treffpunkt ist der Bibliotheks-Meetingraum. Bring deine Notizen und Lieblingsstellen mit - und bleib danach auf einen Kaffee.",
+                "en": "Meet at the library meeting room. Bring your notes and your favourite passages - and stay for coffee afterwards."
+            },
+            "teasers": {
+                "de": "Unser nächstes Treffen. Wir besprechen das beim letzten Mal gewählte Buch.",
+                "en": "The next fortnightly meeting. We pick up the book chosen at the last session and talk it through."
+            },
+            "start": "2026-02-07T15:00:00+01:00",
+            "stop": "2026-02-07T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 4,
+            "featured": false,
+            "location_ref": 8,
+            "host_refs": [
+                8
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Elisa.Nishikawa@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 32,
+            "initial": false,
+            "titles": {
+                "de": "Nächste Buchdiskussion",
+                "en": "Next Book Discussion"
+            },
+            "descriptions": {
+                "de": "Treffpunkt ist der Bibliotheks-Meetingraum. Bring deine Notizen und Lieblingsstellen mit - und bleib danach auf einen Kaffee.",
+                "en": "Meet at the library meeting room. Bring your notes and your favourite passages - and stay for coffee afterwards."
+            },
+            "teasers": {
+                "de": "Unser nächstes Treffen. Wir besprechen das beim letzten Mal gewählte Buch.",
+                "en": "The next fortnightly meeting. We pick up the book chosen at the last session and talk it through."
+            },
+            "start": "2026-02-21T15:00:00+01:00",
+            "stop": "2026-02-21T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 4,
+            "featured": false,
+            "location_ref": 8,
+            "host_refs": [
+                8
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Elisa.Nishikawa@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 33,
+            "initial": false,
+            "titles": {
+                "de": "Nächste Buchdiskussion",
+                "en": "Next Book Discussion"
+            },
+            "descriptions": {
+                "de": "Treffpunkt ist der Bibliotheks-Meetingraum. Bring deine Notizen und Lieblingsstellen mit - und bleib danach auf einen Kaffee.",
+                "en": "Meet at the library meeting room. Bring your notes and your favourite passages - and stay for coffee afterwards."
+            },
+            "teasers": {
+                "de": "Unser nächstes Treffen. Wir besprechen das beim letzten Mal gewählte Buch.",
+                "en": "The next fortnightly meeting. We pick up the book chosen at the last session and talk it through."
+            },
+            "start": "2026-03-07T15:00:00+01:00",
+            "stop": "2026-03-07T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 4,
+            "featured": false,
+            "location_ref": 8,
+            "host_refs": [
+                8
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Elisa.Nishikawa@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 34,
+            "initial": false,
+            "titles": {
+                "de": "Nächste Buchdiskussion",
+                "en": "Next Book Discussion"
+            },
+            "descriptions": {
+                "de": "Treffpunkt ist der Bibliotheks-Meetingraum. Bring deine Notizen und Lieblingsstellen mit - und bleib danach auf einen Kaffee.",
+                "en": "Meet at the library meeting room. Bring your notes and your favourite passages - and stay for coffee afterwards."
+            },
+            "teasers": {
+                "de": "Unser nächstes Treffen. Wir besprechen das beim letzten Mal gewählte Buch.",
+                "en": "The next fortnightly meeting. We pick up the book chosen at the last session and talk it through."
+            },
+            "start": "2026-03-21T15:00:00+01:00",
+            "stop": "2026-03-21T17:30:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 4,
+            "featured": false,
+            "location_ref": 8,
+            "host_refs": [
+                8
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Elisa.Nishikawa@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 35,
+            "initial": false,
+            "titles": {
+                "de": "Nächste Buchdiskussion",
+                "en": "Next Book Discussion"
+            },
+            "descriptions": {
+                "de": "Treffpunkt ist der Bibliotheks-Meetingraum. Bring deine Notizen und Lieblingsstellen mit - und bleib danach auf einen Kaffee.",
+                "en": "Meet at the library meeting room. Bring your notes and your favourite passages - and stay for coffee afterwards."
+            },
+            "teasers": {
+                "de": "Unser nächstes Treffen. Wir besprechen das beim letzten Mal gewählte Buch.",
+                "en": "The next fortnightly meeting. We pick up the book chosen at the last session and talk it through."
+            },
+            "start": "2026-04-04T15:00:00+02:00",
+            "stop": "2026-04-04T17:30:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 4,
+            "featured": false,
+            "location_ref": 8,
+            "host_refs": [
+                8
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Elisa.Nishikawa@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        }
+    ],
+    "rsvps": [
+        {
+            "event_ref": 23,
+            "email": "Elisa.Nishikawa@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 23,
+            "email": "Florence.Shaw@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 23,
+            "email": "Freya.Browning@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 23,
+            "email": "Kaden.Scott@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 24,
+            "email": "Elisa.Nishikawa@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 24,
+            "email": "Florence.Shaw@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 24,
+            "email": "Freya.Browning@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 24,
+            "email": "Kaden.Scott@example.org",
+            "guests": 0
+        }
+    ],
+    "cms_pages": [
+        {
+            "ref": 10,
+            "slug": "index",
+            "published": true,
+            "titles": {
+                "de": "Willkommen in unserem Buchclub",
+                "en": "Welcome to Our Book Club"
+            },
+            "link_names": {
+                "de": "Startseite",
+                "en": "Home"
+            },
+            "menu_locations": [],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 8,
+                    "priority": 1,
+                    "json": {
+                        "headline": "Private Book Club",
+                        "subHeadline": "Reading together, thinking deeper",
+                        "text": "Join our intimate reading circle. New members by invitation.",
+                        "buttonLink": "/members",
+                        "buttonText": "Join Us",
+                        "color": "#6B4226"
+                    },
+                    "image_file": "images/2f0309cb7d77f0f1628200daa11fa1a2d86b2373.jpg"
+                },
+                {
+                    "language": "de",
+                    "type": 8,
+                    "priority": 2,
+                    "json": {
+                        "headline": "Privater Buchclub",
+                        "subHeadline": "Gemeinsam lesen, tiefer denken",
+                        "text": "Werde Teil unseres kleinen Lesekreises. Neue Mitglieder auf Einladung.",
+                        "buttonLink": "/members",
+                        "buttonText": "Mitmachen",
+                        "color": "#6B4226"
+                    },
+                    "image_file": "images/2f0309cb7d77f0f1628200daa11fa1a2d86b2373.jpg"
+                },
+                {
+                    "language": "en",
+                    "type": 1,
+                    "priority": 3,
+                    "json": {
+                        "title": "Welcome to Our Private Book Club"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 1,
+                    "priority": 4,
+                    "json": {
+                        "title": "Willkommen in unserem privaten Buchclub"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 5,
+                    "json": {
+                        "title": "About Our Club",
+                        "content": "We are an intimate group of friends who share a passion for reading. Every two weeks, we gather to discuss our latest read over coffee and pastries. Our selections span fiction, non-fiction, classics, and contemporary works."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 6,
+                    "json": {
+                        "title": "Über unseren Club",
+                        "content": "Wir sind eine kleine Gruppe von Freunden mit Leidenschaft fürs Lesen. Alle zwei Wochen treffen wir uns bei Kaffee und Gebäck, um unser aktuelles Buch zu besprechen. Unsere Auswahl reicht von Belletristik bis hin zu Sachbüchern."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 7,
+                    "json": {
+                        "title": "How It Works",
+                        "content": "Each month, members take turns selecting a book. We read at our own pace and come together for lively discussions. It's a judgment-free space where all opinions are welcome and encouraged."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 8,
+                    "json": {
+                        "title": "So funktioniert es",
+                        "content": "Jeden Monat wählt abwechselnd ein Mitglied ein Buch aus. Wir lesen in eigenem Tempo und treffen uns dann zu lebhaften Diskussionen. Alle Meinungen sind willkommen."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 9,
+                    "json": {
+                        "title": "This Month's Read",
+                        "content": "Currently reading: \"The Midnight Library\" by Matt Haig. Join us for the discussion on the 15th!"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 10,
+                    "json": {
+                        "title": "Lektüre des Monats",
+                        "content": "Aktuell lesen wir: „Die Mitternachtsbibliothek\" von Matt Haig. Diskussion am 15.!"
+                    },
+                    "image_file": null
+                }
+            ]
+        }
+    ],
+    "announcements": [],
+    "tags": [
+        {
+            "ref": 7,
+            "item_type": "book",
+            "parent_ref": null,
+            "position": 0,
+            "labels": {
+                "de": "Gelesen",
+                "en": "Read"
+            },
+            "managed": false
+        },
+        {
+            "ref": 8,
+            "item_type": "book",
+            "parent_ref": null,
+            "position": 1,
+            "labels": {
+                "de": "Als Nächstes",
+                "en": "Next up"
+            },
+            "managed": false
+        },
+        {
+            "ref": 9,
+            "item_type": "book",
+            "parent_ref": null,
+            "position": 2,
+            "labels": {
+                "de": "Vorgeschlagen",
+                "en": "Suggested"
+            },
+            "managed": false
+        },
+        {
+            "ref": 10,
+            "item_type": "book",
+            "parent_ref": null,
+            "position": 3,
+            "labels": {
+                "de": "Literarische Fiktion",
+                "en": "Literary fiction"
+            },
+            "managed": false
+        },
+        {
+            "ref": 11,
+            "item_type": "book",
+            "parent_ref": null,
+            "position": 4,
+            "labels": {
+                "de": "Science-Fiction",
+                "en": "Science fiction"
+            },
+            "managed": false
+        },
+        {
+            "ref": 12,
+            "item_type": "book",
+            "parent_ref": null,
+            "position": 5,
+            "labels": {
+                "de": "Historisch",
+                "en": "Historical"
+            },
+            "managed": false
+        }
+    ],
+    "items": {
+        "book": {
+            "rows": [
+                {
+                    "ref": 1,
+                    "isbn": "9781786892737",
+                    "title": "The Midnight Library",
+                    "author": "Matt Haig",
+                    "description": "Between life and death there is a library, and within it, the books let you try the lives you could have lived.",
+                    "page_count": 304,
+                    "published_year": 2020,
+                    "cover_image": "images/def5b3143a65e695c165fa3d9c5336cba05708be.jpg"
+                },
+                {
+                    "ref": 2,
+                    "isbn": "9780571364886",
+                    "title": "Klara and the Sun",
+                    "author": "Kazuo Ishiguro",
+                    "description": "An artificial friend observes the world from a shop window and, later, a family, asking what it means to love.",
+                    "page_count": 320,
+                    "published_year": 2021,
+                    "cover_image": "images/bbe3809513fbb05bacd00f1e06a077b0b9055bb9.jpg"
+                },
+                {
+                    "ref": 3,
+                    "isbn": "9781526622426",
+                    "title": "Piranesi",
+                    "author": "Susanna Clarke",
+                    "description": "A man lives in an endless house of halls and tides, keeping a careful journal of its statues and its one other inhabitant.",
+                    "page_count": 272,
+                    "published_year": 2020,
+                    "cover_image": "images/d2bf060f93de660d81ad483389bcea595393f12d.jpg"
+                },
+                {
+                    "ref": 4,
+                    "isbn": "9780525536291",
+                    "title": "The Vanishing Half",
+                    "author": "Brit Bennett",
+                    "description": "Two identical twin sisters run away from a small southern town and choose to live in two very different worlds.",
+                    "page_count": 352,
+                    "published_year": 2020,
+                    "cover_image": "images/3fdc65f6bcdf5844b43b4432a458c2ebf23c3e27.jpg"
+                },
+                {
+                    "ref": 5,
+                    "isbn": "9780593135204",
+                    "title": "Project Hail Mary",
+                    "author": "Andy Weir",
+                    "description": "A lone astronaut wakes with no memory aboard a ship that is humanity's last hope, and has to piece together why.",
+                    "page_count": 496,
+                    "published_year": 2021,
+                    "cover_image": "images/4e64b44b937386f1a19eb08ac4d7721f300379bb.jpg"
+                },
+                {
+                    "ref": 6,
+                    "isbn": "9780571334650",
+                    "title": "Normal People",
+                    "author": "Sally Rooney",
+                    "description": "Two teenagers from the same Irish town circle each other through school, university and everything they cannot say.",
+                    "page_count": 266,
+                    "published_year": 2018,
+                    "cover_image": "images/432bc437d9171f16a358e1778171cc67e9cd8770.jpg"
+                },
+                {
+                    "ref": 7,
+                    "isbn": "9781408890042",
+                    "title": "Circe",
+                    "author": "Madeline Miller",
+                    "description": "The witch of Aiaia tells her own story, from an unwanted daughter of the sun to a woman who chooses her exile.",
+                    "page_count": 336,
+                    "published_year": 2018,
+                    "cover_image": "images/5f95ece69bc57fa117a7ab7b2e2bc818b2987e5b.jpg"
+                },
+                {
+                    "ref": 8,
+                    "isbn": "9780571368686",
+                    "title": "Small Things Like These",
+                    "author": "Claire Keegan",
+                    "description": "A coal merchant in a small Irish town discovers what the convent keeps behind its walls, and what silence costs.",
+                    "page_count": 116,
+                    "published_year": 2021,
+                    "cover_image": "images/526c27e8f5105563f0866482fd29a53c1fc578b2.jpg"
+                },
+                {
+                    "ref": 9,
+                    "isbn": "9781529115543",
+                    "title": "Tomorrow, and Tomorrow, and Tomorrow",
+                    "author": "Gabrielle Zevin",
+                    "description": "Two friends build video games together for thirty years, and find that collaboration is its own kind of love.",
+                    "page_count": 496,
+                    "published_year": 2022,
+                    "cover_image": "images/89a6a6f3829ab09c818b6731367b059c6af23246.jpg"
+                },
+                {
+                    "ref": 10,
+                    "isbn": "9780857528124",
+                    "title": "Lessons in Chemistry",
+                    "author": "Bonnie Garmus",
+                    "description": "A chemist pushed out of the laboratory ends up hosting a cookery show, and teaches the country rather more than recipes.",
+                    "page_count": 400,
+                    "published_year": 2022,
+                    "cover_image": "images/9cd82ea85a1fb44d3ba7179e4459281b689fdc4d.jpg"
+                },
+                {
+                    "ref": 11,
+                    "isbn": "9780571376490",
+                    "title": "Demon Copperhead",
+                    "author": "Barbara Kingsolver",
+                    "description": "A boy born in a single-wide trailer in Appalachia narrates his own Dickensian run through foster care and addiction.",
+                    "page_count": 560,
+                    "published_year": 2022,
+                    "cover_image": "images/da932ef19beadebe5e7289aa12ea91e70676ccbd.jpg"
+                },
+                {
+                    "ref": 12,
+                    "isbn": "9780593420317",
+                    "title": "Trust",
+                    "author": "Hernan Diaz",
+                    "description": "Four accounts of the same New York fortune disagree with one another, and the disagreement is the point.",
+                    "page_count": 416,
+                    "published_year": 2022,
+                    "cover_image": "images/c60ed0fd4df25068494fa9cc3a8fe6493849aad4.jpg"
+                },
+                {
+                    "ref": 13,
+                    "isbn": "9781447294832",
+                    "title": "A Little Life",
+                    "author": "Hanya Yanagihara",
+                    "description": "Four friends make their way in New York, and one of them carries a past he will not describe.",
+                    "page_count": 720,
+                    "published_year": 2015,
+                    "cover_image": "images/93b4fb351361b8f3d290ffc9a50e430d9ceac59c.jpg"
+                },
+                {
+                    "ref": 14,
+                    "isbn": "9780802156983",
+                    "title": "Girl, Woman, Other",
+                    "author": "Bernardine Evaristo",
+                    "description": "Twelve mostly black British women, across a century, whose lives turn out to touch at the edges.",
+                    "page_count": 464,
+                    "published_year": 2019,
+                    "cover_image": "images/df5f5f332ba445c5737dd40c9f04e5c47f064acf.jpg"
+                },
+                {
+                    "ref": 15,
+                    "isbn": "9781472223821",
+                    "title": "Hamnet",
+                    "author": "Maggie O'Farrell",
+                    "description": "A glover's son leaves for London, a boy dies in Stratford, and a play is written four years later.",
+                    "page_count": 384,
+                    "published_year": 2020,
+                    "cover_image": "images/311d00b2b1b55ba910a554bfc325c293aee4a3b7.jpg"
+                },
+                {
+                    "ref": 16,
+                    "isbn": "9780571258246",
+                    "title": "The Remains of the Day",
+                    "author": "Kazuo Ishiguro",
+                    "description": "An English butler drives west across the country in 1956 and reckons, slowly, with the loyalty he gave away.",
+                    "page_count": 258,
+                    "published_year": 1989,
+                    "cover_image": null
+                },
+                {
+                    "ref": 17,
+                    "isbn": "9780571258093",
+                    "title": "Never Let Me Go",
+                    "author": "Kazuo Ishiguro",
+                    "description": "Three friends grow up at a boarding school in the English countryside and learn late what they were raised for.",
+                    "page_count": 282,
+                    "published_year": 2005,
+                    "cover_image": null
+                },
+                {
+                    "ref": 18,
+                    "isbn": "9780099760115",
+                    "title": "Beloved",
+                    "author": "Toni Morrison",
+                    "description": "A house outside Cincinnati is haunted by a daughter, and by the years of slavery her mother escaped.",
+                    "page_count": 324,
+                    "published_year": 1987,
+                    "cover_image": null
+                },
+                {
+                    "ref": 19,
+                    "isbn": "9780099740919",
+                    "title": "The Handmaid's Tale",
+                    "author": "Margaret Atwood",
+                    "description": "In the Republic of Gilead a woman is valued for her fertility and nothing else, and she remembers otherwise.",
+                    "page_count": 324,
+                    "published_year": 1985,
+                    "cover_image": null
+                },
+                {
+                    "ref": 20,
+                    "isbn": "9780007205011",
+                    "title": "The God of Small Things",
+                    "author": "Arundhati Roy",
+                    "description": "Twins in Kerala return to the day their family broke, and to the laws that decided who could be loved.",
+                    "page_count": 340,
+                    "published_year": 1997,
+                    "cover_image": null
+                },
+                {
+                    "ref": 21,
+                    "isbn": "9780330447546",
+                    "title": "The Road",
+                    "author": "Cormac McCarthy",
+                    "description": "A father and his son push a shopping cart south through ash, carrying the fire between them.",
+                    "page_count": 307,
+                    "published_year": 2006,
+                    "cover_image": null
+                },
+                {
+                    "ref": 22,
+                    "isbn": "9780747561620",
+                    "title": "Middlesex",
+                    "author": "Jeffrey Eugenides",
+                    "description": "Three generations of a Greek-American family lead to Cal, who tells the story of a gene and a life.",
+                    "page_count": 529,
+                    "published_year": 2002,
+                    "cover_image": null
+                },
+                {
+                    "ref": 23,
+                    "isbn": "9780140167771",
+                    "title": "The Secret History",
+                    "author": "Donna Tartt",
+                    "description": "A small Greek class at a Vermont college talks itself into something it cannot undo.",
+                    "page_count": 629,
+                    "published_year": 1992,
+                    "cover_image": null
+                },
+                {
+                    "ref": 24,
+                    "isbn": "9781408704950",
+                    "title": "The Goldfinch",
+                    "author": "Donna Tartt",
+                    "description": "A boy survives an explosion at a museum and takes a small Dutch painting with him for a decade.",
+                    "page_count": 864,
+                    "published_year": 2013,
+                    "cover_image": null
+                },
+                {
+                    "ref": 25,
+                    "isbn": "9780007230181",
+                    "title": "Wolf Hall",
+                    "author": "Hilary Mantel",
+                    "description": "Thomas Cromwell rises from a blacksmith's yard to the side of a king who wants a different wife.",
+                    "page_count": 653,
+                    "published_year": 2009,
+                    "cover_image": null
+                },
+                {
+                    "ref": 26,
+                    "isbn": "9780007315093",
+                    "title": "Bring Up the Bodies",
+                    "author": "Hilary Mantel",
+                    "description": "Cromwell, secure now, is asked to take apart the queen he helped put on the throne.",
+                    "page_count": 411,
+                    "published_year": 2012,
+                    "cover_image": null
+                },
+                {
+                    "ref": 27,
+                    "isbn": "9781786070159",
+                    "title": "The Sellout",
+                    "author": "Paul Beatty",
+                    "description": "A man in a forgotten Los Angeles suburb tries to put his town back on the map, by means that reach the Supreme Court.",
+                    "page_count": 304,
+                    "published_year": 2015,
+                    "cover_image": null
+                },
+                {
+                    "ref": 28,
+                    "isbn": "9781408871775",
+                    "title": "Lincoln in the Bardo",
+                    "author": "George Saunders",
+                    "description": "The night a president's son is buried, the cemetery's dead argue over him in a hundred voices.",
+                    "page_count": 343,
+                    "published_year": 2017,
+                    "cover_image": null
+                },
+                {
+                    "ref": 29,
+                    "isbn": "9781784708245",
+                    "title": "The Overstory",
+                    "author": "Richard Powers",
+                    "description": "Nine strangers are drawn together by trees, on a timescale that makes their lives look brief.",
+                    "page_count": 625,
+                    "published_year": 2018,
+                    "cover_image": null
+                },
+                {
+                    "ref": 30,
+                    "isbn": "9780571338757",
+                    "title": "Milkman",
+                    "author": "Anna Burns",
+                    "description": "In an unnamed city during the Troubles, an eighteen-year-old is noticed by the wrong man and the rumour does the rest.",
+                    "page_count": 348,
+                    "published_year": 2018,
+                    "cover_image": null
+                },
+                {
+                    "ref": 31,
+                    "isbn": "9781784742324",
+                    "title": "The Testaments",
+                    "author": "Margaret Atwood",
+                    "description": "Fifteen years on, three women write down what Gilead looks like from the inside and from the far side.",
+                    "page_count": 415,
+                    "published_year": 2019,
+                    "cover_image": null
+                },
+                {
+                    "ref": 32,
+                    "isbn": "9781529019278",
+                    "title": "Shuggie Bain",
+                    "author": "Douglas Stuart",
+                    "description": "A boy in 1980s Glasgow keeps loving his mother through the drinking, long after everyone else has stopped.",
+                    "page_count": 430,
+                    "published_year": 2020,
+                    "cover_image": null
+                },
+                {
+                    "ref": 33,
+                    "isbn": "9781094010007",
+                    "title": "Real Life",
+                    "author": "Brandon Taylor",
+                    "description": "A biochemistry student in a Midwestern lab spends one late-summer weekend deciding how much more he will absorb.",
+                    "page_count": 336,
+                    "published_year": 2020,
+                    "cover_image": null
+                },
+                {
+                    "ref": 34,
+                    "isbn": "9780241433386",
+                    "title": "Transcendent Kingdom",
+                    "author": "Yaa Gyasi",
+                    "description": "A neuroscientist studying reward and addiction in mice sits with her mother's silence and her brother's death.",
+                    "page_count": 264,
+                    "published_year": 2020,
+                    "cover_image": null
+                },
+                {
+                    "ref": 35,
+                    "isbn": "9780241975237",
+                    "title": "Homegoing",
+                    "author": "Yaa Gyasi",
+                    "description": "Two half-sisters in eighteenth-century Ghana never meet, and their descendants carry the split for two hundred years.",
+                    "page_count": 320,
+                    "published_year": 2016,
+                    "cover_image": null
+                },
+                {
+                    "ref": 36,
+                    "isbn": "9780241979068",
+                    "title": "Exit West",
+                    "author": "Mohsin Hamid",
+                    "description": "As their city falls, two lovers hear of doors that open onto other countries, and step through.",
+                    "page_count": 229,
+                    "published_year": 2017,
+                    "cover_image": null
+                },
+                {
+                    "ref": 37,
+                    "isbn": "9781786691378",
+                    "title": "Pachinko",
+                    "author": "Min Jin Lee",
+                    "description": "Four generations of a Korean family in Japan work, endure and are never quite allowed to belong.",
+                    "page_count": 537,
+                    "published_year": 2017,
+                    "cover_image": null
+                },
+                {
+                    "ref": 38,
+                    "isbn": "9781408891018",
+                    "title": "Sing, Unburied, Sing",
+                    "author": "Jesmyn Ward",
+                    "description": "A drive to a Mississippi prison to collect a father carries more passengers than the living ones.",
+                    "page_count": 289,
+                    "published_year": 2017,
+                    "cover_image": null
+                },
+                {
+                    "ref": 39,
+                    "isbn": "9781787330689",
+                    "title": "There There",
+                    "author": "Tommy Orange",
+                    "description": "Twelve Native characters converge on a powwow in Oakland, each for their own reason.",
+                    "page_count": 294,
+                    "published_year": 2018,
+                    "cover_image": null
+                },
+                {
+                    "ref": 40,
+                    "isbn": "9781250214997",
+                    "title": "Severance",
+                    "author": "Ling Ma",
+                    "description": "An office worker keeps going to her desk through the end of the world, because the routine is the last thing left.",
+                    "page_count": 291,
+                    "published_year": 2018,
+                    "cover_image": null
+                },
+                {
+                    "ref": 41,
+                    "isbn": "9781783784769",
+                    "title": "Weather",
+                    "author": "Jenny Offill",
+                    "description": "A university librarian answers a doomsday podcast's mail and finds the dread is contagious.",
+                    "page_count": 207,
+                    "published_year": 2020,
+                    "cover_image": null
+                },
+                {
+                    "ref": 42,
+                    "isbn": "9780008478476",
+                    "title": "Cloud Cuckoo Land",
+                    "author": "Anthony Doerr",
+                    "description": "One damaged Greek manuscript reaches a besieged Constantinople, an Idaho library and a ship between stars.",
+                    "page_count": 640,
+                    "published_year": 2021,
+                    "cover_image": null
+                },
+                {
+                    "ref": 43,
+                    "isbn": "9781529151787",
+                    "title": "Bewilderment",
+                    "author": "Richard Powers",
+                    "description": "An astrobiologist raising a grieving nine-year-old tries an experimental therapy built on his dead wife's brain scans.",
+                    "page_count": 278,
+                    "published_year": 2021,
+                    "cover_image": null
+                },
+                {
+                    "ref": 44,
+                    "isbn": "9781914502064",
+                    "title": "The Seven Moons of Maali Almeida",
+                    "author": "Shehan Karunatilaka",
+                    "description": "A war photographer wakes up dead in a celestial visa office with seven moons to solve his own murder.",
+                    "page_count": 386,
+                    "published_year": 2022,
+                    "cover_image": null
+                },
+                {
+                    "ref": 45,
+                    "isbn": "9781399830560",
+                    "title": "Prophet Song",
+                    "author": "Paul Lynch",
+                    "description": "A scientist and mother in Dublin watches the state she lives in stop being the one she knew.",
+                    "page_count": 309,
+                    "published_year": 2023,
+                    "cover_image": null
+                },
+                {
+                    "ref": 46,
+                    "isbn": "9780241353936",
+                    "title": "The Bee Sting",
+                    "author": "Paul Murray",
+                    "description": "An Irish family's car dealership is failing, and each of the four tells the story that keeps them out of it.",
+                    "page_count": 643,
+                    "published_year": 2023,
+                    "cover_image": null
+                },
+                {
+                    "ref": 47,
+                    "isbn": "9781399618069",
+                    "title": "North Woods",
+                    "author": "Daniel Mason",
+                    "description": "One house in the western Massachusetts woods passes through three centuries of the people and beetles who live in it.",
+                    "page_count": 372,
+                    "published_year": 2023,
+                    "cover_image": null
+                },
+                {
+                    "ref": 48,
+                    "isbn": "9781529922936",
+                    "title": "Orbital",
+                    "author": "Samantha Harvey",
+                    "description": "Six astronauts circle the earth sixteen times in one day and look down at the weather doing its work.",
+                    "page_count": 136,
+                    "published_year": 2023,
+                    "cover_image": null
+                },
+                {
+                    "ref": 49,
+                    "isbn": "9781529077285",
+                    "title": "James",
+                    "author": "Percival Everett",
+                    "description": "Huckleberry Finn's raft trip retold by Jim, who has been keeping his own counsel the whole time.",
+                    "page_count": 320,
+                    "published_year": 2024,
+                    "cover_image": null
+                },
+                {
+                    "ref": 50,
+                    "isbn": "9780571365470",
+                    "title": "Intermezzo",
+                    "author": "Sally Rooney",
+                    "description": "Two brothers, a chess player and a lawyer, work out what to do with each other after their father's funeral.",
+                    "page_count": 448,
+                    "published_year": 2024,
+                    "cover_image": null
+                }
+            ],
+            "tags": {
+                "1": [
+                    7,
+                    10
+                ],
+                "2": [
+                    8,
+                    11
+                ],
+                "3": [
+                    7,
+                    10
+                ],
+                "4": [
+                    7,
+                    10
+                ],
+                "5": [
+                    7,
+                    11
+                ],
+                "6": [
+                    7,
+                    10
+                ],
+                "7": [
+                    7,
+                    12
+                ],
+                "8": [
+                    7,
+                    10
+                ],
+                "9": [
+                    9,
+                    10
+                ],
+                "10": [
+                    7,
+                    10
+                ],
+                "11": [
+                    9,
+                    10
+                ],
+                "12": [
+                    8,
+                    12
+                ],
+                "13": [
+                    7,
+                    10
+                ],
+                "14": [
+                    7,
+                    10
+                ],
+                "15": [
+                    7,
+                    12
+                ],
+                "16": [
+                    7,
+                    10
+                ],
+                "17": [
+                    7,
+                    11
+                ],
+                "18": [
+                    7,
+                    12
+                ],
+                "19": [
+                    7,
+                    11
+                ],
+                "20": [
+                    7,
+                    10
+                ],
+                "21": [
+                    7,
+                    11
+                ],
+                "22": [
+                    7,
+                    10
+                ],
+                "23": [
+                    7,
+                    10
+                ],
+                "24": [
+                    7,
+                    10
+                ],
+                "25": [
+                    7,
+                    12
+                ],
+                "26": [
+                    8,
+                    12
+                ],
+                "27": [
+                    9,
+                    10
+                ],
+                "28": [
+                    7,
+                    12
+                ],
+                "29": [
+                    7,
+                    10
+                ],
+                "30": [
+                    7,
+                    10
+                ],
+                "31": [
+                    8,
+                    11
+                ],
+                "32": [
+                    7,
+                    10
+                ],
+                "33": [
+                    9,
+                    10
+                ],
+                "34": [
+                    7,
+                    10
+                ],
+                "35": [
+                    7,
+                    12
+                ],
+                "36": [
+                    7,
+                    10
+                ],
+                "37": [
+                    7,
+                    12
+                ],
+                "38": [
+                    7,
+                    10
+                ],
+                "39": [
+                    7,
+                    10
+                ],
+                "40": [
+                    9,
+                    11
+                ],
+                "41": [
+                    9,
+                    10
+                ],
+                "42": [
+                    8,
+                    11
+                ],
+                "43": [
+                    9,
+                    11
+                ],
+                "44": [
+                    9,
+                    10
+                ],
+                "45": [
+                    8,
+                    10
+                ],
+                "46": [
+                    8,
+                    10
+                ],
+                "47": [
+                    9,
+                    12
+                ],
+                "48": [
+                    8,
+                    11
+                ],
+                "49": [
+                    9,
+                    10
+                ],
+                "50": [
+                    9,
+                    10
+                ]
+            }
+        }
+    },
+    "event_items": [
+        {
+            "event_ref": 23,
+            "item_type": "book",
+            "item_ref": 1,
+            "position": null,
+            "section_label": null,
+            "created_by_email": "Kaden.Scott@example.org",
+            "created_at": "2025-11-08T15:00:00+01:00"
+        },
+        {
+            "event_ref": 24,
+            "item_type": "book",
+            "item_ref": 2,
+            "position": null,
+            "section_label": null,
+            "created_by_email": "Kaden.Scott@example.org",
+            "created_at": "2025-12-27T15:00:00+01:00"
+        }
+    ],
+    "topics": [],
+    "circulation": {
+        "copies": [
+            {
+                "ref": 1,
+                "item_type": "book",
+                "item_ref": 1,
+                "label": "paperback, spine creased",
+                "donated_by_email": "Florence.Shaw@example.org",
+                "donated_at": "2025-07-09T00:00:00+02:00",
+                "holder_email": "Kaden.Scott@example.org",
+                "held_since": "2025-07-24T00:00:00+02:00",
+                "status": "in_handover",
+                "finished_at": "2026-01-05T00:00:00+01:00"
+            },
+            {
+                "ref": 2,
+                "item_type": "book",
+                "item_ref": 5,
+                "label": "hardcover, dust jacket intact",
+                "donated_by_email": "Kaden.Scott@example.org",
+                "donated_at": "2025-06-19T00:00:00+02:00",
+                "holder_email": "Florence.Shaw@example.org",
+                "held_since": "2025-06-29T00:00:00+02:00",
+                "status": "held",
+                "finished_at": null
+            },
+            {
+                "ref": 3,
+                "item_type": "book",
+                "item_ref": 5,
+                "label": "paperback, bought at the airport",
+                "donated_by_email": "Elisa.Nishikawa@example.org",
+                "donated_at": "2025-08-08T00:00:00+02:00",
+                "holder_email": "Kaden.Scott@example.org",
+                "held_since": "2025-08-18T00:00:00+02:00",
+                "status": "held",
+                "finished_at": null
+            },
+            {
+                "ref": 4,
+                "item_type": "book",
+                "item_ref": 5,
+                "label": "large print edition",
+                "donated_by_email": "Freya.Browning@example.org",
+                "donated_at": "2025-11-06T00:00:00+01:00",
+                "holder_email": "Freya.Browning@example.org",
+                "held_since": "2025-11-06T00:00:00+01:00",
+                "status": "available",
+                "finished_at": null
+            },
+            {
+                "ref": 5,
+                "item_type": "book",
+                "item_ref": 7,
+                "label": "first edition, signed at a reading",
+                "donated_by_email": "Kaden.Scott@example.org",
+                "donated_at": "2024-12-01T00:00:00+01:00",
+                "holder_email": "Freya.Browning@example.org",
+                "held_since": "2025-05-07T00:00:00+02:00",
+                "status": "held",
+                "finished_at": null
+            },
+            {
+                "ref": 6,
+                "item_type": "book",
+                "item_ref": 2,
+                "label": "book club edition",
+                "donated_by_email": null,
+                "donated_at": "2025-09-27T00:00:00+02:00",
+                "holder_email": "Kaden.Scott@example.org",
+                "held_since": "2025-10-07T00:00:00+02:00",
+                "status": "held",
+                "finished_at": null
+            },
+            {
+                "ref": 7,
+                "item_type": "book",
+                "item_ref": 3,
+                "label": "hardcover with the illustrated endpapers",
+                "donated_by_email": "Elisa.Nishikawa@example.org",
+                "donated_at": "2025-11-21T00:00:00+01:00",
+                "holder_email": "Elisa.Nishikawa@example.org",
+                "held_since": "2025-11-21T00:00:00+01:00",
+                "status": "available",
+                "finished_at": null
+            },
+            {
+                "ref": 8,
+                "item_type": "book",
+                "item_ref": 15,
+                "label": "reading copy, water damage",
+                "donated_by_email": "Florence.Shaw@example.org",
+                "donated_at": "2025-03-11T00:00:00+01:00",
+                "holder_email": "Kaden.Scott@example.org",
+                "held_since": "2025-03-26T00:00:00+01:00",
+                "status": "retired",
+                "finished_at": null
+            },
+            {
+                "ref": 9,
+                "item_type": "book",
+                "item_ref": 13,
+                "label": "paperback, heavily annotated",
+                "donated_by_email": "Freya.Browning@example.org",
+                "donated_at": "2025-04-20T00:00:00+02:00",
+                "holder_email": "Elisa.Nishikawa@example.org",
+                "held_since": "2025-05-05T00:00:00+02:00",
+                "status": "lost",
+                "finished_at": null
+            },
+            {
+                "ref": 10,
+                "item_type": "book",
+                "item_ref": 6,
+                "label": "paperback, film tie-in cover",
+                "donated_by_email": "Kaden.Scott@example.org",
+                "donated_at": "2025-08-08T00:00:00+02:00",
+                "holder_email": "Kaden.Scott@example.org",
+                "held_since": "2025-08-08T00:00:00+02:00",
+                "status": "available",
+                "finished_at": null
+            }
+        ],
+        "requests": [
+            {
+                "ref": 2,
+                "item_type": "book",
+                "item_ref": 1,
+                "email": "Freya.Browning@example.org",
+                "requested_at": "2025-11-16T00:00:00+01:00",
+                "status": "offered",
+                "offered_copy_ref": 1,
+                "offered_at": "2026-01-05T00:00:00+01:00"
+            },
+            {
+                "ref": 3,
+                "item_type": "book",
+                "item_ref": 1,
+                "email": "Elisa.Nishikawa@example.org",
+                "requested_at": "2025-12-16T00:00:00+01:00",
+                "status": "waiting",
+                "offered_copy_ref": null,
+                "offered_at": null
+            },
+            {
+                "ref": 4,
+                "item_type": "book",
+                "item_ref": 5,
+                "email": "Florence.Shaw@example.org",
+                "requested_at": "2025-06-24T00:00:00+02:00",
+                "status": "fulfilled",
+                "offered_copy_ref": 2,
+                "offered_at": "2025-06-26T00:00:00+02:00"
+            },
+            {
+                "ref": 6,
+                "item_type": "book",
+                "item_ref": 7,
+                "email": "Elisa.Nishikawa@example.org",
+                "requested_at": "2024-12-06T00:00:00+01:00",
+                "status": "fulfilled",
+                "offered_copy_ref": 5,
+                "offered_at": "2024-12-09T00:00:00+01:00"
+            },
+            {
+                "ref": 7,
+                "item_type": "book",
+                "item_ref": 7,
+                "email": "Florence.Shaw@example.org",
+                "requested_at": "2025-01-25T00:00:00+01:00",
+                "status": "fulfilled",
+                "offered_copy_ref": 5,
+                "offered_at": "2025-01-30T00:00:00+01:00"
+            },
+            {
+                "ref": 9,
+                "item_type": "book",
+                "item_ref": 7,
+                "email": "Freya.Browning@example.org",
+                "requested_at": "2025-04-30T00:00:00+02:00",
+                "status": "fulfilled",
+                "offered_copy_ref": 5,
+                "offered_at": "2025-05-05T00:00:00+02:00"
+            },
+            {
+                "ref": 10,
+                "item_type": "book",
+                "item_ref": 2,
+                "email": "Kaden.Scott@example.org",
+                "requested_at": "2025-10-02T00:00:00+02:00",
+                "status": "fulfilled",
+                "offered_copy_ref": 6,
+                "offered_at": "2025-10-04T00:00:00+02:00"
+            },
+            {
+                "ref": 11,
+                "item_type": "book",
+                "item_ref": 2,
+                "email": "Florence.Shaw@example.org",
+                "requested_at": "2025-10-27T00:00:00+01:00",
+                "status": "waiting",
+                "offered_copy_ref": null,
+                "offered_at": null
+            },
+            {
+                "ref": 12,
+                "item_type": "book",
+                "item_ref": 2,
+                "email": "Elisa.Nishikawa@example.org",
+                "requested_at": "2025-11-11T00:00:00+01:00",
+                "status": "waiting",
+                "offered_copy_ref": null,
+                "offered_at": null
+            },
+            {
+                "ref": 13,
+                "item_type": "book",
+                "item_ref": 2,
+                "email": "Freya.Browning@example.org",
+                "requested_at": "2025-12-06T00:00:00+01:00",
+                "status": "waiting",
+                "offered_copy_ref": null,
+                "offered_at": null
+            },
+            {
+                "ref": 14,
+                "item_type": "book",
+                "item_ref": 15,
+                "email": "Kaden.Scott@example.org",
+                "requested_at": "2025-03-21T00:00:00+01:00",
+                "status": "fulfilled",
+                "offered_copy_ref": 8,
+                "offered_at": "2025-03-23T00:00:00+01:00"
+            },
+            {
+                "ref": 15,
+                "item_type": "book",
+                "item_ref": 13,
+                "email": "Elisa.Nishikawa@example.org",
+                "requested_at": "2025-04-30T00:00:00+02:00",
+                "status": "fulfilled",
+                "offered_copy_ref": 9,
+                "offered_at": "2025-05-02T00:00:00+02:00"
+            }
+        ],
+        "handovers": [
+            {
+                "ref": 3,
+                "copy_ref": 2,
+                "from_email": "Kaden.Scott@example.org",
+                "to_email": "Florence.Shaw@example.org",
+                "request_ref": 4,
+                "opened_at": "2025-06-26T00:00:00+02:00",
+                "from_confirmed_at": "2025-06-26T00:00:00+02:00",
+                "to_confirmed_at": "2025-06-29T00:00:00+02:00",
+                "completed_at": "2025-06-29T00:00:00+02:00",
+                "cancelled_at": null,
+                "cancelled_by_email": null,
+                "status": "completed"
+            },
+            {
+                "ref": 5,
+                "copy_ref": 5,
+                "from_email": "Kaden.Scott@example.org",
+                "to_email": "Elisa.Nishikawa@example.org",
+                "request_ref": 6,
+                "opened_at": "2024-12-09T00:00:00+01:00",
+                "from_confirmed_at": "2024-12-09T00:00:00+01:00",
+                "to_confirmed_at": "2024-12-11T00:00:00+01:00",
+                "completed_at": "2024-12-11T00:00:00+01:00",
+                "cancelled_at": null,
+                "cancelled_by_email": null,
+                "status": "completed"
+            },
+            {
+                "ref": 6,
+                "copy_ref": 5,
+                "from_email": "Elisa.Nishikawa@example.org",
+                "to_email": "Florence.Shaw@example.org",
+                "request_ref": 7,
+                "opened_at": "2025-01-30T00:00:00+01:00",
+                "from_confirmed_at": "2025-01-30T00:00:00+01:00",
+                "to_confirmed_at": "2025-02-01T00:00:00+01:00",
+                "completed_at": "2025-02-01T00:00:00+01:00",
+                "cancelled_at": null,
+                "cancelled_by_email": null,
+                "status": "completed"
+            },
+            {
+                "ref": 10,
+                "copy_ref": 8,
+                "from_email": "Florence.Shaw@example.org",
+                "to_email": "Kaden.Scott@example.org",
+                "request_ref": 14,
+                "opened_at": "2025-03-23T00:00:00+01:00",
+                "from_confirmed_at": "2025-03-23T00:00:00+01:00",
+                "to_confirmed_at": "2025-03-26T00:00:00+01:00",
+                "completed_at": "2025-03-26T00:00:00+01:00",
+                "cancelled_at": null,
+                "cancelled_by_email": null,
+                "status": "completed"
+            },
+            {
+                "ref": 11,
+                "copy_ref": 9,
+                "from_email": "Freya.Browning@example.org",
+                "to_email": "Elisa.Nishikawa@example.org",
+                "request_ref": 15,
+                "opened_at": "2025-05-02T00:00:00+02:00",
+                "from_confirmed_at": "2025-05-02T00:00:00+02:00",
+                "to_confirmed_at": "2025-05-05T00:00:00+02:00",
+                "completed_at": "2025-05-05T00:00:00+02:00",
+                "cancelled_at": null,
+                "cancelled_by_email": null,
+                "status": "completed"
+            }
+        ],
+        "ledger": [
+            {
+                "entry_type": "donated",
+                "item_type": "book",
+                "item_ref": 1,
+                "occurred_at": "2025-07-09T00:00:00+02:00",
+                "copy_ref": 1,
+                "from_email": null,
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": "Florence.Shaw@example.org",
+                "payload": {
+                    "label": "paperback, spine creased"
+                }
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 1,
+                "occurred_at": "2025-11-16T00:00:00+01:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Freya.Browning@example.org",
+                "actor_email": "Freya.Browning@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 1,
+                "occurred_at": "2025-12-16T00:00:00+01:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "donated",
+                "item_type": "book",
+                "item_ref": 5,
+                "occurred_at": "2025-06-19T00:00:00+02:00",
+                "copy_ref": 2,
+                "from_email": null,
+                "to_email": "Kaden.Scott@example.org",
+                "actor_email": "Kaden.Scott@example.org",
+                "payload": {
+                    "label": "hardcover, dust jacket intact"
+                }
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 5,
+                "occurred_at": "2025-06-24T00:00:00+02:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": "Florence.Shaw@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "handover_opened",
+                "item_type": "book",
+                "item_ref": 5,
+                "occurred_at": "2025-06-26T00:00:00+02:00",
+                "copy_ref": 2,
+                "from_email": "Kaden.Scott@example.org",
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": null,
+                "payload": {
+                    "handoverId": 3
+                }
+            },
+            {
+                "entry_type": "handover_confirmed",
+                "item_type": "book",
+                "item_ref": 5,
+                "occurred_at": "2025-06-26T00:00:00+02:00",
+                "copy_ref": 2,
+                "from_email": "Kaden.Scott@example.org",
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": "Kaden.Scott@example.org",
+                "payload": {
+                    "handoverId": 3
+                }
+            },
+            {
+                "entry_type": "handover_confirmed",
+                "item_type": "book",
+                "item_ref": 5,
+                "occurred_at": "2025-06-29T00:00:00+02:00",
+                "copy_ref": 2,
+                "from_email": "Kaden.Scott@example.org",
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": "Florence.Shaw@example.org",
+                "payload": {
+                    "handoverId": 3
+                }
+            },
+            {
+                "entry_type": "handover_completed",
+                "item_type": "book",
+                "item_ref": 5,
+                "occurred_at": "2025-06-29T00:00:00+02:00",
+                "copy_ref": 2,
+                "from_email": "Kaden.Scott@example.org",
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": "Florence.Shaw@example.org",
+                "payload": {
+                    "handoverId": 3
+                }
+            },
+            {
+                "entry_type": "donated",
+                "item_type": "book",
+                "item_ref": 5,
+                "occurred_at": "2025-08-08T00:00:00+02:00",
+                "copy_ref": 3,
+                "from_email": null,
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": {
+                    "label": "paperback, bought at the airport"
+                }
+            },
+            {
+                "entry_type": "donated",
+                "item_type": "book",
+                "item_ref": 5,
+                "occurred_at": "2025-11-06T00:00:00+01:00",
+                "copy_ref": 4,
+                "from_email": null,
+                "to_email": "Freya.Browning@example.org",
+                "actor_email": "Freya.Browning@example.org",
+                "payload": {
+                    "label": "large print edition"
+                }
+            },
+            {
+                "entry_type": "donated",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2024-12-01T00:00:00+01:00",
+                "copy_ref": 5,
+                "from_email": null,
+                "to_email": "Kaden.Scott@example.org",
+                "actor_email": "Kaden.Scott@example.org",
+                "payload": {
+                    "label": "first edition, signed at a reading"
+                }
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2024-12-06T00:00:00+01:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "handover_opened",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2024-12-09T00:00:00+01:00",
+                "copy_ref": 5,
+                "from_email": "Kaden.Scott@example.org",
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": null,
+                "payload": {
+                    "handoverId": 5
+                }
+            },
+            {
+                "entry_type": "handover_confirmed",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2024-12-09T00:00:00+01:00",
+                "copy_ref": 5,
+                "from_email": "Kaden.Scott@example.org",
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Kaden.Scott@example.org",
+                "payload": {
+                    "handoverId": 5
+                }
+            },
+            {
+                "entry_type": "handover_confirmed",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2024-12-11T00:00:00+01:00",
+                "copy_ref": 5,
+                "from_email": "Kaden.Scott@example.org",
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": {
+                    "handoverId": 5
+                }
+            },
+            {
+                "entry_type": "handover_completed",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2024-12-11T00:00:00+01:00",
+                "copy_ref": 5,
+                "from_email": "Kaden.Scott@example.org",
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": {
+                    "handoverId": 5
+                }
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2025-01-25T00:00:00+01:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": "Florence.Shaw@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "marked_finished",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2025-01-30T00:00:00+01:00",
+                "copy_ref": 5,
+                "from_email": null,
+                "to_email": null,
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "handover_opened",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2025-01-30T00:00:00+01:00",
+                "copy_ref": 5,
+                "from_email": "Elisa.Nishikawa@example.org",
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": null,
+                "payload": {
+                    "handoverId": 6
+                }
+            },
+            {
+                "entry_type": "handover_confirmed",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2025-01-30T00:00:00+01:00",
+                "copy_ref": 5,
+                "from_email": "Elisa.Nishikawa@example.org",
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": {
+                    "handoverId": 6
+                }
+            },
+            {
+                "entry_type": "handover_confirmed",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2025-02-01T00:00:00+01:00",
+                "copy_ref": 5,
+                "from_email": "Elisa.Nishikawa@example.org",
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": "Florence.Shaw@example.org",
+                "payload": {
+                    "handoverId": 6
+                }
+            },
+            {
+                "entry_type": "handover_completed",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2025-02-01T00:00:00+01:00",
+                "copy_ref": 5,
+                "from_email": "Elisa.Nishikawa@example.org",
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": "Florence.Shaw@example.org",
+                "payload": {
+                    "handoverId": 6
+                }
+            },
+            {
+                "entry_type": "marked_finished",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2025-03-16T00:00:00+01:00",
+                "copy_ref": 5,
+                "from_email": null,
+                "to_email": null,
+                "actor_email": "Florence.Shaw@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 7,
+                "occurred_at": "2025-04-30T00:00:00+02:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Freya.Browning@example.org",
+                "actor_email": "Freya.Browning@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 2,
+                "occurred_at": "2025-10-02T00:00:00+02:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Kaden.Scott@example.org",
+                "actor_email": "Kaden.Scott@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 2,
+                "occurred_at": "2025-10-27T00:00:00+01:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": "Florence.Shaw@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 2,
+                "occurred_at": "2025-11-11T00:00:00+01:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 2,
+                "occurred_at": "2025-12-06T00:00:00+01:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Freya.Browning@example.org",
+                "actor_email": "Freya.Browning@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "donated",
+                "item_type": "book",
+                "item_ref": 3,
+                "occurred_at": "2025-11-21T00:00:00+01:00",
+                "copy_ref": 7,
+                "from_email": null,
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": {
+                    "label": "hardcover with the illustrated endpapers"
+                }
+            },
+            {
+                "entry_type": "donated",
+                "item_type": "book",
+                "item_ref": 15,
+                "occurred_at": "2025-03-11T00:00:00+01:00",
+                "copy_ref": 8,
+                "from_email": null,
+                "to_email": "Florence.Shaw@example.org",
+                "actor_email": "Florence.Shaw@example.org",
+                "payload": {
+                    "label": "reading copy, water damage"
+                }
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 15,
+                "occurred_at": "2025-03-21T00:00:00+01:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Kaden.Scott@example.org",
+                "actor_email": "Kaden.Scott@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "handover_opened",
+                "item_type": "book",
+                "item_ref": 15,
+                "occurred_at": "2025-03-23T00:00:00+01:00",
+                "copy_ref": 8,
+                "from_email": "Florence.Shaw@example.org",
+                "to_email": "Kaden.Scott@example.org",
+                "actor_email": null,
+                "payload": {
+                    "handoverId": 10
+                }
+            },
+            {
+                "entry_type": "handover_confirmed",
+                "item_type": "book",
+                "item_ref": 15,
+                "occurred_at": "2025-03-23T00:00:00+01:00",
+                "copy_ref": 8,
+                "from_email": "Florence.Shaw@example.org",
+                "to_email": "Kaden.Scott@example.org",
+                "actor_email": "Florence.Shaw@example.org",
+                "payload": {
+                    "handoverId": 10
+                }
+            },
+            {
+                "entry_type": "handover_confirmed",
+                "item_type": "book",
+                "item_ref": 15,
+                "occurred_at": "2025-03-26T00:00:00+01:00",
+                "copy_ref": 8,
+                "from_email": "Florence.Shaw@example.org",
+                "to_email": "Kaden.Scott@example.org",
+                "actor_email": "Kaden.Scott@example.org",
+                "payload": {
+                    "handoverId": 10
+                }
+            },
+            {
+                "entry_type": "handover_completed",
+                "item_type": "book",
+                "item_ref": 15,
+                "occurred_at": "2025-03-26T00:00:00+01:00",
+                "copy_ref": 8,
+                "from_email": "Florence.Shaw@example.org",
+                "to_email": "Kaden.Scott@example.org",
+                "actor_email": "Kaden.Scott@example.org",
+                "payload": {
+                    "handoverId": 10
+                }
+            },
+            {
+                "entry_type": "retired",
+                "item_type": "book",
+                "item_ref": 15,
+                "occurred_at": "2025-10-07T00:00:00+02:00",
+                "copy_ref": 8,
+                "from_email": null,
+                "to_email": null,
+                "actor_email": "Kaden.Scott@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "donated",
+                "item_type": "book",
+                "item_ref": 13,
+                "occurred_at": "2025-04-20T00:00:00+02:00",
+                "copy_ref": 9,
+                "from_email": null,
+                "to_email": "Freya.Browning@example.org",
+                "actor_email": "Freya.Browning@example.org",
+                "payload": {
+                    "label": "paperback, heavily annotated"
+                }
+            },
+            {
+                "entry_type": "requested",
+                "item_type": "book",
+                "item_ref": 13,
+                "occurred_at": "2025-04-30T00:00:00+02:00",
+                "copy_ref": null,
+                "from_email": null,
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "handover_opened",
+                "item_type": "book",
+                "item_ref": 13,
+                "occurred_at": "2025-05-02T00:00:00+02:00",
+                "copy_ref": 9,
+                "from_email": "Freya.Browning@example.org",
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": null,
+                "payload": {
+                    "handoverId": 11
+                }
+            },
+            {
+                "entry_type": "handover_confirmed",
+                "item_type": "book",
+                "item_ref": 13,
+                "occurred_at": "2025-05-02T00:00:00+02:00",
+                "copy_ref": 9,
+                "from_email": "Freya.Browning@example.org",
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Freya.Browning@example.org",
+                "payload": {
+                    "handoverId": 11
+                }
+            },
+            {
+                "entry_type": "handover_confirmed",
+                "item_type": "book",
+                "item_ref": 13,
+                "occurred_at": "2025-05-05T00:00:00+02:00",
+                "copy_ref": 9,
+                "from_email": "Freya.Browning@example.org",
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": {
+                    "handoverId": 11
+                }
+            },
+            {
+                "entry_type": "handover_completed",
+                "item_type": "book",
+                "item_ref": 13,
+                "occurred_at": "2025-05-05T00:00:00+02:00",
+                "copy_ref": 9,
+                "from_email": "Freya.Browning@example.org",
+                "to_email": "Elisa.Nishikawa@example.org",
+                "actor_email": "Elisa.Nishikawa@example.org",
+                "payload": {
+                    "handoverId": 11
+                }
+            },
+            {
+                "entry_type": "lost",
+                "item_type": "book",
+                "item_ref": 13,
+                "occurred_at": "2025-09-27T00:00:00+02:00",
+                "copy_ref": 9,
+                "from_email": null,
+                "to_email": null,
+                "actor_email": "Kaden.Scott@example.org",
+                "payload": []
+            },
+            {
+                "entry_type": "donated",
+                "item_type": "book",
+                "item_ref": 6,
+                "occurred_at": "2025-08-08T00:00:00+02:00",
+                "copy_ref": 10,
+                "from_email": null,
+                "to_email": "Kaden.Scott@example.org",
+                "actor_email": "Kaden.Scott@example.org",
+                "payload": {
+                    "label": "paperback, film tie-in cover"
+                }
+            }
+        ]
+    },
+    "comments": [],
+    "change_proposals": [],
+    "trust": [],
+    "wishlist": [],
+    "ballots": [],
+    "images": []
+}

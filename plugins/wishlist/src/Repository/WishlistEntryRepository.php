@@ -34,11 +34,6 @@ class WishlistEntryRepository extends ServiceEntityRepository
         return $this->findOneBy(['userId' => $userId, 'itemType' => $itemType, 'itemId' => $itemId]);
     }
 
-    public function hasAny(): bool
-    {
-        return $this->count([]) > 0;
-    }
-
     /** @return WishlistEntry[] every wish, for the group view (user grouping happens in the service) */
     public function findAllForGroupView(): array
     {

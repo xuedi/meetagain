@@ -1,0 +1,132 @@
+{
+    "format": "meetagain-group-export",
+    "version": "2.0",
+    "exported_at": "2026-01-05T00:00:00+01:00",
+    "plugins": [
+        "wishlist"
+    ],
+    "site": {
+        "slug": "vanilla-group",
+        "name": "Vanilla Group",
+        "description": "Nothing but what a fresh install needs: an owner and a start page. No plugins, no events.",
+        "languages": [
+            "en",
+            "de",
+            "zh"
+        ],
+        "theme_colors": [],
+        "settings": {
+            "send_event_reminders": true,
+            "send_rsvp_notifications": true,
+            "send_upcoming_digest": true,
+            "show_town_hall": false
+        },
+        "plugin_settings": [],
+        "logo_file": null
+    },
+    "locations": [],
+    "users": [
+        {
+            "email": "admin@example.org",
+            "name": "admin",
+            "locale": "de",
+            "role": "admin",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
+            "public": true,
+            "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
+        }
+    ],
+    "hosts": [],
+    "series": [],
+    "events": [],
+    "rsvps": [],
+    "cms_pages": [
+        {
+            "ref": 9,
+            "slug": "index",
+            "published": true,
+            "titles": {
+                "de": "Willkommen",
+                "en": "Welcome",
+                "zh": "欢迎"
+            },
+            "link_names": {
+                "de": "Startseite",
+                "en": "Home",
+                "zh": "首页"
+            },
+            "menu_locations": [
+                1
+            ],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 1,
+                    "priority": 1,
+                    "json": {
+                        "title": "Welcome to the Vanilla Group"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 2,
+                    "json": {
+                        "content": "This start page is all the group has so far."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 1,
+                    "priority": 3,
+                    "json": {
+                        "title": "Willkommen in der Vanilla Group"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 4,
+                    "json": {
+                        "content": "Diese Startseite ist bisher alles, was die Gruppe hat."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "zh",
+                    "type": 1,
+                    "priority": 5,
+                    "json": {
+                        "title": "欢迎来到 Vanilla Group"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "zh",
+                    "type": 2,
+                    "priority": 6,
+                    "json": {
+                        "content": "这个起始页是本小组目前唯一的内容。"
+                    },
+                    "image_file": null
+                }
+            ]
+        }
+    ],
+    "announcements": [],
+    "tags": [],
+    "items": [],
+    "event_items": [],
+    "topics": [],
+    "circulation": [],
+    "comments": [],
+    "change_proposals": [],
+    "trust": [],
+    "wishlist": [],
+    "ballots": [],
+    "images": []
+}

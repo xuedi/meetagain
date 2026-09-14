@@ -13,71 +13,113 @@
             </div>
         {% endif %}
 
-        {% if summary %}
-            <div class="notification is-success is-light">
-                <h2 class="title is-5">{{ 'admin_system_import.success_title'|trans }}</h2>
-                <table class="table is-narrow">
-                    <tbody>
-                        <tr>
-                            <td>{{ 'admin_system_import.users_created'|trans }}</td>
-                            <td>{{ summary.usersCreated }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ 'admin_system_import.users_skipped'|trans }}</td>
-                            <td>{{ summary.usersSkipped }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ 'admin_system_import.locations_created'|trans }}</td>
-                            <td>{{ summary.locationsCreated }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ 'admin_system_import.events_created'|trans }}</td>
-                            <td>{{ summary.eventsCreated }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ 'admin_system_import.cms_created'|trans }}</td>
-                            <td>{{ summary.cmsPagesCreated }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ 'admin_system_import.cms_skipped'|trans }}</td>
-                            <td>{{ summary.cmsPagesSkipped }}</td>
-                        </tr>
-                        {% for itemType, itemCounts in summary.itemsByType %}
+        {% if archive %}
+            <h2 class="title is-5 mb-2">{{ archive.name }}</h2>
+            {% if archive.exported_at %}
+                <p class="has-text-grey mb-3">{{ 'admin_system_import.exported_at'|trans({'%date%': archive.exported_at|date('Y-m-d')}) }}</p>
+            {% endif %}
+            {% if archive.description %}
+                <p class="mb-4">{{ archive.description }}</p>
+            {% endif %}
+
+            <div class="columns">
+                <div class="column">
+                    <table class="table is-fullwidth">
+                        <thead>
                             <tr>
-                                <td>{{ 'admin_system_import.items_created'|trans({'%type%': itemType}) }}</td>
-                                <td>{{ itemCounts.created }}</td>
+                                <th>{{ 'admin_system_import.col_kind'|trans }}</th>
+                                <th>{{ 'admin_system_import.col_rows'|trans }}</th>
                             </tr>
+                        </thead>
+                        <tbody>
+                            {% for kind, rows in archive.counts %}
+                                <tr>
+                                    <td>{{ labels[kind] }}</td>
+                                    <td>{{ rows }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if archive.plugins is not empty %}
+                    <div class="column">
+                        <table class="table is-fullwidth">
+                            <thead>
+                                <tr>
+                                    <th>{{ 'admin_system_import.col_plugin'|trans }}</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for pluginKey in archive.plugins %}
+                                    <tr>
+                                        <td>{{ pluginNames[pluginKey] }}</td>
+                                        <td>
+                                            {% if pluginKey in archive.missing_plugins %}
+                                                <span class="has-text-danger">{{ 'admin_system_import.plugin_missing'|trans }}</span>
+                                            {% else %}
+                                                <span class="has-text-success">{{ 'admin_system_import.plugin_active'|trans }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+
+            <form method="post" action="{{ path('app_admin_system_import_run') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('admin_system_import_run') }}">
+                <div class="field">
+                    <label class="checkbox">
+                        <input type="checkbox" name="site_settings" value="1"{% if siteSettingsDefault %} checked{% endif %}>
+                        {{ 'admin_system_import.label_site_settings'|trans }}
+                    </label>
+                </div>
+                <button type="submit" class="button is-primary">
+                    <span class="icon"><i class="fas fa-file-import"></i></span>
+                    <span>{{ 'admin_system_import.button'|trans }}</span>
+                </button>
+            </form>
+        {% else %}
+            {% if summary %}
+                <table class="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>{{ 'admin_system_import.col_kind'|trans }}</th>
+                            {% for outcome in outcomes %}
+                                <th>{{ outcome.label()|trans }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for kind in summary.counts|keys %}
                             <tr>
-                                <td>{{ 'admin_system_import.items_matched'|trans({'%type%': itemType}) }}</td>
-                                <td>{{ itemCounts.matched }}</td>
+                                <td>{{ labels[kind] }}</td>
+                                {% for outcome in outcomes %}
+                                    <td>{{ summary.get(kind, outcome) }}</td>
+                                {% endfor %}
                             </tr>
                         {% endfor %}
-                        <tr>
-                            <td>{{ 'admin_system_import.item_sections_skipped'|trans }}</td>
-                            <td>{{ summary.itemSectionsSkipped }}</td>
-                        </tr>
-                        <tr>
-                            <td>{{ 'admin_system_import.tag_dropped'|trans }}</td>
-                            <td>{{ summary.tagAssignmentsDropped }}</td>
-                        </tr>
                     </tbody>
                 </table>
-                <p class="mt-3">{{ 'admin_system_import.note'|trans }}</p>
-            </div>
-        {% endif %}
+                <p class="has-text-grey mb-5">{{ 'admin_system_import.note'|trans }}</p>
+            {% endif %}
 
-        <form method="post" action="{{ path('app_admin_system_import') }}" enctype="multipart/form-data">
-            <div class="field">
-                <label class="label">{{ 'admin_system_import.label_zip_file'|trans }}</label>
-                <div class="control">
-                    <input class="input" type="file" name="import_file" accept=".zip" required>
+            <form method="post" action="{{ path('app_admin_system_import') }}" enctype="multipart/form-data">
+                <div class="field">
+                    <label class="label">{{ 'admin_system_import.label_zip_file'|trans }}</label>
+                    <div class="control">
+                        <input class="input" type="file" name="import_file" accept=".zip" required>
+                    </div>
                 </div>
-            </div>
-            <button type="submit" class="button is-primary">
-                <span class="icon"><i class="fas fa-file-import"></i></span>
-                <span>{{ 'admin_system_import.button'|trans }}</span>
-            </button>
-        </form>
+                <button type="submit" class="button is-primary">
+                    <span class="icon"><i class="fas fa-upload"></i></span>
+                    <span>{{ 'admin_system_import.button_preview'|trans }}</span>
+                </button>
+            </form>
+        {% endif %}
 
     </div>
 

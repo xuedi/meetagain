@@ -56,3 +56,6 @@ dishes_dish:
     flash_added: 'Plat ajouté au catalogue.'
     flash_updated: 'Plat mis à jour.'
     flash_deleted: 'Plat supprimé.'
+dishes_portability:
+    kind_likes: 'J''aime sur les plats'
+    kind_gallery: 'Images de galerie des plats'

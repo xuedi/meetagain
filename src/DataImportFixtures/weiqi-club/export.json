@@ -1,0 +1,2597 @@
+{
+    "format": "meetagain-group-export",
+    "version": "2.0",
+    "exported_at": "2026-01-05T00:00:00+01:00",
+    "plugins": [
+        "boardgames",
+        "films",
+        "photos",
+        "wishlist"
+    ],
+    "site": {
+        "slug": "weiqi-club",
+        "name": "Weiqi Club",
+        "description": "",
+        "languages": [
+            "en",
+            "de",
+            "es",
+            "fr",
+            "zh"
+        ],
+        "theme_colors": [],
+        "settings": {
+            "send_event_reminders": true,
+            "send_rsvp_notifications": true,
+            "send_upcoming_digest": true,
+            "show_town_hall": false
+        },
+        "plugin_settings": {
+            "boardgames": {
+                "adapter": null,
+                "circulation": false,
+                "trustSystem": false
+            },
+            "films": {
+                "adapter": null
+            },
+            "photos": {
+                "memberUploads": true,
+                "showCameraMeta": true,
+                "memberStreams": true,
+                "eventBox": true,
+                "contest": false,
+                "contestSubmissionsPerMember": 1
+            }
+        },
+        "logo_file": "images/192348baa79673e708c8d06068ed69c03be79189.png"
+    },
+    "locations": [
+        {
+            "ref": 1,
+            "title": "Weiqi Cafe Berlin",
+            "latitude": "52.5321",
+            "longitude": "13.3799",
+            "city": "Berlin",
+            "country": ""
+        },
+        {
+            "ref": 2,
+            "title": "Community Center Mitte",
+            "latitude": "52.5035",
+            "longitude": "13.4052",
+            "city": "Berlin",
+            "country": ""
+        },
+        {
+            "ref": 5,
+            "title": "Online Platform",
+            "latitude": "0",
+            "longitude": "0",
+            "city": "",
+            "country": ""
+        },
+        {
+            "ref": 4,
+            "title": "Grunewald Camping",
+            "latitude": "52.4693",
+            "longitude": "13.2687",
+            "city": "Berlin",
+            "country": ""
+        }
+    ],
+    "users": [
+        {
+            "email": "admin@example.org",
+            "name": "admin",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
+            "public": true,
+            "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
+        },
+        {
+            "email": "Crystal.Liu@example.org",
+            "name": "Crystal Liu",
+            "locale": "zh",
+            "role": "admin",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
+            "public": true,
+            "image_file": "images/c79532c476e00a2400292babd40d98ac7dff9997.jpg"
+        },
+        {
+            "email": "Abraham.Baker@example.org",
+            "name": "Abraham Baker",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker with a passion for painting and hiking. Catch me exploring the great outdoors or getting lost in colors! #Wanderlust #ArtLover 🎨⛰️",
+            "public": true,
+            "image_file": "images/2815822b97a4d8780ab4a535c93de335d041beb1.jpg"
+        },
+        {
+            "email": "Adem.Lane@example.org",
+            "name": "Adem Lane",
+            "locale": "zh",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker and creative soul, I explore the world through hiking trails and paintbrush strokes. Join me on my journey of discovery! #HikingAdventures #ArtisticLife",
+            "public": true,
+            "image_file": "images/ddde6f9c2ca89fc15b6544f67093a8ffbabc5576.jpg"
+        },
+        {
+            "email": "Adil.Floyd@example.org",
+            "name": "Adil Floyd",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about painting and hiking, I find inspiration in nature's beauty. Balancing my love for creativity with a career in graphic design keeps my heart and mind alive! #ArtLover #NatureEnthusiast #CreativeCareer",
+            "public": true,
+            "image_file": "images/2222401da7a69ee28f16d18df030d4314149f727.jpg"
+        },
+        {
+            "email": "Adriana.O-Sullivan@example.org",
+            "name": "Adriana O-Sullivan",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker by day, coffee lover by night! Balancing work and play like a pro - let's create, explore, and enjoy life together! #HobbyHero #WorkAndPlay",
+            "public": true,
+            "image_file": "images/89595911050c056983c9ccb0a8f384df2c2451f0.jpg"
+        },
+        {
+            "email": "Alec.Whitten@example.org",
+            "name": "Alec Whitten",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker by day, crafting wizard by night! When I'm not doodling my dreams, you'll catch me hiking or whipping up some delicious treats! 🌟🏞️ #Wanderlust #CreativeSoul",
+            "public": true,
+            "image_file": "images/dd375644dd635f8ebbc14455c1a92eba2b3bcbde.jpg"
+        },
+        {
+            "email": "Alesha.Barry@example.org",
+            "name": "Alesha Barry",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Coffee-fueled creative by day, amateur ninja at night - watch out for my decorative sock collection! 🚀☕️ #WorkHardPlayHarder #SockGoals",
+            "public": true,
+            "image_file": "images/e273b0e43eff29b8d94320f130c784b7b520c478.jpg"
+        },
+        {
+            "email": "Aliah.Lane@example.org",
+            "name": "Aliah Lane",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Lover of adventure and creativity, I dive into painting and hiking when I'm not crafting magic in marketing! 🌟✨ #HobbyistHeart #WorkAndPlay",
+            "public": true,
+            "image_file": "images/6ba742bef3c8815b370cea7f78a3f832d3b705b4.jpg"
+        },
+        {
+            "email": "Alisa.Hester@example.org",
+            "name": "Alisa Hester",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Lost in the rhythm of my paintbrush and the soothing melodies of my guitar, I find solace in creativity as work feels like a never-ending cycle. Searching for joy in hobbies while the weight of responsibilities lingers heavy on my shoulders. #CreativeEscape #HeavyHeart",
+            "public": true,
+            "image_file": "images/7d43a8bfd3730903f80ad5443c726f1033c6912b.jpg"
+        },
+        {
+            "email": "Amanda.Lowery@example.org",
+            "name": "Amanda Lowery",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "When I'm not exploring new worlds through books, I'm diving into the beauty of languages - each one a key to a different culture. Join me on this journey of connection and discovery! #LanguageLover #HobbyExplorer",
+            "public": true,
+            "image_file": "images/31fef0605dd4855630afc0c4c11c427a2be34cbc.jpg"
+        },
+        {
+            "email": "Amelie.Bennett@example.org",
+            "name": "Amelie Bennett",
+            "locale": "de",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about exploring new cultures through the beauty of languages, I find joy in connecting with others and discovering unique expressions. In my free time, you'll catch me diving into books or practicing my latest linguistic obsession! #LanguageLover #CulturalExplorer",
+            "public": true,
+            "image_file": "images/99182573f44119ab7be948dd89e4463a742c2a34.jpg"
+        },
+        {
+            "email": "Amelie.Laurent@example.org",
+            "name": "Amelie Laurent",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Lover of languages, forever on a quest for new words and worlds! From juggling hobbies to weaving cultures, I'm all about the fun in learning! 🌍✨ #LanguageLover #HobbyExplorer",
+            "public": true,
+            "image_file": "images/aa7c278d29f74478191ce4cfb1798a4b6283c5b6.jpg"
+        },
+        {
+            "email": "Candice.Wu@example.org",
+            "name": "Candice Wu",
+            "locale": "en",
+            "role": "organizer",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about bridging cultures through the magic of languages, I thrive in diverse workplaces where every conversation is an adventure! 🌍✨ #LanguageLover #WorkLifeJoy",
+            "public": true,
+            "image_file": "images/490bfc684f9830da9ba9b43e3de6d7d15d674a95.jpg"
+        },
+        {
+            "email": "Jessie.Meyton@example.org",
+            "name": "Jessie Meyton",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "When I'm not exploring new worlds through books, I'm diving into the beauty of languages - each one a key to a different culture. Join me on this journey of connection and discovery! #LanguageLover #HobbyExplorer",
+            "public": true,
+            "image_file": "images/518d9628fbfcbcb0a627f2049703b5d04e92cd28.jpg"
+        },
+        {
+            "email": "Mollie.Hall@example.org",
+            "name": "Mollie Hall",
+            "locale": "en",
+            "role": "user",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker by day, crafting wizard by night! When I'm not doodling my dreams, you'll catch me hiking or whipping up some delicious treats! 🌟🏞️ #Wanderlust #CreativeSoul",
+            "public": true,
+            "image_file": "images/c26097c4cbcbb904a18d00c97144af80bb26db65.jpg"
+        },
+        {
+            "email": "Olivia.Rhye@example.org",
+            "name": "Olivia Rhye",
+            "locale": "en",
+            "role": "organizer",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Passionate about bridging cultures through language, I thrive in dynamic work environments that challenge my communication skills. Embracing every opportunity to learn, I'm dedicated to fostering understanding and connection across diverse communities. #LanguageLover #CulturalBridge",
+            "public": true,
+            "image_file": "images/08a3b47613f2d0f6aced2c3c467602e3aa1638f1.jpg"
+        },
+        {
+            "email": "axisbos.audax@example.org",
+            "name": "axisbos audax",
+            "locale": "en",
+            "role": "organizer",
+            "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
+            "bio": "Adventure seeker by day, crafting wizard by night! When I'm not doodling my dreams, you'll catch me hiking or whipping up some delicious treats! 🌟🏞️ #Wanderlust #CreativeSoul",
+            "public": true,
+            "image_file": "images/8cc62ac5b14b41e7c5b5f5e46a1c34cde6edd430.jpg"
+        }
+    ],
+    "hosts": [
+        {
+            "ref": 1,
+            "name": "Admin",
+            "email": "admin@example.org"
+        },
+        {
+            "ref": 2,
+            "name": "Adem",
+            "email": "Adem.Lane@example.org"
+        },
+        {
+            "ref": 3,
+            "name": "Crystal",
+            "email": "Crystal.Liu@example.org"
+        },
+        {
+            "ref": 4,
+            "name": "Jessie",
+            "email": "Jessie.Meyton@example.org"
+        },
+        {
+            "ref": 5,
+            "name": "Mollie",
+            "email": "Mollie.Hall@example.org"
+        },
+        {
+            "ref": 6,
+            "name": "Ghost",
+            "email": null
+        }
+    ],
+    "series": [
+        {
+            "ref": 1,
+            "name": "Weekly Go Study Group",
+            "rule": "Weekly",
+            "ruleSpec": null
+        },
+        {
+            "ref": 2,
+            "name": "Beginner Workshop: Learn Go",
+            "rule": "Monthly",
+            "ruleSpec": null
+        }
+    ],
+    "events": [
+        {
+            "ref": 1,
+            "initial": true,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2025-11-12T18:00:00+01:00",
+            "stop": "2025-11-12T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": true,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 2,
+            "initial": true,
+            "titles": {
+                "de": "Berliner Go-Turnier 2026",
+                "en": "Berlin Go Tournament 2026",
+                "es": "Torneo de Go de Berlín 2026",
+                "fr": "Tournoi de Go de Berlin 2026",
+                "zh": "2026年柏林围棋锦标赛"
+            },
+            "descriptions": {
+                "de": "Nehmen Sie am jährlichen Berliner Go-Turnier teil! Offen für alle Spielstärken mit separaten Divisionen. McMahon-Paarungssystem garantiert faire Spiele. Teilnahmegebühr: 15€ inkl. Mittagessen. Preise für die Top 3 in jeder Division.",
+                "en": "Join us for the annual Berlin Go Tournament! Open to all skill levels with separate divisions. McMahon pairing system ensures fair games. Entry fee: €15 includes lunch. Prizes for top 3 in each division.",
+                "es": "¡Únete al torneo anual de Go de Berlín! Abierto a todos los niveles con divisiones separadas. El sistema de emparejamiento McMahon garantiza partidas justas. Cuota de inscripción: 15 € con comida incluida. Premios para los 3 primeros de cada división.",
+                "fr": "Rejoins-nous pour le tournoi de Go annuel de Berlin ! Ouvert à tous les niveaux avec des divisions séparées. Le système d'appariement McMahon garantit des parties équitables. Droits d'inscription : 15 €, déjeuner inclus. Des prix pour les 3 premiers de chaque division.",
+                "zh": "参加年度柏林围棋锦标赛！对所有水平开放，设有不同组别。麦克马洪配对系统确保公平对局。参赛费：15欧元含午餐。各组别前三名有奖。"
+            },
+            "teasers": {
+                "de": "Jährliche Stadtmeisterschaft für alle Spielstärken. McMahon-Paarungssystem, 5 Runden.",
+                "en": "Annual city championship for all skill levels. McMahon pairing system, 5 rounds.",
+                "es": "Campeonato anual de la ciudad para todos los niveles. Sistema de emparejamiento McMahon, 5 rondas.",
+                "fr": "Championnat annuel de la ville pour tous les niveaux. Système d'appariement McMahon, 5 rondes.",
+                "zh": "年度城市锦标赛，所有水平均可参加。麦克马洪配对系统，5轮比赛。"
+            },
+            "start": "2026-03-14T09:00:00+01:00",
+            "stop": "2026-03-14T18:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": null,
+            "featured": true,
+            "location_ref": 2,
+            "host_refs": [
+                1,
+                4
+            ],
+            "external_rsvp": 0,
+            "creator_email": "admin@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 3,
+            "initial": true,
+            "titles": {
+                "de": "Anfänger-Workshop: Go lernen",
+                "en": "Beginner Workshop: Learn Go",
+                "es": "Taller para principiantes: aprender Go",
+                "fr": "Atelier débutants : apprendre le Go",
+                "zh": "初学者工作坊：学习围棋"
+            },
+            "descriptions": {
+                "de": "Noch nie Go gespielt? Perfekt! Dieser Workshop deckt die Grundregeln, strategische Grundlagen und Ihre ersten Spiele auf einem 9x9-Brett ab. Unsere zertifizierten Instruktoren führen Sie Schritt für Schritt. Alle Materialien werden gestellt, keine Erfahrung nötig. Kostenlose Veranstaltung!",
+                "en": "Never played Go before? Perfect! This workshop covers the basic rules, strategy fundamentals, and your first games on a 9x9 board. Our certified instructors will guide you step by step. All materials provided, no experience needed. Free event!",
+                "es": "¿Nunca has jugado al Go? ¡Perfecto! Este taller cubre las reglas básicas, los fundamentos de estrategia y tus primeras partidas en un tablero de 9x9. Nuestros instructores certificados te guiarán paso a paso. Todos los materiales incluidos, no se necesita experiencia. ¡Evento gratuito!",
+                "fr": "Tu n'as jamais joué au Go ? Parfait ! Cet atelier couvre les règles de base, les fondamentaux de la stratégie et tes premières parties sur un goban 9x9. Nos instructeurs certifiés te guident pas à pas. Tout le matériel est fourni, aucune expérience requise. Événement gratuit !",
+                "zh": "从未下过围棋？太好了！本工作坊涵盖基本规则、策略基础和您在9路棋盘上的首局对弈。我们的认证教练将逐步指导。提供所有材料，无需经验。免费活动！"
+            },
+            "teasers": {
+                "de": "Vollständige Einführung in Go für absolute Anfänger. Kostenlose Veranstaltung, alle Materialien gestellt.",
+                "en": "Complete introduction to Go for absolute beginners. Free event, all materials provided.",
+                "es": "Introducción completa al Go para principiantes absolutos. Evento gratuito, todos los materiales incluidos.",
+                "fr": "Introduction complète au Go pour les grands débutants. Événement gratuit, tout le matériel fourni.",
+                "zh": "为零基础初学者提供的完整围棋入门。免费活动，提供所有材料。"
+            },
+            "start": "2026-02-14T14:00:00+01:00",
+            "stop": "2026-02-14T17:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 2,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                2,
+                3
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 4,
+            "initial": true,
+            "titles": {
+                "de": "Online-Simultanspiel mit 5-Dan",
+                "en": "Online Simultaneous Game with 5-Dan",
+                "es": "Partida simultánea en línea con un 5-dan",
+                "fr": "Partie simultanée en ligne avec un 5-dan",
+                "zh": "与5段棋手的在线联棋"
+            },
+            "descriptions": {
+                "de": "Erleben Sie die Kraft eines starken Spielers! Unser ansässiger 5-Dan spielt simultane Partien gegen 6 Teilnehmer und liefert Live-Kommentar. Großartige Lernmöglichkeit, um High-Level-Denken zu verstehen. Online über OGS-Plattform.",
+                "en": "Experience the power of a strong player! Our resident 5-dan will play simultaneous games against 6 participants while providing live commentary. Great learning opportunity to understand high-level thinking. Online via OGS platform.",
+                "es": "¡Vive la potencia de un jugador fuerte! Nuestro 5-dan residente jugará partidas simultáneas contra 6 participantes con comentarios en directo. Una gran oportunidad para entender el pensamiento de alto nivel. En línea a través de la plataforma OGS.",
+                "fr": "Découvre la puissance d'un joueur de haut niveau ! Notre 5-dan résident jouera des parties simultanées contre 6 participants avec des commentaires en direct. Une excellente occasion d'apprendre à comprendre la réflexion de haut niveau. En ligne via la plateforme OGS.",
+                "zh": "体验强者的力量！我们的常驻5段棋手将同时与6名参与者对弈，并提供现场解说。这是理解高水平思维的绝佳学习机会。通过OGS平台在线进行。"
+            },
+            "teasers": {
+                "de": "Sehen Sie einen 5-Dan-Spieler gegen mehrere Gegner gleichzeitig antreten. Mit Kommentar!",
+                "en": "Watch a 5-dan player take on multiple opponents at once. Commentary included!",
+                "es": "Mira a un jugador 5-dan enfrentarse a varios oponentes a la vez. ¡Con comentarios!",
+                "fr": "Regarde un joueur 5-dan affronter plusieurs adversaires à la fois. Commentaires inclus !",
+                "zh": "观看5段棋手同时对抗多名对手。包含解说！"
+            },
+            "start": "2026-01-31T15:00:00+01:00",
+            "stop": "2026-01-31T18:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": null,
+            "featured": false,
+            "location_ref": 5,
+            "host_refs": [
+                1
+            ],
+            "external_rsvp": 0,
+            "creator_email": "admin@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 5,
+            "initial": true,
+            "titles": {
+                "de": "Wochenend-Go-Retreat",
+                "en": "Weekend Go Retreat",
+                "es": "Retiro de Go de fin de semana",
+                "fr": "Retraite Go du week-end",
+                "zh": "周末围棋静修"
+            },
+            "descriptions": {
+                "de": "Begleiten Sie uns zu einem immersiven Go-Wochenende im schönen Grunewald! Inklusive Unterkunft, Verpflegung, strukturierte Trainingseinheiten, professionelle Vorträge und viel Zeit zum Spielen. Alle Level willkommen. Begrenzt auf 20 Teilnehmer.",
+                "en": "Join us for an immersive Go weekend in the beautiful Grunewald forest! Includes accommodation, meals, structured training sessions, professional lectures, and plenty of time for games. All levels welcome. Limited to 20 participants.",
+                "es": "¡Únete a nosotros para un fin de semana de Go inmersivo en el hermoso bosque de Grunewald! Incluye alojamiento, comidas, sesiones de entrenamiento estructuradas, charlas profesionales y mucho tiempo para jugar. Todos los niveles son bienvenidos. Limitado a 20 participantes.",
+                "fr": "Rejoins-nous pour un week-end de Go immersif dans la belle forêt de Grunewald ! Hébergement et repas inclus, sessions d'entraînement structurées, conférences professionnelles et beaucoup de temps pour jouer. Tous les niveaux sont les bienvenus. Limité à 20 participants.",
+                "zh": "加入我们在美丽的格鲁内瓦尔德森林度过沉浸式围棋周末！包括住宿、餐饮、结构化训练课程、专业讲座和充足的对弈时间。欢迎所有水平。限20名参与者。"
+            },
+            "teasers": {
+                "de": "Intensives Trainingswochenende in der Natur. Vorträge, Spielanalysen und viel Spielzeit.",
+                "en": "Intensive training weekend in nature. Lectures, game reviews, and lots of playing time.",
+                "es": "Fin de semana de entrenamiento intensivo en la naturaleza. Charlas, revisiones de partidas y mucho tiempo de juego.",
+                "fr": "Week-end d'entraînement intensif dans la nature. Conférences, analyses de parties et beaucoup de temps de jeu.",
+                "zh": "在大自然中进行的密集训练周末。讲座、棋局复盘和大量对弈时间。"
+            },
+            "start": "2026-02-27T16:00:00+01:00",
+            "stop": "2026-03-01T16:00:00+01:00",
+            "status": "published",
+            "type": "Outdoor",
+            "series_ref": null,
+            "featured": false,
+            "location_ref": 4,
+            "host_refs": [
+                1,
+                3,
+                5
+            ],
+            "external_rsvp": 0,
+            "creator_email": "admin@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 6,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-01-07T18:00:00+01:00",
+            "stop": "2026-01-07T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 7,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-01-14T18:00:00+01:00",
+            "stop": "2026-01-14T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 8,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-01-21T18:00:00+01:00",
+            "stop": "2026-01-21T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 9,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-01-28T18:00:00+01:00",
+            "stop": "2026-01-28T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 10,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-02-04T18:00:00+01:00",
+            "stop": "2026-02-04T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 11,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-02-11T18:00:00+01:00",
+            "stop": "2026-02-11T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 12,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-02-18T18:00:00+01:00",
+            "stop": "2026-02-18T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 13,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-02-25T18:00:00+01:00",
+            "stop": "2026-02-25T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 14,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-03-04T18:00:00+01:00",
+            "stop": "2026-03-04T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 15,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-03-11T18:00:00+01:00",
+            "stop": "2026-03-11T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 16,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-03-18T18:00:00+01:00",
+            "stop": "2026-03-18T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 17,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-03-25T18:00:00+01:00",
+            "stop": "2026-03-25T21:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 18,
+            "initial": false,
+            "titles": {
+                "de": "Wöchentliche Go-Studiengruppe",
+                "en": "Weekly Go Study Group",
+                "es": "Grupo de estudio de Go semanal",
+                "fr": "Groupe d'étude de Go hebdomadaire",
+                "zh": "每周围棋学习小组"
+            },
+            "descriptions": {
+                "de": "Unser Mittwochs-Treffen steht allen offen. Es ist das Fundament der Community. Wir kommen zusammen, um die neuesten Nachrichten und Entwicklungen der internationalen Weiqi-Szene zu diskutieren. Wir spielen und analysieren Partien.\n\nWir haben bis zum späten Abend einen eigenen Raum im Spreeblick Cafe, der am einfachsten mit der U-Bahn zu erreichen ist.\n\nWenn Sie Ihr eigenes Weiqi-Brett und Ihre eigenen Steine haben, können Sie diese gerne zum Treffen mitbringen. Wir haben auch 6 Sets mit Weiqi-Brettern und Steinen, mit denen Sie spielen können.",
+                "en": "Our Wednesday meetup is open to everyone. It is the foundation of the community. We come together to discuss the latest news and developments of the International Weiqi developments. We play and analyse games.\n\nWe have our own room at the Spreeblick Cafe until the late evening, it is most easy to arrive via subway.\n\nIf you have your own weiqi board and stones, feel free to bring them to the meetup. We also have 6 sets of weiqi boards and stones for you to play with.",
+                "es": "Nuestra quedada de los miércoles está abierta a todo el mundo. Es la base de la comunidad. Nos reunimos para comentar las últimas noticias y novedades del weiqi internacional. Jugamos y analizamos partidas.\n\nTenemos nuestra propia sala en el Spreeblick Cafe hasta altas horas de la noche; lo más fácil es llegar en metro.\n\nSi tienes tu propio tablero y tus piedras, puedes traerlos a la quedada. También tenemos 6 juegos de tableros y piedras para que juegues.",
+                "fr": "Notre rencontre du mercredi est ouverte à tous. C'est le cœur de la communauté. Nous nous retrouvons pour discuter des dernières nouvelles et des développements du weiqi international. Nous jouons et analysons des parties.\n\nNous avons notre propre salle au Spreeblick Cafe jusqu'en fin de soirée, le plus simple est d'arriver en métro.\n\nSi tu as ton propre goban et tes pierres, n'hésite pas à les apporter à la rencontre. Nous avons aussi 6 jeux de plateaux et de pierres à ta disposition.",
+                "zh": "我们的周三聚会对所有人开放，这是社区的基础。我们齐聚一堂，探讨国际围棋的最新动态与发展，共同下棋并分析棋局。\n\n我们包下了施普雷布里克咖啡馆的包间直至深夜，乘坐地铁前来最为便捷。\n\n若您自备棋盘棋子，欢迎携带至聚会现场。我们亦备有6套棋具供您使用。"
+            },
+            "teasers": {
+                "de": "Nehmen Sie an unserem Mittwochs-Treffen im Spreeblick Cafe teil, um über internationale Weiqi-Nachrichten zu diskutieren und Spiele zu spielen. Wir haben 6 Brettspiele zur Verfügung, aber Sie können gerne auch Ihr eigenes mitbringen.",
+                "en": "Join our Wednesday meetup at Spreeblick Cafe to discuss International Weiqi news and play games. We have 6 board sets available, but feel free to bring your own.",
+                "es": "Únete a nuestra quedada de los miércoles en el Spreeblick Cafe para comentar las noticias del weiqi internacional y jugar algunas partidas. Tenemos 6 juegos de tableros disponibles, pero puedes traer el tuyo si quieres.",
+                "fr": "Rejoins notre rencontre du mercredi au Spreeblick Cafe pour discuter des actualités du weiqi international et jouer quelques parties. Nous avons 6 jeux de plateaux à disposition, mais n'hésite pas à apporter le tien.",
+                "zh": "欢迎参加每周三在施普雷布里克咖啡馆举办的围棋聚会，共同探讨国际围棋动态并切磋棋艺。现场备有6套棋具，您也可自带棋具前来。"
+            },
+            "start": "2026-04-01T18:00:00+02:00",
+            "stop": "2026-04-01T21:00:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 1,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                1,
+                2,
+                3,
+                6
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Adem.Lane@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 19,
+            "initial": false,
+            "titles": {
+                "de": "Anfänger-Workshop: Go lernen",
+                "en": "Beginner Workshop: Learn Go",
+                "es": "Taller para principiantes: aprender Go",
+                "fr": "Atelier débutants : apprendre le Go",
+                "zh": "初学者工作坊：学习围棋"
+            },
+            "descriptions": {
+                "de": "Noch nie Go gespielt? Perfekt! Dieser Workshop deckt die Grundregeln, strategische Grundlagen und Ihre ersten Spiele auf einem 9x9-Brett ab. Unsere zertifizierten Instruktoren führen Sie Schritt für Schritt. Alle Materialien werden gestellt, keine Erfahrung nötig. Kostenlose Veranstaltung!",
+                "en": "Never played Go before? Perfect! This workshop covers the basic rules, strategy fundamentals, and your first games on a 9x9 board. Our certified instructors will guide you step by step. All materials provided, no experience needed. Free event!",
+                "es": "¿Nunca has jugado al Go? ¡Perfecto! Este taller cubre las reglas básicas, los fundamentos de estrategia y tus primeras partidas en un tablero de 9x9. Nuestros instructores certificados te guiarán paso a paso. Todos los materiales incluidos, no se necesita experiencia. ¡Evento gratuito!",
+                "fr": "Tu n'as jamais joué au Go ? Parfait ! Cet atelier couvre les règles de base, les fondamentaux de la stratégie et tes premières parties sur un goban 9x9. Nos instructeurs certifiés te guident pas à pas. Tout le matériel est fourni, aucune expérience requise. Événement gratuit !",
+                "zh": "从未下过围棋？太好了！本工作坊涵盖基本规则、策略基础和您在9路棋盘上的首局对弈。我们的认证教练将逐步指导。提供所有材料，无需经验。免费活动！"
+            },
+            "teasers": {
+                "de": "Vollständige Einführung in Go für absolute Anfänger. Kostenlose Veranstaltung, alle Materialien gestellt.",
+                "en": "Complete introduction to Go for absolute beginners. Free event, all materials provided.",
+                "es": "Introducción completa al Go para principiantes absolutos. Evento gratuito, todos los materiales incluidos.",
+                "fr": "Introduction complète au Go pour les grands débutants. Événement gratuit, tout le matériel fourni.",
+                "zh": "为零基础初学者提供的完整围棋入门。免费活动，提供所有材料。"
+            },
+            "start": "2026-03-14T14:00:00+01:00",
+            "stop": "2026-03-14T17:00:00+01:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 2,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                2,
+                3
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 20,
+            "initial": false,
+            "titles": {
+                "de": "Anfänger-Workshop: Go lernen",
+                "en": "Beginner Workshop: Learn Go",
+                "es": "Taller para principiantes: aprender Go",
+                "fr": "Atelier débutants : apprendre le Go",
+                "zh": "初学者工作坊：学习围棋"
+            },
+            "descriptions": {
+                "de": "Noch nie Go gespielt? Perfekt! Dieser Workshop deckt die Grundregeln, strategische Grundlagen und Ihre ersten Spiele auf einem 9x9-Brett ab. Unsere zertifizierten Instruktoren führen Sie Schritt für Schritt. Alle Materialien werden gestellt, keine Erfahrung nötig. Kostenlose Veranstaltung!",
+                "en": "Never played Go before? Perfect! This workshop covers the basic rules, strategy fundamentals, and your first games on a 9x9 board. Our certified instructors will guide you step by step. All materials provided, no experience needed. Free event!",
+                "es": "¿Nunca has jugado al Go? ¡Perfecto! Este taller cubre las reglas básicas, los fundamentos de estrategia y tus primeras partidas en un tablero de 9x9. Nuestros instructores certificados te guiarán paso a paso. Todos los materiales incluidos, no se necesita experiencia. ¡Evento gratuito!",
+                "fr": "Tu n'as jamais joué au Go ? Parfait ! Cet atelier couvre les règles de base, les fondamentaux de la stratégie et tes premières parties sur un goban 9x9. Nos instructeurs certifiés te guident pas à pas. Tout le matériel est fourni, aucune expérience requise. Événement gratuit !",
+                "zh": "从未下过围棋？太好了！本工作坊涵盖基本规则、策略基础和您在9路棋盘上的首局对弈。我们的认证教练将逐步指导。提供所有材料，无需经验。免费活动！"
+            },
+            "teasers": {
+                "de": "Vollständige Einführung in Go für absolute Anfänger. Kostenlose Veranstaltung, alle Materialien gestellt.",
+                "en": "Complete introduction to Go for absolute beginners. Free event, all materials provided.",
+                "es": "Introducción completa al Go para principiantes absolutos. Evento gratuito, todos los materiales incluidos.",
+                "fr": "Introduction complète au Go pour les grands débutants. Événement gratuit, tout le matériel fourni.",
+                "zh": "为零基础初学者提供的完整围棋入门。免费活动，提供所有材料。"
+            },
+            "start": "2026-04-14T14:00:00+02:00",
+            "stop": "2026-04-14T17:00:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 2,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                2,
+                3
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 21,
+            "initial": false,
+            "titles": {
+                "de": "Anfänger-Workshop: Go lernen",
+                "en": "Beginner Workshop: Learn Go",
+                "es": "Taller para principiantes: aprender Go",
+                "fr": "Atelier débutants : apprendre le Go",
+                "zh": "初学者工作坊：学习围棋"
+            },
+            "descriptions": {
+                "de": "Noch nie Go gespielt? Perfekt! Dieser Workshop deckt die Grundregeln, strategische Grundlagen und Ihre ersten Spiele auf einem 9x9-Brett ab. Unsere zertifizierten Instruktoren führen Sie Schritt für Schritt. Alle Materialien werden gestellt, keine Erfahrung nötig. Kostenlose Veranstaltung!",
+                "en": "Never played Go before? Perfect! This workshop covers the basic rules, strategy fundamentals, and your first games on a 9x9 board. Our certified instructors will guide you step by step. All materials provided, no experience needed. Free event!",
+                "es": "¿Nunca has jugado al Go? ¡Perfecto! Este taller cubre las reglas básicas, los fundamentos de estrategia y tus primeras partidas en un tablero de 9x9. Nuestros instructores certificados te guiarán paso a paso. Todos los materiales incluidos, no se necesita experiencia. ¡Evento gratuito!",
+                "fr": "Tu n'as jamais joué au Go ? Parfait ! Cet atelier couvre les règles de base, les fondamentaux de la stratégie et tes premières parties sur un goban 9x9. Nos instructeurs certifiés te guident pas à pas. Tout le matériel est fourni, aucune expérience requise. Événement gratuit !",
+                "zh": "从未下过围棋？太好了！本工作坊涵盖基本规则、策略基础和您在9路棋盘上的首局对弈。我们的认证教练将逐步指导。提供所有材料，无需经验。免费活动！"
+            },
+            "teasers": {
+                "de": "Vollständige Einführung in Go für absolute Anfänger. Kostenlose Veranstaltung, alle Materialien gestellt.",
+                "en": "Complete introduction to Go for absolute beginners. Free event, all materials provided.",
+                "es": "Introducción completa al Go para principiantes absolutos. Evento gratuito, todos los materiales incluidos.",
+                "fr": "Introduction complète au Go pour les grands débutants. Événement gratuit, tout le matériel fourni.",
+                "zh": "为零基础初学者提供的完整围棋入门。免费活动，提供所有材料。"
+            },
+            "start": "2026-05-14T14:00:00+02:00",
+            "stop": "2026-05-14T17:00:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 2,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                2,
+                3
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        },
+        {
+            "ref": 22,
+            "initial": false,
+            "titles": {
+                "de": "Anfänger-Workshop: Go lernen",
+                "en": "Beginner Workshop: Learn Go",
+                "es": "Taller para principiantes: aprender Go",
+                "fr": "Atelier débutants : apprendre le Go",
+                "zh": "初学者工作坊：学习围棋"
+            },
+            "descriptions": {
+                "de": "Noch nie Go gespielt? Perfekt! Dieser Workshop deckt die Grundregeln, strategische Grundlagen und Ihre ersten Spiele auf einem 9x9-Brett ab. Unsere zertifizierten Instruktoren führen Sie Schritt für Schritt. Alle Materialien werden gestellt, keine Erfahrung nötig. Kostenlose Veranstaltung!",
+                "en": "Never played Go before? Perfect! This workshop covers the basic rules, strategy fundamentals, and your first games on a 9x9 board. Our certified instructors will guide you step by step. All materials provided, no experience needed. Free event!",
+                "es": "¿Nunca has jugado al Go? ¡Perfecto! Este taller cubre las reglas básicas, los fundamentos de estrategia y tus primeras partidas en un tablero de 9x9. Nuestros instructores certificados te guiarán paso a paso. Todos los materiales incluidos, no se necesita experiencia. ¡Evento gratuito!",
+                "fr": "Tu n'as jamais joué au Go ? Parfait ! Cet atelier couvre les règles de base, les fondamentaux de la stratégie et tes premières parties sur un goban 9x9. Nos instructeurs certifiés te guident pas à pas. Tout le matériel est fourni, aucune expérience requise. Événement gratuit !",
+                "zh": "从未下过围棋？太好了！本工作坊涵盖基本规则、策略基础和您在9路棋盘上的首局对弈。我们的认证教练将逐步指导。提供所有材料，无需经验。免费活动！"
+            },
+            "teasers": {
+                "de": "Vollständige Einführung in Go für absolute Anfänger. Kostenlose Veranstaltung, alle Materialien gestellt.",
+                "en": "Complete introduction to Go for absolute beginners. Free event, all materials provided.",
+                "es": "Introducción completa al Go para principiantes absolutos. Evento gratuito, todos los materiales incluidos.",
+                "fr": "Introduction complète au Go pour les grands débutants. Événement gratuit, tout le matériel fourni.",
+                "zh": "为零基础初学者提供的完整围棋入门。免费活动，提供所有材料。"
+            },
+            "start": "2026-06-14T14:00:00+02:00",
+            "stop": "2026-06-14T17:00:00+02:00",
+            "status": "published",
+            "type": "Regular",
+            "series_ref": 2,
+            "featured": false,
+            "location_ref": 1,
+            "host_refs": [
+                2,
+                3
+            ],
+            "external_rsvp": 0,
+            "creator_email": "Crystal.Liu@example.org",
+            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+        }
+    ],
+    "rsvps": [
+        {
+            "event_ref": 1,
+            "email": "Adem.Lane@example.org",
+            "guests": 3
+        },
+        {
+            "event_ref": 1,
+            "email": "Alisa.Hester@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 1,
+            "email": "Crystal.Liu@example.org",
+            "guests": 1
+        },
+        {
+            "event_ref": 1,
+            "email": "Jessie.Meyton@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 1,
+            "email": "Mollie.Hall@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 1,
+            "email": "admin@example.org",
+            "guests": 2
+        },
+        {
+            "event_ref": 2,
+            "email": "Adem.Lane@example.org",
+            "guests": 1
+        },
+        {
+            "event_ref": 2,
+            "email": "Alisa.Hester@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 2,
+            "email": "Crystal.Liu@example.org",
+            "guests": 3
+        },
+        {
+            "event_ref": 2,
+            "email": "admin@example.org",
+            "guests": 2
+        },
+        {
+            "event_ref": 3,
+            "email": "Alisa.Hester@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 3,
+            "email": "Jessie.Meyton@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 3,
+            "email": "Mollie.Hall@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 4,
+            "email": "Adem.Lane@example.org",
+            "guests": 2
+        },
+        {
+            "event_ref": 4,
+            "email": "Alisa.Hester@example.org",
+            "guests": 3
+        },
+        {
+            "event_ref": 4,
+            "email": "Crystal.Liu@example.org",
+            "guests": 1
+        },
+        {
+            "event_ref": 4,
+            "email": "Mollie.Hall@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 5,
+            "email": "Crystal.Liu@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 5,
+            "email": "Jessie.Meyton@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 5,
+            "email": "admin@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 6,
+            "email": "Adem.Lane@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 6,
+            "email": "Crystal.Liu@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 6,
+            "email": "admin@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 7,
+            "email": "Alisa.Hester@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 7,
+            "email": "admin@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 8,
+            "email": "Amelie.Laurent@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 8,
+            "email": "Crystal.Liu@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 8,
+            "email": "Jessie.Meyton@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 8,
+            "email": "Mollie.Hall@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 9,
+            "email": "Adem.Lane@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 9,
+            "email": "admin@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 19,
+            "email": "Aliah.Lane@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 19,
+            "email": "Alisa.Hester@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 19,
+            "email": "Amelie.Bennett@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 20,
+            "email": "Abraham.Baker@example.org",
+            "guests": 0
+        },
+        {
+            "event_ref": 20,
+            "email": "Adil.Floyd@example.org",
+            "guests": 0
+        }
+    ],
+    "cms_pages": [
+        {
+            "ref": 5,
+            "slug": "index",
+            "published": true,
+            "titles": {
+                "de": "MeetAgain - Event-Management",
+                "en": "MeetAgain - Event Management",
+                "es": "MeetAgain - Gestión de eventos",
+                "fr": "MeetAgain - Gestion d'événements",
+                "zh": "MeetAgain - 活动管理"
+            },
+            "link_names": {
+                "de": "Startseite",
+                "en": "Home",
+                "es": "Inicio",
+                "fr": "Accueil",
+                "zh": "首页"
+            },
+            "menu_locations": [
+                1
+            ],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 8,
+                    "priority": 1,
+                    "json": {
+                        "headline": "International weiqi Club",
+                        "subHeadline": "learn, play and have fun",
+                        "text": "We are a group of weiqi enthusiasts, we come together to share our passion. Learn how to play weiqi, share strategies and refine your gameplay. Or come by just to socialize.\n\nMeeting times are usually on Wednesdays at 6pm. But we have also social meeting like dinners and sometimes we travel together to Internation turnaments.",
+                        "buttonLink": "/register",
+                        "buttonText": "Join us",
+                        "color": "#0700da"
+                    },
+                    "image_file": "images/c935e548a0892bd015d3566b56acf09776f71e87.jpg"
+                },
+                {
+                    "language": "en",
+                    "type": 9,
+                    "priority": 2,
+                    "json": {
+                        "headline": "Welcome",
+                        "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\n\nAt vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+                    },
+                    "image_file": "images/76c5a15a1a63842f50e626c2585b3c7714e8e5d6.jpg"
+                },
+                {
+                    "language": "de",
+                    "type": 8,
+                    "priority": 3,
+                    "json": {
+                        "headline": "Internationales weiqi Treffen",
+                        "subHeadline": "Spiel, Spass und lernen",
+                        "text": "Wir sind eine Gruppe von Weiqi-Enthusiasten, die sich zusammengeschlossen haben, um unsere Leidenschaft zu teilen. Lernen Sie, wie man Weiqi spielt, tauschen Sie Strategien aus und verfeinern Sie Ihr Spiel. Oder kommen Sie einfach vorbei, um Kontakte zu knüpfen.\n\nDie Treffen finden in der Regel mittwochs um 18 Uhr statt. Wir veranstalten aber auch gesellige Treffen wie Abendessen und reisen manchmal gemeinsam zu internationalen Turnieren.",
+                        "buttonLink": "/register",
+                        "buttonText": "Mach mit",
+                        "color": "#0700da"
+                    },
+                    "image_file": "images/7bf42989ec6c2ba62de5f18316d9193dd18ee779.jpg"
+                },
+                {
+                    "language": "de",
+                    "type": 9,
+                    "priority": 4,
+                    "json": {
+                        "headline": "Willkommen",
+                        "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\n\nAt vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+                    },
+                    "image_file": "images/9b79434e26952ead1e869411272b5dcf49a890db.jpg"
+                },
+                {
+                    "language": "zh",
+                    "type": 8,
+                    "priority": 5,
+                    "json": {
+                        "headline": "国际围棋大会",
+                        "subHeadline": "游戏、娱乐和学习",
+                        "text": "我们是一群围棋爱好者，因共同的热情而相聚。在这里，你可以学习围棋技巧、交流战术心得、提升棋艺水平，或者单纯来结交棋友。\n\n常规活动时间为每周三晚6点。此外我们还组织社交聚会，如围棋晚餐会，有时也会结伴参加国际赛事。",
+                        "buttonLink": "/register",
+                        "buttonText": "加入我们",
+                        "color": "#0700da"
+                    },
+                    "image_file": "images/8b392344b1a231a5f540d50bf8d8685b1b717b7e.jpg"
+                },
+                {
+                    "language": "zh",
+                    "type": 9,
+                    "priority": 6,
+                    "json": {
+                        "headline": "欢迎光临",
+                        "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\n\nAt vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+                    },
+                    "image_file": "images/6f1fb81fca7d351e6598e0fe4c156506620a2ddf.jpg"
+                },
+                {
+                    "language": "fr",
+                    "type": 8,
+                    "priority": 7,
+                    "json": {
+                        "headline": "Club de weiqi international",
+                        "subHeadline": "apprendre, jouer et s'amuser",
+                        "text": "Nous sommes un groupe de passionnés de weiqi, nous nous retrouvons pour partager notre passion. Apprends à jouer au weiqi, partage des stratégies et perfectionne ton jeu. Ou passe simplement nous voir pour faire connaissance.\n\nLes rencontres ont généralement lieu le mercredi à 18h. Mais nous organisons aussi des rencontres conviviales comme des dîners et nous voyageons parfois ensemble vers des tournois internationaux.",
+                        "buttonLink": "/register",
+                        "buttonText": "Rejoins-nous",
+                        "color": "#0700da"
+                    },
+                    "image_file": "images/c935e548a0892bd015d3566b56acf09776f71e87.jpg"
+                },
+                {
+                    "language": "fr",
+                    "type": 9,
+                    "priority": 8,
+                    "json": {
+                        "headline": "Bienvenue",
+                        "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\n\nAt vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+                    },
+                    "image_file": "images/76c5a15a1a63842f50e626c2585b3c7714e8e5d6.jpg"
+                },
+                {
+                    "language": "es",
+                    "type": 8,
+                    "priority": 9,
+                    "json": {
+                        "headline": "Club de weiqi internacional",
+                        "subHeadline": "aprender, jugar y divertirse",
+                        "text": "Somos un grupo de entusiastas del weiqi, nos reunimos para compartir nuestra pasión. Aprende a jugar al weiqi, comparte estrategias y perfecciona tu juego. O pásate simplemente para socializar.\n\nLas quedadas suelen ser los miércoles a las 18h. Pero también organizamos encuentros sociales como cenas y a veces viajamos juntos a torneos internacionales.",
+                        "buttonLink": "/register",
+                        "buttonText": "Únete",
+                        "color": "#0700da"
+                    },
+                    "image_file": "images/c935e548a0892bd015d3566b56acf09776f71e87.jpg"
+                },
+                {
+                    "language": "es",
+                    "type": 9,
+                    "priority": 10,
+                    "json": {
+                        "headline": "Bienvenido",
+                        "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\n\nAt vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+                    },
+                    "image_file": "images/76c5a15a1a63842f50e626c2585b3c7714e8e5d6.jpg"
+                },
+                {
+                    "language": "en",
+                    "type": 11,
+                    "priority": 11,
+                    "json": {
+                        "headline": "Why play with us",
+                        "facts": [
+                            {
+                                "icon": "fa fa-users",
+                                "label": "Active community"
+                            },
+                            {
+                                "icon": "fa fa-globe",
+                                "label": "Players worldwide"
+                            },
+                            {
+                                "icon": "fa fa-graduation-cap",
+                                "label": "Beginner-friendly"
+                            },
+                            {
+                                "icon": "fa fa-trophy",
+                                "label": "Regular tournaments"
+                            }
+                        ]
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 11,
+                    "priority": 12,
+                    "json": {
+                        "headline": "Warum mit uns spielen",
+                        "facts": [
+                            {
+                                "icon": "fa fa-users",
+                                "label": "Aktive Community"
+                            },
+                            {
+                                "icon": "fa fa-globe",
+                                "label": "Spieler weltweit"
+                            },
+                            {
+                                "icon": "fa fa-graduation-cap",
+                                "label": "Anfaengerfreundlich"
+                            },
+                            {
+                                "icon": "fa fa-trophy",
+                                "label": "Regelmaessige Turniere"
+                            }
+                        ]
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "zh",
+                    "type": 11,
+                    "priority": 13,
+                    "json": {
+                        "headline": "为什么和我们一起下棋",
+                        "facts": [
+                            {
+                                "icon": "fa fa-users",
+                                "label": "活跃的社区"
+                            },
+                            {
+                                "icon": "fa fa-globe",
+                                "label": "全球棋手"
+                            },
+                            {
+                                "icon": "fa fa-graduation-cap",
+                                "label": "适合初学者"
+                            },
+                            {
+                                "icon": "fa fa-trophy",
+                                "label": "定期比赛"
+                            }
+                        ]
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "fr",
+                    "type": 11,
+                    "priority": 14,
+                    "json": {
+                        "headline": "Pourquoi jouer avec nous",
+                        "facts": [
+                            {
+                                "icon": "fa fa-users",
+                                "label": "Communauté active"
+                            },
+                            {
+                                "icon": "fa fa-globe",
+                                "label": "Joueurs dans le monde entier"
+                            },
+                            {
+                                "icon": "fa fa-graduation-cap",
+                                "label": "Adapté aux débutants"
+                            },
+                            {
+                                "icon": "fa fa-trophy",
+                                "label": "Tournois réguliers"
+                            }
+                        ]
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "es",
+                    "type": 11,
+                    "priority": 15,
+                    "json": {
+                        "headline": "Por qué jugar con nosotros",
+                        "facts": [
+                            {
+                                "icon": "fa fa-users",
+                                "label": "Comunidad activa"
+                            },
+                            {
+                                "icon": "fa fa-globe",
+                                "label": "Jugadores de todo el mundo"
+                            },
+                            {
+                                "icon": "fa fa-graduation-cap",
+                                "label": "Apto para principiantes"
+                            },
+                            {
+                                "icon": "fa fa-trophy",
+                                "label": "Torneos regulares"
+                            }
+                        ]
+                    },
+                    "image_file": null
+                }
+            ]
+        },
+        {
+            "ref": 6,
+            "slug": "about",
+            "published": true,
+            "titles": {
+                "de": "Über uns",
+                "en": "About Us",
+                "es": "Sobre nosotros",
+                "fr": "À propos de nous",
+                "zh": "关于我们"
+            },
+            "link_names": {
+                "de": "Über uns",
+                "en": "About",
+                "es": "Nosotros",
+                "fr": "À propos",
+                "zh": "关于"
+            },
+            "menu_locations": [
+                0,
+                1
+            ],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 1,
+                    "priority": 1,
+                    "json": {
+                        "title": "About"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 2,
+                    "json": {
+                        "content": "We are a group of passionate weiqi enthusiasts who come together to share our love for this ancient and fascinating game. Whether you're a beginner looking to learn the basics of weiqi, an experienced player wanting to share strategies and improve your gameplay, or simply someone interested in joining our friendly community, you'll find a warm welcome here.\n\nOur regular meeting times are on Wednesdays at 6pm, where we gather to play, learn, and enjoy each other's company. Beyond our weekly meetings, we organize various social events like group dinners and occasionally travel together to participate in international tournaments, fostering both our skills and friendships."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 1,
+                    "priority": 3,
+                    "json": {
+                        "title": "Über Uns"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 4,
+                    "json": {
+                        "content": "Wir sind eine Gruppe leidenschaftlicher Weiqi-Enthusiasten, die sich zusammengeschlossen haben, um unsere Liebe zu diesem alten und faszinierenden Spiel zu teilen. Egal, ob Sie ein Anfänger sind, der die Grundlagen von Weiqi erlernen möchte, ein erfahrener Spieler, der Strategien austauschen und sein Spiel verbessern möchte, oder einfach nur jemand, der daran interessiert ist, unserer freundlichen Gemeinschaft beizutreten – hier sind Sie herzlich willkommen.\n\nWir treffen uns regelmäßig mittwochs um 18 Uhr, um zu spielen, zu lernen und die Gesellschaft der anderen zu genießen. Über unsere wöchentlichen Treffen hinaus organisieren wir verschiedene gesellschaftliche Veranstaltungen wie gemeinsame Abendessen und reisen gelegentlich zusammen zu internationalen Turnieren, um sowohl unsere Fähigkeiten als auch unsere Freundschaften zu pflegen."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "zh",
+                    "type": 1,
+                    "priority": 5,
+                    "json": {
+                        "title": "关于我们"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "zh",
+                    "type": 2,
+                    "priority": 6,
+                    "json": {
+                        "content": "我们是一群充满热情的围棋爱好者，因对这项古老而迷人的棋艺的热爱而相聚。无论你是初学围棋的基础入门者，渴望交流策略提升棋艺的资深棋手，还是单纯想加入我们友好社群的新朋友，这里都将为你敞开怀抱。\n\n每周三晚六点是我们的固定聚会时间，大家齐聚一堂切磋棋艺、交流心得、共度美好时光。除常规活动外，我们还组织各类社交聚会，如集体晚餐，并时常结伴远行参加国际赛事，在提升棋艺的同时也深化着彼此的友谊。"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "fr",
+                    "type": 1,
+                    "priority": 7,
+                    "json": {
+                        "title": "À propos"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "fr",
+                    "type": 2,
+                    "priority": 8,
+                    "json": {
+                        "content": "Nous sommes un groupe de passionnés de weiqi qui se retrouvent pour partager leur amour de ce jeu ancien et fascinant. Que tu sois un débutant qui veut apprendre les bases du weiqi, un joueur expérimenté qui souhaite partager des stratégies et progresser, ou simplement quelqu'un qui veut rejoindre notre communauté conviviale, tu trouveras ici un accueil chaleureux.\n\nNos rencontres régulières ont lieu le mercredi à 18h, où nous nous réunissons pour jouer, apprendre et profiter de la compagnie des uns et des autres. Au-delà de nos rencontres hebdomadaires, nous organisons divers événements sociaux comme des dîners de groupe et nous voyageons parfois ensemble pour participer à des tournois internationaux, développant ainsi nos compétences et nos amitiés."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "es",
+                    "type": 1,
+                    "priority": 9,
+                    "json": {
+                        "title": "Sobre nosotros"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "es",
+                    "type": 2,
+                    "priority": 10,
+                    "json": {
+                        "content": "Somos un grupo de entusiastas del weiqi que nos reunimos para compartir nuestro amor por este juego antiguo y fascinante. Tanto si eres un principiante que quiere aprender lo básico del weiqi, un jugador experimentado que desea compartir estrategias y mejorar su juego, o simplemente alguien interesado en unirse a nuestra comunidad acogedora, aquí encontrarás una cálida bienvenida.\n\nNuestras quedadas habituales son los miércoles a las 18h, donde nos reunimos para jugar, aprender y disfrutar de la compañía de los demás. Además de nuestras quedadas semanales, organizamos varios eventos sociales como cenas de grupo y ocasionalmente viajamos juntos para participar en torneos internacionales, fomentando tanto nuestras habilidades como nuestras amistades."
+                    },
+                    "image_file": null
+                }
+            ]
+        },
+        {
+            "ref": 7,
+            "slug": "rules",
+            "published": true,
+            "titles": {
+                "de": "Community-Regeln",
+                "en": "Community Rules",
+                "es": "Normas de la comunidad",
+                "fr": "Règles de la communauté",
+                "zh": "社区规则"
+            },
+            "link_names": {
+                "de": "Regeln",
+                "en": "Rules",
+                "es": "Normas",
+                "fr": "Règles",
+                "zh": "规则"
+            },
+            "menu_locations": [],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 1,
+                    "priority": 1,
+                    "json": {
+                        "title": "Game Rules"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 2,
+                    "json": {
+                        "title": "Introduction to Go",
+                        "content": "Go (Weiqi in Chinese, Baduk in Korean) is an ancient board game for two players that originated in China over 2,500 years ago. The game is played on a 19×19 grid, though beginners often start with smaller 9×9 or 13×13 boards."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "en",
+                    "type": 2,
+                    "priority": 3,
+                    "json": {
+                        "title": "Basic Rules",
+                        "content": "1. Players alternate placing stones on empty intersections\\n2. Stones are captured when surrounded (no liberties)\\n3. The game ends when both players pass\\n4. Winner is determined by controlled territory plus captures\\n\\nFor detailed rules and strategy guides, join our beginner workshops!"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 1,
+                    "priority": 4,
+                    "json": {
+                        "title": "Spielregeln"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 5,
+                    "json": {
+                        "title": "Einführung in Go",
+                        "content": "Go (Weiqi auf Chinesisch, Baduk auf Koreanisch) ist ein altes Brettspiel für zwei Spieler, das vor über 2.500 Jahren in China entstand. Das Spiel wird auf einem 19×19-Gitter gespielt, obwohl Anfänger oft mit kleineren 9×9- oder 13×13-Brettern beginnen."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 2,
+                    "priority": 6,
+                    "json": {
+                        "title": "Grundregeln",
+                        "content": "1. Spieler platzieren abwechselnd Steine auf leeren Schnittpunkten\\n2. Steine werden gefangen, wenn sie umzingelt sind (keine Freiheiten)\\n3. Das Spiel endet, wenn beide Spieler passen\\n4. Der Gewinner wird durch kontrolliertes Gebiet plus Gefangene bestimmt\\n\\nFür detaillierte Regeln und Strategieanleitungen besuchen Sie unsere Anfänger-Workshops!"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "zh",
+                    "type": 1,
+                    "priority": 7,
+                    "json": {
+                        "title": "游戏规则"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "zh",
+                    "type": 2,
+                    "priority": 8,
+                    "json": {
+                        "title": "围棋简介",
+                        "content": "围棋（中文称围棋，韩文称바둑）是一种起源于中国2500多年前的古老双人棋盘游戏。游戏在19×19的棋盘上进行，虽然初学者通常从较小的9×9或13×13棋盘开始。"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "zh",
+                    "type": 2,
+                    "priority": 9,
+                    "json": {
+                        "title": "基本规则",
+                        "content": "1. 玩家轮流在空交叉点上放置棋子\\n2. 当棋子被包围时（无气）会被吃掉\\n3. 当双方都选择弃权时游戏结束\\n4. 赢家由控制的地盘加上吃掉的棋子数决定\\n\\n详细规则和策略指南，请参加我们的初学者工作坊！"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "fr",
+                    "type": 1,
+                    "priority": 10,
+                    "json": {
+                        "title": "Règles du jeu"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "fr",
+                    "type": 2,
+                    "priority": 11,
+                    "json": {
+                        "title": "Introduction au Go",
+                        "content": "Le Go (Weiqi en chinois, Baduk en coréen) est un ancien jeu de plateau pour deux joueurs, originaire de Chine il y a plus de 2 500 ans. Le jeu se joue sur une grille de 19×19, bien que les débutants commencent souvent avec des plateaux plus petits de 9×9 ou 13×13."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "fr",
+                    "type": 2,
+                    "priority": 12,
+                    "json": {
+                        "title": "Règles de base",
+                        "content": "1. Les joueurs placent à tour de rôle des pierres sur les intersections vides\\n2. Les pierres sont capturées lorsqu'elles sont encerclées (plus de libertés)\\n3. La partie se termine lorsque les deux joueurs passent\\n4. Le gagnant est déterminé par le territoire contrôlé plus les captures\\n\\nPour des règles détaillées et des guides de stratégie, rejoins nos ateliers pour débutants !"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "es",
+                    "type": 1,
+                    "priority": 13,
+                    "json": {
+                        "title": "Reglas del juego"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "es",
+                    "type": 2,
+                    "priority": 14,
+                    "json": {
+                        "title": "Introducción al Go",
+                        "content": "El Go (Weiqi en chino, Baduk en coreano) es un antiguo juego de tablero para dos jugadores originado en China hace más de 2.500 años. El juego se juega en un tablero de 19×19, aunque los principiantes a menudo empiezan con tableros más pequeños de 9×9 o 13×13."
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "es",
+                    "type": 2,
+                    "priority": 15,
+                    "json": {
+                        "title": "Reglas básicas",
+                        "content": "1. Los jugadores colocan piedras por turnos en las intersecciones vacías\\n2. Las piedras se capturan cuando están rodeadas (sin libertades)\\n3. La partida termina cuando ambos jugadores pasan\\n4. El ganador se determina por el territorio controlado más las capturas\\n\\n¡Para reglas detalladas y guías de estrategia, únete a nuestros talleres para principiantes!"
+                    },
+                    "image_file": null
+                }
+            ]
+        },
+        {
+            "ref": 8,
+            "slug": "directions",
+            "published": true,
+            "titles": {
+                "de": "So findest du uns",
+                "en": "How to Find Us",
+                "es": "Cómo encontrarnos",
+                "fr": "Comment nous trouver",
+                "zh": "如何找到我们"
+            },
+            "link_names": {
+                "de": "Anfahrt",
+                "en": "Find us",
+                "es": "Cómo llegar",
+                "fr": "Accès",
+                "zh": "交通"
+            },
+            "menu_locations": [
+                0
+            ],
+            "blocks": [
+                {
+                    "language": "en",
+                    "type": 12,
+                    "priority": 1,
+                    "json": {
+                        "title": "How to find us",
+                        "content": "We meet at the Weiqi Cafe on Brunnenstraße, a five minute walk from Bernauer Straße underground station. Ring the bell marked \"Go Club\" and take the stairs to the first floor.",
+                        "latitude": 52.5321,
+                        "longitude": 13.3799,
+                        "zoom": 16,
+                        "markerLabel": "Weiqi Cafe Berlin",
+                        "mapPosition": "right",
+                        "mapWidth": "third",
+                        "mapHeight": "medium"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "de",
+                    "type": 12,
+                    "priority": 2,
+                    "json": {
+                        "title": "So findest du uns",
+                        "content": "Wir treffen uns im Weiqi Cafe in der Brunnenstraße, fünf Gehminuten vom U-Bahnhof Bernauer Straße entfernt. Klingle bei \"Go Club\" und nimm die Treppe in den ersten Stock.",
+                        "latitude": 52.5321,
+                        "longitude": 13.3799,
+                        "zoom": 16,
+                        "markerLabel": "Weiqi Cafe Berlin",
+                        "mapPosition": "left",
+                        "mapWidth": "half",
+                        "mapHeight": "medium"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "zh",
+                    "type": 12,
+                    "priority": 3,
+                    "json": {
+                        "title": "如何找到我们",
+                        "content": "我们在布伦嫩街的围棋咖啡馆聚会，从贝尔瑙尔街地铁站步行五分钟即可到达。请按写着 \"Go Club\" 的门铃，然后上楼到二层。",
+                        "latitude": 52.5321,
+                        "longitude": 13.3799,
+                        "zoom": 16,
+                        "markerLabel": "Weiqi Cafe Berlin",
+                        "mapPosition": "above",
+                        "mapWidth": "third",
+                        "mapHeight": "small"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "fr",
+                    "type": 12,
+                    "priority": 4,
+                    "json": {
+                        "title": "Comment nous trouver",
+                        "content": "Nous nous retrouvons au Weiqi Cafe, Brunnenstraße, à cinq minutes à pied de la station de métro Bernauer Straße. Sonnez à \"Go Club\" et montez au premier étage.",
+                        "latitude": 52.5321,
+                        "longitude": 13.3799,
+                        "zoom": 16,
+                        "markerLabel": "Weiqi Cafe Berlin",
+                        "mapPosition": "right",
+                        "mapWidth": "two_thirds",
+                        "mapHeight": "large"
+                    },
+                    "image_file": null
+                },
+                {
+                    "language": "es",
+                    "type": 12,
+                    "priority": 5,
+                    "json": {
+                        "title": "Cómo encontrarnos",
+                        "content": "Nos reunimos en el Weiqi Cafe de la Brunnenstraße, a cinco minutos a pie de la estación de metro Bernauer Straße. Llama al timbre \"Go Club\" y sube a la primera planta.",
+                        "latitude": 52.5321,
+                        "longitude": 13.3799,
+                        "zoom": 16,
+                        "markerLabel": "Weiqi Cafe Berlin",
+                        "mapPosition": "below",
+                        "mapWidth": "third",
+                        "mapHeight": "medium"
+                    },
+                    "image_file": null
+                }
+            ]
+        }
+    ],
+    "announcements": [],
+    "tags": [
+        {
+            "ref": 1,
+            "item_type": "film",
+            "parent_ref": null,
+            "position": 0,
+            "labels": {
+                "de": "Drama",
+                "en": "Drama"
+            },
+            "managed": false
+        },
+        {
+            "ref": 2,
+            "item_type": "film",
+            "parent_ref": 1,
+            "position": 1,
+            "labels": {
+                "de": "Familiendrama",
+                "en": "Family drama"
+            },
+            "managed": false
+        },
+        {
+            "ref": 3,
+            "item_type": "film",
+            "parent_ref": 1,
+            "position": 2,
+            "labels": {
+                "de": "Roadmovie",
+                "en": "Road movie"
+            },
+            "managed": false
+        },
+        {
+            "ref": 4,
+            "item_type": "film",
+            "parent_ref": null,
+            "position": 3,
+            "labels": {
+                "de": "Science-Fiction",
+                "en": "Science fiction"
+            },
+            "managed": false
+        },
+        {
+            "ref": 5,
+            "item_type": "film",
+            "parent_ref": null,
+            "position": 4,
+            "labels": {
+                "de": "Spielfilm",
+                "en": "Feature"
+            },
+            "managed": false
+        },
+        {
+            "ref": 6,
+            "item_type": "film",
+            "parent_ref": null,
+            "position": 5,
+            "labels": {
+                "de": "Kurzfilm",
+                "en": "Short"
+            },
+            "managed": false
+        }
+    ],
+    "items": {
+        "film": {
+            "rows": [
+                {
+                    "ref": 1,
+                    "title": "Tokyo Story",
+                    "original_title": "東京物語",
+                    "year": 1953,
+                    "runtime": 136,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "An elderly couple visit their grown children in postwar Tokyo and find little room in their busy lives.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/2675d0bdcb8e32033665732b09494cc96c8218c4.jpg"
+                },
+                {
+                    "ref": 2,
+                    "title": "Cleo from 5 to 7",
+                    "original_title": "Cleo de 5 a 7",
+                    "year": 1962,
+                    "runtime": 90,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A singer wanders Paris for two hours while waiting for a medical result that could change everything.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/b3fbc49537d1f2185283ae277b890df26dd4c9d5.jpg"
+                },
+                {
+                    "ref": 3,
+                    "title": "Stalker",
+                    "original_title": "Сталкер",
+                    "year": 1979,
+                    "runtime": 161,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A guide leads two men through a forbidden zone towards a room said to grant a visitor their deepest wish.",
+                    "genres": [
+                        "Science Fiction",
+                        "Drama"
+                    ],
+                    "poster_image": "images/8648a10c543cd719f8ad94e4aec418c7ed6eeaf1.jpg"
+                },
+                {
+                    "ref": 4,
+                    "title": "Yi Yi",
+                    "original_title": "一一",
+                    "year": 2000,
+                    "runtime": 173,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "Three generations of a Taipei family drift through a year of weddings, illness and quiet reckoning.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/e441a9b11e29bb7de3f8c18079e6d55b10ae308f.jpg"
+                },
+                {
+                    "ref": 5,
+                    "title": "The Wages of Fear",
+                    "original_title": "Le salaire de la peur",
+                    "year": 1953,
+                    "runtime": 131,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "Four desperate men drive two trucks of nitroglycerine across South American mountain roads for a payout.",
+                    "genres": [
+                        "Thriller"
+                    ],
+                    "poster_image": "images/b1e5fd34e4f4b291635980560686d2246baabd09.jpg"
+                },
+                {
+                    "ref": 6,
+                    "title": "Bicycle Thieves",
+                    "original_title": "Ladri di biciclette",
+                    "year": 1948,
+                    "runtime": 89,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A father and his small son search postwar Rome for the stolen bicycle his new job depends on.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/f4e4a7af03aba40028d003d048933afc3bd59f66.jpg"
+                },
+                {
+                    "ref": 7,
+                    "title": "Rashomon",
+                    "original_title": "羅生門",
+                    "year": 1950,
+                    "runtime": 88,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "Four witnesses to a killing in a forest each tell a version of the day that flatters only themselves.",
+                    "genres": [
+                        "Drama",
+                        "Crime"
+                    ],
+                    "poster_image": "images/a30de9fec49f242c1a4fe16d6512eb75240c950b.jpg"
+                },
+                {
+                    "ref": 8,
+                    "title": "The 400 Blows",
+                    "original_title": "Les quatre cents coups",
+                    "year": 1959,
+                    "runtime": 99,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A Paris schoolboy nobody has time for drifts from truancy into petty theft and out towards the sea.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/dfafe98cacfcc333af7312670bceb8fb512f5754.jpg"
+                },
+                {
+                    "ref": 9,
+                    "title": "Solaris",
+                    "original_title": "Солярис",
+                    "year": 1972,
+                    "runtime": 167,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A psychologist sent to a station above an ocean planet meets a visitor his own memory appears to have made.",
+                    "genres": [
+                        "Science Fiction",
+                        "Drama"
+                    ],
+                    "poster_image": "images/f458fa39ec3f2fdb62fbcddbad09310691978340.jpg"
+                },
+                {
+                    "ref": 10,
+                    "title": "Paris, Texas",
+                    "original_title": null,
+                    "year": 1984,
+                    "runtime": 145,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A man walks out of the desert after four missing years and drives west to explain himself to his family.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/968cb337377e3d9384907c8eded54b510421c450.jpg"
+                },
+                {
+                    "ref": 11,
+                    "title": "Close-Up",
+                    "original_title": "نمای نزدیک",
+                    "year": 1990,
+                    "runtime": 98,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A film-struck man is tried for impersonating a famous director, and restages his own deception for the camera.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/cdcea9f01151989307c87e33a029ac9f6c555a17.jpg"
+                },
+                {
+                    "ref": 12,
+                    "title": "Come and See",
+                    "original_title": "Иди и смотри",
+                    "year": 1985,
+                    "runtime": 142,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A boy joins the partisans in occupied Belarus and is aged past recognition by what he walks into.",
+                    "genres": [
+                        "Drama",
+                        "War"
+                    ],
+                    "poster_image": "images/282b006ef9cd12a83d8f18e240e5ff56adcb1ec5.jpg"
+                },
+                {
+                    "ref": 13,
+                    "title": "Wings of Desire",
+                    "original_title": "Der Himmel über Berlin",
+                    "year": 1987,
+                    "runtime": 128,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "Two angels listen to the private thoughts of a divided Berlin until one of them wishes to be mortal.",
+                    "genres": [
+                        "Drama",
+                        "Fantasy"
+                    ],
+                    "poster_image": "images/541c5bcb7a01026118ae247533e2d23dd7278650.jpg"
+                },
+                {
+                    "ref": 14,
+                    "title": "Pather Panchali",
+                    "original_title": "পথের পাঁচালী",
+                    "year": 1955,
+                    "runtime": 125,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A Bengali village family lives through hunger, monsoon and loss while the father looks for work elsewhere.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/503025a430d605130ec2d5f8410a643058bd0399.jpg"
+                },
+                {
+                    "ref": 15,
+                    "title": "La Strada",
+                    "original_title": "La strada",
+                    "year": 1954,
+                    "runtime": 108,
+                    "external_id": null,
+                    "external_source": null,
+                    "description": "A young woman is sold to a travelling strongman and follows his roadside act across a bleak Italy.",
+                    "genres": [
+                        "Drama"
+                    ],
+                    "poster_image": "images/f3e424f7de974ead43163b6a276fa98351ab5cdd.jpg"
+                }
+            ],
+            "tags": {
+                "1": [
+                    1,
+                    2
+                ],
+                "2": [
+                    1
+                ],
+                "3": [
+                    4
+                ],
+                "4": [
+                    1,
+                    2
+                ],
+                "5": [
+                    1,
+                    3
+                ],
+                "6": [
+                    1,
+                    2
+                ],
+                "7": [
+                    1
+                ],
+                "8": [
+                    1,
+                    2
+                ],
+                "9": [
+                    4
+                ],
+                "10": [
+                    1,
+                    3
+                ],
+                "11": [
+                    1
+                ],
+                "12": [
+                    1
+                ],
+                "13": [
+                    1
+                ],
+                "14": [
+                    1,
+                    2
+                ],
+                "15": [
+                    1,
+                    3
+                ]
+            }
+        },
+        "photo": {
+            "rows": [
+                {
+                    "ref": 1,
+                    "translations": {
+                        "en": {
+                            "title": "Harbour, just after sunrise",
+                            "description": "The first ferry of the day leaving the old pier."
+                        },
+                        "de": {
+                            "title": "Hafen kurz nach Sonnenaufgang",
+                            "description": "Die erste Fähre des Tages legt am alten Pier ab."
+                        },
+                        "fr": {
+                            "title": "Le port, juste après le lever du soleil",
+                            "description": "Le premier ferry de la journée quitte la vieille jetée."
+                        },
+                        "es": {
+                            "title": "El puerto, justo después del amanecer",
+                            "description": "El primer ferri del día sale del viejo muelle."
+                        }
+                    },
+                    "meta": {
+                        "make": "FUJIFILM",
+                        "model": "X-T5",
+                        "lens": "XF23mmF1.4 R LM WR",
+                        "exposureTime": "1/800",
+                        "fNumber": 2.8,
+                        "iso": 160,
+                        "focalLength": 23,
+                        "focalLength35": 35,
+                        "exposureBias": -0.33,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-04-18 07:42:11",
+                        "width": 1800,
+                        "height": 1200
+                    },
+                    "taken_at": "2026-04-18 07:42:11",
+                    "image": "images/b430cd81b9b4cc308b7d16cb1e5b412f511d5a05.jpg",
+                    "uploader_email": "Adem.Lane@example.org",
+                    "contest_submitted": false
+                },
+                {
+                    "ref": 2,
+                    "translations": {
+                        "en": {
+                            "title": "Winter forest",
+                            "description": "Cold enough that the tripod head stopped moving."
+                        },
+                        "fr": {
+                            "title": "Forêt d'hiver",
+                            "description": "Il faisait si froid que la rotule du trépied s'est bloquée."
+                        },
+                        "es": {
+                            "title": "Bosque invernal",
+                            "description": "Hacía tanto frío que la rótula del trípode dejó de moverse."
+                        }
+                    },
+                    "meta": {
+                        "make": "NIKON CORPORATION",
+                        "model": "NIKON Z 6_2",
+                        "lens": "NIKKOR Z 24-70mm f/4 S",
+                        "exposureTime": "1/250",
+                        "fNumber": 8,
+                        "iso": 100,
+                        "focalLength": 70,
+                        "focalLength35": 70,
+                        "exposureBias": 0.67,
+                        "flash": false,
+                        "whiteBalance": 0,
+                        "meteringMode": 5,
+                        "takenAt": "2026-01-07 11:26:03",
+                        "width": 2000,
+                        "height": 1333
+                    },
+                    "taken_at": "2026-01-07 11:26:03",
+                    "image": "images/71520d31460c5d88fae03c02d73dbdb89901a877.jpg",
+                    "uploader_email": "Adem.Lane@example.org",
+                    "contest_submitted": false
+                }
+            ],
+            "tags": []
+        }
+    },
+    "event_items": [
+        {
+            "event_ref": 1,
+            "item_type": "photo",
+            "item_ref": 1,
+            "position": 0,
+            "section_label": null,
+            "created_by_email": "Adem.Lane@example.org",
+            "created_at": "2025-11-20T09:00:00+01:00"
+        },
+        {
+            "event_ref": 1,
+            "item_type": "photo",
+            "item_ref": 2,
+            "position": 1,
+            "section_label": null,
+            "created_by_email": "Adem.Lane@example.org",
+            "created_at": "2025-11-20T09:05:00+01:00"
+        }
+    ],
+    "topics": [],
+    "circulation": [],
+    "comments": [
+        {
+            "target_type": "event",
+            "target_ref": 1,
+            "email": "admin@example.org",
+            "created_at": "2025-11-13T12:00:00+01:00",
+            "content": "Great game analysis session tonight!"
+        },
+        {
+            "target_type": "event",
+            "target_ref": 1,
+            "email": "Adem.Lane@example.org",
+            "created_at": "2025-11-13T14:00:00+01:00",
+            "content": "Thanks for teaching me the avalanche joseki"
+        },
+        {
+            "target_type": "event",
+            "target_ref": 1,
+            "email": "admin@example.org",
+            "created_at": "2025-11-13T15:00:00+01:00",
+            "content": "@Adem, we should practice that next week"
+        },
+        {
+            "target_type": "event",
+            "target_ref": 1,
+            "email": "Crystal.Liu@example.org",
+            "created_at": "2025-11-13T16:00:00+01:00",
+            "content": "Next time I will challenge you to a handicap game"
+        },
+        {
+            "target_type": "event",
+            "target_ref": 2,
+            "email": "Alisa.Hester@example.org",
+            "created_at": "2026-02-03T19:00:00+01:00",
+            "content": "Looking forward to this! Is there a dan division?"
+        },
+        {
+            "target_type": "event",
+            "target_ref": 2,
+            "email": "admin@example.org",
+            "created_at": "2026-02-03T21:00:00+01:00",
+            "content": "Yes! Dan and kyu divisions, both use same McMahon system."
+        },
+        {
+            "target_type": "event",
+            "target_ref": 4,
+            "email": "Mollie.Hall@example.org",
+            "created_at": "2026-01-19T18:00:00+01:00",
+            "content": "Can I watch if I don't want to play?"
+        },
+        {
+            "target_type": "event",
+            "target_ref": 4,
+            "email": "admin@example.org",
+            "created_at": "2026-01-19T19:00:00+01:00",
+            "content": "Absolutely! Spectators are welcome to watch and learn."
+        },
+        {
+            "target_type": "event",
+            "target_ref": 6,
+            "email": "Adem.Lane@example.org",
+            "created_at": "2026-01-05T18:00:00+01:00",
+            "content": "Great to see so many new faces last week!"
+        },
+        {
+            "target_type": "event",
+            "target_ref": 7,
+            "email": "Crystal.Liu@example.org",
+            "created_at": "2026-01-11T18:00:00+01:00",
+            "content": "Thanks for organizing!"
+        },
+        {
+            "target_type": "event",
+            "target_ref": 9,
+            "email": "Mollie.Hall@example.org",
+            "created_at": "2026-01-28T13:00:00+01:00",
+            "content": "I might be a bit late"
+        },
+        {
+            "target_type": "event",
+            "target_ref": 19,
+            "email": "Aliah.Lane@example.org",
+            "created_at": "2026-03-11T14:00:00+01:00",
+            "content": "Can I bring a friend who has never played?"
+        }
+    ],
+    "change_proposals": [],
+    "trust": [],
+    "boardgames": [],
+    "wishlist": [],
+    "ballots": [],
+    "images": []
+}

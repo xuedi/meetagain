@@ -5,5 +5,4 @@
 # Format: path/relative/to/this/plugin.php::symbol // why
 
 src/DataHotfix/MigrateDinnerclubToDishes.php::flattenDinnersToAssociations // the unique (event,type,item) constraint is what makes the flattening safe for a dish in several courses
-src/Kernel.php::loadPostExtendFixtures // records the positional column order the fixture rows depend on
 src/Service/DishService.php::addGalleryImage // relies on the unique constraint to dedupe an image that is both gallery and preview

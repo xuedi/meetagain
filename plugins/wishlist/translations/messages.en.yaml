@@ -29,3 +29,6 @@ wishlist_pick:
     col_priority: 'Priority'
     wanted_by_members: 'wanted by %count% members'
     button_attach: 'Attach'
+
+wishlist_portability:
+    kind_entries: 'Wishlist entries'

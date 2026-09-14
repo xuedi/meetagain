@@ -6,7 +6,6 @@ use App\Entity\EventListItemTag;
 use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\ValueObject\LinkCollection;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 #[AutoconfigureTag]
@@ -27,21 +26,6 @@ interface Plugin
      * Return null to contribute nothing for that location.
      */
     public function getEventTile(int $eventId, EventTileLocation $location): ?string;
-
-    /**
-     * Called by app:event:add-fixture, after events have been extended.
-     */
-    public function loadPostExtendFixtures(OutputInterface $output): void;
-
-    /**
-     * Called by app:plugin:pre-fixtures, after base fixtures load and before plugin fixtures.
-     */
-    public function preFixtures(OutputInterface $output): void;
-
-    /**
-     * Called by app:plugin:post-fixtures, after doctrine:fixtures:load completes.
-     */
-    public function postFixtures(OutputInterface $output): void;
 
     /**
      * Null contributes nothing to the footer "about" section.

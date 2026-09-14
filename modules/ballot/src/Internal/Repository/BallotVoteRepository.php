@@ -78,4 +78,23 @@ class BallotVoteRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * @return array<int, array<int, list<string>>>
+     */
+    public function findAllSelections(): array
+    {
+        $rows = $this->createQueryBuilder('v')
+            ->select('IDENTITY(v.ballot) AS ballotId', 'IDENTITY(v.user) AS userId', 'v.optionKey AS optionKey')
+            ->orderBy('v.id', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        $selections = [];
+        foreach ($rows as $row) {
+            $selections[(int) $row['ballotId']][(int) $row['userId']][] = (string) $row['optionKey'];
+        }
+
+        return $selections;
+    }
 }

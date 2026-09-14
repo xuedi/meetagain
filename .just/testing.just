@@ -1,4 +1,4 @@
-# Test suites, fixtures database, coverage, load and attack scenarios.
+# Test suites, coverage, load and attack scenarios.
 
 # Run all tests and checks (same chain as the pre-commit hook)
 [group('testing')]
@@ -7,48 +7,10 @@ test:
     @bin/commit-hooks.sh
     @echo "All tests and checks passed successfully"
 
-# Setup test database
-[group('testing')]
-testSetup:
-    {{PHP}} php bin/console doctrine:database:drop --env=test --force --if-exists
-    {{PHP}} php bin/console doctrine:database:create --env=test
-    {{PHP}} php bin/console doctrine:schema:create --env=test -q
-    {{PHP}} php bin/console doctrine:fixtures:load --env=test -q --group=install
-    {{PHP}} php bin/console doctrine:fixtures:load --env=test -q --append --group=base
-    {{PHP}} php bin/console app:plugin:pre-fixtures --env=test
-    {{PHP}} php bin/console app:fixtures:load --env=test -q --append --group=plugin
-    {{PHP}} php bin/console app:plugin:post-fixtures --env=test
-    ./bin/test-db-clone.sh
-    touch tests/config/.test-db.lock
-
 # Run unit tests
 [group('testing')]
 testUnit +parameter='':
     @{{PHP}} vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=default --no-coverage --log-junit tests/reports/junit.xml {{parameter}}
-    @echo
-    @echo
-
-# Run functional tests
-[group('testing')]
-testFunctional +parameter='':
-    @{{PHP}} php bin/console cache:warmup --env=test --quiet
-    @{{PHP}} sh -c 'vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=functional --processes=$(nproc) --no-coverage --log-junit tests/reports/junit.xml {{parameter}}'
-    @echo
-    @echo
-
-# Run smoke tests - hits every discovered GET route, asserts no 5xx (always run last)
-[group('testing')]
-testSmoke +parameter='':
-    @{{PHP}} php bin/console cache:warmup --env=test --quiet
-    @{{PHP}} sh -c 'vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=smoke --processes=$(nproc) --functional --no-coverage --log-junit tests/reports/junit.xml {{parameter}}'
-    @echo
-    @echo
-
-# Profile DB query counts per GET route - identifies caching candidates
-[group('testing')]
-appProfileQueries +parameter='':
-    @{{PHP}} php bin/console cache:warmup --env=test --quiet
-    @{{PHP}} php bin/console app:profile:queries --env=test {{parameter}}
     @echo
     @echo
 

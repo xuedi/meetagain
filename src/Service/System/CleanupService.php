@@ -5,6 +5,7 @@ namespace App\Service\System;
 use App\CronTaskInterface;
 use App\EntityActionDispatcher;
 use App\Enum\CronTaskStatus;
+use App\ExtendedFilesystem;
 use App\Enum\EntityAction;
 use App\Repository\ImageRepository;
 use App\Repository\SupportRequestRepository;
@@ -15,10 +16,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class CleanupService implements CronTaskInterface
 {
     public const int SUPPORT_THREAD_STALE_DAYS = 180;
+    public const int PENDING_IMPORT_MAX_HOURS = 24;
 
     public function __construct(
         private ImageRepository $imageRepo,
@@ -29,6 +32,9 @@ readonly class CleanupService implements CronTaskInterface
         private EntityActionDispatcher $entityActionDispatcher,
         private ClockInterface $clock,
         private LoggerInterface $logger,
+        private ExtendedFilesystem $fs,
+        #[Autowire('%kernel.project_dir%/var/import')]
+        private string $pendingImportDir,
     ) {}
 
     public function getIdentifier(): string
@@ -55,12 +61,17 @@ readonly class CleanupService implements CronTaskInterface
             $output->writeln('Expire support email verifications: ' . $verifyCount);
             $this->logger->info('Expired support email verifications cleared', ['count' => $verifyCount]);
 
+            $importCount = $this->removeStaleImportArchives();
+            $output->writeln('Remove stale import archives: ' . $importCount);
+            $this->logger->info('Stale import archives removed', ['count' => $importCount]);
+
             $message = sprintf(
-                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d',
+                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d, import_archives: %d',
                 $imageCount,
                 $regCount,
                 $autoResolvedCount,
                 $verifyCount,
+                $importCount,
             );
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
@@ -106,6 +117,21 @@ readonly class CleanupService implements CronTaskInterface
             $count++;
         }
         $this->entityManager->flush();
+
+        return $count;
+    }
+
+    public function removeStaleImportArchives(): int
+    {
+        $cutoff = $this->clock->now()->modify(sprintf('-%d hours', self::PENDING_IMPORT_MAX_HOURS))->getTimestamp();
+
+        $count = 0;
+        foreach ($this->fs->glob($this->pendingImportDir . '/*.zip') as $file) {
+            $modifiedAt = $this->fs->getFileModifiedTime($file);
+            if ($modifiedAt !== false && $modifiedAt < $cutoff && $this->fs->deleteFile($file)) {
+                $count++;
+            }
+        }
 
         return $count;
     }

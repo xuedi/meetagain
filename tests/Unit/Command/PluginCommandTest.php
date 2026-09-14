@@ -36,7 +36,7 @@ class PluginCommandTest extends TestCase
         // Act
         $exitCode = $this->commandTester->execute([
             'action' => 'invalid',
-            'plugin' => 'demo',
+            'plugins' => ['demo'],
         ]);
 
         // Assert
@@ -67,7 +67,7 @@ class PluginCommandTest extends TestCase
         // Act
         $exitCode = $this->commandTester->execute([
             'action' => 'enable',
-            'plugin' => '',
+            'plugins' => [''],
         ]);
 
         // Assert
@@ -84,11 +84,30 @@ class PluginCommandTest extends TestCase
         // Act
         $exitCode = $this->commandTester->execute([
             'action' => 'enable',
-            'plugin' => 'demo',
+            'plugins' => ['demo'],
         ]);
 
         // Assert
         static::assertSame(Command::SUCCESS, $exitCode);
+    }
+
+    public function testEnablingSeveralPluginsInstallsAndEnablesEachInTurn(): void
+    {
+        // Arrange
+        $enabled = [];
+        $this->pluginService->method('enable')->willReturnCallback(static function (string $key) use (&$enabled): void {
+            $enabled[] = $key;
+        });
+
+        // Act
+        $exitCode = $this->commandTester->execute([
+            'action' => 'enable',
+            'plugins' => ['books', 'wishlist'],
+        ]);
+
+        // Assert
+        static::assertSame(Command::SUCCESS, $exitCode);
+        static::assertSame(['books', 'wishlist'], $enabled);
     }
 
     public function testDisablePluginCallsService(): void
@@ -99,7 +118,7 @@ class PluginCommandTest extends TestCase
         // Act
         $exitCode = $this->commandTester->execute([
             'action' => 'disable',
-            'plugin' => 'demo',
+            'plugins' => ['demo'],
         ]);
 
         // Assert
@@ -114,7 +133,7 @@ class PluginCommandTest extends TestCase
         // Act
         $exitCode = $this->commandTester->execute([
             'action' => 'disable',
-            'plugin' => 'all',
+            'plugins' => ['all'],
         ]);
 
         // Assert

@@ -15,11 +15,6 @@ tests/
 │   │   └── TranslationServiceTest.php
 │   └── Entity/
 │       └── EventTest.php
-├── Functional/
-│   └── Controller/
-│       ├── EventControllerTest.php
-│       └── SecurityControllerTest.php
-├── DataFixtures/                 ← shared test fixtures (if needed)
 ├── phpunit.xml                   ← PHPUnit configuration
 ├── bootstrap.php                 ← test bootstrap
 └── reports/
@@ -144,66 +139,15 @@ public function testRemoveOrphanedImagesCallsFlush(): void
 
 ---
 
-## Functional tests
+## Functional and smoke tests
 
-Functional tests make real HTTP requests to the Symfony application. They use
-`WebTestCase` and DAMA DoctrineTestBundle (all DB changes are rolled back after each test).
+This repository ships unit tests only. The functional and smoke suites need a populated database and
+run in the maintainers' own pipeline outside this repository.
 
-```php
-namespace App\Tests\Functional\Controller;
-
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-
-class EventControllerTest extends WebTestCase
-{
-    public function testIndexDisplaysUpcomingEvents(): void
-    {
-        // Arrange: create an authenticated client
-        $client = static::createClient();
-        $user = static::getContainer()->get(UserRepository::class)->findOneBy([]);
-        $client->loginUser($user);
-
-        // Act: request the events page
-        $crawler = $client->request('GET', '/events');
-
-        // Assert: successful response with content
-        $this->assertResponseIsSuccessful();
-        $this->assertGreaterThan(0, $crawler->filter('.event-card')->count());
-    }
-
-    public function testCreateEventRequiresAuthentication(): void
-    {
-        // Arrange: no login
-        $client = static::createClient();
-
-        // Act
-        $client->request('GET', '/event/create');
-
-        // Assert: redirect to login
-        $this->assertResponseRedirects('/login');
-    }
-}
-```
-
----
-
-## Using fixtures in tests
-
-Functional tests use the data created by the core fixture classes. The fixtures run once
-before the test suite and each test rolls back its DB changes via a transaction.
-
-Access fixture-created entities through the container:
-
-```php
-// Get a user that was created by UserFixture
-$user = static::getContainer()
-    ->get(UserRepository::class)
-    ->findOneByEmail('admin@example.com');
-```
-
-For unit tests you don't need fixtures — use `createStub()` / `createMock()` instead.
-
-See [Data Fixtures](fixtures.md) for how to write fixture classes and use `AbstractFixture`.
+What CI checks here beyond the unit suite: the static analysis, and every demo archive imported with
+`--strict` into a fresh database built by the real migrations, exported again and compared row count
+by row count - so an import or export change that loses data fails the build. To try a change by hand,
+build an instance with `just devModeImport <archive>` (see [Demo Data](demo-data.md)).
 
 ---
 
@@ -213,12 +157,8 @@ See [Data Fixtures](fixtures.md) for how to write fixture classes and use `Abstr
 just testUnit                              # All unit tests
 just testUnit tests/Unit/Service/          # Specific directory
 just testUnit tests/Unit/Service/CleanupServiceTest.php  # Single file
-just testFunctional                        # All functional tests
-just test                                  # Full suite + quality checks
+just test                                  # Unit tests + quality checks
 just testCoverage                          # HTML coverage report
-just testPrintResults                      # AI-readable summary
+just testPrintResults                      # Machine-readable summary
 just testPrintResults --failures-only      # Failures only
 ```
-
-The internal `/test-unit` and `/test-functional` agent skills wrap these commands and
-automatically use a small model to keep costs low.

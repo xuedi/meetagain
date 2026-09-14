@@ -62,8 +62,8 @@ string: the module never parses one and ships no vocabulary of its own. A source
 declares them through `describeActions()`, returning `ActionDescriptor(key, label, defaultPoints,
 ?quantityCap)` - and, like `replay()` and `getRevision()`, returning nothing for a context it does not
 serve. **An action no source declares scores nothing.** That mirrors the context rule and keeps a typo
-in a consumer from silently inflating anybody: the operator page lists any key that was replayed but
-never declared.
+in a consumer from silently inflating anybody: `app:trust:rebuild` warns about any key that was
+replayed but never declared.
 
 When no `AccessProviderInterface` answers, access falls back to the viewer holding `ROLE_ADMIN`. A
 context with no access provider is therefore visible to operators and to nobody else.
@@ -82,6 +82,10 @@ context with no access provider is therefore visible to operators and to nobody 
 | `getExplanation($context, int $userId)` | `TrustExplanation` or `null` - where a score came from                                |
 | `getConfig($context)`                   | `TrustConfig` - the context's effective settings                                      |
 | `grant` / `revoke` / `getOutgoing`      | a member managing their own vouches                                                   |
+
+`GrantTransferInterface` is the second outbound interface and serves data movers only: `exportGrants()` returns the
+vouches of the given contexts as `PortableGrant` values, and `restoreGrant()` writes one back with its dates. It stays
+off `TrustInterface` because that surface must never hand anyone another member's edges.
 
 Value types: `TrustAction`, `ActionDescriptor`, `ContextDescriptor`, `TrustConfig`, `TrustExplanation`,
 `TrustActionBreakdown`, and the enums `TrustLevel` (`Slight`, `Trusted`, `Absolute`) and `TrustBand`.
@@ -153,14 +157,14 @@ it wants them, each rendering nothing when no describer claims the context or th
 - `trust_vouch_control(context, userId)` - the four-way select, POST + CSRF.
 - `trust_badge(context, userId)` - band plus vouch count, to drop next to a member's name.
 
-It also owns one page of its own: `/admin/trust`, `ROLE_ADMIN`. That is the **operator** surface - a
-global view for inspecting and fixing any context, and the only way to reach the module before a
-consumer exists. It does not replace `canAdminister`: per-context administration by someone who is not
-a platform administrator happens through the fragments a consumer places, gated by the access chain.
+It owns no page of its own. `app:trust:rebuild` is the way to inspect a context from outside a
+consumer's page.
 
 ## Configuration
 
-Per context, with neutral defaults so a context with no row still works.
+Per context, with neutral defaults so a context with no row still works. Nothing writes a row yet:
+the contract has no setter and the module no settings page, so every context runs on these defaults
+until a consumer needs to tune one and a write method is added to `TrustInterface`.
 
 | Setting                | Default        | Meaning                                                    |
 |------------------------|----------------|------------------------------------------------------------|
@@ -199,8 +203,8 @@ primary anchor. That is the reasoning behind the two root defaults.
 3. Place the Twig fragments on your own page.
 4. Call `TrustInterface` where a decision depends on standing.
 
-`modules/trust/tests/Stub/` is a complete four-interface consumer in about eighty lines, registered
-through `config/services_test.yaml` in the test environment only. It is the reference to copy.
+The bundled reference is `src/Circulation/Trust/`: circulation's context describer, action source and
+access provider, each a few dozen lines.
 
 ## Out of scope
 

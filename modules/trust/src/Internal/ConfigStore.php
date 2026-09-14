@@ -2,8 +2,6 @@
 
 namespace Module\Trust\Internal;
 
-use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Module\Trust\Contract\TrustConfig;
 use Module\Trust\Internal\Entity\TrustContextConfig;
 use Module\Trust\Internal\Repository\TrustContextConfigRepository;
@@ -17,7 +15,6 @@ final class ConfigStore implements ResetInterface
 
     public function __construct(
         private readonly TrustContextConfigRepository $repository,
-        private readonly EntityManagerInterface $entityManager,
     ) {}
 
     public function get(string $context): TrustConfig
@@ -25,30 +22,9 @@ final class ConfigStore implements ResetInterface
         return $this->memo[$context] ??= $this->hydrate($this->repository->findByContext($context));
     }
 
-    public function save(string $context, TrustConfig $config): void
-    {
-        $now = new DateTimeImmutable('now');
-        $entity = $this->repository->findByContext($context);
-
-        if ($entity === null) {
-            $entity = new TrustContextConfig($context, $config->toArray(), $now);
-            $this->entityManager->persist($entity);
-        } else {
-            $entity->setPayload($config->toArray(), $now);
-        }
-
-        $this->entityManager->flush();
-        unset($this->memo[$context]);
-    }
-
     public function getRevision(string $context): ?string
     {
         return $this->repository->findByContext($context)?->getUpdatedAt()->format('U.u');
-    }
-
-    public function isConfigured(string $context): bool
-    {
-        return $this->repository->findByContext($context) !== null;
     }
 
     #[Override]

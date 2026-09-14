@@ -45,10 +45,11 @@ task runner.
 ### Quick Start
 
 ```bash
-just devModeFixtures
+just devModeImport weiqi-club
 ```
 
-Login at http://localhost as `admin@example.org` with password `1234`
+Login at https://meetagain.local as `Crystal.Liu@example.org` with password `1234`. `just devModeImport`
+without an argument lists the other demo archives.
 
 Run `just` to see all available commands.
 

@@ -52,17 +52,6 @@ class TrustContextConfig
         return $this->payload;
     }
 
-    /**
-     * @param array<string, mixed> $payload
-     */
-    public function setPayload(array $payload, DateTimeImmutable $now): static
-    {
-        $this->payload = $payload;
-        $this->updatedAt = $now;
-
-        return $this;
-    }
-
     public function getUpdatedAt(): DateTimeImmutable
     {
         return $this->updatedAt;

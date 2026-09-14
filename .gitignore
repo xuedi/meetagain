@@ -8,6 +8,7 @@ installed.lock
 /config/plugins_test.php
 /config/plugins_prod.php
 /config/plugins-post-fixtures.sh
+/.just/local.just
 /bin/tools/bin/
 /bin/tools/target/
 /docker/certs/*.crt

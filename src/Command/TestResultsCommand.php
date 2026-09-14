@@ -41,7 +41,7 @@ class TestResultsCommand extends Command
             $output->writeln('STATUS: ERROR');
             $output->writeln('---');
             $output->writeln('JUnit report not found: tests/reports/junit.xml');
-            $output->writeln('Run tests first: just testUnit or just testFunctional');
+            $output->writeln('Run tests first: just testUnit');
             return Command::FAILURE;
         }
 

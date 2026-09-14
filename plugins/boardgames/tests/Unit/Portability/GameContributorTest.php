@@ -4,10 +4,10 @@ namespace Plugin\Boardgames\Tests\Unit\Portability;
 
 use App\Entity\Image;
 use App\Entity\User;
-use App\Item\Portability\ImportContext;
-use App\Item\Portability\PortableImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\ImageWriterInterface;
 use App\Service\Media\ImageLocationService;
-use App\Service\System\PortableImageImporter;
+use App\Portability\ImageImporter;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -26,13 +26,13 @@ class GameContributorTest extends TestCase
         $game->setMinPlayers(3);
         $game->setMaxPlayers(4);
         $game->setWeight('2.30');
-        $game->setBoxImage(new Image());
+        $game->setBoxImage(new Image()->setHash('box'));
 
         $repo = $this->createStub(GameRepository::class);
         $repo->method('findBy')->willReturn([$game]);
 
-        $images = $this->createStub(PortableImageWriterInterface::class);
-        $images->method('addImage')->willReturnCallback(static fn(Image $image, string $hint): string => $hint . '.jpg');
+        $images = $this->createStub(ImageWriterInterface::class);
+        $images->method('addImage')->willReturnCallback(static fn(Image $image): string => 'images/' . $image->getHash() . '.jpg');
 
         $contributor = $this->contributor($this->createStub(EntityManagerInterface::class), $repo);
 
@@ -45,7 +45,7 @@ class GameContributorTest extends TestCase
         static::assertSame(1995, $rows[0]['year_published']);
         static::assertSame(3, $rows[0]['min_players']);
         static::assertSame('2.30', $rows[0]['weight']);
-        static::assertSame('images/boardgames/4/box.jpg', $rows[0]['box_image']);
+        static::assertSame('images/box.jpg', $rows[0]['box_image']);
     }
 
     public function testAMatchingExternalIdResolvesToTheExistingGame(): void
@@ -170,7 +170,7 @@ class GameContributorTest extends TestCase
 
     private function context(): ImportContext
     {
-        return new ImportContext($this->createStub(PortableImageImporter::class), '/tmp', new User());
+        return new ImportContext($this->createStub(ImageImporter::class), '/tmp', new User());
     }
 
     private function contributor(EntityManagerInterface $em, GameRepository $repo): GameContributor

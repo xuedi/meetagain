@@ -14,6 +14,7 @@ use Module\Ballot\Contract\BallotScope;
 use Module\Ballot\Contract\BallotSubject;
 use Module\Ballot\Contract\BallotView;
 use Module\Ballot\Contract\Candidate;
+use Module\Ballot\Contract\PortableBallot;
 use Module\Ballot\Internal\Entity\Ballot;
 use Module\Ballot\Internal\Entity\BallotOption;
 use Module\Ballot\Internal\Entity\BallotVote;
@@ -216,6 +217,79 @@ final readonly class BallotService implements BallotInterface
     public function countOpenFor(int $viewerUserId): int
     {
         return count($this->openTo($viewerUserId));
+    }
+
+    #[Override]
+    public function exportAll(): array
+    {
+        $selections = $this->votes->findAllSelections();
+
+        $portable = [];
+        foreach ($this->ballots->findBy([], ['id' => 'ASC']) as $ballot) {
+            $candidates = [];
+            foreach ($ballot->getOptions() as $option) {
+                $candidates[] = new Candidate($option->getOptionKey(), $option->getLabel());
+            }
+
+            $portable[] = new PortableBallot(
+                purpose: $ballot->getPurpose(),
+                status: $ballot->getStatus(),
+                tallyMode: $ballot->getTallyMode(),
+                settlementMode: $ballot->getSettlementMode(),
+                deadline: $ballot->getDeadline(),
+                openedByUserId: $ballot->getOpenedByUserId(),
+                createdAt: $ballot->getCreatedAt(),
+                candidates: $candidates,
+                votes: $selections[(int) $ballot->getId()] ?? [],
+                title: $ballot->getTitle(),
+                subject: $this->subjectOf($ballot),
+                winningKey: $ballot->getWinningKey(),
+                tiedKeys: $ballot->getTiedKeys(),
+                settledByUserId: $ballot->getSettledByUserId(),
+                settledAt: $ballot->getSettledAt(),
+            );
+        }
+
+        return $portable;
+    }
+
+    #[Override]
+    public function restore(PortableBallot $ballot): int
+    {
+        $restored = new Ballot(
+            $ballot->purpose,
+            $ballot->deadline,
+            $ballot->openedByUserId,
+            $ballot->tallyMode,
+            $ballot->settlementMode,
+            $ballot->createdAt,
+            $ballot->subject?->type,
+            $ballot->subject?->id,
+            $ballot->title,
+        );
+        $restored->restoreOutcome($ballot->status, $ballot->winningKey, $ballot->tiedKeys, $ballot->settledByUserId, $ballot->settledAt);
+
+        $position = 0;
+        foreach ($ballot->candidates as $candidate) {
+            if (in_array($candidate->key, $restored->getOptionKeys(), true)) {
+                continue;
+            }
+
+            $restored->addOption(new BallotOption($restored, $candidate->key, $candidate->label, $position++));
+        }
+
+        $this->entityManager->persist($restored);
+
+        $optionKeys = $restored->getOptionKeys();
+        foreach ($ballot->votes as $userId => $keys) {
+            foreach (array_values(array_intersect(array_unique($keys), $optionKeys)) as $key) {
+                $this->entityManager->persist(new BallotVote($restored, $this->userReference($userId), $key, $ballot->createdAt));
+            }
+        }
+
+        $this->entityManager->flush();
+
+        return (int) $restored->getId();
     }
 
     private function applyTally(Ballot $ballot): void

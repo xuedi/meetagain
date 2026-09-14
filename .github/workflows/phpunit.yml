@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "development" ]
 
 permissions:
   contents: read
@@ -51,19 +51,18 @@ jobs:
       - name: Run unit tests
         run: vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=default --no-coverage
 
-  functional:
-    name: Functional + Smoke Tests
+  archives:
+    name: Archive Imports
     runs-on: ubuntu-latest
     services:
-      mysql:
-        image: mysql:26.7@sha256:66aec17cd21a956029b83f083b813073859e8355dc1a00e55df6ba02f0e32345
+      mariadb:
+        image: mariadb:12.3.3@sha256:dd9b303aed4f4890ed09f766d8ca9ddfd176c0c6f6267feff53b3192ec65a979
         env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: meetAgain_test
+          MARIADB_ROOT_PASSWORD: root
         ports:
           - 3306:3306
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
           --health-interval=3s
           --health-timeout=3s
           --health-retries=5
@@ -78,8 +77,6 @@ jobs:
           --health-retries=5
 
     env:
-      # Base dbname only - doctrine.yaml's when@test block appends `_test%TEST_TOKEN%`,
-      # so the effective DB is meetAgain_test (phpunit) / meetAgain_testN (paratest workers).
       DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain
       REDIS_URL: redis://127.0.0.1:6379
 
@@ -98,55 +95,35 @@ jobs:
           key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-php-
 
-      - name: Setup plugins
+      - name: Setup config
         run: |
           cp config/plugins.dist.php config/plugins.php
-          cp config/plugins_test.dist.php config/plugins_test.php
+          cp .env.dist .env
+          echo "DATABASE_URL=${DATABASE_URL}" >> .env
+          echo "REDIS_URL=${REDIS_URL}" >> .env
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-scripts
 
-      - name: Install Sass
-        run: npm install -g sass
-
-      - name: Build assets
+      # Each archive gets a fresh database built by the real migrations, only the plugins it
+      # names, a strict import, and a whole-instance export whose row counts must match the archive.
+      - name: Import every archive and export it again
         run: |
-          cp assets/styles/_config.scss.dist assets/styles/_config.scss
-          php bin/console sass:build
-
-      - name: Setup test environment
-        run: |
-          cp .env.dist .env
-          echo "DATABASE_URL=${DATABASE_URL}" >> .env
-          echo "REDIS_URL=${REDIS_URL}" >> .env
-          echo "APP_ENV=test" >> .env
-          php bin/console doctrine:schema:create --no-interaction
-          php bin/console doctrine:fixtures:load --no-interaction --group=install
-          php bin/console doctrine:fixtures:load --no-interaction --append --group=base
-          php bin/console app:plugin:pre-fixtures
-          php bin/console app:fixtures:load --no-interaction --append --group=plugin
-          php bin/console app:plugin:post-fixtures
-
-      # Functional and smoke tests run under paratest --processes=4, which sets TEST_TOKEN
-      # per worker so each connects to meetAgain_testN. Clone the canonical meetAgain_test
-      # (with its fixtures already loaded) into the four worker DBs, mirroring bin/test-db-clone.sh.
-      - name: Clone test database for paratest workers
-        run: |
-          mysqldump -h127.0.0.1 -uroot -proot --no-tablespaces --single-transaction --quick --set-gtid-purged=OFF meetAgain_test > /tmp/test-template.sql
-          for i in 1 2 3 4; do
-            mysql -h127.0.0.1 -uroot -proot -e "CREATE DATABASE IF NOT EXISTS meetAgain_test${i} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-            mysql -h127.0.0.1 -uroot -proot "meetAgain_test${i}" < /tmp/test-template.sql
+          set -euo pipefail
+          for archive in src/DataImportFixtures/*/; do
+            echo "::group::${archive}"
+            php bin/console app:plugin disable all
+            php bin/console app:plugin enable $(php bin/console app:import:inspect "${archive}" --format=plugins)
+            php bin/console cache:clear -q
+            php bin/console doctrine:database:drop --force --if-exists -q
+            php bin/console doctrine:database:create -q
+            php bin/console doctrine:migrations:migrate -n -q
+            php bin/console app:install:seed -q
+            php bin/console app:import "${archive}" --shift-dates --site-settings --strict
+            php bin/console app:export /tmp/round-trip.zip
+            diff <(php bin/console app:import:inspect "${archive}" | jq -S .counts) <(php bin/console app:import:inspect /tmp/round-trip.zip | jq -S .counts)
+            echo "::endgroup::"
           done
-
-      # Warm once up front: four paratest workers building var/cache/test concurrently race.
-      - name: Warm cache
-        run: php bin/console cache:warmup --env=test --quiet
-
-      - name: Run functional tests
-        run: vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=functional --processes=4 --no-coverage
-
-      - name: Run smoke tests
-        run: vendor/bin/paratest -c tests/config/phpunit.xml --testsuite=smoke --processes=4 --functional --no-coverage
 
   isolation:
     name: Plugin Isolation

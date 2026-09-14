@@ -2,7 +2,6 @@
 
 namespace App\Circulation\Trust;
 
-use App\Enum\UserRole;
 use App\Repository\UserRepository;
 use Module\Trust\Contract\AccessProviderInterface;
 use Override;
@@ -27,15 +26,6 @@ final readonly class AccessProvider implements AccessProviderInterface
     #[Override]
     public function canAdminister(string $context, int $userId): ?bool
     {
-        if ($this->index->itemTypeFor($context) === null) {
-            return null;
-        }
-
-        $user = $this->users->find($userId);
-        if ($user === null) {
-            return false;
-        }
-
-        return $user->getRole() === UserRole::Admin;
+        return $this->index->itemTypeFor($context) === null ? null : false;
     }
 }

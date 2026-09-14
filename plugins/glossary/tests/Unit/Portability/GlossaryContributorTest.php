@@ -3,10 +3,10 @@
 namespace Plugin\Glossary\Tests\Unit\Portability;
 
 use App\Entity\User;
-use App\Item\Portability\ImportContext;
-use App\Item\Portability\PortableImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\ImageWriterInterface;
 use App\Service\Config\LanguageService;
-use App\Service\System\PortableImageImporter;
+use App\Portability\ImageImporter;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +28,7 @@ class GlossaryContributorTest extends TestCase
         $contributor = $this->contributor($this->createStub(EntityManagerInterface::class), $repo);
 
         // Act
-        $rows = $contributor->exportItems([8], $this->createStub(PortableImageWriterInterface::class));
+        $rows = $contributor->exportItems([8], $this->createStub(ImageWriterInterface::class));
 
         // Assert
         self::assertSame([
@@ -136,6 +136,6 @@ class GlossaryContributorTest extends TestCase
 
     private function context(): ImportContext
     {
-        return new ImportContext($this->createStub(PortableImageImporter::class), '/tmp', new User());
+        return new ImportContext($this->createStub(ImageImporter::class), '/tmp', new User());
     }
 }

@@ -159,3 +159,8 @@ boardgames_activity:
 
 boardgames_notifications:
     bring_request: '%requester% bittet dich, %game% mitzubringen'
+
+boardgames_portability:
+    kind_ownerships: 'Brettspiel-Regale'
+    kind_pledges: 'Brettspiel-Zusagen'
+    kind_requests: 'Brettspiel-Mitbringwünsche'

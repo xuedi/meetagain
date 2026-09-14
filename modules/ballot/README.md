@@ -140,11 +140,18 @@ moving one needs this module's own tables. That is deliberate, and it shapes how
 
 Prove your settlement listener through `cast()` and `settle()` - that the winning key becomes the right
 change in your system, and that a tie changes nothing. The step you cannot reach, that `ballot.settle-due`
-turns a passed deadline into exactly those calls, is tested here in `modules/ballot/tests/Functional/DeadlineTest.php`
-and needs no second proof per consumer.
+turns a passed deadline into exactly those calls, is covered by the project's own functional suite and
+needs no second proof per consumer.
 
 Nothing outside this directory may import `Module\Ballot\Internal\**`; Mago Guard fails the build if it
 does. `Contract/` is the whole public surface and speaks in scalars, enums and readonly value objects.
+
+## Moving ballots between instances
+
+`exportAll()` and `restore()` serve data movers only. The first returns every ballot with its options, votes and
+outcome, regardless of visibility; the second writes one back exactly as given. It never tallies and never calls a
+settlement listener, so a settled ballot keeps its recorded outcome even when some of its votes stayed behind. The
+application's archive section is the one caller, and it decides per purpose which ballots and votes leave.
 
 ## Files
 
@@ -154,4 +161,3 @@ does. `Contract/` is the whole public surface and speaks in scalars, enums and r
 | `modules/ballot/src/Internal/`        | the engine, the registries, the cron, the page                  |
 | `modules/ballot/src/Internal/Entity/` | `Ballot`, `BallotOption`, `BallotVote`                          |
 | `modules/ballot/migrations/`          | namespace `ModuleBallotMigrations`                              |
-| `modules/ballot/tests/Stub/`          | seam implementations the module's own tests register            |

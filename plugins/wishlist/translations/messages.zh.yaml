@@ -29,3 +29,6 @@ wishlist_pick:
     col_priority: '优先级'
     wanted_by_members: '有 %count% 位成员期待'
     button_attach: '关联'
+
+wishlist_portability:
+    kind_entries: '愿望清单条目'

@@ -159,3 +159,8 @@ boardgames_activity:
 
 boardgames_notifications:
     bring_request: '%requester% te ha pedido que lleves %game%'
+
+boardgames_portability:
+    kind_ownerships: 'Estanterías de juegos de mesa'
+    kind_pledges: 'Promesas de llevar juegos'
+    kind_requests: 'Peticiones de llevar juegos'

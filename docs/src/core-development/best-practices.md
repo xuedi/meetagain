@@ -218,7 +218,7 @@ common formatting tags while stripping all script-related attributes.
 
 ```bash
 just fixMago   # Format + quality checks (fast, run often)
-just test      # Full suite: unit + functional + quality
+just test      # Full suite: unit tests + quality checks
 ```
 
 Make it a habit: write code → `just fixMago` → `just test` → open PR.

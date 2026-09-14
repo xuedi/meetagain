@@ -159,3 +159,8 @@ boardgames_activity:
 
 boardgames_notifications:
     bring_request: '%requester% vous demande d''apporter %game%'
+
+boardgames_portability:
+    kind_ownerships: 'Étagères de jeux de société'
+    kind_pledges: 'Promesses d''apporter un jeu'
+    kind_requests: 'Demandes d''apporter un jeu'

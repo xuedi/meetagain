@@ -159,3 +159,8 @@ boardgames_activity:
 
 boardgames_notifications:
     bring_request: '%requester% 请你带上 %game%'
+
+boardgames_portability:
+    kind_ownerships: '桌游收藏'
+    kind_pledges: '桌游携带承诺'
+    kind_requests: '桌游携带请求'

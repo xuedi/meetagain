@@ -1,6 +1,6 @@
 # Testing
 
-How to write unit and functional tests for plugin code.
+How to write unit tests for plugin code.
 
 ---
 
@@ -16,12 +16,10 @@ plugins/your-plugin/
         YourFilterTest.php
       Authorization/
         YourAuthorizationTest.php
-    Functional/
-      Controller/
-        YourControllerTest.php
 ```
 
-Mirror the `src/` structure inside `tests/Unit/` and `tests/Functional/` for easy navigation.
+Mirror the `src/` structure inside `tests/Unit/` for easy navigation. The public repository ships no
+shared test database, so a plugin's tests are unit tests.
 
 ---
 
@@ -200,9 +198,6 @@ just testUnit plugins/your-plugin/tests/
 
 # Run a single test class
 just testUnit plugins/your-plugin/tests/Unit/Service/YourServiceTest.php
-
-# Run functional tests for a plugin
-just testFunctional plugins/your-plugin/tests/Functional/
 ```
 
 ---
@@ -210,4 +205,4 @@ just testFunctional plugins/your-plugin/tests/Functional/
 ## Reference
 
 - [Core testing guide](../core-development/testing.md) — PHPUnit patterns, AAA, mocks vs stubs, coverage
-- [Fixtures](../core-development/fixtures.md) — how to load test data in functional tests
+- [Demo Data](../core-development/demo-data.md) - build a dev instance to try your plugin by hand

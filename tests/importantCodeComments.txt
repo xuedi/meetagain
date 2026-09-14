@@ -48,7 +48,7 @@ src/EventSubscriber/LocaleValidationSubscriber.php::getSubscribedEvents // must 
 src/EventSubscriber/Security/BlockedSessionSubscriber.php::getSubscribedEvents // priority is pinned after SessionListener so the session factory exists
 
 # --- Item tags ---
-src/Item/Portability/TagPortability.php::import // import is additive by contract: it never overwrites a classification the target already has
+src/Portability/Item/TagAssignments.php::import // import is additive by contract: it never overwrites a classification the target already has
 
 # --- SEO and canonical URLs ---
 src/Publisher/AlternateLinks/EventAlternateLinkProvider.php::getAlternateLinks // search engines void an hreflang cluster whose canonical target is missing from it
@@ -100,14 +100,10 @@ src/Twig/ContentRuntime.php::safeMessage // re-applies the allow-list on output 
 
 # --- System ---
 src/DataHotfix/Hotfixes/RemoveOrphanedClubPluginTables.php::execute // FK checks are disabled so the interdependent tables drop in any order
-src/Service/System/ImportService.php::import // required ordering: items run after the core flush because contributors need the generated ids
 src/Service/System/CronIntervalCheckService.php::WARNING_THRESHOLD_SECONDS // magic constant: the budget behind the 10/20 minute thresholds
-src/Service/System/ImportService.php::importUsers // imported users are locked on purpose; the password reset flow is the only way in
-src/Service/System/ImportService.php::importEvents // pre-1.1 exports carried the rule on the event, so a series has to be synthesized
+src/Portability/Section/EventsSection.php::import // pre-1.1 exports carried the rule on the event, so a series has to be synthesized
 
 # --- Tests: fixture facts a reader would otherwise have to recompute ---
-tests/Functional/Controller/Admin/Security/IncidentsControllerTest.php::testShowPageHidesUnblockButtonWhenNoBlockIsActive // the test-env ArrayAdapter is reset by kernel.reset, which the setup works around
-tests/Functional/Controller/Admin/Security/IncidentsControllerTest.php::testUnblockRouteRedirectsToShow // the test-env ArrayAdapter is reset by kernel.reset, which the setup works around
 tests/Unit/Emails/Types/EmailTypesTest.php::emailTypeProvider // provider keys must match allTypes(), and why the instances are built in the body
 tests/Unit/Emails/Types/GetMaxSendByTest.php::eventStartingAt // must stay a mutable DateTime because production goes through createFromMutable()
 tests/Unit/EventSubscriber/LocaleSubscriberTest.php::testOnKernelRequestFallsBackToFilteredDefaultWhenAcceptLanguageHasNoMatch // Symfony's getPreferredLanguage returns the first listed locale when nothing matches

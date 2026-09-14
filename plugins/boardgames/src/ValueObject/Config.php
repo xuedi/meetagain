@@ -3,10 +3,11 @@
 namespace Plugin\Boardgames\ValueObject;
 
 use App\Publisher\PluginSettings\Data;
+use App\Publisher\PluginSettings\SecretKeysInterface;
 use Plugin\Boardgames\Enum\ExternalSource;
 use SensitiveParameter;
 
-final class Config implements Data
+final class Config implements Data, SecretKeysInterface
 {
     private ?ExternalSource $adapter = null;
 
@@ -67,6 +68,11 @@ final class Config implements Data
     public function isTrustActive(): bool
     {
         return $this->circulation && $this->trustSystem;
+    }
+
+    public function getSecretKeys(): array
+    {
+        return ['encryptedBggToken'];
     }
 
     public function toArray(): array

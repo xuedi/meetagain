@@ -32,7 +32,6 @@ modules/
     templates/
     translations/
     tests/Unit/
-    tests/Functional/
 ```
 
 `App\Kernel::getModuleConfigDirs()` globs `modules/*/config` and feeds it to `configureContainer()`
@@ -88,7 +87,6 @@ permit = [
     "@global",
     "App\\Entity\\User",
     "App\\Controller\\AbstractController",
-    "App\\Admin\\**",
     "Doctrine\\**", "Symfony\\**", "Twig\\**", "Psr\\**",
 ]
 

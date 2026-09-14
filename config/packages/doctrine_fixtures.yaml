@@ -1,4 +1,0 @@
-when@dev:
-    doctrine_fixtures:
-        orm:
-            default_entity_manager: 'default'

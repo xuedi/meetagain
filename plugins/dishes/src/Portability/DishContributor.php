@@ -5,10 +5,10 @@ namespace Plugin\Dishes\Portability;
 use App\Entity\Image;
 use App\Entity\PronunciationSystem;
 use App\Enum\ImageType;
-use App\Item\Portability\ImportContext;
-use App\Item\Portability\ImportResult;
-use App\Item\Portability\ContributorInterface;
-use App\Item\Portability\PortableImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\Item\ImportResult;
+use App\Portability\Item\ContributorInterface;
+use App\Portability\ImageWriterInterface;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,7 +40,13 @@ readonly class DishContributor implements ContributorInterface
     }
 
     #[Override]
-    public function exportItems(array $itemIds, PortableImageWriterInterface $images): array
+    public function allItemIds(): array
+    {
+        return array_map(intval(...), $this->dishRepo->createQueryBuilder('d')->select('d.id')->orderBy('d.id')->getQuery()->getSingleColumnResult());
+    }
+
+    #[Override]
+    public function exportItems(array $itemIds, ImageWriterInterface $images): array
     {
         $rows = [];
 
@@ -56,23 +62,6 @@ readonly class DishContributor implements ContributorInterface
                 ];
             }
 
-            $gallery = [];
-            $index = 0;
-            foreach ($dish->getGalleryImages() as $galleryImage) {
-                $image = $galleryImage->getImage();
-                if (!$image instanceof Image) {
-                    continue;
-                }
-
-                $file = $images->addImage($image, 'images/dishes/' . $dishId . '/gallery-' . $index);
-                ++$index;
-                if ($file === null) {
-                    continue;
-                }
-
-                $gallery[] = ['file' => $file, 'sort_order' => $galleryImage->getSortOrder()];
-            }
-
             $pronunciation = $dish->getPronunciationSystem();
 
             $rows[] = [
@@ -84,9 +73,8 @@ readonly class DishContributor implements ContributorInterface
                     ? ['language' => $pronunciation->getLanguage(), 'name' => $pronunciation->getName()]
                     : null,
                 'preview_image' => $dish->getPreviewImage() instanceof Image
-                    ? $images->addImage($dish->getPreviewImage(), 'images/dishes/' . $dishId . '/preview')
+                    ? $images->addImage($dish->getPreviewImage())
                     : null,
-                'gallery' => $gallery,
             ];
         }
 

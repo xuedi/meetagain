@@ -54,12 +54,6 @@ readonly class NavigationPlugin implements Plugin
         return null;
     }
 
-    public function loadPostExtendFixtures(OutputInterface $output): void {}
-
-    public function preFixtures(OutputInterface $output): void {}
-
-    public function postFixtures(OutputInterface $output): void {}
-
     public function getFooterAbout(): ?string
     {
         return null;

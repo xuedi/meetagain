@@ -56,3 +56,6 @@ dishes_dish:
     flash_added: 'Dish added to the catalog.'
     flash_updated: 'Dish updated.'
     flash_deleted: 'Dish deleted.'
+dishes_portability:
+    kind_likes: 'Dish likes'
+    kind_gallery: 'Dish gallery images'

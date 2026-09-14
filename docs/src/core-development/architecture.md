@@ -53,7 +53,6 @@ Supporting layers:
 | **Command**         | CLI commands; same rules as controllers                   |
 | **EventSubscriber** | React to Symfony framework events (login, response, etc.) |
 | **Twig extension**  | Presentation helpers for templates                        |
-| **DataFixtures**    | Test and dev data; allowed extra flexibility              |
 
 ---
 
@@ -207,16 +206,13 @@ Every plugin must implement `src/Plugin.php`:
 interface Plugin
 {
     public function getPluginKey(): string;
-    public function getMenuLinks(): array;
-    public function getEventTile(int $eventId): ?string;
+    public function getLinkCollection(): LinkCollection;
+    public function getEventTile(int $eventId, EventTileLocation $location): ?string;
+    public function getFooterAbout(): ?string;
     public function getEventListItemTags(int $eventId): array;
     public function warmCache(WarmCacheType $type, array $ids): void;
-    public function getFooterAbout(): ?string;
-    public function getMemberPageTop(): ?string;
-    public function getAdminSystemLinks(): ?AdminSection;
-    public function loadPostExtendFixtures(OutputInterface $output): void;
-    public function preFixtures(OutputInterface $output): void;
-    public function postFixtures(OutputInterface $output): void;
+    public function getStylesheets(): array;
+    public function getJavascripts(): array;
 }
 ```
 
@@ -284,10 +280,10 @@ Plugins implement `EntityActionInterface` to receive these notifications.
 | `src/Security/`         | UserChecker, authenticators                   |
 | `src/EventSubscriber/`  | Symfony event listeners                       |
 | `src/Filter/`           | Filter interfaces and composite services      |
-| `src/DataFixtures/`     | Dev and test data fixtures                    |
+| `src/Portability/`      | Archive export and import, one section each   |
+| `src/DataImportFixtures/` | Demo archives, see [Demo Data](demo-data.md) |
 | `src/Twig/`             | Twig extensions                               |
 | `templates/`            | Twig templates (mirrors controller structure) |
 | `translations/`         | YAML translation files (en, de, cn)           |
 | `plugins/`              | Optional plugin modules                       |
 | `tests/Unit/`           | PHPUnit unit tests                            |
-| `tests/Functional/`     | PHPUnit functional (HTTP) tests               |
