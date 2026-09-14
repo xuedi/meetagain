@@ -2,3 +2,5 @@
 # published. Written by the operator, never committed. The committed .dist files carry
 # everything a contributor needs.
 *.local
+*.local.json
+*.unknown.json

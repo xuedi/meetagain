@@ -1,0 +1,129 @@
+{
+    "options": {
+        "labelWidth": 48,
+        "tailLines": 20,
+        "showDurationFrom": 2,
+        "failLog": "justFail.log"
+    },
+    "aliases": {
+        "DOCKER": "docker-compose --env-file .env.dist -f docker/docker-compose.yml",
+        "PHP": "docker-compose --env-file .env.dist -f docker/docker-compose.yml exec -T -e XDEBUG_MODE=off php",
+        "PHP_COVERAGE": "docker-compose --env-file .env.dist -f docker/docker-compose.yml exec -T -e XDEBUG_MODE=coverage php",
+        "DB": "docker-compose --env-file .env.dist -f docker/docker-compose.yml exec -T mariadb"
+    },
+    "rules": [
+        {
+            "label": "Stop containers",
+            "commands": ["DOCKER down"]
+        },
+        {
+            "label": "Reset generated files",
+            "commands": [
+                "rm -rf .env installed.lock config/plugins.php var/",
+                "cp .env.dist .env",
+                "cp assets/styles/_config.scss.dist assets/styles/_config.scss",
+                "touch installed.lock"
+            ]
+        },
+        {
+            "label": "Start containers",
+            "commands": ["DOCKER up -d"]
+        },
+        {
+            "label": "Install Composer packages",
+            "commands": ["PHP composer install"]
+        },
+        {
+            "label": "Compile assets",
+            "commands": [
+                "rm -rf public/assets/ public/media/",
+                "PHP php bin/console sass:build",
+                "PHP php bin/console asset-map:compile",
+                "PHP php bin/console app:media:compile",
+                "PHP purgecss --config assets/purgecss.config.js"
+            ]
+        },
+        {
+            "label": "Enable plugins",
+            "commands": [
+                "PHP php bin/console app:plugin disable all",
+                "PHP php bin/console app:plugin enable*"
+            ]
+        },
+        {
+            "label": "Reset database",
+            "commands": [
+                "PHP php bin/console doctrine:database:drop --force --if-exists",
+                "PHP php bin/console doctrine:database:create --if-not-exists"
+            ]
+        },
+        {
+            "label": "Run migrations",
+            "commands": ["PHP php bin/console doctrine:migrations:migrate *"]
+        },
+        {
+            "label": "Seed email templates",
+            "commands": ["PHP php bin/console app:email-templates:seed"]
+        },
+        {
+            "label": "Seed install baseline",
+            "commands": ["PHP php bin/console app:install:seed*"]
+        },
+        {
+            "label": "Reset security state",
+            "commands": ["PHP php bin/console app:security:reset-state"]
+        },
+        {
+            "label": "Clear caches",
+            "commands": [
+                "PHP composer dump-autoload",
+                "PHP php bin/console cache:pool:clear --all -q"
+            ]
+        },
+        {
+            "label": "Build tools",
+            "commands": [
+                "cd bin/tools && cargo build --release --workspace",
+                "for crate in bin/tools/*/src/main.rs; do *"
+            ]
+        },
+        {
+            "label": "Install commit hooks",
+            "commands": [
+                "git config core.hooksPath .githooks",
+                "mkdir -p bin/commit-hooks",
+                "rm -f bin/commit-hooks/*.bash",
+                "cp tests/config/commit-hooks/*.bash bin/commit-hooks/",
+                "for hook in plugins/*/commit-hooks/*.bash; do *",
+                "chmod +x bin/commit-hooks/*.bash"
+            ]
+        },
+        {
+            "label": "Collect plugin recipes",
+            "commands": [
+                "cat /dev/null > .just/local.just",
+                "for recipes in plugins/*/just/*.just; do *"
+            ]
+        }
+    ],
+    "fold": [
+        "PHP mkdir -p var/log",
+        "PHP touch var/log/dev.log",
+        "PHP truncate -s 0 var/log/dev.log",
+        "PHP php bin/console cache:pool:clear cache.cms_page_cache -q",
+        "PHP php bin/console cache:clear -q",
+        "PHP php bin/console app:cache:app-state:clear -q",
+        "PHP php bin/console app:cache:config:clear -q",
+        "mkdir -p bin/tools/bin"
+    ],
+    "ignore": [
+        "echo*",
+        "printf *",
+        "clear",
+        "PHP php bin/console *",
+        "DOCKER exec php bash",
+        "DB mariadb *",
+        "PHP vendor/bin/phpunit *",
+        "cd bin/tools && cargo test *"
+    ]
+}

@@ -1,8 +1,9 @@
 # Developer Tooling
 
-`bin/tools/` holds seven small Rust programs: three guards that run on every commit, and four
-CLIs for talking to services a deployment depends on. They are built from source on your
-machine - no binaries are committed.
+`bin/tools/` holds small Rust programs: guards that run on every commit, CLIs for talking to
+services a deployment depends on, and `output-filter`, which turns the output of a `just` recipe
+into one status line per task. They are built from source on your machine - no binaries are
+committed.
 
 ```bash
 just buildTools   # compile everything into bin/tools/bin/
@@ -75,6 +76,36 @@ Twig, JavaScript and SCSS are out of its scope.
 
 ---
 
+## Quieter recipes with `output-filter`
+
+Every recipe line runs through `output-filter`: the justfile's `set shell` points at
+`bin/just-shell`, which falls back to a plain shell until the binary is built. Commands that have
+a label print one line per task instead of the command and its output:
+
+```text
+Install Composer packages ....................... OK   3s
+Compile assets .................................. OK   3s
+Run migrations .................................. FAILED
+  PHP php bin/console doctrine:migrations:migrate -n -q
+  | An exception occurred while executing a query: ...
+  full output: justFail.log
+```
+
+- **Everything without a label runs untouched**, so recipes whose output is the point - the
+  tests, `just app ...`, a database query - look as they always did. A command with no rule gets a
+  `$ command` heading and is recorded in the gitignored `output-filter.unknown.json`, ready to be
+  labelled.
+- **Rules live in `config/tools/output-filter.dist.json`.** `rules` give a `label` to a list of
+  `commands`, `fold` merges a command silently into the line before it, `ignore` runs a command
+  untouched without a heading, and `aliases` shorten the expanded `PHP` and `DOCKER` prefixes the
+  patterns are written in. `*` matches anything and the longest matching pattern wins. A gitignored
+  `output-filter.local.json` next to it can add your own. `output-filter --check` validates both.
+- **When a step fails**, the run stops where just stops. You see the command and the last lines of
+  its output, and `justFail.log` in the repo root holds its full output.
+- **`just debug=1 <recipe>`** shows every command and its full output again.
+
+---
+
 ## Configuration
 
 Every tool reads config from the repo root, in two layers:
@@ -97,6 +128,8 @@ Never put a credential in a `.dist`. That is what the overlay is for.
     Nothing generates them and nothing else holds their values, so anything you put in one
     belongs in a password manager as well. To set one up, copy the `.dist` and fill in the keys
     you need - or write only the lines that differ, since the rest falls back to the `.dist`.
+    `output-filter` keeps the same two layers as JSON: `output-filter.dist.json` and the
+    gitignored `output-filter.local.json`.
 
 ---
 
