@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class CaptchaServiceTest extends TestCase
 {
-    private const string PROJECT_DIR = '/var/www/html';
+    private const string PROJECT_DIR = __DIR__ . '/../../..';
 
     private MockObject|SessionInterface $sessionMock;
     private MockObject|RequestStack $requestStackMock;
