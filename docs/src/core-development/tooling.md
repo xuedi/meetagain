@@ -86,9 +86,8 @@ a label print one line per task instead of the command and its output:
 Install Composer packages ....................... OK   3s
 Compile assets .................................. OK   3s
 Run migrations .................................. FAILED
-  PHP php bin/console doctrine:migrations:migrate -n -q
-  | An exception occurred while executing a query: ...
-  full output: justFail.log
+
+the full log of what failed can be found here: justFail.log
 ```
 
 - **Everything without a label runs untouched**, so recipes whose output is the point - the
@@ -100,8 +99,11 @@ Run migrations .................................. FAILED
   untouched without a heading, and `aliases` shorten the expanded `PHP` and `DOCKER` prefixes the
   patterns are written in. `*` matches anything and the longest matching pattern wins. A gitignored
   `output-filter.local.json` next to it can add your own. `output-filter --check` validates both.
-- **When a step fails**, the run stops where just stops. You see the command and the last lines of
-  its output, and `justFail.log` in the repo root holds its full output.
+- **`just test` and the pre-commit hook print one line per hook.** `bin/commit-hooks.sh` runs each
+  script in `bin/commit-hooks/` through the same shim. `just check` and `just testUnit` still show
+  their full output when you run them directly.
+- **When a step fails**, the run stops where just stops, and `justFail.log` in the repo root holds
+  the failed command and its full output.
 - **`just debug=1 <recipe>`** shows every command and its full output again.
 
 ---

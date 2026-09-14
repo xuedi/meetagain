@@ -140,7 +140,11 @@ fn a_failing_command_exits_with_its_code_and_writes_the_fail_log() {
 
     assert_eq!(Some(3), output.status.code());
     assert_eq!(
-        vec!["Break things FAILED", "echo broken; exit 3", "| broken", "full output: justFail.log"],
+        vec![
+            "Break things FAILED",
+            "",
+            "the full log of what failed can be found here: justFail.log"
+        ],
         stderr(&output)
     );
     assert_eq!(Some("$ echo broken; exit 3\nbroken\n".to_string()), workspace.file("justFail.log"));

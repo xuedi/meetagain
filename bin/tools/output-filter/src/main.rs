@@ -122,16 +122,16 @@ fn run_step(
                 screen.open(&label);
             }
             screen.failed(interrupted);
-            screen.detail(command);
-            for tail_line in tail(&output, options.tail_lines) {
-                screen.detail(&format!("| {}", tail_line));
-            }
             let log = format!("$ {}\n{}\n", line, output.join("\n"));
-            let written = match fs::write(&options.fail_log, log) {
-                Ok(()) => format!("full output: {}", options.fail_log),
-                Err(error) => format!("cannot write {}: {}", options.fail_log, error),
-            };
-            screen.detail(&written);
+            match fs::write(&options.fail_log, log) {
+                Ok(()) => screen.point_to(&options.fail_log),
+                Err(error) => {
+                    for output_line in &output {
+                        screen.detail(output_line);
+                    }
+                    screen.detail(&format!("cannot write {}: {}", options.fail_log, error));
+                }
+            }
             state.forget();
             ExitCode::from(exit_code(status, interrupted))
         }
@@ -170,15 +170,6 @@ fn capture(args: &[OsString]) -> io::Result<(ExitStatus, Vec<String>)> {
         output.push(String::from_utf8_lossy(&line?).trim_end_matches('\r').to_string());
     }
     Ok((child.wait()?, output))
-}
-
-fn tail(output: &[String], count: usize) -> Vec<&str> {
-    let lines: Vec<&str> = output
-        .iter()
-        .map(|line| line.trim_end())
-        .filter(|line| !line.is_empty())
-        .collect();
-    lines[lines.len().saturating_sub(count)..].to_vec()
 }
 
 fn exit_code(status: ExitStatus, interrupted: bool) -> u8 {
@@ -220,7 +211,6 @@ struct Rule {
 #[derive(Debug, PartialEq)]
 struct Options {
     label_width: usize,
-    tail_lines: usize,
     show_duration_from: u64,
     fail_log: String,
 }
@@ -229,7 +219,6 @@ impl Default for Options {
     fn default() -> Self {
         Self {
             label_width: 48,
-            tail_lines: 20,
             show_duration_from: 2,
             fail_log: "justFail.log".to_string(),
         }
@@ -242,7 +231,6 @@ impl Options {
             let at = format!("{}.{}", at, key);
             match key.as_str() {
                 "labelWidth" => self.label_width = as_number(value, &at)?,
-                "tailLines" => self.tail_lines = as_number(value, &at)?,
                 "showDurationFrom" => self.show_duration_from = as_number(value, &at)? as u64,
                 "failLog" => self.fail_log = as_text(value, &at)?,
                 _ => return Err(format!("{}: unknown option", at)),
@@ -604,6 +592,10 @@ impl<W: Write> Screen<W> {
     fn detail(&mut self, text: &str) {
         let _ = writeln!(self.out, "  {}", text);
     }
+
+    fn point_to(&mut self, log: &str) {
+        let _ = writeln!(self.out, "\nthe full log of what failed can be found here: {}", log);
+    }
 }
 
 fn paint(color: bool, text: &str, code: &str) -> String {
@@ -629,7 +621,7 @@ mod tests {
 
     fn config() -> Config {
         let dist = json!({
-            "options": {"tailLines": 5},
+            "options": {"showDurationFrom": 5},
             "aliases": {
                 "DOCKER": "docker-compose -f compose.yml",
                 "PHP": "docker-compose -f compose.yml exec php"
@@ -658,7 +650,7 @@ mod tests {
         let config = config();
 
         assert_eq!(30, config.options.label_width);
-        assert_eq!(5, config.options.tail_lines);
+        assert_eq!(5, config.options.show_duration_from);
         assert_eq!(6, config.rules.len());
     }
 
@@ -728,14 +720,6 @@ mod tests {
     fn a_folded_command_joins_the_open_step_or_stands_as_itself() {
         assert_eq!(("Compile".to_string(), true), step_label(None, "PHP cache:clear", Some("Compile")));
         assert_eq!(("PHP cache:clear".to_string(), false), step_label(None, "PHP cache:clear", None));
-    }
-
-    #[test]
-    fn the_tail_skips_blank_lines_and_keeps_the_last_ones() {
-        let output: Vec<String> = ["one", "   ", "", "two  ", "three"].iter().map(|line| line.to_string()).collect();
-
-        assert_eq!(vec!["two", "three"], tail(&output, 2));
-        assert_eq!(vec!["one", "two", "three"], tail(&output, 20));
     }
 
     #[test]
