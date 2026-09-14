@@ -6,7 +6,7 @@
 buildTools:
     cd bin/tools && cargo build --release --workspace
     mkdir -p bin/tools/bin
-    @for crate in bin/tools/*/src/main.rs; do name=$(basename $(dirname $(dirname $crate))); cp "bin/tools/target/release/$name" "bin/tools/bin/$name"; echo "installed: bin/tools/bin/$name"; done
+    @for crate in bin/tools/*/src/main.rs; do name=$(basename $(dirname $(dirname $crate))); cp "bin/tools/target/release/$name" "bin/tools/bin/$name.new"; mv "bin/tools/bin/$name.new" "bin/tools/bin/$name"; echo "installed: bin/tools/bin/$name"; done
 
 # Run the tools' own test suite
 [group('tools')]

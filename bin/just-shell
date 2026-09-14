@@ -1,0 +1,5 @@
+#!/bin/sh
+if [ -x bin/tools/bin/output-filter ]; then
+    exec bin/tools/bin/output-filter "$@"
+fi
+exec "$@"

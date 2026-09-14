@@ -1,0 +1,12 @@
+[package]
+name = "output-filter"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "output-filter"
+path = "src/main.rs"
+
+[dependencies]
+serde_json.workspace = true
+libc.workspace = true
