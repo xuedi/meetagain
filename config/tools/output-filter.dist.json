@@ -182,7 +182,7 @@
         },
         {
             "label": "Run tests with coverage",
-            "commands": ["PHP_COVERAGE vendor/bin/phpunit *"]
+            "commands": ["PHP_COVERAGE sh -c 'vendor/bin/paratest *"]
         },
         {
             "label": "Generate coverage badge",

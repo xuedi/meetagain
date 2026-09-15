@@ -36,6 +36,8 @@ when@test:
             #   single-process phpunit -> meetAgain_test
             #   paratest worker N      -> meetAgain_testN
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+            # A backtrace per query costs hundreds of MB in a test that loads the sample fixtures.
+            profiling_collect_backtrace: false
 
 when@prod:
     doctrine:
