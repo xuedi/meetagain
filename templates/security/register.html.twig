@@ -25,6 +25,23 @@
                     {{ form_row(form.plainPassword) }}
                     {{ form_row(form.agreeTerms) }}
 
+                    <div class="field">
+                        <label class="label">{{ 'security.label_captcha'|trans }}</label>
+                        <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
+                            <img src="data:image/png;base64, {{ captcha }}" alt="captcha">
+                            <div class="control is-flex-grow-1">
+                                {{ form_widget(form.captcha) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="is-size-7 has-text-grey mt-2">{{ 'security.captcha_limit_text'|trans }}</p>
+                    <div data-captcha-counter data-url="{{ path('app_ajax_get_captcha_count') }}">
+                        <p class="mb-4 is-size-7 has-text-grey">
+                            {{ 'security.captcha_tries_pre'|trans }} <strong id="refreshCount">{{ refreshCount }}</strong> {{ 'security.captcha_tries_mid'|trans }} <strong id="refreshTime">{{ refreshTime }}</strong> {{ 'security.captcha_tries_post'|trans }}
+                        </p>
+                    </div>
+
                     <div class="field is-grouped mt-4">
                         <div class="control">
                             <button class="button is-primary">{{ "security.button_register" | trans }}</button>
@@ -54,4 +71,8 @@
         </div>
     </section>
 
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/captcha-counter.js') }}" defer></script>
 {% endblock %}

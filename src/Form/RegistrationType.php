@@ -49,6 +49,12 @@ class RegistrationType extends AbstractType
                 new NotBlank(message: 'security.validator_password_blank'),
                 new Length(min: 6, max: 254, minMessage: 'security.validator_password_min'),
             ],
+        ])->add('captcha', TextType::class, [
+            'label' => 'security.label_captcha_input',
+            'mapped' => false,
+            'constraints' => [
+                new NotBlank(),
+            ],
         ]);
     }
 

@@ -41,6 +41,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class SecurityController extends AbstractController
 {
     public const string LOGIN_ROUTE = 'app_login';
+    private const int USER_AGENT_MAX = 512;
 
     public function __construct(
         private readonly ActivityService $activityService,
@@ -132,42 +133,53 @@ final class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $blocklistEntry = $this->emailBlocklistRepository->findByEmail((string) $user->getEmail());
-            if ($blocklistEntry !== null) {
-                return $this->render('security/register_blocked.html.twig', [
-                    'reason' => $blocklistEntry->getReason(),
-                    'supportPath' => $this->generateUrl('app_contact'),
-                ]);
+            $captchaError = $this->captchaService->isValid((string) $form->get('captcha')->getData());
+            if ($captchaError !== null) {
+                $form->get('captcha')->addError(new FormError($this->translator->trans($captchaError)));
             }
 
-            $plainPassword = $form->get('plainPassword')->getData();
+            if ($form->getErrors(true)->count() === 0) {
+                $blocklistEntry = $this->emailBlocklistRepository->findByEmail((string) $user->getEmail());
+                if ($blocklistEntry !== null) {
+                    return $this->render('security/register_blocked.html.twig', [
+                        'reason' => $blocklistEntry->getReason(),
+                        'supportPath' => $this->generateUrl('app_contact'),
+                    ]);
+                }
 
-            $user->setPassword($this->hasher->hashPassword($user, $plainPassword));
-            $user->setRole(UserRole::User);
-            $user->setNotification(true);
-            $user->setStatus(UserStatus::Registered);
-            $user->setPublic(true);
-            $user->setVerified(false);
-            $user->setLocale($request->getLocale());
-            $user->setRegcode(bin2hex(random_bytes(32)));
-            $user->setRegcodeExpiresAt(new DateTimeImmutable('+24 hours'));
-            $user->setLastLogin(new DateTime());
-            $user->setCreatedAt(new DateTimeImmutable());
-            $user->setBio(null);
-            $user->setOsmConsent($this->consentService->getShowOsm());
+                $plainPassword = $form->get('plainPassword')->getData();
 
-            $em->persist($user);
-            $em->flush();
+                $user->setPassword($this->hasher->hashPassword($user, $plainPassword));
+                $user->setRole(UserRole::User);
+                $user->setNotification(true);
+                $user->setStatus(UserStatus::Registered);
+                $user->setPublic(true);
+                $user->setVerified(false);
+                $user->setLocale($request->getLocale());
+                $user->setRegcode(bin2hex(random_bytes(32)));
+                $user->setRegcodeExpiresAt(new DateTimeImmutable('+24 hours'));
+                $user->setLastLogin(new DateTime());
+                $user->setCreatedAt(new DateTimeImmutable());
+                $user->setBio(null);
+                $user->setOsmConsent($this->consentService->getShowOsm());
 
-            $this->entityActionDispatcher->dispatch(EntityAction::CreateUser, $user->getId());
+                $em->persist($user);
+                $em->flush();
 
-            $this->activityService->log(Registered::TYPE, $user, []);
-            $this->verificationRequestEmail->send(['user' => $user]);
+                $this->entityActionDispatcher->dispatch(EntityAction::CreateUser, $user->getId());
 
-            return $this->render('security/register_email_send.html.twig');
+                $this->activityService->log(Registered::TYPE, $user, $this->requestMeta($request));
+                $this->verificationRequestEmail->send(['user' => $user]);
+
+                return $this->render('security/register_email_send.html.twig');
+            }
         }
 
+        $this->captchaService->reset();
         return $this->render('security/register.html.twig', [
+            'captcha' => $this->captchaService->generate(),
+            'refreshCount' => $this->captchaService->getRefreshCount(),
+            'refreshTime' => $this->captchaService->getRefreshTime(),
             'form' => $form,
         ]);
     }
@@ -285,5 +297,16 @@ final class SecurityController extends AbstractController
         return $this->render('security/reset_password.html.twig', [
             'form' => $form,
         ]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function requestMeta(Request $request): array
+    {
+        return [
+            'ip' => $request->getClientIp() ?? '',
+            'user_agent' => mb_substr((string) $request->headers->get('User-Agent'), 0, self::USER_AGENT_MAX),
+        ];
     }
 }
