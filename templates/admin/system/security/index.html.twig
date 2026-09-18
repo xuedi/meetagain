@@ -1,0 +1,125 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/vendor/chart.js') }}"></script>
+    <script src="{{ asset('js/admin/dashboard.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <div class="columns">
+            <div class="column is-7">
+
+                {% include 'admin/_components/dashboard/multi_chart.html.twig' with {'tile': chartTile} only %}
+
+                <h2 class="title is-6">{{ 'admin_system_security.heading_measures'|trans }}</h2>
+                <table class="table is-fullwidth">
+                    <thead>
+                        <tr>
+                            <th>{{ 'admin_system_security.col_measure'|trans }}</th>
+                            <th class="has-text-right">{{ 'admin_system_security.col_checked'|trans }}</th>
+                            <th class="has-text-right">{{ 'admin_system_security.col_blocked'|trans }}</th>
+                            <th>{{ 'admin_system_security.col_last_block'|trans }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in measures %}
+                            <tr>
+                                <td>
+                                    <span class="icon-text">
+                                        <span class="icon {{ row.enabled ? 'has-text-success' : 'has-text-grey' }}"><i class="fa fa-{{ row.measure.icon }}"></i></span>
+                                        <span class="{{ row.enabled ? '' : 'has-text-grey' }}">{{ row.measure.labelKey|trans }}</span>
+                                    </span>
+                                    <p class="is-size-7 has-text-grey">{{ row.measure.descriptionKey|trans }}</p>
+                                </td>
+                                <td class="has-text-right">{{ row.checked }}</td>
+                                <td class="has-text-right {{ row.blocked > 0 ? 'has-text-danger' : '' }}">{{ row.blocked }}</td>
+                                <td class="is-nowrap has-text-grey">{{ row.lastBlock ? row.lastBlock|date('Y-m-d H:i') : '-' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% include 'admin/_components/dashboard/list.html.twig' with {'tile': elsewhereTile} only %}
+
+            </div>
+            <div class="column is-5">
+
+                <h2 class="title is-6">{{ 'admin_system_security.heading_toggles'|trans }}</h2>
+                <table class="table is-fullwidth">
+                    <tbody>
+                        {% for row in measures %}
+                            <tr>
+                                <td>{{ row.measure.labelKey|trans }}</td>
+                                <td>
+                                    {% include '_components/toggle.html.twig' with {
+                                        'link': path('app_admin_system_security_toggle', {'measure': row.measure.value}),
+                                        'status': row.enabled,
+                                        'csrfTokenId': 'admin_system_security_toggle' ~ row.measure.value,
+                                    } only %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <fieldset class="p-4 mb-4 mt-4 fieldset-default">
+                    <legend class="px-2 has-text-weight-semibold is-size-7">{{ 'admin_system_security.heading_settings'|trans }}</legend>
+                    {{ form_start(form) }}
+                    {{ form_row(form.powDifficulty) }}
+                    {{ form_row(form.logRetentionDays) }}
+                    <button class="button is-primary">{{ 'global.button_save'|trans }}</button>
+                    {{ form_end(form) }}
+                </fieldset>
+
+            </div>
+        </div>
+
+        <h2 class="title is-6">{{ 'admin_system_security.heading_recent'|trans }}</h2>
+        <table class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>{{ 'admin_system_security.col_time'|trans }}</th>
+                    <th>{{ 'admin_system_security.col_measure'|trans }}</th>
+                    <th>{{ 'admin_system_security.col_context'|trans }}</th>
+                    <th>{{ 'admin_system_security.col_reason'|trans }}</th>
+                    <th>{{ 'admin_system_security.col_ip'|trans }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in recentBlocks %}
+                    <tr>
+                        <td class="is-nowrap">{{ entry.createdAt|date('Y-m-d H:i:s') }}</td>
+                        <td><span class="tag is-light">{{ entry.measure.labelKey|trans }}</span></td>
+                        <td class="has-text-grey">{{ entry.context ?? '-' }}</td>
+                        <td>
+                            {% if entry.detail and entry.detail.reason is defined %}
+                                {{ ('admin_system_security.reason_' ~ entry.detail.reason)|trans }}
+                                {% if entry.detail.elapsed_ms is defined %}
+                                    <span class="has-text-grey is-size-7">{{ entry.detail.elapsed_ms }} ms</span>
+                                {% endif %}
+                                {% if entry.detail.difficulty is defined %}
+                                    <span class="has-text-grey is-size-7">{{ entry.detail.difficulty }} bit</span>
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="is-nowrap has-text-grey">{{ entry.ip ?? '-' }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="has-text-centered has-text-grey">{{ 'admin_system_security.empty_blocks'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,70 @@
+{#
+    Human Check -- the bot defenses rendered inside a guest form
+
+    Renders whichever measures an admin has switched on at /admin/system/security: the image
+    captcha with its refresh counter, the hidden honeypot field, and the signed stamp that
+    carries the submit-timing and proof-of-work challenge. A disabled measure has no field on
+    the form at all, so this partial adapts without any branch at the call site. Include it
+    once per guest form and pass that form's meta child.
+
+    Used in:    templates/security/register.html.twig, templates/security/reset.html.twig,
+                templates/support/index.html.twig
+    Parameters:
+        - form (FormView, required)   -- the meta child of the surrounding form
+        - label (string, optional)    -- captcha label key; default: 'security.label_captcha'
+    Depends on: assets/js/captcha-counter.js, assets/js/human-check.js,
+                _components/captcha_refresh.html.twig (the form the refresh button submits)
+#}
+<div data-form-meta{% if form.vars.powEnabled %} data-form-meta-bits="{{ form.vars.powDifficulty }}" data-form-meta-worker="{{ asset('js/human-check-worker.js') }}" data-form-meta-label="{{ 'security.human_check_working'|trans }}"{% endif %}>
+
+    {% if form.reference is defined %}
+        <div class="is-offscreen" aria-hidden="true">
+            {{ form_widget(form.reference) }}
+        </div>
+    {% endif %}
+
+    {% if form.stamp is defined %}
+        {{ form_widget(form.stamp, {'attr': {'data-form-meta-stamp': ''}}) }}
+    {% endif %}
+
+    {% if form.proof is defined %}
+        {{ form_widget(form.proof, {'attr': {'data-form-meta-proof': ''}}) }}
+    {% endif %}
+
+    {{ form_errors(form) }}
+
+    {% if form.captcha is defined %}
+        <fieldset class="p-4 mb-4 mt-4 fieldset-info"
+                  data-captcha-counter
+                  data-url="{{ path('app_ajax_get_captcha_count') }}"
+                  data-refresh-url="{{ path('app_captcha_refresh', {'context': form.vars.context}) }}">
+            <legend class="px-2 has-text-info has-text-weight-semibold is-size-7">{{ (label|default('security.label_captcha'))|trans }}</legend>
+
+            <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
+                <img src="data:image/png;base64, {{ form.vars.captchaImage }}" alt="{{ (label|default('security.label_captcha'))|trans }}" data-captcha-image>
+                <div class="control is-flex-grow-1">
+                    {{ form_widget(form.captcha) }}
+                </div>
+            </div>
+            {{ form_errors(form.captcha) }}
+
+            <div class="is-flex is-flex-wrap-wrap is-align-items-center is-justify-content-space-between mt-3" style="gap: 0.75rem;">
+                <div class="is-size-7 has-text-grey">
+                    <p class="mb-0">{{ 'security.captcha_limit_text'|trans }}</p>
+                    <p class="mb-0">
+                        {{ 'security.captcha_tries_pre'|trans }} <strong id="refreshCount">{{ form.vars.refreshCount }}</strong> {{ 'security.captcha_tries_mid'|trans }} <strong id="refreshTime">{{ form.vars.refreshTime }}</strong> {{ 'security.captcha_tries_post'|trans }}
+                    </p>
+                </div>
+                <button type="submit"
+                        form="captchaRefresh"
+                        class="button is-small is-info is-light flex-shrink-0"
+                        data-captcha-refresh>
+                    <span class="icon"><i class="fa fa-rotate"></i></span>
+                    <span>{{ 'security.captcha_new_code'|trans }}</span>
+                </button>
+            </div>
+        </fieldset>
+    {% endif %}
+
+</div>
+{% do form.setRendered %}

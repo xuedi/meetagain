@@ -93,6 +93,11 @@ final class ConfigController extends AbstractSettingsController implements Admin
 
         $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_system_config.intro'))], actions: [
             new AdminTopActionButton(
+                label: $this->translator->trans('admin_system_config.button_security'),
+                target: $this->generateUrl('app_admin_system_security'),
+                icon: 'shield-halved',
+            ),
+            new AdminTopActionButton(
                 label: $this->translator->trans('admin_system_config.button_view_redis_cache'),
                 target: $this->generateUrl('app_admin_system_redis_cache'),
                 icon: 'database',

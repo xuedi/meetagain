@@ -6,7 +6,7 @@ use App\Controller\AbstractController;
 use App\Entity\Session\Consent;
 use App\Enum\ConsentType;
 use App\Service\Config\LocaleCookieService;
-use App\Service\Member\CaptchaService;
+use App\Service\Security\CaptchaService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

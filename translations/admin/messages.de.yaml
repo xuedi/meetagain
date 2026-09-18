@@ -649,6 +649,7 @@ admin_secretbox:
     col_count: 'Verschluesselte Eintraege'
     no_consumers: 'Keine registrierten Verbraucher.'
 admin_security:
+    button_security_measures: 'Sicherheitsmaßnahmen'
     tab_incidents: 'Vorfälle'
     tab_rate_limiting: 'Rate-Limit'
     tab_permissions: 'Berechtigungen'

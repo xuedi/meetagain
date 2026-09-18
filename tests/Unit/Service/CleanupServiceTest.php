@@ -11,6 +11,8 @@ use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
 use App\Repository\SupportRequestRepository;
 use App\Repository\UserRepository;
+use App\Service\Security\MeasureLogger;
+use App\Service\Security\MeasureSettings;
 use App\Service\Support\ThreadService;
 use App\Service\System\CleanupService;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -40,6 +42,8 @@ class CleanupServiceTest extends TestCase
             userRepo: $userRepo ?? $this->createStub(UserRepository::class),
             supportRequestRepo: $supportRequestRepo ?? $this->createStub(SupportRequestRepository::class),
             threadService: $threadService ?? $this->createStub(ThreadService::class),
+            measureLogger: $this->createStub(MeasureLogger::class),
+            measureSettings: $this->createStub(MeasureSettings::class),
             entityManager: $entityManager ?? $this->createStub(EntityManagerInterface::class),
             entityActionDispatcher: $entityActionDispatcher ?? $this->createStub(EntityActionDispatcher::class),
             clock: $clock ?? new MockClock('2026-08-19 12:00:00', 'UTC'),

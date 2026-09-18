@@ -49,3 +49,7 @@ Error: 错误
 # Admin location namespace - venue form
 'admin_location.validator_blank': '此字段不能为空。'
 'admin_location.validator_too_long': '此值过长，最多 {limit} 个字符。'
+
+# Admin system security namespace - measure tuning
+'admin_system_security.validator_pow_difficulty': '难度必须介于 {min} 和 {max} 位之间。'
+'admin_system_security.validator_log_retention': '保留天数必须介于 {min} 和 {max} 之间。'

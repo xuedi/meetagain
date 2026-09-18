@@ -7,7 +7,6 @@ use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
@@ -35,10 +34,8 @@ class SupportRequestType extends AbstractType
             return;
         }
 
-        $builder->add('captcha', TextType::class, [
-            'mapped' => false,
-            'label' => 'support.form_label_captcha_input',
-            'required' => false,
+        $builder->add('meta', HumanCheckType::class, [
+            'context' => 'app_contact',
         ]);
     }
 

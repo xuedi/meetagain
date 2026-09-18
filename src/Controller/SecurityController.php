@@ -20,7 +20,6 @@ use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
 use App\Repository\EmailBlocklistRepository;
 use App\Service\Config\ConfigService;
-use App\Service\Member\CaptchaService;
 use App\Service\Member\ConsentService;
 use App\Service\Member\PasswordResetService;
 use App\Service\Security\SecurityService;
@@ -29,7 +28,6 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Target;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -51,7 +49,6 @@ final class SecurityController extends AbstractController
         private readonly Security $security,
         private readonly UserPasswordHasherInterface $hasher,
         private readonly ConsentService $consentService,
-        private readonly CaptchaService $captchaService,
         private readonly PasswordResetService $passwordResetService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly ConfigService $configService,
@@ -133,55 +130,42 @@ final class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $captchaError = $this->captchaService->isValid((string) $form->get('captcha')->getData());
-            if ($captchaError !== null) {
-                $form->get('captcha')->addError(new FormError($this->translator->trans($captchaError)));
+            $blocklistEntry = $this->emailBlocklistRepository->findByEmail((string) $user->getEmail());
+            if ($blocklistEntry !== null) {
+                return $this->render('security/register_blocked.html.twig', [
+                    'reason' => $blocklistEntry->getReason(),
+                    'supportPath' => $this->generateUrl('app_contact'),
+                ]);
             }
 
-            if ($form->getErrors(true)->count() === 0) {
-                $blocklistEntry = $this->emailBlocklistRepository->findByEmail((string) $user->getEmail());
-                if ($blocklistEntry !== null) {
-                    return $this->render('security/register_blocked.html.twig', [
-                        'reason' => $blocklistEntry->getReason(),
-                        'supportPath' => $this->generateUrl('app_contact'),
-                    ]);
-                }
+            $plainPassword = $form->get('plainPassword')->getData();
 
-                $plainPassword = $form->get('plainPassword')->getData();
+            $user->setPassword($this->hasher->hashPassword($user, $plainPassword));
+            $user->setRole(UserRole::User);
+            $user->setNotification(true);
+            $user->setStatus(UserStatus::Registered);
+            $user->setPublic(true);
+            $user->setVerified(false);
+            $user->setLocale($request->getLocale());
+            $user->setRegcode(bin2hex(random_bytes(32)));
+            $user->setRegcodeExpiresAt(new DateTimeImmutable('+24 hours'));
+            $user->setLastLogin(new DateTime());
+            $user->setCreatedAt(new DateTimeImmutable());
+            $user->setBio(null);
+            $user->setOsmConsent($this->consentService->getShowOsm());
 
-                $user->setPassword($this->hasher->hashPassword($user, $plainPassword));
-                $user->setRole(UserRole::User);
-                $user->setNotification(true);
-                $user->setStatus(UserStatus::Registered);
-                $user->setPublic(true);
-                $user->setVerified(false);
-                $user->setLocale($request->getLocale());
-                $user->setRegcode(bin2hex(random_bytes(32)));
-                $user->setRegcodeExpiresAt(new DateTimeImmutable('+24 hours'));
-                $user->setLastLogin(new DateTime());
-                $user->setCreatedAt(new DateTimeImmutable());
-                $user->setBio(null);
-                $user->setOsmConsent($this->consentService->getShowOsm());
+            $em->persist($user);
+            $em->flush();
 
-                $em->persist($user);
-                $em->flush();
+            $this->entityActionDispatcher->dispatch(EntityAction::CreateUser, $user->getId());
 
-                $this->entityActionDispatcher->dispatch(EntityAction::CreateUser, $user->getId());
+            $this->activityService->log(Registered::TYPE, $user, $this->requestMeta($request));
+            $this->verificationRequestEmail->send(['user' => $user]);
 
-                $this->activityService->log(Registered::TYPE, $user, $this->requestMeta($request));
-                $this->verificationRequestEmail->send(['user' => $user]);
-
-                return $this->render('security/register_email_send.html.twig');
-            }
+            return $this->render('security/register_email_send.html.twig');
         }
 
-        $this->captchaService->reset();
-        return $this->render('security/register.html.twig', [
-            'captcha' => $this->captchaService->generate(),
-            'refreshCount' => $this->captchaService->getRefreshCount(),
-            'refreshTime' => $this->captchaService->getRefreshTime(),
-            'form' => $form,
-        ]);
+        return $this->render('security/register.html.twig', ['form' => $form]);
     }
 
     #[Route('/register/verify/{code}', name: 'app_register_confirm_email')]
@@ -237,36 +221,22 @@ final class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $captcha = $form->get('captcha')->getData();
-            $captchaError = $this->captchaService->isValid($captcha);
-            if ($captchaError !== null) {
-                $form->get('captcha')->addError(new FormError($this->translator->trans($captchaError)));
-            }
-
             $email = $form->get('email')->getData();
 
-            if ($form->getErrors(true)->count() === 0) {
-                $blocklistEntry = $this->emailBlocklistRepository->findByEmail($email);
-                if ($blocklistEntry !== null) {
-                    return $this->render('security/reset_blocked.html.twig', [
-                        'reason' => $blocklistEntry->getReason(),
-                        'supportPath' => $this->generateUrl('app_contact'),
-                    ]);
-                }
-
-                $this->passwordResetService->requestReset($email);
-
-                return $this->render('security/reset_email_send.html.twig');
+            $blocklistEntry = $this->emailBlocklistRepository->findByEmail($email);
+            if ($blocklistEntry !== null) {
+                return $this->render('security/reset_blocked.html.twig', [
+                    'reason' => $blocklistEntry->getReason(),
+                    'supportPath' => $this->generateUrl('app_contact'),
+                ]);
             }
+
+            $this->passwordResetService->requestReset($email);
+
+            return $this->render('security/reset_email_send.html.twig');
         }
 
-        $this->captchaService->reset();
-        return $this->render('security/reset.html.twig', [
-            'captcha' => $this->captchaService->generate(),
-            'refreshCount' => $this->captchaService->getRefreshCount(),
-            'refreshTime' => $this->captchaService->getRefreshTime(),
-            'form' => $form,
-        ]);
+        return $this->render('security/reset.html.twig', ['form' => $form]);
     }
 
     #[Route('/reset/verify/{code}', name: 'app_reset_password')]

@@ -649,6 +649,7 @@ admin_secretbox:
     col_count: 'Enregistrements chiffrés'
     no_consumers: 'Aucun consommateur enregistré.'
 admin_security:
+    button_security_measures: 'Mesures de sécurité'
     tab_incidents: 'Incidents'
     tab_rate_limiting: 'Limitation de débit'
     tab_permissions: 'Permissions'

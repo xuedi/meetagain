@@ -84,6 +84,11 @@ final class IncidentsController extends AbstractSecurityController implements Ad
             );
         }
         $actions[] = $this->buildRangeDropdown($range);
+        $actions[] = new AdminTopActionButton(
+            label: $this->translator->trans('admin_security.button_security_measures'),
+            target: $this->generateUrl('app_admin_system_security'),
+            icon: 'shield-halved',
+        );
 
         $adminTop = new AdminTop(info: $info, actions: $actions);
 

@@ -1,0 +1,20 @@
+{#
+    Captcha Refresh Form -- the POST target for the "new code" button
+
+    An empty form carrying only its CSRF token, so the button inside the captcha fieldset can
+    reach it through the HTML `form` attribute. It must sit outside the page's own form, since
+    nesting one form in another is invalid markup and the browser drops the inner one. Include
+    it once per page that renders _components/human_check.html.twig, after that page's
+    form_end(). With JavaScript on, captcha-counter.js intercepts the button and swaps the
+    image in place instead, so the visitor keeps what they already typed.
+
+    Used in:    templates/security/register.html.twig, templates/security/reset.html.twig,
+                templates/support/index.html.twig
+    Parameters:
+        - form (FormView, required)   -- the meta child of that page's form
+#}
+{% if form.captcha is defined %}
+    <form id="captchaRefresh" method="post" action="{{ path('app_captcha_refresh', {'context': form.vars.context}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('captcha_refresh' ~ form.vars.context) }}">
+    </form>
+{% endif %}

@@ -1,0 +1,7 @@
+parameters:
+    human_check_min_elapsed_ms: 2000
+
+when@test:
+    parameters:
+        # A functional test posts a form microseconds after fetching it; the real threshold would reject every one.
+        human_check_min_elapsed_ms: 0

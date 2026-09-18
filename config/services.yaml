@@ -12,6 +12,7 @@ services:
         bind:
             string $kernelProjectDir: '%kernel.project_dir%'
             string $environment: '%kernel.environment%'
+            int $humanCheckMinElapsedMs: '%human_check_min_elapsed_ms%'
 
     App\:
         resource: '../src/'
