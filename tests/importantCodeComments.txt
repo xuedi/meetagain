@@ -114,8 +114,6 @@ tests/Unit/Service/AdminNotificationServiceTest.php::testSkipsProvidersWithNoIte
 tests/Unit/Service/BlockHydratorTest.php::testAppliesDefaultForOptionalMissingField // names the field deliberately left out, which is the whole case
 tests/Unit/Service/BlockHydratorTest.php::testThrowsOnMissingRequiredField // names the field deliberately left out, which is the whole case
 tests/Unit/Service/BlockHydratorTest.php::testThrowsWithAllMissingRequiredFields // lists the required fields, so the expected message can be read against them
-tests/Unit/Service/CaptchaServiceTest.php::testIsValidForcesResetAfterMaxAttempts // marks which attempt crosses the threshold, which is not visible in the loop
-tests/Unit/Service/CaptchaServiceTest.php::testGetRefreshTimeReturnsSmallestRemainingTime // marks which fixture timestamp is the oldest, which decides the expectation
 tests/Unit/Service/Email/SendScheduledEmailsServiceTest.php::testGuardErrorIsLoggedAndLoopContinues // marks which user survives the guard, which is what the assertion checks
 tests/Unit/Service/Event/OccurrenceCalculatorTest.php::OccurrenceCalculatorTest // the matrix fixture pins rlanvin/php-rrule v2.6 behaviour, WKST=MO default included
 tests/Unit/Service/Event/OccurrenceCalculatorTest.php::testABiweeklyRuleCountsWeeksFromMondayNotFromTheAnchor // the eight-day gap is the point of the case and is not obvious from the dates

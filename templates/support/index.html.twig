@@ -16,28 +16,14 @@
                     {{ form_row(form.audience) }}
                     {{ form_row(form.message) }}
 
-                    {% if not app.user %}
-                        <div class="field">
-                            <label class="label">{{ 'support.label_captcha'|trans }}</label>
-                            <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
-                                <img src="data:image/png;base64, {{ captcha }}" alt="captcha">
-                                <div class="control is-flex-grow-1">
-                                    {{ form_widget(form.captcha) }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <p class="is-size-7 has-text-grey mt-2">{{ 'security.captcha_limit_text'|trans }}</p>
-                        <div data-captcha-counter data-url="{{ path('app_ajax_get_captcha_count') }}">
-                            <p class="mb-4 is-size-7 has-text-grey">
-                                {{ 'security.captcha_tries_pre'|trans }} <strong id="refreshCount">{{ refreshCount }}</strong> {{ 'security.captcha_tries_mid'|trans }} <strong id="refreshTime">{{ refreshTime }}</strong> {{ 'security.captcha_tries_post'|trans }}
-                            </p>
-                        </div>
+                    {% if form.meta is defined %}
+                        {% include '_components/human_check.html.twig' with {'form': form.meta, 'label': 'support.label_captcha'} only %}
                     {% endif %}
-
-                    {{ form_widget(form) }}
                     <button class="button is-primary mt-2">{{ 'support.button_send'|trans }}</button>
                     {{ form_end(form) }}
+                    {% if form.meta is defined %}
+                        {% include '_components/captcha_refresh.html.twig' with {'form': form.meta} only %}
+                    {% endif %}
 
                     <p class="is-size-7 has-text-grey mt-4">{{ 'support.response_time'|trans }}</p>
 
@@ -68,5 +54,6 @@
 {% block javascripts %}
 {% if not app.user %}
     <script src="{{ asset('js/captcha-counter.js') }}" defer></script>
+    <script src="{{ asset('js/human-check.js') }}" defer></script>
 {% endif %}
 {% endblock %}

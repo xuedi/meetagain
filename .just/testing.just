@@ -22,7 +22,7 @@ testPrintResults +parameter='':
 # Show coverage report
 [group('testing')]
 testCoverage +parameter='':
-    {{PHP_COVERAGE}} vendor/bin/phpunit -c tests/config/phpunit.xml
+    {{PHP_COVERAGE}} sh -c 'vendor/bin/paratest -c tests/config/phpunit.xml --processes=$(nproc)'
     {{PHP}} php bin/console app:badge:generate
     {{PHP}} php bin/console app:test:coverage-report {{parameter}}
 

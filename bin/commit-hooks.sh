@@ -11,6 +11,9 @@
 #
 # Order is controlled by the numeric prefix (01-, 05-, 10-, 20-, 30-, ...).
 #
+# Each hook runs through bin/just-shell, the same shim the justfile uses, so
+# output-filter reports a labelled hook as one status line.
+#
 # Public/open-source contributors typically have an empty bin/commit-hooks/ and
 # this script becomes a no-op. Private tooling can drop scripts in without the
 # core repo needing to know about them.
@@ -29,7 +32,7 @@ LC_ALL=C
 
 for hook in "$dir"/*.bash; do
     [ -x "$hook" ] || continue
-    "$hook" || exit 1
+    bin/just-shell sh -cu "$hook" || exit 1
 done
 
 exit 0

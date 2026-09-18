@@ -5,7 +5,6 @@ namespace App\Form;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -20,12 +19,8 @@ class PasswordResetType extends AbstractType
                 new NotBlank(message: 'security.validator_email_blank'),
                 new Email(message: 'security.validator_email_format'),
             ],
-        ])->add('captcha', TextType::class, [
-            'mapped' => false,
-            'label' => 'security.label_captcha_input',
-            'constraints' => [
-                new NotBlank(),
-            ],
+        ])->add('meta', HumanCheckType::class, [
+            'context' => 'app_reset',
         ]);
     }
 }

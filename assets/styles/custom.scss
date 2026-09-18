@@ -66,6 +66,7 @@ body {
 // ── Forms ────────────────────────────────────────────────────────────────────
 
 .fieldset-warning  { border: 2px solid #f14668; border-radius: 4px; }
+.fieldset-info     { border: 2px solid cfg.$info; border-radius: 4px; }
 .fieldset-default  { border: 1px solid #dbdbdb; border-radius: 4px; }
 .col-narrow        { width: 60px; }
 .col-medium        { width: 200px; }
@@ -85,6 +86,16 @@ input[type="color"] {
     font-size: 1em;
     text-align: left;
     line-height: 1.5;
+}
+
+// Off-screen field wrapper - never `display: none`, which a bot can read and skip.
+.is-offscreen {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
 }
 
 // ── Navbar ───────────────────────────────────────────────────────────────────

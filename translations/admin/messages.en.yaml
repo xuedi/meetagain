@@ -649,6 +649,7 @@ admin_secretbox:
     col_count: 'Encrypted records'
     no_consumers: 'No registered consumers.'
 admin_security:
+    button_security_measures: 'Security measures'
     tab_incidents: 'Incidents'
     tab_rate_limiting: 'Rate limiting'
     tab_permissions: 'Permissions'

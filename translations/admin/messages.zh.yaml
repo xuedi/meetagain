@@ -649,6 +649,7 @@ admin_secretbox:
     col_count: '加密记录数'
     no_consumers: '未注册使用者。'
 admin_security:
+    button_security_measures: '防护措施'
     tab_incidents: '安全事件'
     tab_rate_limiting: '限速'
     tab_permissions: '权限'

@@ -1,7 +1,6 @@
 {
     "options": {
         "labelWidth": 48,
-        "tailLines": 20,
         "showDurationFrom": 2,
         "failLog": "justFail.log"
     },
@@ -22,7 +21,8 @@
                 "rm -rf .env installed.lock config/plugins.php var/",
                 "cp .env.dist .env",
                 "cp assets/styles/_config.scss.dist assets/styles/_config.scss",
-                "touch installed.lock"
+                "touch installed.lock",
+                "rm -rf .env installed.lock config/plugins.php vendor/ var/ public/bundles/ public/assets/"
             ]
         },
         {
@@ -104,6 +104,93 @@
                 "cat /dev/null > .just/local.just",
                 "for recipes in plugins/*/just/*.just; do *"
             ]
+        },
+        {
+            "label": "Validate composer.json",
+            "commands": ["PHP composer validate --strict --quiet"]
+        },
+        {
+            "label": "Preflight",
+            "commands": ["bin/commit-hooks/00-preflight.bash"]
+        },
+        {
+            "label": "Leak guard",
+            "commands": ["bin/commit-hooks/01-leak-guard.bash"]
+        },
+        {
+            "label": "Docs guard",
+            "commands": ["bin/commit-hooks/04-docs-guard.bash"]
+        },
+        {
+            "label": "Mermaid guard",
+            "commands": ["bin/commit-hooks/05-mermaid-guard.bash"]
+        },
+        {
+            "label": "Comment guard",
+            "commands": ["bin/commit-hooks/06-comment-guard.bash"]
+        },
+        {
+            "label": "Static checks",
+            "commands": ["bin/commit-hooks/07-check.bash"]
+        },
+        {
+            "label": "Unit tests",
+            "commands": ["bin/commit-hooks/10-unit-tests.bash"]
+        },
+        {
+            "label": "Build pa11y image",
+            "commands": ["DOCKER build pa11y -q"]
+        },
+        {
+            "label": "Build documentation",
+            "commands": ["docker run * zensical/zensical build *"]
+        },
+        {
+            "label": "Switch to installer mode",
+            "commands": ["rm -f .env installed.lock"]
+        },
+        {
+            "label": "Empty Mailpit",
+            "commands": ["curl -sS -X DELETE http://localhost:8025/api/v1/messages"]
+        },
+        {
+            "label": "Stage coverage badge",
+            "commands": ["git add tests/badge/coverage.svg"]
+        },
+        {
+            "label": "Prepare reports",
+            "commands": [
+                "mkdir -p tests/reports/*",
+                "PHP mkdir -p tests/reports/*"
+            ]
+        },
+        {
+            "label": "Start benchmark stack",
+            "commands": ["DOCKER up -d php-bench"]
+        },
+        {
+            "label": "Stop benchmark stack",
+            "commands": ["DOCKER stop php-bench"]
+        },
+        {
+            "label": "Update Bulma",
+            "commands": ["bin/update-bulma.sh *"]
+        },
+        {
+            "label": "Issue local certificate",
+            "commands": ["mkcert -cert-file *"]
+        },
+        {
+            "label": "Run tests with coverage",
+            "commands": ["PHP_COVERAGE sh -c 'vendor/bin/paratest *"]
+        },
+        {
+            "label": "Generate coverage badge",
+            "commands": ["PHP php bin/console app:badge:generate"]
+        },
+        {
+            "label": "Rebuild PHP image",
+            "commands": ["DOCKER build --no-cache php"]
         }
     ],
     "fold": [
@@ -124,6 +211,21 @@
         "DOCKER exec php bash",
         "DB mariadb *",
         "PHP vendor/bin/phpunit *",
-        "cd bin/tools && cargo test *"
+        "PHP sh -c 'vendor/bin/paratest *",
+        "PHP vendor/bin/mago *",
+        "PHP php bin/check-*",
+        "PHP composer validate --strict",
+        "cd bin/tools && cargo test *",
+        "bin/commit-hooks.sh",
+        "bin/tools/bin/leak-guard",
+        "PHP composer show --outdated",
+        "for locale in en de zh fr es; do *",
+        "DOCKER run --rm pa11y *",
+        "DOCKER run --rm sitespeed",
+        "DOCKER run --rm -e K6_WEB_DASHBOARD_EXPORT=* loadtest run *",
+        "xdg-open *",
+        "command -v *",
+        "mkcert -install",
+        "CA=\"$(mkcert -CAROOT)/rootCA.pem\"; *"
     ]
 }

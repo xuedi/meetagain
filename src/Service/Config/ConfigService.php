@@ -4,6 +4,7 @@ namespace App\Service\Config;
 
 use App\Entity\Config;
 use App\Enum\ConfigType;
+use App\Enum\SecurityMeasure;
 use App\ExtendedFilesystem;
 use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
@@ -166,7 +167,18 @@ readonly class ConfigService
 
     public function getBooleanConfigs(): array
     {
-        return $this->repo->findBy(['type' => ConfigType::Boolean]);
+        $securityKeys = SecurityMeasure::configKeys();
+
+        $configs = [];
+        foreach ($this->repo->findBy(['type' => ConfigType::Boolean]) as $config) {
+            if (in_array($config->getName(), $securityKeys, true)) {
+                continue;
+            }
+
+            $configs[] = $config;
+        }
+
+        return $configs;
     }
 
     public function toggleBoolean(string $name): bool
@@ -305,7 +317,7 @@ readonly class ConfigService
         });
     }
 
-    private function getBoolean(string $name, bool $default = false): bool
+    public function getBoolean(string $name, bool $default = false): bool
     {
         return ($this->getCachedValue($name) ?? ($default ? 'true' : 'false')) === 'true';
     }

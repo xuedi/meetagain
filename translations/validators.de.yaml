@@ -218,3 +218,7 @@ Error: Fehler
 # Admin location namespace - venue form
 'admin_location.validator_blank': 'Dieses Feld darf nicht leer sein.'
 'admin_location.validator_too_long': 'Dieser Wert ist zu lang, maximal {{ limit }} Zeichen.'
+
+# Admin system security namespace - measure tuning
+'admin_system_security.validator_pow_difficulty': 'Die Schwierigkeit muss zwischen {{ min }} und {{ max }} Bit liegen.'
+'admin_system_security.validator_log_retention': 'Die Aufbewahrung muss zwischen {{ min }} und {{ max }} Tagen liegen.'

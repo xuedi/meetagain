@@ -649,6 +649,7 @@ admin_secretbox:
     col_count: 'Registros cifrados'
     no_consumers: 'No hay consumidores registrados.'
 admin_security:
+    button_security_measures: 'Medidas de seguridad'
     tab_incidents: 'Incidentes'
     tab_rate_limiting: 'Límite de peticiones'
     tab_permissions: 'Permisos'

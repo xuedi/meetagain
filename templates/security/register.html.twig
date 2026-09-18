@@ -25,6 +25,8 @@
                     {{ form_row(form.plainPassword) }}
                     {{ form_row(form.agreeTerms) }}
 
+                    {% include '_components/human_check.html.twig' with {'form': form.meta} only %}
+
                     <div class="field is-grouped mt-4">
                         <div class="control">
                             <button class="button is-primary">{{ "security.button_register" | trans }}</button>
@@ -32,6 +34,7 @@
                         </div>
                     </div>
                     {{ form_end(form) }}
+                    {% include '_components/captcha_refresh.html.twig' with {'form': form.meta} only %}
 
                 </div>
 
@@ -54,4 +57,9 @@
         </div>
     </section>
 
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/captcha-counter.js') }}" defer></script>
+    <script src="{{ asset('js/human-check.js') }}" defer></script>
 {% endblock %}

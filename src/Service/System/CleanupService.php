@@ -10,6 +10,8 @@ use App\Enum\EntityAction;
 use App\Repository\ImageRepository;
 use App\Repository\SupportRequestRepository;
 use App\Repository\UserRepository;
+use App\Service\Security\MeasureLogger;
+use App\Service\Security\MeasureSettings;
 use App\Service\Support\ThreadService;
 use App\ValueObject\CronTaskResult;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,6 +30,8 @@ readonly class CleanupService implements CronTaskInterface
         private UserRepository $userRepo,
         private SupportRequestRepository $supportRequestRepo,
         private ThreadService $threadService,
+        private MeasureLogger $measureLogger,
+        private MeasureSettings $measureSettings,
         private EntityManagerInterface $entityManager,
         private EntityActionDispatcher $entityActionDispatcher,
         private ClockInterface $clock,
@@ -65,13 +69,18 @@ readonly class CleanupService implements CronTaskInterface
             $output->writeln('Remove stale import archives: ' . $importCount);
             $this->logger->info('Stale import archives removed', ['count' => $importCount]);
 
+            $measureLogCount = $this->removeExpiredSecurityMeasureLogs();
+            $output->writeln('Remove expired security measure logs: ' . $measureLogCount);
+            $this->logger->info('Expired security measure logs removed', ['count' => $measureLogCount]);
+
             $message = sprintf(
-                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d, import_archives: %d',
+                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d, import_archives: %d, security_measure_logs: %d',
                 $imageCount,
                 $regCount,
                 $autoResolvedCount,
                 $verifyCount,
                 $importCount,
+                $measureLogCount,
             );
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
@@ -80,6 +89,11 @@ readonly class CleanupService implements CronTaskInterface
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
         }
+    }
+
+    public function removeExpiredSecurityMeasureLogs(): int
+    {
+        return $this->measureLogger->purgeOlderThan($this->measureSettings->logRetentionDays());
     }
 
     public function removeImageCache(): int

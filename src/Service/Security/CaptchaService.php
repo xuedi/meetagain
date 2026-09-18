@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Member;
+namespace App\Service\Security;
 
 use DateTimeImmutable;
 use Imagick;
@@ -27,11 +27,11 @@ readonly class CaptchaService
         return $this->requestStack->getSession();
     }
 
-    public function generate(): string
+    public function generate(string $formKey): string
     {
         $session = $this->getSession();
-        $image = $session->get('captcha_image');
-        if ($image !== null) {
+        $image = $session->get($this->sessionKey('image', $formKey));
+        if (is_string($image)) {
             return $image;
         }
 
@@ -45,44 +45,45 @@ readonly class CaptchaService
         $refresh[] = new DateTimeImmutable();
 
         $session->set('captcha_refresh', $refresh);
-        $session->set('captcha_text', $code);
-        $session->set('captcha_image', $image);
+        $session->set($this->sessionKey('text', $formKey), $code);
+        $session->set($this->sessionKey('image', $formKey), $image);
 
         return $image;
     }
 
-    public function isValid(string $code): ?string
+    public function isValid(string $formKey, string $code): ?string
     {
         $session = $this->getSession();
-        $expected = strtolower((string) $session->get('captcha_text'));
+        $expected = $session->get($this->sessionKey('text', $formKey));
 
-        if (!hash_equals($expected, strtolower($code))) {
-            $attempts = (int) $session->get('captcha_attempts', 0) + 1;
-            $session->set('captcha_attempts', $attempts);
+        if (!is_string($expected) || $expected === '') {
+            return 'security.captcha_wrong';
+        }
+
+        if (!hash_equals(strtolower($expected), strtolower($code))) {
+            $attemptKey = $this->sessionKey('attempts', $formKey);
+            $attempts = (int) $session->get($attemptKey, 0) + 1;
+            $session->set($attemptKey, $attempts);
 
             if ($attempts >= self::MAX_ATTEMPTS) {
-                $session->remove('captcha_text');
-                $session->remove('captcha_image');
-                $session->remove('captcha_attempts');
+                $this->forget($formKey);
             }
 
             return 'security.captcha_wrong';
         }
 
-        $session->remove('captcha_attempts');
+        $this->forget($formKey);
 
         return null;
     }
 
-    public function reset(): void
+    public function reset(string $formKey): void
     {
-        $session = $this->getSession();
         if ($this->getRefreshCount() >= self::MAX_REFRESHES) {
             return;
         }
-        $session->remove('captcha_text');
-        $session->remove('captcha_image');
-        $session->remove('captcha_attempts');
+
+        $this->forget($formKey);
     }
 
     public function getRefreshCount(): int
@@ -117,6 +118,19 @@ readonly class CaptchaService
         }
 
         return $minSeconds === PHP_INT_MAX ? 0 : $minSeconds;
+    }
+
+    private function forget(string $formKey): void
+    {
+        $session = $this->getSession();
+        $session->remove($this->sessionKey('text', $formKey));
+        $session->remove($this->sessionKey('image', $formKey));
+        $session->remove($this->sessionKey('attempts', $formKey));
+    }
+
+    private function sessionKey(string $part, string $formKey): string
+    {
+        return 'captcha_' . $part . '_' . $formKey;
     }
 
     private function generateImage(string $code): string

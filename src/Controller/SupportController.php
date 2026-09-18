@@ -10,14 +10,12 @@ use App\Enum\EntityAction;
 use App\Enum\SecurityEventType;
 use App\Enum\SupportRequestStatus;
 use App\Form\SupportRequestType;
-use App\Service\Member\CaptchaService;
 use App\Service\Security\ContentSanitizer;
 use App\Service\Security\SecurityService;
 use App\Service\Support\ThreadService;
 use DateTimeImmutable;
 use SensitiveParameter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
@@ -27,7 +25,6 @@ final class SupportController extends AbstractController
 {
     public function __construct(
         private readonly SupportNotificationEmail $supportNotificationEmail,
-        private readonly CaptchaService $captchaService,
         #[Autowire(service: 'limiter.support')]
         private readonly RateLimiterFactoryInterface $supportLimiter,
         private readonly SecurityService $securityService,
@@ -75,48 +72,28 @@ final class SupportController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($isGuest) {
-                $captchaError = $this->captchaService->isValid((string) $form->get('captcha')->getData());
-                if ($captchaError !== null) {
-                    $form->get('captcha')->addError(new FormError($captchaError));
-                    $this->captchaService->reset();
-                }
+            $supportRequest = new SupportRequest();
+            $supportRequest->setRequester($isGuest ? null : $user);
+            $supportRequest->setAudience($form->get('audience')->getData());
+            $supportRequest->setMessage($this->contentSanitizer->escape((string) $form->get('message')->getData()));
+            $supportRequest->setCreatedAt(new DateTimeImmutable());
+            $supportRequest->setStatus(SupportRequestStatus::New);
+            $supportRequest->setIpAddress($request->getClientIp());
+
+            $token = $this->threadService->openThread($supportRequest, $request->getClientIp());
+
+            $this->entityActionDispatcher->dispatch(EntityAction::CreateSupportRequest, (int) $supportRequest->getId());
+            $this->supportNotificationEmail->send(['request' => $supportRequest]);
+
+            if ($token === null) {
+                return $this->render('support/submitted.html.twig');
             }
 
-            if ($form->getErrors(true)->count() === 0) {
-                $supportRequest = new SupportRequest();
-                $supportRequest->setRequester($isGuest ? null : $user);
-                $supportRequest->setAudience($form->get('audience')->getData());
-                $supportRequest->setMessage($this->contentSanitizer->escape((string) $form->get('message')->getData()));
-                $supportRequest->setCreatedAt(new DateTimeImmutable());
-                $supportRequest->setStatus(SupportRequestStatus::New);
-                $supportRequest->setIpAddress($request->getClientIp());
+            $this->addFlash('success', 'support.flash_request_received');
 
-                $token = $this->threadService->openThread($supportRequest, $request->getClientIp());
-
-                $this->entityActionDispatcher->dispatch(EntityAction::CreateSupportRequest, (int) $supportRequest->getId());
-                $this->supportNotificationEmail->send(['request' => $supportRequest]);
-
-                if ($token === null) {
-                    return $this->render('support/submitted.html.twig');
-                }
-
-                $this->addFlash('success', 'support.flash_request_received');
-
-                return $this->redirectToRoute('app_support_thread', ['token' => $token]);
-            }
+            return $this->redirectToRoute('app_support_thread', ['token' => $token]);
         }
 
-        if (!$isGuest) {
-            return $this->render('support/index.html.twig', ['form' => $form, 'captcha' => null]);
-        }
-
-        $this->captchaService->reset();
-        return $this->render('support/index.html.twig', [
-            'form' => $form,
-            'captcha' => $this->captchaService->generate(),
-            'refreshCount' => $this->captchaService->getRefreshCount(),
-            'refreshTime' => $this->captchaService->getRefreshTime(),
-        ]);
+        return $this->render('support/index.html.twig', ['form' => $form]);
     }
 }
