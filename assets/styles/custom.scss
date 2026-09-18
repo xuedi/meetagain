@@ -294,6 +294,9 @@ details.activities-load-more {
     border-radius: 6px;
     line-height: 1.2;
 }
+.upcoming-event__link .media-content {
+    min-width: 0;
+}
 .upcoming-event__title {
     overflow: hidden;
     text-overflow: ellipsis;
