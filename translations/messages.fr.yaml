@@ -131,6 +131,7 @@ security:
     rate_limited_reset_message: 'Trop de tentatives de réinitialisation de mot de passe. Réessaie plus tard.'
     captcha_new_code: 'Obtenir un nouveau code'
     captcha_wrong: 'Code captcha incorrect, réessaie.'
+    human_check_legend: 'Vérification de sécurité'
     human_check_failed: 'Nous n''avons pas pu vérifier que ce formulaire a été rempli par une personne. Merci de réessayer.'
     human_check_working: 'Vérification...'
     validator_username_max: 'Les noms d''utilisateur ne peuvent pas dépasser {{ limit }} caractères.'

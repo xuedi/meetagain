@@ -15,7 +15,7 @@
     Depends on: assets/js/captcha-counter.js, assets/js/human-check.js,
                 _components/captcha_refresh.html.twig (the form the refresh button submits)
 #}
-<div data-form-meta{% if form.vars.powEnabled %} data-form-meta-bits="{{ form.vars.powDifficulty }}" data-form-meta-worker="{{ asset('js/human-check-worker.js') }}" data-form-meta-label="{{ 'security.human_check_working'|trans }}"{% endif %}>
+<div data-form-meta{% if form.vars.powEnabled %} data-form-meta-bits="{{ form.vars.powDifficulty }}" data-form-meta-worker="{{ asset('js/human-check-worker.js') }}"{% endif %}>
 
     {% if form.reference is defined %}
         <div class="is-offscreen" aria-hidden="true">
@@ -33,13 +33,16 @@
 
     {{ form_errors(form) }}
 
-    {% if form.captcha is defined %}
+    {% if form.captcha is defined or form.vars.powEnabled %}
         <fieldset class="p-4 mb-4 mt-4 fieldset-info"
-                  data-captcha-counter
+                  {% if form.captcha is defined %}data-captcha-counter
                   data-url="{{ path('app_ajax_get_captcha_count') }}"
-                  data-refresh-url="{{ path('app_captcha_refresh', {'context': form.vars.context}) }}">
-            <legend class="px-2 has-text-info has-text-weight-semibold is-size-7">{{ (label|default('security.label_captcha'))|trans }}</legend>
+                  data-refresh-url="{{ path('app_captcha_refresh', {'context': form.vars.context}) }}"{% endif %}>
+            <legend class="px-2 has-text-info has-text-weight-semibold is-size-7">
+                {{ (form.captcha is defined ? label|default('security.label_captcha') : 'security.human_check_legend')|trans }}
+            </legend>
 
+        {% if form.captcha is defined %}
             <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
                 <img src="data:image/png;base64, {{ form.vars.captchaImage }}" alt="{{ (label|default('security.label_captcha'))|trans }}" data-captcha-image>
                 <div class="control is-flex-grow-1">
@@ -63,6 +66,18 @@
                     <span>{{ 'security.captcha_new_code'|trans }}</span>
                 </button>
             </div>
+        {% endif %}
+
+        {% if form.vars.powEnabled %}
+            <p class="is-size-7 has-text-grey {{ form.captcha is defined ? 'mt-3' : '' }} mb-0"
+               data-form-meta-status
+               role="status"
+               aria-live="polite"
+               hidden>
+                <span class="icon is-small"><i class="fa fa-circle-notch fa-spin"></i></span>
+                <span>{{ 'security.human_check_working'|trans }}</span>
+            </p>
+        {% endif %}
         </fieldset>
     {% endif %}
 

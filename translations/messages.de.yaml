@@ -131,6 +131,7 @@ security:
     rate_limited_reset_message: 'Zu viele Passwort-Zurücksetzen-Versuche. Bitte versuche es später erneut.'
     captcha_new_code: 'Neuen Code anfordern'
     captcha_wrong: 'Falscher Captcha-Code, bitte erneut versuchen.'
+    human_check_legend: 'Sicherheitsprüfung'
     human_check_failed: 'Wir konnten nicht bestätigen, dass dieses Formular von einer Person ausgefüllt wurde. Bitte erneut versuchen.'
     human_check_working: 'Prüfung läuft...'
     validator_username_max: 'Benutzernamen dürfen nicht länger als {{ limit }} Zeichen sein.'
