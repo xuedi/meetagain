@@ -184,6 +184,11 @@ final class MeasuresController extends AbstractSettingsController implements Adm
         }
         $actions[] = $this->buildRangeDropdown($range);
         $actions[] = new AdminTopActionButton(
+            label: $this->translator->trans('admin_system_security.button_measure_log'),
+            target: $this->generateUrl('app_admin_security_measures'),
+            icon: 'list',
+        );
+        $actions[] = new AdminTopActionButton(
             label: $this->translator->trans('global.button_back'),
             target: $this->generateUrl('app_admin_system_config'),
             icon: 'arrow-left',
@@ -269,6 +274,7 @@ final class MeasuresController extends AbstractSettingsController implements Adm
                 ),
                 new TileListItem(
                     label: sprintf('%d %s', $totalBlocks, $this->translator->trans('admin_system_security.elsewhere_measure_blocks')),
+                    link: $this->generateUrl('app_admin_security_measures'),
                 ),
             ],
         );

@@ -1,5 +1,5 @@
 // RateLimitProvider attack: 11 failed logins. Symfony's login_throttling fires
-// at 10 (TooManyLoginAttemptsAuthenticationException), LoginThrottleSubscriber
+// at 10 (TooManyLoginAttemptsAuthenticationException), LoginAttemptSubscriber
 // hands it to SecurityService, RateLimitProvider returns Block immediately
 // (login_throttling = instant block). The 11th login attempt should be 403'd.
 //

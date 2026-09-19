@@ -37,40 +37,19 @@ readonly class ChallengeSigner
      */
     public function verify(string $stamp, string $context): ?array
     {
-        $parts = explode('.', $stamp, 2);
-        if (count($parts) !== 2) {
+        $payload = $this->decodeSigned($stamp, $context);
+        if ($payload === null || $this->isExpired($payload['issuedAt'])) {
             return null;
         }
 
-        [$encoded, $signature] = $parts;
-        if (!hash_equals($this->sign($encoded), $signature)) {
-            return null;
-        }
+        return $payload;
+    }
 
-        $decoded = base64_decode(strtr($encoded, '-_', '+/'), true);
-        if ($decoded === false) {
-            return null;
-        }
+    public function rejectionReason(string $stamp, string $context): string
+    {
+        $payload = $this->decodeSigned($stamp, $context);
 
-        $payload = json_decode($decoded, true);
-        if (!is_array($payload) || !isset($payload['n'], $payload['t'], $payload['d'], $payload['c'])) {
-            return null;
-        }
-
-        if (!hash_equals((string) $payload['c'], $context)) {
-            return null;
-        }
-
-        $issuedAt = (int) $payload['t'];
-        if (($this->nowMs() - $issuedAt) > self::MAX_AGE_MS) {
-            return null;
-        }
-
-        return [
-            'nonce' => (string) $payload['n'],
-            'issuedAt' => $issuedAt,
-            'difficulty' => (int) $payload['d'],
-        ];
+        return $payload !== null && $this->isExpired($payload['issuedAt']) ? 'expired_stamp' : 'invalid_stamp';
     }
 
     public function burn(string $nonce): bool
@@ -115,6 +94,47 @@ readonly class ChallengeSigner
         }
 
         return $bits;
+    }
+
+    /**
+     * @return array{nonce: string, issuedAt: int, difficulty: int}|null
+     */
+    private function decodeSigned(string $stamp, string $context): ?array
+    {
+        $parts = explode('.', $stamp, 2);
+        if (count($parts) !== 2) {
+            return null;
+        }
+
+        [$encoded, $signature] = $parts;
+        if (!hash_equals($this->sign($encoded), $signature)) {
+            return null;
+        }
+
+        $decoded = base64_decode(strtr($encoded, '-_', '+/'), true);
+        if ($decoded === false) {
+            return null;
+        }
+
+        $payload = json_decode($decoded, true);
+        if (!is_array($payload) || !isset($payload['n'], $payload['t'], $payload['d'], $payload['c'])) {
+            return null;
+        }
+
+        if (!hash_equals((string) $payload['c'], $context)) {
+            return null;
+        }
+
+        return [
+            'nonce' => (string) $payload['n'],
+            'issuedAt' => (int) $payload['t'],
+            'difficulty' => (int) $payload['d'],
+        ];
+    }
+
+    private function isExpired(int $issuedAt): bool
+    {
+        return ($this->nowMs() - $issuedAt) > self::MAX_AGE_MS;
     }
 
     private function sign(string $encoded): string

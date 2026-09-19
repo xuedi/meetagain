@@ -52,6 +52,10 @@ class SecurityMeasureLog
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $detail = null;
 
+    #[ORM\ManyToOne(targetEntity: Incident::class)]
+    #[ORM\JoinColumn(name: 'incident_id', nullable: true, onDelete: 'SET NULL')]
+    private ?Incident $incident = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -167,6 +171,18 @@ class SecurityMeasureLog
     public function setDetail(?array $detail): static
     {
         $this->detail = $detail;
+
+        return $this;
+    }
+
+    public function getIncident(): ?Incident
+    {
+        return $this->incident;
+    }
+
+    public function setIncident(?Incident $incident): static
+    {
+        $this->incident = $incident;
 
         return $this;
     }

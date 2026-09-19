@@ -10,6 +10,7 @@ use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
 use App\Repository\AccessDeniedLogRepository;
 use App\Repository\NotFoundLogRepository;
+use App\Repository\SecurityMeasureLogRepository;
 use App\Service\AppStateService;
 use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
@@ -43,6 +44,7 @@ readonly class SecurityService implements CronTaskInterface
         private NotFoundLogRepository $notFoundLogRepository,
         private AccessDeniedLogRepository $accessDeniedLogRepository,
         private RequestIdentityResolver $identityResolver,
+        private SecurityMeasureLogRepository $securityMeasureLogRepository,
     ) {}
 
     /**
@@ -90,7 +92,8 @@ readonly class SecurityService implements CronTaskInterface
 
         $blockingReport = null;
         foreach ($reports as $report) {
-            if ($report->recommendation !== SecurityRecommendation::Block) {
+            $isDetectionBlock = $report->recommendation === SecurityRecommendation::Block || $report->recommendation === SecurityRecommendation::BlockSession;
+            if (!$isDetectionBlock) {
                 continue;
             }
 
@@ -115,7 +118,7 @@ readonly class SecurityService implements CronTaskInterface
             $snapshot['incidentId'] = $incidentId;
         }
         $this->blockStore->blockSession($sessionId, $snapshot, self::BLOCK_TTL_SECONDS);
-        if ($ip !== '') {
+        if ($ip !== '' && $blockingReport->recommendation->blocksIp()) {
             $this->blockStore->blockIp($ip, $snapshot, self::BLOCK_TTL_SECONDS);
         }
     }
@@ -200,10 +203,7 @@ readonly class SecurityService implements CronTaskInterface
         $primaryProvider = null;
         foreach ($reports as $report) {
             $serialised[] = $report->toArray();
-            if ($report->recommendation === SecurityRecommendation::Block && $primaryProvider === null) {
-                $primaryProvider = $report->providerKey;
-            }
-            if ($report->recommendation === SecurityRecommendation::BlockShortCircuit && $primaryProvider === null) {
+            if ($report->recommendation->isBlocking() && $primaryProvider === null) {
                 $primaryProvider = $report->providerKey;
             }
             if ($report->threatLevel > $maxThreat) {
@@ -260,17 +260,21 @@ readonly class SecurityService implements CronTaskInterface
     private function stampLogRow(Incident $incident, string $sessionId, string $ip, string $triggeredBy): void
     {
         try {
-            $log = match ($triggeredBy) {
-                'not_found' => $this->notFoundLogRepository->findLatestUnlinkedForOffender($ip, $sessionId),
-                'access_denied' => $this->accessDeniedLogRepository->findLatestUnlinkedForOffender($ip),
-                default => null,
+            $logs = match ($triggeredBy) {
+                'not_found' => [$this->notFoundLogRepository->findLatestUnlinkedForOffender($ip, $sessionId)],
+                'access_denied' => [$this->accessDeniedLogRepository->findLatestUnlinkedForOffender($ip)],
+                'form_measure' => $this->securityMeasureLogRepository->findUnlinkedBlocksForIp($ip, $this->clock->now()->modify('-24 hours')),
+                default => [],
             };
+            $logs = array_filter($logs);
 
-            if ($log === null) {
+            if ($logs === []) {
                 return;
             }
 
-            $log->setIncident($incident);
+            foreach ($logs as $log) {
+                $log->setIncident($incident);
+            }
             $this->em->flush();
         } catch (Throwable $e) {
             $this->logger->warning('Failed to stamp log row with incident id: ' . $e->getMessage(), [

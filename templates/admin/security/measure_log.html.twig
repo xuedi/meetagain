@@ -1,0 +1,71 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+                <tr>
+                    <th>{{ 'admin_security.col_time'|trans }}</th>
+                    <th>{{ 'admin_security.col_ip'|trans }}</th>
+                    <th>{{ 'admin_security.col_form'|trans }}</th>
+                    <th>{{ 'admin_security.col_measure'|trans }}</th>
+                    <th>{{ 'admin_security.col_reason'|trans }}</th>
+                    <th>{{ 'admin_security.col_user_agent'|trans }}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in rows %}
+                    <tr>
+                        <td class="is-nowrap">{{ entry.createdAt|date('Y-m-d H:i:s') }}</td>
+                        <td class="is-nowrap">
+                            {{ entry.ip ?? '-' }}
+                            {% if entry.ip and entry.ip != ipFilter %}
+                                <a href="{{ path('app_admin_security_measures', filters|merge({'ip': entry.ip})) }}"
+                                   class="ml-1 has-text-grey"
+                                   title="{{ 'admin_security.filter_by_ip'|trans }}">
+                                    <span class="icon is-small"><i class="fa fa-filter"></i></span>
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td class="has-text-grey">{{ entry.context ?? '-' }}</td>
+                        <td><span class="tag is-light">{{ entry.measure.labelKey|trans }}</span></td>
+                        <td>
+                            {% if entry.detail and entry.detail.reason is defined %}
+                                {{ ('admin_system_security.reason_' ~ entry.detail.reason)|trans }}
+                                {% if entry.detail.elapsed_ms is defined %}
+                                    <span class="has-text-grey is-size-7">{{ entry.detail.elapsed_ms }} ms</span>
+                                {% endif %}
+                                {% if entry.detail.difficulty is defined %}
+                                    <span class="has-text-grey is-size-7">{{ entry.detail.difficulty }} bit</span>
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td class="has-text-grey is-size-7" title="{{ entry.userAgent }}">{{ entry.userAgent ? entry.userAgent|shortened(50) : '-' }}</td>
+                        <td>
+                            {% if entry.incident %}
+                                <a href="{{ path('app_admin_security_incidents_show', {'id': entry.incident.id}) }}"
+                                   title="{{ 'admin_security.view_incident'|trans }}">
+                                    <span class="icon"><i class="fa fa-triangle-exclamation"></i></span>
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="has-text-centered has-text-grey">{{ 'admin_security.empty_measure_blocks'|trans }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

@@ -35,6 +35,10 @@
                             </p>
                         </div>
 
+                        {% if meta %}
+                            {% include '_components/human_check.html.twig' with {'form': meta} only %}
+                        {% endif %}
+
                         <div class="field is-grouped mt-5">
                             <div class="control">
                                 <button type="submit" class="button is-primary">{{ 'chrome.menu_login'|trans }}</button>
@@ -42,6 +46,9 @@
                             </div>
                         </div>
                     </form>
+                    {% if meta %}
+                        {% include '_components/captcha_refresh.html.twig' with {'form': meta} only %}
+                    {% endif %}
 
                     <p class="mt-4 is-size-7">
                         {{ "security.intro_reset_link"|trans }} <a href="{{ path('app_reset') }}">{{ 'security.link_here' | trans }}</a>
@@ -68,4 +75,11 @@
         </div>
     </section>
 
+{% endblock %}
+
+{% block javascripts %}
+    {% if meta %}
+        <script src="{{ asset('js/captcha-counter.js') }}" defer></script>
+        <script src="{{ asset('js/human-check.js') }}" defer></script>
+    {% endif %}
 {% endblock %}

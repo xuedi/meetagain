@@ -66,6 +66,17 @@ class IncidentRepository extends ServiceEntityRepository
         return array_values($qb->getQuery()->getResult());
     }
 
+    public function deleteEndedBefore(DateTimeImmutable $cutoff): int
+    {
+        return (int) $this
+            ->createQueryBuilder('i')
+            ->delete()
+            ->where('i.endedAt < :cutoff')
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->execute();
+    }
+
     public function countAll(): int
     {
         return (int) $this->createQueryBuilder('i')->select('COUNT(i.id)')->getQuery()->getSingleScalarResult();

@@ -7,4 +7,5 @@ enum SecurityEventType: string
     case NotFound = 'not_found';
     case RateLimit = 'rate_limit';
     case AccessDenied = 'access_denied';
+    case FormMeasure = 'form_measure';
 }

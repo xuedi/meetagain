@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Form;
 
+use App\Enum\SecurityEventType;
 use App\Enum\SecurityMeasure;
 use App\Form\HumanCheckType;
 use App\Form\PasswordResetType;
@@ -11,6 +12,7 @@ use App\Service\Security\CaptchaService;
 use App\Service\Security\ChallengeSigner;
 use App\Service\Security\MeasureLogger;
 use App\Service\Security\MeasureSettings;
+use App\Service\Security\SecurityService;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -20,6 +22,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -35,6 +38,9 @@ final class HumanCheckTypeTest extends TestCase
     private array $blocks = [];
     /** @var list<SecurityMeasure> */
     private array $passes = [];
+    /** @var list<array{0: SecurityEventType, 1: array<string, mixed>}> */
+    private array $events = [];
+    private Request $request;
 
     protected function setUp(): void
     {
@@ -42,6 +48,8 @@ final class HumanCheckTypeTest extends TestCase
         $this->signer = new ChallengeSigner('a-test-secret', new ArrayAdapter(), $this->clock);
         $this->blocks = [];
         $this->passes = [];
+        $this->events = [];
+        $this->request = Request::create('/register', 'POST');
     }
 
     #[DataProvider('guestFormProvider')]
@@ -261,6 +269,92 @@ final class HumanCheckTypeTest extends TestCase
         static::assertCount(1, $form->getErrors());
     }
 
+    public function testABlockedSubmissionRaisesOneEventWithItsDistinctReasons(): void
+    {
+        // Arrange
+        $form = $this->humanCheck([SecurityMeasure::Honeypot, SecurityMeasure::SubmitTiming, SecurityMeasure::ProofOfWork]);
+
+        // Act
+        $form->submit([HumanCheckType::HONEYPOT_FIELD => 'spam', 'stamp' => '', 'proof' => '']);
+
+        // Assert
+        static::assertCount(1, $this->events);
+        static::assertSame(SecurityEventType::FormMeasure, $this->events[0][0]);
+        static::assertSame(['context' => self::CONTEXT, 'reasons' => ['filled', 'missing_stamp']], $this->events[0][1]);
+    }
+
+    #[DataProvider('crossSiteHeaderProvider')]
+    public function testACrossSiteSubmissionIsLoggedButRaisesNoEvent(string $header, string $value): void
+    {
+        // Arrange
+        $this->request->headers->set($header, $value);
+        $form = $this->humanCheck([SecurityMeasure::Honeypot]);
+
+        // Act
+        $form->submit([HumanCheckType::HONEYPOT_FIELD => 'spam']);
+
+        // Assert
+        static::assertSame([[SecurityMeasure::Honeypot, 'filled']], $this->blocks);
+        static::assertSame([], $this->events);
+    }
+
+    public static function crossSiteHeaderProvider(): Generator
+    {
+        yield 'foreign origin' => ['Origin', 'https://evil.example'];
+        yield 'opaque origin' => ['Origin', 'null'];
+        yield 'fetch metadata cross-site' => ['Sec-Fetch-Site', 'cross-site'];
+        yield 'fetch metadata same-site' => ['Sec-Fetch-Site', 'same-site'];
+    }
+
+    #[DataProvider('ownSiteHeaderProvider')]
+    public function testAnOwnSiteOrHeaderlessSubmissionIsScored(string $header, string $value): void
+    {
+        // Arrange
+        if ($header !== '') {
+            $this->request->headers->set($header, $value);
+        }
+        $form = $this->humanCheck([SecurityMeasure::Honeypot]);
+
+        // Act
+        $form->submit([HumanCheckType::HONEYPOT_FIELD => 'spam']);
+
+        // Assert
+        static::assertCount(1, $this->events);
+    }
+
+    public static function ownSiteHeaderProvider(): Generator
+    {
+        yield 'no browser headers, a script' => ['', ''];
+        yield 'own origin' => ['Origin', 'http://localhost'];
+        yield 'fetch metadata same-origin' => ['Sec-Fetch-Site', 'same-origin'];
+    }
+
+    public function testAPassingSubmissionRaisesNoEvent(): void
+    {
+        // Arrange
+        $form = $this->humanCheck([SecurityMeasure::Honeypot]);
+
+        // Act
+        $form->submit([HumanCheckType::HONEYPOT_FIELD => '']);
+
+        // Assert
+        static::assertSame([], $this->events);
+    }
+
+    public function testAnExpiredStampIsReportedAsExpiredNotInvalid(): void
+    {
+        // Arrange
+        $form = $this->humanCheck([SecurityMeasure::SubmitTiming]);
+        $stamp = $this->signer->issue(self::CONTEXT, 18);
+        $this->clock->modify('+3 hours');
+
+        // Act
+        $form->submit(['stamp' => $stamp]);
+
+        // Assert
+        static::assertSame([[SecurityMeasure::SubmitTiming, 'expired_stamp']], $this->blocks);
+    }
+
     /**
      * @param list<SecurityMeasure> $enabled
      */
@@ -272,8 +366,12 @@ final class HumanCheckTypeTest extends TestCase
     /**
      * @param list<SecurityMeasure> $enabled
      */
-    private function factory(array $enabled = [], bool $captchaValid = true, int $difficulty = 18, ?CaptchaService $captchaService = null): FormFactoryInterface
-    {
+    private function factory(
+        array $enabled = [],
+        bool $captchaValid = true,
+        int $difficulty = 18,
+        ?CaptchaService $captchaService = null,
+    ): FormFactoryInterface {
         $measureSettings = $this->createStub(MeasureSettings::class);
         $measureSettings
             ->method('isEnabled')
@@ -298,13 +396,22 @@ final class HumanCheckTypeTest extends TestCase
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
 
+        $requestStack = new RequestStack();
+        $requestStack->push($this->request);
+
+        $securityService = $this->createStub(SecurityService::class);
+        $securityService->method('event')->willReturnCallback(function (SecurityEventType $type, Request $request, array $context): void {
+            $this->events[] = [$type, $context];
+        });
+
         $type = new HumanCheckType(
             $measureSettings,
             $captchaService,
             $this->signer,
             $measureLogger,
-            $this->createStub(RequestStack::class),
+            $requestStack,
             $translator,
+            $securityService,
         );
 
         return Forms::createFormFactoryBuilder()

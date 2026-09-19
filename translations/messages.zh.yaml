@@ -373,6 +373,7 @@ profile_social:
     button_load_all: '显示全部'
     find_more_hint: '在成员页面寻找更多可关注的人，或在下次聚会时询问他们的用户名。'
     activity_login: '已登录'
+    activity_login_measures_activated: '%ip% 登录失败 %attempts% 次后，已启用额外的登录安全措施'
     activity_circulation_donated: '向%circulation%投入了一件实物'
     activity_circulation_requested: '在%circulation%加入了等待名单'
     activity_circulation_completed: '在%circulation%完成了一次交接'

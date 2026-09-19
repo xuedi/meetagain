@@ -9,9 +9,9 @@
     image in place instead, so the visitor keeps what they already typed.
 
     Used in:    templates/security/register.html.twig, templates/security/reset.html.twig,
-                templates/support/index.html.twig
+                templates/security/login.html.twig, templates/support/index.html.twig
     Parameters:
-        - form (FormView, required)   -- the meta child of that page's form
+        - form (FormView, required)   -- the meta child of that page's form, or the standalone login meta form
 #}
 {% if form.captcha is defined %}
     <form id="captchaRefresh" method="post" action="{{ path('app_captcha_refresh', {'context': form.vars.context}) }}">

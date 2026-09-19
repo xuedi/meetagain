@@ -22,3 +22,4 @@
 'security.account_status_blocked': 'This account has been blocked. Please contact support if you think this is a mistake.'
 'security.account_status_denied': 'This registration was declined.'
 'security.account_status_inactive': 'This account cannot be used to log in.'
+'security.human_check_failed': 'We could not verify that this form was filled in by a person. Please try again.'

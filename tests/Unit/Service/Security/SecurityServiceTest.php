@@ -10,6 +10,7 @@ use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
 use App\Repository\AccessDeniedLogRepository;
 use App\Repository\NotFoundLogRepository;
+use App\Repository\SecurityMeasureLogRepository;
 use App\Service\AppStateService;
 use App\Service\Security\BlockedSessionStore;
 use App\Service\Security\ProviderReport;
@@ -149,6 +150,31 @@ class SecurityServiceTest extends TestCase
         static::assertSame($persistedIncident, $notFoundLog->getIncident());
     }
 
+    public function testASessionOnlyBlockWritesAnIncidentButLeavesTheIpOpen(): void
+    {
+        // Arrange
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $detector = $this->makeProvider('form_measure', priority: 0, recommendation: SecurityRecommendation::BlockSession, threatLevel: 100);
+
+        $persistedIncident = null;
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist')->willReturnCallback(static function (object $entity) use (&$persistedIncident): void {
+            $persistedIncident = $entity;
+        });
+
+        $service = $this->buildService([$detector], $blockStore, em: $em);
+        $request = Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']);
+
+        // Act
+        $service->event(SecurityEventType::FormMeasure, $request);
+
+        // Assert
+        static::assertInstanceOf(Incident::class, $persistedIncident);
+        static::assertSame('form_measure', $persistedIncident->getTriggeredBy());
+        static::assertTrue($blockStore->isSessionBlocked('ip:1.2.3.4'));
+        static::assertFalse($blockStore->isIpBlocked('1.2.3.4'));
+    }
+
     public function testNotFoundBlockStampsLatestNotFoundLogRow(): void
     {
         // Arrange
@@ -276,6 +302,7 @@ class SecurityServiceTest extends TestCase
             notFoundLogRepository: $notFoundLogRepository,
             accessDeniedLogRepository: $accessDeniedLogRepository,
             identityResolver: new RequestIdentityResolver(new NullLogger()),
+            securityMeasureLogRepository: $this->createStub(SecurityMeasureLogRepository::class),
         );
     }
 

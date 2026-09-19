@@ -79,6 +79,33 @@ final class ChallengeSignerTest extends TestCase
         static::assertNull($payload);
     }
 
+    public function testAnExpiredStampIsRejectedAsExpired(): void
+    {
+        // Arrange
+        $clock = new MockClock('2026-09-18 10:00:00');
+        $signer = new ChallengeSigner(self::SECRET, new ArrayAdapter(), $clock);
+        $stamp = $signer->issue(self::CONTEXT, 18);
+
+        // Act
+        $clock->modify('+3 hours');
+        $reason = $signer->rejectionReason($stamp, self::CONTEXT);
+
+        // Assert
+        static::assertSame('expired_stamp', $reason);
+    }
+
+    public function testAForgedOrForeignStampIsRejectedAsInvalid(): void
+    {
+        // Arrange
+        $signer = $this->signer();
+        $foreign = new ChallengeSigner('another-secret', new ArrayAdapter(), new MockClock('2026-09-18 10:00:00'));
+
+        // Act & Assert
+        static::assertSame('invalid_stamp', $signer->rejectionReason($foreign->issue(self::CONTEXT, 18), self::CONTEXT));
+        static::assertSame('invalid_stamp', $signer->rejectionReason($signer->issue('app_contact', 18), self::CONTEXT));
+        static::assertSame('invalid_stamp', $signer->rejectionReason('garbage', self::CONTEXT));
+    }
+
     public function testGarbageDoesNotVerify(): void
     {
         // Arrange

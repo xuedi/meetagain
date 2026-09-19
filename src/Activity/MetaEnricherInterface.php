@@ -14,5 +14,5 @@ interface MetaEnricherInterface
      * @param array<string, mixed> $meta
      * @return array<string, mixed>
      */
-    public function enrich(string $type, User $user, array $meta): array;
+    public function enrich(string $type, ?User $user, array $meta): array;
 }
