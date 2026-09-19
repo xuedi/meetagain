@@ -109,6 +109,28 @@ readonly class ImageService
         return count($files);
     }
 
+    public function removeIfOrphaned(Image $image): bool
+    {
+        if ($this->imageLocationRepo->findByImageId((int) $image->getId()) !== []) {
+            return false;
+        }
+
+        $this->entityManager
+            ->createQuery('DELETE App\Entity\ImageReport r WHERE r.image = :image')
+            ->setParameter('image', $image)
+            ->execute();
+
+        $hash = (string) $image->getHash();
+        $source = $this->getSourcePath($image);
+        $this->entityManager->remove($image);
+        $this->entityManager->flush();
+
+        $this->filesystem->remove($source);
+        $this->filesystem->remove($this->filesystem->glob($this->getThumbnailDir() . $hash . '_*.webp'));
+
+        return true;
+    }
+
     public function createThumbnails(Image $image, ?ImageType $imageType = null): int
     {
         $cnt = 0;
