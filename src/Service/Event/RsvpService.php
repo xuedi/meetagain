@@ -93,6 +93,7 @@ final readonly class RsvpService
 
     private function setGuests(Event $event, User $user, int $guests): void
     {
+        $guests = max(0, min($guests, RsvpGuest::MAX_GUESTS));
         $row = $this->row($event, $user);
         while ($row->getGuests() < $guests) {
             $row->increment();

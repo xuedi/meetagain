@@ -197,7 +197,6 @@ events:
     rsvp_external_title: 'Asistentes que se apuntaron fuera de este sitio'
     label_external_rsvp: 'Externos'
     button_external_rsvp_save: 'Guardar'
-    flash_external_rsvp_saved: 'Número de asistentes externos actualizado.'
     flash_external_rsvp_invalid: 'Introduce un número entero de asistentes externos.'
     flash_rsvp_guests_requires_rsvp: 'Apúntate primero al evento antes de añadir acompañantes.'
     flash_rsvp_guests_limit: 'Has alcanzado el número máximo de acompañantes.'
@@ -530,7 +529,6 @@ profile_image:
     detail_reported: 'reportada:'
     detail_reported_yes: 'sí'
     detail_reported_no: 'no'
-    flash_image_changed: 'La imagen ha cambiado.'
     flash_upload_error: 'Hubo un error al subir el archivo.'
 support:
     sidebar_title: 'Cómo podemos ayudarte'

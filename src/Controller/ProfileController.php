@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Activity\ActivityService;
-use App\Activity\Messages\ChangedUsername;
 use App\Entity\Event;
 use App\Exception\Event\RsvpRefusedException;
 use App\Filter\Event\EventFilterService;
@@ -13,7 +11,7 @@ use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\Event\RsvpService;
 use App\Service\Member\BlockingService;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\Member\ProfileService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,37 +25,30 @@ final class ProfileController extends AbstractController
     public const string ROUTE_PROFILE = 'app_profile';
 
     public function __construct(
-        private readonly ActivityService $activityService,
         private readonly EventRepository $repo,
         private readonly MessageRepository $msgRepo,
         private readonly UserRepository $userRepo,
         private readonly BlockingService $blockingService,
         private readonly EventFilterService $eventFilterService,
+        private readonly ProfileService $profileService,
     ) {}
 
     #[Route('/profile/', name: self::ROUTE_PROFILE)]
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    public function index(Request $request): Response
     {
         $response = $this->getResponse();
         $user = $this->getAuthedUser();
-        $oldUserName = $user->getName();
 
         $form = $this->createForm(ProfileType::class, $this->getAuthedUser());
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $newUserName = $form->get('name')->getData();
-            if ($oldUserName !== $newUserName) {
-                $this->activityService->log(ChangedUsername::TYPE, $user, [
-                    'old' => $oldUserName,
-                    'new' => $newUserName,
-                ]);
-            }
-            $user->setBio($form->get('bio')->getData());
-            $user->setLocale($form->get('languages')->getData());
-            $user->setPublic($form->get('public')->getData());
-
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $this->profileService->update(
+                $user,
+                (string) $form->get('name')->getData(),
+                $form->get('bio')->getData(),
+                (string) $form->get('languages')->getData(),
+                (bool) $form->get('public')->getData(),
+            );
 
             return $this->redirectToRoute('app_profile');
         }

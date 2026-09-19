@@ -293,7 +293,6 @@ final class EventController extends AbstractController
         $em->flush();
 
         $this->activityService->log(AdminEventEdited::TYPE, $this->getAuthedUser(), ['event_id' => $event->getId()]);
-        $this->addFlash('success', 'events.flash_external_rsvp_saved');
 
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
     }

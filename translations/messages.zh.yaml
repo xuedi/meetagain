@@ -197,7 +197,6 @@ events:
     rsvp_external_title: '在本站以外报名的参加者'
     label_external_rsvp: '外部'
     button_external_rsvp_save: '保存'
-    flash_external_rsvp_saved: '外部报名人数已更新。'
     flash_external_rsvp_invalid: '请输入外部参加者的整数人数。'
     flash_rsvp_guests_requires_rsvp: '请先报名活动，然后再添加同行人。'
     flash_rsvp_guests_limit: '你已达到同行人数量上限。'
@@ -530,7 +529,6 @@ profile_image:
     detail_reported: '被举报：'
     detail_reported_yes: '是'
     detail_reported_no: '否'
-    flash_image_changed: '图片已更换。'
     flash_upload_error: '上传文件时出错。'
 support:
     sidebar_title: '我们如何帮助您'
