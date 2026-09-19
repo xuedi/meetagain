@@ -81,10 +81,14 @@ final class MemberController extends AbstractController implements AdminNavigati
 
     #[Route('/admin/member/delete/{id}', name: 'app_admin_member_delete', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
-    public function delete(User $user): Response
+    public function delete(User $user, Request $request): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::MEMBER_DELETE, $user);
         $this->assertAccessible($user);
+
+        if (!$this->isCsrfTokenValid('delete' . $user->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         try {
             $this->userService->softDelete($this->getAuthedUser(), $user);

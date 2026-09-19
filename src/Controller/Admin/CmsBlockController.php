@@ -28,7 +28,6 @@ use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,16 +62,7 @@ final class CmsBlockController extends AbstractController
     #[Route('/block/{blockId}/edit', name: 'app_admin_cms_block_edit', methods: ['GET'])]
     public function cmsBlockEdit(int $blockId): Response
     {
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw $this->createNotFoundException('Block not found');
-        }
-
-        if (!$this->adminCmsListFilterService->isCmsAccessible($block->getPage()->getId())) {
-            $this->logger->warning('CMS block edit access denied', ['blockId' => $blockId]);
-            throw $this->createAccessDeniedException('This CMS block is not accessible in the current context');
-        }
-
+        $block = $this->findAccessibleBlock($blockId);
         $cms = $block->getPage();
         $actions = [];
         if ($cms->getSlug() !== null && $cms->getSlug() !== '') {
@@ -113,14 +103,7 @@ final class CmsBlockController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw $this->createNotFoundException('Block not found');
-        }
-
-        if (!$this->adminCmsListFilterService->isCmsAccessible($block->getPage()->getId())) {
-            throw $this->createAccessDeniedException('This CMS block is not accessible in the current context');
-        }
+        $block = $this->findAccessibleBlock($blockId);
 
         if (!$block->getType()->getCapabilities()->supportsImageRight) {
             throw $this->createAccessDeniedException('Block type does not support imageRight');
@@ -144,14 +127,7 @@ final class CmsBlockController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw $this->createNotFoundException('Block not found');
-        }
-
-        if (!$this->adminCmsListFilterService->isCmsAccessible($block->getPage()->getId())) {
-            throw $this->createAccessDeniedException('This CMS block is not accessible in the current context');
-        }
+        $block = $this->findAccessibleBlock($blockId);
 
         if (!$block->getType()->getCapabilities()->supportsImage()) {
             throw $this->createAccessDeniedException('Block type does not support images');
@@ -174,9 +150,13 @@ final class CmsBlockController extends AbstractController
     #[Route('/block/{id}/add', name: 'app_admin_cms_add_block', methods: ['POST'])]
     public function cmsBlockAdd(Request $request, int $id): Response
     {
+        if (!$this->isCsrfTokenValid('app_admin_cms_add_block' . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $cmsPage = $this->cmsRepo->find($id);
         if ($cmsPage === null) {
-            throw new RuntimeException('Could not find valid page');
+            throw $this->createNotFoundException('Page not found');
         }
 
         if (!$this->adminCmsListFilterService->isCmsAccessible($cmsPage->getId())) {
@@ -204,38 +184,36 @@ final class CmsBlockController extends AbstractController
     #[Route('/block/down', name: 'app_admin_cms_edit_block_down', methods: ['POST'])]
     public function cmsBlockMoveDown(Request $request): Response
     {
-        $pageId = (int) $request->request->get('id');
         $blockId = (int) $request->request->get('blockId');
-        $locale = (string) $request->request->get('locale');
 
         if (!$this->isCsrfTokenValid('app_admin_cms_edit_block_down' . $blockId, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $this->blockService->moveBlockDown($pageId, $blockId, $locale);
+        $block = $this->findAccessibleBlock($blockId);
+        $this->blockService->moveBlockDown($block);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $pageId,
-            'locale' => $locale,
+            'id' => $block->getPage()?->getId(),
+            'locale' => $block->getLanguage(),
         ]);
     }
 
     #[Route('/block/up', name: 'app_admin_cms_edit_block_up', methods: ['POST'])]
     public function cmsBlockMoveUp(Request $request): Response
     {
-        $pageId = (int) $request->request->get('id');
         $blockId = (int) $request->request->get('blockId');
-        $locale = (string) $request->request->get('locale');
 
         if (!$this->isCsrfTokenValid('app_admin_cms_edit_block_up' . $blockId, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $this->blockService->moveBlockUp($pageId, $blockId, $locale);
+        $block = $this->findAccessibleBlock($blockId);
+        $this->blockService->moveBlockUp($block);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $pageId,
-            'locale' => $locale,
+            'id' => $block->getPage()?->getId(),
+            'locale' => $block->getLanguage(),
         ]);
     }
 
@@ -243,10 +221,16 @@ final class CmsBlockController extends AbstractController
     public function cmsBlockSave(Request $request): Response
     {
         $blockId = (int) $request->request->get('blockId');
+
+        if (!$this->isCsrfTokenValid('app_admin_cms_edit_block_save' . $blockId, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        $block = $this->findAccessibleBlock($blockId);
         $type = CmsBlockType::from((int) $request->request->get('blockType'));
 
         try {
-            $block = $this->blockService->updateBlock($blockId, $type, $request->getPayload()->all());
+            $block = $this->blockService->updateBlock($block, $type, $request->getPayload()->all());
             $this->logBlockActivity(AdminCmsBlockUpdated::TYPE, $block);
         } catch (BlockValidationException $e) {
             $this->addFlash('error', $this->translator->trans('admin_cms.flash_block_validation_error'));
@@ -270,23 +254,24 @@ final class CmsBlockController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw $this->createNotFoundException('Block not found');
-        }
+        $block = $this->findAccessibleBlock($blockId);
+        $pageId = $block->getPage()?->getId();
+        $locale = $block->getLanguage();
 
         $this->logBlockActivity(AdminCmsBlockDeleted::TYPE, $block);
-        $this->blockService->deleteBlock($blockId);
+        $this->blockService->deleteBlock($block);
 
         return $this->redirectToRoute('app_admin_cms_edit', [
-            'id' => $request->request->get('id'),
-            'locale' => $request->request->get('locale'),
+            'id' => $pageId,
+            'locale' => $locale,
         ]);
     }
 
     #[Route('/block/{blockId}/card/{slot}/image/modal', name: 'app_admin_cms_card_image_modal', methods: ['GET'], requirements: ['slot' => '[0-2]'])]
     public function cmsCardImageModal(int $blockId, int $slot): Response
     {
+        $this->findAccessibleBlock($blockId);
+
         $form = $this->createForm(EventUploadType::class, null, [
             'action' => $this->generateUrl('app_admin_cms_card_image_upload', [
                 'blockId' => $blockId,
@@ -302,21 +287,14 @@ final class CmsBlockController extends AbstractController
     #[Route('/block/{blockId}/card/{slot}/image/upload', name: 'app_admin_cms_card_image_upload', methods: ['POST'], requirements: ['slot' => '[0-2]'])]
     public function cmsCardImageUpload(Request $request, int $blockId, int $slot): Response
     {
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw new RuntimeException('Could not find block');
-        }
-
-        if (!$this->adminCmsListFilterService->isCmsAccessible($block->getPage()->getId())) {
-            throw $this->createAccessDeniedException('This CMS block is not accessible in the current context');
-        }
+        $block = $this->findAccessibleBlock($blockId);
 
         $form = $this->createForm(EventUploadType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
             assert($user instanceof User);
-            $fileConstraint = new File(maxSize: '10M', mimeTypes: ['image/*']);
+            $fileConstraint = new File(maxSize: '10M', mimeTypes: ImageService::ACCEPTED_MIME_TYPES);
 
             $files = $form->get('files')->getData() ?? [];
             $file = reset($files);
@@ -362,14 +340,7 @@ final class CmsBlockController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw new RuntimeException('Could not find block');
-        }
-
-        if (!$this->adminCmsListFilterService->isCmsAccessible($block->getPage()->getId())) {
-            throw $this->createAccessDeniedException('This CMS block is not accessible in the current context');
-        }
+        $block = $this->findAccessibleBlock($blockId);
 
         $json = $block->getJson();
         if (isset($json['cards'][$slot])) {
@@ -392,6 +363,8 @@ final class CmsBlockController extends AbstractController
     #[Route('/block/{blockId}/gallery/modal', name: 'app_admin_cms_gallery_modal', methods: ['GET'])]
     public function cmsGalleryModal(int $blockId): Response
     {
+        $this->findAccessibleBlock($blockId);
+
         $form = $this->createForm(EventUploadType::class, null, [
             'action' => $this->generateUrl('app_admin_cms_gallery_add', ['blockId' => $blockId]),
         ]);
@@ -404,17 +377,14 @@ final class CmsBlockController extends AbstractController
     #[Route('/block/{blockId}/gallery/add', name: 'app_admin_cms_gallery_add', methods: ['POST'])]
     public function cmsGalleryAdd(Request $request, int $blockId): Response
     {
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw new RuntimeException('Could not find block');
-        }
+        $block = $this->findAccessibleBlock($blockId);
 
         $form = $this->createForm(EventUploadType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
             assert($user instanceof User);
-            $fileConstraint = new File(maxSize: '10M', mimeTypes: ['image/*']);
+            $fileConstraint = new File(maxSize: '10M', mimeTypes: ImageService::ACCEPTED_MIME_TYPES);
             foreach ($form->get('files')->getData() ?? [] as $file) {
                 if (!$file instanceof UploadedFile) {
                     continue;
@@ -459,10 +429,7 @@ final class CmsBlockController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw new RuntimeException('Could not find block');
-        }
+        $block = $this->findAccessibleBlock($blockId);
 
         $json = $block->getJson();
         $json['images'] = array_values(array_filter($json['images'] ?? [], static fn(array $item) => $item['id'] !== $imageId));
@@ -480,6 +447,22 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
+    private function findAccessibleBlock(int $blockId): CmsBlock
+    {
+        $block = $this->blockRepo->find($blockId);
+        if ($block === null) {
+            throw $this->createNotFoundException('Block not found');
+        }
+
+        $page = $block->getPage();
+        if ($page === null || !$this->adminCmsListFilterService->isCmsAccessible((int) $page->getId())) {
+            $this->logger->warning('CMS block access denied', ['blockId' => $blockId]);
+            throw $this->createAccessDeniedException('This CMS block is not accessible in the current context');
+        }
+
+        return $block;
+    }
+
     /**
      * @return array<Location>
      */
@@ -489,9 +472,7 @@ final class CmsBlockController extends AbstractController
             return [];
         }
 
-        return $this->locationRepo->findWithCoordinatesForAdmin(
-            $this->locationFilterService->getLocationIdFilter()->getLocationIds(),
-        );
+        return $this->locationRepo->findWithCoordinatesForAdmin($this->locationFilterService->getLocationIdFilter()->getLocationIds());
     }
 
     private function logBlockActivity(string $type, CmsBlock $block): void

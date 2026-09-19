@@ -11,8 +11,22 @@ install: buildTools
     chmod +x bin/commit-hooks/*.bash
     cat /dev/null > .just/local.just
     for recipes in plugins/*/just/*.just; do if [ -f "$recipes" ]; then cat "$recipes" >> .just/local.just; fi; done
+    {{JUST}} devSecretBoxKey
     @echo "Pre-commit dispatcher activated. Scripts in bin/commit-hooks/ will run on every commit."
     @echo "Next, once per machine: just devCerts"
+
+# Give this clone its own APP_SECRET_BOX_KEY in .env.local, which no dev reset overwrites
+[group('development')]
+devSecretBoxKey:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if grep -q '^APP_SECRET_BOX_KEY=' .env.local 2>/dev/null; then
+        echo "APP_SECRET_BOX_KEY already set in .env.local - keeping it."
+        exit 0
+    fi
+    command -v openssl >/dev/null || { echo "openssl is not installed - cannot generate APP_SECRET_BOX_KEY"; exit 1; }
+    printf 'APP_SECRET_BOX_KEY=%s\n' "$(openssl rand -base64 32)" >> .env.local
+    echo "Generated APP_SECRET_BOX_KEY into .env.local - the .env.dist value is public and must never run anywhere real."
 
 # Issue the local TLS certificate and trust it in the browser and system stores
 [group('development')]

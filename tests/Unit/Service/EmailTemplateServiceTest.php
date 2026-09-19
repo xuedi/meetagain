@@ -163,6 +163,48 @@ class EmailTemplateServiceTest extends TestCase
         ];
     }
 
+    public function testRenderContentEscapesMarkupInASubstitutedValue(): void
+    {
+        // Arrange
+        $content = '<p>Hello {{username}}</p>';
+        $context = ['username' => '<a href="https://evil.example">Alice</a>'];
+
+        // Act
+        $result = $this->subject->renderContent($content, $context);
+
+        // Assert
+        static::assertSame(
+            '<p>Hello &lt;a href=&quot;https://evil.example&quot;&gt;Alice&lt;/a&gt;</p>',
+            $result,
+        );
+    }
+
+    public function testRenderContentLetsTheAnnouncementBodyThroughAsHtml(): void
+    {
+        // Arrange
+        $content = '<div>{{content}}</div>';
+        $context = ['content' => '<p>A real announcement</p>'];
+
+        // Act
+        $result = $this->subject->renderContent($content, $context);
+
+        // Assert
+        static::assertSame('<div><p>A real announcement</p></div>', $result);
+    }
+
+    public function testRenderSubjectLeavesTheValueUnescaped(): void
+    {
+        // Arrange
+        $subject = 'Message from {{sender}}';
+        $context = ['sender' => 'Tom & Jerry'];
+
+        // Act
+        $result = $this->subject->renderSubject($subject, $context);
+
+        // Assert
+        static::assertSame('Message from Tom & Jerry', $result);
+    }
+
     public function testRenderContentIgnoresNonScalarValues(): void
     {
         // Arrange

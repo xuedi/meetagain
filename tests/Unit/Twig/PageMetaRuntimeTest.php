@@ -3,6 +3,7 @@
 namespace Tests\Unit\Twig;
 
 use App\Publisher\MetaDescription\MetaDescriptionProviderInterface;
+use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Config\SiteNameResolver;
 use App\Service\Seo\CanonicalUrlService;
@@ -146,5 +147,70 @@ class PageMetaRuntimeTest extends TestCase
 
         // Assert
         static::assertSame('Meet the members of this community.', $result);
+    }
+
+    public function testLdJsonKeepsAClosingScriptTagFromEndingTheBlock(): void
+    {
+        // Arrange
+        $title = '</script><script>alert(1)</script>';
+
+        // Act
+        $result = (string) $this->subject->ldJson(['name' => $title]);
+
+        // Assert
+        static::assertStringNotContainsString('</script>', $result);
+        static::assertStringNotContainsString('<', $result);
+        static::assertSame($title, json_decode($result, true)['name']);
+    }
+
+    public function testLdJsonEscapesTheOtherHtmlSignificantCharacters(): void
+    {
+        // Arrange
+        $payload = ['name' => 'Tom & "Jerry" O\'Brien', 'url' => 'https://example.org/a/b'];
+
+        // Act
+        $result = (string) $this->subject->ldJson($payload);
+
+        // Assert
+        static::assertStringNotContainsString('&', $result);
+        static::assertStringNotContainsString("'", $result);
+        static::assertStringContainsString('https:\\/\\/example.org', $result);
+        static::assertSame($payload, json_decode($result, true));
+    }
+
+    public function testLdJsonLeavesNonAsciiTextReadable(): void
+    {
+        // Act
+        $result = (string) $this->subject->ldJson(['name' => 'Königsallee 北京']);
+
+        // Assert
+        static::assertStringContainsString('Königsallee 北京', $result);
+    }
+
+    public function testOrganizationSchemaFromAProviderIsEscapedToo(): void
+    {
+        // Arrange
+        $provider = new class implements OrganizationSchemaProviderInterface {
+            public function getOrganizationSchema(): ?array
+            {
+                return ['@type' => 'Organization', 'name' => '</script><script>alert(1)</script>'];
+            }
+        };
+        $subject = new PageMetaRuntime(
+            $this->requestStackStub,
+            $this->configServiceStub,
+            $this->canonicalUrlServiceStub,
+            $this->siteNameResolverStub,
+            $this->noindexServiceStub,
+            [],
+            [$provider],
+        );
+
+        // Act
+        $result = (string) $subject->getOrganizationSchema();
+
+        // Assert
+        static::assertStringNotContainsString('</script>', $result);
+        static::assertSame('https://schema.org', json_decode($result, true)['@context']);
     }
 }

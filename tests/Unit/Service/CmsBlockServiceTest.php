@@ -85,28 +85,31 @@ class CmsBlockServiceTest extends TestCase
         $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator(), $dispatcherMock);
 
         // Act
-        $result = $subject->updateBlock(42, CmsBlockType::Text, ['title' => 'new', 'content' => 'new content']);
+        $result = $subject->updateBlock($block, CmsBlockType::Text, ['title' => 'new', 'content' => 'new content']);
 
         // Assert
         static::assertSame($block, $result);
     }
 
-    public function testUpdateBlockThrowsWhenBlockNotFound(): void
+    public function testUpdateBlockThrowsWhenBlockHasNoPage(): void
     {
         // Arrange
         $emStub = $this->createStub(EntityManagerInterface::class);
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
-        $blockRepoStub->method('find')->willReturn(null);
         $dispatcherMock = $this->createMock(EntityActionDispatcher::class);
         $dispatcherMock->expects($this->never())->method('dispatch');
+
+        $block = new CmsBlock();
+        $block->setType(CmsBlockType::Text);
+        $block->setJson(['title' => 'old', 'content' => 'old content']);
 
         $subject = new CmsBlockService($emStub, $blockRepoStub, $this->makeHydrator(), $dispatcherMock);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not load block');
+        $this->expectExceptionMessage('Could not load the page owning this block');
 
         // Act
-        $subject->updateBlock(999, CmsBlockType::Text, ['title' => '', 'content' => '']);
+        $subject->updateBlock($block, CmsBlockType::Text, ['title' => '', 'content' => '']);
     }
 
     public function testDeleteBlockRemovesBlockAndDispatchesAction(): void
@@ -128,25 +131,25 @@ class CmsBlockServiceTest extends TestCase
         $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator(), $dispatcherMock);
 
         // Act
-        $subject->deleteBlock(42);
+        $subject->deleteBlock($block);
     }
 
-    public function testDeleteBlockThrowsWhenBlockNotFound(): void
+    public function testDeleteBlockThrowsWhenBlockHasNoPage(): void
     {
         // Arrange
-        $emStub = $this->createStub(EntityManagerInterface::class);
+        $emMock = $this->createMock(EntityManagerInterface::class);
         $blockRepoStub = $this->createStub(CmsBlockRepository::class);
-        $blockRepoStub->method('find')->willReturn(null);
         $dispatcherMock = $this->createMock(EntityActionDispatcher::class);
+        $emMock->expects($this->never())->method('remove');
         $dispatcherMock->expects($this->never())->method('dispatch');
 
-        $subject = new CmsBlockService($emStub, $blockRepoStub, $this->makeHydrator(), $dispatcherMock);
+        $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator(), $dispatcherMock);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not load block');
+        $this->expectExceptionMessage('Could not load the page owning this block');
 
         // Act
-        $subject->deleteBlock(999);
+        $subject->deleteBlock(new CmsBlock());
     }
 
     public function testMoveBlockDownAdjustsPriorityAndDispatchesAction(): void
@@ -158,8 +161,9 @@ class CmsBlockServiceTest extends TestCase
 
         $block = new CmsBlock();
         $block->setPriority(3);
+        $block->setLanguage('en');
+        $block->setPage($this->makePage(1));
 
-        $blockRepoStub->method('find')->willReturn($block);
         $blockRepoStub->method('findBy')->willReturn([$block]);
 
         $emMock->expects($this->exactly(2))->method('persist');
@@ -170,7 +174,7 @@ class CmsBlockServiceTest extends TestCase
         $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator(), $dispatcherMock);
 
         // Act
-        $subject->moveBlockDown(1, 42, 'en');
+        $subject->moveBlockDown($block);
 
         // Assert
         static::assertSame(1.0, $block->getPriority());
@@ -209,12 +213,12 @@ class CmsBlockServiceTest extends TestCase
             'buttonText' => 'new',
             'color' => 'new',
         ];
-        $subject->updateBlock(42, CmsBlockType::Hero, $payload);
+        $subject->updateBlock($block, CmsBlockType::Hero, $payload);
         static::assertFalse($block->getJson()['imageRight']);
 
         // Act + Assert
         $payload['imageRight'] = '1';
-        $subject->updateBlock(42, CmsBlockType::Hero, $payload);
+        $subject->updateBlock($block, CmsBlockType::Hero, $payload);
         static::assertTrue($block->getJson()['imageRight']);
     }
 }

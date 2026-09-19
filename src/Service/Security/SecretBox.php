@@ -6,6 +6,12 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class SecretBox
 {
+    public const array PUBLISHED_KEYS = [
+        'ZQu5U3lD+Cz9mAC8RBXM0G39yDGZ1dYdxP7B5fkB7kc=',
+        'ACgMr4NtZlF+FO5j4e0pKPDFslJhkM5NTvJ4hcbfNEA=',
+        'WRHkc/i5wAQrDIaj4JV2m8fjhyQIlwGqduPWJtorZ/s=',
+    ];
+
     private string $key;
 
     public function __construct(#[Autowire(env: 'APP_SECRET_BOX_KEY')] string $base64Key)

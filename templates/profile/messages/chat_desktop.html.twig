@@ -63,12 +63,14 @@
                             <div class="level-right">
                                 {% if hasBlockedPartner %}
                                     <form action="{{ path('app_profile_unblock_user', {'id': conversationsId}) }}" method="post" class="is-inline ajax-block-form">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('app_profile_unblock_user' ~ conversationsId) }}">
                                         <button type="submit" class="button is-warning is-small">
                                             <span class="icon"><i class="fa fa-unlock"></i></span><span>{{ 'member.button_unblock'|trans }}</span>
                                         </button>
                                     </form>
                                 {% else %}
                                     <form action="{{ path('app_profile_block_user', {'id': conversationsId}) }}" method="post" class="is-inline ajax-block-form">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('app_profile_block_user' ~ conversationsId) }}">
                                         <button type="submit" class="button is-dark is-small">
                                             <span class="icon"><i class="fa fa-ban"></i></span><span>{{ 'member.button_block'|trans }}</span>
                                         </button>

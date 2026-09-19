@@ -162,6 +162,7 @@ class Installer
 APP_ENV=prod
 APP_HOST="{$data['site_url']}"
 APP_SECRET={$this->generateSecret()}
+APP_SECRET_BOX_KEY={$this->generateSecretBoxKey()}
 
 # Docker settings (auto-detected)
 HOST_USERNAME={$this->getCurrentUser()}
@@ -420,6 +421,11 @@ ENV;
     private function generateSecret(): string
     {
         return bin2hex(random_bytes(16));
+    }
+
+    private function generateSecretBoxKey(): string
+    {
+        return base64_encode(sodium_crypto_secretbox_keygen());
     }
 
     private function getTimestamp(): string

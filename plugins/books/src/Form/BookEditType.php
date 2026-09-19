@@ -3,6 +3,7 @@
 namespace Plugin\Books\Form;
 
 use App\Item\Tag\AssignmentFormHelper;
+use App\Service\Media\ImageService;
 use Override;
 use Plugin\Books\Entity\Book;
 use Plugin\Books\Service\BookService;
@@ -58,7 +59,7 @@ class BookEditType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'constraints' => [
-                    new File(maxSize: '8000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('books_book.flash_invalid_image')),
+                    new File(maxSize: '8000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('books_book.flash_invalid_image')),
                 ],
             ]);
 

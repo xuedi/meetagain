@@ -18,6 +18,9 @@ final class PageMetaExtension extends AbstractExtension
             new TwigFunction('get_organization_schema', [PageMetaRuntime::class, 'getOrganizationSchema'], [
                 'is_safe' => ['html'],
             ]),
+            new TwigFunction('ld_json', [PageMetaRuntime::class, 'ldJson'], [
+                'is_safe' => ['html'],
+            ]),
             new TwigFunction('page_noindex', [PageMetaRuntime::class, 'isNoindex']),
         ];
     }

@@ -76,7 +76,7 @@ final class MemberController extends AbstractController
             $currentUser = $this->getAuthedUser();
             $userDetails = $this->repo->findOneBy(['id' => $id]);
 
-            if ($userDetails === null) {
+            if ($userDetails === null || !$this->memberFilterService->isMemberAccessible($id)) {
                 throw $this->createNotFoundException();
             }
 
@@ -116,11 +116,8 @@ final class MemberController extends AbstractController
     #[IsGranted('ROLE_ORGANIZER')]
     public function rotateProfileImage(Request $request, int $id): Response
     {
-        if (!$this->isCsrfTokenValid('app_member_rotate_avatar' . $id, (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
+        $user = $this->findModeratableMember($request, 'app_member_rotate_avatar', $id);
 
-        $user = $this->repo->findOneBy(['id' => $id]);
         if ($user->getImage() !== null) {
             $this->imageService->rotateThumbNail($user->getImage());
         }
@@ -132,11 +129,8 @@ final class MemberController extends AbstractController
     #[IsGranted('ROLE_ORGANIZER')]
     public function removeProfileImage(Request $request, EntityManagerInterface $em, int $id): Response
     {
-        if (!$this->isCsrfTokenValid('app_member_remove_avatar' . $id, (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
+        $user = $this->findModeratableMember($request, 'app_member_remove_avatar', $id);
 
-        $user = $this->repo->findOneBy(['id' => $id]);
         $oldImageId = $user->getImage()?->getId();
         $user->setImage(null);
         $em->persist($user);
@@ -153,11 +147,8 @@ final class MemberController extends AbstractController
     #[IsGranted('ROLE_ORGANIZER')]
     public function restrictUser(Request $request, EntityManagerInterface $em, int $id): Response
     {
-        if (!$this->isCsrfTokenValid('app_member_restrict' . $id, (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
+        $user = $this->findModeratableMember($request, 'app_member_restrict', $id);
 
-        $user = $this->repo->findOneBy(['id' => $id]);
         $user->setRestricted(!$user->isRestricted());
         $em->persist($user);
         $em->flush();
@@ -169,15 +160,26 @@ final class MemberController extends AbstractController
     #[IsGranted('ROLE_ORGANIZER')]
     public function verifyUser(Request $request, EntityManagerInterface $em, int $id): Response
     {
-        if (!$this->isCsrfTokenValid('app_member_verify' . $id, (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
+        $user = $this->findModeratableMember($request, 'app_member_verify', $id);
 
-        $user = $this->repo->findOneBy(['id' => $id]);
         $user->setVerified(!$user->isVerified());
         $em->persist($user);
         $em->flush();
 
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
+    }
+
+    private function findModeratableMember(Request $request, string $tokenId, int $id): User
+    {
+        if (!$this->isCsrfTokenValid($tokenId . $id, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        $user = $this->repo->findOneBy(['id' => $id]);
+        if ($user === null || !$this->memberFilterService->isMemberAccessible($id)) {
+            throw $this->createNotFoundException('Member not found in current context.');
+        }
+
+        return $user;
     }
 }

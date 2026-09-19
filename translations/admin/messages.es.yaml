@@ -642,6 +642,8 @@ admin_secretbox:
     heading_consumers: 'Consumidores'
     label_key_present: 'APP_SECRET_BOX_KEY presente'
     label_key_valid: 'Longitud de clave válida (32 bytes)'
+    label_key_published: 'Clave publicada en el repositorio'
+    status_key_published: 'Sí - hay que rotarla, cualquiera con un clon puede descifrar los datos'
     label_sodium_loaded: 'Extensión libsodium cargada'
     status_yes: 'Sí'
     status_no: 'No'

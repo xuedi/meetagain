@@ -8,6 +8,7 @@ use App\Service\Member\BlockingService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -22,6 +23,8 @@ final class BlockController extends AbstractController
     #[Route('/profile/block/{id}', name: 'app_profile_block_user', methods: ['POST'])]
     public function blockUser(Request $request, int $id): Response
     {
+        $this->assertToken($request, 'app_profile_block_user' . $id);
+
         $currentUser = $this->getAuthedUser();
         $targetUser = $this->userRepo->findOneBy(['id' => $id]);
 
@@ -62,6 +65,8 @@ final class BlockController extends AbstractController
     #[Route('/profile/unblock/{id}', name: 'app_profile_unblock_user', methods: ['POST'])]
     public function unblockUser(Request $request, int $id): Response
     {
+        $this->assertToken($request, 'app_profile_unblock_user' . $id);
+
         $currentUser = $this->getAuthedUser();
         $targetUser = $this->userRepo->findOneBy(['id' => $id]);
 
@@ -91,5 +96,12 @@ final class BlockController extends AbstractController
         return $this->render('profile/blocked.html.twig', [
             'blockedUsers' => $blockedUsers,
         ]);
+    }
+
+    private function assertToken(Request $request, string $tokenId): void
+    {
+        if (!$this->isCsrfTokenValid($tokenId, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
     }
 }

@@ -12,9 +12,12 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\RuntimeExtensionInterface;
+use Twig\Markup;
 
 final readonly class PageMetaRuntime implements RuntimeExtensionInterface
 {
+    private const int LD_JSON_FLAGS = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT;
+
     /**
      * @param iterable<MetaDescriptionProviderInterface>   $metaDescriptionProviders
      * @param iterable<OrganizationSchemaProviderInterface> $organizationProviders
@@ -74,30 +77,32 @@ final readonly class PageMetaRuntime implements RuntimeExtensionInterface
         };
     }
 
-    public function getOrganizationSchema(): string
+    public function getOrganizationSchema(): Markup
     {
         foreach ($this->organizationProviders as $provider) {
             $schema = $provider->getOrganizationSchema();
             if ($schema !== null) {
-                return (
-                    json_encode(
-                        array_merge(['@context' => 'https://schema.org'], is_array($schema) ? $schema : []),
-                        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES,
-                    ) ?: ''
-                );
+                return $this->ldJson(array_merge(['@context' => 'https://schema.org'], $schema));
             }
         }
 
         $host = rtrim($this->configService->getHost(), '/');
 
-        return (
-            json_encode([
-                '@context' => 'https://schema.org',
-                '@type' => 'Organization',
-                '@id' => $host . '/#organization',
-                'name' => 'MeetAgain',
-                'url' => $host,
-            ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''
+        return $this->ldJson([
+            '@context' => 'https://schema.org',
+            '@type' => 'Organization',
+            '@id' => $host . '/#organization',
+            'name' => 'MeetAgain',
+            'url' => $host,
+        ]);
+    }
+
+    /** @param array<array-key, mixed> $data */
+    public function ldJson(array $data): Markup
+    {
+        return new Markup(
+            json_encode($data, self::LD_JSON_FLAGS) ?: '{}',
+            'UTF-8',
         );
     }
 }

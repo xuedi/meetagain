@@ -571,7 +571,7 @@ class ImageServiceTest extends TestCase
      * @param array{server: ?string, client: string} $mimeData
      */
     #[DataProvider('provideMimeTypeFallbackCases')]
-    public function testUploadDetectsMimeType(array $mimeData, ?string $expectedMime, bool $expectThrow): void
+    public function testUploadTrustsOnlyTheServerDetectedMimeType(array $mimeData, ?string $expectedMime, bool $expectThrow): void
     {
         // Arrange
         $imageContent = 'content-' . random_int(1, 9999);
@@ -604,18 +604,48 @@ class ImageServiceTest extends TestCase
             'image/png',
             false,
         ];
-        yield 'server null falls back to client' => [
+        yield 'a raster type the browsers still send is normalised' => [
+            ['server' => 'image/jpg', 'client' => 'image/jpeg'],
+            'image/jpeg',
+            false,
+        ];
+        yield 'legacy pjpeg is normalised' => [
+            ['server' => 'image/pjpeg', 'client' => 'image/jpeg'],
+            'image/jpeg',
+            false,
+        ];
+        yield 'legacy x-png is normalised' => [
+            ['server' => 'image/x-png', 'client' => 'image/png'],
+            'image/png',
+            false,
+        ];
+        yield 'heic is still accepted' => [
+            ['server' => 'image/heic', 'client' => 'image/heic'],
+            'image/heic',
+            false,
+        ];
+        yield 'avif is still accepted' => [
+            ['server' => 'image/avif', 'client' => 'image/avif'],
+            'image/avif',
+            false,
+        ];
+        yield 'svg is refused even when the client claims png' => [
+            ['server' => 'image/svg+xml', 'client' => 'image/png'],
+            null,
+            true,
+        ];
+        yield 'a non-image is refused' => [
+            ['server' => 'text/html', 'client' => 'image/png'],
+            null,
+            true,
+        ];
+        yield 'server null no longer falls back to the client' => [
             ['server' => null, 'client' => 'image/jpeg'],
-            'image/jpeg',
-            false,
+            null,
+            true,
         ];
-        yield 'server empty falls back to client' => [
+        yield 'server empty no longer falls back to the client' => [
             ['server' => '', 'client' => 'image/jpeg'],
-            'image/jpeg',
-            false,
-        ];
-        yield 'client octet-stream is rejected' => [
-            ['server' => null, 'client' => 'application/octet-stream'],
             null,
             true,
         ];
@@ -667,10 +697,15 @@ class ImageServiceTest extends TestCase
             'png',
             false,
         ];
-        yield 'server null and unknown mime falls back to client lowercased' => [
-            ['server' => null, 'mime' => 'application/x-totally-unknown', 'client' => 'XYZ'],
-            'xyz',
+        yield 'heic keeps its own extension' => [
+            ['server' => null, 'mime' => 'image/heic', 'client' => 'something'],
+            'heic',
             false,
+        ];
+        yield 'an unsupported mime throws before the extension is resolved' => [
+            ['server' => null, 'mime' => 'application/x-totally-unknown', 'client' => 'XYZ'],
+            null,
+            true,
         ];
         yield 'all empty throws' => [
             ['server' => null, 'mime' => 'application/x-totally-unknown', 'client' => ''],

@@ -57,6 +57,18 @@ class UserCheckerTest extends TestCase
         static::assertTrue(true);
     }
 
+    #[DataProvider('inactiveStatusProvider')]
+    public function testAssertActiveRejectsEveryNonActiveStatus(UserStatus $status): void
+    {
+        // Arrange
+        $inactiveUser = $this->createStub(User::class);
+        $inactiveUser->method('getStatus')->willReturn($status);
+
+        // Act & Assert
+        $this->expectException(CustomUserMessageAccountStatusException::class);
+        UserChecker::assertActive($inactiveUser);
+    }
+
     #[DataProvider('statusMessageProvider')]
     public function testCheckPostAuthRejectsInactiveUsersWithItsOwnMessage(UserStatus $status, string $expected): void
     {
@@ -173,6 +185,55 @@ class UserCheckerTest extends TestCase
 
         // Act
         $subject->checkPostAuth($this->createActiveUser());
+    }
+
+    public function testCheckPostAuthSkipsTheLoginSideEffectsOnAStatelessFirewall(): void
+    {
+        // Arrange
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->expects($this->never())->method('set');
+
+        $request = new Request();
+        $request->setSession($sessionMock);
+        $request->attributes->set('_stateless', true);
+
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($request);
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->never())->method('flush');
+
+        $activityServiceMock = $this->createMock(ActivityService::class);
+        $activityServiceMock->expects($this->never())->method('log');
+
+        $subject = $this->createSubject(
+            activityService: $activityServiceMock,
+            em: $emMock,
+            requestStack: $requestStackStub,
+        );
+
+        // Act & Assert
+        $subject->checkPostAuth($this->createActiveUser());
+        static::assertTrue(true);
+    }
+
+    public function testCheckPostAuthStillRejectsAnInactiveUserOnAStatelessFirewall(): void
+    {
+        // Arrange
+        $request = new Request();
+        $request->attributes->set('_stateless', true);
+
+        $requestStackStub = $this->createStub(RequestStack::class);
+        $requestStackStub->method('getCurrentRequest')->willReturn($request);
+
+        $blocked = $this->createStub(User::class);
+        $blocked->method('getStatus')->willReturn(UserStatus::Blocked);
+
+        $subject = $this->createSubject(requestStack: $requestStackStub);
+
+        // Act & Assert
+        $this->expectException(CustomUserMessageAccountStatusException::class);
+        $subject->checkPostAuth($blocked);
     }
 
     private function createActiveUser(): User

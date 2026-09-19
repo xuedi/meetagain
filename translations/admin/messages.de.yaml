@@ -642,6 +642,8 @@ admin_secretbox:
     heading_consumers: 'Verbraucher'
     label_key_present: 'APP_SECRET_BOX_KEY vorhanden'
     label_key_valid: 'Schluessellange gueltig (32 Byte)'
+    label_key_published: 'Schluessel im Repository veroeffentlicht'
+    status_key_published: 'Ja - bitte austauschen, jeder mit einem Clone kann die damit verschluesselten Daten lesen'
     label_sodium_loaded: 'libsodium-Erweiterung geladen'
     status_yes: 'Ja'
     status_no: 'Nein'

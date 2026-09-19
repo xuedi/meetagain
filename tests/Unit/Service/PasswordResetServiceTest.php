@@ -169,6 +169,29 @@ class PasswordResetServiceTest extends TestCase
         static::assertNull($service->requestReset('blocked@example.com'));
     }
 
+    public function testABlocklistRefusalNeverLogsTheAddress(): void
+    {
+        $blocklistStub = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklistStub->method('isBlocked')->willReturn(true);
+
+        $user = new User();
+        $user->setEmail('blocked@example.com');
+
+        $loggerMock = $this->createMock(LoggerInterface::class);
+        $loggerMock
+            ->expects($this->exactly(2))
+            ->method('info')
+            ->willReturnCallback(function (string $message, array $context): void {
+                $this->assertStringNotContainsString('@', $message);
+                $this->assertArrayNotHasKey('email', $context);
+            });
+
+        $service = $this->createService(blocklist: $blocklistStub, logger: $loggerMock);
+
+        static::assertNull($service->requestReset('blocked@example.com'));
+        static::assertFalse($service->resetPassword($user, 'newPassword'));
+    }
+
     public function testResetPasswordReturnsFalseAndDoesNotPersistWhenBlocklisted(): void
     {
         $user = new User();

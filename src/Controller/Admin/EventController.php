@@ -63,6 +63,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -692,9 +693,10 @@ final class EventController extends AbstractController implements AdminNavigatio
     }
 
     #[Route('/{id}/delete', name: 'app_admin_event_delete', methods: ['POST'])]
-    public function delete(Event $event): Response
+    public function delete(Request $request, Event $event): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::EVENT_DELETE, $event);
+        $this->assertEventActionAllowed($request, 'app_admin_event_delete', $event);
 
         $this->addFlash('error', $this->translator->trans('admin_event.flash_delete_not_implemented'));
 
@@ -702,9 +704,10 @@ final class EventController extends AbstractController implements AdminNavigatio
     }
 
     #[Route('/{id}/cancel', name: 'app_admin_event_cancel', methods: ['POST'])]
-    public function cancel(Event $event): Response
+    public function cancel(Request $request, Event $event): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::EVENT_CANCEL, $event);
+        $this->assertEventActionAllowed($request, 'app_admin_event_cancel', $event);
 
         $user = $this->getAuthedUser();
         $rsvpCount = $event->getRsvp()->count();
@@ -720,13 +723,25 @@ final class EventController extends AbstractController implements AdminNavigatio
     }
 
     #[Route('/{id}/uncancel', name: 'app_admin_event_uncancel', methods: ['POST'])]
-    public function uncancel(Event $event): Response
+    public function uncancel(Request $request, Event $event): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::EVENT_CANCEL, $event);
+        $this->assertEventActionAllowed($request, 'app_admin_event_uncancel', $event);
 
         $this->eventService->uncancelEvent($event);
 
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
+    }
+
+    private function assertEventActionAllowed(Request $request, string $tokenId, Event $event): void
+    {
+        if (!$this->isCsrfTokenValid($tokenId . $event->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        if (!$this->eventFilterService->isEventAccessible($event->getId())) {
+            throw $this->createAccessDeniedException('This event is not accessible in the current context');
+        }
     }
 
     private function getTranslation(mixed $languageCode, ?int $getId): EventTranslation

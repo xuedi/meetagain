@@ -127,7 +127,7 @@ final class ImageUploadController extends AbstractController
 
         $form = $this->createForm(ImageUploadType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted() || $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $imageData = $form->get('newImage')->getData();
             if ($imageData instanceof UploadedFile) {
                 $image = $this->imageService->upload($imageData, $this->getAuthedUser(), $imageType);
@@ -211,7 +211,7 @@ final class ImageUploadController extends AbstractController
                 $imageType = ImageType::ProfilePicture;
                 $entity = $this->em->getRepository(User::class)->findOneBy(['id' => $id]);
                 if ($entity === null || $entity->getId() !== $this->getAuthedUser()->getId()) {
-                    throw new Exception('You cant change other user profile picture');
+                    throw new AccessDeniedException('A member only changes their own profile picture');
                 }
                 $image = $entity->getImage();
                 $rawGallery = $this->em

@@ -180,7 +180,7 @@ final class TemplatesController extends AbstractEmailController implements Admin
         $language = $request->query->getString('lang', $this->languageService->getAdminFilteredEnabledCodes()[0]);
         $mockContext = $this->getMockContextForTemplate($template->getIdentifier(), $language);
 
-        $renderedSubject = $this->templateService->renderContent($template->getSubject($language), $mockContext);
+        $renderedSubject = $this->templateService->renderSubject($template->getSubject($language), $mockContext);
         $renderedBody = $this->templateService->renderContent($template->getBody($language), $mockContext);
 
         $adminTop = new AdminTop(info: [

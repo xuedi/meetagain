@@ -55,6 +55,10 @@ final class ImportController extends AbstractSettingsController implements Admin
             return $this->renderPage();
         }
 
+        if (!$this->isCsrfTokenValid('admin_system_import_upload', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $file = $request->files->get('import_file');
         if (!$file instanceof UploadedFile) {
             return $this->renderPage(error: $this->translator->trans('admin_system_import.error_no_file'));

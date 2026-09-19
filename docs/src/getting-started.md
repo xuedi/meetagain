@@ -54,6 +54,11 @@ Once started, the following services are available:
 
 Mail is queued, not sent: `just appCron` dispatches the queue, and Mailpit then captures every outgoing email - no real mail is sent in dev mode.
 
+The database and Mailpit are published to `127.0.0.1` only, so they are reachable from your own machine and from
+nowhere else. Mailpit has no authentication and holds every password-reset link the dev site produces, and the
+database password is the one committed in `.env.dist`; on a shared network, publishing either on every interface
+hands both to anyone who can reach your host. Keep the `127.0.0.1:` prefix on those port mappings.
+
 ---
 
 ## Reset variants

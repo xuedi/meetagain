@@ -40,6 +40,7 @@
                     {% if film.runtime %}<p class="is-size-7">{{ film.runtime }} min</p>{% endif %}
 
                     <form method="POST" action="{{ path('app_plugin_films_film_import') }}" class="mt-2">
+                        <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_films_film_import') }}">
                         <input type="hidden" name="externalId" value="{{ film.externalId }}">
                         <input type="hidden" name="source" value="{{ film.source.value }}">
                         <button type="submit" class="button is-small">

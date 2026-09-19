@@ -27,6 +27,20 @@ RUN set -eux; \
     redis \
 	opcache
 
+# --- ImageMagick policy -----------------------------------------------------
+# The PHP imagick extension links ImageMagick 6 and reads /etc/ImageMagick-6/ - not
+# the ImageMagick 7 CLI's /etc/ImageMagick-7/. The stock policy there already denies
+# URL/HTTP/HTTPS, @* paths and PS/EPS/PDF/XPS; these six coders are what it leaves open.
+RUN set -eux; \
+    for coder in MSL MVG SVG MSVG TEXT LABEL; do \
+      sed -i "s|</policymap>|  <policy domain=\"coder\" rights=\"none\" pattern=\"${coder}\" />\n</policymap>|" /etc/ImageMagick-6/policy.xml; \
+      grep -q "domain=\"coder\" rights=\"none\" pattern=\"${coder}\"" /etc/ImageMagick-6/policy.xml \
+        || { echo "policy.xml is missing a denial for ${coder}"; exit 1; }; \
+    done; \
+    printf '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>' > /tmp/policy-probe.svg; \
+    php -r 'try { (new Imagick())->readImage("/tmp/policy-probe.svg"); } catch (Throwable) { exit(0); } fwrite(STDERR, "ImageMagick still reads SVG - policy.xml is not in force\n"); exit(1);'; \
+    rm -f /tmp/policy-probe.svg
+
 RUN groupadd -g $GID -o $UNAME
 RUN useradd -m -u $UID -g $GID -o -s /bin/bash $UNAME
 RUN setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp;

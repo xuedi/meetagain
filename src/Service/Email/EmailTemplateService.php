@@ -110,6 +110,8 @@ readonly class EmailTemplateService
         ],
     ];
 
+    private const array HTML_VARIABLES = ['content'];
+
     private const array VARIABLES = [
         EmailType::VerificationRequest->value => ['username', 'token', 'host', 'url', 'lang', 'greeting'],
         EmailType::Welcome->value => ['host', 'url', 'lang', 'greeting'],
@@ -261,12 +263,28 @@ readonly class EmailTemplateService
 
     public function renderContent(string $content, array $context): string
     {
+        return $this->substitute($content, $context, escape: true);
+    }
+
+    public function renderSubject(string $subject, array $context): string
+    {
+        return $this->substitute($subject, $context, escape: false);
+    }
+
+    /** @param array<string, mixed> $context */
+    private function substitute(string $content, array $context, bool $escape): string
+    {
         foreach ($context as $key => $value) {
             if (!is_scalar($value)) {
                 continue;
             }
 
-            $content = str_replace('{{' . $key . '}}', (string) $value, $content);
+            $replacement = (string) $value;
+            if ($escape && !in_array($key, self::HTML_VARIABLES, true)) {
+                $replacement = htmlspecialchars($replacement, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            }
+
+            $content = str_replace('{{' . $key . '}}', $replacement, $content);
         }
 
         return $content;

@@ -32,7 +32,7 @@ services:
       - ma-mysql-data:/var/lib/mysql
       - ./mariadb/init:/docker-entrypoint-initdb.d:ro
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     environment:
       - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MARIADB_DATABASE=${MARIADB_DATABASE}
@@ -46,8 +46,8 @@ services:
     image: axllent/mailpit:v1.31.1@sha256:98b916bd3c8d61f7633a52d3ea2f58d00620cb01ca57ab59edde68c347a95365
     user: ${HOST_UID}:${HOST_GID}
     ports:
-      - "1025:1025"
-      - "8025:8025"
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
     environment:
       - MP_MAX_MESSAGES=0
 

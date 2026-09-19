@@ -353,10 +353,15 @@ class AnnouncementServiceTest extends TestCase
         // Arrange
         $templateServiceMock = $this->createMock(EmailTemplateService::class);
         $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement->value)->willReturn($emailTemplate);
+        $render = static fn(string $content): string => str_replace(['{{title}}', '{{content}}'], ['My Title', ''], $content);
         $templateServiceMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
+            ->method('renderSubject')
+            ->willReturnCallback($render);
+        $templateServiceMock
+            ->expects($this->once())
             ->method('renderContent')
-            ->willReturnCallback(static fn(string $content) => str_replace(['{{title}}', '{{content}}'], ['My Title', ''], $content));
+            ->willReturnCallback($render);
 
         // Arrange
         $configService = $this->createStub(ConfigService::class);

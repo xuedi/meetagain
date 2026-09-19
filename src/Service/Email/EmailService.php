@@ -79,7 +79,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         $emailQueue->setMaxSendBy($source->getMaxSendBy($context, $now));
         $emailQueue->setTemplate($identifier);
         $emailQueue->setAttachments($source->getAttachments($context));
-        $emailQueue->setSubject($this->templateService->renderContent($templateContent['subject'], $twigContext));
+        $emailQueue->setSubject($this->templateService->renderSubject($templateContent['subject'], $twigContext));
         $emailQueue->setRenderedBody($this->templateService->renderContent($templateContent['body'], $twigContext));
 
         $this->em->persist($emailQueue);

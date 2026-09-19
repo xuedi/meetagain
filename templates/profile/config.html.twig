@@ -146,6 +146,7 @@
                                         <td style="width: 60px; text-align: right;">
                                             <a href="{{ path('app_profile_unblock_user', {'id': block.blocked.id}) }}"
                                                class="ajax-unblock"
+                                               data-csrf-token="{{ csrf_token('app_profile_unblock_user' ~ block.blocked.id) }}"
                                                data-user-id="{{ block.blocked.id }}"
                                                data-user-name="{{ block.blocked.name }}">
                                                 <span class="icon"><i class="fa fa-unlock"></i></span>

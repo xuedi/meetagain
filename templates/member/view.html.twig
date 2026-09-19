@@ -34,7 +34,8 @@
                                     {% if isBlocked %}
                                         <a href="{{ path('app_profile_unblock_user', {'id': userDetails.id}) }}"
                                            class="button is-light is-small"
-                                           data-post>
+                                           data-post
+                                           data-csrf-token="{{ csrf_token('app_profile_unblock_user' ~ userDetails.id) }}">
                                             <span class="icon"><i class="fa fa-unlock"></i></span>
                                             <span>{{ 'member.button_unblock'|trans }}</span>
                                         </a>
@@ -42,6 +43,7 @@
                                         <a href="{{ path('app_profile_block_user', {'id': userDetails.id}) }}"
                                            class="button is-light is-small"
                                            data-post
+                                           data-csrf-token="{{ csrf_token('app_profile_block_user' ~ userDetails.id) }}"
                                            data-confirm="{{ 'member.button_block_confirm'|trans }}">
                                             <span class="icon"><i class="fa fa-ban"></i></span>
                                             <span>{{ 'member.button_block'|trans }}</span>

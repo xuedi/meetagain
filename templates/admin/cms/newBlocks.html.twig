@@ -14,6 +14,7 @@
 {% for newBlock in newBlocks %}
     <article class="message is-success is-hidden" id="new-block-{{ newBlock.name }}">
         <form method="post" action="{{ path('app_admin_cms_add_block', {'id': cms.id}) }}">
+        <input type="hidden" name="_token" value="{{ csrf_token('app_admin_cms_add_block' ~ cms.id) }}"/>
         <input type="hidden" name="editLocale" value="{{ editLocale }}"/>
         <input type="hidden" name="blockType" value="{{ newBlock.value }}"/>
         <div class="message-header">

@@ -3,6 +3,7 @@
 namespace Plugin\Dishes\Form;
 
 use App\Item\TranslationFormHelper;
+use App\Service\Media\ImageService;
 use App\Item\Tag\AssignmentFormHelper;
 use Plugin\Dishes\Entity\Dish;
 use Plugin\Dishes\Service\DishService;
@@ -59,7 +60,7 @@ class DishEditType extends AbstractType
             'required' => false,
             'mapped' => false,
             'constraints' => [
-                new File(maxSize: '8000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('dishes_dish.error_invalid_image')),
+                new File(maxSize: '8000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('dishes_dish.error_invalid_image')),
             ],
         ]);
 
