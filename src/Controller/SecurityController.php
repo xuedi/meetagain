@@ -22,6 +22,7 @@ use App\Repository\EmailBlocklistRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Member\ConsentService;
 use App\Service\Member\PasswordResetService;
+use App\Service\Security\LoginGuard;
 use App\Service\Security\SecurityService;
 use DateTime;
 use DateTimeImmutable;
@@ -59,6 +60,7 @@ final class SecurityController extends AbstractController
         #[Target('registration')]
         private readonly RateLimiterFactoryInterface $registrationLimiter,
         private readonly SecurityService $securityService,
+        private readonly LoginGuard $loginGuard,
     ) {}
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE)]
@@ -76,6 +78,7 @@ final class SecurityController extends AbstractController
             'redirectPath' => $redirectPath,
             'last_username' => $lastUsername,
             'error' => $error,
+            'meta' => $this->loginGuard->isActive($request) ? $this->loginGuard->createMeasuresForm()->createView() : null,
         ]);
     }
 

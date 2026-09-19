@@ -373,6 +373,7 @@ profile_social:
     button_load_all: 'Load all'
     find_more_hint: 'Find more people to follow at the member page or ask for their username at the next meetup.'
     activity_login: 'Logged in'
+    activity_login_measures_activated: 'Extra login security measures activated for %ip% after %attempts% failed attempts'
     activity_circulation_donated: 'Added a copy to %circulation%'
     activity_circulation_requested: 'Joined a waiting list in %circulation%'
     activity_circulation_completed: 'Completed a handover in %circulation%'

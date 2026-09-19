@@ -12,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class CaptchaController extends AbstractController
 {
-    private const array REFRESHABLE_FORMS = ['app_register', 'app_reset', 'app_contact'];
+    private const array REFRESHABLE_FORMS = ['app_register', 'app_reset', 'app_contact', 'app_login'];
 
     public function __construct(
         private readonly CaptchaService $captchaService,

@@ -86,9 +86,7 @@ abstract class AbstractSecurityProvider implements SecurityProviderInterface
         $stateKey = $this->resolveStateKey($sessionId, $ip);
         $state = $this->loadState($stateKey);
 
-        $alreadyBlocked =
-            ($state['recommendation'] ?? null) === SecurityRecommendation::Block->value
-            || ($state['recommendation'] ?? null) === SecurityRecommendation::BlockShortCircuit->value;
+        $alreadyBlocked = SecurityRecommendation::tryFrom((string) ($state['recommendation'] ?? ''))?->isBlocking() ?? false;
 
         if ($readOnly || !$this->handlesType($type) || $alreadyBlocked) {
             $details = $state['details'] ?? [];

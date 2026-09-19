@@ -8,9 +8,9 @@
     once per guest form and pass that form's meta child.
 
     Used in:    templates/security/register.html.twig, templates/security/reset.html.twig,
-                templates/support/index.html.twig
+                templates/security/login.html.twig, templates/support/index.html.twig
     Parameters:
-        - form (FormView, required)   -- the meta child of the surrounding form
+        - form (FormView, required)   -- the meta child of the surrounding form, or the standalone login meta form
         - label (string, optional)    -- captcha label key; default: 'security.label_captcha'
     Depends on: assets/js/captcha-counter.js, assets/js/human-check.js,
                 _components/captcha_refresh.html.twig (the form the refresh button submits)

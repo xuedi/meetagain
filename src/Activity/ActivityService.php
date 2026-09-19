@@ -23,7 +23,7 @@ readonly class ActivityService
         private iterable $enrichers,
     ) {}
 
-    public function log(string $type, User $user, array $meta = []): void
+    public function log(string $type, ?User $user, array $meta = []): void
     {
         foreach ($this->enrichers as $enricher) {
             try {

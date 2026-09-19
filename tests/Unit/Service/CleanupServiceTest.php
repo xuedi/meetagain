@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
+use App\Repository\IncidentRepository;
 use App\Repository\SupportRequestRepository;
 use App\Repository\UserRepository;
 use App\Service\Security\MeasureLogger;
@@ -36,11 +37,13 @@ class CleanupServiceTest extends TestCase
         ?ThreadService $threadService = null,
         ?ClockInterface $clock = null,
         ?ExtendedFilesystem $fs = null,
+        ?IncidentRepository $incidentRepo = null,
     ): CleanupService {
         return new CleanupService(
             imageRepo: $imageRepo ?? $this->createStub(ImageRepository::class),
             userRepo: $userRepo ?? $this->createStub(UserRepository::class),
             supportRequestRepo: $supportRequestRepo ?? $this->createStub(SupportRequestRepository::class),
+            incidentRepo: $incidentRepo ?? $this->createStub(IncidentRepository::class),
             threadService: $threadService ?? $this->createStub(ThreadService::class),
             measureLogger: $this->createStub(MeasureLogger::class),
             measureSettings: $this->createStub(MeasureSettings::class),
@@ -51,6 +54,24 @@ class CleanupServiceTest extends TestCase
             fs: $fs ?? $this->createStub(ExtendedFilesystem::class),
             pendingImportDir: '/app/var/import',
         );
+    }
+
+    public function testRemoveExpiredIncidentsDeletesIncidentsEndedMoreThanHalfAYearAgo(): void
+    {
+        // Arrange
+        $incidentRepo = $this->createMock(IncidentRepository::class);
+        $incidentRepo
+            ->expects($this->once())
+            ->method('deleteEndedBefore')
+            ->with(new DateTimeImmutable('2026-02-20 12:00:00', new DateTimeZone('UTC')))
+            ->willReturn(4);
+        $subject = $this->createService(incidentRepo: $incidentRepo);
+
+        // Act
+        $deleted = $subject->removeExpiredIncidents();
+
+        // Assert
+        static::assertSame(4, $deleted);
     }
 
     public function testRemoveStaleImportArchivesDeletesUploadsWaitingLongerThanADay(): void

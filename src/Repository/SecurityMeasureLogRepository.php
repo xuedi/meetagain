@@ -126,10 +126,17 @@ class SecurityMeasureLogRepository extends ServiceEntityRepository
     /**
      * @return list<SecurityMeasureLog>
      */
-    public function recentBlocks(int $limit, ?DateTimeImmutable $sinceDay = null): array
-    {
+    public function recentBlocks(
+        int $limit,
+        ?DateTimeImmutable $sinceDay = null,
+        ?SecurityMeasure $measure = null,
+        ?string $context = null,
+        ?string $ip = null,
+    ): array {
         $qb = $this
             ->createQueryBuilder('s')
+            ->leftJoin('s.incident', 'i')
+            ->addSelect('i')
             ->where('s.outcome = :outcome')
             ->setParameter('outcome', SecurityMeasureOutcome::Blocked->value)
             ->orderBy('s.createdAt', 'DESC')
@@ -138,8 +145,71 @@ class SecurityMeasureLogRepository extends ServiceEntityRepository
         if ($sinceDay !== null) {
             $qb->andWhere('s.day >= :sinceDay')->setParameter('sinceDay', $sinceDay);
         }
+        if ($measure !== null) {
+            $qb->andWhere('s.measure = :measure')->setParameter('measure', $measure->value);
+        }
+        if ($context !== null) {
+            $qb->andWhere('s.context = :context')->setParameter('context', $context);
+        }
+        if ($ip !== null) {
+            $qb->andWhere('s.ip = :ip')->setParameter('ip', $ip);
+        }
 
         return array_values($qb->getQuery()->getResult());
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function blockedContexts(): array
+    {
+        $rows = $this
+            ->createQueryBuilder('s')
+            ->select('DISTINCT s.context AS context')
+            ->where('s.outcome = :outcome')
+            ->andWhere('s.context IS NOT NULL')
+            ->setParameter('outcome', SecurityMeasureOutcome::Blocked->value)
+            ->orderBy('s.context', 'ASC')
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        return array_values(array_map(strval(...), $rows));
+    }
+
+    /**
+     * @return list<SecurityMeasureLog>
+     */
+    public function findUnlinkedBlocksForIp(string $ip, DateTimeImmutable $since): array
+    {
+        return array_values($this
+            ->createQueryBuilder('s')
+            ->where('s.outcome = :outcome')
+            ->andWhere('s.ip = :ip')
+            ->andWhere('s.incident IS NULL')
+            ->andWhere('s.createdAt >= :since')
+            ->setParameter('outcome', SecurityMeasureOutcome::Blocked->value)
+            ->setParameter('ip', $ip)
+            ->setParameter('since', $since)
+            ->getQuery()
+            ->getResult());
+    }
+
+    /**
+     * @return list<SecurityMeasureLog>
+     */
+    public function findBlocksBetween(DateTimeImmutable $from, DateTimeImmutable $to, int $limit): array
+    {
+        return array_values($this
+            ->createQueryBuilder('s')
+            ->where('s.outcome = :outcome')
+            ->andWhere('s.createdAt >= :from')
+            ->andWhere('s.createdAt < :to')
+            ->setParameter('outcome', SecurityMeasureOutcome::Blocked->value)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult());
     }
 
     public function deleteOlderThan(DateTimeImmutable $cutoffDay): int

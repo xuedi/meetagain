@@ -373,6 +373,7 @@ profile_social:
     button_load_all: 'Alle anzeigen'
     find_more_hint: 'Finde mehr Leute zum Folgen auf der Mitgliederseite oder frage beim nächsten Treffen nach ihrem Nutzernamen.'
     activity_login: 'Angemeldet'
+    activity_login_measures_activated: 'Zusätzliche Login-Sicherheitsmaßnahmen für %ip% nach %attempts% fehlgeschlagenen Versuchen aktiviert'
     activity_circulation_donated: 'Hat ein Exemplar zu %circulation% hinzugefügt'
     activity_circulation_requested: 'Steht auf einer Warteliste in %circulation%'
     activity_circulation_completed: 'Hat eine Übergabe in %circulation% abgeschlossen'

@@ -2,11 +2,13 @@
 
 namespace App\Form;
 
+use App\Enum\SecurityEventType;
 use App\Enum\SecurityMeasure;
 use App\Service\Security\CaptchaService;
 use App\Service\Security\ChallengeSigner;
 use App\Service\Security\MeasureLogger;
 use App\Service\Security\MeasureSettings;
+use App\Service\Security\SecurityService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -17,6 +19,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -33,6 +36,7 @@ final class HumanCheckType extends AbstractType
         private readonly MeasureLogger $measureLogger,
         private readonly RequestStack $requestStack,
         private readonly TranslatorInterface $translator,
+        private readonly SecurityService $securityService,
         private readonly int $humanCheckMinElapsedMs = 2000,
     ) {}
 
@@ -114,6 +118,7 @@ final class HumanCheckType extends AbstractType
         $request = $this->requestStack->getCurrentRequest();
         [$stamp, $stampReason] = $this->readStamp($form, $context);
         $genericErrorAdded = false;
+        $reasons = [];
 
         foreach (SecurityMeasure::formMeasures() as $measure) {
             if (!$this->isEnabled($measure)) {
@@ -133,6 +138,7 @@ final class HumanCheckType extends AbstractType
             }
 
             $this->measureLogger->recordBlock($measure, $context, $request, $detail);
+            $reasons[] = (string) ($detail['reason'] ?? $measure->value);
 
             if ($measure === SecurityMeasure::ImageCaptcha || $genericErrorAdded) {
                 continue;
@@ -141,6 +147,25 @@ final class HumanCheckType extends AbstractType
             $form->addError(new FormError($this->translator->trans('security.human_check_failed')));
             $genericErrorAdded = true;
         }
+
+        if ($reasons === [] || $request === null || $this->isCrossSite($request)) {
+            return;
+        }
+
+        $this->securityService->event(SecurityEventType::FormMeasure, $request, [
+            'context' => $context,
+            'reasons' => array_values(array_unique($reasons)),
+        ]);
+    }
+
+    private function isCrossSite(Request $request): bool
+    {
+        $origin = $request->headers->get('Origin');
+        $fetchSite = $request->headers->get('Sec-Fetch-Site');
+        $foreignOrigin = $origin !== null && $origin !== $request->getSchemeAndHttpHost();
+        $foreignFetch = $fetchSite !== null && !in_array($fetchSite, ['same-origin', 'none'], true);
+
+        return $foreignOrigin || $foreignFetch;
     }
 
     /**
@@ -159,7 +184,7 @@ final class HumanCheckType extends AbstractType
 
         $stamp = $this->signer->verify($submitted, $context);
         if ($stamp === null) {
-            return [null, 'invalid_stamp'];
+            return [null, $this->signer->rejectionReason($submitted, $context)];
         }
 
         if (!$this->signer->burn($stamp['nonce'])) {

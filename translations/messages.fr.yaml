@@ -373,6 +373,7 @@ profile_social:
     button_load_all: 'Tout charger'
     find_more_hint: 'Trouve plus de personnes à suivre sur la page des membres ou demande leur nom d''utilisateur lors de la prochaine rencontre.'
     activity_login: 'Connecté'
+    activity_login_measures_activated: 'Mesures de sécurité supplémentaires activées pour la connexion depuis %ip% après %attempts% tentatives échouées'
     activity_circulation_donated: 'A ajouté un exemplaire à %circulation%'
     activity_circulation_requested: 'S''est inscrit sur une liste d''attente dans %circulation%'
     activity_circulation_completed: 'A terminé une remise dans %circulation%'
