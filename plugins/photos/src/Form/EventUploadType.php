@@ -2,6 +2,7 @@
 
 namespace Plugin\Photos\Form;
 
+use App\Service\Media\ImageService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -32,7 +33,7 @@ class EventUploadType extends AbstractType
                 'constraints' => [
                     new Count(min: 1, minMessage: $this->translator->trans('photos_event.error_no_image')),
                     new All([
-                        new File(maxSize: '16000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('photos_event.error_invalid_image')),
+                        new File(maxSize: '16000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('photos_event.error_invalid_image')),
                     ]),
                 ],
             ])

@@ -32,6 +32,14 @@ readonly class UserChecker implements UserCheckerInterface
     {
     }
 
+    public static function assertActive(User $user): void
+    {
+        $status = $user->getStatus();
+        if ($status !== UserStatus::Active) {
+            throw new CustomUserMessageAccountStatusException(self::statusMessage($status));
+        }
+    }
+
     #[Override]
     public function checkPostAuth(UserInterface $user, #[SensitiveParameter] ?TokenInterface $token = null): void
     {
@@ -39,13 +47,10 @@ readonly class UserChecker implements UserCheckerInterface
             return;
         }
 
-        $status = $user->getStatus();
-        if ($status !== UserStatus::Active) {
-            throw new CustomUserMessageAccountStatusException($this->statusMessage($status));
-        }
+        self::assertActive($user);
 
         $request = $this->requestStack->getCurrentRequest();
-        if (!$request instanceof Request) {
+        if (!$request instanceof Request || $request->attributes->getBoolean('_stateless')) {
             return;
         }
 
@@ -62,7 +67,7 @@ readonly class UserChecker implements UserCheckerInterface
         }
     }
 
-    private function statusMessage(?UserStatus $status): string
+    private static function statusMessage(?UserStatus $status): string
     {
         return match ($status) {
             UserStatus::Registered => 'security.account_status_registered',

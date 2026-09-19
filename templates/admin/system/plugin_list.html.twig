@@ -33,19 +33,23 @@
                                 <button class="button is-danger is-light" disabled>{{ 'admin_system_plugins.button_uninstall'|trans }}</button>
                                 <a href="{{ path('admin_plugin_disable', {key: plugin.key}) }}"
                                    class="button is-danger is-light"
-                                   data-post>{{ 'admin_system_plugins.button_disable'|trans }}</a>
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('admin_plugin_disable' ~ plugin.key) }}">{{ 'admin_system_plugins.button_disable'|trans }}</a>
                             {% else %}
                                 <a href="{{ path('admin_plugin_uninstall', {key: plugin.key}) }}"
                                    class="button is-danger is-light"
-                                   data-post>{{ 'admin_system_plugins.button_uninstall'|trans }}</a>
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('admin_plugin_uninstall' ~ plugin.key) }}">{{ 'admin_system_plugins.button_uninstall'|trans }}</a>
                                 <a href="{{ path('admin_plugin_enable', {key: plugin.key}) }}"
                                    class="button is-success is-light"
-                                   data-post>{{ 'admin_system_plugins.button_enable'|trans }}</a>
+                                   data-post
+                                   data-csrf-token="{{ csrf_token('admin_plugin_enable' ~ plugin.key) }}">{{ 'admin_system_plugins.button_enable'|trans }}</a>
                             {% endif %}
                         {% else %}
                             <a href="{{ path('admin_plugin_install', {key: plugin.key}) }}"
                                class="button is-success is-light"
-                               data-post>{{ 'admin_system_plugins.button_install'|trans }}</a>
+                               data-post
+                               data-csrf-token="{{ csrf_token('admin_plugin_install' ~ plugin.key) }}">{{ 'admin_system_plugins.button_install'|trans }}</a>
                             <button class="button is-success is-light" disabled>{{ 'admin_system_plugins.button_enable'|trans }}</button>
                         {% endif %}
                         {% if plugin.enabled and plugin.key in configurableKeys %}

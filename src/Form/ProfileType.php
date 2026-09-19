@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use App\Service\Config\LanguageService;
+use App\Service\Media\ImageService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -42,7 +43,7 @@ class ProfileType extends AbstractType
             'label' => false,
             'attr' => ['class' => 'is-hidden'],
             'constraints' => [
-                new File(maxSize: '10M', mimeTypes: ['image/*'], mimeTypesMessage: 'shared.form_image_upload_mime_error_square'),
+                new File(maxSize: '10M', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: 'shared.form_image_upload_mime_error_square'),
             ],
         ])->add('name', TextType::class, [
             'label' => 'profile.form_label_username',

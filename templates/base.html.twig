@@ -34,10 +34,21 @@
     {% block twitter_image %}{% if ogImage %}<meta name="twitter:image" content="{{ ogImage.absoluteUrl }}">
     <meta name="twitter:image:alt" content="{{ ogImage.altText|e('html_attr') }}">{% endif %}{% endblock %}
 
-    <script type="application/ld+json">{{ get_organization_schema()|raw }}</script>
+    <script type="application/ld+json">{{ get_organization_schema() }}</script>
 
     {% if breadcrumbs is defined and breadcrumbs|length > 1 %}
-    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{% for crumb in breadcrumbs %}{"@type":"ListItem","position":{{ loop.index }},"name":{{ crumb.label|json_encode|raw }}{% if crumb.url is defined %},"item":{{ crumb.url|json_encode|raw }}{% endif %}}{% if not loop.last %},{% endif %}{% endfor %}]}</script>
+    {% set breadcrumbItems = [] %}
+    {% for crumb in breadcrumbs %}
+        {% set breadcrumbItems = breadcrumbItems|merge([
+            {'@type': 'ListItem', 'position': loop.index, 'name': crumb.label}
+                |merge(crumb.url is defined ? {'item': crumb.url} : {})
+        ]) %}
+    {% endfor %}
+    <script type="application/ld+json">{{ ld_json({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        'itemListElement': breadcrumbItems,
+    }) }}</script>
     {% endif %}
 
     {% block json_ld %}{% endblock %}

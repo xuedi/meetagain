@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Service\Media\ImageService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -24,7 +25,7 @@ class SiteLogoType extends AbstractType
             'required' => false,
             'label' => 'admin_system_theme.field_logo',
             'constraints' => [
-                new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('admin_system_theme.logo_mime_error')),
+                new File(maxSize: '5000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('admin_system_theme.logo_mime_error')),
             ],
         ]);
     }

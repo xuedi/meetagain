@@ -4,6 +4,7 @@ namespace Plugin\Films\Service;
 
 use Plugin\Films\Entity\ExternalSource;
 use Psr\Log\LoggerInterface;
+use SensitiveParameter;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 
@@ -14,7 +15,7 @@ readonly class OmdbLookup implements FilmMetadataLookupInterface
     public function __construct(
         private HttpClientInterface $httpClient,
         private LoggerInterface $logger,
-        #[\SensitiveParameter]
+        #[SensitiveParameter]
         private string $apiKey,
     ) {}
 
@@ -47,7 +48,7 @@ readonly class OmdbLookup implements FilmMetadataLookupInterface
 
             return $results;
         } catch (Throwable $e) {
-            $this->logger->error('OMDb search failed: ' . $e->getMessage(), ['query' => $query]);
+            $this->logger->error('OMDb search failed: ' . $this->redact($e->getMessage()), ['query' => $query]);
 
             return [];
         }
@@ -78,7 +79,7 @@ readonly class OmdbLookup implements FilmMetadataLookupInterface
                 posterUrl: ($data['Poster'] ?? 'N/A') !== 'N/A' ? $data['Poster'] : null,
             );
         } catch (Throwable $e) {
-            $this->logger->error('OMDb fetch failed: ' . $e->getMessage(), ['id' => $externalId]);
+            $this->logger->error('OMDb fetch failed: ' . $this->redact($e->getMessage()), ['id' => $externalId]);
 
             return null;
         }
@@ -87,6 +88,11 @@ readonly class OmdbLookup implements FilmMetadataLookupInterface
     public function getSource(): ExternalSource
     {
         return ExternalSource::Omdb;
+    }
+
+    private function redact(string $message): string
+    {
+        return (string) preg_replace('/apikey=[^&"\'\s]*/i', 'apikey=***', $message);
     }
 
     private function parseRuntime(?string $runtime): ?int

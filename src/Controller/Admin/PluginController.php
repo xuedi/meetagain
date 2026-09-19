@@ -11,7 +11,9 @@ use App\Service\Admin\CommandService;
 use App\Service\Admin\PluginSettingsService;
 use App\Service\Config\PluginService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -64,8 +66,10 @@ final class PluginController extends AbstractController implements AdminNavigati
     }
 
     #[Route('/admin/plugin/install/{key}', name: 'admin_plugin_install', methods: ['POST'])]
-    public function install(string $key): Response
+    public function install(string $key, Request $request): Response
     {
+        $this->assertToken($request, 'admin_plugin_install' . $key);
+
         try {
             $this->pluginService->install($key);
             $this->commandService->executeSubprocessMigrations();
@@ -82,8 +86,10 @@ final class PluginController extends AbstractController implements AdminNavigati
     }
 
     #[Route('/admin/plugin/uninstall/{key}', name: 'admin_plugin_uninstall', methods: ['POST'])]
-    public function uninstall(string $key): Response
+    public function uninstall(string $key, Request $request): Response
     {
+        $this->assertToken($request, 'admin_plugin_uninstall' . $key);
+
         $this->pluginService->uninstall($key);
         $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_uninstalled', [
             '%plugin%' => $key,
@@ -93,8 +99,10 @@ final class PluginController extends AbstractController implements AdminNavigati
     }
 
     #[Route('/admin/plugin/enable/{key}', name: 'admin_plugin_enable', methods: ['POST'])]
-    public function enable(string $key): Response
+    public function enable(string $key, Request $request): Response
     {
+        $this->assertToken($request, 'admin_plugin_enable' . $key);
+
         $this->pluginService->enable($key);
         $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_enabled', [
             '%plugin%' => $key,
@@ -104,13 +112,22 @@ final class PluginController extends AbstractController implements AdminNavigati
     }
 
     #[Route('/admin/plugin/disable/{key}', name: 'admin_plugin_disable', methods: ['POST'])]
-    public function disable(string $key): Response
+    public function disable(string $key, Request $request): Response
     {
+        $this->assertToken($request, 'admin_plugin_disable' . $key);
+
         $this->pluginService->disable($key);
         $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_disabled', [
             '%plugin%' => $key,
         ]));
 
         return $this->redirectToRoute('app_admin_plugin');
+    }
+
+    private function assertToken(Request $request, string $tokenId): void
+    {
+        if (!$this->isCsrfTokenValid($tokenId, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
     }
 }

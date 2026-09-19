@@ -30,7 +30,7 @@ readonly class PasswordResetService
     public function requestReset(string $email): ?User
     {
         if ($this->blocklist->isBlocked($email)) {
-            $this->logger->info('Password reset refused: email on blocklist', ['email' => $email]);
+            $this->logger->info('Password reset refused: the address is on the email blocklist');
 
             return null;
         }
@@ -65,8 +65,8 @@ readonly class PasswordResetService
     public function resetPassword(User $user, #[SensitiveParameter] string $newPassword): bool
     {
         if ($this->blocklist->isBlocked((string) $user->getEmail())) {
-            $this->logger->info('Password reset finalize refused: email on blocklist', [
-                'email' => $user->getEmail(),
+            $this->logger->info('Password reset finalize refused: the address is on the email blocklist', [
+                'userId' => $user->getId(),
             ]);
 
             return false;

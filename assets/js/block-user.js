@@ -63,7 +63,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const url = event.currentTarget.getAttribute('href');
             const userId = event.currentTarget.dataset.userId;
 
-            maFetch(url, true, 'POST').then(() => {
+            const formData = new FormData();
+            formData.append('_token', event.currentTarget.dataset.csrfToken || '');
+
+            maFetch(url, true, formData).then(() => {
                 const row = document.getElementById('block-' + userId);
                 if (row) {
                     row.remove();
@@ -88,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-            maFetch(url, true, 'POST').then(() => {
+            maFetch(url, true, new FormData(form)).then(() => {
                 window.location.reload();
             });
         });

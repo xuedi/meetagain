@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Service\Media\ImageService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -19,7 +20,7 @@ class WebsiteImageType extends AbstractType
             'required' => false,
             'label' => 'admin_system_config.field_website_image_label',
             'constraints' => [
-                new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: 'shared.form_image_upload_mime_error'),
+                new File(maxSize: '5000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: 'shared.form_image_upload_mime_error'),
             ],
         ]);
     }

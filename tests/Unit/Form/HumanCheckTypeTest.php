@@ -235,6 +235,19 @@ final class HumanCheckTypeTest extends TestCase
         static::assertSame([SecurityMeasure::ProofOfWork], $this->passes);
     }
 
+    public function testAStampClaimingZeroDifficultyStillHasToDoTheConfiguredWork(): void
+    {
+        // Arrange
+        $form = $this->humanCheck([SecurityMeasure::ProofOfWork], difficulty: 16);
+        $forged = $this->signer->issue(self::CONTEXT, 0);
+
+        // Act
+        $form->submit(['stamp' => $forged, 'proof' => 'anything']);
+
+        // Assert
+        static::assertSame([[SecurityMeasure::ProofOfWork, 'invalid_proof']], $this->blocks);
+    }
+
     public function testOneGenericErrorIsShownEvenWhenTwoMeasuresBlock(): void
     {
         // Arrange

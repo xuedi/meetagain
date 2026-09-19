@@ -4,6 +4,7 @@ namespace Plugin\Photos\Form;
 
 use App\Item\Tag\AssignmentFormHelper;
 use App\Item\TranslationFormHelper;
+use App\Service\Media\ImageService;
 use Override;
 use Plugin\Photos\Service\PhotoService;
 use Symfony\Component\Form\AbstractType;
@@ -34,7 +35,7 @@ class PhotoAddType extends AbstractType
             'mapped' => false,
             'constraints' => [
                 new NotNull(message: $this->translator->trans('photos_photo.error_no_image')),
-                new File(maxSize: '16000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('photos_photo.error_invalid_image')),
+                new File(maxSize: '16000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('photos_photo.error_invalid_image')),
             ],
         ]);
 

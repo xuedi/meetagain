@@ -71,6 +71,11 @@ document.addEventListener('change', function (event) {
     const formData = new FormData();
     formData.append('image_upload[newImage]', file);
 
+    const token = trigger.getAttribute('data-csrf-token');
+    if (token) {
+        formData.append('image_upload[_token]', token);
+    }
+
     maFetch(url, false, formData)
         .then(() => location.reload())
         .catch(() => location.reload());

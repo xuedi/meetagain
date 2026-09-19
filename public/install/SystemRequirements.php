@@ -15,7 +15,7 @@ class SystemRequirements
             'tag_class' => $phpPassed ? 'is-success' : 'is-danger',
         ];
 
-        $extensions = ['pdo', 'pdo_mysql', 'intl', 'iconv', 'ctype', 'json', 'mbstring'];
+        $extensions = ['pdo', 'pdo_mysql', 'intl', 'iconv', 'ctype', 'json', 'mbstring', 'sodium'];
         foreach ($extensions as $ext) {
             $isLoaded = extension_loaded($ext);
             $requirements['ext_' . $ext] = [

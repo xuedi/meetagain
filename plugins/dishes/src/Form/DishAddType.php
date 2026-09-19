@@ -4,6 +4,7 @@ namespace Plugin\Dishes\Form;
 
 use App\Item\Tag\AssignmentFormHelper;
 use App\Service\Config\LanguageService;
+use App\Service\Media\ImageService;
 use Plugin\Dishes\Service\DishService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -64,7 +65,7 @@ class DishAddType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'constraints' => [
-                    new File(maxSize: '8000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('dishes_dish.error_invalid_image')),
+                    new File(maxSize: '8000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('dishes_dish.error_invalid_image')),
                 ],
             ]);
 

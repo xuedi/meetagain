@@ -2,6 +2,7 @@
 
 namespace App\Form;
 
+use App\Service\Media\ImageService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -22,7 +23,7 @@ class ImageUploadType extends AbstractType
                 new Image(
                     maxSize: '10M',
                     mimeTypes: [
-                        'image/*',
+                        ...ImageService::ACCEPTED_MIME_TYPES,
                     ],
                     mimeTypesMessage: 'shared.form_image_upload_mime_error',
                 ),

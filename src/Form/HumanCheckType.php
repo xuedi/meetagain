@@ -224,13 +224,15 @@ final class HumanCheckType extends AbstractType
             return ['reason' => $stampReason ?? 'missing_stamp'];
         }
 
+        $difficulty = $this->measureSettings->proofOfWorkDifficulty();
+
         $proof = (string) $form->get('proof')->getData();
         if ($proof === '') {
-            return ['reason' => 'missing_proof', 'difficulty' => $stamp['difficulty']];
+            return ['reason' => 'missing_proof', 'difficulty' => $difficulty];
         }
 
-        if (!$this->signer->isProofValid($stamp['nonce'], $proof, $stamp['difficulty'])) {
-            return ['reason' => 'invalid_proof', 'difficulty' => $stamp['difficulty']];
+        if (!$this->signer->isProofValid($stamp['nonce'], $proof, $difficulty)) {
+            return ['reason' => 'invalid_proof', 'difficulty' => $difficulty];
         }
 
         return null;

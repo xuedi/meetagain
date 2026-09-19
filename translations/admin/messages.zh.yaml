@@ -642,6 +642,8 @@ admin_secretbox:
     heading_consumers: '使用者'
     label_key_present: 'APP_SECRET_BOX_KEY已设置'
     label_key_valid: '密钥长度有效（32字节）'
+    label_key_published: '密钥已在代码库中公开'
+    status_key_published: '是 - 请立即更换，任何拿到代码副本的人都能解密相关数据'
     label_sodium_loaded: 'libsodium扩展已加载'
     status_yes: '是'
     status_no: '否'

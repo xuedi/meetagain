@@ -12,6 +12,7 @@
             'content': 'admin_event.warning_delete_content'|trans,
             'buttonLabel': 'admin_event.warning_delete_button'|trans,
             'buttonUrl': path('app_admin_event_delete', {'id': event.id}),
+            'csrfToken': 'app_admin_event_delete' ~ event.id,
             'type': 'danger'
         } %}
 
@@ -21,6 +22,7 @@
             'content': 'admin_event.warning_cancel_content'|trans,
             'buttonLabel': 'admin_event.warning_cancel_button'|trans,
             'buttonUrl': path('app_admin_event_cancel', {'id': event.id}),
+            'csrfToken': 'app_admin_event_cancel' ~ event.id,
             'type': 'warning'
         } %}
 
@@ -30,6 +32,7 @@
             'content': 'admin_event.warning_uncancel_content'|trans,
             'buttonLabel': 'admin_event.warning_uncancel_button'|trans,
             'buttonUrl': path('app_admin_event_uncancel', {'id': event.id}),
+            'csrfToken': 'app_admin_event_uncancel' ~ event.id,
             'type': 'warning'
         } %}
 

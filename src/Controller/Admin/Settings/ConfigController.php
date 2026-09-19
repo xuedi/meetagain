@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -119,6 +120,10 @@ final class ConfigController extends AbstractSettingsController implements Admin
     public function boolean(Request $request, string $name): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SETTINGS_UPDATE);
+
+        if (!$this->isCsrfTokenValid('app_admin_system_boolean' . $name, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
 
         $value = $this->configService->toggleBoolean($name);
 

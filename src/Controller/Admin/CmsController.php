@@ -51,6 +51,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[IsGranted('ROLE_STEWARD'), Route('/admin/cms')]
 final class CmsController extends AbstractController implements AdminNavigationInterface
 {
+    private const string ADD_TOKEN_ID = 'app_admin_cms_add';
+
     public function getAdminNavigation(): ?AdminNavigationConfig
     {
         return new AdminNavigationConfig(
@@ -84,6 +86,7 @@ final class CmsController extends AbstractController implements AdminNavigationI
 
         $newForm = $this->createForm(CmsType::class, null, [
             'action' => $this->generateUrl('app_admin_cms_add'),
+            'csrf_token_id' => self::ADD_TOKEN_ID,
             'is_admin' => $isAdmin,
         ]);
 
@@ -282,10 +285,15 @@ final class CmsController extends AbstractController implements AdminNavigationI
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::CMS_PAGE_CREATE);
 
+        $submitted = $request->request->all('cms');
+        if (!$this->isCsrfTokenValid(self::ADD_TOKEN_ID, (string) ($submitted['_token'] ?? ''))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $user = $this->getAuthedUser();
 
         $newPage = new Cms();
-        $newPage->setSlug($request->request->all('cms')['slug']);
+        $newPage->setSlug($submitted['slug']);
         $newPage->setPublished(false);
         $newPage->setLocked(false);
         $newPage->setCreatedBy($user);

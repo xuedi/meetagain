@@ -14,6 +14,7 @@ use App\Repository\EventTranslationRepository;
 use App\Repository\HostRepository;
 use App\Repository\LocationRepository;
 use App\Service\Config\LanguageService;
+use App\Service\Media\ImageService;
 use Override;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -136,7 +137,7 @@ class EventType extends AbstractType
                 'required' => false,
                 'label' => $this->translator->trans('admin_event.form_label_preview_image'),
                 'constraints' => [
-                    new File(maxSize: '5000k', mimeTypes: ['image/*'], mimeTypesMessage: $this->translator->trans('admin_event.form_image_mime_error')),
+                    new File(maxSize: '5000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('admin_event.form_image_mime_error')),
                 ],
             ])
             ->add('allFollowing', CheckboxType::class, [

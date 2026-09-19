@@ -108,6 +108,7 @@
             {% endif %}
 
             <form method="post" action="{{ path('app_admin_system_import') }}" enctype="multipart/form-data">
+                <input type="hidden" name="_token" value="{{ csrf_token('admin_system_import_upload') }}">
                 <div class="field">
                     <label class="label">{{ 'admin_system_import.label_zip_file'|trans }}</label>
                     <div class="control">

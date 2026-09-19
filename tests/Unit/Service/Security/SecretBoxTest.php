@@ -93,4 +93,22 @@ class SecretBoxTest extends TestCase
         $this->expectException(SecretBoxException::class);
         new SecretBox('not!!valid_base64===');
     }
+
+    public function testAPublishedKeyStillWorksSoTheSiteStaysUp(): void
+    {
+        // Arrange
+        $box = new SecretBox('ZQu5U3lD+Cz9mAC8RBXM0G39yDGZ1dYdxP7B5fkB7kc=');
+
+        // Act
+        $roundTripped = $box->decrypt($box->encrypt('still readable'));
+
+        // Assert
+        static::assertSame('still readable', $roundTripped);
+    }
+
+    public function testTheLeakedKeyIsListedAsPublished(): void
+    {
+        // Act / Assert
+        static::assertContains('ZQu5U3lD+Cz9mAC8RBXM0G39yDGZ1dYdxP7B5fkB7kc=', SecretBox::PUBLISHED_KEYS);
+    }
 }

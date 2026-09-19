@@ -76,6 +76,10 @@ final class FilmController extends AbstractController
     #[IsGranted('ROLE_STEWARD')]
     public function import(Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('app_plugin_films_film_import', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $externalId = (string) $request->request->get('externalId', '');
         $source = (string) $request->request->get('source', '');
 

@@ -13,6 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Override;
 use SensitiveParameter;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -20,7 +21,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'security.validator_email_unique')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -180,6 +181,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     // Kept after Symfony 8 dropped eraseCredentials() from UserInterface: still called by our own code
     public function eraseCredentials(): void
     {
+    }
+
+    #[Override]
+    public function isEqualTo(UserInterface $user): bool
+    {
+        if (!$user instanceof self) {
+            return false;
+        }
+
+        return $user->getId() === $this->getId()
+            && $user->getStatus() === $this->getStatus()
+            && $user->getRole() === $this->getRole()
+            && $user->getUserIdentifier() === $this->getUserIdentifier();
     }
 
     public function getCreatedAt(): ?DateTimeImmutable

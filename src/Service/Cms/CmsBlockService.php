@@ -35,67 +35,67 @@ readonly class CmsBlockService
         $this->em->flush();
 
         $this->reorderBlocks($page->getId(), $locale);
-        $this->entityActionDispatcher->dispatch(EntityAction::UpdateCmsBlock, $page->getId());
+        $this->entityActionDispatcher->dispatch(EntityAction::UpdateCmsBlock, (int) $page->getId());
 
         return $block;
     }
 
-    public function updateBlock(int $blockId, CmsBlockType $type, array $payload): CmsBlock
+    public function updateBlock(CmsBlock $block, CmsBlockType $type, array $payload): CmsBlock
     {
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw new RuntimeException('Could not load block');
-        }
+        $pageId = $this->pageIdOf($block);
 
         $block->setJson($this->hydrator->hydrate($type, $payload, $block->getImage())->toArray());
         $this->em->persist($block);
         $this->em->flush();
 
-        $this->entityActionDispatcher->dispatch(EntityAction::UpdateCmsBlock, $block->getPage()->getId());
+        $this->entityActionDispatcher->dispatch(EntityAction::UpdateCmsBlock, $pageId);
 
         return $block;
     }
 
-    public function deleteBlock(int $blockId): void
+    public function deleteBlock(CmsBlock $block): void
     {
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw new RuntimeException('Could not load block');
-        }
+        $pageId = $this->pageIdOf($block);
 
-        $pageId = $block->getPage()->getId();
         $this->em->remove($block);
         $this->em->flush();
 
         $this->entityActionDispatcher->dispatch(EntityAction::UpdateCmsBlock, $pageId);
     }
 
-    public function moveBlockUp(int $pageId, int $blockId, string $locale): void
+    public function moveBlockUp(CmsBlock $block): void
     {
-        $this->adjustPriority($pageId, $blockId, $locale, -1.5);
+        $this->adjustPriority($block, -1.5);
     }
 
-    public function moveBlockDown(int $pageId, int $blockId, string $locale): void
+    public function moveBlockDown(CmsBlock $block): void
     {
-        $this->adjustPriority($pageId, $blockId, $locale, 1.5);
+        $this->adjustPriority($block, 1.5);
     }
 
-    private function adjustPriority(int $pageId, int $blockId, string $locale, float $offset): void
+    private function adjustPriority(CmsBlock $block, float $offset): void
     {
-        $block = $this->blockRepo->find($blockId);
-        if ($block === null) {
-            throw new RuntimeException('Could not load block');
-        }
+        $pageId = $this->pageIdOf($block);
 
         $block->setPriority($block->getPriority() + $offset);
         $this->em->persist($block);
         $this->em->flush();
 
-        $this->reorderBlocks($pageId, $locale);
+        $this->reorderBlocks($pageId, (string) $block->getLanguage());
         $this->entityActionDispatcher->dispatch(EntityAction::UpdateCmsBlock, $pageId);
     }
 
-    private function reorderBlocks(int $pageId, string $locale): void
+    private function pageIdOf(CmsBlock $block): int
+    {
+        $page = $block->getPage();
+        if ($page === null) {
+            throw new RuntimeException('Could not load the page owning this block');
+        }
+
+        return (int) $page->getId();
+    }
+
+    private function reorderBlocks(?int $pageId, string $locale): void
     {
         $blocks = $this->blockRepo->findBy(['page' => $pageId, 'language' => $locale], ['priority' => 'ASC']);
 

@@ -5,6 +5,7 @@ namespace App\Portability;
 use App\Entity\Image;
 use App\Entity\User;
 use App\Enum\ImageType;
+use RuntimeException;
 
 class ImportContext
 {
@@ -33,10 +34,12 @@ class ImportContext
             return null;
         }
 
+        $imagePath = $this->resolveArchivePath($archiveRelativePath);
+
         $attribution = $this->imageAttributions[$archiveRelativePath] ?? [];
 
         $image = $this->imageImporter->import(
-            $this->extractedArchiveDir . '/' . $archiveRelativePath,
+            $imagePath,
             $type,
             $uploader ?? $this->systemUser,
             $attribution['attribution'] ?? null,
@@ -49,6 +52,23 @@ class ImportContext
         }
 
         return $image;
+    }
+
+    private function resolveArchivePath(string $relativePath): string
+    {
+        if (str_contains($relativePath, "\0") || str_contains($relativePath, '..') || str_starts_with($relativePath, '/')) {
+            throw new RuntimeException('The archive names a file outside itself: ' . $relativePath);
+        }
+
+        $path = $this->extractedArchiveDir . '/' . $relativePath;
+
+        $root = realpath($this->extractedArchiveDir);
+        $resolved = $root === false ? false : realpath($path);
+        if ($resolved !== false && !str_starts_with($resolved, $root . '/')) {
+            throw new RuntimeException('The archive links to a file outside itself: ' . $relativePath);
+        }
+
+        return $path;
     }
 
     public function getSystemUser(): User

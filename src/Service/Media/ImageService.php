@@ -24,6 +24,24 @@ use Symfony\Component\Mime\MimeTypes;
 
 readonly class ImageService
 {
+    public const array ACCEPTED_MIME_TYPES = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'image/webp',
+        'image/avif',
+        'image/heic',
+        'image/heif',
+    ];
+
+    public const array MIME_ALIASES = [
+        'image/jpg' => 'image/jpeg',
+        'image/pjpeg' => 'image/jpeg',
+        'image/x-png' => 'image/png',
+        'image/heic-sequence' => 'image/heic',
+        'image/heif-sequence' => 'image/heif',
+    ];
+
     private const int FREE_AXIS_CEILING = 2400;
 
     public function __construct(
@@ -313,19 +331,26 @@ readonly class ImageService
         return $cnt;
     }
 
+    public static function normaliseMimeType(string $mimeType): string
+    {
+        $lower = strtolower(trim($mimeType));
+
+        return self::MIME_ALIASES[$lower] ?? $lower;
+    }
+
     private function detectMimeType(UploadedFile $imageData): string
     {
         $serverMime = $imageData->getMimeType();
-        if ($serverMime !== null && $serverMime !== '') {
-            return $serverMime;
+        if ($serverMime === null || $serverMime === '') {
+            throw new RuntimeException('Could not determine MIME type for uploaded file.');
         }
 
-        $clientMime = $imageData->getClientMimeType();
-        if ($clientMime !== '' && $clientMime !== 'application/octet-stream') {
-            return $clientMime;
+        $mimeType = self::normaliseMimeType($serverMime);
+        if (!in_array($mimeType, self::ACCEPTED_MIME_TYPES, true)) {
+            throw new RuntimeException(sprintf('Refusing upload of unsupported image type "%s".', $mimeType));
         }
 
-        throw new RuntimeException('Could not determine MIME type for uploaded file.');
+        return $mimeType;
     }
 
     private function detectExtension(UploadedFile $imageData, string $mimeType): string

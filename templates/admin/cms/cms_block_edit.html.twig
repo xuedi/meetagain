@@ -41,6 +41,7 @@
     {% set form %}
         <div class="box">
             <form id="cms-block-form" method="post" action="{{ path('app_admin_cms_edit_block_save') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('app_admin_cms_edit_block_save' ~ block.id) }}"/>
                 <input type="hidden" name="blockId" value="{{ block.id }}"/>
                 <input type="hidden" name="blockType" value="{{ block.type.value }}"/>
 

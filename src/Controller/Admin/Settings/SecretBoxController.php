@@ -2,7 +2,10 @@
 
 namespace App\Controller\Admin\Settings;
 
+use App\Service\Security\SecretBox;
 use App\Service\Security\SecretBoxConsumerInterface;
+use SensitiveParameter;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,6 +20,8 @@ final class SecretBoxController extends AbstractSettingsController
         TranslatorInterface $translator,
         #[AutowireIterator(SecretBoxConsumerInterface::class)]
         private readonly iterable $consumers,
+        #[SensitiveParameter, Autowire(env: 'default::APP_SECRET_BOX_KEY')]
+        private readonly ?string $secretBoxKey = null,
     ) {
         parent::__construct($translator, 'secretbox');
     }
@@ -24,13 +29,18 @@ final class SecretBoxController extends AbstractSettingsController
     #[Route('/secretbox', name: 'app_admin_system_secretbox', methods: ['GET'])]
     public function index(): Response
     {
-        $rawKey = getenv('APP_SECRET_BOX_KEY');
-        $keyPresent = $rawKey !== false && $rawKey !== '';
+        $rawKey = $this->secretBoxKey;
+        $keyPresent = $rawKey !== null && $rawKey !== '';
         $keyValid = false;
+        $keyPublished = false;
 
         if ($keyPresent) {
             $decoded = base64_decode($rawKey, strict: true);
             $keyValid = $decoded !== false && strlen($decoded) === SODIUM_CRYPTO_SECRETBOX_KEYBYTES;
+
+            foreach (SecretBox::PUBLISHED_KEYS as $publishedKey) {
+                $keyPublished = $keyPublished || hash_equals($publishedKey, $rawKey);
+            }
         }
 
         $consumers = [];
@@ -45,6 +55,7 @@ final class SecretBoxController extends AbstractSettingsController
             'active' => 'system',
             'keyPresent' => $keyPresent,
             'keyValid' => $keyValid,
+            'keyPublished' => $keyPublished,
             'sodiumLoaded' => extension_loaded('sodium'),
             'consumers' => $consumers,
             'adminTabs' => $this->getTabs(),
