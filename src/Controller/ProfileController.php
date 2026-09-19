@@ -12,6 +12,7 @@ use App\Form\ProfileType;
 use App\Repository\EventRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
+use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\RsvpGuestService;
 use App\Service\Member\BlockingService;
 use DateTimeImmutable;
@@ -89,8 +90,14 @@ final class ProfileController extends AbstractController
         if (!$this->isCsrfTokenValid('app_profile_toggle_rsvp' . $event->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
-        if ($event->getStart() < new DateTimeImmutable()) { // does reload page for flashMessage to trigger
-            $this->addFlash('error', 'events.flash_rsvp_past');
+        $refusal = match (true) {
+            $event->isCanceled() => ['error', 'events.flash_rsvp_canceled'],
+            $event->getStart() < new DateTimeImmutable() => ['error', 'events.flash_rsvp_past'],
+            !$this->isGranted(PermissionAttribute::EVENT_RSVP, $event) => ['warning', 'events.flash_group_only'],
+            default => null,
+        };
+        if ($refusal !== null) { // does reload page for flashMessage to trigger
+            $this->addFlash(...$refusal);
 
             return new Response('', Response::HTTP_LOCKED);
         }
