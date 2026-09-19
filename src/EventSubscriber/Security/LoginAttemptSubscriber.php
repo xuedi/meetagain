@@ -4,13 +4,13 @@ namespace App\EventSubscriber\Security;
 
 use App\Activity\ActivityService;
 use App\Activity\Messages\LoginMeasuresActivated;
-use App\Controller\SecurityController;
 use App\Entity\User;
 use App\Enum\SecurityEventType;
 use App\Service\Security\LoginGuard;
 use App\Service\Security\SecurityService;
 use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
@@ -23,6 +23,8 @@ use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 readonly class LoginAttemptSubscriber implements EventSubscriberInterface
 {
+    public const string ROUTE_DEFAULT = '_login_attempt';
+    public const string HUMAN_CHECK_FAILED = 'security.human_check_failed';
     private const int BEFORE_USER_CHECKS_PRIORITY = 300;
 
     public function __construct(
@@ -45,9 +47,12 @@ readonly class LoginAttemptSubscriber implements EventSubscriberInterface
     public function onCheckPassport(CheckPassportEvent $event): void
     {
         $request = $this->requestStack->getCurrentRequest();
-        $isLoginRoute = $request?->attributes->get('_route') === SecurityController::LOGIN_ROUTE;
-        if ($request === null || !$isLoginRoute || !$this->loginGuard->isActive($request)) {
+        if ($request === null || !self::isLoginAttempt($request) || !$this->loginGuard->isActive($request)) {
             return;
+        }
+
+        if ($request->attributes->getBoolean('_stateless')) {
+            throw new CustomUserMessageAuthenticationException(self::HUMAN_CHECK_FAILED);
         }
 
         $form = $this->loginGuard->createMeasuresForm();
@@ -56,7 +61,7 @@ readonly class LoginAttemptSubscriber implements EventSubscriberInterface
             return;
         }
 
-        throw new CustomUserMessageAuthenticationException('security.human_check_failed');
+        throw new CustomUserMessageAuthenticationException(self::HUMAN_CHECK_FAILED);
     }
 
     public function onLoginFailure(LoginFailureEvent $event): void
@@ -68,7 +73,7 @@ readonly class LoginAttemptSubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        if ($request->attributes->get('_route') !== SecurityController::LOGIN_ROUTE) {
+        if (!self::isLoginAttempt($request)) {
             return;
         }
 
@@ -85,6 +90,11 @@ readonly class LoginAttemptSubscriber implements EventSubscriberInterface
     public function onLoginSuccess(LoginSuccessEvent $event): void
     {
         $this->loginGuard->reset($event->getRequest());
+    }
+
+    private static function isLoginAttempt(Request $request): bool
+    {
+        return $request->attributes->getBoolean(self::ROUTE_DEFAULT);
     }
 
     private function reportThrottle(LoginFailureEvent $event): void
