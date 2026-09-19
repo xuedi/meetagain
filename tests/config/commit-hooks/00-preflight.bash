@@ -22,6 +22,8 @@ COMPOSE="docker-compose --env-file .env.dist -f docker/docker-compose.yml"
 # required because the test env swaps every cache pool for cache.adapter.array.
 REQUIRED_SERVICES="php mariadb"
 GUARDS="leak-guard docs-guard mermaid-guard comment-guard"
+TEST_LOG="var/log/test.log"
+TEST_LOG_MAX_BYTES=$((20 * 1024 * 1024))
 
 problems=()
 warnings=()
@@ -57,6 +59,19 @@ for guard in $GUARDS; do
         problems+=("config/tools/$guard.dist is missing - $guard cannot run without it")
     fi
 done
+
+# The admin system-log page renders every entry of the last hour with no cap, and
+# a functional test crawls it. var/log/test.log is rotated by nothing, so a long
+# local session grows it until dom-crawler exhausts its memory limit mid-suite -
+# a failure with nothing to do with the commit. Truncating here drops only the
+# accumulated history: the log of the run that is about to start is kept.
+if [ -f "$TEST_LOG" ]; then
+    test_log_bytes=$(wc -c <"$TEST_LOG")
+    if [ "$test_log_bytes" -gt "$TEST_LOG_MAX_BYTES" ]; then
+        : >"$TEST_LOG"
+        warnings+=("$TEST_LOG had grown to $((test_log_bytes / 1024 / 1024))MB and was truncated")
+    fi
+fi
 
 for warning in ${warnings+"${warnings[@]}"}; do
     echo "warning: $warning" >&2
