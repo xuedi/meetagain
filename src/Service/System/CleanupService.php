@@ -23,6 +23,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 readonly class CleanupService implements CronTaskInterface
 {
     public const int SUPPORT_THREAD_STALE_DAYS = 180;
+    public const int GHOSTED_REGISTRATION_DAYS = 10;
     public const int PENDING_IMPORT_MAX_HOURS = 24;
 
     public function __construct(
@@ -153,7 +154,7 @@ readonly class CleanupService implements CronTaskInterface
     public function removeGhostedRegistrations(): int
     {
         $count = 0;
-        $users = $this->userRepo->getOldRegistrations(10);
+        $users = $this->userRepo->getOldRegistrations(self::GHOSTED_REGISTRATION_DAYS);
         foreach ($users as $user) {
             $this->entityActionDispatcher->dispatch(EntityAction::DeleteUser, $user->getId());
             $activities = $user->getActivities();

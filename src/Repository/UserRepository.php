@@ -8,6 +8,7 @@ use App\Enum\UserStatus;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Override;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -226,20 +227,32 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this->getUserNameList()[$userId];
     }
 
-    public function getOldRegistrations(int $int)
+    public function getOldRegistrations(int $days)
     {
-        $qb = $this->getEntityManager()->createQueryBuilder();
-
-        return $qb
-            ->select('u')
-            ->from(User::class, 'u')
-            ->where($qb->expr()->isNotNull('u.regcode'))
-            ->andWhere($qb->expr()->lt('u.createdAt', ':date'))
-            ->andWhere($qb->expr()->eq('u.status', ':status'))
-            ->setParameter('date', new DateTime('-' . $int . ' days'))
-            ->setParameter('status', UserStatus::Registered->value)
+        return $this->unconfirmedRegistrations()
+            ->andWhere('u.createdAt < :date')
+            ->setParameter('date', new DateTime('-' . $days . ' days'))
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return list<User>
+     */
+    public function findUnconfirmedRegistrations(): array
+    {
+        return $this->unconfirmedRegistrations()
+            ->orderBy('u.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    private function unconfirmedRegistrations(): QueryBuilder
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.regcode IS NOT NULL')
+            ->andWhere('u.status = :status')
+            ->setParameter('status', UserStatus::Registered->value);
     }
 
     /**
