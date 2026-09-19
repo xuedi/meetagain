@@ -44,6 +44,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
                 toggleBlock.dispatchEvent(new CustomEvent('ma:toggled', { bubbles: true, detail: response }));
+            }).catch(() => {
+                // A refused toggle carries its reason as a flash message, which only the next render shows.
+                window.location.reload();
             });
         });
     });

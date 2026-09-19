@@ -759,6 +759,70 @@ class EventRepository extends ServiceEntityRepository
      * @param array<int>|null $restrictToEventIds null = no restriction, [] = empty result
      * @return array{items: Event[], total: int}
      */
+    /**
+     * @param list<int> $eventIds
+     * @return array{items: Event[], total: int}
+     */
+    public function findUpcomingByIds(array $eventIds, DateTimeInterface $from, int $limit, int $offset, ?string $translatedIn = null): array
+    {
+        if ($eventIds === []) {
+            return ['items' => [], 'total' => 0];
+        }
+
+        $qb = $this
+            ->createQueryBuilder('e')
+            ->where('e.start >= :from')
+            ->andWhere('e.status IN (:statuses)')
+            ->andWhere('e.id IN (:eventIds)')
+            ->setParameter('from', $from)
+            ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
+            ->setParameter('eventIds', $eventIds);
+
+        if ($translatedIn !== null) {
+            $this->restrictToTranslated($qb, $translatedIn);
+        }
+
+        $countQb = clone $qb;
+        $total = (int) $countQb->select('COUNT(DISTINCT e.id)')->getQuery()->getSingleScalarResult();
+
+        $ids = $qb
+            ->select('e.id')
+            ->orderBy('e.start', 'ASC')
+            ->addOrderBy('e.id', 'ASC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        if ($ids === []) {
+            return ['items' => [], 'total' => $total];
+        }
+
+        $events = $this
+            ->createQueryBuilder('e')
+            ->leftJoin('e.translations', 't')
+            ->addSelect('t')
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+
+        $byId = [];
+        foreach ($events as $event) {
+            $byId[$event->getId()] = $event;
+        }
+        $items = [];
+        foreach ($ids as $id) {
+            if (!isset($byId[(int) $id])) {
+                continue;
+            }
+
+            $items[] = $byId[(int) $id];
+        }
+
+        return ['items' => $items, 'total' => $total];
+    }
+
     public function findPublicUpcoming(
         DateTimeInterface $from,
         ?DateTimeInterface $to,

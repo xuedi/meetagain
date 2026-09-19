@@ -4,18 +4,15 @@ namespace App\Controller;
 
 use App\Activity\ActivityService;
 use App\Activity\Messages\ChangedUsername;
-use App\Activity\Messages\RsvpNo;
-use App\Activity\Messages\RsvpYes;
 use App\Entity\Event;
+use App\Exception\Event\RsvpRefusedException;
 use App\Filter\Event\EventFilterService;
 use App\Form\ProfileType;
 use App\Repository\EventRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
-use App\Security\Permission\Attribute\PermissionAttribute;
-use App\Service\Event\RsvpGuestService;
+use App\Service\Event\RsvpService;
 use App\Service\Member\BlockingService;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -85,32 +82,18 @@ final class ProfileController extends AbstractController
     }
 
     #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp', methods: ['POST'])]
-    public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em, RsvpGuestService $rsvpGuestService): Response
+    public function toggleRsvp(Request $request, Event $event, RsvpService $rsvpService): Response
     {
         if (!$this->isCsrfTokenValid('app_profile_toggle_rsvp' . $event->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
-        $refusal = match (true) {
-            $event->isCanceled() => ['error', 'events.flash_rsvp_canceled'],
-            $event->getStart() < new DateTimeImmutable() => ['error', 'events.flash_rsvp_past'],
-            !$this->isGranted(PermissionAttribute::EVENT_RSVP, $event) => ['warning', 'events.flash_group_only'],
-            default => null,
-        };
-        if ($refusal !== null) { // does reload page for flashMessage to trigger
-            $this->addFlash(...$refusal);
+
+        try {
+            $status = $rsvpService->toggle($event, $this->getAuthedUser());
+        } catch (RsvpRefusedException $refused) { // does reload page for flashMessage to trigger
+            $this->addFlash($refused->reason->flashLevel(), $refused->reason->flashKey());
 
             return new Response('', Response::HTTP_LOCKED);
-        }
-
-        $user = $this->getAuthedUser();
-        $status = $event->toggleRsvp($user);
-        $em->persist($event);
-        $em->flush();
-
-        $type = $status ? RsvpYes::TYPE : RsvpNo::TYPE;
-        $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
-        if (!$status) {
-            $rsvpGuestService->onRsvpRemoved($event, $user);
         }
 
         if ($request->isXmlHttpRequest()) {
