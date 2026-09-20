@@ -37,11 +37,12 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
+        $mayUseSession = $request->hasPreviousSession() && !$request->attributes->get('_stateless', false);
 
         // The URL locale is the explicit choice and beats every stored preference.
         $locale = $request->attributes->get('_locale');
         if ($locale) {
-            if ($request->hasPreviousSession()) {
+            if ($mayUseSession) {
                 $request->getSession()->set('_locale', $locale);
             }
 
@@ -49,7 +50,7 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
         }
 
         // Session reads need a started session; the cookie fallback below must stay reachable without one.
-        if ($request->hasPreviousSession()) {
+        if ($mayUseSession) {
             $session = $request->getSession();
             if ($session->has('_locale')) {
                 $request->setLocale($session->get('_locale'));

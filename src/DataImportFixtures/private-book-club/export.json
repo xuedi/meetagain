@@ -548,7 +548,7 @@
     ],
     "cms_pages": [
         {
-            "ref": 10,
+            "ref": 12,
             "slug": "index",
             "published": true,
             "titles": {

@@ -85,6 +85,49 @@ class LocaleSubscriberTest extends TestCase
         static::assertTrue(true);
     }
 
+    public function testOnKernelRequestNeverTouchesSessionOnStatelessRoute(): void
+    {
+        // Arrange
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('de'));
+
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('getName')->willReturn('PHPSESSID');
+        $sessionMock->expects($this->never())->method('has');
+        $sessionMock->expects($this->never())->method('get');
+        $sessionMock->expects($this->never())->method('set');
+
+        $request = new Request([], [], [], ['PHPSESSID' => 'test-session-id']);
+        $request->setSession($sessionMock);
+        $request->attributes->set('_stateless', true);
+
+        // Act
+        $subscriber->onKernelRequest($this->createRequestEvent($request));
+
+        // Assert
+        static::assertSame('de', $request->getLocale());
+    }
+
+    public function testOnKernelRequestSkipsSessionWriteOnStatelessRouteWhenAttributePresent(): void
+    {
+        // Arrange
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub());
+
+        $sessionMock = $this->createMock(SessionInterface::class);
+        $sessionMock->method('getName')->willReturn('PHPSESSID');
+        $sessionMock->expects($this->never())->method('set');
+
+        $request = new Request([], [], [], ['PHPSESSID' => 'test-session-id']);
+        $request->setSession($sessionMock);
+        $request->attributes->set('_locale', 'de');
+        $request->attributes->set('_stateless', true);
+
+        // Act
+        $subscriber->onKernelRequest($this->createRequestEvent($request));
+
+        // Assert
+        static::assertSame('de', $request->attributes->get('_locale'));
+    }
+
     public function testOnKernelRequestRestoresLocaleFromSessionWhenNoAttribute(): void
     {
         $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('de'));
