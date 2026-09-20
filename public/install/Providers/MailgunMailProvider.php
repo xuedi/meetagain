@@ -57,7 +57,7 @@ class MailgunMailProvider implements MailProvider
             'mailgun+api://%s:%s@default?region=%s',
             urlencode($config['api_key'] ?? ''),
             urlencode($config['domain'] ?? ''),
-            $config['region'] ?? 'us'
+            $config['region'] ?? 'us',
         );
     }
 

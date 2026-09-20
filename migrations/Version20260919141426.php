@@ -15,7 +15,9 @@ final class Version20260919141426 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql('ALTER TABLE logs_security_measure ADD incident_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE logs_security_measure ADD CONSTRAINT FK_C923EE3F59E53FB9 FOREIGN KEY (incident_id) REFERENCES logs_incident (id) ON DELETE SET NULL');
+        $this->addSql(
+            'ALTER TABLE logs_security_measure ADD CONSTRAINT FK_C923EE3F59E53FB9 FOREIGN KEY (incident_id) REFERENCES logs_incident (id) ON DELETE SET NULL',
+        );
         $this->addSql('CREATE INDEX IDX_C923EE3F59E53FB9 ON logs_security_measure (incident_id)');
     }
 

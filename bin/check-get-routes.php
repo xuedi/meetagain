@@ -11,7 +11,7 @@ use PhpParser\NodeFinder;
 use PhpParser\ParserFactory;
 
 $allowlistFile = $root . '/tests/config/get-routes-allowlist.php';
-$allowlist     = file_exists($allowlistFile) ? (require $allowlistFile) : [];
+$allowlist = file_exists($allowlistFile) ? (require $allowlistFile) : [];
 
 $mutationMethodNames = ['flush', 'persist', 'remove', 'dispatch', 'send'];
 
@@ -20,8 +20,8 @@ if (isset($argv[1])) {
 } else {
     $scanDirs = array_filter([
         $root . '/src/Controller',
-        ...glob($root . '/plugins/*/src/Controller') ?: [],
-        ...glob($root . '/modules/*/src/Internal/Controller') ?: [],
+        ...(glob($root . '/plugins/*/src/Controller') ?: []),
+        ...(glob($root . '/modules/*/src/Internal/Controller') ?: []),
     ], 'is_dir');
 }
 
@@ -49,10 +49,8 @@ function routeIsGetReachable(Node\AttributeGroup $attrGroup): bool
             if ($arg->name?->toString() === 'methods') {
                 if ($arg->value instanceof Node\Expr\Array_) {
                     foreach ($arg->value->items as $item) {
-                        if ($item?->value instanceof Node\Scalar\String_) {
-                            if (strtoupper($item->value->value) === 'GET') {
-                                return true;
-                            }
+                        if ($item?->value instanceof Node\Scalar\String_ && strtoupper($item->value->value) === 'GET') {
+                            return true;
                         }
                     }
                     return false;
@@ -68,7 +66,7 @@ function routeIsGetReachable(Node\AttributeGroup $attrGroup): bool
 
 function isAncestorOf(Node $ancestor, Node $target, NodeFinder $finder): bool
 {
-    $descendants = $finder->find([$ancestor], fn (Node $n) => $n === $target);
+    $descendants = $finder->find([$ancestor], fn(Node $n) => $n === $target);
     return $descendants !== [];
 }
 
@@ -109,13 +107,13 @@ function findUnguardedMutationCalls(array $stmts, array $mutationMethodNames, No
 {
     $hits = [];
 
-    $postGuardedIfs = $finder->find($stmts, fn (Node $n) => $n instanceof Node\Stmt\If_ && ifBlockIsPostGuard($n));
+    $postGuardedIfs = $finder->find($stmts, fn(Node $n) => $n instanceof Node\Stmt\If_ && ifBlockIsPostGuard($n));
 
     $allMutationCalls = $finder->find($stmts, function (Node $node) use ($mutationMethodNames): bool {
-        if (!($node instanceof MethodCall)) {
+        if (!$node instanceof MethodCall) {
             return false;
         }
-        if (!($node->name instanceof Node\Identifier)) {
+        if (!$node->name instanceof Node\Identifier) {
             return false;
         }
         $name = $node->name->toString();
@@ -123,10 +121,7 @@ function findUnguardedMutationCalls(array $stmts, array $mutationMethodNames, No
             return false;
         }
         // $form->remove() is Form field removal, not EntityManager.
-        if ($name === 'remove'
-            && $node->var instanceof Node\Expr\Variable
-            && $node->var->name === 'form'
-        ) {
+        if ($name === 'remove' && $node->var instanceof Node\Expr\Variable && $node->var->name === 'form') {
             return false;
         }
         return true;
@@ -151,8 +146,8 @@ function findUnguardedMutationCalls(array $stmts, array $mutationMethodNames, No
     return $hits;
 }
 
-$parser     = new ParserFactory()->createForNewestSupportedVersion();
-$finder     = new NodeFinder();
+$parser = new ParserFactory()->createForNewestSupportedVersion();
+$finder = new NodeFinder();
 $violations = [];
 
 foreach (phpFilesIn($scanDirs) as $file) {
@@ -178,11 +173,11 @@ foreach (phpFilesIn($scanDirs) as $file) {
 
     foreach ($classes as $class) {
         $className = $class->name?->toString() ?? '';
-        $fqcn      = $namespaceName !== '' ? $namespaceName . '\\' . $className : $className;
+        $fqcn = $namespaceName !== '' ? $namespaceName . '\\' . $className : $className;
 
         foreach ($class->getMethods() as $method) {
             $methodName = $method->name->toString();
-            $key        = $fqcn . '::' . $methodName;
+            $key = $fqcn . '::' . $methodName;
 
             if (isset($allowlist[$key])) {
                 continue;
@@ -200,15 +195,9 @@ foreach (phpFilesIn($scanDirs) as $file) {
             }
 
             $bodyStmts = $method->stmts ?? [];
-            $hits      = findUnguardedMutationCalls($bodyStmts, $mutationMethodNames, $finder);
+            $hits = findUnguardedMutationCalls($bodyStmts, $mutationMethodNames, $finder);
             foreach ($hits as $hit) {
-                $violations[] = sprintf(
-                    '%s:%d [%s] %s',
-                    $file->getPathname(),
-                    $hit['line'],
-                    $key,
-                    $hit['call'],
-                );
+                $violations[] = sprintf('%s:%d [%s] %s', $file->getPathname(), $hit['line'], $key, $hit['call']);
             }
         }
     }

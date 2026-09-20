@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PluginPhotosMigrations;
 
@@ -39,7 +37,9 @@ final class Version20260801123215 extends AbstractMigration
         ) DEFAULT CHARACTER SET utf8mb4');
 
         $this->addSql('ALTER TABLE plg_photos_photo ADD CONSTRAINT FK_4B0459CD3DA5256D FOREIGN KEY (image_id) REFERENCES image (id)');
-        $this->addSql('ALTER TABLE plg_photos_photo_translation ADD CONSTRAINT FK_7200F06E7E9E4C8C FOREIGN KEY (photo_id) REFERENCES plg_photos_photo (id) ON DELETE CASCADE');
+        $this->addSql(
+            'ALTER TABLE plg_photos_photo_translation ADD CONSTRAINT FK_7200F06E7E9E4C8C FOREIGN KEY (photo_id) REFERENCES plg_photos_photo (id) ON DELETE CASCADE',
+        );
     }
 
     public function down(Schema $schema): void

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -22,27 +20,27 @@ final class Version20260720120000 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql(<<<'SQL'
-            CREATE TABLE item_category_assignment (
-                id INT AUTO_INCREMENT NOT NULL,
-                item_type VARCHAR(50) NOT NULL,
-                item_id INT NOT NULL,
-                category_id INT NOT NULL,
-                UNIQUE INDEX uniq_item_category (item_type, item_id),
-                PRIMARY KEY(id)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
-        SQL);
+                CREATE TABLE item_category_assignment (
+                    id INT AUTO_INCREMENT NOT NULL,
+                    item_type VARCHAR(50) NOT NULL,
+                    item_id INT NOT NULL,
+                    category_id INT NOT NULL,
+                    UNIQUE INDEX uniq_item_category (item_type, item_id),
+                    PRIMARY KEY(id)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            SQL);
 
         $this->addSql(<<<'SQL'
-            CREATE TABLE item_tag_assignment (
-                id INT AUTO_INCREMENT NOT NULL,
-                item_type VARCHAR(50) NOT NULL,
-                item_id INT NOT NULL,
-                tag_id INT NOT NULL,
-                INDEX idx_item_tag_cloud (item_type, tag_id),
-                UNIQUE INDEX uniq_item_tag (item_type, item_id, tag_id),
-                PRIMARY KEY(id)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
-        SQL);
+                CREATE TABLE item_tag_assignment (
+                    id INT AUTO_INCREMENT NOT NULL,
+                    item_type VARCHAR(50) NOT NULL,
+                    item_id INT NOT NULL,
+                    tag_id INT NOT NULL,
+                    INDEX idx_item_tag_cloud (item_type, tag_id),
+                    UNIQUE INDEX uniq_item_tag (item_type, item_id, tag_id),
+                    PRIMARY KEY(id)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            SQL);
     }
 
     public function down(Schema $schema): void

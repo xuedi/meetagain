@@ -8,6 +8,7 @@ extends = ["../../../../tests/config/mago-rules.toml"]
 
 [source]
 paths = [
+    "plugins/films/migrations/**/*.php",
     "plugins/films/src/**/*.php",
     "plugins/films/tests/**/*.php",
 ]

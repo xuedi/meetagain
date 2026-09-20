@@ -51,31 +51,31 @@ foreach (array_keys($config) as $key) {
 }
 
 if ($unlisted === [] && $unsatisfied === [] && $stale === []) {
-    echo sprintf('Plugin config check passed - %d installed plugin(s) listed in %s.', count($installed), basename($configFile)) . PHP_EOL;
+    echo sprintf('Plugin config check passed - %d installed plugin(s) listed in %s.', count($installed), basename($configFile)), PHP_EOL;
     exit(0);
 }
 
 foreach ($unlisted as $key) {
-    echo sprintf('%s is installed but has no key in %s', $key, basename($configFile)) . PHP_EOL;
+    echo sprintf('%s is installed but has no key in %s', $key, basename($configFile)), PHP_EOL;
 }
 foreach ($unsatisfied as [$key, $required]) {
-    echo sprintf('%s requires %s, which has no key in %s', $key, $required, basename($configFile)) . PHP_EOL;
+    echo sprintf('%s requires %s, which has no key in %s', $key, $required, basename($configFile)), PHP_EOL;
 }
 foreach ($stale as $key) {
-    echo sprintf('%s has a key in %s but no plugins/%s/config directory', $key, basename($configFile), $key) . PHP_EOL;
+    echo sprintf('%s has a key in %s but no plugins/%s/config directory', $key, basename($configFile), $key), PHP_EOL;
 }
 
 $missing = array_unique([...$unlisted, ...array_column($unsatisfied, 1)]);
 if ($missing !== []) {
     echo PHP_EOL . 'Add the missing line(s):' . PHP_EOL;
     foreach ($missing as $key) {
-        echo sprintf("    '%s' => true,", $key) . PHP_EOL;
+        echo sprintf("    '%s' => true,", $key), PHP_EOL;
     }
 }
 if ($stale !== []) {
     echo PHP_EOL . 'Delete the stale line(s):' . PHP_EOL;
     foreach ($stale as $key) {
-        echo sprintf("    '%s' => %s,", $key, var_export($config[$key], true)) . PHP_EOL;
+        echo sprintf("    '%s' => %s,", $key, var_export($config[$key], true)), PHP_EOL;
     }
 }
 echo PHP_EOL;

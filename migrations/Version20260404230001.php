@@ -14,7 +14,9 @@ final class Version20260404230001 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE image_report (id INT AUTO_INCREMENT NOT NULL, image_id INT DEFAULT NULL, reporter_id INT DEFAULT NULL, reason INT NOT NULL, remarks LONGTEXT DEFAULT NULL, status VARCHAR(10) NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_6B32294C3DA5256D (image_id), INDEX IDX_6B32294CE1CFE6F5 (reporter_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4');
+        $this->addSql(
+            'CREATE TABLE image_report (id INT AUTO_INCREMENT NOT NULL, image_id INT DEFAULT NULL, reporter_id INT DEFAULT NULL, reason INT NOT NULL, remarks LONGTEXT DEFAULT NULL, status VARCHAR(10) NOT NULL, created_at DATETIME NOT NULL, INDEX IDX_6B32294C3DA5256D (image_id), INDEX IDX_6B32294CE1CFE6F5 (reporter_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4',
+        );
         $this->addSql('ALTER TABLE image_report ADD CONSTRAINT FK_6B32294C3DA5256D FOREIGN KEY (image_id) REFERENCES image (id) ON DELETE SET NULL');
         $this->addSql('ALTER TABLE image_report ADD CONSTRAINT FK_6B32294CE1CFE6F5 FOREIGN KEY (reporter_id) REFERENCES `user` (id) ON DELETE SET NULL');
     }

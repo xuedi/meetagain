@@ -16,9 +16,15 @@ final class Version20260912110000 extends AbstractMigration
     {
         $locale = $this->sourceLocale();
 
-        $this->addSql('CREATE TABLE plg_glossary_definition (id INT AUTO_INCREMENT NOT NULL, language VARCHAR(2) NOT NULL, text LONGTEXT NOT NULL, glossary_id INT NOT NULL, UNIQUE INDEX uniq_glossary_definition_lang_entry (language, glossary_id), INDEX IDX_ECAC27B66ABB587D (glossary_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4');
-        $this->addSql('ALTER TABLE plg_glossary_definition ADD CONSTRAINT FK_ECAC27B66ABB587D FOREIGN KEY (glossary_id) REFERENCES plg_glossary_glossary (id) ON DELETE CASCADE');
-        $this->addSql("INSERT INTO plg_glossary_definition (glossary_id, language, text) SELECT id, ?, explanation FROM plg_glossary_glossary WHERE TRIM(explanation) <> ''", [$locale]);
+        $this->addSql(
+            'CREATE TABLE plg_glossary_definition (id INT AUTO_INCREMENT NOT NULL, language VARCHAR(2) NOT NULL, text LONGTEXT NOT NULL, glossary_id INT NOT NULL, UNIQUE INDEX uniq_glossary_definition_lang_entry (language, glossary_id), INDEX IDX_ECAC27B66ABB587D (glossary_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4',
+        );
+        $this->addSql(
+            'ALTER TABLE plg_glossary_definition ADD CONSTRAINT FK_ECAC27B66ABB587D FOREIGN KEY (glossary_id) REFERENCES plg_glossary_glossary (id) ON DELETE CASCADE',
+        );
+        $this->addSql("INSERT INTO plg_glossary_definition (glossary_id, language, text) SELECT id, ?, explanation FROM plg_glossary_glossary WHERE TRIM(explanation) <> ''", [
+            $locale,
+        ]);
         $this->addSql('ALTER TABLE plg_glossary_glossary DROP explanation');
         $this->renameStoredField('explanation', 'definition_' . $locale);
     }

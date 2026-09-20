@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -20,7 +18,9 @@ final class Version20260215031127 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // Create new cms_menu_location table
-        $this->addSql('CREATE TABLE cms_menu_location (id INT AUTO_INCREMENT NOT NULL, location INT NOT NULL, cms_id INT NOT NULL, INDEX IDX_C29E7788BE8A7CFB (cms_id), UNIQUE INDEX unique_cms_location (cms_id, location), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4');
+        $this->addSql(
+            'CREATE TABLE cms_menu_location (id INT AUTO_INCREMENT NOT NULL, location INT NOT NULL, cms_id INT NOT NULL, INDEX IDX_C29E7788BE8A7CFB (cms_id), UNIQUE INDEX unique_cms_location (cms_id, location), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4',
+        );
         $this->addSql('ALTER TABLE cms_menu_location ADD CONSTRAINT FK_C29E7788BE8A7CFB FOREIGN KEY (cms_id) REFERENCES cms (id)');
 
         // Drop old JSON column (data will be set fresh via fixtures or manually in production)

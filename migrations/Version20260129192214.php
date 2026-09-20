@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -33,6 +31,8 @@ final class Version20260129192214 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        throw new RuntimeException('Cannot revert permission system simplification - this would recreate the complex database-driven permission system that was intentionally removed.');
+        throw new RuntimeException(
+            'Cannot revert permission system simplification - this would recreate the complex database-driven permission system that was intentionally removed.',
+        );
     }
 }

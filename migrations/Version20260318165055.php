@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -17,7 +15,6 @@ final class Version20260318165055 extends AbstractMigration
         return 'added config settings for admin notification';
     }
 
-    //
     public function up(Schema $schema): void
     {
         $this->addSql("INSERT INTO config (name, value, type) VALUES ('send_admin_notification', 'true', 'boolean')");

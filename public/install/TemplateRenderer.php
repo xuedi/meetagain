@@ -15,7 +15,7 @@ class TemplateRenderer
         $templatePath = $this->templateDir . '/' . $template . '.html';
 
         if (!file_exists($templatePath)) {
-            return "Template not found: $template";
+            return "Template not found: {$template}";
         }
 
         $content = file_get_contents($templatePath);
@@ -35,9 +35,7 @@ class TemplateRenderer
             $layout = file_get_contents($layoutPath);
             $layout = str_replace('{{ content }}', $content, $layout);
             $layout = str_replace('{{ current_step }}', (string) ($vars['current_step'] ?? 1), $layout);
-            $layout = $this->processConditionals($layout, $vars);
-
-            return $layout;
+            return $this->processConditionals($layout, $vars);
         }
 
         return $content;
@@ -48,37 +46,37 @@ class TemplateRenderer
     {
         $pattern = '/{%\s*for\s+(\w+)\s+in\s+(\w+)\s*%}(.*?){%\s*endfor\s*%}/s';
 
-        return preg_replace_callback($pattern, function ($matches) use ($vars) {
-            $itemVar = $matches[1];
-            $arrayVar = $matches[2];
-            $loopContent = $matches[3];
-            $output = '';
+        return preg_replace_callback(
+            $pattern,
+            function ($matches) use ($vars) {
+                $itemVar = $matches[1];
+                $arrayVar = $matches[2];
+                $loopContent = $matches[3];
+                $output = '';
 
-            if (isset($vars[$arrayVar]) && is_array($vars[$arrayVar])) {
-                foreach ($vars[$arrayVar] as $item) {
-                    $itemContent = $loopContent;
+                if (isset($vars[$arrayVar]) && is_array($vars[$arrayVar])) {
+                    foreach ($vars[$arrayVar] as $item) {
+                        $itemContent = $loopContent;
 
-                    $loopVars = $vars;
-                    if (is_array($item)) {
-                        $loopVars[$itemVar] = $item;
-                        $itemContent = $this->processConditionals($itemContent, $loopVars);
+                        $loopVars = $vars;
+                        if (is_array($item)) {
+                            $loopVars[$itemVar] = $item;
+                            $itemContent = $this->processConditionals($itemContent, $loopVars);
 
-                        foreach ($item as $key => $value) {
-                            $itemContent = str_replace(
-                                '{{ ' . $itemVar . '.' . $key . ' }}',
-                                htmlspecialchars((string) $value),
-                                $itemContent
-                            );
+                            foreach ($item as $key => $value) {
+                                $itemContent = str_replace('{{ ' . $itemVar . '.' . $key . ' }}', htmlspecialchars((string) $value), $itemContent);
+                            }
+                        } else {
+                            $itemContent = str_replace('{{ ' . $itemVar . ' }}', htmlspecialchars((string) $item), $itemContent);
                         }
-                    } else {
-                        $itemContent = str_replace('{{ ' . $itemVar . ' }}', htmlspecialchars((string) $item), $itemContent);
+                        $output .= $itemContent;
                     }
-                    $output .= $itemContent;
                 }
-            }
 
-            return $output;
-        }, $content) ?? $content;
+                return $output;
+            },
+            $content,
+        ) ?? $content;
     }
 
     /** @param array<string, mixed> $vars */
@@ -86,15 +84,19 @@ class TemplateRenderer
     {
         $pattern = '/{%\s*if\s+([^%]+?)\s*%}(.*?)(?:{%\s*else\s*%}(.*?))?{%\s*endif\s*%}/s';
 
-        return preg_replace_callback($pattern, function ($matches) use ($vars) {
-            $condition = trim($matches[1]);
-            $ifContent = $matches[2];
-            $elseContent = $matches[3] ?? '';
+        return preg_replace_callback(
+            $pattern,
+            function ($matches) use ($vars) {
+                $condition = trim($matches[1]);
+                $ifContent = $matches[2];
+                $elseContent = $matches[3] ?? '';
 
-            $result = $this->evaluateCondition($condition, $vars);
+                $result = $this->evaluateCondition($condition, $vars);
 
-            return $result ? $ifContent : $elseContent;
-        }, $content) ?? $content;
+                return $result ? $ifContent : $elseContent;
+            },
+            $content,
+        ) ?? $content;
     }
 
     /** @param array<string, mixed> $vars */

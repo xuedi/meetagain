@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -21,7 +19,9 @@ final class Version20260724230732 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE event_canonical_root (id INT AUTO_INCREMENT NOT NULL, locale VARCHAR(2) NOT NULL, type VARCHAR(10) NOT NULL, created_at DATETIME NOT NULL, event_id INT NOT NULL, INDEX IDX_91E7E93C71F7E88B (event_id), UNIQUE INDEX UNIQ_91E7E93C71F7E88B4180C698 (event_id, locale), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4');
+        $this->addSql(
+            'CREATE TABLE event_canonical_root (id INT AUTO_INCREMENT NOT NULL, locale VARCHAR(2) NOT NULL, type VARCHAR(10) NOT NULL, created_at DATETIME NOT NULL, event_id INT NOT NULL, INDEX IDX_91E7E93C71F7E88B (event_id), UNIQUE INDEX UNIQ_91E7E93C71F7E88B4180C698 (event_id, locale), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4',
+        );
         $this->addSql('ALTER TABLE event_canonical_root ADD CONSTRAINT FK_91E7E93C71F7E88B FOREIGN KEY (event_id) REFERENCES event (id) ON DELETE CASCADE');
     }
 

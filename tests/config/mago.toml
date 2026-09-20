@@ -1,33 +1,65 @@
 # Mago configuration for core.
 #
-# Covers `src/`, `tests/` and `modules/` only. Plugins are deliberately absent: each plugin owns a
-# `tests/config/mago.toml` that this file never names, and `just checkMago` discovers them by glob.
-# That keeps a commercial plugin's name out of the open-source tree, and gives every plugin its own
-# run, so a rule one plugin relaxes stays relaxed for that plugin alone.
+# Covers every hand-written PHP file outside `plugins/`: `src/`, `tests/`, `modules/`, and the
+# entry points and generated-adjacent corners that drifted uncovered for a long time - `bin/`,
+# `config/`, `migrations/` and `public/`. Some of those are in `[source]` for the formatter only
+# and are lifted out of the linter or analyzer below; each exclusion says why.
+#
+# Plugins are deliberately absent: each plugin owns a `tests/config/mago.toml` that this file never
+# names, and `just checkMago` discovers them by glob. That keeps a commercial plugin's name out of
+# the open-source tree, and gives every plugin its own run, so a rule one plugin relaxes stays
+# relaxed for that plugin alone.
 #
 # For more information, see https://mago.carthage.software/#/getting-started/configuration
 extends = ["mago-rules.toml"]
 
 [source]
 paths = [
+    "bin/**/*.php",
+    "config/**/*.php",
+    "migrations/**/*.php",
+    "modules/*/migrations/**/*.php",
     "modules/*/src/**/*.php",
     "modules/*/tests/**/*.php",
+    "public/**/*.php",
     "src/",
     "tests/",
 ]
 includes = ["vendor"]
-excludes = []
+# Generated files. `reference.php` says so in its own header, and the other three are Symfony Flex
+# recipe files it rewrites when a bundle or importmap entry changes - formatting them is undone on
+# the next `composer require`.
+excludes = [
+    "config/bundles.php",
+    "config/importmap.php",
+    "config/preload.php",
+    "config/reference.php",
+]
+
+[linter]
+# The standalone install wizard runs before composer's autoloader and the app's own classes exist,
+# so it cannot follow the conventions the rest of the tree is linted against - it declares plain
+# functions and uses `empty()` on form and $_SERVER keys that may be absent. It stays in `[source]`
+# so the formatter still covers it; only the rule set is lifted.
+excludes = ["public/install/"]
 
 [analyzer]
 # The analyzer produces PHPUnit false positives (createMock/createStub return MockObject&T, which
 # mago reports as non-existent-method and invalid-callable); the linter already covers tests for
 # style and structure. tests/stubs/ is intentionally NOT excluded, so extension stubs (e.g.
 # Imagick) stay visible to the analyzer.
+#
+# `bin/` and `public/install/` are standalone entry points, each its own program at runtime. The
+# analyzer reads them as one, so two scripts that both declare a `phpFilesIn()` helper collide as
+# duplicate-definition; the check scripts also walk php-parser nodes whose concrete type cannot be
+# narrowed statically. Both stay in `[source]`, so the formatter still covers them.
 excludes = [
+    "bin/",
+    "modules/ballot/tests/",
+    "modules/trust/tests/",
+    "public/install/",
     "tests/Unit/",
     "tests/bootstrap.php",
-    "modules/trust/tests/",
-    "modules/ballot/tests/",
 ]
 
 # The module perimeter lives here, not in the shared rule file: it guards `modules/`, which only
@@ -72,6 +104,25 @@ permit = ["**"]
 
 [[guard.perimeter.rules]]
 namespace = "Tests\\"
+permit = ["**"]
+
+# Migration namespaces, and the two Symfony config-builder namespaces `config/` files declare.
+# They are listed for the same reason as the catch-alls above: `[[guard.perimeter.rules]]` puts
+# the run into allowlist mode, so a namespace with no entry has every dependency reported.
+[[guard.perimeter.rules]]
+namespace = "AppMigrations"
+permit = ["**"]
+
+[[guard.perimeter.rules]]
+namespace = "ModuleBallotMigrations"
+permit = ["**"]
+
+[[guard.perimeter.rules]]
+namespace = "ModuleTrustMigrations"
+permit = ["**"]
+
+[[guard.perimeter.rules]]
+namespace = "Symfony\\"
 permit = ["**"]
 
 [[guard.perimeter.rules]]

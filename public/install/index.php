@@ -17,7 +17,7 @@ $mailProviderRegistry = MailProviderRegistry::createDefault();
 
 if ($installer->isInstalled()) {
     header('Location: /');
-    exit;
+    exit();
 }
 
 $step = $_GET['step'] ?? null;
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$installer->validateCsrfToken($csrfToken)) {
         $installer->addError('Invalid security token. Please try again.');
         echo $installer->render('error', ['message' => 'Invalid security token']);
-        exit;
+        exit();
     }
 }
 
@@ -74,15 +74,17 @@ function showStep1(Installer $installer): void
     $requirements = $installer->checkRequirements();
     $canProceed = $installer->allRequirementsPassed();
 
-    echo $installer->render('step1', [
-        'requirements' => $requirements,
-        'can_proceed' => $canProceed,
-        'db_host' => $installer->getSessionData('db_host', 'localhost'),
-        'db_port' => $installer->getSessionData('db_port', '3306'),
-        'db_name' => $installer->getSessionData('db_name', 'meetAgain'),
-        'db_user' => $installer->getSessionData('db_user', 'meetAgain'),
-        'db_password' => $installer->getSessionData('db_password', ''),
-    ]);
+    echo
+        $installer->render('step1', [
+            'requirements' => $requirements,
+            'can_proceed' => $canProceed,
+            'db_host' => $installer->getSessionData('db_host', 'localhost'),
+            'db_port' => $installer->getSessionData('db_port', '3306'),
+            'db_name' => $installer->getSessionData('db_name', 'meetAgain'),
+            'db_user' => $installer->getSessionData('db_user', 'meetAgain'),
+            'db_password' => $installer->getSessionData('db_password', ''),
+        ])
+    ;
 }
 
 function handleStep1(Installer $installer): void
@@ -104,39 +106,35 @@ function handleStep1(Installer $installer): void
     }
 
     if (!$installer->hasErrors()) {
-        $installer->testDatabaseConnection(
-            $data['db_host'],
-            $data['db_port'],
-            $data['db_name'],
-            $data['db_user'],
-            $dbPassword
-        );
+        $installer->testDatabaseConnection($data['db_host'], $data['db_port'], $data['db_name'], $data['db_user'], $dbPassword);
     }
 
     if (!$installer->hasErrors()) {
         $data['db_password'] = $dbPassword;
     }
 
-    $installer->handleFormResult($data, 2, fn () => showStep1($installer));
+    $installer->handleFormResult($data, 2, fn() => showStep1($installer));
 }
 
 function showStep2(Installer $installer): void
 {
-    echo $installer->render('step2', [
-        'provider' => $installer->getSessionData('mail_provider', 'null'),
-        'smtp_host' => $installer->getSessionData('smtp_host', ''),
-        'smtp_port' => $installer->getSessionData('smtp_port', '587'),
-        'smtp_user' => $installer->getSessionData('smtp_user', ''),
-        'smtp_password' => $installer->getSessionData('smtp_password', ''),
-        'smtp_encryption' => $installer->getSessionData('smtp_encryption', 'tls'),
-        'sendgrid_api_key' => $installer->getSessionData('sendgrid_api_key', ''),
-        'mailgun_api_key' => $installer->getSessionData('mailgun_api_key', ''),
-        'mailgun_domain' => $installer->getSessionData('mailgun_domain', ''),
-        'mailgun_region' => $installer->getSessionData('mailgun_region', 'us'),
-        'ses_region' => $installer->getSessionData('ses_region', 'eu-west-1'),
-        'ses_access_key' => $installer->getSessionData('ses_access_key', ''),
-        'ses_secret_key' => $installer->getSessionData('ses_secret_key', ''),
-    ]);
+    echo
+        $installer->render('step2', [
+            'provider' => $installer->getSessionData('mail_provider', 'null'),
+            'smtp_host' => $installer->getSessionData('smtp_host', ''),
+            'smtp_port' => $installer->getSessionData('smtp_port', '587'),
+            'smtp_user' => $installer->getSessionData('smtp_user', ''),
+            'smtp_password' => $installer->getSessionData('smtp_password', ''),
+            'smtp_encryption' => $installer->getSessionData('smtp_encryption', 'tls'),
+            'sendgrid_api_key' => $installer->getSessionData('sendgrid_api_key', ''),
+            'mailgun_api_key' => $installer->getSessionData('mailgun_api_key', ''),
+            'mailgun_domain' => $installer->getSessionData('mailgun_domain', ''),
+            'mailgun_region' => $installer->getSessionData('mailgun_region', 'us'),
+            'ses_region' => $installer->getSessionData('ses_region', 'eu-west-1'),
+            'ses_access_key' => $installer->getSessionData('ses_access_key', ''),
+            'ses_secret_key' => $installer->getSessionData('ses_secret_key', ''),
+        ])
+    ;
 }
 
 function handleStep2(Installer $installer): void
@@ -164,21 +162,23 @@ function handleStep2(Installer $installer): void
         $data['mailer_dsn'] = $provider->buildDsn($mailConfig);
     }
 
-    $installer->handleFormResult($data, 3, fn () => showStep2($installer));
+    $installer->handleFormResult($data, 3, fn() => showStep2($installer));
 }
 
 function showStep3(Installer $installer): void
 {
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $protocol = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $defaultUrl = $protocol . '://' . $host;
 
-    echo $installer->render('step3', [
-        'site_url' => $installer->getSessionData('site_url', $defaultUrl),
-        'site_name' => $installer->getSessionData('site_name', 'MeetAgain'),
-        'admin_email' => $installer->getSessionData('admin_email', ''),
-        'admin_name' => $installer->getSessionData('admin_name', 'Admin'),
-    ]);
+    echo
+        $installer->render('step3', [
+            'site_url' => $installer->getSessionData('site_url', $defaultUrl),
+            'site_name' => $installer->getSessionData('site_name', 'MeetAgain'),
+            'admin_email' => $installer->getSessionData('admin_email', ''),
+            'admin_name' => $installer->getSessionData('admin_name', 'Admin'),
+        ])
+    ;
 }
 
 function handleStep3(Installer $installer): void
@@ -214,16 +214,20 @@ function handleStep3(Installer $installer): void
         $data['admin_password'] = $adminPassword;
     }
 
-    $installer->handleFormResult($data, null, fn () => showStep3($installer));
+    $installer->handleFormResult($data, null, fn() => showStep3($installer));
 
     if ($installer->runInstallation()) {
-        echo $installer->render('success', [
-            'site_url' => $data['site_url'],
-            'admin_email' => $data['admin_email'],
-        ]);
+        echo
+            $installer->render('success', [
+                'site_url' => $data['site_url'],
+                'admin_email' => $data['admin_email'],
+            ])
+        ;
     } else {
-        echo $installer->render('error', [
-            'message' => 'Installation failed',
-        ]);
+        echo
+            $installer->render('error', [
+                'message' => 'Installation failed',
+            ])
+        ;
     }
 }

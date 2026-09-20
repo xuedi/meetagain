@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -19,9 +17,7 @@ final class Version20260216165015 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql(
-            "INSERT IGNORE INTO config (name, value, type) VALUES ('send_rsvp_notifications', 'false', 'boolean')"
-        );
+        $this->addSql("INSERT IGNORE INTO config (name, value, type) VALUES ('send_rsvp_notifications', 'false', 'boolean')");
     }
 
     public function down(Schema $schema): void

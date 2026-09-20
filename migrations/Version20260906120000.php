@@ -58,7 +58,9 @@ final class Version20260906120000 extends AbstractMigration
         ) DEFAULT CHARACTER SET utf8mb4');
 
         $this->addSql('ALTER TABLE plg_voting_poll ADD CONSTRAINT FK_CF9B452971F7E88B FOREIGN KEY (event_id) REFERENCES event (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE plg_voting_poll_option ADD CONSTRAINT FK_2EFDE8F23C947C0F FOREIGN KEY (poll_id) REFERENCES plg_voting_poll (id) ON DELETE CASCADE');
+        $this->addSql(
+            'ALTER TABLE plg_voting_poll_option ADD CONSTRAINT FK_2EFDE8F23C947C0F FOREIGN KEY (poll_id) REFERENCES plg_voting_poll (id) ON DELETE CASCADE',
+        );
         $this->addSql('ALTER TABLE plg_voting_vote ADD CONSTRAINT FK_11373A083C947C0F FOREIGN KEY (poll_id) REFERENCES plg_voting_poll (id) ON DELETE CASCADE');
     }
 }

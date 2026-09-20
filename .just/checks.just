@@ -2,7 +2,7 @@
 
 # Run all tests and checks
 [group('checks')]
-check: checkMago checkMagoAnalyze checkMagoGuard checkPluginConfig checkPluginIsolation
+check: checkMago checkMagoFormat checkMagoAnalyze checkMagoGuard checkPluginConfig checkPluginIsolation
     {{PHP}} composer validate --strict
     {{PHP}} php bin/check-get-routes.php
     {{PHP}} php bin/check-new-parentheses.php
@@ -12,6 +12,11 @@ check: checkMago checkMagoAnalyze checkMagoGuard checkPluginConfig checkPluginIs
 [group('checks')]
 checkMago:
     {{PHP}} sh bin/mago.sh lint
+
+# Check formatting with Mago - reports drift without writing; `just fixMago` applies it
+[group('checks')]
+checkMagoFormat:
+    {{PHP}} sh bin/mago.sh format --dry-run
 
 # Analyze code with Mago - core, then each plugin against its own config
 [group('checks')]
@@ -25,7 +30,7 @@ checkMagoGuard:
 
 # Run all Mago checks (lint + analyze + guard)
 [group('checks')]
-checkMagoAll: checkMago checkMagoAnalyze checkMagoGuard
+checkMagoAll: checkMago checkMagoFormat checkMagoAnalyze checkMagoGuard
     echo "All Mago checks complete"
 
 # Check accessibility (Pa11y)

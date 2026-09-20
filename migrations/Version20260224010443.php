@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -37,6 +35,8 @@ final class Version20260224010443 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE `user` ADD roles JSON NOT NULL DEFAULT (JSON_ARRAY(CONCAT(\'ROLE_\', role))), DROP role, CHANGE regcode_expires_at regcode_expires_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
+        $this->addSql(
+            'ALTER TABLE `user` ADD roles JSON NOT NULL DEFAULT (JSON_ARRAY(CONCAT(\'ROLE_\', role))), DROP role, CHANGE regcode_expires_at regcode_expires_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'',
+        );
     }
 }

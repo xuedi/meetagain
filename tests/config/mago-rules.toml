@@ -14,6 +14,9 @@ tab-width = 4
 use-tabs = false
 opening-tag-on-own-line = false
 empty-line-after-opening-tag = false
+# `<?php declare(strict_types=1);` on one line, the way all but a handful of files already write it.
+# Without this the formatter leaves a split pair split, so the two forms coexisted indefinitely.
+combine-opening-tag-and-declare = true
 
 [linter]
 integrations = ["symfony", "php-unit"]
@@ -103,6 +106,11 @@ enabled = false
 
 # Disabled — test files commonly contain inline helper stubs alongside the test class
 [linter.rules.single-class-per-file]
+enabled = false
+
+# Disabled — mago wants plain functions in snake_case. The only plain functions in the tree are the
+# helpers in the `bin/check-*.php` scripts, and they are camelCase like every method around them.
+[linter.rules.function-name]
 enabled = false
 
 # Disabled — the rule rewrites `if (cond) { $x++; }` into `if (!(cond)) { continue; }` followed by

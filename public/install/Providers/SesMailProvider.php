@@ -57,7 +57,7 @@ class SesMailProvider implements MailProvider
             'ses+api://%s:%s@default?region=%s',
             urlencode($config['access_key'] ?? ''),
             urlencode($config['secret_key'] ?? ''),
-            $config['region'] ?? 'eu-west-1'
+            $config['region'] ?? 'eu-west-1',
         );
     }
 
