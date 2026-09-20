@@ -36,7 +36,9 @@
                         <p class="notification has-text-centered">
                             {{ 'profile_images.profile_change_hint'|trans({'%profile_link%': '<a href="' ~ path('app_profile') ~ '">' ~ ('profile_images.profile_change_link_label'|trans) ~ '</a>'})|raw }}
                         </p>
-                        {% include 'profile/image/image_details.html.twig' with {'image': image, 'size': '400x400'} %}
+                        {% if image is defined and image %}
+                            {% include 'profile/image/image_details.html.twig' with {'image': image, 'size': '400x400'} %}
+                        {% endif %}
                     {% endif %}
 
                     {% if action == 'event' %}

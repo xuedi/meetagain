@@ -152,6 +152,7 @@ admin_system_config:
     field_host: '服务器主机'
     field_sender_name: '发件人名称'
     field_sender_email: '发件人邮箱'
+    validator_sender_email_format: '请输入有效的电子邮件地址。'
     field_system_user: '系统用户'
     field_date_format: '日期格式'
     field_footer_col1: '页脚栏1'

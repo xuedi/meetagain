@@ -152,6 +152,7 @@ admin_system_config:
     field_host: 'Server-Host'
     field_sender_name: 'Absendername'
     field_sender_email: 'Absender-E-Mail'
+    validator_sender_email_format: 'Bitte gib eine gültige E-Mail-Adresse ein.'
     field_system_user: 'Systembenutzer'
     field_date_format: 'Datumsformat'
     field_footer_col1: 'Fußzeile Spalte 1'

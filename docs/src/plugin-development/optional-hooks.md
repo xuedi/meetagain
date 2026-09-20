@@ -47,6 +47,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `ConfigPrivacyToggleProviderInterface`       | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                          |
 | `SendingIdentityProviderInterface`           | Decide the name, logo and links a mail is sent under  | `resolve()`                                            |
 | `AudienceFilterInterface`                    | Narrow who receives installation-wide mail            | `filterInstallationWideAudience()`                     |
+| `PushDispatcherInterface`                    | Notice a queued message and deliver it another way    | `dispatch()`                                           |
 
 ---
 
@@ -554,6 +555,35 @@ readonly class AssetLinksProvider implements WellKnownProviderInterface
   site root is shared with the CMS slug router.
 
 ---
+
+### PushDispatcherInterface
+
+Called once for every message the mail queue accepts, right after the row is persisted and before the flush. Use it
+to deliver the same event over another channel without touching the code that triggered it: every notification the
+installation sends passes through this one seam, so you do not have to hook each trigger separately.
+
+```php
+final readonly class MyDispatcher implements PushDispatcherInterface
+{
+    #[Override]
+    public function dispatch(string $identifier, string $recipient, ?DateTimeImmutable $deadline): void
+    {
+        // $identifier is the stable template identifier, $deadline the sender's own cut-off.
+    }
+}
+```
+
+Three rules:
+
+- **Never throw.** A failure here must not stop the message being sent. Catch everything and log it.
+- **Never flush.** Persist what you need and let the caller's flush carry it, or you will break callers that
+  enqueue in bulk and flush once.
+- **Decide for yourself whether the identifier is yours.** Every identifier is offered to every implementation.
+  Account and security mail reaches you too, and pushing a password reset somewhere is a phishing lesson nobody
+  needs.
+
+Callers that queue a message nothing actually happened about - a preview sweep, an operator sending a test - pass
+`dispatchPush: false`, so your dispatcher is not called for them.
 
 ### UrlOwnerProviderInterface
 

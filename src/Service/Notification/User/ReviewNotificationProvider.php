@@ -22,7 +22,7 @@ readonly class ReviewNotificationProvider implements NotificationProviderInterfa
         $label = $this->translator->trans('notification.review.pending_count', ['%count%' => $count]);
 
         return [
-            new NotificationItem(label: $label, icon: 'fa-check-double', route: 'app_profile_review'),
+            new NotificationItem(label: $label, icon: 'fa-check-double', route: 'app_profile_review', key: 'review_pending'),
         ];
     }
 }

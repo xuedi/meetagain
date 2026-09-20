@@ -94,7 +94,7 @@ readonly class PreviewSweepService
                 $email->locale($locale);
                 $email->context($mockContext);
 
-                $this->emailQueue->enqueue($emailType, $email, $mockContext, true, $origin);
+                $this->emailQueue->enqueue($emailType, $email, $mockContext, true, $origin, false);
                 ++$enqueued;
             } catch (Throwable $e) {
                 $errors[$recipient] = $e->getMessage();

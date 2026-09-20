@@ -9,5 +9,11 @@ readonly class NotificationItem
         public ?string $icon = null,
         public ?string $route = null,
         public array $routeParams = [],
+        public ?string $key = null,
     ) {}
+
+    public function key(): ?string
+    {
+        return $this->key ?? $this->route;
+    }
 }

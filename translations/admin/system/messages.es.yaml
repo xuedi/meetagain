@@ -152,6 +152,7 @@ admin_system_config:
     field_host: 'Host del sitio'
     field_sender_name: 'Nombre del remitente'
     field_sender_email: 'Correo del remitente'
+    validator_sender_email_format: 'Introduce una dirección de correo electrónico válida.'
     field_system_user: 'Usuario del sistema'
     field_date_format: 'Formato de fecha'
     field_footer_col1: 'Columna 1 del pie'

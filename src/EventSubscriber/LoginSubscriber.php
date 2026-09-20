@@ -2,10 +2,9 @@
 
 namespace App\EventSubscriber;
 
-use App\Entity\Session\Consent;
 use App\Entity\User;
-use App\Enum\ConsentType;
 use App\Service\Config\LocaleCookieService;
+use App\Service\Member\ConsentService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
@@ -13,6 +12,7 @@ readonly class LoginSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private LocaleCookieService $localeCookieService,
+        private ConsentService $consentService,
     ) {}
 
     public static function getSubscribedEvents(): array
@@ -35,21 +35,6 @@ readonly class LoginSubscriber implements EventSubscriberInterface
             $response->headers->setCookie($this->localeCookieService->createCookie($user->getLocale()));
         }
 
-        if (!$user->isOsmConsent()) {
-            return;
-        }
-
-        $consent = Consent::getBySession($session);
-        $consent->setOsm(ConsentType::Granted);
-        $session->set('consent', $consent);
-        $consent->save($request->getSession());
-
-        if ($response === null) {
-            return;
-        }
-
-        foreach ($consent->getHtmlCookies() as $cookie) {
-            $response->headers->setCookie($cookie);
-        }
+        $this->consentService->setShowOsm((bool) $user->isOsmConsent(), $response);
     }
 }

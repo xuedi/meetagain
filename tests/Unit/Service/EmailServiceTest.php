@@ -658,6 +658,7 @@ final class EmailServiceTest extends TestCase
             logger: $logger ?? $this->createStub(LoggerInterface::class),
             enrichers: $enrichers,
             identityProviders: $identityProviders,
+            pushDispatchers: [],
         );
     }
 

@@ -106,7 +106,7 @@ final class DebuggingController extends AbstractEmailController implements Admin
                 ->locale($language)
                 ->context($context);
 
-            $this->emailQueue->enqueue($emailType, $email, $context);
+            $this->emailQueue->enqueue($emailType, $email, $context, dispatchPush: false);
 
             $this->addFlash('success', $this->translator->trans('admin_email_debugging.flash_queued', [
                 '%recipient%' => $recipient,
