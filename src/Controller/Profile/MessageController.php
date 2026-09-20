@@ -2,17 +2,13 @@
 
 namespace App\Controller\Profile;
 
-use App\Activity\ActivityService;
-use App\Activity\Messages\SendMessage;
 use App\Controller\AbstractController;
-use App\Entity\Message;
 use App\Form\CommentType;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\Member\BlockingService;
-use App\Service\Security\ContentSanitizer;
+use App\Service\Member\MessageService;
 use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Knp\Bundle\TimeBundle\DateTimeFormatter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,13 +20,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class MessageController extends AbstractController
 {
     public function __construct(
-        private readonly ActivityService $activityService,
-        private readonly EntityManagerInterface $em,
         private readonly MessageRepository $msgRepo,
         private readonly UserRepository $userRepo,
         private readonly BlockingService $blockingService,
         private readonly DateTimeFormatter $dateTimeFormatter,
-        private readonly ContentSanitizer $contentSanitizer,
+        private readonly MessageService $messageService,
     ) {}
 
     #[Route('/profile/messages/{id}', name: 'app_profile_messages', methods: ['GET', 'POST'])]
@@ -49,22 +43,11 @@ final class MessageController extends AbstractController
                 $form = $this->createForm(CommentType::class);
                 $form->handleRequest($request);
                 if ($form->isSubmitted() && $form->isValid()) {
-                    $msg = new Message();
-                    $msg->setDeleted(false);
-                    $msg->setWasRead(false);
-                    $msg->setSender($this->getAuthedUser());
-                    $msg->setReceiver($conversationPartner);
-                    $msg->setCreatedAt(new DateTimeImmutable());
-                    $msg->setContent($this->contentSanitizer->toPlainText((string) $form->getData()['comment']));
-
-                    $this->em->persist($msg);
-                    $this->em->flush();
-
-                    $this->activityService->log(SendMessage::TYPE, $user, ['user_id' => $conversationPartner->getId()]);
+                    $this->messageService->send($user, $conversationPartner, (string) $form->getData()['comment']);
                 }
             }
             $messages = $this->msgRepo->getMessages($user, $conversationPartner);
-            $this->msgRepo->markConversationRead($user, $conversationPartner);
+            $this->messageService->markRead($user, $conversationPartner);
             if (!$this->msgRepo->hasNewMessages($user)) {
                 $request->getSession()->set('hasNewMessage', false);
             }
@@ -94,7 +77,7 @@ final class MessageController extends AbstractController
         }
 
         $user = $this->getAuthedUser();
-        $message = $this->msgRepo->findEditableForSender($id, $user, new DateTimeImmutable());
+        $message = $this->messageService->findEditable($id, $user, new DateTimeImmutable());
         if ($message === null) {
             return new JsonResponse(['error' => 'profile_messages.edit_window_expired'], 403);
         }
@@ -103,18 +86,16 @@ final class MessageController extends AbstractController
         if ($trimmed === '') {
             return new JsonResponse(['error' => 'profile_messages.edit_empty'], 400);
         }
-        if (mb_strlen($trimmed) > 5000) {
+        if (mb_strlen($trimmed) > MessageService::MAX_LENGTH) {
             return new JsonResponse(['error' => 'profile_messages.edit_too_long'], 400);
         }
-        $sanitized = $this->contentSanitizer->toPlainText($trimmed);
+        $sanitized = $this->messageService->sanitize($trimmed);
         if ($sanitized === $message->getContent()) {
             return new JsonResponse(['error' => 'profile_messages.edit_no_change'], 400);
         }
 
         $editedAt = new DateTimeImmutable();
-        $message->setContent($sanitized);
-        $message->setEditedAt($editedAt);
-        $this->em->flush();
+        $this->messageService->edit($message, $trimmed, $editedAt);
 
         return new JsonResponse([
             'id' => $message->getId(),

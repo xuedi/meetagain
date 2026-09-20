@@ -2,12 +2,14 @@
 
 namespace App\Form;
 
+use App\Service\Member\MessageService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CommentType extends AbstractType
@@ -21,7 +23,8 @@ class CommentType extends AbstractType
     {
         $builder->add('comment', TextareaType::class, [
             'constraints' => [
-                new Length(max: 5000, maxMessage: 'profile_messages.validator_content_max'),
+                new NotBlank(message: 'profile_messages.validator_content_blank'),
+                new Length(max: MessageService::MAX_LENGTH, maxMessage: 'profile_messages.validator_content_max'),
             ],
         ]);
     }

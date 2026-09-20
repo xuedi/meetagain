@@ -204,6 +204,7 @@ Error: Fehler
 'admin_system_language.validator_code_pattern': 'Sprachcode muss aus 2 Kleinbuchstaben bestehen (z. B. en, de, zh).'
 
 # Profile messages namespace - message edit window
+'profile_messages.validator_content_blank': 'Bitte gib eine Nachricht ein.'
 'profile_messages.validator_content_max': 'Der Nachrichtentext darf nicht länger als {{ limit }} Zeichen sein.'
 
 # Admin CMS namespace - reserved slug guard
