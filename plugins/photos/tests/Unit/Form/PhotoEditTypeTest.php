@@ -2,10 +2,10 @@
 
 namespace Plugin\Photos\Tests\Unit\Form;
 
-use App\Item\Tag\AssignmentFormHelper;
-use App\Item\Tag\TagService;
 use App\Filter\Event\EventFilterResult;
 use App\Filter\Event\EventFilterService;
+use App\Item\Tag\AssignmentFormHelper;
+use App\Item\Tag\TagService;
 use App\Item\TranslationFormHelper;
 use App\Repository\EventRepository;
 use App\Service\Config\LanguageService;
@@ -25,7 +25,12 @@ class PhotoEditTypeTest extends TestCase
     {
         // Arrange
         $photo = new Photo();
-        $photo->addTranslation(new PhotoTranslation()->setLanguage('en')->setTitle('Harbour')->setDescription('At dawn.'));
+        $photo->addTranslation(
+            new PhotoTranslation()
+                ->setLanguage('en')
+                ->setTitle('Harbour')
+                ->setDescription('At dawn.'),
+        );
 
         // Act
         $form = $this->formFor($photo);

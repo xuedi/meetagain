@@ -189,7 +189,7 @@ final class ScoreProvider implements ResetInterface
                 $descriptor = $descriptors[$key];
                 $cap = $config->capFor($descriptor);
                 $counted = $cap === null ? $quantity : min($cap, $quantity);
-                $points[$userId] = ($points[$userId] ?? 0) + $config->pointsFor($descriptor) * $counted;
+                $points[$userId] = ($points[$userId] ?? 0) + ($config->pointsFor($descriptor) * $counted);
             }
         }
 
@@ -208,8 +208,7 @@ final class ScoreProvider implements ResetInterface
                 if (!isset($descriptors[$action->action])) {
                     continue;
                 }
-                $quantities[$action->userId][$action->action] =
-                    ($quantities[$action->userId][$action->action] ?? 0) + max(0, $action->quantity);
+                $quantities[$action->userId][$action->action] = ($quantities[$action->userId][$action->action] ?? 0) + max(0, $action->quantity);
             }
         }
 

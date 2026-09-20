@@ -5,6 +5,7 @@ namespace App\Service\Admin;
 use App\Admin\Navigation\AdminLink;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Navigation\AdminSection;
+use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
@@ -143,7 +144,7 @@ readonly class AdminNavigationService
             return true;
         } catch (RouteNotFoundException) {
             return false;
-        } catch (\Exception) {
+        } catch (Exception) {
             return true;
         }
     }

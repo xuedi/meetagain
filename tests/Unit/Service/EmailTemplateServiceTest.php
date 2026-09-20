@@ -173,10 +173,7 @@ class EmailTemplateServiceTest extends TestCase
         $result = $this->subject->renderContent($content, $context);
 
         // Assert
-        static::assertSame(
-            '<p>Hello &lt;a href=&quot;https://evil.example&quot;&gt;Alice&lt;/a&gt;</p>',
-            $result,
-        );
+        static::assertSame('<p>Hello &lt;a href=&quot;https://evil.example&quot;&gt;Alice&lt;/a&gt;</p>', $result);
     }
 
     public function testRenderContentLetsTheAnnouncementBodyThroughAsHtml(): void

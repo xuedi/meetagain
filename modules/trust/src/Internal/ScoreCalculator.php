@@ -53,7 +53,7 @@ final readonly class ScoreCalculator
         for ($round = 0; $round < self::MAX_ROUNDS; $round++) {
             $next = array_map(static fn(int $points): float => (float) $points, $base);
             foreach ($accepted as $edge) {
-                $next[$edge['to']] += $scores[$edge['from']] * $config->percentFor($edge['level']) / 100;
+                $next[$edge['to']] += ($scores[$edge['from']] * $config->percentFor($edge['level'])) / 100;
             }
 
             $delta = 0.0;

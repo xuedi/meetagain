@@ -277,11 +277,7 @@ readonly class ChangeProposalService
         $proposal->setReviewedAt(new DateTimeImmutable());
         $this->em->flush();
 
-        $this->activityService->log(
-            $approved ? ChangeProposalApplied::TYPE : ChangeProposalRejected::TYPE,
-            $reviewer,
-            $this->activityMeta($proposal),
-        );
+        $this->activityService->log($approved ? ChangeProposalApplied::TYPE : ChangeProposalRejected::TYPE, $reviewer, $this->activityMeta($proposal));
     }
 
     /** @return array{target_type: string, target_id: int, target_label: string} */

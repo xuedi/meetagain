@@ -14,13 +14,6 @@ abstract readonly class AbstractLocalizedRowSource implements LocalizedContentSo
         protected EntityManagerInterface $em,
     ) {}
 
-    /** @return class-string */
-    abstract protected function getEntityClass(): string;
-
-    abstract protected function getLocaleField(): string;
-
-    abstract protected function getOwnerField(): string;
-
     #[Override]
     public function countOutsideLocales(array $ownerIds, array $keepLocales): int
     {
@@ -28,11 +21,7 @@ abstract readonly class AbstractLocalizedRowSource implements LocalizedContentSo
             return 0;
         }
 
-        return (int) $this
-            ->baseQuery($ownerIds, $keepLocales)
-            ->select('COUNT(row.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        return (int) $this->baseQuery($ownerIds, $keepLocales)->select('COUNT(row.id)')->getQuery()->getSingleScalarResult();
     }
 
     #[Override]
@@ -50,6 +39,13 @@ abstract readonly class AbstractLocalizedRowSource implements LocalizedContentSo
 
         return count($entities);
     }
+
+    /** @return class-string */
+    abstract protected function getEntityClass(): string;
+
+    abstract protected function getLocaleField(): string;
+
+    abstract protected function getOwnerField(): string;
 
     /**
      * @param list<int> $ownerIds

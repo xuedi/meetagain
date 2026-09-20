@@ -34,20 +34,23 @@ class ExifRuntimeTest extends TestCase
         ]));
 
         // Assert
-        static::assertSame([
-            ['label' => 'photos_photo.meta_camera', 'value' => 'FUJIFILM X-T5'],
-            ['label' => 'photos_photo.meta_lens', 'value' => 'XF23mmF1.4 R LM WR'],
-            ['label' => 'photos_photo.meta_exposure', 'value' => '1/800 s'],
-            ['label' => 'photos_photo.meta_aperture', 'value' => 'f/2.8'],
-            ['label' => 'photos_photo.meta_iso', 'value' => '160'],
-            ['label' => 'photos_photo.meta_focal_length', 'value' => '23 mm'],
-            ['label' => 'photos_photo.meta_focal_length_35', 'value' => '35 mm'],
-            ['label' => 'photos_photo.meta_exposure_bias', 'value' => '-0.33 EV'],
-            ['label' => 'photos_photo.meta_flash', 'value' => 'photos_photo.flash_not_fired'],
-            ['label' => 'photos_photo.meta_white_balance', 'value' => 'photos_photo.wb_auto'],
-            ['label' => 'photos_photo.meta_metering', 'value' => 'photos_photo.metering_pattern'],
-            ['label' => 'photos_photo.meta_dimensions', 'value' => '1800 × 1200'],
-        ], $rows);
+        static::assertSame(
+            [
+                ['label' => 'photos_photo.meta_camera', 'value' => 'FUJIFILM X-T5'],
+                ['label' => 'photos_photo.meta_lens', 'value' => 'XF23mmF1.4 R LM WR'],
+                ['label' => 'photos_photo.meta_exposure', 'value' => '1/800 s'],
+                ['label' => 'photos_photo.meta_aperture', 'value' => 'f/2.8'],
+                ['label' => 'photos_photo.meta_iso', 'value' => '160'],
+                ['label' => 'photos_photo.meta_focal_length', 'value' => '23 mm'],
+                ['label' => 'photos_photo.meta_focal_length_35', 'value' => '35 mm'],
+                ['label' => 'photos_photo.meta_exposure_bias', 'value' => '-0.33 EV'],
+                ['label' => 'photos_photo.meta_flash', 'value' => 'photos_photo.flash_not_fired'],
+                ['label' => 'photos_photo.meta_white_balance', 'value' => 'photos_photo.wb_auto'],
+                ['label' => 'photos_photo.meta_metering', 'value' => 'photos_photo.metering_pattern'],
+                ['label' => 'photos_photo.meta_dimensions', 'value' => '1800 × 1200'],
+            ],
+            $rows,
+        );
     }
 
     #[DataProvider('emptyMeta')]

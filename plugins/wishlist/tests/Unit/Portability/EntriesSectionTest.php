@@ -19,8 +19,9 @@ final class EntriesSectionTest extends SectionTestCase
     public function testAWishSurvivesTheRoundTrip(): void
     {
         // Arrange
-        $exported = $this->section([$this->entry(1, 7)], [$this->user(1, 'ada@example.org')])
-            ->export($this->scope([1 => [DataCategory::Collections]]), $this->images());
+        $exported = $this->section([$this->entry(1, 7)], [$this->user(1, 'ada@example.org')])->export($this->scope([1 => [
+            DataCategory::Collections,
+        ]]), $this->images());
 
         $importedAda = $this->user(11, 'ada@example.org');
         $context = $this->context();

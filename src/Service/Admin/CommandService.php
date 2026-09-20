@@ -6,6 +6,7 @@ use App\Service\Command\ClearCacheCommand;
 use App\Service\Command\CommandInterface;
 use App\Service\Command\ExecuteMigrationsCommand;
 use App\Service\Command\RebuildThemeCommand;
+use RuntimeException;
 use SensioLabs\AnsiConverter\AnsiToHtmlConverter;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -82,7 +83,7 @@ readonly class CommandService
         $process->run();
 
         if (!$process->isSuccessful()) {
-            throw new \RuntimeException('Migration failed: ' . $process->getErrorOutput());
+            throw new RuntimeException('Migration failed: ' . $process->getErrorOutput());
         }
     }
 }

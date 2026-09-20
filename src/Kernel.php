@@ -43,18 +43,6 @@ class Kernel extends BaseKernel
         }
     }
 
-    /**
-     * @return array<class-string<BundleInterface>, array<string, bool>>
-     */
-    private function readBundles(string $bundlesFile): array
-    {
-        if (!file_exists($bundlesFile)) {
-            return [];
-        }
-
-        return require $bundlesFile;
-    }
-
     public function getPluginConfigDirs(): iterable
     {
         $envPluginsFile = $this->getProjectDir() . '/config/plugins_' . $this->environment . '.php';
@@ -111,6 +99,18 @@ class Kernel extends BaseKernel
 
             $this->doConfigureRoutes($routes, $pluginConfigDir);
         }
+    }
+
+    /**
+     * @return array<class-string<BundleInterface>, array<string, bool>>
+     */
+    private function readBundles(string $bundlesFile): array
+    {
+        if (!file_exists($bundlesFile)) {
+            return [];
+        }
+
+        return require $bundlesFile;
     }
 
     private function doConfigureContainer(ContainerConfigurator $container, string $configDir): void

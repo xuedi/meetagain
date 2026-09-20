@@ -117,10 +117,12 @@ final class PluginSettingsTest extends TestCase
         $store = $this->createStub(StoreInterface::class);
         $store->method('supports')->willReturnCallback(static fn(string $key, ?string $scopeId): bool => $scopeId === null);
         $store->method('load')->willReturnCallback(fn(string $key): ?object => $this->stored[$key] ?? null);
-        $store->method('save')->willReturnCallback(function (string $key, object $data, ?string $scopeId): void {
-            static::assertInstanceOf(Data::class, $data);
-            $this->saved[] = ['key' => $key, 'values' => $data->toArray(), 'scopeId' => $scopeId];
-        });
+        $store
+            ->method('save')
+            ->willReturnCallback(function (string $key, object $data, ?string $scopeId): void {
+                static::assertInstanceOf(Data::class, $data);
+                $this->saved[] = ['key' => $key, 'values' => $data->toArray(), 'scopeId' => $scopeId];
+            });
 
         return $store;
     }

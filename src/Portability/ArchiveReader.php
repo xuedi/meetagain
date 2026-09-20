@@ -61,17 +61,6 @@ readonly class ArchiveReader
 
     /**
      * @param array<array-key, mixed> $data
-     * @return list<string>
-     */
-    private function plugins(array $data): array
-    {
-        $plugins = is_array($data['plugins'] ?? null) ? $data['plugins'] : [];
-
-        return array_values(array_filter($plugins, is_string(...)));
-    }
-
-    /**
-     * @param array<array-key, mixed> $data
      * @return array<string, int>
      */
     public function countRows(array $data): array
@@ -104,6 +93,17 @@ readonly class ArchiveReader
         }
 
         return $counts;
+    }
+
+    /**
+     * @param array<array-key, mixed> $data
+     * @return list<string>
+     */
+    private function plugins(array $data): array
+    {
+        $plugins = is_array($data['plugins'] ?? null) ? $data['plugins'] : [];
+
+        return array_values(array_filter($plugins, is_string(...)));
     }
 
     private function readJson(string $zipOrDirectory): string

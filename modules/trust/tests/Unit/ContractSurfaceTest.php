@@ -20,9 +20,11 @@ class ContractSurfaceTest extends TestCase
         // Act
         $edgeReaders = array_filter(
             $reflection->getMethods(),
-            static fn(ReflectionMethod $method): bool => str_contains(strtolower($method->getName()), 'incoming')
+            static fn(ReflectionMethod $method): bool => (
+                str_contains(strtolower($method->getName()), 'incoming')
                 || str_contains(strtolower($method->getName()), 'vouchers')
-                || str_contains(strtolower($method->getName()), 'grants'),
+                || str_contains(strtolower($method->getName()), 'grants')
+            ),
         );
 
         // Assert

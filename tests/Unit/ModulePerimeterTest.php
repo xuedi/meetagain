@@ -60,12 +60,7 @@ class ModulePerimeterTest extends TestCase
         $declared = str_contains($config, $expected);
 
         // Assert
-        self::assertTrue($declared, sprintf(
-            "modules/%s/tests has no outbound rule in %s.\nExpected a line: %s",
-            $module,
-            self::CONFIG,
-            $expected,
-        ));
+        self::assertTrue($declared, sprintf("modules/%s/tests has no outbound rule in %s.\nExpected a line: %s", $module, self::CONFIG, $expected));
     }
 
     public function testTheGenericBackstopIsInPlace(): void

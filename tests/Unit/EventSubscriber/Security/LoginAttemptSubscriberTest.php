@@ -39,14 +39,13 @@ class LoginAttemptSubscriberTest extends TestCase
         $formFactory->method('createNamed')->willReturn($form);
 
         $this->guard = new LoginGuard(
-            new RateLimiterFactory(
-                ['id' => 'login_failure', 'policy' => 'sliding_window', 'limit' => 3, 'interval' => '15 minutes'],
-                new InMemoryStorage(),
-            ),
-            new RateLimiterFactory(
-                ['id' => 'login_measures_announcement', 'policy' => 'fixed_window', 'limit' => 1, 'interval' => '1 hour'],
-                new InMemoryStorage(),
-            ),
+            new RateLimiterFactory(['id' => 'login_failure', 'policy' => 'sliding_window', 'limit' => 3, 'interval' => '15 minutes'], new InMemoryStorage()),
+            new RateLimiterFactory([
+                'id' => 'login_measures_announcement',
+                'policy' => 'fixed_window',
+                'limit' => 1,
+                'interval' => '1 hour',
+            ], new InMemoryStorage()),
             $formFactory,
         );
     }
@@ -110,9 +109,11 @@ class LoginAttemptSubscriberTest extends TestCase
         // Arrange
         $logged = [];
         $activityService = $this->createStub(ActivityService::class);
-        $activityService->method('log')->willReturnCallback(static function (...$args) use (&$logged): void {
-            $logged[] = $args;
-        });
+        $activityService
+            ->method('log')
+            ->willReturnCallback(static function (...$args) use (&$logged): void {
+                $logged[] = $args;
+            });
         $subscriber = $this->subscriber(activityService: $activityService);
 
         // Act
@@ -132,9 +133,11 @@ class LoginAttemptSubscriberTest extends TestCase
         // Arrange
         $logged = 0;
         $activityService = $this->createStub(ActivityService::class);
-        $activityService->method('log')->willReturnCallback(static function () use (&$logged): void {
-            $logged++;
-        });
+        $activityService
+            ->method('log')
+            ->willReturnCallback(static function () use (&$logged): void {
+                $logged++;
+            });
         $subscriber = $this->subscriber(activityService: $activityService);
 
         // Act
@@ -285,21 +288,11 @@ class LoginAttemptSubscriberTest extends TestCase
 
     private function passportCheck(): CheckPassportEvent
     {
-        return new CheckPassportEvent(
-            $this->createStub(AuthenticatorInterface::class),
-            new SelfValidatingPassport(new UserBadge('alice@example.test')),
-        );
+        return new CheckPassportEvent($this->createStub(AuthenticatorInterface::class), new SelfValidatingPassport(new UserBadge('alice@example.test')));
     }
 
     private function failure(AuthenticationException $exception, ?Passport $passport = null, ?Request $request = null): LoginFailureEvent
     {
-        return new LoginFailureEvent(
-            $exception,
-            $this->createStub(AuthenticatorInterface::class),
-            $request ?? $this->loginRequest(),
-            null,
-            'main',
-            $passport,
-        );
+        return new LoginFailureEvent($exception, $this->createStub(AuthenticatorInterface::class), $request ?? $this->loginRequest(), null, 'main', $passport);
     }
 }

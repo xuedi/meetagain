@@ -38,7 +38,11 @@ class PhotoTest extends TestCase
     {
         // Arrange
         $photo = new Photo();
-        $photo->addTranslation(new PhotoTranslation()->setLanguage('de')->setTitle('Hafen'));
+        $photo->addTranslation(
+            new PhotoTranslation()
+                ->setLanguage('de')
+                ->setTitle('Hafen'),
+        );
 
         // Act + Assert
         static::assertSame('Hafen', $photo->getTranslatedTitle('en'));

@@ -48,6 +48,14 @@ class LocationType extends AbstractType
             ]);
     }
 
+    #[Override]
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Location::class,
+        ]);
+    }
+
     /**
      * @param positive-int $max
      *
@@ -59,13 +67,5 @@ class LocationType extends AbstractType
             new NotBlank(message: 'admin_location.validator_blank'),
             new Length(max: $max, maxMessage: 'admin_location.validator_too_long'),
         ];
-    }
-
-    #[Override]
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data_class' => Location::class,
-        ]);
     }
 }

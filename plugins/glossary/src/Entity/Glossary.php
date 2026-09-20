@@ -122,7 +122,9 @@ class Glossary
         }
 
         if ($existing === null) {
-            $existing = new Definition()->setLanguage($language)->setGlossary($this);
+            $existing = new Definition()
+                ->setLanguage($language)
+                ->setGlossary($this);
             $this->definitions->add($existing);
         }
         $existing->setText($text);

@@ -39,14 +39,11 @@ class ImageAttributionService
 
     public function hasAny(): bool
     {
-        return $this->hasAny ??= $this->cache->get(
-            self::CACHE_KEY_PREFIX . $this->scope(),
-            function (ItemInterface $item): bool {
-                $item->tag(self::CACHE_TAG);
+        return $this->hasAny ??= $this->cache->get(self::CACHE_KEY_PREFIX . $this->scope(), function (ItemInterface $item): bool {
+            $item->tag(self::CACHE_TAG);
 
-                return $this->imageRepository->hasAttributed($this->resolveVisibleIds());
-            },
-        );
+            return $this->imageRepository->hasAttributed($this->resolveVisibleIds());
+        });
     }
 
     public function invalidate(): void

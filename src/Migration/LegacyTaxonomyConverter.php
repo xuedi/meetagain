@@ -52,7 +52,7 @@ readonly class LegacyTaxonomyConverter
         }
 
         foreach ($this->rowsOf($taxonomy, 'categories') as $row) {
-            $parent = $row['parent'] === null ? null : ($groups[$row['parent']] ?? null);
+            $parent = $row['parent'] === null ? null : $groups[$row['parent']] ?? null;
             $tag = $this->createTag($itemType, $row['labels'], $parent, $position++);
             $keyed[$this->mapKey($itemType, $scope, self::CATEGORY_AXIS, $row['id'])] = $tag;
         }
@@ -66,7 +66,7 @@ readonly class LegacyTaxonomyConverter
 
         foreach ($this->rowsOf($taxonomy, 'tags') as $row) {
             $tag = $created[$row['id']];
-            $parent = $row['parent'] === null ? null : ($created[$row['parent']] ?? null);
+            $parent = $row['parent'] === null ? null : $created[$row['parent']] ?? null;
             $tag->setParent($parent === $tag ? null : $parent);
         }
 
@@ -176,7 +176,7 @@ readonly class LegacyTaxonomyConverter
                 continue;
             }
 
-            $parent = $key === 'categories' ? ($raw['group'] ?? null) : ($raw['parent'] ?? null);
+            $parent = $key === 'categories' ? $raw['group'] ?? null : $raw['parent'] ?? null;
             $rows[] = [
                 'id' => (int) $raw['id'],
                 'labels' => $labels,

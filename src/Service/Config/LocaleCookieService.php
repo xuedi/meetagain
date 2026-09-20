@@ -19,13 +19,7 @@ readonly class LocaleCookieService
 
     public function createCookie(string $locale): Cookie
     {
-        return new Cookie(
-            name: self::COOKIE_NAME,
-            value: $locale,
-            expire: new DateTime('+6 months'),
-            httpOnly: true,
-            sameSite: Cookie::SAMESITE_LAX,
-        );
+        return new Cookie(name: self::COOKIE_NAME, value: $locale, expire: new DateTime('+6 months'), httpOnly: true, sameSite: Cookie::SAMESITE_LAX);
     }
 
     public function isConsentGranted(Request $request): bool

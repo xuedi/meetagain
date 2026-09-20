@@ -26,52 +26,10 @@ abstract class AbstractSecurityProvider implements SecurityProviderInterface
 
     abstract public function getPriority(): int;
 
-    abstract protected function handlesType(SecurityEventType $type): bool;
-
-    /**
-     * @param array<string, mixed> $context
-     * @param array<string, mixed> $state
-     * @return array{state: array<string, mixed>, threatLevel: int, summary: string, details: array<string, mixed>}
-     */
-    abstract protected function processEvent(SecurityEventType $type, Request $request, array $context, string $ip, array $state): array;
-
-    /**
-     * @return array{threatLevel: int, summary: string, details: array<string, mixed>}
-     */
-    abstract protected function scanLogs(DateTimeImmutable $from, DateTimeImmutable $to): array;
-
-    /**
-     * @param array<string, mixed> $context
-     */
-    protected function persistLog(Request $request, array $context): void
-    {
-    }
-
-    protected function resolveStateKey(string $sessionId, string $ip): string
-    {
-        return $sessionId;
-    }
-
     #[Override]
     public function handles(SecurityEventType $type): bool
     {
         return $this->handlesType($type);
-    }
-
-    /**
-     * @param array<string, mixed> $details
-     */
-    protected function buildReport(int $threatLevel, string $summary, array $details = []): ProviderReport
-    {
-        $recommendation = $threatLevel >= 100 ? SecurityRecommendation::Block : SecurityRecommendation::Handled;
-
-        return new ProviderReport(
-            providerKey: $this->getKey(),
-            threatLevel: $threatLevel,
-            summary: $summary,
-            recommendation: $recommendation,
-            details: $details,
-        );
     }
 
     #[Override]
@@ -121,6 +79,61 @@ abstract class AbstractSecurityProvider implements SecurityProviderInterface
         return $this->buildReport($result['threatLevel'], $result['summary'], $result['details']);
     }
 
+    public function clearAllState(): void
+    {
+        try {
+            foreach ($this->loadIndex() as $stateKey => $expiresAt) {
+                $this->securityCachePool->deleteItem($this->cacheKey($stateKey));
+            }
+            $this->securityCachePool->deleteItem($this->indexCacheKey());
+        } catch (Throwable $e) {
+            $this->logger->warning('Failed to clear security provider state: ' . $e->getMessage(), [
+                'exception' => $e,
+                'providerKey' => $this->getKey(),
+            ]);
+        }
+    }
+
+    abstract protected function handlesType(SecurityEventType $type): bool;
+
+    /**
+     * @param array<string, mixed> $context
+     * @param array<string, mixed> $state
+     * @return array{state: array<string, mixed>, threatLevel: int, summary: string, details: array<string, mixed>}
+     */
+    abstract protected function processEvent(SecurityEventType $type, Request $request, array $context, string $ip, array $state): array;
+
+    /**
+     * @return array{threatLevel: int, summary: string, details: array<string, mixed>}
+     */
+    abstract protected function scanLogs(DateTimeImmutable $from, DateTimeImmutable $to): array;
+
+    /**
+     * @param array<string, mixed> $context
+     */
+    protected function persistLog(Request $request, array $context): void {}
+
+    protected function resolveStateKey(string $sessionId, string $ip): string
+    {
+        return $sessionId;
+    }
+
+    /**
+     * @param array<string, mixed> $details
+     */
+    protected function buildReport(int $threatLevel, string $summary, array $details = []): ProviderReport
+    {
+        $recommendation = $threatLevel >= 100 ? SecurityRecommendation::Block : SecurityRecommendation::Handled;
+
+        return new ProviderReport(
+            providerKey: $this->getKey(),
+            threatLevel: $threatLevel,
+            summary: $summary,
+            recommendation: $recommendation,
+            details: $details,
+        );
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -160,21 +173,6 @@ abstract class AbstractSecurityProvider implements SecurityProviderInterface
             $this->logger->warning('Failed to save security provider state: ' . $e->getMessage(), [
                 'exception' => $e,
                 'cacheKey' => $cacheKey,
-            ]);
-        }
-    }
-
-    public function clearAllState(): void
-    {
-        try {
-            foreach ($this->loadIndex() as $stateKey => $expiresAt) {
-                $this->securityCachePool->deleteItem($this->cacheKey($stateKey));
-            }
-            $this->securityCachePool->deleteItem($this->indexCacheKey());
-        } catch (Throwable $e) {
-            $this->logger->warning('Failed to clear security provider state: ' . $e->getMessage(), [
-                'exception' => $e,
-                'providerKey' => $this->getKey(),
             ]);
         }
     }

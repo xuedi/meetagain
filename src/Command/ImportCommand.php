@@ -28,8 +28,18 @@ class ImportCommand extends Command
     protected function configure(): void
     {
         $this->addArgument('archive', InputArgument::REQUIRED, 'Path to the archive ZIP or to a directory holding its export.json');
-        $this->addOption('shift-dates', null, InputOption::VALUE_NONE, 'Move every date by whole weeks, from the week the archive was exported to the current week');
-        $this->addOption('site-settings', null, InputOption::VALUE_NONE, 'Write the archive site block (name, languages, theme, logo, feature settings) into this instance');
+        $this->addOption(
+            'shift-dates',
+            null,
+            InputOption::VALUE_NONE,
+            'Move every date by whole weeks, from the week the archive was exported to the current week',
+        );
+        $this->addOption(
+            'site-settings',
+            null,
+            InputOption::VALUE_NONE,
+            'Write the archive site block (name, languages, theme, logo, feature settings) into this instance',
+        );
         $this->addOption('strict', null, InputOption::VALUE_NONE, 'Exit non-zero when any row was skipped or dropped');
     }
 

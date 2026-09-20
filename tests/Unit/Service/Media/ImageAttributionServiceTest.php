@@ -163,12 +163,7 @@ class ImageAttributionServiceTest extends TestCase
         ?TagAwareCacheInterface $cache = null,
         ?RequestStack $stack = null,
     ): ImageAttributionService {
-        return new ImageAttributionService(
-            $repository,
-            $filterService,
-            $cache ?? $this->cache(),
-            $stack ?? $this->stack('club.example.org'),
-        );
+        return new ImageAttributionService($repository, $filterService, $cache ?? $this->cache(), $stack ?? $this->stack('club.example.org'));
     }
 
     private function cache(): TagAwareCacheInterface

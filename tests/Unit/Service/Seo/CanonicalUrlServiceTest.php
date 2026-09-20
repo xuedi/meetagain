@@ -12,18 +12,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CanonicalUrlServiceTest extends TestCase
 {
-    private function makeService(
-        string $host = 'https://example.com',
-        iterable $providers = [],
-        iterable $urlOwnerProviders = [],
-    ): CanonicalUrlService {
+    private function makeService(string $host = 'https://example.com', iterable $providers = [], iterable $urlOwnerProviders = []): CanonicalUrlService
+    {
         $configStub = $this->createStub(ConfigService::class);
         $configStub->method('getHost')->willReturn($host);
 
-        return new CanonicalUrlService(
-            urlOwnerService: new UrlOwnerService($configStub, $urlOwnerProviders),
-            providers: $providers,
-        );
+        return new CanonicalUrlService(urlOwnerService: new UrlOwnerService($configStub, $urlOwnerProviders), providers: $providers);
     }
 
     public function testNoProvidersReturnsHostPlusRequestUri(): void
@@ -107,9 +101,7 @@ class CanonicalUrlServiceTest extends TestCase
     {
         // Arrange
         $owner = $this->createStub(UrlOwnerProviderInterface::class);
-        $owner
-            ->method('getOwnerHost')
-            ->willReturnCallback(static fn(string $route) => $route === 'app_dishes_dishlist' ? 'https://cinema.example.org' : null);
+        $owner->method('getOwnerHost')->willReturnCallback(static fn(string $route) => $route === 'app_dishes_dishlist' ? 'https://cinema.example.org' : null);
 
         $request = Request::create('/en/dishes');
         $request->attributes->set('_route', 'app_dishes_dishlist');
@@ -126,11 +118,9 @@ class CanonicalUrlServiceTest extends TestCase
     {
         // Arrange
         $owner = $this->createStub(UrlOwnerProviderInterface::class);
-        $owner
-            ->method('getOwnerHost')
-            ->willReturnCallback(
-                static fn(string $route, array $parameters) => ($parameters['id'] ?? null) === 17 ? 'https://dragon.example.org' : null,
-            );
+        $owner->method('getOwnerHost')->willReturnCallback(static fn(string $route, array $parameters) => ($parameters['id'] ?? null) === 17
+            ? 'https://dragon.example.org'
+            : null);
 
         $request = Request::create('/en/event/17');
         $request->attributes->set('_route', 'app_event_details');

@@ -23,7 +23,8 @@ class RsvpGuestRepository extends ServiceEntityRepository
      */
     public function getCountsForEvent(Event $event): array
     {
-        $rows = $this->createQueryBuilder('g')
+        $rows = $this
+            ->createQueryBuilder('g')
             ->select('u.id AS userId', 'g.guests')
             ->join('g.user', 'u')
             ->where('g.event = :event')
@@ -49,7 +50,8 @@ class RsvpGuestRepository extends ServiceEntityRepository
             return [];
         }
 
-        $rows = $this->createQueryBuilder('g')
+        $rows = $this
+            ->createQueryBuilder('g')
             ->select('IDENTITY(g.event) AS eventId', 'SUM(g.guests) AS total')
             ->where('g.event IN (:events)')
             ->groupBy('g.event')
@@ -75,7 +77,8 @@ class RsvpGuestRepository extends ServiceEntityRepository
             return [];
         }
 
-        $rows = $this->createQueryBuilder('g')
+        $rows = $this
+            ->createQueryBuilder('g')
             ->select('IDENTITY(g.event) AS eventId', 'g.guests')
             ->where('g.event IN (:events)')
             ->andWhere('g.user = :user')
@@ -94,7 +97,8 @@ class RsvpGuestRepository extends ServiceEntityRepository
 
     public function deleteFor(Event $event, User $user): void
     {
-        $this->createQueryBuilder('g')
+        $this
+            ->createQueryBuilder('g')
             ->delete()
             ->where('g.event = :event')
             ->andWhere('g.user = :user')

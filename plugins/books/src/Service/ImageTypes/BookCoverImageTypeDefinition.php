@@ -24,11 +24,6 @@ final class BookCoverImageTypeDefinition extends AbstractImageTypeDefinition
         return ImageType::PluginBooksCover;
     }
 
-    protected function sizes(): array
-    {
-        return [[self::FREE_AXIS, 800], [400, 600], [350, 525], [200, 300], [100, 150]];
-    }
-
     public function getEditLink(int $locationId): ?array
     {
         return ['route' => 'app_plugin_books_book_show', 'params' => ['id' => $locationId]];
@@ -58,5 +53,10 @@ final class BookCoverImageTypeDefinition extends AbstractImageTypeDefinition
             'route' => 'app_plugin_books_book_show',
             'params' => ['id' => $book->getId()],
         ];
+    }
+
+    protected function sizes(): array
+    {
+        return [[self::FREE_AXIS, 800], [400, 600], [350, 525], [200, 300], [100, 150]];
     }
 }

@@ -12,6 +12,7 @@ use Plugin\Boardgames\Form\ConfigType;
 use Plugin\Boardgames\Publisher\PluginSettings\ConfigDescriptor;
 use Plugin\Boardgames\ValueObject\Config;
 use Psr\Log\NullLogger;
+use SensitiveParameter;
 use Symfony\Component\Form\FormInterface;
 
 class ConfigDescriptorTest extends TestCase
@@ -152,11 +153,7 @@ class ConfigDescriptorTest extends TestCase
     {
         $descriptors = new PluginSettingsService([$this->descriptor($scopeId)]);
 
-        return new Resolver(
-            $descriptors,
-            [$this->store(null, $global), $this->store($scopeId, $scoped)],
-            [$this->scopeProvider($scopeId)],
-        );
+        return new Resolver($descriptors, [$this->store(null, $global), $this->store($scopeId, $scoped)], [$this->scopeProvider($scopeId)]);
     }
 
     private function scopeProvider(?string $scopeId): ScopeProviderInterface
@@ -185,7 +182,7 @@ class ConfigDescriptorTest extends TestCase
         return $secretBox;
     }
 
-    private function form(string $token, bool $clear): FormInterface
+    private function form(#[SensitiveParameter] string $token, bool $clear): FormInterface
     {
         $tokenField = $this->createStub(FormInterface::class);
         $tokenField->method('getData')->willReturn($token);
@@ -194,9 +191,7 @@ class ConfigDescriptorTest extends TestCase
         $clearField->method('getData')->willReturn($clear);
 
         $form = $this->createStub(FormInterface::class);
-        $form->method('get')->willReturnCallback(
-            static fn(string $name): FormInterface => $name === 'bggToken' ? $tokenField : $clearField,
-        );
+        $form->method('get')->willReturnCallback(static fn(string $name): FormInterface => $name === 'bggToken' ? $tokenField : $clearField);
 
         return $form;
     }

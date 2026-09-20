@@ -25,9 +25,12 @@ final class RebuildCommand extends Command
     #[Override]
     protected function configure(): void
     {
-        $this
-            ->addOption('context', null, InputOption::VALUE_REQUIRED, 'Limit to one context string')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Compare against the cache and report drift without writing');
+        $this->addOption('context', null, InputOption::VALUE_REQUIRED, 'Limit to one context string')->addOption(
+            'dry-run',
+            null,
+            InputOption::VALUE_NONE,
+            'Compare against the cache and report drift without writing',
+        );
     }
 
     #[Override]

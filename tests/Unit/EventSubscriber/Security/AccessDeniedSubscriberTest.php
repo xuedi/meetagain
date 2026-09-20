@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Throwable;
 
 class AccessDeniedSubscriberTest extends TestCase
 {
@@ -86,7 +87,7 @@ class AccessDeniedSubscriberTest extends TestCase
         static::assertTrue(true);
     }
 
-    private function createEvent(\Throwable $throwable): ExceptionEvent
+    private function createEvent(Throwable $throwable): ExceptionEvent
     {
         return new ExceptionEvent($this->createStub(HttpKernelInterface::class), Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $throwable);
     }

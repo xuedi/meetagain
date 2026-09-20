@@ -59,7 +59,7 @@ readonly class FieldPurpose implements PurposeInterface
         $exportable = array_filter(
             $this->em->getRepository(ChangeProposal::class)->findBy(['id' => array_values($proposalIds)]),
             static fn(ChangeProposal $proposal): bool => $proposal->getStatus() === ChangeProposalStatus::Pending
-                && $scope->grants($proposal->getProposedBy(), DataCategory::Interactions),
+            && $scope->grants($proposal->getProposedBy(), DataCategory::Interactions),
         );
 
         return count($exportable) === count($proposalIds);

@@ -62,10 +62,7 @@ class Kernel implements Plugin
             return [];
         }
 
-        return [new EventListItemTag(
-            text: $this->translator->trans('boardgames.event_list_tag', ['%count%' => $count]),
-            icon: 'fa fa-dice',
-        )];
+        return [new EventListItemTag(text: $this->translator->trans('boardgames.event_list_tag', ['%count%' => $count]), icon: 'fa fa-dice')];
     }
 
     public function warmCache(WarmCacheType $type, array $ids): void {}

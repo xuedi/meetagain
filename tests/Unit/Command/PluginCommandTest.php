@@ -95,9 +95,11 @@ class PluginCommandTest extends TestCase
     {
         // Arrange
         $enabled = [];
-        $this->pluginService->method('enable')->willReturnCallback(static function (string $key) use (&$enabled): void {
-            $enabled[] = $key;
-        });
+        $this->pluginService
+            ->method('enable')
+            ->willReturnCallback(static function (string $key) use (&$enabled): void {
+                $enabled[] = $key;
+            });
 
         // Act
         $exitCode = $this->commandTester->execute([

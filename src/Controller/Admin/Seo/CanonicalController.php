@@ -52,12 +52,7 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
         $locale = $request->query->getString('locale') ?: null;
         $onlyBranched = $request->query->getBoolean('branched');
 
-        $lanes = $this->overviewService->getLanes(
-            $seriesId,
-            $locale,
-            $onlyBranched,
-            $this->eventListFilterService->getEventIdFilter()->getEventIds(),
-        );
+        $lanes = $this->overviewService->getLanes($seriesId, $locale, $onlyBranched, $this->eventListFilterService->getEventIdFilter()->getEventIds());
 
         return $this->render('admin/seo/canonical/index.html.twig', [
             'active' => 'seo',
@@ -81,10 +76,9 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
             return $this->redirectToRoute('app_admin_seo_canonical_config');
         }
 
-        $adminTop = new AdminTop(
-            info: [new AdminTopInfoText($this->translator->trans('admin_seo_canonical.topbar_config'))],
-            actions: [$this->backToCanonical()],
-        );
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans(
+            'admin_seo_canonical.topbar_config',
+        ))], actions: [$this->backToCanonical()]);
 
         return $this->render('admin/seo/canonical/config.html.twig', [
             'active' => 'seo',
@@ -205,11 +199,7 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
         $activeLabel = $this->translator->trans('admin_seo_canonical.filter_all');
 
         foreach ($this->overviewService->getSeriesOptions() as $id => $name) {
-            $options[] = new AdminTopActionDropdownOption(
-                label: $name,
-                target: $this->filterUrl($id, $locale, $onlyBranched),
-                isActive: $seriesId === $id,
-            );
+            $options[] = new AdminTopActionDropdownOption(label: $name, target: $this->filterUrl($id, $locale, $onlyBranched), isActive: $seriesId === $id);
             if ($seriesId === $id) {
                 $activeLabel = $name;
             }
@@ -231,11 +221,7 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
         )];
 
         foreach ($this->languageService->getAdminFilteredEnabledCodes() as $code) {
-            $options[] = new AdminTopActionDropdownOption(
-                label: $code,
-                target: $this->filterUrl($seriesId, $code, $onlyBranched),
-                isActive: $locale === $code,
-            );
+            $options[] = new AdminTopActionDropdownOption(label: $code, target: $this->filterUrl($seriesId, $code, $onlyBranched), isActive: $locale === $code);
         }
 
         return new AdminTopActionDropdown(
@@ -255,9 +241,7 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
             label: sprintf(
                 '%s %s',
                 $this->translator->trans('admin_seo_canonical.filter_branched_label'),
-                $this->translator->trans($onlyBranched
-                    ? 'admin_seo_canonical.filter_branched_only'
-                    : 'admin_seo_canonical.filter_all'),
+                $this->translator->trans($onlyBranched ? 'admin_seo_canonical.filter_branched_only' : 'admin_seo_canonical.filter_all'),
             ),
             options: [
                 new AdminTopActionDropdownOption(

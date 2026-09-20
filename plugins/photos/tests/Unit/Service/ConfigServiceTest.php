@@ -3,10 +3,10 @@
 namespace Plugin\Photos\Tests\Unit\Service;
 
 use App\Publisher\PluginSettings\Resolver;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use PHPUnit\Framework\TestCase;
 use Plugin\Photos\Service\ConfigService;
 use Plugin\Photos\ValueObject\Config;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ConfigServiceTest extends TestCase
 {

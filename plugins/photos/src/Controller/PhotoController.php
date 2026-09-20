@@ -4,13 +4,13 @@ namespace Plugin\Photos\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use App\Entity\Event;
 use App\Entity\User;
+use App\Filter\Event\EventFilterService;
 use App\Item\ListRegistry;
 use App\Item\Tag\AssignmentFormHelper;
 use App\Item\Tag\TagService;
 use App\Item\TranslationFormHelper;
-use App\Entity\Event;
-use App\Filter\Event\EventFilterService;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Item\AssociationService;
@@ -177,8 +177,7 @@ final class PhotoController extends AbstractController
         BreadcrumbBuilder $breadcrumbBuilder,
         EventFilterService $eventFilterService,
         EventRepository $eventRepository,
-    ): Response
-    {
+    ): Response {
         if (!$listRegistry->has(PhotoService::ITEM_TYPE)) {
             throw $this->createNotFoundException();
         }

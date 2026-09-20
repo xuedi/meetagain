@@ -4,11 +4,11 @@ namespace App\Controller;
 
 use App\Admin\Dashboard\ChartTile;
 use App\Admin\Dashboard\CounterTile;
-use App\Admin\Dashboard\Tile;
 use App\Admin\Dashboard\HealthTile;
 use App\Admin\Dashboard\ListTile;
 use App\Admin\Dashboard\MultiSeriesChartTile;
 use App\Admin\Dashboard\TableTile;
+use App\Admin\Dashboard\Tile;
 use App\Admin\Dashboard\TileDataset;
 use App\Admin\Dashboard\TileHealthCheck;
 use App\Admin\Dashboard\TileListItem;

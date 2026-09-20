@@ -137,11 +137,8 @@ class CommentServiceTest extends TestCase
         $service->deleteAllFor('event', 42);
     }
 
-    private function makeService(
-        EntityManagerInterface $em,
-        ?TargetProviderInterface $provider = null,
-        ?CommentRepository $repository = null,
-    ): CommentService {
+    private function makeService(EntityManagerInterface $em, ?TargetProviderInterface $provider = null, ?CommentRepository $repository = null): CommentService
+    {
         $config = new HtmlSanitizerConfig()->allowSafeElements();
 
         return new CommentService(

@@ -20,23 +20,26 @@ class ExifServiceTest extends TestCase
         $meta = $service->extract(self::FIXTURE_DIR . '/with-exif.jpg');
 
         // Assert
-        static::assertSame([
-            'make' => 'FUJIFILM',
-            'model' => 'X-T5',
-            'lens' => 'XF23mmF1.4 R LM WR',
-            'exposureTime' => '1/800',
-            'fNumber' => 2.8,
-            'iso' => 160,
-            'focalLength' => 23.0,
-            'focalLength35' => 35,
-            'exposureBias' => -0.33,
-            'flash' => false,
-            'whiteBalance' => 0,
-            'meteringMode' => 5,
-            'takenAt' => '2026-04-18 07:42:11',
-            'width' => 160,
-            'height' => 120,
-        ], $meta);
+        static::assertSame(
+            [
+                'make' => 'FUJIFILM',
+                'model' => 'X-T5',
+                'lens' => 'XF23mmF1.4 R LM WR',
+                'exposureTime' => '1/800',
+                'fNumber' => 2.8,
+                'iso' => 160,
+                'focalLength' => 23.0,
+                'focalLength35' => 35,
+                'exposureBias' => -0.33,
+                'flash' => false,
+                'whiteBalance' => 0,
+                'meteringMode' => 5,
+                'takenAt' => '2026-04-18 07:42:11',
+                'width' => 160,
+                'height' => 120,
+            ],
+            $meta,
+        );
     }
 
     public function testCarriesNoLocationData(): void

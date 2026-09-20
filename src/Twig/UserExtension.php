@@ -13,12 +13,20 @@ final class UserExtension extends AbstractExtension
     {
         return [
             new TwigFunction('get_user_name', [UserRuntime::class, 'getUserName']),
-            new TwigFunction('get_member_view_actions', [UserRuntime::class, 'getMemberViewActions'], [
-                'is_safe' => ['html'],
-            ]),
-            new TwigFunction('get_member_view_sections', [UserRuntime::class, 'getMemberViewSections'], [
-                'is_safe' => ['html'],
-            ]),
+            new TwigFunction(
+                'get_member_view_actions',
+                [UserRuntime::class, 'getMemberViewActions'],
+                [
+                    'is_safe' => ['html'],
+                ],
+            ),
+            new TwigFunction(
+                'get_member_view_sections',
+                [UserRuntime::class, 'getMemberViewSections'],
+                [
+                    'is_safe' => ['html'],
+                ],
+            ),
         ];
     }
 }

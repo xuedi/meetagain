@@ -20,8 +20,8 @@ use App\Service\Config\LanguageService;
 use App\Service\Media\AltLocaleRequirementResolver;
 use App\Service\Media\ImageAltService;
 use App\Service\Media\ImageAltStatusCache;
-use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageAttributionService;
+use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
 use DateTimeImmutable;
@@ -85,12 +85,9 @@ final class ImagesController extends AbstractSettingsController implements Admin
         $issuesByImageId = $this->classifyIssues($images);
         $issueCounts = $this->countIssues($issuesByImageId);
         if ($issuesFilter !== ImageIssueFilter::All) {
-            $images = array_values(array_filter(
-                $images,
-                static fn(Image $image): bool => $issuesFilter === ImageIssueFilter::Healthy
-                    ? $issuesByImageId[(int) $image->getId()] === []
-                    : in_array($issuesFilter, $issuesByImageId[(int) $image->getId()], true),
-            ));
+            $images = array_values(array_filter($images, static fn(Image $image): bool => $issuesFilter === ImageIssueFilter::Healthy
+                ? $issuesByImageId[(int) $image->getId()] === []
+                : in_array($issuesFilter, $issuesByImageId[(int) $image->getId()], true)));
         }
 
         $info = [
@@ -296,13 +293,9 @@ final class ImagesController extends AbstractSettingsController implements Admin
      */
     private function translateIssues(array $issuesByImageId): array
     {
-        return array_map(
-            fn(array $issues): array => array_map(
-                fn(ImageIssueFilter $issue): string => $this->translator->trans($issue->label()),
-                $issues,
-            ),
-            $issuesByImageId,
-        );
+        return array_map(fn(array $issues): array => array_map(fn(ImageIssueFilter $issue): string => $this->translator->trans(
+            $issue->label(),
+        ), $issues), $issuesByImageId);
     }
 
     private function resolveLocation(string $param): ?ImageType
@@ -345,11 +338,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_system_images.issues_filter_label'),
-                $this->translator->trans($current->label()),
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_system_images.issues_filter_label'), $this->translator->trans($current->label())),
             options: $options,
             icon: 'triangle-exclamation',
         );

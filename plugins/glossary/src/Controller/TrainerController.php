@@ -217,17 +217,21 @@ final class TrainerController extends AbstractGlossaryController
         $config = $this->trainer->config();
         $directions = $config->getOfferedDirections();
 
-        return $this->createForm(TrainerSetupType::class, [
-            'scope' => $scope,
-            'tags' => implode(',', $tagIds),
-            'mode' => Mode::Review,
-            'direction' => $directions[0],
-            'answerMode' => $config->getDefaultAnswerMode(),
-            'size' => $config->getSessionSize(),
-        ], [
-            'directions' => $directions,
-            'action' => $this->generateUrl('app_plugin_glossary_trainer_start'),
-        ]);
+        return $this->createForm(
+            TrainerSetupType::class,
+            [
+                'scope' => $scope,
+                'tags' => implode(',', $tagIds),
+                'mode' => Mode::Review,
+                'direction' => $directions[0],
+                'answerMode' => $config->getDefaultAnswerMode(),
+                'size' => $config->getSessionSize(),
+            ],
+            [
+                'directions' => $directions,
+                'action' => $this->generateUrl('app_plugin_glossary_trainer_start'),
+            ],
+        );
     }
 
     /** @param list<int> $tagIds */

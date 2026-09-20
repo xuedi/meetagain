@@ -109,11 +109,8 @@ class LocationTargetTest extends TestCase
     }
 
     /** @param list<Location> $visible */
-    private function makeTarget(
-        array $visible = [],
-        ?EntityActionDispatcher $dispatcher = null,
-        ?EntityManagerInterface $em = null,
-    ): LocationTarget {
+    private function makeTarget(array $visible = [], ?EntityActionDispatcher $dispatcher = null, ?EntityManagerInterface $em = null): LocationTarget
+    {
         $repo = $this->createStub(LocationRepository::class);
         $repo->method('findAllForAdmin')->willReturn($visible);
 

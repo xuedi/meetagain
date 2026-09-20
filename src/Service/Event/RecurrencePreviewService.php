@@ -30,11 +30,7 @@ final readonly class RecurrencePreviewService
         $probe = $state->pattern(period: $isYearly ? RecurrencePeriod::Month : null);
 
         // takeFrom, not take: the picked day is a start date, so a matching "after" is a valid candidate.
-        $occurrences = $this->calculator->takeFrom(
-            $probe,
-            $after,
-            $isYearly ? self::YEARLY_CANDIDATE_COUNT : self::CANDIDATE_COUNT,
-        );
+        $occurrences = $this->calculator->takeFrom($probe, $after, $isYearly ? self::YEARLY_CANDIDATE_COUNT : self::CANDIDATE_COUNT);
 
         $intlLocale = $locale ?? Locale::getDefault();
         $candidates = [];
@@ -54,14 +50,7 @@ final readonly class RecurrencePreviewService
 
     private function formatLabel(DateTimeInterface $date, string $intlLocale): string
     {
-        $formatter = new IntlDateFormatter(
-            $intlLocale,
-            IntlDateFormatter::MEDIUM,
-            IntlDateFormatter::NONE,
-            null,
-            null,
-            self::LABEL_PATTERN,
-        );
+        $formatter = new IntlDateFormatter($intlLocale, IntlDateFormatter::MEDIUM, IntlDateFormatter::NONE, null, null, self::LABEL_PATTERN);
 
         return $formatter->format($date) ?: $date->format('Y-m-d');
     }

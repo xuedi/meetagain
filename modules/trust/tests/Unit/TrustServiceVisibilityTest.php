@@ -6,11 +6,11 @@ use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Trust\Contract\AccessProviderInterface;
+use Module\Trust\Contract\ActionDescriptor;
 use Module\Trust\Contract\ActionSourceInterface;
 use Module\Trust\Contract\ContextDescriberInterface;
 use Module\Trust\Contract\ContextDescriptor;
 use Module\Trust\Contract\TrustAction;
-use Module\Trust\Contract\ActionDescriptor;
 use Module\Trust\Internal\AccessResolver;
 use Module\Trust\Internal\ActionRegistry;
 use Module\Trust\Internal\ConfigStore;
@@ -71,9 +71,7 @@ class TrustServiceVisibilityTest extends TestCase
     private function service(?int $viewerId): TrustService
     {
         $security = $this->createStub(Security::class);
-        $security->method('getUser')->willReturn(
-            $viewerId === null ? null : $this->createConfiguredStub(User::class, ['getId' => $viewerId]),
-        );
+        $security->method('getUser')->willReturn($viewerId === null ? null : $this->createConfiguredStub(User::class, ['getId' => $viewerId]));
         $security->method('isGranted')->willReturn(false);
 
         $configRepository = $this->createStub(TrustContextConfigRepository::class);

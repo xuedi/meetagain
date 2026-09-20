@@ -18,12 +18,17 @@ class LedgerServiceTest extends TestCase
         // Arrange
         $occurredAt = new DateTimeImmutable('2026-08-01 10:00:00');
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects(self::once())->method('persist')->with(self::callback(
-            static fn(CirculationLedgerEntry $entry): bool => $entry->getEntryType() === CirculationLedgerEntryType::Donated
-                && $entry->getContext() === 'book-group-1'
-                && $entry->getItemId() === 42
-                && $entry->getOccurredAt() === $occurredAt,
-        ));
+        $em
+            ->expects(self::once())
+            ->method('persist')
+            ->with(self::callback(
+                static fn(CirculationLedgerEntry $entry): bool => (
+                    $entry->getEntryType() === CirculationLedgerEntryType::Donated
+                    && $entry->getContext() === 'book-group-1'
+                    && $entry->getItemId() === 42
+                    && $entry->getOccurredAt() === $occurredAt
+                ),
+            ));
         $em->expects(self::once())->method('flush');
         $service = new LedgerService($em, $this->createStub(CirculationLedgerEntryRepository::class));
 
@@ -42,10 +47,7 @@ class LedgerServiceTest extends TestCase
         $reflection = new ReflectionClass(CirculationLedgerEntry::class);
 
         // Act
-        $setters = array_filter(
-            $reflection->getMethods(),
-            static fn($method): bool => str_starts_with($method->getName(), 'set'),
-        );
+        $setters = array_filter($reflection->getMethods(), static fn($method): bool => str_starts_with($method->getName(), 'set'));
 
         // Assert
         self::assertSame([], $setters);

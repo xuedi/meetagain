@@ -173,30 +173,6 @@ final class NotFoundProvider extends AbstractSecurityProvider
         ];
     }
 
-    private function weightedThreat(int $probeHits, int $assetHits, int $flaggedHits, int $base = 0): int
-    {
-        $probeWeight = 100 / self::BLOCK_AT_PROBES;
-
-        return (int) min(
-            100,
-            $base
-            + $probeHits * $probeWeight
-            + $flaggedHits * self::FLAGGED_URL_WEIGHT * $probeWeight
-            + $assetHits * (100 / self::BLOCK_AT_ASSET_HITS),
-        );
-    }
-
-    private function buildSummary(int $probeHits, int $flaggedHits, int $assetHits, int $distinctPaths): string
-    {
-        return sprintf(
-            '%d probe 404s, %d flagged 404s, %d asset 404s (distinct paths: %d)',
-            $probeHits,
-            $flaggedHits,
-            $assetHits,
-            $distinctPaths,
-        );
-    }
-
     #[Override]
     protected function persistLog(Request $request, array $context): void
     {
@@ -244,7 +220,7 @@ final class NotFoundProvider extends AbstractSecurityProvider
             }
         }
 
-        $threatLevel = (int) min(100, ($patternHits + $flaggedHits * self::FLAGGED_URL_WEIGHT + count($uniqueIps)) / 100);
+        $threatLevel = (int) min(100, ($patternHits + ($flaggedHits * self::FLAGGED_URL_WEIGHT) + count($uniqueIps)) / 100);
         $summary = sprintf(
             '%d 404s in window, %d unique IPs, %d suspicious-pattern hits, %d flagged-URL hits',
             count($rows),
@@ -263,5 +239,20 @@ final class NotFoundProvider extends AbstractSecurityProvider
                 'flaggedHits' => $flaggedHits,
             ],
         ];
+    }
+
+    private function weightedThreat(int $probeHits, int $assetHits, int $flaggedHits, int $base = 0): int
+    {
+        $probeWeight = 100 / self::BLOCK_AT_PROBES;
+
+        return (int) min(
+            100,
+            $base + ($probeHits * $probeWeight) + ($flaggedHits * self::FLAGGED_URL_WEIGHT * $probeWeight) + ($assetHits * (100 / self::BLOCK_AT_ASSET_HITS)),
+        );
+    }
+
+    private function buildSummary(int $probeHits, int $flaggedHits, int $assetHits, int $distinctPaths): string
+    {
+        return sprintf('%d probe 404s, %d flagged 404s, %d asset 404s (distinct paths: %d)', $probeHits, $flaggedHits, $assetHits, $distinctPaths);
     }
 }

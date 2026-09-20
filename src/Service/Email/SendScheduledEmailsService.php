@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Throwable;
 
 final readonly class SendScheduledEmailsService implements CronTaskInterface
 {
@@ -98,7 +99,7 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
             $output->writeln('SendScheduledEmailsService: ' . $message);
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $output->writeln('SendScheduledEmailsService exception: ' . $e->getMessage());
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());

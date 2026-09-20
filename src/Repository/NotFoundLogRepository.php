@@ -281,10 +281,10 @@ class NotFoundLogRepository extends ServiceEntityRepository
             $qb->andWhere('n.createdAt >= :since')->setParameter('since', $since);
         }
 
-        $rows = array_map(
-            static fn(array $row): array => ['bucket' => (string) $row['bucket'], 'number' => (int) $row['number']],
-            $qb->getQuery()->getArrayResult(),
-        );
+        $rows = array_map(static fn(array $row): array => [
+            'bucket' => (string) $row['bucket'],
+            'number' => (int) $row['number'],
+        ], $qb->getQuery()->getArrayResult());
 
         return array_values(array_reverse($rows));
     }
@@ -308,10 +308,10 @@ class NotFoundLogRepository extends ServiceEntityRepository
             $qb->andWhere(sprintf('n.%s IS NOT NULL', $field))->andWhere(sprintf("n.%s != ''", $field));
         }
 
-        return array_values(array_map(
-            static fn(array $row): array => ['value' => (string) $row['value'], 'number' => (int) $row['number']],
-            $qb->getQuery()->getArrayResult(),
-        ));
+        return array_values(array_map(static fn(array $row): array => [
+            'value' => (string) $row['value'],
+            'number' => (int) $row['number'],
+        ], $qb->getQuery()->getArrayResult()));
     }
 
     private function countDistinct(string $field, ?DateTimeImmutable $since): int

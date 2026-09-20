@@ -4,8 +4,8 @@ namespace Tests\Unit\Service\Notification;
 
 use App\Entity\User;
 use App\Repository\EmailQueueRepository;
-use App\Service\Support\VisibilityResolver;
 use App\Service\Notification\User\CoreNotificationProvider;
+use App\Service\Support\VisibilityResolver;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;

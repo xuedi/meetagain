@@ -69,12 +69,7 @@ readonly class ChangeProposalReviewProvider implements ReviewNotificationProvide
     {
         $lines = [];
         foreach ($this->service->fieldRows($proposal) as $row) {
-            $lines[] = sprintf(
-                '%s: %s -> %s',
-                $row['label'],
-                $row['before'] !== '' ? $row['before'] : '-',
-                $row['after'] !== '' ? $row['after'] : '-',
-            );
+            $lines[] = sprintf('%s: %s -> %s', $row['label'], $row['before'] !== '' ? $row['before'] : '-', $row['after'] !== '' ? $row['after'] : '-');
         }
 
         return implode("\n", $lines);

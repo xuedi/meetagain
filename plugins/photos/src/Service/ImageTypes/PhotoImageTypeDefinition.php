@@ -24,11 +24,6 @@ final class PhotoImageTypeDefinition extends AbstractImageTypeDefinition
         return ImageType::PluginPhotosPhoto;
     }
 
-    protected function sizes(): array
-    {
-        return [[1600, self::FREE_AXIS], [1024, 768], [600, 400], [400, 400], [350, 263]];
-    }
-
     public function getEditLink(int $locationId): ?array
     {
         return ['route' => 'app_plugin_photos_photo_show', 'params' => ['id' => $locationId]];
@@ -38,10 +33,7 @@ final class PhotoImageTypeDefinition extends AbstractImageTypeDefinition
     {
         $rows = $this->connection->fetchAllAssociative('SELECT image_id, id AS location_id FROM plg_photos_photo');
 
-        return array_values(array_map(
-            static fn(array $row): array => ['imageId' => (int) $row['image_id'], 'locationId' => (int) $row['location_id']],
-            $rows,
-        ));
+        return array_values(array_map(static fn(array $row): array => ['imageId' => (int) $row['image_id'], 'locationId' => (int) $row['location_id']], $rows));
     }
 
     public function locate(Image $image): ?array
@@ -58,5 +50,10 @@ final class PhotoImageTypeDefinition extends AbstractImageTypeDefinition
             'route' => 'app_plugin_photos_photo_show',
             'params' => ['id' => $photo->getId()],
         ];
+    }
+
+    protected function sizes(): array
+    {
+        return [[1600, self::FREE_AXIS], [1024, 768], [600, 400], [400, 400], [350, 263]];
     }
 }

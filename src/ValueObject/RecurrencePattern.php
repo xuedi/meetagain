@@ -34,8 +34,12 @@ final readonly class RecurrencePattern
      * @param list<Weekday>|Weekday                        $weekdays
      * @param list<RecurrenceOrdinal>|RecurrenceOrdinal|null $ordinals
      */
-    public static function weekday(RecurrencePeriod $period, array|Weekday $weekdays, array|RecurrenceOrdinal|null $ordinals = null, ?int $anchorMonth = null): self
-    {
+    public static function weekday(
+        RecurrencePeriod $period,
+        array|Weekday $weekdays,
+        array|RecurrenceOrdinal|null $ordinals = null,
+        ?int $anchorMonth = null,
+    ): self {
         if (!$period->carriesDayRule()) {
             throw new InvalidRecurrencePatternException(sprintf('Period "%s" cannot carry a weekday rule.', $period->value));
         }
@@ -117,11 +121,7 @@ final readonly class RecurrencePattern
         }
 
         if (isset($parts['BYMONTHDAY'])) {
-            return self::dayOfMonth(
-                $period,
-                array_map(static fn(string $day): int => (int) $day, explode(',', $parts['BYMONTHDAY'])),
-                $anchorMonth,
-            );
+            return self::dayOfMonth($period, array_map(static fn(string $day): int => (int) $day, explode(',', $parts['BYMONTHDAY'])), $anchorMonth);
         }
 
         if (isset($parts['BYDAY'])) {

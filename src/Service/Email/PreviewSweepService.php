@@ -170,11 +170,7 @@ readonly class PreviewSweepService
 
         foreach ($requested as $identifier) {
             if (!in_array($identifier, $available, true)) {
-                throw new RuntimeException(sprintf(
-                    'Unknown email type "%s". Available: %s',
-                    $identifier,
-                    implode(', ', $available),
-                ));
+                throw new RuntimeException(sprintf('Unknown email type "%s". Available: %s', $identifier, implode(', ', $available)));
             }
         }
 
@@ -195,11 +191,7 @@ readonly class PreviewSweepService
 
         foreach ($requested as $code) {
             if (!in_array($code, $available, true)) {
-                throw new RuntimeException(sprintf(
-                    'Unknown language "%s". Available: %s',
-                    $code,
-                    implode(', ', $available),
-                ));
+                throw new RuntimeException(sprintf('Unknown language "%s". Available: %s', $code, implode(', ', $available)));
             }
         }
 

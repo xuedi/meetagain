@@ -48,11 +48,7 @@ class ThreadServiceTest extends TestCase
         $token = 'a1' . str_repeat('0', 62);
 
         $repo = $this->createMock(SupportRequestRepository::class);
-        $repo
-            ->expects($this->once())
-            ->method('findOneBy')
-            ->with(['token' => $token])
-            ->willReturn($expected);
+        $repo->expects($this->once())->method('findOneBy')->with(['token' => $token])->willReturn($expected);
 
         $service = $this->createService(requestRepo: $repo);
 

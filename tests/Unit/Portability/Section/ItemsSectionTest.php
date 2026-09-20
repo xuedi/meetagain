@@ -113,7 +113,9 @@ final class ItemsSectionTest extends SectionTestCase
         $context = $this->context();
 
         // Act
-        new ItemsSection($this->registry([]), $this->createStub(TagAssignments::class))->import(['karaoke' => ['rows' => [['ref' => 1], ['ref' => 2]]]], $context);
+        new ItemsSection($this->registry([]), $this->createStub(TagAssignments::class))->import([
+            'karaoke' => ['rows' => [['ref' => 1], ['ref' => 2]]],
+        ], $context);
 
         // Assert
         static::assertSame(['karaoke' => ['skipped' => 2]], $context->toSummary()->counts);
@@ -127,10 +129,12 @@ final class ItemsSectionTest extends SectionTestCase
     {
         $registry = $this->createStub(Registry::class);
         $registry->method('all')->willReturn($contributors);
-        $registry->method('contributorFor')->willReturnCallback(static fn(string $itemType): ?ContributorInterface => array_find(
-            $contributors,
-            static fn(ContributorInterface $contributor): bool => $contributor->getItemType() === $itemType,
-        ));
+        $registry
+            ->method('contributorFor')
+            ->willReturnCallback(static fn(string $itemType): ?ContributorInterface => array_find(
+                $contributors,
+                static fn(ContributorInterface $contributor): bool => $contributor->getItemType() === $itemType,
+            ));
 
         return $registry;
     }

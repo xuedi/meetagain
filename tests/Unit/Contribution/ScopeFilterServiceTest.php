@@ -105,7 +105,10 @@ class ScopeFilterServiceTest extends TestCase
             /**
              * @param list<int>|null $visible
              */
-            public function __construct(private readonly ?array $visible, private readonly ?string $onlyType) {}
+            public function __construct(
+                private readonly ?array $visible,
+                private readonly ?string $onlyType,
+            ) {}
 
             public function getPriority(): int
             {
@@ -132,7 +135,11 @@ class ScopeFilterServiceTest extends TestCase
             /**
              * @param list<string> $order
              */
-            public function __construct(private readonly string $name, private readonly int $priority, private array &$order) {}
+            public function __construct(
+                private readonly string $name,
+                private readonly int $priority,
+                private array &$order,
+            ) {}
 
             public function getPriority(): int
             {

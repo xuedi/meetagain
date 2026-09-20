@@ -55,7 +55,9 @@ class EligibilityResolverTest extends TestCase
     private function provider(?EligibilityVerdict $verdict): EligibilityProviderInterface
     {
         return new class($verdict) implements EligibilityProviderInterface {
-            public function __construct(private readonly ?EligibilityVerdict $verdict) {}
+            public function __construct(
+                private readonly ?EligibilityVerdict $verdict,
+            ) {}
 
             public function canRequest(string $context, string $itemType, int $itemId, User $user): ?EligibilityVerdict
             {

@@ -52,7 +52,9 @@ readonly class BallotsSection implements SectionInterface
     {
         $ballots = array_values(array_filter(
             $this->ballots->exportAll(),
-            fn(PortableBallot $ballot): bool => $this->purposeFor($ballot->purpose)?->inScope($ballot->purpose, $ballot->subject, $this->keysOf($ballot), $scope) ?? false,
+            fn(PortableBallot $ballot): bool => (
+                $this->purposeFor($ballot->purpose)?->inScope($ballot->purpose, $ballot->subject, $this->keysOf($ballot), $scope) ?? false
+            ),
         ));
         $users = $this->usersOf($ballots);
 

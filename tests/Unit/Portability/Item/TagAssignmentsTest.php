@@ -34,10 +34,11 @@ final class TagAssignmentsTest extends SectionTestCase
         $this->assignments()->import('dish', ['tags' => [12 => [2, 5]]], [12 => 91], $context);
 
         // Assert
-        $written = array_map(
-            static fn(ItemTagAssignment $assignment): array => [$assignment->getItemType(), $assignment->getItemId(), $assignment->getTag()?->getId()],
-            $this->persisted,
-        );
+        $written = array_map(static fn(ItemTagAssignment $assignment): array => [
+            $assignment->getItemType(),
+            $assignment->getItemId(),
+            $assignment->getTag()?->getId(),
+        ], $this->persisted);
         static::assertSame([['dish', 91, 40], ['dish', 91, 41]], $written);
         static::assertSame(2, $context->toSummary()->get(TagAssignments::KIND, Outcome::Created));
     }

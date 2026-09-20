@@ -35,11 +35,7 @@ class CirculationLedgerEntryRepository extends ServiceEntityRepository
      */
     public function findContextItemTypes(): array
     {
-        $rows = $this->createQueryBuilder('l')
-            ->select('DISTINCT l.context, l.itemType')
-            ->orderBy('l.context', 'ASC')
-            ->getQuery()
-            ->getArrayResult();
+        $rows = $this->createQueryBuilder('l')->select('DISTINCT l.context, l.itemType')->orderBy('l.context', 'ASC')->getQuery()->getArrayResult();
 
         $itemTypes = [];
         foreach ($rows as $row) {
@@ -55,9 +51,12 @@ class CirculationLedgerEntryRepository extends ServiceEntityRepository
      */
     public function findTimeline(string $context, string $itemType, int $limit, int $offset, ?array $allowedItemIds = null): array
     {
-        $qb = $this->createQueryBuilder('l')
-            ->where('l.context = :context')->setParameter('context', $context)
-            ->andWhere('l.itemType = :itemType')->setParameter('itemType', $itemType)
+        $qb = $this
+            ->createQueryBuilder('l')
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('l.itemType = :itemType')
+            ->setParameter('itemType', $itemType)
             ->orderBy('l.id', 'DESC')
             ->setMaxResults($limit)
             ->setFirstResult($offset);
@@ -74,10 +73,13 @@ class CirculationLedgerEntryRepository extends ServiceEntityRepository
 
     public function countTimeline(string $context, string $itemType, ?array $allowedItemIds = null): int
     {
-        $qb = $this->createQueryBuilder('l')
+        $qb = $this
+            ->createQueryBuilder('l')
             ->select('COUNT(l.id)')
-            ->where('l.context = :context')->setParameter('context', $context)
-            ->andWhere('l.itemType = :itemType')->setParameter('itemType', $itemType);
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('l.itemType = :itemType')
+            ->setParameter('itemType', $itemType);
 
         if ($allowedItemIds !== null) {
             if ($allowedItemIds === []) {
@@ -94,19 +96,26 @@ class CirculationLedgerEntryRepository extends ServiceEntityRepository
      */
     public function findOfType(string $context, CirculationLedgerEntryType $entryType): array
     {
-        return array_values($this->createQueryBuilder('l')
-            ->where('l.context = :context')->setParameter('context', $context)
-            ->andWhere('l.entryType = :entryType')->setParameter('entryType', $entryType)
-            ->orderBy('l.id', 'ASC')
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('l')
+                ->where('l.context = :context')
+                ->setParameter('context', $context)
+                ->andWhere('l.entryType = :entryType')
+                ->setParameter('entryType', $entryType)
+                ->orderBy('l.id', 'ASC')
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     public function getMaxId(string $context): ?int
     {
-        $max = $this->createQueryBuilder('l')
+        $max = $this
+            ->createQueryBuilder('l')
             ->select('MAX(l.id)')
-            ->where('l.context = :context')->setParameter('context', $context)
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
             ->getQuery()
             ->getSingleScalarResult();
 
@@ -115,9 +124,11 @@ class CirculationLedgerEntryRepository extends ServiceEntityRepository
 
     public function countCompletedHandovers(string $context): int
     {
-        return (int) $this->createQueryBuilder('l')
+        return (int) $this
+            ->createQueryBuilder('l')
             ->select('COUNT(l.id)')
-            ->where('l.context = :context')->setParameter('context', $context)
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
             ->andWhere('l.entryType = :entryType')
             ->setParameter('entryType', CirculationLedgerEntryType::HandoverCompleted)
             ->getQuery()
@@ -129,9 +140,11 @@ class CirculationLedgerEntryRepository extends ServiceEntityRepository
      */
     public function countHandoversPerCopy(string $context): array
     {
-        $rows = $this->createQueryBuilder('l')
+        $rows = $this
+            ->createQueryBuilder('l')
             ->select('l.copyId AS copyId, COUNT(l.id) AS total')
-            ->where('l.context = :context')->setParameter('context', $context)
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
             ->andWhere('l.entryType = :entryType')
             ->setParameter('entryType', CirculationLedgerEntryType::HandoverCompleted)
             ->andWhere('l.copyId IS NOT NULL')
@@ -152,9 +165,11 @@ class CirculationLedgerEntryRepository extends ServiceEntityRepository
      */
     public function countDonationsPerUser(string $context): array
     {
-        $rows = $this->createQueryBuilder('l')
+        $rows = $this
+            ->createQueryBuilder('l')
             ->select('l.actorUserId AS userId, COUNT(l.id) AS total')
-            ->where('l.context = :context')->setParameter('context', $context)
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
             ->andWhere('l.entryType = :entryType')
             ->setParameter('entryType', CirculationLedgerEntryType::Donated)
             ->andWhere('l.actorUserId IS NOT NULL')

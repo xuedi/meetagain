@@ -4,9 +4,9 @@ namespace Plugin\Films\Tests\Unit\Controller;
 
 use App\Activity\ActivityService;
 use App\Item\ListRegistry;
-use App\Service\Seo\BreadcrumbBuilder;
 use App\Item\Tag\AssignmentFormHelper;
 use App\Item\Tag\TagService;
+use App\Service\Seo\BreadcrumbBuilder;
 use PHPUnit\Framework\TestCase;
 use Plugin\Films\Controller\FilmController;
 use Plugin\Films\Service\FilmLookupResolver;
@@ -44,10 +44,6 @@ class FilmControllerTest extends TestCase
 
     private function breadcrumbBuilder(): BreadcrumbBuilder
     {
-        return new BreadcrumbBuilder(
-            $this->createStub(UrlGeneratorInterface::class),
-            $this->createStub(TranslatorInterface::class),
-            new RequestStack(),
-        );
+        return new BreadcrumbBuilder($this->createStub(UrlGeneratorInterface::class), $this->createStub(TranslatorInterface::class), new RequestStack());
     }
 }

@@ -132,17 +132,20 @@ class TextMapTest extends TestCase
         $stored = $block->toArray();
 
         // Assert
-        static::assertSame([
-            'title' => 'Where we meet',
-            'content' => '<p>Ring the bell.</p>',
-            'latitude' => 52.5035,
-            'longitude' => 13.4052,
-            'zoom' => 17,
-            'markerLabel' => 'Community Center Mitte',
-            'mapPosition' => 'above',
-            'mapWidth' => 'half',
-            'mapHeight' => 'small',
-        ], $stored);
+        static::assertSame(
+            [
+                'title' => 'Where we meet',
+                'content' => '<p>Ring the bell.</p>',
+                'latitude' => 52.5035,
+                'longitude' => 13.4052,
+                'zoom' => 17,
+                'markerLabel' => 'Community Center Mitte',
+                'mapPosition' => 'above',
+                'mapWidth' => 'half',
+                'mapHeight' => 'small',
+            ],
+            $stored,
+        );
         static::assertEquals($block, TextMap::fromJson($stored));
     }
 

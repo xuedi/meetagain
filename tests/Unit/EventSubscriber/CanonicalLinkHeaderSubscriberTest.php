@@ -101,10 +101,13 @@ class CanonicalLinkHeaderSubscriberTest extends TestCase
         $subscriber->onKernelResponse($this->createEvent($response));
 
         // Assert
-        static::assertSame([
-            '</media/app.css>; rel="preload"; as="style"',
-            '<https://example.test/foo>; rel="canonical"',
-        ], $response->headers->all('Link'));
+        static::assertSame(
+            [
+                '</media/app.css>; rel="preload"; as="style"',
+                '<https://example.test/foo>; rel="canonical"',
+            ],
+            $response->headers->all('Link'),
+        );
     }
 
     private function createEvent(Response $response, int $type = HttpKernelInterface::MAIN_REQUEST): ResponseEvent

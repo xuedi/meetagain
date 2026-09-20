@@ -206,11 +206,7 @@ class UserCheckerTest extends TestCase
         $activityServiceMock = $this->createMock(ActivityService::class);
         $activityServiceMock->expects($this->never())->method('log');
 
-        $subject = $this->createSubject(
-            activityService: $activityServiceMock,
-            em: $emMock,
-            requestStack: $requestStackStub,
-        );
+        $subject = $this->createSubject(activityService: $activityServiceMock, em: $emMock, requestStack: $requestStackStub);
 
         // Act & Assert
         $subject->checkPostAuth($this->createActiveUser());

@@ -84,10 +84,7 @@ readonly class ContestService
     /** @return list<BallotView> */
     public function getFinishedContests(?int $viewerUserId = null): array
     {
-        return array_values(array_filter(
-            $this->contests($viewerUserId),
-            static fn(BallotView $contest): bool => $contest->status === BallotStatus::Settled,
-        ));
+        return array_values(array_filter($this->contests($viewerUserId), static fn(BallotView $contest): bool => $contest->status === BallotStatus::Settled));
     }
 
     public function start(int $createdBy): int

@@ -18,8 +18,8 @@ use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
 use App\Repository\CmsBlockRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
-use App\Service\Media\ImageLocationService;
 use App\Service\Media\AvatarService;
+use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -147,32 +147,6 @@ final class ImageUploadController extends AbstractController
         return $this->returnBackToImage($entityName, $id);
     }
 
-    private function replaceBlockImage(CmsBlock $block, UploadedFile $file, ImageType $imageType, int $id, int $previousImage): bool
-    {
-        $image = $this->imageService->upload($file, $this->getAuthedUser(), $imageType);
-        if (!$image instanceof Image) {
-            return false;
-        }
-
-        $image->setUploader($this->getAuthedUser());
-        $image->setUpdatedAt(new DateTimeImmutable());
-        $this->em->persist($image);
-        $this->imageService->createThumbnails($image, $imageType);
-        $this->em->flush();
-        $this->entityActionDispatcher->dispatch(EntityAction::CreateImage, $image->getId());
-
-        $block->setImage($image);
-        $this->em->persist($block);
-        $this->em->flush();
-
-        if ($previousImage > 0) {
-            $this->imageLocationService->removeLocation($previousImage, $imageType, $id);
-        }
-        $this->imageLocationService->addLocation($image->getId(), $imageType, $id);
-
-        return true;
-    }
-
     #[Route('/image/event/{id}/upload', name: 'app_event_image_upload', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function uploadEventImages(Request $request, int $id): Response
     {
@@ -216,6 +190,32 @@ final class ImageUploadController extends AbstractController
         }
 
         return $this->returnBackToImage($entity, $id);
+    }
+
+    private function replaceBlockImage(CmsBlock $block, UploadedFile $file, ImageType $imageType, int $id, int $previousImage): bool
+    {
+        $image = $this->imageService->upload($file, $this->getAuthedUser(), $imageType);
+        if (!$image instanceof Image) {
+            return false;
+        }
+
+        $image->setUploader($this->getAuthedUser());
+        $image->setUpdatedAt(new DateTimeImmutable());
+        $this->em->persist($image);
+        $this->imageService->createThumbnails($image, $imageType);
+        $this->em->flush();
+        $this->entityActionDispatcher->dispatch(EntityAction::CreateImage, $image->getId());
+
+        $block->setImage($image);
+        $this->em->persist($block);
+        $this->em->flush();
+
+        if ($previousImage > 0) {
+            $this->imageLocationService->removeLocation($previousImage, $imageType, $id);
+        }
+        $this->imageLocationService->addLocation($image->getId(), $imageType, $id);
+
+        return true;
     }
 
     private function prepare(string $entityString, int $id): array

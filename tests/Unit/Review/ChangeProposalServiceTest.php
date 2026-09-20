@@ -47,8 +47,7 @@ class ChangeProposalServiceTest extends TestCase
         $em->expects(self::once())->method('persist');
         $em->expects(self::once())->method('flush');
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects(self::once())->method('log')
-            ->with(ChangeProposalCreated::TYPE, self::isInstanceOf(User::class), self::arrayHasKey('target_label'));
+        $activity->expects(self::once())->method('log')->with(ChangeProposalCreated::TYPE, self::isInstanceOf(User::class), self::arrayHasKey('target_label'));
         $service = $this->makeService($em, activity: $activity, provider: $this->provider());
 
         // Act
@@ -97,8 +96,7 @@ class ChangeProposalServiceTest extends TestCase
         $provider->method('getTargetLabel')->willReturn('entry');
         $provider->expects(self::once())->method('apply')->with(1, 'phrase', 'new');
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects(self::once())->method('log')
-            ->with(ChangeProposalApplied::TYPE, self::isInstanceOf(User::class), self::anything());
+        $activity->expects(self::once())->method('log')->with(ChangeProposalApplied::TYPE, self::isInstanceOf(User::class), self::anything());
         $service = $this->makeService(activity: $activity, provider: $provider);
         $proposal = $this->proposal([new FieldChange('phrase', 'old', 'new')]);
         $reviewer = $this->user(9);
@@ -151,8 +149,7 @@ class ChangeProposalServiceTest extends TestCase
     {
         // Arrange
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects(self::once())->method('log')
-            ->with(ChangeProposalRejected::TYPE, self::isInstanceOf(User::class), self::anything());
+        $activity->expects(self::once())->method('log')->with(ChangeProposalRejected::TYPE, self::isInstanceOf(User::class), self::anything());
         $service = $this->makeService(activity: $activity, provider: $this->provider(canReview: true));
         $proposal = $this->proposal([
             new FieldChange('phrase', 'old', 'new'),
@@ -186,9 +183,7 @@ class ChangeProposalServiceTest extends TestCase
         // Arrange
         $provider = $this->createMock(ChangeTargetProviderInterface::class);
         $provider->method('canReview')->willReturn(true);
-        $provider->method('validate')->willReturnCallback(
-            static fn(int $id, string $field, ?string $value): ?string => $field === 'pinyin' ? 'broken' : null,
-        );
+        $provider->method('validate')->willReturnCallback(static fn(int $id, string $field, ?string $value): ?string => $field === 'pinyin' ? 'broken' : null);
         $provider->expects(self::never())->method('apply');
         $service = $this->makeService(provider: $provider);
         $proposal = $this->proposal([
@@ -272,18 +267,13 @@ class ChangeProposalServiceTest extends TestCase
         $provider->method('canReview')->willReturn(true);
         $provider->method('getTargetLabel')->willReturn('entry');
         $registry = $this->createStub(ChangeTargetRegistry::class);
-        $registry->method('providerFor')->willReturnCallback(
-            static fn(string $type): ?ChangeTargetProviderInterface => $type === 'glossary' ? $provider : null,
-        );
+        $registry->method('providerFor')->willReturnCallback(static fn(string $type): ?ChangeTargetProviderInterface => $type === 'glossary'
+            ? $provider
+            : null);
         $repo = $this->createStub(ChangeProposalRepository::class);
         $repo->method('findPending')->willReturn([$reviewable, $foreign]);
 
-        $service = new ChangeProposalService(
-            $this->createStub(EntityManagerInterface::class),
-            $repo,
-            $registry,
-            $this->createStub(ActivityService::class),
-        );
+        $service = new ChangeProposalService($this->createStub(EntityManagerInterface::class), $repo, $registry, $this->createStub(ActivityService::class));
 
         // Act
         $result = $service->pendingReviewableBy($this->user(9));

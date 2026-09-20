@@ -30,12 +30,17 @@ class CirculationHandoverRepository extends ServiceEntityRepository
      */
     public function findOpenForUser(User $user): array
     {
-        return array_values($this->createQueryBuilder('h')
-            ->where('h.status = :open')->setParameter('open', CirculationHandoverStatus::Open)
-            ->andWhere('h.fromUser = :user OR h.toUser = :user')->setParameter('user', $user)
-            ->orderBy('h.openedAt', 'DESC')
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('h')
+                ->where('h.status = :open')
+                ->setParameter('open', CirculationHandoverStatus::Open)
+                ->andWhere('h.fromUser = :user OR h.toUser = :user')
+                ->setParameter('user', $user)
+                ->orderBy('h.openedAt', 'DESC')
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     /**
@@ -43,11 +48,16 @@ class CirculationHandoverRepository extends ServiceEntityRepository
      */
     public function findOpenOlderThan(DateTimeImmutable $cutoff): array
     {
-        return array_values($this->createQueryBuilder('h')
-            ->where('h.status = :open')->setParameter('open', CirculationHandoverStatus::Open)
-            ->andWhere('h.openedAt < :cutoff')->setParameter('cutoff', $cutoff)
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('h')
+                ->where('h.status = :open')
+                ->setParameter('open', CirculationHandoverStatus::Open)
+                ->andWhere('h.openedAt < :cutoff')
+                ->setParameter('cutoff', $cutoff)
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     /**
@@ -55,14 +65,20 @@ class CirculationHandoverRepository extends ServiceEntityRepository
      */
     public function findOpenInContext(string $context, string $itemType): array
     {
-        return array_values($this->createQueryBuilder('h')
-            ->join('h.copy', 'c')
-            ->where('h.status = :open')->setParameter('open', CirculationHandoverStatus::Open)
-            ->andWhere('c.context = :context')->setParameter('context', $context)
-            ->andWhere('c.itemType = :itemType')->setParameter('itemType', $itemType)
-            ->orderBy('h.openedAt', 'DESC')
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('h')
+                ->join('h.copy', 'c')
+                ->where('h.status = :open')
+                ->setParameter('open', CirculationHandoverStatus::Open)
+                ->andWhere('c.context = :context')
+                ->setParameter('context', $context)
+                ->andWhere('c.itemType = :itemType')
+                ->setParameter('itemType', $itemType)
+                ->orderBy('h.openedAt', 'DESC')
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     /**
@@ -70,14 +86,21 @@ class CirculationHandoverRepository extends ServiceEntityRepository
      */
     public function findOpenForCopies(string $context, string $itemType, int $itemId): array
     {
-        return array_values($this->createQueryBuilder('h')
-            ->join('h.copy', 'c')
-            ->where('h.status = :open')->setParameter('open', CirculationHandoverStatus::Open)
-            ->andWhere('c.context = :context')->setParameter('context', $context)
-            ->andWhere('c.itemType = :itemType')->setParameter('itemType', $itemType)
-            ->andWhere('c.itemId = :itemId')->setParameter('itemId', $itemId)
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('h')
+                ->join('h.copy', 'c')
+                ->where('h.status = :open')
+                ->setParameter('open', CirculationHandoverStatus::Open)
+                ->andWhere('c.context = :context')
+                ->setParameter('context', $context)
+                ->andWhere('c.itemType = :itemType')
+                ->setParameter('itemType', $itemType)
+                ->andWhere('c.itemId = :itemId')
+                ->setParameter('itemId', $itemId)
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     /**
@@ -90,9 +113,6 @@ class CirculationHandoverRepository extends ServiceEntityRepository
             return [];
         }
 
-        return array_values($this->createQueryBuilder('h')
-            ->where('h.copy IN (:copyIds)')->setParameter('copyIds', $copyIds)
-            ->getQuery()
-            ->getResult());
+        return array_values($this->createQueryBuilder('h')->where('h.copy IN (:copyIds)')->setParameter('copyIds', $copyIds)->getQuery()->getResult());
     }
 }

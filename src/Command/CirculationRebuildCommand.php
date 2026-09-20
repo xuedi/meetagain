@@ -29,9 +29,12 @@ final class CirculationRebuildCommand extends Command
     #[Override]
     protected function configure(): void
     {
-        $this
-            ->addOption('context', null, InputOption::VALUE_REQUIRED, 'Limit to one context string')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Report drift without writing');
+        $this->addOption('context', null, InputOption::VALUE_REQUIRED, 'Limit to one context string')->addOption(
+            'dry-run',
+            null,
+            InputOption::VALUE_NONE,
+            'Report drift without writing',
+        );
     }
 
     #[Override]

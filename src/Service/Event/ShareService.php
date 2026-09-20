@@ -49,7 +49,9 @@ final readonly class ShareService
             errorCorrectionLevel: ErrorCorrectionLevel::Medium,
             size: self::QR_PNG_SIZE,
             margin: 16,
-        )->build()->getString();
+        )
+            ->build()
+            ->getString();
     }
 
     public function buildShareUrl(Event $event, string $locale): string
@@ -70,31 +72,11 @@ final readonly class ShareService
         $mailBody = rawurlencode($teaser === '' ? $shareUrl : $teaser . "\n\n" . $shareUrl);
 
         return [
-            new ShareLink(
-                key: 'whatsapp',
-                label: 'events.share_target_whatsapp',
-                url: 'https://wa.me/?text=' . rawurlencode($title . ' ' . $shareUrl),
-            ),
-            new ShareLink(
-                key: 'telegram',
-                label: 'events.share_target_telegram',
-                url: 'https://t.me/share/url?url=' . $encodedUrl . '&text=' . $encodedTitle,
-            ),
-            new ShareLink(
-                key: 'facebook',
-                label: 'events.share_target_facebook',
-                url: 'https://www.facebook.com/sharer/sharer.php?u=' . $encodedUrl,
-            ),
-            new ShareLink(
-                key: 'x',
-                label: 'events.share_target_x',
-                url: 'https://twitter.com/intent/tweet?url=' . $encodedUrl . '&text=' . $encodedTitle,
-            ),
-            new ShareLink(
-                key: 'linkedin',
-                label: 'events.share_target_linkedin',
-                url: 'https://www.linkedin.com/sharing/share-offsite/?url=' . $encodedUrl,
-            ),
+            new ShareLink(key: 'whatsapp', label: 'events.share_target_whatsapp', url: 'https://wa.me/?text=' . rawurlencode($title . ' ' . $shareUrl)),
+            new ShareLink(key: 'telegram', label: 'events.share_target_telegram', url: 'https://t.me/share/url?url=' . $encodedUrl . '&text=' . $encodedTitle),
+            new ShareLink(key: 'facebook', label: 'events.share_target_facebook', url: 'https://www.facebook.com/sharer/sharer.php?u=' . $encodedUrl),
+            new ShareLink(key: 'x', label: 'events.share_target_x', url: 'https://twitter.com/intent/tweet?url=' . $encodedUrl . '&text=' . $encodedTitle),
+            new ShareLink(key: 'linkedin', label: 'events.share_target_linkedin', url: 'https://www.linkedin.com/sharing/share-offsite/?url=' . $encodedUrl),
             new ShareLink(
                 key: 'email',
                 label: 'events.share_target_email',
@@ -152,16 +134,15 @@ final readonly class ShareService
             errorCorrectionLevel: ErrorCorrectionLevel::Medium,
             size: self::QR_SVG_SIZE,
             margin: 8,
-        )->build()->getString();
+        )
+            ->build()
+            ->getString();
     }
 
     private function buildAddress(Location $location): string
     {
         $town = trim(($location->getPostcode() ?? '') . ' ' . ($location->getCity() ?? ''));
-        $parts = array_filter(
-            [$location->getName(), $location->getStreet(), $town],
-            static fn(?string $part): bool => $part !== null && trim($part) !== '',
-        );
+        $parts = array_filter([$location->getName(), $location->getStreet(), $town], static fn(?string $part): bool => $part !== null && trim($part) !== '');
 
         return implode(', ', $parts);
     }

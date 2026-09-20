@@ -4,6 +4,7 @@ namespace Plugin\Films\Service;
 
 use Plugin\Films\Entity\ExternalSource;
 use Psr\Log\LoggerInterface;
+use SensitiveParameter;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
 
@@ -15,7 +16,7 @@ readonly class TmdbLookup implements FilmMetadataLookupInterface
     public function __construct(
         private HttpClientInterface $httpClient,
         private LoggerInterface $logger,
-        #[\SensitiveParameter]
+        #[SensitiveParameter]
         private string $apiKey,
     ) {}
 

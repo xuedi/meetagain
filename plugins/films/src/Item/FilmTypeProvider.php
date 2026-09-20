@@ -4,9 +4,9 @@ namespace Plugin\Films\Item;
 
 use App\Entity\EventItemAssociation;
 use App\Enum\ItemViewType;
-use App\Item\TypeProviderInterface;
 use App\Item\ListCellProviderInterface;
 use App\Item\ListProviderInterface;
+use App\Item\TypeProviderInterface;
 use Override;
 use Plugin\Films\Entity\Film;
 use Plugin\Films\Service\FilmService;

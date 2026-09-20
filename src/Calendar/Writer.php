@@ -72,11 +72,7 @@ final readonly class Writer
 
     private function escapeText(string $value): string
     {
-        return str_replace(
-            ['\\', "\r\n", "\n", "\r", ';', ','],
-            ['\\\\', '\\n', '\\n', '\\n', '\\;', '\\,'],
-            $value,
-        );
+        return str_replace(['\\', "\r\n", "\n", "\r", ';', ','], ['\\\\', '\\n', '\\n', '\\n', '\\;', '\\,'], $value);
     }
 
     private function fold(string $line): string
@@ -95,7 +91,7 @@ final readonly class Writer
         $limit = self::FOLD_OCTETS;
 
         foreach ($characters as $character) {
-            $wouldOverflow = strlen($current) + strlen($character) > $limit;
+            $wouldOverflow = (strlen($current) + strlen($character)) > $limit;
             if ($wouldOverflow) {
                 $chunks[] = $current;
                 $current = '';

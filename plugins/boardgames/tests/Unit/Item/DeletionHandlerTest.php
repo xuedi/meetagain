@@ -50,10 +50,6 @@ class DeletionHandlerTest extends TestCase
 
     private function handler(GameOwnershipRepository $ownerships): DeletionHandler
     {
-        return new DeletionHandler(
-            $ownerships,
-            $this->createStub(GamePledgeRepository::class),
-            $this->createStub(BringRequestRepository::class),
-        );
+        return new DeletionHandler($ownerships, $this->createStub(GamePledgeRepository::class), $this->createStub(BringRequestRepository::class));
     }
 }

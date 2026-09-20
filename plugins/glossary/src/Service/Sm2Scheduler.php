@@ -23,7 +23,7 @@ final readonly class Sm2Scheduler implements SchedulerInterface
             $interval = match ($repetitions) {
                 0 => 1,
                 1 => 6,
-                default => (int) round($card->getIntervalDays() * $card->getEasePermille() / 1000),
+                default => (int) round(($card->getIntervalDays() * $card->getEasePermille()) / 1000),
             };
             $card->setRepetitions($repetitions + 1)->setState(CardState::Review);
         } else {
@@ -35,7 +35,7 @@ final readonly class Sm2Scheduler implements SchedulerInterface
         }
 
         $miss = 5 - $this->quality($grade);
-        $easeDelta = 100 - $miss * (80 + $miss * 20);
+        $easeDelta = 100 - ($miss * (80 + ($miss * 20)));
 
         $card
             ->setEasePermille(max(self::EASE_FLOOR, $card->getEasePermille() + $easeDelta))

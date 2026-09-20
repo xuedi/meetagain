@@ -3,6 +3,7 @@
 namespace Plugin\Books\Form;
 
 use App\Item\Tag\AssignmentFormHelper;
+use Override;
 use Plugin\Books\Service\BookService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -21,7 +22,7 @@ class BookManualType extends AbstractType
         private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -62,10 +63,9 @@ class BookManualType extends AbstractType
 
         $this->assignmentFormHelper->addAssignmentFields($builder, BookService::ITEM_TYPE, null);
 
-        $builder
-            ->add('submit', SubmitType::class, [
-                'label' => $this->translator->trans('books_book.button_submit'),
-                'attr' => ['class' => 'button'],
-            ]);
+        $builder->add('submit', SubmitType::class, [
+            'label' => $this->translator->trans('books_book.button_submit'),
+            'attr' => ['class' => 'button'],
+        ]);
     }
 }

@@ -4,13 +4,13 @@ namespace Module\Trust\Tests\Unit;
 
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Trust\Contract\ActionDescriptor;
 use Module\Trust\Contract\ActionSourceInterface;
 use Module\Trust\Contract\ContextDescriberInterface;
 use Module\Trust\Contract\ContextDescriptor;
 use Module\Trust\Contract\TrustAction;
-use Module\Trust\Contract\ActionDescriptor;
-use Module\Trust\Internal\ConfigStore;
 use Module\Trust\Internal\ActionRegistry;
+use Module\Trust\Internal\ConfigStore;
 use Module\Trust\Internal\ContextRegistry;
 use Module\Trust\Internal\Repository\TrustContextConfigRepository;
 use Module\Trust\Internal\Repository\TrustGrantRepository;
@@ -18,11 +18,11 @@ use Module\Trust\Internal\ScoreCalculator;
 use Module\Trust\Internal\ScoreProvider;
 use Override;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\NullLogger;
+use RuntimeException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\CacheItem;
-use Psr\Cache\CacheItemPoolInterface;
-use RuntimeException;
 
 class ScoreProviderCacheTest extends TestCase
 {

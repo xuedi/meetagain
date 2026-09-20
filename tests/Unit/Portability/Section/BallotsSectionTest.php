@@ -144,11 +144,13 @@ final class BallotsSectionTest extends SectionTestCase
     {
         $ballotInterface = $this->createStub(BallotInterface::class);
         $ballotInterface->method('exportAll')->willReturn($ballots);
-        $ballotInterface->method('restore')->willReturnCallback(function (PortableBallot $ballot): int {
-            $this->restored[] = $ballot;
+        $ballotInterface
+            ->method('restore')
+            ->willReturnCallback(function (PortableBallot $ballot): int {
+                $this->restored[] = $ballot;
 
-            return count($this->restored);
-        });
+                return count($this->restored);
+            });
 
         $userRepository = $this->createStub(UserRepository::class);
         $userRepository->method('findBy')->willReturnCallback(fn(array $criteria): array => array_map($this->user(...), $criteria['id']));

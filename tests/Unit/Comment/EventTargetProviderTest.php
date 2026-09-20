@@ -20,11 +20,7 @@ class EventTargetProviderTest extends TestCase
     {
         // Arrange
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $urlGenerator
-            ->expects(self::once())
-            ->method('generate')
-            ->with('app_event_details', ['id' => 7])
-            ->willReturn('/en/event/7');
+        $urlGenerator->expects(self::once())->method('generate')->with('app_event_details', ['id' => 7])->willReturn('/en/event/7');
         $provider = $this->makeProvider(event: new Event(), urlGenerator: $urlGenerator);
 
         // Act + Assert
@@ -45,11 +41,7 @@ class EventTargetProviderTest extends TestCase
         // Arrange
         $event = new Event();
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $authorizationChecker
-            ->expects(self::once())
-            ->method('isGranted')
-            ->with(PermissionAttribute::EVENT_COMMENT_CREATE, $event)
-            ->willReturn(true);
+        $authorizationChecker->expects(self::once())->method('isGranted')->with(PermissionAttribute::EVENT_COMMENT_CREATE, $event)->willReturn(true);
         $provider = $this->makeProvider(event: $event, authorizationChecker: $authorizationChecker);
 
         // Act + Assert
@@ -72,10 +64,7 @@ class EventTargetProviderTest extends TestCase
         // Arrange
         $user = new User();
         $activityService = $this->createMock(ActivityService::class);
-        $activityService
-            ->expects(self::once())
-            ->method('log')
-            ->with(CommentedOnEvent::TYPE, $user, ['event_id' => 7]);
+        $activityService->expects(self::once())->method('log')->with(CommentedOnEvent::TYPE, $user, ['event_id' => 7]);
         $provider = $this->makeProvider(event: new Event(), activityService: $activityService);
 
         $comment = new Comment();

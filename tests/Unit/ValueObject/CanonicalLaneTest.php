@@ -28,10 +28,7 @@ class CanonicalLaneTest extends TestCase
         $segments = $lane->segments();
 
         // Assert
-        self::assertSame(
-            ['first', 'follower', 'detached', 'follower'],
-            array_map(static fn(CanonicalLaneSegment $s) => $s->type->value, $segments),
-        );
+        self::assertSame(['first', 'follower', 'detached', 'follower'], array_map(static fn(CanonicalLaneSegment $s) => $s->type->value, $segments));
         self::assertSame([1, 3, 1, 2], array_map(static fn(CanonicalLaneSegment $s) => $s->count, $segments));
     }
 

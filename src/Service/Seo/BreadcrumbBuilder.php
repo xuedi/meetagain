@@ -30,10 +30,6 @@ final readonly class BreadcrumbBuilder
 
     private function absoluteUrl(string $route, ?string $locale): string
     {
-        return $this->urlGenerator->generate(
-            $route,
-            $locale !== null ? ['_locale' => $locale] : [],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
+        return $this->urlGenerator->generate($route, $locale !== null ? ['_locale' => $locale] : [], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 }

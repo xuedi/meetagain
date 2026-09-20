@@ -53,25 +53,6 @@ class EmailQueueRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
-    /**
-     * @param list<EmailQueueStatus>|null $statuses
-     */
-    private function applyFilters(QueryBuilder $qb, ?DateTimeImmutable $since, ?string $template, ?string $recipient, ?array $statuses): void
-    {
-        if ($since !== null) {
-            $qb->andWhere('eq.createdAt >= :since')->setParameter('since', $since);
-        }
-        if ($template !== null) {
-            $qb->andWhere('eq.template = :template')->setParameter('template', $template);
-        }
-        if ($recipient !== null && $recipient !== '') {
-            $qb->andWhere('eq.recipient = :recipient')->setParameter('recipient', $recipient);
-        }
-        if ($statuses !== null && $statuses !== []) {
-            $qb->andWhere('eq.status IN (:statuses)')->setParameter('statuses', $statuses);
-        }
-    }
-
     public function getPendingCount(): int
     {
         return (int) $this
@@ -170,5 +151,24 @@ class EmailQueueRepository extends ServiceEntityRepository
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @param list<EmailQueueStatus>|null $statuses
+     */
+    private function applyFilters(QueryBuilder $qb, ?DateTimeImmutable $since, ?string $template, ?string $recipient, ?array $statuses): void
+    {
+        if ($since !== null) {
+            $qb->andWhere('eq.createdAt >= :since')->setParameter('since', $since);
+        }
+        if ($template !== null) {
+            $qb->andWhere('eq.template = :template')->setParameter('template', $template);
+        }
+        if ($recipient !== null && $recipient !== '') {
+            $qb->andWhere('eq.recipient = :recipient')->setParameter('recipient', $recipient);
+        }
+        if ($statuses !== null && $statuses !== []) {
+            $qb->andWhere('eq.status IN (:statuses)')->setParameter('statuses', $statuses);
+        }
     }
 }

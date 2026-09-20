@@ -210,11 +210,6 @@ class CmsType extends AbstractType
         });
     }
 
-    private function isEmpty(mixed $value): bool
-    {
-        return $value === null || $value === '' || is_array($value) && count($value) === 0;
-    }
-
     #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
@@ -223,5 +218,10 @@ class CmsType extends AbstractType
             'is_admin' => false,
             'edit_locale' => 'en',
         ]);
+    }
+
+    private function isEmpty(mixed $value): bool
+    {
+        return $value === null || $value === '' || is_array($value) && count($value) === 0;
     }
 }

@@ -4,10 +4,10 @@ namespace Plugin\Books\Portability;
 
 use App\Entity\Image;
 use App\Enum\ImageType;
-use App\Portability\ImportContext;
-use App\Portability\Item\ImportResult;
-use App\Portability\Item\ContributorInterface;
 use App\Portability\ImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\Item\ContributorInterface;
+use App\Portability\Item\ImportResult;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,7 +39,15 @@ readonly class BookContributor implements ContributorInterface
     #[Override]
     public function allItemIds(): array
     {
-        return array_map(intval(...), $this->bookRepo->createQueryBuilder('b')->select('b.id')->orderBy('b.id')->getQuery()->getSingleColumnResult());
+        return array_map(
+            intval(...),
+            $this->bookRepo
+                ->createQueryBuilder('b')
+                ->select('b.id')
+                ->orderBy('b.id')
+                ->getQuery()
+                ->getSingleColumnResult(),
+        );
     }
 
     #[Override]
@@ -56,9 +64,7 @@ readonly class BookContributor implements ContributorInterface
                 'description' => $book->getDescription(),
                 'page_count' => $book->getPageCount(),
                 'published_year' => $book->getPublishedYear(),
-                'cover_image' => $book->getCoverImage() instanceof Image
-                    ? $images->addImage($book->getCoverImage())
-                    : null,
+                'cover_image' => $book->getCoverImage() instanceof Image ? $images->addImage($book->getCoverImage()) : null,
             ];
         }
 
@@ -111,11 +117,7 @@ readonly class BookContributor implements ContributorInterface
             $this->imageLocationService->addLocation((int) $image->getId(), ImageType::PluginBooksCover, (int) $book->getId());
         }
 
-        return new ImportResult(
-            refToItemId: array_map(static fn(Book $book): int => (int) $book->getId(), $refToItemId),
-            created: $created,
-            matched: $matched,
-        );
+        return new ImportResult(refToItemId: array_map(static fn(Book $book): int => (int) $book->getId(), $refToItemId), created: $created, matched: $matched);
     }
 
     private function nullableString(mixed $value): ?string

@@ -5,8 +5,8 @@ namespace App\Service\System;
 use App\CronTaskInterface;
 use App\EntityActionDispatcher;
 use App\Enum\CronTaskStatus;
-use App\ExtendedFilesystem;
 use App\Enum\EntityAction;
+use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\SupportRequestRepository;
@@ -20,6 +20,7 @@ use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Throwable;
 
 readonly class CleanupService implements CronTaskInterface
 {
@@ -93,7 +94,7 @@ readonly class CleanupService implements CronTaskInterface
             );
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $output->writeln('CleanupService exception: ' . $e->getMessage());
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());

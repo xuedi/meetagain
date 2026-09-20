@@ -24,8 +24,7 @@ enum IncidentSeverity: string
         return match ($this) {
             self::Low => 'is-light',
             self::Medium => 'is-warning',
-            self::High => 'is-danger',
-            self::Critical => 'is-danger',
+            self::High, self::Critical => 'is-danger',
         };
     }
 }

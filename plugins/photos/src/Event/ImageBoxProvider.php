@@ -54,9 +54,7 @@ final readonly class ImageBoxProvider implements ImageBoxProviderInterface
     {
         $photos = [];
         foreach ($this->associations->listForEvent($eventId) as $association) {
-            $photo = $association->getItemType() === PhotoService::ITEM_TYPE
-                ? $this->photoService->getAttached((int) $association->getItemId())
-                : null;
+            $photo = $association->getItemType() === PhotoService::ITEM_TYPE ? $this->photoService->getAttached((int) $association->getItemId()) : null;
 
             if ($photo instanceof Photo) {
                 $photos[] = $photo;
@@ -68,10 +66,8 @@ final readonly class ImageBoxProvider implements ImageBoxProviderInterface
 
     private function uploadForm(int $eventId): FormView
     {
-        return $this->formFactory
-            ->create(EventUploadType::class, null, [
-                'action' => $this->urlGenerator->generate('app_plugin_photos_event_upload', ['id' => $eventId]),
-            ])
-            ->createView();
+        return $this->formFactory->create(EventUploadType::class, null, [
+            'action' => $this->urlGenerator->generate('app_plugin_photos_event_upload', ['id' => $eventId]),
+        ])->createView();
     }
 }

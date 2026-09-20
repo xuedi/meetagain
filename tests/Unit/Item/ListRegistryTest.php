@@ -86,10 +86,7 @@ class ListRegistryTest extends TestCase
     public function testAnInactivePluginStillAnswersForItsDetailRoute(): void
     {
         // Arrange
-        $registry = $this->makeRegistry(
-            [$this->provider('glossary', 'glossary', 'app_glossary_show', false)],
-            ['books'],
-        );
+        $registry = $this->makeRegistry([$this->provider('glossary', 'glossary', 'app_glossary_show', false)], ['books']);
 
         // Act
         $result = $registry->isDetailRouteIndexable('app_glossary_show');
@@ -110,12 +107,8 @@ class ListRegistryTest extends TestCase
         return new ListRegistry($providers, $pluginService);
     }
 
-    private function provider(
-        string $pluginKey,
-        string $key,
-        ?string $detailRoute = null,
-        bool $detailIndexable = true,
-    ): ListProviderInterface {
+    private function provider(string $pluginKey, string $key, ?string $detailRoute = null, bool $detailIndexable = true): ListProviderInterface
+    {
         $provider = $this->createStub(ListProviderInterface::class);
         $provider->method('getPluginKey')->willReturn($pluginKey);
         $provider->method('getKey')->willReturn($key);

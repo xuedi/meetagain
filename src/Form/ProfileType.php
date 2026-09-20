@@ -71,6 +71,14 @@ class ProfileType extends AbstractType
         ]);
     }
 
+    #[Override]
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => User::class,
+        ]);
+    }
+
     private function cappedOnlyWhenRenamed(string $originalName): Callback
     {
         return new Callback(static function (?string $value, ExecutionContextInterface $context) use ($originalName): void {
@@ -79,17 +87,10 @@ class ProfileType extends AbstractType
                 return;
             }
 
-            $context->buildViolation(ProfileService::NAME_VIOLATION_MESSAGE)
+            $context
+                ->buildViolation(ProfileService::NAME_VIOLATION_MESSAGE)
                 ->setParameter('{{ limit }}', (string) $limit)
                 ->addViolation();
         });
-    }
-
-    #[Override]
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data_class' => User::class,
-        ]);
     }
 }

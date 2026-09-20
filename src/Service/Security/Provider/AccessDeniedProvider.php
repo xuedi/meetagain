@@ -43,6 +43,26 @@ final class AccessDeniedProvider extends AbstractSecurityProvider
         return 0;
     }
 
+    public static function resolveReason(Throwable $exception, bool $isHttpAccessDenied): string
+    {
+        $message = $exception->getMessage();
+        if (str_starts_with($message, 'Invalid CSRF')) {
+            return 'csrf';
+        }
+        if ($isHttpAccessDenied) {
+            return 'controller';
+        }
+        $previous = $exception->getPrevious();
+        if ($previous !== null && str_contains($previous->getMessage(), 'voter')) {
+            return 'voter';
+        }
+        if (str_contains($message, 'voter') || str_contains($message, 'Access Denied by')) {
+            return 'voter';
+        }
+
+        return 'firewall';
+    }
+
     #[Override]
     protected function handlesType(SecurityEventType $type): bool
     {
@@ -109,26 +129,6 @@ final class AccessDeniedProvider extends AbstractSecurityProvider
             'summary' => $summary,
             'details' => $details,
         ];
-    }
-
-    public static function resolveReason(Throwable $exception, bool $isHttpAccessDenied): string
-    {
-        $message = $exception->getMessage();
-        if (str_starts_with($message, 'Invalid CSRF')) {
-            return 'csrf';
-        }
-        if ($isHttpAccessDenied) {
-            return 'controller';
-        }
-        $previous = $exception->getPrevious();
-        if ($previous !== null && str_contains($previous->getMessage(), 'voter')) {
-            return 'voter';
-        }
-        if (str_contains($message, 'voter') || str_contains($message, 'Access Denied by')) {
-            return 'voter';
-        }
-
-        return 'firewall';
     }
 
     #[Override]

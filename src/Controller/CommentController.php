@@ -22,12 +22,7 @@ final class CommentController extends AbstractController
         private readonly CommentRepository $comments,
     ) {}
 
-    #[Route(
-        '/comment/{targetType}/{targetId}',
-        name: 'app_comment_create',
-        requirements: ['targetType' => '[a-z_]+', 'targetId' => '\d+'],
-        methods: ['POST'],
-    )]
+    #[Route('/comment/{targetType}/{targetId}', name: 'app_comment_create', requirements: ['targetType' => '[a-z_]+', 'targetId' => '\d+'], methods: ['POST'])]
     public function create(Request $request, string $targetType, int $targetId): Response
     {
         $this->guardCsrf($request, 'app_comment_create' . $targetType . $targetId);
@@ -46,10 +41,7 @@ final class CommentController extends AbstractController
         try {
             $this->commentService->create($targetType, $targetId, $this->getAuthedUser(), (string) $request->request->get('content', ''));
         } catch (InvalidContentException $exception) {
-            $this->addFlash(
-                'error',
-                $exception->reason === InvalidContentException::REASON_TOO_LONG ? 'comment.flash_too_long' : 'comment.flash_empty',
-            );
+            $this->addFlash('error', $exception->reason === InvalidContentException::REASON_TOO_LONG ? 'comment.flash_too_long' : 'comment.flash_empty');
 
             return $this->redirect($returnUrl);
         }

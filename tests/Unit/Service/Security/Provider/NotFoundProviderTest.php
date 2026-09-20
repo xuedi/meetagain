@@ -219,12 +219,6 @@ class NotFoundProviderTest extends TestCase
         $suspiciousRepo = $this->createStub(SuspiciousUrlRepository::class);
         $suspiciousRepo->method('findAllUrls')->willReturn($flaggedUrls);
 
-        return new NotFoundProvider(
-            new ArrayAdapter(),
-            new NullLogger(),
-            $em,
-            $logRepo,
-            new SuspiciousUrlMatcher($suspiciousRepo),
-        );
+        return new NotFoundProvider(new ArrayAdapter(), new NullLogger(), $em, $logRepo, new SuspiciousUrlMatcher($suspiciousRepo));
     }
 }

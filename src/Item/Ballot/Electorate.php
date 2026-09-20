@@ -22,8 +22,6 @@ final readonly class Electorate implements ElectorateProviderInterface
     #[Override]
     public function mayVote(int $userId, ?BallotSubject $subject): bool
     {
-        return $subject !== null
-            && $subject->type === Purpose::SUBJECT_TYPE
-            && $this->eventFilter->isEventAccessible($subject->id);
+        return $subject !== null && $subject->type === Purpose::SUBJECT_TYPE && $this->eventFilter->isEventAccessible($subject->id);
     }
 }

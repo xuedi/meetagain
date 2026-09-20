@@ -25,11 +25,6 @@ final class FilmPosterImageTypeDefinition extends AbstractImageTypeDefinition
         return ImageType::PluginFilmsPoster;
     }
 
-    protected function sizes(): array
-    {
-        return [[self::FREE_AXIS, 800], [400, 600], [350, 525], [200, 300], [100, 150]];
-    }
-
     public function fitMode(): ImageFitMode
     {
         return ImageFitMode::Fit;
@@ -64,5 +59,10 @@ final class FilmPosterImageTypeDefinition extends AbstractImageTypeDefinition
             'route' => 'app_plugin_films_film_show',
             'params' => ['id' => $film->getId()],
         ];
+    }
+
+    protected function sizes(): array
+    {
+        return [[self::FREE_AXIS, 800], [400, 600], [350, 525], [200, 300], [100, 150]];
     }
 }

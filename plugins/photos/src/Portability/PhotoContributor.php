@@ -44,7 +44,15 @@ readonly class PhotoContributor implements ContributorInterface, UploadsInterfac
     #[Override]
     public function allItemIds(): array
     {
-        return array_map(intval(...), $this->photoRepo->createQueryBuilder('p')->select('p.id')->orderBy('p.id')->getQuery()->getSingleColumnResult());
+        return array_map(
+            intval(...),
+            $this->photoRepo
+                ->createQueryBuilder('p')
+                ->select('p.id')
+                ->orderBy('p.id')
+                ->getQuery()
+                ->getSingleColumnResult(),
+        );
     }
 
     #[Override]
@@ -141,11 +149,7 @@ readonly class PhotoContributor implements ContributorInterface, UploadsInterfac
             $this->imageLocationService->addLocation((int) $image->getId(), ImageType::PluginPhotosPhoto, (int) $photo->getId());
         }
 
-        return new ImportResult(
-            refToItemId: array_map(static fn(Photo $photo): int => (int) $photo->getId(), $refToPhoto),
-            created: $created,
-            matched: 0,
-        );
+        return new ImportResult(refToItemId: array_map(static fn(Photo $photo): int => (int) $photo->getId(), $refToPhoto), created: $created, matched: 0);
     }
 
     /**

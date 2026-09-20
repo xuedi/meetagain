@@ -24,12 +24,7 @@ class RunnerTest extends TestCase
         $hotfix = new RecordingHotfix('a_fresh', $log);
         $appState = $this->makeAppStateSpy();
 
-        $runner = new Runner(
-            [$hotfix],
-            $appState['service'],
-            $this->makeClock('2026-04-30T12:00:00+00:00'),
-            $this->createStub(LoggerInterface::class),
-        );
+        $runner = new Runner([$hotfix], $appState['service'], $this->makeClock('2026-04-30T12:00:00+00:00'), $this->createStub(LoggerInterface::class));
 
         // Act
         $result = $runner->runCronTask(new NullOutput());
@@ -48,12 +43,7 @@ class RunnerTest extends TestCase
         $hotfix = new RecordingHotfix('b_done', $log);
         $appState = $this->makeAppStateSpy(initial: ['data_hotfix.b_done' => '2026-04-29T08:00:00+00:00']);
 
-        $runner = new Runner(
-            [$hotfix],
-            $appState['service'],
-            $this->makeClock('2026-04-30T12:00:00+00:00'),
-            $this->createStub(LoggerInterface::class),
-        );
+        $runner = new Runner([$hotfix], $appState['service'], $this->makeClock('2026-04-30T12:00:00+00:00'), $this->createStub(LoggerInterface::class));
 
         // Act
         $result = $runner->runCronTask(new NullOutput());

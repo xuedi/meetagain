@@ -39,7 +39,10 @@ final class ExportCommandTest extends TestCase
         $exporter
             ->expects($this->once())
             ->method('export')
-            ->with(static::isInstanceOf(Scope::class), static::callback(static fn(?DateTimeInterface $anchor): bool => $anchor?->format('Y-m-d') === '2026-01-07'))
+            ->with(
+                static::isInstanceOf(Scope::class),
+                static::callback(static fn(?DateTimeInterface $anchor): bool => $anchor?->format('Y-m-d') === '2026-01-07'),
+            )
             ->willReturn('/tmp/meetagain-export.zip');
         $tester = new CommandTester(new ExportCommand($exporter, $this->scopeBuilder(), $this->createStub(ExtendedFilesystem::class)));
 

@@ -41,7 +41,10 @@ class ImageAltStatusCacheTest extends TestCase
         $image = self::imageWithId(1);
         $pool = new ArrayAdapter();
         $resolver = $this->createMock(AltLocaleRequirementResolver::class);
-        $resolver->expects($this->once())->method('getRequiredAltLocalesForImages')->willReturn([1 => ['en']]);
+        $resolver
+            ->expects($this->once())
+            ->method('getRequiredAltLocalesForImages')
+            ->willReturn([1 => ['en']]);
         $cache = $this->cache($pool, resolver: $resolver);
 
         // Act
@@ -138,27 +141,22 @@ class ImageAltStatusCacheTest extends TestCase
     ): ImageAltStatusCache {
         if ($resolver === null) {
             $resolver = $this->createStub(AltLocaleRequirementResolver::class);
-            $resolver->method('getRequiredAltLocalesForImages')->willReturnCallback(
-                static function (array $images) use ($requiredLocales): array {
+            $resolver
+                ->method('getRequiredAltLocalesForImages')
+                ->willReturnCallback(static function (array $images) use ($requiredLocales): array {
                     $result = [];
                     foreach ($images as $image) {
                         $result[(int) $image->getId()] = $requiredLocales;
                     }
 
                     return $result;
-                },
-            );
+                });
         }
 
         $language = $this->createStub(LanguageService::class);
         $language->method('getFilteredDefaultLocale')->willReturn('en');
 
-        return new ImageAltStatusCache(
-            $pool,
-            $resolver,
-            $language,
-            $logger ?? $this->createStub(LoggerInterface::class),
-        );
+        return new ImageAltStatusCache($pool, $resolver, $language, $logger ?? $this->createStub(LoggerInterface::class));
     }
 
     private static function imageWithId(int $id): Image

@@ -42,12 +42,12 @@ use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Config\LanguageService;
 use App\Service\Event\AttendeeUpdateNotifier;
 use App\Service\Event\EventService;
-use App\Service\Media\ImageLocationService;
-use App\Service\Media\ImageService;
 use App\Service\Event\RecurrenceBuilderStateResolver;
 use App\Service\Event\RecurrenceDescriber;
 use App\Service\Event\RecurrencePreviewService;
 use App\Service\Event\RecurrenceResolver;
+use App\Service\Media\ImageLocationService;
+use App\Service\Media\ImageService;
 use App\Service\Seo\EventCanonicalRebuildService;
 use App\ValueObject\RecurrenceBuilderState;
 use App\ValueObject\ScheduleChange;
@@ -82,17 +82,6 @@ final class EventController extends AbstractController implements AdminNavigatio
         '1w' => '+1 week',
     ];
 
-    public function getAdminNavigation(): ?AdminNavigationConfig
-    {
-        return new AdminNavigationConfig(
-            section: 'admin_shell.section_content',
-            links: [
-                new AdminLink(label: 'admin_shell.menu_event', route: 'app_admin_event', active: 'event', role: 'ROLE_ORGANIZER'),
-            ],
-            sectionPriority: 50,
-        );
-    }
-
     public function __construct(
         private readonly ImageService $imageService,
         private readonly EntityManagerInterface $entityManager,
@@ -116,13 +105,23 @@ final class EventController extends AbstractController implements AdminNavigatio
         private readonly LocationChoiceService $locationChoices,
     ) {}
 
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'admin_shell.section_content',
+            links: [
+                new AdminLink(label: 'admin_shell.menu_event', route: 'app_admin_event', active: 'event', role: 'ROLE_ORGANIZER'),
+            ],
+            sectionPriority: 50,
+        );
+    }
+
     #[Route('/recurrence/preview', name: 'app_admin_event_recurrence_preview', methods: ['GET'])]
     public function recurrencePreview(Request $request): JsonResponse
     {
         $mode = RecurrenceMode::tryFrom((string) $request->query->get('mode'));
         $period = RecurrencePeriod::tryFrom((string) $request->query->get('period'));
-        $after = DateTimeImmutable::createFromFormat('Y-m-d', (string) $request->query->get('after'))
-            ?: new DateTimeImmutable('today');
+        $after = DateTimeImmutable::createFromFormat('Y-m-d', (string) $request->query->get('after')) ?: new DateTimeImmutable('today');
 
         if (!$mode instanceof RecurrenceMode || !$period instanceof RecurrencePeriod) {
             return $this->json(['error' => 'invalid_parameters'], Response::HTTP_BAD_REQUEST);
@@ -140,10 +139,7 @@ final class EventController extends AbstractController implements AdminNavigatio
                 static fn(mixed $value): ?Weekday => Weekday::tryFrom((string) $value),
                 (array) ($query['weekday'] ?? []),
             ))),
-            daysOfMonth: array_values(array_map(
-                static fn(mixed $value): int => (int) $value,
-                (array) ($query['day'] ?? []),
-            )),
+            daysOfMonth: array_values(array_map(static fn(mixed $value): int => (int) $value, (array) ($query['day'] ?? []))),
             fallbackWeekday: Weekday::fromDate($after),
         );
 
@@ -154,34 +150,6 @@ final class EventController extends AbstractController implements AdminNavigatio
         }
 
         return $this->json($this->recurrenceStatePayload($state) + ['candidates' => $candidates]);
-    }
-
-    /**
-     * @return array{
-     *     selection: array{mode: string, period: string, ordinal: list<int>, weekday: list<string>, day: list<int>},
-     *     controls: array{ordinal: bool, weekday: bool, weekdayMultiple: bool, day: bool, multiHint: bool, shortMonthHint: bool, periods: list<string>}
-     * }
-     */
-    private function recurrenceStatePayload(RecurrenceBuilderState $state): array
-    {
-        return [
-            'selection' => [
-                'mode' => $state->mode->value,
-                'period' => $state->period->value,
-                'ordinal' => array_map(static fn(RecurrenceOrdinal $case): int => $case->value, $state->ordinals),
-                'weekday' => array_map(static fn(Weekday $case): string => $case->value, $state->weekdays),
-                'day' => $state->daysOfMonth,
-            ],
-            'controls' => [
-                'ordinal' => $state->showsOrdinal(),
-                'weekday' => $state->showsWeekday(),
-                'weekdayMultiple' => $state->allowsSeveralWeekdays(),
-                'day' => $state->showsDayOfMonth(),
-                'multiHint' => $state->allowsSeveralEntries(),
-                'shortMonthHint' => $state->warnsAboutShortMonths(),
-                'periods' => array_map(static fn(RecurrencePeriod $case): string => $case->value, $state->periods),
-            ],
-        ];
     }
 
     #[Route('', name: 'app_admin_event')]
@@ -248,169 +216,6 @@ final class EventController extends AbstractController implements AdminNavigatio
             'active' => 'event',
             'adminTop' => new AdminTop(info: $info, actions: $actions),
         ]);
-    }
-
-    private function matchesFilters(Event $e, ?DateTimeImmutable $until, ?int $typeFilter, string $scheduleFilter): bool
-    {
-        if ($until !== null && $e->getStart() > $until) {
-            return false;
-        }
-        if ($typeFilter !== null && $e->getType()?->value !== $typeFilter) {
-            return false;
-        }
-        if ($scheduleFilter === 'onetime' && $e->getSeries() !== null) {
-            return false;
-        }
-        if ($scheduleFilter === 'series' && $e->getSeries() === null) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @return array<string, int|string|bool> URL params preserving every active filter except $exclude.
-     */
-    private function preserveFiltersExcept(string $exclude, string $range, ?int $typeFilter, string $scheduleFilter): array
-    {
-        $p = [];
-        if ($exclude !== 'range' && $range !== self::DEFAULT_RANGE) {
-            $p['range'] = $range;
-        }
-        if ($exclude !== 'type' && $typeFilter !== null) {
-            $p['type'] = $typeFilter;
-        }
-        if ($exclude !== 'schedule' && $scheduleFilter !== 'all') {
-            $p['schedule'] = $scheduleFilter;
-        }
-
-        return $p;
-    }
-
-    private function rangeUntil(string $range): ?DateTimeImmutable
-    {
-        $offset = self::RANGE_OFFSETS[$range] ?? null;
-
-        return $offset !== null ? new DateTimeImmutable($offset) : null;
-    }
-
-    /**
-     * @param array<Event> $allEvents
-     */
-    private function buildRangeDropdown(array $allEvents, string $range, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
-    {
-        $options = [];
-        $activeLabel = '';
-        foreach (array_keys(self::RANGE_OFFSETS) as $key) {
-            $optionUntil = $this->rangeUntil($key);
-            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $optionUntil, $typeFilter, $scheduleFilter)));
-            $params = $this->preserveFiltersExcept('range', $range, $typeFilter, $scheduleFilter);
-            if ($key !== self::DEFAULT_RANGE) {
-                $params['range'] = $key;
-            }
-            $label = $this->translator->trans('admin_event.filter_range_' . $key);
-            $isActive = $range === $key;
-            if ($isActive) {
-                $activeLabel = $label;
-            }
-            $options[] = new AdminTopActionDropdownOption(
-                label: $label,
-                target: $this->generateUrl('app_admin_event', $params),
-                isActive: $isActive,
-                count: $count,
-            );
-        }
-
-        return new AdminTopActionDropdown(
-            label: sprintf('%s %s', $this->translator->trans('admin_event.filter_range_label'), $activeLabel),
-            options: $options,
-            icon: 'clock',
-        );
-    }
-
-    /**
-     * @param array<Event> $allEvents
-     */
-    private function buildTypeDropdown(
-        array $allEvents,
-        ?DateTimeImmutable $until,
-        string $range,
-        ?int $typeFilter,
-        string $scheduleFilter,
-    ): AdminTopActionDropdown {
-        $countAll = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, null, $scheduleFilter)));
-
-        $options = [
-            new AdminTopActionDropdownOption(
-                label: $this->translator->trans('admin_event.filter_type_any'),
-                target: $this->generateUrl('app_admin_event', $this->preserveFiltersExcept('type', $range, $typeFilter, $scheduleFilter)),
-                isActive: $typeFilter === null,
-                count: $countAll,
-            ),
-        ];
-
-        $activeLabel = $this->translator->trans('admin_event.filter_type_any');
-        foreach (EventTypeEnum::cases() as $case) {
-            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, $case->value, $scheduleFilter)));
-            $params = $this->preserveFiltersExcept('type', $range, $typeFilter, $scheduleFilter);
-            $params['type'] = $case->value;
-            $label = $this->translator->trans('admin_event.filter_type_' . strtolower($case->name));
-            $isActive = $typeFilter === $case->value;
-            if ($isActive) {
-                $activeLabel = $label;
-            }
-            $options[] = new AdminTopActionDropdownOption(
-                label: $label,
-                target: $this->generateUrl('app_admin_event', $params),
-                isActive: $isActive,
-                count: $count,
-            );
-        }
-
-        return new AdminTopActionDropdown(
-            label: sprintf('%s %s', $this->translator->trans('admin_event.filter_type_label'), $activeLabel),
-            options: $options,
-            icon: 'tag',
-        );
-    }
-
-    /**
-     * @param array<Event> $allEvents
-     */
-    private function buildScheduleDropdown(
-        array $allEvents,
-        ?DateTimeImmutable $until,
-        string $range,
-        ?int $typeFilter,
-        string $scheduleFilter,
-    ): AdminTopActionDropdown {
-        $values = ['all', 'onetime', 'series'];
-        $options = [];
-        $activeLabel = '';
-        foreach ($values as $value) {
-            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, $typeFilter, $value)));
-            $params = $this->preserveFiltersExcept('schedule', $range, $typeFilter, $scheduleFilter);
-            if ($value !== 'all') {
-                $params['schedule'] = $value;
-            }
-            $label = $this->translator->trans('admin_event.filter_schedule_' . $value);
-            $isActive = $scheduleFilter === $value;
-            if ($isActive) {
-                $activeLabel = $label;
-            }
-            $options[] = new AdminTopActionDropdownOption(
-                label: $label,
-                target: $this->generateUrl('app_admin_event', $params),
-                isActive: $isActive,
-                count: $count,
-            );
-        }
-
-        return new AdminTopActionDropdown(
-            label: sprintf('%s %s', $this->translator->trans('admin_event.filter_schedule_label'), $activeLabel),
-            options: $options,
-            icon: 'calendar',
-        );
     }
 
     #[Route('/{id}/edit', name: 'app_admin_event_edit', methods: ['GET', 'POST'])]
@@ -597,101 +402,6 @@ final class EventController extends AbstractController implements AdminNavigatio
         return $this->renderEditPage($event, $form);
     }
 
-    private function pendingVenueBallot(Event $event): ?BallotView
-    {
-        $provider = $this->locationChoices->providerFor($event, BallotLocationChoice::VALUE);
-
-        return $provider instanceof BallotLocationChoice ? $provider->pendingDecisionFor($event) : null;
-    }
-
-    private function renderEditPage(Event $event, FormInterface $form): Response
-    {
-        return $this->render('admin/event/edit.html.twig', [
-            'active' => 'event',
-            'event' => $event,
-            'form' => $form,
-            'adminTop' => new AdminTop(actions: [
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_view'),
-                    target: $this->generateUrl('app_event_details', ['id' => $event->getId()]),
-                    icon: 'eye',
-                    newTab: true,
-                ),
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_back'),
-                    target: $this->generateUrl('app_admin_event'),
-                    icon: 'arrow-left',
-                ),
-            ]),
-            'notifiableAttendeeCount' => $this->attendeeNotifier->countNotifiable($event),
-            'recurrence' => $this->buildRecurrenceContext($event),
-            'venueForm' => $this->createForm(LocationType::class),
-            'pendingVenueBallot' => $this->pendingVenueBallot($event),
-        ]);
-    }
-
-    /**
-     * @return array{
-     *     selection: array{mode: string, period: string, ordinal: list<int>, weekday: list<string>, day: list<int>},
-     *     controls: array{ordinal: bool, weekday: bool, weekdayMultiple: bool, day: bool, multiHint: bool, shortMonthHint: bool, periods: list<string>},
-     *     summary: string,
-     *     currentRule: ?EventInterval,
-     *     currentRuleSpec: ?string,
-     *     anchor: DateTime|DateTimeImmutable,
-     *     customValue: int,
-     *     ordinals: list<array{value: int, label: string}>,
-     *     weekdays: list<array{value: string, label: string}>,
-     *     periods: list<array{value: string, label: string}>
-     * }
-     */
-    private function buildRecurrenceContext(?Event $event): array
-    {
-        $series = $event?->getSeries();
-        $anchor = $event?->getStart() ?? new DateTimeImmutable();
-        $currentPattern = $series !== null
-            ? $this->recurrenceResolver->resolve($series->getRule(), $series->getRuleSpec(), $anchor)
-            : null;
-        $isCustom = $series?->getRule() === EventInterval::Custom;
-
-        $state = $this->recurrenceBuilderStateResolver->resolve(
-            mode: RecurrenceMode::Weekday,
-            period: RecurrencePeriod::Month,
-            ordinals: [],
-            weekdays: [],
-            daysOfMonth: [],
-            fallbackWeekday: Weekday::fromDate($anchor),
-        );
-
-        return $this->recurrenceStatePayload($state) + [
-            'summary' => $isCustom && $currentPattern !== null ? $this->recurrenceDescriber->describe($currentPattern) : '',
-            'currentRule' => $series?->getRule(),
-            'currentRuleSpec' => $series?->getRuleSpec(),
-            'anchor' => $anchor,
-            'customValue' => EventInterval::Custom->value,
-            'ordinals' => array_map(
-                fn(RecurrenceOrdinal $case): array => [
-                    'value' => $case->value,
-                    'label' => $this->translator->trans($case->label()),
-                ],
-                RecurrenceOrdinal::cases(),
-            ),
-            'weekdays' => array_map(
-                fn(Weekday $case): array => [
-                    'value' => $case->value,
-                    'label' => $this->recurrenceDescriber->weekdayName($case),
-                ],
-                Weekday::cases(),
-            ),
-            'periods' => array_map(
-                fn(RecurrencePeriod $case): array => [
-                    'value' => $case->value,
-                    'label' => $this->translator->trans($case->label()),
-                ],
-                array_values(array_filter(RecurrencePeriod::cases(), static fn(RecurrencePeriod $case): bool => $case->carriesDayRule())),
-            ),
-        ];
-    }
-
     #[Route('/{id}/delete', name: 'app_admin_event_delete', methods: ['POST'])]
     public function delete(Request $request, Event $event): Response
     {
@@ -731,27 +441,6 @@ final class EventController extends AbstractController implements AdminNavigatio
         $this->eventService->uncancelEvent($event);
 
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
-    }
-
-    private function assertEventActionAllowed(Request $request, string $tokenId, Event $event): void
-    {
-        if (!$this->isCsrfTokenValid($tokenId . $event->getId(), (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
-
-        if (!$this->eventFilterService->isEventAccessible($event->getId())) {
-            throw $this->createAccessDeniedException('This event is not accessible in the current context');
-        }
-    }
-
-    private function getTranslation(mixed $languageCode, ?int $getId): EventTranslation
-    {
-        $translation = $this->eventTransRepo->findOneBy(['language' => $languageCode, 'event' => $getId]);
-        if ($translation !== null) {
-            return $translation;
-        }
-
-        return new EventTranslation();
     }
 
     #[Route('/new', name: 'app_admin_event_add', methods: ['GET', 'POST'])]
@@ -819,6 +508,305 @@ final class EventController extends AbstractController implements AdminNavigatio
             'recurrence' => $this->buildRecurrenceContext(null),
             'venueForm' => $this->createForm(LocationType::class),
         ]);
+    }
+
+    /**
+     * @return array{
+     *     selection: array{mode: string, period: string, ordinal: list<int>, weekday: list<string>, day: list<int>},
+     *     controls: array{ordinal: bool, weekday: bool, weekdayMultiple: bool, day: bool, multiHint: bool, shortMonthHint: bool, periods: list<string>}
+     * }
+     */
+    private function recurrenceStatePayload(RecurrenceBuilderState $state): array
+    {
+        return [
+            'selection' => [
+                'mode' => $state->mode->value,
+                'period' => $state->period->value,
+                'ordinal' => array_map(static fn(RecurrenceOrdinal $case): int => $case->value, $state->ordinals),
+                'weekday' => array_map(static fn(Weekday $case): string => $case->value, $state->weekdays),
+                'day' => $state->daysOfMonth,
+            ],
+            'controls' => [
+                'ordinal' => $state->showsOrdinal(),
+                'weekday' => $state->showsWeekday(),
+                'weekdayMultiple' => $state->allowsSeveralWeekdays(),
+                'day' => $state->showsDayOfMonth(),
+                'multiHint' => $state->allowsSeveralEntries(),
+                'shortMonthHint' => $state->warnsAboutShortMonths(),
+                'periods' => array_map(static fn(RecurrencePeriod $case): string => $case->value, $state->periods),
+            ],
+        ];
+    }
+
+    private function matchesFilters(Event $e, ?DateTimeImmutable $until, ?int $typeFilter, string $scheduleFilter): bool
+    {
+        if ($until !== null && $e->getStart() > $until) {
+            return false;
+        }
+        if ($typeFilter !== null && $e->getType()?->value !== $typeFilter) {
+            return false;
+        }
+        if ($scheduleFilter === 'onetime' && $e->getSeries() !== null) {
+            return false;
+        }
+        if ($scheduleFilter === 'series' && $e->getSeries() === null) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @return array<string, int|string|bool> URL params preserving every active filter except $exclude.
+     */
+    private function preserveFiltersExcept(string $exclude, string $range, ?int $typeFilter, string $scheduleFilter): array
+    {
+        $p = [];
+        if ($exclude !== 'range' && $range !== self::DEFAULT_RANGE) {
+            $p['range'] = $range;
+        }
+        if ($exclude !== 'type' && $typeFilter !== null) {
+            $p['type'] = $typeFilter;
+        }
+        if ($exclude !== 'schedule' && $scheduleFilter !== 'all') {
+            $p['schedule'] = $scheduleFilter;
+        }
+
+        return $p;
+    }
+
+    private function rangeUntil(string $range): ?DateTimeImmutable
+    {
+        $offset = self::RANGE_OFFSETS[$range] ?? null;
+
+        return $offset !== null ? new DateTimeImmutable($offset) : null;
+    }
+
+    /**
+     * @param array<Event> $allEvents
+     */
+    private function buildRangeDropdown(array $allEvents, string $range, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
+    {
+        $options = [];
+        $activeLabel = '';
+        foreach (array_keys(self::RANGE_OFFSETS) as $key) {
+            $optionUntil = $this->rangeUntil($key);
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $optionUntil, $typeFilter, $scheduleFilter)));
+            $params = $this->preserveFiltersExcept('range', $range, $typeFilter, $scheduleFilter);
+            if ($key !== self::DEFAULT_RANGE) {
+                $params['range'] = $key;
+            }
+            $label = $this->translator->trans('admin_event.filter_range_' . $key);
+            $isActive = $range === $key;
+            if ($isActive) {
+                $activeLabel = $label;
+            }
+            $options[] = new AdminTopActionDropdownOption(
+                label: $label,
+                target: $this->generateUrl('app_admin_event', $params),
+                isActive: $isActive,
+                count: $count,
+            );
+        }
+
+        return new AdminTopActionDropdown(
+            label: sprintf('%s %s', $this->translator->trans('admin_event.filter_range_label'), $activeLabel),
+            options: $options,
+            icon: 'clock',
+        );
+    }
+
+    /**
+     * @param array<Event> $allEvents
+     */
+    private function buildTypeDropdown(
+        array $allEvents,
+        ?DateTimeImmutable $until,
+        string $range,
+        ?int $typeFilter,
+        string $scheduleFilter,
+    ): AdminTopActionDropdown {
+        $countAll = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, null, $scheduleFilter)));
+
+        $options = [
+            new AdminTopActionDropdownOption(
+                label: $this->translator->trans('admin_event.filter_type_any'),
+                target: $this->generateUrl('app_admin_event', $this->preserveFiltersExcept('type', $range, $typeFilter, $scheduleFilter)),
+                isActive: $typeFilter === null,
+                count: $countAll,
+            ),
+        ];
+
+        $activeLabel = $this->translator->trans('admin_event.filter_type_any');
+        foreach (EventTypeEnum::cases() as $case) {
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, $case->value, $scheduleFilter)));
+            $params = $this->preserveFiltersExcept('type', $range, $typeFilter, $scheduleFilter);
+            $params['type'] = $case->value;
+            $label = $this->translator->trans('admin_event.filter_type_' . strtolower($case->name));
+            $isActive = $typeFilter === $case->value;
+            if ($isActive) {
+                $activeLabel = $label;
+            }
+            $options[] = new AdminTopActionDropdownOption(
+                label: $label,
+                target: $this->generateUrl('app_admin_event', $params),
+                isActive: $isActive,
+                count: $count,
+            );
+        }
+
+        return new AdminTopActionDropdown(
+            label: sprintf('%s %s', $this->translator->trans('admin_event.filter_type_label'), $activeLabel),
+            options: $options,
+            icon: 'tag',
+        );
+    }
+
+    /**
+     * @param array<Event> $allEvents
+     */
+    private function buildScheduleDropdown(
+        array $allEvents,
+        ?DateTimeImmutable $until,
+        string $range,
+        ?int $typeFilter,
+        string $scheduleFilter,
+    ): AdminTopActionDropdown {
+        $values = ['all', 'onetime', 'series'];
+        $options = [];
+        $activeLabel = '';
+        foreach ($values as $value) {
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, $typeFilter, $value)));
+            $params = $this->preserveFiltersExcept('schedule', $range, $typeFilter, $scheduleFilter);
+            if ($value !== 'all') {
+                $params['schedule'] = $value;
+            }
+            $label = $this->translator->trans('admin_event.filter_schedule_' . $value);
+            $isActive = $scheduleFilter === $value;
+            if ($isActive) {
+                $activeLabel = $label;
+            }
+            $options[] = new AdminTopActionDropdownOption(
+                label: $label,
+                target: $this->generateUrl('app_admin_event', $params),
+                isActive: $isActive,
+                count: $count,
+            );
+        }
+
+        return new AdminTopActionDropdown(
+            label: sprintf('%s %s', $this->translator->trans('admin_event.filter_schedule_label'), $activeLabel),
+            options: $options,
+            icon: 'calendar',
+        );
+    }
+
+    private function pendingVenueBallot(Event $event): ?BallotView
+    {
+        $provider = $this->locationChoices->providerFor($event, BallotLocationChoice::VALUE);
+
+        return $provider instanceof BallotLocationChoice ? $provider->pendingDecisionFor($event) : null;
+    }
+
+    private function renderEditPage(Event $event, FormInterface $form): Response
+    {
+        return $this->render('admin/event/edit.html.twig', [
+            'active' => 'event',
+            'event' => $event,
+            'form' => $form,
+            'adminTop' => new AdminTop(actions: [
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_view'),
+                    target: $this->generateUrl('app_event_details', ['id' => $event->getId()]),
+                    icon: 'eye',
+                    newTab: true,
+                ),
+                new AdminTopActionButton(
+                    label: $this->translator->trans('global.button_back'),
+                    target: $this->generateUrl('app_admin_event'),
+                    icon: 'arrow-left',
+                ),
+            ]),
+            'notifiableAttendeeCount' => $this->attendeeNotifier->countNotifiable($event),
+            'recurrence' => $this->buildRecurrenceContext($event),
+            'venueForm' => $this->createForm(LocationType::class),
+            'pendingVenueBallot' => $this->pendingVenueBallot($event),
+        ]);
+    }
+
+    /**
+     * @return array{
+     *     selection: array{mode: string, period: string, ordinal: list<int>, weekday: list<string>, day: list<int>},
+     *     controls: array{ordinal: bool, weekday: bool, weekdayMultiple: bool, day: bool, multiHint: bool, shortMonthHint: bool, periods: list<string>},
+     *     summary: string,
+     *     currentRule: ?EventInterval,
+     *     currentRuleSpec: ?string,
+     *     anchor: DateTime|DateTimeImmutable,
+     *     customValue: int,
+     *     ordinals: list<array{value: int, label: string}>,
+     *     weekdays: list<array{value: string, label: string}>,
+     *     periods: list<array{value: string, label: string}>
+     * }
+     */
+    private function buildRecurrenceContext(?Event $event): array
+    {
+        $series = $event?->getSeries();
+        $anchor = $event?->getStart() ?? new DateTimeImmutable();
+        $currentPattern = $series !== null ? $this->recurrenceResolver->resolve($series->getRule(), $series->getRuleSpec(), $anchor) : null;
+        $isCustom = $series?->getRule() === EventInterval::Custom;
+
+        $state = $this->recurrenceBuilderStateResolver->resolve(
+            mode: RecurrenceMode::Weekday,
+            period: RecurrencePeriod::Month,
+            ordinals: [],
+            weekdays: [],
+            daysOfMonth: [],
+            fallbackWeekday: Weekday::fromDate($anchor),
+        );
+
+        return (
+            $this->recurrenceStatePayload($state)
+            + [
+                'summary' => $isCustom && $currentPattern !== null ? $this->recurrenceDescriber->describe($currentPattern) : '',
+                'currentRule' => $series?->getRule(),
+                'currentRuleSpec' => $series?->getRuleSpec(),
+                'anchor' => $anchor,
+                'customValue' => EventInterval::Custom->value,
+                'ordinals' => array_map(fn(RecurrenceOrdinal $case): array => [
+                    'value' => $case->value,
+                    'label' => $this->translator->trans($case->label()),
+                ], RecurrenceOrdinal::cases()),
+                'weekdays' => array_map(fn(Weekday $case): array => [
+                    'value' => $case->value,
+                    'label' => $this->recurrenceDescriber->weekdayName($case),
+                ], Weekday::cases()),
+                'periods' => array_map(fn(RecurrencePeriod $case): array => [
+                    'value' => $case->value,
+                    'label' => $this->translator->trans($case->label()),
+                ], array_values(array_filter(RecurrencePeriod::cases(), static fn(RecurrencePeriod $case): bool => $case->carriesDayRule()))),
+            ]
+        );
+    }
+
+    private function assertEventActionAllowed(Request $request, string $tokenId, Event $event): void
+    {
+        if (!$this->isCsrfTokenValid($tokenId . $event->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        if (!$this->eventFilterService->isEventAccessible($event->getId())) {
+            throw $this->createAccessDeniedException('This event is not accessible in the current context');
+        }
+    }
+
+    private function getTranslation(mixed $languageCode, ?int $getId): EventTranslation
+    {
+        $translation = $this->eventTransRepo->findOneBy(['language' => $languageCode, 'event' => $getId]);
+        if ($translation !== null) {
+            return $translation;
+        }
+
+        return new EventTranslation();
     }
 
     private function buildBackOnlyTop(): AdminTop

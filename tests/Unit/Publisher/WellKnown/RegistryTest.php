@@ -96,9 +96,7 @@ class RegistryTest extends TestCase
         $provider = $this->createStub(WellKnownProviderInterface::class);
         $provider->method('getSuffix')->willReturn($suffix);
         $provider->method('getPriority')->willReturn($priority);
-        $provider->method('provide')->willReturn(
-            $body === null ? null : WellKnownDocument::of($body, 'text/plain'),
-        );
+        $provider->method('provide')->willReturn($body === null ? null : WellKnownDocument::of($body, 'text/plain'));
 
         return $provider;
     }

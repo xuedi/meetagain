@@ -178,8 +178,14 @@ final class CirculationSectionTest extends SectionTestCase
     /**
      * @param array<string, mixed> $payload
      */
-    private function entry(int $id, CirculationLedgerEntryType $type, ?int $fromUserId, ?int $toUserId, ?int $actorUserId, array $payload): CirculationLedgerEntry
-    {
+    private function entry(
+        int $id,
+        CirculationLedgerEntryType $type,
+        ?int $fromUserId,
+        ?int $toUserId,
+        ?int $actorUserId,
+        array $payload,
+    ): CirculationLedgerEntry {
         $occurredAt = new DateTimeImmutable('2030-01-08 10:00');
 
         return $this->withId(new CirculationLedgerEntry($type, 'book', 'book', 5, $occurredAt, 11, $fromUserId, $toUserId, $actorUserId, $payload), $id);

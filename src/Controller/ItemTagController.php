@@ -31,11 +31,15 @@ final class ItemTagController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $form = $this->createForm(TagsType::class, ['tags' => $this->editorRows($itemType)], [
-            'usage' => $this->tagService->getUsage($itemType),
-            'depths' => $this->tagService->getDepths($itemType),
-            'parent_choices' => $this->parentChoices($itemType),
-        ]);
+        $form = $this->createForm(
+            TagsType::class,
+            ['tags' => $this->editorRows($itemType)],
+            [
+                'usage' => $this->tagService->getUsage($itemType),
+                'depths' => $this->tagService->getDepths($itemType),
+                'parent_choices' => $this->parentChoices($itemType),
+            ],
+        );
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

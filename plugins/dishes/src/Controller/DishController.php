@@ -5,9 +5,9 @@ namespace Plugin\Dishes\Controller;
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Item\ListRegistry;
-use App\Item\TranslationFormHelper;
 use App\Item\Tag\AssignmentFormHelper;
 use App\Item\Tag\TagService;
+use App\Item\TranslationFormHelper;
 use App\Service\Seo\BreadcrumbBuilder;
 use Plugin\Dishes\Activity\Messages\DishAdded;
 use Plugin\Dishes\Form\DishAddType;
@@ -109,11 +109,7 @@ final class DishController extends AbstractController
         return $this->render('@Dishes/dish/detail.html.twig', [
             'dish' => $dish,
             'liked' => $liked,
-            'breadcrumbs' => $breadcrumbBuilder->build(
-                'app_dishes_dishlist',
-                'dishes.menu_main',
-                $dish->getTranslatedName($request->getLocale()),
-            ),
+            'breadcrumbs' => $breadcrumbBuilder->build('app_dishes_dishlist', 'dishes.menu_main', $dish->getTranslatedName($request->getLocale())),
         ]);
     }
 

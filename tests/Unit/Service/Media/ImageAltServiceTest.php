@@ -95,10 +95,7 @@ class ImageAltServiceTest extends TestCase
         $incomplete = self::imageWithId(2);
         $incomplete->setAlt('english');
 
-        $service = $this->service(
-            requiredLocales: ['en', 'de'],
-            candidates: [$complete, $incomplete],
-        );
+        $service = $this->service(requiredLocales: ['en', 'de'], candidates: [$complete, $incomplete]);
 
         // Act
         $page = $service->findMissingAltPage(null, 2);
@@ -152,16 +149,16 @@ class ImageAltServiceTest extends TestCase
 
         $requirements = $this->createStub(AltLocaleRequirementResolver::class);
         $requirements->method('getRequiredAltLocales')->willReturn($requiredLocales);
-        $requirements->method('getRequiredAltLocalesForImages')->willReturnCallback(
-            static function (array $images) use ($requiredLocales): array {
+        $requirements
+            ->method('getRequiredAltLocalesForImages')
+            ->willReturnCallback(static function (array $images) use ($requiredLocales): array {
                 $result = [];
                 foreach ($images as $image) {
                     $result[(int) $image->getId()] = $requiredLocales;
                 }
 
                 return $result;
-            },
-        );
+            });
 
         return new ImageAltService(
             $repository,

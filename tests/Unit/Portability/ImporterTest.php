@@ -9,8 +9,8 @@ use App\Portability\ArchiveReader;
 use App\Portability\DateShifter;
 use App\Portability\Exporter;
 use App\Portability\ImageImporter;
-use App\Portability\Importer;
 use App\Portability\ImportContext;
+use App\Portability\Importer;
 use App\Portability\Outcome;
 use App\Portability\PluginSectionInterface;
 use App\Portability\SectionInterface;
@@ -269,9 +269,11 @@ final class ImporterTest extends TestCase
 
         $section = $this->createStub(SectionInterface::class);
         $section->method('getKey')->willReturn('events');
-        $section->method('import')->willReturnCallback(static function (array $rows, ImportContext $context): void {
-            $context->importImage($rows[0]['image_file'], ImageType::EventTeaser);
-        });
+        $section
+            ->method('import')
+            ->willReturnCallback(static function (array $rows, ImportContext $context): void {
+                $context->importImage($rows[0]['image_file'], ImageType::EventTeaser);
+            });
 
         // Act
         $this->importer([$section], imageImporter: $imageImporter)->import($this->zipPath);
@@ -366,9 +368,11 @@ final class ImporterTest extends TestCase
         $section = $this->createStub(SectionInterface::class);
         $section->method('getKey')->willReturn($key);
         $section->method('getOrder')->willReturn($order);
-        $section->method('import')->willReturnCallback(function (array $rows) use ($key): void {
-            $this->calls[] = [$key, $rows];
-        });
+        $section
+            ->method('import')
+            ->willReturnCallback(function (array $rows) use ($key): void {
+                $this->calls[] = [$key, $rows];
+            });
 
         return $section;
     }

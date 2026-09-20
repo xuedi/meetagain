@@ -137,7 +137,9 @@ readonly class TransferService
                 continue;
             }
 
-            $entry = new Glossary()->setPhrase($row['phrase'])->setSecondary($row['secondary']);
+            $entry = new Glossary()
+                ->setPhrase($row['phrase'])
+                ->setSecondary($row['secondary']);
             $entry->setDefinition($mapping->language, $row['definition']);
             $newRows[] = [$entry, $tagIds];
             $index[$key] = $entry;
@@ -368,7 +370,7 @@ readonly class TransferService
     private function targetTag(ImportMapping $mapping, array $labels): ?ItemTag
     {
         $newLabel = trim((string) $mapping->newTagLabel);
-        $existingId = $newLabel === '' ? $mapping->targetTagId : ($labels[mb_strtolower($newLabel)] ?? null);
+        $existingId = $newLabel === '' ? $mapping->targetTagId : $labels[mb_strtolower($newLabel)] ?? null;
 
         if ($existingId !== null) {
             $tag = $this->tagService->getManagedTag(GlossaryTaggableTypeProvider::ITEM_TYPE, $existingId);

@@ -69,16 +69,19 @@ final class ExporterTest extends TestCase
         $data = $this->read($this->exporter([])->export(new Scope(site: $site)));
 
         // Assert
-        static::assertSame([
-            'slug' => 'weiqi-club',
-            'name' => 'Weiqi Club',
-            'description' => 'Go in Berlin',
-            'languages' => ['de', 'en'],
-            'theme_colors' => ['danger' => '#222222', 'primary' => '#111111'],
-            'settings' => ['send_upcoming_digest' => false, 'show_town_hall' => true],
-            'plugin_settings' => ['books' => ['circulation' => true], 'glossary' => ['trainerEnabled' => true]],
-            'logo_file' => null,
-        ], $data['site']);
+        static::assertSame(
+            [
+                'slug' => 'weiqi-club',
+                'name' => 'Weiqi Club',
+                'description' => 'Go in Berlin',
+                'languages' => ['de', 'en'],
+                'theme_colors' => ['danger' => '#222222', 'primary' => '#111111'],
+                'settings' => ['send_upcoming_digest' => false, 'show_town_hall' => true],
+                'plugin_settings' => ['books' => ['circulation' => true], 'glossary' => ['trainerEnabled' => true]],
+                'logo_file' => null,
+            ],
+            $data['site'],
+        );
     }
 
     public function testAnAnchorPinsExportedAtToItsMondayAndMovesEveryDateByWholeWeeks(): void

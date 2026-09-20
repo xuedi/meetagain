@@ -19,10 +19,7 @@ final readonly class PluginSettingsService
     {
         $materialised = $descriptors instanceof Traversable ? iterator_to_array($descriptors, false) : array_values($descriptors);
 
-        usort(
-            $materialised,
-            static fn(DescriptorInterface $a, DescriptorInterface $b): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($materialised, static fn(DescriptorInterface $a, DescriptorInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         $keyed = [];
         foreach ($materialised as $descriptor) {
@@ -50,10 +47,7 @@ final readonly class PluginSettingsService
     /** @return array<string, DescriptorInterface> */
     public function getByPlugin(string $pluginKey): array
     {
-        return array_filter(
-            $this->descriptors,
-            static fn(DescriptorInterface $descriptor): bool => $descriptor->getPluginKey() === $pluginKey,
-        );
+        return array_filter($this->descriptors, static fn(DescriptorInterface $descriptor): bool => $descriptor->getPluginKey() === $pluginKey);
     }
 
     /** @return list<string> */

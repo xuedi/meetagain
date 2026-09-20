@@ -33,9 +33,7 @@ final readonly class ItemListRuntime implements RuntimeExtensionInterface
     {
         $route = $this->registry->providerFor($itemType)?->getListRoute();
 
-        return $route !== null
-            ? $this->urlGenerator->generate($route)
-            : $this->requestStack->getCurrentRequest()?->getPathInfo() ?? '';
+        return $route !== null ? $this->urlGenerator->generate($route) : $this->requestStack->getCurrentRequest()?->getPathInfo() ?? '';
     }
 
     public function listCount(string $itemType): int

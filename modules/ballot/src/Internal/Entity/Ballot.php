@@ -225,13 +225,8 @@ class Ballot
     }
 
     /** @param list<string> $tiedKeys */
-    public function restoreOutcome(
-        BallotStatus $status,
-        ?string $winningKey,
-        array $tiedKeys,
-        ?int $settledByUserId,
-        ?DateTimeImmutable $settledAt,
-    ): static {
+    public function restoreOutcome(BallotStatus $status, ?string $winningKey, array $tiedKeys, ?int $settledByUserId, ?DateTimeImmutable $settledAt): static
+    {
         $this->status = $status;
         $this->winningKey = $winningKey;
         $this->tiedKeys = $tiedKeys;

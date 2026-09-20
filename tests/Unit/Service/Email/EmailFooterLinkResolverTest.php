@@ -23,10 +23,13 @@ final class EmailFooterLinkResolverTest extends TestCase
         $links = $resolver->resolve('https://example.org/', 'de');
 
         // Assert
-        static::assertSame([
-            ['label' => 'Impressum', 'url' => 'https://example.org/de/imprint'],
-            ['label' => 'Datenschutz', 'url' => 'https://example.org/de/privacy'],
-        ], $links);
+        static::assertSame(
+            [
+                ['label' => 'Impressum', 'url' => 'https://example.org/de/imprint'],
+                ['label' => 'Datenschutz', 'url' => 'https://example.org/de/privacy'],
+            ],
+            $links,
+        );
     }
 
     public function testANarrowingListDropsAPageOutsideItAndKeepsTheOnesInside(): void
@@ -42,10 +45,13 @@ final class EmailFooterLinkResolverTest extends TestCase
         $links = $resolver->resolve('https://weiqi.meetagain.test', 'de', [11, 12]);
 
         // Assert
-        static::assertSame([
-            ['label' => 'Clubregeln', 'url' => 'https://weiqi.meetagain.test/de/club-rules'],
-            ['label' => 'Impressum', 'url' => 'https://weiqi.meetagain.test/de/imprint'],
-        ], $links);
+        static::assertSame(
+            [
+                ['label' => 'Clubregeln', 'url' => 'https://weiqi.meetagain.test/de/club-rules'],
+                ['label' => 'Impressum', 'url' => 'https://weiqi.meetagain.test/de/imprint'],
+            ],
+            $links,
+        );
     }
 
     public function testAnEmptyNarrowingListLeavesNoFooterLinksAtAll(): void
@@ -89,7 +95,11 @@ final class EmailFooterLinkResolverTest extends TestCase
         $cms->setSlug($slug);
         $cms->setEmailFooter(true);
         new ReflectionProperty(Cms::class, 'id')->setValue($cms, $id);
-        $cms->addLinkName(new CmsLinkName()->setLanguage($language)->setName($linkName));
+        $cms->addLinkName(
+            new CmsLinkName()
+                ->setLanguage($language)
+                ->setName($linkName),
+        );
 
         return $cms;
     }

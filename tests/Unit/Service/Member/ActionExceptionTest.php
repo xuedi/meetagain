@@ -44,39 +44,39 @@ class ActionExceptionTest extends TestCase
     public static function provideFactoryCases(): iterable
     {
         yield 'selfModification' => [
-            static fn() => ActionException::selfModification(),
+            ActionException::selfModification(...),
             ActionFailure::SelfModification,
         ];
         yield 'systemUser' => [
-            static fn() => ActionException::systemUser(),
+            ActionException::systemUser(...),
             ActionFailure::SystemUser,
         ];
         yield 'invalidRoleValue' => [
-            static fn() => ActionException::invalidRoleValue(),
+            ActionException::invalidRoleValue(...),
             ActionFailure::InvalidRoleValue,
         ];
         yield 'invalidFlagName' => [
-            static fn() => ActionException::invalidFlagName(),
+            ActionException::invalidFlagName(...),
             ActionFailure::InvalidFlagName,
         ];
         yield 'invalidStatusTransition' => [
-            static fn() => ActionException::invalidStatusTransition(),
+            ActionException::invalidStatusTransition(...),
             ActionFailure::InvalidStatusTransition,
         ];
         yield 'invalidGroupRoleValue' => [
-            static fn() => ActionException::invalidGroupRoleValue(),
+            ActionException::invalidGroupRoleValue(...),
             ActionFailure::InvalidGroupRoleValue,
         ];
         yield 'invalidGroupRoleTransition' => [
-            static fn() => ActionException::invalidGroupRoleTransition(),
+            ActionException::invalidGroupRoleTransition(...),
             ActionFailure::InvalidGroupRoleTransition,
         ];
         yield 'membershipNotFound' => [
-            static fn() => ActionException::membershipNotFound(),
+            ActionException::membershipNotFound(...),
             ActionFailure::MembershipNotFound,
         ];
         yield 'noOp' => [
-            static fn() => ActionException::noOp(),
+            ActionException::noOp(...),
             ActionFailure::NoOp,
         ];
     }

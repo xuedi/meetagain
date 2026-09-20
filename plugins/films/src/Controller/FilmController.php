@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Throwable;
 
 #[Route('/films')]
 final class FilmController extends AbstractController
@@ -61,7 +62,7 @@ final class FilmController extends AbstractController
 
             try {
                 $results = $adapter->searchByTitle($query, $year, $locale);
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 $this->addFlash('error', 'films_film.flash_lookup_error');
             }
         }

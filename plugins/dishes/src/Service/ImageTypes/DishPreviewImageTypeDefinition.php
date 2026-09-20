@@ -24,11 +24,6 @@ final class DishPreviewImageTypeDefinition extends AbstractImageTypeDefinition
         return ImageType::PluginDishesPreview;
     }
 
-    protected function sizes(): array
-    {
-        return [[1024, 768], [600, 400], [400, 400], [350, 263], [100, 100]];
-    }
-
     public function getEditLink(int $locationId): ?array
     {
         return ['route' => 'app_plugin_dishes_dish_show', 'params' => ['id' => $locationId]];
@@ -71,5 +66,10 @@ final class DishPreviewImageTypeDefinition extends AbstractImageTypeDefinition
             'route' => 'app_plugin_dishes_dish_show',
             'params' => ['id' => $dish->getId()],
         ];
+    }
+
+    protected function sizes(): array
+    {
+        return [[1024, 768], [600, 400], [400, 400], [350, 263], [100, 100]];
     }
 }

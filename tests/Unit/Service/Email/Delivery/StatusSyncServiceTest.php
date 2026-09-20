@@ -6,14 +6,15 @@ use App\Entity\EmailQueue;
 use App\Enum\CronTaskStatus;
 use App\Repository\EmailQueueRepository;
 use App\Service\Config\ConfigService;
-use App\Service\Email\Delivery\Log;
 use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
+use App\Service\Email\Delivery\Log;
 use App\Service\Email\Delivery\ProviderChain;
 use App\Service\Email\Delivery\StatusSyncService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Console\Output\BufferedOutput;
 
@@ -207,7 +208,7 @@ class StatusSyncServiceTest extends TestCase
     {
         $email = new EmailQueue();
         $email->setProviderMessageId($providerMessageId);
-        $ref = new \ReflectionClass($email);
+        $ref = new ReflectionClass($email);
         $prop = $ref->getProperty('id');
         $prop->setValue($email, $id);
         return $email;

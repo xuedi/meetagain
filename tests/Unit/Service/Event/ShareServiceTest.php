@@ -60,10 +60,7 @@ class ShareServiceTest extends TestCase
             'https://t.me/share/url?url=https%3A%2F%2Fmeetagain.org%2Fen%2Fevent%2F18&text=Brot%20%26%20Spiele%3A%20Gr%C3%BCnkohl',
             $targets['telegram']->url,
         );
-        self::assertSame(
-            'https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmeetagain.org%2Fen%2Fevent%2F18',
-            $targets['facebook']->url,
-        );
+        self::assertSame('https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fmeetagain.org%2Fen%2Fevent%2F18', $targets['facebook']->url);
     }
 
     public function testTheMailTargetCarriesTheTeaserAndTheUrlInItsBody(): void
@@ -119,14 +116,8 @@ class ShareServiceTest extends TestCase
         $links = $this->indexByKey($service->buildSheet($event, 'en')->mapLinks);
 
         // Assert
-        self::assertSame(
-            'https://www.openstreetmap.org/?mlat=52.5162&mlon=13.3777#map=17/52.5162/13.3777',
-            $links['osm']->url,
-        );
-        self::assertSame(
-            'https://www.google.com/maps/dir/?api=1&destination=52.5162%2C13.3777',
-            $links['directions']->url,
-        );
+        self::assertSame('https://www.openstreetmap.org/?mlat=52.5162&mlon=13.3777#map=17/52.5162/13.3777', $links['osm']->url);
+        self::assertSame('https://www.google.com/maps/dir/?api=1&destination=52.5162%2C13.3777', $links['directions']->url);
     }
 
     public function testMapLinksFallBackToTheAddressWithoutCoordinates(): void
@@ -140,14 +131,8 @@ class ShareServiceTest extends TestCase
         $links = $this->indexByKey($service->buildSheet($event, 'en')->mapLinks);
 
         // Assert
-        self::assertSame(
-            'https://www.openstreetmap.org/search?query=Cafe%20Central%2C%20Hauptstr.%201%2C%2010115%20Berlin',
-            $links['osm']->url,
-        );
-        self::assertSame(
-            'https://www.google.com/maps/dir/?api=1&destination=Cafe%20Central%2C%20Hauptstr.%201%2C%2010115%20Berlin',
-            $links['directions']->url,
-        );
+        self::assertSame('https://www.openstreetmap.org/search?query=Cafe%20Central%2C%20Hauptstr.%201%2C%2010115%20Berlin', $links['osm']->url);
+        self::assertSame('https://www.google.com/maps/dir/?api=1&destination=Cafe%20Central%2C%20Hauptstr.%201%2C%2010115%20Berlin', $links['directions']->url);
     }
 
     public function testAnEventWithoutALocationHasNoMapLinks(): void
@@ -183,18 +168,15 @@ class ShareServiceTest extends TestCase
         $config->method('getHost')->willReturn('https://meetagain.org');
 
         $provider = $this->createStub(UrlOwnerProviderInterface::class);
-        $provider->method('getOwnerHost')->willReturnCallback(
-            static fn(string $route, array $parameters): ?string => ($parameters['id'] ?? null) === $claimedEventId
+        $provider->method('getOwnerHost')->willReturnCallback(static fn(string $route, array $parameters): ?string => ($parameters['id'] ?? null)
+            === $claimedEventId
                 ? 'https://dragon.meetagain.org'
-                : null,
-        );
+                : null);
 
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
-        $urlGenerator->method('generate')->willReturnCallback(
-            static fn(string $route, array $parameters): string => $route === 'app_event_share_qr'
-                ? sprintf('/%s/event/%d/share/qr.png', $parameters['_locale'] ?? 'en', $parameters['id'])
-                : sprintf('/%s/event/%d', $parameters['_locale'] ?? 'en', $parameters['id']),
-        );
+        $urlGenerator->method('generate')->willReturnCallback(static fn(string $route, array $parameters): string => $route === 'app_event_share_qr'
+            ? sprintf('/%s/event/%d/share/qr.png', $parameters['_locale'] ?? 'en', $parameters['id'])
+            : sprintf('/%s/event/%d', $parameters['_locale'] ?? 'en', $parameters['id']));
 
         return new ShareService(new UrlOwnerService($config, [$provider]), $urlGenerator);
     }
@@ -206,7 +188,9 @@ class ShareServiceTest extends TestCase
         $translation->setTitle($title);
         $translation->setTeaser($teaser);
 
-        return new EventStub()->setId($id)->addTranslation($translation);
+        return new EventStub()
+            ->setId($id)
+            ->addTranslation($translation);
     }
 
     private function makeLocation(?string $latitude, ?string $longitude): Location

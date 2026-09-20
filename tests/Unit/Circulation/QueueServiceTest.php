@@ -131,7 +131,10 @@ class QueueServiceTest extends TestCase
         // Assert
         self::assertSame(CirculationRequestStatus::Expired, $request->getStatus());
         self::assertNull($request->getOfferedCopy());
-        self::assertCount(1, array_filter($this->ledgerRows, static fn(CirculationLedgerEntry $row): bool => $row->getEntryType() === CirculationLedgerEntryType::RequestExpired));
+        self::assertCount(1, array_filter(
+            $this->ledgerRows,
+            static fn(CirculationLedgerEntry $row): bool => $row->getEntryType() === CirculationLedgerEntryType::RequestExpired,
+        ));
     }
 
     public function testReleasePutsAnOfferedRequestBackInTheQueue(): void
@@ -167,12 +170,7 @@ class QueueServiceTest extends TestCase
 
         $ledger = new LedgerService($em, $this->createStub(CirculationLedgerEntryRepository::class));
 
-        return new QueueService(
-            $em,
-            $requests,
-            new HandoverService($em, $ledger, $this->createStub(ActivityService::class)),
-            $ledger,
-        );
+        return new QueueService($em, $requests, new HandoverService($em, $ledger, $this->createStub(ActivityService::class)), $ledger);
     }
 
     private function availableCopy(): CirculationCopy

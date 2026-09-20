@@ -11,7 +11,10 @@ final class SettingsTest extends TestCase
     public function testTheSettingsSurviveTheirArrayForm(): void
     {
         // Arrange
-        $settings = new Settings()->setAdapter(ExternalSource::Tmdb)->setEncryptedTmdbKey('cipher-t')->setEncryptedOmdbKey('cipher-o');
+        $settings = new Settings()
+            ->setAdapter(ExternalSource::Tmdb)
+            ->setEncryptedTmdbKey('cipher-t')
+            ->setEncryptedOmdbKey('cipher-o');
 
         // Act
         $restored = Settings::fromArray($settings->toArray());

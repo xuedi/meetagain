@@ -19,12 +19,16 @@ class ItemTagRepository extends ServiceEntityRepository
     /** @return list<ItemTag> */
     public function findForType(string $itemType): array
     {
-        return array_values($this->createQueryBuilder('t')
-            ->where('t.itemType = :type')->setParameter('type', $itemType)
-            ->orderBy('t.position', 'ASC')
-            ->addOrderBy('t.id', 'ASC')
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('t')
+                ->where('t.itemType = :type')
+                ->setParameter('type', $itemType)
+                ->orderBy('t.position', 'ASC')
+                ->addOrderBy('t.id', 'ASC')
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     public function findOneForType(string $itemType, int $id): ?ItemTag
@@ -34,21 +38,25 @@ class ItemTagRepository extends ServiceEntityRepository
 
     public function nextPosition(string $itemType): int
     {
-        $max = $this->createQueryBuilder('t')
+        $max = $this
+            ->createQueryBuilder('t')
             ->select('MAX(t.position)')
-            ->where('t.itemType = :type')->setParameter('type', $itemType)
+            ->where('t.itemType = :type')
+            ->setParameter('type', $itemType)
             ->getQuery()
             ->getSingleScalarResult();
 
-        return $max === null ? 0 : ((int) $max) + 1;
+        return $max === null ? 0 : (int) $max + 1;
     }
 
     /** @return list<int> */
     public function idsForType(string $itemType): array
     {
-        $rows = $this->createQueryBuilder('t')
+        $rows = $this
+            ->createQueryBuilder('t')
             ->select('t.id')
-            ->where('t.itemType = :type')->setParameter('type', $itemType)
+            ->where('t.itemType = :type')
+            ->setParameter('type', $itemType)
             ->getQuery()
             ->getScalarResult();
 
@@ -62,9 +70,11 @@ class ItemTagRepository extends ServiceEntityRepository
         $frontier = [$tag->getId()];
 
         while ($frontier !== []) {
-            $rows = $this->createQueryBuilder('t')
+            $rows = $this
+                ->createQueryBuilder('t')
                 ->select('t.id')
-                ->where('t.parent IN (:parents)')->setParameter('parents', $frontier)
+                ->where('t.parent IN (:parents)')
+                ->setParameter('parents', $frontier)
                 ->getQuery()
                 ->getScalarResult();
 

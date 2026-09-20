@@ -51,11 +51,7 @@ class RegistryTest extends TestCase
     public function testTheScopeChainNarrowsTheListing(): void
     {
         // Arrange
-        $registry = new Registry(
-            [$this->provider('location', [1, 2, 3])],
-            new ScopeFilterService([$this->filter([2, 3])]),
-            $this->plugins(),
-        );
+        $registry = new Registry([$this->provider('location', [1, 2, 3])], new ScopeFilterService([$this->filter([2, 3])]), $this->plugins());
 
         // Act
         $ids = $this->idsOf($registry->entriesFor('location', new User()));
@@ -85,11 +81,7 @@ class RegistryTest extends TestCase
     public function testMayTouchAsksTheProviderAndIsNotNarrowedByTheScopeChain(): void
     {
         // Arrange
-        $registry = new Registry(
-            [$this->provider('location', [1], touchable: [9])],
-            new ScopeFilterService([$this->filter([])]),
-            $this->plugins(),
-        );
+        $registry = new Registry([$this->provider('location', [1], touchable: [9])], new ScopeFilterService([$this->filter([])]), $this->plugins());
 
         // Act
         $verdict = $registry->mayTouch('location', new User(), 9);
@@ -113,11 +105,7 @@ class RegistryTest extends TestCase
     public function testEveryRegisteredProviderIsListed(): void
     {
         // Arrange
-        $registry = new Registry(
-            [$this->provider('location', []), $this->provider('event', [])],
-            new ScopeFilterService([]),
-            $this->plugins(),
-        );
+        $registry = new Registry([$this->provider('location', []), $this->provider('event', [])], new ScopeFilterService([]), $this->plugins());
 
         // Act
         $types = array_map(static fn(TargetProviderInterface $p): string => $p->getType(), $registry->all());
@@ -129,11 +117,7 @@ class RegistryTest extends TestCase
     public function testASectionFromAnInactivePluginIsNotOffered(): void
     {
         // Arrange
-        $registry = new Registry(
-            [$this->provider('glossary', [1], touchable: [1], pluginKey: 'glossary')],
-            new ScopeFilterService([]),
-            $this->plugins([]),
-        );
+        $registry = new Registry([$this->provider('glossary', [1], touchable: [1], pluginKey: 'glossary')], new ScopeFilterService([]), $this->plugins([]));
 
         // Act & Assert
         self::assertSame([], $registry->all());
@@ -244,7 +228,10 @@ class RegistryTest extends TestCase
             /**
              * @param list<int>|null $visible
              */
-            public function __construct(private readonly ?array $visible, private readonly ?string $onlyType) {}
+            public function __construct(
+                private readonly ?array $visible,
+                private readonly ?string $onlyType,
+            ) {}
 
             public function getPriority(): int
             {

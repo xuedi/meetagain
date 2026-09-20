@@ -38,34 +38,54 @@ class RecurrenceDescriberTest extends TestCase
         yield 'first Sunday zh' => ['FREQ=MONTHLY;BYDAY=1SU', 'zh', '每月第一个星期日'];
         yield 'last Friday en' => ['FREQ=MONTHLY;BYDAY=-1FR', 'en', 'Every last Friday of the month'];
         yield 'second Saturday two months en' => [
-            'FREQ=MONTHLY;INTERVAL=2;BYDAY=2SA', 'en', 'Every second Saturday of every second month',
+            'FREQ=MONTHLY;INTERVAL=2;BYDAY=2SA',
+            'en',
+            'Every second Saturday of every second month',
         ];
         yield 'third Monday quarterly en' => [
-            'FREQ=MONTHLY;INTERVAL=3;BYDAY=3MO', 'en', 'Every third Monday of every quarter',
+            'FREQ=MONTHLY;INTERVAL=3;BYDAY=3MO',
+            'en',
+            'Every third Monday of every quarter',
         ];
         yield 'fourth Thursday yearly en' => [
-            'FREQ=YEARLY;BYMONTH=8;BYDAY=4TH', 'en', 'Every fourth Thursday of August each year',
+            'FREQ=YEARLY;BYMONTH=8;BYDAY=4TH',
+            'en',
+            'Every fourth Thursday of August each year',
         ];
         yield 'fourth Thursday yearly de' => [
-            'FREQ=YEARLY;BYMONTH=8;BYDAY=4TH', 'de', 'Jeden vierten Donnerstag im August jedes Jahr',
+            'FREQ=YEARLY;BYMONTH=8;BYDAY=4TH',
+            'de',
+            'Jeden vierten Donnerstag im August jedes Jahr',
         ];
         yield 'several weekdays en' => [
-            'FREQ=WEEKLY;BYDAY=MO,WE,FR', 'en', 'Every Monday, Wednesday and Friday',
+            'FREQ=WEEKLY;BYDAY=MO,WE,FR',
+            'en',
+            'Every Monday, Wednesday and Friday',
         ];
         yield 'several weekdays de' => [
-            'FREQ=WEEKLY;BYDAY=MO,WE,FR', 'de', 'Jeden Montag, Mittwoch und Freitag',
+            'FREQ=WEEKLY;BYDAY=MO,WE,FR',
+            'de',
+            'Jeden Montag, Mittwoch und Freitag',
         ];
         yield 'several weekdays zh' => [
-            'FREQ=WEEKLY;BYDAY=MO,WE,FR', 'zh', '每星期一、星期三和星期五',
+            'FREQ=WEEKLY;BYDAY=MO,WE,FR',
+            'zh',
+            '每星期一、星期三和星期五',
         ];
         yield 'two weekdays en' => [
-            'FREQ=WEEKLY;BYDAY=SA,SU', 'en', 'Every Saturday and Sunday',
+            'FREQ=WEEKLY;BYDAY=SA,SU',
+            'en',
+            'Every Saturday and Sunday',
         ];
         yield 'several ordinals en' => [
-            'FREQ=MONTHLY;BYDAY=1FR,3FR', 'en', 'Every first and third Friday of the month',
+            'FREQ=MONTHLY;BYDAY=1FR,3FR',
+            'en',
+            'Every first and third Friday of the month',
         ];
         yield 'several ordinals de' => [
-            'FREQ=MONTHLY;BYDAY=1FR,3FR', 'de', 'Jeden ersten und dritten Freitag im Monat',
+            'FREQ=MONTHLY;BYDAY=1FR,3FR',
+            'de',
+            'Jeden ersten und dritten Freitag im Monat',
         ];
         yield 'daily en' => ['FREQ=DAILY', 'en', 'Every day'];
         yield 'daily de' => ['FREQ=DAILY', 'de', 'Jeden Tag'];
@@ -103,12 +123,16 @@ class RecurrenceDescriberTest extends TestCase
         yield 'last day zh' => ['FREQ=MONTHLY;BYMONTHDAY=-1', 'zh', '每月最后一天'];
         yield 'two days en' => ['FREQ=MONTHLY;BYMONTHDAY=1,15', 'en', 'Every 1st and 15th of the month'];
         yield 'three days en' => [
-            'FREQ=MONTHLY;BYMONTHDAY=5,12,28', 'en', 'Every 5th, 12th and 28th of the month',
+            'FREQ=MONTHLY;BYMONTHDAY=5,12,28',
+            'en',
+            'Every 5th, 12th and 28th of the month',
         ];
         yield 'two days de' => ['FREQ=MONTHLY;BYMONTHDAY=1,15', 'de', 'Jeden 1. und 15. des Monats'];
         yield 'two days zh' => ['FREQ=MONTHLY;BYMONTHDAY=1,15', 'zh', '每月1和15日'];
         yield 'last day yearly en' => [
-            'FREQ=YEARLY;BYMONTH=8;BYMONTHDAY=-1', 'en', 'On the last day of August each year',
+            'FREQ=YEARLY;BYMONTH=8;BYMONTHDAY=-1',
+            'en',
+            'On the last day of August each year',
         ];
     }
 
@@ -130,11 +154,7 @@ class RecurrenceDescriberTest extends TestCase
                 : RecurrencePattern::weekday($period, Weekday::Sunday, [RecurrenceOrdinal::First, RecurrenceOrdinal::Last], $anchorMonth);
             if (!$period->isWeekly()) {
                 $patterns[] = RecurrencePattern::dayOfMonth($period, 15, $anchorMonth);
-                $patterns[] = RecurrencePattern::dayOfMonth(
-                    $period,
-                    RecurrencePattern::LAST_DAY_OF_MONTH,
-                    $anchorMonth,
-                );
+                $patterns[] = RecurrencePattern::dayOfMonth($period, RecurrencePattern::LAST_DAY_OF_MONTH, $anchorMonth);
             }
         }
 
@@ -154,11 +174,7 @@ class RecurrenceDescriberTest extends TestCase
         $translator->addLoader('yaml', new YamlFileLoader());
 
         foreach (['en', 'de', 'zh'] as $locale) {
-            $translator->addResource(
-                'yaml',
-                sprintf('%s/../../../../translations/admin/messages.%s.yaml', __DIR__, $locale),
-                $locale,
-            );
+            $translator->addResource('yaml', sprintf('%s/../../../../translations/admin/messages.%s.yaml', __DIR__, $locale), $locale);
         }
 
         return $translator;

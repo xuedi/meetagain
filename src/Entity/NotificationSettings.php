@@ -19,15 +19,6 @@ class NotificationSettings implements JsonSerializable
 
     public bool $attendedEventUpdate;
 
-    public static function fromJson(?array $notificationSettings): self
-    {
-        if ($notificationSettings === null) {
-            return new self([]);
-        }
-
-        return new self($notificationSettings);
-    }
-
     public function __construct(array $data)
     {
         $this->announcements = $data['announcements'] ?? true;
@@ -36,6 +27,15 @@ class NotificationSettings implements JsonSerializable
         $this->eventReminder = $data['eventReminder'] ?? true;
         $this->upcomingEvents = $data['upcomingEvents'] ?? true;
         $this->attendedEventUpdate = $data['attendedEventUpdate'] ?? true;
+    }
+
+    public static function fromJson(?array $notificationSettings): self
+    {
+        if ($notificationSettings === null) {
+            return new self([]);
+        }
+
+        return new self($notificationSettings);
     }
 
     public function jsonSerialize(): array

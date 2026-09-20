@@ -184,40 +184,6 @@ final class EventController extends AbstractController
         );
     }
 
-    /**
-     * @param array<int>|null $allowedEventIds
-     * @return array<Event>
-     */
-    private function getFeaturedEvents(?array $allowedEventIds, string $locale): array
-    {
-        $provided = $this->getProvidedFeaturedEvents();
-        if ($provided === null) {
-            return $this->repo->findFeatured($allowedEventIds, $locale);
-        }
-
-        return $this->eventService->keepTranslatedIn($provided, $locale);
-    }
-
-    /**
-     * @return array<Event>|null
-     */
-    private function getProvidedFeaturedEvents(): ?array
-    {
-        $providers = iterator_to_array($this->featuredEventProviders);
-
-        usort($providers, static fn(FeaturedEventProviderInterface $a, FeaturedEventProviderInterface $b): int => $b->getPriority() <=> $a->getPriority());
-
-        foreach ($providers as $provider) {
-            if (!$provider->shouldProvide()) {
-                continue;
-            }
-
-            return $provider->getFeaturedEvents();
-        }
-
-        return null;
-    }
-
     #[IsGranted('ROLE_USER')]
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp', methods: ['POST'])]
     public function toggleRsvp(Request $request, Event $event, RsvpService $rsvpService): Response
@@ -331,5 +297,39 @@ final class EventController extends AbstractController
         $this->itemAssociationService->detach($id, $itemType, $itemId);
 
         return $this->redirectToRoute('app_event_details', ['id' => $id]);
+    }
+
+    /**
+     * @param array<int>|null $allowedEventIds
+     * @return array<Event>
+     */
+    private function getFeaturedEvents(?array $allowedEventIds, string $locale): array
+    {
+        $provided = $this->getProvidedFeaturedEvents();
+        if ($provided === null) {
+            return $this->repo->findFeatured($allowedEventIds, $locale);
+        }
+
+        return $this->eventService->keepTranslatedIn($provided, $locale);
+    }
+
+    /**
+     * @return array<Event>|null
+     */
+    private function getProvidedFeaturedEvents(): ?array
+    {
+        $providers = iterator_to_array($this->featuredEventProviders);
+
+        usort($providers, static fn(FeaturedEventProviderInterface $a, FeaturedEventProviderInterface $b): int => $b->getPriority() <=> $a->getPriority());
+
+        foreach ($providers as $provider) {
+            if (!$provider->shouldProvide()) {
+                continue;
+            }
+
+            return $provider->getFeaturedEvents();
+        }
+
+        return null;
     }
 }

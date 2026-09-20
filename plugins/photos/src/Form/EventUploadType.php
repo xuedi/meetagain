@@ -23,23 +23,25 @@ class EventUploadType extends AbstractType
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('files', FileType::class, [
-                'label' => 'photos_event.field_files',
-                'help' => 'photos_event.help_files',
-                'required' => true,
-                'mapped' => false,
-                'multiple' => true,
-                'constraints' => [
-                    new Count(min: 1, minMessage: $this->translator->trans('photos_event.error_no_image')),
-                    new All([
-                        new File(maxSize: '16000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('photos_event.error_invalid_image')),
-                    ]),
-                ],
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'photos_event.button_upload',
-            ]);
+        $builder->add('files', FileType::class, [
+            'label' => 'photos_event.field_files',
+            'help' => 'photos_event.help_files',
+            'required' => true,
+            'mapped' => false,
+            'multiple' => true,
+            'constraints' => [
+                new Count(min: 1, minMessage: $this->translator->trans('photos_event.error_no_image')),
+                new All([
+                    new File(
+                        maxSize: '16000k',
+                        mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                        mimeTypesMessage: $this->translator->trans('photos_event.error_invalid_image'),
+                    ),
+                ]),
+            ],
+        ])->add('submit', SubmitType::class, [
+            'label' => 'photos_event.button_upload',
+        ]);
     }
 
     #[Override]

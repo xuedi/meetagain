@@ -45,9 +45,7 @@ class LocationRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('l')
-            ->where('l.latitude IS NOT NULL')
-            ->andWhere('l.longitude IS NOT NULL');
+        $qb = $this->createQueryBuilder('l')->where('l.latitude IS NOT NULL')->andWhere('l.longitude IS NOT NULL');
 
         if ($restrictToLocationIds !== null) {
             $qb->andWhere('l.id IN (:locationIds)')->setParameter('locationIds', $restrictToLocationIds);

@@ -23,12 +23,20 @@ final class PluginExtension extends AbstractExtension
                 'getPluginProfileDropdownLinks',
             ]),
             new TwigFunction('get_plugin_profile_config_links', [PluginRuntime::class, 'getPluginProfileConfigLinks']),
-            new TwigFunction('get_plugin_navbar_pills_html', [PluginRuntime::class, 'getPluginNavbarPillsHtml'], [
-                'is_safe' => ['html'],
-            ]),
-            new TwigFunction('event_list_item_tags', [PluginRuntime::class, 'getEventListItemTags'], [
-                'is_safe' => ['html'],
-            ]),
+            new TwigFunction(
+                'get_plugin_navbar_pills_html',
+                [PluginRuntime::class, 'getPluginNavbarPillsHtml'],
+                [
+                    'is_safe' => ['html'],
+                ],
+            ),
+            new TwigFunction(
+                'event_list_item_tags',
+                [PluginRuntime::class, 'getEventListItemTags'],
+                [
+                    'is_safe' => ['html'],
+                ],
+            ),
             new TwigFunction('warm_event_list_item_tags', [PluginRuntime::class, 'warmEventListItemTags']),
         ];
     }

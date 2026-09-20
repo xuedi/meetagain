@@ -66,7 +66,10 @@ class TrainerSetupType extends AbstractType
             $typing = ($data['answerMode'] ?? null) === AnswerMode::Typing;
             $direction = $data['direction'] ?? null;
             if ($typing && $direction instanceof Direction && !$direction->answersWithTerm()) {
-                $event->getForm()->get('answerMode')->addError(new FormError($this->translator->trans('glossary_trainer.error_typing_needs_term')));
+                $event
+                    ->getForm()
+                    ->get('answerMode')
+                    ->addError(new FormError($this->translator->trans('glossary_trainer.error_typing_needs_term')));
             }
         });
     }

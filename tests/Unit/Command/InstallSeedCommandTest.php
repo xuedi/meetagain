@@ -112,16 +112,20 @@ final class InstallSeedCommandTest extends TestCase
         $hasher->method('hashPassword')->willReturn('hash');
 
         $languageService = $this->createStub(LanguageService::class);
-        $languageService->method('invalidateCache')->willReturnCallback(function (): void {
-            $this->calls[] = 'language cache dropped';
-        });
+        $languageService
+            ->method('invalidateCache')
+            ->willReturnCallback(function (): void {
+                $this->calls[] = 'language cache dropped';
+            });
 
         $emailTemplateSeed = $this->createStub(Command::class);
-        $emailTemplateSeed->method('run')->willReturnCallback(function (): int {
-            $this->calls[] = 'email templates seeded';
+        $emailTemplateSeed
+            ->method('run')
+            ->willReturnCallback(function (): int {
+                $this->calls[] = 'email templates seeded';
 
-            return Command::SUCCESS;
-        });
+                return Command::SUCCESS;
+            });
         $application = $this->createStub(Application::class);
         $application->method('find')->willReturn($emailTemplateSeed);
 
@@ -142,10 +146,12 @@ final class InstallSeedCommandTest extends TestCase
     {
         $repository = $this->createStub(EntityRepository::class);
         $repository->method('findAll')->willReturnCallback(fn(): array => $this->rows[$entityClass] ?? []);
-        $repository->method('findOneBy')->willReturnCallback(fn(array $criteria): ?object => array_find(
-            $this->rows[$entityClass] ?? [],
-            static fn(object $row): bool => $row instanceof User && $row->getEmail() === $criteria['email'],
-        ));
+        $repository
+            ->method('findOneBy')
+            ->willReturnCallback(fn(array $criteria): ?object => array_find(
+                $this->rows[$entityClass] ?? [],
+                static fn(object $row): bool => $row instanceof User && $row->getEmail() === $criteria['email'],
+            ));
 
         return $repository;
     }

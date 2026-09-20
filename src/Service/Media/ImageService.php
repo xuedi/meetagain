@@ -115,10 +115,7 @@ readonly class ImageService
             return false;
         }
 
-        $this->entityManager
-            ->createQuery('DELETE App\Entity\ImageReport r WHERE r.image = :image')
-            ->setParameter('image', $image)
-            ->execute();
+        $this->entityManager->createQuery('DELETE App\Entity\ImageReport r WHERE r.image = :image')->setParameter('image', $image)->execute();
 
         $hash = (string) $image->getHash();
         $source = $this->getSourcePath($image);
@@ -160,78 +157,6 @@ readonly class ImageService
         }
 
         return $cnt;
-    }
-
-    /**
-     * @return array<string, array<string, true>> hash => set of valid size tokens
-     */
-    private function requiredSizeTokensByHash(): array
-    {
-        $typesByImageId = $this->imageLocationRepo->findTypesPerImageId();
-
-        $map = [];
-        foreach ($this->imageRepo->findAll() as $image) {
-            $tokens = [];
-            foreach ($this->usedTypes($image, $typesByImageId) as $type) {
-                foreach ($this->imageTypeRegistry->getThumbnailSizes($type) as [$width, $height]) {
-                    $tokens[$this->thumbnailSizeFormat->format($width, $height)] = true;
-                }
-            }
-            $map[$image->getHash()] = $tokens;
-        }
-
-        return $map;
-    }
-
-    /**
-     * @param array<int, list<ImageType>> $typesByImageId
-     * @return list<ImageType>
-     */
-    private function usedTypes(Image $image, array $typesByImageId): array
-    {
-        return [$image->getType(), ...($typesByImageId[$image->getId()] ?? [])];
-    }
-
-    private function scaleThumbnail(Imagick $imagick, int $width, int $height, ImageFitMode $fitMode, string $target): void
-    {
-        $free = ImageTypeDefinitionInterface::FREE_AXIS;
-
-        if ($width === $free) {
-            $imagick->thumbnailImage(self::FREE_AXIS_CEILING, $height, true);
-            $this->logFreeAxisClamp($imagick->getImageWidth(), $imagick->getImageHeight(), $height, $target);
-
-            return;
-        }
-
-        if ($height === $free) {
-            $imagick->thumbnailImage($width, self::FREE_AXIS_CEILING, true);
-            $this->logFreeAxisClamp($imagick->getImageHeight(), $imagick->getImageWidth(), $width, $target);
-
-            return;
-        }
-
-        if ($fitMode === ImageFitMode::Fit) {
-            $imagick->thumbnailImage($width, $height, true);
-
-            return;
-        }
-
-        $imagick->cropThumbnailImage($width, $height);
-    }
-
-    private function logFreeAxisClamp(int $freeAxis, int $fixedAxis, int $requestedFixedAxis, string $target): void
-    {
-        if ($freeAxis !== self::FREE_AXIS_CEILING || $fixedAxis >= $requestedFixedAxis) {
-            return;
-        }
-
-        $this->logger->warning(sprintf(
-            "Thumbnail '%s' hit the %dpx free-axis ceiling; its fixed axis is %dpx instead of the requested %dpx.",
-            $target,
-            self::FREE_AXIS_CEILING,
-            $fixedAxis,
-            $requestedFixedAxis,
-        ));
     }
 
     public function regenerateAllThumbnails(?ImageType $only = null): int
@@ -360,41 +285,6 @@ readonly class ImageService
         return self::MIME_ALIASES[$lower] ?? $lower;
     }
 
-    private function detectMimeType(UploadedFile $imageData): string
-    {
-        $serverMime = $imageData->getMimeType();
-        if ($serverMime === null || $serverMime === '') {
-            throw new RuntimeException('Could not determine MIME type for uploaded file.');
-        }
-
-        $mimeType = self::normaliseMimeType($serverMime);
-        if (!in_array($mimeType, self::ACCEPTED_MIME_TYPES, true)) {
-            throw new RuntimeException(sprintf('Refusing upload of unsupported image type "%s".', $mimeType));
-        }
-
-        return $mimeType;
-    }
-
-    private function detectExtension(UploadedFile $imageData, string $mimeType): string
-    {
-        $serverExt = $imageData->guessExtension();
-        if ($serverExt !== null && $serverExt !== '') {
-            return $serverExt;
-        }
-
-        $mimeExt = MimeTypes::getDefault()->getExtensions($mimeType)[0] ?? null;
-        if ($mimeExt !== null) {
-            return $mimeExt;
-        }
-
-        $clientExt = $imageData->getClientOriginalExtension();
-        if ($clientExt !== '') {
-            return strtolower($clientExt);
-        }
-
-        throw new RuntimeException('Could not determine file extension for uploaded file.');
-    }
-
     public function getSourcePath(Image $image): string
     {
         $path = $this->kernelProjectDir . '/data/images/';
@@ -455,9 +345,116 @@ readonly class ImageService
         }
     }
 
+    /**
+     * @return array<string, array<string, true>> hash => set of valid size tokens
+     */
+    private function requiredSizeTokensByHash(): array
+    {
+        $typesByImageId = $this->imageLocationRepo->findTypesPerImageId();
+
+        $map = [];
+        foreach ($this->imageRepo->findAll() as $image) {
+            $tokens = [];
+            foreach ($this->usedTypes($image, $typesByImageId) as $type) {
+                foreach ($this->imageTypeRegistry->getThumbnailSizes($type) as [$width, $height]) {
+                    $tokens[$this->thumbnailSizeFormat->format($width, $height)] = true;
+                }
+            }
+            $map[$image->getHash()] = $tokens;
+        }
+
+        return $map;
+    }
+
+    /**
+     * @param array<int, list<ImageType>> $typesByImageId
+     * @return list<ImageType>
+     */
+    private function usedTypes(Image $image, array $typesByImageId): array
+    {
+        return [$image->getType(), ...($typesByImageId[$image->getId()] ?? [])];
+    }
+
+    private function scaleThumbnail(Imagick $imagick, int $width, int $height, ImageFitMode $fitMode, string $target): void
+    {
+        $free = ImageTypeDefinitionInterface::FREE_AXIS;
+
+        if ($width === $free) {
+            $imagick->thumbnailImage(self::FREE_AXIS_CEILING, $height, true);
+            $this->logFreeAxisClamp($imagick->getImageWidth(), $imagick->getImageHeight(), $height, $target);
+
+            return;
+        }
+
+        if ($height === $free) {
+            $imagick->thumbnailImage($width, self::FREE_AXIS_CEILING, true);
+            $this->logFreeAxisClamp($imagick->getImageHeight(), $imagick->getImageWidth(), $width, $target);
+
+            return;
+        }
+
+        if ($fitMode === ImageFitMode::Fit) {
+            $imagick->thumbnailImage($width, $height, true);
+
+            return;
+        }
+
+        $imagick->cropThumbnailImage($width, $height);
+    }
+
+    private function logFreeAxisClamp(int $freeAxis, int $fixedAxis, int $requestedFixedAxis, string $target): void
+    {
+        if ($freeAxis !== self::FREE_AXIS_CEILING || $fixedAxis >= $requestedFixedAxis) {
+            return;
+        }
+
+        $this->logger->warning(sprintf(
+            "Thumbnail '%s' hit the %dpx free-axis ceiling; its fixed axis is %dpx instead of the requested %dpx.",
+            $target,
+            self::FREE_AXIS_CEILING,
+            $fixedAxis,
+            $requestedFixedAxis,
+        ));
+    }
+
+    private function detectMimeType(UploadedFile $imageData): string
+    {
+        $serverMime = $imageData->getMimeType();
+        if ($serverMime === null || $serverMime === '') {
+            throw new RuntimeException('Could not determine MIME type for uploaded file.');
+        }
+
+        $mimeType = self::normaliseMimeType($serverMime);
+        if (!in_array($mimeType, self::ACCEPTED_MIME_TYPES, true)) {
+            throw new RuntimeException(sprintf('Refusing upload of unsupported image type "%s".', $mimeType));
+        }
+
+        return $mimeType;
+    }
+
+    private function detectExtension(UploadedFile $imageData, string $mimeType): string
+    {
+        $serverExt = $imageData->guessExtension();
+        if ($serverExt !== null && $serverExt !== '') {
+            return $serverExt;
+        }
+
+        $mimeExt = MimeTypes::getDefault()->getExtensions($mimeType)[0] ?? null;
+        if ($mimeExt !== null) {
+            return $mimeExt;
+        }
+
+        $clientExt = $imageData->getClientOriginalExtension();
+        if ($clientExt !== '') {
+            return strtolower($clientExt);
+        }
+
+        throw new RuntimeException('Could not determine file extension for uploaded file.');
+    }
+
     private function getThumbnailFile(Image $image, int $width, int $height): string
     {
-        return $this->getThumbnailDir() . sprintf('%s_%s.webp', $image->getHash(), $this->thumbnailSizeFormat->format($width, $height));
+        return sprintf('%s%s_%s.webp', $this->getThumbnailDir(), $image->getHash(), $this->thumbnailSizeFormat->format($width, $height));
     }
 
     private function sizeTokenOf(string $file): ?string

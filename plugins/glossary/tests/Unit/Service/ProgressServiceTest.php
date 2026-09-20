@@ -58,15 +58,18 @@ class ProgressServiceTest extends TestCase
         $upcoming = $service->details(self::USER, 'en', new DateTimeImmutable('2026-09-12 10:00'))['upcoming'];
 
         // Assert
-        self::assertSame([
-            '2026-09-12' => 1,
-            '2026-09-13' => 0,
-            '2026-09-14' => 1,
-            '2026-09-15' => 0,
-            '2026-09-16' => 0,
-            '2026-09-17' => 0,
-            '2026-09-18' => 0,
-        ], $upcoming);
+        self::assertSame(
+            [
+                '2026-09-12' => 1,
+                '2026-09-13' => 0,
+                '2026-09-14' => 1,
+                '2026-09-15' => 0,
+                '2026-09-16' => 0,
+                '2026-09-17' => 0,
+                '2026-09-18' => 0,
+            ],
+            $upcoming,
+        );
     }
 
     public function testTheMostMissedWordsComeFirstAndWordsNeverMissedStayOut(): void
@@ -82,10 +85,7 @@ class ProgressServiceTest extends TestCase
         $hardest = $service->details(self::USER, 'en', new DateTimeImmutable('2026-09-12 10:00'))['hardest'];
 
         // Assert
-        self::assertSame(
-            [[2, 2, 2], [1, 4, 1]],
-            array_map(static fn(array $row): array => [$row['entry']->getId(), $row['seen'], $row['missed']], $hardest),
-        );
+        self::assertSame([[2, 2, 2], [1, 4, 1]], array_map(static fn(array $row): array => [$row['entry']->getId(), $row['seen'], $row['missed']], $hardest));
     }
 
     public function testTheStreakStillCountsWhenTodayHasNoAnswerYet(): void

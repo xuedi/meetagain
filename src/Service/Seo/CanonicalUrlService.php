@@ -22,10 +22,7 @@ readonly class CanonicalUrlService
         $route = $request->attributes->get('_route');
         $routeParameters = $request->attributes->get('_route_params');
 
-        $ownerHost = $this->urlOwnerService->getOwnerHost(
-            is_string($route) ? $route : '',
-            is_array($routeParameters) ? $routeParameters : [],
-        );
+        $ownerHost = $this->urlOwnerService->getOwnerHost(is_string($route) ? $route : '', is_array($routeParameters) ? $routeParameters : []);
 
         $defaultUrl = $ownerHost . $request->getPathInfo();
 

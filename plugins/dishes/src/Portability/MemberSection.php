@@ -245,7 +245,11 @@ readonly class MemberSection implements PluginSectionInterface
         }
 
         $liked[$likeKey] = true;
-        $this->em->persist(new DishLike()->setDish($dish)->setUserId($userId));
+        $this->em->persist(
+            new DishLike()
+                ->setDish($dish)
+                ->setUserId($userId),
+        );
         $dish->setLikes($dish->getLikes() + 1);
         $context->count(self::KIND_LIKES, Outcome::Created);
     }

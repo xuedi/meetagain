@@ -21,7 +21,8 @@ final readonly class MemberNameResolver
             return [];
         }
 
-        $rows = $this->entityManager->createQueryBuilder()
+        $rows = $this->entityManager
+            ->createQueryBuilder()
             ->select('u.id', 'u.name')
             ->from(User::class, 'u')
             ->where('u.id IN (:ids)')

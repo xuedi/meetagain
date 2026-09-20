@@ -95,14 +95,17 @@ final class FieldPurposeTest extends SectionTestCase
         ];
 
         // Assert
-        static::assertEquals([
-            new BallotSubject('event', 90),
-            new BallotSubject('location', 40),
-            new BallotSubject('item_tag_dish', 70),
-            new BallotSubject('item_tag_dish', 0),
-            new BallotSubject('glossary', 30),
-            null,
-        ], $subjects);
+        static::assertEquals(
+            [
+                new BallotSubject('event', 90),
+                new BallotSubject('location', 40),
+                new BallotSubject('item_tag_dish', 70),
+                new BallotSubject('item_tag_dish', 0),
+                new BallotSubject('glossary', 30),
+                null,
+            ],
+            $subjects,
+        );
     }
 
     public function testProposalKeysAreRekeyedAndLeavingTheValueAloneStays(): void
@@ -131,15 +134,20 @@ final class FieldPurposeTest extends SectionTestCase
     private function purpose(array $proposals = [], array $events = []): FieldPurpose
     {
         $proposalRepository = $this->createStub(EntityRepository::class);
-        $proposalRepository->method('findBy')->willReturnCallback(static fn(array $criteria): array => array_values(array_filter(
-            $proposals,
-            static fn(ChangeProposal $proposal): bool => in_array($proposal->getId(), $criteria['id'], true),
-        )));
+        $proposalRepository
+            ->method('findBy')
+            ->willReturnCallback(static fn(array $criteria): array => array_values(array_filter($proposals, static fn(ChangeProposal $proposal): bool => in_array(
+                $proposal->getId(),
+                $criteria['id'],
+                true,
+            ))));
         $eventRepository = $this->createStub(EntityRepository::class);
         $eventRepository->method('findBy')->willReturn($events);
 
         $em = $this->createStub(EntityManagerInterface::class);
-        $em->method('getRepository')->willReturnCallback(static fn(string $class): EntityRepository => $class === Event::class ? $eventRepository : $proposalRepository);
+        $em->method('getRepository')->willReturnCallback(static fn(string $class): EntityRepository => $class === Event::class
+            ? $eventRepository
+            : $proposalRepository);
 
         return new FieldPurpose($em);
     }

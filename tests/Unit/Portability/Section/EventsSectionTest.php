@@ -97,7 +97,11 @@ final class EventsSectionTest extends SectionTestCase
     {
         // Arrange
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->once())->method('findBy')->with(['id' => [1, 2]], ['id' => 'ASC'])->willReturn([]);
+        $repository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['id' => [1, 2]], ['id' => 'ASC'])
+            ->willReturn([]);
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repository);
         $section = new EventsSection($em, $this->createStub(LocationRepository::class), $this->createStub(UserRepository::class));
@@ -156,11 +160,7 @@ final class EventsSectionTest extends SectionTestCase
      */
     private function section(array $events = []): EventsSection
     {
-        return new EventsSection(
-            $this->entityManager($events),
-            $this->createStub(LocationRepository::class),
-            $this->createStub(UserRepository::class),
-        );
+        return new EventsSection($this->entityManager($events), $this->createStub(LocationRepository::class), $this->createStub(UserRepository::class));
     }
 
     private function translation(string $language, string $title, string $description, string $teaser): EventTranslation

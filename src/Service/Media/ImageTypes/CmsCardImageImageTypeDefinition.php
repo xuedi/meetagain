@@ -25,11 +25,6 @@ final class CmsCardImageImageTypeDefinition extends AbstractImageTypeDefinition
         return ImageType::CmsCardImage;
     }
 
-    protected function sizes(): array
-    {
-        return [[600, 400], [350, 233], [300, 200]];
-    }
-
     public function getEditLink(int $locationId): ?array
     {
         return ['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => $locationId]];
@@ -55,6 +50,11 @@ final class CmsCardImageImageTypeDefinition extends AbstractImageTypeDefinition
         }
 
         return $pairs;
+    }
+
+    protected function sizes(): array
+    {
+        return [[600, 400], [350, 233], [300, 200]];
     }
 
     protected function cmsBlockRepository(): CmsBlockRepository

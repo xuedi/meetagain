@@ -33,38 +33,59 @@ class RecurrencePatternTest extends TestCase
     public static function provideWeekdayPatterns(): iterable
     {
         yield 'weekly ignores the ordinal' => [
-            RecurrencePeriod::Week, Weekday::Sunday, null, null, 'FREQ=WEEKLY;BYDAY=SU',
+            RecurrencePeriod::Week,
+            Weekday::Sunday,
+            null,
+            null,
+            'FREQ=WEEKLY;BYDAY=SU',
         ];
         yield 'every two weeks' => [
-            RecurrencePeriod::TwoWeeks, Weekday::Friday, null, null, 'FREQ=WEEKLY;INTERVAL=2;BYDAY=FR',
+            RecurrencePeriod::TwoWeeks,
+            Weekday::Friday,
+            null,
+            null,
+            'FREQ=WEEKLY;INTERVAL=2;BYDAY=FR',
         ];
         yield 'first Sunday of the month' => [
-            RecurrencePeriod::Month, Weekday::Sunday, RecurrenceOrdinal::First, null, 'FREQ=MONTHLY;BYDAY=1SU',
+            RecurrencePeriod::Month,
+            Weekday::Sunday,
+            RecurrenceOrdinal::First,
+            null,
+            'FREQ=MONTHLY;BYDAY=1SU',
         ];
         yield 'last Friday of the month' => [
-            RecurrencePeriod::Month, Weekday::Friday, RecurrenceOrdinal::Last, null, 'FREQ=MONTHLY;BYDAY=-1FR',
+            RecurrencePeriod::Month,
+            Weekday::Friday,
+            RecurrenceOrdinal::Last,
+            null,
+            'FREQ=MONTHLY;BYDAY=-1FR',
         ];
         yield 'second Saturday every two months' => [
-            RecurrencePeriod::TwoMonths, Weekday::Saturday, RecurrenceOrdinal::Second, null,
+            RecurrencePeriod::TwoMonths,
+            Weekday::Saturday,
+            RecurrenceOrdinal::Second,
+            null,
             'FREQ=MONTHLY;INTERVAL=2;BYDAY=2SA',
         ];
         yield 'third Monday every quarter' => [
-            RecurrencePeriod::Quarter, Weekday::Monday, RecurrenceOrdinal::Third, null,
+            RecurrencePeriod::Quarter,
+            Weekday::Monday,
+            RecurrenceOrdinal::Third,
+            null,
             'FREQ=MONTHLY;INTERVAL=3;BYDAY=3MO',
         ];
         yield 'fourth Thursday of August each year' => [
-            RecurrencePeriod::Year, Weekday::Thursday, RecurrenceOrdinal::Fourth, 8,
+            RecurrencePeriod::Year,
+            Weekday::Thursday,
+            RecurrenceOrdinal::Fourth,
+            8,
             'FREQ=YEARLY;BYMONTH=8;BYDAY=4TH',
         ];
     }
 
     #[DataProvider('provideDayOfMonthPatterns')]
-    public function testDayOfMonthPatternSerialisesToRfcString(
-        RecurrencePeriod $period,
-        int $dayOfMonth,
-        ?int $anchorMonth,
-        string $expected,
-    ): void {
+    public function testDayOfMonthPatternSerialisesToRfcString(RecurrencePeriod $period, int $dayOfMonth, ?int $anchorMonth, string $expected): void
+    {
         // Act
         $pattern = RecurrencePattern::dayOfMonth($period, $dayOfMonth, $anchorMonth);
 
@@ -75,19 +96,34 @@ class RecurrencePatternTest extends TestCase
     public static function provideDayOfMonthPatterns(): iterable
     {
         yield 'fifteenth of the month' => [
-            RecurrencePeriod::Month, 15, null, 'FREQ=MONTHLY;BYMONTHDAY=15',
+            RecurrencePeriod::Month,
+            15,
+            null,
+            'FREQ=MONTHLY;BYMONTHDAY=15',
         ];
         yield 'last day of the month' => [
-            RecurrencePeriod::Month, RecurrencePattern::LAST_DAY_OF_MONTH, null, 'FREQ=MONTHLY;BYMONTHDAY=-1',
+            RecurrencePeriod::Month,
+            RecurrencePattern::LAST_DAY_OF_MONTH,
+            null,
+            'FREQ=MONTHLY;BYMONTHDAY=-1',
         ];
         yield 'first every two months' => [
-            RecurrencePeriod::TwoMonths, 1, null, 'FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=1',
+            RecurrencePeriod::TwoMonths,
+            1,
+            null,
+            'FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=1',
         ];
         yield 'thirty-first every quarter' => [
-            RecurrencePeriod::Quarter, 31, null, 'FREQ=MONTHLY;INTERVAL=3;BYMONTHDAY=31',
+            RecurrencePeriod::Quarter,
+            31,
+            null,
+            'FREQ=MONTHLY;INTERVAL=3;BYMONTHDAY=31',
         ];
         yield 'fifteenth of August each year' => [
-            RecurrencePeriod::Year, 15, 8, 'FREQ=YEARLY;BYMONTH=8;BYMONTHDAY=15',
+            RecurrencePeriod::Year,
+            15,
+            8,
+            'FREQ=YEARLY;BYMONTH=8;BYMONTHDAY=15',
         ];
     }
 
@@ -229,7 +265,9 @@ class RecurrencePatternTest extends TestCase
         yield 'first and fifteenth' => [RecurrencePeriod::Month, [15, 1], 'FREQ=MONTHLY;BYMONTHDAY=1,15'];
         yield 'duplicates collapse' => [RecurrencePeriod::Month, [10, 10], 'FREQ=MONTHLY;BYMONTHDAY=10'];
         yield 'three days quarterly' => [
-            RecurrencePeriod::Quarter, [28, 5, 12], 'FREQ=MONTHLY;INTERVAL=3;BYMONTHDAY=5,12,28',
+            RecurrencePeriod::Quarter,
+            [28, 5, 12],
+            'FREQ=MONTHLY;INTERVAL=3;BYMONTHDAY=5,12,28',
         ];
     }
 

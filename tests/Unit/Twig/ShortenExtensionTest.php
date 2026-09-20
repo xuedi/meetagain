@@ -29,10 +29,7 @@ class ShortenExtensionTest extends TestCase
         $output = $extension->shortened($value, 30);
 
         // Assert
-        static::assertSame(
-            sprintf('<span class="is-truncated" style="--truncate-ch: 30" title="%s">%s</span>', $value, $value),
-            $output,
-        );
+        static::assertSame(sprintf('<span class="is-truncated" style="--truncate-ch: 30" title="%s">%s</span>', $value, $value), $output);
     }
 
     public function testMarkupInTheValueIsEscapedInBothTitleAndBody(): void

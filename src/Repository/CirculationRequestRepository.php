@@ -24,26 +24,38 @@ class CirculationRequestRepository extends ServiceEntityRepository
      */
     public function findQueue(string $context, string $itemType, int $itemId): array
     {
-        return array_values($this->createQueryBuilder('r')
-            ->leftJoin('r.user', 'u')->addSelect('u')
-            ->where('r.context = :context')->setParameter('context', $context)
-            ->andWhere('r.itemType = :itemType')->setParameter('itemType', $itemType)
-            ->andWhere('r.itemId = :itemId')->setParameter('itemId', $itemId)
-            ->andWhere('r.status IN (:open)')
-            ->setParameter('open', [CirculationRequestStatus::Waiting, CirculationRequestStatus::Offered])
-            ->orderBy('r.requestedAt', 'ASC')
-            ->addOrderBy('r.id', 'ASC')
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('r')
+                ->leftJoin('r.user', 'u')
+                ->addSelect('u')
+                ->where('r.context = :context')
+                ->setParameter('context', $context)
+                ->andWhere('r.itemType = :itemType')
+                ->setParameter('itemType', $itemType)
+                ->andWhere('r.itemId = :itemId')
+                ->setParameter('itemId', $itemId)
+                ->andWhere('r.status IN (:open)')
+                ->setParameter('open', [CirculationRequestStatus::Waiting, CirculationRequestStatus::Offered])
+                ->orderBy('r.requestedAt', 'ASC')
+                ->addOrderBy('r.id', 'ASC')
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     public function findOpenFor(string $context, string $itemType, int $itemId, User $user): ?CirculationRequest
     {
-        return $this->createQueryBuilder('r')
-            ->where('r.context = :context')->setParameter('context', $context)
-            ->andWhere('r.itemType = :itemType')->setParameter('itemType', $itemType)
-            ->andWhere('r.itemId = :itemId')->setParameter('itemId', $itemId)
-            ->andWhere('r.user = :user')->setParameter('user', $user)
+        return $this
+            ->createQueryBuilder('r')
+            ->where('r.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('r.itemType = :itemType')
+            ->setParameter('itemType', $itemType)
+            ->andWhere('r.itemId = :itemId')
+            ->setParameter('itemId', $itemId)
+            ->andWhere('r.user = :user')
+            ->setParameter('user', $user)
             ->andWhere('r.status IN (:open)')
             ->setParameter('open', [CirculationRequestStatus::Waiting, CirculationRequestStatus::Offered])
             ->setMaxResults(1)
@@ -61,11 +73,15 @@ class CirculationRequestRepository extends ServiceEntityRepository
             return [];
         }
 
-        $rows = $this->createQueryBuilder('r')
+        $rows = $this
+            ->createQueryBuilder('r')
             ->select('r.itemId AS itemId, COUNT(r.id) AS total')
-            ->where('r.context = :context')->setParameter('context', $context)
-            ->andWhere('r.itemType = :itemType')->setParameter('itemType', $itemType)
-            ->andWhere('r.itemId IN (:itemIds)')->setParameter('itemIds', $itemIds)
+            ->where('r.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('r.itemType = :itemType')
+            ->setParameter('itemType', $itemType)
+            ->andWhere('r.itemId IN (:itemIds)')
+            ->setParameter('itemIds', $itemIds)
             ->andWhere('r.status IN (:open)')
             ->setParameter('open', [CirculationRequestStatus::Waiting, CirculationRequestStatus::Offered])
             ->groupBy('r.itemId')
@@ -90,15 +106,22 @@ class CirculationRequestRepository extends ServiceEntityRepository
             return [];
         }
 
-        return array_values($this->createQueryBuilder('r')
-            ->where('r.context = :context')->setParameter('context', $context)
-            ->andWhere('r.itemType = :itemType')->setParameter('itemType', $itemType)
-            ->andWhere('r.itemId IN (:itemIds)')->setParameter('itemIds', $itemIds)
-            ->andWhere('r.user = :user')->setParameter('user', $user)
-            ->andWhere('r.status IN (:open)')
-            ->setParameter('open', [CirculationRequestStatus::Waiting, CirculationRequestStatus::Offered])
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('r')
+                ->where('r.context = :context')
+                ->setParameter('context', $context)
+                ->andWhere('r.itemType = :itemType')
+                ->setParameter('itemType', $itemType)
+                ->andWhere('r.itemId IN (:itemIds)')
+                ->setParameter('itemIds', $itemIds)
+                ->andWhere('r.user = :user')
+                ->setParameter('user', $user)
+                ->andWhere('r.status IN (:open)')
+                ->setParameter('open', [CirculationRequestStatus::Waiting, CirculationRequestStatus::Offered])
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     /**
@@ -114,11 +137,16 @@ class CirculationRequestRepository extends ServiceEntityRepository
      */
     public function findOffersOlderThan(DateTimeImmutable $cutoff): array
     {
-        return array_values($this->createQueryBuilder('r')
-            ->where('r.status = :offered')->setParameter('offered', CirculationRequestStatus::Offered)
-            ->andWhere('r.offeredAt < :cutoff')->setParameter('cutoff', $cutoff)
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('r')
+                ->where('r.status = :offered')
+                ->setParameter('offered', CirculationRequestStatus::Offered)
+                ->andWhere('r.offeredAt < :cutoff')
+                ->setParameter('cutoff', $cutoff)
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     /**
@@ -127,10 +155,14 @@ class CirculationRequestRepository extends ServiceEntityRepository
      */
     public function findOpenInContext(string $context, string $itemType, ?array $allowedItemIds = null): array
     {
-        $qb = $this->createQueryBuilder('r')
-            ->leftJoin('r.user', 'u')->addSelect('u')
-            ->where('r.context = :context')->setParameter('context', $context)
-            ->andWhere('r.itemType = :itemType')->setParameter('itemType', $itemType)
+        $qb = $this
+            ->createQueryBuilder('r')
+            ->leftJoin('r.user', 'u')
+            ->addSelect('u')
+            ->where('r.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('r.itemType = :itemType')
+            ->setParameter('itemType', $itemType)
             ->andWhere('r.status IN (:open)')
             ->setParameter('open', [CirculationRequestStatus::Waiting, CirculationRequestStatus::Offered])
             ->orderBy('r.requestedAt', 'ASC');

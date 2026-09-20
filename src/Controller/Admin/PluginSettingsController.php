@@ -63,7 +63,9 @@ final class PluginSettingsController extends AbstractController implements Admin
 
             $forms = [];
             foreach ($descriptors as $descriptorKey => $other) {
-                $forms[$descriptorKey] = $descriptorKey === $sectionKey ? $form->createView() : $this->buildForm($other, $this->loadGlobal($other))->createView();
+                $forms[$descriptorKey] = $descriptorKey === $sectionKey
+                    ? $form->createView()
+                    : $this->buildForm($other, $this->loadGlobal($other))->createView();
             }
         } else {
             $forms = [];

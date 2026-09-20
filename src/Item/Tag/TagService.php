@@ -304,7 +304,7 @@ readonly class TagService implements ActionInterface
             }
 
             $submittedId = (string) ($row['id'] ?? '');
-            $tag = is_numeric($submittedId) ? ($existing[(int) $submittedId] ?? null) : null;
+            $tag = is_numeric($submittedId) ? $existing[(int) $submittedId] ?? null : null;
             $created = $tag === null;
             if ($tag === null) {
                 $tag = new ItemTag();

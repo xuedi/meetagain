@@ -42,11 +42,8 @@ final readonly class EventAlternateLinkProvider implements AlternateLinkProvider
         $rootUrls = [];
         foreach (array_keys($localeUrls) as $locale) {
             $rootId = $this->resolver->resolveRoot($event, $locale)->getId();
-            $rootUrls[$locale] = $host . $this->router->generate(
-                'app_event_details',
-                ['_locale' => $locale, 'id' => $rootId],
-                UrlGeneratorInterface::ABSOLUTE_PATH,
-            );
+            $rootUrls[$locale] =
+                $host . $this->router->generate('app_event_details', ['_locale' => $locale, 'id' => $rootId], UrlGeneratorInterface::ABSOLUTE_PATH);
         }
 
         return $rootUrls;

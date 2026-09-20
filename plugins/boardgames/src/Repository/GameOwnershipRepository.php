@@ -21,7 +21,8 @@ class GameOwnershipRepository extends ServiceEntityRepository
     /** @return list<GameOwnership> */
     public function findShelfOf(User $user): array
     {
-        return $this->createQueryBuilder('o')
+        return $this
+            ->createQueryBuilder('o')
             ->addSelect('g')
             ->join('o.game', 'g')
             ->andWhere('o.user = :user')
@@ -39,7 +40,8 @@ class GameOwnershipRepository extends ServiceEntityRepository
     /** @return list<GameOwnership> */
     public function findPublicOwnersOf(Game $game): array
     {
-        return $this->createQueryBuilder('o')
+        return $this
+            ->createQueryBuilder('o')
             ->addSelect('u')
             ->join('o.user', 'u')
             ->andWhere('o.game = :game')
@@ -61,7 +63,8 @@ class GameOwnershipRepository extends ServiceEntityRepository
             return [];
         }
 
-        return $this->createQueryBuilder('o')
+        return $this
+            ->createQueryBuilder('o')
             ->addSelect('u')
             ->addSelect('g')
             ->join('o.user', 'u')
@@ -77,7 +80,8 @@ class GameOwnershipRepository extends ServiceEntityRepository
     /** @return list<GameOwnership> */
     public function findAskableOwnersOf(Game $game): array
     {
-        return $this->createQueryBuilder('o')
+        return $this
+            ->createQueryBuilder('o')
             ->addSelect('u')
             ->join('o.user', 'u')
             ->andWhere('o.game = :game')
@@ -96,7 +100,8 @@ class GameOwnershipRepository extends ServiceEntityRepository
             return;
         }
 
-        $this->createQueryBuilder('o')
+        $this
+            ->createQueryBuilder('o')
             ->delete()
             ->andWhere('o.game IN (:ids)')
             ->setParameter('ids', $gameIds)

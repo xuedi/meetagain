@@ -13,11 +13,6 @@ final class SiteLogoImageTypeDefinition extends AbstractImageTypeDefinition
         return ImageType::SiteLogo;
     }
 
-    protected function sizes(): array
-    {
-        return [[self::FREE_AXIS, 120], [350, self::FREE_AXIS]];
-    }
-
     public function fitMode(): ImageFitMode
     {
         return ImageFitMode::Fit;
@@ -56,5 +51,10 @@ final class SiteLogoImageTypeDefinition extends AbstractImageTypeDefinition
             'route' => 'app_admin_system_theme',
             'params' => [],
         ];
+    }
+
+    protected function sizes(): array
+    {
+        return [[self::FREE_AXIS, 120], [350, self::FREE_AXIS]];
     }
 }

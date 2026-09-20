@@ -2,13 +2,13 @@
 
 namespace Plugin\Glossary\Tests\Unit\Item;
 
+use App\Item\Tag\TagService;
 use App\Review\ChangeProposalService;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
-use App\Item\Tag\TagService;
-use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Item\GlossaryListCellProvider;
+use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Service\ConfigService;
 use Plugin\Glossary\Service\GlossaryService;
 use Plugin\Glossary\ValueObject\Config;
@@ -25,9 +25,16 @@ class GlossaryListCellProviderTest extends TestCase
         $config = new Config();
 
         $twig = $this->createMock(Environment::class);
-        $twig->expects(self::once())
+        $twig
+            ->expects(self::once())
             ->method('render')
-            ->with('@Glossary/item/list_cell.html.twig', ['entry' => $entry, 'definition' => 'Hello', 'config' => $config, 'hasTags' => false, 'viewMode' => null])
+            ->with('@Glossary/item/list_cell.html.twig', [
+                'entry' => $entry,
+                'definition' => 'Hello',
+                'config' => $config,
+                'hasTags' => false,
+                'viewMode' => null,
+            ])
             ->willReturn('<td>你好</td>');
 
         $provider = $this->makeProvider($this->serviceReturning($entry), $this->configReturning($config), $twig);
@@ -57,11 +64,7 @@ class GlossaryListCellProviderTest extends TestCase
     public function testRegistersUnderTheGlossaryItemType(): void
     {
         // Arrange
-        $provider = $this->makeProvider(
-            $this->serviceReturning(null),
-            $this->configReturning(new Config()),
-            $this->createStub(Environment::class),
-        );
+        $provider = $this->makeProvider($this->serviceReturning(null), $this->configReturning(new Config()), $this->createStub(Environment::class));
 
         // Act & Assert
         self::assertSame('glossary', $provider->getPluginKey());
@@ -71,11 +74,7 @@ class GlossaryListCellProviderTest extends TestCase
     public function testExposesTheIndexAndDetailRoutes(): void
     {
         // Arrange
-        $provider = $this->makeProvider(
-            $this->serviceReturning(null),
-            $this->configReturning(new Config()),
-            $this->createStub(Environment::class),
-        );
+        $provider = $this->makeProvider($this->serviceReturning(null), $this->configReturning(new Config()), $this->createStub(Environment::class));
 
         // Act & Assert
         self::assertSame('app_plugin_glossary', $provider->getListRoute());
@@ -101,11 +100,8 @@ class GlossaryListCellProviderTest extends TestCase
         self::assertSame('2026-03-04', $stamps[7]->format('Y-m-d'));
     }
 
-    private function makeProvider(
-        GlossaryService $service,
-        ConfigService $configService,
-        Environment $twig,
-    ): GlossaryListCellProvider {
+    private function makeProvider(GlossaryService $service, ConfigService $configService, Environment $twig): GlossaryListCellProvider
+    {
         return new GlossaryListCellProvider(
             $service,
             $configService,

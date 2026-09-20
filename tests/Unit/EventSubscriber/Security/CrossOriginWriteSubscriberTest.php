@@ -95,12 +95,7 @@ class CrossOriginWriteSubscriberTest extends TestCase
     public function testIgnoresASubRequest(): void
     {
         // Arrange
-        $event = $this->makeEvent(
-            '/en/admin/member/delete/7',
-            'POST',
-            ['Origin' => 'https://neighbour.example.org'],
-            HttpKernelInterface::SUB_REQUEST,
-        );
+        $event = $this->makeEvent('/en/admin/member/delete/7', 'POST', ['Origin' => 'https://neighbour.example.org'], HttpKernelInterface::SUB_REQUEST);
 
         // Act & Assert
         $this->makeSubject()->onKernelController($event);
@@ -110,12 +105,8 @@ class CrossOriginWriteSubscriberTest extends TestCase
     /**
      * @param array<string, string> $headers
      */
-    private function makeEvent(
-        string $path,
-        string $method,
-        array $headers = [],
-        int $requestType = HttpKernelInterface::MAIN_REQUEST,
-    ): ControllerEvent {
+    private function makeEvent(string $path, string $method, array $headers = [], int $requestType = HttpKernelInterface::MAIN_REQUEST): ControllerEvent
+    {
         $server = [];
         foreach ($headers as $name => $value) {
             $server['HTTP_' . str_replace('-', '_', strtoupper($name))] = $value;
@@ -124,12 +115,7 @@ class CrossOriginWriteSubscriberTest extends TestCase
         $request = Request::create(self::HOST . $path, $method, server: $server);
         $request->attributes->set('_locale', 'en');
 
-        return new ControllerEvent(
-            $this->createStub(HttpKernelInterface::class),
-            static fn(): null => null,
-            $request,
-            $requestType,
-        );
+        return new ControllerEvent($this->createStub(HttpKernelInterface::class), static fn(): null => null, $request, $requestType);
     }
 
     private function makeSubject(): CrossOriginWriteSubscriber

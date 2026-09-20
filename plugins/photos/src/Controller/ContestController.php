@@ -4,11 +4,11 @@ namespace Plugin\Photos\Controller;
 
 use App\Controller\AbstractController;
 use App\Service\Seo\BreadcrumbBuilder;
+use Module\Ballot\Contract\BallotInterface;
+use Module\Ballot\Contract\BallotView;
 use Plugin\Photos\Entity\Photo;
 use Plugin\Photos\Service\ContestService;
 use Plugin\Photos\Service\PhotoService;
-use Module\Ballot\Contract\BallotInterface;
-use Module\Ballot\Contract\BallotView;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;

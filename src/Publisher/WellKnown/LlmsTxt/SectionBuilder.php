@@ -69,10 +69,6 @@ final readonly class SectionBuilder
      */
     private function generate(string $route, string $locale, array $parameters = []): string
     {
-        return $this->urlGenerator->generate(
-            $route,
-            ['_locale' => $locale, ...$parameters],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
+        return $this->urlGenerator->generate($route, ['_locale' => $locale, ...$parameters], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 }

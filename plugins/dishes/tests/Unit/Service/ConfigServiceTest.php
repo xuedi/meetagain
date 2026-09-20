@@ -4,8 +4,8 @@ namespace Plugin\Dishes\Tests\Unit\Service;
 
 use App\Publisher\PluginSettings\Resolver;
 use PHPUnit\Framework\TestCase;
-use Plugin\Dishes\ValueObject\Config;
 use Plugin\Dishes\Service\ConfigService;
+use Plugin\Dishes\ValueObject\Config;
 
 class ConfigServiceTest extends TestCase
 {

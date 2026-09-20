@@ -60,12 +60,7 @@ class CirculationService
             return [];
         }
 
-        return $this->copies->findForItem(
-            $this->getContext($itemType),
-            $itemType,
-            $itemId,
-            $this->itemFilter->getAllowedItemIds($itemType),
-        );
+        return $this->copies->findForItem($this->getContext($itemType), $itemType, $itemId, $this->itemFilter->getAllowedItemIds($itemType));
     }
 
     /**
@@ -120,9 +115,7 @@ class CirculationService
         $context = $this->getContext($itemType);
         $copies = $this->copies->findForItems($context, $itemType, $itemIds);
         $queueCounts = $this->requests->countOpenPerItem($context, $itemType, $itemIds);
-        $ownRequests = $viewer === null
-            ? []
-            : $this->requests->findOpenForUserAndItems($context, $itemType, $itemIds, $viewer);
+        $ownRequests = $viewer === null ? [] : $this->requests->findOpenForUserAndItems($context, $itemType, $itemIds, $viewer);
 
         $totals = [];
         $available = [];
@@ -174,18 +167,9 @@ class CirculationService
         $this->em->persist($copy);
         $this->em->flush();
 
-        $this->ledger->append(
-            CirculationLedgerEntryType::Donated,
-            $context,
-            $itemType,
-            $itemId,
-            $now,
-            $copy->getId(),
-            null,
-            $donor->getId(),
-            $donor->getId(),
-            ['label' => $copy->getLabel()],
-        );
+        $this->ledger->append(CirculationLedgerEntryType::Donated, $context, $itemType, $itemId, $now, $copy->getId(), null, $donor->getId(), $donor->getId(), [
+            'label' => $copy->getLabel(),
+        ]);
 
         $this->activityService->log(DonatedCopy::TYPE, $donor, ['item_type' => $itemType, 'item_id' => $itemId]);
         $this->queue->offerToNext($copy);
@@ -213,17 +197,7 @@ class CirculationService
         $this->em->persist($request);
         $this->em->flush();
 
-        $this->ledger->append(
-            CirculationLedgerEntryType::Requested,
-            $context,
-            $itemType,
-            $itemId,
-            $now,
-            null,
-            null,
-            $user->getId(),
-            $user->getId(),
-        );
+        $this->ledger->append(CirculationLedgerEntryType::Requested, $context, $itemType, $itemId, $now, null, null, $user->getId(), $user->getId());
 
         $this->activityService->log(RequestedItem::TYPE, $user, ['item_type' => $itemType, 'item_id' => $itemId]);
         $this->offerAnyAvailableCopy($context, $itemType, $itemId);

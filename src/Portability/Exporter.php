@@ -58,7 +58,10 @@ readonly class Exporter
             'images' => $images->getAttributions(),
         ];
 
-        $zip->addFromString('export.json', json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n");
+        $zip->addFromString(
+            'export.json',
+            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n",
+        );
         $zip->close();
 
         return $zipPath;
@@ -130,10 +133,7 @@ readonly class Exporter
             }
 
             $uploaders = $contributor->getUploaderIds($ids);
-            $itemIds[$itemType] = array_values(array_filter(
-                $ids,
-                static fn(int $itemId): bool => $scope->carriesUpload($uploaders[$itemId] ?? null),
-            ));
+            $itemIds[$itemType] = array_values(array_filter($ids, static fn(int $itemId): bool => $scope->carriesUpload($uploaders[$itemId] ?? null)));
         }
 
         return $scope->withItemIds($itemIds);

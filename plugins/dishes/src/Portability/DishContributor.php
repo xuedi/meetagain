@@ -5,10 +5,10 @@ namespace Plugin\Dishes\Portability;
 use App\Entity\Image;
 use App\Entity\PronunciationSystem;
 use App\Enum\ImageType;
-use App\Portability\ImportContext;
-use App\Portability\Item\ImportResult;
-use App\Portability\Item\ContributorInterface;
 use App\Portability\ImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\Item\ContributorInterface;
+use App\Portability\Item\ImportResult;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,7 +42,15 @@ readonly class DishContributor implements ContributorInterface
     #[Override]
     public function allItemIds(): array
     {
-        return array_map(intval(...), $this->dishRepo->createQueryBuilder('d')->select('d.id')->orderBy('d.id')->getQuery()->getSingleColumnResult());
+        return array_map(
+            intval(...),
+            $this->dishRepo
+                ->createQueryBuilder('d')
+                ->select('d.id')
+                ->orderBy('d.id')
+                ->getQuery()
+                ->getSingleColumnResult(),
+        );
     }
 
     #[Override]
@@ -72,9 +80,7 @@ readonly class DishContributor implements ContributorInterface
                 'pronunciation' => $pronunciation instanceof PronunciationSystem
                     ? ['language' => $pronunciation->getLanguage(), 'name' => $pronunciation->getName()]
                     : null,
-                'preview_image' => $dish->getPreviewImage() instanceof Image
-                    ? $images->addImage($dish->getPreviewImage())
-                    : null,
+                'preview_image' => $dish->getPreviewImage() instanceof Image ? $images->addImage($dish->getPreviewImage()) : null,
             ];
         }
 
@@ -138,11 +144,7 @@ readonly class DishContributor implements ContributorInterface
             $this->imageLocationService->addLocation((int) $image->getId(), ImageType::PluginDishesPreview, (int) $dish->getId());
         }
 
-        return new ImportResult(
-            refToItemId: array_map(static fn(Dish $dish): int => (int) $dish->getId(), $refToItemId),
-            created: $created,
-            matched: 0,
-        );
+        return new ImportResult(refToItemId: array_map(static fn(Dish $dish): int => (int) $dish->getId(), $refToItemId), created: $created, matched: 0);
     }
 
     private function findPronunciationSystem(mixed $pronunciation): ?PronunciationSystem
@@ -151,10 +153,12 @@ readonly class DishContributor implements ContributorInterface
             return null;
         }
 
-        return $this->em->getRepository(PronunciationSystem::class)->findOneBy([
-            'language' => (string) ($pronunciation['language'] ?? ''),
-            'name' => (string) ($pronunciation['name'] ?? ''),
-        ]);
+        return $this->em
+            ->getRepository(PronunciationSystem::class)
+            ->findOneBy([
+                'language' => (string) ($pronunciation['language'] ?? ''),
+                'name' => (string) ($pronunciation['name'] ?? ''),
+            ]);
     }
 
     private function nullableString(mixed $value): ?string

@@ -97,16 +97,6 @@ readonly class BlockedSessionStore
         return $this->lookupExpiry(self::IP_INDEX_KEY, $ip);
     }
 
-    private function lookupExpiry(string $indexKey, string $entry): ?DateTimeImmutable
-    {
-        $expiresAt = $this->loadIndex($indexKey)[$entry] ?? null;
-        if ($expiresAt === null || $expiresAt < time()) {
-            return null;
-        }
-
-        return new DateTimeImmutable('@' . $expiresAt);
-    }
-
     /**
      * @return list<array{key: string, snapshot: array<string, mixed>}>
      */
@@ -121,6 +111,16 @@ readonly class BlockedSessionStore
     public function listBlockedIps(): array
     {
         return $this->listFromIndex(self::IP_INDEX_KEY, $this->getIpSnapshot(...));
+    }
+
+    private function lookupExpiry(string $indexKey, string $entry): ?DateTimeImmutable
+    {
+        $expiresAt = $this->loadIndex($indexKey)[$entry] ?? null;
+        if ($expiresAt === null || $expiresAt < time()) {
+            return null;
+        }
+
+        return new DateTimeImmutable('@' . $expiresAt);
     }
 
     /**

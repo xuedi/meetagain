@@ -32,12 +32,7 @@ class EmailTemplateSeedCommand extends Command
     #[Override]
     protected function configure(): void
     {
-        $this->addOption(
-            'overwrite',
-            null,
-            InputOption::VALUE_NONE,
-            'Reset every existing translation back to the shipped default, discarding admin edits',
-        );
+        $this->addOption('overwrite', null, InputOption::VALUE_NONE, 'Reset every existing translation back to the shipped default, discarding admin edits');
     }
 
     #[Override]
@@ -46,8 +41,9 @@ class EmailTemplateSeedCommand extends Command
         $overwrite = (bool) $input->getOption('overwrite');
 
         if ($overwrite) {
-            new SymfonyStyle($input, $output)
-                ->warning('Overwrite mode: every subject and body is reset to the shipped default. Wording typed into the admin UI is lost.');
+            new SymfonyStyle($input, $output)->warning(
+                'Overwrite mode: every subject and body is reset to the shipped default. Wording typed into the admin UI is lost.',
+            );
         }
 
         $defaults = $this->templateService->getDefaultTemplates();

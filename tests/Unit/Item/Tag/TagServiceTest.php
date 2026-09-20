@@ -109,7 +109,10 @@ class TagServiceTest extends TestCase
 
     private function assignment(ItemTag $tag): ItemTagAssignment
     {
-        return new ItemTagAssignment()->setItemType(self::TYPE)->setItemId(7)->setTag($tag);
+        return new ItemTagAssignment()
+            ->setItemType(self::TYPE)
+            ->setItemId(7)
+            ->setTag($tag);
     }
 
     /** @param list<ItemTag> $tags */
@@ -129,6 +132,17 @@ class TagServiceTest extends TestCase
         $em = $this->em ?? $this->createStub(EntityManagerInterface::class);
         $assignmentRepo = $this->assignmentRepo ?? $this->createStub(ItemTagAssignmentRepository::class);
 
-        return new TagService($em, $tagRepo, $assignmentRepo, new AssignmentClosure($em, $tagRepo, $assignmentRepo), $registry, $languageService, [], [], [], []);
+        return new TagService(
+            $em,
+            $tagRepo,
+            $assignmentRepo,
+            new AssignmentClosure($em, $tagRepo, $assignmentRepo),
+            $registry,
+            $languageService,
+            [],
+            [],
+            [],
+            [],
+        );
     }
 }

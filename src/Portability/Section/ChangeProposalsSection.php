@@ -52,10 +52,10 @@ readonly class ChangeProposalsSection implements SectionInterface
             return [];
         }
 
-        $proposals = $this->em->getRepository(ChangeProposal::class)->findBy(
-            ['status' => ChangeProposalStatus::Pending, 'targetType' => array_keys($targets)],
-            ['id' => 'ASC'],
-        );
+        $proposals = $this->em->getRepository(ChangeProposal::class)->findBy([
+            'status' => ChangeProposalStatus::Pending,
+            'targetType' => array_keys($targets),
+        ], ['id' => 'ASC']);
 
         $rows = [];
         foreach ($proposals as $proposal) {
@@ -203,12 +203,7 @@ readonly class ChangeProposalsSection implements SectionInterface
             }
 
             $resolution = $change['resolution'] ?? null;
-            $fieldChanges[] = new FieldChange(
-                (string) $field,
-                $before,
-                $after,
-                is_string($resolution) ? FieldResolution::tryFrom($resolution) : null,
-            );
+            $fieldChanges[] = new FieldChange((string) $field, $before, $after, is_string($resolution) ? FieldResolution::tryFrom($resolution) : null);
         }
 
         return $fieldChanges === [] ? null : $fieldChanges;

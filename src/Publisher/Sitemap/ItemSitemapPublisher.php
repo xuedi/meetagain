@@ -135,11 +135,7 @@ final readonly class ItemSitemapPublisher implements SitemapPublisherInterface
     {
         $urls = [];
         foreach ($locales as $locale) {
-            $urls[$locale] = $this->urlGenerator->generate(
-                $route,
-                ['_locale' => $locale, ...$params],
-                UrlGeneratorInterface::ABSOLUTE_URL,
-            );
+            $urls[$locale] = $this->urlGenerator->generate($route, ['_locale' => $locale, ...$params], UrlGeneratorInterface::ABSOLUTE_URL);
         }
 
         return $urls;

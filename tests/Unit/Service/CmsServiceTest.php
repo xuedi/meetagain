@@ -9,6 +9,8 @@ use App\Filter\Event\EventFilterResult;
 use App\Filter\Event\EventFilterService;
 use App\Repository\CmsRepository;
 use App\Service\Cms\CmsService;
+use DateInterval;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -115,9 +117,7 @@ class CmsServiceTest extends TestCase
         $cacheMock
             ->expects($this->once())
             ->method('get')
-            ->willReturnCallback(static function (string $key, callable $callback): string {
-                return $callback(self::createCacheItem());
-            });
+            ->willReturnCallback(static fn(string $key, callable $callback): string => $callback(self::createCacheItem()));
 
         $eventFilterServiceStub = $this->createStub(EventFilterService::class);
         $eventFilterServiceStub->method('getEventIdFilter')->willReturn(new EventFilterResult(null, false));
@@ -211,12 +211,12 @@ class CmsServiceTest extends TestCase
                         return $this;
                     }
 
-                    public function expiresAt(?\DateTimeInterface $expiration): static
+                    public function expiresAt(?DateTimeInterface $expiration): static
                     {
                         return $this;
                     }
 
-                    public function expiresAfter(int|\DateInterval|null $time): static
+                    public function expiresAfter(int|DateInterval|null $time): static
                     {
                         return $this;
                     }
@@ -308,11 +308,9 @@ class CmsServiceTest extends TestCase
             });
 
         $cacheStub = $this->createStub(TagAwareCacheInterface::class);
-        $cacheStub
-            ->method('get')
-            ->willReturnCallback(static function (string $key, callable $callback, ?float $beta = null): string {
-                return $callback(self::createCacheItem());
-            });
+        $cacheStub->method('get')->willReturnCallback(static fn(string $key, callable $callback, ?float $beta = null): string => $callback(
+            self::createCacheItem(),
+        ));
 
         $subject = new CmsService(
             twig: $twigMock,
@@ -516,12 +514,12 @@ class CmsServiceTest extends TestCase
                 return $this;
             }
 
-            public function expiresAt(?\DateTimeInterface $expiration): static
+            public function expiresAt(?DateTimeInterface $expiration): static
             {
                 return $this;
             }
 
-            public function expiresAfter(int|\DateInterval|null $time): static
+            public function expiresAfter(int|DateInterval|null $time): static
             {
                 return $this;
             }

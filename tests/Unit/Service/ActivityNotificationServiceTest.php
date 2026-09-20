@@ -11,6 +11,7 @@ use App\Emails\Types\NotificationMessageEmail;
 use App\Entity\Activity;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
+use DateTime;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionMethod;
@@ -271,7 +272,7 @@ final class ActivityNotificationServiceTest extends TestCase
         $sender = new UserStub()->setId(1);
         $recipient = new UserStub()->setId(2);
         $recipient->setNotification(true);
-        $recipient->setLastLogin(new \DateTime('-3 hours'));
+        $recipient->setLastLogin(new DateTime('-3 hours'));
 
         $notificationSettings = new \App\Entity\NotificationSettings(['receivedMessage' => true]);
         $recipient->setNotificationSettings($notificationSettings);
@@ -315,7 +316,7 @@ final class ActivityNotificationServiceTest extends TestCase
         $sender = new UserStub()->setId(1);
         $recipient = new UserStub()->setId(2);
         $recipient->setNotification(true);
-        $recipient->setLastLogin(new \DateTime('-1 hour'));
+        $recipient->setLastLogin(new DateTime('-1 hour'));
 
         $notificationSettings = new \App\Entity\NotificationSettings(['receivedMessage' => true]);
         $recipient->setNotificationSettings($notificationSettings);

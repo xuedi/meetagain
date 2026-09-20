@@ -57,19 +57,21 @@ final readonly class FieldBallotService implements SettlementListenerInterface
 
         $settings = BallotTermsType::read($terms, self::DEFAULT_MODE);
 
-        return $this->ballots->open(new BallotRequest(
-            self::PURPOSE,
-            $candidates,
-            new DateTimeImmutable($settings['deadline']),
-            (int) $steward->getId(),
-            new BallotSubject($targetType, $targetId),
-            $settings['tallyMode'],
-            SettlementMode::Confirmed,
-            $this->translator->trans('review.ballot_title', [
-                '%field%' => $provider->getFieldLabel($field),
-                '%target%' => $provider->getTargetLabel($targetId) ?? '',
-            ]),
-        ));
+        return $this->ballots->open(
+            new BallotRequest(
+                self::PURPOSE,
+                $candidates,
+                new DateTimeImmutable($settings['deadline']),
+                (int) $steward->getId(),
+                new BallotSubject($targetType, $targetId),
+                $settings['tallyMode'],
+                SettlementMode::Confirmed,
+                $this->translator->trans('review.ballot_title', [
+                    '%field%' => $provider->getFieldLabel($field),
+                    '%target%' => $provider->getTargetLabel($targetId) ?? '',
+                ]),
+            ),
+        );
     }
 
     public function confirm(int $ballotId, User $steward): void
@@ -199,10 +201,7 @@ final readonly class FieldBallotService implements SettlementListenerInterface
                 }
 
                 $seen[(string) $change->after] = true;
-                $candidates[] = new Candidate(
-                    $this->keyFor((int) $proposal->getId(), $field),
-                    $provider->formatValue($field, $change->after),
-                );
+                $candidates[] = new Candidate($this->keyFor((int) $proposal->getId(), $field), $provider->formatValue($field, $change->after));
             }
         }
 
@@ -210,9 +209,12 @@ final readonly class FieldBallotService implements SettlementListenerInterface
             return [];
         }
 
-        $candidates[] = new Candidate($this->keyFor(self::KEEP, $field), $this->translator->trans('review.ballot_keep', [
-            '%value%' => $provider->formatValue($field, $currentValue),
-        ]));
+        $candidates[] = new Candidate(
+            $this->keyFor(self::KEEP, $field),
+            $this->translator->trans('review.ballot_keep', [
+                '%value%' => $provider->formatValue($field, $currentValue),
+            ]),
+        );
 
         return $candidates;
     }
@@ -232,8 +234,8 @@ final readonly class FieldBallotService implements SettlementListenerInterface
     private function awaitsDecision(?ChangeProposal $proposal, string $field): bool
     {
         return $proposal !== null
-            && $proposal->isPending()
-            && array_any($proposal->getUnresolvedChanges(), static fn(FieldChange $change): bool => $change->field === $field);
+        && $proposal->isPending()
+        && array_any($proposal->getUnresolvedChanges(), static fn(FieldChange $change): bool => $change->field === $field);
     }
 
     private function fieldOf(BallotView $view): ?string

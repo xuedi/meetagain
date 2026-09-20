@@ -93,9 +93,7 @@ readonly class LocationSection implements RowFormInterface
     {
         $venue = $this->locationRepo->find((int) $id);
 
-        return $venue === null
-            ? null
-            : new Draft($this->detachedCopy($venue), (string) $venue->getName(), 'contribution.correct_intro');
+        return $venue === null ? null : new Draft($this->detachedCopy($venue), (string) $venue->getName(), 'contribution.correct_intro');
     }
 
     #[Override]

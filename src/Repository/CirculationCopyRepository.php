@@ -28,11 +28,15 @@ class CirculationCopyRepository extends ServiceEntityRepository
             return [];
         }
 
-        return array_values($this->circulatingQuery($context, $itemType)
-            ->andWhere('c.itemId = :itemId')->setParameter('itemId', $itemId)
-            ->orderBy('c.donatedAt', 'ASC')
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->circulatingQuery($context, $itemType)
+                ->andWhere('c.itemId = :itemId')
+                ->setParameter('itemId', $itemId)
+                ->orderBy('c.donatedAt', 'ASC')
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     /**
@@ -45,11 +49,15 @@ class CirculationCopyRepository extends ServiceEntityRepository
             return [];
         }
 
-        return array_values($this->circulatingQuery($context, $itemType)
-            ->andWhere('c.itemId IN (:itemIds)')->setParameter('itemIds', $itemIds)
-            ->orderBy('c.donatedAt', 'ASC')
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->circulatingQuery($context, $itemType)
+                ->andWhere('c.itemId IN (:itemIds)')
+                ->setParameter('itemIds', $itemIds)
+                ->orderBy('c.donatedAt', 'ASC')
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     /**
@@ -58,11 +66,16 @@ class CirculationCopyRepository extends ServiceEntityRepository
      */
     public function findShelf(string $context, string $itemType, ?array $allowedItemIds = null): array
     {
-        $qb = $this->createQueryBuilder('c')
-            ->leftJoin('c.holder', 'h')->addSelect('h')
-            ->leftJoin('c.donatedBy', 'd')->addSelect('d')
-            ->where('c.context = :context')->setParameter('context', $context)
-            ->andWhere('c.itemType = :itemType')->setParameter('itemType', $itemType)
+        $qb = $this
+            ->createQueryBuilder('c')
+            ->leftJoin('c.holder', 'h')
+            ->addSelect('h')
+            ->leftJoin('c.donatedBy', 'd')
+            ->addSelect('d')
+            ->where('c.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('c.itemType = :itemType')
+            ->setParameter('itemType', $itemType)
             ->orderBy('c.donatedAt', 'DESC');
 
         if ($allowedItemIds !== null) {
@@ -80,14 +93,21 @@ class CirculationCopyRepository extends ServiceEntityRepository
      */
     public function findAvailableForItem(string $context, string $itemType, int $itemId): array
     {
-        return array_values($this->createQueryBuilder('c')
-            ->where('c.context = :context')->setParameter('context', $context)
-            ->andWhere('c.itemType = :itemType')->setParameter('itemType', $itemType)
-            ->andWhere('c.itemId = :itemId')->setParameter('itemId', $itemId)
-            ->andWhere('c.status = :status')->setParameter('status', CirculationCopyStatus::Available)
-            ->orderBy('c.heldSince', 'ASC')
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('c')
+                ->where('c.context = :context')
+                ->setParameter('context', $context)
+                ->andWhere('c.itemType = :itemType')
+                ->setParameter('itemType', $itemType)
+                ->andWhere('c.itemId = :itemId')
+                ->setParameter('itemId', $itemId)
+                ->andWhere('c.status = :status')
+                ->setParameter('status', CirculationCopyStatus::Available)
+                ->orderBy('c.heldSince', 'ASC')
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     /**
@@ -116,9 +136,11 @@ class CirculationCopyRepository extends ServiceEntityRepository
      */
     public function findDistinctContexts(string $itemType): array
     {
-        $rows = $this->createQueryBuilder('c')
+        $rows = $this
+            ->createQueryBuilder('c')
             ->select('DISTINCT c.context AS context')
-            ->where('c.itemType = :itemType')->setParameter('itemType', $itemType)
+            ->where('c.itemType = :itemType')
+            ->setParameter('itemType', $itemType)
             ->getQuery()
             ->getScalarResult();
 
@@ -130,21 +152,30 @@ class CirculationCopyRepository extends ServiceEntityRepository
      */
     public function findHeldBy(int $userId): array
     {
-        return array_values($this->createQueryBuilder('c')
-            ->where('c.holder = :userId')->setParameter('userId', $userId)
-            ->andWhere('c.status IN (:statuses)')
-            ->setParameter('statuses', [CirculationCopyStatus::Available, CirculationCopyStatus::Held])
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('c')
+                ->where('c.holder = :userId')
+                ->setParameter('userId', $userId)
+                ->andWhere('c.status IN (:statuses)')
+                ->setParameter('statuses', [CirculationCopyStatus::Available, CirculationCopyStatus::Held])
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     private function circulatingQuery(string $context, string $itemType): QueryBuilder
     {
-        return $this->createQueryBuilder('c')
-            ->leftJoin('c.holder', 'h')->addSelect('h')
-            ->leftJoin('c.donatedBy', 'd')->addSelect('d')
-            ->where('c.context = :context')->setParameter('context', $context)
-            ->andWhere('c.itemType = :itemType')->setParameter('itemType', $itemType)
+        return $this
+            ->createQueryBuilder('c')
+            ->leftJoin('c.holder', 'h')
+            ->addSelect('h')
+            ->leftJoin('c.donatedBy', 'd')
+            ->addSelect('d')
+            ->where('c.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('c.itemType = :itemType')
+            ->setParameter('itemType', $itemType)
             ->andWhere('c.status IN (:statuses)')
             ->setParameter('statuses', [
                 CirculationCopyStatus::Available,

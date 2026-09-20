@@ -20,12 +20,13 @@ use App\Enum\EmailType;
 use App\Filter\Email\AudienceFilterService;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use App\Service\Support\RecipientResolver;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
+use App\Service\Support\RecipientResolver;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -68,7 +69,13 @@ class EmailTypesTest extends TestCase
                 $this->createStub(TranslatorInterface::class),
                 $this->host,
             ),
-            'NotificationEventCanceled' => new NotificationEventCanceledEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host),
+            'NotificationEventCanceled' => new NotificationEventCanceledEmail(
+                $this->blocklist,
+                $this->mockSampleFactory(),
+                $this->queue,
+                $this->config,
+                $this->host,
+            ),
             'NotificationMessage' => new NotificationMessageEmail(
                 $this->blocklist,
                 $this->mockSampleFactory(),
@@ -166,11 +173,7 @@ class EmailTypesTest extends TestCase
             if (!is_string($value)) {
                 continue;
             }
-            static::assertStringNotContainsString(
-                sprintf('/%s/%s/', $locale, $locale),
-                $value,
-                "{$key}: '{$name}' repeats the locale segment",
-            );
+            static::assertStringNotContainsString(sprintf('/%s/%s/', $locale, $locale), $value, "{$key}: '{$name}' repeats the locale segment");
         }
     }
 
@@ -205,25 +208,25 @@ class EmailTypesTest extends TestCase
 
     public function testAdminNotificationGuardCheckThrowsOnEmptyContext(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new AdminNotificationEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config)->guardCheck([]);
     }
 
     public function testNotificationEventCanceledGuardCheckThrowsOnEmptyContext(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new NotificationEventCanceledEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host)->guardCheck([]);
     }
 
     public function testPasswordResetGuardCheckThrowsOnEmptyContext(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new PasswordResetEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host)->guardCheck([]);
     }
 
     public function testSupportNotificationGuardCheckThrowsOnEmptyContext(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new SupportNotificationEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
@@ -237,13 +240,13 @@ class EmailTypesTest extends TestCase
 
     public function testVerificationRequestGuardCheckThrowsOnEmptyContext(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new VerificationRequestEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host)->guardCheck([]);
     }
 
     public function testWelcomeGuardCheckThrowsOnEmptyContext(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         new WelcomeEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host)->guardCheck([]);
     }
 }

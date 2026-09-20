@@ -33,7 +33,10 @@ class PluginCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $action = $input->getArgument('action');
-        $plugins = array_values(array_filter(array_map(strval(...), (array) $input->getArgument('plugins')), static fn(string $plugin): bool => $plugin !== ''));
+        $plugins = array_values(array_filter(
+            array_map(strval(...), (array) $input->getArgument('plugins')),
+            static fn(string $plugin): bool => $plugin !== '',
+        ));
 
         if ($action === null) {
             return Command::SUCCESS;

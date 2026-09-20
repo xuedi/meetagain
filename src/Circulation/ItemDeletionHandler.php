@@ -63,18 +63,9 @@ final readonly class ItemDeletionHandler implements ActionInterface
         $this->em->flush();
 
         foreach ($copies as $copy) {
-            $this->ledger->append(
-                CirculationLedgerEntryType::Retired,
-                $copy->getContext(),
-                $itemType,
-                $itemId,
-                $now,
-                $copy->getId(),
-                null,
-                null,
-                null,
-                ['reason' => 'item_deleted'],
-            );
+            $this->ledger->append(CirculationLedgerEntryType::Retired, $copy->getContext(), $itemType, $itemId, $now, $copy->getId(), null, null, null, [
+                'reason' => 'item_deleted',
+            ]);
         }
     }
 }

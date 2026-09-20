@@ -8,6 +8,7 @@ use App\Repository\CronLogRepository;
 use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 readonly class CronLogCleanupService implements CronTaskInterface
 {
@@ -29,7 +30,7 @@ readonly class CronLogCleanupService implements CronTaskInterface
             $output->writeln('CronLogCleanupService: ' . $message);
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $output->writeln('CronLogCleanupService exception: ' . $e->getMessage());
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());

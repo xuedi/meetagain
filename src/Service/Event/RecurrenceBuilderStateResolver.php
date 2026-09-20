@@ -44,14 +44,7 @@ final readonly class RecurrenceBuilderStateResolver
             $ordinals = [] === $ordinals ? [RecurrenceOrdinal::First] : $ordinals;
         }
 
-        return new RecurrenceBuilderState(
-            $mode,
-            $period,
-            $ordinals,
-            $weekdays,
-            $this->resolveDaysOfMonth($daysOfMonth),
-            $this->selectablePeriods($mode),
-        );
+        return new RecurrenceBuilderState($mode, $period, $ordinals, $weekdays, $this->resolveDaysOfMonth($daysOfMonth), $this->selectablePeriods($mode));
     }
 
     /**
@@ -66,10 +59,7 @@ final readonly class RecurrenceBuilderStateResolver
             return [RecurrencePattern::LAST_DAY_OF_MONTH];
         }
 
-        $days = array_values(array_unique(array_filter(
-            $daysOfMonth,
-            static fn(int $day): bool => $day >= 1 && $day <= 31,
-        )));
+        $days = array_values(array_unique(array_filter($daysOfMonth, static fn(int $day): bool => $day >= 1 && $day <= 31)));
         sort($days);
 
         return [] === $days ? [self::DEFAULT_DAY_OF_MONTH] : $days;
@@ -82,8 +72,7 @@ final readonly class RecurrenceBuilderStateResolver
     {
         return array_values(array_filter(
             RecurrencePeriod::cases(),
-            static fn(RecurrencePeriod $case): bool => $case->carriesDayRule()
-                && (RecurrenceMode::DayOfMonth !== $mode || !$case->isWeekly()),
+            static fn(RecurrencePeriod $case): bool => $case->carriesDayRule() && (RecurrenceMode::DayOfMonth !== $mode || !$case->isWeekly()),
         ));
     }
 }

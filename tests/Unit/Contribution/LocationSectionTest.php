@@ -105,7 +105,9 @@ class LocationSectionTest extends TestCase
     private function filter(bool $allows): ScopeFilterInterface
     {
         return new class($allows) implements ScopeFilterInterface {
-            public function __construct(private readonly bool $allows) {}
+            public function __construct(
+                private readonly bool $allows,
+            ) {}
 
             public function getPriority(): int
             {

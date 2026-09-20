@@ -53,22 +53,25 @@ class BallotServicePortabilityTest extends TestCase
         $exported = $this->service([$ballot], [5 => [7 => ['14'], 8 => ['12']]])->exportAll();
 
         // Assert
-        static::assertEquals([new PortableBallot(
-            purpose: 'event.item.film',
-            status: BallotStatus::Settled,
-            tallyMode: TallyMode::Single,
-            settlementMode: SettlementMode::Confirmed,
-            deadline: new DateTimeImmutable('2030-01-10 18:00'),
-            openedByUserId: 3,
-            createdAt: new DateTimeImmutable('2030-01-01 12:00'),
-            candidates: [new Candidate('12', 'Alien'), new Candidate('14', 'Brazil')],
-            votes: [7 => ['14'], 8 => ['12']],
-            title: 'Film night',
-            subject: new BallotSubject('event', 9),
-            winningKey: '14',
-            settledByUserId: 3,
-            settledAt: new DateTimeImmutable('2030-01-11 09:00'),
-        )], $exported);
+        static::assertEquals(
+            [new PortableBallot(
+                purpose: 'event.item.film',
+                status: BallotStatus::Settled,
+                tallyMode: TallyMode::Single,
+                settlementMode: SettlementMode::Confirmed,
+                deadline: new DateTimeImmutable('2030-01-10 18:00'),
+                openedByUserId: 3,
+                createdAt: new DateTimeImmutable('2030-01-01 12:00'),
+                candidates: [new Candidate('12', 'Alien'), new Candidate('14', 'Brazil')],
+                votes: [7 => ['14'], 8 => ['12']],
+                title: 'Film night',
+                subject: new BallotSubject('event', 9),
+                winningKey: '14',
+                settledByUserId: 3,
+                settledAt: new DateTimeImmutable('2030-01-11 09:00'),
+            )],
+            $exported,
+        );
     }
 
     public function testRestoreWritesTheBallotAsGivenWithoutTallyingOrNotifying(): void

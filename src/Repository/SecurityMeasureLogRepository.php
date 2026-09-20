@@ -181,17 +181,19 @@ class SecurityMeasureLogRepository extends ServiceEntityRepository
      */
     public function findUnlinkedBlocksForIp(string $ip, DateTimeImmutable $since): array
     {
-        return array_values($this
-            ->createQueryBuilder('s')
-            ->where('s.outcome = :outcome')
-            ->andWhere('s.ip = :ip')
-            ->andWhere('s.incident IS NULL')
-            ->andWhere('s.createdAt >= :since')
-            ->setParameter('outcome', SecurityMeasureOutcome::Blocked->value)
-            ->setParameter('ip', $ip)
-            ->setParameter('since', $since)
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('s')
+                ->where('s.outcome = :outcome')
+                ->andWhere('s.ip = :ip')
+                ->andWhere('s.incident IS NULL')
+                ->andWhere('s.createdAt >= :since')
+                ->setParameter('outcome', SecurityMeasureOutcome::Blocked->value)
+                ->setParameter('ip', $ip)
+                ->setParameter('since', $since)
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     /**
@@ -199,17 +201,19 @@ class SecurityMeasureLogRepository extends ServiceEntityRepository
      */
     public function findBlocksBetween(DateTimeImmutable $from, DateTimeImmutable $to, int $limit): array
     {
-        return array_values($this
-            ->createQueryBuilder('s')
-            ->where('s.outcome = :outcome')
-            ->andWhere('s.createdAt >= :from')
-            ->andWhere('s.createdAt < :to')
-            ->setParameter('outcome', SecurityMeasureOutcome::Blocked->value)
-            ->setParameter('from', $from)
-            ->setParameter('to', $to)
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('s')
+                ->where('s.outcome = :outcome')
+                ->andWhere('s.createdAt >= :from')
+                ->andWhere('s.createdAt < :to')
+                ->setParameter('outcome', SecurityMeasureOutcome::Blocked->value)
+                ->setParameter('from', $from)
+                ->setParameter('to', $to)
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     public function deleteOlderThan(DateTimeImmutable $cutoffDay): int

@@ -71,7 +71,12 @@ readonly class TagAssignments
                 }
 
                 $carried[] = $resolvedId;
-                $this->em->persist(new ItemTagAssignment()->setItemType($itemType)->setItemId($itemId)->setTag($tag));
+                $this->em->persist(
+                    new ItemTagAssignment()
+                        ->setItemType($itemType)
+                        ->setItemId($itemId)
+                        ->setTag($tag),
+                );
                 $context->count(self::KIND, Outcome::Created);
             }
         }

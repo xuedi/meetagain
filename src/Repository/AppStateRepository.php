@@ -29,7 +29,8 @@ class AppStateRepository extends ServiceEntityRepository
             return [];
         }
 
-        $rows = $this->createQueryBuilder('appState')
+        $rows = $this
+            ->createQueryBuilder('appState')
             ->select('appState.keyName', 'appState.value')
             ->where('appState.keyName IN (:keys)')
             ->setParameter('keys', $keys)

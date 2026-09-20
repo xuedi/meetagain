@@ -16,11 +16,7 @@ class GlossaryTest extends TestCase
         $glossary = new Glossary();
 
         // Act
-        $glossary->setPhrase('干嘛')
-            ->setSecondary('gàn má')
-            ->setTermLanguage('zh')
-            ->setCreatedBy(2)
-            ->setCreatedAt($createdAt);
+        $glossary->setPhrase('干嘛')->setSecondary('gàn má')->setTermLanguage('zh')->setCreatedBy(2)->setCreatedAt($createdAt);
 
         // Assert
         self::assertSame('干嘛', $glossary->getPhrase());
@@ -59,7 +55,9 @@ class GlossaryTest extends TestCase
     public function testSettingAnEmptyDefinitionRemovesThatLanguage(): void
     {
         // Arrange
-        $glossary = new Glossary()->setDefinition('en', 'Hello')->setDefinition('de', 'Hallo');
+        $glossary = new Glossary()
+            ->setDefinition('en', 'Hello')
+            ->setDefinition('de', 'Hallo');
 
         // Act
         $glossary->setDefinition('de', '  ');

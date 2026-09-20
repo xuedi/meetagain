@@ -140,7 +140,8 @@ readonly class Importer
         $activePlugins = $this->pluginService->getActiveList();
         $sections = array_values(array_filter(
             iterator_to_array($this->sections, false),
-            static fn(SectionInterface $section): bool => !$section instanceof PluginSectionInterface || in_array($section->getPluginKey(), $activePlugins, true),
+            static fn(SectionInterface $section): bool => !$section instanceof PluginSectionInterface
+            || in_array($section->getPluginKey(), $activePlugins, true),
         ));
         usort($sections, static fn(SectionInterface $a, SectionInterface $b): int => $a->getOrder() <=> $b->getOrder());
 

@@ -26,9 +26,7 @@ readonly class SummaryTileBuilder
         $uploaders = [];
         $count = 0;
         foreach ($this->associations->listForEvent((int) $event->getId()) as $association) {
-            $photo = $association->getItemType() === PhotoService::ITEM_TYPE
-                ? $this->photoService->getAttached((int) $association->getItemId())
-                : null;
+            $photo = $association->getItemType() === PhotoService::ITEM_TYPE ? $this->photoService->getAttached((int) $association->getItemId()) : null;
 
             if (!$photo instanceof Photo) {
                 continue;

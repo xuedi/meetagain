@@ -30,7 +30,12 @@ class ExportCommand extends Command
     protected function configure(): void
     {
         $this->addArgument('archive', InputArgument::REQUIRED, 'Path of the archive ZIP to write');
-        $this->addOption('anchor', null, InputOption::VALUE_REQUIRED, 'Pin exported_at to the Monday of this date (YYYY-MM-DD) and move every date by the same whole weeks');
+        $this->addOption(
+            'anchor',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Pin exported_at to the Monday of this date (YYYY-MM-DD) and move every date by the same whole weeks',
+        );
     }
 
     #[Override]

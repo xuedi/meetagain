@@ -171,12 +171,7 @@ class LocaleSubscriberTest extends TestCase
 
         $request = new Request();
         $request->attributes->set('_locale', 'de');
-        $event = new ResponseEvent(
-            $this->createStub(HttpKernelInterface::class),
-            $request,
-            HttpKernelInterface::MAIN_REQUEST,
-            new Response(),
-        );
+        $event = new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, new Response());
 
         $subscriber->onKernelResponse($event);
     }
@@ -188,12 +183,7 @@ class LocaleSubscriberTest extends TestCase
 
         $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $cookieService);
 
-        $event = new ResponseEvent(
-            $this->createStub(HttpKernelInterface::class),
-            new Request(),
-            HttpKernelInterface::MAIN_REQUEST,
-            new Response(),
-        );
+        $event = new ResponseEvent($this->createStub(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, new Response());
 
         $subscriber->onKernelResponse($event);
     }

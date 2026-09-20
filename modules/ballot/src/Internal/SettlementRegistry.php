@@ -38,10 +38,7 @@ final readonly class SettlementRegistry
     private function sorted(): array
     {
         $listeners = array_values(iterator_to_array($this->listeners));
-        usort(
-            $listeners,
-            static fn(SettlementListenerInterface $a, SettlementListenerInterface $b): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($listeners, static fn(SettlementListenerInterface $a, SettlementListenerInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $listeners;
     }

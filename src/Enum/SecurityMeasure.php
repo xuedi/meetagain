@@ -51,9 +51,7 @@ enum SecurityMeasure: string
 
     public function isFormMeasure(): bool
     {
-        return match ($this) {
-            self::ImageCaptcha, self::Honeypot, self::SubmitTiming, self::ProofOfWork => true,
-        };
+        return match ($this) { self::ImageCaptcha, self::Honeypot, self::SubmitTiming, self::ProofOfWork => true };
     }
 
     /**

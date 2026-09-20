@@ -308,11 +308,11 @@ readonly class ShelfSection implements PluginSectionInterface
 
     private function day(mixed $value): ?DateTimeImmutable
     {
-        return is_string($value) ? DateTimeImmutable::createFromFormat('!Y-m-d', $value) ?: null : null;
+        return is_string($value) ? (DateTimeImmutable::createFromFormat('!Y-m-d', $value) ?: null) : null;
     }
 
     private function timestamp(mixed $value): ?DateTimeImmutable
     {
-        return is_string($value) ? DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, $value) ?: null : null;
+        return is_string($value) ? (DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, $value) ?: null) : null;
     }
 }

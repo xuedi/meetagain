@@ -6,6 +6,7 @@ use App\AssetMapper\AppBundle;
 use App\AssetMapper\OpaqueMediaPathResolver;
 use MatthiasMullie\Minify\JS;
 use Override;
+use RuntimeException;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -46,7 +47,7 @@ final class MediaCompileCommand extends Command
             $filename = "{$hash}.{$ext}";
 
             if (isset($seen[$filename])) {
-                throw new \RuntimeException("Hash collision detected: {$filename}");
+                throw new RuntimeException("Hash collision detected: {$filename}");
             }
             $seen[$filename] = true;
 
@@ -70,7 +71,7 @@ final class MediaCompileCommand extends Command
         foreach (AppBundle::SOURCES as $logicalPath) {
             $asset = $this->assetMapper->getAsset($logicalPath);
             if ($asset === null) {
-                throw new \RuntimeException("Global JS bundle: asset '{$logicalPath}' not found in AssetMapper.");
+                throw new RuntimeException("Global JS bundle: asset '{$logicalPath}' not found in AssetMapper.");
             }
             $content = $asset->content ?? file_get_contents($asset->sourcePath);
             $minifier->add($content);

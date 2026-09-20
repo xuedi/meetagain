@@ -93,7 +93,8 @@ class GameRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('g')
+        $qb = $this
+            ->createQueryBuilder('g')
             ->andWhere('g.name LIKE :term')
             ->setParameter('term', '%' . $term . '%')
             ->orderBy('g.name', 'ASC')

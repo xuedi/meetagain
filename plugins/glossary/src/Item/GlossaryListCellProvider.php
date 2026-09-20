@@ -4,8 +4,8 @@ namespace Plugin\Glossary\Item;
 
 use App\Enum\ItemViewType;
 use App\Item\ListCellProviderInterface;
-use App\Item\Tag\TagService;
 use App\Item\ListProviderInterface;
+use App\Item\Tag\TagService;
 use App\Review\ChangeProposalService;
 use Override;
 use Plugin\Glossary\Entity\Glossary;
@@ -95,31 +95,6 @@ final class GlossaryListCellProvider implements ListCellProviderInterface, ListP
         ]);
     }
 
-    private function hasTags(): bool
-    {
-        return $this->hasTags ??= $this->tagService->getVocabulary(GlossaryTaggableTypeProvider::ITEM_TYPE) !== [];
-    }
-
-    /** @return array<int, Glossary> */
-    private function entries(): array
-    {
-        return $this->entries ??= $this->byId($this->glossaryService->getList());
-    }
-
-    /**
-     * @param Glossary[] $entries
-     * @return array<int, Glossary>
-     */
-    private function byId(array $entries): array
-    {
-        $byId = [];
-        foreach ($entries as $entry) {
-            $byId[(int) $entry->getId()] = $entry;
-        }
-
-        return $byId;
-    }
-
     #[Override]
     public function getListRoute(): string
     {
@@ -155,5 +130,30 @@ final class GlossaryListCellProvider implements ListCellProviderInterface, ListP
         }
 
         return $stamps;
+    }
+
+    private function hasTags(): bool
+    {
+        return $this->hasTags ??= $this->tagService->getVocabulary(GlossaryTaggableTypeProvider::ITEM_TYPE) !== [];
+    }
+
+    /** @return array<int, Glossary> */
+    private function entries(): array
+    {
+        return $this->entries ??= $this->byId($this->glossaryService->getList());
+    }
+
+    /**
+     * @param Glossary[] $entries
+     * @return array<int, Glossary>
+     */
+    private function byId(array $entries): array
+    {
+        $byId = [];
+        foreach ($entries as $entry) {
+            $byId[(int) $entry->getId()] = $entry;
+        }
+
+        return $byId;
     }
 }

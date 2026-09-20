@@ -12,10 +12,10 @@ use App\Service\Http\RequestHostResolver;
 use App\Service\Media\SiteLogoResolver;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use ReflectionMethod;
 use ReflectionParameter;
 use RuntimeException;
-use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\Translator;
 use Twig\Environment;
@@ -114,10 +114,7 @@ final class LayoutRendererTest extends TestCase
             ->setRenderedBody('<p>legacy row</p>');
 
         $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())->method('warning')->with(
-            static::stringContains('no frozen layout'),
-            static::anything(),
-        );
+        $logger->expects($this->once())->method('warning')->with(static::stringContains('no frozen layout'), static::anything());
 
         // Act
         $html = $this->renderer(logger: $logger)->wrap($mail);
@@ -135,8 +132,7 @@ final class LayoutRendererTest extends TestCase
             'siteUrl' => 'https://second.example',
             'logoUrl' => 'https://second.example/logo.png',
             'links' => [['label' => 'Imprint', 'url' => 'https://second.example/en/imprint']],
-            'attribution' => 'Sent by <a href="https://second.example">Second Site</a>'
-                . ' - a group on the <a href="https://example.org">MeetAgain</a> platform',
+            'attribution' => 'Sent by <a href="https://second.example">Second Site</a> - a group on the <a href="https://example.org">MeetAgain</a> platform',
         ]);
 
         // Act
@@ -216,21 +212,23 @@ final class LayoutRendererTest extends TestCase
             ->setLang('en')
             ->setRenderedBody($body)
             ->setContext([
-                LayoutRenderer::CONTEXT_KEY => [...[
-                    'siteName' => 'Example Site',
-                    'siteUrl' => 'https://example.org',
-                    'logoUrl' => 'https://example.org/logo.png',
-                    'accent' => '#123456',
-                    'links' => [['label' => 'Imprint', 'url' => 'https://example.org/en/imprint']],
-                ], ...$overrides],
+                LayoutRenderer::CONTEXT_KEY => [
+                    ...[
+                        'siteName' => 'Example Site',
+                        'siteUrl' => 'https://example.org',
+                        'logoUrl' => 'https://example.org/logo.png',
+                        'accent' => '#123456',
+                        'links' => [['label' => 'Imprint', 'url' => 'https://example.org/en/imprint']],
+                    ],
+                    ...$overrides,
+                ],
             ]);
     }
 
     public function testAStoredAttributionReplacesTheDefaultSentByLine(): void
     {
         // Arrange
-        $attribution = 'Sent by <a href="https://second.example">Second Site</a>'
-            . ' - a group on the <a href="https://example.org">Example Site</a> platform';
+        $attribution = 'Sent by <a href="https://second.example">Second Site</a> - a group on the <a href="https://example.org">Example Site</a> platform';
         $mail = $this->queued('<p>body</p>', ['attribution' => $attribution]);
 
         // Act
@@ -289,11 +287,8 @@ final class LayoutRendererTest extends TestCase
         );
     }
 
-    private function renderer(
-        ?Environment $twig = null,
-        ?LoggerInterface $logger = null,
-        ?EmailFooterLinkResolver $footerLinks = null,
-    ): LayoutRenderer {
+    private function renderer(?Environment $twig = null, ?LoggerInterface $logger = null, ?EmailFooterLinkResolver $footerLinks = null): LayoutRenderer
+    {
         if ($twig === null) {
             $twig = new Environment(new FilesystemLoader(dirname(__DIR__, 4) . '/templates'));
             $twig->addExtension(new TranslationExtension(new Translator('en')));
@@ -309,9 +304,7 @@ final class LayoutRendererTest extends TestCase
         $hostResolver->method('getSchemeAndHost')->willReturn('https://example.org');
 
         $logoResolver = $this->createStub(SiteLogoResolver::class);
-        $logoResolver->method('endpointUrl')->willReturnCallback(
-            static fn(string $schemeAndHost): string => rtrim($schemeAndHost, '/') . '/logo.png',
-        );
+        $logoResolver->method('endpointUrl')->willReturnCallback(static fn(string $schemeAndHost): string => rtrim($schemeAndHost, '/') . '/logo.png');
 
         if ($footerLinks === null) {
             $footerLinks = $this->createStub(EmailFooterLinkResolver::class);

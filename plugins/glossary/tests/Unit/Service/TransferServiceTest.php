@@ -11,16 +11,17 @@ use Plugin\Glossary\Enum\DuplicatePolicy;
 use Plugin\Glossary\Service\GlossaryService;
 use Plugin\Glossary\Service\ImportException;
 use Plugin\Glossary\Service\TransferService;
-use Symfony\Component\Filesystem\Filesystem;
 use Plugin\Glossary\ValueObject\ImportMapping;
 use ReflectionProperty;
+use Symfony\Component\Filesystem\Filesystem;
 
 class TransferServiceTest extends TestCase
 {
     public function testAnAnkiExportIsReadWithItsHeaders(): void
     {
         // Arrange
-        $content = "#separator:tab\n#html:true\n#columns:Front\tBack\tTags\n#tags column:3\n"
+        $content =
+            "#separator:tab\n#html:true\n#columns:Front\tBack\tTags\n#tags column:3\n"
             . "你好\t<b>hello</b><br>hi\tHSK1 greeting\n"
             . "\"多行\"\t\"line one\nline two\"\tHSK1\n";
 
@@ -106,7 +107,9 @@ class TransferServiceTest extends TestCase
     public function testTheExportIsAnAnkiReadableTabSeparatedFile(): void
     {
         // Arrange
-        $entry = new Glossary()->setPhrase('你好')->setSecondary('nǐ hǎo');
+        $entry = new Glossary()
+            ->setPhrase('你好')
+            ->setSecondary('nǐ hǎo');
         new ReflectionProperty(Glossary::class, 'id')->setValue($entry, 1);
 
         $glossaryService = $this->createStub(GlossaryService::class);
@@ -124,8 +127,11 @@ class TransferServiceTest extends TestCase
         self::assertStringContainsString("你好\thello\tnǐ hǎo\tGreeting_words\n", $content);
     }
 
-    private function service(?GlossaryService $glossaryService = null, ?TagService $tagService = null, ?ItemTagAssignmentRepository $assignments = null): TransferService
-    {
+    private function service(
+        ?GlossaryService $glossaryService = null,
+        ?TagService $tagService = null,
+        ?ItemTagAssignmentRepository $assignments = null,
+    ): TransferService {
         return new TransferService(
             $glossaryService ?? $this->createStub(GlossaryService::class),
             $tagService ?? $this->createStub(TagService::class),
@@ -143,7 +149,7 @@ class TransferServiceTest extends TestCase
         $filesystem = new Filesystem();
         $abandoned = str_repeat('a', 32);
         $filesystem->dumpFile($dir . '/' . $abandoned . '.txt', 'abandoned');
-        touch($dir . '/' . $abandoned . '.txt', time() - 2 * 86_400);
+        touch($dir . '/' . $abandoned . '.txt', time() - (2 * 86_400));
         $service = new TransferService(
             $this->createStub(GlossaryService::class),
             $this->createStub(TagService::class),

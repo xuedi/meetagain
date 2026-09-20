@@ -21,11 +21,7 @@ class ConfigRuntimeTest extends TestCase
         $this->configServiceStub = $this->createStub(ConfigService::class);
         $this->siteLogoResolverStub = $this->createStub(SiteLogoResolver::class);
         $this->imageAttributionServiceStub = $this->createStub(ImageAttributionService::class);
-        $this->subject = new ConfigRuntime(
-            $this->configServiceStub,
-            $this->siteLogoResolverStub,
-            $this->imageAttributionServiceStub,
-        );
+        $this->subject = new ConfigRuntime($this->configServiceStub, $this->siteLogoResolverStub, $this->imageAttributionServiceStub);
     }
 
     public function testHasImageAttributionsDelegatesToService(): void

@@ -129,7 +129,9 @@ final class ItemBallotController extends AbstractController
         return $this->render('item/ballot/close.html.twig', [
             'ballot' => $ballot,
             'itemType' => $this->itemTypeOf($ballot),
-            'choices' => $ballot->tiedKeys === [] ? array_map(static fn(Candidate $candidate): string => $candidate->key, $ballot->candidates) : $ballot->tiedKeys,
+            'choices' => $ballot->tiedKeys === []
+                ? array_map(static fn(Candidate $candidate): string => $candidate->key, $ballot->candidates)
+                : $ballot->tiedKeys,
         ]);
     }
 

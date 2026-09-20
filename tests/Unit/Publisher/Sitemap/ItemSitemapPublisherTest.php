@@ -6,9 +6,9 @@ use App\Item\ListProviderInterface;
 use App\Item\ListRegistry;
 use App\Item\Tag\FacetService;
 use App\Item\Tag\TagService;
-use App\Repository\ItemTagAssignmentRepository;
 use App\Publisher\Sitemap\ItemSitemapPublisher;
 use App\Publisher\UrlOwner\UrlOwnerProviderInterface;
+use App\Repository\ItemTagAssignmentRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use App\Service\Seo\UrlOwnerService;
@@ -24,10 +24,7 @@ class ItemSitemapPublisherTest extends TestCase
     public function testEmitsTheListPageOncePerLocaleWithFullAlternates(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en', 'de', 'zh'],
-            providers: ['dish' => $this->makeProvider('app_dish_list', null, [])],
-        );
+        $publisher = $this->makePublisher(locales: ['en', 'de', 'zh'], providers: ['dish' => $this->makeProvider('app_dish_list', null, [])]);
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -45,10 +42,7 @@ class ItemSitemapPublisherTest extends TestCase
     public function testATypeWithoutADetailRouteEmitsOnlyItsListPage(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            providers: ['dish' => $this->makeProvider('app_dish_list', null, [3, 4])],
-        );
+        $publisher = $this->makePublisher(locales: ['en'], providers: ['dish' => $this->makeProvider('app_dish_list', null, [3, 4])]);
 
         // Act
         $locs = array_map(static fn($url) => $url->loc, $publisher->getSitemapUrls());
@@ -60,22 +54,22 @@ class ItemSitemapPublisherTest extends TestCase
     public function testEmitsOneDetailUrlPerItemAndLocale(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en', 'de'],
-            providers: ['dish' => $this->makeProvider('app_dish_list', 'app_dish_show', [3, 4])],
-        );
+        $publisher = $this->makePublisher(locales: ['en', 'de'], providers: ['dish' => $this->makeProvider('app_dish_list', 'app_dish_show', [3, 4])]);
 
         // Act
         $detailUrls = array_values(array_filter($publisher->getSitemapUrls(), static fn($url) => isset($url->meta['item_id'])));
         $locs = array_map(static fn($url) => $url->loc, $detailUrls);
 
         // Assert
-        self::assertSame([
-            'https://example.com/en/app_dish_show/3',
-            'https://example.com/de/app_dish_show/3',
-            'https://example.com/en/app_dish_show/4',
-            'https://example.com/de/app_dish_show/4',
-        ], $locs);
+        self::assertSame(
+            [
+                'https://example.com/en/app_dish_show/3',
+                'https://example.com/de/app_dish_show/3',
+                'https://example.com/en/app_dish_show/4',
+                'https://example.com/de/app_dish_show/4',
+            ],
+            $locs,
+        );
         foreach ($detailUrls as $url) {
             self::assertSame(0.5, $url->priority);
             self::assertSame('monthly', $url->changefreq);
@@ -86,10 +80,12 @@ class ItemSitemapPublisherTest extends TestCase
     public function testEmitsTheCreationDateAsLastmodWhereTheProviderKnowsOne(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            providers: ['dish' => $this->makeProvider('app_dish_list', 'app_dish_show', [3, 4], [3 => new DateTimeImmutable('2026-02-11')])],
-        );
+        $publisher = $this->makePublisher(locales: ['en'], providers: ['dish' => $this->makeProvider(
+            'app_dish_list',
+            'app_dish_show',
+            [3, 4],
+            [3 => new DateTimeImmutable('2026-02-11')],
+        )]);
 
         // Act
         $byId = [];
@@ -109,10 +105,7 @@ class ItemSitemapPublisherTest extends TestCase
     public function testEmitsNothingForAnItemTypeWhoseIdsAreAllFilteredAway(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            providers: ['dish' => $this->makeProvider('app_dish_list', 'app_dish_show', [])],
-        );
+        $publisher = $this->makePublisher(locales: ['en'], providers: ['dish' => $this->makeProvider('app_dish_list', 'app_dish_show', [])]);
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -126,11 +119,7 @@ class ItemSitemapPublisherTest extends TestCase
     {
         // Arrange
         $facetService = $this->makeFacetService($this->requestStackWith(new Request(['tag' => ['9']])));
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            providers: ['dish' => $this->facetSensitiveProvider($facetService)],
-            facetService: $facetService,
-        );
+        $publisher = $this->makePublisher(locales: ['en'], providers: ['dish' => $this->facetSensitiveProvider($facetService)], facetService: $facetService);
 
         // Act
         $locs = array_map(static fn($url) => $url->loc, $publisher->getSitemapUrls());
@@ -143,13 +132,10 @@ class ItemSitemapPublisherTest extends TestCase
     public function testCoversEveryActiveItemType(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            providers: [
-                'dish' => $this->makeProvider('app_dish_list', 'app_dish_show', [1]),
-                'film' => $this->makeProvider('app_film_list', 'app_film_show', [2]),
-            ],
-        );
+        $publisher = $this->makePublisher(locales: ['en'], providers: [
+            'dish' => $this->makeProvider('app_dish_list', 'app_dish_show', [1]),
+            'film' => $this->makeProvider('app_film_list', 'app_film_show', [2]),
+        ]);
 
         // Act
         $types = array_values(array_unique(array_map(static fn($url) => $url->meta['item_type'], $publisher->getSitemapUrls())));
@@ -161,10 +147,7 @@ class ItemSitemapPublisherTest extends TestCase
     public function testEmitsNothingWithoutEnabledLocales(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: [],
-            providers: ['dish' => $this->makeProvider('app_dish_list', 'app_dish_show', [3])],
-        );
+        $publisher = $this->makePublisher(locales: [], providers: ['dish' => $this->makeProvider('app_dish_list', 'app_dish_show', [3])]);
 
         // Act & Assert
         self::assertSame([], $publisher->getSitemapUrls());
@@ -188,12 +171,8 @@ class ItemSitemapPublisherTest extends TestCase
      * @param array<string, ListProviderInterface> $providers
      * @param array<string> $foreignOwnedRoutes routes another host owns, so this feed must drop them
      */
-    private function makePublisher(
-        array $locales,
-        array $providers,
-        ?FacetService $facetService = null,
-        array $foreignOwnedRoutes = [],
-    ): ItemSitemapPublisher {
+    private function makePublisher(array $locales, array $providers, ?FacetService $facetService = null, array $foreignOwnedRoutes = []): ItemSitemapPublisher
+    {
         $registry = $this->createStub(ListRegistry::class);
         $registry->method('activeProviders')->willReturn($providers);
 
@@ -201,24 +180,22 @@ class ItemSitemapPublisherTest extends TestCase
         $language->method('getFilteredEnabledCodes')->willReturn($locales);
 
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
-        $urlGenerator->method('generate')->willReturnCallback(
-            static function (string $route, array $params = []): string {
+        $urlGenerator
+            ->method('generate')
+            ->willReturnCallback(static function (string $route, array $params = []): string {
                 $locale = $params['_locale'] ?? 'en';
                 $id = $params['id'] ?? null;
 
                 return "https://example.com/{$locale}/{$route}" . ($id !== null ? "/{$id}" : '');
-            },
-        );
+            });
 
         $config = $this->createStub(ConfigService::class);
         $config->method('getHost')->willReturn('https://example.com');
 
         $ownerProvider = $this->createStub(UrlOwnerProviderInterface::class);
-        $ownerProvider
-            ->method('getOwnerHost')
-            ->willReturnCallback(
-                static fn(string $route) => in_array($route, $foreignOwnedRoutes, true) ? 'https://other.example.com' : null,
-            );
+        $ownerProvider->method('getOwnerHost')->willReturnCallback(static fn(string $route) => in_array($route, $foreignOwnedRoutes, true)
+            ? 'https://other.example.com'
+            : null);
 
         return new ItemSitemapPublisher(
             $registry,
@@ -232,12 +209,9 @@ class ItemSitemapPublisherTest extends TestCase
     public function testATypeThatOptsOutEmitsItsListPageButNoDetailPages(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en', 'de', 'zh'],
-            providers: [
-                'glossary' => $this->makeProvider('app_glossary_list', 'app_glossary_show', [7, 8], [], false),
-            ],
-        );
+        $publisher = $this->makePublisher(locales: ['en', 'de', 'zh'], providers: [
+            'glossary' => $this->makeProvider('app_glossary_list', 'app_glossary_show', [7, 8], [], false),
+        ]);
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -276,9 +250,7 @@ class ItemSitemapPublisherTest extends TestCase
         $provider->method('getListRoute')->willReturn('app_dish_list');
         $provider->method('getDetailRoute')->willReturn('app_dish_show');
         $provider->method('isDetailIndexable')->willReturn(true);
-        $provider->method('getItemIds')->willReturnCallback(
-            static fn(): array => $facetService->current()->tags === [] ? [3, 4] : [3],
-        );
+        $provider->method('getItemIds')->willReturnCallback(static fn(): array => $facetService->current()->tags === [] ? [3, 4] : [3]);
         $provider->method('getLastmodByItemId')->willReturn([]);
 
         return $provider;

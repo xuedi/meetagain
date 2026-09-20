@@ -130,12 +130,8 @@ class PluginSettingsServiceTest extends TestCase
         static::assertSame(['films', 'dishes'], $keys);
     }
 
-    private function makeProvider(
-        string $key,
-        int $priority = 0,
-        ?string $pluginKey = null,
-        bool $scopable = true,
-    ): DescriptorInterface {
+    private function makeProvider(string $key, int $priority = 0, ?string $pluginKey = null, bool $scopable = true): DescriptorInterface
+    {
         return new StubDescriptor($key, $priority, $pluginKey, $scopable);
     }
 }

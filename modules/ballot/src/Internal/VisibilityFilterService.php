@@ -60,10 +60,7 @@ final readonly class VisibilityFilterService
     private function sorted(): array
     {
         $filters = array_values(iterator_to_array($this->filters));
-        usort(
-            $filters,
-            static fn(VisibilityFilterInterface $a, VisibilityFilterInterface $b): int => $b->getPriority() <=> $a->getPriority(),
-        );
+        usort($filters, static fn(VisibilityFilterInterface $a, VisibilityFilterInterface $b): int => $b->getPriority() <=> $a->getPriority());
 
         return $filters;
     }

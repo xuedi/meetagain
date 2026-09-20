@@ -60,8 +60,7 @@ class AudienceFilterServiceTest extends TestCase
         $neverCalled->expects($this->never())->method('filterInstallationWideAudience');
 
         // Act
-        $result = new AudienceFilterService([$empties, $neverCalled])
-            ->installationWideAudience([$this->user('a@example.org')]);
+        $result = new AudienceFilterService([$empties, $neverCalled])->installationWideAudience([$this->user('a@example.org')]);
 
         // Assert
         static::assertSame([], $result);
@@ -72,14 +71,13 @@ class AudienceFilterServiceTest extends TestCase
     {
         return new class($keep) implements AudienceFilterInterface {
             /** @param list<User> $keep */
-            public function __construct(private readonly array $keep) {}
+            public function __construct(
+                private readonly array $keep,
+            ) {}
 
             public function filterInstallationWideAudience(array $recipients): array
             {
-                return array_values(array_filter(
-                    $recipients,
-                    fn(User $user) => in_array($user, $this->keep, true),
-                ));
+                return array_values(array_filter($recipients, fn(User $user) => in_array($user, $this->keep, true)));
             }
         };
     }

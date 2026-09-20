@@ -33,15 +33,18 @@ final class EventItemsSectionTest extends SectionTestCase
         $this->section()->import($exported, $context);
 
         // Assert
-        static::assertSame([[
-            'event_ref' => 4,
-            'item_type' => 'dish',
-            'item_ref' => 12,
-            'position' => 2,
-            'section_label' => 'Mains',
-            'created_by_email' => 'cook@example.org',
-            'created_at' => '2030-01-06T19:00:00+00:00',
-        ]], $exported);
+        static::assertSame(
+            [[
+                'event_ref' => 4,
+                'item_type' => 'dish',
+                'item_ref' => 12,
+                'position' => 2,
+                'section_label' => 'Mains',
+                'created_by_email' => 'cook@example.org',
+                'created_at' => '2030-01-06T19:00:00+00:00',
+            ]],
+            $exported,
+        );
         $link = $this->onlyPersisted(EventItemAssociation::class);
         static::assertSame($event, $link->getEvent());
         static::assertSame('dish', $link->getItemType());

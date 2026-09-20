@@ -7,8 +7,6 @@ use App\Repository\CmsBlockRepository;
 
 trait ResolvesCmsBlockLocation
 {
-    abstract protected function cmsBlockRepository(): CmsBlockRepository;
-
     public function locate(Image $image): ?array
     {
         $block = $this->cmsBlockRepository()->findOneBy(['image' => $image]);
@@ -22,4 +20,6 @@ trait ResolvesCmsBlockLocation
             'params' => ['id' => $block->getPage()->getId()],
         ];
     }
+
+    abstract protected function cmsBlockRepository(): CmsBlockRepository;
 }

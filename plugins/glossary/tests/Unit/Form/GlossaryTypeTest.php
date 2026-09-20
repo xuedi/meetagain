@@ -35,7 +35,9 @@ class GlossaryTypeTest extends TestCase
     public function testSecondaryEnabledAddsTheSecondaryField(): void
     {
         // Arrange
-        $config = new Config()->setSecondaryEnabled(true)->setSecondaryLabel('Romaji');
+        $config = new Config()
+            ->setSecondaryEnabled(true)
+            ->setSecondaryLabel('Romaji');
 
         // Act
         $form = $this->formFor($config, []);
@@ -112,7 +114,12 @@ class GlossaryTypeTest extends TestCase
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
 
-        $type = new GlossaryType($configService, new AssignmentFormHelper($tagService, new RequestStack()), new TranslationFormHelper($languageService), $translator);
+        $type = new GlossaryType(
+            $configService,
+            new AssignmentFormHelper($tagService, new RequestStack()),
+            new TranslationFormHelper($languageService),
+            $translator,
+        );
         $factory = Forms::createFormFactoryBuilder()
             ->addExtension(new PreloadedExtension([$type], []))
             ->getFormFactory();

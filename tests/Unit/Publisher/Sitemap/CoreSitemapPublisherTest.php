@@ -30,6 +30,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Tests\Unit\Stubs\EventSeriesStub;
 use Tests\Unit\Stubs\EventStub;
@@ -102,13 +103,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testEmitsMemberPagesBasedOnMemberCount(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            cmsPages: [],
-            events: [],
-            cmsFilter: CmsFilterResult::noFilter(),
-            memberCount: 60,
-        );
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter(), memberCount: 60);
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -121,13 +116,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testEmitsNoMemberPagesWhenZeroMembers(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            cmsPages: [],
-            events: [],
-            cmsFilter: CmsFilterResult::noFilter(),
-            memberCount: 0,
-        );
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter(), memberCount: 0);
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -140,13 +129,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testCapsMemberPaginationAtFifty(): void
     {
         // Arrange
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            cmsPages: [],
-            events: [],
-            cmsFilter: CmsFilterResult::noFilter(),
-            memberCount: 100_000,
-        );
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [], cmsFilter: CmsFilterResult::noFilter(), memberCount: 100_000);
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -162,12 +145,7 @@ class CoreSitemapPublisherTest extends TestCase
         $page1 = $this->makeCmsPage(1, 'allowed');
         $page2 = $this->makeCmsPage(2, 'blocked');
 
-        $publisher = $this->makePublisher(
-            locales: ['en'],
-            cmsPages: [$page1, $page2],
-            events: [],
-            cmsFilter: new CmsFilterResult([1], true),
-        );
+        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [$page1, $page2], events: [], cmsFilter: new CmsFilterResult([1], true));
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -195,13 +173,16 @@ class CoreSitemapPublisherTest extends TestCase
         $locs = array_map(static fn($u) => $u->loc, $publisher->getSitemapUrls());
 
         // Assert
-        self::assertSame([
-            'https://example.com/en/app_default',
-            'https://example.com/en/app_event',
-            'https://example.com/en/app_event_featured',
-            'https://example.com/en/app_contact',
-            'https://example.com/en/app_cookie',
-        ], $locs);
+        self::assertSame(
+            [
+                'https://example.com/en/app_default',
+                'https://example.com/en/app_event',
+                'https://example.com/en/app_event_featured',
+                'https://example.com/en/app_contact',
+                'https://example.com/en/app_cookie',
+            ],
+            $locs,
+        );
     }
 
     public function testEmitsACmsPageOnlyInTheLocalesItHasContentFor(): void
@@ -209,12 +190,7 @@ class CoreSitemapPublisherTest extends TestCase
         // Arrange
         $page = $this->makeCmsPage(1, 'privacy', ['de']);
 
-        $publisher = $this->makePublisher(
-            locales: ['en', 'de'],
-            cmsPages: [$page],
-            events: [],
-            cmsFilter: CmsFilterResult::noFilter(),
-        );
+        $publisher = $this->makePublisher(locales: ['en', 'de'], cmsPages: [$page], events: [], cmsFilter: CmsFilterResult::noFilter());
 
         // Act
         $urls = array_values(array_filter($publisher->getSitemapUrls(), static fn($u) => $u->section === 'cms'));
@@ -230,12 +206,7 @@ class CoreSitemapPublisherTest extends TestCase
         // Arrange
         $page = $this->makeCmsPage(1, 'privacy', ['fr']);
 
-        $publisher = $this->makePublisher(
-            locales: ['en', 'de'],
-            cmsPages: [$page],
-            events: [],
-            cmsFilter: CmsFilterResult::noFilter(),
-        );
+        $publisher = $this->makePublisher(locales: ['en', 'de'], cmsPages: [$page], events: [], cmsFilter: CmsFilterResult::noFilter());
 
         // Act
         $urls = array_filter($publisher->getSitemapUrls(), static fn($u) => $u->section === 'cms');
@@ -269,7 +240,13 @@ class CoreSitemapPublisherTest extends TestCase
         // Arrange
         $event = $this->makeEvent(42, new DateTime('2026-05-01'));
 
-        $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [$event], cmsFilter: CmsFilterResult::noFilter(), foreignOwnedRoutes: ['app_event_details']);
+        $publisher = $this->makePublisher(
+            locales: ['en'],
+            cmsPages: [],
+            events: [$event],
+            cmsFilter: CmsFilterResult::noFilter(),
+            foreignOwnedRoutes: ['app_event_details'],
+        );
 
         // Act
         $urls = $publisher->getSitemapUrls();
@@ -367,19 +344,22 @@ class CoreSitemapPublisherTest extends TestCase
         );
 
         // Act
-        $locs = array_values(array_map(
-            static fn($u) => $u->loc,
-            array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains($u->loc, '/event/')),
-        ));
+        $locs = array_values(array_map(static fn($u) => $u->loc, array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains(
+            $u->loc,
+            '/event/',
+        ))));
         sort($locs);
 
         // Assert
-        self::assertSame([
-            'https://example.com/de/event/1',
-            'https://example.com/de/event/3',
-            'https://example.com/en/event/1',
-            'https://example.com/en/event/3',
-        ], $locs);
+        self::assertSame(
+            [
+                'https://example.com/de/event/1',
+                'https://example.com/de/event/3',
+                'https://example.com/en/event/1',
+                'https://example.com/en/event/3',
+            ],
+            $locs,
+        );
     }
 
     public function testEmitsMarkedRootsUnderAGroupLocaleToo(): void
@@ -402,17 +382,20 @@ class CoreSitemapPublisherTest extends TestCase
         );
 
         // Act
-        $locs = array_values(array_map(
-            static fn($u) => $u->loc,
-            array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains($u->loc, '/event/')),
-        ));
+        $locs = array_values(array_map(static fn($u) => $u->loc, array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains(
+            $u->loc,
+            '/event/',
+        ))));
         sort($locs);
 
         // Assert
-        self::assertSame([
-            'https://example.com/de/event/1',
-            'https://example.com/de/event/3',
-        ], $locs);
+        self::assertSame(
+            [
+                'https://example.com/de/event/1',
+                'https://example.com/de/event/3',
+            ],
+            $locs,
+        );
     }
 
     public function testDropsLocalesTheSiteDoesNotServe(): void
@@ -455,10 +438,7 @@ class CoreSitemapPublisherTest extends TestCase
         );
 
         // Act
-        $locs = array_map(
-            static fn($u) => $u->loc,
-            array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains($u->loc, '/event/')),
-        );
+        $locs = array_map(static fn($u) => $u->loc, array_filter($publisher->getSitemapUrls(), static fn($u) => str_contains($u->loc, '/event/')));
 
         // Assert
         self::assertSame(['https://example.com/de/event/1'], array_values($locs));
@@ -487,10 +467,13 @@ class CoreSitemapPublisherTest extends TestCase
         self::assertCount(2, $urls);
         foreach ($urls as $url) {
             self::assertStringContainsString('/event/1', $url->loc);
-            self::assertSame([
-                'en' => 'https://example.com/en/event/1',
-                'de' => 'https://example.com/de/event/1',
-            ], $url->alternates);
+            self::assertSame(
+                [
+                    'en' => 'https://example.com/en/event/1',
+                    'de' => 'https://example.com/de/event/1',
+                ],
+                $url->alternates,
+            );
         }
     }
 
@@ -552,11 +535,9 @@ class CoreSitemapPublisherTest extends TestCase
         $memberFilterService->method('getUserIdFilter')->willReturn(MemberFilterResult::noFilter());
 
         $eventFilterService = $this->createStub(EventFilterService::class);
-        $eventFilterService
-            ->method('getAccessibleEventIds')
-            ->willReturnCallback(
-                static fn(array $ids) => $accessibleEventIds === null ? $ids : array_values(array_intersect($ids, $accessibleEventIds)),
-            );
+        $eventFilterService->method('getAccessibleEventIds')->willReturnCallback(static fn(array $ids) => $accessibleEventIds === null
+            ? $ids
+            : array_values(array_intersect($ids, $accessibleEventIds)));
 
         $markerRepo = $this->createStub(EventCanonicalRootRepository::class);
         $markerRepo->method('findBySeriesIds')->willReturn($markers);
@@ -593,11 +574,9 @@ class CoreSitemapPublisherTest extends TestCase
         $config->method('getHost')->willReturn('https://example.com');
 
         $provider = $this->createStub(UrlOwnerProviderInterface::class);
-        $provider
-            ->method('getOwnerHost')
-            ->willReturnCallback(
-                static fn(string $route) => in_array($route, $foreignOwnedRoutes, true) ? 'https://other.example.com' : null,
-            );
+        $provider->method('getOwnerHost')->willReturnCallback(static fn(string $route) => in_array($route, $foreignOwnedRoutes, true)
+            ? 'https://other.example.com'
+            : null);
 
         return new UrlOwnerService($config, [$provider]);
     }
@@ -607,16 +586,16 @@ class CoreSitemapPublisherTest extends TestCase
      */
     private function makeCmsPage(int $id, string $slug, array $languages = ['en', 'de']): Cms
     {
-        $reflection = new \ReflectionClass(Cms::class);
+        $reflection = new ReflectionClass(Cms::class);
         $page = $reflection->newInstanceWithoutConstructor();
 
         $reflection->getProperty('id')->setValue($page, $id);
         $reflection->getProperty('slug')->setValue($page, $slug);
         $reflection->getProperty('createdAt')->setValue($page, new DateTimeImmutable('2026-04-01'));
-        $reflection->getProperty('blocks')->setValue($page, new ArrayCollection(array_map(
-            static fn(string $language): CmsBlock => new CmsBlock()->setLanguage($language),
-            $languages,
-        )));
+        $reflection->getProperty('blocks')->setValue(
+            $page,
+            new ArrayCollection(array_map(static fn(string $language): CmsBlock => new CmsBlock()->setLanguage($language), $languages)),
+        );
 
         return $page;
     }
@@ -649,9 +628,9 @@ class CoreSitemapPublisherTest extends TestCase
         return $event;
     }
 
-    private function makeEvent(int $id, \DateTimeInterface $start): Event
+    private function makeEvent(int $id, DateTimeInterface $start): Event
     {
-        $reflection = new \ReflectionClass(Event::class);
+        $reflection = new ReflectionClass(Event::class);
         $event = $reflection->newInstanceWithoutConstructor();
 
         $reflection->getProperty('id')->setValue($event, $id);

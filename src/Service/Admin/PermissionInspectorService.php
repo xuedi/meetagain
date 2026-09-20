@@ -2,6 +2,7 @@
 
 namespace App\Service\Admin;
 
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use Symfony\Component\Routing\RouterInterface;
@@ -94,6 +95,6 @@ readonly class PermissionInspectorService
     /** @param \ReflectionAttribute[] $attributes */
     private function collectRoleIds(array $attributes): array
     {
-        return array_map(static fn(\ReflectionAttribute $attr) => $attr->newInstance()->attribute, $attributes);
+        return array_map(static fn(ReflectionAttribute $attr) => $attr->newInstance()->attribute, $attributes);
     }
 }

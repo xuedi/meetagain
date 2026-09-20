@@ -65,15 +65,12 @@ class EventCanonicalRebuildCommand extends Command
             return;
         }
 
-        $io->table(
-            ['Locale', 'Members', 'Roots', 'Detached', 'Removed'],
-            array_map(static fn(CanonicalRebuildSummary $s) => [
-                $s->locale,
-                $s->membersScanned,
-                $s->rootsWritten,
-                $s->detachedWritten,
-                $s->markersRemoved,
-            ], $summaries),
-        );
+        $io->table(['Locale', 'Members', 'Roots', 'Detached', 'Removed'], array_map(static fn(CanonicalRebuildSummary $s) => [
+            $s->locale,
+            $s->membersScanned,
+            $s->rootsWritten,
+            $s->detachedWritten,
+            $s->markersRemoved,
+        ], $summaries));
     }
 }

@@ -26,19 +26,12 @@ final readonly class LedgerReplay
 
             $current = $states[$copyId] ?? new CopyState(null, null, CirculationCopyStatus::Available);
             $states[$copyId] = match ($entry->getEntryType()) {
-                CirculationLedgerEntryType::Donated => new CopyState(
-                    $entry->getActorUserId(),
-                    $entry->getOccurredAt(),
-                    CirculationCopyStatus::Available,
-                ),
+                CirculationLedgerEntryType::Donated => new CopyState($entry->getActorUserId(), $entry->getOccurredAt(), CirculationCopyStatus::Available),
                 CirculationLedgerEntryType::MarkedFinished,
-                CirculationLedgerEntryType::HandoverCancelled => $current->with(status: CirculationCopyStatus::Available),
+                CirculationLedgerEntryType::HandoverCancelled,
+                    => $current->with(status: CirculationCopyStatus::Available),
                 CirculationLedgerEntryType::HandoverOpened => $current->with(status: CirculationCopyStatus::InHandover),
-                CirculationLedgerEntryType::HandoverCompleted => new CopyState(
-                    $entry->getToUserId(),
-                    $entry->getOccurredAt(),
-                    CirculationCopyStatus::Held,
-                ),
+                CirculationLedgerEntryType::HandoverCompleted => new CopyState($entry->getToUserId(), $entry->getOccurredAt(), CirculationCopyStatus::Held),
                 CirculationLedgerEntryType::Retired => $current->with(status: CirculationCopyStatus::Retired),
                 CirculationLedgerEntryType::Lost => $current->with(status: CirculationCopyStatus::Lost),
                 default => $current,

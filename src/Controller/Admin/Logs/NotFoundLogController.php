@@ -18,6 +18,7 @@ use App\Repository\SuspiciousUrlRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -111,17 +112,14 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
         );
         $suspiciousHits = array_sum($suspiciousCounts);
 
-        $adminTop = new AdminTop(
-            info: $this->buildStatisticsInfo($totalCount, $rangeCount, $since, $suspiciousHits),
-            actions: [
-                $this->buildRangeDropdown('app_admin_not_found_log_statistics', $range),
-                new AdminTopActionButton(
-                    label: $this->translator->trans('global.button_back'),
-                    target: $this->generateUrl('app_admin_not_found_log', $range === self::DEFAULT_RANGE ? [] : ['range' => $range]),
-                    icon: 'arrow-left',
-                ),
-            ],
-        );
+        $adminTop = new AdminTop(info: $this->buildStatisticsInfo($totalCount, $rangeCount, $since, $suspiciousHits), actions: [
+            $this->buildRangeDropdown('app_admin_not_found_log_statistics', $range),
+            new AdminTopActionButton(
+                label: $this->translator->trans('global.button_back'),
+                target: $this->generateUrl('app_admin_not_found_log', $range === self::DEFAULT_RANGE ? [] : ['range' => $range]),
+                icon: 'arrow-left',
+            ),
+        ]);
 
         return $this->render('admin/logs/logs_notFound_statistics.html.twig', [
             'active' => 'logs',
@@ -165,7 +163,11 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
             $this->entityManager->remove($existing);
             $suspicious = false;
         } else {
-            $this->entityManager->persist(new SuspiciousUrl()->setUrl($url)->setCreatedAt(new DateTimeImmutable()));
+            $this->entityManager->persist(
+                new SuspiciousUrl()
+                    ->setUrl($url)
+                    ->setCreatedAt(new DateTimeImmutable()),
+            );
             $suspicious = true;
         }
         $this->entityManager->flush();
@@ -253,9 +255,7 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
 
     private function buildChartTile(string $range, ?DateTimeImmutable $since): ChartTile
     {
-        $buckets = $range === '24h'
-            ? $this->notFoundLogRepo->getHourlyCounts(24, $since)
-            : $this->notFoundLogRepo->getDailyCounts(self::CHART_BUCKETS, $since);
+        $buckets = $range === '24h' ? $this->notFoundLogRepo->getHourlyCounts(24, $since) : $this->notFoundLogRepo->getDailyCounts(self::CHART_BUCKETS, $since);
 
         $dataset = [];
         foreach ($buckets as $bucket) {
@@ -307,7 +307,7 @@ final class NotFoundLogController extends AbstractLogsController implements Admi
         }
         try {
             return new DateTimeImmutable($value);
-        } catch (\Exception) {
+        } catch (Exception) {
             return null;
         }
     }

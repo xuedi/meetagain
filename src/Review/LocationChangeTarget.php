@@ -2,6 +2,8 @@
 
 namespace App\Review;
 
+use App\Contribution\LocationSection;
+use App\Contribution\Registry;
 use App\Entity\Location;
 use App\Entity\User;
 use App\EntityActionDispatcher;
@@ -9,8 +11,6 @@ use App\Enum\EntityAction;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Repository\LocationRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
-use App\Contribution\LocationSection;
-use App\Contribution\Registry;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -66,9 +66,7 @@ final readonly class LocationChangeTarget implements ChangeTargetProviderInterfa
     #[Override]
     public function getFieldLabel(string $field): string
     {
-        return in_array($field, self::FIELDS, true)
-            ? $this->translator->trans('admin_location.form_label_' . $field)
-            : $field;
+        return in_array($field, self::FIELDS, true) ? $this->translator->trans('admin_location.form_label_' . $field) : $field;
     }
 
     #[Override]

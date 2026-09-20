@@ -114,10 +114,7 @@ readonly class TagsSection implements SectionInterface
         $parent = $parentRef === null ? null : $this->importTag($itemType, (int) $parentRef, $rows, $candidates, $context, $visiting);
         $labels = $this->labels($row['labels'] ?? null);
 
-        $tag = array_find(
-            $candidates,
-            fn(ItemTag $candidate): bool => $candidate->getParent() === $parent && $this->sharesLabel($candidate, $labels),
-        );
+        $tag = array_find($candidates, fn(ItemTag $candidate): bool => $candidate->getParent() === $parent && $this->sharesLabel($candidate, $labels));
 
         if ($tag instanceof ItemTag) {
             $context->count($this->getKey(), Outcome::Matched);

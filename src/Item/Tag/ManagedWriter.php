@@ -18,8 +18,7 @@ readonly class ManagedWriter
     /** @param array<string, string> $labels one of which identifies the row on a later call */
     public function resolve(string $itemType, array $labels, ?ItemTag $parent): ItemTag
     {
-        return $this->find($itemType, $labels, $parent)
-            ?? $this->tagService->addTag($itemType, array_map(trim(...), $labels), $parent, true);
+        return $this->find($itemType, $labels, $parent) ?? $this->tagService->addTag($itemType, array_map(trim(...), $labels), $parent, true);
     }
 
     /** @param array<string, string> $labels */

@@ -22,42 +22,37 @@ class ConfigType extends AbstractType
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
-            ->add('adapter', EnumType::class, [
-                'class' => ExternalSource::class,
-                'label' => 'boardgames_config.adapter_label',
-                'placeholder' => $this->translator->trans('boardgames_config.adapter_none'),
-                'required' => false,
-                'expanded' => true,
-                'choice_label' => fn(ExternalSource $source) => $this->translator->trans('boardgames_config.adapter_' . $source->value),
-            ])
-            ->add('bggToken', PasswordType::class, [
-                'label' => 'boardgames_config.bgg_token_label',
-                'help' => 'boardgames_config.bgg_token_help',
-                'mapped' => false,
-                'required' => false,
-                'always_empty' => true,
-                'attr' => [
-                    'placeholder' => $options['bgg_token_set'] ? $this->translator->trans('boardgames_config.token_already_set') : '',
-                    'autocomplete' => 'off',
-                ],
-            ])
-            ->add('clearBggToken', CheckboxType::class, [
-                'label' => 'boardgames_config.clear_token_label',
-                'mapped' => false,
-                'required' => false,
-            ])
-            ->add('circulation', CheckboxType::class, [
-                'label' => 'boardgames_config.field_circulation',
-                'help' => 'boardgames_config.help_circulation',
-                'required' => false,
-            ])
-            ->add('trustSystem', CheckboxType::class, [
-                'label' => 'boardgames_config.field_trust_system',
-                'help' => 'boardgames_config.help_trust_system',
-                'required' => false,
-                'row_attr' => ['class' => 'ml-5'],
-            ]);
+        $builder->add('adapter', EnumType::class, [
+            'class' => ExternalSource::class,
+            'label' => 'boardgames_config.adapter_label',
+            'placeholder' => $this->translator->trans('boardgames_config.adapter_none'),
+            'required' => false,
+            'expanded' => true,
+            'choice_label' => fn(ExternalSource $source) => $this->translator->trans('boardgames_config.adapter_' . $source->value),
+        ])->add('bggToken', PasswordType::class, [
+            'label' => 'boardgames_config.bgg_token_label',
+            'help' => 'boardgames_config.bgg_token_help',
+            'mapped' => false,
+            'required' => false,
+            'always_empty' => true,
+            'attr' => [
+                'placeholder' => $options['bgg_token_set'] ? $this->translator->trans('boardgames_config.token_already_set') : '',
+                'autocomplete' => 'off',
+            ],
+        ])->add('clearBggToken', CheckboxType::class, [
+            'label' => 'boardgames_config.clear_token_label',
+            'mapped' => false,
+            'required' => false,
+        ])->add('circulation', CheckboxType::class, [
+            'label' => 'boardgames_config.field_circulation',
+            'help' => 'boardgames_config.help_circulation',
+            'required' => false,
+        ])->add('trustSystem', CheckboxType::class, [
+            'label' => 'boardgames_config.field_trust_system',
+            'help' => 'boardgames_config.help_trust_system',
+            'required' => false,
+            'row_attr' => ['class' => 'ml-5'],
+        ]);
     }
 
     #[Override]

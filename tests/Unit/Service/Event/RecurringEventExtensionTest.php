@@ -220,10 +220,7 @@ class RecurringEventExtensionTest extends TestCase
         $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYDAY=1SU');
 
         // Assert
-        static::assertSame(
-            '2026-07-05 19:00,2026-08-02 19:00,2026-09-06 19:00,2026-10-04 19:00,2026-11-01 19:00,2026-12-06 19:00',
-            $starts,
-        );
+        static::assertSame('2026-07-05 19:00,2026-08-02 19:00,2026-09-06 19:00,2026-10-04 19:00,2026-11-01 19:00,2026-12-06 19:00', $starts);
     }
 
     public function testExtendGeneratesTheLastWeekdayOfEachMonth(): void
@@ -232,10 +229,7 @@ class RecurringEventExtensionTest extends TestCase
         $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYDAY=-1FR');
 
         // Assert
-        static::assertSame(
-            '2026-06-26 19:00,2026-07-31 19:00,2026-08-28 19:00,2026-09-25 19:00,2026-10-30 19:00,2026-11-27 19:00',
-            $starts,
-        );
+        static::assertSame('2026-06-26 19:00,2026-07-31 19:00,2026-08-28 19:00,2026-09-25 19:00,2026-10-30 19:00,2026-11-27 19:00', $starts);
     }
 
     public function testExtendSkipsMonthsWithoutADayThirtyOne(): void
@@ -253,10 +247,7 @@ class RecurringEventExtensionTest extends TestCase
         $starts = $this->generateCustomSeries('FREQ=MONTHLY;BYMONTHDAY=-1');
 
         // Assert
-        static::assertSame(
-            '2026-06-30 19:00,2026-07-31 19:00,2026-08-31 19:00,2026-09-30 19:00,2026-10-31 19:00,2026-11-30 19:00',
-            $starts,
-        );
+        static::assertSame('2026-06-30 19:00,2026-07-31 19:00,2026-08-31 19:00,2026-09-30 19:00,2026-10-31 19:00,2026-11-30 19:00', $starts);
     }
 
     public function testExtendKeepsQuarterlySpacing(): void

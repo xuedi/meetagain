@@ -22,11 +22,6 @@ readonly class CaptchaService
         private string $projectDir,
     ) {}
 
-    private function getSession(): SessionInterface
-    {
-        return $this->requestStack->getSession();
-    }
-
     public function generate(string $formKey): string
     {
         $session = $this->getSession();
@@ -118,6 +113,11 @@ readonly class CaptchaService
         }
 
         return $minSeconds === PHP_INT_MAX ? 0 : $minSeconds;
+    }
+
+    private function getSession(): SessionInterface
+    {
+        return $this->requestStack->getSession();
     }
 
     private function forget(string $formKey): void

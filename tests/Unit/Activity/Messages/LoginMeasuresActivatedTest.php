@@ -25,7 +25,10 @@ class LoginMeasuresActivatedTest extends TestCase
         $translator->addLoader('array', new ArrayLoader());
         $translator->addResource('array', ['profile_social.activity_login_measures_activated' => '%ip% after %attempts%'], 'en');
         $subject = new LoginMeasuresActivated();
-        $subject->injectServices($this->createStub(RouterInterface::class), $this->createStub(ImageHtmlRenderer::class), $translator, ['ip' => '<b>1.2.3.4', 'attempts' => 3]);
+        $subject->injectServices($this->createStub(RouterInterface::class), $this->createStub(ImageHtmlRenderer::class), $translator, [
+            'ip' => '<b>1.2.3.4',
+            'attempts' => 3,
+        ]);
 
         // Act
         $html = $subject->render(true);
@@ -38,7 +41,9 @@ class LoginMeasuresActivatedTest extends TestCase
     {
         // Arrange
         $subject = new LoginMeasuresActivated();
-        $subject->injectServices($this->createStub(RouterInterface::class), $this->createStub(ImageHtmlRenderer::class), new IdentityTranslator(), ['ip' => '1.2.3.4']);
+        $subject->injectServices($this->createStub(RouterInterface::class), $this->createStub(ImageHtmlRenderer::class), new IdentityTranslator(), [
+            'ip' => '1.2.3.4',
+        ]);
 
         // Assert
         $this->expectException(InvalidArgumentException::class);

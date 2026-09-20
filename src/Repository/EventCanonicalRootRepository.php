@@ -29,12 +29,7 @@ class EventCanonicalRootRepository extends ServiceEntityRepository
      */
     public function findBySeriesAndLocale(int $seriesId, string $locale): array
     {
-        return $this
-            ->seriesQuery([$seriesId])
-            ->andWhere('m.locale = :locale')
-            ->setParameter('locale', $locale)
-            ->getQuery()
-            ->getResult();
+        return $this->seriesQuery([$seriesId])->andWhere('m.locale = :locale')->setParameter('locale', $locale)->getQuery()->getResult();
     }
 
     /**
@@ -55,12 +50,7 @@ class EventCanonicalRootRepository extends ServiceEntityRepository
      */
     public function findByEvent(int $eventId): array
     {
-        return $this
-            ->createQueryBuilder('m')
-            ->where('m.event = :eventId')
-            ->setParameter('eventId', $eventId)
-            ->getQuery()
-            ->getResult();
+        return $this->createQueryBuilder('m')->where('m.event = :eventId')->setParameter('eventId', $eventId)->getQuery()->getResult();
     }
 
     public function findOneByEventAndLocale(int $eventId, string $locale): ?EventCanonicalRoot
@@ -85,11 +75,7 @@ class EventCanonicalRootRepository extends ServiceEntityRepository
             return 0;
         }
 
-        $qb = $this
-            ->createQueryBuilder('m')
-            ->delete()
-            ->where('m.event IN (:eventIds)')
-            ->setParameter('eventIds', $eventIds);
+        $qb = $this->createQueryBuilder('m')->delete()->where('m.event IN (:eventIds)')->setParameter('eventIds', $eventIds);
 
         if ($locales !== null) {
             $qb->andWhere('m.locale IN (:locales)')->setParameter('locales', $locales);

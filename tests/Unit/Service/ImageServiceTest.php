@@ -22,6 +22,7 @@ use ImagickPixel;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -728,7 +729,7 @@ class ImageServiceTest extends TestCase
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('persist')->willReturnCallback(static function (object $entity) use (&$nextId): void {
             if ($entity instanceof Image && $entity->getId() === null) {
-                $ref = new \ReflectionClass($entity);
+                $ref = new ReflectionClass($entity);
                 $prop = $ref->getProperty('id');
                 $prop->setValue($entity, $nextId++);
             }
@@ -935,14 +936,16 @@ class ImageServiceTest extends TestCase
         $imageRepo->method('findAll')->willReturn([$this->storedImage(1, 'hash1', ImageType::SiteLogo)]);
 
         $filesystem = $this->createStub(ExtendedFilesystem::class);
-        $filesystem->method('scanDirectory')->willReturn([
-            '.',
-            '..',
-            'hash1_h120.webp',
-            'hash1_w350.webp',
-            'hash1_h999.webp',
-            'hash1_840x120.webp',
-        ]);
+        $filesystem
+            ->method('scanDirectory')
+            ->willReturn([
+                '.',
+                '..',
+                'hash1_h120.webp',
+                'hash1_w350.webp',
+                'hash1_h999.webp',
+                'hash1_840x120.webp',
+            ]);
 
         $subject = $this->createService(
             imageRepo: $imageRepo,

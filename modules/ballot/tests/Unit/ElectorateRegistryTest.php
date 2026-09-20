@@ -63,7 +63,10 @@ class ElectorateRegistryTest extends TestCase
     private function provider(string $purpose, bool $allows): ElectorateProviderInterface
     {
         return new class($purpose, $allows) implements ElectorateProviderInterface {
-            public function __construct(private readonly string $purpose, private readonly bool $allows) {}
+            public function __construct(
+                private readonly string $purpose,
+                private readonly bool $allows,
+            ) {}
 
             public function supports(string $purpose): bool
             {

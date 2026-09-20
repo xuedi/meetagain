@@ -4,10 +4,10 @@ namespace Plugin\Boardgames\Portability;
 
 use App\Entity\Image;
 use App\Enum\ImageType;
-use App\Portability\Item\ContributorInterface;
-use App\Portability\ImportContext;
-use App\Portability\Item\ImportResult;
 use App\Portability\ImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\Item\ContributorInterface;
+use App\Portability\Item\ImportResult;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,7 +40,15 @@ readonly class GameContributor implements ContributorInterface
     #[Override]
     public function allItemIds(): array
     {
-        return array_map(intval(...), $this->gameRepo->createQueryBuilder('g')->select('g.id')->orderBy('g.id')->getQuery()->getSingleColumnResult());
+        return array_map(
+            intval(...),
+            $this->gameRepo
+                ->createQueryBuilder('g')
+                ->select('g.id')
+                ->orderBy('g.id')
+                ->getQuery()
+                ->getSingleColumnResult(),
+        );
     }
 
     #[Override]
@@ -64,9 +72,7 @@ readonly class GameContributor implements ContributorInterface
                 'description' => $game->getDescription(),
                 'external_source' => $game->getExternalSource()->value,
                 'external_id' => $game->getExternalId(),
-                'box_image' => $game->getBoxImage() instanceof Image
-                    ? $images->addImage($game->getBoxImage())
-                    : null,
+                'box_image' => $game->getBoxImage() instanceof Image ? $images->addImage($game->getBoxImage()) : null,
             ];
         }
 
@@ -125,11 +131,7 @@ readonly class GameContributor implements ContributorInterface
             $this->imageLocationService->addLocation((int) $image->getId(), ImageType::PluginBoardgamesBox, (int) $game->getId());
         }
 
-        return new ImportResult(
-            refToItemId: array_map(static fn(Game $game): int => (int) $game->getId(), $refToItem),
-            created: $created,
-            matched: $matched,
-        );
+        return new ImportResult(refToItemId: array_map(static fn(Game $game): int => (int) $game->getId(), $refToItem), created: $created, matched: $matched);
     }
 
     /** @param array<string, mixed> $row */

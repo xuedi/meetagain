@@ -37,10 +37,7 @@ class EventCanonicalOverviewServiceTest extends TestCase
         self::assertSame('Tuesday Meetup', $lanes[0]->seriesName);
         self::assertSame('en', $lanes[0]->locale);
         self::assertSame([1, 2], array_map(static fn($stop) => $stop->eventId, $lanes[0]->stops));
-        self::assertSame(
-            ['locale', 'rootCount', 'seriesId', 'seriesName', 'stops'],
-            $this->sortedPropertyNames($lanes[0]),
-        );
+        self::assertSame(['locale', 'rootCount', 'seriesId', 'seriesName', 'stops'], $this->sortedPropertyNames($lanes[0]));
     }
 
     public function testIdenticalOccurrencesShareOneRootAndDoNotBranch(): void

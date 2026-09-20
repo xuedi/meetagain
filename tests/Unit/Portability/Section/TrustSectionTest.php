@@ -24,10 +24,28 @@ final class TrustSectionTest extends SectionTestCase
     {
         // Arrange
         $grants = $this->createMock(GrantTransferInterface::class);
-        $grants->expects($this->once())->method('exportGrants')->with(['book-group-7'])->willReturn([
-            new PortableGrant('book-group-7', 1, 2, TrustLevel::Trusted, new DateTimeImmutable('2026-01-05T10:00:00+01:00'), new DateTimeImmutable('2026-02-01T12:00:00+01:00')),
-            new PortableGrant('book-group-7', 3, 1, TrustLevel::Slight, new DateTimeImmutable('2026-01-06T10:00:00+01:00'), new DateTimeImmutable('2026-01-06T10:00:00+01:00')),
-        ]);
+        $grants
+            ->expects($this->once())
+            ->method('exportGrants')
+            ->with(['book-group-7'])
+            ->willReturn([
+                new PortableGrant(
+                    'book-group-7',
+                    1,
+                    2,
+                    TrustLevel::Trusted,
+                    new DateTimeImmutable('2026-01-05T10:00:00+01:00'),
+                    new DateTimeImmutable('2026-02-01T12:00:00+01:00'),
+                ),
+                new PortableGrant(
+                    'book-group-7',
+                    3,
+                    1,
+                    TrustLevel::Slight,
+                    new DateTimeImmutable('2026-01-06T10:00:00+01:00'),
+                    new DateTimeImmutable('2026-01-06T10:00:00+01:00'),
+                ),
+            ]);
         $scope = new Scope(
             users: [1 => 'admin', 2 => 'user', 3 => 'user'],
             grants: [1 => [DataCategory::Interactions], 2 => [DataCategory::Interactions], 3 => [DataCategory::Collections]],
@@ -38,14 +56,17 @@ final class TrustSectionTest extends SectionTestCase
         $rows = $this->section($grants)->export($scope, $this->images());
 
         // Assert
-        static::assertSame([[
-            'item_type' => 'book',
-            'from_email' => 'member-1@example.org',
-            'to_email' => 'member-2@example.org',
-            'level' => 'trusted',
-            'created_at' => '2026-01-05T10:00:00+01:00',
-            'updated_at' => '2026-02-01T12:00:00+01:00',
-        ]], $rows);
+        static::assertSame(
+            [[
+                'item_type' => 'book',
+                'from_email' => 'member-1@example.org',
+                'to_email' => 'member-2@example.org',
+                'level' => 'trusted',
+                'created_at' => '2026-01-05T10:00:00+01:00',
+                'updated_at' => '2026-02-01T12:00:00+01:00',
+            ]],
+            $rows,
+        );
     }
 
     public function testAScopeWithoutContextsExportsNothing(): void
@@ -79,14 +100,17 @@ final class TrustSectionTest extends SectionTestCase
         ]], $context);
 
         // Assert
-        static::assertEquals([new PortableGrant(
-            'book',
-            11,
-            12,
-            TrustLevel::Absolute,
-            new DateTimeImmutable('2026-01-05T10:00:00+01:00'),
-            new DateTimeImmutable('2026-02-01T12:00:00+01:00'),
-        )], $this->restored);
+        static::assertEquals(
+            [new PortableGrant(
+                'book',
+                11,
+                12,
+                TrustLevel::Absolute,
+                new DateTimeImmutable('2026-01-05T10:00:00+01:00'),
+                new DateTimeImmutable('2026-02-01T12:00:00+01:00'),
+            )],
+            $this->restored,
+        );
         static::assertSame(1, $context->toSummary()->get('trust', Outcome::Created));
     }
 
@@ -112,9 +136,7 @@ final class TrustSectionTest extends SectionTestCase
     private function section(GrantTransferInterface $grants): TrustSection
     {
         $userRepository = $this->createStub(UserRepository::class);
-        $userRepository->method('findBy')->willReturnCallback(
-            fn(array $criteria): array => array_map($this->member(...), $criteria['id']),
-        );
+        $userRepository->method('findBy')->willReturnCallback(fn(array $criteria): array => array_map($this->member(...), $criteria['id']));
 
         return new TrustSection($grants, $userRepository, new ContextResolver([new DefaultContextProvider()]));
     }
@@ -122,9 +144,11 @@ final class TrustSectionTest extends SectionTestCase
     private function recordingGrants(): GrantTransferInterface
     {
         $grants = $this->createStub(GrantTransferInterface::class);
-        $grants->method('restoreGrant')->willReturnCallback(function (PortableGrant $grant): void {
-            $this->restored[] = $grant;
-        });
+        $grants
+            ->method('restoreGrant')
+            ->willReturnCallback(function (PortableGrant $grant): void {
+                $this->restored[] = $grant;
+            });
 
         return $grants;
     }

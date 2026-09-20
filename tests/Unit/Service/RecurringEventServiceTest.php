@@ -55,8 +55,12 @@ class RecurringEventServiceTest extends TestCase
         return $event;
     }
 
-    private function createService(EventRepository $repo, EntityManagerInterface $em, ?EventSeriesRepository $seriesRepo = null, string $now = self::NOW): RecurringEventService
-    {
+    private function createService(
+        EventRepository $repo,
+        EntityManagerInterface $em,
+        ?EventSeriesRepository $seriesRepo = null,
+        string $now = self::NOW,
+    ): RecurringEventService {
         return new RecurringEventService(
             repo: $repo,
             seriesRepo: $seriesRepo ?? $this->createStub(EventSeriesRepository::class),
@@ -656,7 +660,6 @@ class RecurringEventServiceTest extends TestCase
         static::assertSame($attendee2, $result->removedAttendees[11]['user']);
     }
 
-
     public function testExecuteRealignmentClearsTheExternalRsvpCountOfAMovedChild(): void
     {
         // Arrange
@@ -689,7 +692,6 @@ class RecurringEventServiceTest extends TestCase
         // Assert
         static::assertSame(0, $movedChild->getExternalRsvp());
     }
-
 
     public function testPlanRealignmentReturnsUnmovedItemsWhenTheCustomSpecCannotBeParsed(): void
     {

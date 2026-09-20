@@ -56,9 +56,9 @@ final class ChangeProposalController extends AbstractController
 
         return $this->render('review/proposals.html.twig', [
             'ballotTerms' => $canReview ? $this->createForm(BallotTermsType::class, null, [
-                'mode' => FieldBallotService::DEFAULT_MODE,
-                'notice' => $this->translator->trans('review.ballot_terms_notice'),
-            ])->createView() : null,
+                    'mode' => FieldBallotService::DEFAULT_MODE,
+                    'notice' => $this->translator->trans('review.ballot_terms_notice'),
+                ])->createView() : null,
             'targetLabel' => $targetLabel,
             'targetUrl' => $this->service->targetUrl($targetType, $targetId),
             'targetType' => $targetType,
@@ -83,7 +83,12 @@ final class ChangeProposalController extends AbstractController
         return $this->redirectToProposalsOf($targetType, $targetId);
     }
 
-    #[Route('/proposals/{targetType}/{targetId}/confirm/{ballotId}', name: 'app_review_field_ballot_confirm', requirements: ['targetId' => '\d+', 'ballotId' => '\d+'], methods: ['POST'])]
+    #[Route(
+        '/proposals/{targetType}/{targetId}/confirm/{ballotId}',
+        name: 'app_review_field_ballot_confirm',
+        requirements: ['targetId' => '\d+', 'ballotId' => '\d+'],
+        methods: ['POST'],
+    )]
     public function confirmBallot(Request $request, string $targetType, int $targetId, int $ballotId, #[CurrentUser] User $user): Response
     {
         $this->assertMayReview($request, $targetType, $targetId, $user);
@@ -96,38 +101,6 @@ final class ChangeProposalController extends AbstractController
         }
 
         return $this->redirectToProposalsOf($targetType, $targetId);
-    }
-
-    private function assertMayReview(Request $request, string $targetType, int $targetId, User $user): void
-    {
-        if (!$this->isCsrfTokenValid('field_ballot' . $targetType . $targetId, $request->request->getString('_token'))) {
-            throw $this->createAccessDeniedException('Invalid CSRF token.');
-        }
-
-        if (!$this->service->canReviewTarget($targetType, $targetId, $user)) {
-            throw $this->createAccessDeniedException();
-        }
-    }
-
-    /**
-     * @param  list<array<string, mixed>>            $rows
-     * @param  array<string, BallotView>             $ballots
-     * @return list<array<string, mixed>>
-     */
-    private function withBallots(array $rows, array $ballots): array
-    {
-        foreach ($rows as $index => $row) {
-            $ballot = $ballots[$row['field']] ?? null;
-            $rows[$index]['ballot'] = $ballot;
-            $rows[$index]['ballotState'] = $ballot === null ? null : $this->fieldBallots->stateOf($ballot);
-        }
-
-        return $rows;
-    }
-
-    private function redirectToProposalsOf(string $targetType, int $targetId): Response
-    {
-        return $this->redirectToRoute('app_review_proposals', ['targetType' => $targetType, 'targetId' => $targetId]);
     }
 
     #[Route('/proposal/{id}/apply/{field}', name: 'app_review_proposal_apply', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -178,6 +151,38 @@ final class ChangeProposalController extends AbstractController
         }
 
         return $this->redirectToProposals($proposal);
+    }
+
+    private function assertMayReview(Request $request, string $targetType, int $targetId, User $user): void
+    {
+        if (!$this->isCsrfTokenValid('field_ballot' . $targetType . $targetId, $request->request->getString('_token'))) {
+            throw $this->createAccessDeniedException('Invalid CSRF token.');
+        }
+
+        if (!$this->service->canReviewTarget($targetType, $targetId, $user)) {
+            throw $this->createAccessDeniedException();
+        }
+    }
+
+    /**
+     * @param  list<array<string, mixed>>            $rows
+     * @param  array<string, BallotView>             $ballots
+     * @return list<array<string, mixed>>
+     */
+    private function withBallots(array $rows, array $ballots): array
+    {
+        foreach ($rows as $index => $row) {
+            $ballot = $ballots[$row['field']] ?? null;
+            $rows[$index]['ballot'] = $ballot;
+            $rows[$index]['ballotState'] = $ballot === null ? null : $this->fieldBallots->stateOf($ballot);
+        }
+
+        return $rows;
+    }
+
+    private function redirectToProposalsOf(string $targetType, int $targetId): Response
+    {
+        return $this->redirectToRoute('app_review_proposals', ['targetType' => $targetType, 'targetId' => $targetId]);
     }
 
     private function pendingProposal(Request $request, int $id): ChangeProposal

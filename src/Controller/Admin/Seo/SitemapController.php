@@ -61,11 +61,7 @@ final class SitemapController extends AbstractSeoController implements AdminNavi
             new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($allRows), $this->translator->trans('admin_seo_sitemap.summary_urls'))),
         ];
         if ($localeFilter !== '' || $sectionFilter !== '' || $warningsOnly) {
-            $info[] = new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                count($rows),
-                $this->translator->trans('admin_seo_sitemap.summary_shown'),
-            ));
+            $info[] = new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($rows), $this->translator->trans('admin_seo_sitemap.summary_shown')));
         }
         $warningsTotal = $this->overviewService->countWarnings($allRows);
         if ($warningsTotal > 0) {

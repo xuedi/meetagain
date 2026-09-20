@@ -58,6 +58,19 @@ class SupportRequestRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** @return SupportRequest[] */
+    public function findExpiredEmailVerifications(DateTimeImmutable $now): array
+    {
+        return $this
+            ->createQueryBuilder('sr')
+            ->where('sr.emailVerifyToken IS NOT NULL')
+            ->andWhere('sr.emailVerifyExpiresAt IS NOT NULL')
+            ->andWhere('sr.emailVerifyExpiresAt < :now')
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getResult();
+    }
+
     /** @param array<int>|null $onlyIds null = unrestricted */
     private function scoped(?SupportAudience $audience, ?array $onlyIds): QueryBuilder
     {
@@ -72,18 +85,5 @@ class SupportRequestRepository extends ServiceEntityRepository
         }
 
         return $qb;
-    }
-
-    /** @return SupportRequest[] */
-    public function findExpiredEmailVerifications(DateTimeImmutable $now): array
-    {
-        return $this
-            ->createQueryBuilder('sr')
-            ->where('sr.emailVerifyToken IS NOT NULL')
-            ->andWhere('sr.emailVerifyExpiresAt IS NOT NULL')
-            ->andWhere('sr.emailVerifyExpiresAt < :now')
-            ->setParameter('now', $now)
-            ->getQuery()
-            ->getResult();
     }
 }

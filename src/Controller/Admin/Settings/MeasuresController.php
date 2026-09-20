@@ -153,11 +153,7 @@ final class MeasuresController extends AbstractSettingsController implements Adm
     private function buildTop(string $range, int $totalBlocks, int $rangeBlocks): AdminTop
     {
         $info = [
-            new AdminTopInfoHtml(sprintf(
-                '<strong>%d</strong>&nbsp;%s',
-                $totalBlocks,
-                $this->translator->trans('admin_system_security.summary_total_blocks'),
-            )),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalBlocks, $this->translator->trans('admin_system_security.summary_total_blocks'))),
         ];
 
         if ($rangeBlocks === 0) {
@@ -209,11 +205,7 @@ final class MeasuresController extends AbstractSettingsController implements Adm
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf(
-                '%s %s',
-                $this->translator->trans('admin_logs.range_label'),
-                $this->translator->trans('admin_logs.range_' . $current),
-            ),
+            label: sprintf('%s %s', $this->translator->trans('admin_logs.range_label'), $this->translator->trans('admin_logs.range_' . $current)),
             options: $options,
             icon: 'clock',
         );
@@ -221,7 +213,10 @@ final class MeasuresController extends AbstractSettingsController implements Adm
 
     private function buildChartTile(): MultiSeriesChartTile
     {
-        $firstDay = $this->clock->now()->setTime(0, 0)->modify(sprintf('-%d days', self::CHART_DAYS - 1));
+        $firstDay = $this->clock
+            ->now()
+            ->setTime(0, 0)
+            ->modify(sprintf('-%d days', self::CHART_DAYS - 1));
         $series = $this->measureLogRepo->dailyBlockSeries($firstDay);
 
         $labels = [];
@@ -236,19 +231,10 @@ final class MeasuresController extends AbstractSettingsController implements Adm
                 $data[] = $series[$measure->value][$label] ?? 0;
             }
 
-            $datasets[] = new TileDataset(
-                label: $this->translator->trans($measure->labelKey()),
-                data: $data,
-                borderColor: $measure->color(),
-            );
+            $datasets[] = new TileDataset(label: $this->translator->trans($measure->labelKey()), data: $data, borderColor: $measure->color());
         }
 
-        return new MultiSeriesChartTile(
-            title: 'admin_system_security.chart_title',
-            canvasId: 'securityMeasureChart',
-            labels: $labels,
-            datasets: $datasets,
-        );
+        return new MultiSeriesChartTile(title: 'admin_system_security.chart_title', canvasId: 'securityMeasureChart', labels: $labels, datasets: $datasets);
     }
 
     private function buildElsewhereTile(?DateTimeImmutable $sinceDay, int $totalBlocks): ListTile
@@ -257,27 +243,24 @@ final class MeasuresController extends AbstractSettingsController implements Adm
         $rateLimits = $sinceDay === null ? $this->rateLimitLogRepo->countAll() : $this->rateLimitLogRepo->countSince($sinceDay);
         $blocked = count($this->blockedSessionStore->listBlockedSessions()) + count($this->blockedSessionStore->listBlockedIps());
 
-        return new ListTile(
-            title: 'admin_system_security.heading_elsewhere',
-            items: [
-                new TileListItem(
-                    label: sprintf('%d %s', $incidents, $this->translator->trans('admin_system_security.elsewhere_incidents')),
-                    link: $this->generateUrl('app_admin_security_incidents'),
-                ),
-                new TileListItem(
-                    label: sprintf('%d %s', $blocked, $this->translator->trans('admin_system_security.elsewhere_blocked')),
-                    link: $this->generateUrl('app_admin_security_blocked'),
-                ),
-                new TileListItem(
-                    label: sprintf('%d %s', $rateLimits, $this->translator->trans('admin_system_security.elsewhere_rate_limits')),
-                    link: $this->generateUrl('app_admin_security_rate_limiting'),
-                ),
-                new TileListItem(
-                    label: sprintf('%d %s', $totalBlocks, $this->translator->trans('admin_system_security.elsewhere_measure_blocks')),
-                    link: $this->generateUrl('app_admin_security_measures'),
-                ),
-            ],
-        );
+        return new ListTile(title: 'admin_system_security.heading_elsewhere', items: [
+            new TileListItem(
+                label: sprintf('%d %s', $incidents, $this->translator->trans('admin_system_security.elsewhere_incidents')),
+                link: $this->generateUrl('app_admin_security_incidents'),
+            ),
+            new TileListItem(
+                label: sprintf('%d %s', $blocked, $this->translator->trans('admin_system_security.elsewhere_blocked')),
+                link: $this->generateUrl('app_admin_security_blocked'),
+            ),
+            new TileListItem(
+                label: sprintf('%d %s', $rateLimits, $this->translator->trans('admin_system_security.elsewhere_rate_limits')),
+                link: $this->generateUrl('app_admin_security_rate_limiting'),
+            ),
+            new TileListItem(
+                label: sprintf('%d %s', $totalBlocks, $this->translator->trans('admin_system_security.elsewhere_measure_blocks')),
+                link: $this->generateUrl('app_admin_security_measures'),
+            ),
+        ]);
     }
 
     private function resolveSinceDay(string $range): ?DateTimeImmutable

@@ -18,9 +18,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -115,8 +115,9 @@ final class HumanCheckTypeTest extends TestCase
         $captchaService->expects(static::never())->method('reset');
         $captchaService->method('generate')->willReturn(self::CAPTCHA_IMAGE);
 
-        $form = $this->factory([SecurityMeasure::ImageCaptcha], captchaService: $captchaService)
-            ->create(HumanCheckType::class, null, ['context' => self::CONTEXT]);
+        $form = $this->factory([SecurityMeasure::ImageCaptcha], captchaService: $captchaService)->create(HumanCheckType::class, null, [
+            'context' => self::CONTEXT,
+        ]);
 
         // Act
         $form->createView();
@@ -366,16 +367,10 @@ final class HumanCheckTypeTest extends TestCase
     /**
      * @param list<SecurityMeasure> $enabled
      */
-    private function factory(
-        array $enabled = [],
-        bool $captchaValid = true,
-        int $difficulty = 18,
-        ?CaptchaService $captchaService = null,
-    ): FormFactoryInterface {
+    private function factory(array $enabled = [], bool $captchaValid = true, int $difficulty = 18, ?CaptchaService $captchaService = null): FormFactoryInterface
+    {
         $measureSettings = $this->createStub(MeasureSettings::class);
-        $measureSettings
-            ->method('isEnabled')
-            ->willReturnCallback(static fn(SecurityMeasure $measure): bool => in_array($measure, $enabled, true));
+        $measureSettings->method('isEnabled')->willReturnCallback(static fn(SecurityMeasure $measure): bool => in_array($measure, $enabled, true));
         $measureSettings->method('proofOfWorkDifficulty')->willReturn($difficulty);
 
         if ($captchaService === null) {
@@ -386,12 +381,16 @@ final class HumanCheckTypeTest extends TestCase
         }
 
         $measureLogger = $this->createStub(MeasureLogger::class);
-        $measureLogger->method('recordPass')->willReturnCallback(function (SecurityMeasure $measure): void {
-            $this->passes[] = $measure;
-        });
-        $measureLogger->method('recordBlock')->willReturnCallback(function (SecurityMeasure $measure, ?string $context, $request, ?array $detail): void {
-            $this->blocks[] = [$measure, (string) ($detail['reason'] ?? '')];
-        });
+        $measureLogger
+            ->method('recordPass')
+            ->willReturnCallback(function (SecurityMeasure $measure): void {
+                $this->passes[] = $measure;
+            });
+        $measureLogger
+            ->method('recordBlock')
+            ->willReturnCallback(function (SecurityMeasure $measure, ?string $context, $request, ?array $detail): void {
+                $this->blocks[] = [$measure, (string) ($detail['reason'] ?? '')];
+            });
 
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
@@ -400,24 +399,15 @@ final class HumanCheckTypeTest extends TestCase
         $requestStack->push($this->request);
 
         $securityService = $this->createStub(SecurityService::class);
-        $securityService->method('event')->willReturnCallback(function (SecurityEventType $type, Request $request, array $context): void {
-            $this->events[] = [$type, $context];
-        });
+        $securityService
+            ->method('event')
+            ->willReturnCallback(function (SecurityEventType $type, Request $request, array $context): void {
+                $this->events[] = [$type, $context];
+            });
 
-        $type = new HumanCheckType(
-            $measureSettings,
-            $captchaService,
-            $this->signer,
-            $measureLogger,
-            $requestStack,
-            $translator,
-            $securityService,
-        );
+        $type = new HumanCheckType($measureSettings, $captchaService, $this->signer, $measureLogger, $requestStack, $translator, $securityService);
 
-        return Forms::createFormFactoryBuilder()
-            ->addExtension(new ValidatorExtension(Validation::createValidator()))
-            ->addType($type)
-            ->getFormFactory();
+        return Forms::createFormFactoryBuilder()->addExtension(new ValidatorExtension(Validation::createValidator()))->addType($type)->getFormFactory();
     }
 
     private function solve(string $nonce, int $difficulty): string

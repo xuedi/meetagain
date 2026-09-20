@@ -162,14 +162,14 @@ class CalendarFeedServiceTest extends TestCase
         $repository->method('findForCalendarFeed')->willReturn($events);
 
         $filter = $this->createStub(EventFilterService::class);
-        $filter->method('getAccessibleEventIds')->willReturnCallback(
-            static fn(array $ids): array => $accessibleIds === null ? $ids : array_values(array_intersect($ids, $accessibleIds)),
-        );
+        $filter->method('getAccessibleEventIds')->willReturnCallback(static fn(array $ids): array => $accessibleIds === null
+            ? $ids
+            : array_values(array_intersect($ids, $accessibleIds)));
 
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
-        $urlGenerator->method('generate')->willReturnCallback(
-            static fn(string $route, array $parameters): string => sprintf('https://example.org/en/event/%d', $parameters['id']),
-        );
+        $urlGenerator
+            ->method('generate')
+            ->willReturnCallback(static fn(string $route, array $parameters): string => sprintf('https://example.org/en/event/%d', $parameters['id']));
 
         $config = $this->createStub(ConfigService::class);
         $config->method('getHost')->willReturn('https://example.org');

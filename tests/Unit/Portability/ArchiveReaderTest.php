@@ -47,17 +47,20 @@ final class ArchiveReaderTest extends TestCase
         $description = $this->reader(activePlugins: ['books'])->describe($zipPath);
 
         // Assert
-        static::assertSame([
-            'format' => Exporter::FORMAT,
-            'version' => '2.0',
-            'exported_at' => '2026-01-05T00:00:00+01:00',
-            'slug' => 'weiqi-club',
-            'name' => 'Weiqi Club',
-            'description' => 'Go in Berlin',
-            'plugins' => ['books', 'films'],
-            'missing_plugins' => ['films'],
-            'counts' => ['users' => 2, 'book' => 3],
-        ], $description);
+        static::assertSame(
+            [
+                'format' => Exporter::FORMAT,
+                'version' => '2.0',
+                'exported_at' => '2026-01-05T00:00:00+01:00',
+                'slug' => 'weiqi-club',
+                'name' => 'Weiqi Club',
+                'description' => 'Go in Berlin',
+                'plugins' => ['books', 'films'],
+                'missing_plugins' => ['films'],
+                'counts' => ['users' => 2, 'book' => 3],
+            ],
+            $description,
+        );
     }
 
     public function testASectionOfListsCountsEachListAsItsOwnKind(): void
@@ -78,7 +81,10 @@ final class ArchiveReaderTest extends TestCase
     public function testAnUnpackedArchiveReadsLikeItsZip(): void
     {
         // Arrange
-        file_put_contents($this->directory . '/export.json', json_encode(['format' => Exporter::FORMAT, 'site' => ['name' => 'Vanilla Group']], JSON_THROW_ON_ERROR));
+        file_put_contents($this->directory . '/export.json', json_encode([
+            'format' => Exporter::FORMAT,
+            'site' => ['name' => 'Vanilla Group'],
+        ], JSON_THROW_ON_ERROR));
 
         // Act
         $description = $this->reader()->describe($this->directory);

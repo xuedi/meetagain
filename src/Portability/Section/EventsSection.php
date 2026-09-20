@@ -132,9 +132,7 @@ readonly class EventsSection implements SectionInterface
 
             $creatorEmail = (string) ($row['creator_email'] ?? '');
             $event->setUser(
-                $context->resolveRef(User::class, $creatorEmail)
-                ?? $this->userRepository->findOneBy(['email' => $creatorEmail])
-                ?? $context->getSystemUser(),
+                $context->resolveRef(User::class, $creatorEmail) ?? $this->userRepository->findOneBy(['email' => $creatorEmail]) ?? $context->getSystemUser(),
             );
 
             $this->addTranslations($event, $row);
@@ -184,9 +182,11 @@ readonly class EventsSection implements SectionInterface
      */
     private function resolveLocation(array $row, ImportContext $context): Location
     {
-        return $context->resolveRef(Location::class, $row['location_ref'] ?? null)
-            ?? $this->locationRepository->findOneBy([])
-            ?? $this->createFallbackLocation($context->getSystemUser());
+        return (
+            $context->resolveRef(Location::class, $row['location_ref'] ?? null) ?? $this->locationRepository->findOneBy([]) ?? $this->createFallbackLocation(
+                $context->getSystemUser(),
+            )
+        );
     }
 
     /**
