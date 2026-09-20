@@ -6,8 +6,6 @@ use App\EventSubscriber\LocaleSubscriber;
 use App\Service\Config\LanguageService;
 use App\Service\Config\LocaleCookieService;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
-use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -33,15 +31,6 @@ class LocaleSubscriberTest extends TestCase
         $cookieService->method('getValidLocale')->willReturn($validLocale);
 
         return $cookieService;
-    }
-
-    private function createFirewallMapStub(bool $stateless = false): FirewallMap
-    {
-        $config = new FirewallConfig(name: 'test', userChecker: 'user_checker', stateless: $stateless);
-        $firewallMap = $this->createStub(FirewallMap::class);
-        $firewallMap->method('getFirewallConfig')->willReturn($config);
-
-        return $firewallMap;
     }
 
     /**
@@ -73,7 +62,7 @@ class LocaleSubscriberTest extends TestCase
 
     public function testOnKernelRequestSavesLocaleToSessionWhenAttributePresent(): void
     {
-        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub(), $this->createFirewallMapStub());
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub());
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->expects($this->once())->method('set')->with('_locale', 'de');
@@ -86,7 +75,7 @@ class LocaleSubscriberTest extends TestCase
 
     public function testOnKernelRequestSkipsSessionWriteWhenAttributePresentButNoSession(): void
     {
-        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub(), $this->createFirewallMapStub());
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub());
 
         $request = new Request();
         $request->attributes->set('_locale', 'de');
@@ -96,10 +85,10 @@ class LocaleSubscriberTest extends TestCase
         static::assertTrue(true);
     }
 
-    public function testOnKernelRequestNeverTouchesSessionOnStatelessFirewall(): void
+    public function testOnKernelRequestNeverTouchesSessionOnStatelessRoute(): void
     {
         // Arrange
-        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('de'), $this->createFirewallMapStub(true));
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('de'));
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->method('getName')->willReturn('PHPSESSID');
@@ -109,6 +98,7 @@ class LocaleSubscriberTest extends TestCase
 
         $request = new Request([], [], [], ['PHPSESSID' => 'test-session-id']);
         $request->setSession($sessionMock);
+        $request->attributes->set('_stateless', true);
 
         // Act
         $subscriber->onKernelRequest($this->createRequestEvent($request));
@@ -117,10 +107,10 @@ class LocaleSubscriberTest extends TestCase
         static::assertSame('de', $request->getLocale());
     }
 
-    public function testOnKernelRequestSkipsSessionWriteOnStatelessFirewallWhenAttributePresent(): void
+    public function testOnKernelRequestSkipsSessionWriteOnStatelessRouteWhenAttributePresent(): void
     {
         // Arrange
-        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub(), $this->createFirewallMapStub(true));
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub());
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->method('getName')->willReturn('PHPSESSID');
@@ -129,6 +119,7 @@ class LocaleSubscriberTest extends TestCase
         $request = new Request([], [], [], ['PHPSESSID' => 'test-session-id']);
         $request->setSession($sessionMock);
         $request->attributes->set('_locale', 'de');
+        $request->attributes->set('_stateless', true);
 
         // Act
         $subscriber->onKernelRequest($this->createRequestEvent($request));
@@ -139,7 +130,7 @@ class LocaleSubscriberTest extends TestCase
 
     public function testOnKernelRequestRestoresLocaleFromSessionWhenNoAttribute(): void
     {
-        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('de'), $this->createFirewallMapStub());
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('de'));
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('has')->willReturn(true);
@@ -154,7 +145,7 @@ class LocaleSubscriberTest extends TestCase
 
     public function testOnKernelRequestUsesCookieLocaleWhenSessionEmpty(): void
     {
-        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('de'), $this->createFirewallMapStub());
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('de'));
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('has')->willReturn(false);
@@ -168,7 +159,7 @@ class LocaleSubscriberTest extends TestCase
 
     public function testOnKernelRequestUsesCookieLocaleWithoutSession(): void
     {
-        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('zh'), $this->createFirewallMapStub());
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $this->createCookieServiceStub('zh'));
 
         $request = new Request();
 
@@ -180,7 +171,7 @@ class LocaleSubscriberTest extends TestCase
     public function testOnKernelRequestUsesAcceptLanguageHintWhenSessionAndCookieEmpty(): void
     {
         $languageService = $this->createLanguageServiceStub('en', ['en', 'de', 'zh']);
-        $subscriber = new LocaleSubscriber($languageService, $this->createCookieServiceStub(), $this->createFirewallMapStub());
+        $subscriber = new LocaleSubscriber($languageService, $this->createCookieServiceStub());
 
         $sessionMock = $this->createMock(SessionInterface::class);
         $sessionMock->method('getName')->willReturn('PHPSESSID');
@@ -199,7 +190,7 @@ class LocaleSubscriberTest extends TestCase
     public function testOnKernelRequestFallsBackToFilteredDefaultWhenAcceptLanguageHasNoMatch(): void
     {
         $languageService = $this->createLanguageServiceStub('en', ['en', 'de', 'zh']);
-        $subscriber = new LocaleSubscriber($languageService, $this->createCookieServiceStub(), $this->createFirewallMapStub());
+        $subscriber = new LocaleSubscriber($languageService, $this->createCookieServiceStub());
 
         $sessionStub = $this->createStub(SessionInterface::class);
         $sessionStub->method('has')->willReturn(false);
@@ -219,7 +210,7 @@ class LocaleSubscriberTest extends TestCase
         $cookieService = $this->createMock(LocaleCookieService::class);
         $cookieService->expects($this->once())->method('attachIfConsentGranted');
 
-        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $cookieService, $this->createFirewallMapStub());
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $cookieService);
 
         $request = new Request();
         $request->attributes->set('_locale', 'de');
@@ -233,7 +224,7 @@ class LocaleSubscriberTest extends TestCase
         $cookieService = $this->createMock(LocaleCookieService::class);
         $cookieService->expects($this->never())->method('attachIfConsentGranted');
 
-        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $cookieService, $this->createFirewallMapStub());
+        $subscriber = new LocaleSubscriber($this->createLanguageServiceStub(), $cookieService);
 
         $event = new ResponseEvent($this->createStub(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, new Response());
 

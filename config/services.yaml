@@ -58,9 +58,6 @@ services:
     Doctrine\Migrations\DependencyFactory:
         alias: 'doctrine.migrations.dependency_factory'
 
-    Symfony\Bundle\SecurityBundle\Security\FirewallMap:
-        alias: 'security.firewall.map'
-
     Redis:
         class: Redis
         factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
