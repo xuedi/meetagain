@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PluginDishesMigrations;
 
@@ -70,11 +68,19 @@ final class Version20260713150000 extends AbstractMigration
         ) DEFAULT CHARACTER SET utf8mb4');
 
         $this->addSql('ALTER TABLE plg_dishes_dish ADD CONSTRAINT FK_175547B9FAE957CD FOREIGN KEY (preview_image_id) REFERENCES image (id) ON DELETE SET NULL');
-        $this->addSql('ALTER TABLE plg_dishes_dish ADD CONSTRAINT FK_175547B9732B7AF4 FOREIGN KEY (pronunciation_system_id) REFERENCES pronunciation_system (id)');
-        $this->addSql('ALTER TABLE plg_dishes_dish_translation ADD CONSTRAINT FK_6B7CFA3C148EB0CB FOREIGN KEY (dish_id) REFERENCES plg_dishes_dish (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE plg_dishes_dish_image ADD CONSTRAINT FK_7DA96442148EB0CB FOREIGN KEY (dish_id) REFERENCES plg_dishes_dish (id) ON DELETE CASCADE');
+        $this->addSql(
+            'ALTER TABLE plg_dishes_dish ADD CONSTRAINT FK_175547B9732B7AF4 FOREIGN KEY (pronunciation_system_id) REFERENCES pronunciation_system (id)',
+        );
+        $this->addSql(
+            'ALTER TABLE plg_dishes_dish_translation ADD CONSTRAINT FK_6B7CFA3C148EB0CB FOREIGN KEY (dish_id) REFERENCES plg_dishes_dish (id) ON DELETE CASCADE',
+        );
+        $this->addSql(
+            'ALTER TABLE plg_dishes_dish_image ADD CONSTRAINT FK_7DA96442148EB0CB FOREIGN KEY (dish_id) REFERENCES plg_dishes_dish (id) ON DELETE CASCADE',
+        );
         $this->addSql('ALTER TABLE plg_dishes_dish_image ADD CONSTRAINT FK_7DA964423DA5256D FOREIGN KEY (image_id) REFERENCES image (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE plg_dishes_dish_like ADD CONSTRAINT FK_85A65284148EB0CB FOREIGN KEY (dish_id) REFERENCES plg_dishes_dish (id) ON DELETE CASCADE');
+        $this->addSql(
+            'ALTER TABLE plg_dishes_dish_like ADD CONSTRAINT FK_85A65284148EB0CB FOREIGN KEY (dish_id) REFERENCES plg_dishes_dish (id) ON DELETE CASCADE',
+        );
     }
 
     public function down(Schema $schema): void

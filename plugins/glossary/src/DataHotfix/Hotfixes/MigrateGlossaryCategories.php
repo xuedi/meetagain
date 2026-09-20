@@ -42,10 +42,10 @@ readonly class MigrateGlossaryCategories implements DataHotfixInterface
         $rows = $connection->fetchAllAssociative(sprintf('SELECT id, category FROM %s WHERE category IS NOT NULL', self::GLOSSARY_TABLE));
         foreach ($rows as $row) {
             $itemId = (int) $row['id'];
-            $alreadyAssigned = $connection->fetchOne(
-                'SELECT id FROM item_category_assignment WHERE item_type = ? AND item_id = ?',
-                [GlossaryTaggableTypeProvider::ITEM_TYPE, $itemId],
-            );
+            $alreadyAssigned = $connection->fetchOne('SELECT id FROM item_category_assignment WHERE item_type = ? AND item_id = ?', [
+                GlossaryTaggableTypeProvider::ITEM_TYPE,
+                $itemId,
+            ]);
             if ($alreadyAssigned !== false) {
                 continue;
             }
@@ -80,10 +80,10 @@ readonly class MigrateGlossaryCategories implements DataHotfixInterface
 
     private function legacyColumnExists(Connection $connection): bool
     {
-        $count = $connection->fetchOne(
-            'SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?',
-            [self::GLOSSARY_TABLE, 'category'],
-        );
+        $count = $connection->fetchOne('SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?', [
+            self::GLOSSARY_TABLE,
+            'category',
+        ]);
 
         return (int) $count > 0;
     }

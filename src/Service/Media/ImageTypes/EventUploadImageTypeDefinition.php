@@ -12,11 +12,6 @@ final class EventUploadImageTypeDefinition extends AbstractImageTypeDefinition
         return ImageType::EventUpload;
     }
 
-    protected function sizes(): array
-    {
-        return [[1024, 768], [350, 263], [210, 140]];
-    }
-
     public function getEditLink(int $locationId): ?array
     {
         return ['route' => 'app_admin_event_edit', 'params' => ['id' => $locationId]];
@@ -44,5 +39,10 @@ final class EventUploadImageTypeDefinition extends AbstractImageTypeDefinition
             'route' => 'app_admin_event_edit',
             'params' => ['id' => $event->getId()],
         ];
+    }
+
+    protected function sizes(): array
+    {
+        return [[1024, 768], [350, 263], [210, 140]];
     }
 }

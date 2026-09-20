@@ -36,7 +36,9 @@ class GlossaryChangeTargetTest extends TestCase
     {
         $entry = new Glossary();
         $single = new Glossary()->setDefinition('en', 'Hello');
-        $double = new Glossary()->setDefinition('en', 'Hello')->setDefinition('de', 'Hallo');
+        $double = new Glossary()
+            ->setDefinition('en', 'Hello')
+            ->setDefinition('de', 'Hallo');
 
         yield 'missing entry fails every field' => [null, GlossaryChangeTarget::FIELD_PHRASE, 'x', 'glossary.validation_entry_missing'];
         yield 'blank phrase is rejected' => [$entry, GlossaryChangeTarget::FIELD_PHRASE, '  ', 'glossary.validation_phrase_blank'];
@@ -106,9 +108,7 @@ class GlossaryChangeTargetTest extends TestCase
     {
         // Arrange
         $service = $this->createMock(GlossaryService::class);
-        $service->expects(self::once())
-            ->method('applyChange')
-            ->with(1, GlossaryChangeTarget::FIELD_PHRASE, 'new');
+        $service->expects(self::once())->method('applyChange')->with(1, GlossaryChangeTarget::FIELD_PHRASE, 'new');
         $target = $this->makeTarget(service: $service);
 
         // Act
@@ -124,15 +124,17 @@ class GlossaryChangeTargetTest extends TestCase
         if ($service === null) {
             $service = $this->createStub(GlossaryService::class);
             $service->method('get')->willReturn($entry);
-            $service->method('definitionLanguageOf')->willReturnCallback(
-                static fn(string $field): ?string => preg_match('/^definition_([a-z]{2})$/', $field, $match) === 1 ? $match[1] : null,
-            );
+            $service->method('definitionLanguageOf')->willReturnCallback(static fn(string $field): ?string => preg_match(
+                '/^definition_([a-z]{2})$/',
+                $field,
+                $match,
+            ) === 1
+                    ? $match[1]
+                    : null);
         }
-        $service->method('decodeTagIds')->willReturnCallback(
-            static fn(?string $value): array => $value === null || $value === ''
-                ? []
-                : array_map(intval(...), explode(',', $value)),
-        );
+        $service->method('decodeTagIds')->willReturnCallback(static fn(?string $value): array => (
+            $value === null || $value === '' ? [] : array_map(intval(...), explode(',', $value))
+        ));
 
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getConfig')->willReturn(Config::fromArray(['primaryLabel' => 'Term']));

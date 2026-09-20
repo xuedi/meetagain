@@ -52,6 +52,7 @@ final class RedisCacheController extends AbstractSettingsController implements A
         $info = [
             new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalKeys, $this->translator->trans('admin_system_cache.summary_total'))),
         ];
+        // @mago-expect analyzer:impossible-condition, analyzer:redundant-comparison
         if ($prefix !== null) {
             $info[] = new AdminTopInfoHtml(sprintf(
                 '<strong>%d</strong>&nbsp;%s',

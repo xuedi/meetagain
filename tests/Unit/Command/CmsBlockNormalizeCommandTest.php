@@ -150,11 +150,11 @@ class CmsBlockNormalizeCommandTest extends TestCase
         });
 
         $dispatcher = $this->createStub(EntityActionDispatcher::class);
-        $dispatcher->method('dispatch')->willReturnCallback(
-            static function ($action, int $entityId) use (&$dispatched): void {
+        $dispatcher
+            ->method('dispatch')
+            ->willReturnCallback(static function ($action, int $entityId) use (&$dispatched): void {
                 $dispatched[] = $entityId;
-            },
-        );
+            });
 
         return new CmsBlockNormalizeCommand($repository, new RichTextNormalizer(), $em, $dispatcher);
     }

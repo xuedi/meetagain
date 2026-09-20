@@ -31,12 +31,10 @@ final class MemberSectionTest extends SectionTestCase
     {
         // Arrange
         $member = $this->member(3, 'learner@example.org');
-        $exported = $this->section(
-            cards: [$this->card(3, 8)],
-            days: [$this->day(3)],
-            proposals: [$this->proposal($member, 8, [new FieldChange('tag', '3,5', '5'), new FieldChange('phrase', 'ni hao', 'nǐ hǎo', FieldResolution::Denied)])],
-            users: [$member],
-        )->export($this->scope(), $this->images());
+        $exported = $this->section(cards: [$this->card(3, 8)], days: [$this->day(3)], proposals: [$this->proposal($member, 8, [
+            new FieldChange('tag', '3,5', '5'),
+            new FieldChange('phrase', 'ni hao', 'nǐ hǎo', FieldResolution::Denied),
+        ])], users: [$member])->export($this->scope(), $this->images());
 
         $context = $this->importContext();
 
@@ -86,12 +84,11 @@ final class MemberSectionTest extends SectionTestCase
     {
         // Arrange
         $member = $this->member(3, 'learner@example.org');
-        $section = $this->section(
-            cards: [$this->card(3, 8)],
-            days: [$this->day(3)],
-            proposals: [$this->proposal($member, 8, [new FieldChange('phrase', 'a', 'b')])],
-            users: [$member],
-        );
+        $section = $this->section(cards: [$this->card(3, 8)], days: [$this->day(3)], proposals: [$this->proposal($member, 8, [new FieldChange(
+            'phrase',
+            'a',
+            'b',
+        )])], users: [$member]);
         $scope = new Scope(users: [3 => 'user'], itemIds: ['glossary' => [8]], grants: [3 => [DataCategory::Attendance]]);
 
         // Act
@@ -105,12 +102,11 @@ final class MemberSectionTest extends SectionTestCase
     {
         // Arrange
         $member = $this->member(3, 'learner@example.org');
-        $section = $this->section(
-            cards: [$this->card(3, 8)],
-            days: [$this->day(3)],
-            proposals: [$this->proposal($member, 8, [new FieldChange('phrase', 'a', 'b')])],
-            users: [$member],
-        );
+        $section = $this->section(cards: [$this->card(3, 8)], days: [$this->day(3)], proposals: [$this->proposal($member, 8, [new FieldChange(
+            'phrase',
+            'a',
+            'b',
+        )])], users: [$member]);
         $scope = new Scope(users: [3 => 'user'], itemIds: ['glossary' => [8]], grants: [3 => [DataCategory::Collections]]);
 
         // Act
@@ -139,12 +135,14 @@ final class MemberSectionTest extends SectionTestCase
     {
         // Arrange
         $context = $this->importContext();
-        $rows = ['change_proposals' => [[
-            'ref' => 44,
-            'target_ref' => 8,
-            'email' => 'learner@example.org',
-            'changes' => ['tag' => ['before' => '3', 'after' => '3,7', 'resolution' => null]],
-        ]]];
+        $rows = [
+            'change_proposals' => [[
+                'ref' => 44,
+                'target_ref' => 8,
+                'email' => 'learner@example.org',
+                'changes' => ['tag' => ['before' => '3', 'after' => '3,7', 'resolution' => null]],
+            ]],
+        ];
 
         // Act
         $this->section()->import($rows, $context);
@@ -180,7 +178,12 @@ final class MemberSectionTest extends SectionTestCase
         $rows = [
             'cards' => [['email' => 'stranger@example.org', 'glossary_ref' => 8, 'direction' => 'definition_to_term']],
             'days' => [['email' => 'stranger@example.org', 'day' => '2030-01-06T00:00:00+01:00']],
-            'change_proposals' => [['ref' => 44, 'target_ref' => 99, 'email' => 'learner@example.org', 'changes' => ['phrase' => ['before' => 'a', 'after' => 'b']]]],
+            'change_proposals' => [[
+                'ref' => 44,
+                'target_ref' => 99,
+                'email' => 'learner@example.org',
+                'changes' => ['phrase' => ['before' => 'a', 'after' => 'b']],
+            ]],
         ];
 
         // Act
@@ -225,10 +228,15 @@ final class MemberSectionTest extends SectionTestCase
         $dayRepository->method('findOneBy')->willReturn($existingDay);
 
         $proposalRepository = $this->createStub(EntityRepository::class);
-        $proposalRepository->method('findBy')->willReturnCallback(static fn(array $criteria): array => array_values(array_filter(
-            $proposals,
-            static fn(ChangeProposal $proposal): bool => $proposal->getStatus() === $criteria['status'] && $proposal->getTargetType() === $criteria['targetType'],
-        )));
+        $proposalRepository
+            ->method('findBy')
+            ->willReturnCallback(static fn(array $criteria): array => array_values(array_filter(
+                $proposals,
+                static fn(ChangeProposal $proposal): bool => (
+                    $proposal->getStatus() === $criteria['status']
+                    && $proposal->getTargetType() === $criteria['targetType']
+                ),
+            )));
 
         $repositories = [TrainerCard::class => $cardRepository, TrainerDay::class => $dayRepository, ChangeProposal::class => $proposalRepository];
 
@@ -243,14 +251,16 @@ final class MemberSectionTest extends SectionTestCase
         $userRepository->method('findBy')->willReturn($users);
 
         $glossaryService = $this->createStub(GlossaryService::class);
-        $glossaryService->method('decodeTagIds')->willReturnCallback(
-            static fn(?string $value): array => $value === null || $value === '' ? [] : array_map(intval(...), explode(',', $value)),
-        );
-        $glossaryService->method('encodeTagIds')->willReturnCallback(static function (array $tagIds): ?string {
-            sort($tagIds);
+        $glossaryService->method('decodeTagIds')->willReturnCallback(static fn(?string $value): array => (
+            $value === null || $value === '' ? [] : array_map(intval(...), explode(',', $value))
+        ));
+        $glossaryService
+            ->method('encodeTagIds')
+            ->willReturnCallback(static function (array $tagIds): ?string {
+                sort($tagIds);
 
-            return $tagIds === [] ? null : implode(',', $tagIds);
-        });
+                return $tagIds === [] ? null : implode(',', $tagIds);
+            });
 
         return new MemberSection($em, $userRepository, $glossaryService);
     }

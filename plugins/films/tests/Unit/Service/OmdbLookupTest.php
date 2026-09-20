@@ -5,10 +5,10 @@ namespace Plugin\Films\Tests\Unit\Service;
 use PHPUnit\Framework\TestCase;
 use Plugin\Films\Service\OmdbLookup;
 use Psr\Log\AbstractLogger;
+use Stringable;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
-use Stringable;
 
 class OmdbLookupTest extends TestCase
 {

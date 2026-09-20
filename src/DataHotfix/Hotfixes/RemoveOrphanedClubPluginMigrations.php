@@ -34,10 +34,7 @@ readonly class RemoveOrphanedClubPluginMigrations implements DataHotfixInterface
         }
 
         foreach (self::REMOVED_NAMESPACES as $namespace) {
-            $this->connection->executeStatement(
-                sprintf('DELETE FROM %s WHERE version LIKE ?', self::MIGRATIONS_TABLE),
-                [$namespace . '%'],
-            );
+            $this->connection->executeStatement(sprintf('DELETE FROM %s WHERE version LIKE ?', self::MIGRATIONS_TABLE), [$namespace . '%']);
         }
     }
 

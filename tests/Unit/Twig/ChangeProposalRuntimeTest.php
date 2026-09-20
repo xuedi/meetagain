@@ -12,10 +12,7 @@ class ChangeProposalRuntimeTest extends TestCase
     {
         // Arrange
         $service = $this->createMock(ChangeProposalService::class);
-        $service->expects(self::once())
-            ->method('countPendingForTarget')
-            ->with('glossary', 4)
-            ->willReturn(2);
+        $service->expects(self::once())->method('countPendingForTarget')->with('glossary', 4)->willReturn(2);
         $runtime = new ChangeProposalRuntime($service);
 
         // Act

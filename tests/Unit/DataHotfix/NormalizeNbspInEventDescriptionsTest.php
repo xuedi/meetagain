@@ -5,6 +5,7 @@ namespace Tests\Unit\DataHotfix;
 use App\DataHotfix\Hotfixes\NormalizeNbspInEventDescriptions;
 use App\Entity\EventTranslation;
 use App\Repository\EventTranslationRepository;
+use ArrayIterator;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -69,7 +70,7 @@ class NormalizeNbspInEventDescriptionsTest extends TestCase
     private function makeRepoReturning(array $translations): EventTranslationRepository
     {
         $repo = $this->createStub(EventTranslationRepository::class);
-        $repo->method('iterateAll')->willReturn(new \ArrayIterator($translations));
+        $repo->method('iterateAll')->willReturn(new ArrayIterator($translations));
 
         return $repo;
     }

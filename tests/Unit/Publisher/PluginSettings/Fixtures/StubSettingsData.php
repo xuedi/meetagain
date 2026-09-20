@@ -3,6 +3,7 @@
 namespace Tests\Unit\Publisher\PluginSettings\Fixtures;
 
 use App\Publisher\PluginSettings\Data;
+
 final class StubSettingsData implements Data
 {
     public function __construct(

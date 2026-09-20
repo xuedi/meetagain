@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -22,7 +20,9 @@ final class Version20260722215412 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('CREATE TABLE change_proposal (id INT AUTO_INCREMENT NOT NULL, target_type VARCHAR(50) NOT NULL, target_id INT NOT NULL, status VARCHAR(10) NOT NULL, changes JSON NOT NULL, created_at DATETIME NOT NULL, reviewed_at DATETIME DEFAULT NULL, proposed_by_id INT NOT NULL, reviewed_by_id INT DEFAULT NULL, INDEX IDX_101F889CDAB5A938 (proposed_by_id), INDEX IDX_101F889CFC6B21F1 (reviewed_by_id), INDEX idx_change_proposal_target (target_type, target_id), INDEX idx_change_proposal_status (status), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4');
+        $this->addSql(
+            'CREATE TABLE change_proposal (id INT AUTO_INCREMENT NOT NULL, target_type VARCHAR(50) NOT NULL, target_id INT NOT NULL, status VARCHAR(10) NOT NULL, changes JSON NOT NULL, created_at DATETIME NOT NULL, reviewed_at DATETIME DEFAULT NULL, proposed_by_id INT NOT NULL, reviewed_by_id INT DEFAULT NULL, INDEX IDX_101F889CDAB5A938 (proposed_by_id), INDEX IDX_101F889CFC6B21F1 (reviewed_by_id), INDEX idx_change_proposal_target (target_type, target_id), INDEX idx_change_proposal_status (status), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4',
+        );
         $this->addSql('ALTER TABLE change_proposal ADD CONSTRAINT FK_101F889CDAB5A938 FOREIGN KEY (proposed_by_id) REFERENCES `user` (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE change_proposal ADD CONSTRAINT FK_101F889CFC6B21F1 FOREIGN KEY (reviewed_by_id) REFERENCES `user` (id) ON DELETE SET NULL');
     }

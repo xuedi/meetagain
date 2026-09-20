@@ -36,11 +36,6 @@ final class ShortenExtension extends AbstractExtension
             return $escaped;
         }
 
-        return sprintf(
-            '<span class="is-truncated" style="--truncate-ch: %d" title="%s">%s</span>',
-            $width,
-            $escaped,
-            $escaped,
-        );
+        return sprintf('<span class="is-truncated" style="--truncate-ch: %d" title="%s">%s</span>', $width, $escaped, $escaped);
     }
 }

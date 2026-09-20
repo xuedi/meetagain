@@ -67,7 +67,11 @@ final class RsvpsSectionTest extends SectionTestCase
 
         // Assert
         static::assertSame(
-            [[1, 'anna@example.org'], [1, 'zoe@example.org'], [2, 'zoe@example.org']],
+            [
+                [1, 'anna@example.org'],
+                [1, 'zoe@example.org'],
+                [2, 'zoe@example.org'],
+            ],
             array_map(static fn(array $row): array => [$row['event_ref'], $row['email']], $rows),
         );
     }
@@ -116,9 +120,9 @@ final class RsvpsSectionTest extends SectionTestCase
         $guestRepository->method('findBy')->willReturn($guests);
 
         $em = $this->createStub(EntityManagerInterface::class);
-        $em->method('getRepository')->willReturnCallback(
-            static fn(string $class): EntityRepository => $class === RsvpGuest::class ? $guestRepository : $eventRepository,
-        );
+        $em->method('getRepository')->willReturnCallback(static fn(string $class): EntityRepository => $class === RsvpGuest::class
+            ? $guestRepository
+            : $eventRepository);
         $em->method('persist')->willReturnCallback(function (object $entity): void {
             $this->persisted[] = $entity;
         });

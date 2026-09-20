@@ -4,6 +4,7 @@ namespace App\Security\Permission;
 
 use App\Entity\User;
 use Override;
+use SensitiveParameter;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -22,7 +23,7 @@ final class Gateway implements VoterInterface
     ) {}
 
     #[Override]
-    public function vote(#[\SensitiveParameter] TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
+    public function vote(#[SensitiveParameter] TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
     {
         $context = null;
         $result = self::ACCESS_ABSTAIN;
@@ -66,7 +67,7 @@ final class Gateway implements VoterInterface
         return true;
     }
 
-    private function buildContext(#[\SensitiveParameter] TokenInterface $token, mixed $subject): Context
+    private function buildContext(#[SensitiveParameter] TokenInterface $token, mixed $subject): Context
     {
         $user = $token->getUser();
 

@@ -52,10 +52,7 @@ class SiteLogoResolverTest extends TestCase
         $provider->method('resolveSiteLogo')->willReturn($this->logo('groupHash'));
         $this->configServiceStub->method('getSiteLogoId')->willReturn(99);
 
-        static::assertSame(
-            '/images/thumbnails/groupHash_h120.webp',
-            $this->resolver([$provider])->resolve()['url'],
-        );
+        static::assertSame('/images/thumbnails/groupHash_h120.webp', $this->resolver([$provider])->resolve()['url']);
     }
 
     public function testSiteLogoWinsOverFallback(): void
@@ -66,10 +63,7 @@ class SiteLogoResolverTest extends TestCase
         $this->configServiceStub->method('getSiteLogoId')->willReturn(42);
         $this->imageRepositoryStub->method('find')->willReturn($this->logo('abc123'));
 
-        static::assertSame(
-            '/images/thumbnails/abc123_h120.webp',
-            $this->resolver([$provider])->resolve()['url'],
-        );
+        static::assertSame('/images/thumbnails/abc123_h120.webp', $this->resolver([$provider])->resolve()['url']);
     }
 
     public function testFallbackUsedWhenNoSiteLogoConfigured(): void
@@ -79,10 +73,7 @@ class SiteLogoResolverTest extends TestCase
         $provider->method('resolveFallbackSiteLogo')->willReturn($this->logo('fallbackHash'));
         $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
 
-        static::assertSame(
-            '/images/thumbnails/fallbackHash_h120.webp',
-            $this->resolver([$provider])->resolve()['url'],
-        );
+        static::assertSame('/images/thumbnails/fallbackHash_h120.webp', $this->resolver([$provider])->resolve()['url']);
     }
 
     public function testFallsThroughToDefaultAssetWhenNothingMatches(): void
@@ -108,20 +99,14 @@ class SiteLogoResolverTest extends TestCase
         $provider = $this->createStub(SiteLogoProviderInterface::class);
         $provider->method('resolveSiteLogo')->willReturn($this->logo('wideHash'));
 
-        static::assertSame(
-            ['url' => '/images/thumbnails/wideHash_h120.webp', 'width' => null, 'height' => 120],
-            $this->resolver([$provider])->resolve(),
-        );
+        static::assertSame(['url' => '/images/thumbnails/wideHash_h120.webp', 'width' => null, 'height' => 120], $this->resolver([$provider])->resolve());
     }
 
     public function testDefaultAssetCarriesNoDimensions(): void
     {
         $this->configServiceStub->method('getSiteLogoId')->willReturn(null);
 
-        static::assertSame(
-            ['url' => '/build/images/logo-default.webp', 'width' => null, 'height' => null],
-            $this->resolver([])->resolve(),
-        );
+        static::assertSame(['url' => '/build/images/logo-default.webp', 'width' => null, 'height' => null], $this->resolver([])->resolve());
     }
 
     public function testTheEndpointUrlIsTheSitesOwnHostAndNeverAHashedAssetPath(): void
@@ -129,10 +114,7 @@ class SiteLogoResolverTest extends TestCase
         $provider = $this->createStub(SiteLogoProviderInterface::class);
         $provider->method('resolveSiteLogo')->willReturn($this->logo('groupHash'));
 
-        static::assertSame(
-            'https://espanol.meetagain.test/logo.png',
-            $this->resolver([$provider])->endpointUrl('https://espanol.meetagain.test/'),
-        );
+        static::assertSame('https://espanol.meetagain.test/logo.png', $this->resolver([$provider])->endpointUrl('https://espanol.meetagain.test/'));
     }
 
     public function testResolveImageExposesTheChainResultForTheEndpointToRasterise(): void

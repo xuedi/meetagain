@@ -2,30 +2,35 @@
 
 # Run all tests and checks
 [group('checks')]
-check: checkMago checkMagoAnalyze checkMagoGuard checkPluginConfig checkPluginIsolation
+check: checkMago checkMagoFormat checkMagoAnalyze checkMagoGuard checkPluginConfig checkPluginIsolation
     {{PHP}} composer validate --strict
     {{PHP}} php bin/check-get-routes.php
     {{PHP}} php bin/check-new-parentheses.php
     echo "All tests and checks passed successfully"
 
-# Check Mago (linter)
+# Check Mago (linter) - core, then each plugin against its own config
 [group('checks')]
 checkMago:
-    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml lint
+    {{PHP}} sh bin/mago.sh lint
 
-# Analyze code with Mago
+# Check formatting with Mago - reports drift without writing; `just fixMago` applies it
+[group('checks')]
+checkMagoFormat:
+    {{PHP}} sh bin/mago.sh format --dry-run
+
+# Analyze code with Mago - core, then each plugin against its own config
 [group('checks')]
 checkMagoAnalyze:
-    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml analyze
+    {{PHP}} sh bin/mago.sh analyze
 
-# Check architectural rules with Mago
+# Check architectural rules with Mago - core, then each plugin against its own config
 [group('checks')]
 checkMagoGuard:
-    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml guard
+    {{PHP}} sh bin/mago.sh guard
 
 # Run all Mago checks (lint + analyze + guard)
 [group('checks')]
-checkMagoAll: checkMago checkMagoAnalyze checkMagoGuard
+checkMagoAll: checkMago checkMagoFormat checkMagoAnalyze checkMagoGuard
     echo "All Mago checks complete"
 
 # Check accessibility (Pa11y)

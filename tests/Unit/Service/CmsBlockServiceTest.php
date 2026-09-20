@@ -9,8 +9,8 @@ use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EntityAction;
 use App\Repository\CmsBlockRepository;
 use App\Service\Cms\BlockHydrator;
-use App\Service\Cms\RichTextNormalizer;
 use App\Service\Cms\CmsBlockService;
+use App\Service\Cms\RichTextNormalizer;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -106,7 +106,7 @@ class CmsBlockServiceTest extends TestCase
         $subject = new CmsBlockService($emStub, $blockRepoStub, $this->makeHydrator(), $dispatcherMock);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not load the page owning this block');
+        $this->expectExceptionMessageIsOrContains('Could not load the page owning this block');
 
         // Act
         $subject->updateBlock($block, CmsBlockType::Text, ['title' => '', 'content' => '']);
@@ -146,7 +146,7 @@ class CmsBlockServiceTest extends TestCase
         $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator(), $dispatcherMock);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not load the page owning this block');
+        $this->expectExceptionMessageIsOrContains('Could not load the page owning this block');
 
         // Act
         $subject->deleteBlock(new CmsBlock());

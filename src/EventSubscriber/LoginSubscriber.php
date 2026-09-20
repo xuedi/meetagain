@@ -24,10 +24,10 @@ readonly class LoginSubscriber implements EventSubscriberInterface
     {
         $user = $event->getUser();
         $request = $event->getRequest();
-        $session = $request->getSession();
-        if (!$user instanceof User) {
+        if (!$user instanceof User || $request->attributes->getBoolean('_stateless')) {
             return;
         }
+        $session = $request->getSession();
         $session->set('_locale', $user->getLocale());
 
         $response = $event->getResponse();

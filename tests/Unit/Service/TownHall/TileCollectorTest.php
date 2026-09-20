@@ -51,10 +51,7 @@ class TileCollectorTest extends TestCase
         $result = $collector->collectByLocation();
 
         // Assert
-        self::assertSame(
-            ['high.html.twig', 'mid.html.twig', 'low.html.twig'],
-            array_map(static fn(Tile $tile): string => $tile->partial, $result['sidebar']),
-        );
+        self::assertSame(['high.html.twig', 'mid.html.twig', 'low.html.twig'], array_map(static fn(Tile $tile): string => $tile->partial, $result['sidebar']));
     }
 
     public function testTilesAreGroupedByLocation(): void

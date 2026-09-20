@@ -25,10 +25,13 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
     /** @return list<int> */
     public function tagIdsFor(string $itemType, int $itemId): array
     {
-        $rows = $this->createQueryBuilder('a')
+        $rows = $this
+            ->createQueryBuilder('a')
             ->select('IDENTITY(a.tag) AS tagId')
-            ->where('a.itemType = :type')->setParameter('type', $itemType)
-            ->andWhere('a.itemId = :id')->setParameter('id', $itemId)
+            ->where('a.itemType = :type')
+            ->setParameter('type', $itemType)
+            ->andWhere('a.itemId = :id')
+            ->setParameter('id', $itemId)
             ->getQuery()
             ->getScalarResult();
 
@@ -45,12 +48,16 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
             return [];
         }
 
-        $rows = $this->createQueryBuilder('a')
+        $rows = $this
+            ->createQueryBuilder('a')
             ->select('a.itemId')
-            ->where('a.itemType = :type')->setParameter('type', $itemType)
-            ->andWhere('a.tag IN (:tags)')->setParameter('tags', $tagIds)
+            ->where('a.itemType = :type')
+            ->setParameter('type', $itemType)
+            ->andWhere('a.tag IN (:tags)')
+            ->setParameter('tags', $tagIds)
             ->groupBy('a.itemId')
-            ->having('COUNT(DISTINCT a.tag) = :count')->setParameter('count', count($tagIds))
+            ->having('COUNT(DISTINCT a.tag) = :count')
+            ->setParameter('count', count($tagIds))
             ->getQuery()
             ->getScalarResult();
 
@@ -67,10 +74,13 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
             return [];
         }
 
-        $rows = $this->createQueryBuilder('a')
+        $rows = $this
+            ->createQueryBuilder('a')
             ->select('IDENTITY(a.tag) AS tagId', 'COUNT(a.itemId) AS total')
-            ->where('a.itemType = :type')->setParameter('type', $itemType)
-            ->andWhere('a.itemId IN (:ids)')->setParameter('ids', $itemIds)
+            ->where('a.itemType = :type')
+            ->setParameter('type', $itemType)
+            ->andWhere('a.itemId IN (:ids)')
+            ->setParameter('ids', $itemIds)
             ->groupBy('a.tag')
             ->getQuery()
             ->getScalarResult();
@@ -86,9 +96,11 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
     /** @return array<int, int> tag id => how many items of this type carry it */
     public function countsForType(string $itemType): array
     {
-        $rows = $this->createQueryBuilder('a')
+        $rows = $this
+            ->createQueryBuilder('a')
             ->select('IDENTITY(a.tag) AS tagId', 'COUNT(a.itemId) AS total')
-            ->where('a.itemType = :type')->setParameter('type', $itemType)
+            ->where('a.itemType = :type')
+            ->setParameter('type', $itemType)
             ->groupBy('a.tag')
             ->getQuery()
             ->getScalarResult();
@@ -111,10 +123,13 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
             return [];
         }
 
-        $rows = $this->createQueryBuilder('a')
+        $rows = $this
+            ->createQueryBuilder('a')
             ->select('a.itemId', 'IDENTITY(a.tag) AS tagId')
-            ->where('a.itemType = :type')->setParameter('type', $itemType)
-            ->andWhere('a.itemId IN (:ids)')->setParameter('ids', $itemIds)
+            ->where('a.itemType = :type')
+            ->setParameter('type', $itemType)
+            ->andWhere('a.itemId IN (:ids)')
+            ->setParameter('ids', $itemIds)
             ->getQuery()
             ->getScalarResult();
 
@@ -129,9 +144,11 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
     /** @return array<int, list<int>> item id => tag ids, for every item of this type that carries any */
     public function tagIdsForType(string $itemType): array
     {
-        $rows = $this->createQueryBuilder('a')
+        $rows = $this
+            ->createQueryBuilder('a')
             ->select('a.itemId', 'IDENTITY(a.tag) AS tagId')
-            ->where('a.itemType = :type')->setParameter('type', $itemType)
+            ->where('a.itemType = :type')
+            ->setParameter('type', $itemType)
             ->getQuery()
             ->getScalarResult();
 
@@ -153,11 +170,14 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
             return [];
         }
 
-        $rows = $this->createQueryBuilder('a')
+        $rows = $this
+            ->createQueryBuilder('a')
             ->select('a.itemId')
             ->distinct()
-            ->where('a.itemType = :type')->setParameter('type', $itemType)
-            ->andWhere('a.tag IN (:tags)')->setParameter('tags', $tagIds)
+            ->where('a.itemType = :type')
+            ->setParameter('type', $itemType)
+            ->andWhere('a.tag IN (:tags)')
+            ->setParameter('tags', $tagIds)
             ->getQuery()
             ->getScalarResult();
 
@@ -171,20 +191,26 @@ class ItemTagAssignmentRepository extends ServiceEntityRepository
             return;
         }
 
-        $this->createQueryBuilder('a')
+        $this
+            ->createQueryBuilder('a')
             ->delete()
-            ->where('a.itemType = :type')->setParameter('type', $itemType)
-            ->andWhere('a.tag IN (:tags)')->setParameter('tags', $tagIds)
+            ->where('a.itemType = :type')
+            ->setParameter('type', $itemType)
+            ->andWhere('a.tag IN (:tags)')
+            ->setParameter('tags', $tagIds)
             ->getQuery()
             ->execute();
     }
 
     public function deleteFor(string $itemType, int $itemId): void
     {
-        $this->createQueryBuilder('a')
+        $this
+            ->createQueryBuilder('a')
             ->delete()
-            ->where('a.itemType = :type')->setParameter('type', $itemType)
-            ->andWhere('a.itemId = :id')->setParameter('id', $itemId)
+            ->where('a.itemType = :type')
+            ->setParameter('type', $itemType)
+            ->andWhere('a.itemId = :id')
+            ->setParameter('id', $itemId)
             ->getQuery()
             ->execute();
     }

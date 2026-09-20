@@ -54,10 +54,7 @@ readonly class DropItemCategoryAssignment implements DataHotfixInterface
 
     private function hasForeignKey(): bool
     {
-        return $this->connection->fetchOne(
-            'SELECT COUNT(*) FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = DATABASE()'
-            . ' AND TABLE_NAME = ? AND REFERENCED_TABLE_NAME = ?',
-            ['item_tag_assignment', 'item_tag'],
-        ) > 0;
+        return $this->connection->fetchOne('SELECT COUNT(*) FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = DATABASE()'
+        . ' AND TABLE_NAME = ? AND REFERENCED_TABLE_NAME = ?', ['item_tag_assignment', 'item_tag']) > 0;
     }
 }

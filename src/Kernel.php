@@ -39,20 +39,9 @@ class Kernel extends BaseKernel
             }
 
             // @mago-expect analyzer:unsafe-instantiation
+            // @mago-expect analyzer:deprecated-class
             yield new $class();
         }
-    }
-
-    /**
-     * @return array<class-string<BundleInterface>, array<string, bool>>
-     */
-    private function readBundles(string $bundlesFile): array
-    {
-        if (!file_exists($bundlesFile)) {
-            return [];
-        }
-
-        return require $bundlesFile;
     }
 
     public function getPluginConfigDirs(): iterable
@@ -111,6 +100,18 @@ class Kernel extends BaseKernel
 
             $this->doConfigureRoutes($routes, $pluginConfigDir);
         }
+    }
+
+    /**
+     * @return array<class-string<BundleInterface>, array<string, bool>>
+     */
+    private function readBundles(string $bundlesFile): array
+    {
+        if (!file_exists($bundlesFile)) {
+            return [];
+        }
+
+        return require $bundlesFile;
     }
 
     private function doConfigureContainer(ContainerConfigurator $container, string $configDir): void

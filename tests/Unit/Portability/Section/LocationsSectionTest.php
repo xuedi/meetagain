@@ -54,7 +54,11 @@ final class LocationsSectionTest extends SectionTestCase
     {
         // Arrange
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->once())->method('findBy')->with(['id' => [1, 2]], ['id' => 'ASC'])->willReturn([]);
+        $repository
+            ->expects($this->once())
+            ->method('findBy')
+            ->with(['id' => [1, 2]], ['id' => 'ASC'])
+            ->willReturn([]);
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repository);
 

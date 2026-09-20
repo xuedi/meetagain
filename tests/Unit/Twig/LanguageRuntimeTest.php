@@ -28,12 +28,7 @@ class LanguageRuntimeTest extends TestCase
         $this->requestStackStub = $this->createStub(RequestStack::class);
         $this->routerStub = $this->createStub(RouterInterface::class);
         $this->configServiceStub = $this->createStub(ConfigService::class);
-        $this->subject = new LanguageRuntime(
-            $this->languageServiceStub,
-            $this->requestStackStub,
-            $this->routerStub,
-            $this->configServiceStub,
-        );
+        $this->subject = new LanguageRuntime($this->languageServiceStub, $this->requestStackStub, $this->routerStub, $this->configServiceStub);
     }
 
     public function testGetCurrentLocaleReturnsRequestLocale(): void
@@ -50,7 +45,7 @@ class LanguageRuntimeTest extends TestCase
         $this->requestStackStub->method('getCurrentRequest')->willReturn(null);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not get current locale');
+        $this->expectExceptionMessageIsOrContains('Could not get current locale');
 
         $this->subject->getCurrentLocale();
     }
@@ -153,5 +148,4 @@ class LanguageRuntimeTest extends TestCase
         // Assert
         static::assertTrue($result);
     }
-
 }

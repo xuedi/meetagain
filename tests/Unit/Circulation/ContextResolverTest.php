@@ -51,7 +51,10 @@ class ContextResolverTest extends TestCase
     private function provider(?string $context, int $priority): ContextProviderInterface
     {
         return new class($context, $priority) implements ContextProviderInterface {
-            public function __construct(private readonly ?string $context, private readonly int $priority) {}
+            public function __construct(
+                private readonly ?string $context,
+                private readonly int $priority,
+            ) {}
 
             public function getContext(string $itemType): ?string
             {

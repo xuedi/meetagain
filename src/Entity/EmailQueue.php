@@ -179,10 +179,7 @@ class EmailQueue
     /** @return list<Attachment> */
     public function getAttachments(): array
     {
-        return array_values(array_filter(array_map(
-            Attachment::fromArray(...),
-            $this->attachments ?? [],
-        )));
+        return array_values(array_filter(array_map(Attachment::fromArray(...), $this->attachments ?? [])));
     }
 
     /** @param list<Attachment> $attachments */

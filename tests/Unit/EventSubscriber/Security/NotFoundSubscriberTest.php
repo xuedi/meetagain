@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Throwable;
 
 class NotFoundSubscriberTest extends TestCase
 {
@@ -49,7 +50,7 @@ class NotFoundSubscriberTest extends TestCase
         $subscriber->onKernelException($event);
     }
 
-    private function createEvent(\Throwable $throwable): ExceptionEvent
+    private function createEvent(Throwable $throwable): ExceptionEvent
     {
         return new ExceptionEvent($this->createStub(HttpKernelInterface::class), Request::create('/'), HttpKernelInterface::MAIN_REQUEST, $throwable);
     }

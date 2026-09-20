@@ -20,13 +20,10 @@ class PledgeServiceTest extends TestCase
     {
         // Arrange
         $event = new Event();
-        $service = $this->service(
-            $this->createStub(GamePledgeRepository::class),
-            $this->ownershipRepo(new GameOwnership()),
-        );
+        $service = $this->service($this->createStub(GamePledgeRepository::class), $this->ownershipRepo(new GameOwnership()));
 
         // Assert
-        $this->expectExceptionMessage('boardgames_tile.flash_rsvp_required');
+        $this->expectExceptionMessageIsOrContains('boardgames_tile.flash_rsvp_required');
 
         // Act
         $service->pledge($event, new Game(), new User());
@@ -41,7 +38,7 @@ class PledgeServiceTest extends TestCase
         $service = $this->service($this->createStub(GamePledgeRepository::class), $this->ownershipRepo(null));
 
         // Assert
-        $this->expectExceptionMessage('boardgames_tile.flash_ownership_required');
+        $this->expectExceptionMessageIsOrContains('boardgames_tile.flash_ownership_required');
 
         // Act
         $service->pledge($event, new Game(), $user);

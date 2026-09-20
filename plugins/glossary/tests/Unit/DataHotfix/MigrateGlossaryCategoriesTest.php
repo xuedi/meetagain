@@ -14,16 +14,17 @@ class MigrateGlossaryCategoriesTest extends TestCase
     {
         // Arrange
         $connection = $this->createMock(Connection::class);
-        $connection->method('fetchOne')->willReturnCallback(
-            static fn(string $sql): mixed => str_contains($sql, 'information_schema') ? 1 : false,
-        );
+        $connection->method('fetchOne')->willReturnCallback(static fn(string $sql): mixed => str_contains($sql, 'information_schema') ? 1 : false);
         $connection->method('fetchAllAssociative')->willReturn([['id' => 1, 'category' => 5]]);
         $connection->method('fetchAssociative')->willReturn(false); // no global config row
-        $connection->expects(self::once())->method('insert')->with('item_category_assignment', [
-            'item_type' => 'glossary',
-            'item_id' => 1,
-            'category_id' => 5,
-        ]);
+        $connection
+            ->expects(self::once())
+            ->method('insert')
+            ->with('item_category_assignment', [
+                'item_type' => 'glossary',
+                'item_id' => 1,
+                'category_id' => 5,
+            ]);
 
         // Act
         $this->makeSubject($connection)->execute();
@@ -39,8 +40,10 @@ class MigrateGlossaryCategoriesTest extends TestCase
         $connection->method('fetchOne')->willReturn(0); // information_schema: column absent
         $connection->expects(self::never())->method('fetchAllAssociative');
         $connection->method('fetchAssociative')->willReturn(['id' => 9, 'data' => $oldConfig]);
-        $connection->expects(self::once())->method('update')->willReturnCallback(
-            function (string $table, array $set, array $where): int {
+        $connection
+            ->expects(self::once())
+            ->method('update')
+            ->willReturnCallback(static function (string $table, array $set, array $where): int {
                 self::assertSame('plugin_settings', $table);
                 self::assertSame(['id' => 9], $where);
                 $decoded = json_decode((string) $set['data'], true);
@@ -49,8 +52,7 @@ class MigrateGlossaryCategoriesTest extends TestCase
                 self::assertSame(['en' => 'Greeting'], $decoded['taxonomy']['categories'][0]['labels']);
 
                 return 1;
-            },
-        );
+            });
 
         // Act
         $this->makeSubject($connection)->execute();

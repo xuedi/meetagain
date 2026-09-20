@@ -9,6 +9,7 @@ use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
+use DateTime;
 use DateTimeImmutable;
 
 readonly class DashboardActionService
@@ -79,7 +80,7 @@ readonly class DashboardActionService
 
     public function getMembersThisWeek(int $year, int $week, ?DashboardScope $scope = null): int
     {
-        $tmp = new \DateTime();
+        $tmp = new DateTime();
         $tmp->setISODate($year, $week);
         $start = DateTimeImmutable::createFromMutable($tmp);
 

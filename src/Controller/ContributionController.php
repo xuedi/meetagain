@@ -77,11 +77,15 @@ final class ContributionController extends AbstractController
             }
         }
 
-        return $this->render('contribution/index.html.twig', $this->shell($user, 'suggest', $type, null) + [
-            'form' => $form,
-            'typeLabelKey' => $provider->getLabelKey(),
-            'pending' => $this->pendingSuggestionCards($user, $type),
-        ]);
+        return $this->render(
+            'contribution/index.html.twig',
+            $this->shell($user, 'suggest', $type, null)
+            + [
+                'form' => $form,
+                'typeLabelKey' => $provider->getLabelKey(),
+                'pending' => $this->pendingSuggestionCards($user, $type),
+            ],
+        );
     }
 
     #[Route('/{type}/{id}', name: 'app_contribution_correct', requirements: ['id' => '[^/]+'], methods: ['GET', 'POST'])]
@@ -111,22 +115,21 @@ final class ContributionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $proposal = $this->changeProposalService->propose(
-                $provider->getTargetType(),
-                (int) $id,
-                $user,
-                $provider->changesFrom($id, $form),
-            );
+            $proposal = $this->changeProposalService->propose($provider->getTargetType(), (int) $id, $user, $provider->changesFrom($id, $form));
             $this->addFlash('success', $proposal === null ? 'contribution.flash_unchanged' : 'contribution.flash_proposed');
 
             return $this->redirectToRoute('app_contribution_correct', ['type' => $provider->getType(), 'id' => $id]);
         }
 
-        return $this->render('contribution/index.html.twig', $this->shell($user, 'correct', $provider->getType(), $id) + [
-            'form' => $form,
-            'draft' => $draft,
-            'pendingProposals' => $this->pendingProposalCards($provider->getTargetType(), (int) $id),
-        ]);
+        return $this->render(
+            'contribution/index.html.twig',
+            $this->shell($user, 'correct', $provider->getType(), $id)
+            + [
+                'form' => $form,
+                'draft' => $draft,
+                'pendingProposals' => $this->pendingProposalCards($provider->getTargetType(), (int) $id),
+            ],
+        );
     }
 
     private function correctTags(Request $request, string $itemType, User $user): Response
@@ -142,21 +145,22 @@ final class ContributionController extends AbstractController
             foreach ($this->submittedTagChanges($request, $itemType) as $targetId => $changes) {
                 $proposed += $this->changeProposalService->propose($targetType, $targetId, $user, $changes) === null ? 0 : 1;
             }
-            $this->addFlash(
-                $proposed === 0 ? 'info' : 'success',
-                $proposed === 0 ? 'item.tag_flash_unchanged' : 'item.tag_flash_suggested',
-            );
+            $this->addFlash($proposed === 0 ? 'info' : 'success', $proposed === 0 ? 'item.tag_flash_unchanged' : 'item.tag_flash_suggested');
 
             return $this->redirectToRoute('app_contribution_correct', ['type' => TagSection::TYPE, 'id' => $itemType]);
         }
 
-        return $this->render('contribution/index.html.twig', $this->shell($user, 'correct_tags', TagSection::TYPE, $itemType) + [
-            'itemType' => $itemType,
-            'typeLabelKey' => (string) $this->tagTypes->providerFor($itemType)?->getLabelKey(),
-            'rows' => $this->suggestionBuilder->rows($itemType, $request->getLocale()),
-            'usage' => $this->tagService->getUsage($itemType),
-            'pendingProposals' => $this->pendingTagProposalCards($targetType),
-        ]);
+        return $this->render(
+            'contribution/index.html.twig',
+            $this->shell($user, 'correct_tags', TagSection::TYPE, $itemType)
+            + [
+                'itemType' => $itemType,
+                'typeLabelKey' => (string) $this->tagTypes->providerFor($itemType)?->getLabelKey(),
+                'rows' => $this->suggestionBuilder->rows($itemType, $request->getLocale()),
+                'usage' => $this->tagService->getUsage($itemType),
+                'pendingProposals' => $this->pendingTagProposalCards($targetType),
+            ],
+        );
     }
 
     /**

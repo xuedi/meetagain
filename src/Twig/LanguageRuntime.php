@@ -104,6 +104,19 @@ final readonly class LanguageRuntime implements RuntimeExtensionInterface
         return $this->applyAlternateLinkFilters($localeUrls, $request);
     }
 
+    public function routeExists(string $name): bool
+    {
+        try {
+            $this->router->generate($name);
+
+            return true;
+        } catch (RouteNotFoundException) {
+            return false;
+        } catch (Exception) {
+            return true;
+        }
+    }
+
     /**
      * @param array<string, string> $altLangList locale => path
      * @return array<string, string>
@@ -118,18 +131,5 @@ final readonly class LanguageRuntime implements RuntimeExtensionInterface
         }
 
         return $altLangList;
-    }
-
-    public function routeExists(string $name): bool
-    {
-        try {
-            $this->router->generate($name);
-
-            return true;
-        } catch (RouteNotFoundException) {
-            return false;
-        } catch (Exception) {
-            return true;
-        }
     }
 }

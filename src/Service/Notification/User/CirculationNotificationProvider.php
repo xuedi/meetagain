@@ -56,9 +56,9 @@ readonly class CirculationNotificationProvider implements NotificationProviderIn
 
         if (!$handover->hasConfirmed($user)) {
             $items[] = new NotificationItem(
-                label: $this->translator->trans($isReceiver
-                    ? 'chrome.notification_circulation_ready_for_you'
-                    : 'chrome.notification_circulation_confirm_handover'),
+                label: $this->translator->trans(
+                    $isReceiver ? 'chrome.notification_circulation_ready_for_you' : 'chrome.notification_circulation_confirm_handover',
+                ),
                 icon: 'fa-handshake',
                 route: 'app_circulation_handover',
                 routeParams: $routeParams,

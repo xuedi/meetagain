@@ -19,11 +19,8 @@ final readonly class RecurrenceRuntime implements RuntimeExtensionInterface
         private TranslatorInterface $translator,
     ) {}
 
-    public function recurrenceLabel(
-        ?EventInterval $rule,
-        ?string $ruleSpec,
-        ?DateTimeInterface $anchor = null,
-    ): string {
+    public function recurrenceLabel(?EventInterval $rule, ?string $ruleSpec, ?DateTimeInterface $anchor = null): string
+    {
         if (!$rule instanceof EventInterval) {
             return '';
         }
@@ -34,8 +31,6 @@ final readonly class RecurrenceRuntime implements RuntimeExtensionInterface
 
         $pattern = $this->resolver->resolve($rule, $ruleSpec, $anchor ?? new DateTimeImmutable());
 
-        return $pattern instanceof RecurrencePattern
-            ? $this->describer->describe($pattern)
-            : $this->translator->trans('admin_event.recurrence_summary_empty');
+        return $pattern instanceof RecurrencePattern ? $this->describer->describe($pattern) : $this->translator->trans('admin_event.recurrence_summary_empty');
     }
 }

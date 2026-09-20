@@ -4,8 +4,8 @@ namespace Module\Ballot\Internal;
 
 use App\Entity\User;
 use DateTimeImmutable;
-use DomainException;
 use Doctrine\ORM\EntityManagerInterface;
+use DomainException;
 use InvalidArgumentException;
 use Module\Ballot\Contract\BallotInterface;
 use Module\Ballot\Contract\BallotOutcome;
@@ -85,28 +85,6 @@ final readonly class BallotService implements BallotInterface
 
         $this->withdrawVotes($ballot, $userId);
         $this->recordVotes($ballot, $userId, $this->selectionFor($ballot, $candidateKeys));
-    }
-
-    private function withdrawVotes(Ballot $ballot, int $userId): void
-    {
-        foreach ($this->votes->findForVoter($ballot, $userId) as $previous) {
-            $this->entityManager->remove($previous);
-        }
-
-        $this->entityManager->flush();
-    }
-
-    /**
-     * @param list<string> $selection
-     */
-    private function recordVotes(Ballot $ballot, int $userId, array $selection): void
-    {
-        $now = $this->now();
-        foreach ($selection as $key) {
-            $this->entityManager->persist(new BallotVote($ballot, $this->userReference($userId), $key, $now));
-        }
-
-        $this->entityManager->flush();
     }
 
     #[Override]
@@ -207,10 +185,7 @@ final readonly class BallotService implements BallotInterface
     {
         $ballot = $this->ballots->find($ballotId);
 
-        return $ballot instanceof Ballot
-            && $this->isVotable($ballot)
-            && $this->isVisible($ballot, $userId)
-            && $this->isElector($ballot, $userId);
+        return $ballot instanceof Ballot && $this->isVotable($ballot) && $this->isVisible($ballot, $userId) && $this->isElector($ballot, $userId);
     }
 
     #[Override]
@@ -290,6 +265,28 @@ final readonly class BallotService implements BallotInterface
         $this->entityManager->flush();
 
         return (int) $restored->getId();
+    }
+
+    private function withdrawVotes(Ballot $ballot, int $userId): void
+    {
+        foreach ($this->votes->findForVoter($ballot, $userId) as $previous) {
+            $this->entityManager->remove($previous);
+        }
+
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @param list<string> $selection
+     */
+    private function recordVotes(Ballot $ballot, int $userId, array $selection): void
+    {
+        $now = $this->now();
+        foreach ($selection as $key) {
+            $this->entityManager->persist(new BallotVote($ballot, $this->userReference($userId), $key, $now));
+        }
+
+        $this->entityManager->flush();
     }
 
     private function applyTally(Ballot $ballot): void
@@ -384,12 +381,7 @@ final readonly class BallotService implements BallotInterface
 
     private function scopeOf(Ballot $ballot): BallotScope
     {
-        return new BallotScope(
-            (int) $ballot->getId(),
-            $ballot->getPurpose(),
-            $this->subjectOf($ballot),
-            $ballot->getOptionKeys(),
-        );
+        return new BallotScope((int) $ballot->getId(), $ballot->getPurpose(), $this->subjectOf($ballot), $ballot->getOptionKeys());
     }
 
     /**
@@ -421,10 +413,7 @@ final readonly class BallotService implements BallotInterface
             }
         }
 
-        return array_values(array_filter(
-            $ballots,
-            static fn(Ballot $ballot): bool => isset($allowed[(int) $ballot->getId()]),
-        ));
+        return array_values(array_filter($ballots, static fn(Ballot $ballot): bool => isset($allowed[(int) $ballot->getId()])));
     }
 
     /**

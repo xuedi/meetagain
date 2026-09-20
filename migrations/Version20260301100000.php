@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -16,7 +14,9 @@ final class Version20260301100000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE `user` ADD api_token_hash VARCHAR(64) DEFAULT NULL, ADD api_token_created_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
+        $this->addSql(
+            'ALTER TABLE `user` ADD api_token_hash VARCHAR(64) DEFAULT NULL, ADD api_token_created_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'',
+        );
     }
 
     public function down(Schema $schema): void

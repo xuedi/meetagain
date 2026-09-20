@@ -24,7 +24,10 @@ final class ChangeProposalsSectionTest extends SectionTestCase
     public function testAnEventProposalSurvivesTheRoundTrip(): void
     {
         // Arrange
-        $proposal = $this->proposal('event', 9, [new FieldChange('title', 'Go night', 'Go evening'), new FieldChange('teaser', 'Old', 'New', FieldResolution::Denied)]);
+        $proposal = $this->proposal('event', 9, [
+            new FieldChange('title', 'Go night', 'Go evening'),
+            new FieldChange('teaser', 'Old', 'New', FieldResolution::Denied),
+        ]);
         $exported = $this->section([$proposal])->export($this->scope(eventIds: [9]), $this->images());
 
         $context = $this->context();
@@ -139,7 +142,10 @@ final class ChangeProposalsSectionTest extends SectionTestCase
         $context->mapRef(ItemTag::class, 7, $this->withId(new ItemTag(), 70));
         $context->mapRef(ItemTag::class, 2, $this->withId(new ItemTag(), 20));
         $context->mapRef(ItemTag::class, 5, $this->withId(new ItemTag(), 50));
-        $row = $this->tagRow(7, ['parent' => ['before' => '2', 'after' => '5', 'resolution' => null], 'label_en' => ['before' => 'Soup', 'after' => 'Soups', 'resolution' => null]]);
+        $row = $this->tagRow(7, [
+            'parent' => ['before' => '2', 'after' => '5', 'resolution' => null],
+            'label_en' => ['before' => 'Soup', 'after' => 'Soups', 'resolution' => null],
+        ]);
 
         // Act
         $this->section()->import([$row], $context);
@@ -212,7 +218,12 @@ final class ChangeProposalsSectionTest extends SectionTestCase
         $context = $this->context();
 
         // Act
-        $this->section()->import([['target_type' => 'glossary', 'target_ref' => 3, 'email' => 'member@example.org', 'changes' => ['phrase' => ['after' => 'x']]]], $context);
+        $this->section()->import([[
+            'target_type' => 'glossary',
+            'target_ref' => 3,
+            'email' => 'member@example.org',
+            'changes' => ['phrase' => ['after' => 'x']],
+        ]], $context);
 
         // Assert
         static::assertSame(1, $context->toSummary()->get('change_proposals', Outcome::Skipped));
@@ -244,15 +255,20 @@ final class ChangeProposalsSectionTest extends SectionTestCase
     private function section(array $proposals = [], array $events = [], bool $taggable = true): ChangeProposalsSection
     {
         $proposalRepository = $this->createStub(EntityRepository::class);
-        $proposalRepository->method('findBy')->willReturnCallback(static fn(array $criteria): array => array_values(array_filter(
-            $proposals,
-            static fn(ChangeProposal $proposal): bool => $proposal->getStatus() === $criteria['status'] && in_array($proposal->getTargetType(), $criteria['targetType'], true),
-        )));
+        $proposalRepository
+            ->method('findBy')
+            ->willReturnCallback(static fn(array $criteria): array => array_values(array_filter(
+                $proposals,
+                static fn(ChangeProposal $proposal): bool => $proposal->getStatus() === $criteria['status']
+                && in_array($proposal->getTargetType(), $criteria['targetType'], true),
+            )));
         $eventRepository = $this->createStub(EntityRepository::class);
         $eventRepository->method('findBy')->willReturn($events);
 
         $em = $this->createStub(EntityManagerInterface::class);
-        $em->method('getRepository')->willReturnCallback(static fn(string $class): EntityRepository => $class === Event::class ? $eventRepository : $proposalRepository);
+        $em->method('getRepository')->willReturnCallback(static fn(string $class): EntityRepository => $class === Event::class
+            ? $eventRepository
+            : $proposalRepository);
         $em->method('persist')->willReturnCallback(function (object $entity): void {
             $this->persisted[] = $entity;
         });

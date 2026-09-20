@@ -63,11 +63,7 @@ final readonly class SecurityTxtProvider implements WellKnownProviderInterface
             return $contact;
         }
 
-        return $this->urlGenerator->generate(
-            'app_contact',
-            ['_locale' => $request->getLocale()],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
+        return $this->urlGenerator->generate('app_contact', ['_locale' => $request->getLocale()], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     private function resolvePreferredLanguages(): string

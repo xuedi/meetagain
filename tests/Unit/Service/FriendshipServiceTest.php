@@ -158,7 +158,7 @@ class FriendshipServiceTest extends TestCase
 
         // Assert
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
-        $this->expectExceptionMessage('Should never happen, see: config/packages/security.yaml');
+        $this->expectExceptionMessageIsOrContains('Should never happen, see: config/packages/security.yaml');
 
         // Act
         $subject->toggleFollow(42, 'app_profile_view');
@@ -184,7 +184,7 @@ class FriendshipServiceTest extends TestCase
 
         // Assert
         $this->expectException(AuthenticationCredentialsNotFoundException::class);
-        $this->expectExceptionMessage('Should never happen, see: config/packages/security.yaml');
+        $this->expectExceptionMessageIsOrContains('Should never happen, see: config/packages/security.yaml');
 
         // Act
         $subject->toggleFollow(42, 'app_profile_view');

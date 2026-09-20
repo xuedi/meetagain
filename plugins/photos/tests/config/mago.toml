@@ -1,0 +1,21 @@
+# Mago configuration for the photos plugin.
+#
+# Rules come from core; only the paths are the plugin's own. A rule this plugin needs relaxed
+# belongs here, not in the shared file, so the relaxation stops at this plugin.
+#
+# Paths resolve against the project root, `extends` against this file.
+extends = ["../../../../tests/config/mago-rules.toml"]
+
+[source]
+paths = [
+    "plugins/photos/migrations/**/*.php",
+    "plugins/photos/src/**/*.php",
+    "plugins/photos/tests/**/*.php",
+]
+# Core and modules are read for type resolution, not linted - the core run owns those.
+includes = ["vendor", "src", "modules"]
+excludes = []
+
+[analyzer]
+# PHPUnit createMock/createStub false positives, as in core.
+excludes = ["plugins/photos/tests/Unit/"]

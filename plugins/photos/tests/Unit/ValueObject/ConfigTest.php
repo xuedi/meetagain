@@ -24,7 +24,13 @@ class ConfigTest extends TestCase
     public function testRoundTripsThroughTheStoredArray(): void
     {
         // Arrange
-        $config = new Config()->setMemberUploads(false)->setShowCameraMeta(false)->setMemberStreams(false)->setEventBox(false)->setContest(true)->setContestSubmissionsPerMember(3);
+        $config = new Config()
+            ->setMemberUploads(false)
+            ->setShowCameraMeta(false)
+            ->setMemberStreams(false)
+            ->setEventBox(false)
+            ->setContest(true)
+            ->setContestSubmissionsPerMember(3);
 
         // Act
         $restored = Config::fromArray($config->toArray());

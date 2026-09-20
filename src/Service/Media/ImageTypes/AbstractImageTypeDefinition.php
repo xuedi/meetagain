@@ -16,11 +16,6 @@ abstract class AbstractImageTypeDefinition implements ImageTypeDefinitionInterfa
         protected readonly Connection $connection,
     ) {}
 
-    /**
-     * @return array<int, array{0: int, 1: int}>
-     */
-    abstract protected function sizes(): array;
-
     final public function thumbnailSizes(): array
     {
         $merged = [];
@@ -67,4 +62,9 @@ abstract class AbstractImageTypeDefinition implements ImageTypeDefinitionInterfa
             $this->repo->insertForType($this->getType(), $toInsert);
         }
     }
+
+    /**
+     * @return array<int, array{0: int, 1: int}>
+     */
+    abstract protected function sizes(): array;
 }

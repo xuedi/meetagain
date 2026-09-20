@@ -34,13 +34,7 @@ final readonly class VouchService
         if ($existing instanceof TrustGrant) {
             $existing->setLevel($level, $now);
         } else {
-            $this->entityManager->persist(new TrustGrant(
-                $context,
-                $this->reference($fromUserId),
-                $this->reference($toUserId),
-                $level,
-                $now,
-            ));
+            $this->entityManager->persist(new TrustGrant($context, $this->reference($fromUserId), $this->reference($toUserId), $level, $now));
         }
 
         $this->entityManager->flush();

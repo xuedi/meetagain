@@ -23,7 +23,9 @@ final class Version20260815180000 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE language ADD tile_image_id INT DEFAULT NULL, ADD tile_greeting VARCHAR(255) DEFAULT NULL, ADD tile_intro LONGTEXT DEFAULT NULL, ADD tile_cta VARCHAR(255) DEFAULT NULL, ADD tile_image_alt VARCHAR(255) DEFAULT NULL');
+        $this->addSql(
+            'ALTER TABLE language ADD tile_image_id INT DEFAULT NULL, ADD tile_greeting VARCHAR(255) DEFAULT NULL, ADD tile_intro LONGTEXT DEFAULT NULL, ADD tile_cta VARCHAR(255) DEFAULT NULL, ADD tile_image_alt VARCHAR(255) DEFAULT NULL',
+        );
         $this->addSql('ALTER TABLE language ADD CONSTRAINT FK_D4DB71B558AEB961 FOREIGN KEY (tile_image_id) REFERENCES image (id)');
         $this->addSql('CREATE INDEX IDX_D4DB71B558AEB961 ON language (tile_image_id)');
         $this->addSql("INSERT INTO config (name, value, type) VALUES ('show_frontpage', 'true', 'boolean')");

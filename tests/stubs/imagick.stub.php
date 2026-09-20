@@ -142,4 +142,4 @@ class Imagick
     }
 }
 
-class ImagickException extends \Exception {}
+class ImagickException extends Exception {}

@@ -80,9 +80,11 @@ final readonly class ChangeTarget implements ChangeTargetProviderInterface, Chan
     #[Override]
     public function getTargetUrl(int $targetId): ?string
     {
-        return $this->security->isGranted('ROLE_STEWARD')
-            ? $this->router->generate('app_item_tags', ['itemType' => $this->itemType])
-            : $this->router->generate('app_contribution_correct', ['type' => TagSection::TYPE, 'id' => $this->itemType]);
+        return (
+            $this->security->isGranted('ROLE_STEWARD')
+                ? $this->router->generate('app_item_tags', ['itemType' => $this->itemType])
+                : $this->router->generate('app_contribution_correct', ['type' => TagSection::TYPE, 'id' => $this->itemType])
+        );
     }
 
     #[Override]

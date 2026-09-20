@@ -51,11 +51,7 @@ readonly class EventSection implements RowFormInterface
     {
         $entries = [];
         foreach ($this->eventRepo->findAllForAdmin($this->eventFilter->getEventIdFilter()->getEventIds()) as $event) {
-            $entries[] = new Entry(
-                (int) $event->getId(),
-                $this->titleOf($event),
-                $event->getStart()?->format('Y-m-d'),
-            );
+            $entries[] = new Entry((int) $event->getId(), $this->titleOf($event), $event->getStart()?->format('Y-m-d'));
         }
 
         return $entries;
@@ -92,12 +88,7 @@ readonly class EventSection implements RowFormInterface
             $labels[$field] = $this->changeTarget->getFieldLabel($field);
         }
 
-        return new Draft(
-            $this->currentValues($event),
-            $this->titleOf($event),
-            'contribution.event_correct_intro',
-            ['fields' => $labels],
-        );
+        return new Draft($this->currentValues($event), $this->titleOf($event), 'contribution.event_correct_intro', ['fields' => $labels]);
     }
 
     #[Override]

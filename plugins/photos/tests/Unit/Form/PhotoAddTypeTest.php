@@ -65,11 +65,7 @@ class PhotoAddTypeTest extends TestCase
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
 
-        $type = new PhotoAddType(
-            $translator,
-            new TranslationFormHelper($languageService),
-            new AssignmentFormHelper($tagService, new RequestStack()),
-        );
+        $type = new PhotoAddType($translator, new TranslationFormHelper($languageService), new AssignmentFormHelper($tagService, new RequestStack()));
 
         return Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension(Validation::createValidator()))

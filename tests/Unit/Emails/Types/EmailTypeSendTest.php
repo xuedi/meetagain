@@ -21,20 +21,21 @@ use App\Entity\NotificationSettings;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\SupportAudience;
-use App\Filter\Event\FollowerEventNotificationFilterInterface;
 use App\Filter\Email\AudienceFilterService;
+use App\Filter\Event\FollowerEventNotificationFilterInterface;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use App\Service\Support\RecipientResolver;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
+use App\Service\Support\RecipientResolver;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mime\Address;
@@ -141,7 +142,14 @@ class EmailTypeSendTest extends TestCase
 
         $sender = $this->makeUser('sender@example.com', 'Bob', 'en', null, true, null, 2);
 
-        new NotificationMessageEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, new \Symfony\Component\Clock\MockClock(), $this->host)->send([
+        new NotificationMessageEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $queue,
+            $this->config,
+            new \Symfony\Component\Clock\MockClock(),
+            $this->host,
+        )->send([
             'sender' => $sender,
             'recipient' => $this->makeUser(),
         ]);
@@ -297,7 +305,13 @@ class EmailTypeSendTest extends TestCase
     {
         $user = $this->makeUser(settings: new NotificationSettings(['announcements' => true]));
 
-        static::assertTrue(new AnnouncementEmail($this->blocklist, $this->mockSampleFactory(), $this->createStub(EmailQueueInterface::class), $this->config, $this->host)->guardCheck([
+        static::assertTrue(new AnnouncementEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->createStub(EmailQueueInterface::class),
+            $this->config,
+            $this->host,
+        )->guardCheck([
             'user' => $user,
             'renderedContent' => ['title' => 't', 'content' => 'c'],
             'announcementUrl' => 'https://example.com/a/1',
@@ -308,7 +322,13 @@ class EmailTypeSendTest extends TestCase
     {
         $user = $this->makeUser(settings: new NotificationSettings(['announcements' => false]));
 
-        static::assertFalse(new AnnouncementEmail($this->blocklist, $this->mockSampleFactory(), $this->createStub(EmailQueueInterface::class), $this->config, $this->host)->guardCheck([
+        static::assertFalse(new AnnouncementEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->createStub(EmailQueueInterface::class),
+            $this->config,
+            $this->host,
+        )->guardCheck([
             'user' => $user,
             'renderedContent' => ['title' => 't', 'content' => 'c'],
             'announcementUrl' => 'https://example.com/a/1',
@@ -386,7 +406,7 @@ class EmailTypeSendTest extends TestCase
             $this->createStub(EntityManagerInterface::class),
         );
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $email->guardCheck(['user' => 'not-a-user', 'event' => $this->makeEvent()]);
     }
 

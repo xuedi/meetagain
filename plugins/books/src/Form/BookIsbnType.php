@@ -3,6 +3,7 @@
 namespace Plugin\Books\Form;
 
 use App\Item\Tag\AssignmentFormHelper;
+use Override;
 use Plugin\Books\Service\BookService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -19,7 +20,7 @@ class BookIsbnType extends AbstractType
         private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('isbn', TextType::class, [
@@ -36,7 +37,7 @@ class BookIsbnType extends AbstractType
         $this->assignmentFormHelper->addAssignmentFields($builder, BookService::ITEM_TYPE, null);
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([]);

@@ -28,13 +28,7 @@ readonly class MeasureLogger
         }
 
         $counter = new SecurityMeasureLog();
-        $counter
-            ->setDay($day)
-            ->setCreatedAt($now)
-            ->setMeasure($measure)
-            ->setOutcome(SecurityMeasureOutcome::Passed)
-            ->setCount(1)
-            ->setContext($context);
+        $counter->setDay($day)->setCreatedAt($now)->setMeasure($measure)->setOutcome(SecurityMeasureOutcome::Passed)->setCount(1)->setContext($context);
 
         $this->em->persist($counter);
         $this->em->flush();
@@ -65,6 +59,11 @@ readonly class MeasureLogger
 
     public function purgeOlderThan(int $retentionDays): int
     {
-        return $this->repo->deleteOlderThan($this->clock->now()->setTime(0, 0)->modify(sprintf('-%d days', max(1, $retentionDays))));
+        return $this->repo->deleteOlderThan(
+            $this->clock
+                ->now()
+                ->setTime(0, 0)
+                ->modify(sprintf('-%d days', max(1, $retentionDays))),
+        );
     }
 }

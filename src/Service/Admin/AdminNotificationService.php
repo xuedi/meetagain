@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Throwable;
 
 readonly class AdminNotificationService implements CronTaskInterface
 {
@@ -59,7 +60,7 @@ readonly class AdminNotificationService implements CronTaskInterface
             $this->logger->info('Admin notifications processed', ['result' => $result]);
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $result);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $output->writeln('AdminNotificationService exception: ' . $e->getMessage());
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());

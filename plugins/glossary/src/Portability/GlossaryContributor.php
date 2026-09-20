@@ -2,10 +2,10 @@
 
 namespace Plugin\Glossary\Portability;
 
-use App\Portability\Item\ContributorInterface;
-use App\Portability\ImportContext;
-use App\Portability\Item\ImportResult;
 use App\Portability\ImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\Item\ContributorInterface;
+use App\Portability\Item\ImportResult;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -37,7 +37,15 @@ readonly class GlossaryContributor implements ContributorInterface
     #[Override]
     public function allItemIds(): array
     {
-        return array_map(intval(...), $this->glossaryRepo->createQueryBuilder('g')->select('g.id')->orderBy('g.id')->getQuery()->getSingleColumnResult());
+        return array_map(
+            intval(...),
+            $this->glossaryRepo
+                ->createQueryBuilder('g')
+                ->select('g.id')
+                ->orderBy('g.id')
+                ->getQuery()
+                ->getSingleColumnResult(),
+        );
     }
 
     #[Override]

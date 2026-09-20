@@ -35,12 +35,16 @@ final class SiteSettingsTest extends TestCase
         $strings = [];
         $booleans = [];
         $config = $this->createStub(ConfigService::class);
-        $config->method('setString')->willReturnCallback(static function (string $name, string $value) use (&$strings): void {
-            $strings[$name] = $value;
-        });
-        $config->method('setBoolean')->willReturnCallback(static function (string $name, bool $value) use (&$booleans): void {
-            $booleans[$name] = $value;
-        });
+        $config
+            ->method('setString')
+            ->willReturnCallback(static function (string $name, string $value) use (&$strings): void {
+                $strings[$name] = $value;
+            });
+        $config
+            ->method('setBoolean')
+            ->willReturnCallback(static function (string $name, bool $value) use (&$booleans): void {
+                $booleans[$name] = $value;
+            });
         $site = [
             'name' => 'Weiqi Club',
             'description' => 'Go in Berlin',
@@ -60,9 +64,11 @@ final class SiteSettingsTest extends TestCase
         // Arrange
         $written = null;
         $config = $this->createStub(ConfigService::class);
-        $config->method('setString')->willReturnCallback(static function (string $name, string $value) use (&$written): void {
-            $written = $value;
-        });
+        $config
+            ->method('setString')
+            ->willReturnCallback(static function (string $name, string $value) use (&$written): void {
+                $written = $value;
+            });
 
         $description = str_repeat('Board games every Friday. ', 20);
 
@@ -167,7 +173,10 @@ final class SiteSettingsTest extends TestCase
     {
         // Arrange
         $pluginSettings = $this->createMock(PluginSettings::class);
-        $pluginSettings->expects($this->once())->method('apply')->with(['books' => ['circulation' => true]]);
+        $pluginSettings
+            ->expects($this->once())
+            ->method('apply')
+            ->with(['books' => ['circulation' => true]]);
 
         // Act
         $this->siteSettings(pluginSettings: $pluginSettings)->apply(['plugin_settings' => ['books' => ['circulation' => true]]], $this->context());
@@ -187,10 +196,19 @@ final class SiteSettingsTest extends TestCase
         $pluginService = $this->createStub(PluginService::class);
         $pluginService->method('getActiveList')->willReturn(['books']);
         $pluginSettings = $this->createMock(PluginSettings::class);
-        $pluginSettings->expects($this->once())->method('export')->with(['books'])->willReturn(['books' => ['circulation' => true]]);
+        $pluginSettings
+            ->expects($this->once())
+            ->method('export')
+            ->with(['books'])
+            ->willReturn(['books' => ['circulation' => true]]);
 
         // Act
-        $site = $this->siteSettings(config: $config, languageService: $languageService, pluginService: $pluginService, pluginSettings: $pluginSettings)->current();
+        $site = $this->siteSettings(
+            config: $config,
+            languageService: $languageService,
+            pluginService: $pluginService,
+            pluginSettings: $pluginSettings,
+        )->current();
 
         // Assert
         static::assertSame('weiqi-club', $site->slug);
@@ -221,9 +239,11 @@ final class SiteSettingsTest extends TestCase
         $languageRepository->method('findAll')->willReturn($languages);
 
         $templateService = $this->createStub(EmailTemplateService::class);
-        $templateService->method('getDefaultTemplates')->willReturnCallback(
-            static fn(string $code): array => ['welcome' => ['subject' => 'Welcome (' . $code . ')', 'body' => '<p>Hi</p>', 'variables' => []]],
-        );
+        $templateService
+            ->method('getDefaultTemplates')
+            ->willReturnCallback(static fn(string $code): array => [
+                'welcome' => ['subject' => 'Welcome (' . $code . ')', 'body' => '<p>Hi</p>', 'variables' => []],
+            ]);
         $templateService->method('getTemplate')->willReturn(new EmailTemplate()->setIdentifier('welcome'));
 
         $em = $this->createStub(EntityManagerInterface::class);
@@ -255,6 +275,10 @@ final class SiteSettingsTest extends TestCase
 
     private function language(string $code, bool $enabled, int $sortOrder): Language
     {
-        return new Language()->setCode($code)->setName($code)->setEnabled($enabled)->setSortOrder($sortOrder);
+        return new Language()
+            ->setCode($code)
+            ->setName($code)
+            ->setEnabled($enabled)
+            ->setSortOrder($sortOrder);
     }
 }

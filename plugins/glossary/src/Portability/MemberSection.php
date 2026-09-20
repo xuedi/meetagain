@@ -172,10 +172,9 @@ readonly class MemberSection implements PluginSectionInterface
      */
     private function proposalRows(Scope $scope, array $entryIds): array
     {
-        $proposals = $this->em->getRepository(ChangeProposal::class)->findBy(
-            ['status' => ChangeProposalStatus::Pending, 'targetType' => self::ITEM_TYPE],
-            ['id' => 'ASC'],
-        );
+        $proposals = $this->em->getRepository(ChangeProposal::class)->findBy(['status' => ChangeProposalStatus::Pending, 'targetType' => self::ITEM_TYPE], [
+            'id' => 'ASC',
+        ]);
 
         $rows = [];
         foreach ($proposals as $proposal) {
@@ -220,7 +219,12 @@ readonly class MemberSection implements PluginSectionInterface
             return;
         }
 
-        $card = new TrainerCard($userId, $this->em->getReference(Glossary::class, $entryId), $direction, $this->date($row['created_at'] ?? null) ?? new DateTimeImmutable());
+        $card = new TrainerCard(
+            $userId,
+            $this->em->getReference(Glossary::class, $entryId),
+            $direction,
+            $this->date($row['created_at'] ?? null) ?? new DateTimeImmutable(),
+        );
         $card->setState(CardState::tryFrom((string) ($row['state'] ?? '')) ?? CardState::New);
         $card->setDueAt($this->date($row['due_at'] ?? null));
         $card->setIntervalDays((int) ($row['interval_days'] ?? 0));
@@ -327,12 +331,7 @@ readonly class MemberSection implements PluginSectionInterface
             }
 
             $resolution = $change['resolution'] ?? null;
-            $fieldChanges[] = new FieldChange(
-                (string) $field,
-                $before,
-                $after,
-                is_string($resolution) ? FieldResolution::tryFrom($resolution) : null,
-            );
+            $fieldChanges[] = new FieldChange((string) $field, $before, $after, is_string($resolution) ? FieldResolution::tryFrom($resolution) : null);
         }
 
         return $fieldChanges === [] ? null : $fieldChanges;

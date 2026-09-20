@@ -8,8 +8,8 @@ use App\Enum\ImageType;
 use App\ExtendedFilesystem;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use finfo;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class ImageImporter
 {

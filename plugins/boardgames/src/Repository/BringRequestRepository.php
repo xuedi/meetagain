@@ -29,7 +29,8 @@ class BringRequestRepository extends ServiceEntityRepository
     /** @return list<BringRequest> */
     public function findOpenForEvent(int $eventId): array
     {
-        return $this->createQueryBuilder('r')
+        return $this
+            ->createQueryBuilder('r')
             ->addSelect('g')
             ->join('r.game', 'g')
             ->andWhere('r.event = :eventId')
@@ -44,7 +45,8 @@ class BringRequestRepository extends ServiceEntityRepository
     /** @return list<BringRequest> */
     public function findOpenForOwner(User $owner): array
     {
-        return $this->createQueryBuilder('r')
+        return $this
+            ->createQueryBuilder('r')
             ->addSelect('g')
             ->addSelect('e')
             ->join('r.game', 'g')
@@ -61,7 +63,8 @@ class BringRequestRepository extends ServiceEntityRepository
     /** @return list<BringRequest> */
     public function findOpenStartingBefore(DateTimeImmutable $moment): array
     {
-        return $this->createQueryBuilder('r')
+        return $this
+            ->createQueryBuilder('r')
             ->join('r.event', 'e')
             ->andWhere('r.status = :status')
             ->andWhere('e.start <= :moment')
@@ -74,7 +77,8 @@ class BringRequestRepository extends ServiceEntityRepository
     /** @return list<BringRequest> */
     public function findAllOpen(): array
     {
-        return $this->createQueryBuilder('r')
+        return $this
+            ->createQueryBuilder('r')
             ->addSelect('g')
             ->addSelect('e')
             ->join('r.game', 'g')
@@ -92,7 +96,8 @@ class BringRequestRepository extends ServiceEntityRepository
             return;
         }
 
-        $this->createQueryBuilder('r')
+        $this
+            ->createQueryBuilder('r')
             ->delete()
             ->andWhere('r.game IN (:ids)')
             ->setParameter('ids', $gameIds)

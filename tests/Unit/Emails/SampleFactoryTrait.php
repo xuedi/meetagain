@@ -9,10 +9,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 trait SampleFactoryTrait
 {
-    private function mockSampleFactory(
-        string $host = 'https://meetagain.local',
-        string $url = 'meetagain.local',
-    ): MockSampleFactory {
+    private function mockSampleFactory(string $host = 'https://meetagain.local', string $url = 'meetagain.local'): MockSampleFactory
+    {
         $resolver = $this->createStub(RequestHostResolver::class);
         $resolver->method('getSchemeAndHost')->willReturn($host);
         $resolver->method('getHost')->willReturn($url);

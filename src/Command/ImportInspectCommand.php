@@ -30,7 +30,13 @@ class ImportInspectCommand extends Command
     protected function configure(): void
     {
         $this->addArgument('archives', InputArgument::REQUIRED | InputArgument::IS_ARRAY, 'Paths to archive ZIPs or to directories holding their export.json');
-        $this->addOption('format', null, InputOption::VALUE_REQUIRED, 'json: one archive in full; plugins: the plugin keys of one archive; table: one row per archive', self::FORMAT_JSON);
+        $this->addOption(
+            'format',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'json: one archive in full; plugins: the plugin keys of one archive; table: one row per archive',
+            self::FORMAT_JSON,
+        );
     }
 
     #[Override]
@@ -78,12 +84,7 @@ class ImportInspectCommand extends Command
             $description = $descriptions[$index];
             $rows[] = [basename(rtrim($archive, '/')), $description['name'], implode(', ', $description['plugins']), $description['description']];
         }
-        $io
-            ->createTable()
-            ->setHeaders(['Archive', 'Name', 'Plugins', 'Description'])
-            ->setRows($rows)
-            ->setColumnMaxWidth(3, 60)
-            ->render();
+        $io->createTable()->setHeaders(['Archive', 'Name', 'Plugins', 'Description'])->setRows($rows)->setColumnMaxWidth(3, 60)->render();
 
         return Command::SUCCESS;
     }

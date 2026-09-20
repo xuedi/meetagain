@@ -53,10 +53,7 @@ final readonly class RecurrenceBuilderState
 
     public function warnsAboutShortMonths(): bool
     {
-        return $this->showsDayOfMonth() && [] !== array_filter(
-            $this->daysOfMonth,
-            static fn(int $day): bool => $day >= self::SHORT_MONTH_THRESHOLD,
-        );
+        return $this->showsDayOfMonth() && [] !== array_filter($this->daysOfMonth, static fn(int $day): bool => $day >= self::SHORT_MONTH_THRESHOLD);
     }
 
     public function pattern(?int $anchorMonth = null, ?RecurrencePeriod $period = null): RecurrencePattern

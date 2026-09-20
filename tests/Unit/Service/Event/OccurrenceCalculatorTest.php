@@ -150,11 +150,7 @@ class OccurrenceCalculatorTest extends TestCase
     {
         // Arrange
         $calculator = new OccurrenceCalculator();
-        $pattern = RecurrencePattern::weekday(
-            RecurrencePeriod::Month,
-            Weekday::Friday,
-            [RecurrenceOrdinal::Fourth, RecurrenceOrdinal::Last],
-        );
+        $pattern = RecurrencePattern::weekday(RecurrencePeriod::Month, Weekday::Friday, [RecurrenceOrdinal::Fourth, RecurrenceOrdinal::Last]);
 
         // Act
         $occurrences = $calculator->until($pattern, new DateTimeImmutable('2026-02-01'), new DateTimeImmutable('2026-02-28'));
@@ -183,17 +179,10 @@ class OccurrenceCalculatorTest extends TestCase
         $pattern = RecurrencePattern::dayOfMonth(RecurrencePeriod::Month, [28, 31]);
 
         // Act
-        $occurrences = $calculator->until(
-            $pattern,
-            new DateTimeImmutable('2026-01-01'),
-            new DateTimeImmutable('2026-03-31'),
-        );
+        $occurrences = $calculator->until($pattern, new DateTimeImmutable('2026-01-01'), new DateTimeImmutable('2026-03-31'));
 
         // Assert
-        static::assertSame(
-            '2026-01-28,2026-01-31,2026-02-28,2026-03-28,2026-03-31',
-            self::join($occurrences),
-        );
+        static::assertSame('2026-01-28,2026-01-31,2026-02-28,2026-03-28,2026-03-31', self::join($occurrences));
     }
 
     public function testAWindowEndingBeforeTheFirstOccurrenceReturnsNothing(): void

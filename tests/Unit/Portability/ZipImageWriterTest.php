@@ -62,7 +62,9 @@ final class ZipImageWriterTest extends TestCase
     public function testAnImageWithoutItsFileIsLeftOut(): void
     {
         // Arrange
-        $missing = new Image()->setHash('missing')->setExtension('jpg');
+        $missing = new Image()
+            ->setHash('missing')
+            ->setExtension('jpg');
 
         // Act
         $path = new ZipImageWriter($this->zip, $this->projectDir)->addImage($missing);
@@ -83,17 +85,22 @@ final class ZipImageWriterTest extends TestCase
         $attributions = $writer->getAttributions();
 
         // Assert
-        static::assertSame([
-            'images/aaa.jpg' => ['attribution' => 'Photo: Ada, CC BY 4.0', 'attribution_not_required' => false],
-            'images/ccc.jpg' => ['attribution' => null, 'attribution_not_required' => true],
-        ], $attributions);
+        static::assertSame(
+            [
+                'images/aaa.jpg' => ['attribution' => 'Photo: Ada, CC BY 4.0', 'attribution_not_required' => false],
+                'images/ccc.jpg' => ['attribution' => null, 'attribution_not_required' => true],
+            ],
+            $attributions,
+        );
     }
 
     private function image(string $hash): Image
     {
         file_put_contents($this->projectDir . '/data/images/' . $hash . '.jpg', $hash);
 
-        return new Image()->setHash($hash)->setExtension('jpg');
+        return new Image()
+            ->setHash($hash)
+            ->setExtension('jpg');
     }
 
     private function closedZipFileCount(): int

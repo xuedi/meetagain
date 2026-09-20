@@ -190,6 +190,6 @@ class CirculationHandover
         $isGiver = $this->fromUser?->getId() === $user->getId();
         $isReceiver = $this->toUser->getId() === $user->getId();
 
-        return ($isGiver && $this->fromConfirmedAt !== null) || ($isReceiver && $this->toConfirmedAt !== null);
+        return $isGiver && $this->fromConfirmedAt !== null || $isReceiver && $this->toConfirmedAt !== null;
     }
 }

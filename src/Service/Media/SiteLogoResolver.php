@@ -75,11 +75,7 @@ readonly class SiteLogoResolver
 
     private function buildUrl(Image $image): string
     {
-        $url = sprintf(
-            '/images/thumbnails/%s_%s.webp',
-            $image->getHash(),
-            $this->thumbnailSizeFormat->format(self::SIZE[0], self::SIZE[1]),
-        );
+        $url = sprintf('/images/thumbnails/%s_%s.webp', $image->getHash(), $this->thumbnailSizeFormat->format(self::SIZE[0], self::SIZE[1]));
         if ($image->getUpdatedAt() !== null) {
             $url .= '?v' . $image->getUpdatedAt()->format('YmdHis');
         }

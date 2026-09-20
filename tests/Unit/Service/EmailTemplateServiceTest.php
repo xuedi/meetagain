@@ -91,7 +91,7 @@ class EmailTemplateServiceTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Email template "welcome" not found');
+        $this->expectExceptionMessageIsOrContains('Email template "welcome" not found');
 
         // Act
         $this->subject->getTemplateContent(EmailType::Welcome->value, 'en');
@@ -108,7 +108,7 @@ class EmailTemplateServiceTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('No translation found for email template');
+        $this->expectExceptionMessageIsOrContains('No translation found for email template');
 
         // Act
         $this->subject->getTemplateContent(EmailType::Welcome->value, 'en');
@@ -173,10 +173,7 @@ class EmailTemplateServiceTest extends TestCase
         $result = $this->subject->renderContent($content, $context);
 
         // Assert
-        static::assertSame(
-            '<p>Hello &lt;a href=&quot;https://evil.example&quot;&gt;Alice&lt;/a&gt;</p>',
-            $result,
-        );
+        static::assertSame('<p>Hello &lt;a href=&quot;https://evil.example&quot;&gt;Alice&lt;/a&gt;</p>', $result);
     }
 
     public function testRenderContentLetsTheAnnouncementBodyThroughAsHtml(): void

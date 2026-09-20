@@ -26,17 +26,11 @@ readonly class RemoveVotingPluginLeftovers implements DataHotfixInterface
     public function execute(): void
     {
         if ($this->tableExists(self::MIGRATIONS_TABLE)) {
-            $this->connection->executeStatement(
-                sprintf('DELETE FROM %s WHERE version LIKE ?', self::MIGRATIONS_TABLE),
-                ['PluginVotingMigrations%'],
-            );
+            $this->connection->executeStatement(sprintf('DELETE FROM %s WHERE version LIKE ?', self::MIGRATIONS_TABLE), ['PluginVotingMigrations%']);
         }
 
         if ($this->tableExists(self::SETTINGS_TABLE)) {
-            $this->connection->executeStatement(
-                sprintf('DELETE FROM %s WHERE plugin_key = ?', self::SETTINGS_TABLE),
-                [self::PLUGIN_KEY],
-            );
+            $this->connection->executeStatement(sprintf('DELETE FROM %s WHERE plugin_key = ?', self::SETTINGS_TABLE), [self::PLUGIN_KEY]);
         }
     }
 

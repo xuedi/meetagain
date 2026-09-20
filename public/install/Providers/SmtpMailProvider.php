@@ -72,13 +72,7 @@ class SmtpMailProvider implements MailProvider
             $auth .= '@';
         }
 
-        $dsn = sprintf(
-            '%s://%s%s:%d',
-            $scheme,
-            $auth,
-            $config['smtp_host'] ?? 'localhost',
-            (int) ($config['smtp_port'] ?? 25)
-        );
+        $dsn = sprintf('%s://%s%s:%d', $scheme, $auth, $config['smtp_host'] ?? 'localhost', (int) ($config['smtp_port'] ?? 25));
 
         if (($config['encryption'] ?? 'none') === 'tls') {
             $dsn .= '?encryption=tls';
@@ -96,28 +90,23 @@ class SmtpMailProvider implements MailProvider
         string $host,
         int $port,
         ?string $user,
+        #[SensitiveParameter]
         ?string $password,
         string $encryption,
         Installer $installer,
     ): bool {
         try {
             $timeout = 5;
-            $socket = @fsockopen(
-                ($encryption === 'ssl' ? 'ssl://' : '') . $host,
-                $port,
-                $errno,
-                $errstr,
-                $timeout
-            );
+            $socket = @fsockopen(($encryption === 'ssl' ? 'ssl://' : '') . $host, $port, $errno, $errstr, $timeout);
 
             if (!$socket) {
-                $installer->addError("SMTP connection failed: $errstr ($errno)");
+                $installer->addError("SMTP connection failed: {$errstr} ({$errno})");
 
                 return false;
             }
 
             $response = fgets($socket, 512);
-            if (strpos($response, '220') !== 0) {
+            if (!str_starts_with($response, '220')) {
                 $installer->addError('SMTP server did not respond correctly');
                 fclose($socket);
 

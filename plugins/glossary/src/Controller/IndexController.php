@@ -26,8 +26,13 @@ final class IndexController extends AbstractGlossaryController
     }
 
     #[Route('/{id}', name: 'app_plugin_glossary_show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function detail(int $id, ListRegistry $listRegistry, BreadcrumbBuilder $breadcrumbBuilder, TrainerService $trainer, ProgressService $progress): Response
-    {
+    public function detail(
+        int $id,
+        ListRegistry $listRegistry,
+        BreadcrumbBuilder $breadcrumbBuilder,
+        TrainerService $trainer,
+        ProgressService $progress,
+    ): Response {
         if (!$listRegistry->has(GlossaryTaggableTypeProvider::ITEM_TYPE)) {
             throw $this->createNotFoundException();
         }

@@ -115,9 +115,11 @@ class GrantTransferTest extends TestCase
     {
         $entityManager = $this->createStub(EntityManagerInterface::class);
         $entityManager->method('getReference')->willReturnCallback(fn(string $class, int $id): User => $this->user($id));
-        $entityManager->method('persist')->willReturnCallback(function (object $entity): void {
-            $this->persisted[] = $entity;
-        });
+        $entityManager
+            ->method('persist')
+            ->willReturnCallback(function (object $entity): void {
+                $this->persisted[] = $entity;
+            });
 
         $configRepository = $this->createStub(TrustContextConfigRepository::class);
         $configRepository->method('findByContext')->willReturn(null);

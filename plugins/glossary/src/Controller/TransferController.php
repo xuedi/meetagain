@@ -101,7 +101,10 @@ final class TransferController extends AbstractGlossaryController
                     '%skipped%' => $summary['skipped'],
                 ]));
                 if ($summary['unknownTags'] !== []) {
-                    $this->addFlash('warning', $this->translator->trans('glossary_import.flash_unknown_tags', ['%tags%' => implode(', ', $summary['unknownTags'])]));
+                    $this->addFlash('warning', $this->translator->trans('glossary_import.flash_unknown_tags', ['%tags%' => implode(
+                        ', ',
+                        $summary['unknownTags'],
+                    )]));
                 }
 
                 return $this->redirectToRoute('app_plugin_glossary', $summary['tagId'] === null ? [] : ['tag' => [$summary['tagId']]]);

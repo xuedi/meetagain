@@ -99,7 +99,7 @@ class EventSimilarityServiceTest extends TestCase
         static::assertSame(20.0, $emptyOnOneSide->total);
         static::assertSame(0.0, $emptyOnBothSides->teaser);
         // teaser drops out of the weighting entirely: only title (20) and description (60) remain
-        static::assertSame(round($emptyOnBothSides->description * 60 / 80, 2), $emptyOnBothSides->total);
+        static::assertSame(round(($emptyOnBothSides->description * 60) / 80, 2), $emptyOnBothSides->total);
     }
 
     public function testMissingTranslationCountsAsFullyChanged(): void

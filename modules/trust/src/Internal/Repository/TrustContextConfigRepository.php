@@ -26,10 +26,7 @@ class TrustContextConfigRepository extends ServiceEntityRepository
      */
     public function findConfiguredContexts(): array
     {
-        $rows = $this->createQueryBuilder('c')
-            ->select('c.context')
-            ->getQuery()
-            ->getArrayResult();
+        $rows = $this->createQueryBuilder('c')->select('c.context')->getQuery()->getArrayResult();
 
         return array_map(static fn(array $row): string => (string) $row['context'], $rows);
     }

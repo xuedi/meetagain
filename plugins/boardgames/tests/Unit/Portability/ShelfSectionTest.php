@@ -31,7 +31,12 @@ final class ShelfSectionTest extends SectionTestCase
         $bo = $this->user(2, 'bo@example.org');
         $exported = $this->section([
             GameOwnership::class => [$this->ownership($ada, $game)],
-            GamePledge::class => [new GamePledge()->setEvent($event)->setGame($game)->setUser($ada)->setStatus(PledgeStatus::Withdrawn)->setCreatedAt(new DateTimeImmutable('2026-01-06 10:00'))],
+            GamePledge::class => [new GamePledge()
+                ->setEvent($event)
+                ->setGame($game)
+                ->setUser($ada)
+                ->setStatus(PledgeStatus::Withdrawn)
+                ->setCreatedAt(new DateTimeImmutable('2026-01-06 10:00'))],
             BringRequest::class => [$this->request($event, $game, $bo, $ada)],
         ])->export($this->scope([1, 2]), $this->images());
 
@@ -82,7 +87,11 @@ final class ShelfSectionTest extends SectionTestCase
         $bo = $this->user(2, 'bo@example.org');
         $section = $this->section([
             GameOwnership::class => [$this->ownership($ada, $game), $this->ownership($bo, $game)],
-            GamePledge::class => [new GamePledge()->setEvent($event)->setGame($game)->setUser($bo)->setCreatedAt(new DateTimeImmutable())],
+            GamePledge::class => [new GamePledge()
+                ->setEvent($event)
+                ->setGame($game)
+                ->setUser($bo)
+                ->setCreatedAt(new DateTimeImmutable())],
             BringRequest::class => [$this->request($event, $game, $ada, $bo)],
         ]);
 
@@ -115,8 +124,9 @@ final class ShelfSectionTest extends SectionTestCase
         $context->mapRef(User::class, 'ada@example.org', $this->user(11, 'ada@example.org'));
 
         // Act
-        $this->section(game: $this->withId(new Game(), 44), existingOwnership: new GameOwnership())
-            ->import(['ownerships' => [['game_ref' => 4, 'email' => 'ada@example.org']]], $context);
+        $this->section(game: $this->withId(new Game(), 44), existingOwnership: new GameOwnership())->import([
+            'ownerships' => [['game_ref' => 4, 'email' => 'ada@example.org']],
+        ], $context);
 
         // Assert
         static::assertSame(1, $context->toSummary()->get(ShelfSection::KIND_OWNERSHIPS, Outcome::Matched));

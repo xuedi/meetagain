@@ -15,6 +15,7 @@ use App\Enum\EntityAction;
 use App\Enum\SecurityEventType;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
+use App\EventSubscriber\Security\LoginAttemptSubscriber;
 use App\Form\NewPasswordType;
 use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
@@ -63,7 +64,7 @@ final class SecurityController extends AbstractController
         private readonly LoginGuard $loginGuard,
     ) {}
 
-    #[Route(path: '/login', name: self::LOGIN_ROUTE)]
+    #[Route(path: '/login', name: self::LOGIN_ROUTE, defaults: [LoginAttemptSubscriber::ROUTE_DEFAULT => true])]
     public function login(Request $request): Response
     {
         $error = $this->authenticationUtils->getLastAuthenticationError();

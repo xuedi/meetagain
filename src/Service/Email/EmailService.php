@@ -24,6 +24,7 @@ use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
+use Throwable;
 
 readonly class EmailService implements CronTaskInterface, EmailQueueInterface
 {
@@ -45,13 +46,8 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         private iterable $identityProviders,
     ) {}
 
-    public function enqueue(
-        EmailInterface $source,
-        TemplatedEmail $email,
-        array $context,
-        bool $flush = true,
-        ?object $origin = null,
-    ): bool {
+    public function enqueue(EmailInterface $source, TemplatedEmail $email, array $context, bool $flush = true, ?object $origin = null): bool
+    {
         $identifier = $source->getIdentifier();
         $locale = $email->getLocale() ?? 'en';
         $templateContent = $this->templateService->getTemplateContent($identifier, $locale);
@@ -103,7 +99,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
             $status = str_contains($result, '(Failed:') || str_contains($result, '(Late:') ? CronTaskStatus::warning : CronTaskStatus::ok;
 
             return new CronTaskResult($this->getIdentifier(), $status, $result);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $output->writeln('EmailService exception: ' . $e->getMessage());
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());

@@ -60,20 +60,17 @@ final class TemplateProviderChainTest extends TestCase
         $fs->method('fileExists')->willReturn(true);
         $fs->method('getFileContents')->willReturn('<p>shipped body</p>');
 
-        return new EmailTemplateService(
-            $this->createStub(EmailTemplateRepository::class),
-            $fs,
-            self::PROJECT_DIR,
-            $providers,
-        );
+        return new EmailTemplateService($this->createStub(EmailTemplateRepository::class), $fs, self::PROJECT_DIR, $providers);
     }
 
     private function makeProvider(string $identifier, string $subject): TemplateProviderInterface
     {
         $provider = $this->createStub(TemplateProviderInterface::class);
-        $provider->method('getDefinitions')->willReturn([
-            new TemplateDefinition($identifier, $subject, '<p>provided body</p>', ['amount']),
-        ]);
+        $provider
+            ->method('getDefinitions')
+            ->willReturn([
+                new TemplateDefinition($identifier, $subject, '<p>provided body</p>', ['amount']),
+            ]);
 
         return $provider;
     }

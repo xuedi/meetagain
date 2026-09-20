@@ -28,9 +28,7 @@ readonly class UserChecker implements UserCheckerInterface
     ) {}
 
     #[Override]
-    public function checkPreAuth(UserInterface $user): void
-    {
-    }
+    public function checkPreAuth(UserInterface $user): void {}
 
     public static function assertActive(User $user): void
     {

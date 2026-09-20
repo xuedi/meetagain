@@ -22,7 +22,8 @@ class BallotVoteRepository extends ServiceEntityRepository
      */
     public function countByOptionKey(int $ballotId): array
     {
-        $rows = $this->createQueryBuilder('v')
+        $rows = $this
+            ->createQueryBuilder('v')
             ->select('v.optionKey AS optionKey', 'COUNT(v.id) AS total')
             ->where('IDENTITY(v.ballot) = :ballot')
             ->setParameter('ballot', $ballotId)
@@ -40,7 +41,8 @@ class BallotVoteRepository extends ServiceEntityRepository
 
     public function countVoters(int $ballotId): int
     {
-        return (int) $this->createQueryBuilder('v')
+        return (int) $this
+            ->createQueryBuilder('v')
             ->select('COUNT(DISTINCT IDENTITY(v.user))')
             ->where('IDENTITY(v.ballot) = :ballot')
             ->setParameter('ballot', $ballotId)
@@ -53,7 +55,8 @@ class BallotVoteRepository extends ServiceEntityRepository
      */
     public function findSelection(int $ballotId, int $userId): array
     {
-        $rows = $this->createQueryBuilder('v')
+        $rows = $this
+            ->createQueryBuilder('v')
             ->select('v.optionKey AS optionKey')
             ->where('IDENTITY(v.ballot) = :ballot')
             ->andWhere('IDENTITY(v.user) = :user')
@@ -70,7 +73,8 @@ class BallotVoteRepository extends ServiceEntityRepository
      */
     public function findForVoter(Ballot $ballot, int $userId): array
     {
-        return $this->createQueryBuilder('v')
+        return $this
+            ->createQueryBuilder('v')
             ->where('v.ballot = :ballot')
             ->andWhere('IDENTITY(v.user) = :user')
             ->setParameter('ballot', $ballot)
@@ -84,7 +88,8 @@ class BallotVoteRepository extends ServiceEntityRepository
      */
     public function findAllSelections(): array
     {
-        $rows = $this->createQueryBuilder('v')
+        $rows = $this
+            ->createQueryBuilder('v')
             ->select('IDENTITY(v.ballot) AS ballotId', 'IDENTITY(v.user) AS userId', 'v.optionKey AS optionKey')
             ->orderBy('v.id', 'ASC')
             ->getQuery()

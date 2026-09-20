@@ -1,0 +1,220 @@
+# Shared Mago rule set.
+#
+# Thresholds and rule toggles only - no `[source]` block, so extending this file adds rules
+# without pulling in anyone else's paths. `tests/config/mago.toml` extends it for core, and each
+# plugin's own `tests/config/mago.toml` extends it for that plugin.
+#
+# Rules are merged into one flat set per run, so a toggle here applies to every run that extends
+# it. A relaxation that only one plugin needs belongs in that plugin's config, not here.
+php-version = "8.4"
+
+[formatter]
+print-width = 160
+tab-width = 4
+use-tabs = false
+opening-tag-on-own-line = false
+empty-line-after-opening-tag = false
+# `<?php declare(strict_types=1);` on one line, the way all but a handful of files already write it.
+# Without this the formatter leaves a split pair split, so the two forms coexisted indefinitely.
+combine-opening-tag-and-declare = true
+
+[linter]
+integrations = ["symfony", "php-unit"]
+# No `minimum-fail-level` here: the linter has no such config key (it silently ignores one) and
+# already exits non-zero on a warning by default. Only the analyzer needs it set, below.
+
+# Raised from default 12 — controllers, services and test classes legitimately accumulate methods
+[linter.rules.too-many-methods]
+threshold = 45
+
+# Raised from default 5 — Symfony forms and commands commonly exceed 5 params
+[linter.rules.excessive-parameter-list]
+threshold = 20
+
+# Raised from default 15 — real code, not greenfield
+[linter.rules.cyclomatic-complexity]
+threshold = 150
+
+# Raised — entities with many fields are normal in this domain
+[linter.rules.too-many-properties]
+threshold = 30
+
+# Raised — large enums exist for country codes etc.
+[linter.rules.too-many-enum-cases]
+threshold = 100
+
+# Raised from default 2.0 — too strict for existing codebase
+[linter.rules.kan-defect]
+threshold = 10.0
+
+# Disabled — all hits are test passwords/fixture data, not real credentials
+[linter.rules.no-literal-password]
+enabled = false
+
+# Disabled — 412 hits, penalises a common readable pattern with named arguments
+[linter.rules.literal-named-argument]
+enabled = false
+
+# Disabled — isset() is idiomatic PHP, not a code smell
+[linter.rules.no-isset]
+enabled = false
+
+# Disabled — ?: is common shorthand, not confusing
+[linter.rules.no-shorthand-ternary]
+enabled = false
+
+# Disabled — Halstead complexity is too academic for this codebase
+[linter.rules.halstead]
+enabled = false
+
+# Disabled — TODO comments are tracked; not a linter concern
+[linter.rules.tagged-todo]
+enabled = false
+
+# Disabled — assertion style is a test team preference, not enforced here
+[linter.rules.assertion-style]
+enabled = false
+
+# Disabled — entity setters, test data providers, and service flags with bool params are idiomatic
+[linter.rules.no-boolean-flag-parameter]
+enabled = false
+
+# Disabled — strict assertions debatable for this test suite
+[linter.rules.strict-assertions]
+enabled = false
+
+# Disabled — strict behaviour rules are too opinionated for now
+[linter.rules.strict-behavior]
+enabled = false
+
+# Disabled — readable literal checks are too pedantic for existing code
+[linter.rules.readable-literal]
+enabled = false
+
+# Disabled — nested ternaries exist in templates/legacy code
+[linter.rules.no-nested-ternary]
+enabled = false
+
+# Disabled — assert descriptions not required in this project
+[linter.rules.assert-description]
+enabled = false
+
+# Disabled — `else` after a terminating branch is sometimes the clearer form
+# (symmetric pair of actions like follow/unfollow), rule is purely stylistic.
+[linter.rules.no-else-clause]
+enabled = false
+
+# Disabled — test files commonly contain inline helper stubs alongside the test class
+[linter.rules.single-class-per-file]
+enabled = false
+
+# Disabled — mago wants plain functions in snake_case. The only plain functions in the tree are the
+# helpers in the `bin/check-*.php` scripts, and they are camelCase like every method around them.
+[linter.rules.function-name]
+enabled = false
+
+# Disabled — the rule rewrites `if (cond) { $x++; }` into `if (!(cond)) { continue; }` followed by
+# the statement, which reads worse for a single statement, and its auto-fix emits that statement at
+# column 0, destroying the indentation of every block it touches.
+[linter.rules.prefer-early-continue]
+enabled = false
+
+# Disabled — its auto-fix strips `?->` from calls that really are nullable. It rewrote
+# `$image->getType()?->value ?? 0` to `$image->getType()->value ?? 0` on a `?ImageType` return,
+# which turns a silent null into a PHP warning and makes the `??` fallback unreachable reasoning.
+# A redundant `?->` costs nothing; removing a needed one is a runtime change.
+[linter.rules.no-redundant-nullsafe]
+enabled = false
+
+[analyzer]
+# Fail the run on a warning, not only on an error - the analyzer defaults to `error`, so without
+# this a warning prints and the build still passes. The tree is at zero findings on every level,
+# so this is a ratchet: anything new has to be fixed, suppressed at the line with a `@mago-expect`
+# naming the reason, or deliberately ignored below. "note" is the strictest setting and would make
+# help-level style suggestions blocking too.
+minimum-fail-level = "warning"
+
+# `excludes` is deliberately not set here: the analyzer matches it as a literal path prefix, not a
+# glob, so `**/tests/Unit/` does not work and every entry would have to name a specific directory.
+# Each config that extends this file lists its own - see the `[analyzer]` block in mago.toml.
+
+ignore = [
+    # mixed-* — require full type annotation of the codebase (Symfony form getData(),
+    # Doctrine meta arrays, etc.). Separate typing project.
+    "mixed-assignment",
+    "mixed-method-access",
+    "mixed-array-access",
+    "mixed-array-assignment",
+    "mixed-argument",
+    "mixed-return-statement",
+    "mixed-operand",
+    "mixed-property-access",
+    "mixed-property-type-coercion",
+    "mixed-clone",
+
+    # Downstream effects of mixed-* — all resolve to `mixed` type.
+    "invalid-callable",
+    "invalid-destructuring-source",
+
+    # possibly-null-* / possible-*-null / possibly-false-* — require systematic null-safety
+    # refactor (nullable Doctrine relations, optional Symfony services, getId() before flush).
+    # Real issues but a separate null-safety project.
+    "possibly-null-argument",
+    "possible-method-access-on-null",
+    "possibly-null-array-access",
+    "possibly-null-array-index",
+    "possibly-null-operand",
+    "possibly-null-iterator",
+    "possibly-null-property-access",
+    "possibly-false-argument",
+    "possibly-false-operand",
+    "possibly-false-iterator",
+
+    # Downstream effects of null-* — return types involving null flow.
+    "invalid-return-statement",
+    "nullable-return-statement",
+
+    # Type precision — separate project, not runtime bugs.
+    "less-specific-nested-argument-type",
+    "less-specific-argument",
+    "less-specific-return-statement",
+    "less-specific-nested-return-statement",
+
+    # Requires intersection type support — separate project.
+    "ambiguous-object-method-access",
+    "ambiguous-object-property-access",
+
+    # invalid-iterator when type is mixed — downstream of mixed-* (Doctrine raw queries,
+    # untyped arrays). The nonnull variant requires explicit array shape annotations.
+    "invalid-iterator",
+
+    # invalid-type-cast — intentional (array) and (float) casts on mixed JSON payload
+    # fields in API controllers and ImportService. Downstream of mixed-typing.
+    "invalid-type-cast",
+
+    # possibly-static-access-on-interface — BlockHydrator and CmsBlockType intentionally
+    # call static methods via class-string<Interface>; all concrete classes implement them.
+    "possibly-static-access-on-interface",
+
+    # template-constraint-violation — Enum::getTranslatedList() returns mixed; fixing
+    # requires adding generic @return annotations throughout enum classes.
+    "template-constraint-violation",
+
+    # redundant-* — the analyzer treats docblock and extension-stub types as ground truth and then
+    # calls the code guarding against them redundant. Checked against the real signatures, it is
+    # wrong far more often than it is right: it reports `(string) $user->getName()` as redundant on
+    # a `?string`, `(string) $response->getContent()` on a `string|false`, and
+    # `(string) $request->query->get(...)` on a nullable InputBag read - following any of those
+    # turns '' into null or false. Its linter twin `no-redundant-nullsafe` is disabled above for
+    # the same reason, after its auto-fix stripped `?->` off a nullable `getType()`.
+    "redundant-cast",
+    "redundant-null-coalesce",
+    "redundant-nullsafe-operator",
+    "redundant-type-comparison",
+    "redundant-logical-operation",
+    "redundant-comparison",
+
+    # Style preferences — not bugs.
+    "non-documented-method",
+    "non-documented-property",
+]

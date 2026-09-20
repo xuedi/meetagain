@@ -37,12 +37,7 @@ class EmailPreviewCommand extends Command
         $io = new SymfonyStyle($input, $output);
 
         try {
-            $result = $this->sweep->sweep(
-                $input->getOption('type'),
-                $input->getOption('lang'),
-                (string) $input->getOption('to'),
-                !$input->getOption('plain'),
-            );
+            $result = $this->sweep->sweep($input->getOption('type'), $input->getOption('lang'), (string) $input->getOption('to'), !$input->getOption('plain'));
         } catch (RuntimeException $e) {
             $io->error($e->getMessage());
 
@@ -60,13 +55,8 @@ class EmailPreviewCommand extends Command
             count($result->identifiers),
             count($result->locales),
         ));
-        $io->text(sprintf(
-            'Newest first in the inbox once dispatched: %s, each language A-Z by identifier',
-            implode(', ', $result->locales),
-        ));
-        $io->text($result->tagged
-            ? 'Subjects tagged [identifier][resolved site name][language] - pass --plain to see them untagged'
-            : 'Subjects untagged');
+        $io->text(sprintf('Newest first in the inbox once dispatched: %s, each language A-Z by identifier', implode(', ', $result->locales)));
+        $io->text($result->tagged ? 'Subjects tagged [identifier][resolved site name][language] - pass --plain to see them untagged' : 'Subjects untagged');
 
         if ($result->withoutType !== []) {
             $io->warning(sprintf(

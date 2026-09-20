@@ -68,15 +68,8 @@ final class EventShareController extends AbstractController
     {
         $event = $this->findAccessibleEvent($id);
 
-        $response = new Response(
-            $this->shareService->buildQrPng($event, $request->getLocale()),
-            Response::HTTP_OK,
-            ['Content-Type' => 'image/png'],
-        );
-        $response->headers->set(
-            'Content-Disposition',
-            $response->headers->makeDisposition('attachment', sprintf('event-%d-qr.png', $id)),
-        );
+        $response = new Response($this->shareService->buildQrPng($event, $request->getLocale()), Response::HTTP_OK, ['Content-Type' => 'image/png']);
+        $response->headers->set('Content-Disposition', $response->headers->makeDisposition('attachment', sprintf('event-%d-qr.png', $id)));
         $response->headers->set('X-Robots-Tag', 'noindex');
 
         return $response;

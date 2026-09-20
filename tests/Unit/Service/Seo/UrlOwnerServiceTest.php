@@ -50,10 +50,9 @@ class UrlOwnerServiceTest extends TestCase
     public function testProviderDeferralFallsThroughToTheConfiguredHost(): void
     {
         // Arrange
-        $service = new UrlOwnerService(
-            $this->makeConfig('https://meetagain.org'),
-            [$this->makeProvider(['app_dishes_dishlist' => 'https://cinema.meetagain.org'])],
-        );
+        $service = new UrlOwnerService($this->makeConfig('https://meetagain.org'), [$this->makeProvider([
+            'app_dishes_dishlist' => 'https://cinema.meetagain.org',
+        ])]);
 
         // Act
         $ownerHost = $service->getOwnerHost('app_login');
@@ -65,10 +64,9 @@ class UrlOwnerServiceTest extends TestCase
     public function testOwnsUrlComparesHostsOnly(): void
     {
         // Arrange
-        $service = new UrlOwnerService(
-            $this->makeConfig('https://meetagain.org'),
-            [$this->makeProvider(['app_dishes_dishlist' => 'https://cinema.meetagain.org'])],
-        );
+        $service = new UrlOwnerService($this->makeConfig('https://meetagain.org'), [$this->makeProvider([
+            'app_dishes_dishlist' => 'https://cinema.meetagain.org',
+        ])]);
 
         // Act + Assert
         self::assertTrue($service->ownsUrl('app_dishes_dishlist', [], 'https://cinema.meetagain.org/en/dishes'));
@@ -78,10 +76,9 @@ class UrlOwnerServiceTest extends TestCase
     public function testAnUnclaimedRouteBelongsToWhicheverHostServesIt(): void
     {
         // Arrange
-        $service = new UrlOwnerService(
-            $this->makeConfig('https://meetagain.org'),
-            [$this->makeProvider(['app_dishes_dishlist' => 'https://cinema.meetagain.org'])],
-        );
+        $service = new UrlOwnerService($this->makeConfig('https://meetagain.org'), [$this->makeProvider([
+            'app_dishes_dishlist' => 'https://cinema.meetagain.org',
+        ])]);
 
         // Act + Assert
         self::assertTrue($service->ownsUrl('app_login', [], 'https://meetagain.org/en/login'));
@@ -101,11 +98,9 @@ class UrlOwnerServiceTest extends TestCase
     {
         // Arrange
         $provider = $this->createStub(UrlOwnerProviderInterface::class);
-        $provider
-            ->method('getOwnerHost')
-            ->willReturnCallback(
-                static fn(string $route, array $parameters) => ($parameters['id'] ?? null) === 17 ? 'https://dragon.meetagain.org' : null,
-            );
+        $provider->method('getOwnerHost')->willReturnCallback(static fn(string $route, array $parameters) => ($parameters['id'] ?? null) === 17
+            ? 'https://dragon.meetagain.org'
+            : null);
         $service = new UrlOwnerService($this->makeConfig('https://meetagain.org'), [$provider]);
 
         // Act + Assert

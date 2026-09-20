@@ -173,11 +173,7 @@ class RichTextNormalizerTest extends TestCase
         $stored = $this->normalizer->toStorage('<p>One</p><p>Two</p>');
 
         // Assert
-        static::assertSame(
-            '<p>One<br>Two</p>',
-            $stored,
-            'toStorage reads adjacency as one paragraph - its input language is editor output, not storage',
-        );
+        static::assertSame('<p>One<br>Two</p>', $stored, 'toStorage reads adjacency as one paragraph - its input language is editor output, not storage');
     }
 
     #[DataProvider('provideBlankParagraphMarkerCases')]
@@ -255,17 +251,21 @@ class RichTextNormalizerTest extends TestCase
 
     private static function brokenImprint(): string
     {
-        return '<p><strong>Information pursuant to §5 DDG</strong></p><p></p>'
+        return (
+            '<p><strong>Information pursuant to §5 DDG</strong></p><p></p>'
             . '<p> MeetAgain UG</p><p> Urbanstrasse 96</p><p> 10967 Berlin</p><p> Germany</p><p></p>'
             . '<h2>Editorial Responsibility</h2>'
-            . '<p>Responsible for editorial content:</p><p>Daniel Koch, Urbanstrasse 96</p>';
+            . '<p>Responsible for editorial content:</p><p>Daniel Koch, Urbanstrasse 96</p>'
+        );
     }
 
     private static function repairedImprint(): string
     {
-        return '<p><strong>Information pursuant to §5 DDG</strong></p>'
+        return (
+            '<p><strong>Information pursuant to §5 DDG</strong></p>'
             . '<p>MeetAgain UG<br>Urbanstrasse 96<br>10967 Berlin<br>Germany</p>'
             . '<h2>Editorial Responsibility</h2>'
-            . '<p>Responsible for editorial content:<br>Daniel Koch, Urbanstrasse 96</p>';
+            . '<p>Responsible for editorial content:<br>Daniel Koch, Urbanstrasse 96</p>'
+        );
     }
 }

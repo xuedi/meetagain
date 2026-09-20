@@ -23,7 +23,8 @@ class GamePledgeRepository extends ServiceEntityRepository
     /** @return list<GamePledge> */
     public function findActiveForEvent(int $eventId): array
     {
-        return $this->createQueryBuilder('p')
+        return $this
+            ->createQueryBuilder('p')
             ->addSelect('g')
             ->addSelect('u')
             ->join('p.game', 'g')
@@ -40,7 +41,8 @@ class GamePledgeRepository extends ServiceEntityRepository
 
     public function countActiveForEvent(int $eventId): int
     {
-        return (int) $this->createQueryBuilder('p')
+        return (int) $this
+            ->createQueryBuilder('p')
             ->select('COUNT(p.id)')
             ->andWhere('p.event = :eventId')
             ->andWhere('p.status = :status')
@@ -62,7 +64,8 @@ class GamePledgeRepository extends ServiceEntityRepository
             return;
         }
 
-        $this->createQueryBuilder('p')
+        $this
+            ->createQueryBuilder('p')
             ->delete()
             ->andWhere('p.game IN (:ids)')
             ->setParameter('ids', $gameIds)

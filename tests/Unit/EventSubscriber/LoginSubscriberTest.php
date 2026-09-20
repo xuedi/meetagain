@@ -19,9 +19,7 @@ class LoginSubscriberTest extends TestCase
     {
         $cookieService = $this->createStub(LocaleCookieService::class);
         $cookieService->method('isConsentGranted')->willReturn($consentGranted);
-        $cookieService->method('createCookie')->willReturnCallback(
-            static fn(string $locale): Cookie => new Cookie(LocaleCookieService::COOKIE_NAME, $locale),
-        );
+        $cookieService->method('createCookie')->willReturnCallback(static fn(string $locale): Cookie => new Cookie(LocaleCookieService::COOKIE_NAME, $locale));
 
         return new LoginSubscriber($cookieService);
     }

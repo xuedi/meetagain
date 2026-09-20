@@ -181,8 +181,7 @@ class PhotoServiceTest extends TestCase
     {
         // Arrange
         $repository = $this->createMock(PhotoRepository::class);
-        $repository->expects(static::exactly(2))->method('findByCreator')
-            ->willReturnOnConsecutiveCalls([new Photo()], []);
+        $repository->expects(static::exactly(2))->method('findByCreator')->willReturnOnConsecutiveCalls([new Photo()], []);
         $service = $this->service(repository: $repository);
 
         // Act + Assert

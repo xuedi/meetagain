@@ -24,11 +24,6 @@ final class CmsBlockImageTypeDefinition extends AbstractImageTypeDefinition
         return ImageType::CmsBlock;
     }
 
-    protected function sizes(): array
-    {
-        return [[432, 432], [350, 350], [80, 80]];
-    }
-
     public function getEditLink(int $locationId): ?array
     {
         return ['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => $locationId]];
@@ -42,6 +37,11 @@ final class CmsBlockImageTypeDefinition extends AbstractImageTypeDefinition
             'imageId' => (int) $r['image_id'],
             'locationId' => (int) $r['location_id'],
         ], $rows);
+    }
+
+    protected function sizes(): array
+    {
+        return [[432, 432], [350, 350], [80, 80]];
     }
 
     protected function cmsBlockRepository(): CmsBlockRepository

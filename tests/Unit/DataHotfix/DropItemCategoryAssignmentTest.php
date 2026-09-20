@@ -67,11 +67,13 @@ class DropItemCategoryAssignmentTest extends TestCase
     private function connection(array &$statements): Connection
     {
         $connection = $this->createStub(Connection::class);
-        $connection->method('executeStatement')->willReturnCallback(static function (string $sql) use (&$statements): int {
-            $statements[] = $sql;
+        $connection
+            ->method('executeStatement')
+            ->willReturnCallback(static function (string $sql) use (&$statements): int {
+                $statements[] = $sql;
 
-            return 0;
-        });
+                return 0;
+            });
         $connection->method('fetchOne')->willReturn(0);
 
         return $connection;
@@ -82,9 +84,11 @@ class DropItemCategoryAssignmentTest extends TestCase
     {
         $appState = $this->createStub(AppStateService::class);
         $appState->method('get')->willReturnCallback(static fn(string $key): ?string => $state[$key] ?? null);
-        $appState->method('set')->willReturnCallback(static function (string $key, string $value) use (&$state): void {
-            $state[$key] = $value;
-        });
+        $appState
+            ->method('set')
+            ->willReturnCallback(static function (string $key, string $value) use (&$state): void {
+                $state[$key] = $value;
+            });
 
         return $appState;
     }

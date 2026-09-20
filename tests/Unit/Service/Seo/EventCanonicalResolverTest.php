@@ -106,10 +106,7 @@ class EventCanonicalResolverTest extends TestCase
         $first = $this->makeMember(1, $series, day: '2026-01-01');
         $branch = $this->makeMember(2, $series, day: '2026-01-08');
         $later = $this->makeMember(3, $series, day: '2026-01-15');
-        $resolver = $this->createResolver(
-            [$first, $branch, $later],
-            [$this->makeMarker($branch, 'en', EventCanonicalRootType::Root)],
-        );
+        $resolver = $this->createResolver([$first, $branch, $later], [$this->makeMarker($branch, 'en', EventCanonicalRootType::Root)]);
 
         // Act & Assert
         static::assertSame($branch, $resolver->resolveRoot($later, 'en'));
@@ -124,10 +121,7 @@ class EventCanonicalResolverTest extends TestCase
         $first = $this->makeMember(1, $series, day: '2026-01-01');
         $oddOne = $this->makeMember(2, $series, day: '2026-01-08');
         $later = $this->makeMember(3, $series, day: '2026-01-15');
-        $resolver = $this->createResolver(
-            [$first, $oddOne, $later],
-            [$this->makeMarker($oddOne, 'en', EventCanonicalRootType::Detached)],
-        );
+        $resolver = $this->createResolver([$first, $oddOne, $later], [$this->makeMarker($oddOne, 'en', EventCanonicalRootType::Detached)]);
 
         // Act & Assert
         static::assertSame($oddOne, $resolver->resolveRoot($oddOne, 'en'));
@@ -141,10 +135,7 @@ class EventCanonicalResolverTest extends TestCase
         $first = $this->makeMember(1, $series, day: '2026-01-01');
         $branch = $this->makeMember(2, $series, day: '2026-01-08');
         $later = $this->makeMember(3, $series, day: '2026-01-15');
-        $resolver = $this->createResolver(
-            [$first, $branch, $later],
-            [$this->makeMarker($branch, 'de', EventCanonicalRootType::Root)],
-        );
+        $resolver = $this->createResolver([$first, $branch, $later], [$this->makeMarker($branch, 'de', EventCanonicalRootType::Root)]);
 
         // Act & Assert
         static::assertSame($branch, $resolver->resolveRoot($later, 'de'));
@@ -172,10 +163,7 @@ class EventCanonicalResolverTest extends TestCase
         $first = $this->makeMember(1, $series, ['en', 'de'], '2026-01-01');
         $englishOnlyRoot = $this->makeMember(2, $series, ['en'], '2026-01-08');
         $later = $this->makeMember(3, $series, ['en', 'de'], '2026-01-15');
-        $resolver = $this->createResolver(
-            [$first, $englishOnlyRoot, $later],
-            [$this->makeMarker($englishOnlyRoot, 'en', EventCanonicalRootType::Root)],
-        );
+        $resolver = $this->createResolver([$first, $englishOnlyRoot, $later], [$this->makeMarker($englishOnlyRoot, 'en', EventCanonicalRootType::Root)]);
 
         // Act & Assert
         static::assertSame($englishOnlyRoot, $resolver->resolveRoot($later, 'en'));
@@ -223,10 +211,7 @@ class EventCanonicalResolverTest extends TestCase
         $first = $this->makeMember(1, $series, day: '2026-01-01');
         $branch = $this->makeMember(2, $series, day: '2026-01-08');
         $later = $this->makeMember(3, $series, day: '2026-01-15');
-        $resolver = $this->createResolver(
-            [$first, $branch, $later],
-            [$this->makeMarker($branch, 'de', EventCanonicalRootType::Root)],
-        );
+        $resolver = $this->createResolver([$first, $branch, $later], [$this->makeMarker($branch, 'de', EventCanonicalRootType::Root)]);
 
         // Act
         $resolved = $resolver->resolveRootIds([$first, $branch, $later], ['en', 'de']);

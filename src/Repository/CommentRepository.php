@@ -36,6 +36,32 @@ class CommentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @param int|null $before only comments older than this id
+     * @return array<Comment>
+     */
+    public function findForTargetBefore(string $targetType, int $targetId, ?int $before, int $limit): array
+    {
+        $qb = $this
+            ->createQueryBuilder('c')
+            ->leftJoin('c.user', 'u')
+            ->addSelect('u')
+            ->leftJoin('u.image', 'i')
+            ->addSelect('i')
+            ->where('c.targetType = :targetType')
+            ->andWhere('c.targetId = :targetId')
+            ->setParameter('targetType', $targetType)
+            ->setParameter('targetId', $targetId)
+            ->orderBy('c.id', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($before !== null) {
+            $qb->andWhere('c.id < :before')->setParameter('before', $before);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function deleteForTarget(string $targetType, int $targetId): int
     {
         return (int) $this

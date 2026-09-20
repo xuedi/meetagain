@@ -86,12 +86,7 @@ readonly class GlossarySection implements RowFormInterface
             return null;
         }
 
-        return new Draft(
-            $this->service->draftOf($entry),
-            (string) $entry->getPhrase(),
-            'glossary.contribution_intro',
-            ['entry_id' => (int) $entry->getId()],
-        );
+        return new Draft($this->service->draftOf($entry), (string) $entry->getPhrase(), 'glossary.contribution_intro', ['entry_id' => (int) $entry->getId()]);
     }
 
     #[Override]

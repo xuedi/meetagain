@@ -4,10 +4,10 @@ namespace Plugin\Dishes\Tests\Unit\Portability;
 
 use App\Entity\Image;
 use App\Entity\User;
-use App\Portability\ImportContext;
-use App\Portability\ImageWriterInterface;
-use App\Service\Media\ImageLocationService;
 use App\Portability\ImageImporter;
+use App\Portability\ImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -67,7 +67,11 @@ class DishContributorTest extends TestCase
         $imageImporter->method('import')->willReturn(new Image());
 
         $contributor = $this->contributor($em, $this->createStub(DishRepository::class));
-        $row = ['ref' => 12, 'translations' => ['en' => ['name' => 'Arancini', 'description' => '']], 'gallery' => [['file' => 'images/g.jpg', 'sort_order' => 3]]];
+        $row = [
+            'ref' => 12,
+            'translations' => ['en' => ['name' => 'Arancini', 'description' => '']],
+            'gallery' => [['file' => 'images/g.jpg', 'sort_order' => 3]],
+        ];
 
         // Act
         $contributor->importItems([$row], new ImportContext($imageImporter, '/tmp', new User()));

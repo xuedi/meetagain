@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Cms\ReservedSlug;
 
-use App\Cms\ReservedSlug\ReservedSlugProviderInterface;
 use App\Cms\ReservedSlug\Registry;
+use App\Cms\ReservedSlug\ReservedSlugProviderInterface;
 use App\Repository\CmsRepository;
 use PHPUnit\Framework\TestCase;
 

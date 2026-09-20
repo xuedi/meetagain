@@ -17,6 +17,11 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
         return '/media/' . self::hashLogicalPath($stablePath) . '.' . self::normalizeExtension($ext);
     }
 
+    public static function hashLogicalPath(string $logicalPath): string
+    {
+        return substr(hash('sha256', self::SECRET_SALT . '|' . $logicalPath), 0, self::HASH_LENGTH);
+    }
+
     private static function normalizeExtension(string $ext): string
     {
         return match ($ext) {
@@ -25,10 +30,5 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
             '' => 'bin',
             default => $ext,
         };
-    }
-
-    public static function hashLogicalPath(string $logicalPath): string
-    {
-        return substr(hash('sha256', self::SECRET_SALT . '|' . $logicalPath), 0, self::HASH_LENGTH);
     }
 }

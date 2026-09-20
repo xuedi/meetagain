@@ -12,11 +12,6 @@ final class WebsiteImageImageTypeDefinition extends AbstractImageTypeDefinition
         return ImageType::WebsiteImage;
     }
 
-    protected function sizes(): array
-    {
-        return [[1200, 630], [350, 184]];
-    }
-
     public function getEditLink(int $locationId): ?array
     {
         return ['route' => 'app_admin_system_config', 'params' => []];
@@ -50,5 +45,10 @@ final class WebsiteImageImageTypeDefinition extends AbstractImageTypeDefinition
             'route' => 'app_admin_system_config',
             'params' => [],
         ];
+    }
+
+    protected function sizes(): array
+    {
+        return [[1200, 630], [350, 184]];
     }
 }

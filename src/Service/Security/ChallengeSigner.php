@@ -3,6 +3,7 @@
 namespace App\Service\Security;
 
 use Psr\Clock\ClockInterface;
+use SensitiveParameter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -12,7 +13,7 @@ readonly class ChallengeSigner
     public const int MAX_AGE_MS = 7200000;
 
     public function __construct(
-        #[\SensitiveParameter]
+        #[SensitiveParameter]
         #[Autowire('%kernel.secret%')]
         private string $secret,
         #[Autowire(service: 'cache.security_challenge')]

@@ -100,19 +100,19 @@ class InstallSeedCommand extends Command
     ];
 
     private const array CONFIG = [
-        ['automatic_registration', 'false', ConfigType::Boolean],
-        ['show_town_hall', 'false', ConfigType::Boolean],
-        ['send_rsvp_notifications', 'false', ConfigType::Boolean],
-        ['send_admin_notification', 'true', ConfigType::Boolean],
-        ['email_delivery_sync_enabled', 'false', ConfigType::Boolean],
-        ['send_event_reminders', 'false', ConfigType::Boolean],
-        ['send_upcoming_digest', 'false', ConfigType::Boolean],
-        ['email_sender_mail', 'email@localhost', ConfigType::String],
-        ['email_sender_name', 'localhost', ConfigType::String],
-        ['website_url', 'meetagain.local', ConfigType::String],
-        ['website_host', 'https://meetagain.local', ConfigType::String],
-        ['date_format', 'Y-m-d H:i', ConfigType::String],
-        ['tdm_reservation', 'true', ConfigType::Boolean],
+        ['automatic_registration',      'false',                   ConfigType::Boolean],
+        ['show_town_hall',              'false',                   ConfigType::Boolean],
+        ['send_rsvp_notifications',     'false',                   ConfigType::Boolean],
+        ['send_admin_notification',     'true',                    ConfigType::Boolean],
+        ['email_delivery_sync_enabled', 'false',                   ConfigType::Boolean],
+        ['send_event_reminders',        'false',                   ConfigType::Boolean],
+        ['send_upcoming_digest',        'false',                   ConfigType::Boolean],
+        ['email_sender_mail',           'email@localhost',         ConfigType::String],
+        ['email_sender_name',           'localhost',               ConfigType::String],
+        ['website_url',                 'meetagain.local',         ConfigType::String],
+        ['website_host',                'https://meetagain.local', ConfigType::String],
+        ['date_format',                 'Y-m-d H:i',               ConfigType::String],
+        ['tdm_reservation',             'true',                    ConfigType::Boolean],
     ];
 
     private const array PRONUNCIATION_SYSTEMS = [
@@ -205,10 +205,7 @@ class InstallSeedCommand extends Command
 
     private function seedLanguages(): int
     {
-        $existing = array_map(
-            static fn(Language $language): ?string => $language->getCode(),
-            $this->em->getRepository(Language::class)->findAll(),
-        );
+        $existing = array_map(static fn(Language $language): ?string => $language->getCode(), $this->em->getRepository(Language::class)->findAll());
 
         $created = 0;
         foreach (self::LANGUAGES as $row) {
@@ -231,10 +228,7 @@ class InstallSeedCommand extends Command
 
     private function seedConfig(): int
     {
-        $existing = array_map(
-            static fn(Config $config): ?string => $config->getName(),
-            $this->em->getRepository(Config::class)->findAll(),
-        );
+        $existing = array_map(static fn(Config $config): ?string => $config->getName(), $this->em->getRepository(Config::class)->findAll());
         $systemUserId = (string) $this->findSystemUser(self::IMPORT_USER)?->getId();
 
         $created = 0;
@@ -282,10 +276,7 @@ class InstallSeedCommand extends Command
 
     private function seedAppState(): int
     {
-        $existing = array_map(
-            static fn(AppState $entry): string => $entry->getKeyName(),
-            $this->em->getRepository(AppState::class)->findAll(),
-        );
+        $existing = array_map(static fn(AppState $entry): string => $entry->getKeyName(), $this->em->getRepository(AppState::class)->findAll());
 
         $created = 0;
         foreach (self::APP_STATE as $key => $value) {

@@ -46,9 +46,12 @@ final class EmailAttachmentTest extends TestCase
 
         $stored = null;
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())->method('persist')->willReturnCallback(static function (EmailQueue $row) use (&$stored): void {
-            $stored = $row;
-        });
+        $em
+            ->expects($this->once())
+            ->method('persist')
+            ->willReturnCallback(static function (EmailQueue $row) use (&$stored): void {
+                $stored = $row;
+            });
 
         // Act
         $this->makeService(em: $em)->enqueue($source, $this->makeEmail(), []);
@@ -66,10 +69,13 @@ final class EmailAttachmentTest extends TestCase
         $row = $this->makeQueuedRow([new Attachment(self::FIXTURE_PATH, 'INV-1.pdf')]);
         $sent = null;
         $transport = $this->createMock(TransportInterface::class);
-        $transport->expects($this->once())->method('send')->willReturnCallback(function (Email $message) use (&$sent): SentMessage {
-            $sent = $message;
-            return $this->createStub(SentMessage::class);
-        });
+        $transport
+            ->expects($this->once())
+            ->method('send')
+            ->willReturnCallback(function (Email $message) use (&$sent): SentMessage {
+                $sent = $message;
+                return $this->createStub(SentMessage::class);
+            });
 
         // Act
         $this->makeService(transport: $transport, mailRepo: $this->makeRepo($row))->sendQueue();
@@ -86,10 +92,13 @@ final class EmailAttachmentTest extends TestCase
         $row = $this->makeQueuedRow([new Attachment('/tmp/does-not-exist.pdf', 'INV-1.pdf')]);
         $sent = null;
         $transport = $this->createMock(TransportInterface::class);
-        $transport->expects($this->once())->method('send')->willReturnCallback(function (Email $message) use (&$sent): SentMessage {
-            $sent = $message;
-            return $this->createStub(SentMessage::class);
-        });
+        $transport
+            ->expects($this->once())
+            ->method('send')
+            ->willReturnCallback(function (Email $message) use (&$sent): SentMessage {
+                $sent = $message;
+                return $this->createStub(SentMessage::class);
+            });
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('warning')->with('Email attachment is missing and was skipped');
 
@@ -148,12 +157,8 @@ final class EmailAttachmentTest extends TestCase
         $layoutRenderer = $this->createStub(LayoutRenderer::class);
         $layoutRenderer->method('capture')->willReturn([]);
         $layoutRenderer->method('snapshot')->willReturn([]);
-        $layoutRenderer
-            ->method('captureIdentity')
-            ->willReturn(new SendingIdentity(siteName: 'Test Site', siteUrl: 'https://test.example.com'));
-        $layoutRenderer
-            ->method('wrap')
-            ->willReturnCallback(static fn(EmailQueue $mail) => '<html><body>' . $mail->getRenderedBody() . '</body></html>');
+        $layoutRenderer->method('captureIdentity')->willReturn(new SendingIdentity(siteName: 'Test Site', siteUrl: 'https://test.example.com'));
+        $layoutRenderer->method('wrap')->willReturnCallback(static fn(EmailQueue $mail) => '<html><body>' . $mail->getRenderedBody() . '</body></html>');
 
         return new EmailService(
             transport: $transport ?? $this->createStub(TransportInterface::class),

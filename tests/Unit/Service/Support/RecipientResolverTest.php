@@ -16,10 +16,11 @@ class RecipientResolverTest extends TestCase
     {
         // Arrange
         $claimed = $this->createStub(User::class);
-        $resolver = $this->makeResolver(
-            [$this->provider(null), $this->provider([$claimed]), $this->provider([$this->createStub(User::class)])],
-            admins: [$this->createStub(User::class)],
-        );
+        $resolver = $this->makeResolver([
+            $this->provider(null),
+            $this->provider([$claimed]),
+            $this->provider([$this->createStub(User::class)]),
+        ], admins: [$this->createStub(User::class)]);
 
         // Act
         $recipients = $resolver->resolve($this->createStub(SupportRequest::class));

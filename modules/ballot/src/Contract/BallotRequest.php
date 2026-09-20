@@ -25,9 +25,6 @@ final readonly class BallotRequest
      */
     public function candidateKeys(): array
     {
-        return array_values(array_unique(array_map(
-            static fn(Candidate $candidate): string => $candidate->key,
-            $this->candidates,
-        )));
+        return array_values(array_unique(array_map(static fn(Candidate $candidate): string => $candidate->key, $this->candidates)));
     }
 }

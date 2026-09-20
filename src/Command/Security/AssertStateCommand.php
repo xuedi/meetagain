@@ -9,6 +9,7 @@ use App\Repository\RateLimitLogRepository;
 use App\Service\Security\BlockedSessionStore;
 use DateInterval;
 use DateTimeImmutable;
+use Exception;
 use JsonException;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -247,7 +248,7 @@ final class AssertStateCommand extends Command
         $duration = is_string($raw) ? $raw : 'PT5M';
         try {
             return new DateTimeImmutable()->sub(new DateInterval($duration));
-        } catch (\Exception) {
+        } catch (Exception) {
             return new DateTimeImmutable()->sub(new DateInterval('PT5M'));
         }
     }

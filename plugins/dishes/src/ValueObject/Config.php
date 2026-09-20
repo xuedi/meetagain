@@ -3,6 +3,7 @@
 namespace Plugin\Dishes\ValueObject;
 
 use App\Publisher\PluginSettings\Data;
+
 final class Config implements Data
 {
     /** @var array<string, string> locale => footer text */

@@ -72,13 +72,15 @@ final class EmailTemplateSeedCommandTest extends TestCase
 
         $templateService = $this->createStub(EmailTemplateService::class);
         $templateService->method('getTemplate')->willReturn($template);
-        $templateService->method('getDefaultTemplates')->willReturn([
-            'welcome' => [
-                'subject' => 'Shipped subject',
-                'body' => '<p>Shipped body</p>',
-                'variables' => ['host'],
-            ],
-        ]);
+        $templateService
+            ->method('getDefaultTemplates')
+            ->willReturn([
+                'welcome' => [
+                    'subject' => 'Shipped subject',
+                    'body' => '<p>Shipped body</p>',
+                    'variables' => ['host'],
+                ],
+            ]);
 
         $languageService = $this->createStub(LanguageService::class);
         $languageService->method('getEnabledCodes')->willReturn(['en']);

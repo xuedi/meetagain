@@ -179,9 +179,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     }
 
     // Kept after Symfony 8 dropped eraseCredentials() from UserInterface: still called by our own code
-    public function eraseCredentials(): void
-    {
-    }
+    public function eraseCredentials(): void {}
 
     #[Override]
     public function isEqualTo(UserInterface $user): bool
@@ -190,10 +188,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
             return false;
         }
 
-        return $user->getId() === $this->getId()
+        return (
+            $user->getId() === $this->getId()
             && $user->getStatus() === $this->getStatus()
             && $user->getRole() === $this->getRole()
-            && $user->getUserIdentifier() === $this->getUserIdentifier();
+            && $user->getUserIdentifier() === $this->getUserIdentifier()
+        );
     }
 
     public function getCreatedAt(): ?DateTimeImmutable

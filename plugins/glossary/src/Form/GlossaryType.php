@@ -48,13 +48,20 @@ class GlossaryType extends AbstractType
             ]);
         }
 
-        $this->translationFormHelper->addTranslatedFields($builder, [
-            self::DEFINITION_FIELD => [TextareaType::class, [
-                'label' => $config->getDefinitionLabel() ?? 'glossary.label_definition',
-                'required' => false,
-                'attr' => ['rows' => 3],
-            ]],
-        ], static fn(string $code): string => $current[$code] ?? '');
+        $this->translationFormHelper->addTranslatedFields(
+            $builder,
+            [
+                self::DEFINITION_FIELD => [
+                    TextareaType::class,
+                    [
+                        'label' => $config->getDefinitionLabel() ?? 'glossary.label_definition',
+                        'required' => false,
+                        'attr' => ['rows' => 3],
+                    ],
+                ],
+            ],
+            static fn(string $code): string => $current[$code] ?? '',
+        );
 
         $this->assignmentFormHelper->addAssignmentFields(
             $builder,

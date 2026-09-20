@@ -49,8 +49,22 @@ final class MemberSectionTest extends SectionTestCase
         $consenting = $this->user(5, 'five@example.org');
         $refusing = $this->user(6, 'six@example.org');
         $dish = $this->withId(new Dish(), 3);
-        $dish->getGalleryImages()->add($this->galleryImage(11, $dish, new Image()->setHash('kept')->setUploader($consenting), 2));
-        $dish->getGalleryImages()->add($this->galleryImage(12, $dish, new Image()->setHash('refused')->setUploader($refusing), 1));
+        $dish->getGalleryImages()->add($this->galleryImage(
+            11,
+            $dish,
+            new Image()
+                ->setHash('kept')
+                ->setUploader($consenting),
+            2,
+        ));
+        $dish->getGalleryImages()->add($this->galleryImage(
+            12,
+            $dish,
+            new Image()
+                ->setHash('refused')
+                ->setUploader($refusing),
+            1,
+        ));
         $scope = new Scope(
             users: [5 => 'user', 6 => 'user'],
             itemIds: ['dish' => [3]],
@@ -61,13 +75,16 @@ final class MemberSectionTest extends SectionTestCase
         $block = $this->section(dishes: $this->dishes([$dish]))->export($scope, $this->images());
 
         // Assert
-        static::assertSame([[
-            'dish_ref' => 3,
-            'image_file' => 'images/kept.jpg',
-            'uploader_email' => 'five@example.org',
-            'sort_order' => 2,
-            'created_at' => '2026-01-07T19:00:00+00:00',
-        ]], $block['gallery']);
+        static::assertSame(
+            [[
+                'dish_ref' => 3,
+                'image_file' => 'images/kept.jpg',
+                'uploader_email' => 'five@example.org',
+                'sort_order' => 2,
+                'created_at' => '2026-01-07T19:00:00+00:00',
+            ]],
+            $block['gallery'],
+        );
         static::assertSame([], $block['likes']);
     }
 
@@ -81,13 +98,16 @@ final class MemberSectionTest extends SectionTestCase
         $block = $this->section(dishes: $this->dishes([$dish]))->export(new Scope(itemIds: ['dish' => [3]], everyUpload: true), $this->images());
 
         // Assert
-        static::assertSame([[
-            'dish_ref' => 3,
-            'image_file' => 'images/orphan.jpg',
-            'uploader_email' => null,
-            'sort_order' => 1,
-            'created_at' => '2026-01-07T19:00:00+00:00',
-        ]], $block['gallery']);
+        static::assertSame(
+            [[
+                'dish_ref' => 3,
+                'image_file' => 'images/orphan.jpg',
+                'uploader_email' => null,
+                'sort_order' => 1,
+                'created_at' => '2026-01-07T19:00:00+00:00',
+            ]],
+            $block['gallery'],
+        );
     }
 
     public function testNothingToCarryGivesAnEmptyBlock(): void
@@ -145,7 +165,9 @@ final class MemberSectionTest extends SectionTestCase
         $context = $this->importContext();
 
         // Act
-        $this->section(dishes: $this->dishes([], $this->withId(new Dish(), 30)))->import(['likes' => [['dish_ref' => 3, 'email' => 'nobody@example.org']]], $context);
+        $this->section(dishes: $this->dishes([], $this->withId(new Dish(), 30)))->import([
+            'likes' => [['dish_ref' => 3, 'email' => 'nobody@example.org']],
+        ], $context);
 
         // Assert
         static::assertSame(1, $context->toSummary()->get(MemberSection::KIND_LIKES, Outcome::Dropped));
@@ -195,7 +217,9 @@ final class MemberSectionTest extends SectionTestCase
         $context = $this->importContext();
 
         // Act
-        $this->section(dishes: $this->dishes([], $this->withId(new Dish(), 30)))->import(['gallery' => [['dish_ref' => 3, 'image_file' => 'images/gone.jpg']]], $context);
+        $this->section(dishes: $this->dishes([], $this->withId(new Dish(), 30)))->import([
+            'gallery' => [['dish_ref' => 3, 'image_file' => 'images/gone.jpg']],
+        ], $context);
 
         // Assert
         static::assertSame([], $this->persisted);
@@ -239,7 +263,9 @@ final class MemberSectionTest extends SectionTestCase
 
     private function like(Dish $dish, int $userId): DishLike
     {
-        return new DishLike()->setDish($dish)->setUserId($userId);
+        return new DishLike()
+            ->setDish($dish)
+            ->setUserId($userId);
     }
 
     private function galleryImage(int $id, Dish $dish, Image $image, int $sortOrder): DishImage

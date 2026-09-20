@@ -32,9 +32,9 @@ final class CommentsSectionTest extends SectionTestCase
         static::assertSame(
             [
                 ['circulation_handover', 8, 'member@example.org'],
-                ['event', 1, 'member@example.org'],
-                ['photo', 7, 'member@example.org'],
-                ['topic', 3, null],
+                ['event',                1, 'member@example.org'],
+                ['photo',                7, 'member@example.org'],
+                ['topic',                3, null],
             ],
             array_map(static fn(array $row): array => [$row['target_type'], $row['target_ref'], $row['email']], $rows),
         );
@@ -59,7 +59,12 @@ final class CommentsSectionTest extends SectionTestCase
         // Assert
         $comments = $this->persistedComments();
         static::assertSame(
-            [['circulation_handover', 108], ['event', 101], ['photo', 107], ['topic', 103]],
+            [
+                ['circulation_handover', 108],
+                ['event',                101],
+                ['photo',                107],
+                ['topic',                103],
+            ],
             array_map(static fn(Comment $comment): array => [$comment->getTargetType(), $comment->getTargetId()], $comments),
         );
         static::assertSame($member, $comments[1]->getUser());
@@ -139,10 +144,13 @@ final class CommentsSectionTest extends SectionTestCase
     private function section(array $comments = [], array $topicIds = [], array $handoverIds = []): CommentsSection
     {
         $repository = $this->createStub(EntityRepository::class);
-        $repository->method('findBy')->willReturnCallback(static fn(array $criteria): array => array_values(array_filter(
-            $comments,
-            static fn(Comment $comment): bool => $comment->getTargetType() === $criteria['targetType'] && in_array($comment->getTargetId(), $criteria['targetId'], true),
-        )));
+        $repository
+            ->method('findBy')
+            ->willReturnCallback(static fn(array $criteria): array => array_values(array_filter(
+                $comments,
+                static fn(Comment $comment): bool => $comment->getTargetType() === $criteria['targetType']
+                && in_array($comment->getTargetId(), $criteria['targetId'], true),
+            )));
 
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repository);

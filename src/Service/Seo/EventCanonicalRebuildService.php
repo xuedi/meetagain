@@ -83,9 +83,7 @@ final readonly class EventCanonicalRebuildService
         $totals = [];
         foreach ($this->seriesRepository->findAll() as $series) {
             foreach ($this->rebuildSeries($series) as $summary) {
-                $totals[$summary->locale] = isset($totals[$summary->locale])
-                    ? $totals[$summary->locale]->merge($summary)
-                    : $summary;
+                $totals[$summary->locale] = isset($totals[$summary->locale]) ? $totals[$summary->locale]->merge($summary) : $summary;
             }
         }
 
@@ -110,8 +108,7 @@ final readonly class EventCanonicalRebuildService
         foreach ($locales as $locale) {
             $existing = $this->markerRepository->findOneByEventAndLocale($eventId, $locale);
             $baseline = $this->resolver->resolveBaselineRoot($event, $locale);
-            $diverged = $baseline instanceof Event
-                && $this->similarityService->compare($event, $baseline, $locale)->exceeds($threshold);
+            $diverged = $baseline instanceof Event && $this->similarityService->compare($event, $baseline, $locale)->exceeds($threshold);
 
             if (!$diverged) {
                 if ($existing instanceof EventCanonicalRoot) {
@@ -207,7 +204,7 @@ final readonly class EventCanonicalRebuildService
             }
         }
 
-        return $closerToDiverged * 2 > count($following);
+        return ($closerToDiverged * 2) > count($following);
     }
 
     private function makeMarker(Event $event, string $locale, EventCanonicalRootType $type): EventCanonicalRoot

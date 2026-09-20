@@ -74,24 +74,6 @@ final class RateLimitProvider extends AbstractSecurityProvider
         ];
     }
 
-    private function scoreFor(string $limiter, int $hits): int
-    {
-        if ($limiter === 'login_throttling') {
-            return 100;
-        }
-        if ($limiter === 'support') {
-            return (int) min(60, $hits * 5);
-        }
-        if (str_starts_with($limiter, 'api_')) {
-            if ($hits <= 2) {
-                return 0;
-            }
-            return (int) min(100, $hits * 10);
-        }
-
-        return (int) min(80, $hits * 8);
-    }
-
     #[Override]
     protected function persistLog(Request $request, array $context): void
     {
@@ -144,5 +126,23 @@ final class RateLimitProvider extends AbstractSecurityProvider
                 'loginThrottling' => $hasLoginThrottling,
             ],
         ];
+    }
+
+    private function scoreFor(string $limiter, int $hits): int
+    {
+        if ($limiter === 'login_throttling') {
+            return 100;
+        }
+        if ($limiter === 'support') {
+            return (int) min(60, $hits * 5);
+        }
+        if (str_starts_with($limiter, 'api_')) {
+            if ($hits <= 2) {
+                return 0;
+            }
+            return (int) min(100, $hits * 10);
+        }
+
+        return (int) min(80, $hits * 8);
     }
 }

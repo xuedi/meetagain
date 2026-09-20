@@ -276,47 +276,6 @@ readonly class ConfigService
         $this->cache->delete(self::CACHE_KEY_THEME_COLORS);
     }
 
-    private function parseConfigScss(): array
-    {
-        $path = $this->kernel->getProjectDir() . '/assets/styles/_config.scss';
-        $content = $this->fs->getFileContents($path);
-        if ($content === false) {
-            return [];
-        }
-
-        $scssToKey = [
-            'primary' => 'color_primary',
-            'link' => 'color_link',
-            'info' => 'color_info',
-            'success' => 'color_success',
-            'warning' => 'color_warning',
-            'danger' => 'color_danger',
-            'text-grey' => 'color_text_grey',
-            'text-grey-light' => 'color_text_grey_light',
-        ];
-
-        $map = [];
-        foreach ($scssToKey as $scssVar => $key) {
-            $m = [];
-            if (!preg_match('/\$' . preg_quote($scssVar, '/') . '\s*:\s*(#[0-9a-fA-F]{3,6})\s*;/', $content, $m)) {
-                continue;
-            }
-
-            $map[$key] = $m[1];
-        }
-
-        return $map;
-    }
-
-    private function getCachedValue(string $name): ?string
-    {
-        return $this->cache->get(self::CACHE_KEY_PREFIX . $name, function (ItemInterface $item) use ($name): ?string {
-            $item->expiresAfter(null);
-
-            return $this->repo->findOneBy(['name' => $name])?->getValue();
-        });
-    }
-
     public function getBoolean(string $name, bool $default = false): bool
     {
         return ($this->getCachedValue($name) ?? ($default ? 'true' : 'false')) === 'true';
@@ -377,5 +336,46 @@ readonly class ConfigService
         $this->em->persist($setting);
         $this->em->flush();
         $this->cache->delete(self::CACHE_KEY_PREFIX . $name);
+    }
+
+    private function parseConfigScss(): array
+    {
+        $path = $this->kernel->getProjectDir() . '/assets/styles/_config.scss';
+        $content = $this->fs->getFileContents($path);
+        if ($content === false) {
+            return [];
+        }
+
+        $scssToKey = [
+            'primary' => 'color_primary',
+            'link' => 'color_link',
+            'info' => 'color_info',
+            'success' => 'color_success',
+            'warning' => 'color_warning',
+            'danger' => 'color_danger',
+            'text-grey' => 'color_text_grey',
+            'text-grey-light' => 'color_text_grey_light',
+        ];
+
+        $map = [];
+        foreach ($scssToKey as $scssVar => $key) {
+            $m = [];
+            if (!preg_match('/\$' . preg_quote($scssVar, '/') . '\s*:\s*(#[0-9a-fA-F]{3,6})\s*;/', $content, $m)) {
+                continue;
+            }
+
+            $map[$key] = $m[1];
+        }
+
+        return $map;
+    }
+
+    private function getCachedValue(string $name): ?string
+    {
+        return $this->cache->get(self::CACHE_KEY_PREFIX . $name, function (ItemInterface $item) use ($name): ?string {
+            $item->expiresAfter(null);
+
+            return $this->repo->findOneBy(['name' => $name])?->getValue();
+        });
     }
 }

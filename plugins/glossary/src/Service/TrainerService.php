@@ -67,7 +67,9 @@ class TrainerService
         $visible = $this->visibleIds();
 
         $ids = match ($scope) {
-            Scope::Selection => $tagIds === [] ? $visible : array_values(array_intersect($visible, $this->assignmentRepo->itemIdsWithAllTags(GlossaryTaggableTypeProvider::ITEM_TYPE, $tagIds))),
+            Scope::Selection => $tagIds === []
+                ? $visible
+                : array_values(array_intersect($visible, $this->assignmentRepo->itemIdsWithAllTags(GlossaryTaggableTypeProvider::ITEM_TYPE, $tagIds))),
             Scope::Due => $this->cardRepo->dueGlossaryIds($userId, null, $visible, $now),
             Scope::Starred => array_values(array_intersect($visible, $this->cardRepo->markedGlossaryIds($userId))),
             Scope::Worst => $this->cardRepo->worstGlossaryIds($userId, $visible, self::WORST_LIMIT),
@@ -89,8 +91,16 @@ class TrainerService
     }
 
     /** @param list<int> $tagIds */
-    public function start(int $userId, Scope $scope, array $tagIds, Mode $mode, Direction $direction, AnswerMode $answerMode, int $size, DateTimeImmutable $now): TrainerSession
-    {
+    public function start(
+        int $userId,
+        Scope $scope,
+        array $tagIds,
+        Mode $mode,
+        Direction $direction,
+        AnswerMode $answerMode,
+        int $size,
+        DateTimeImmutable $now,
+    ): TrainerSession {
         $candidates = $this->servable($this->scopeIds($scope, $tagIds, $userId, $now), $direction);
 
         if ($mode === Mode::Review) {
@@ -116,8 +126,15 @@ class TrainerService
         return null;
     }
 
-    public function answer(TrainerSession $session, int $userId, int $glossaryId, ?Grade $grade, ?string $typed, ?int $choiceId, DateTimeImmutable $now): TrainerSession
-    {
+    public function answer(
+        TrainerSession $session,
+        int $userId,
+        int $glossaryId,
+        ?Grade $grade,
+        ?string $typed,
+        ?int $choiceId,
+        DateTimeImmutable $now,
+    ): TrainerSession {
         if (!in_array($glossaryId, $session->queue, true)) {
             return $session;
         }
@@ -136,12 +153,18 @@ class TrainerService
 
         $this->record($userId, $entry, $session->direction, $grade, $session->mode, $now);
 
-        return $session->withAnswer($glossaryId, $grade->isPass(), $session->answerMode === AnswerMode::Flip ? null : [
-            'verdict' => $result->value,
-            'prompt' => $this->promptFor($entry, $session->direction),
-            'expected' => $expected,
-            'given' => $given,
-        ]);
+        return $session->withAnswer(
+            $glossaryId,
+            $grade->isPass(),
+            $session->answerMode === AnswerMode::Flip
+                ? null
+                : [
+                    'verdict' => $result->value,
+                    'prompt' => $this->promptFor($entry, $session->direction),
+                    'expected' => $expected,
+                    'given' => $given,
+                ],
+        );
     }
 
     /**

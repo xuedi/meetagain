@@ -6,7 +6,6 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Sentry\EventId;
 use Sentry\SentrySdk;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -39,11 +38,6 @@ final class ErrorController extends AbstractController
 
         if ($exception instanceof HttpExceptionInterface) {
             $status = $exception->getStatusCode();
-
-            if (str_starts_with($request->getPathInfo(), '/api/')) {
-                return new JsonResponse(['error' => $exception->getMessage()], $status);
-            }
-
             $eventId = SentrySdk::getCurrentHub()->getLastEventId() ?? EventId::generate();
 
             return new Response($this->twig->render('error/500.html.twig', [

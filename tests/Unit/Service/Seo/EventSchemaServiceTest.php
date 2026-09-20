@@ -83,14 +83,17 @@ class EventSchemaServiceTest extends TestCase
         $schema = $subject->buildSchema($event, self::CANONICAL_URL, 'en');
 
         // Assert
-        static::assertSame([
-            '@type' => 'Offer',
-            'url' => self::CANONICAL_URL,
-            'price' => '0',
-            'priceCurrency' => 'EUR',
-            'availability' => 'https://schema.org/InStock',
-            'validFrom' => '2026-03-01T08:00:00+00:00',
-        ], $schema['offers']);
+        static::assertSame(
+            [
+                '@type' => 'Offer',
+                'url' => self::CANONICAL_URL,
+                'price' => '0',
+                'priceCurrency' => 'EUR',
+                'availability' => 'https://schema.org/InStock',
+                'validFrom' => '2026-03-01T08:00:00+00:00',
+            ],
+            $schema['offers'],
+        );
     }
 
     public function testOfferValidFromFallsBackToStartWhenCreatedAtMissing(): void

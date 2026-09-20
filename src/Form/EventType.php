@@ -137,7 +137,11 @@ class EventType extends AbstractType
                 'required' => false,
                 'label' => $this->translator->trans('admin_event.form_label_preview_image'),
                 'constraints' => [
-                    new File(maxSize: '5000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('admin_event.form_image_mime_error')),
+                    new File(
+                        maxSize: '5000k',
+                        mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                        mimeTypesMessage: $this->translator->trans('admin_event.form_image_mime_error'),
+                    ),
                 ],
             ])
             ->add('allFollowing', CheckboxType::class, [
@@ -183,6 +187,14 @@ class EventType extends AbstractType
         }
     }
 
+    #[Override]
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Event::class,
+        ]);
+    }
+
     private function venueBallotNotice(): ?string
     {
         $venues = $this->locationRepository->findAllForAdmin($this->locationFilterService->getLocationIdFilter()->getLocationIds());
@@ -206,13 +218,5 @@ class EventType extends AbstractType
         }
 
         return $choices;
-    }
-
-    #[Override]
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'data_class' => Event::class,
-        ]);
     }
 }

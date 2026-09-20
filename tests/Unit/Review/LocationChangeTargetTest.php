@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Review;
 
+use App\Contribution\Registry;
 use App\Entity\Location;
 use App\Entity\User;
 use App\EntityActionDispatcher;
@@ -9,7 +10,6 @@ use App\Enum\EntityAction;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Repository\LocationRepository;
 use App\Review\LocationChangeTarget;
-use App\Contribution\Registry;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;

@@ -13,11 +13,16 @@ final class SettingsStoreTest extends TestCase
     public function testSavingDetachedSettingsWritesOntoTheOneGlobalRow(): void
     {
         // Arrange
-        $global = new Settings()->setAdapter(ExternalSource::Omdb)->setEncryptedOmdbKey('kept-before');
+        $global = new Settings()
+            ->setAdapter(ExternalSource::Omdb)
+            ->setEncryptedOmdbKey('kept-before');
         $service = $this->createMock(SettingsService::class);
         $service->method('getOrCreateGlobal')->willReturn($global);
         $service->expects($this->once())->method('save')->with($this->identicalTo($global));
-        $detached = new Settings()->setAdapter(ExternalSource::Tmdb)->setEncryptedTmdbKey('cipher-t')->setEncryptedOmdbKey('kept-before');
+        $detached = new Settings()
+            ->setAdapter(ExternalSource::Tmdb)
+            ->setEncryptedTmdbKey('cipher-t')
+            ->setEncryptedOmdbKey('kept-before');
 
         // Act
         new SettingsStore($service)->save('films', $detached, null);

@@ -46,9 +46,7 @@ class PhotoRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')
-            ->orderBy('p.takenAt', 'DESC')
-            ->addOrderBy('p.createdAt', 'DESC');
+        $qb = $this->createQueryBuilder('p')->orderBy('p.takenAt', 'DESC')->addOrderBy('p.createdAt', 'DESC');
 
         if ($allowedIds !== null) {
             $qb->where('p.id IN (:ids)')->setParameter('ids', $allowedIds);
@@ -68,7 +66,8 @@ class PhotoRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->where('p.createdBy = :userId')
             ->setParameter('userId', $userId)
             ->orderBy('p.takenAt', 'DESC')
@@ -98,10 +97,7 @@ class PhotoRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')
-            ->select('p.createdBy AS userId, COUNT(p.id) AS total')
-            ->groupBy('p.createdBy')
-            ->orderBy('total', 'DESC');
+        $qb = $this->createQueryBuilder('p')->select('p.createdBy AS userId, COUNT(p.id) AS total')->groupBy('p.createdBy')->orderBy('total', 'DESC');
 
         if ($allowedIds !== null) {
             $qb->where('p.id IN (:ids)')->setParameter('ids', $allowedIds);
@@ -129,10 +125,7 @@ class PhotoRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')
-            ->select('p.id')
-            ->where('p.contestSubmitted = true')
-            ->orderBy('p.createdAt', 'ASC');
+        $qb = $this->createQueryBuilder('p')->select('p.id')->where('p.contestSubmitted = true')->orderBy('p.createdAt', 'ASC');
 
         if ($allowedIds !== null) {
             $qb->andWhere('p.id IN (:ids)')->setParameter('ids', $allowedIds);
@@ -148,7 +141,8 @@ class PhotoRepository extends ServiceEntityRepository
             return 0;
         }
 
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->select('COUNT(p.id)')
             ->where('p.contestSubmitted = true')
             ->andWhere('p.createdBy = :userId')
@@ -168,10 +162,13 @@ class PhotoRepository extends ServiceEntityRepository
             return;
         }
 
-        $this->createQueryBuilder('p')
+        $this
+            ->createQueryBuilder('p')
             ->update()
-            ->set('p.contestSubmitted', ':off')->setParameter('off', false)
-            ->where('p.id IN (:ids)')->setParameter('ids', $ids)
+            ->set('p.contestSubmitted', ':off')
+            ->setParameter('off', false)
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $ids)
             ->getQuery()
             ->execute();
     }
@@ -196,9 +193,6 @@ class PhotoRepository extends ServiceEntityRepository
 
     private function withRelations(QueryBuilder $qb): QueryBuilder
     {
-        return $qb
-            ->addSelect('i', 't')
-            ->leftJoin('p.image', 'i')
-            ->leftJoin('p.translations', 't');
+        return $qb->addSelect('i', 't')->leftJoin('p.image', 'i')->leftJoin('p.translations', 't');
     }
 }

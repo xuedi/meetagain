@@ -96,7 +96,11 @@ class GameEditType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'constraints' => [
-                    new File(maxSize: '8000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('boardgames_game.flash_invalid_image')),
+                    new File(
+                        maxSize: '8000k',
+                        mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                        mimeTypesMessage: $this->translator->trans('boardgames_game.flash_invalid_image'),
+                    ),
                 ],
             ]);
 

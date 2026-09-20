@@ -15,11 +15,7 @@ final readonly class CopyState
 
     public function with(?int $holderId = null, ?DateTimeImmutable $heldSince = null, ?CirculationCopyStatus $status = null): self
     {
-        return new self(
-            $holderId ?? $this->holderId,
-            $heldSince ?? $this->heldSince,
-            $status ?? $this->status,
-        );
+        return new self($holderId ?? $this->holderId, $heldSince ?? $this->heldSince, $status ?? $this->status);
     }
 
     public function equals(?int $holderId, ?DateTimeImmutable $heldSince, CirculationCopyStatus $status): bool

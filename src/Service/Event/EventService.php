@@ -63,10 +63,7 @@ readonly class EventService
      */
     public function keepTranslatedIn(array $events, string $locale): array
     {
-        return array_values(array_filter(
-            $events,
-            static fn(Event $event): bool => $event->findTranslation($locale) !== null,
-        ));
+        return array_values(array_filter($events, static fn(Event $event): bool => $event->findTranslation($locale) !== null));
     }
 
     public function updateRecurringEvents(Event $event, ?DateTimeInterface $syncFrom = null): int
@@ -102,24 +99,6 @@ readonly class EventService
         $event->setCanceled(false);
         $this->em->persist($event);
         $this->em->flush();
-    }
-
-    private function structureList(array $events): array
-    {
-        $structuredList = [];
-        foreach ($events as $event) {
-            $key = $event->getStart()->format('Y-m');
-            if (!isset($structuredList[$key])) {
-                $structuredList[$key] = [
-                    'year' => $event->getStart()->format('Y'),
-                    'month' => $event->getStart()->format('F'),
-                    'events' => [],
-                ];
-            }
-            $structuredList[$key]['events'][] = $event;
-        }
-
-        return $structuredList;
     }
 
     /**
@@ -183,5 +162,23 @@ readonly class EventService
         }
 
         return $tiles;
+    }
+
+    private function structureList(array $events): array
+    {
+        $structuredList = [];
+        foreach ($events as $event) {
+            $key = $event->getStart()->format('Y-m');
+            if (!isset($structuredList[$key])) {
+                $structuredList[$key] = [
+                    'year' => $event->getStart()->format('Y'),
+                    'month' => $event->getStart()->format('F'),
+                    'events' => [],
+                ];
+            }
+            $structuredList[$key]['events'][] = $event;
+        }
+
+        return $structuredList;
     }
 }

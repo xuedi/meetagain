@@ -2,10 +2,10 @@
 
 namespace App\Service\Email\Delivery\Provider;
 
+use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
 use App\Service\Email\Delivery\Log;
 use App\Service\Email\Delivery\LogCollection;
 use App\Service\Email\Delivery\LogFilter;
-use App\Service\Email\Delivery\EmailDeliveryProviderInterface;
 use DateTimeImmutable;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;

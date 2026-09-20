@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -17,10 +15,14 @@ final class Version20260511182112 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql('ALTER TABLE logs_access_denied ADD incident_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE logs_access_denied ADD CONSTRAINT FK_CB682DDE59E53FB9 FOREIGN KEY (incident_id) REFERENCES logs_incident (id) ON DELETE SET NULL');
+        $this->addSql(
+            'ALTER TABLE logs_access_denied ADD CONSTRAINT FK_CB682DDE59E53FB9 FOREIGN KEY (incident_id) REFERENCES logs_incident (id) ON DELETE SET NULL',
+        );
         $this->addSql('CREATE INDEX IDX_CB682DDE59E53FB9 ON logs_access_denied (incident_id)');
         $this->addSql('ALTER TABLE logs_not_found ADD incident_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE logs_not_found ADD CONSTRAINT FK_C33C8E4859E53FB9 FOREIGN KEY (incident_id) REFERENCES logs_incident (id) ON DELETE SET NULL');
+        $this->addSql(
+            'ALTER TABLE logs_not_found ADD CONSTRAINT FK_C33C8E4859E53FB9 FOREIGN KEY (incident_id) REFERENCES logs_incident (id) ON DELETE SET NULL',
+        );
         $this->addSql('CREATE INDEX IDX_C33C8E4859E53FB9 ON logs_not_found (incident_id)');
     }
 

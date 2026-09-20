@@ -23,7 +23,8 @@ class BallotRepository extends ServiceEntityRepository
      */
     public function findOpen(): array
     {
-        return $this->createQueryBuilder('b')
+        return $this
+            ->createQueryBuilder('b')
             ->where('b.status = :status')
             ->setParameter('status', BallotStatus::Open)
             ->orderBy('b.deadline', 'ASC')
@@ -36,7 +37,8 @@ class BallotRepository extends ServiceEntityRepository
      */
     public function findDue(DateTimeImmutable $now): array
     {
-        return $this->createQueryBuilder('b')
+        return $this
+            ->createQueryBuilder('b')
             ->where('b.status = :status')
             ->andWhere('b.deadline <= :now')
             ->setParameter('status', BallotStatus::Open)
@@ -51,7 +53,8 @@ class BallotRepository extends ServiceEntityRepository
      */
     public function findForPurpose(string $purpose): array
     {
-        return $this->createQueryBuilder('b')
+        return $this
+            ->createQueryBuilder('b')
             ->where('b.purpose = :purpose')
             ->setParameter('purpose', $purpose)
             ->orderBy('b.id', 'DESC')
@@ -64,7 +67,8 @@ class BallotRepository extends ServiceEntityRepository
      */
     public function findForSubject(string $subjectType, int $subjectId): array
     {
-        return $this->createQueryBuilder('b')
+        return $this
+            ->createQueryBuilder('b')
             ->where('b.subjectType = :type')
             ->andWhere('b.subjectId = :id')
             ->setParameter('type', $subjectType)

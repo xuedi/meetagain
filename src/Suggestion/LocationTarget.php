@@ -167,9 +167,14 @@ final readonly class LocationTarget implements SuggestionTargetProviderInterface
     {
         $visible = $this->repo->findAllForAdmin($this->filterService->getLocationIdFilter()->getLocationIds());
 
-        return array_any($visible, static fn(Location $existing): bool => $existing->getId() !== $draft->getId()
-            && strcasecmp(trim((string) $existing->getName()), $name) === 0
-            && strcasecmp(trim((string) $existing->getPostcode()), $postcode) === 0);
+        return array_any(
+            $visible,
+            static fn(Location $existing): bool => (
+                $existing->getId() !== $draft->getId()
+                && strcasecmp(trim((string) $existing->getName()), $name) === 0
+                && strcasecmp(trim((string) $existing->getPostcode()), $postcode) === 0
+            ),
+        );
     }
 
     /** @param array<string, scalar|null> $payload */

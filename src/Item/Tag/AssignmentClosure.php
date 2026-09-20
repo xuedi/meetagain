@@ -56,10 +56,10 @@ readonly class AssignmentClosure
      */
     private function chains(array $tags): array
     {
-        return array_map(
-            static fn(ItemTag $tag): array => array_map(static fn(ItemTag $ancestor): int => (int) $ancestor->getId(), $tag->getAncestors()),
-            $tags,
-        );
+        return array_map(static fn(ItemTag $tag): array => array_map(
+            static fn(ItemTag $ancestor): int => (int) $ancestor->getId(),
+            $tag->getAncestors(),
+        ), $tags);
     }
 
     /**
@@ -131,7 +131,12 @@ readonly class AssignmentClosure
         }
 
         foreach (array_diff_key($wanted, array_flip($assigned)) as $tag) {
-            $this->em->persist(new ItemTagAssignment()->setItemType($itemType)->setItemId($itemId)->setTag($tag));
+            $this->em->persist(
+                new ItemTagAssignment()
+                    ->setItemType($itemType)
+                    ->setItemId($itemId)
+                    ->setTag($tag),
+            );
         }
     }
 

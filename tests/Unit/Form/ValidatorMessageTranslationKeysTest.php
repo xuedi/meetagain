@@ -4,6 +4,8 @@ namespace Tests\Unit\Form;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class ValidatorMessageTranslationKeysTest extends TestCase
 {
@@ -73,7 +75,7 @@ class ValidatorMessageTranslationKeysTest extends TestCase
         }
 
         $files = [];
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir));
         foreach ($iterator as $file) {
             if (!($file->isFile() && $file->getExtension() === 'php')) {
                 continue;

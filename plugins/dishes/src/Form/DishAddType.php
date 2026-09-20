@@ -5,6 +5,7 @@ namespace Plugin\Dishes\Form;
 use App\Item\Tag\AssignmentFormHelper;
 use App\Service\Config\LanguageService;
 use App\Service\Media\ImageService;
+use Override;
 use Plugin\Dishes\Service\DishService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -25,7 +26,7 @@ class DishAddType extends AbstractType
         private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $codes = $this->languageService->getFilteredEnabledCodes();
@@ -65,20 +66,23 @@ class DishAddType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'constraints' => [
-                    new File(maxSize: '8000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('dishes_dish.error_invalid_image')),
+                    new File(
+                        maxSize: '8000k',
+                        mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                        mimeTypesMessage: $this->translator->trans('dishes_dish.error_invalid_image'),
+                    ),
                 ],
             ]);
 
         $this->assignmentFormHelper->addAssignmentFields($builder, DishService::ITEM_TYPE, null);
 
-        $builder
-            ->add('submit', SubmitType::class, [
-                'label' => 'dishes_dish.button_submit',
-                'attr' => ['class' => 'button is-primary'],
-            ]);
+        $builder->add('submit', SubmitType::class, [
+            'label' => 'dishes_dish.button_submit',
+            'attr' => ['class' => 'button is-primary'],
+        ]);
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(['current_locale' => null]);

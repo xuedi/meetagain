@@ -29,11 +29,7 @@ class TopicTargetProviderTest extends TestCase
     {
         // Arrange
         $urlGenerator = $this->createMock(UrlGeneratorInterface::class);
-        $urlGenerator
-            ->expects(self::once())
-            ->method('generate')
-            ->with('app_townhall_forum_topic', ['topicId' => 7])
-            ->willReturn('/en/townhall/forum/7');
+        $urlGenerator->expects(self::once())->method('generate')->with('app_townhall_forum_topic', ['topicId' => 7])->willReturn('/en/townhall/forum/7');
         $provider = $this->makeProvider(topic: new Topic(), urlGenerator: $urlGenerator);
 
         // Act + Assert
@@ -90,10 +86,7 @@ class TopicTargetProviderTest extends TestCase
         // Arrange
         $user = new User();
         $activityService = $this->createMock(ActivityService::class);
-        $activityService
-            ->expects(self::once())
-            ->method('log')
-            ->with(CommentedOnTopic::TYPE, $user, ['topic_id' => 7, 'topic_title' => 'Language']);
+        $activityService->expects(self::once())->method('log')->with(CommentedOnTopic::TYPE, $user, ['topic_id' => 7, 'topic_title' => 'Language']);
         $topic = new Topic()->setTitle('Language');
         $provider = $this->makeProvider(topic: $topic, activityService: $activityService);
 

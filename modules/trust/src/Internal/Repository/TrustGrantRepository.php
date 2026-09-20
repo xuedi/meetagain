@@ -22,7 +22,8 @@ class TrustGrantRepository extends ServiceEntityRepository
      */
     public function findEdges(string $context): array
     {
-        $rows = $this->createQueryBuilder('g')
+        $rows = $this
+            ->createQueryBuilder('g')
             ->select('IDENTITY(g.fromUser) AS fromUser', 'IDENTITY(g.toUser) AS toUser', 'g.level')
             ->where('g.context = :context')
             ->setParameter('context', $context)
@@ -43,17 +44,21 @@ class TrustGrantRepository extends ServiceEntityRepository
      */
     public function findForContexts(array $contexts): array
     {
-        return array_values($this->createQueryBuilder('g')
-            ->where('g.context IN (:contexts)')
-            ->setParameter('contexts', $contexts)
-            ->orderBy('g.id', 'ASC')
-            ->getQuery()
-            ->getResult());
+        return array_values(
+            $this
+                ->createQueryBuilder('g')
+                ->where('g.context IN (:contexts)')
+                ->setParameter('contexts', $contexts)
+                ->orderBy('g.id', 'ASC')
+                ->getQuery()
+                ->getResult(),
+        );
     }
 
     public function findEdge(string $context, int $fromUserId, int $toUserId): ?TrustGrant
     {
-        return $this->createQueryBuilder('g')
+        return $this
+            ->createQueryBuilder('g')
             ->where('g.context = :context')
             ->andWhere('IDENTITY(g.fromUser) = :from')
             ->andWhere('IDENTITY(g.toUser) = :to')
@@ -69,7 +74,8 @@ class TrustGrantRepository extends ServiceEntityRepository
      */
     public function findOutgoing(string $context, int $fromUserId): array
     {
-        $rows = $this->createQueryBuilder('g')
+        $rows = $this
+            ->createQueryBuilder('g')
             ->select('IDENTITY(g.toUser) AS toUser', 'g.level')
             ->where('g.context = :context')
             ->andWhere('IDENTITY(g.fromUser) = :from')
@@ -91,7 +97,8 @@ class TrustGrantRepository extends ServiceEntityRepository
      */
     public function countIncomingByUser(string $context): array
     {
-        $rows = $this->createQueryBuilder('g')
+        $rows = $this
+            ->createQueryBuilder('g')
             ->select('IDENTITY(g.toUser) AS toUser', 'COUNT(g.id) AS total')
             ->where('g.context = :context')
             ->setParameter('context', $context)
@@ -109,7 +116,8 @@ class TrustGrantRepository extends ServiceEntityRepository
 
     public function findRevision(string $context): ?string
     {
-        $row = $this->createQueryBuilder('g')
+        $row = $this
+            ->createQueryBuilder('g')
             ->select('COUNT(g.id) AS total', 'MAX(g.updatedAt) AS latest')
             ->where('g.context = :context')
             ->setParameter('context', $context)
@@ -128,10 +136,7 @@ class TrustGrantRepository extends ServiceEntityRepository
      */
     public function findContexts(): array
     {
-        $rows = $this->createQueryBuilder('g')
-            ->select('DISTINCT g.context AS context')
-            ->getQuery()
-            ->getArrayResult();
+        $rows = $this->createQueryBuilder('g')->select('DISTINCT g.context AS context')->getQuery()->getArrayResult();
 
         return array_map(static fn(array $row): string => (string) $row['context'], $rows);
     }

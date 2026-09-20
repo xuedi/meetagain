@@ -4,8 +4,6 @@ namespace App\Controller;
 
 use App\Activity\ActivityService;
 use App\Activity\Messages\AdminEventEdited;
-use App\Activity\Messages\RsvpNo;
-use App\Activity\Messages\RsvpYes;
 use App\Entity\Event;
 use App\Entity\RsvpGuest;
 use App\Enum\EventRsvpFilter;
@@ -13,6 +11,8 @@ use App\Enum\EventSortFilter;
 use App\Enum\EventTileLocation;
 use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
+use App\Enum\RsvpRefusal;
+use App\Exception\Event\RsvpRefusedException;
 use App\FeaturedEventProviderInterface;
 use App\Filter\Event\EventFilterService;
 use App\Form\EventFilterType;
@@ -20,13 +20,12 @@ use App\Repository\EventRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\CalendarFeedService;
 use App\Service\Event\EventService;
-use App\Service\Event\RsvpGuestService;
+use App\Service\Event\RsvpService;
 use App\Service\Item\AssociationService;
 use App\Service\Item\AttachControlBuilder;
 use App\Service\Seo\BreadcrumbBuilder;
 use App\Service\Seo\CanonicalUrlService;
 use App\Service\Seo\EventSchemaService;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -185,71 +184,18 @@ final class EventController extends AbstractController
         );
     }
 
-    /**
-     * @param array<int>|null $allowedEventIds
-     * @return array<Event>
-     */
-    private function getFeaturedEvents(?array $allowedEventIds, string $locale): array
-    {
-        $provided = $this->getProvidedFeaturedEvents();
-        if ($provided === null) {
-            return $this->repo->findFeatured($allowedEventIds, $locale);
-        }
-
-        return $this->eventService->keepTranslatedIn($provided, $locale);
-    }
-
-    /**
-     * @return array<Event>|null
-     */
-    private function getProvidedFeaturedEvents(): ?array
-    {
-        $providers = iterator_to_array($this->featuredEventProviders);
-
-        usort($providers, static fn(FeaturedEventProviderInterface $a, FeaturedEventProviderInterface $b): int => $b->getPriority() <=> $a->getPriority());
-
-        foreach ($providers as $provider) {
-            if (!$provider->shouldProvide()) {
-                continue;
-            }
-
-            return $provider->getFeaturedEvents();
-        }
-
-        return null;
-    }
-
     #[IsGranted('ROLE_USER')]
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp', methods: ['POST'])]
-    public function toggleRsvp(Request $request, Event $event, EntityManagerInterface $em, RsvpGuestService $rsvpGuestService): Response
+    public function toggleRsvp(Request $request, Event $event, RsvpService $rsvpService): Response
     {
         if (!$this->isCsrfTokenValid('app_event_toggle_rsvp' . $event->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
-        if ($event->isCanceled()) {
-            $this->addFlash('error', 'events.flash_rsvp_canceled');
 
-            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
-        }
-        if ($event->getStart() < new DateTimeImmutable()) {
-            $this->addFlash('error', 'events.flash_rsvp_past');
-
-            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
-        }
-        $user = $this->getAuthedUser();
-        if (!$this->isGranted(PermissionAttribute::EVENT_RSVP, $event)) {
-            $this->addFlash('warning', 'events.flash_group_only');
-
-            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
-        }
-        $event->toggleRsvp($this->getAuthedUser());
-        $em->persist($event);
-        $em->flush();
-
-        $type = $event->hasRsvp($user) ? RsvpYes::TYPE : RsvpNo::TYPE;
-        $this->activityService->log($type, $user, ['event_id' => $event->getId()]);
-        if (!$event->hasRsvp($user)) {
-            $rsvpGuestService->onRsvpRemoved($event, $user);
+        try {
+            $rsvpService->toggle($event, $this->getAuthedUser());
+        } catch (RsvpRefusedException $refused) {
+            $this->addFlash($refused->reason->flashLevel(), $refused->reason->flashKey());
         }
 
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
@@ -257,41 +203,32 @@ final class EventController extends AbstractController
 
     #[IsGranted('ROLE_USER')]
     #[Route('/event/rsvpGuests/{event}/{direction}/', name: 'app_event_rsvp_guests', requirements: ['direction' => 'add|remove'], methods: ['POST'])]
-    public function rsvpGuests(Request $request, Event $event, string $direction, RsvpGuestService $rsvpGuestService): Response
+    public function rsvpGuests(Request $request, Event $event, string $direction, RsvpService $rsvpService): Response
     {
         if (!$this->isCsrfTokenValid('app_event_rsvp_guests' . $event->getId(), (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
-        if ($event->isCanceled()) {
-            $this->addFlash('error', 'events.flash_rsvp_canceled');
 
-            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
-        }
-        if ($event->getStart() < new DateTimeImmutable()) {
-            $this->addFlash('error', 'events.flash_rsvp_past');
+        try {
+            $count = $rsvpService->changeGuests($event, $this->getAuthedUser(), $direction);
+        } catch (RsvpRefusedException $refused) {
+            if ($request->isXmlHttpRequest()) {
+                $status = in_array($refused->reason, [RsvpRefusal::Inaccessible, RsvpRefusal::NotAllowed], true)
+                    ? Response::HTTP_FORBIDDEN
+                    : Response::HTTP_CONFLICT;
 
-            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
-        }
-        if (!$this->isGranted(PermissionAttribute::EVENT_RSVP, $event)) {
-            $this->addFlash('warning', 'events.flash_group_only');
-
-            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
-        }
-
-        $count = $rsvpGuestService->change($event, $this->getAuthedUser(), $direction);
-        if ($request->isXmlHttpRequest()) {
-            if ($count === null) {
-                return new JsonResponse(['error' => 'not_rsvpd'], Response::HTTP_CONFLICT);
+                return new JsonResponse(['error' => $refused->reason->errorCode()], $status);
             }
+            $this->addFlash($refused->reason->flashLevel(), $refused->reason->flashKey());
 
-            return new JsonResponse([
-                'count' => $count,
-                'capped' => $direction === 'add' && $count === RsvpGuest::MAX_GUESTS,
-            ]);
+            return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
         }
-        if ($count === null) {
-            $this->addFlash('warning', 'events.flash_rsvp_guests_requires_rsvp');
-        } elseif ($direction === 'add' && $count === RsvpGuest::MAX_GUESTS) {
+
+        $capped = $direction === 'add' && $count === RsvpGuest::MAX_GUESTS;
+        if ($request->isXmlHttpRequest()) {
+            return new JsonResponse(['count' => $count, 'capped' => $capped]);
+        }
+        if ($capped) {
             $this->addFlash('warning', 'events.flash_rsvp_guests_limit');
         }
 
@@ -322,7 +259,6 @@ final class EventController extends AbstractController
         $em->flush();
 
         $this->activityService->log(AdminEventEdited::TYPE, $this->getAuthedUser(), ['event_id' => $event->getId()]);
-        $this->addFlash('success', 'events.flash_external_rsvp_saved');
 
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
     }
@@ -361,5 +297,39 @@ final class EventController extends AbstractController
         $this->itemAssociationService->detach($id, $itemType, $itemId);
 
         return $this->redirectToRoute('app_event_details', ['id' => $id]);
+    }
+
+    /**
+     * @param array<int>|null $allowedEventIds
+     * @return array<Event>
+     */
+    private function getFeaturedEvents(?array $allowedEventIds, string $locale): array
+    {
+        $provided = $this->getProvidedFeaturedEvents();
+        if ($provided === null) {
+            return $this->repo->findFeatured($allowedEventIds, $locale);
+        }
+
+        return $this->eventService->keepTranslatedIn($provided, $locale);
+    }
+
+    /**
+     * @return array<Event>|null
+     */
+    private function getProvidedFeaturedEvents(): ?array
+    {
+        $providers = iterator_to_array($this->featuredEventProviders);
+
+        usort($providers, static fn(FeaturedEventProviderInterface $a, FeaturedEventProviderInterface $b): int => $b->getPriority() <=> $a->getPriority());
+
+        foreach ($providers as $provider) {
+            if (!$provider->shouldProvide()) {
+                continue;
+            }
+
+            return $provider->getFeaturedEvents();
+        }
+
+        return null;
     }
 }

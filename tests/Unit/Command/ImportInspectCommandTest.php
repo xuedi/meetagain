@@ -46,10 +46,12 @@ final class ImportInspectCommandTest extends TestCase
     {
         // Arrange
         $reader = $this->createStub(ArchiveReader::class);
-        $reader->method('describe')->willReturnCallback(fn(string $archive): array => match ($archive) {
-            'src/DataImportFixtures/weiqi-club/' => $this->description('weiqi-club', 'Weiqi Club', 'Go in Berlin', ['films']),
-            default => $this->description('vanilla-group', 'Vanilla Group', 'Nothing but the install', []),
-        });
+        $reader
+            ->method('describe')
+            ->willReturnCallback(fn(string $archive): array => match ($archive) {
+                'src/DataImportFixtures/weiqi-club/' => $this->description('weiqi-club', 'Weiqi Club', 'Go in Berlin', ['films']),
+                default => $this->description('vanilla-group', 'Vanilla Group', 'Nothing but the install', []),
+            });
         $tester = new CommandTester(new ImportInspectCommand($reader));
 
         // Act

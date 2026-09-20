@@ -42,16 +42,6 @@ final class MemberController extends AbstractController implements AdminNavigati
         );
     }
 
-    private function getAuthedUser(): User
-    {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw new AuthenticationCredentialsNotFoundException('Should never happen, see: config/packages/security.yaml');
-        }
-
-        return $user;
-    }
-
     #[Route('/admin/member', name: 'app_admin_member')]
     public function list(): Response
     {
@@ -183,6 +173,16 @@ final class MemberController extends AbstractController implements AdminNavigati
         }
 
         return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
+    }
+
+    private function getAuthedUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw new AuthenticationCredentialsNotFoundException('Should never happen, see: config/packages/security.yaml');
+        }
+
+        return $user;
     }
 
     private function assertAccessible(User $user): void

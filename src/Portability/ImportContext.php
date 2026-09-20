@@ -54,23 +54,6 @@ class ImportContext
         return $image;
     }
 
-    private function resolveArchivePath(string $relativePath): string
-    {
-        if (str_contains($relativePath, "\0") || str_contains($relativePath, '..') || str_starts_with($relativePath, '/')) {
-            throw new RuntimeException('The archive names a file outside itself: ' . $relativePath);
-        }
-
-        $path = $this->extractedArchiveDir . '/' . $relativePath;
-
-        $root = realpath($this->extractedArchiveDir);
-        $resolved = $root === false ? false : realpath($path);
-        if ($resolved !== false && !str_starts_with($resolved, $root . '/')) {
-            throw new RuntimeException('The archive links to a file outside itself: ' . $relativePath);
-        }
-
-        return $path;
-    }
-
     public function getSystemUser(): User
     {
         return $this->systemUser;
@@ -137,5 +120,22 @@ class ImportContext
     public function toSummary(array $missingPlugins = [], int $weeksShifted = 0, bool $siteApplied = false): ImportSummary
     {
         return new ImportSummary($this->counts, $missingPlugins, $weeksShifted, $siteApplied);
+    }
+
+    private function resolveArchivePath(string $relativePath): string
+    {
+        if (str_contains($relativePath, "\0") || str_contains($relativePath, '..') || str_starts_with($relativePath, '/')) {
+            throw new RuntimeException('The archive names a file outside itself: ' . $relativePath);
+        }
+
+        $path = $this->extractedArchiveDir . '/' . $relativePath;
+
+        $root = realpath($this->extractedArchiveDir);
+        $resolved = $root === false ? false : realpath($path);
+        if ($resolved !== false && !str_starts_with($resolved, $root . '/')) {
+            throw new RuntimeException('The archive links to a file outside itself: ' . $relativePath);
+        }
+
+        return $path;
     }
 }

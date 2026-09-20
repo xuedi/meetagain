@@ -18,11 +18,7 @@ final class SiteLogoPngRendererTest extends TestCase
         $image = new Image()->setHash('groupHash');
         $imageService = $this->createMock(ImageService::class);
         $imageService->expects($this->once())->method('getSourcePath')->with($image)->willReturn('/data/images/groupHash.jpg');
-        $imageService
-            ->expects($this->once())
-            ->method('renderPng')
-            ->with('/data/images/groupHash.jpg', SiteLogoPngRenderer::HEIGHT)
-            ->willReturn('png-bytes');
+        $imageService->expects($this->once())->method('renderPng')->with('/data/images/groupHash.jpg', SiteLogoPngRenderer::HEIGHT)->willReturn('png-bytes');
 
         // Act
         $rendered = $this->renderer($image, $imageService)->render();
@@ -36,11 +32,7 @@ final class SiteLogoPngRendererTest extends TestCase
     {
         // Arrange
         $imageService = $this->createMock(ImageService::class);
-        $imageService
-            ->expects($this->once())
-            ->method('renderPng')
-            ->with('/app/assets/images/logo.webp', SiteLogoPngRenderer::HEIGHT)
-            ->willReturn('png-bytes');
+        $imageService->expects($this->once())->method('renderPng')->with('/app/assets/images/logo.webp', SiteLogoPngRenderer::HEIGHT)->willReturn('png-bytes');
 
         // Act
         $rendered = $this->renderer(null, $imageService)->render();

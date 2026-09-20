@@ -34,7 +34,9 @@ class GlossaryServiceTest extends TestCase
         $em->expects(self::once())->method('persist');
         $em->expects(self::once())->method('flush');
         $service = $this->makeService($em, $this->createStub(GlossaryRepository::class), config: new Config()->setTermLanguage('zh'));
-        $glossary = new Glossary()->setPhrase('你好')->submitDefinitions(['en' => 'Hello', 'de' => '']);
+        $glossary = new Glossary()
+            ->setPhrase('你好')
+            ->submitDefinitions(['en' => 'Hello', 'de' => '']);
 
         // Act
         $service->create($glossary, userId: 9);
@@ -68,9 +70,7 @@ class GlossaryServiceTest extends TestCase
         $em->expects(self::once())->method('remove')->with($item);
         $em->expects(self::once())->method('flush');
         $proposals = $this->createMock(ChangeProposalService::class);
-        $proposals->expects(self::once())
-            ->method('removeForTarget')
-            ->with(GlossaryTaggableTypeProvider::ITEM_TYPE, 1);
+        $proposals->expects(self::once())->method('removeForTarget')->with(GlossaryTaggableTypeProvider::ITEM_TYPE, 1);
         $service = $this->makeService($em, $this->repoReturning($item), changeProposalService: $proposals);
 
         // Act
@@ -109,7 +109,9 @@ class GlossaryServiceTest extends TestCase
     public function testApplyChangeWritesOneDefinitionAndLeavesTheOthers(): void
     {
         // Arrange
-        $item = new Glossary()->setDefinition('en', 'Hello')->setDefinition('de', 'Hallo');
+        $item = new Glossary()
+            ->setDefinition('en', 'Hello')
+            ->setDefinition('de', 'Hallo');
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('flush');
         $service = $this->makeService($em, $this->repoReturning($item));
@@ -124,7 +126,9 @@ class GlossaryServiceTest extends TestCase
     public function testApplyChangeWithAnEmptyDefinitionRemovesThatLanguage(): void
     {
         // Arrange
-        $item = new Glossary()->setDefinition('en', 'Hello')->setDefinition('de', 'Hallo');
+        $item = new Glossary()
+            ->setDefinition('en', 'Hello')
+            ->setDefinition('de', 'Hallo');
         $service = $this->makeService($this->createStub(EntityManagerInterface::class), $this->repoReturning($item));
 
         // Act
@@ -161,14 +165,8 @@ class GlossaryServiceTest extends TestCase
     {
         // Arrange
         $tagService = $this->createMock(TagService::class);
-        $tagService->expects(self::once())
-            ->method('setTags')
-            ->with(GlossaryTaggableTypeProvider::ITEM_TYPE, 1, [3, 7]);
-        $service = $this->makeService(
-            $this->createStub(EntityManagerInterface::class),
-            $this->repoReturning(new Glossary()),
-            tagService: $tagService,
-        );
+        $tagService->expects(self::once())->method('setTags')->with(GlossaryTaggableTypeProvider::ITEM_TYPE, 1, [3, 7]);
+        $service = $this->makeService($this->createStub(EntityManagerInterface::class), $this->repoReturning(new Glossary()), tagService: $tagService);
 
         // Act
         $service->applyChange(1, GlossaryChangeTarget::FIELD_TAG, '3,7');
@@ -214,9 +212,15 @@ class GlossaryServiceTest extends TestCase
     public function testUpdateCopiesTheDraftOntoTheManagedEntry(): void
     {
         // Arrange
-        $managed = new Glossary()->setPhrase('old')->setDefinition('en', 'old')->setDefinition('de', 'alt');
+        $managed = new Glossary()
+            ->setPhrase('old')
+            ->setDefinition('en', 'old')
+            ->setDefinition('de', 'alt');
         $service = $this->makeService($this->createStub(EntityManagerInterface::class), $this->repoReturning($managed));
-        $draft = new Glossary()->setPhrase('new')->setSecondary('xīn')->submitDefinitions(['en' => 'new', 'de' => '']);
+        $draft = new Glossary()
+            ->setPhrase('new')
+            ->setSecondary('xīn')
+            ->submitDefinitions(['en' => 'new', 'de' => '']);
 
         // Act
         $service->update($draft, 1, []);
@@ -230,7 +234,11 @@ class GlossaryServiceTest extends TestCase
     public function testADraftCopiesTheFieldsWithoutSharingDefinitionRows(): void
     {
         // Arrange
-        $entry = new Glossary()->setPhrase('你好')->setSecondary('nǐ hǎo')->setTermLanguage('zh')->setDefinition('en', 'Hello');
+        $entry = new Glossary()
+            ->setPhrase('你好')
+            ->setSecondary('nǐ hǎo')
+            ->setTermLanguage('zh')
+            ->setDefinition('en', 'Hello');
         $service = $this->makeService($this->createStub(EntityManagerInterface::class), $this->createStub(GlossaryRepository::class));
 
         // Act
@@ -264,8 +272,14 @@ class GlossaryServiceTest extends TestCase
         $request = new Request();
         $request->setLocale('fr');
         $requestStack->push($request);
-        $service = $this->makeService($this->createStub(EntityManagerInterface::class), $this->createStub(GlossaryRepository::class), requestStack: $requestStack);
-        $entry = new Glossary()->setDefinition('de', 'Hallo')->setDefinition('en', 'Hello');
+        $service = $this->makeService(
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(GlossaryRepository::class),
+            requestStack: $requestStack,
+        );
+        $entry = new Glossary()
+            ->setDefinition('de', 'Hallo')
+            ->setDefinition('en', 'Hello');
 
         // Act
         $definition = $service->definitionFor($entry);
@@ -284,7 +298,12 @@ class GlossaryServiceTest extends TestCase
         $service = $this->makeService($em, $this->createStub(GlossaryRepository::class), itemActionDispatcher: $dispatcher);
         $rows = [];
         for ($i = 0; $i < 201; ++$i) {
-            $rows[] = [new Glossary()->setPhrase('word ' . $i)->setDefinition('en', 'meaning'), []];
+            $rows[] = [
+                new Glossary()
+                    ->setPhrase('word ' . $i)
+                    ->setDefinition('en', 'meaning'),
+                [],
+            ];
         }
 
         // Act
@@ -298,17 +317,11 @@ class GlossaryServiceTest extends TestCase
     {
         // Arrange
         $filter = $this->createMock(FilterService::class);
-        $filter->expects(self::once())
-            ->method('getAllowedItemIds')
-            ->with(GlossaryTaggableTypeProvider::ITEM_TYPE)
-            ->willReturn([4, 7]);
+        $filter->expects(self::once())->method('getAllowedItemIds')->with(GlossaryTaggableTypeProvider::ITEM_TYPE)->willReturn([4, 7]);
 
         $entry = new Glossary()->setPhrase('你好');
         $repo = $this->createMock(GlossaryRepository::class);
-        $repo->expects(self::once())
-            ->method('findAllowed')
-            ->with([4, 7])
-            ->willReturn([$entry]);
+        $repo->expects(self::once())->method('findAllowed')->with([4, 7])->willReturn([$entry]);
 
         $service = $this->makeService($this->createStub(EntityManagerInterface::class), $repo, $filter);
 
@@ -323,9 +336,7 @@ class GlossaryServiceTest extends TestCase
     {
         // Arrange
         $dispatcher = $this->createMock(ActionDispatcher::class);
-        $dispatcher->expects(self::once())
-            ->method('dispatch')
-            ->with(ItemAction::Created, GlossaryTaggableTypeProvider::ITEM_TYPE, 0);
+        $dispatcher->expects(self::once())->method('dispatch')->with(ItemAction::Created, GlossaryTaggableTypeProvider::ITEM_TYPE, 0);
 
         $service = $this->makeService(
             $this->createStub(EntityManagerInterface::class),

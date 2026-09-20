@@ -133,19 +133,6 @@ readonly class FilmService
         $this->dispatcher->dispatch(ItemAction::Deleted, self::ITEM_TYPE, $filmId);
     }
 
-    /** @return string[] */
-    private function parseGenres(?string $csv): array
-    {
-        if ($csv === null || trim($csv) === '') {
-            return [];
-        }
-
-        $parts = array_map(static fn(string $g) => strtolower(trim($g)), explode(',', $csv));
-        $parts = array_filter($parts, static fn(string $g) => $g !== '');
-
-        return array_values(array_unique($parts));
-    }
-
     /** @return Film[] */
     public function getList(): array
     {
@@ -176,5 +163,18 @@ readonly class FilmService
     public function findByExternalId(string $externalId, ExternalSource $source): ?Film
     {
         return $this->filmRepo->findByExternalId($externalId, $source->value);
+    }
+
+    /** @return string[] */
+    private function parseGenres(?string $csv): array
+    {
+        if ($csv === null || trim($csv) === '') {
+            return [];
+        }
+
+        $parts = array_map(static fn(string $g) => strtolower(trim($g)), explode(',', $csv));
+        $parts = array_filter($parts, static fn(string $g) => $g !== '');
+
+        return array_values(array_unique($parts));
     }
 }

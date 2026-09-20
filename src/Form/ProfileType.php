@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\User;
 use App\Service\Config\LanguageService;
 use App\Service\Media\ImageService;
+use App\Service\Member\ProfileService;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -15,7 +16,6 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\File;
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -46,11 +46,10 @@ class ProfileType extends AbstractType
                 new File(maxSize: '10M', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: 'shared.form_image_upload_mime_error_square'),
             ],
         ])->add('name', TextType::class, [
+            'data' => $user->getName(),
+            'mapped' => false,
             'label' => 'profile.form_label_username',
-            'constraints' => [
-                new Length(max: 64, maxMessage: 'security.validator_username_max'),
-                $this->cappedOnlyWhenRenamed((string) $user->getName()),
-            ],
+            'constraints' => [$this->cappedOnlyWhenRenamed((string) $user->getName())],
         ])->add('public', ChoiceType::class, [
             'data' => $user->isPublic(),
             'mapped' => false,
@@ -72,24 +71,26 @@ class ProfileType extends AbstractType
         ]);
     }
 
-    private function cappedOnlyWhenRenamed(string $originalName): Callback
-    {
-        return new Callback(static function (?string $value, ExecutionContextInterface $context) use ($originalName): void {
-            if ($value === null || $value === $originalName || mb_strlen($value) <= User::NAME_MAX_LENGTH) {
-                return;
-            }
-
-            $context->buildViolation('security.validator_username_max')
-                ->setParameter('{{ limit }}', (string) User::NAME_MAX_LENGTH)
-                ->addViolation();
-        });
-    }
-
     #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
         ]);
+    }
+
+    private function cappedOnlyWhenRenamed(string $originalName): Callback
+    {
+        return new Callback(static function (?string $value, ExecutionContextInterface $context) use ($originalName): void {
+            $limit = $value === null ? null : ProfileService::nameLimitExceeded($originalName, $value);
+            if ($limit === null) {
+                return;
+            }
+
+            $context
+                ->buildViolation(ProfileService::NAME_VIOLATION_MESSAGE)
+                ->setParameter('{{ limit }}', (string) $limit)
+                ->addViolation();
+        });
     }
 }

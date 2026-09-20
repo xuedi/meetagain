@@ -31,23 +31,31 @@ final readonly class UserRuntime implements RuntimeExtensionInterface
 
     public function getMemberViewActions(User $viewer, User $target): string
     {
-        return $this->concatProviderOutput($this->memberViewActionProviders, $viewer, $target, 'renderActions');
+        return $this->concatProviderOutput(
+            $this->memberViewActionProviders,
+            static fn(ViewActionProviderInterface $provider): ?string => $provider->renderActions($viewer, $target),
+        );
     }
 
     public function getMemberViewSections(User $viewer, User $target): string
     {
-        return $this->concatProviderOutput($this->memberViewSectionProviders, $viewer, $target, 'renderSection');
+        return $this->concatProviderOutput(
+            $this->memberViewSectionProviders,
+            static fn(ViewSectionProviderInterface $provider): ?string => $provider->renderSection($viewer, $target),
+        );
     }
 
     /**
-     * @param iterable<object> $providers
+     * @template T of object
+     * @param iterable<T> $providers
+     * @param callable(T): ?string $render
      */
-    private function concatProviderOutput(iterable $providers, User $viewer, User $target, string $method): string
+    private function concatProviderOutput(iterable $providers, callable $render): string
     {
         $html = '';
         foreach ($providers as $provider) {
             try {
-                $fragment = $provider->{$method}($viewer, $target);
+                $fragment = $render($provider);
             } catch (Throwable) {
                 continue;
             }

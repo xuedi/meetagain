@@ -3,9 +3,9 @@
 namespace App\Controller;
 
 use App\Emails\Types\SupportNotificationEmail;
-use App\EntityActionDispatcher;
 use App\Entity\SupportRequest;
 use App\Entity\User;
+use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Enum\SecurityEventType;
 use App\Enum\SupportRequestStatus;

@@ -12,26 +12,15 @@ use PHPUnit\Framework\TestCase;
 
 class RecurrenceBuilderStateResolverTest extends TestCase
 {
-    private function resolve(
-        RecurrenceMode $mode,
-        RecurrencePeriod $period,
-        array $ordinals = [],
-        array $weekdays = [],
-        array $daysOfMonth = [],
-    ) {
-        return new RecurrenceBuilderStateResolver()
-            ->resolve($mode, $period, $ordinals, $weekdays, $daysOfMonth, Weekday::Thursday);
+    private function resolve(RecurrenceMode $mode, RecurrencePeriod $period, array $ordinals = [], array $weekdays = [], array $daysOfMonth = [])
+    {
+        return new RecurrenceBuilderStateResolver()->resolve($mode, $period, $ordinals, $weekdays, $daysOfMonth, Weekday::Thursday);
     }
 
     public function testAWeeklyPeriodDropsOrdinalsAndKeepsEveryWeekday(): void
     {
         // Act
-        $state = $this->resolve(
-            RecurrenceMode::Weekday,
-            RecurrencePeriod::TwoWeeks,
-            [RecurrenceOrdinal::First],
-            [Weekday::Friday, Weekday::Monday],
-        );
+        $state = $this->resolve(RecurrenceMode::Weekday, RecurrencePeriod::TwoWeeks, [RecurrenceOrdinal::First], [Weekday::Friday, Weekday::Monday]);
 
         // Assert
         static::assertSame([], $state->ordinals);
@@ -44,12 +33,7 @@ class RecurrenceBuilderStateResolverTest extends TestCase
     public function testAMonthlyPeriodTrimsToOneWeekdayAndDefaultsTheOrdinal(): void
     {
         // Act
-        $state = $this->resolve(
-            RecurrenceMode::Weekday,
-            RecurrencePeriod::Month,
-            [],
-            [Weekday::Friday, Weekday::Monday],
-        );
+        $state = $this->resolve(RecurrenceMode::Weekday, RecurrencePeriod::Month, [], [Weekday::Friday, Weekday::Monday]);
 
         // Assert
         static::assertSame([RecurrenceOrdinal::First], $state->ordinals);
@@ -75,10 +59,7 @@ class RecurrenceBuilderStateResolverTest extends TestCase
         $state = $this->resolve(RecurrenceMode::DayOfMonth, RecurrencePeriod::Quarter, [], [], [15]);
 
         // Assert
-        static::assertSame(
-            [RecurrencePeriod::Month, RecurrencePeriod::TwoMonths, RecurrencePeriod::Quarter, RecurrencePeriod::Year],
-            $state->periods,
-        );
+        static::assertSame([RecurrencePeriod::Month, RecurrencePeriod::TwoMonths, RecurrencePeriod::Quarter, RecurrencePeriod::Year], $state->periods);
     }
 
     public function testAWeekdaySelectionOffersEveryPeriodExceptDay(): void
@@ -123,13 +104,7 @@ class RecurrenceBuilderStateResolverTest extends TestCase
     public function testTheLastDayOfMonthSurvivesNormalisation(): void
     {
         // Act
-        $state = $this->resolve(
-            RecurrenceMode::DayOfMonth,
-            RecurrencePeriod::Month,
-            [],
-            [],
-            [RecurrencePattern::LAST_DAY_OF_MONTH],
-        );
+        $state = $this->resolve(RecurrenceMode::DayOfMonth, RecurrencePeriod::Month, [], [], [RecurrencePattern::LAST_DAY_OF_MONTH]);
 
         // Assert
         static::assertSame([RecurrencePattern::LAST_DAY_OF_MONTH], $state->daysOfMonth);
@@ -149,12 +124,7 @@ class RecurrenceBuilderStateResolverTest extends TestCase
     public function testAYearlyPatternTakesTheAnchorMonthFromTheCaller(): void
     {
         // Act
-        $state = $this->resolve(
-            RecurrenceMode::Weekday,
-            RecurrencePeriod::Year,
-            [RecurrenceOrdinal::Second],
-            [Weekday::Sunday],
-        );
+        $state = $this->resolve(RecurrenceMode::Weekday, RecurrencePeriod::Year, [RecurrenceOrdinal::Second], [Weekday::Sunday]);
 
         // Assert
         static::assertSame('FREQ=YEARLY;BYMONTH=8;BYDAY=2SU', $state->pattern(8)->toRfcString());

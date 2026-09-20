@@ -27,10 +27,7 @@ final class DefaultBodyLocaleCoverageTest extends TestCase
         $english = array_map('basename', glob($root . '/*.html') ?: []);
 
         // Act
-        $missing = array_values(array_filter(
-            $english,
-            static fn(string $file): bool => !file_exists($root . '/' . $locale . '/' . $file),
-        ));
+        $missing = array_values(array_filter($english, static fn(string $file): bool => !file_exists($root . '/' . $locale . '/' . $file)));
 
         // Assert
         static::assertNotEmpty($english);

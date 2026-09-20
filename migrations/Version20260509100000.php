@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -18,8 +16,8 @@ final class Version20260509100000 extends AbstractMigration
     {
         $this->addSql('ALTER TABLE logs_incident DROP COLUMN brute_force_hits');
         $this->addSql(<<<'SQL'
-            DELETE FROM app_state WHERE key_name = 'security.incident.brute_force.last_processed_log_id'
-        SQL);
+                DELETE FROM app_state WHERE key_name = 'security.incident.brute_force.last_processed_log_id'
+            SQL);
     }
 
     public function down(Schema $schema): void

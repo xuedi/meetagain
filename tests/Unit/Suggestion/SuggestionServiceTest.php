@@ -31,8 +31,7 @@ class SuggestionServiceTest extends TestCase
         $em->expects(self::once())->method('persist');
         $em->expects(self::once())->method('flush');
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects(self::once())->method('log')
-            ->with(SuggestionCreated::TYPE, self::isInstanceOf(User::class), self::arrayHasKey('description'));
+        $activity->expects(self::once())->method('log')->with(SuggestionCreated::TYPE, self::isInstanceOf(User::class), self::arrayHasKey('description'));
         $service = $this->makeService($em, activity: $activity, provider: $this->provider());
 
         // Act
@@ -63,7 +62,7 @@ class SuggestionServiceTest extends TestCase
 
         // Assert
         $this->expectException(SuggestionException::class);
-        $this->expectExceptionMessage('that venue already exists');
+        $this->expectExceptionMessageIsOrContains('that venue already exists');
 
         // Act
         $service->propose('location', $this->user(5), new stdClass());
@@ -87,8 +86,7 @@ class SuggestionServiceTest extends TestCase
         $provider = $this->provider();
         $provider->method('create')->willReturn(42);
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects(self::once())->method('log')
-            ->with(SuggestionApproved::TYPE, self::isInstanceOf(User::class), self::anything());
+        $activity->expects(self::once())->method('log')->with(SuggestionApproved::TYPE, self::isInstanceOf(User::class), self::anything());
         $service = $this->makeService(activity: $activity, provider: $provider);
         $suggestion = $this->suggestion();
         $reviewer = $this->user(9);
@@ -148,8 +146,7 @@ class SuggestionServiceTest extends TestCase
         // Arrange
         $provider = $this->provider(expectNoCreate: true);
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects(self::once())->method('log')
-            ->with(SuggestionRejected::TYPE, self::isInstanceOf(User::class), self::anything());
+        $activity->expects(self::once())->method('log')->with(SuggestionRejected::TYPE, self::isInstanceOf(User::class), self::anything());
         $service = $this->makeService(activity: $activity, provider: $provider);
         $suggestion = $this->suggestion();
 
@@ -200,18 +197,13 @@ class SuggestionServiceTest extends TestCase
         $provider = $this->createStub(SuggestionTargetProviderInterface::class);
         $provider->method('canReview')->willReturn(true);
         $registry = $this->createStub(SuggestionRegistry::class);
-        $registry->method('providerFor')->willReturnCallback(
-            static fn(string $type): ?SuggestionTargetProviderInterface => $type === 'location' ? $provider : null,
-        );
+        $registry->method('providerFor')->willReturnCallback(static fn(string $type): ?SuggestionTargetProviderInterface => $type === 'location'
+            ? $provider
+            : null);
         $repo = $this->createStub(SuggestionRepository::class);
         $repo->method('findPending')->willReturn([$reviewable, $foreign]);
 
-        $service = new SuggestionService(
-            $this->createStub(EntityManagerInterface::class),
-            $repo,
-            $registry,
-            $this->createStub(ActivityService::class),
-        );
+        $service = new SuggestionService($this->createStub(EntityManagerInterface::class), $repo, $registry, $this->createStub(ActivityService::class));
 
         // Act
         $result = $service->pendingReviewableBy($this->user(9));
@@ -243,9 +235,7 @@ class SuggestionServiceTest extends TestCase
         ?string $validationError = null,
         bool $expectNoCreate = false,
     ): SuggestionTargetProviderInterface&Stub {
-        $provider = $expectNoCreate
-            ? $this->createMock(SuggestionTargetProviderInterface::class)
-            : $this->createStub(SuggestionTargetProviderInterface::class);
+        $provider = $expectNoCreate ? $this->createMock(SuggestionTargetProviderInterface::class) : $this->createStub(SuggestionTargetProviderInterface::class);
         if ($expectNoCreate) {
             $provider->expects(self::never())->method('create');
         }

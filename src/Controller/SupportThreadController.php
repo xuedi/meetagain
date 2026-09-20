@@ -120,10 +120,12 @@ final class SupportThreadController extends AbstractController
 
     private function isMailable(SupportRequest $supportRequest, string $email): bool
     {
-        return $email !== ''
+        return (
+            $email !== ''
             && filter_var($email, FILTER_VALIDATE_EMAIL) !== false
             && !$this->blocklist->isBlocked($email)
-            && !$supportRequest->isEmailVerified();
+            && !$supportRequest->isEmailVerified()
+        );
     }
 
     private function replyForm(SupportRequest $supportRequest): FormInterface

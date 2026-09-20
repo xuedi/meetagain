@@ -89,7 +89,9 @@ class VisibilityFilterServiceTest extends TestCase
             /**
              * @param list<int>|null $visible
              */
-            public function __construct(private readonly ?array $visible) {}
+            public function __construct(
+                private readonly ?array $visible,
+            ) {}
 
             public function getPriority(): int
             {

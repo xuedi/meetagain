@@ -11,6 +11,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Override;
+use SensitiveParameter;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -103,7 +104,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     #[Override]
-    public function upgradePassword(PasswordAuthenticatedUserInterface $user, #[\SensitiveParameter] string $newHashedPassword): void
+    public function upgradePassword(PasswordAuthenticatedUserInterface $user, #[SensitiveParameter] string $newHashedPassword): void
     {
         if (!$user instanceof User) {
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', $user::class));
@@ -229,7 +230,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function getOldRegistrations(int $days)
     {
-        return $this->unconfirmedRegistrations()
+        return $this
+            ->unconfirmedRegistrations()
             ->andWhere('u.createdAt < :date')
             ->setParameter('date', new DateTime('-' . $days . ' days'))
             ->getQuery()
@@ -241,15 +243,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function findUnconfirmedRegistrations(): array
     {
-        return $this->unconfirmedRegistrations()
-            ->orderBy('u.createdAt', 'ASC')
-            ->getQuery()
-            ->getResult();
+        return $this->unconfirmedRegistrations()->orderBy('u.createdAt', 'ASC')->getQuery()->getResult();
     }
 
     private function unconfirmedRegistrations(): QueryBuilder
     {
-        return $this->createQueryBuilder('u')
+        return $this
+            ->createQueryBuilder('u')
             ->where('u.regcode IS NOT NULL')
             ->andWhere('u.status = :status')
             ->setParameter('status', UserStatus::Registered->value);

@@ -60,14 +60,7 @@ readonly class ItemTaxonomyToTags implements DataHotfixInterface
                 continue;
             }
 
-            $this->converter->rewriteAssignments(
-                $itemType,
-                (int) $itemId,
-                self::GLOBAL_SCOPE,
-                $categories[$itemKey] ?? null,
-                $snapshot[$itemKey] ?? [],
-                $map,
-            );
+            $this->converter->rewriteAssignments($itemType, (int) $itemId, self::GLOBAL_SCOPE, $categories[$itemKey] ?? null, $snapshot[$itemKey] ?? [], $map);
         }
     }
 

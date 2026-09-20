@@ -22,10 +22,12 @@ class ChangeProposalReviewProviderTest extends TestCase
         $service = $this->createStub(ChangeProposalService::class);
         $service->method('pendingReviewableBy')->willReturn([$proposal]);
         $service->method('targetLabel')->willReturn('你好');
-        $service->method('fieldRows')->willReturn([
-            ['field' => 'phrase', 'label' => 'Phrase', 'before' => 'old', 'after' => 'new', 'resolution' => null],
-            ['field' => 'pinyin', 'label' => 'Pinyin', 'before' => '', 'after' => 'nĭ hăo', 'resolution' => null],
-        ]);
+        $service
+            ->method('fieldRows')
+            ->willReturn([
+                ['field' => 'phrase', 'label' => 'Phrase', 'before' => 'old', 'after' => 'new', 'resolution' => null],
+                ['field' => 'pinyin', 'label' => 'Pinyin', 'before' => '', 'after' => 'nĭ hăo', 'resolution' => null],
+            ]);
         $router = $this->createStub(RouterInterface::class);
         $router->method('generate')->willReturn('/review/proposals/glossary/1');
         $provider = new ChangeProposalReviewProvider($service, $router, $this->createStub(TranslatorInterface::class));
@@ -84,11 +86,7 @@ class ChangeProposalReviewProviderTest extends TestCase
 
     private function makeProvider(ChangeProposalService $service): ChangeProposalReviewProvider
     {
-        return new ChangeProposalReviewProvider(
-            $service,
-            $this->createStub(RouterInterface::class),
-            $this->createStub(TranslatorInterface::class),
-        );
+        return new ChangeProposalReviewProvider($service, $this->createStub(RouterInterface::class), $this->createStub(TranslatorInterface::class));
     }
 
     private function proposal(int $id): ChangeProposal

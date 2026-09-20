@@ -21,11 +21,7 @@ final readonly class EventSimilarityService
     {
         $title = $this->fieldChange($left->getTitle($locale), $right->getTitle($locale));
         $teaser = $this->fieldChange($left->getTeaser($locale), $right->getTeaser($locale));
-        $description = $this->fieldChange(
-            $left->getDescription($locale),
-            $right->getDescription($locale),
-            self::DESCRIPTION_LENGTH_CAP,
-        );
+        $description = $this->fieldChange($left->getDescription($locale), $right->getDescription($locale), self::DESCRIPTION_LENGTH_CAP);
 
         $weighted = 0.0;
         $weightSum = 0;

@@ -27,7 +27,10 @@ class LedgerActionSourceTest extends TestCase
         // Assert
         self::assertCount(2, $actions);
         self::assertSame([5, 3], array_map(static fn(TrustAction $action): int => $action->userId, $actions));
-        self::assertSame([LedgerActionSource::HANDOVER_ACTION, LedgerActionSource::HANDOVER_ACTION], array_map(static fn(TrustAction $action): string => $action->action, $actions));
+        self::assertSame(
+            [LedgerActionSource::HANDOVER_ACTION, LedgerActionSource::HANDOVER_ACTION],
+            array_map(static fn(TrustAction $action): string => $action->action, $actions),
+        );
     }
 
     public function testADonationOriginHandoverRewardsOnlyTheReceiver(): void
@@ -66,8 +69,14 @@ class LedgerActionSourceTest extends TestCase
         ]);
 
         // Act
-        $declared = array_map(static fn(ActionDescriptor $descriptor): string => $descriptor->key, iterator_to_array($source->describeActions(self::CONTEXT), false));
-        $replayed = array_unique(array_map(static fn(TrustAction $action): string => $action->action, iterator_to_array($source->replay(self::CONTEXT), false)));
+        $declared = array_map(
+            static fn(ActionDescriptor $descriptor): string => $descriptor->key,
+            iterator_to_array($source->describeActions(self::CONTEXT), false),
+        );
+        $replayed = array_unique(array_map(
+            static fn(TrustAction $action): string => $action->action,
+            iterator_to_array($source->replay(self::CONTEXT), false),
+        ));
 
         // Assert
         self::assertSame([], array_diff($replayed, $declared));
@@ -80,7 +89,9 @@ class LedgerActionSourceTest extends TestCase
             $this->entry(CirculationLedgerEntryType::Donated, actorUserId: 3),
             $this->entry(CirculationLedgerEntryType::HandoverCompleted, fromUserId: 3, toUserId: 5),
         ]);
-        $shape = static fn(TrustAction $action): string => $action->userId . '|' . $action->action . '|' . $action->occurredAt->format(DATE_ATOM) . '|' . $action->quantity;
+        $shape = static fn(TrustAction $action): string => (
+            $action->userId . '|' . $action->action . '|' . $action->occurredAt->format(DATE_ATOM) . '|' . $action->quantity
+        );
 
         // Act
         $first = array_map($shape, iterator_to_array($source->replay(self::CONTEXT), false));
@@ -131,12 +142,18 @@ class LedgerActionSourceTest extends TestCase
         return $index;
     }
 
-    private function entry(
-        CirculationLedgerEntryType $type,
-        ?int $fromUserId = null,
-        ?int $toUserId = null,
-        ?int $actorUserId = null,
-    ): CirculationLedgerEntry {
-        return new CirculationLedgerEntry($type, self::CONTEXT, 'book', 42, new DateTimeImmutable('2026-08-01 09:00:00'), 9, $fromUserId, $toUserId, $actorUserId);
+    private function entry(CirculationLedgerEntryType $type, ?int $fromUserId = null, ?int $toUserId = null, ?int $actorUserId = null): CirculationLedgerEntry
+    {
+        return new CirculationLedgerEntry(
+            $type,
+            self::CONTEXT,
+            'book',
+            42,
+            new DateTimeImmutable('2026-08-01 09:00:00'),
+            9,
+            $fromUserId,
+            $toUserId,
+            $actorUserId,
+        );
     }
 }

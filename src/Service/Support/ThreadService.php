@@ -76,14 +76,7 @@ readonly class ThreadService
     public function postRequesterMessage(SupportRequest $request, string $body, ?string $ipAddress): SupportMessage
     {
         $now = $this->clock->now();
-        $message = $this->appendMessage(
-            $request,
-            SupportMessageAuthor::Requester,
-            $this->sanitizer->escape($body),
-            null,
-            $ipAddress,
-            $now,
-        );
+        $message = $this->appendMessage($request, SupportMessageAuthor::Requester, $this->sanitizer->escape($body), null, $ipAddress, $now);
 
         $request->setLastActivityAt($now);
         if (!$request->isNew()) {
@@ -99,14 +92,7 @@ readonly class ThreadService
     public function postAdminMessage(SupportRequest $request, string $body, User $actingAdmin): SupportMessage
     {
         $now = $this->clock->now();
-        $message = $this->appendMessage(
-            $request,
-            SupportMessageAuthor::Admin,
-            $this->sanitizer->basic($body),
-            $actingAdmin,
-            null,
-            $now,
-        );
+        $message = $this->appendMessage($request, SupportMessageAuthor::Admin, $this->sanitizer->basic($body), $actingAdmin, null, $now);
 
         if (!$request->getRespondedBy() instanceof User) {
             $request->setRespondedBy($actingAdmin);

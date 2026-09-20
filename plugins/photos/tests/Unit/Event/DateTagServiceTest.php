@@ -19,7 +19,8 @@ class DateTagServiceTest extends TestCase
         $root = new ItemTag();
         $dateTag = new ItemTag();
         $writer = $this->createMock(ManagedWriter::class);
-        $writer->expects(static::exactly(2))
+        $writer
+            ->expects(static::exactly(2))
             ->method('resolve')
             ->willReturnCallback(static function (string $itemType, array $labels, ?ItemTag $parent) use ($root, $dateTag): ItemTag {
                 if ($parent === null) {

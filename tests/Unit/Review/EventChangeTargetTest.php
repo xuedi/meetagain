@@ -28,10 +28,17 @@ class EventChangeTargetTest extends TestCase
         $fields = $target->fieldsFor($event);
 
         // Assert
-        self::assertSame([
-            'title_en', 'teaser_en', 'description_en',
-            'title_de', 'teaser_de', 'description_de',
-        ], $fields);
+        self::assertSame(
+            [
+                'title_en',
+                'teaser_en',
+                'description_en',
+                'title_de',
+                'teaser_de',
+                'description_de',
+            ],
+            $fields,
+        );
     }
 
     public function testAFieldKeyReadsBackTheValueOfItsOwnLocale(): void
@@ -87,9 +94,9 @@ class EventChangeTargetTest extends TestCase
     private function target(): EventChangeTarget
     {
         $translator = $this->createStub(TranslatorInterface::class);
-        $translator->method('trans')->willReturnCallback(
-            static fn(string $id, array $parameters = []): string => $id . ($parameters === [] ? '' : '|' . implode(',', $parameters)),
-        );
+        $translator
+            ->method('trans')
+            ->willReturnCallback(static fn(string $id, array $parameters = []): string => $id . ($parameters === [] ? '' : '|' . implode(',', $parameters)));
 
         return new EventChangeTarget(
             $this->createStub(EntityManagerInterface::class),

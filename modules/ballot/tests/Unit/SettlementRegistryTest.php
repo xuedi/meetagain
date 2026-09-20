@@ -64,7 +64,10 @@ class SettlementRegistryTest extends TestCase
             /** @var list<BallotOutcome> */
             public array $seen = [];
 
-            public function __construct(private readonly string $purpose, private readonly int $priority) {}
+            public function __construct(
+                private readonly string $purpose,
+                private readonly int $priority,
+            ) {}
 
             public function getPriority(): int
             {

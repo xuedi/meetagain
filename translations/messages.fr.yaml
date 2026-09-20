@@ -197,7 +197,6 @@ events:
     rsvp_external_title: 'Participants inscrits ailleurs que sur ce site'
     label_external_rsvp: 'Externes'
     button_external_rsvp_save: 'Enregistrer'
-    flash_external_rsvp_saved: 'Nombre d''inscrits externes mis à jour.'
     flash_external_rsvp_invalid: 'Saisis un nombre entier de participants externes.'
     flash_rsvp_guests_requires_rsvp: 'Inscris-toi d''abord à l''événement avant d''ajouter des accompagnants.'
     flash_rsvp_guests_limit: 'Tu as atteint le nombre maximum d''accompagnants.'
@@ -530,7 +529,6 @@ profile_image:
     detail_reported: 'signalée :'
     detail_reported_yes: 'oui'
     detail_reported_no: 'non'
-    flash_image_changed: 'L''image a été modifiée.'
     flash_upload_error: 'Une erreur est survenue lors du téléversement du fichier.'
 support:
     sidebar_title: 'Comment nous pouvons aider'

@@ -34,11 +34,13 @@ final class InstanceScopeBuilderTest extends TestCase
     {
         // Arrange
         $userRepository = $this->createStub(UserRepository::class);
-        $userRepository->method('findBy')->willReturn([
-            $this->user(1, UserRole::System),
-            $this->user(2, UserRole::Admin),
-            $this->user(3, UserRole::User),
-        ]);
+        $userRepository
+            ->method('findBy')
+            ->willReturn([
+                $this->user(1, UserRole::System),
+                $this->user(2, UserRole::Admin),
+                $this->user(3, UserRole::User),
+            ]);
         $eventRepository = $this->createStub(EventRepository::class);
         $eventRepository->method('findBy')->willReturn([$this->withId(new Event(), 5), $this->withId(new Event(), 6)]);
         $cmsRepository = $this->createStub(CmsRepository::class);

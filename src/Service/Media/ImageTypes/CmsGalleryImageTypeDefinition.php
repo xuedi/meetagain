@@ -25,11 +25,6 @@ final class CmsGalleryImageTypeDefinition extends AbstractImageTypeDefinition
         return ImageType::CmsGallery;
     }
 
-    protected function sizes(): array
-    {
-        return [[1024, 768], [350, 263], [210, 140]];
-    }
-
     public function getEditLink(int $locationId): ?array
     {
         return ['route' => 'app_admin_cms_block_edit', 'params' => ['blockId' => $locationId]];
@@ -54,6 +49,11 @@ final class CmsGalleryImageTypeDefinition extends AbstractImageTypeDefinition
         }
 
         return $pairs;
+    }
+
+    protected function sizes(): array
+    {
+        return [[1024, 768], [350, 263], [210, 140]];
     }
 
     protected function cmsBlockRepository(): CmsBlockRepository

@@ -94,7 +94,12 @@ final class AnnouncementsSectionTest extends SectionTestCase
         new AnnouncementsSection($this->entityManager())->import([['link_hash' => 'abc123'], ['link_hash' => 'abc123']], $context);
 
         // Assert
-        static::assertSame(['abc123', null], array_map(static fn(object $announcement): ?string => $announcement instanceof Announcement ? $announcement->getLinkHash() : null, $this->persisted));
+        static::assertSame(
+            ['abc123', null],
+            array_map(static fn(object $announcement): ?string => $announcement instanceof Announcement
+                ? $announcement->getLinkHash()
+                : null, $this->persisted),
+        );
     }
 
     public function testAnUnknownCreatorFallsBackToTheSystemUserAndAnUnknownStatusToDraft(): void

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -21,15 +19,15 @@ final class Version20250711005232 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE event_translation ADD teaser LONGTEXT DEFAULT NULL
-        SQL);
+                ALTER TABLE event_translation ADD teaser LONGTEXT DEFAULT NULL
+            SQL);
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE event_translation DROP teaser
-        SQL);
+                ALTER TABLE event_translation DROP teaser
+            SQL);
     }
 }

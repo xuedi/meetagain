@@ -148,8 +148,10 @@ final readonly class DashboardService
 
         $openHandovers = array_values(array_filter(
             $this->handovers->findOpenForUser($viewer),
-            static fn(CirculationHandover $handover): bool => $handover->getCopy()->getContext() === $context
-                && $handover->getCopy()->getItemType() === $itemType,
+            static fn(CirculationHandover $handover): bool => (
+                $handover->getCopy()->getContext() === $context
+                && $handover->getCopy()->getItemType() === $itemType
+            ),
         ));
 
         $received = 0;
@@ -161,10 +163,7 @@ final readonly class DashboardService
 
         return [
             'holding' => $holding,
-            'donated' => array_values(array_filter(
-                $shelf,
-                static fn(CirculationCopy $copy): bool => $copy->getDonatedBy()?->getId() === $viewerId,
-            )),
+            'donated' => array_values(array_filter($shelf, static fn(CirculationCopy $copy): bool => $copy->getDonatedBy()?->getId() === $viewerId)),
             'waiting' => $waiting,
             'openHandovers' => $openHandovers,
             'received' => $received,

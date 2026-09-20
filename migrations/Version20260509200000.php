@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -18,10 +16,10 @@ final class Version20260509200000 extends AbstractMigration
     {
         $this->addSql('DELETE FROM logs_incident');
         $this->addSql(<<<'SQL'
-            DELETE FROM app_state
-            WHERE key_name LIKE 'security.incident.%'
-               OR key_name = 'cron.incident_aggregator.last_run'
-        SQL);
+                DELETE FROM app_state
+                WHERE key_name LIKE 'security.incident.%'
+                   OR key_name = 'cron.incident_aggregator.last_run'
+            SQL);
 
         $this->addSql('ALTER TABLE logs_incident DROP COLUMN probing_hits');
         $this->addSql('ALTER TABLE logs_incident DROP COLUMN access_denied_hits');

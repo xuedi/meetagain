@@ -74,16 +74,18 @@ final readonly class BallotLocationChoice implements LocationChoiceProviderInter
         }
 
         $settings = BallotTermsType::read($terms);
-        $this->ballots->open(new BallotRequest(
-            self::PURPOSE,
-            $this->candidates(),
-            new DateTimeImmutable($settings['deadline']),
-            $userId,
-            new BallotSubject(self::SUBJECT_TYPE, (int) $event->getId()),
-            $settings['tallyMode'],
-            SettlementMode::Automatic,
-            $this->translator->trans('admin_event.venue_ballot_title', ['%event%' => $this->titleOf($event)]),
-        ));
+        $this->ballots->open(
+            new BallotRequest(
+                self::PURPOSE,
+                $this->candidates(),
+                new DateTimeImmutable($settings['deadline']),
+                $userId,
+                new BallotSubject(self::SUBJECT_TYPE, (int) $event->getId()),
+                $settings['tallyMode'],
+                SettlementMode::Automatic,
+                $this->translator->trans('admin_event.venue_ballot_title', ['%event%' => $this->titleOf($event)]),
+            ),
+        );
     }
 
     #[Override]
@@ -146,10 +148,7 @@ final readonly class BallotLocationChoice implements LocationChoiceProviderInter
             $candidates[] = new Candidate((string) $venue->getId(), (string) $venue->getName());
         }
 
-        $candidates[] = new Candidate(
-            self::CANDIDATE_UNDECIDED,
-            $this->translator->trans('admin_event.venue_ballot_undecided'),
-        );
+        $candidates[] = new Candidate(self::CANDIDATE_UNDECIDED, $this->translator->trans('admin_event.venue_ballot_undecided'));
 
         return $candidates;
     }

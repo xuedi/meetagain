@@ -39,12 +39,7 @@ final class CirculationController extends AbstractController
         private readonly TownHallService $townHall,
     ) {}
 
-    #[Route(
-        '/{itemType}/{itemId}/donate',
-        name: 'app_circulation_donate',
-        requirements: ['itemType' => '[a-z_]+', 'itemId' => '\d+'],
-        methods: ['POST'],
-    )]
+    #[Route('/{itemType}/{itemId}/donate', name: 'app_circulation_donate', requirements: ['itemType' => '[a-z_]+', 'itemId' => '\d+'], methods: ['POST'])]
     public function donate(Request $request, string $itemType, int $itemId): RedirectResponse
     {
         $this->guardCsrf($request, 'app_circulation_donate' . $itemType . $itemId);
@@ -60,12 +55,7 @@ final class CirculationController extends AbstractController
         return $this->redirectBack($request, $itemType);
     }
 
-    #[Route(
-        '/{itemType}/{itemId}/request',
-        name: 'app_circulation_request',
-        requirements: ['itemType' => '[a-z_]+', 'itemId' => '\d+'],
-        methods: ['POST'],
-    )]
+    #[Route('/{itemType}/{itemId}/request', name: 'app_circulation_request', requirements: ['itemType' => '[a-z_]+', 'itemId' => '\d+'], methods: ['POST'])]
     public function requestItem(Request $request, string $itemType, int $itemId): RedirectResponse
     {
         $this->guardCsrf($request, 'app_circulation_request' . $itemType . $itemId);
@@ -149,14 +139,18 @@ final class CirculationController extends AbstractController
 
         $copy = $handover->getCopy();
 
-        return $this->render('circulation/handover.html.twig', [
-            'handover' => $handover,
-            'copy' => $copy,
-            'itemType' => $copy->getItemType(),
-            'typeLabelKey' => $this->typeLabelKey($copy->getItemType()),
-            'nextEvent' => $this->townHall->getUpcomingEvents(1)[0] ?? null,
-            'isParticipant' => $handover->isParticipant($this->getAuthedUser()),
-        ], $this->getResponse());
+        return $this->render(
+            'circulation/handover.html.twig',
+            [
+                'handover' => $handover,
+                'copy' => $copy,
+                'itemType' => $copy->getItemType(),
+                'typeLabelKey' => $this->typeLabelKey($copy->getItemType()),
+                'nextEvent' => $this->townHall->getUpcomingEvents(1)[0] ?? null,
+                'isParticipant' => $handover->isParticipant($this->getAuthedUser()),
+            ],
+            $this->getResponse(),
+        );
     }
 
     #[Route('/handover/{id}/confirm', name: 'app_circulation_handover_confirm', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -212,26 +206,30 @@ final class CirculationController extends AbstractController
 
         $status = CirculationCopyStatus::tryFrom($request->query->getString('status'));
 
-        return $this->render('circulation/dashboard.html.twig', [
-            'itemType' => $itemType,
-            'typeLabelKey' => $this->typeLabelKey($itemType),
-            'context' => $context,
-            'tab' => $tab,
-            'coreTabs' => self::CORE_TABS,
-            'extraTabs' => $extraTabs,
-            'extraTabHtml' => $extraTab?->render($itemType, $context),
-            'statusFilter' => $status,
-            'statuses' => CirculationCopyStatus::cases(),
-            'shelf' => $tab === 'shelf' ? $this->dashboard->getShelf($itemType, $status) : [],
-            'waiting' => $tab === 'waiting' ? $this->dashboard->getWaiting($itemType, $viewer) : [],
-            'openHandovers' => $tab === 'handovers' ? $this->dashboard->getOpenHandovers($itemType, $viewer, $seesAll) : [],
-            'completedHandovers' => $tab === 'handovers' ? $this->dashboard->getCompletedHandovers($itemType, 25) : [],
-            'activity' => $tab === 'activity' ? $this->dashboard->getActivity($itemType, $request->query->getInt('page', 1)) : null,
-            'stats' => $tab === 'stats' ? $this->dashboard->getStats($itemType) : null,
-            'about' => $tab === 'about' ? $this->dashboard->getMemberSummary($itemType, $viewer) : null,
-            'viewer' => $viewer,
-            'seesAll' => $seesAll,
-        ], $this->getResponse());
+        return $this->render(
+            'circulation/dashboard.html.twig',
+            [
+                'itemType' => $itemType,
+                'typeLabelKey' => $this->typeLabelKey($itemType),
+                'context' => $context,
+                'tab' => $tab,
+                'coreTabs' => self::CORE_TABS,
+                'extraTabs' => $extraTabs,
+                'extraTabHtml' => $extraTab?->render($itemType, $context),
+                'statusFilter' => $status,
+                'statuses' => CirculationCopyStatus::cases(),
+                'shelf' => $tab === 'shelf' ? $this->dashboard->getShelf($itemType, $status) : [],
+                'waiting' => $tab === 'waiting' ? $this->dashboard->getWaiting($itemType, $viewer) : [],
+                'openHandovers' => $tab === 'handovers' ? $this->dashboard->getOpenHandovers($itemType, $viewer, $seesAll) : [],
+                'completedHandovers' => $tab === 'handovers' ? $this->dashboard->getCompletedHandovers($itemType, 25) : [],
+                'activity' => $tab === 'activity' ? $this->dashboard->getActivity($itemType, $request->query->getInt('page', 1)) : null,
+                'stats' => $tab === 'stats' ? $this->dashboard->getStats($itemType) : null,
+                'about' => $tab === 'about' ? $this->dashboard->getMemberSummary($itemType, $viewer) : null,
+                'viewer' => $viewer,
+                'seesAll' => $seesAll,
+            ],
+            $this->getResponse(),
+        );
     }
 
     private function assertEnabled(string $itemType): void

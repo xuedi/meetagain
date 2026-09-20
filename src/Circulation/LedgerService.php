@@ -30,18 +30,7 @@ final readonly class LedgerService
         ?int $actorUserId = null,
         array $payload = [],
     ): CirculationLedgerEntry {
-        $entry = new CirculationLedgerEntry(
-            $entryType,
-            $context,
-            $itemType,
-            $itemId,
-            $occurredAt,
-            $copyId,
-            $fromUserId,
-            $toUserId,
-            $actorUserId,
-            $payload,
-        );
+        $entry = new CirculationLedgerEntry($entryType, $context, $itemType, $itemId, $occurredAt, $copyId, $fromUserId, $toUserId, $actorUserId, $payload);
 
         $this->em->persist($entry);
         $this->em->flush();

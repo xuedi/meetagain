@@ -100,9 +100,6 @@ final readonly class PageMetaRuntime implements RuntimeExtensionInterface
     /** @param array<array-key, mixed> $data */
     public function ldJson(array $data): Markup
     {
-        return new Markup(
-            json_encode($data, self::LD_JSON_FLAGS) ?: '{}',
-            'UTF-8',
-        );
+        return new Markup(json_encode($data, self::LD_JSON_FLAGS) ?: '{}', 'UTF-8');
     }
 }

@@ -36,10 +36,6 @@ class IndexControllerTest extends TestCase
 
     private function breadcrumbBuilder(): BreadcrumbBuilder
     {
-        return new BreadcrumbBuilder(
-            $this->createStub(UrlGeneratorInterface::class),
-            $this->createStub(TranslatorInterface::class),
-            new RequestStack(),
-        );
+        return new BreadcrumbBuilder($this->createStub(UrlGeneratorInterface::class), $this->createStub(TranslatorInterface::class), new RequestStack());
     }
 }

@@ -18,6 +18,7 @@ use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
 use App\Repository\CmsBlockRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use App\Service\Media\AvatarService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
@@ -46,6 +47,7 @@ final class ImageUploadController extends AbstractController
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly ImageLocationService $imageLocationService,
         private readonly Security $security,
+        private readonly AvatarService $avatarService,
     ) {}
 
     #[Route('/image/{entity}/{id}/modal', name: 'app_image_modal', requirements: [
@@ -130,27 +132,13 @@ final class ImageUploadController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $imageData = $form->get('newImage')->getData();
             if ($imageData instanceof UploadedFile) {
-                $image = $this->imageService->upload($imageData, $this->getAuthedUser(), $imageType);
-                $image->setUploader($this->getAuthedUser());
-                $image->setUpdatedAt(new DateTimeImmutable());
-                $this->em->persist($image);
-                $this->imageService->createThumbnails($image, $imageType);
-                $this->em->flush();
-                $this->entityActionDispatcher->dispatch(EntityAction::CreateImage, $image->getId());
+                $replaced = $entity instanceof User
+                    ? $this->avatarService->replace($entity, $imageData) instanceof Image
+                    : $this->replaceBlockImage($entity, $imageData, $imageType, $id, $previousImage);
 
-                $entity->setImage($image);
-                $this->em->persist($entity);
-                $this->em->flush();
-
-                if ($previousImage > 0) {
-                    $this->imageLocationService->removeLocation($previousImage, $imageType, $id);
+                if ($replaced) {
+                    return $this->returnBackToImage($entityName, $id);
                 }
-                $this->imageLocationService->addLocation($entity->getImage()->getId(), $imageType, $id);
-
-                $this->logActivity($entityName, $previousImage, $entity->getImage()->getId());
-                $this->addFlash('success', 'profile_image.flash_image_changed');
-
-                return $this->returnBackToImage($entityName, $id);
             }
         }
 
@@ -202,6 +190,32 @@ final class ImageUploadController extends AbstractController
         }
 
         return $this->returnBackToImage($entity, $id);
+    }
+
+    private function replaceBlockImage(CmsBlock $block, UploadedFile $file, ImageType $imageType, int $id, int $previousImage): bool
+    {
+        $image = $this->imageService->upload($file, $this->getAuthedUser(), $imageType);
+        if (!$image instanceof Image) {
+            return false;
+        }
+
+        $image->setUploader($this->getAuthedUser());
+        $image->setUpdatedAt(new DateTimeImmutable());
+        $this->em->persist($image);
+        $this->imageService->createThumbnails($image, $imageType);
+        $this->em->flush();
+        $this->entityActionDispatcher->dispatch(EntityAction::CreateImage, $image->getId());
+
+        $block->setImage($image);
+        $this->em->persist($block);
+        $this->em->flush();
+
+        if ($previousImage > 0) {
+            $this->imageLocationService->removeLocation($previousImage, $imageType, $id);
+        }
+        $this->imageLocationService->addLocation($image->getId(), $imageType, $id);
+
+        return true;
     }
 
     private function prepare(string $entityString, int $id): array

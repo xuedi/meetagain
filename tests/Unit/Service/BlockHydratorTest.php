@@ -84,7 +84,7 @@ class BlockHydratorTest extends TestCase
 
         // Assert
         $this->expectException(BlockValidationException::class);
-        $this->expectExceptionMessage('Missing required field "title"');
+        $this->expectExceptionMessageIsOrContains('Missing required field "title"');
 
         // Act
         $this->hydrator->hydrate(CmsBlockType::Headline, $payload);

@@ -19,9 +19,12 @@ class RestoreItemTagClosureTest extends TestCase
         $em->method('getConnection')->willReturn($connection);
         $restored = [];
         $closure = $this->createMock(AssignmentClosure::class);
-        $closure->expects(static::exactly(2))->method('restore')->willReturnCallback(static function (string $itemType) use (&$restored): void {
-            $restored[] = $itemType;
-        });
+        $closure
+            ->expects(static::exactly(2))
+            ->method('restore')
+            ->willReturnCallback(static function (string $itemType) use (&$restored): void {
+                $restored[] = $itemType;
+            });
 
         // Act
         new RestoreItemTagClosure($em, $closure)->execute();

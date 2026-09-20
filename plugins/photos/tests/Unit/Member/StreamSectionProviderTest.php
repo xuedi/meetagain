@@ -9,9 +9,9 @@ use PHPUnit\Framework\TestCase;
 use Plugin\Photos\Entity\Photo;
 use Plugin\Photos\Member\StreamSectionProvider;
 use Plugin\Photos\Service\ConfigService;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Plugin\Photos\Service\PhotoService;
 use Plugin\Photos\ValueObject\Config;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Twig\Environment;
 
 class StreamSectionProviderTest extends TestCase
@@ -76,7 +76,12 @@ class StreamSectionProviderTest extends TestCase
         $twig = $this->createStub(Environment::class);
         $twig->method('render')->willReturn('<section>');
 
-        return new StreamSectionProvider($photoService, new ConfigService($resolver, $this->createStub(AuthorizationCheckerInterface::class)), $registry, $twig);
+        return new StreamSectionProvider(
+            $photoService,
+            new ConfigService($resolver, $this->createStub(AuthorizationCheckerInterface::class)),
+            $registry,
+            $twig,
+        );
     }
 
     private function user(int $id): User

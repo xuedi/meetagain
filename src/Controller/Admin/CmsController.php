@@ -53,17 +53,6 @@ final class CmsController extends AbstractController implements AdminNavigationI
 {
     private const string ADD_TOKEN_ID = 'app_admin_cms_add';
 
-    public function getAdminNavigation(): ?AdminNavigationConfig
-    {
-        return new AdminNavigationConfig(
-            section: 'admin_shell.section_content',
-            links: [
-                new AdminLink(label: 'admin_shell.menu_cms', route: 'app_admin_cms', active: 'cms', role: 'ROLE_STEWARD'),
-            ],
-            sectionPriority: 50,
-        );
-    }
-
     public function __construct(
         private readonly CmsRepository $repo,
         private readonly EntityManagerInterface $em,
@@ -78,6 +67,17 @@ final class CmsController extends AbstractController implements AdminNavigationI
         private readonly TranslatorInterface $translator,
         private readonly ValidatorInterface $validator,
     ) {}
+
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'admin_shell.section_content',
+            links: [
+                new AdminLink(label: 'admin_shell.menu_cms', route: 'app_admin_cms', active: 'cms', role: 'ROLE_STEWARD'),
+            ],
+            sectionPriority: 50,
+        );
+    }
 
     #[Route('', name: 'app_admin_cms')]
     public function cmsList(): Response
@@ -190,65 +190,6 @@ final class CmsController extends AbstractController implements AdminNavigationI
         ]);
     }
 
-    private function buildEditTop(Cms $cms, ?Announcement $linkedAnnouncement, bool $isAdmin): AdminTop
-    {
-        $statusTag = $cms->isPublished()
-            ? sprintf('<span class="tag is-success is-medium">%s</span>', htmlspecialchars(
-                $this->translator->trans('admin_cms.published'),
-                ENT_QUOTES | ENT_HTML5,
-                'UTF-8',
-            ))
-            : sprintf('<span class="tag is-light is-medium">%s</span>', htmlspecialchars(
-                $this->translator->trans('admin_cms.draft'),
-                ENT_QUOTES | ENT_HTML5,
-                'UTF-8',
-            ));
-
-        $info = [
-            new AdminTopInfoHtml(sprintf('<strong>/%s</strong>', htmlspecialchars((string) $cms->getSlug(), ENT_QUOTES | ENT_HTML5, 'UTF-8'))),
-            new AdminTopInfoHtml($statusTag),
-            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($cms->getBlocks()), $this->translator->trans('admin_cms.summary_blocks'))),
-            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($cms->getLanguages()), $this->translator->trans('admin_cms.summary_languages'))),
-        ];
-
-        $actions = [];
-        if ($isAdmin) {
-            if ($linkedAnnouncement !== null) {
-                $actions[] = new AdminTopActionButton(
-                    label: $this->translator->trans('admin_cms.button_open_announcement'),
-                    target: $this->generateUrl('app_admin_email_announcements_view', [
-                        'id' => $linkedAnnouncement->getId(),
-                    ]),
-                    icon: 'bullhorn',
-                );
-            } else {
-                $actions[] = new AdminTopActionForm(
-                    label: $this->translator->trans('admin_cms.button_create_announcement'),
-                    target: $this->generateUrl('app_admin_email_announcements_from_cms', ['id' => $cms->getId()]),
-                    csrfTokenId: 'admin_email_announcements_from_cms' . $cms->getId(),
-                    icon: 'bullhorn',
-                );
-            }
-        }
-        $actions[] = new AdminTopActionButton(
-            label: $this->translator->trans('global.button_back'),
-            target: $this->generateUrl('app_admin_cms'),
-            icon: 'arrow-left',
-        );
-
-        return new AdminTop(info: $info, actions: $actions);
-    }
-
-    private function getAuthedUser(): User
-    {
-        $user = $this->getUser();
-        if (!$user instanceof User) {
-            throw new AuthenticationCredentialsNotFoundException('Should never happen, see: config/packages/security.yaml');
-        }
-
-        return $user;
-    }
-
     #[Route('/delete', name: 'app_admin_cms_delete', methods: ['POST'])]
     public function cmsDelete(Request $request): Response
     {
@@ -318,6 +259,65 @@ final class CmsController extends AbstractController implements AdminNavigationI
             'id' => $newPage->getId(),
             'locale' => $request->getLocale(),
         ]);
+    }
+
+    private function buildEditTop(Cms $cms, ?Announcement $linkedAnnouncement, bool $isAdmin): AdminTop
+    {
+        $statusTag = $cms->isPublished()
+            ? sprintf('<span class="tag is-success is-medium">%s</span>', htmlspecialchars(
+                $this->translator->trans('admin_cms.published'),
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ))
+            : sprintf('<span class="tag is-light is-medium">%s</span>', htmlspecialchars(
+                $this->translator->trans('admin_cms.draft'),
+                ENT_QUOTES | ENT_HTML5,
+                'UTF-8',
+            ));
+
+        $info = [
+            new AdminTopInfoHtml(sprintf('<strong>/%s</strong>', htmlspecialchars((string) $cms->getSlug(), ENT_QUOTES | ENT_HTML5, 'UTF-8'))),
+            new AdminTopInfoHtml($statusTag),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($cms->getBlocks()), $this->translator->trans('admin_cms.summary_blocks'))),
+            new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($cms->getLanguages()), $this->translator->trans('admin_cms.summary_languages'))),
+        ];
+
+        $actions = [];
+        if ($isAdmin) {
+            if ($linkedAnnouncement !== null) {
+                $actions[] = new AdminTopActionButton(
+                    label: $this->translator->trans('admin_cms.button_open_announcement'),
+                    target: $this->generateUrl('app_admin_email_announcements_view', [
+                        'id' => $linkedAnnouncement->getId(),
+                    ]),
+                    icon: 'bullhorn',
+                );
+            } else {
+                $actions[] = new AdminTopActionForm(
+                    label: $this->translator->trans('admin_cms.button_create_announcement'),
+                    target: $this->generateUrl('app_admin_email_announcements_from_cms', ['id' => $cms->getId()]),
+                    csrfTokenId: 'admin_email_announcements_from_cms' . $cms->getId(),
+                    icon: 'bullhorn',
+                );
+            }
+        }
+        $actions[] = new AdminTopActionButton(
+            label: $this->translator->trans('global.button_back'),
+            target: $this->generateUrl('app_admin_cms'),
+            icon: 'arrow-left',
+        );
+
+        return new AdminTop(info: $info, actions: $actions);
+    }
+
+    private function getAuthedUser(): User
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw new AuthenticationCredentialsNotFoundException('Should never happen, see: config/packages/security.yaml');
+        }
+
+        return $user;
     }
 
     private function getLastEditLocale(?string $locale, SessionInterface $session): string

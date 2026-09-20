@@ -8,7 +8,9 @@ use Override;
 
 readonly class EnabledLocalesAltRequirementProvider implements AltLocaleRequirementProviderInterface
 {
-    public function __construct(private LanguageService $languageService) {}
+    public function __construct(
+        private LanguageService $languageService,
+    ) {}
 
     #[Override]
     public function getRequiredAltLocales(Image $image): array

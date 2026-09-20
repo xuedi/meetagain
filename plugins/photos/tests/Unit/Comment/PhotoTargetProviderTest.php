@@ -49,9 +49,7 @@ class PhotoTargetProviderTest extends TestCase
     {
         // Arrange
         $activity = $this->createMock(ActivityService::class);
-        $activity->expects(static::once())
-            ->method('log')
-            ->with(CommentedOnPhoto::TYPE, static::anything(), ['photo_id' => 4, 'photo_title' => 'Harbour']);
+        $activity->expects(static::once())->method('log')->with(CommentedOnPhoto::TYPE, static::anything(), ['photo_id' => 4, 'photo_title' => 'Harbour']);
         $provider = $this->provider(photo: $this->photo(), activity: $activity);
 
         // Act
@@ -78,9 +76,7 @@ class PhotoTargetProviderTest extends TestCase
         $checker->method('isGranted')->willReturn($granted);
 
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
-        $urlGenerator->method('generate')->willReturnCallback(
-            static fn(string $route, array $params = []): string => '/en/photos/' . $params['id'],
-        );
+        $urlGenerator->method('generate')->willReturnCallback(static fn(string $route, array $params = []): string => '/en/photos/' . $params['id']);
 
         return new PhotoTargetProvider($photoService, $checker, $urlGenerator, $activity ?? $this->createStub(ActivityService::class));
     }
@@ -88,7 +84,11 @@ class PhotoTargetProviderTest extends TestCase
     private function photo(): Photo
     {
         $photo = new Photo();
-        $photo->addTranslation(new PhotoTranslation()->setLanguage('en')->setTitle('Harbour'));
+        $photo->addTranslation(
+            new PhotoTranslation()
+                ->setLanguage('en')
+                ->setTitle('Harbour'),
+        );
 
         return $photo;
     }

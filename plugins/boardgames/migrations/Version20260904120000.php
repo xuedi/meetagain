@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace PluginBoardgamesMigrations;
 
@@ -91,14 +89,26 @@ final class Version20260904120000 extends AbstractMigration
 
         $this->addSql('ALTER TABLE plg_boardgames_game ADD CONSTRAINT FK_5801FE9C6C62E7C9 FOREIGN KEY (box_image_id) REFERENCES image (id) ON DELETE SET NULL');
         $this->addSql('ALTER TABLE plg_boardgames_ownership ADD CONSTRAINT FK_AF4FE64DA76ED395 FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE plg_boardgames_ownership ADD CONSTRAINT FK_AF4FE64DE48FD905 FOREIGN KEY (game_id) REFERENCES plg_boardgames_game (id) ON DELETE CASCADE');
+        $this->addSql(
+            'ALTER TABLE plg_boardgames_ownership ADD CONSTRAINT FK_AF4FE64DE48FD905 FOREIGN KEY (game_id) REFERENCES plg_boardgames_game (id) ON DELETE CASCADE',
+        );
         $this->addSql('ALTER TABLE plg_boardgames_pledge ADD CONSTRAINT FK_F3798C0E71F7E88B FOREIGN KEY (event_id) REFERENCES event (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE plg_boardgames_pledge ADD CONSTRAINT FK_F3798C0EE48FD905 FOREIGN KEY (game_id) REFERENCES plg_boardgames_game (id) ON DELETE CASCADE');
+        $this->addSql(
+            'ALTER TABLE plg_boardgames_pledge ADD CONSTRAINT FK_F3798C0EE48FD905 FOREIGN KEY (game_id) REFERENCES plg_boardgames_game (id) ON DELETE CASCADE',
+        );
         $this->addSql('ALTER TABLE plg_boardgames_pledge ADD CONSTRAINT FK_F3798C0EA76ED395 FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE plg_boardgames_bring_request ADD CONSTRAINT FK_5A8C7B5E71F7E88B FOREIGN KEY (event_id) REFERENCES event (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE plg_boardgames_bring_request ADD CONSTRAINT FK_5A8C7B5EE48FD905 FOREIGN KEY (game_id) REFERENCES plg_boardgames_game (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE plg_boardgames_bring_request ADD CONSTRAINT FK_5A8C7B5E4DA1E751 FOREIGN KEY (requested_by_id) REFERENCES `user` (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE plg_boardgames_bring_request ADD CONSTRAINT FK_5A8C7B5E2B18554A FOREIGN KEY (owner_user_id) REFERENCES `user` (id) ON DELETE CASCADE');
+        $this->addSql(
+            'ALTER TABLE plg_boardgames_bring_request ADD CONSTRAINT FK_5A8C7B5E71F7E88B FOREIGN KEY (event_id) REFERENCES event (id) ON DELETE CASCADE',
+        );
+        $this->addSql(
+            'ALTER TABLE plg_boardgames_bring_request ADD CONSTRAINT FK_5A8C7B5EE48FD905 FOREIGN KEY (game_id) REFERENCES plg_boardgames_game (id) ON DELETE CASCADE',
+        );
+        $this->addSql(
+            'ALTER TABLE plg_boardgames_bring_request ADD CONSTRAINT FK_5A8C7B5E4DA1E751 FOREIGN KEY (requested_by_id) REFERENCES `user` (id) ON DELETE CASCADE',
+        );
+        $this->addSql(
+            'ALTER TABLE plg_boardgames_bring_request ADD CONSTRAINT FK_5A8C7B5E2B18554A FOREIGN KEY (owner_user_id) REFERENCES `user` (id) ON DELETE CASCADE',
+        );
     }
 
     public function down(Schema $schema): void

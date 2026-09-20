@@ -34,14 +34,14 @@ abstract class MessageAbstract implements MessageInterface
         return $this;
     }
 
-    abstract protected function renderText(): string;
-
-    abstract protected function renderHtml(): string;
-
     public function render(bool $asHtml = false): string
     {
         return $asHtml ? $this->renderHtml() : $this->renderText();
     }
+
+    abstract protected function renderText(): string;
+
+    abstract protected function renderHtml(): string;
 
     protected function escapeHtml(string $value): string
     {

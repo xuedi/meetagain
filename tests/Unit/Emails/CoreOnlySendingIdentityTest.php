@@ -33,10 +33,7 @@ class CoreOnlySendingIdentityTest extends TestCase
         $this->service($em)->enqueue($this->source(), $this->email(), []);
 
         // Assert
-        static::assertSame(
-            ['siteName' => self::SITE, 'siteUrl' => self::HOST],
-            $captured->getContext()[LayoutRenderer::CONTEXT_KEY],
-        );
+        static::assertSame(['siteName' => self::SITE, 'siteUrl' => self::HOST], $captured->getContext()[LayoutRenderer::CONTEXT_KEY]);
     }
 
     public function testHostAndUrlResolveToTheConfiguredHost(): void
@@ -119,13 +116,14 @@ class CoreOnlySendingIdentityTest extends TestCase
     private function capturingEntityManager(?EmailQueue &$captured): EntityManagerInterface
     {
         $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->once())->method('persist')->with(static::callback(
-            static function (EmailQueue $row) use (&$captured): bool {
+        $em
+            ->expects($this->once())
+            ->method('persist')
+            ->with(static::callback(static function (EmailQueue $row) use (&$captured): bool {
                 $captured = $row;
 
                 return true;
-            },
-        ));
+            }));
 
         return $em;
     }

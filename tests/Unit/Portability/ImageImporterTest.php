@@ -181,10 +181,6 @@ class ImageImporterTest extends TestCase
 
     private function buildImporter(ExtendedFilesystem $fs, ?EntityManagerInterface $em = null): ImageImporter
     {
-        return new ImageImporter(
-            em: $em ?? $this->createStub(EntityManagerInterface::class),
-            fs: $fs,
-            projectDir: self::PROJECT_DIR,
-        );
+        return new ImageImporter(em: $em ?? $this->createStub(EntityManagerInterface::class), fs: $fs, projectDir: self::PROJECT_DIR);
     }
 }

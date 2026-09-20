@@ -43,7 +43,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Announcement has already been sent');
+        $this->expectExceptionMessageIsOrContains('Announcement has already been sent');
 
         // Act
         $subject->send($announcement);
@@ -68,7 +68,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Announcement must have a CMS page linked before sending');
+        $this->expectExceptionMessageIsOrContains('Announcement must have a CMS page linked before sending');
 
         // Act
         $subject->send($announcement);
@@ -326,7 +326,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Announcement email template not found in database');
+        $this->expectExceptionMessageIsOrContains('Announcement email template not found in database');
 
         // Act
         $subject->renderPreview($announcement);
@@ -354,14 +354,8 @@ class AnnouncementServiceTest extends TestCase
         $templateServiceMock = $this->createMock(EmailTemplateService::class);
         $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement->value)->willReturn($emailTemplate);
         $render = static fn(string $content): string => str_replace(['{{title}}', '{{content}}'], ['My Title', ''], $content);
-        $templateServiceMock
-            ->expects($this->once())
-            ->method('renderSubject')
-            ->willReturnCallback($render);
-        $templateServiceMock
-            ->expects($this->once())
-            ->method('renderContent')
-            ->willReturnCallback($render);
+        $templateServiceMock->expects($this->once())->method('renderSubject')->willReturnCallback($render);
+        $templateServiceMock->expects($this->once())->method('renderContent')->willReturnCallback($render);
 
         // Arrange
         $configService = $this->createStub(ConfigService::class);

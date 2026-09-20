@@ -61,7 +61,9 @@ class ConfigTest extends TestCase
     public function testSizesAreClampedToTheirLimits(): void
     {
         // Arrange + Act
-        $config = new Config()->setSessionSize(1000)->setNewCardsPerDay(-5);
+        $config = new Config()
+            ->setSessionSize(1000)
+            ->setNewCardsPerDay(-5);
         $stored = Config::fromArray(['sessionSize' => 1]);
 
         // Assert
@@ -75,7 +77,9 @@ class ConfigTest extends TestCase
         // Arrange
         $directions = [Direction::TermToDefinition, Direction::SecondaryToTerm];
         $without = new Config()->setDirections($directions);
-        $with = new Config()->setDirections($directions)->setSecondaryEnabled(true);
+        $with = new Config()
+            ->setDirections($directions)
+            ->setSecondaryEnabled(true);
         $onlySecondary = new Config()->setDirections([Direction::SecondaryToTerm]);
 
         // Act & Assert

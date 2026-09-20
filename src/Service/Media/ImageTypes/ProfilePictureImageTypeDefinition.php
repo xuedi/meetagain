@@ -23,11 +23,6 @@ final class ProfilePictureImageTypeDefinition extends AbstractImageTypeDefinitio
         return ImageType::ProfilePicture;
     }
 
-    protected function sizes(): array
-    {
-        return [[400, 400], [350, 350], [80, 80]];
-    }
-
     public function getEditLink(int $locationId): ?array
     {
         return ['route' => 'app_admin_member_edit', 'params' => ['id' => $locationId]];
@@ -55,5 +50,10 @@ final class ProfilePictureImageTypeDefinition extends AbstractImageTypeDefinitio
             'route' => 'app_admin_member_edit',
             'params' => ['id' => $user->getId()],
         ];
+    }
+
+    protected function sizes(): array
+    {
+        return [[400, 400], [350, 350], [80, 80]];
     }
 }

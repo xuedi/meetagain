@@ -115,13 +115,7 @@ readonly class EventCanonicalOverviewService
             );
         }
 
-        return new CanonicalLane(
-            seriesId: (int) $series->getId(),
-            seriesName: $series->getName(),
-            locale: $locale,
-            stops: $stops,
-            rootCount: count($rootIds),
-        );
+        return new CanonicalLane(seriesId: (int) $series->getId(), seriesName: $series->getName(), locale: $locale, stops: $stops, rootCount: count($rootIds));
     }
 
     /**

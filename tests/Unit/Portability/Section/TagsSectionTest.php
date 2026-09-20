@@ -23,10 +23,20 @@ final class TagsSectionTest extends SectionTestCase
         $this->section()->import($exported, $context);
 
         // Assert
-        static::assertSame([
-            ['ref' => 3, 'item_type' => 'dish', 'parent_ref' => null, 'position' => 0, 'labels' => ['de' => 'Küche', 'en' => 'Cuisine'], 'managed' => false],
-            ['ref' => 5, 'item_type' => 'dish', 'parent_ref' => 3, 'position' => 4, 'labels' => ['en' => 'Sicilian'], 'managed' => true],
-        ], $exported);
+        static::assertSame(
+            [
+                [
+                    'ref' => 3,
+                    'item_type' => 'dish',
+                    'parent_ref' => null,
+                    'position' => 0,
+                    'labels' => ['de' => 'Küche', 'en' => 'Cuisine'],
+                    'managed' => false,
+                ],
+                ['ref' => 5, 'item_type' => 'dish', 'parent_ref' => 3, 'position' => 4, 'labels' => ['en' => 'Sicilian'], 'managed' => true],
+            ],
+            $exported,
+        );
         $parent = $context->resolveRef(ItemTag::class, 3);
         $child = $context->resolveRef(ItemTag::class, 5);
         static::assertSame([$parent, $child], $this->persisted);
@@ -140,6 +150,9 @@ final class TagsSectionTest extends SectionTestCase
      */
     private function tag(string $itemType, array $labels, ?ItemTag $parent = null): ItemTag
     {
-        return new ItemTag()->setItemType($itemType)->setLabels($labels)->setParent($parent);
+        return new ItemTag()
+            ->setItemType($itemType)
+            ->setLabels($labels)
+            ->setParent($parent);
     }
 }

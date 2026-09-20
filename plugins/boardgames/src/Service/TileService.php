@@ -91,8 +91,10 @@ readonly class TileService
 
         return array_values(array_filter(
             $this->shelf->getBringableShelf($user),
-            fn(GameOwnership $ownership): bool => $ownership->getGame() !== null
-                && $this->pledges->findOwn($event, $ownership->getGame(), $user)?->getStatus() !== PledgeStatus::Pledged,
+            fn(GameOwnership $ownership): bool => (
+                $ownership->getGame() !== null
+                && $this->pledges->findOwn($event, $ownership->getGame(), $user)?->getStatus() !== PledgeStatus::Pledged
+            ),
         ));
     }
 

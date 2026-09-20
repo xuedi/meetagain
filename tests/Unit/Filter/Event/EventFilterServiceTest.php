@@ -35,10 +35,7 @@ class EventFilterServiceTest extends TestCase
     public function testGetAccessibleEventIdsIntersectsAcrossFilters(): void
     {
         // Arrange
-        $service = new EventFilterService(
-            [$this->makeFilter(100, [1, 2, 3]), $this->makeFilter(50, [2, 3, 4])],
-            [],
-        );
+        $service = new EventFilterService([$this->makeFilter(100, [1, 2, 3]), $this->makeFilter(50, [2, 3, 4])], []);
 
         // Act
         $result = $service->getAccessibleEventIds([1, 2, 3, 4]);
@@ -50,10 +47,7 @@ class EventFilterServiceTest extends TestCase
     public function testGetAccessibleEventIdsReturnsEmptyWhenAFilterBlocksAll(): void
     {
         // Arrange
-        $service = new EventFilterService(
-            [$this->makeFilter(100, []), $this->makeFilter(50, [1, 2])],
-            [],
-        );
+        $service = new EventFilterService([$this->makeFilter(100, []), $this->makeFilter(50, [1, 2])], []);
 
         // Act
         $result = $service->getAccessibleEventIds([1, 2]);
@@ -105,9 +99,9 @@ class EventFilterServiceTest extends TestCase
     {
         $filter = $this->createStub(EventFilterInterface::class);
         $filter->method('getPriority')->willReturn($priority);
-        $filter->method('narrowAccessibleEventIds')->willReturnCallback(
-            static fn(array $ids) => $accessible === null ? null : array_values(array_intersect($ids, $accessible)),
-        );
+        $filter->method('narrowAccessibleEventIds')->willReturnCallback(static fn(array $ids) => $accessible === null
+            ? null
+            : array_values(array_intersect($ids, $accessible)));
 
         return $filter;
     }

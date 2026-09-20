@@ -36,10 +36,7 @@ final readonly class TrustExplanation
      */
     public function unearnedActions(): array
     {
-        $open = array_values(array_filter(
-            $this->actions,
-            static fn(TrustActionBreakdown $action): bool => $action->pointsPerUnit > 0 && !$action->isCapped(),
-        ));
+        $open = array_values(array_filter($this->actions, static fn(TrustActionBreakdown $action): bool => $action->pointsPerUnit > 0 && !$action->isCapped()));
         usort($open, static fn(TrustActionBreakdown $a, TrustActionBreakdown $b): int => $b->pointsPerUnit <=> $a->pointsPerUnit);
 
         return $open;

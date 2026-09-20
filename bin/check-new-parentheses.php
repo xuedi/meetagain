@@ -19,8 +19,8 @@ if (isset($argv[1])) {
         $root . '/migrations',
         $root . '/bin',
         $root . '/config',
-        ...glob($root . '/modules/*', GLOB_ONLYDIR) ?: [],
-        ...glob($root . '/plugins/*', GLOB_ONLYDIR) ?: [],
+        ...(glob($root . '/modules/*', GLOB_ONLYDIR) ?: []),
+        ...(glob($root . '/plugins/*', GLOB_ONLYDIR) ?: []),
     ], 'is_dir');
 }
 
@@ -47,10 +47,9 @@ function dereferencedNew(Node $node): ?Expr\New_
         $node instanceof Expr\NullsafeMethodCall,
         $node instanceof Expr\PropertyFetch,
         $node instanceof Expr\NullsafePropertyFetch,
-        $node instanceof Expr\ArrayDimFetch => $node->var,
-        $node instanceof Expr\StaticCall,
-        $node instanceof Expr\StaticPropertyFetch,
-        $node instanceof Expr\ClassConstFetch => $node->class,
+        $node instanceof Expr\ArrayDimFetch,
+            => $node->var,
+        $node instanceof Expr\StaticCall, $node instanceof Expr\StaticPropertyFetch, $node instanceof Expr\ClassConstFetch => $node->class,
         default => null,
     };
 
@@ -88,7 +87,7 @@ foreach (phpFilesIn($scanDirs, $root) as $relative => $path) {
 }
 
 if ($violations === []) {
-    echo sprintf('New-expression check passed - %d files, no (new Foo())->... left.', $scanned) . PHP_EOL;
+    echo sprintf('New-expression check passed - %d files, no (new Foo())->... left.', $scanned), PHP_EOL;
     exit(0);
 }
 

@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -20,7 +18,9 @@ final class Version20251226221548 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE language (id INT AUTO_INCREMENT NOT NULL, code VARCHAR(2) NOT NULL, name VARCHAR(64) NOT NULL, enabled TINYINT NOT NULL, sort_order INT NOT NULL, UNIQUE INDEX UNIQ_D4DB71B577153098 (code), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4');
+        $this->addSql(
+            'CREATE TABLE language (id INT AUTO_INCREMENT NOT NULL, code VARCHAR(2) NOT NULL, name VARCHAR(64) NOT NULL, enabled TINYINT NOT NULL, sort_order INT NOT NULL, UNIQUE INDEX UNIQ_D4DB71B577153098 (code), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4',
+        );
         $this->addSql("INSERT INTO language (code, name, enabled, sort_order) VALUES ('en', 'English', 1, 1), ('de', 'German', 1, 2), ('cn', 'Chinese', 1, 3)");
     }
 

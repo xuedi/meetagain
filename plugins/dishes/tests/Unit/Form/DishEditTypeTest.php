@@ -2,8 +2,8 @@
 
 namespace Plugin\Dishes\Tests\Unit\Form;
 
-use App\Item\TranslationFormHelper;
 use App\Item\Tag\AssignmentFormHelper;
+use App\Item\TranslationFormHelper;
 use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Dishes\Entity\Dish;
@@ -21,7 +21,9 @@ class DishEditTypeTest extends TestCase
     public function testBuildsTranslatableFieldsForEachLanguageSeededFromDish(): void
     {
         // Arrange
-        $dish = new Dish()->setPhonetic('mǐ fàn')->setOrigin('China');
+        $dish = new Dish()
+            ->setPhonetic('mǐ fàn')
+            ->setOrigin('China');
         $german = new DishTranslation();
         $german->setLanguage('de');
         $german->setName('Reis');

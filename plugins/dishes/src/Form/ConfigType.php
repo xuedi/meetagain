@@ -3,6 +3,7 @@
 namespace Plugin\Dishes\Form;
 
 use App\Service\Config\LanguageService;
+use Override;
 use Plugin\Dishes\ValueObject\Config;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -16,7 +17,7 @@ class ConfigType extends AbstractType
         private readonly LanguageService $languageService,
     ) {}
 
-    #[\Override]
+    #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('phoneticInList', CheckboxType::class, [
@@ -33,10 +34,9 @@ class ConfigType extends AbstractType
                 'attr' => ['rows' => 3],
             ]);
         }
-
     }
 
-    #[\Override]
+    #[Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -44,7 +44,7 @@ class ConfigType extends AbstractType
         ]);
     }
 
-    #[\Override]
+    #[Override]
     public function getBlockPrefix(): string
     {
         return 'dishes_config';

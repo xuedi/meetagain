@@ -3,13 +3,13 @@
 namespace Tests\Unit\Service\Email;
 
 use App\Emails\EmailInterface;
+use App\Emails\EmailQueueInterface;
 use App\Entity\EmailQueue;
 use App\Entity\EmailTemplate;
 use App\Repository\EmailQueueRepository;
 use App\Repository\EmailTemplateRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
-use App\Emails\EmailQueueInterface;
 use App\Service\Email\LayoutRenderer;
 use App\Service\Email\PreviewSweepService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,7 +28,7 @@ class PreviewSweepServiceTest extends TestCase
 
         // Act & Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('refuses to run in "prod"');
+        $this->expectExceptionMessageIsOrContains('refuses to run in "prod"');
         $service->sweep();
     }
 
@@ -38,13 +38,15 @@ class PreviewSweepServiceTest extends TestCase
         $origin = new stdClass();
         $seen = [];
         $queue = $this->createStub(EmailQueueInterface::class);
-        $queue->method('enqueue')->willReturnCallback(
-            static function (EmailInterface $source, TemplatedEmail $email, array $context, bool $flush, ?object $passed) use (&$seen): bool {
+        $queue
+            ->method('enqueue')
+            ->willReturnCallback(static function (EmailInterface $source, TemplatedEmail $email, array $context, bool $flush, ?object $passed) use (
+                &$seen,
+            ): bool {
                 $seen[] = $passed;
 
                 return true;
-            },
-        );
+            });
         $service = $this->makeService(emailQueue: $queue, locales: ['en']);
 
         // Act
@@ -60,13 +62,15 @@ class PreviewSweepServiceTest extends TestCase
         // Arrange
         $seen = [];
         $queue = $this->createStub(EmailQueueInterface::class);
-        $queue->method('enqueue')->willReturnCallback(
-            static function (EmailInterface $source, TemplatedEmail $email, array $context, bool $flush, ?object $passed) use (&$seen): bool {
+        $queue
+            ->method('enqueue')
+            ->willReturnCallback(static function (EmailInterface $source, TemplatedEmail $email, array $context, bool $flush, ?object $passed) use (
+                &$seen,
+            ): bool {
                 $seen[] = $passed;
 
                 return true;
-            },
-        );
+            });
         $service = $this->makeService(emailQueue: $queue, locales: ['en']);
 
         // Act
@@ -82,13 +86,13 @@ class PreviewSweepServiceTest extends TestCase
         // Arrange
         $queue = $this->createStub(EmailQueueInterface::class);
         $recipients = [];
-        $queue->method('enqueue')->willReturnCallback(
-            static function (EmailInterface $source, TemplatedEmail $email) use (&$recipients): bool {
+        $queue
+            ->method('enqueue')
+            ->willReturnCallback(static function (EmailInterface $source, TemplatedEmail $email) use (&$recipients): bool {
                 $recipients[] = $email->getTo()[0]->getAddress();
 
                 return true;
-            },
-        );
+            });
         $service = $this->makeService(emailQueue: $queue, locales: ['en', 'de']);
 
         // Act
@@ -96,12 +100,15 @@ class PreviewSweepServiceTest extends TestCase
 
         // Assert
         static::assertSame(4, $result->enqueued);
-        static::assertSame([
-            'welcome+de@preview.invalid',
-            'announcement+de@preview.invalid',
-            'welcome+en@preview.invalid',
-            'announcement+en@preview.invalid',
-        ], $recipients);
+        static::assertSame(
+            [
+                'welcome+de@preview.invalid',
+                'announcement+de@preview.invalid',
+                'welcome+en@preview.invalid',
+                'announcement+en@preview.invalid',
+            ],
+            $recipients,
+        );
     }
 
     public function testCallerTagsBecomeExtraPlusAddressSegments(): void
@@ -109,13 +116,13 @@ class PreviewSweepServiceTest extends TestCase
         // Arrange
         $queue = $this->createStub(EmailQueueInterface::class);
         $recipients = [];
-        $queue->method('enqueue')->willReturnCallback(
-            static function (EmailInterface $source, TemplatedEmail $email) use (&$recipients): bool {
+        $queue
+            ->method('enqueue')
+            ->willReturnCallback(static function (EmailInterface $source, TemplatedEmail $email) use (&$recipients): bool {
                 $recipients[] = $email->getTo()[0]->getAddress();
 
                 return true;
-            },
-        );
+            });
         $service = $this->makeService(emailQueue: $queue, locales: ['en']);
 
         // Act
@@ -146,7 +153,7 @@ class PreviewSweepServiceTest extends TestCase
 
         // Act & Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unknown email type "nope"');
+        $this->expectExceptionMessageIsOrContains('Unknown email type "nope"');
         $service->sweep(['nope']);
     }
 
@@ -157,7 +164,7 @@ class PreviewSweepServiceTest extends TestCase
 
         // Act & Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unknown language "kl"');
+        $this->expectExceptionMessageIsOrContains('Unknown language "kl"');
         $service->sweep([], ['kl']);
     }
 
@@ -281,9 +288,10 @@ class PreviewSweepServiceTest extends TestCase
     {
         $type = $this->createStub(EmailInterface::class);
         $type->method('getIdentifier')->willReturn($identifier);
-        $type->method('getDisplayMockData')->willReturnCallback(
-            static fn(string $locale): array => ['subject' => $identifier, 'context' => ['lang' => $locale]],
-        );
+        $type->method('getDisplayMockData')->willReturnCallback(static fn(string $locale): array => [
+            'subject' => $identifier,
+            'context' => ['lang' => $locale],
+        ]);
 
         return $type;
     }

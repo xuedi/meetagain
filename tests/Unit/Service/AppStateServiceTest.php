@@ -28,8 +28,11 @@ class AppStateServiceTest extends TestCase
         $this->cache = new ArrayAdapter();
     }
 
-    private function makeService(?EntityManagerInterface $em = null, (CacheInterface&CacheItemPoolInterface)|null $cache = null, ?LoggerInterface $logger = null): AppStateService
-    {
+    private function makeService(
+        ?EntityManagerInterface $em = null,
+        (CacheInterface&CacheItemPoolInterface)|null $cache = null,
+        ?LoggerInterface $logger = null,
+    ): AppStateService {
         return new AppStateService(
             $this->repository,
             $em ?? $this->createStub(EntityManagerInterface::class),
@@ -247,11 +250,7 @@ class AppStateServiceTest extends TestCase
     {
         // Arrange
         $this->repository->expects($this->never())->method('findByKey');
-        $this->repository
-            ->expects($this->once())
-            ->method('findValuesByKeys')
-            ->with(['a_key', 'b_key'])
-            ->willReturn(['a_key' => 'a_value']);
+        $this->repository->expects($this->once())->method('findValuesByKeys')->with(['a_key', 'b_key'])->willReturn(['a_key' => 'a_value']);
         $service = $this->makeService();
 
         // Act
@@ -282,11 +281,7 @@ class AppStateServiceTest extends TestCase
     {
         // Arrange
         $this->repository->method('findByKey')->willReturn(new AppState('primed', 'primed_value', new DateTimeImmutable()));
-        $this->repository
-            ->expects($this->once())
-            ->method('findValuesByKeys')
-            ->with(['fresh'])
-            ->willReturn(['fresh' => 'fresh_value']);
+        $this->repository->expects($this->once())->method('findValuesByKeys')->with(['fresh'])->willReturn(['fresh' => 'fresh_value']);
         $service = $this->makeService();
 
         // Act

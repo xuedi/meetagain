@@ -72,10 +72,7 @@ final class TemplatesController extends AbstractEmailController implements Admin
                 'subject' => $mockData['subject'],
                 'context' => $mockData['context'],
                 'renderedBody' => $dbTemplate
-                    ? $this->templateService->renderContent(
-                        $dbTemplate->getBody($language),
-                        $mockData['context'],
-                    )
+                    ? $this->templateService->renderContent($dbTemplate->getBody($language), $mockData['context'])
                     : '<p>Template not found. Run app:email-templates:seed</p>',
                 'template' => $dbTemplate,
                 'section' => new AdminCollapsibleSection(
@@ -98,21 +95,6 @@ final class TemplatesController extends AbstractEmailController implements Admin
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
-    }
-
-    /**
-     * @param EmailTemplate[] $templates
-     *
-     * @return array<string, EmailTemplate>
-     */
-    private function buildTemplatesByMockKey(array $templates): array
-    {
-        $result = [];
-        foreach ($templates as $template) {
-            $result[$template->getIdentifier()] = $template;
-        }
-
-        return $result;
     }
 
     #[Route('/{id}/edit', name: 'app_admin_email_templates_edit', methods: ['GET', 'POST'])]
@@ -239,6 +221,21 @@ final class TemplatesController extends AbstractEmailController implements Admin
         $this->addFlash('success', $this->translator->trans('admin_email_templates.flash_reset'));
 
         return $this->redirectToRoute('app_admin_email_templates_edit', ['id' => $template->getId()]);
+    }
+
+    /**
+     * @param EmailTemplate[] $templates
+     *
+     * @return array<string, EmailTemplate>
+     */
+    private function buildTemplatesByMockKey(array $templates): array
+    {
+        $result = [];
+        foreach ($templates as $template) {
+            $result[$template->getIdentifier()] = $template;
+        }
+
+        return $result;
     }
 
     private function getMockContextForTemplate(string $identifier, string $locale): array

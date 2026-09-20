@@ -27,7 +27,10 @@ class GlossaryTargetTest extends TestCase
         $restored = $target->fromPayload($payload);
 
         // Assert
-        self::assertSame(['phrase' => '半路出家', 'secondary' => 'bàn lù chū jiā', 'definition_en' => 'A latecomer to a craft.', 'definition_de' => 'Ein Quereinsteiger.'], $payload);
+        self::assertSame(
+            ['phrase' => '半路出家', 'secondary' => 'bàn lù chū jiā', 'definition_en' => 'A latecomer to a craft.', 'definition_de' => 'Ein Quereinsteiger.'],
+            $payload,
+        );
         self::assertInstanceOf(Glossary::class, $restored);
         self::assertSame('bàn lù chū jiā', $restored->getSecondary());
         self::assertSame(['en' => 'A latecomer to a craft.', 'de' => 'Ein Quereinsteiger.'], $restored->getSubmittedDefinitions());
@@ -52,8 +55,12 @@ class GlossaryTargetTest extends TestCase
         $target = $this->target(duplicates: ['你好']);
 
         // Act
-        $duplicate = $target->validate(new Glossary()->setPhrase('你好')->submitDefinitions(['en' => 'Hello.']));
-        $fresh = $target->validate(new Glossary()->setPhrase('您好')->submitDefinitions(['en' => 'Hello, politely.']));
+        $duplicate = $target->validate(new Glossary()
+            ->setPhrase('你好')
+            ->submitDefinitions(['en' => 'Hello.']));
+        $fresh = $target->validate(new Glossary()
+            ->setPhrase('您好')
+            ->submitDefinitions(['en' => 'Hello, politely.']));
 
         // Assert
         self::assertSame('glossary.validator_duplicate', $duplicate);
@@ -67,8 +74,12 @@ class GlossaryTargetTest extends TestCase
 
         // Act & Assert
         self::assertSame('glossary.validator_incomplete', $target->validate(new Glossary()->setPhrase('加油')));
-        self::assertSame('glossary.validator_incomplete', $target->validate(new Glossary()->setPhrase('加油')->submitDefinitions(['en' => ' '])));
-        self::assertSame('glossary.validator_incomplete', $target->validate(new Glossary()->setPhrase(' ')->submitDefinitions(['en' => 'Keep going.'])));
+        self::assertSame('glossary.validator_incomplete', $target->validate(new Glossary()
+            ->setPhrase('加油')
+            ->submitDefinitions(['en' => ' '])));
+        self::assertSame('glossary.validator_incomplete', $target->validate(new Glossary()
+            ->setPhrase(' ')
+            ->submitDefinitions(['en' => 'Keep going.'])));
     }
 
     public function testTheSummaryShowsTheSecondaryOnlyWhereEnabledAndOneRowPerDefinition(): void
@@ -94,9 +105,13 @@ class GlossaryTargetTest extends TestCase
     {
         $service = $this->createStub(GlossaryService::class);
         $service->method('isDuplicatePhrase')->willReturnCallback(static fn(string $phrase): bool => in_array($phrase, $duplicates, true));
-        $service->method('definitionLanguageOf')->willReturnCallback(
-            static fn(string $field): ?string => preg_match('/^definition_([a-z]{2})$/', $field, $match) === 1 ? $match[1] : null,
-        );
+        $service->method('definitionLanguageOf')->willReturnCallback(static fn(string $field): ?string => preg_match(
+            '/^definition_([a-z]{2})$/',
+            $field,
+            $match,
+        ) === 1
+                ? $match[1]
+                : null);
 
         $config = new Config()->setSecondaryEnabled($secondaryEnabled);
         $configService = $this->createStub(ConfigService::class);

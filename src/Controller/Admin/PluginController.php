@@ -17,6 +17,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Throwable;
 
 #[IsGranted('ROLE_ADMIN')]
 final class PluginController extends AbstractController implements AdminNavigationInterface
@@ -76,7 +77,7 @@ final class PluginController extends AbstractController implements AdminNavigati
             $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_installed', [
                 '%plugin%' => $key,
             ]));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->addFlash('error', $this->translator->trans('admin_system_plugins.flash_install_failed', [
                 '%error%' => $e->getMessage(),
             ]));

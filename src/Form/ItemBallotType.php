@@ -21,16 +21,14 @@ final class ItemBallotType extends AbstractType
             $choices[(string) $itemId] = (string) $itemId;
         }
 
-        $builder
-            ->add(self::FIELD_ITEMS, ChoiceType::class, [
-                'label' => false,
-                'choices' => $choices,
-                'choice_label' => false,
-                'expanded' => true,
-                'multiple' => true,
-                'data' => array_values($choices),
-            ])
-            ->add(self::FIELD_TERMS, BallotTermsType::class);
+        $builder->add(self::FIELD_ITEMS, ChoiceType::class, [
+            'label' => false,
+            'choices' => $choices,
+            'choice_label' => false,
+            'expanded' => true,
+            'multiple' => true,
+            'data' => array_values($choices),
+        ])->add(self::FIELD_TERMS, BallotTermsType::class);
     }
 
     #[Override]

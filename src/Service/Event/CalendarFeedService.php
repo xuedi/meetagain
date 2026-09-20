@@ -38,14 +38,11 @@ final readonly class CalendarFeedService
 
     public function renderFeed(string $host, string $locale): string
     {
-        $entries = $this->cache->get(
-            $this->cacheKey($host, $locale),
-            function (ItemInterface $item) use ($locale): array {
-                $item->expiresAt($this->hourBoundary()->modify('+1 hour'));
+        $entries = $this->cache->get($this->cacheKey($host, $locale), function (ItemInterface $item) use ($locale): array {
+            $item->expiresAt($this->hourBoundary()->modify('+1 hour'));
 
-                return $this->buildEntries($locale);
-            },
-        );
+            return $this->buildEntries($locale);
+        });
 
         return $this->writer->write($entries, $this->calendarName($host, $locale), $this->hourBoundary());
     }
@@ -99,15 +96,9 @@ final readonly class CalendarFeedService
 
         $start = DateTimeImmutable::createFromInterface($event->getStart());
         $stop = $event->getStop();
-        $end = $stop === null
-            ? $start->modify('+' . self::DEFAULT_DURATION_HOURS . ' hours')
-            : DateTimeImmutable::createFromInterface($stop);
+        $end = $stop === null ? $start->modify('+' . self::DEFAULT_DURATION_HOURS . ' hours') : DateTimeImmutable::createFromInterface($stop);
 
-        $url = $this->urlGenerator->generate(
-            'app_event_details',
-            ['_locale' => $locale, 'id' => $id],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
+        $url = $this->urlGenerator->generate('app_event_details', ['_locale' => $locale, 'id' => $id], UrlGeneratorInterface::ABSOLUTE_URL);
 
         return new Entry(
             uid: sprintf('event-%d@%s', $id, $this->uidDomain()),
@@ -151,10 +142,7 @@ final readonly class CalendarFeedService
         }
 
         $town = trim(($location->getPostcode() ?? '') . ' ' . ($location->getCity() ?? ''));
-        $parts = array_filter(
-            [$location->getName(), $location->getStreet(), $town],
-            static fn(?string $part): bool => $part !== null && trim($part) !== '',
-        );
+        $parts = array_filter([$location->getName(), $location->getStreet(), $town], static fn(?string $part): bool => $part !== null && trim($part) !== '');
 
         return $parts === [] ? null : implode(', ', $parts);
     }
@@ -199,6 +187,9 @@ final readonly class CalendarFeedService
 
     private function windowEnd(): DateTimeImmutable
     {
-        return $this->hourBoundary()->setTime(0, 0)->modify('+' . self::WINDOW_MONTHS . ' months');
+        return $this
+            ->hourBoundary()
+            ->setTime(0, 0)
+            ->modify('+' . self::WINDOW_MONTHS . ' months');
     }
 }

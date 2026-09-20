@@ -146,11 +146,14 @@ class LogServiceTest extends TestCase
 
         // Assert
         static::assertSame(3, $count);
-        static::assertSame([
-            '/var/log/prod-2026-05-11.log',
-            '/var/log/prod-2026-05-12.log',
-            '/var/log/prod.log',
-        ], $deleted);
+        static::assertSame(
+            [
+                '/var/log/prod-2026-05-11.log',
+                '/var/log/prod-2026-05-12.log',
+                '/var/log/prod.log',
+            ],
+            $deleted,
+        );
     }
 
     public function testClearOnlyCountsFilesItActuallyRemoved(): void
@@ -159,9 +162,7 @@ class LogServiceTest extends TestCase
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('isFile')->willReturn(false);
         $fs->method('glob')->willReturn(['/var/log/prod-2026-05-11.log', '/var/log/prod-2026-05-12.log']);
-        $fs->method('deleteFile')->willReturnCallback(
-            static fn(string $path): bool => $path === '/var/log/prod-2026-05-11.log',
-        );
+        $fs->method('deleteFile')->willReturnCallback(static fn(string $path): bool => $path === '/var/log/prod-2026-05-11.log');
         $service = new LogService($fs, self::LOGS_DIR, self::ENV);
 
         // Act

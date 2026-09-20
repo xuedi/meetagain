@@ -113,10 +113,7 @@ readonly class RichTextNormalizer
             return null;
         }
 
-        return HTMLDocument::createFromString(
-            '<!DOCTYPE html><html><body>' . $html . '</body></html>',
-            LIBXML_NOERROR,
-        );
+        return HTMLDocument::createFromString('<!DOCTYPE html><html><body>' . $html . '</body></html>', LIBXML_NOERROR);
     }
 
     /**
@@ -180,10 +177,7 @@ readonly class RichTextNormalizer
 
         $lines[] = $current;
 
-        return array_values(array_filter(
-            array_map($this->trimBlank(...), $lines),
-            static fn(string $line): bool => $line !== '',
-        ));
+        return array_values(array_filter(array_map($this->trimBlank(...), $lines), static fn(string $line): bool => $line !== ''));
     }
 
     private function trimBlank(string $value): string

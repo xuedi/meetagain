@@ -21,9 +21,7 @@ class ConfigTest extends TestCase
     public function testToArrayFromArrayRoundTrip(): void
     {
         // Arrange
-        $config = new Config()
-            ->setFooterText(['en' => 'See you next time', 'zh' => '下次见'])
-            ->setPhoneticInList(true);
+        $config = new Config()->setFooterText(['en' => 'See you next time', 'zh' => '下次见'])->setPhoneticInList(true);
 
         // Act
         $restored = Config::fromArray($config->toArray());

@@ -1,200 +1,70 @@
-# Mago configuration file
+# Mago configuration for core.
+#
+# Covers every hand-written PHP file outside `plugins/`: `src/`, `tests/`, `modules/`, and the
+# entry points and generated-adjacent corners that drifted uncovered for a long time - `bin/`,
+# `config/`, `migrations/` and `public/`. Some of those are in `[source]` for the formatter only
+# and are lifted out of the linter or analyzer below; each exclusion says why.
+#
+# Plugins are deliberately absent: each plugin owns a `tests/config/mago.toml` that this file never
+# names, and `just checkMago` discovers them by glob. That keeps a commercial plugin's name out of
+# the open-source tree, and gives every plugin its own run, so a rule one plugin relaxes stays
+# relaxed for that plugin alone.
+#
 # For more information, see https://mago.carthage.software/#/getting-started/configuration
-php-version = "8.4"
+extends = ["mago-rules.toml"]
 
 [source]
 paths = [
+    "bin/**/*.php",
+    "config/**/*.php",
+    "migrations/**/*.php",
+    "modules/*/migrations/**/*.php",
     "modules/*/src/**/*.php",
     "modules/*/tests/**/*.php",
-    "plugins/boardgames/src/**/*.php",
-    "plugins/books/src/**/*.php",
-    "plugins/dishes/src/**/*.php",
-    "plugins/films/src/**/*.php",
-    "plugins/glossary/src/**/*.php",
-    "plugins/karaoke/src/**/*.php",
-    "plugins/photos/src/**/*.php",
-    "plugins/wishlist/src/**/*.php",
+    "public/**/*.php",
     "src/",
     "tests/",
 ]
 includes = ["vendor"]
-excludes = []
-
-[formatter]
-print-width = 160
-tab-width = 4
-use-tabs = false
-opening-tag-on-own-line = false
-empty-line-after-opening-tag = false
+# Generated files. `reference.php` says so in its own header, and the other three are Symfony Flex
+# recipe files it rewrites when a bundle or importmap entry changes - formatting them is undone on
+# the next `composer require`.
+excludes = [
+    "config/bundles.php",
+    "config/importmap.php",
+    "config/preload.php",
+    "config/reference.php",
+]
 
 [linter]
-integrations = ["symfony", "php-unit"]
-
-# Raised from default 12 — controllers, services and test classes legitimately accumulate methods
-[linter.rules.too-many-methods]
-threshold = 45
-
-# Raised from default 5 — Symfony forms and commands commonly exceed 5 params
-[linter.rules.excessive-parameter-list]
-threshold = 20
-
-# Raised from default 15 — real code, not greenfield
-[linter.rules.cyclomatic-complexity]
-threshold = 150
-
-# Raised — entities with many fields are normal in this domain
-[linter.rules.too-many-properties]
-threshold = 30
-
-# Raised — large enums exist for country codes etc.
-[linter.rules.too-many-enum-cases]
-threshold = 100
-
-# Raised from default 2.0 — too strict for existing codebase
-[linter.rules.kan-defect]
-threshold = 10.0
-
-# Disabled — all hits are test passwords/fixture data, not real credentials
-[linter.rules.no-literal-password]
-enabled = false
-
-# Disabled — 412 hits, penalises a common readable pattern with named arguments
-[linter.rules.literal-named-argument]
-enabled = false
-
-# Disabled — isset() is idiomatic PHP, not a code smell
-[linter.rules.no-isset]
-enabled = false
-
-# Disabled — ?: is common shorthand, not confusing
-[linter.rules.no-shorthand-ternary]
-enabled = false
-
-# Disabled — Halstead complexity is too academic for this codebase
-[linter.rules.halstead]
-enabled = false
-
-# Disabled — TODO comments are tracked; not a linter concern
-[linter.rules.tagged-todo]
-enabled = false
-
-# Disabled — assertion style is a test team preference, not enforced here
-[linter.rules.assertion-style]
-enabled = false
-
-# Disabled — entity setters, test data providers, and service flags with bool params are idiomatic
-[linter.rules.no-boolean-flag-parameter]
-enabled = false
-
-# Disabled — strict assertions debatable for this test suite
-[linter.rules.strict-assertions]
-enabled = false
-
-# Disabled — strict behaviour rules are too opinionated for now
-[linter.rules.strict-behavior]
-enabled = false
-
-# Disabled — readable literal checks are too pedantic for existing code
-[linter.rules.readable-literal]
-enabled = false
-
-# Disabled — nested ternaries exist in templates/legacy code
-[linter.rules.no-nested-ternary]
-enabled = false
-
-# Disabled — assert descriptions not required in this project
-[linter.rules.assert-description]
-enabled = false
-
-# Disabled — `else` after a terminating branch is sometimes the clearer form
-# (symmetric pair of actions like follow/unfollow), rule is purely stylistic.
-[linter.rules.no-else-clause]
-enabled = false
-
-# Disabled — test files commonly contain inline helper stubs alongside the test class
-[linter.rules.single-class-per-file]
-enabled = false
+# The standalone install wizard runs before composer's autoloader and the app's own classes exist,
+# so it cannot follow the conventions the rest of the tree is linted against - it declares plain
+# functions and uses `empty()` on form and $_SERVER keys that may be absent. It stays in `[source]`
+# so the formatter still covers it; only the rule set is lifted.
+excludes = ["public/install/"]
 
 [analyzer]
-# tests/ test suites excluded: the linter already covers tests for style/structure.
-# The analyzer produces PHPUnit false positives (createMock/createStub return
-# MockObject&T which mago reports as non-existent-method and invalid-callable).
-# tests/stubs/ is intentionally NOT excluded so extension stubs (e.g. Imagick) are
-# visible to the analyzer.
+# The analyzer produces PHPUnit false positives (createMock/createStub return MockObject&T, which
+# mago reports as non-existent-method and invalid-callable); the linter already covers tests for
+# style and structure. tests/stubs/ is intentionally NOT excluded, so extension stubs (e.g.
+# Imagick) stay visible to the analyzer.
+#
+# `bin/` and `public/install/` are standalone entry points, each its own program at runtime. The
+# analyzer reads them as one, so two scripts that both declare a `phpFilesIn()` helper collide as
+# duplicate-definition; the check scripts also walk php-parser nodes whose concrete type cannot be
+# narrowed statically. Both stay in `[source]`, so the formatter still covers them.
 excludes = [
+    "bin/",
+    "modules/ballot/tests/",
+    "modules/trust/tests/",
+    "public/install/",
     "tests/Unit/",
     "tests/bootstrap.php",
-    "modules/trust/tests/",
-    "modules/ballot/tests/",
 ]
 
-ignore = [
-    # mixed-* — require full type annotation of the codebase (Symfony form getData(),
-    # Doctrine meta arrays, etc.). Separate typing project.
-    "mixed-assignment",
-    "mixed-method-access",
-    "mixed-array-access",
-    "mixed-array-assignment",
-    "mixed-argument",
-    "mixed-return-statement",
-    "mixed-operand",
-    "mixed-property-access",
-    "mixed-property-type-coercion",
-    "mixed-clone",
-
-    # Downstream effects of mixed-* — all resolve to `mixed` type.
-    "invalid-callable",
-    "invalid-destructuring-source",
-
-    # possibly-null-* / possible-*-null / possibly-false-* — require systematic null-safety
-    # refactor (nullable Doctrine relations, optional Symfony services, getId() before flush).
-    # Real issues but a separate null-safety project.
-    "possibly-null-argument",
-    "possible-method-access-on-null",
-    "possibly-null-array-access",
-    "possibly-null-array-index",
-    "possibly-null-operand",
-    "possibly-null-iterator",
-    "possibly-null-property-access",
-    "possibly-false-argument",
-    "possibly-false-operand",
-    "possibly-false-iterator",
-
-    # Downstream effects of null-* — return types involving null flow.
-    "invalid-return-statement",
-    "nullable-return-statement",
-
-    # Type precision — separate project, not runtime bugs.
-    "less-specific-nested-argument-type",
-    "less-specific-argument",
-    "less-specific-return-statement",
-    "less-specific-nested-return-statement",
-
-    # Requires intersection type support — separate project.
-    "ambiguous-object-method-access",
-    "ambiguous-object-property-access",
-
-    # invalid-iterator when type is mixed — downstream of mixed-* (Doctrine raw queries,
-    # untyped arrays). The nonnull variant requires explicit array shape annotations.
-    "invalid-iterator",
-
-    # invalid-type-cast — intentional (array) and (float) casts on mixed JSON payload
-    # fields in API controllers and ImportService. Downstream of mixed-typing.
-    "invalid-type-cast",
-
-    # possibly-static-access-on-interface — BlockHydrator and CmsBlockType intentionally
-    # call static methods via class-string<Interface>; all concrete classes implement them.
-    "possibly-static-access-on-interface",
-
-    # template-constraint-violation — Enum::getTranslatedList() returns mixed; fixing
-    # requires adding generic @return annotations throughout enum classes.
-    "template-constraint-violation",
-
-    # Style preferences — not bugs.
-    "non-documented-method",
-    "non-documented-property",
-]
-
+# The module perimeter lives here, not in the shared rule file: it guards `modules/`, which only
+# this config covers. tests/Unit/ModulePerimeterTest.php asserts these rules are present in this
+# file, and a module added without an entry here is reported by that test, not by mago.
 [guard]
 
 # Inbound: nothing outside the module may reach past its Contract namespace.
@@ -234,6 +104,25 @@ permit = ["**"]
 
 [[guard.perimeter.rules]]
 namespace = "Tests\\"
+permit = ["**"]
+
+# Migration namespaces, and the two Symfony config-builder namespaces `config/` files declare.
+# They are listed for the same reason as the catch-alls above: `[[guard.perimeter.rules]]` puts
+# the run into allowlist mode, so a namespace with no entry has every dependency reported.
+[[guard.perimeter.rules]]
+namespace = "AppMigrations"
+permit = ["**"]
+
+[[guard.perimeter.rules]]
+namespace = "ModuleBallotMigrations"
+permit = ["**"]
+
+[[guard.perimeter.rules]]
+namespace = "ModuleTrustMigrations"
+permit = ["**"]
+
+[[guard.perimeter.rules]]
+namespace = "Symfony\\"
 permit = ["**"]
 
 [[guard.perimeter.rules]]

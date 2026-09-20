@@ -49,10 +49,7 @@ function removeDirectory(string $dir): void
     if (!is_dir($dir)) {
         return;
     }
-    $entries = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
-        RecursiveIteratorIterator::CHILD_FIRST,
-    );
+    $entries = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
     foreach ($entries as $entry) {
         $entry->isDir() ? rmdir($entry->getPathname()) : unlink($entry->getPathname());
     }
@@ -92,17 +89,13 @@ foreach (array_keys($installed) as $dropped) {
     file_put_contents($generatedConfig, implode(PHP_EOL, $lines) . PHP_EOL);
 
     removeDirectory($cacheDir);
-    $command = sprintf(
-        'COLUMNS=240 %s %s lint:container --env=prod --no-ansi 2>&1',
-        escapeshellarg(PHP_BINARY),
-        escapeshellarg($root . '/bin/console'),
-    );
+    $command = sprintf('COLUMNS=240 %s %s lint:container --env=prod --no-ansi 2>&1', escapeshellarg(PHP_BINARY), escapeshellarg($root . '/bin/console'));
     exec($command, $output, $exitCode);
 
     $alsoDropped = array_diff(array_keys($installed), $kept, [$dropped]);
     $label = $dropped . ($alsoDropped === [] ? '' : ' (+ dependents: ' . implode(', ', $alsoDropped) . ')');
     if ($exitCode === 0) {
-        echo sprintf('  without %-40s ok', $label) . PHP_EOL;
+        echo sprintf('  without %-40s ok', $label), PHP_EOL;
     } else {
         $reason = '';
         foreach ($output as $line) {
@@ -112,7 +105,7 @@ foreach (array_keys($installed) as $dropped) {
             }
         }
         $failures[$dropped] = $reason === '' ? implode(' ', array_slice($output, 0, 5)) : $reason;
-        echo sprintf('  without %-40s FAILED', $label) . PHP_EOL;
+        echo sprintf('  without %-40s FAILED', $label), PHP_EOL;
     }
     $output = [];
 }
@@ -121,13 +114,13 @@ $cleanup();
 removeDirectory($cacheDir);
 
 if ($failures === []) {
-    echo sprintf('Plugin isolation check passed - %d leave-one-out combination(s) compile.', count($installed)) . PHP_EOL;
+    echo sprintf('Plugin isolation check passed - %d leave-one-out combination(s) compile.', count($installed)), PHP_EOL;
     exit(0);
 }
 
 echo PHP_EOL;
 foreach ($failures as $dropped => $reason) {
-    echo sprintf('Removing %s breaks the container: %s', $dropped, $reason) . PHP_EOL;
+    echo sprintf('Removing %s breaks the container: %s', $dropped, $reason), PHP_EOL;
 }
 echo PHP_EOL;
 echo 'Code that is registered in the production container must not inject another plugin\'s service.' . PHP_EOL;

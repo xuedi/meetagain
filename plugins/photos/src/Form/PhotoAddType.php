@@ -35,7 +35,11 @@ class PhotoAddType extends AbstractType
             'mapped' => false,
             'constraints' => [
                 new NotNull(message: $this->translator->trans('photos_photo.error_no_image')),
-                new File(maxSize: '16000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: $this->translator->trans('photos_photo.error_invalid_image')),
+                new File(
+                    maxSize: '16000k',
+                    mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                    mimeTypesMessage: $this->translator->trans('photos_photo.error_invalid_image'),
+                ),
             ],
         ]);
 

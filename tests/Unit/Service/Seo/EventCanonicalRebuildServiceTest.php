@@ -73,29 +73,31 @@ class EventCanonicalRebuildServiceTest extends TestCase
 
         $markerRepository = $this->createStub(EventCanonicalRootRepository::class);
         $markerRepository->method('findBySeries')->willReturn($existingMarkers);
-        $markerRepository->method('findOneByEventAndLocale')->willReturnCallback(
-            static function (int $eventId, string $locale) use ($existingMarkers): ?EventCanonicalRoot {
-                return array_find(
-                    $existingMarkers,
-                    static fn(EventCanonicalRoot $m) => $m->getEvent()?->getId() === $eventId && $m->getLocale() === $locale,
-                );
-            },
-        );
+        $markerRepository
+            ->method('findOneByEventAndLocale')
+            ->willReturnCallback(static fn(int $eventId, string $locale): ?EventCanonicalRoot => array_find(
+                $existingMarkers,
+                static fn(EventCanonicalRoot $m) => $m->getEvent()?->getId() === $eventId && $m->getLocale() === $locale,
+            ));
 
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getEventCanonicalThreshold')->willReturn($threshold);
 
         $entityManager = $this->createStub(EntityManagerInterface::class);
-        $entityManager->method('persist')->willReturnCallback(function (object $entity): void {
-            if ($entity instanceof EventCanonicalRoot) {
-                $this->persisted[] = $entity;
-            }
-        });
-        $entityManager->method('remove')->willReturnCallback(function (object $entity): void {
-            if ($entity instanceof EventCanonicalRoot) {
-                $this->removed[] = $entity;
-            }
-        });
+        $entityManager
+            ->method('persist')
+            ->willReturnCallback(function (object $entity): void {
+                if ($entity instanceof EventCanonicalRoot) {
+                    $this->persisted[] = $entity;
+                }
+            });
+        $entityManager
+            ->method('remove')
+            ->willReturnCallback(function (object $entity): void {
+                if ($entity instanceof EventCanonicalRoot) {
+                    $this->removed[] = $entity;
+                }
+            });
 
         return new EventCanonicalRebuildService(
             eventRepository: $eventRepository,
@@ -226,10 +228,13 @@ class EventCanonicalRebuildServiceTest extends TestCase
         $service->rebuildSeries($series);
 
         // Assert
-        static::assertSame([
-            3 => EventCanonicalRootType::Root,
-            5 => EventCanonicalRootType::Root,
-        ], $this->writtenMarkers()['en']);
+        static::assertSame(
+            [
+                3 => EventCanonicalRootType::Root,
+                5 => EventCanonicalRootType::Root,
+            ],
+            $this->writtenMarkers()['en'],
+        );
     }
 
     public function testSeriesBranchingInOneLocaleOnlyProducesMarkersThere(): void

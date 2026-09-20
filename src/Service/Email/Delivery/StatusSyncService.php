@@ -10,6 +10,7 @@ use App\ValueObject\CronTaskResult;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 
 final readonly class StatusSyncService implements CronTaskInterface
 {
@@ -70,7 +71,7 @@ final readonly class StatusSyncService implements CronTaskInterface
             $output->writeln('StatusSyncService: ' . $message);
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $output->writeln('StatusSyncService exception: ' . $e->getMessage());
 
             return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());

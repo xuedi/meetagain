@@ -102,9 +102,6 @@ class ShelfService
     /** @return list<GameOwnership> */
     public function getBringableShelf(User $user): array
     {
-        return array_values(array_filter(
-            $this->getShelf($user),
-            static fn(GameOwnership $ownership): bool => $ownership->isWillingToBring(),
-        ));
+        return array_values(array_filter($this->getShelf($user), static fn(GameOwnership $ownership): bool => $ownership->isWillingToBring()));
     }
 }

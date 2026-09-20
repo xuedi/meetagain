@@ -17,7 +17,8 @@ class ImageTypeRegistry
      * @param iterable<ImageTypeDefinitionInterface> $definitions
      */
     public function __construct(
-        #[AutowireIterator(ImageTypeDefinitionInterface::class)] iterable $definitions,
+        #[AutowireIterator(ImageTypeDefinitionInterface::class)]
+        iterable $definitions,
         private readonly ThumbnailSizeFormat $thumbnailSizeFormat,
     ) {
         $map = [];

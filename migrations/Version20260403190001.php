@@ -20,7 +20,9 @@ final class Version20260403190001 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE event CHANGE rsvp_notification_sent_at rsvp_notification_sent_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
+        $this->addSql(
+            'ALTER TABLE event CHANGE rsvp_notification_sent_at rsvp_notification_sent_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\'',
+        );
         $this->addSql('ALTER TABLE support_request CHANGE contact_type contact_type VARCHAR(20) DEFAULT \'general\' NOT NULL');
     }
 }

@@ -73,12 +73,7 @@ class Registry
     {
         $sections = [];
         foreach ($this->all() as $provider) {
-            $sections[] = new Section(
-                $provider->getType(),
-                $provider->getLabelKey(),
-                $provider->getIcon(),
-                $this->entriesFor($provider->getType(), $user),
-            );
+            $sections[] = new Section($provider->getType(), $provider->getLabelKey(), $provider->getIcon(), $this->entriesFor($provider->getType(), $user));
         }
 
         return $sections;
@@ -95,10 +90,7 @@ class Registry
         }
 
         $entries = $provider->listForMember($user);
-        $reachable = array_fill_keys(
-            $this->scope->narrow($type, array_map(static fn(Entry $entry): int|string => $entry->id, $entries), $user),
-            true,
-        );
+        $reachable = array_fill_keys($this->scope->narrow($type, array_map(static fn(Entry $entry): int|string => $entry->id, $entries), $user), true);
 
         return array_values(array_filter($entries, static fn(Entry $entry): bool => isset($reachable[$entry->id])));
     }

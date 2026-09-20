@@ -29,7 +29,7 @@ class BlockingServiceTest extends TestCase
 
         // Assert
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot block yourself');
+        $this->expectExceptionMessageIsOrContains('Cannot block yourself');
 
         // Act
         $subject->block($user, $user);

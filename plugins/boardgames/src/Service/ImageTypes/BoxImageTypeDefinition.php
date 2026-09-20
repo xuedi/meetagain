@@ -24,11 +24,6 @@ final class BoxImageTypeDefinition extends AbstractImageTypeDefinition
         return ImageType::PluginBoardgamesBox;
     }
 
-    protected function sizes(): array
-    {
-        return [[self::FREE_AXIS, 800], [400, 400], [350, 350], [200, 200]];
-    }
-
     public function getEditLink(int $locationId): ?array
     {
         return ['route' => 'app_plugin_boardgames_game_show', 'params' => ['id' => $locationId]];
@@ -58,5 +53,10 @@ final class BoxImageTypeDefinition extends AbstractImageTypeDefinition
             'route' => 'app_plugin_boardgames_game_show',
             'params' => ['id' => $game->getId()],
         ];
+    }
+
+    protected function sizes(): array
+    {
+        return [[self::FREE_AXIS, 800], [400, 400], [350, 350], [200, 200]];
     }
 }

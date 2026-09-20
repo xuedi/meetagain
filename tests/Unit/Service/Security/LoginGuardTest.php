@@ -115,14 +115,18 @@ class LoginGuardTest extends TestCase
 
     private function guard(int $announcementLimit = 30): LoginGuard
     {
-        $failures = new RateLimiterFactory(
-            ['id' => 'login_failure', 'policy' => 'sliding_window', 'limit' => 3, 'interval' => '15 minutes'],
-            new InMemoryStorage(),
-        );
-        $announcements = new RateLimiterFactory(
-            ['id' => 'login_measures_announcement', 'policy' => 'fixed_window', 'limit' => $announcementLimit, 'interval' => '1 hour'],
-            new InMemoryStorage(),
-        );
+        $failures = new RateLimiterFactory([
+            'id' => 'login_failure',
+            'policy' => 'sliding_window',
+            'limit' => 3,
+            'interval' => '15 minutes',
+        ], new InMemoryStorage());
+        $announcements = new RateLimiterFactory([
+            'id' => 'login_measures_announcement',
+            'policy' => 'fixed_window',
+            'limit' => $announcementLimit,
+            'interval' => '1 hour',
+        ], new InMemoryStorage());
 
         return new LoginGuard($failures, $announcements, $this->createStub(FormFactoryInterface::class));
     }

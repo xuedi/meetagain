@@ -35,15 +35,18 @@ class PhotoContributorTest extends TestCase
         $rows = $this->contributor($repository, users: $users)->exportItems([12], $writer);
 
         // Assert
-        static::assertSame([[
-            'ref' => 0,
-            'translations' => ['en' => ['title' => 'Harbour', 'description' => 'At dawn.']],
-            'meta' => self::META,
-            'taken_at' => '2026-04-18 07:42:11',
-            'image' => 'images/photos/0/photo.jpg',
-            'uploader_email' => 'lena@example.org',
-            'contest_submitted' => true,
-        ]], $rows);
+        static::assertSame(
+            [[
+                'ref' => 0,
+                'translations' => ['en' => ['title' => 'Harbour', 'description' => 'At dawn.']],
+                'meta' => self::META,
+                'taken_at' => '2026-04-18 07:42:11',
+                'image' => 'images/photos/0/photo.jpg',
+                'uploader_email' => 'lena@example.org',
+                'contest_submitted' => true,
+            ]],
+            $rows,
+        );
     }
 
     public function testAPhotoWhoseImageCannotBeWrittenIsNotExported(): void
@@ -119,9 +122,9 @@ class PhotoContributorTest extends TestCase
             $persisted[] = $entity;
         });
         $context = $this->context();
-        $context->method('resolveRef')->willReturnCallback(
-            fn(string $class, mixed $ref): ?User => $ref === 'lena@example.org' ? $this->user(42, 'lena@example.org') : null,
-        );
+        $context->method('resolveRef')->willReturnCallback(fn(string $class, mixed $ref): ?User => $ref === 'lena@example.org'
+            ? $this->user(42, 'lena@example.org')
+            : null);
 
         // Act
         $this->contributor(em: $em)->importItems([[
@@ -219,7 +222,12 @@ class PhotoContributorTest extends TestCase
         $photo->setMeta(self::META);
         $photo->setTakenAt(new DateTimeImmutable('2026-04-18 07:42:11'));
         $photo->setContestSubmitted(true);
-        $photo->addTranslation(new PhotoTranslation()->setLanguage('en')->setTitle('Harbour')->setDescription('At dawn.'));
+        $photo->addTranslation(
+            new PhotoTranslation()
+                ->setLanguage('en')
+                ->setTitle('Harbour')
+                ->setDescription('At dawn.'),
+        );
 
         return $photo;
     }

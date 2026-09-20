@@ -75,7 +75,8 @@ class AppStateService implements ResetInterface
             foreach ($this->cache->getItems(array_keys($pending)) as $cacheKey => $item) {
                 $key = $pending[$cacheKey];
                 if ($item->isHit()) {
-                    $values[$key] = $this->memo[$key] = $item->get();
+                    $this->memo[$key] = $item->get();
+                    $values[$key] = $this->memo[$key];
                     continue;
                 }
                 $missing[$key] = $item;
@@ -88,7 +89,8 @@ class AppStateService implements ResetInterface
                     $item->expiresAfter(null);
                     $item->set($value);
                     $this->cache->saveDeferred($item);
-                    $values[$key] = $this->memo[$key] = $value;
+                    $this->memo[$key] = $value;
+                    $values[$key] = $value;
                 }
                 $this->cache->commit();
             }
@@ -96,7 +98,8 @@ class AppStateService implements ResetInterface
             $this->logCacheFailureOnce($exception);
             $rows = $this->repository->findValuesByKeys(array_values($pending));
             foreach ($pending as $key) {
-                $values[$key] = $this->memo[$key] = $rows[$key] ?? null;
+                $this->memo[$key] = $rows[$key] ?? null;
+                $values[$key] = $this->memo[$key];
             }
         }
 

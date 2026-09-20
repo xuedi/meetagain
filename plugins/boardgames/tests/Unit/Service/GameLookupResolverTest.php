@@ -11,6 +11,7 @@ use Plugin\Boardgames\Service\GameLookupResolver;
 use Plugin\Boardgames\Service\WikidataLookup;
 use Plugin\Boardgames\ValueObject\Config;
 use Psr\Log\NullLogger;
+use SensitiveParameter;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
@@ -90,7 +91,7 @@ class GameLookupResolverTest extends TestCase
         static::assertNull($lookup);
     }
 
-    private function resolver(Config $config, ?string $environmentToken): GameLookupResolver
+    private function resolver(Config $config, #[SensitiveParameter] ?string $environmentToken): GameLookupResolver
     {
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getConfig')->willReturn($config);

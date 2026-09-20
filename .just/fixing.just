@@ -1,9 +1,9 @@
 # Formatters and generators that write back into the tree.
 
-# Format code with Mago
+# Format code with Mago - core, then each plugin against its own config
 [group('fixing')]
 fixMago:
-    {{PHP}} vendor/bin/mago --config=tests/config/mago.toml lint --fix --format-after-fix
+    {{PHP}} sh bin/mago.sh lint --fix --format-after-fix
 
 # Generate coverage badge (CI)
 [group('fixing')]

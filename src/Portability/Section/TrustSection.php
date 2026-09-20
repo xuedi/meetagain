@@ -48,8 +48,9 @@ readonly class TrustSection implements SectionInterface
 
         $grants = array_values(array_filter(
             $this->grants->exportGrants(array_map(strval(...), array_keys($itemTypes))),
-            static fn(PortableGrant $grant): bool => $scope->grantsId($grant->fromUserId, DataCategory::Interactions)
-                && $scope->grantsId($grant->toUserId, DataCategory::Interactions),
+            static fn(PortableGrant $grant): bool => (
+                $scope->grantsId($grant->fromUserId, DataCategory::Interactions) && $scope->grantsId($grant->toUserId, DataCategory::Interactions)
+            ),
         ));
         if ($grants === []) {
             return [];
@@ -92,14 +93,16 @@ readonly class TrustSection implements SectionInterface
             }
 
             $createdAt = $this->date($row['created_at'] ?? null) ?? new DateTimeImmutable();
-            $this->grants->restoreGrant(new PortableGrant(
-                $this->contextResolver->resolve($itemType),
-                $fromUserId,
-                $toUserId,
-                $level,
-                $createdAt,
-                $this->date($row['updated_at'] ?? null) ?? $createdAt,
-            ));
+            $this->grants->restoreGrant(
+                new PortableGrant(
+                    $this->contextResolver->resolve($itemType),
+                    $fromUserId,
+                    $toUserId,
+                    $level,
+                    $createdAt,
+                    $this->date($row['updated_at'] ?? null) ?? $createdAt,
+                ),
+            );
             $context->count($this->getKey(), Outcome::Created);
         }
     }

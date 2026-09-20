@@ -4,10 +4,10 @@ namespace Plugin\Films\Portability;
 
 use App\Entity\Image;
 use App\Enum\ImageType;
-use App\Portability\ImportContext;
-use App\Portability\Item\ImportResult;
-use App\Portability\Item\ContributorInterface;
 use App\Portability\ImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Portability\Item\ContributorInterface;
+use App\Portability\Item\ImportResult;
 use App\Service\Media\ImageLocationService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -40,7 +40,15 @@ readonly class FilmContributor implements ContributorInterface
     #[Override]
     public function allItemIds(): array
     {
-        return array_map(intval(...), $this->filmRepo->createQueryBuilder('f')->select('f.id')->orderBy('f.id')->getQuery()->getSingleColumnResult());
+        return array_map(
+            intval(...),
+            $this->filmRepo
+                ->createQueryBuilder('f')
+                ->select('f.id')
+                ->orderBy('f.id')
+                ->getQuery()
+                ->getSingleColumnResult(),
+        );
     }
 
     #[Override]
@@ -59,9 +67,7 @@ readonly class FilmContributor implements ContributorInterface
                 'external_source' => $film->getExternalSource()?->value,
                 'description' => $film->getDescription(),
                 'genres' => $film->getGenres(),
-                'poster_image' => $film->getPosterImage() instanceof Image
-                    ? $images->addImage($film->getPosterImage())
-                    : null,
+                'poster_image' => $film->getPosterImage() instanceof Image ? $images->addImage($film->getPosterImage()) : null,
             ];
         }
 
@@ -117,11 +123,7 @@ readonly class FilmContributor implements ContributorInterface
             $this->imageLocationService->addLocation((int) $image->getId(), ImageType::PluginFilmsPoster, (int) $film->getId());
         }
 
-        return new ImportResult(
-            refToItemId: array_map(static fn(Film $film): int => (int) $film->getId(), $refToItemId),
-            created: $created,
-            matched: $matched,
-        );
+        return new ImportResult(refToItemId: array_map(static fn(Film $film): int => (int) $film->getId(), $refToItemId), created: $created, matched: $matched);
     }
 
     /**

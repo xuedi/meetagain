@@ -3,10 +3,10 @@
 namespace Plugin\Glossary\Tests\Unit\Portability;
 
 use App\Entity\User;
-use App\Portability\ImportContext;
-use App\Portability\ImageWriterInterface;
-use App\Service\Config\LanguageService;
 use App\Portability\ImageImporter;
+use App\Portability\ImageWriterInterface;
+use App\Portability\ImportContext;
+use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -31,13 +31,16 @@ class GlossaryContributorTest extends TestCase
         $rows = $contributor->exportItems([8], $this->createStub(ImageWriterInterface::class));
 
         // Assert
-        self::assertSame([
-            'ref' => 8,
-            'phrase' => '你好',
-            'secondary' => 'nǐ hǎo',
-            'term_language' => 'zh',
-            'definitions' => ['en' => 'hello', 'de' => 'hallo'],
-        ], $rows[0]);
+        self::assertSame(
+            [
+                'ref' => 8,
+                'phrase' => '你好',
+                'secondary' => 'nǐ hǎo',
+                'term_language' => 'zh',
+                'definitions' => ['en' => 'hello', 'de' => 'hallo'],
+            ],
+            $rows[0],
+        );
     }
 
     public function testDuplicatePhraseResolvesToTheExistingEntry(): void

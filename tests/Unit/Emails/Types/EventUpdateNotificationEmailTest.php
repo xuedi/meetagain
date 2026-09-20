@@ -12,6 +12,7 @@ use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
+use DateTime;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -266,7 +267,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $location->method('getName')->willReturn('Main Hall');
 
         $event = $this->createStub(Event::class);
-        $event->method('getStart')->willReturn(new \DateTime('2026-06-01 19:00:00'));
+        $event->method('getStart')->willReturn(new DateTime('2026-06-01 19:00:00'));
         $event->method('getLocation')->willReturn($location);
         $event->method('getTitle')->willReturn('Test Event');
         $event->method('getId')->willReturn(42);

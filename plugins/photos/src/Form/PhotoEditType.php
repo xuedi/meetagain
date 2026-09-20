@@ -70,6 +70,13 @@ class PhotoEditType extends AbstractType
         ]);
     }
 
+    #[Override]
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefault('photo', null);
+        $resolver->setAllowedTypes('photo', [Photo::class, 'null']);
+    }
+
     /** @return array<string, int> */
     private function eventChoices(): array
     {
@@ -84,13 +91,6 @@ class PhotoEditType extends AbstractType
     {
         $photoId = $photo?->getId();
 
-        return $photoId === null ? null : ($this->associations->eventIdsForItem(PhotoService::ITEM_TYPE, $photoId)[0] ?? null);
-    }
-
-    #[Override]
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefault('photo', null);
-        $resolver->setAllowedTypes('photo', [Photo::class, 'null']);
+        return $photoId === null ? null : $this->associations->eventIdsForItem(PhotoService::ITEM_TYPE, $photoId)[0] ?? null;
     }
 }

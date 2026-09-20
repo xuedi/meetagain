@@ -39,7 +39,7 @@ class LocaleCookieServiceTest extends TestCase
         static::assertSame('de', $cookie->getValue());
         static::assertTrue($cookie->isHttpOnly());
         static::assertSame(Cookie::SAMESITE_LAX, $cookie->getSameSite());
-        static::assertGreaterThan(time() + 150 * 24 * 3600, $cookie->getExpiresTime());
+        static::assertGreaterThan(time() + (150 * 24 * 3600), $cookie->getExpiresTime());
     }
 
     public function testIsConsentGrantedReadsConsentCookie(): void
@@ -50,9 +50,7 @@ class LocaleCookieServiceTest extends TestCase
         // Act & Assert
         static::assertTrue($service->isConsentGranted($this->createConsentedRequest()));
         static::assertFalse($service->isConsentGranted(new Request()));
-        static::assertFalse($service->isConsentGranted(
-            new Request([], [], [], [Consent::TYPE_COOKIES => ConsentType::Denied->value]),
-        ));
+        static::assertFalse($service->isConsentGranted(new Request([], [], [], [Consent::TYPE_COOKIES => ConsentType::Denied->value])));
     }
 
     public function testGetValidLocaleReturnsNullWhenCookieMissing(): void
@@ -117,11 +115,7 @@ class LocaleCookieServiceTest extends TestCase
         $response = new Response();
 
         // Act
-        $service->attachIfConsentGranted(
-            $this->createConsentedRequest([LocaleCookieService::COOKIE_NAME => 'de']),
-            $response,
-            'de',
-        );
+        $service->attachIfConsentGranted($this->createConsentedRequest([LocaleCookieService::COOKIE_NAME => 'de']), $response, 'de');
 
         // Assert
         static::assertCount(0, $response->headers->getCookies());

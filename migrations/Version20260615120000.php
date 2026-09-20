@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -17,13 +15,13 @@ final class Version20260615120000 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql(<<<'SQL'
-            ALTER TABLE support_request
-                ADD responded_by_id INT DEFAULT NULL,
-                ADD response LONGTEXT DEFAULT NULL,
-                ADD reply_channel VARCHAR(10) DEFAULT NULL,
-                ADD CONSTRAINT FK_SUPPORT_REQUEST_RESPONDED_BY
-                    FOREIGN KEY (responded_by_id) REFERENCES user (id) ON DELETE SET NULL
-        SQL);
+                ALTER TABLE support_request
+                    ADD responded_by_id INT DEFAULT NULL,
+                    ADD response LONGTEXT DEFAULT NULL,
+                    ADD reply_channel VARCHAR(10) DEFAULT NULL,
+                    ADD CONSTRAINT FK_SUPPORT_REQUEST_RESPONDED_BY
+                        FOREIGN KEY (responded_by_id) REFERENCES user (id) ON DELETE SET NULL
+            SQL);
         $this->addSql('CREATE INDEX IDX_SUPPORT_REQUEST_RESPONDED_BY ON support_request (responded_by_id)');
     }
 

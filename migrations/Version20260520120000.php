@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace AppMigrations;
 
@@ -17,48 +15,48 @@ final class Version20260520120000 extends AbstractMigration
     public function up(Schema $schema): void
     {
         $this->addSql(<<<'SQL'
-            CREATE TABLE wall_post (
-                id INT AUTO_INCREMENT NOT NULL,
-                author_id INT DEFAULT NULL,
-                content LONGTEXT NOT NULL,
-                created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
-                edited_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)',
-                INDEX IDX_WALL_POST_AUTHOR (author_id),
-                INDEX IDX_WALL_POST_CREATED (created_at),
-                PRIMARY KEY(id)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
-        SQL);
+                CREATE TABLE wall_post (
+                    id INT AUTO_INCREMENT NOT NULL,
+                    author_id INT DEFAULT NULL,
+                    content LONGTEXT NOT NULL,
+                    created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+                    edited_at DATETIME DEFAULT NULL COMMENT '(DC2Type:datetime_immutable)',
+                    INDEX IDX_WALL_POST_AUTHOR (author_id),
+                    INDEX IDX_WALL_POST_CREATED (created_at),
+                    PRIMARY KEY(id)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            SQL);
 
         $this->addSql(<<<'SQL'
-            ALTER TABLE wall_post
-                ADD CONSTRAINT FK_WALL_POST_AUTHOR
-                    FOREIGN KEY (author_id) REFERENCES user (id) ON DELETE SET NULL
-        SQL);
+                ALTER TABLE wall_post
+                    ADD CONSTRAINT FK_WALL_POST_AUTHOR
+                        FOREIGN KEY (author_id) REFERENCES user (id) ON DELETE SET NULL
+            SQL);
 
         $this->addSql(<<<'SQL'
-            CREATE TABLE wall_reply (
-                id INT AUTO_INCREMENT NOT NULL,
-                post_id INT NOT NULL,
-                author_id INT DEFAULT NULL,
-                content LONGTEXT NOT NULL,
-                created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
-                INDEX IDX_WALL_REPLY_POST (post_id),
-                INDEX IDX_WALL_REPLY_AUTHOR (author_id),
-                PRIMARY KEY(id)
-            ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
-        SQL);
+                CREATE TABLE wall_reply (
+                    id INT AUTO_INCREMENT NOT NULL,
+                    post_id INT NOT NULL,
+                    author_id INT DEFAULT NULL,
+                    content LONGTEXT NOT NULL,
+                    created_at DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+                    INDEX IDX_WALL_REPLY_POST (post_id),
+                    INDEX IDX_WALL_REPLY_AUTHOR (author_id),
+                    PRIMARY KEY(id)
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB
+            SQL);
 
         $this->addSql(<<<'SQL'
-            ALTER TABLE wall_reply
-                ADD CONSTRAINT FK_WALL_REPLY_POST
-                    FOREIGN KEY (post_id) REFERENCES wall_post (id) ON DELETE CASCADE,
-                ADD CONSTRAINT FK_WALL_REPLY_AUTHOR
-                    FOREIGN KEY (author_id) REFERENCES user (id) ON DELETE SET NULL
-        SQL);
+                ALTER TABLE wall_reply
+                    ADD CONSTRAINT FK_WALL_REPLY_POST
+                        FOREIGN KEY (post_id) REFERENCES wall_post (id) ON DELETE CASCADE,
+                    ADD CONSTRAINT FK_WALL_REPLY_AUTHOR
+                        FOREIGN KEY (author_id) REFERENCES user (id) ON DELETE SET NULL
+            SQL);
 
         $this->addSql(<<<'SQL'
-            INSERT INTO config (name, value, type) VALUES ('show_town_hall', 'false', 'boolean')
-        SQL);
+                INSERT INTO config (name, value, type) VALUES ('show_town_hall', 'false', 'boolean')
+            SQL);
     }
 
     public function down(Schema $schema): void

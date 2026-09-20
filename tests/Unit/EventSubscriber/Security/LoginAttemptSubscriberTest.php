@@ -39,14 +39,13 @@ class LoginAttemptSubscriberTest extends TestCase
         $formFactory->method('createNamed')->willReturn($form);
 
         $this->guard = new LoginGuard(
-            new RateLimiterFactory(
-                ['id' => 'login_failure', 'policy' => 'sliding_window', 'limit' => 3, 'interval' => '15 minutes'],
-                new InMemoryStorage(),
-            ),
-            new RateLimiterFactory(
-                ['id' => 'login_measures_announcement', 'policy' => 'fixed_window', 'limit' => 1, 'interval' => '1 hour'],
-                new InMemoryStorage(),
-            ),
+            new RateLimiterFactory(['id' => 'login_failure', 'policy' => 'sliding_window', 'limit' => 3, 'interval' => '15 minutes'], new InMemoryStorage()),
+            new RateLimiterFactory([
+                'id' => 'login_measures_announcement',
+                'policy' => 'fixed_window',
+                'limit' => 1,
+                'interval' => '1 hour',
+            ], new InMemoryStorage()),
             $formFactory,
         );
     }
@@ -110,9 +109,11 @@ class LoginAttemptSubscriberTest extends TestCase
         // Arrange
         $logged = [];
         $activityService = $this->createStub(ActivityService::class);
-        $activityService->method('log')->willReturnCallback(static function (...$args) use (&$logged): void {
-            $logged[] = $args;
-        });
+        $activityService
+            ->method('log')
+            ->willReturnCallback(static function (...$args) use (&$logged): void {
+                $logged[] = $args;
+            });
         $subscriber = $this->subscriber(activityService: $activityService);
 
         // Act
@@ -132,15 +133,17 @@ class LoginAttemptSubscriberTest extends TestCase
         // Arrange
         $logged = 0;
         $activityService = $this->createStub(ActivityService::class);
-        $activityService->method('log')->willReturnCallback(static function () use (&$logged): void {
-            $logged++;
-        });
+        $activityService
+            ->method('log')
+            ->willReturnCallback(static function () use (&$logged): void {
+                $logged++;
+            });
         $subscriber = $this->subscriber(activityService: $activityService);
 
         // Act
         foreach (['10.0.0.1', '10.0.0.2'] as $ip) {
             $request = Request::create('/login', 'POST', server: ['REMOTE_ADDR' => $ip]);
-            $request->attributes->set('_route', 'app_login');
+            $request->attributes->set(LoginAttemptSubscriber::ROUTE_DEFAULT, true);
             for ($i = 0; $i < 3; ++$i) {
                 $subscriber->onLoginFailure($this->failure(new AuthenticationException('bad'), null, $request));
             }
@@ -155,7 +158,7 @@ class LoginAttemptSubscriberTest extends TestCase
     {
         // Arrange
         $subscriber = $this->subscriber();
-        $request = $this->loginRequest();
+        $request = Request::create('/jump', 'POST', server: ['REMOTE_ADDR' => '10.0.0.1']);
         $request->attributes->set('_route', 'app_jump_landing');
 
         // Act
@@ -215,6 +218,41 @@ class LoginAttemptSubscriberTest extends TestCase
         static::assertTrue($this->guard->isActive($request));
     }
 
+    public function testAnyRouteWithTheLoginAttemptDefaultIsCounted(): void
+    {
+        // Arrange
+        $subscriber = $this->subscriber();
+        $request = Request::create('/api/v1/auth/login', 'POST', server: ['REMOTE_ADDR' => '10.0.0.1']);
+        $request->attributes->set('_route', 'some_other_login');
+        $request->attributes->set(LoginAttemptSubscriber::ROUTE_DEFAULT, true);
+
+        // Act
+        for ($i = 0; $i < 3; ++$i) {
+            $subscriber->onLoginFailure($this->failure(new AuthenticationException('bad'), null, $request));
+        }
+
+        // Assert
+        static::assertTrue($this->guard->isActive($this->loginRequest()));
+    }
+
+    public function testAStatelessLoginIsRefusedWithoutValidatingTheForm(): void
+    {
+        // Arrange
+        $this->measuresFormValid = true;
+        $request = $this->loginRequest();
+        $request->attributes->set('_stateless', true);
+        for ($i = 0; $i < 3; ++$i) {
+            $this->guard->recordFailure($request);
+        }
+        $subscriber = $this->subscriber(request: $request);
+
+        // Assert
+        $this->expectExceptionObject(new CustomUserMessageAuthenticationException(LoginAttemptSubscriber::HUMAN_CHECK_FAILED));
+
+        // Act
+        $subscriber->onCheckPassport($this->passportCheck());
+    }
+
     private function subscriber(
         ?SecurityService $securityService = null,
         ?ActivityService $activityService = null,
@@ -236,7 +274,7 @@ class LoginAttemptSubscriberTest extends TestCase
     private function loginRequest(): Request
     {
         $request = Request::create('/login', 'POST', server: ['REMOTE_ADDR' => '10.0.0.1']);
-        $request->attributes->set('_route', 'app_login');
+        $request->attributes->set(LoginAttemptSubscriber::ROUTE_DEFAULT, true);
 
         return $request;
     }
@@ -250,21 +288,11 @@ class LoginAttemptSubscriberTest extends TestCase
 
     private function passportCheck(): CheckPassportEvent
     {
-        return new CheckPassportEvent(
-            $this->createStub(AuthenticatorInterface::class),
-            new SelfValidatingPassport(new UserBadge('alice@example.test')),
-        );
+        return new CheckPassportEvent($this->createStub(AuthenticatorInterface::class), new SelfValidatingPassport(new UserBadge('alice@example.test')));
     }
 
     private function failure(AuthenticationException $exception, ?Passport $passport = null, ?Request $request = null): LoginFailureEvent
     {
-        return new LoginFailureEvent(
-            $exception,
-            $this->createStub(AuthenticatorInterface::class),
-            $request ?? $this->loginRequest(),
-            null,
-            'main',
-            $passport,
-        );
+        return new LoginFailureEvent($exception, $this->createStub(AuthenticatorInterface::class), $request ?? $this->loginRequest(), null, 'main', $passport);
     }
 }

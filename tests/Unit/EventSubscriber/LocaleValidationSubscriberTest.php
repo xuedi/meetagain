@@ -58,7 +58,7 @@ class LocaleValidationSubscriberTest extends TestCase
     public function testInvalidLocaleThrows404(): void
     {
         $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('Locale "xx" is not available');
+        $this->expectExceptionMessageIsOrContains('Locale "xx" is not available');
 
         $request = new Request();
         $request->attributes->set('_locale', 'xx');

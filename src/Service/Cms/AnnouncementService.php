@@ -71,6 +71,38 @@ readonly class AnnouncementService
         return $recipientCount;
     }
 
+    public function getPreviewContext(Announcement $announcement, string $locale = 'en'): array
+    {
+        $linkHash = $announcement->getLinkHash() ?? 'preview-' . $announcement->getId();
+        $cmsPage = $announcement->getCmsPage();
+
+        $renderedContent = $cmsPage instanceof Cms ? $this->renderContent($cmsPage, $locale) : ['title' => null, 'content' => ''];
+
+        return [
+            'title' => $renderedContent['title'],
+            'content' => $renderedContent['content'],
+            'announcementUrl' => $this->configService->getHost() . '/announcement/' . $linkHash,
+            'username' => 'User',
+            'host' => $this->configService->getHost(),
+            'lang' => $locale,
+        ];
+    }
+
+    public function renderPreview(Announcement $announcement, string $locale = 'en'): array
+    {
+        $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement->value);
+        if (!$dbTemplate instanceof EmailTemplate) {
+            throw new RuntimeException('Announcement email template not found in database. Run app:email-templates:seed command.');
+        }
+
+        $context = $this->getPreviewContext($announcement, $locale);
+
+        return [
+            'subject' => $this->templateService->renderSubject($dbTemplate->getSubject($locale), $context),
+            'body' => $this->templateService->renderContent($dbTemplate->getBody($locale), $context),
+        ];
+    }
+
     /**
      * @return User[]
      */
@@ -130,11 +162,7 @@ readonly class AnnouncementService
                 $mapBlock->longitude,
             );
             $label = $mapBlock->markerLabel !== '' ? $mapBlock->markerLabel : 'OpenStreetMap';
-            $parts[] = sprintf(
-                '<p><a href="%s">%s</a></p>',
-                $url,
-                htmlspecialchars($label, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
-            );
+            $parts[] = sprintf('<p><a href="%s">%s</a></p>', $url, htmlspecialchars($label, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
         }
 
         return implode("\n", $parts);
@@ -149,37 +177,5 @@ readonly class AnnouncementService
         }
 
         return implode("\n", $parts);
-    }
-
-    public function getPreviewContext(Announcement $announcement, string $locale = 'en'): array
-    {
-        $linkHash = $announcement->getLinkHash() ?? 'preview-' . $announcement->getId();
-        $cmsPage = $announcement->getCmsPage();
-
-        $renderedContent = $cmsPage instanceof Cms ? $this->renderContent($cmsPage, $locale) : ['title' => null, 'content' => ''];
-
-        return [
-            'title' => $renderedContent['title'],
-            'content' => $renderedContent['content'],
-            'announcementUrl' => $this->configService->getHost() . '/announcement/' . $linkHash,
-            'username' => 'User',
-            'host' => $this->configService->getHost(),
-            'lang' => $locale,
-        ];
-    }
-
-    public function renderPreview(Announcement $announcement, string $locale = 'en'): array
-    {
-        $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement->value);
-        if (!$dbTemplate instanceof EmailTemplate) {
-            throw new RuntimeException('Announcement email template not found in database. Run app:email-templates:seed command.');
-        }
-
-        $context = $this->getPreviewContext($announcement, $locale);
-
-        return [
-            'subject' => $this->templateService->renderSubject($dbTemplate->getSubject($locale), $context),
-            'body' => $this->templateService->renderContent($dbTemplate->getBody($locale), $context),
-        ];
     }
 }

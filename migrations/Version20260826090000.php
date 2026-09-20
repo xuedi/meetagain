@@ -93,15 +93,33 @@ final class Version20260826090000 extends AbstractMigration
             PRIMARY KEY (id)
         ) DEFAULT CHARACTER SET utf8mb4');
 
-        $this->addSql('ALTER TABLE circulation_copy ADD CONSTRAINT FK_circulation_copy_donated_by FOREIGN KEY (donated_by_id) REFERENCES `user` (id) ON DELETE SET NULL');
-        $this->addSql('ALTER TABLE circulation_copy ADD CONSTRAINT FK_circulation_copy_holder FOREIGN KEY (holder_id) REFERENCES `user` (id) ON DELETE SET NULL');
-        $this->addSql('ALTER TABLE circulation_request ADD CONSTRAINT FK_circulation_request_user FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE circulation_request ADD CONSTRAINT FK_circulation_request_offered_copy FOREIGN KEY (offered_copy_id) REFERENCES circulation_copy (id) ON DELETE SET NULL');
-        $this->addSql('ALTER TABLE circulation_handover ADD CONSTRAINT FK_circulation_handover_copy FOREIGN KEY (copy_id) REFERENCES circulation_copy (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE circulation_handover ADD CONSTRAINT FK_circulation_handover_from_user FOREIGN KEY (from_user_id) REFERENCES `user` (id) ON DELETE SET NULL');
-        $this->addSql('ALTER TABLE circulation_handover ADD CONSTRAINT FK_circulation_handover_to_user FOREIGN KEY (to_user_id) REFERENCES `user` (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE circulation_handover ADD CONSTRAINT FK_circulation_handover_request FOREIGN KEY (request_id) REFERENCES circulation_request (id) ON DELETE SET NULL');
-        $this->addSql('ALTER TABLE circulation_handover ADD CONSTRAINT FK_circulation_handover_cancelled_by FOREIGN KEY (cancelled_by_id) REFERENCES `user` (id) ON DELETE SET NULL');
+        $this->addSql(
+            'ALTER TABLE circulation_copy ADD CONSTRAINT FK_circulation_copy_donated_by FOREIGN KEY (donated_by_id) REFERENCES `user` (id) ON DELETE SET NULL',
+        );
+        $this->addSql(
+            'ALTER TABLE circulation_copy ADD CONSTRAINT FK_circulation_copy_holder FOREIGN KEY (holder_id) REFERENCES `user` (id) ON DELETE SET NULL',
+        );
+        $this->addSql(
+            'ALTER TABLE circulation_request ADD CONSTRAINT FK_circulation_request_user FOREIGN KEY (user_id) REFERENCES `user` (id) ON DELETE CASCADE',
+        );
+        $this->addSql(
+            'ALTER TABLE circulation_request ADD CONSTRAINT FK_circulation_request_offered_copy FOREIGN KEY (offered_copy_id) REFERENCES circulation_copy (id) ON DELETE SET NULL',
+        );
+        $this->addSql(
+            'ALTER TABLE circulation_handover ADD CONSTRAINT FK_circulation_handover_copy FOREIGN KEY (copy_id) REFERENCES circulation_copy (id) ON DELETE CASCADE',
+        );
+        $this->addSql(
+            'ALTER TABLE circulation_handover ADD CONSTRAINT FK_circulation_handover_from_user FOREIGN KEY (from_user_id) REFERENCES `user` (id) ON DELETE SET NULL',
+        );
+        $this->addSql(
+            'ALTER TABLE circulation_handover ADD CONSTRAINT FK_circulation_handover_to_user FOREIGN KEY (to_user_id) REFERENCES `user` (id) ON DELETE CASCADE',
+        );
+        $this->addSql(
+            'ALTER TABLE circulation_handover ADD CONSTRAINT FK_circulation_handover_request FOREIGN KEY (request_id) REFERENCES circulation_request (id) ON DELETE SET NULL',
+        );
+        $this->addSql(
+            'ALTER TABLE circulation_handover ADD CONSTRAINT FK_circulation_handover_cancelled_by FOREIGN KEY (cancelled_by_id) REFERENCES `user` (id) ON DELETE SET NULL',
+        );
     }
 
     public function down(Schema $schema): void

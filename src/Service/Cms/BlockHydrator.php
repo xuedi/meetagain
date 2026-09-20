@@ -43,9 +43,7 @@ readonly class BlockHydrator
             };
 
             if ($field->richText && is_string($resolved[$field->name])) {
-                $resolved[$field->name] = $this->richTextNormalizer->toStorage(
-                    $this->cmsContent->sanitize($resolved[$field->name]),
-                );
+                $resolved[$field->name] = $this->richTextNormalizer->toStorage($this->cmsContent->sanitize($resolved[$field->name]));
             }
         }
 

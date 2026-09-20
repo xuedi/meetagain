@@ -39,7 +39,9 @@ class ParticipationResolverTest extends TestCase
     private function provider(?bool $answer): ParticipationProviderInterface
     {
         return new class($answer) implements ParticipationProviderInterface {
-            public function __construct(private readonly ?bool $answer) {}
+            public function __construct(
+                private readonly ?bool $answer,
+            ) {}
 
             public function isEnabled(string $itemType): ?bool
             {

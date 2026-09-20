@@ -271,25 +271,6 @@ readonly class EmailTemplateService
         return $this->substitute($subject, $context, escape: false);
     }
 
-    /** @param array<string, mixed> $context */
-    private function substitute(string $content, array $context, bool $escape): string
-    {
-        foreach ($context as $key => $value) {
-            if (!is_scalar($value)) {
-                continue;
-            }
-
-            $replacement = (string) $value;
-            if ($escape && !in_array($key, self::HTML_VARIABLES, true)) {
-                $replacement = htmlspecialchars($replacement, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            }
-
-            $content = str_replace('{{' . $key . '}}', $replacement, $content);
-        }
-
-        return $content;
-    }
-
     /**
      * @return array<string, array{subject: string, body: string, variables: string[]}>
      */
@@ -317,6 +298,25 @@ readonly class EmailTemplateService
         }
 
         return $templates;
+    }
+
+    /** @param array<string, mixed> $context */
+    private function substitute(string $content, array $context, bool $escape): string
+    {
+        foreach ($context as $key => $value) {
+            if (!is_scalar($value)) {
+                continue;
+            }
+
+            $replacement = (string) $value;
+            if ($escape && !in_array($key, self::HTML_VARIABLES, true)) {
+                $replacement = htmlspecialchars($replacement, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            }
+
+            $content = str_replace('{{' . $key . '}}', $replacement, $content);
+        }
+
+        return $content;
     }
 
     private function loadTemplateBody(string $identifier, string $language = self::DEFAULT_LANGUAGE): string

@@ -17,6 +17,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -402,7 +403,7 @@ final class EmailServiceTest extends TestCase
         $mailRepoStub = $this->createStub(EmailQueueRepository::class);
         $mailRepoStub->method('findBy')->willReturn([$queued]);
 
-        $exception = new class('Connection refused') extends \RuntimeException implements TransportExceptionInterface {
+        $exception = new class('Connection refused') extends RuntimeException implements TransportExceptionInterface {
             public function getDebug(): string
             {
                 return '';
@@ -453,7 +454,7 @@ final class EmailServiceTest extends TestCase
         $sentMessage = $this->createStub(SentMessage::class);
         $sentMessage->method('getMessageId')->willReturn('ok-id');
 
-        $exception = new class('Timeout') extends \RuntimeException implements TransportExceptionInterface {
+        $exception = new class('Timeout') extends RuntimeException implements TransportExceptionInterface {
             public function getDebug(): string
             {
                 return '';

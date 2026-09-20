@@ -130,7 +130,9 @@ readonly class CirculationSection implements SectionInterface
         }
 
         $requests = [];
-        foreach ($this->em->getRepository(CirculationRequest::class)->findBy(['context' => array_keys($scope->circulationContexts)], ['id' => 'ASC']) as $request) {
+        foreach ($this->em->getRepository(CirculationRequest::class)->findBy(['context' => array_keys($scope->circulationContexts)], [
+            'id' => 'ASC',
+        ]) as $request) {
             $isScopedItem = $this->inScope($scope, $request->getItemType(), $request->getItemId());
             if (!$isScopedItem || !$scope->grants($request->getUser(), DataCategory::Collections)) {
                 continue;
@@ -291,7 +293,12 @@ readonly class CirculationSection implements SectionInterface
         }
 
         $itemType = (string) ($row['item_type'] ?? '');
-        $copy = new CirculationCopy($this->contextResolver->resolve($itemType), $itemType, $itemId, $this->date($row['donated_at'] ?? null) ?? new DateTimeImmutable());
+        $copy = new CirculationCopy(
+            $this->contextResolver->resolve($itemType),
+            $itemType,
+            $itemId,
+            $this->date($row['donated_at'] ?? null) ?? new DateTimeImmutable(),
+        );
         $copy->setLabel(isset($row['label']) ? (string) $row['label'] : null);
         $copy->setDonatedBy($context->resolveRef(User::class, $row['donated_by_email'] ?? null));
         $copy->setHolder($context->resolveRef(User::class, $row['holder_email'] ?? null));
@@ -322,7 +329,13 @@ readonly class CirculationSection implements SectionInterface
         }
 
         $itemType = (string) ($row['item_type'] ?? '');
-        $request = new CirculationRequest($this->contextResolver->resolve($itemType), $itemType, $itemId, $user, $this->date($row['requested_at'] ?? null) ?? new DateTimeImmutable());
+        $request = new CirculationRequest(
+            $this->contextResolver->resolve($itemType),
+            $itemType,
+            $itemId,
+            $user,
+            $this->date($row['requested_at'] ?? null) ?? new DateTimeImmutable(),
+        );
         $request->setStatus(CirculationRequestStatus::tryFrom((string) ($row['status'] ?? '')) ?? CirculationRequestStatus::Waiting);
         $request->setOfferedCopy($context->resolveRef(CirculationCopy::class, $row['offered_copy_ref'] ?? null));
         $request->setOfferedAt($this->date($row['offered_at'] ?? null));
@@ -388,18 +401,20 @@ readonly class CirculationSection implements SectionInterface
         }
 
         $itemType = (string) ($row['item_type'] ?? '');
-        $this->em->persist(new CirculationLedgerEntry(
-            $entryType,
-            $this->contextResolver->resolve($itemType),
-            $itemType,
-            $itemId,
-            $this->date($row['occurred_at'] ?? null) ?? new DateTimeImmutable(),
-            $copyId,
-            $userIds['from'],
-            $userIds['to'],
-            $userIds['actor'],
-            $this->importPayload(is_array($row['payload'] ?? null) ? $row['payload'] : [], $context),
-        ));
+        $this->em->persist(
+            new CirculationLedgerEntry(
+                $entryType,
+                $this->contextResolver->resolve($itemType),
+                $itemType,
+                $itemId,
+                $this->date($row['occurred_at'] ?? null) ?? new DateTimeImmutable(),
+                $copyId,
+                $userIds['from'],
+                $userIds['to'],
+                $userIds['actor'],
+                $this->importPayload(is_array($row['payload'] ?? null) ? $row['payload'] : [], $context),
+            ),
+        );
         $context->count(self::KIND_LEDGER, Outcome::Created);
     }
 

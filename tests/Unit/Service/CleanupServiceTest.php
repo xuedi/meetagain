@@ -16,9 +16,9 @@ use App\Service\Security\MeasureLogger;
 use App\Service\Security\MeasureSettings;
 use App\Service\Support\ThreadService;
 use App\Service\System\CleanupService;
-use Doctrine\Common\Collections\ArrayCollection;
 use DateTimeImmutable;
 use DateTimeZone;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
@@ -80,10 +80,13 @@ class CleanupServiceTest extends TestCase
         $now = new DateTimeImmutable('2026-08-19 12:00:00', new DateTimeZone('UTC'));
         $fs = $this->createMock(ExtendedFilesystem::class);
         $fs->expects($this->once())->method('glob')->with('/app/var/import/*.zip')->willReturn(['/app/var/import/stale.zip', '/app/var/import/fresh.zip']);
-        $fs->expects($this->exactly(2))->method('getFileModifiedTime')->willReturnMap([
-            ['/app/var/import/stale.zip', $now->modify('-25 hours')->getTimestamp()],
-            ['/app/var/import/fresh.zip', $now->modify('-1 hour')->getTimestamp()],
-        ]);
+        $fs
+            ->expects($this->exactly(2))
+            ->method('getFileModifiedTime')
+            ->willReturnMap([
+                ['/app/var/import/stale.zip', $now->modify('-25 hours')->getTimestamp()],
+                ['/app/var/import/fresh.zip', $now->modify('-1 hour')->getTimestamp()],
+            ]);
         $fs->expects($this->once())->method('deleteFile')->with('/app/var/import/stale.zip')->willReturn(true);
 
         $subject = $this->createService(fs: $fs);
@@ -150,7 +153,6 @@ class CleanupServiceTest extends TestCase
         // Act
         $subject->removeGhostedRegistrations();
     }
-
 
     public function testAutoResolveStaleSupportThreadsResolvesAfterOneHundredEightyDays(): void
     {

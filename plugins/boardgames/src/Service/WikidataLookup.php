@@ -101,8 +101,7 @@ class WikidataLookup implements GameMetadataLookupInterface
 
     private function buildSearchQuery(string $term): string
     {
-        return sprintf(
-            'SELECT ?game ?gameLabel ?year ?minPlayers ?maxPlayers ?image ?bggId WHERE {
+        return sprintf('SELECT ?game ?gameLabel ?year ?minPlayers ?maxPlayers ?image ?bggId WHERE {
   ?game wdt:P31/wdt:P279* wd:Q131436 .
   ?game rdfs:label ?gameLabel .
   FILTER(CONTAINS(LCASE(?gameLabel), "%s"))
@@ -111,16 +110,12 @@ class WikidataLookup implements GameMetadataLookupInterface
   OPTIONAL { ?game wdt:P1873 ?maxPlayers. }
   OPTIONAL { ?game wdt:P18 ?image. }
   OPTIONAL { ?game wdt:P2339 ?bggId. }
-} LIMIT %d',
-            $this->escape(mb_strtolower($term)),
-            self::SEARCH_LIMIT,
-        );
+} LIMIT %d', $this->escape(mb_strtolower($term)), self::SEARCH_LIMIT);
     }
 
     private function buildEntityQuery(string $entityId): string
     {
-        return sprintf(
-            'SELECT ?game ?gameLabel ?year ?minPlayers ?maxPlayers ?image ?bggId WHERE {
+        return sprintf('SELECT ?game ?gameLabel ?year ?minPlayers ?maxPlayers ?image ?bggId WHERE {
   BIND(wd:%s AS ?game)
   ?game rdfs:label ?gameLabel .
   FILTER(LANG(?gameLabel) = "en")
@@ -129,9 +124,7 @@ class WikidataLookup implements GameMetadataLookupInterface
   OPTIONAL { ?game wdt:P1873 ?maxPlayers. }
   OPTIONAL { ?game wdt:P18 ?image. }
   OPTIONAL { ?game wdt:P2339 ?bggId. }
-} LIMIT 1',
-            $this->escape($entityId),
-        );
+} LIMIT 1', $this->escape($entityId));
     }
 
     private function escape(string $value): string
