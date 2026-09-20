@@ -1,5 +1,9 @@
 framework:
     validation:
+        # Match what Symfony\Component\Mime\Address accepts, so an address that passes a form
+        # can always be used as a recipient. The html5 default allows "a..b@host", which Mime rejects.
+        email_validation_mode: strict
+
         # Enables validator auto-mapping support.
         # For instance, basic validation constraints will be inferred from Doctrine's metadata.
         #auto_mapping:

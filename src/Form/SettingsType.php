@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Email;
 
 class SettingsType extends AbstractType
 {
@@ -43,6 +44,9 @@ class SettingsType extends AbstractType
                 'label' => 'admin_system_config.field_sender_email',
                 'attr' => ['placeholder' => $mailer->getAddress()],
                 'data' => $mailer->getAddress(),
+                'constraints' => [
+                    new Email(message: 'admin_system_config.validator_sender_email_format'),
+                ],
             ])
             ->add('systemUser', ChoiceType::class, [
                 'attr' => ['class' => 'is-fullwidth'],
