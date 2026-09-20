@@ -39,6 +39,25 @@ readonly class NotificationSettingsService
         $this->store($user, $settings);
     }
 
+    /**
+     * @param array<string, bool> $categories
+     */
+    public function applyPush(User $user, array $categories): void
+    {
+        $settings = $user->getNotificationSettings();
+        foreach ($categories as $category => $value) {
+            $settings->setPush((string) $category, $value);
+        }
+
+        $this->store($user, $settings);
+    }
+
+    public function applyQuietHours(User $user, bool $enabled, string $start, string $end, string $timeZone, bool $allowUrgent): void
+    {
+        $settings = $user->getNotificationSettings()->setQuietHours($enabled, $start, $end, $timeZone, $allowUrgent);
+        $this->store($user, $settings);
+    }
+
     public function setMasterSwitch(User $user, bool $enabled): void
     {
         $user->setNotification($enabled);

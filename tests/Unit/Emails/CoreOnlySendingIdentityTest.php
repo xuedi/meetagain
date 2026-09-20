@@ -110,6 +110,7 @@ class CoreOnlySendingIdentityTest extends TestCase
             logger: $this->createStub(LoggerInterface::class),
             enrichers: [],
             identityProviders: [],
+            pushDispatchers: [],
         );
     }
 

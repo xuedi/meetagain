@@ -169,6 +169,7 @@ final class EmailAttachmentTest extends TestCase
             logger: $logger ?? $this->createStub(LoggerInterface::class),
             enrichers: [],
             identityProviders: [],
+            pushDispatchers: [],
         );
     }
 }

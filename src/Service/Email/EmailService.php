@@ -6,6 +6,7 @@ use App\CronTaskInterface;
 use App\EmailContextEnricherInterface;
 use App\Emails\EmailInterface;
 use App\Emails\EmailQueueInterface;
+use App\Emails\PushDispatcherInterface;
 use App\Emails\SendingIdentity;
 use App\Emails\SendingIdentityProviderInterface;
 use App\Entity\EmailQueue;
@@ -44,10 +45,18 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         private iterable $enrichers,
         #[AutowireIterator(SendingIdentityProviderInterface::class)]
         private iterable $identityProviders,
+        #[AutowireIterator(PushDispatcherInterface::class)]
+        private iterable $pushDispatchers,
     ) {}
 
-    public function enqueue(EmailInterface $source, TemplatedEmail $email, array $context, bool $flush = true, ?object $origin = null): bool
-    {
+    public function enqueue(
+        EmailInterface $source,
+        TemplatedEmail $email,
+        array $context,
+        bool $flush = true,
+        ?object $origin = null,
+        bool $dispatchPush = true,
+    ): bool {
         $identifier = $source->getIdentifier();
         $locale = $email->getLocale() ?? 'en';
         $templateContent = $this->templateService->getTemplateContent($identifier, $locale);
@@ -79,11 +88,25 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         $emailQueue->setRenderedBody($this->templateService->renderContent($templateContent['body'], $twigContext));
 
         $this->em->persist($emailQueue);
+        if ($dispatchPush) {
+            $this->dispatchPush($identifier, $emailQueue->getRecipient(), $emailQueue->getMaxSendBy());
+        }
         if ($flush) {
             $this->em->flush();
         }
 
         return true;
+    }
+
+    private function dispatchPush(string $identifier, string $recipient, ?DateTimeImmutable $deadline): void
+    {
+        foreach ($this->pushDispatchers as $dispatcher) {
+            try {
+                $dispatcher->dispatch($identifier, $recipient, $deadline);
+            } catch (Throwable $e) {
+                $this->logger->error('Push dispatch failed', ['identifier' => $identifier, 'exception' => $e]);
+            }
+        }
     }
 
     public function getIdentifier(): string

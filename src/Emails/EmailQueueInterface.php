@@ -8,7 +8,15 @@ interface EmailQueueInterface
 {
     /**
      * A non-null $origin replaces what the source reports, for callers that know better than the
-     * type does.
+     * type does. $dispatchPush is false for preview and debugging paths, which enqueue a real row
+     * for a message nothing actually happened about.
      */
-    public function enqueue(EmailInterface $source, TemplatedEmail $email, array $context, bool $flush = true, ?object $origin = null): bool;
+    public function enqueue(
+        EmailInterface $source,
+        TemplatedEmail $email,
+        array $context,
+        bool $flush = true,
+        ?object $origin = null,
+        bool $dispatchPush = true,
+    ): bool;
 }
