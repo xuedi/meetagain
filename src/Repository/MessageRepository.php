@@ -6,6 +6,7 @@ use App\Entity\Message;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -13,6 +14,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class MessageRepository extends ServiceEntityRepository
 {
+    private const string PARTNER_ID = 'CASE WHEN IDENTITY(m.sender) = :selfId THEN IDENTITY(m.receiver) ELSE IDENTITY(m.sender) END';
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Message::class);
@@ -20,63 +23,71 @@ class MessageRepository extends ServiceEntityRepository
 
     /**
      * @param int[] $excludeUserIds User IDs to exclude from conversation list (e.g., blocked users)
+     *
+     * @return array<int, array{messages: int, unread: int, lastMessage: DateTimeImmutable, user: User}>
      */
-    public function getConversations(User $user, ?int $id = null, array $excludeUserIds = []): array
+    public function getConversations(User $user, ?int $id = null, array $excludeUserIds = [], ?int $limit = null, int $offset = 0): array
     {
-        $messages = $this
-            ->createQueryBuilder('m')
-            ->leftJoin('m.sender', 's')
-            ->addSelect('s')
-            ->leftJoin('s.image', 'si')
-            ->addSelect('si')
-            ->leftJoin('m.receiver', 'r')
-            ->addSelect('r')
-            ->leftJoin('r.image', 'ri')
-            ->addSelect('ri')
-            ->where('m.sender = :user OR m.receiver = :user')
-            ->setParameter('user', $user)
-            ->orderBy('m.createdAt', 'DESC')
+        $rows = $this
+            ->conversationQuery($user, $excludeUserIds)
+            ->select(
+                self::PARTNER_ID . ' AS partnerId',
+                'COUNT(m.id) AS messages',
+                'SUM(CASE WHEN IDENTITY(m.receiver) = :selfId AND m.wasRead = false THEN 1 ELSE 0 END) AS unread',
+                'MAX(m.createdAt) AS lastMessage',
+            )
+            ->groupBy('partnerId')
+            ->orderBy('lastMessage', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
             ->getQuery()
-            ->getResult();
+            ->getArrayResult();
+
+        $partners = $this->findPartners(array_map(static fn(array $row): int => (int) $row['partnerId'], $rows));
 
         $list = [];
-        foreach ($messages as $message) {
-            $isReceived = $message->getReceiver()->getId() === $user->getId();
-            $partner = $isReceived ? $message->getSender() : $message->getReceiver();
-            $partnerId = $partner->getId();
-
-            if (in_array($partnerId, $excludeUserIds, true)) {
+        foreach ($rows as $row) {
+            $partnerId = (int) $row['partnerId'];
+            if (!isset($partners[$partnerId])) {
                 continue;
             }
 
-            $isUnread = $isReceived && $message->isWasRead() === false;
-
-            if (!isset($list[$partnerId])) {
-                $list[$partnerId] = [
-                    'messages' => 1,
-                    'unread' => $isUnread ? 1 : 0,
-                    'lastMessage' => $message->getCreatedAt(),
-                    'user' => $partner,
-                ];
-                continue;
-            }
-            ++$list[$partnerId]['messages'];
-            if ($isUnread) {
-                $list[$partnerId]['unread'] = ($list[$partnerId]['unread'] ?? 0) + 1;
-            }
-        }
-
-        if ($id !== null && !isset($list[$id]) && !in_array($id, $excludeUserIds, true)) {
-            $userRepo = $this->getEntityManager()->getRepository(User::class);
-            $list[] = [
-                'messages' => 0,
-                'unread' => 0,
-                'lastMessage' => new DateTimeImmutable(),
-                'user' => $userRepo->findOneBy(['id' => $id]),
+            $list[$partnerId] = [
+                'messages' => (int) $row['messages'],
+                'unread' => (int) $row['unread'],
+                'lastMessage' => new DateTimeImmutable((string) $row['lastMessage']),
+                'user' => $partners[$partnerId],
             ];
         }
 
+        if ($id !== null && !isset($list[$id]) && !in_array($id, $excludeUserIds, true)) {
+            $partner = $this->getEntityManager()->getRepository(User::class)->find($id);
+            if ($partner instanceof User) {
+                $list[$id] = [
+                    'messages' => 0,
+                    'unread' => 0,
+                    'lastMessage' => new DateTimeImmutable(),
+                    'user' => $partner,
+                ];
+            }
+        }
+
         return $list;
+    }
+
+    /**
+     * @param int[] $excludeUserIds
+     */
+    public function countConversations(User $user, array $excludeUserIds = []): int
+    {
+        $rows = $this
+            ->conversationQuery($user, $excludeUserIds)
+            ->select(self::PARTNER_ID . ' AS partnerId')
+            ->groupBy('partnerId')
+            ->getQuery()
+            ->getArrayResult();
+
+        return count($rows);
     }
 
     public function findEditableForSender(int $messageId, User $sender, DateTimeImmutable $now): ?Message
@@ -102,14 +113,35 @@ class MessageRepository extends ServiceEntityRepository
             return null;
         }
 
+        return $this->threadQuery($user, $partner)->orderBy('m.createdAt', 'ASC')->getQuery()->getResult();
+    }
+
+    /**
+     * @return Message[] Oldest first.
+     */
+    public function getThreadPage(User $user, User $partner, int $limit, int $offset = 0): array
+    {
+        return $this
+            ->threadQuery($user, $partner)
+            ->orderBy('m.id', 'ASC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function countThread(User $user, User $partner): int
+    {
+        return (int) $this->threadQuery($user, $partner)->select('COUNT(m.id)')->getQuery()->getSingleScalarResult();
+    }
+
+    private function threadQuery(User $user, User $partner): QueryBuilder
+    {
         return $this
             ->createQueryBuilder('m')
             ->where('(m.sender = :self AND m.receiver = :partner) OR (m.sender = :partner AND m.receiver = :self)')
             ->setParameter('self', $user)
-            ->setParameter('partner', $partner)
-            ->orderBy('m.createdAt', 'ASC')
-            ->getQuery()
-            ->getResult();
+            ->setParameter('partner', $partner);
     }
 
     public function getMessageCount(User $user): int
@@ -177,5 +209,56 @@ class MessageRepository extends ServiceEntityRepository
             'total' => (int) $totalQb->getQuery()->getSingleScalarResult(),
             'unread' => (int) $unreadQb->getQuery()->getSingleScalarResult(),
         ];
+    }
+
+    /**
+     * @param int[] $excludeUserIds
+     */
+    private function conversationQuery(User $user, array $excludeUserIds): QueryBuilder
+    {
+        $qb = $this
+            ->createQueryBuilder('m')
+            ->where('m.sender = :self OR m.receiver = :self')
+            ->setParameter('self', $user)
+            ->setParameter('selfId', $user->getId());
+
+        if ($excludeUserIds !== []) {
+            $qb
+                ->andWhere('IDENTITY(m.sender) NOT IN (:excluded)')
+                ->andWhere('IDENTITY(m.receiver) NOT IN (:excluded)')
+                ->setParameter('excluded', $excludeUserIds);
+        }
+
+        return $qb;
+    }
+
+    /**
+     * @param int[] $partnerIds
+     *
+     * @return array<int, User>
+     */
+    private function findPartners(array $partnerIds): array
+    {
+        if ($partnerIds === []) {
+            return [];
+        }
+
+        $users = $this
+            ->getEntityManager()
+            ->getRepository(User::class)
+            ->createQueryBuilder('u')
+            ->leftJoin('u.image', 'ui')
+            ->addSelect('ui')
+            ->where('u.id IN (:ids)')
+            ->setParameter('ids', $partnerIds)
+            ->getQuery()
+            ->getResult();
+
+        $byId = [];
+        foreach ($users as $user) {
+            $byId[(int) $user->getId()] = $user;
+        }
+
+        return $byId;
     }
 }

@@ -204,6 +204,7 @@ Error: Error
 'admin_system_language.validator_code_pattern': 'Language code must be 2 lowercase letters (e.g., en, de, zh).'
 
 # Profile messages namespace - message edit window
+'profile_messages.validator_content_blank': 'Please enter a message.'
 'profile_messages.validator_content_max': 'Message text cannot be longer than {{ limit }} characters.'
 
 # Admin CMS namespace - reserved slug guard

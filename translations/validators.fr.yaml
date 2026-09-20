@@ -204,6 +204,7 @@ Error: 'Erreur'
 'admin_system_language.validator_code_pattern': 'Le code de langue doit être composé de 2 lettres minuscules (par ex. en, de, zh).'
 
 # Profile messages namespace - message edit window
+'profile_messages.validator_content_blank': 'Veuillez saisir un message.'
 'profile_messages.validator_content_max': 'Le texte du message ne peut pas dépasser {{ limit }} caractères.'
 
 # Admin CMS namespace - reserved slug guard
