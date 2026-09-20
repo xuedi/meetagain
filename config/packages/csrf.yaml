@@ -9,3 +9,5 @@ framework:
             - submit
             - authenticate
             - logout
+            - cookie_accept
+            - cookie_deny
