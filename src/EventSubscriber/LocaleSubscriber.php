@@ -5,7 +5,9 @@ namespace App\EventSubscriber;
 use App\Service\Config\LanguageService;
 use App\Service\Config\LocaleCookieService;
 use Override;
+use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -15,6 +17,7 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
     public function __construct(
         private LanguageService $languageService,
         private LocaleCookieService $localeCookieService,
+        private FirewallMap $firewallMap,
     ) {}
 
     #[Override]
@@ -37,11 +40,12 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
+        $mayUseSession = $request->hasPreviousSession() && !$this->isStateless($request);
 
         // The URL locale is the explicit choice and beats every stored preference.
         $locale = $request->attributes->get('_locale');
         if ($locale) {
-            if ($request->hasPreviousSession()) {
+            if ($mayUseSession) {
                 $request->getSession()->set('_locale', $locale);
             }
 
@@ -49,7 +53,7 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
         }
 
         // Session reads need a started session; the cookie fallback below must stay reachable without one.
-        if ($request->hasPreviousSession()) {
+        if ($mayUseSession) {
             $session = $request->getSession();
             if ($session->has('_locale')) {
                 $request->setLocale($session->get('_locale'));
@@ -79,5 +83,10 @@ readonly class LocaleSubscriber implements EventSubscriberInterface
         }
 
         $this->localeCookieService->attachIfConsentGranted($event->getRequest(), $event->getResponse(), $locale);
+    }
+
+    private function isStateless(Request $request): bool
+    {
+        return $this->firewallMap->getFirewallConfig($request)?->isStateless() ?? false;
     }
 }
