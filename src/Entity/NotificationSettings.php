@@ -2,11 +2,20 @@
 
 namespace App\Entity;
 
-use Exception;
+use InvalidArgumentException;
 use JsonSerializable;
 
 class NotificationSettings implements JsonSerializable
 {
+    public const array KEYS = [
+        'announcements',
+        'followingUpdates',
+        'receivedMessage',
+        'eventReminder',
+        'upcomingEvents',
+        'attendedEventUpdate',
+    ];
+
     public bool $announcements;
 
     public bool $followingUpdates;
@@ -86,32 +95,39 @@ class NotificationSettings implements JsonSerializable
         ];
     }
 
-    public function toggle(string $type): self
+    public static function isKnownKey(string $type): bool
     {
-        switch ($type) {
-            case 'announcements':
-                $this->announcements = !$this->announcements;
-                break;
-            case 'followingUpdates':
-                $this->followingUpdates = !$this->followingUpdates;
-                break;
-            case 'receivedMessage':
-                $this->receivedMessage = !$this->receivedMessage;
-                break;
-            case 'eventReminder':
-                $this->eventReminder = !$this->eventReminder;
-                break;
-            case 'upcomingEvents':
-                $this->upcomingEvents = !$this->upcomingEvents;
-                break;
-            case 'attendedEventUpdate':
-                $this->attendedEventUpdate = !$this->attendedEventUpdate;
-                break;
-            default:
-                throw new Exception(sprintf("Invalid type: '%s'", $type));
-        }
+        return in_array($type, self::KEYS, true);
+    }
+
+    /**
+     * @param list<string> $keys
+     *
+     * @return list<string>
+     */
+    public static function unknownKeys(array $keys): array
+    {
+        return array_values(array_filter($keys, static fn(string $key): bool => !self::isKnownKey($key)));
+    }
+
+    public function set(string $type, bool $value): self
+    {
+        match ($type) {
+            'announcements' => $this->announcements = $value,
+            'followingUpdates' => $this->followingUpdates = $value,
+            'receivedMessage' => $this->receivedMessage = $value,
+            'eventReminder' => $this->eventReminder = $value,
+            'upcomingEvents' => $this->upcomingEvents = $value,
+            'attendedEventUpdate' => $this->attendedEventUpdate = $value,
+            default => throw new InvalidArgumentException(sprintf("Invalid type: '%s'", $type)),
+        };
 
         return $this;
+    }
+
+    public function toggle(string $type): self
+    {
+        return $this->set($type, !$this->isActive($type));
     }
 
     public function isActive(string $type): bool
@@ -123,7 +139,7 @@ class NotificationSettings implements JsonSerializable
             'eventReminder' => $this->eventReminder,
             'upcomingEvents' => $this->upcomingEvents,
             'attendedEventUpdate' => $this->attendedEventUpdate,
-            default => throw new Exception(sprintf("Invalid type: '%s'", $type)),
+            default => throw new InvalidArgumentException(sprintf("Invalid type: '%s'", $type)),
         };
     }
 }

@@ -39,6 +39,7 @@ readonly class CirculationNotificationProvider implements NotificationProviderIn
                 icon: 'fa-people-arrows',
                 route: 'app_circulation_dashboard',
                 routeParams: ['itemType' => $copy->getItemType()],
+                key: 'circulation_queue_waiting',
             );
         }
 
@@ -62,6 +63,7 @@ readonly class CirculationNotificationProvider implements NotificationProviderIn
                 icon: 'fa-handshake',
                 route: 'app_circulation_handover',
                 routeParams: $routeParams,
+                key: $isReceiver ? 'circulation_ready_for_you' : 'circulation_confirm_handover',
             );
         }
 
@@ -71,6 +73,7 @@ readonly class CirculationNotificationProvider implements NotificationProviderIn
                 icon: 'fa-comment',
                 route: 'app_circulation_handover',
                 routeParams: $routeParams,
+                key: 'circulation_new_message',
             );
         }
 

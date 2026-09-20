@@ -9,6 +9,7 @@ use App\Form\ChangePassword;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Member\BlockingService;
 use App\Service\Member\ConsentService;
+use App\Service\Notification\NotificationSettingsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,6 +29,7 @@ final class ConfigController extends AbstractController
         private readonly ActivityService $activityService,
         private readonly BlockingService $blockingService,
         private readonly ConsentService $consentService,
+        private readonly NotificationSettingsService $notificationSettings,
     ) {}
 
     #[Route('/profile/config', name: 'app_profile_config')]
@@ -109,14 +111,10 @@ final class ConfigController extends AbstractController
         }
 
         $user = $this->getAuthedUser();
-        $setting = $user->getNotificationSettings()->toggle($type);
-        $user->setNotificationSettings($setting);
-
-        $this->em->persist($user);
-        $this->em->flush();
+        $newStatus = $this->notificationSettings->toggle($user, $type);
 
         if ($request->isXmlHttpRequest()) {
-            return new JsonResponse(['newStatus' => $setting->isActive($type)]);
+            return new JsonResponse(['newStatus' => $newStatus]);
         }
 
         return $this->redirectToRoute('app_profile_config');
