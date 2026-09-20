@@ -26,12 +26,13 @@ paths = [
     "tests/",
 ]
 includes = ["vendor"]
-# Generated files. `reference.php` says so in its own header, and the other three are Symfony Flex
-# recipe files it rewrites when a bundle or importmap entry changes - formatting them is undone on
-# the next `composer require`.
+# Generated files. `reference.php` says so in its own header, three more are Symfony Flex recipe
+# files it rewrites when a bundle or importmap entry changes, and `plugins.php` is written by the
+# installer and by every dev reset - formatting any of them is undone the next time it is written.
 excludes = [
     "config/bundles.php",
     "config/importmap.php",
+    "config/plugins.php",
     "config/preload.php",
     "config/reference.php",
 ]

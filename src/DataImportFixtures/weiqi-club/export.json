@@ -1380,7 +1380,7 @@
     ],
     "cms_pages": [
         {
-            "ref": 5,
+            "ref": 7,
             "slug": "index",
             "published": true,
             "titles": {
@@ -1659,7 +1659,7 @@
             ]
         },
         {
-            "ref": 6,
+            "ref": 8,
             "slug": "about",
             "published": true,
             "titles": {
@@ -1774,7 +1774,7 @@
             ]
         },
         {
-            "ref": 7,
+            "ref": 9,
             "slug": "rules",
             "published": true,
             "titles": {
@@ -1941,7 +1941,7 @@
             ]
         },
         {
-            "ref": 8,
+            "ref": 10,
             "slug": "directions",
             "published": true,
             "titles": {
