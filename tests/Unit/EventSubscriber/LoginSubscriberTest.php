@@ -2,34 +2,52 @@
 
 namespace Tests\Unit\EventSubscriber;
 
+use App\Entity\Session\Consent;
 use App\Entity\User;
+use App\Enum\ConsentType;
 use App\EventSubscriber\LoginSubscriber;
 use App\Service\Config\LocaleCookieService;
+use App\Service\Member\ConsentService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 
 class LoginSubscriberTest extends TestCase
 {
-    private function createSubscriber(bool $consentGranted = false): LoginSubscriber
+    private function createSubscriber(Request $request, bool $consentGranted = false): LoginSubscriber
     {
         $cookieService = $this->createStub(LocaleCookieService::class);
         $cookieService->method('isConsentGranted')->willReturn($consentGranted);
         $cookieService->method('createCookie')->willReturnCallback(static fn(string $locale): Cookie => new Cookie(LocaleCookieService::COOKIE_NAME, $locale));
 
-        return new LoginSubscriber($cookieService);
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        return new LoginSubscriber($cookieService, new ConsentService($requestStack));
     }
 
-    private function createLoginEvent(UserInterface $user, SessionInterface $session, ?Response $response = null): LoginSuccessEvent
+    private function createRequest(SessionInterface $session): Request
     {
         $request = new Request();
         $request->setSession($session);
-        $response ??= new Response();
 
+        return $request;
+    }
+
+    private function createSession(): Session
+    {
+        return new Session(new MockArraySessionStorage());
+    }
+
+    private function createLoginEvent(UserInterface $user, Request $request, ?Response $response): LoginSuccessEvent
+    {
         $event = $this->createStub(LoginSuccessEvent::class);
         $event->method('getUser')->willReturn($user);
         $event->method('getRequest')->willReturn($request);
@@ -38,127 +56,130 @@ class LoginSubscriberTest extends TestCase
         return $event;
     }
 
+    private function createUser(string $locale, bool $osmConsent): User
+    {
+        $user = new User();
+        $user->setLocale($locale);
+        $user->setOsmConsent($osmConsent);
+
+        return $user;
+    }
+
+    /** @return list<string> */
+    private function cookieNames(Response $response): array
+    {
+        return array_map(static fn(Cookie $cookie): string => $cookie->getName(), $response->headers->getCookies());
+    }
+
+    private function osmCookieValue(Response $response): ?string
+    {
+        foreach ($response->headers->getCookies() as $cookie) {
+            if ($cookie->getName() === Consent::TYPE_OSM) {
+                return $cookie->getValue();
+            }
+        }
+
+        return null;
+    }
+
     public function testGetSubscribedEventsReturnsLoginSuccessEvent(): void
     {
+        // Arrange & Act
         $events = LoginSubscriber::getSubscribedEvents();
 
+        // Assert
         static::assertArrayHasKey(LoginSuccessEvent::class, $events);
         static::assertSame('onLoginSuccess', $events[LoginSuccessEvent::class]);
     }
 
     public function testOnLoginSuccessReturnsEarlyWhenUserNotUserInstance(): void
     {
-        $subscriber = $this->createSubscriber();
+        // Arrange
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->never())->method('set');
+        $request = $this->createRequest($session);
+        $event = $this->createLoginEvent($this->createStub(UserInterface::class), $request, new Response());
 
-        $nonUserMock = $this->createStub(UserInterface::class);
-        $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->never())->method('set');
-
-        $event = $this->createLoginEvent($nonUserMock, $sessionMock);
-
-        $subscriber->onLoginSuccess($event);
+        // Act & Assert
+        $this->createSubscriber($request)->onLoginSuccess($event);
     }
 
     public function testOnLoginSuccessSetsSessionLocaleFromUser(): void
     {
-        $subscriber = $this->createSubscriber();
+        // Arrange
+        $session = $this->createSession();
+        $request = $this->createRequest($session);
+        $event = $this->createLoginEvent($this->createUser('de', false), $request, new Response());
 
-        $user = new User();
-        $user->setLocale('de');
-        $user->setOsmConsent(false);
+        // Act
+        $this->createSubscriber($request)->onLoginSuccess($event);
 
-        $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->once())->method('set')->with('_locale', 'de');
-
-        $event = $this->createLoginEvent($user, $sessionMock);
-
-        $subscriber->onLoginSuccess($event);
-    }
-
-    public function testOnLoginSuccessReturnsEarlyWhenUserHasNoOsmConsent(): void
-    {
-        $subscriber = $this->createSubscriber();
-
-        $user = new User();
-        $user->setLocale('en');
-        $user->setOsmConsent(false);
-
-        $sessionMock = $this->createMock(SessionInterface::class);
-        $sessionMock->expects($this->once())->method('set')->with('_locale', 'en');
-
-        $response = new Response();
-        $event = $this->createLoginEvent($user, $sessionMock, $response);
-
-        $subscriber->onLoginSuccess($event);
-
-        static::assertEmpty($response->headers->getCookies());
+        // Assert
+        static::assertSame('de', $session->get('_locale'));
     }
 
     public function testOnLoginSuccessSetsLocaleCookieWhenConsentGranted(): void
     {
-        $subscriber = $this->createSubscriber(consentGranted: true);
-
-        $user = new User();
-        $user->setLocale('de');
-        $user->setOsmConsent(false);
-
-        $sessionStub = $this->createStub(SessionInterface::class);
-
+        // Arrange
+        $session = $this->createSession();
+        $request = $this->createRequest($session);
         $response = new Response();
-        $event = $this->createLoginEvent($user, $sessionStub, $response);
+        $event = $this->createLoginEvent($this->createUser('de', false), $request, $response);
 
-        $subscriber->onLoginSuccess($event);
+        // Act
+        $this->createSubscriber($request, consentGranted: true)->onLoginSuccess($event);
 
-        $cookieNames = array_map(static fn($c) => $c->getName(), $response->headers->getCookies());
-        static::assertContains(LocaleCookieService::COOKIE_NAME, $cookieNames);
+        // Assert
+        static::assertContains(LocaleCookieService::COOKIE_NAME, $this->cookieNames($response));
     }
 
-    public function testOnLoginSuccessSetsConsentCookiesWhenUserHasOsmConsent(): void
-    {
-        $subscriber = $this->createSubscriber();
-
-        $user = new User();
-        $user->setLocale('en');
-        $user->setOsmConsent(true);
-
-        $sessionStub = $this->createStub(SessionInterface::class);
-        $sessionStub->method('get')->willReturn(null);
-
-        $response = new Response();
-        $event = $this->createLoginEvent($user, $sessionStub, $response);
-
-        $subscriber->onLoginSuccess($event);
-
-        $cookies = $response->headers->getCookies();
-        static::assertNotEmpty($cookies);
-
-        $cookieNames = array_map(static fn($c) => $c->getName(), $cookies);
-        static::assertContains('consent_cookies_osm', $cookieNames);
-        static::assertContains('consent_cookies', $cookieNames);
-    }
-
-    public function testOnLoginSuccessReturnsEarlyWhenResponseIsNull(): void
+    public function testOnLoginSuccessGrantsOsmConsentWhenUserHasIt(): void
     {
         // Arrange
-        $subscriber = $this->createSubscriber();
+        $session = $this->createSession();
+        $request = $this->createRequest($session);
+        $response = new Response();
+        $event = $this->createLoginEvent($this->createUser('en', true), $request, $response);
 
-        $user = new User();
-        $user->setLocale('en');
-        $user->setOsmConsent(true);
+        // Act
+        $this->createSubscriber($request)->onLoginSuccess($event);
 
-        $session = $this->createStub(SessionInterface::class);
-        $session->method('get')->willReturn(null);
+        // Assert
+        static::assertSame(ConsentType::Granted, Consent::getBySession($session)->getOsm());
+        static::assertSame('granted', $this->osmCookieValue($response));
+        static::assertContains(Consent::TYPE_COOKIES, $this->cookieNames($response));
+    }
 
-        $request = new Request();
-        $request->setSession($session);
+    public function testOnLoginSuccessRevokesOsmConsentWhenUserHasNone(): void
+    {
+        // Arrange
+        $session = $this->createSession();
+        $consent = new Consent();
+        $consent->setOsm(ConsentType::Granted);
+        $consent->save($session);
+        $request = $this->createRequest($session);
+        $response = new Response();
+        $event = $this->createLoginEvent($this->createUser('en', false), $request, $response);
 
-        $event = $this->createStub(LoginSuccessEvent::class);
-        $event->method('getUser')->willReturn($user);
-        $event->method('getRequest')->willReturn($request);
-        $event->method('getResponse')->willReturn(null);
+        // Act
+        $this->createSubscriber($request)->onLoginSuccess($event);
 
-        // Act / Assert
-        $subscriber->onLoginSuccess($event);
-        static::assertTrue(true);
+        // Assert
+        static::assertSame(ConsentType::Denied, Consent::getBySession($session)->getOsm());
+        static::assertSame('denied', $this->osmCookieValue($response));
+    }
+
+    public function testOnLoginSuccessWritesSessionConsentWhenResponseIsNull(): void
+    {
+        // Arrange
+        $session = $this->createSession();
+        $request = $this->createRequest($session);
+        $event = $this->createLoginEvent($this->createUser('en', true), $request, null);
+
+        // Act
+        $this->createSubscriber($request)->onLoginSuccess($event);
+
+        // Assert
+        static::assertSame(ConsentType::Granted, Consent::getBySession($session)->getOsm());
     }
 }
