@@ -43,7 +43,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Announcement has already been sent');
+        $this->expectExceptionMessageIsOrContains('Announcement has already been sent');
 
         // Act
         $subject->send($announcement);
@@ -68,7 +68,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Announcement must have a CMS page linked before sending');
+        $this->expectExceptionMessageIsOrContains('Announcement must have a CMS page linked before sending');
 
         // Act
         $subject->send($announcement);
@@ -326,7 +326,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Announcement email template not found in database');
+        $this->expectExceptionMessageIsOrContains('Announcement email template not found in database');
 
         // Act
         $subject->renderPreview($announcement);

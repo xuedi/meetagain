@@ -24,9 +24,30 @@ shift
 
 status=0
 
+# `guard` enforces the module perimeter, which only core declares. Running it against a config
+# with no `[guard]` section prints four "checks were skipped" warnings and checks nothing, so the
+# run is skipped instead - and picked up automatically if a plugin ever declares its own rules.
+has_guard_rules() {
+    grep -qE '^\[+guard' "$1" && return 0
+    sed -n 's/^extends *= *\[\{0,1\}"\([^"]*\)".*/\1/p' "$1" | while read -r parent; do
+        [ -n "$parent" ] || continue
+        case "$parent" in
+            /*) resolved="$parent" ;;
+            *)  resolved="$(dirname "$1")/$parent" ;;
+        esac
+        [ -f "$resolved" ] && grep -qE '^\[+guard' "$resolved" && exit 0
+    done
+    [ $? -eq 0 ] && return 0
+    return 1
+}
+
 run() {
     config="$1"
     shift
+    if [ "$command" = 'guard' ] && ! has_guard_rules "$config"; then
+        printf '\n\033[1m> mago %s (%s)\033[0m\n  no [guard] rules - skipped\n' "$command" "$config"
+        return
+    fi
     printf '\n\033[1m> mago %s (%s)\033[0m\n' "$command" "$config"
     vendor/bin/mago --config="$config" "$command" "$@" || status=1
 }

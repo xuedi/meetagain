@@ -85,7 +85,7 @@ class TransferServiceTest extends TestCase
     {
         // Assert
         $this->expectException(ImportException::class);
-        $this->expectExceptionMessage('glossary_import.error_empty');
+        $this->expectExceptionMessageIsOrContains('glossary_import.error_empty');
 
         // Act
         $this->service()->parse("#separator:tab\n\n");
@@ -98,7 +98,7 @@ class TransferServiceTest extends TestCase
 
         // Assert
         $this->expectException(ImportException::class);
-        $this->expectExceptionMessage('glossary_import.error_too_many_rows');
+        $this->expectExceptionMessageIsOrContains('glossary_import.error_too_many_rows');
 
         // Act
         $this->service()->parse($content);

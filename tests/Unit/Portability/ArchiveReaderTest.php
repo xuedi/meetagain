@@ -114,7 +114,7 @@ final class ArchiveReaderTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid export format');
+        $this->expectExceptionMessageIsOrContains('Invalid export format');
 
         // Act
         $this->reader()->read($zipPath);
@@ -124,7 +124,7 @@ final class ArchiveReaderTest extends TestCase
     {
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('export.json not found');
+        $this->expectExceptionMessageIsOrContains('export.json not found');
 
         // Act
         $this->reader()->read($this->directory);

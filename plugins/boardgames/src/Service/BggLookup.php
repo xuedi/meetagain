@@ -195,6 +195,7 @@ class BggLookup implements GameMetadataLookupInterface
 
     private function attributeInt(SimpleXMLElement $item, string $tag): ?int
     {
+        // @mago-expect analyzer:string-member-selector
         return $this->intOrNull((string) ($item->{$tag}['value'] ?? ''));
     }
 

@@ -106,7 +106,7 @@ class CmsBlockServiceTest extends TestCase
         $subject = new CmsBlockService($emStub, $blockRepoStub, $this->makeHydrator(), $dispatcherMock);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not load the page owning this block');
+        $this->expectExceptionMessageIsOrContains('Could not load the page owning this block');
 
         // Act
         $subject->updateBlock($block, CmsBlockType::Text, ['title' => '', 'content' => '']);
@@ -146,7 +146,7 @@ class CmsBlockServiceTest extends TestCase
         $subject = new CmsBlockService($emMock, $blockRepoStub, $this->makeHydrator(), $dispatcherMock);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not load the page owning this block');
+        $this->expectExceptionMessageIsOrContains('Could not load the page owning this block');
 
         // Act
         $subject->deleteBlock(new CmsBlock());

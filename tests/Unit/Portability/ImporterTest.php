@@ -114,7 +114,7 @@ final class ImporterTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Invalid export format');
+        $this->expectExceptionMessageIsOrContains('Invalid export format');
 
         // Act
         $importer->import($this->zipPath);
@@ -128,7 +128,7 @@ final class ImporterTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('app:install:seed');
+        $this->expectExceptionMessageIsOrContains('app:install:seed');
 
         // Act
         $importer->import($this->zipPath);
@@ -178,7 +178,7 @@ final class ImporterTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('exported_at');
+        $this->expectExceptionMessageIsOrContains('exported_at');
 
         // Act
         $importer->import($this->zipPath, shiftDates: true);

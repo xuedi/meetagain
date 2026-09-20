@@ -122,7 +122,7 @@ class ChangeProposalServiceTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('category is gone');
+        $this->expectExceptionMessageIsOrContains('category is gone');
 
         // Act
         $service->applyField($proposal, 'category', $this->user(9));

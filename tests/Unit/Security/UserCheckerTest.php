@@ -80,7 +80,7 @@ class UserCheckerTest extends TestCase
 
         // Assert
         $this->expectException(CustomUserMessageAccountStatusException::class);
-        $this->expectExceptionMessage($expected);
+        $this->expectExceptionMessageIsOrContains($expected);
 
         // Act
         $subject->checkPostAuth($inactiveUser);

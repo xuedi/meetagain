@@ -17,6 +17,8 @@ empty-line-after-opening-tag = false
 
 [linter]
 integrations = ["symfony", "php-unit"]
+# No `minimum-fail-level` here: the linter has no such config key (it silently ignores one) and
+# already exits non-zero on a warning by default. Only the analyzer needs it set, below.
 
 # Raised from default 12 — controllers, services and test classes legitimately accumulate methods
 [linter.rules.too-many-methods]
@@ -117,6 +119,13 @@ enabled = false
 enabled = false
 
 [analyzer]
+# Fail the run on a warning, not only on an error - the analyzer defaults to `error`, so without
+# this a warning prints and the build still passes. The tree is at zero findings on every level,
+# so this is a ratchet: anything new has to be fixed, suppressed at the line with a `@mago-expect`
+# naming the reason, or deliberately ignored below. "note" is the strictest setting and would make
+# help-level style suggestions blocking too.
+minimum-fail-level = "warning"
+
 # `excludes` is deliberately not set here: the analyzer matches it as a literal path prefix, not a
 # glob, so `**/tests/Unit/` does not work and every entry would have to name a specific directory.
 # Each config that extends this file lists its own - see the `[analyzer]` block in mago.toml.
@@ -182,6 +191,20 @@ ignore = [
     # template-constraint-violation — Enum::getTranslatedList() returns mixed; fixing
     # requires adding generic @return annotations throughout enum classes.
     "template-constraint-violation",
+
+    # redundant-* — the analyzer treats docblock and extension-stub types as ground truth and then
+    # calls the code guarding against them redundant. Checked against the real signatures, it is
+    # wrong far more often than it is right: it reports `(string) $user->getName()` as redundant on
+    # a `?string`, `(string) $response->getContent()` on a `string|false`, and
+    # `(string) $request->query->get(...)` on a nullable InputBag read - following any of those
+    # turns '' into null or false. Its linter twin `no-redundant-nullsafe` is disabled above for
+    # the same reason, after its auto-fix stripped `?->` off a nullable `getType()`.
+    "redundant-cast",
+    "redundant-null-coalesce",
+    "redundant-nullsafe-operator",
+    "redundant-type-comparison",
+    "redundant-logical-operation",
+    "redundant-comparison",
 
     # Style preferences — not bugs.
     "non-documented-method",

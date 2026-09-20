@@ -45,7 +45,7 @@ class LanguageRuntimeTest extends TestCase
         $this->requestStackStub->method('getCurrentRequest')->willReturn(null);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Could not get current locale');
+        $this->expectExceptionMessageIsOrContains('Could not get current locale');
 
         $this->subject->getCurrentLocale();
     }

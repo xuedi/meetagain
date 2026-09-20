@@ -91,7 +91,7 @@ class EmailTemplateServiceTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Email template "welcome" not found');
+        $this->expectExceptionMessageIsOrContains('Email template "welcome" not found');
 
         // Act
         $this->subject->getTemplateContent(EmailType::Welcome->value, 'en');
@@ -108,7 +108,7 @@ class EmailTemplateServiceTest extends TestCase
 
         // Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('No translation found for email template');
+        $this->expectExceptionMessageIsOrContains('No translation found for email template');
 
         // Act
         $this->subject->getTemplateContent(EmailType::Welcome->value, 'en');

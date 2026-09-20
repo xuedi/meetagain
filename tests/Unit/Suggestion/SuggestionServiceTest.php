@@ -62,7 +62,7 @@ class SuggestionServiceTest extends TestCase
 
         // Assert
         $this->expectException(SuggestionException::class);
-        $this->expectExceptionMessage('that venue already exists');
+        $this->expectExceptionMessageIsOrContains('that venue already exists');
 
         // Act
         $service->propose('location', $this->user(5), new stdClass());

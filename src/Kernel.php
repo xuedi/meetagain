@@ -39,6 +39,7 @@ class Kernel extends BaseKernel
             }
 
             // @mago-expect analyzer:unsafe-instantiation
+            // @mago-expect analyzer:deprecated-class
             yield new $class();
         }
     }

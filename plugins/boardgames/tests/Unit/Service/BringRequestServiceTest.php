@@ -39,7 +39,7 @@ class BringRequestServiceTest extends TestCase
         $requester = $this->user(7);
 
         // Assert
-        $this->expectExceptionMessage('boardgames_tile.flash_cannot_ask_self');
+        $this->expectExceptionMessageIsOrContains('boardgames_tile.flash_cannot_ask_self');
 
         // Act
         $service->ask(new Event(), new Game(), $requester, $requester, null);
@@ -52,7 +52,7 @@ class BringRequestServiceTest extends TestCase
         $service = $this->service($ownership, null);
 
         // Assert
-        $this->expectExceptionMessage('boardgames_tile.flash_owner_not_askable');
+        $this->expectExceptionMessageIsOrContains('boardgames_tile.flash_owner_not_askable');
 
         // Act
         $service->ask(new Event(), new Game(), $this->user(1), $this->user(2), null);
@@ -65,7 +65,7 @@ class BringRequestServiceTest extends TestCase
         $service = $this->service($ownership, null);
 
         // Assert
-        $this->expectExceptionMessage('boardgames_tile.flash_owner_not_askable');
+        $this->expectExceptionMessageIsOrContains('boardgames_tile.flash_owner_not_askable');
 
         // Act
         $service->ask(new Event(), new Game(), $this->user(1), $this->user(2), null);
@@ -77,7 +77,7 @@ class BringRequestServiceTest extends TestCase
         $service = $this->service(null, null);
 
         // Assert
-        $this->expectExceptionMessage('boardgames_tile.flash_owner_not_askable');
+        $this->expectExceptionMessageIsOrContains('boardgames_tile.flash_owner_not_askable');
 
         // Act
         $service->ask(new Event(), new Game(), $this->user(1), $this->user(2), null);
@@ -90,7 +90,7 @@ class BringRequestServiceTest extends TestCase
         $service = $this->service($this->askableOwnership(), $existing);
 
         // Assert
-        $this->expectExceptionMessage('boardgames_tile.flash_request_already_open');
+        $this->expectExceptionMessageIsOrContains('boardgames_tile.flash_request_already_open');
 
         // Act
         $service->ask(new Event(), new Game(), $this->user(1), $this->user(2), null);
@@ -103,7 +103,7 @@ class BringRequestServiceTest extends TestCase
         $service = $this->service($this->askableOwnership(), $existing);
 
         // Assert
-        $this->expectExceptionMessage('boardgames_tile.flash_request_declined_before');
+        $this->expectExceptionMessageIsOrContains('boardgames_tile.flash_request_declined_before');
 
         // Act
         $service->ask(new Event(), new Game(), $this->user(1), $this->user(2), null);
@@ -178,7 +178,7 @@ class BringRequestServiceTest extends TestCase
         $service = $this->service($this->askableOwnership(), null);
 
         // Assert
-        $this->expectExceptionMessage('boardgames_tile.flash_request_closed');
+        $this->expectExceptionMessageIsOrContains('boardgames_tile.flash_request_closed');
 
         // Act
         $service->decline($request);

@@ -28,7 +28,7 @@ class PreviewSweepServiceTest extends TestCase
 
         // Act & Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('refuses to run in "prod"');
+        $this->expectExceptionMessageIsOrContains('refuses to run in "prod"');
         $service->sweep();
     }
 
@@ -153,7 +153,7 @@ class PreviewSweepServiceTest extends TestCase
 
         // Act & Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unknown email type "nope"');
+        $this->expectExceptionMessageIsOrContains('Unknown email type "nope"');
         $service->sweep(['nope']);
     }
 
@@ -164,7 +164,7 @@ class PreviewSweepServiceTest extends TestCase
 
         // Act & Assert
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Unknown language "kl"');
+        $this->expectExceptionMessageIsOrContains('Unknown language "kl"');
         $service->sweep([], ['kl']);
     }
 
