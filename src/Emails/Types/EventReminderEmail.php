@@ -27,6 +27,8 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmailInterface
 {
+    public const string WINDOW = 'PT5H';
+
     public function __construct(
         BlocklistCheckerInterface $blocklist,
         MockSampleFactory $samples,
@@ -126,7 +128,7 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
 
     public function getDueContexts(DateTimeImmutable $now): array
     {
-        $events = $this->eventRepo->findEventsNeedingReminder($now, $now->add(new DateInterval('PT5H')));
+        $events = $this->eventRepo->findEventsNeedingReminder($now, $now->add(new DateInterval(self::WINDOW)));
 
         $contexts = [];
         foreach ($events as $event) {
@@ -151,7 +153,7 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
 
     public function getPlannedItems(DateTimeImmutable $from, DateTimeImmutable $to): array
     {
-        $events = $this->eventRepo->findEventsNeedingReminder($from->add(new DateInterval('PT5H')), $to->add(new DateInterval('PT5H')));
+        $events = $this->eventRepo->findEventsNeedingReminder($from->add(new DateInterval(self::WINDOW)), $to->add(new DateInterval(self::WINDOW)));
 
         $items = [];
         foreach ($events as $event) {
@@ -170,7 +172,7 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
             $items[] = new ScheduledMailItem(
                 mailType: EmailType::EventReminder->value,
                 label: 'Event: ' . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
-                expectedTime: DateTimeImmutable::createFromMutable($event->getStart())->sub(new DateInterval('PT5H')),
+                expectedTime: DateTimeImmutable::createFromMutable($event->getStart())->sub(new DateInterval(self::WINDOW)),
                 expectedRecipients: $eligibleCount,
             );
         }
