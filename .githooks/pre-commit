@@ -12,4 +12,4 @@
 #
 # Bypass once with: git commit --no-verify
 
-exec bin/commit-hooks.sh
+exec bin/commit-hooks.sh --commit

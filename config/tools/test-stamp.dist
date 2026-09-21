@@ -1,0 +1,27 @@
+# test-stamp fingerprints every file that can change a test result, so the pre-commit hook can
+# skip the expensive hooks while the working tree still matches the last green `just test`.
+#
+# Extend this through the optional config/tools/test-stamp.local overlay: list keys concatenate
+# (.dist then .local), scalar keys take the overlay's value. Any change here invalidates the stamp.
+
+# Directories walked with their repository's git ignore rules (.gitignore, .git/info/exclude).
+# A nested checkout the outer repository excludes is invisible from `.` - add it as its own root.
+SCAN_ROOTS=.
+
+# Git-ignored paths that still change a test result: the installed hooks, the recipes plugins
+# contribute, the enabled-plugin lists and the local environment files. Walked without ignore
+# rules. Keep out anything a test run writes, or the tree never holds still long enough to be
+# stamped.
+INCLUDE_IGNORED=bin/commit-hooks,.just/local.just,.env.local,config/plugins.php,config/plugins_test.php,.env.test.local
+
+# Path prefixes whose edits cannot change the result of a skipped hook. A wrong entry here is a
+# false "fresh", so only list what is checked solely by an ALWAYS_RUN hook.
+EXCLUDE=docs/src
+
+# Hooks (basename without .bash) that run on every commit even when the stamp is fresh. The
+# markdown guards check staged files only, so a green `just test` says nothing about the
+# markdown in the commit; all four cost milliseconds.
+ALWAYS_RUN=01-leak-guard,04-docs-guard,05-mermaid-guard,06-comment-guard
+
+# The stamp, relative to the repo root. Gitignored.
+STAMP_FILE=testPassing.lock
