@@ -73,6 +73,9 @@ class SupportRequest
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?User $invitedAdminsBy = null;
 
+    #[ORM\Column(length: 5, nullable: true)]
+    private ?string $locale = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -290,6 +293,18 @@ class SupportRequest
     public function canInviteAdmins(): bool
     {
         return $this->audience === SupportAudience::Organizer && !$this->hasInvitedAdmins();
+    }
+
+    public function getLocale(): ?string
+    {
+        return $this->locale;
+    }
+
+    public function setLocale(?string $locale): static
+    {
+        $this->locale = $locale;
+
+        return $this;
     }
 
     public function isNew(): bool

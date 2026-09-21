@@ -105,6 +105,7 @@ class EmailTypesTest extends TestCase
                 $this->createStub(AppStateService::class),
                 [],
                 new AudienceFilterService([]),
+                $this->createStub(TranslatorInterface::class),
             ),
             'VerificationRequest' => new VerificationRequestEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host),
             'Welcome' => new WelcomeEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host),

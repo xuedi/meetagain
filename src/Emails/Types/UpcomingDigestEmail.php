@@ -27,6 +27,7 @@ use DateInterval;
 use DateTimeImmutable;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEmailInterface
 {
@@ -46,6 +47,7 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
         #[AutowireIterator(UserEventDigestFilterInterface::class)]
         private iterable $digestFilters,
         private AudienceFilterService $audience,
+        private TranslatorInterface $translator,
     ) {
         parent::__construct($blocklist, $samples);
     }
@@ -236,6 +238,8 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
     {
         $lang = $user->getLocale();
         $host = $this->config->getHost();
+        $moreInfo = htmlspecialchars($this->translator->trans('email_upcoming_events.button_more_info', [], null, $lang));
+        $rsvp = htmlspecialchars($this->translator->trans('email_upcoming_events.button_rsvp', [], null, $lang));
 
         $html = '';
         foreach ($events as $event) {
@@ -245,15 +249,14 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
             $url = sprintf('%s/%s/event/%s', $host, $lang, $event->getId());
 
             $html .= sprintf(
-                '<div class="card">'
-                . '<p><strong>%s</strong></p><p>%s - %s</p>'
-                . '<p><a href="%s">More Info</a> &nbsp; <a href="%s#rsvp">I Want to Go</a></p>'
-                . '</div>',
+                '<div class="card">' . '<p><strong>%s</strong></p><p>%s - %s</p>' . '<p><a href="%s">%s</a> &nbsp; <a href="%s#rsvp">%s</a></p>' . '</div>',
                 $title,
                 $date,
                 $location,
                 $url,
+                $moreInfo,
                 $url,
+                $rsvp,
             );
         }
 

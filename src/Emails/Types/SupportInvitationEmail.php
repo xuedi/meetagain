@@ -83,7 +83,7 @@ readonly class SupportInvitationEmail extends EmailAbstract
             $email = new TemplatedEmail();
             $email->from($this->config->getMailerAddress());
             $email->to((string) $admin->getEmail());
-            $email->locale('en');
+            $email->locale($admin->getLocale());
             $email->context([
                 'invitedBy' => $invitedBy instanceof User ? $invitedBy->getName() : '',
                 'name' => $request->getRequesterLabel(),

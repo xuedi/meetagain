@@ -221,6 +221,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->createStub(AppStateService::class),
             [],
             new AudienceFilterService([]),
+            $this->createStub(TranslatorInterface::class),
         );
 
         static::assertFalse($email->guardCheck([

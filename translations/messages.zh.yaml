@@ -478,6 +478,7 @@ profile_review:
     link_details: '详情'
     change_proposal_description: '%proposer% 对 %target% 提出了修改建议'
     suggestion_description: '%proposer% 建议新增 %target%'
+    member_approval_description: '%name% 正在等待审核'
 review:
     page_title: '修改建议'
     empty_state: '没有待处理的建议。'
@@ -691,6 +692,14 @@ email_event_update:
     line_location: '地点已从 <b>%before%</b> 改为 <b>%after%</b>。'
     line_canceled: '活动已<b>取消</b>。'
     line_uncanceled: '活动不再处于取消状态。'
+email_upcoming_events:
+    button_more_info: '了解更多'
+    button_rsvp: '我要参加'
+notifications:
+    section_pending_approval: '等待审核的成员'
+    section_reported_images: '被举报的图片'
+    item_reported_image: '图片 #%image% 被举报，原因：%reason%'
+    image_deleted: '已删除'
 town_hall:
     forum_page_title: '论坛'
     forum_sidebar_heading: '话题'

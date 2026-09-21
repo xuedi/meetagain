@@ -2,27 +2,29 @@
 
 namespace App\Service\Notification\Admin;
 
-use App\Enum\UserStatus;
+use App\Entity\User;
+use App\Filter\Member\PendingApprovalFilterService;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 readonly class UserPendingApprovalNotificationProvider implements AdminNotificationProviderInterface
 {
     public function __construct(
         private UserRepository $userRepository,
+        private PendingApprovalFilterService $pendingApproval,
     ) {}
 
-    public function getSection(): string
+    public function getSection(): TranslatableInterface
     {
-        return 'Users Pending Approval';
+        return new TranslatableMessage('notifications.section_pending_approval');
     }
 
-    public function getPendingItems(): array
+    public function getPendingItems(User $recipient): array
     {
-        $users = $this->userRepository->findByStatus(UserStatus::EmailVerified);
         $items = [];
-
-        foreach ($users as $user) {
+        foreach ($this->pendingApproval->pendingFor($recipient) as $user) {
             $items[] = new AdminNotificationItem(label: sprintf('%s (%s)', $user->getName(), $user->getEmail()), route: 'app_admin_member');
         }
 

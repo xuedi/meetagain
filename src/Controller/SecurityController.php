@@ -23,12 +23,14 @@ use App\Repository\EmailBlocklistRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Member\ConsentService;
 use App\Service\Member\PasswordResetService;
+use App\Service\Member\RegistrationApprovalProviderInterface;
 use App\Service\Security\LoginGuard;
 use App\Service\Security\SecurityService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -43,6 +45,7 @@ final class SecurityController extends AbstractController
     public const string LOGIN_ROUTE = 'app_login';
     private const int USER_AGENT_MAX = 512;
 
+    /** @param iterable<RegistrationApprovalProviderInterface> $registrationApprovalProviders */
     public function __construct(
         private readonly ActivityService $activityService,
         private readonly VerificationRequestEmail $verificationRequestEmail,
@@ -62,6 +65,8 @@ final class SecurityController extends AbstractController
         private readonly RateLimiterFactoryInterface $registrationLimiter,
         private readonly SecurityService $securityService,
         private readonly LoginGuard $loginGuard,
+        #[AutowireIterator(RegistrationApprovalProviderInterface::class)]
+        private readonly iterable $registrationApprovalProviders,
     ) {}
 
     #[Route(path: '/login', name: self::LOGIN_ROUTE, defaults: [LoginAttemptSubscriber::ROUTE_DEFAULT => true])]
@@ -96,17 +101,18 @@ final class SecurityController extends AbstractController
             throw $this->createAccessDeniedException('Invalid CSRF token.');
         }
 
-        $user = $this->getAuthedUser();
-        $osm = $user->isOsmConsent() ? ConsentType::Granted : ConsentType::Denied;
+        $osmConsent = $this->getAuthedUser()->isOsmConsent();
 
         $this->security->logout(false);
 
         $consent = Consent::createByCookies($request->cookies);
         $consent->setCookies(ConsentType::Granted);
-        $consent->setOsm($osm);
         $consent->save($request->getSession());
 
-        return $this->redirectToRoute('app_login');
+        $response = $this->redirectToRoute('app_login');
+        $this->consentService->setShowOsm($osmConsent, $response);
+
+        return $response;
     }
 
     #[Route('/register', name: 'app_register')]
@@ -184,7 +190,7 @@ final class SecurityController extends AbstractController
         $user->setRegcodeExpiresAt(null);
         $this->activityService->log(RegistrationEmailConfirmed::TYPE, $user, []);
 
-        if ($this->configService->isAutomaticRegistration()) {
+        if (!$this->requiresApproval($user)) {
             $user->setStatus(UserStatus::Active);
             $em->persist($user);
             $em->flush();
@@ -199,6 +205,18 @@ final class SecurityController extends AbstractController
         $em->flush();
 
         return $this->render('security/register_success.html.twig');
+    }
+
+    private function requiresApproval(User $user): bool
+    {
+        foreach ($this->registrationApprovalProviders as $provider) {
+            $answer = $provider->requiresApproval($user);
+            if ($answer !== null) {
+                return $answer;
+            }
+        }
+
+        return !$this->configService->isAutomaticRegistration();
     }
 
     #[Route(path: '/reset', name: 'app_reset')]

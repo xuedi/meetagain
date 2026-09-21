@@ -478,6 +478,7 @@ profile_review:
     link_details: 'Details'
     change_proposal_description: '%proposer% hat eine Änderung für %target% vorgeschlagen'
     suggestion_description: '%proposer% hat %target% vorgeschlagen'
+    member_approval_description: '%name% wartet auf Freischaltung'
 review:
     page_title: 'Vorgeschlagene Änderungen'
     empty_state: 'Keine offenen Vorschläge.'
@@ -691,6 +692,14 @@ email_event_update:
     line_location: 'Veranstaltungsort geändert von <b>%before%</b> auf <b>%after%</b>.'
     line_canceled: 'Die Veranstaltung wurde <b>abgesagt</b>.'
     line_uncanceled: 'Die Veranstaltung ist nicht mehr abgesagt.'
+email_upcoming_events:
+    button_more_info: 'Mehr erfahren'
+    button_rsvp: 'Ich bin dabei'
+notifications:
+    section_pending_approval: 'Mitglieder warten auf Freischaltung'
+    section_reported_images: 'Gemeldete Bilder'
+    item_reported_image: 'Bild #%image% gemeldet wegen: %reason%'
+    image_deleted: 'gelöscht'
 town_hall:
     forum_page_title: 'Forum'
     forum_sidebar_heading: 'Themen'

@@ -3,20 +3,27 @@
 namespace Tests\Unit\Service\Notification;
 
 use App\Entity\User;
+use App\Enum\UserRole;
+use App\Filter\Member\PendingApprovalFilterService;
 use App\Repository\UserRepository;
 use App\Service\Notification\Admin\UserPendingApprovalNotificationProvider;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class UserPendingApprovalNotificationProviderTest extends TestCase
 {
     public function testGetSectionReturnsExpectedString(): void
     {
         // Arrange
-        $provider = new UserPendingApprovalNotificationProvider(userRepository: $this->createStub(UserRepository::class));
+        $provider = $this->provider($this->createStub(UserRepository::class));
 
-        // Act & Assert
-        static::assertSame('Users Pending Approval', $provider->getSection());
+        // Act
+        $section = $provider->getSection();
+
+        // Assert
+        static::assertInstanceOf(TranslatableMessage::class, $section);
+        static::assertSame('notifications.section_pending_approval', $section->getMessage());
     }
 
     public function testGetPendingItemsWithEmptyUserListReturnsEmptyArray(): void
@@ -25,10 +32,10 @@ class UserPendingApprovalNotificationProviderTest extends TestCase
         $repoStub = $this->createStub(UserRepository::class);
         $repoStub->method('findByStatus')->willReturn([]);
 
-        $provider = new UserPendingApprovalNotificationProvider(userRepository: $repoStub);
+        $provider = $this->provider($repoStub);
 
         // Act & Assert
-        static::assertSame([], $provider->getPendingItems());
+        static::assertSame([], $provider->getPendingItems($this->admin()));
     }
 
     public function testGetPendingItemsWithOneUserReturnsItemWithNameAndEmail(): void
@@ -41,10 +48,10 @@ class UserPendingApprovalNotificationProviderTest extends TestCase
         $repoStub = $this->createStub(UserRepository::class);
         $repoStub->method('findByStatus')->willReturn([$user]);
 
-        $provider = new UserPendingApprovalNotificationProvider(userRepository: $repoStub);
+        $provider = $this->provider($repoStub);
 
         // Act
-        $items = $provider->getPendingItems();
+        $items = $provider->getPendingItems($this->admin());
 
         // Assert
         static::assertCount(1, $items);
@@ -66,10 +73,10 @@ class UserPendingApprovalNotificationProviderTest extends TestCase
         $repoStub = $this->createStub(UserRepository::class);
         $repoStub->method('findByStatus')->willReturn([$user1, $user2]);
 
-        $provider = new UserPendingApprovalNotificationProvider(userRepository: $repoStub);
+        $provider = $this->provider($repoStub);
 
         // Act & Assert
-        static::assertCount(2, $provider->getPendingItems());
+        static::assertCount(2, $provider->getPendingItems($this->admin()));
     }
 
     public function testGetLatestPendingAtDelegatesToRepo(): void
@@ -80,9 +87,22 @@ class UserPendingApprovalNotificationProviderTest extends TestCase
         $repoMock = $this->createMock(UserRepository::class);
         $repoMock->expects($this->once())->method('getLatestPendingCreatedAt')->willReturn($date);
 
-        $provider = new UserPendingApprovalNotificationProvider(userRepository: $repoMock);
+        $provider = $this->provider($repoMock);
 
         // Act & Assert
         static::assertSame($date, $provider->getLatestPendingAt());
+    }
+
+    private function provider(UserRepository $repository): UserPendingApprovalNotificationProvider
+    {
+        return new UserPendingApprovalNotificationProvider($repository, new PendingApprovalFilterService([], $repository));
+    }
+
+    private function admin(): User
+    {
+        $admin = $this->createStub(User::class);
+        $admin->method('getRole')->willReturn(UserRole::Admin);
+
+        return $admin;
     }
 }

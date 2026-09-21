@@ -184,6 +184,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(AppStateService::class),
             [],
             new AudienceFilterService([]),
+            $this->createStub(TranslatorInterface::class),
         );
 
         $now = new DateTimeImmutable(self::NOW);

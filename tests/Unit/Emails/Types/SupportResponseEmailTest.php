@@ -42,7 +42,7 @@ class SupportResponseEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config);
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'en');
 
         // Act
         $emailType->send(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
@@ -57,6 +57,34 @@ class SupportResponseEmailTest extends TestCase
         static::assertArrayHasKey('createdAt', $context);
     }
 
+    public function testARequestWithNoLanguageAndNoRequesterFallsBackToTheInstallationDefault(): void
+    {
+        // Arrange
+        $config = $this->createStub(ConfigService::class);
+        $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
+        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklist->method('isBlocked')->willReturn(false);
+
+        $enqueued = null;
+        $queue = $this->createStub(EmailQueueInterface::class);
+        $queue
+            ->method('enqueue')
+            ->willReturnCallback(static function ($source, TemplatedEmail $email) use (&$enqueued): bool {
+                $enqueued = $email;
+
+                return true;
+            });
+
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'fr');
+
+        // Act
+        $emailType->send(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
+
+        // Assert
+        static::assertInstanceOf(TemplatedEmail::class, $enqueued);
+        static::assertSame('fr', $enqueued->getLocale());
+    }
+
     public function testSendSkipsWhenRecipientBlocklisted(): void
     {
         // Arrange
@@ -69,7 +97,7 @@ class SupportResponseEmailTest extends TestCase
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->never())->method('enqueue');
 
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config);
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'en');
 
         // Act
         $emailType->send(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
@@ -83,6 +111,7 @@ class SupportResponseEmailTest extends TestCase
             $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
+            'en',
         );
 
         // Act & Assert
@@ -101,7 +130,7 @@ class SupportResponseEmailTest extends TestCase
         $queue = $this->createMock(EmailQueueInterface::class);
         $queue->expects($this->never())->method('enqueue');
 
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config);
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'en');
 
         // Act
         $emailType->send(['request' => $this->makeRequest(verified: false), 'response' => 'Here is your answer.']);
@@ -115,6 +144,7 @@ class SupportResponseEmailTest extends TestCase
             $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
+            'en',
         );
 
         // Act & Assert

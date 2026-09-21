@@ -4,6 +4,7 @@ namespace App\Service\Admin;
 
 use App\CronTaskInterface;
 use App\Emails\Types\AdminNotificationEmail;
+use App\Entity\User;
 use App\Enum\CronTaskStatus;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
@@ -18,6 +19,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 readonly class AdminNotificationService implements CronTaskInterface
@@ -37,6 +40,7 @@ readonly class AdminNotificationService implements CronTaskInterface
         private ConfigService $configService,
         private LoggerInterface $logger,
         private ClockInterface $clock,
+        private TranslatorInterface $translator,
     ) {}
 
     public function getIdentifier(): string
@@ -83,21 +87,27 @@ readonly class AdminNotificationService implements CronTaskInterface
             return 'no new items';
         }
 
-        $sections = $this->collectSections();
-        if ($sections === []) {
-            return 'no items';
+        $sent = 0;
+        foreach ($this->userRepository->findAdminUsers() as $recipient) {
+            $sections = $this->collectSections($recipient);
+            if ($sections === []) {
+                continue;
+            }
+
+            $this->adminNotificationEmail->send([
+                'user' => $recipient,
+                'sectionsHtml' => $this->renderSectionsHtml($sections, $recipient->getLocale()),
+            ]);
+            ++$sent;
         }
 
-        $sectionsHtml = $this->renderSectionsHtml($sections);
-        $recipients = $this->userRepository->findAdminUsers();
-
-        foreach ($recipients as $recipient) {
-            $this->adminNotificationEmail->send(['user' => $recipient, 'sectionsHtml' => $sectionsHtml]);
+        if ($sent === 0) {
+            return 'no items';
         }
 
         $this->updateLastSentAt();
 
-        return sprintf('%d sent', count($recipients));
+        return sprintf('%d sent', $sent);
     }
 
     private function getLatestPendingAt(): ?DateTimeImmutable
@@ -116,11 +126,11 @@ readonly class AdminNotificationService implements CronTaskInterface
     /**
      * @return AdminNotificationSection[]
      */
-    private function collectSections(): array
+    private function collectSections(User $recipient): array
     {
         $sections = [];
         foreach ($this->providers as $provider) {
-            $items = $provider->getPendingItems();
+            $items = $provider->getPendingItems($recipient);
             if ($items !== []) {
                 $sections[] = new AdminNotificationSection($provider->getSection(), $items);
             }
@@ -132,18 +142,23 @@ readonly class AdminNotificationService implements CronTaskInterface
     /**
      * @param AdminNotificationSection[] $sections
      */
-    private function renderSectionsHtml(array $sections): string
+    private function renderSectionsHtml(array $sections, string $locale): string
     {
         $html = '';
         foreach ($sections as $section) {
-            $html .= sprintf('<h3>%s</h3><ul>', htmlspecialchars($section->title));
+            $html .= sprintf('<h3>%s</h3><ul>', htmlspecialchars($this->translate($section->title, $locale)));
             foreach ($section->items as $item) {
-                $html .= sprintf('<li>%s</li>', htmlspecialchars($item->label));
+                $html .= sprintf('<li>%s</li>', htmlspecialchars($this->translate($item->label, $locale)));
             }
             $html .= '</ul>';
         }
 
         return $html;
+    }
+
+    private function translate(string|TranslatableInterface $text, string $locale): string
+    {
+        return $text instanceof TranslatableInterface ? $text->trans($this->translator, $locale) : $text;
     }
 
     private function getLastSentAt(): ?DateTimeImmutable

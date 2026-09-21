@@ -13,6 +13,9 @@ use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class AdminNotificationServiceTest extends TestCase
@@ -32,6 +35,7 @@ class AdminNotificationServiceTest extends TestCase
             configService: $configService,
             logger: $this->createStub(LoggerInterface::class),
             clock: new MockClock(new DateTimeImmutable('2026-01-01 10:00:00')),
+            translator: $this->translator(),
         );
     }
 
@@ -156,6 +160,59 @@ class AdminNotificationServiceTest extends TestCase
         static::assertSame('1 sent', $result);
     }
 
+    public function testEachRecipientGetsTheSummaryInTheirOwnLanguage(): void
+    {
+        // Arrange
+        $config = $this->createStub(ConfigService::class);
+        $config->method('isSendAdminNotification')->willReturn(true);
+
+        $provider = $this->createStub(AdminNotificationProviderInterface::class);
+        $provider->method('getLatestPendingAt')->willReturn(new DateTimeImmutable('2026-01-01 09:00:00'));
+        $provider->method('getSection')->willReturn(new TranslatableMessage('notifications.section_reported_images'));
+        $provider
+            ->method('getPendingItems')
+            ->willReturn([
+                new AdminNotificationItem(new TranslatableMessage('notifications.item_reported_image', [
+                    '%image%' => '7',
+                    '%reason%' => new TranslatableMessage('report.reason_privacy'),
+                ])),
+            ]);
+
+        $cache = $this->createStub(TagAwareCacheInterface::class);
+        $cache->method('get')->willReturn(null);
+
+        $german = $this->createStub(User::class);
+        $german->method('getLocale')->willReturn('de');
+        $english = $this->createStub(User::class);
+        $english->method('getLocale')->willReturn('en');
+
+        $userRepository = $this->createStub(UserRepository::class);
+        $userRepository->method('findAdminUsers')->willReturn([$german, $english]);
+
+        $sent = [];
+        $email = $this->createStub(AdminNotificationEmail::class);
+        $email
+            ->method('send')
+            ->willReturnCallback(static function (array $context) use (&$sent): void {
+                $sent[$context['user']->getLocale()] = $context['sectionsHtml'];
+            });
+
+        $service = $this->buildService(
+            providers: [$provider],
+            adminNotificationEmail: $email,
+            userRepository: $userRepository,
+            cache: $cache,
+            configService: $config,
+        );
+
+        // Act
+        $service->processNotification();
+
+        // Assert
+        static::assertSame('<h3>Gemeldete Bilder</h3><ul><li>Bild #7 gemeldet: Privatsphäre</li></ul>', $sent['de']);
+        static::assertSame('<h3>Reported images</h3><ul><li>Image #7 reported: Privacy</li></ul>', $sent['en']);
+    }
+
     public function testSkipsProvidersWithNoItems(): void
     {
         // Arrange
@@ -184,5 +241,31 @@ class AdminNotificationServiceTest extends TestCase
 
         // Assert
         static::assertSame('no items', $result);
+    }
+
+    private function translator(): Translator
+    {
+        $translator = new Translator('en');
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addResource(
+            'array',
+            [
+                'notifications.section_reported_images' => 'Reported images',
+                'notifications.item_reported_image' => 'Image #%image% reported: %reason%',
+                'report.reason_privacy' => 'Privacy',
+            ],
+            'en',
+        );
+        $translator->addResource(
+            'array',
+            [
+                'notifications.section_reported_images' => 'Gemeldete Bilder',
+                'notifications.item_reported_image' => 'Bild #%image% gemeldet: %reason%',
+                'report.reason_privacy' => 'Privatsphäre',
+            ],
+            'de',
+        );
+
+        return $translator;
     }
 }

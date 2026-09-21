@@ -639,6 +639,7 @@ class EmailTypeSendTest extends TestCase
             $this->createStub(AppStateService::class),
             [],
             new AudienceFilterService([]),
+            $this->createStub(TranslatorInterface::class),
         );
         $user = $this->makeUser(settings: new NotificationSettings(['upcomingEvents' => true]));
 
@@ -661,6 +662,7 @@ class EmailTypeSendTest extends TestCase
             $this->createStub(AppStateService::class),
             [],
             new AudienceFilterService([]),
+            $this->createStub(TranslatorInterface::class),
         );
         $user = $this->makeUser(settings: new NotificationSettings(['upcomingEvents' => false]));
 

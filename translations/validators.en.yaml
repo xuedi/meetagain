@@ -220,6 +220,10 @@ Error: Error
 'admin_location.validator_blank': 'This field cannot be empty.'
 'admin_location.validator_too_long': 'This value is too long, maximum {{ limit }} characters.'
 
+# Location namespace - venue coordinates
+'location.validator_latitude_range': 'The latitude must be a number between {{ min }} and {{ max }}.'
+'location.validator_longitude_range': 'The longitude must be a number between {{ min }} and {{ max }}.'
+
 # Admin system security namespace - measure tuning
 'admin_system_security.validator_pow_difficulty': 'The difficulty must be between {{ min }} and {{ max }} bits.'
 'admin_system_security.validator_log_retention': 'Retention must be between {{ min }} and {{ max }} days.'
