@@ -76,6 +76,37 @@ Twig, JavaScript and SCSS are out of its scope.
 
 ---
 
+## Skipping tests that already passed: `test-stamp`
+
+A green `just test` records the working tree in `testPassing.lock` (gitignored, repo root). When
+you commit afterwards, the pre-commit hook asks `test-stamp check` first. If no file has changed
+since, it runs only the four guards and skips static checks and the test suites:
+
+```text
+Tests skipped - the tree matches testPassing.lock (just test to force)
+Leak guard ...................................... OK
+```
+
+- **Content, not timestamps.** Every file is hashed with BLAKE3 together with its path and its
+  executable bit. `touch`, staging and committing change nothing; editing a byte or losing a `+x`
+  does. `.git/` is never read, so a partial commit leaves the stamp valid for the next one.
+- **Which files count** is set in `config/tools/test-stamp.dist`. `SCAN_ROOTS` are walked with
+  their repository's git ignore rules, `INCLUDE_IGNORED` pulls back ignored files that still
+  change a result (the installed hooks, `.env.local`, the enabled-plugin lists), `EXCLUDE` drops
+  prefixes only an always-running guard checks. `test-stamp files` prints the full list.
+- **The guards always run.** `docs-guard` and `mermaid-guard` look at staged markdown only, which a
+  green `just test` says nothing about. `ALWAYS_RUN` names the hooks that run on a fresh stamp.
+- **A stale stamp says why:** the hook lists up to ten changed, added or removed paths, runs the
+  whole chain and, when it passes, writes a new stamp.
+- **Edits during a run are never stamped.** The fingerprint is taken before the first hook and
+  compared again after the last one; if they differ, no stamp is written.
+- **`just test` always runs everything**, and so does a clone without the built binary.
+
+The stamp proves what the hooks always proved: that the *working tree* passed. Neither checks the
+staged snapshot on its own.
+
+---
+
 ## Quieter recipes with `output-filter`
 
 Every recipe line runs through `output-filter`: the justfile's `set shell` points at

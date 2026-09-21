@@ -220,6 +220,10 @@ Error: Fehler
 'admin_location.validator_blank': 'Dieses Feld darf nicht leer sein.'
 'admin_location.validator_too_long': 'Dieser Wert ist zu lang, maximal {{ limit }} Zeichen.'
 
+# Location namespace - venue coordinates
+'location.validator_latitude_range': 'Der Breitengrad muss eine Zahl zwischen {{ min }} und {{ max }} sein.'
+'location.validator_longitude_range': 'Der Längengrad muss eine Zahl zwischen {{ min }} und {{ max }} sein.'
+
 # Admin system security namespace - measure tuning
 'admin_system_security.validator_pow_difficulty': 'Die Schwierigkeit muss zwischen {{ min }} und {{ max }} Bit liegen.'
 'admin_system_security.validator_log_retention': 'Die Aufbewahrung muss zwischen {{ min }} und {{ max }} Tagen liegen.'

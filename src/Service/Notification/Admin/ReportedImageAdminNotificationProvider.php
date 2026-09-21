@@ -2,8 +2,11 @@
 
 namespace App\Service\Notification\Admin;
 
+use App\Entity\User;
 use App\Repository\ImageReportRepository;
 use DateTimeImmutable;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 readonly class ReportedImageAdminNotificationProvider implements AdminNotificationProviderInterface
 {
@@ -11,21 +14,22 @@ readonly class ReportedImageAdminNotificationProvider implements AdminNotificati
         private ImageReportRepository $imageReportRepository,
     ) {}
 
-    public function getSection(): string
+    public function getSection(): TranslatableInterface
     {
-        return 'Reported Images';
+        return new TranslatableMessage('notifications.section_reported_images');
     }
 
-    public function getPendingItems(): array
+    public function getPendingItems(User $recipient): array
     {
         $reports = $this->imageReportRepository->getOpen();
         $items = [];
 
         foreach ($reports as $report) {
-            $items[] = new AdminNotificationItem(
-                label: sprintf('Image #%s reported for: %s', $report->getImage()?->getId() ?? 'deleted', $report->getReason()->name),
-                route: 'app_admin_support_reports',
-            );
+            $imageId = $report->getImage()?->getId();
+            $items[] = new AdminNotificationItem(label: new TranslatableMessage('notifications.item_reported_image', [
+                '%image%' => $imageId === null ? new TranslatableMessage('notifications.image_deleted') : (string) $imageId,
+                '%reason%' => new TranslatableMessage($report->getReason()->label()),
+            ]), route: 'app_admin_support_reports');
         }
 
         return $items;

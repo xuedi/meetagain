@@ -4,11 +4,13 @@ namespace Tests\Unit\Service\Notification;
 
 use App\Entity\Image;
 use App\Entity\ImageReport;
+use App\Entity\User;
 use App\Enum\ImageReportReason;
 use App\Repository\ImageReportRepository;
 use App\Service\Notification\Admin\ReportedImageAdminNotificationProvider;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class ReportedImageAdminNotificationProviderTest extends TestCase
 {
@@ -17,8 +19,12 @@ class ReportedImageAdminNotificationProviderTest extends TestCase
         // Arrange
         $provider = new ReportedImageAdminNotificationProvider(imageReportRepository: $this->createStub(ImageReportRepository::class));
 
-        // Act & Assert
-        static::assertSame('Reported Images', $provider->getSection());
+        // Act
+        $section = $provider->getSection();
+
+        // Assert
+        static::assertInstanceOf(TranslatableMessage::class, $section);
+        static::assertSame('notifications.section_reported_images', $section->getMessage());
     }
 
     public function testGetPendingItemsWithNoReportsReturnsEmptyArray(): void
@@ -30,7 +36,7 @@ class ReportedImageAdminNotificationProviderTest extends TestCase
         $provider = new ReportedImageAdminNotificationProvider(imageReportRepository: $repoStub);
 
         // Act & Assert
-        static::assertSame([], $provider->getPendingItems());
+        static::assertSame([], $provider->getPendingItems($this->createStub(User::class)));
     }
 
     public function testGetPendingItemsWithOneReportImageExistsContainsIdAndReason(): void
@@ -49,12 +55,15 @@ class ReportedImageAdminNotificationProviderTest extends TestCase
         $provider = new ReportedImageAdminNotificationProvider(imageReportRepository: $repoStub);
 
         // Act
-        $items = $provider->getPendingItems();
+        $items = $provider->getPendingItems($this->createStub(User::class));
 
         // Assert
         static::assertCount(1, $items);
-        static::assertStringContainsString('42', $items[0]->label);
-        static::assertStringContainsString('Privacy', $items[0]->label);
+        $label = $items[0]->label;
+        static::assertInstanceOf(TranslatableMessage::class, $label);
+        static::assertSame('notifications.item_reported_image', $label->getMessage());
+        static::assertSame('42', $label->getParameters()['%image%']);
+        static::assertSame('report.reason_privacy', $label->getParameters()['%reason%']->getMessage());
     }
 
     public function testGetPendingItemsWithDeletedImageUsesDeletedPlaceholder(): void
@@ -70,10 +79,12 @@ class ReportedImageAdminNotificationProviderTest extends TestCase
         $provider = new ReportedImageAdminNotificationProvider(imageReportRepository: $repoStub);
 
         // Act
-        $items = $provider->getPendingItems();
+        $items = $provider->getPendingItems($this->createStub(User::class));
 
         // Assert
-        static::assertStringContainsString('deleted', $items[0]->label);
+        $label = $items[0]->label;
+        static::assertInstanceOf(TranslatableMessage::class, $label);
+        static::assertSame('notifications.image_deleted', $label->getParameters()['%image%']->getMessage());
     }
 
     public function testGetLatestPendingAtWithEmptyReportsReturnsNull(): void

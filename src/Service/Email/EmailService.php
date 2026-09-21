@@ -98,7 +98,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         return true;
     }
 
-    private function dispatchPush(string $identifier, string $recipient, ?DateTimeImmutable $deadline): void
+    public function dispatchPush(string $identifier, string $recipient, ?DateTimeImmutable $deadline): void
     {
         foreach ($this->pushDispatchers as $dispatcher) {
             try {

@@ -184,6 +184,68 @@ class MessageRepository extends ServiceEntityRepository
     }
 
     /**
+     * @return list<array{sender: User, receiver: User, firstUnread: DateTimeImmutable}>
+     */
+    public function findUnremindedPairs(?DateTimeImmutable $firstUnreadAfter, DateTimeImmutable $firstUnreadUntil): array
+    {
+        $qb = $this
+            ->createQueryBuilder('m')
+            ->select('IDENTITY(m.sender) AS senderId', 'IDENTITY(m.receiver) AS receiverId', 'MIN(m.createdAt) AS firstUnread')
+            ->where('m.wasRead = false')
+            ->andWhere('m.deleted = false')
+            ->andWhere('m.reminderSentAt IS NULL')
+            ->groupBy('m.sender')
+            ->addGroupBy('m.receiver')
+            ->having('MIN(m.createdAt) <= :until')
+            ->setParameter('until', $firstUnreadUntil)
+            ->orderBy('firstUnread', 'ASC');
+
+        if ($firstUnreadAfter instanceof DateTimeImmutable) {
+            $qb->andHaving('MIN(m.createdAt) > :after')->setParameter('after', $firstUnreadAfter);
+        }
+
+        $rows = $qb->getQuery()->getArrayResult();
+        $userIds = [];
+        foreach ($rows as $row) {
+            $userIds[] = (int) $row['senderId'];
+            $userIds[] = (int) $row['receiverId'];
+        }
+        $users = $this->findPartners(array_values(array_unique($userIds)));
+
+        $pairs = [];
+        foreach ($rows as $row) {
+            $sender = $users[(int) $row['senderId']] ?? null;
+            $receiver = $users[(int) $row['receiverId']] ?? null;
+            if ($sender === null || $receiver === null) {
+                continue;
+            }
+            $pairs[] = [
+                'sender' => $sender,
+                'receiver' => $receiver,
+                'firstUnread' => new DateTimeImmutable((string) $row['firstUnread']),
+            ];
+        }
+
+        return $pairs;
+    }
+
+    public function markReminderSent(User $sender, User $receiver, DateTimeImmutable $at): void
+    {
+        $this
+            ->createQueryBuilder('m')
+            ->update(Message::class, 'm')
+            ->set('m.reminderSentAt', ':at')
+            ->where('m.sender = :sender AND m.receiver = :receiver')
+            ->andWhere('m.wasRead = false')
+            ->andWhere('m.reminderSentAt IS NULL')
+            ->setParameter('at', $at)
+            ->setParameter('sender', $sender)
+            ->setParameter('receiver', $receiver)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
      * @param array<int>|null $restrictToUserIds Both sender and receiver must be in this set.
      * @return array{total: int, unread: int}
      */

@@ -45,7 +45,7 @@ readonly class AdminNotificationEmail extends EmailAbstract
             'subject' => 'Admin: Items require your attention',
             'context' => [
                 'username' => $sample->adminName,
-                'sections' => $this->samples->sectionsHtml(),
+                'sections' => $this->samples->sectionsHtml($locale),
                 'host' => $sample->host,
                 'lang' => $locale,
             ],

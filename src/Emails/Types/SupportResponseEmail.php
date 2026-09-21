@@ -12,6 +12,7 @@ use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class SupportResponseEmail extends EmailAbstract
 {
@@ -20,6 +21,8 @@ readonly class SupportResponseEmail extends EmailAbstract
         MockSampleFactory $samples,
         private EmailQueueInterface $queue,
         private ConfigService $config,
+        #[Autowire('%kernel.default_locale%')]
+        private string $defaultLocale,
     ) {
         parent::__construct($blocklist, $samples);
     }
@@ -71,7 +74,7 @@ readonly class SupportResponseEmail extends EmailAbstract
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string) $request->getEmail());
-        $email->locale('en');
+        $email->locale($request->getLocale() ?? $request->getRequester()?->getLocale() ?? $this->defaultLocale);
         $email->context([
             'name' => $request->getRequesterLabel(),
             'originalMessage' => $request->getMessage(),

@@ -21,6 +21,7 @@ use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Filter\Email\AudienceFilterService;
 use App\Repository\EventRepository;
+use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
@@ -147,8 +148,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->config,
-            new \Symfony\Component\Clock\MockClock(),
-            $this->host,
+            $this->createStub(MessageRepository::class),
         );
 
         static::assertFalse($email->guardCheck([
@@ -221,6 +221,7 @@ final class EmailTypeBlocklistTest extends TestCase
             $this->createStub(AppStateService::class),
             [],
             new AudienceFilterService([]),
+            $this->createStub(TranslatorInterface::class),
         );
 
         static::assertFalse($email->guardCheck([

@@ -18,6 +18,7 @@ use App\Emails\Types\WelcomeEmail;
 use App\Entity\Event;
 use App\Filter\Email\AudienceFilterService;
 use App\Repository\EventRepository;
+use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
@@ -183,6 +184,7 @@ final class GetMaxSendByTest extends TestCase
             $this->createStub(AppStateService::class),
             [],
             new AudienceFilterService([]),
+            $this->createStub(TranslatorInterface::class),
         );
 
         $now = new DateTimeImmutable(self::NOW);
@@ -198,8 +200,7 @@ final class GetMaxSendByTest extends TestCase
             $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->createStub(ConfigService::class),
-            new \Symfony\Component\Clock\MockClock(),
-            $this->createStub(RequestHostResolver::class),
+            $this->createStub(MessageRepository::class),
         );
 
         $result = $email->getMaxSendBy([], new DateTimeImmutable(self::NOW));

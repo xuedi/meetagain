@@ -2,10 +2,12 @@
 
 namespace App\Service\Notification\Admin;
 
+use Symfony\Contracts\Translation\TranslatableInterface;
+
 readonly class AdminNotificationItem
 {
     public function __construct(
-        public string $label,
+        public string|TranslatableInterface $label,
         public ?string $route = null,
         public array $routeParams = [],
     ) {}

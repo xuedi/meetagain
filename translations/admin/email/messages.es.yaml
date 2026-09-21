@@ -32,7 +32,7 @@ admin_email_templates:
     trigger_verification_request: 'tras el registro'
     trigger_welcome: 'tras la verificación del correo'
     trigger_password_reset_request: 'al solicitar restablecer la contraseña'
-    trigger_notification_message: 'al recibir un mensaje directo'
+    trigger_notification_message: '3 h después de un mensaje directo no leído'
     trigger_notification_rsvp_aggregated: 'hasta 48 h antes del evento'
     trigger_notification_event_canceled: 'cuando se cancela un evento'
     trigger_announcement: 'enviado por un admin'

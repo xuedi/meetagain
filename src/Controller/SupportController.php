@@ -79,6 +79,7 @@ final class SupportController extends AbstractController
             $supportRequest->setCreatedAt(new DateTimeImmutable());
             $supportRequest->setStatus(SupportRequestStatus::New);
             $supportRequest->setIpAddress($request->getClientIp());
+            $supportRequest->setLocale($request->getLocale());
 
             $token = $this->threadService->openThread($supportRequest, $request->getClientIp());
 

@@ -106,7 +106,12 @@ readonly class UserService
         $this->em->flush();
 
         if ($oldStatus === UserStatus::EmailVerified && $newStatus === UserStatus::Active) {
+            $this->dispatcher->dispatch(EntityAction::ApproveUser, (int) $target->getId());
             $this->welcomeEmail->send(['user' => $target]);
+        }
+
+        if ($newStatus === UserStatus::Denied) {
+            $this->dispatcher->dispatch(EntityAction::DenyUser, (int) $target->getId());
         }
 
         $type = match (true) {

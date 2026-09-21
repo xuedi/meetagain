@@ -10,6 +10,7 @@ installed.lock
 /config/plugins-post-fixtures.sh
 /.just/local.just
 /justFail.log
+/testPassing.lock
 /bin/tools/bin/
 /bin/tools/target/
 /docker/certs/*.crt

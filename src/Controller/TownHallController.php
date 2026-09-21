@@ -150,7 +150,7 @@ final class TownHallController extends AbstractController
         $this->guardEnabled();
 
         return $this->render('town_hall/gallery.html.twig', [
-            'images' => $this->townHallService->getAllEventImagesChronological(),
+            'images' => $this->townHallService->getEventImages(),
         ]);
     }
 

@@ -1,0 +1,14 @@
+[package]
+name = "test-stamp"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "test-stamp"
+path = "src/main.rs"
+
+[dependencies]
+toolconfig.workspace = true
+blake3.workspace = true
+ignore.workspace = true
+rayon.workspace = true

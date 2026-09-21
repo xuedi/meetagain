@@ -24,6 +24,7 @@ use App\Enum\SupportAudience;
 use App\Filter\Email\AudienceFilterService;
 use App\Filter\Event\FollowerEventNotificationFilterInterface;
 use App\Repository\EventRepository;
+use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
@@ -142,14 +143,7 @@ class EmailTypeSendTest extends TestCase
 
         $sender = $this->makeUser('sender@example.com', 'Bob', 'en', null, true, null, 2);
 
-        new NotificationMessageEmail(
-            $this->blocklist,
-            $this->mockSampleFactory(),
-            $queue,
-            $this->config,
-            new \Symfony\Component\Clock\MockClock(),
-            $this->host,
-        )->send([
+        new NotificationMessageEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->createStub(MessageRepository::class))->send([
             'sender' => $sender,
             'recipient' => $this->makeUser(),
         ]);
@@ -344,8 +338,7 @@ class EmailTypeSendTest extends TestCase
             $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->config,
-            new \Symfony\Component\Clock\MockClock(),
-            $this->host,
+            $this->createStub(MessageRepository::class),
         )->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)]));
     }
 
@@ -358,24 +351,22 @@ class EmailTypeSendTest extends TestCase
             $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->config,
-            new \Symfony\Component\Clock\MockClock(),
-            $this->host,
+            $this->createStub(MessageRepository::class),
         )->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)]));
     }
 
-    public function testNotificationMessageGuardCheckReturnsFalseWhenRecentLogin(): void
+    public function testNotificationMessageGuardCheckIgnoresARecentLogin(): void
     {
         $user = $this->makeUser(settings: new NotificationSettings([
             'receivedMessage' => true,
         ]), lastLogin: new DateTime('-10 minutes'));
 
-        static::assertFalse(new NotificationMessageEmail(
+        static::assertTrue(new NotificationMessageEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->config,
-            new \Symfony\Component\Clock\MockClock(),
-            $this->host,
+            $this->createStub(MessageRepository::class),
         )->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)]));
     }
 
@@ -383,15 +374,14 @@ class EmailTypeSendTest extends TestCase
     {
         $user = $this->makeUser(settings: new NotificationSettings([
             'receivedMessage' => true,
-        ]), lastLogin: new DateTime('-3 hours'));
+        ]));
 
         static::assertTrue(new NotificationMessageEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
             $this->createStub(EmailQueueInterface::class),
             $this->config,
-            new \Symfony\Component\Clock\MockClock(),
-            $this->host,
+            $this->createStub(MessageRepository::class),
         )->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)]));
     }
 
@@ -649,6 +639,7 @@ class EmailTypeSendTest extends TestCase
             $this->createStub(AppStateService::class),
             [],
             new AudienceFilterService([]),
+            $this->createStub(TranslatorInterface::class),
         );
         $user = $this->makeUser(settings: new NotificationSettings(['upcomingEvents' => true]));
 
@@ -671,6 +662,7 @@ class EmailTypeSendTest extends TestCase
             $this->createStub(AppStateService::class),
             [],
             new AudienceFilterService([]),
+            $this->createStub(TranslatorInterface::class),
         );
         $user = $this->makeUser(settings: new NotificationSettings(['upcomingEvents' => false]));
 

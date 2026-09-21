@@ -5,6 +5,7 @@ namespace App\Entity;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: \App\Repository\LocationRepository::class)]
 class Location
@@ -37,9 +38,11 @@ class Location
     private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Assert\Range(notInRangeMessage: 'location.validator_longitude_range', invalidMessage: 'location.validator_longitude_range', min: -180, max: 180)]
     private ?string $longitude = null;
 
     #[ORM\Column(length: 20, nullable: true)]
+    #[Assert\Range(notInRangeMessage: 'location.validator_latitude_range', invalidMessage: 'location.validator_latitude_range', min: -90, max: 90)]
     private ?string $latitude = null;
 
     public function getId(): ?int

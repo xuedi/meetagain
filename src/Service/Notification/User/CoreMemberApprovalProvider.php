@@ -4,18 +4,20 @@ namespace App\Service\Notification\User;
 
 use App\Entity\User;
 use App\Enum\UserStatus;
+use App\Filter\Member\PendingApprovalFilterService;
 use App\Repository\UserRepository;
 use App\Service\Member\UserService;
 use InvalidArgumentException;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class CoreMemberApprovalProvider implements ReviewNotificationProviderInterface
 {
     public function __construct(
         private UserRepository $userRepo,
         private UserService $userService,
-        private Security $security,
+        private PendingApprovalFilterService $pendingApproval,
+        private TranslatorInterface $translator,
     ) {}
 
     public function getIdentifier(): string
@@ -25,17 +27,13 @@ readonly class CoreMemberApprovalProvider implements ReviewNotificationProviderI
 
     public function getReviewItems(User $user): array
     {
-        if (!$this->security->isGranted('ROLE_ADMIN')) {
-            return [];
-        }
-
-        $pendingUsers = $this->userRepo->findByStatus(UserStatus::EmailVerified);
         $items = [];
-
-        foreach ($pendingUsers as $pendingUser) {
+        foreach ($this->pendingApproval->pendingFor($user) as $pendingUser) {
             $items[] = new ReviewNotificationItem(
                 id: (string) $pendingUser->getId(),
-                description: sprintf('User %s is waiting for approval', $pendingUser->getName()),
+                description: $this->translator->trans('profile_review.member_approval_description', [
+                    '%name%' => $pendingUser->getName(),
+                ]),
                 canDeny: true,
                 icon: 'user-check',
             );
@@ -46,29 +44,25 @@ readonly class CoreMemberApprovalProvider implements ReviewNotificationProviderI
 
     public function approveItem(User $user, string $itemId): void
     {
-        if (!$this->security->isGranted('ROLE_ADMIN')) {
-            throw new AccessDeniedException('Only admins can approve members.');
-        }
-
-        $pendingUser = $this->userRepo->find((int) $itemId);
-        if ($pendingUser === null || $pendingUser->getStatus() !== UserStatus::EmailVerified) {
-            throw new InvalidArgumentException('User not found or not pending approval.');
-        }
-
-        $this->userService->transitionStatus($user, $pendingUser, UserStatus::Active);
+        $this->userService->transitionStatus($user, $this->reviewablePendingUser($user, $itemId), UserStatus::Active);
     }
 
     public function denyItem(User $user, string $itemId): void
     {
-        if (!$this->security->isGranted('ROLE_ADMIN')) {
-            throw new AccessDeniedException('Only admins can deny members.');
-        }
+        $this->userService->transitionStatus($user, $this->reviewablePendingUser($user, $itemId), UserStatus::Denied);
+    }
 
+    private function reviewablePendingUser(User $reviewer, string $itemId): User
+    {
         $pendingUser = $this->userRepo->find((int) $itemId);
         if ($pendingUser === null || $pendingUser->getStatus() !== UserStatus::EmailVerified) {
             throw new InvalidArgumentException('User not found or not pending approval.');
         }
 
-        $this->userService->transitionStatus($user, $pendingUser, UserStatus::Denied);
+        if (!$this->pendingApproval->mayReview($reviewer, $pendingUser)) {
+            throw new AccessDeniedException('You may not decide on this member.');
+        }
+
+        return $pendingUser;
     }
 }

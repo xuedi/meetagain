@@ -2,6 +2,7 @@
 
 namespace App\Emails;
 
+use App\Enum\ImageReportReason;
 use App\Service\Http\RequestHostResolver;
 use DateInterval;
 use Psr\Clock\ClockInterface;
@@ -170,20 +171,34 @@ readonly class MockSampleFactory
         $url = sprintf('%s/%s/event/%d', $sample->host, $sample->locale, $sample->eventId);
 
         return sprintf(
-            '<div class="card"><p><strong>%s</strong></p><p>%s - %s</p><p><a href="%s">More Info</a> &nbsp; <a href="%s#rsvp">I Want to Go</a></p></div>',
+            '<div class="card"><p><strong>%s</strong></p><p>%s - %s</p><p><a href="%s">%s</a> &nbsp; <a href="%s#rsvp">%s</a></p></div>',
             htmlspecialchars($sample->eventTitle),
             $sample->eventStart,
             htmlspecialchars($sample->eventLocation),
             $url,
+            htmlspecialchars($this->translator->trans('email_upcoming_events.button_more_info', [], null, $sample->locale)),
             $url,
+            htmlspecialchars($this->translator->trans('email_upcoming_events.button_rsvp', [], null, $sample->locale)),
         );
     }
 
-    public function sectionsHtml(): string
+    public function sectionsHtml(string $locale): string
     {
-        return (
-            '<h3>Users Pending Approval</h3><ul><li>Zuzanna Burke (zuzanna.burke@example.org)</li></ul>'
-            . '<h3>Reported Images</h3><ul><li>Event teaser reported by Rene Wells</li></ul>'
+        $reportedImage = $this->translator->trans(
+            'notifications.item_reported_image',
+            [
+                '%image%' => '318',
+                '%reason%' => $this->translator->trans(ImageReportReason::Copyright->label(), [], null, $locale),
+            ],
+            null,
+            $locale,
+        );
+
+        return sprintf(
+            '<h3>%s</h3><ul><li>Zuzanna Burke (zuzanna.burke@example.org)</li></ul><h3>%s</h3><ul><li>%s</li></ul>',
+            htmlspecialchars($this->translator->trans('notifications.section_pending_approval', [], null, $locale)),
+            htmlspecialchars($this->translator->trans('notifications.section_reported_images', [], null, $locale)),
+            htmlspecialchars($reportedImage),
         );
     }
 }

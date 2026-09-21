@@ -478,6 +478,7 @@ profile_review:
     link_details: 'Details'
     change_proposal_description: '%proposer% proposed a change to %target%'
     suggestion_description: '%proposer% suggested %target%'
+    member_approval_description: '%name% is waiting for approval'
 review:
     page_title: 'Proposed changes'
     empty_state: 'No pending proposals.'
@@ -701,6 +702,14 @@ email_event_update:
     line_location: 'Location changed from <b>%before%</b> to <b>%after%</b>.'
     line_canceled: 'The event has been <b>canceled</b>.'
     line_uncanceled: 'The event is no longer canceled.'
+email_upcoming_events:
+    button_more_info: 'More info'
+    button_rsvp: 'I want to go'
+notifications:
+    section_pending_approval: 'Members waiting for approval'
+    section_reported_images: 'Reported images'
+    item_reported_image: 'Image #%image% reported for: %reason%'
+    image_deleted: 'deleted'
 town_hall:
     forum_page_title: 'Forum'
     forum_sidebar_heading: 'Topics'

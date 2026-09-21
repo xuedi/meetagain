@@ -9,6 +9,7 @@ use App\Emails\Guard\Rule\SupportRequestPresentRule;
 use App\Emails\MockSampleFactory;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
+use App\Enum\SupportAudience;
 use App\Service\Config\ConfigService;
 use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Support\RecipientResolver;
@@ -47,7 +48,7 @@ readonly class SupportNotificationEmail extends EmailAbstract
         return [
             'subject' => sprintf('New Support Request from %s', $sample->recipientName),
             'context' => [
-                'audience' => 'Organizers',
+                'audience' => $this->translator->trans(SupportAudience::Organizer->label(), [], null, $locale),
                 'name' => $sample->recipientName,
                 'email' => 'florence.shaw@example.org',
                 'message' => $sample->messageText,
@@ -82,9 +83,9 @@ readonly class SupportNotificationEmail extends EmailAbstract
             $email = new TemplatedEmail();
             $email->from($this->config->getMailerAddress());
             $email->to((string) $recipient->getEmail());
-            $email->locale('en');
+            $email->locale($recipient->getLocale());
             $email->context([
-                'audience' => $this->translator->trans($request->getAudience()->label(), [], null, 'en'),
+                'audience' => $this->translator->trans($request->getAudience()->label(), [], null, $recipient->getLocale()),
                 'name' => $request->getRequesterLabel(),
                 'email' => $request->getEmail(),
                 'message' => $request->getMessage(),

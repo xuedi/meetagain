@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
+#[ORM\Index(name: 'idx_message_reminder_due', columns: ['was_read', 'reminder_sent_at', 'created_at'])]
 class Message
 {
     public const int EDIT_WINDOW_MINUTES = 10;
@@ -44,6 +45,9 @@ class Message
 
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $editedAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $reminderSentAt = null;
 
     public function getId(): ?int
     {
@@ -130,6 +134,18 @@ class Message
     public function setEditedAt(?DateTimeImmutable $editedAt): static
     {
         $this->editedAt = $editedAt;
+
+        return $this;
+    }
+
+    public function getReminderSentAt(): ?DateTimeImmutable
+    {
+        return $this->reminderSentAt;
+    }
+
+    public function setReminderSentAt(?DateTimeImmutable $reminderSentAt): static
+    {
+        $this->reminderSentAt = $reminderSentAt;
 
         return $this;
     }
