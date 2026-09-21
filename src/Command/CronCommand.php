@@ -5,6 +5,8 @@ namespace App\Command;
 use App\CronTaskInterface;
 use App\Entity\CronLog;
 use App\Enum\CronTaskStatus;
+use App\Metrics\Point;
+use App\Metrics\Recorder;
 use App\Service\Admin\CommandExecutionService;
 use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
@@ -24,6 +26,7 @@ class CronCommand extends LoggedCommand
     public function __construct(
         private readonly EntityManagerInterface $em,
         CommandExecutionService $commandExecutionService,
+        private readonly Recorder $recorder,
         #[AutowireIterator(CronTaskInterface::class)]
         private readonly iterable $cronTasks = [],
     ) {
@@ -65,8 +68,41 @@ class CronCommand extends LoggedCommand
         $this->em->persist($log);
         $this->em->flush();
 
+        if ($this->recorder->isEnabled()) {
+            $this->recordMetrics($tasks, $aggregated, $totalDurationMs);
+        }
+
         $this->release();
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * @param list<array{identifier: string, status: string, message: string, duration_ms: int}> $tasks
+     */
+    private function recordMetrics(array $tasks, CronTaskStatus $aggregated, int $totalDurationMs): void
+    {
+        foreach ($tasks as $task) {
+            $this->recorder->add(
+                new Point(
+                    'cron_task',
+                    ['duration_ms' => $task['duration_ms']],
+                    [
+                        'task' => $task['identifier'],
+                        'status' => $task['status'],
+                    ],
+                ),
+            );
+        }
+        $this->recorder->add(
+            new Point(
+                'cron_run',
+                [
+                    'duration_ms' => $totalDurationMs,
+                    'memory_peak_mb' => round(memory_get_peak_usage(true) / 1_048_576, 1),
+                ],
+                ['status' => $aggregated->value],
+            ),
+        );
     }
 }

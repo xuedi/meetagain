@@ -63,6 +63,7 @@ nav:
       - Demo Data: core-development/demo-data.md
       - Testing: core-development/testing.md
       - Developer Tooling: core-development/tooling.md
+      - Metrics: core-development/metrics.md
       - Best Practices: core-development/best-practices.md
     - Troubleshooting: core-development/troubleshooting.md
   - Plugin Development:

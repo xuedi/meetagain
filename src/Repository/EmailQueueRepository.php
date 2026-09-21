@@ -77,6 +77,19 @@ class EmailQueueRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function findOldestPendingCreatedAt(): ?DateTimeImmutable
+    {
+        $oldest = $this
+            ->createQueryBuilder('eq')
+            ->select('MIN(eq.createdAt)')
+            ->where('eq.status = :status')
+            ->setParameter('status', EmailQueueStatus::Pending)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return is_string($oldest) ? new DateTimeImmutable($oldest) : null;
+    }
+
     /**
      * @return array<string, int> Template name => count
      */

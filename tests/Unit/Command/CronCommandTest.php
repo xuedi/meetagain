@@ -3,6 +3,7 @@
 namespace Tests\Unit\Command;
 
 use App\Command\CronCommand;
+use App\Metrics\Recorder;
 use App\Service\Admin\CommandExecutionService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +17,7 @@ class CronCommandTest extends TestCase
 
         // Act
         $emStub = $this->createStub(EntityManagerInterface::class);
-        $command = new CronCommand($emStub, $commandExecServiceStub);
+        $command = new CronCommand($emStub, $commandExecServiceStub, new Recorder(null, 'test'));
 
         // Assert
         static::assertSame('app:cron', $command->getName());
@@ -29,7 +30,7 @@ class CronCommandTest extends TestCase
 
         // Act
         $emStub = $this->createStub(EntityManagerInterface::class);
-        $command = new CronCommand($emStub, $commandExecServiceStub);
+        $command = new CronCommand($emStub, $commandExecServiceStub, new Recorder(null, 'test'));
 
         // Assert
         static::assertSame('cron manager to be called often, maybe every 5 min or so', $command->getDescription());

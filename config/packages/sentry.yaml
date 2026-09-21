@@ -8,7 +8,8 @@ sentry:
             - 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException'
             - 'Symfony\Component\Security\Core\Exception\AccessDeniedException'
             - 'Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException'
-        traces_sample_rate: 1.0
+        traces_sample_rate: 0.0
     register_error_listener: true
     register_error_handler: false
-
+    tracing:
+        enabled: false
