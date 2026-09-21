@@ -19,6 +19,7 @@ use App\Emails\Types\WelcomeEmail;
 use App\Enum\EmailType;
 use App\Filter\Email\AudienceFilterService;
 use App\Repository\EventRepository;
+use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
@@ -81,8 +82,7 @@ class EmailTypesTest extends TestCase
                 $this->mockSampleFactory(),
                 $this->queue,
                 $this->config,
-                new \Symfony\Component\Clock\MockClock(),
-                $this->host,
+                $this->createStub(MessageRepository::class),
             ),
             'PasswordReset' => new PasswordResetEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host),
             'RsvpAggregated' => new RsvpAggregatedEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $eventRepo, $em),

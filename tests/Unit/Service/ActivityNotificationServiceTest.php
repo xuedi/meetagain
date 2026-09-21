@@ -6,14 +6,13 @@ use App\Activity\Messages\Login;
 use App\Activity\Messages\RsvpYes;
 use App\Activity\Messages\SendMessage;
 use App\Activity\NotificationService as ActivityNotificationService;
-use App\Emails\Guard\EmailGuardEvaluator;
-use App\Emails\Types\NotificationMessageEmail;
 use App\Entity\Activity;
+use App\Enum\EmailType;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use DateTime;
+use App\Service\Email\EmailService;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use ReflectionMethod;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -35,12 +34,10 @@ final class ActivityNotificationServiceTest extends TestCase
         $eventRepoMock->expects($this->once())->method('findOneBy')->with(['id' => 42])->willReturn(new EventStub()->setId(42));
 
         $service = new ActivityNotificationService(
-            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $eventRepoMock,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $this->createStub(TagAwareCacheInterface::class),
-            logger: new NullLogger(),
-            guardEvaluator: new EmailGuardEvaluator(),
+            emailService: $this->createStub(EmailService::class),
         );
 
         // Act
@@ -49,11 +46,13 @@ final class ActivityNotificationServiceTest extends TestCase
         // Assert
     }
 
-    public function testNotifyWithSendMessageCallsSendMessage(): void
+    public function testNotifyWithSendMessagePingsTheRecipient(): void
     {
         // Arrange
         $sender = new UserStub()->setId(1);
-        $recipient = new UserStub()->setId(2);
+        $recipient = new UserStub()
+            ->setId(2)
+            ->setEmail('bob@example.com');
 
         $activity = $this->createStub(Activity::class);
         $activity->method('getUser')->willReturn($sender);
@@ -63,16 +62,18 @@ final class ActivityNotificationServiceTest extends TestCase
         $userRepoMock = $this->createMock(UserRepository::class);
         $userRepoMock->expects($this->once())->method('findOneBy')->with(['id' => 2])->willReturn($recipient);
 
-        $cacheMock = $this->createMock(TagAwareCacheInterface::class);
-        $cacheMock->expects($this->once())->method('get');
+        $emailServiceMock = $this->createMock(EmailService::class);
+        $emailServiceMock
+            ->expects($this->once())
+            ->method('dispatchPush')
+            ->with(EmailType::NotificationMessage->value, 'bob@example.com', $this->isInstanceOf(DateTimeImmutable::class));
+        $emailServiceMock->expects($this->never())->method('enqueue');
 
         $service = new ActivityNotificationService(
-            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoMock,
-            appCache: $cacheMock,
-            logger: new NullLogger(),
-            guardEvaluator: new EmailGuardEvaluator(),
+            appCache: $this->createStub(TagAwareCacheInterface::class),
+            emailService: $emailServiceMock,
         );
 
         // Act
@@ -96,12 +97,10 @@ final class ActivityNotificationServiceTest extends TestCase
         $userRepoMock->expects($this->never())->method('findOneBy');
 
         $service = new ActivityNotificationService(
-            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $eventRepoMock,
             userRepo: $userRepoMock,
             appCache: $this->createStub(TagAwareCacheInterface::class),
-            logger: new NullLogger(),
-            guardEvaluator: new EmailGuardEvaluator(),
+            emailService: $this->createStub(EmailService::class),
         );
 
         // Act
@@ -122,12 +121,10 @@ final class ActivityNotificationServiceTest extends TestCase
         $cacheMock->expects($this->never())->method('get');
 
         $service = new ActivityNotificationService(
-            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $eventRepoStub,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
-            logger: new NullLogger(),
-            guardEvaluator: new EmailGuardEvaluator(),
+            emailService: $this->createStub(EmailService::class),
         );
 
         // Act
@@ -164,12 +161,10 @@ final class ActivityNotificationServiceTest extends TestCase
             });
 
         $service = new ActivityNotificationService(
-            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $eventRepoStub,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
-            logger: new NullLogger(),
-            guardEvaluator: new EmailGuardEvaluator(),
+            emailService: $this->createStub(EmailService::class),
         );
 
         // Act
@@ -203,12 +198,10 @@ final class ActivityNotificationServiceTest extends TestCase
             });
 
         $service = new ActivityNotificationService(
-            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $eventRepoStub,
             userRepo: $this->createStub(UserRepository::class),
             appCache: $cacheMock,
-            logger: new NullLogger(),
-            guardEvaluator: new EmailGuardEvaluator(),
+            emailService: $this->createStub(EmailService::class),
         );
 
         // Act
@@ -224,12 +217,10 @@ final class ActivityNotificationServiceTest extends TestCase
         $userRepoMock->expects($this->never())->method('findOneBy');
 
         $service = new ActivityNotificationService(
-            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoMock,
             appCache: $this->createStub(TagAwareCacheInterface::class),
-            logger: new NullLogger(),
-            guardEvaluator: new EmailGuardEvaluator(),
+            emailService: $this->createStub(EmailService::class),
         );
 
         // Act
@@ -247,125 +238,19 @@ final class ActivityNotificationServiceTest extends TestCase
         $userRepoStub = $this->createStub(UserRepository::class);
         $userRepoStub->method('findOneBy')->willReturn(null);
 
-        $cacheMock = $this->createMock(TagAwareCacheInterface::class);
-        $cacheMock->expects($this->never())->method('get');
+        $emailServiceMock = $this->createMock(EmailService::class);
+        $emailServiceMock->expects($this->never())->method('dispatchPush');
 
         $service = new ActivityNotificationService(
-            notificationMessageEmail: $this->createStub(NotificationMessageEmail::class),
             eventRepo: $this->createStub(EventRepository::class),
             userRepo: $userRepoStub,
-            appCache: $cacheMock,
-            logger: new NullLogger(),
-            guardEvaluator: new EmailGuardEvaluator(),
+            appCache: $this->createStub(TagAwareCacheInterface::class),
+            emailService: $emailServiceMock,
         );
 
         // Act
         $method = new ReflectionMethod($service, 'sendMessage');
         $method->invoke($service, $sender, 999);
-
-        // Assert
-    }
-
-    public function testSendMessageSendsEmailWhenConditionsAreMet(): void
-    {
-        // Arrange
-        $sender = new UserStub()->setId(1);
-        $recipient = new UserStub()->setId(2);
-        $recipient->setNotification(true);
-        $recipient->setLastLogin(new DateTime('-3 hours'));
-
-        $notificationSettings = new \App\Entity\NotificationSettings(['receivedMessage' => true]);
-        $recipient->setNotificationSettings($notificationSettings);
-
-        $userRepoStub = $this->createStub(UserRepository::class);
-        $userRepoStub->method('findOneBy')->willReturn($recipient);
-
-        $emailMock = $this->createMock(NotificationMessageEmail::class);
-        $emailMock->method('guardCheck')->willReturn(true);
-        $emailMock->expects($this->once())->method('send');
-
-        $cacheMock = $this->createMock(TagAwareCacheInterface::class);
-        $cacheMock
-            ->expects($this->once())
-            ->method('get')
-            ->willReturnCallback(function ($key, $callback) {
-                $item = $this->createStub(ItemInterface::class);
-
-                return $callback($item);
-            });
-
-        $service = new ActivityNotificationService(
-            notificationMessageEmail: $emailMock,
-            eventRepo: $this->createStub(EventRepository::class),
-            userRepo: $userRepoStub,
-            appCache: $cacheMock,
-            logger: new NullLogger(),
-            guardEvaluator: new EmailGuardEvaluator(),
-        );
-
-        // Act
-        $method = new ReflectionMethod($service, 'sendMessage');
-        $method->invoke($service, $sender, 2);
-
-        // Assert
-    }
-
-    public function testSendMessageSkipsWhenRecipientRecentlyActive(): void
-    {
-        // Arrange
-        $sender = new UserStub()->setId(1);
-        $recipient = new UserStub()->setId(2);
-        $recipient->setNotification(true);
-        $recipient->setLastLogin(new DateTime('-1 hour'));
-
-        $notificationSettings = new \App\Entity\NotificationSettings(['receivedMessage' => true]);
-        $recipient->setNotificationSettings($notificationSettings);
-
-        $userRepoStub = $this->createStub(UserRepository::class);
-        $userRepoStub->method('findOneBy')->willReturn($recipient);
-
-        $skipRule = new class implements \App\Emails\EmailGuardRuleInterface {
-            public function getName(): string
-            {
-                return 'test-skip';
-            }
-
-            public function getCost(): \App\Emails\EmailGuardCost
-            {
-                return \App\Emails\EmailGuardCost::Free;
-            }
-
-            public function evaluate(array $context): \App\Emails\EmailGuardResult
-            {
-                return \App\Emails\EmailGuardResult::skip('test-skip', 'recently active');
-            }
-        };
-        $emailMock = $this->createMock(NotificationMessageEmail::class);
-        $emailMock->method('getGuardRules')->willReturn([$skipRule]);
-        $emailMock->expects($this->never())->method('send');
-
-        $cacheMock = $this->createMock(TagAwareCacheInterface::class);
-        $cacheMock
-            ->expects($this->once())
-            ->method('get')
-            ->willReturnCallback(function ($key, $callback) {
-                $item = $this->createStub(ItemInterface::class);
-
-                return $callback($item);
-            });
-
-        $service = new ActivityNotificationService(
-            notificationMessageEmail: $emailMock,
-            eventRepo: $this->createStub(EventRepository::class),
-            userRepo: $userRepoStub,
-            appCache: $cacheMock,
-            logger: new NullLogger(),
-            guardEvaluator: new EmailGuardEvaluator(),
-        );
-
-        // Act
-        $method = new ReflectionMethod($service, 'sendMessage');
-        $method->invoke($service, $sender, 2);
 
         // Assert
     }

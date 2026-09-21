@@ -32,7 +32,7 @@ admin_email_templates:
     trigger_verification_request: 'après l''inscription'
     trigger_welcome: 'après la vérification de l''e-mail'
     trigger_password_reset_request: 'à la demande de réinitialisation du mot de passe'
-    trigger_notification_message: 'à la réception d''un message direct'
+    trigger_notification_message: '3 h après un message direct non lu'
     trigger_notification_rsvp_aggregated: 'jusqu''à 48 h avant l''événement'
     trigger_notification_event_canceled: 'quand l''événement est annulé'
     trigger_announcement: 'envoyé par un admin'
