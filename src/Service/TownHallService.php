@@ -63,15 +63,20 @@ readonly class TownHallService
      */
     public function getLatestEventImages(int $limit = 8): array
     {
-        return $this->imageRepo->findRecentEventUploads($limit, $this->resolveEventIds());
+        return $this->imageRepo->findEventUploads($this->resolveEventIds(), $limit);
     }
 
     /**
      * @return array<Image>
      */
-    public function getAllEventImagesChronological(int $limit = 500): array
+    public function getEventImages(int $limit = 500, int $offset = 0): array
     {
-        return $this->imageRepo->findAllEventUploadsChronological($this->resolveEventIds(), $limit);
+        return $this->imageRepo->findEventUploads($this->resolveEventIds(), $limit, $offset);
+    }
+
+    public function countEventImages(): int
+    {
+        return $this->imageRepo->countEventUploads($this->resolveEventIds());
     }
 
     /**
