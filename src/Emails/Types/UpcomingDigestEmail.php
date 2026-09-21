@@ -249,7 +249,7 @@ readonly class UpcomingDigestEmail extends EmailAbstract implements ScheduledEma
             $url = sprintf('%s/%s/event/%s', $host, $lang, $event->getId());
 
             $html .= sprintf(
-                '<div class="card">' . '<p><strong>%s</strong></p><p>%s - %s</p>' . '<p><a href="%s">%s</a> &nbsp; <a href="%s#rsvp">%s</a></p>' . '</div>',
+                '<div class="card"><p><strong>%s</strong></p><p>%s - %s</p><p><a href="%s">%s</a> &nbsp; <a href="%s#rsvp">%s</a></p></div>',
                 $title,
                 $date,
                 $location,

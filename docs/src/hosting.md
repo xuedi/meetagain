@@ -74,6 +74,9 @@ MAILER_DSN=smtp://user:password@smtp.example.com:587
 REDIS_URL=redis://127.0.0.1:6379
 ```
 
+Optionally, set `METRICS_DSN` to send runtime metrics to a VictoriaMetrics collector. See
+[Metrics](core-development/metrics.md).
+
 ---
 
 ## First-time setup
