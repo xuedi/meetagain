@@ -56,7 +56,7 @@ class ActivityRepository extends ServiceEntityRepository
      */
     public function findRecentForAdmin(int $limit, ?DateTimeImmutable $since = null, ?int $userId = null): array
     {
-        $qb = $this->createQueryBuilder('a')->orderBy('a.createdAt', 'DESC')->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('a')->leftJoin('a.user', 'u')->addSelect('u')->orderBy('a.createdAt', 'DESC')->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->andWhere('a.createdAt >= :since')->setParameter('since', $since);

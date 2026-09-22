@@ -23,6 +23,8 @@ class EventRepository extends ServiceEntityRepository
 {
     private const int IN_PROGRESS_GRACE_HOURS = 4;
 
+    private array $eventNameLists = [];
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Event::class);
@@ -219,6 +221,10 @@ class EventRepository extends ServiceEntityRepository
 
     public function getEventNameList(string $language): array
     {
+        if (isset($this->eventNameLists[$language])) {
+            return $this->eventNameLists[$language];
+        }
+
         $events = $this->createQueryBuilder('e')->leftJoin('e.translations', 't')->addSelect('t')->getQuery()->getResult();
 
         $list = [];
@@ -226,7 +232,7 @@ class EventRepository extends ServiceEntityRepository
             $list[$event->getId()] = $event->getTitle($language);
         }
 
-        return $list;
+        return $this->eventNameLists[$language] = $list;
     }
 
     /**
