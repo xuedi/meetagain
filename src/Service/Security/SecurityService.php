@@ -8,6 +8,8 @@ use App\Enum\CronTaskStatus;
 use App\Enum\IncidentSeverity;
 use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
+use App\Metrics\Point;
+use App\Metrics\Recorder;
 use App\Repository\AccessDeniedLogRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\SecurityMeasureLogRepository;
@@ -45,6 +47,7 @@ readonly class SecurityService implements CronTaskInterface
         private AccessDeniedLogRepository $accessDeniedLogRepository,
         private RequestIdentityResolver $identityResolver,
         private SecurityMeasureLogRepository $securityMeasureLogRepository,
+        private Recorder $recorder,
     ) {}
 
     /**
@@ -86,6 +89,7 @@ readonly class SecurityService implements CronTaskInterface
         if ($shortCircuited) {
             if ($ip !== '') {
                 $this->blockStore->blockIp($ip, $this->buildSnapshot('fuse', $reports), self::BLOCK_TTL_SECONDS);
+                $this->recordBlock('fuse', 'ip');
             }
             return;
         }
@@ -118,9 +122,16 @@ readonly class SecurityService implements CronTaskInterface
             $snapshot['incidentId'] = $incidentId;
         }
         $this->blockStore->blockSession($sessionId, $snapshot, self::BLOCK_TTL_SECONDS);
-        if ($ip !== '' && $blockingReport->recommendation->blocksIp()) {
+        $blocksIp = $ip !== '' && $blockingReport->recommendation->blocksIp();
+        if ($blocksIp) {
             $this->blockStore->blockIp($ip, $snapshot, self::BLOCK_TTL_SECONDS);
         }
+        $this->recordBlock($blockingReport->providerKey, $blocksIp ? 'ip' : 'session');
+    }
+
+    private function recordBlock(string $provider, string $scope): void
+    {
+        $this->recorder->add(new Point('security_block', ['value' => 1], ['provider' => $provider, 'scope' => $scope]));
     }
 
     public function getIdentifier(): string

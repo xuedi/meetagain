@@ -3,6 +3,7 @@
 namespace Tests\Unit\EventSubscriber\Security;
 
 use App\EventSubscriber\Security\BlockedSessionSubscriber;
+use App\Metrics\TerminateSubscriber;
 use App\Service\Security\BlockedSessionStore;
 use App\Service\Security\LoadtestBypass;
 use App\Service\Security\RequestIdentityResolver;
@@ -109,6 +110,7 @@ class BlockedSessionSubscriberTest extends TestCase
         static::assertSame(403, $response->getStatusCode());
         static::assertSame('<html>blocked</html>', $response->getContent());
         static::assertSame('text/html; charset=utf-8', $response->headers->get('Content-Type'));
+        static::assertSame('_blocked', $event->getRequest()->attributes->get(TerminateSubscriber::ROUTE_ATTRIBUTE));
     }
 
     public function testBlockedSessionAlsoProducesA403(): void
@@ -133,6 +135,7 @@ class BlockedSessionSubscriberTest extends TestCase
         // Assert
         static::assertNotNull($event->getResponse());
         static::assertSame(403, $event->getResponse()->getStatusCode());
+        static::assertSame('_blocked', $event->getRequest()->attributes->get(TerminateSubscriber::ROUTE_ATTRIBUTE));
     }
 
     public function testEmptyIpSkipsIpCheckButStillChecksSession(): void
@@ -167,6 +170,7 @@ class BlockedSessionSubscriberTest extends TestCase
 
         // Assert
         static::assertNull($event->getResponse());
+        static::assertFalse($event->getRequest()->attributes->has(TerminateSubscriber::ROUTE_ATTRIBUTE));
     }
 
     public function testTwigFailureFallsBackToHardcodedHtmlAndLogs(): void

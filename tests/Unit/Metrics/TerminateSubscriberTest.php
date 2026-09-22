@@ -48,4 +48,20 @@ class TerminateSubscriberTest extends TestCase
         // Assert
         static::assertStringContainsString(',route=_none,', $listener->receive()[0]);
     }
+
+    public function testRouteAttributeOverridesTheMatchedRoute(): void
+    {
+        // Arrange
+        $listener = new UdpListener();
+        $subscriber = new TerminateSubscriber(new Recorder($listener->dsn(), 'prod'), new Stats());
+        $request = Request::create('/wp-login.php');
+        $request->attributes->set(TerminateSubscriber::ROUTE_ATTRIBUTE, '_blocked');
+        $event = new TerminateEvent($this->createStub(HttpKernelInterface::class), $request, new Response('', 403));
+
+        // Act
+        $subscriber->onKernelTerminate($event);
+
+        // Assert
+        static::assertStringContainsString(',route=_blocked,', $listener->receive()[0]);
+    }
 }

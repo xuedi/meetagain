@@ -8,6 +8,7 @@ use App\Entity\NotFoundLog;
 use App\Enum\CronTaskStatus;
 use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
+use App\Metrics\Recorder;
 use App\Repository\AccessDeniedLogRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\SecurityMeasureLogRepository;
@@ -26,6 +27,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\HttpFoundation\Request;
+use Tests\Unit\Metrics\UdpListener;
 
 class SecurityServiceTest extends TestCase
 {
@@ -175,6 +177,70 @@ class SecurityServiceTest extends TestCase
         static::assertFalse($blockStore->isIpBlocked('1.2.3.4'));
     }
 
+    public function testFuseBlockSendsAnIpBlockMarker(): void
+    {
+        // Arrange
+        $listener = new UdpListener();
+        $recorder = new Recorder($listener->dsn(), 'prod');
+        $fuse = $this->makeProvider('fuse', priority: 1000, recommendation: SecurityRecommendation::BlockShortCircuit);
+        $service = $this->buildService([$fuse], recorder: $recorder);
+
+        // Act
+        $service->event(SecurityEventType::NotFound, Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']));
+        $recorder->flush();
+
+        // Assert
+        static::assertSame(['security_block,app=test,env=prod,provider=fuse,scope=ip value=1i'], $listener->receive());
+    }
+
+    public function testDetectionBlockSendsAMarkerNamingTheProvider(): void
+    {
+        // Arrange
+        $listener = new UdpListener();
+        $recorder = new Recorder($listener->dsn(), 'prod');
+        $detector = $this->makeProvider('not_found', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 100);
+        $service = $this->buildService([$detector], recorder: $recorder);
+
+        // Act
+        $service->event(SecurityEventType::NotFound, Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']));
+        $recorder->flush();
+
+        // Assert
+        static::assertSame(['security_block,app=test,env=prod,provider=not_found,scope=ip value=1i'], $listener->receive());
+    }
+
+    public function testSessionOnlyBlockSendsASessionScopedMarker(): void
+    {
+        // Arrange
+        $listener = new UdpListener();
+        $recorder = new Recorder($listener->dsn(), 'prod');
+        $detector = $this->makeProvider('form_measure', priority: 0, recommendation: SecurityRecommendation::BlockSession, threatLevel: 100);
+        $service = $this->buildService([$detector], recorder: $recorder);
+
+        // Act
+        $service->event(SecurityEventType::FormMeasure, Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']));
+        $recorder->flush();
+
+        // Assert
+        static::assertSame(['security_block,app=test,env=prod,provider=form_measure,scope=session value=1i'], $listener->receive());
+    }
+
+    public function testNoBlockSendsNoMarker(): void
+    {
+        // Arrange
+        $listener = new UdpListener();
+        $recorder = new Recorder($listener->dsn(), 'prod');
+        $detector = $this->makeProvider('not_found', priority: 0, recommendation: SecurityRecommendation::Handled);
+        $service = $this->buildService([$detector], recorder: $recorder);
+
+        // Act
+        $service->event(SecurityEventType::NotFound, Request::create('/', server: ['REMOTE_ADDR' => '1.2.3.4']));
+        $recorder->flush();
+
+        // Assert
+        static::assertSame([], $listener->receive());
+    }
+
     public function testNotFoundBlockStampsLatestNotFoundLogRow(): void
     {
         // Arrange
@@ -284,6 +350,7 @@ class SecurityServiceTest extends TestCase
         ?AppStateService $appState = null,
         ?NotFoundLogRepository $notFoundLogRepository = null,
         ?AccessDeniedLogRepository $accessDeniedLogRepository = null,
+        ?Recorder $recorder = null,
     ): SecurityService {
         $blockStore ??= new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
         $em ??= $this->createStub(EntityManagerInterface::class);
@@ -303,6 +370,7 @@ class SecurityServiceTest extends TestCase
             accessDeniedLogRepository: $accessDeniedLogRepository,
             identityResolver: new RequestIdentityResolver(new NullLogger()),
             securityMeasureLogRepository: $this->createStub(SecurityMeasureLogRepository::class),
+            recorder: $recorder ?? new Recorder(null, 'test'),
         );
     }
 

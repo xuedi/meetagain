@@ -10,6 +10,8 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 final readonly class TerminateSubscriber implements EventSubscriberInterface
 {
+    public const string ROUTE_ATTRIBUTE = '_metrics_route';
+
     private const int RUNTIME_SAMPLE_ONE_IN = 100;
     private const int BYTES_PER_MB = 1_048_576;
 
@@ -36,7 +38,7 @@ final readonly class TerminateSubscriber implements EventSubscriberInterface
         $startedAt = (float) $request->server->get('REQUEST_TIME_FLOAT', microtime(true));
         $durationMs = round((microtime(true) - $startedAt) * 1000, 1);
         $this->releaseClient();
-        $route = $request->attributes->get('_route');
+        $route = $request->attributes->get(self::ROUTE_ATTRIBUTE) ?? $request->attributes->get('_route');
 
         $this->recorder->add(
             new Point(

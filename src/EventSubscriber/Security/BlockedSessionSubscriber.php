@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber\Security;
 
+use App\Metrics\TerminateSubscriber;
 use App\Service\Security\BlockedSessionStore;
 use App\Service\Security\LoadtestBypass;
 use App\Service\Security\RequestIdentityResolver;
@@ -67,17 +68,17 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
         }
 
         $ip = $request->getClientIp() ?? '';
-        if ($ip !== '' && $this->blockStore->isIpBlocked($ip)) {
-            $event->setResponse($this->buildBlockResponse());
-            $event->stopPropagation();
+        $isBlocked = $ip !== '' && $this->blockStore->isIpBlocked($ip);
+        if (!$isBlocked) {
+            $isBlocked = $this->blockStore->isSessionBlocked($this->identityResolver->resolveSessionKey($request, $ip));
+        }
+        if (!$isBlocked) {
             return;
         }
 
-        $sessionId = $this->identityResolver->resolveSessionKey($request, $ip);
-        if ($this->blockStore->isSessionBlocked($sessionId)) {
-            $event->setResponse($this->buildBlockResponse());
-            $event->stopPropagation();
-        }
+        $request->attributes->set(TerminateSubscriber::ROUTE_ATTRIBUTE, '_blocked');
+        $event->setResponse($this->buildBlockResponse());
+        $event->stopPropagation();
     }
 
     private function isLoadtestBypass(Request $request): bool
