@@ -43,4 +43,34 @@ readonly class ConsentService
             $response->headers->setCookie($cookie);
         }
     }
+
+    public function getShowExternalMedia(): bool
+    {
+        $session = $this->requestStack->getCurrentRequest()?->getSession();
+        if (!$session instanceof SessionInterface) {
+            return false;
+        }
+
+        return Consent::getBySession($session)->getExternalMedia() === ConsentType::Granted;
+    }
+
+    public function setShowExternalMedia(bool $granted, ?Response $response = null): void
+    {
+        $session = $this->requestStack->getCurrentRequest()?->getSession();
+        if (!$session instanceof SessionInterface) {
+            return;
+        }
+
+        $consent = Consent::getBySession($session);
+        $consent->setExternalMedia($granted ? ConsentType::Granted : ConsentType::Denied);
+        $consent->save($session);
+
+        if ($response === null) {
+            return;
+        }
+
+        foreach ($consent->getHtmlCookies() as $cookie) {
+            $response->headers->setCookie($cookie);
+        }
+    }
 }

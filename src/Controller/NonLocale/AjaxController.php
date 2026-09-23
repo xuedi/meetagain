@@ -6,6 +6,7 @@ use App\Controller\AbstractController;
 use App\Entity\Session\Consent;
 use App\Enum\ConsentType;
 use App\Service\Config\LocaleCookieService;
+use App\Service\Member\ConsentService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ final class AjaxController extends AbstractController
 {
     public function __construct(
         private readonly LocaleCookieService $localeCookieService,
+        private readonly ConsentService $consentService,
     ) {}
 
     #[Route('/ajax/', name: 'app_ajax', methods: ['GET'])]
@@ -34,6 +36,7 @@ final class AjaxController extends AbstractController
         $consent = Consent::getBySession($request->getSession());
         $consent->setCookies(ConsentType::Granted);
         $consent->setOsm($request->request->get('osmConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
+        $consent->setExternalMedia($request->request->get('externalMediaConsent') === 'true' ? ConsentType::Granted : ConsentType::Denied);
         $consent->save($request->getSession());
 
         $response = new JsonResponse('Saved preferences', Response::HTTP_OK);
@@ -41,6 +44,19 @@ final class AjaxController extends AbstractController
             $response->headers->setCookie($cookie);
         }
         $response->headers->setCookie($this->localeCookieService->createCookie($request->getLocale()));
+
+        return $response;
+    }
+
+    #[Route('/ajax/consent/external-media', name: 'app_ajax_consent_external_media', methods: ['POST'])]
+    public function grantExternalMedia(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('external_media_consent', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        $response = new JsonResponse('Saved preferences', Response::HTTP_OK);
+        $this->consentService->setShowExternalMedia(true, $response);
 
         return $response;
     }
@@ -55,6 +71,7 @@ final class AjaxController extends AbstractController
         $consent = Consent::getBySession($request->getSession());
         $consent->setCookies(ConsentType::Denied);
         $consent->setOsm(ConsentType::Denied);
+        $consent->setExternalMedia(ConsentType::Denied);
         $consent->save($request->getSession());
 
         $response = new JsonResponse('Saved preferences', Response::HTTP_OK);

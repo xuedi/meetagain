@@ -638,6 +638,8 @@ cookie:
     consent_text: 'Ce site n''utilise aucune publicité ni aucun pistage tiers. Nous ne stockons que la session techniquement nécessaire et votre choix de cookies.'
     option_osm: 'OpenStreetMap'
     option_osm_text: 'Ce cookie est déposé par le serveur OpenStreetMap et est nécessaire pour afficher la carte sur la page de détail de l''événement. S''il n''est pas autorisé, l''adresse restera affichée, mais sans la carte.'
+    option_external_media: 'Médias externes'
+    option_external_media_text: 'Charger les vidéos intégrées de YouTube, TikTok et services similaires. Lorsqu''une vidéo se charge, votre adresse IP et les informations de votre navigateur sont transmises au fournisseur, qui peut stocker des données sur votre appareil. Sans cette autorisation, la question vous est posée avant chaque vidéo.'
     button_accept: 'Accepter'
     button_deny: 'Refuser'
     button_status: 'Statut'

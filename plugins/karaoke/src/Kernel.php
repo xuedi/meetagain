@@ -2,13 +2,19 @@
 
 namespace Plugin\Karaoke;
 
+use App\Entity\Link;
 use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
 use App\Plugin;
 use App\ValueObject\LinkCollection;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class Kernel implements Plugin
 {
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+    ) {}
+
     public function getPluginKey(): string
     {
         return 'karaoke';
@@ -16,7 +22,9 @@ class Kernel implements Plugin
 
     public function getLinkCollection(): LinkCollection
     {
-        return LinkCollection::empty();
+        return LinkCollection::empty()->withNavLinks([
+            new Link(slug: $this->urlGenerator->generate('app_plugin_karaoke'), name: 'karaoke.menu_main'),
+        ]);
     }
 
     public function getEventTile(int $eventId, EventTileLocation $location): ?string

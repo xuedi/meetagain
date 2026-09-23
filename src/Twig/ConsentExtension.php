@@ -13,6 +13,7 @@ final class ConsentExtension extends AbstractExtension
     {
         return [
             new TwigFunction('show_osm', [ConsentRuntime::class, 'showOsm']),
+            new TwigFunction('show_external_media', [ConsentRuntime::class, 'showExternalMedia']),
         ];
     }
 }

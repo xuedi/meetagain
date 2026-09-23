@@ -1,0 +1,50 @@
+{#
+    Karaoke Player - the video embed behind the external-media consent gate
+
+    Renders the provider iframe when the visitor has consented (loadMedia), otherwise a neutral gate
+    that references no provider host. The gate's form posts back to the song page for a one-time load,
+    which works without JavaScript; karaoke_player.js intercepts it, mounts the iframe in place and, when
+    the "always" box is ticked, stores the consent through the core endpoint first.
+
+    Used in:    plugins/karaoke/templates/detail.html.twig, plugins/karaoke/templates/timing.html.twig
+    Parameters:
+        - song      (Song, required) -- the song whose video is embedded
+        - loadMedia (bool, required) -- true renders the iframe, false the gate
+        - loadUrl   (string, optional) -- where the gate posts the one-time load; default: the song page
+    Depends on: plugins/karaoke/assets/js/karaoke_player.js, show_external_media() consent
+#}
+{% set provider = song.mediaProvider %}
+{% set embedUrl = song.mediaLink.embedUrl ~ (provider.value == 'youtube' ? '&origin=' ~ app.request.schemeAndHttpHost|url_encode : '') %}
+<div class="karaoke-stage image {{ provider.value == 'tiktok' ? 'is-9by16 karaoke-stage-portrait' : 'is-16by9' }}"
+     data-karaoke-stage
+     data-provider="{{ provider.value }}"
+     data-embed-url="{{ embedUrl }}">
+    {% if loadMedia %}
+        <iframe class="has-ratio" src="{{ embedUrl }}" title="{{ song.title }}"
+                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                allowfullscreen referrerpolicy="strict-origin-when-cross-origin"
+                data-karaoke-frame></iframe>
+    {% else %}
+        <form class="karaoke-gate has-ratio has-background-light p-5 is-flex is-flex-direction-column is-justify-content-center"
+              method="post" action="{{ loadUrl|default(path('app_plugin_karaoke_show', {id: song.id})) }}" data-karaoke-gate>
+            <input type="hidden" name="load" value="1">
+            <input type="hidden" name="_token" value="{{ csrf_token('external_media_consent') }}">
+            <p class="title is-5 mb-2">{{ 'karaoke.gate_title'|trans({'%provider%': provider.label}) }}</p>
+            <p class="mb-4">{{ 'karaoke.gate_text'|trans({'%provider%': provider.label}) }}</p>
+            <div class="field">
+                <label class="checkbox is-hidden" data-karaoke-always>
+                    <input type="checkbox" name="always" value="1">
+                    {{ 'karaoke.gate_always'|trans }}
+                </label>
+            </div>
+            <div class="buttons">
+                <button type="submit" class="button is-link"
+                        data-consent-url="{{ path('app_ajax_consent_external_media') }}">
+                    <span class="icon"><i class="fa fa-play"></i></span>
+                    <span>{{ 'karaoke.gate_button_load'|trans }}</span>
+                </button>
+                <a href="{{ path('app_cookie') }}" class="button is-text">{{ 'karaoke.gate_settings'|trans }}</a>
+            </div>
+        </form>
+    {% endif %}
+</div>

@@ -1,0 +1,68 @@
+.karaoke-stage-portrait {
+    max-width: 22rem;
+    margin: 0 auto;
+}
+
+.karaoke-gate {
+    border: 1px solid var(--bulma-border);
+    border-radius: var(--bulma-radius);
+    overflow-y: auto;
+}
+
+.karaoke-lyrics {
+    list-style: none;
+    margin: 0;
+    max-height: 70vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.karaoke-line {
+    border-left: 3px solid transparent;
+    border-radius: var(--bulma-radius-small);
+    padding: 0.4rem 0.75rem;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.karaoke-original {
+    display: block;
+    font-size: 1.2rem;
+}
+
+.karaoke-translation {
+    color: var(--bulma-text-weak);
+    display: block;
+}
+
+.karaoke-lyrics.is-seekable .karaoke-line[data-start-ms] {
+    cursor: pointer;
+}
+
+.karaoke-lyrics.is-seekable .karaoke-line[data-start-ms]:hover {
+    background-color: var(--bulma-background);
+}
+
+.karaoke-line.is-current {
+    background-color: var(--bulma-primary-soft);
+    border-left-color: var(--bulma-primary);
+}
+
+.karaoke-lyrics.hide-original .karaoke-original,
+.karaoke-lyrics.hide-translation .karaoke-translation {
+    visibility: hidden;
+}
+
+@media screen and (max-width: 768px) {
+    .karaoke-lyrics {
+        max-height: none;
+    }
+}
+
+.karaoke-sticky {
+    position: sticky;
+    top: 4.5rem;
+}
+
+.karaoke-line.is-next td:first-child {
+    box-shadow: inset 3px 0 0 var(--bulma-link);
+}

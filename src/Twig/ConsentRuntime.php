@@ -15,4 +15,9 @@ final readonly class ConsentRuntime implements RuntimeExtensionInterface
     {
         return $this->consentService->getShowOsm();
     }
+
+    public function showExternalMedia(): bool
+    {
+        return $this->consentService->getShowExternalMedia();
+    }
 }

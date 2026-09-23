@@ -4,6 +4,7 @@
     "exported_at": "2026-01-05T00:00:00+01:00",
     "plugins": [
         "glossary",
+        "karaoke",
         "wishlist"
     ],
     "site": {
@@ -677,6 +678,39 @@
             "labels": {
                 "en": "HSK 2",
                 "zh": "HSK 2"
+            },
+            "managed": false
+        },
+        {
+            "ref": 38,
+            "item_type": "song",
+            "parent_ref": null,
+            "position": 0,
+            "labels": {
+                "en": "Folk song",
+                "zh": "民歌"
+            },
+            "managed": false
+        },
+        {
+            "ref": 39,
+            "item_type": "song",
+            "parent_ref": null,
+            "position": 1,
+            "labels": {
+                "en": "Beginner",
+                "zh": "初级"
+            },
+            "managed": false
+        },
+        {
+            "ref": 40,
+            "item_type": "song",
+            "parent_ref": null,
+            "position": 2,
+            "labels": {
+                "en": "Intermediate",
+                "zh": "中级"
             },
             "managed": false
         }
@@ -4388,6 +4422,263 @@
                 ],
                 "321": [
                     37
+                ]
+            }
+        },
+        "song": {
+            "rows": [
+                {
+                    "ref": 1,
+                    "title": "茉莉花",
+                    "artist": "江苏民歌",
+                    "language": "zh",
+                    "media": {
+                        "provider": "youtube",
+                        "id": "YkfAzMlL3xM"
+                    },
+                    "offset_ms": 0,
+                    "lines": [
+                        {
+                            "start_ms": null,
+                            "text": "好一朵美丽的茉莉花",
+                            "translations": {
+                                "en": "What a beautiful jasmine flower"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "好一朵美丽的茉莉花",
+                            "translations": {
+                                "en": "What a beautiful jasmine flower"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "芬芳美丽满枝桠",
+                            "translations": {
+                                "en": "Fragrant and lovely, it fills every branch"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "又香又白人人夸",
+                            "translations": {
+                                "en": "So sweet and so white, everyone sings its praise"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "让我来将你摘下",
+                            "translations": {
+                                "en": "Let me pick you from the branch"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "送给别人家",
+                            "translations": {
+                                "en": "And give you to someone dear"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "茉莉花呀茉莉花",
+                            "translations": {
+                                "en": "Oh jasmine flower, jasmine flower"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "ref": 2,
+                    "title": "康定情歌",
+                    "artist": "四川民歌",
+                    "language": "zh",
+                    "media": {
+                        "provider": "youtube",
+                        "id": "nE-sLijay0A"
+                    },
+                    "offset_ms": 0,
+                    "lines": [
+                        {
+                            "start_ms": null,
+                            "text": "跑马溜溜的山上",
+                            "translations": {
+                                "en": "On the mountain where the horses run"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "一朵溜溜的云哟",
+                            "translations": {
+                                "en": "There floats a single cloud"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "端端溜溜的照在",
+                            "translations": {
+                                "en": "Shining straight down upon"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "康定溜溜的城哟",
+                            "translations": {
+                                "en": "The town of Kangding"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "月亮弯弯",
+                            "translations": {
+                                "en": "The moon is a curve"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "康定溜溜的城哟",
+                            "translations": {
+                                "en": "Over the town of Kangding"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "李家溜溜的大姐",
+                            "translations": {
+                                "en": "The eldest daughter of the Li family"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "人才溜溜的好哟",
+                            "translations": {
+                                "en": "Is fine in looks and in character"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "张家溜溜的大哥",
+                            "translations": {
+                                "en": "The eldest son of the Zhang family"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "看上溜溜的她哟",
+                            "translations": {
+                                "en": "Has set his heart on her"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "月亮弯弯",
+                            "translations": {
+                                "en": "The moon is a curve"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "看上溜溜的她哟",
+                            "translations": {
+                                "en": "He has set his heart on her"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "一来溜溜的看上",
+                            "translations": {
+                                "en": "First, he fell for her"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "人才溜溜的好哟",
+                            "translations": {
+                                "en": "Because she is so fine"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "二来溜溜的看上",
+                            "translations": {
+                                "en": "Second, he fell for her"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "会当溜溜的家哟",
+                            "translations": {
+                                "en": "Because she knows how to keep a home"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "月亮弯弯",
+                            "translations": {
+                                "en": "The moon is a curve"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "会当溜溜的家哟",
+                            "translations": {
+                                "en": "She knows how to keep a home"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "世间溜溜的女子",
+                            "translations": {
+                                "en": "Every woman in the world"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "任我溜溜的爱哟",
+                            "translations": {
+                                "en": "Is mine to love as I choose"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "世间溜溜的男子",
+                            "translations": {
+                                "en": "Every man in the world"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "任你溜溜的求哟",
+                            "translations": {
+                                "en": "Is yours to court as you choose"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "月亮弯弯",
+                            "translations": {
+                                "en": "The moon is a curve"
+                            }
+                        },
+                        {
+                            "start_ms": null,
+                            "text": "任你溜溜的求哟",
+                            "translations": {
+                                "en": "Yours to court as you choose"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "tags": {
+                "1": [
+                    38,
+                    39
+                ],
+                "2": [
+                    38,
+                    40
                 ]
             }
         }

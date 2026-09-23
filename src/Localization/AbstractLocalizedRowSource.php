@@ -77,10 +77,18 @@ abstract readonly class AbstractLocalizedRowSource implements LocalizedContentSo
      */
     private function baseQuery(array $ownerIds, array $keepLocales): QueryBuilder
     {
-        return $this->em
-            ->createQueryBuilder()
-            ->from($this->getEntityClass(), 'row')
-            ->where(sprintf('row.%s IN (:ownerIds)', $this->getOwnerField()))
+        $qb = $this->em->createQueryBuilder()->from($this->getEntityClass(), 'row');
+
+        $path = explode('.', $this->getOwnerField());
+        $ownerField = array_pop($path);
+        $alias = 'row';
+        foreach ($path as $index => $association) {
+            $qb->innerJoin(sprintf('%s.%s', $alias, $association), 'via' . $index);
+            $alias = 'via' . $index;
+        }
+
+        return $qb
+            ->where(sprintf('%s.%s IN (:ownerIds)', $alias, $ownerField))
             ->andWhere(sprintf('row.%s NOT IN (:keepLocales)', $this->getLocaleField()))
             ->setParameter('ownerIds', $ownerIds)
             ->setParameter('keepLocales', $keepLocales);

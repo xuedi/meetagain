@@ -11,3 +11,4 @@ framework:
             - logout
             - cookie_accept
             - cookie_deny
+            - external_media_consent

@@ -24,6 +24,7 @@ final class CookieController extends AbstractController
         $form = $this->createForm(CookieConsentType::class, null, [
             'cookies_granted' => $consent->getCookies() === ConsentType::Granted,
             'osm_granted' => $consent->getOsm() === ConsentType::Granted,
+            'external_media_granted' => $consent->getExternalMedia() === ConsentType::Granted,
         ]);
 
         $form->handleRequest($request);
@@ -33,6 +34,7 @@ final class CookieController extends AbstractController
 
             $consent->setCookies($data['cookies'] ? ConsentType::Granted : ConsentType::Denied);
             $consent->setOsm($data['cookies'] && $data['osm'] ? ConsentType::Granted : ConsentType::Denied);
+            $consent->setExternalMedia($data['cookies'] && $data['external_media'] ? ConsentType::Granted : ConsentType::Denied);
 
             $consent->save($request->getSession());
 

@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% set heading = 'karaoke.page_title_timing'|trans({'%title%': song.title}) %}
+
+{% block title %}{{ heading }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('plugins/karaoke/styles/karaoke.css') }}"/>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('plugins/karaoke/js/karaoke_player.js') }}" defer></script>
+    <script src="{{ asset('plugins/karaoke/js/karaoke_timing.js') }}" defer></script>
+{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <h1 class="title is-4">{{ heading }}</h1>
+            <p class="mb-4">{{ 'karaoke.timing_intro'|trans }}</p>
+
+            <div class="columns" data-karaoke-player data-karaoke-custom>
+                <div class="column is-6">
+                    <div class="karaoke-sticky">
+                        {% include '@Karaoke/_player.html.twig' with {
+                            'song': song,
+                            'loadMedia': loadMedia,
+                            'loadUrl': path('app_plugin_karaoke_timing', {id: song.id})
+                        } only %}
+                        <div class="buttons mt-3 is-hidden" data-karaoke-timing-controls>
+                            <button type="button" class="button is-link is-medium" data-karaoke-stamp>
+                                <span class="icon"><i class="fa fa-stopwatch"></i></span>
+                                <span>{{ 'karaoke.button_stamp'|trans }}</span>
+                            </button>
+                            <button type="button" class="button is-medium" data-karaoke-undo>
+                                <span class="icon"><i class="fa fa-rotate-left"></i></span>
+                                <span>{{ 'karaoke.button_undo'|trans }}</span>
+                            </button>
+                        </div>
+                        <p class="help is-hidden" data-karaoke-timing-help>{{ 'karaoke.timing_keys'|trans }}</p>
+                    </div>
+                </div>
+                <div class="column is-6">
+                    <form method="post" action="{{ path('app_plugin_karaoke_timing', {id: song.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_karaoke_timing' ~ song.id) }}">
+                        <div class="field">
+                            <label class="label" for="karaoke-offset">{{ 'karaoke.field_offset'|trans }}</label>
+                            <div class="control">
+                                <input class="input" type="number" step="10" id="karaoke-offset" name="offset" value="{{ song.offsetMs }}">
+                            </div>
+                            <p class="help">{{ 'karaoke.help_offset'|trans }}</p>
+                        </div>
+                        <table class="table is-fullwidth is-narrow" data-karaoke-timing-table>
+                            <thead>
+                                <tr>
+                                    <th>{{ 'karaoke.col_start'|trans }}</th>
+                                    <th>{{ 'karaoke.col_line'|trans }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for line in song.lines %}
+                                    <tr class="karaoke-line" data-karaoke-row>
+                                        <td style="width: 8rem;">
+                                            <input class="input is-small is-family-monospace" type="text" name="start[{{ loop.index0 }}]"
+                                                   value="{{ starts[loop.index0] }}" placeholder="mm:ss.cc" inputmode="decimal"
+                                                   aria-label="{{ 'karaoke.col_start'|trans }} {{ loop.index }}">
+                                        </td>
+                                        <td lang="{{ song.language }}">{{ line.text }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="buttons is-right">
+                            <a href="{{ path('app_plugin_karaoke_show', {id: song.id}) }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                            <button type="submit" class="button is-link">{{ 'karaoke.button_save_timing'|trans }}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

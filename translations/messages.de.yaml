@@ -638,6 +638,8 @@ cookie:
     consent_text: 'Diese Webseite nutzt keine Werbung und kein Drittanbieter-Tracking. Gespeichert werden nur die technisch notwendige Session und Ihre Cookie-Auswahl.'
     option_osm: 'Open Street maps'
     option_osm_text: 'Dieser Cookie wird nicht von uns gesetzt aber durch die Einbindung von OpenStreetMaps, wenn nicht gesetzt gibt es keine Karte auf der Event detail Seite.'
+    option_external_media: 'Externe Medien'
+    option_external_media_text: 'Eingebettete Videos von YouTube, TikTok und ähnlichen Diensten laden. Beim Laden eines Videos werden deine IP-Adresse und Browserdaten an den Anbieter übertragen, der Daten auf deinem Gerät speichern kann. Ohne diese Zustimmung wirst du vor jedem Video gefragt.'
     button_accept: 'Akzeptieren'
     button_deny: 'Ablehnen'
     button_status: 'Status'

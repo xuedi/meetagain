@@ -40,6 +40,25 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="list-item">
+                            <div class="list-item-content">
+                                <div class="list-item-title">
+                                    <label class="checkbox" for="external_media_consent_checkbox">
+                                        <input
+                                            type="checkbox"
+                                            name="external_media_consent_checkbox"
+                                            {% if show_external_media() %}checked{% endif %}
+                                            id="external_media_consent_checkbox"
+                                            aria-describedby="external-media-description"
+                                        />
+                                        <strong>{{ "cookie.option_external_media" | trans }}</strong>
+                                    </label>
+                                </div>
+                                <div id="external-media-description" class="list-item-description has-text-grey is-size-7">
+                                    {{ "cookie.option_external_media_text" | trans }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="navbar-item">
