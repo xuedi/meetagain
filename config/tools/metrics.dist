@@ -1,0 +1,27 @@
+# Read-only client for the metrics store (any Prometheus-compatible query API).
+#
+# BACKEND=prometheus talks to the query API directly, e.g. the local VictoriaMetrics from
+# `just dockerMetricsStart`. BACKEND=grafana goes through Grafana's datasource proxy with a
+# service-account token (role Viewer), so the store itself never needs to be reachable.
+# Put a production URL and TOKEN into the gitignored config/tools/metrics.local overlay.
+
+BACKEND=prometheus
+URL=http://localhost:8428
+TOKEN=
+DATASOURCE_UID=victoriametrics
+
+# Label matchers added to every report query; --app and --env override them per call.
+APP=meetagain
+ENV=dev
+
+# Report thresholds.
+SLOW_ROUTE_MS=1000
+SLOW_ROUTE_MIN_HITS=5
+PHP_BOUND_MS=300
+N_PLUS_ONE_QUERIES=50
+HIGH_MEMORY_MB=64
+REGRESSION_PCT=25
+PROBE_SPIKE_FACTOR=5
+PROBE_SPIKE_MIN=50
+STALE_CRON_MINUTES=15
+STALE_HTTP_MINUTES=60

@@ -15,18 +15,16 @@
     </td>
     {% if config.secondaryEnabled %}<td style="vertical-align: middle;" class="has-text-grey">{{ entry.secondary }}</td>{% endif %}
     <td style="vertical-align: middle;" class="item-cell-prose">{{ definition|nl2br }}</td>
-    {% if hasTags %}<td style="vertical-align: middle;">{{ item_tag_labels('glossary', entry.id)|join(', ') }}</td>{% endif %}
+    {% if hasTags %}<td style="vertical-align: middle;">{{ tagLabels|join(', ') }}</td>{% endif %}
     {% if is_granted('ROLE_USER') %}
         <td style="vertical-align: middle;" class="has-text-right">
             {% if is_granted('ROLE_ORGANIZER') %}
-                {% set pendingProposals = pending_change_proposals('glossary', entry.id) %}
-                {% if pendingProposals > 0 %}
+                {% if hasPendingProposal %}
                     <a class="has-text-warning" href="{{ path('app_review_proposals', {targetType: 'glossary', targetId: entry.id}) }}"
                        title="{{ 'glossary.heading_changes_approval'|trans }}">
                         <i class="fa fa-edit"></i>
                     </a>
-                {% endif %}
-                {% if pendingProposals == 0 %}
+                {% else %}
                     <a href="{{ path('app_plugin_glossary_edit', {id: entry.id}) }}">
                         <i class="fas fa-edit"></i>
                     </a>

@@ -9,6 +9,7 @@ members = [
     "gsc",
     "leak-guard",
     "mermaid-guard",
+    "metrics",
     "output-filter",
     "test-stamp",
     "toolconfig",

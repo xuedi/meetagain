@@ -12,6 +12,7 @@ use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Service\ConfigService;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
 
 final class GlossaryListCellProvider implements ListCellProviderInterface, ListProviderInterface
@@ -21,6 +22,18 @@ final class GlossaryListCellProvider implements ListCellProviderInterface, ListP
 
     private ?bool $hasTags = null;
 
+    /** @var list<int> */
+    private array $listedIds = [];
+
+    /** @var array<int, list<string>> */
+    private array $tagLabels = [];
+
+    /** @var array<int, true> */
+    private array $tagLabelsLoaded = [];
+
+    /** @var array<int, int>|null */
+    private ?array $pendingProposalIds = null;
+
     public function __construct(
         private readonly GlossaryService $glossaryService,
         private readonly ConfigService $configService,
@@ -28,6 +41,7 @@ final class GlossaryListCellProvider implements ListCellProviderInterface, ListP
         private readonly Environment $twig,
         private readonly ChangeProposalService $changeProposalService,
         private readonly Security $security,
+        private readonly RequestStack $requestStack,
     ) {}
 
     #[Override]
@@ -56,6 +70,8 @@ final class GlossaryListCellProvider implements ListCellProviderInterface, ListP
             'viewMode' => $mode?->value,
             'config' => $this->configService->getConfig(),
             'hasTags' => $this->hasTags(),
+            'tagLabels' => $this->tagLabelsFor($itemId),
+            'hasPendingProposal' => isset($this->pendingProposalIds()[$itemId]),
         ]);
     }
 
@@ -64,22 +80,22 @@ final class GlossaryListCellProvider implements ListCellProviderInterface, ListP
     {
         $entries = $this->glossaryService->getList();
         $this->entries ??= $this->byId($entries);
+        $this->listedIds = array_values(array_map(static fn(Glossary $entry): int => (int) $entry->getId(), $entries));
 
-        if (!$this->security->isGranted('ROLE_ORGANIZER')) {
-            return array_values(array_map(static fn(Glossary $entry): int => (int) $entry->getId(), $entries));
+        $pendingProposalIds = $this->pendingProposalIds();
+        if ($pendingProposalIds === []) {
+            return $this->listedIds;
         }
-
-        $pendingProposalIds = $this->changeProposalService->pendingTargetIds(GlossaryTaggableTypeProvider::ITEM_TYPE);
 
         $needsAttention = [];
         $rest = [];
-        foreach ($entries as $entry) {
-            if (in_array((int) $entry->getId(), $pendingProposalIds, true)) {
-                $needsAttention[] = (int) $entry->getId();
+        foreach ($this->listedIds as $itemId) {
+            if (isset($pendingProposalIds[$itemId])) {
+                $needsAttention[] = $itemId;
                 continue;
             }
 
-            $rest[] = (int) $entry->getId();
+            $rest[] = $itemId;
         }
 
         return [...$needsAttention, ...$rest];
@@ -135,6 +151,36 @@ final class GlossaryListCellProvider implements ListCellProviderInterface, ListP
     private function hasTags(): bool
     {
         return $this->hasTags ??= $this->tagService->getVocabulary(GlossaryTaggableTypeProvider::ITEM_TYPE) !== [];
+    }
+
+    /** @return list<string> */
+    private function tagLabelsFor(int $itemId): array
+    {
+        if (!$this->hasTags()) {
+            return [];
+        }
+
+        if (!isset($this->tagLabelsLoaded[$itemId])) {
+            $itemIds = array_values(array_unique([...$this->listedIds, $itemId]));
+            $this->tagLabels += $this->tagService->getLabelsForItems(
+                GlossaryTaggableTypeProvider::ITEM_TYPE,
+                $itemIds,
+                $this->requestStack->getCurrentRequest()?->getLocale(),
+            );
+            $this->tagLabelsLoaded += array_fill_keys($itemIds, true);
+        }
+
+        return $this->tagLabels[$itemId] ?? [];
+    }
+
+    /** @return array<int, int> */
+    private function pendingProposalIds(): array
+    {
+        if (!$this->security->isGranted('ROLE_ORGANIZER')) {
+            return [];
+        }
+
+        return $this->pendingProposalIds ??= array_flip($this->changeProposalService->pendingTargetIds(GlossaryTaggableTypeProvider::ITEM_TYPE));
     }
 
     /** @return array<int, Glossary> */

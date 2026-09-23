@@ -42,6 +42,29 @@ it appears.
   are.
 - The dashboard lives in `docker/metrics/grafana/dashboards/meetagain.json`. To change it, edit it in
   Grafana, export the JSON, and commit the file.
+- Every block by the security chain sends a `security_block` point tagged with the detector that
+  blocked (`fuse`, `not_found`, ...) and whether the IP or only the session was blocked. The dashboard
+  draws it as a red marker next to the deploy markers. Requests the block then turns away are tagged
+  with the route `_blocked`, so a burst of `_none` (no route matched) that ends in a marker and turns
+  into `_blocked` is a probing bot being stopped.
+
+## Reading the data from the command line
+
+`bin/tools/bin/metrics` is a read-only client for the collected series. Against the local stack it
+works without configuration:
+
+```bash
+bin/tools/bin/metrics health
+bin/tools/bin/metrics report performance --since 24h
+bin/tools/bin/metrics query 'sum by (route) (count_over_time(http_request_duration_ms[1h]))'
+```
+
+The reports (`daily`, `issues`, `performance`, `deploy`, `probes`) each run a set of queries and print
+one condensed answer; `metrics --help` lists every command. To read a production collector, put
+`BACKEND=grafana`, its `URL` and a Grafana service-account `TOKEN` (role Viewer) into
+`config/tools/metrics.local`. The tool then queries through Grafana's datasource proxy, so the
+collector itself never has to be reachable. The reports use MetricsQL functions, so they need
+VictoriaMetrics rather than plain Prometheus.
 
 ## Adding a gauge
 

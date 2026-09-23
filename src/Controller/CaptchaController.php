@@ -36,6 +36,7 @@ final class CaptchaController extends AbstractController
                 'image' => $this->captchaService->generate($context),
                 'count' => $this->captchaService->getRefreshCount(),
                 'next' => $this->captchaService->getRefreshTime(),
+                'expiries' => $this->captchaService->getRefreshExpiries(),
             ]);
         }
 
