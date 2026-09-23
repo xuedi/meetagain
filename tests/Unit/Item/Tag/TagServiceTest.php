@@ -96,6 +96,28 @@ class TagServiceTest extends TestCase
         );
     }
 
+    public function testLabelsForManyItemsHideImpliedAncestorsAndSkipUntaggedItems(): void
+    {
+        // Arrange
+        $nature = $this->tag(1, 'Nature');
+        $forest = $this->tag(2, 'Forest')->setParent($nature);
+        $city = $this->tag(3, 'City');
+        $assignmentRepo = $this->createMock(ItemTagAssignmentRepository::class);
+        $assignmentRepo
+            ->expects(static::exactly(2))
+            ->method('tagIdsForItems')
+            ->willReturnCallback(static fn(string $type, array $ids): array => array_intersect_key([10 => [1, 2], 11 => [3, 1]], array_flip($ids)));
+        $this->assignmentRepo = $assignmentRepo;
+        $service = $this->service([$nature, $forest, $city]);
+
+        // Act
+        $labels = $service->getLabelsForItems(self::TYPE, [10, 11, 12], 'en');
+
+        // Assert
+        static::assertSame([10 => ['Forest'], 11 => ['Nature', 'City']], $labels);
+        static::assertSame(['Forest'], $service->getLabels(self::TYPE, 10, 'en'));
+    }
+
     private function tag(int $id, string $label, bool $managed = false): ItemTag
     {
         $tag = new ItemTag();

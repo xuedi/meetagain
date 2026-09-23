@@ -146,7 +146,7 @@ readonly class MockSampleFactory
             ),
             $this->translator->trans(
                 'email_event_update.line_location',
-                ['%before%' => $world['previousLocation'], '%after%' => $sample->eventLocation],
+                ['%before%' => htmlspecialchars($world['previousLocation']), '%after%' => htmlspecialchars($sample->eventLocation)],
                 'messages',
                 $sample->locale,
             ),

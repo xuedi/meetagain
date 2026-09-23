@@ -176,17 +176,27 @@ class EmailTemplateServiceTest extends TestCase
         static::assertSame('<p>Hello &lt;a href=&quot;https://evil.example&quot;&gt;Alice&lt;/a&gt;</p>', $result);
     }
 
-    public function testRenderContentLetsTheAnnouncementBodyThroughAsHtml(): void
+    #[DataProvider('htmlVariableProvider')]
+    public function testRenderContentLetsAnHtmlFragmentThroughAsMarkup(string $key): void
     {
         // Arrange
-        $content = '<div>{{content}}</div>';
-        $context = ['content' => '<p>A real announcement</p>'];
+        $content = '<div>{{' . $key . '}}</div>';
+        $context = [$key => '<ul><li>A real fragment</li></ul>'];
 
         // Act
         $result = $this->subject->renderContent($content, $context);
 
         // Assert
-        static::assertSame('<div><p>A real announcement</p></div>', $result);
+        static::assertSame('<div><ul><li>A real fragment</li></ul></div>', $result);
+    }
+
+    public static function htmlVariableProvider(): Generator
+    {
+        yield 'announcement body' => ['content'];
+        yield 'admin notification sections' => ['sections'];
+        yield 'upcoming digest events' => ['eventsHtml'];
+        yield 'event update changes' => ['changesHtml'];
+        yield 'series reschedule removed dates' => ['removedDatesHtml'];
     }
 
     public function testRenderSubjectLeavesTheValueUnescaped(): void

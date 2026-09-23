@@ -98,6 +98,7 @@ final class HumanCheckType extends AbstractType
         $view->vars['powEnabled'] = $this->isEnabled(SecurityMeasure::ProofOfWork);
         $view->vars['refreshCount'] = $this->captchaService->getRefreshCount();
         $view->vars['refreshTime'] = $this->captchaService->getRefreshTime();
+        $view->vars['refreshExpiries'] = $this->captchaService->getRefreshExpiries();
     }
 
     #[Override]

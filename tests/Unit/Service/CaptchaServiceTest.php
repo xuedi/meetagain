@@ -188,6 +188,36 @@ class CaptchaServiceTest extends TestCase
         static::assertGreaterThan(0, $result);
     }
 
+    public function testGetRefreshExpiriesListsTheLiveRefreshesAscendingAndPrunesTheRest(): void
+    {
+        // Arrange
+        $this->session->set('captcha_refresh', [
+            new DateTimeImmutable('-10 seconds'),
+            new DateTimeImmutable('-2 minutes'),
+            new DateTimeImmutable('-35 seconds'),
+        ]);
+
+        // Act
+        $expiries = $this->subject->getRefreshExpiries();
+
+        // Assert
+        static::assertCount(2, $expiries);
+        static::assertEqualsWithDelta(25, $expiries[0], 1);
+        static::assertEqualsWithDelta(50, $expiries[1], 1);
+        static::assertCount(2, $this->session->get('captcha_refresh'));
+        static::assertSame(2, $this->subject->getRefreshCount());
+        static::assertSame($expiries[0], $this->subject->getRefreshTime());
+    }
+
+    public function testGetRefreshExpiriesIsEmptyWithoutRefreshHistory(): void
+    {
+        // Act
+        $expiries = $this->subject->getRefreshExpiries();
+
+        // Assert
+        static::assertSame([], $expiries);
+    }
+
     #[DataProvider('refreshCountDataProvider')]
     public function testGetRefreshCount(array $refreshHistory, int $expectedCount): void
     {

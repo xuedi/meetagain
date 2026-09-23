@@ -6,7 +6,6 @@ use App\Controller\AbstractController;
 use App\Entity\Session\Consent;
 use App\Enum\ConsentType;
 use App\Service\Config\LocaleCookieService;
-use App\Service\Security\CaptchaService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +15,6 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AjaxController extends AbstractController
 {
     public function __construct(
-        private readonly CaptchaService $captchaService,
         private readonly LocaleCookieService $localeCookieService,
     ) {}
 
@@ -65,14 +63,5 @@ final class AjaxController extends AbstractController
         }
 
         return $response;
-    }
-
-    #[Route('/ajax/get-captcha-count', name: 'app_ajax_get_captcha_count', methods: ['GET'])]
-    public function getCaptchaCountIndex(): Response
-    {
-        return new JsonResponse([
-            'count' => $this->captchaService->getRefreshCount(),
-            'next' => $this->captchaService->getRefreshTime(),
-        ]);
     }
 }

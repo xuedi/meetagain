@@ -83,36 +83,35 @@ readonly class CaptchaService
 
     public function getRefreshCount(): int
     {
-        $session = $this->getSession();
-        $refresh = $session->get('captcha_refresh', []);
-        foreach ($refresh as $key => $value) {
-            if ($value->modify('+1 minute') >= new DateTimeImmutable()) {
-                continue;
-            }
-
-            unset($refresh[$key]);
-        }
-        $session->set('captcha_refresh', $refresh);
-
-        return count($refresh);
+        return count($this->getRefreshExpiries());
     }
 
     public function getRefreshTime(): int
     {
+        return $this->getRefreshExpiries()[0] ?? 0;
+    }
+
+    /** @return list<int> */
+    public function getRefreshExpiries(): array
+    {
         $session = $this->getSession();
-        $refresh = $session->get('captcha_refresh', []);
-        $now = new DateTimeImmutable();
-        $minSeconds = PHP_INT_MAX;
+        $now = new DateTimeImmutable()->getTimestamp();
 
-        foreach ($refresh as $value) {
-            $expireTime = $value->modify('+1 minute');
-            $seconds = $expireTime->getTimestamp() - $now->getTimestamp();
-            if ($seconds > 0 && $seconds < $minSeconds) {
-                $minSeconds = $seconds;
+        $active = [];
+        $expiries = [];
+        foreach ($session->get('captcha_refresh', []) as $refreshedAt) {
+            $seconds = $refreshedAt->modify('+1 minute')->getTimestamp() - $now;
+            if ($seconds <= 0) {
+                continue;
             }
-        }
 
-        return $minSeconds === PHP_INT_MAX ? 0 : $minSeconds;
+            $active[] = $refreshedAt;
+            $expiries[] = $seconds;
+        }
+        $session->set('captcha_refresh', $active);
+        sort($expiries);
+
+        return $expiries;
     }
 
     private function getSession(): SessionInterface

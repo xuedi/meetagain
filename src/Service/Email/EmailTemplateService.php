@@ -110,7 +110,7 @@ readonly class EmailTemplateService
         ],
     ];
 
-    private const array HTML_VARIABLES = ['content'];
+    private const array HTML_VARIABLES = ['content', 'sections', 'eventsHtml', 'changesHtml', 'removedDatesHtml'];
 
     private const array VARIABLES = [
         EmailType::VerificationRequest->value => ['username', 'token', 'host', 'url', 'lang', 'greeting'],

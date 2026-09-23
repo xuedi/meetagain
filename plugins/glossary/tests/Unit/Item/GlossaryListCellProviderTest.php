@@ -2,6 +2,7 @@
 
 namespace Plugin\Glossary\Tests\Unit\Item;
 
+use App\Entity\ItemTag;
 use App\Item\Tag\TagService;
 use App\Review\ChangeProposalService;
 use DateTimeImmutable;
@@ -14,6 +15,8 @@ use Plugin\Glossary\Service\GlossaryService;
 use Plugin\Glossary\ValueObject\Config;
 use ReflectionProperty;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Environment;
 
 class GlossaryListCellProviderTest extends TestCase
@@ -34,6 +37,8 @@ class GlossaryListCellProviderTest extends TestCase
                 'config' => $config,
                 'hasTags' => false,
                 'viewMode' => null,
+                'tagLabels' => [],
+                'hasPendingProposal' => false,
             ])
             ->willReturn('<td>你好</td>');
 
@@ -100,15 +105,69 @@ class GlossaryListCellProviderTest extends TestCase
         self::assertSame('2026-03-04', $stamps[7]->format('Y-m-d'));
     }
 
-    private function makeProvider(GlossaryService $service, ConfigService $configService, Environment $twig): GlossaryListCellProvider
+    public function testLooksUpTagsAndPendingProposalsOnceForTheWholeList(): void
     {
+        // Arrange
+        $service = $this->createStub(GlossaryService::class);
+        $service->method('getList')->willReturn([$this->makeEntry(7, '2026-03-04'), $this->makeEntry(8, '2026-03-05')]);
+        $service->method('definitionFor')->willReturn('Hello');
+
+        $tagService = $this->createMock(TagService::class);
+        $tagService->method('getVocabulary')->willReturn([new ItemTag()]);
+        $tagService
+            ->expects(self::once())
+            ->method('getLabelsForItems')
+            ->with(GlossaryTaggableTypeProvider::ITEM_TYPE, [7, 8], 'de')
+            ->willReturn([8 => ['Verb']]);
+
+        $proposals = $this->createMock(ChangeProposalService::class);
+        $proposals->expects(self::once())->method('pendingTargetIds')->willReturn([8]);
+
+        $security = $this->createStub(Security::class);
+        $security->method('isGranted')->willReturn(true);
+
+        $rendered = [];
+        $twig = $this->createStub(Environment::class);
+        $twig->method('render')->willReturnCallback(static function (string $template, array $context) use (&$rendered): string {
+            $rendered[$context['entry']->getId()] = [$context['tagLabels'], $context['hasPendingProposal']];
+
+            return '';
+        });
+
+        $provider = $this->makeProvider($service, $this->configReturning(new Config()), $twig, $tagService, $proposals, $security);
+
+        // Act
+        $itemIds = $provider->getItemIds();
+        foreach ($itemIds as $itemId) {
+            $provider->renderListCell($itemId);
+        }
+
+        // Assert
+        self::assertSame([8, 7], $itemIds);
+        self::assertSame([8 => [['Verb'], true], 7 => [[], false]], $rendered);
+    }
+
+    private function makeProvider(
+        GlossaryService $service,
+        ConfigService $configService,
+        Environment $twig,
+        ?TagService $tagService = null,
+        ?ChangeProposalService $proposals = null,
+        ?Security $security = null,
+    ): GlossaryListCellProvider {
+        $requestStack = new RequestStack();
+        $request = new Request();
+        $request->setLocale('de');
+        $requestStack->push($request);
+
         return new GlossaryListCellProvider(
             $service,
             $configService,
-            $this->createStub(TagService::class),
+            $tagService ?? $this->createStub(TagService::class),
             $twig,
-            $this->createStub(ChangeProposalService::class),
-            $this->createStub(Security::class),
+            $proposals ?? $this->createStub(ChangeProposalService::class),
+            $security ?? $this->createStub(Security::class),
+            $requestStack,
         );
     }
 

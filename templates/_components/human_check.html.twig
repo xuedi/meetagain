@@ -36,7 +36,7 @@
     {% if form.captcha is defined or form.vars.powEnabled %}
         <fieldset class="p-4 mb-4 mt-4 fieldset-info"
                   {% if form.captcha is defined %}data-captcha-counter
-                  data-url="{{ path('app_ajax_get_captcha_count') }}"
+                  data-expiries="{{ form.vars.refreshExpiries|json_encode }}"
                   data-refresh-url="{{ path('app_captcha_refresh', {'context': form.vars.context}) }}"{% endif %}>
             <legend class="px-2 has-text-info has-text-weight-semibold is-size-7">
                 {{ (form.captcha is defined ? label|default('security.label_captcha') : 'security.human_check_legend')|trans }}

@@ -126,35 +126,32 @@ readonly class TagService implements ActionInterface
     /** @return list<string> the labels of the assigned tags the closure did not merely imply */
     public function getLabels(string $itemType, int $itemId, ?string $locale): array
     {
-        $assigned = $this->getTagIds($itemType, $itemId);
-        if ($assigned === []) {
+        return $this->getLabelsForItems($itemType, [$itemId], $locale)[$itemId] ?? [];
+    }
+
+    /**
+     * @param list<int> $itemIds
+     * @return array<int, list<string>> item id => labels, for the items that carry any
+     */
+    public function getLabelsForItems(string $itemType, array $itemIds, ?string $locale): array
+    {
+        $assignedByItem = $this->assignmentRepo->tagIdsForItems($itemType, $itemIds);
+        if ($assignedByItem === []) {
             return [];
         }
 
-        $implied = [];
-        $tags = [];
-        foreach ($this->getVocabulary($itemType) as $tag) {
-            if (!in_array((int) $tag->getId(), $assigned, true)) {
-                continue;
-            }
+        $vocabulary = $this->getVocabulary($itemType);
+        $sourceLocale = $this->sourceLocale();
 
-            $tags[] = $tag;
-            foreach ($tag->getAncestors() as $ancestor) {
-                $implied[(int) $ancestor->getId()] = true;
+        $labelsByItem = [];
+        foreach ($assignedByItem as $itemId => $assigned) {
+            $labels = $this->labelsOf($vocabulary, $assigned, $locale, $sourceLocale);
+            if ($labels !== []) {
+                $labelsByItem[$itemId] = $labels;
             }
         }
 
-        $labels = [];
-        foreach ($tags as $tag) {
-            $label = $tag->getLabel($locale, $this->sourceLocale());
-            if (isset($implied[(int) $tag->getId()]) || $label === '') {
-                continue;
-            }
-
-            $labels[] = $label;
-        }
-
-        return $labels;
+        return $labelsByItem;
     }
 
     public function labelFor(ItemTag $tag, ?string $locale): string
@@ -358,6 +355,39 @@ readonly class TagService implements ActionInterface
         }
 
         $this->assignmentRepo->deleteFor($itemType, $itemId);
+    }
+
+    /**
+     * @param list<ItemTag> $vocabulary
+     * @param list<int>     $assigned
+     * @return list<string>
+     */
+    private function labelsOf(array $vocabulary, array $assigned, ?string $locale, string $sourceLocale): array
+    {
+        $implied = [];
+        $tags = [];
+        foreach ($vocabulary as $tag) {
+            if (!in_array((int) $tag->getId(), $assigned, true)) {
+                continue;
+            }
+
+            $tags[] = $tag;
+            foreach ($tag->getAncestors() as $ancestor) {
+                $implied[(int) $ancestor->getId()] = true;
+            }
+        }
+
+        $labels = [];
+        foreach ($tags as $tag) {
+            $label = $tag->getLabel($locale, $sourceLocale);
+            if (isset($implied[(int) $tag->getId()]) || $label === '') {
+                continue;
+            }
+
+            $labels[] = $label;
+        }
+
+        return $labels;
     }
 
     /**
