@@ -33,23 +33,24 @@ class SongType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $song = $options['song'];
+        $draft = $options['draft'];
 
         $builder->add('title', TextType::class, [
             'label' => 'karaoke.field_title',
             'mapped' => false,
-            'data' => $song?->getTitle(),
+            'data' => $song?->getTitle() ?? $draft['title'] ?? null,
             'constraints' => [new NotBlank(), new Length(max: 255)],
         ])->add('artist', TextType::class, [
             'label' => 'karaoke.field_artist',
             'required' => false,
             'mapped' => false,
-            'data' => $song?->getArtist(),
+            'data' => $song?->getArtist() ?? $draft['artist'] ?? null,
             'constraints' => [new Length(max: 255)],
         ])->add('language', LanguageType::class, [
             'label' => 'karaoke.field_language',
             'help' => 'karaoke.help_language',
             'mapped' => false,
-            'data' => $song?->getLanguage(),
+            'data' => $song?->getLanguage() ?? $draft['language'] ?? null,
             'placeholder' => '',
             'preferred_choices' => ['zh', 'en', 'de', 'fr', 'es', 'ja', 'ko'],
             'choice_filter' => static fn(?string $code): bool => $code !== null && strlen($code) === 2,
@@ -58,7 +59,8 @@ class SongType extends AbstractType
             'label' => 'karaoke.field_media_link',
             'help' => 'karaoke.help_media_link',
             'mapped' => false,
-            'data' => $song?->getMediaLink(),
+            'data' => $song?->getMediaLink() ?? $draft['link'] ?? null,
+            'data_class' => null,
             'invalid_message' => 'karaoke.validator_media_link',
             'constraints' => [new NotNull(message: 'karaoke.validator_media_link')],
         ])->add('lyrics', TextareaType::class, [
@@ -104,11 +106,13 @@ class SongType extends AbstractType
     {
         $resolver->setDefaults([
             'song' => null,
+            'draft' => [],
             'lyrics' => '',
             'translation_language' => 'en',
             'translation_languages' => [],
         ]);
         $resolver->setAllowedTypes('song', [Song::class, 'null']);
+        $resolver->setAllowedTypes('draft', 'array');
         $resolver->setAllowedTypes('lyrics', 'string');
         $resolver->setAllowedTypes('translation_language', 'string');
         $resolver->setAllowedTypes('translation_languages', 'array');

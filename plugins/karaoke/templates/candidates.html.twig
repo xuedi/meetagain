@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% set heading = song ? 'karaoke_lookup.page_title_song'|trans({'%title%': song.title}) : 'karaoke.button_new'|trans %}
+
+{% block title %}{{ heading }}{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <h1 class="title is-4">{{ heading }}</h1>
+            {% if lookup.videoTitle %}
+                <p class="mb-3">{{ 'karaoke_lookup.video_title'|trans({'%title%': lookup.videoTitle}) }}</p>
+            {% endif %}
+
+            <form method="get" action="{{ song ? path('app_plugin_karaoke_lookup', {id: song.id}) : path('app_plugin_karaoke_find') }}" class="box">
+                {% if link %}<input type="hidden" name="link" value="{{ link }}">{% endif %}
+                <div class="columns is-align-items-flex-end">
+                    <div class="column">
+                        <label class="label" for="karaoke-search-title">{{ 'karaoke.field_title'|trans }}</label>
+                        <input class="input" type="text" id="karaoke-search-title" name="title" value="{{ lookup.title }}">
+                    </div>
+                    <div class="column">
+                        <label class="label" for="karaoke-search-artist">{{ 'karaoke.field_artist'|trans }}</label>
+                        <input class="input" type="text" id="karaoke-search-artist" name="artist" value="{{ lookup.artist }}">
+                    </div>
+                    <div class="column is-narrow">
+                        <button type="submit" class="button">
+                            <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
+                            <span>{{ 'karaoke_lookup.button_search_again'|trans }}</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            {% if lookup.rows is empty %}
+                <p class="has-text-grey mb-4">{{ 'karaoke_lookup.no_results'|trans }}</p>
+            {% else %}
+                <p class="help mb-3">{{ 'karaoke_lookup.results_intro'|trans }}</p>
+                {% for row in lookup.rows %}
+                    {% set candidate = row.candidate %}
+                    <div class="box">
+                        <div class="level is-mobile mb-2">
+                            <div class="level-left">
+                                <div>
+                                    <p class="has-text-weight-semibold">{{ candidate.title }}</p>
+                                    <p class="is-size-7 has-text-grey">
+                                        {{ candidate.artist ?? '-' }}{% if candidate.album %} &middot; {{ candidate.album }}{% endif %}
+                                        &middot; {{ ('karaoke_lookup.source_' ~ candidate.source)|trans }}
+                                        {% if candidate.durationSeconds is not null %}
+                                            &middot; {{ '%d:%02d'|format(candidate.durationSeconds // 60, candidate.durationSeconds % 60) }}
+                                            {% if row.durationDelta is not null %}
+                                                ({{ 'karaoke_lookup.duration_delta'|trans({'%seconds%': (row.durationDelta > 0 ? '+' : '') ~ row.durationDelta}) }})
+                                            {% endif %}
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="level-right">
+                                {% if candidate.synced %}
+                                    <span class="tag is-success is-light">{{ 'karaoke_lookup.tag_timed'|trans }}</span>
+                                {% else %}
+                                    <span class="tag is-light">{{ 'karaoke_lookup.tag_untimed'|trans }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if row.preview is not empty %}
+                            <p class="is-size-7 mb-3">{{ row.preview|join(' / ') }}</p>
+                        {% endif %}
+                        <div class="buttons are-small">
+                            {% if song %}
+                                {% if row.timingsOnly %}
+                                    <form method="post" action="{{ path('app_plugin_karaoke_lookup_timings', {id: song.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_karaoke_lookup_timings' ~ song.id) }}">
+                                        <input type="hidden" name="pick" value="{{ candidate.key }}">
+                                        <button type="submit" class="button is-link mb-0">
+                                            <span class="icon"><i class="fa fa-stopwatch"></i></span>
+                                            <span>{{ 'karaoke_lookup.button_timings_only'|trans }}</span>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                                <a href="{{ path('app_plugin_karaoke_edit', {id: song.id, pick: candidate.key}) }}" class="button">
+                                    {{ 'karaoke_lookup.button_replace'|trans }}
+                                </a>
+                            {% else %}
+                                <a href="{{ path('app_plugin_karaoke_new', {link: link, pick: candidate.key}) }}" class="button is-link">
+                                    {{ 'karaoke_lookup.button_use'|trans }}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="buttons">
+                {% if song %}
+                    <a href="{{ path('app_plugin_karaoke_edit', {id: song.id}) }}" class="button">{{ 'karaoke_lookup.button_back_to_edit'|trans }}</a>
+                {% else %}
+                    <a href="{{ path('app_plugin_karaoke_new', {link: link}) }}" class="button">{{ 'karaoke_lookup.button_none_fits'|trans }}</a>
+                {% endif %}
+            </div>
+            <p class="is-size-7 has-text-grey">{{ 'karaoke_lookup.attribution'|trans }}</p>
+        </div>
+    </section>
+{% endblock %}

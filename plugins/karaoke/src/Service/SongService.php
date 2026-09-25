@@ -70,6 +70,13 @@ readonly class SongService
         $this->em->flush();
     }
 
+    public function setOffset(Song $song, int $offsetMs): void
+    {
+        $song->setOffsetMs(max(-self::MAX_OFFSET_MS, min(self::MAX_OFFSET_MS, $offsetMs)));
+
+        $this->em->flush();
+    }
+
     public function nudgeOffset(Song $song, int $deltaMs): void
     {
         $song->setOffsetMs(max(-self::MAX_OFFSET_MS, min(self::MAX_OFFSET_MS, $song->getOffsetMs() + $deltaMs)));

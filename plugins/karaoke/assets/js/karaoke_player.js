@@ -7,6 +7,8 @@
  * (onTime, seekTo): YouTube through its IFrame Player API, loaded only after consent, TikTok through the
  * messages its embed player posts. The adapter drives the marker on the lyric lines, click-to-seek and the
  * line loop. Other providers play without a marker. Without JavaScript the gate and the lyrics still work.
+ * The sync button turns one tap at the first timed line into the song's offset: kept in this browser for
+ * everyone, and posted through the offset route when an organizer saves it.
  *
  * Loaded in:  plugins/karaoke/templates/detail.html.twig, plugins/karaoke/templates/timing.html.twig
  * Used by:    [data-karaoke-player] with [data-karaoke-stage], [data-karaoke-gate], [data-karaoke-lyrics],
@@ -15,6 +17,7 @@
 window.KaraokePlayer = (() => {
     const TIKTOK_ORIGIN = 'https://www.tiktok.com';
     const POLL_MS = 200;
+    const MAX_OFFSET_MS = 60000;
 
     const loadYouTubeApi = () => {
         if (window.YT && window.YT.Player) {
@@ -174,12 +177,31 @@ window.KaraokePlayer = (() => {
         } catch {}
     };
 
+    const readNumber = (key) => {
+        try {
+            const value = window.localStorage.getItem('karaoke.' + key);
+            return value === null || value === '' || Number.isNaN(Number(value)) ? null : Number(value);
+        } catch {
+            return null;
+        }
+    };
+
+    const writeNumber = (key, value) => {
+        try {
+            if (value === null) {
+                window.localStorage.removeItem('karaoke.' + key);
+            } else {
+                window.localStorage.setItem('karaoke.' + key, String(value));
+            }
+        } catch {}
+    };
+
     const initLyrics = (root) => {
         const list = root.querySelector('[data-karaoke-lyrics]');
         const controls = root.querySelector('[data-karaoke-controls]');
-        const offsetMs = Number(root.dataset.offsetMs || 0);
         const lines = list ? Array.from(list.querySelectorAll('[data-start-ms]')) : [];
-        const starts = lines.map((line) => Number(line.dataset.startMs) + offsetMs);
+        const rawStarts = lines.map((line) => Number(line.dataset.startMs));
+        let starts = rawStarts.map((start) => start + Number(root.dataset.offsetMs || 0));
         let current = -1;
         let loop = false;
         let adapter = null;
@@ -246,6 +268,10 @@ window.KaraokePlayer = (() => {
 
         return {
             onTime,
+            firstStart: () => (rawStarts.length > 0 ? rawStarts[0] : null),
+            setOffset: (offsetMs) => {
+                starts = rawStarts.map((start) => start + offsetMs);
+            },
             connect: (connected) => {
                 adapter = connected;
                 if (!adapter || !list || lines.length === 0) {
@@ -268,13 +294,68 @@ window.KaraokePlayer = (() => {
         };
     };
 
+    const initSync = (root, lyrics) => {
+        const panel = root.querySelector('[data-karaoke-sync]');
+        if (!panel || lyrics.firstStart() === null) {
+            return () => {};
+        }
+        const key = 'offset.' + root.dataset.songId;
+        const serverOffset = Number(root.dataset.offsetMs || 0);
+        const tap = panel.querySelector('[data-karaoke-sync-tap]');
+        const save = panel.querySelector('[data-karaoke-sync-save]');
+        const reset = panel.querySelector('[data-karaoke-sync-reset]');
+        const local = panel.querySelector('[data-karaoke-sync-local]');
+        let adapter = null;
+
+        const show = (offsetMs, isLocal) => {
+            lyrics.setOffset(offsetMs);
+            if (save) {
+                save.querySelector('input[name="offset"]').value = String(offsetMs);
+                save.classList.toggle('is-hidden', !isLocal);
+            }
+            reset.classList.toggle('is-hidden', !isLocal);
+            local.classList.toggle('is-hidden', !isLocal);
+        };
+
+        panel.classList.remove('is-hidden');
+        const stored = readNumber(key);
+        if (stored !== null && stored !== serverOffset) {
+            show(stored, true);
+        }
+
+        tap.addEventListener('click', () => {
+            if (!adapter) {
+                return;
+            }
+            const offsetMs = Math.max(-MAX_OFFSET_MS, Math.min(MAX_OFFSET_MS, adapter.currentMs() - lyrics.firstStart()));
+            writeNumber(key, offsetMs);
+            show(offsetMs, true);
+        });
+        reset.addEventListener('click', () => {
+            writeNumber(key, null);
+            show(serverOffset, false);
+        });
+        if (save) {
+            save.addEventListener('submit', () => writeNumber(key, null));
+        }
+
+        return (connected) => {
+            adapter = connected;
+            tap.disabled = !adapter;
+        };
+    };
+
     document.addEventListener('DOMContentLoaded', () => {
         const root = document.querySelector('[data-karaoke-player]');
         if (!root || root.hasAttribute('data-karaoke-custom')) {
             return;
         }
         const lyrics = initLyrics(root);
-        attach(root, lyrics.onTime).then(lyrics.connect);
+        const connectSync = initSync(root, lyrics);
+        attach(root, lyrics.onTime).then((adapter) => {
+            lyrics.connect(adapter);
+            connectSync(adapter);
+        });
     });
 
     return {attach};

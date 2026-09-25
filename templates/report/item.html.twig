@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'item_report.page_title'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-7-tablet is-6-desktop">
+                    <h1 class="title is-4">{{ 'item_report.page_title'|trans }}</h1>
+                    <p class="mb-4">
+                        {% if itemPath %}
+                            {{ 'item_report.intro'|trans }} <a href="{{ itemPath }}">{{ itemLabel }}</a>
+                        {% else %}
+                            {{ 'item_report.intro'|trans }} {{ itemLabel }}
+                        {% endif %}
+                    </p>
+
+                    {{ form_start(form) }}
+                    {{ form_errors(form) }}
+                    {{ form_row(form.reason) }}
+                    {{ form_row(form.relationship) }}
+                    {{ form_row(form.explanation) }}
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.email) }}
+                    {{ form_row(form.goodFaith) }}
+                    {% if form.meta is defined %}
+                        {% include '_components/human_check.html.twig' with {'form': form.meta, 'label': 'item_report.label_captcha'} only %}
+                    {% endif %}
+                    <button class="button is-danger mt-2">{{ 'item_report.button_send'|trans }}</button>
+                    {{ form_end(form) }}
+                    {% if form.meta is defined %}
+                        {% include '_components/captcha_refresh.html.twig' with {'form': form.meta} only %}
+                    {% endif %}
+
+                    <p class="is-size-7 has-text-grey mt-4">{{ 'item_report.privacy_note'|trans }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+{% if not app.user %}
+    <script src="{{ asset('js/captcha-counter.js') }}" defer></script>
+    <script src="{{ asset('js/human-check.js') }}" defer></script>
+{% endif %}
+{% endblock %}

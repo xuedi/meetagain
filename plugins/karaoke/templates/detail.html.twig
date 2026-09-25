@@ -37,14 +37,39 @@
             </div>
             {% include '_components/item/tag_badges.html.twig' with {'itemType': 'song', 'itemId': song.id} only %}
 
-            <div class="columns mt-4" data-karaoke-player data-offset-ms="{{ song.offsetMs }}">
+            <div class="columns mt-4" data-karaoke-player data-song-id="{{ song.id }}" data-offset-ms="{{ song.offsetMs }}">
                 <div class="column is-7">
                     {% include '@Karaoke/_player.html.twig' with {'song': song, 'loadMedia': loadMedia} only %}
-                    <p class="is-size-7 mt-2">
-                        <a href="{{ song.mediaLink.watchUrl }}" rel="noopener noreferrer" target="_blank">
-                            {{ 'karaoke.link_watch'|trans({'%provider%': song.mediaProvider.label}) }}
-                        </a>
-                    </p>
+                    <div class="level is-mobile mt-2">
+                        <div class="level-left">
+                            <a href="{{ song.mediaLink.watchUrl }}" class="is-size-7" rel="noopener noreferrer" target="_blank">
+                                {{ 'karaoke.link_watch'|trans({'%provider%': song.mediaProvider.label}) }}
+                            </a>
+                        </div>
+                        <div class="level-right">
+                            {% include '_components/item/report_link.html.twig' with {'itemType': 'song', 'itemId': song.id} only %}
+                        </div>
+                    </div>
+                    {% if song.timed and song.mediaProvider.reportsTime %}
+                        <div class="is-hidden mt-3" data-karaoke-sync>
+                            <div class="buttons are-small mb-1">
+                                <button type="button" class="button is-link mb-0" data-karaoke-sync-tap disabled>
+                                    <span class="icon"><i class="fa fa-crosshairs"></i></span>
+                                    <span>{{ 'karaoke.button_sync'|trans }}</span>
+                                </button>
+                                {% if is_granted('ROLE_ORGANIZER') %}
+                                    <form method="post" action="{{ path('app_plugin_karaoke_offset', {id: song.id}) }}" class="is-hidden" data-karaoke-sync-save>
+                                        <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_karaoke_offset' ~ song.id) }}">
+                                        <input type="hidden" name="offset" value="{{ song.offsetMs }}">
+                                        <button type="submit" class="button mb-0">{{ 'karaoke.button_sync_save'|trans }}</button>
+                                    </form>
+                                {% endif %}
+                                <button type="button" class="button mb-0 is-hidden" data-karaoke-sync-reset>{{ 'karaoke.button_sync_reset'|trans }}</button>
+                            </div>
+                            <p class="help" data-karaoke-sync-help>{{ 'karaoke.sync_help'|trans }}</p>
+                            <p class="help is-hidden" data-karaoke-sync-local>{{ 'karaoke.sync_local'|trans }}</p>
+                        </div>
+                    {% endif %}
                     {% if is_granted('ROLE_ORGANIZER') and song.timed and song.mediaProvider.reportsTime %}
                         <form method="post" action="{{ path('app_plugin_karaoke_offset', {id: song.id}) }}" class="is-flex is-align-items-center mt-3">
                             <input type="hidden" name="_token" value="{{ csrf_token('app_plugin_karaoke_offset' ~ song.id) }}">

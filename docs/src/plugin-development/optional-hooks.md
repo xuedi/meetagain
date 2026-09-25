@@ -31,6 +31,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `SecurityProviderInterface`                  | Participate in live security event detection          | `observe()`, `scanRetrospective()`                     |
 | `DescriptorInterface`                        | Add a settings section to your plugin's settings page | `getFormType()`, `createDefault()`, `applyForm()`      |
 | `TaggableTypeProviderInterface`              | Give an item type a tag vocabulary                    | `getPluginKey()`, `getTypeKey()`, `getLabelKey()`      |
+| `ReportableTypeProviderInterface`            | Let any visitor report an item of your type           | `getItemLabel()`, `getItemPath()`                      |
 | `Tag\CreationHandlerInterface`               | Claim a tag row the moment it is created              | `onTagCreated()`                                       |
 | `Tag\DeletionHandlerInterface`               | Release what you attached before a tag row is removed | `onTagDeleted()`                                       |
 | `Event\ImageBoxProviderInterface`            | Replace the event page's image box with your own      | `getPluginKey()`, `renderImageBox()`                   |
@@ -1554,6 +1555,29 @@ remove the row once nothing carries it any more.
 
 Reference implementation: the dishes plugin (`Plugin\Dishes\Item\DishTaggableTypeProvider`,
 `Plugin\Dishes\Item\DishTypeProvider`, `Plugin\Dishes\Controller\DishController::edit`).
+
+## Item reports
+
+If your item type carries content its uploader may not own - song lyrics, recipes copied from a book, photos -
+opt it into the report form any visitor can reach, guests included. A report records the reason, an explanation,
+the notifier's name and email and a good-faith statement; the notifier gets a receipt and later the decision by
+email, and the people who may manage the item see it on the review page.
+
+Implement `App\Item\Report\ReportableTypeProviderInterface`:
+
+- `getPluginKey()` and `getTypeKey()` - the same keys your tag or list provider uses.
+- `getItemLabel(int $itemId)` - the item's display name, or `null` when it does not exist.
+- `getItemPath(int $itemId)` - the path of the item's public page.
+
+Then show the link on the item page:
+
+```twig
+{% include '_components/item/report_link.html.twig' with {'itemType': 'song', 'itemId': song.id} only %}
+```
+
+Core checks visibility through the item filter chain before the form opens, so a visitor can only report what they
+can see. Removing a reported item is your plugin's ordinary delete: as long as it dispatches `ItemAction::Deleted`,
+every open report on the item is resolved and each notifier is told. See `plugins/karaoke/src/Item/SongReportableTypeProvider.php`.
 
 ## Export and import
 

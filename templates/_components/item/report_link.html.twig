@@ -1,0 +1,12 @@
+{#
+    Item Report Link - the small "Report" link an item page shows to every visitor
+
+    Used in:    item detail pages of types that implement ReportableTypeProviderInterface
+    Parameters:
+        - itemType (string, required) -- the registry key of the item type
+        - itemId   (int, required)    -- the item's id
+#}
+<a href="{{ path('app_report_item', {type: itemType, id: itemId}) }}" class="is-size-7 has-text-grey" rel="nofollow">
+    <span class="icon is-small"><i class="fa fa-flag"></i></span>
+    <span>{{ 'item_report.link_report'|trans }}</span>
+</a>

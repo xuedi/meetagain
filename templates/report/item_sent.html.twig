@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'item_report.sent_title'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-6">
+                    <div class="notification">
+                        <p class="title is-5">{{ 'item_report.sent_title'|trans }}</p>
+                        <p>{{ 'item_report.sent_body'|trans }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

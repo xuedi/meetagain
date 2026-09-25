@@ -11,5 +11,6 @@ readonly class ReviewNotificationItem
         public ?string $icon = null,
         public ?string $longDescription = null,
         public ?string $detailUrl = null,
+        public ?string $approveLabelKey = null,
     ) {}
 }

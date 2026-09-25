@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'karaoke.button_new'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-7">
+                    <h1 class="title is-4">{{ 'karaoke.button_new'|trans }}</h1>
+                    <p class="mb-4">{{ 'karaoke_lookup.link_intro'|trans }}</p>
+                    <form method="get" action="{{ path('app_plugin_karaoke_find') }}" class="box">
+                        <div class="field">
+                            <label class="label" for="karaoke-link">{{ 'karaoke.field_media_link'|trans }}</label>
+                            <div class="control">
+                                <input class="input{% if invalid %} is-danger{% endif %}" type="url" id="karaoke-link" name="link" value="{{ link }}" required autofocus
+                                       placeholder="https://www.youtube.com/watch?v=...">
+                            </div>
+                            {% if invalid %}
+                                <p class="help is-danger">{{ 'karaoke.validator_media_link'|trans({}, 'validators') }}</p>
+                            {% else %}
+                                <p class="help">{{ 'karaoke.help_media_link'|trans }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="buttons is-right">
+                            <a href="{{ path('app_plugin_karaoke') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                            <button type="submit" class="button is-link">
+                                <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
+                                <span>{{ 'karaoke_lookup.button_find'|trans }}</span>
+                            </button>
+                        </div>
+                    </form>
+                    <p class="is-size-7">
+                        <a href="{{ path('app_plugin_karaoke_new', {manual: 1}) }}">{{ 'karaoke_lookup.link_manual'|trans }}</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

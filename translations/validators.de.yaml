@@ -227,3 +227,7 @@ Error: Fehler
 # Admin system security namespace - measure tuning
 'admin_system_security.validator_pow_difficulty': 'Die Schwierigkeit muss zwischen {{ min }} und {{ max }} Bit liegen.'
 'admin_system_security.validator_log_retention': 'Die Aufbewahrung muss zwischen {{ min }} und {{ max }} Tagen liegen.'
+'item_report.validator_explanation_blank': 'Bitte beschreib, was nicht stimmt.'
+'item_report.validator_explanation_short': 'Bitte beschreib es etwas genauer.'
+'item_report.validator_explanation_long': 'Die Begründung ist zu lang.'
+'item_report.validator_good_faith': 'Bitte bestätige, dass du die Meldung in gutem Glauben machst.'

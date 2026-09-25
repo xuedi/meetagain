@@ -227,3 +227,7 @@ Error: Error
 # Admin system security namespace - measure tuning
 'admin_system_security.validator_pow_difficulty': 'The difficulty must be between {{ min }} and {{ max }} bits.'
 'admin_system_security.validator_log_retention': 'Retention must be between {{ min }} and {{ max }} days.'
+'item_report.validator_explanation_blank': 'Please explain what is wrong.'
+'item_report.validator_explanation_short': 'Please explain in a bit more detail.'
+'item_report.validator_explanation_long': 'The explanation is too long.'
+'item_report.validator_good_faith': 'Please confirm that the report is made in good faith.'

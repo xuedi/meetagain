@@ -101,4 +101,43 @@ class LyricsTextTest extends TestCase
         static::assertSame('01:02.34', $formatted);
         static::assertSame(62_340, $lyrics->parseTimestamp($formatted));
     }
+
+    public function testParseRowsReadsEveryRowAsOneUntranslatedLine(): void
+    {
+        // Arrange
+        $plain = "好一朵美丽的茉莉花\n芬芳美丽满枝桠\n\n[ar:张也]\n[00:30.00] 又香又白人人夸";
+
+        // Act
+        $lines = new LyricsText()->parseRows($plain);
+
+        // Assert
+        static::assertSame(['好一朵美丽的茉莉花', '芬芳美丽满枝桠', '又香又白人人夸'], array_column($lines, 'text'));
+        static::assertSame([null, null, 30_000], array_column($lines, 'startMs'));
+        static::assertSame([null, null, null], array_column($lines, 'translation'));
+    }
+
+    /**
+     * @param list<string> $current
+     * @param list<string> $candidate
+     */
+    #[DataProvider('lineMatches')]
+    public function testMatchesLinesForTimingsOnly(array $current, array $candidate, bool $expected): void
+    {
+        // Act
+        $matches = new LyricsText()->matchesLines($current, $candidate);
+
+        // Assert
+        static::assertSame($expected, $matches);
+    }
+
+    /** @return iterable<string, array{list<string>, list<string>, bool}> */
+    public static function lineMatches(): iterable
+    {
+        yield 'identical lines match' => [['好一朵茉莉花', '芬芳美丽'], ['好一朵茉莉花', '芬芳美丽'], true];
+        yield 'punctuation, spaces and case are ignored' => [['Hello, World!', '好一朵 茉莉花。'], ['hello world', '好一朵茉莉花'], true];
+        yield 'four of five equal lines is enough' => [['a', 'b', 'c', 'd', 'e'], ['a', 'b', 'c', 'd', 'x'], true];
+        yield 'three of five equal lines is not' => [['a', 'b', 'c', 'd', 'e'], ['a', 'b', 'c', 'x', 'y'], false];
+        yield 'a different line count never matches' => [['a', 'b'], ['a', 'b', 'c'], false];
+        yield 'a song without lines never matches' => [[], [], false];
+    }
 }

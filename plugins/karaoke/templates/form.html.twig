@@ -7,7 +7,19 @@
 {% block body %}
     <section class="section">
         <div class="container">
-            <h1 class="title is-4">{{ heading }}</h1>
+            <div class="level mb-4">
+                <div class="level-left">
+                    <h1 class="title is-4 mb-0">{{ heading }}</h1>
+                </div>
+                {% if song and lookupEnabled|default(false) %}
+                    <div class="level-right">
+                        <a href="{{ path('app_plugin_karaoke_lookup', {id: song.id}) }}" class="button">
+                            <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
+                            <span>{{ 'karaoke_lookup.button_find_for_song'|trans }}</span>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
 
             {{ form_start(form) }}
             {{ form_errors(form) }}

@@ -14,7 +14,9 @@ use Plugin\Karaoke\Entity\LyricLine;
 use Plugin\Karaoke\Entity\Song;
 use Plugin\Karaoke\Form\SongType;
 use Plugin\Karaoke\Service\LyricsText;
+use Plugin\Karaoke\Service\SongLookup;
 use Plugin\Karaoke\Service\SongService;
+use Plugin\Karaoke\ValueObject\MediaLink;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,6 +34,7 @@ final class SongController extends AbstractController
         private readonly TagService $tagService,
         private readonly LanguageService $languageService,
         private readonly LyricsText $lyricsText,
+        private readonly SongLookup $songLookup,
     ) {}
 
     #[Route('', name: 'app_plugin_karaoke', methods: ['GET'])]
@@ -44,9 +47,18 @@ final class SongController extends AbstractController
     #[IsGranted('ROLE_ORGANIZER')]
     public function new(Request $request): Response
     {
+        $query = $request->query;
+        $isDraftRequest = $request->isMethod('POST') || $query->has('link') || $query->has('manual');
+        if (!$isDraftRequest && $this->songLookup->isEnabled()) {
+            return $this->redirectToRoute('app_plugin_karaoke_find');
+        }
+
+        $draft = $request->isMethod('POST') ? null : $this->draftFromLink($query->getString('link'), $query->getString('pick'));
         $form = $this->createForm(SongType::class, null, [
             'translation_language' => $this->translationLanguage($request),
             'translation_languages' => $this->languageService->getAdminFilteredEnabledCodes(),
+            'draft' => $draft ?? [],
+            'lyrics' => $draft['lyrics'] ?? '',
         ]);
         $form->handleRequest($request);
 
@@ -106,7 +118,7 @@ final class SongController extends AbstractController
         $translationLanguage = $this->translationLanguage($request);
         $form = $this->createForm(SongType::class, null, [
             'song' => $song,
-            'lyrics' => $this->songService->lyricsFor($song, $translationLanguage),
+            'lyrics' => $this->pickedLyrics($request, $song, $translationLanguage) ?? $this->songService->lyricsFor($song, $translationLanguage),
         ]);
         $form->handleRequest($request);
 
@@ -131,6 +143,7 @@ final class SongController extends AbstractController
             'song' => $song,
             'translationLanguage' => $translationLanguage,
             'translationLanguages' => $this->languageService->getAdminFilteredEnabledCodes(),
+            'lookupEnabled' => $this->songLookup->isEnabled(),
         ]);
     }
 
@@ -179,7 +192,12 @@ final class SongController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $this->songService->nudgeOffset($song, $request->request->getInt('delta'));
+        if ($request->request->has('offset')) {
+            $this->songService->setOffset($song, $request->request->getInt('offset'));
+            $this->addFlash('success', 'karaoke.flash_offset_saved');
+        } else {
+            $this->songService->nudgeOffset($song, $request->request->getInt('delta'));
+        }
 
         return $this->redirectToRoute('app_plugin_karaoke_show', ['id' => $id]);
     }
@@ -216,6 +234,34 @@ final class SongController extends AbstractController
         $requested = $request->query->getString('lang', $request->getLocale());
 
         return in_array($requested, $codes, true) ? $requested : $codes[0] ?? $request->getLocale();
+    }
+
+    /**
+     * @return array{title: ?string, artist: ?string, language: ?string, lyrics: string, link: MediaLink}|null
+     */
+    private function draftFromLink(string $pastedUrl, string $pick): ?array
+    {
+        $link = $this->songLookup->parseLink($pastedUrl);
+        if ($link === null) {
+            return null;
+        }
+
+        return [...$this->songLookup->draftForLink($link, $pastedUrl, $pick), 'link' => $link];
+    }
+
+    private function pickedLyrics(Request $request, Song $song, string $translationLanguage): ?string
+    {
+        $pick = $request->query->getString('pick');
+        if ($request->isMethod('POST') || $pick === '') {
+            return null;
+        }
+
+        $lyrics = $this->songLookup->lyricsForSong($song, $pick, $translationLanguage);
+        if ($lyrics === null) {
+            $this->addFlash('warning', 'karaoke_lookup.flash_pick_gone');
+        }
+
+        return $lyrics;
     }
 
     private function saveTags(FormInterface $form, Song $song): void
