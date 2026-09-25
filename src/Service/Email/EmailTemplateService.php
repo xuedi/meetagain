@@ -304,7 +304,7 @@ readonly class EmailTemplateService
     private function substitute(string $content, array $context, bool $escape): string
     {
         foreach ($context as $key => $value) {
-            if (!is_scalar($value)) {
+            if ($value !== null && !is_scalar($value)) {
                 continue;
             }
 

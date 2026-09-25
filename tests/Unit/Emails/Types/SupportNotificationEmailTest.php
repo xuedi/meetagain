@@ -107,6 +107,62 @@ class SupportNotificationEmailTest extends TestCase
         $emailType->send(['request' => $request]);
     }
 
+    public function testSendLabelsGuestRequesterWithTranslatedGuestName(): void
+    {
+        // Arrange
+        $config = $this->createStub(ConfigService::class);
+        $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
+
+        $admin = $this->createStub(User::class);
+        $admin->method('getEmail')->willReturn('admin@example.com');
+        $admin->method('getLocale')->willReturn('de');
+
+        $resolver = $this->createStub(RecipientResolver::class);
+        $resolver->method('resolve')->willReturn([$admin]);
+
+        $enqueued = null;
+        $queue = $this->createStub(EmailQueueInterface::class);
+        $queue
+            ->method('enqueue')
+            ->willReturnCallback(static function ($type, TemplatedEmail $email) use (&$enqueued): bool {
+                $enqueued = $email;
+                return true;
+            });
+
+        $request = $this->createStub(SupportRequest::class);
+        $request->method('getAudience')->willReturn(SupportAudience::Organizer);
+        $request->method('getRequesterLabel')->willReturn(null);
+        $request->method('getEmail')->willReturn(null);
+        $request->method('getMessage')->willReturn('Hallo');
+        $request->method('getCreatedAt')->willReturn(new DateTimeImmutable('2026-01-01'));
+
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator
+            ->method('trans')
+            ->willReturnMap([
+                [SupportAudience::Organizer->label(), [], null, 'de', 'Die Organisatoren'],
+                ['admin_support.requester_guest', [], null, 'de', 'Gast'],
+            ]);
+
+        $emailType = new SupportNotificationEmail(
+            $this->createStub(BlocklistCheckerInterface::class),
+            $this->mockSampleFactory(),
+            $queue,
+            $config,
+            $resolver,
+            $this->createStub(LoggerInterface::class),
+            $translator,
+        );
+
+        // Act
+        $emailType->send(['request' => $request]);
+
+        // Assert
+        static::assertInstanceOf(TemplatedEmail::class, $enqueued);
+        static::assertSame('Gast', $enqueued->getContext()['name']);
+        static::assertNull($enqueued->getContext()['email']);
+    }
+
     private function makeRequest(): SupportRequest
     {
         $request = $this->createStub(SupportRequest::class);
