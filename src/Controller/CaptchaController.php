@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
 
 final class CaptchaController extends AbstractController
 {
@@ -40,6 +41,11 @@ final class CaptchaController extends AbstractController
             ]);
         }
 
-        return $this->redirectToRoute($context);
+        $routeParams = array_filter($request->request->all('route'), is_string(...));
+        try {
+            return $this->redirectToRoute($context, $routeParams);
+        } catch (RoutingException) {
+            throw new BadRequestHttpException('Invalid route parameters.');
+        }
     }
 }
