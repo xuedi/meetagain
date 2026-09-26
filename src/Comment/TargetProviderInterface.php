@@ -2,7 +2,6 @@
 
 namespace App\Comment;
 
-use App\Entity\Comment;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
@@ -21,5 +20,5 @@ interface TargetProviderInterface
     public function canComment(int $targetId): bool;
 
     /** Side effects the target owns, run after the comment is persisted. */
-    public function onCommentCreated(Comment $comment): void;
+    public function onCommentCreated(int $targetId, int $userId): void;
 }

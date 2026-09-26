@@ -4,10 +4,10 @@ namespace App\Comment;
 
 use App\Activity\ActivityService;
 use App\Activity\Messages\CommentedOnEvent;
-use App\Entity\Comment;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -21,6 +21,7 @@ final readonly class EventTargetProvider implements TargetProviderInterface
         private AuthorizationCheckerInterface $authorizationChecker,
         private UrlGeneratorInterface $urlGenerator,
         private ActivityService $activityService,
+        private EntityManagerInterface $em,
     ) {}
 
     #[Override]
@@ -48,13 +49,8 @@ final readonly class EventTargetProvider implements TargetProviderInterface
     }
 
     #[Override]
-    public function onCommentCreated(Comment $comment): void
+    public function onCommentCreated(int $targetId, int $userId): void
     {
-        $user = $comment->getUser();
-        if (!$user instanceof User) {
-            return;
-        }
-
-        $this->activityService->log(CommentedOnEvent::TYPE, $user, ['event_id' => $comment->getTargetId()]);
+        $this->activityService->log(CommentedOnEvent::TYPE, $this->em->getReference(User::class, $userId), ['event_id' => $targetId]);
     }
 }

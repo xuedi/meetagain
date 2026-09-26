@@ -2,7 +2,6 @@
 
 namespace App\Portability;
 
-use App\Circulation\ContextResolver;
 use App\Entity\Announcement;
 use App\Entity\Cms;
 use App\Entity\Event;
@@ -10,13 +9,13 @@ use App\Entity\Topic;
 use App\Enum\UserRole;
 use App\Portability\Item\Registry;
 use App\Repository\AnnouncementRepository;
-use App\Repository\CirculationLedgerEntryRepository;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\Repository\ItemTagRepository;
 use App\Repository\TopicRepository;
 use App\Repository\UserRepository;
 use App\Service\Config\PluginService;
+use Module\Circulation\Contract\CirculationInterface;
 
 readonly class InstanceScopeBuilder
 {
@@ -27,8 +26,7 @@ readonly class InstanceScopeBuilder
         private TopicRepository $topicRepository,
         private AnnouncementRepository $announcementRepository,
         private ItemTagRepository $tagRepository,
-        private CirculationLedgerEntryRepository $ledgerRepository,
-        private ContextResolver $contextResolver,
+        private CirculationInterface $circulation,
         private Registry $itemRegistry,
         private PluginService $pluginService,
         private SiteSettings $siteSettings,
@@ -49,11 +47,11 @@ readonly class InstanceScopeBuilder
         }
 
         $itemIds = [];
-        $circulationContexts = $this->ledgerRepository->findContextItemTypes();
+        $circulationContexts = $this->circulation->ledgerContexts();
         foreach ($this->itemRegistry->all() as $contributor) {
             $itemType = $contributor->getItemType();
             $itemIds[$itemType] = $contributor->allItemIds();
-            $circulationContexts[$this->contextResolver->resolve($itemType)] ??= $itemType;
+            $circulationContexts[$this->circulation->contextFor($itemType)] ??= $itemType;
         }
         ksort($circulationContexts);
 

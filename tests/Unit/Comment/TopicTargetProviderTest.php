@@ -5,11 +5,11 @@ namespace Tests\Unit\Comment;
 use App\Activity\ActivityService;
 use App\Activity\Messages\CommentedOnTopic;
 use App\Comment\TopicTargetProvider;
-use App\Entity\Comment;
 use App\Entity\Topic;
 use App\Entity\User;
 use App\Service\TownHall\AccessService;
 use App\Service\TownHall\TopicService;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -88,26 +88,10 @@ class TopicTargetProviderTest extends TestCase
         $activityService = $this->createMock(ActivityService::class);
         $activityService->expects(self::once())->method('log')->with(CommentedOnTopic::TYPE, $user, ['topic_id' => 7, 'topic_title' => 'Language']);
         $topic = new Topic()->setTitle('Language');
-        $provider = $this->makeProvider(topic: $topic, activityService: $activityService);
-
-        $comment = new Comment();
-        $comment->setTargetType(TopicService::TYPE);
-        $comment->setTargetId(7);
-        $comment->setUser($user);
+        $provider = $this->makeProvider(topic: $topic, activityService: $activityService, author: $user);
 
         // Act
-        $provider->onCommentCreated($comment);
-    }
-
-    public function testAuthorlessCommentIsNotLogged(): void
-    {
-        // Arrange
-        $activityService = $this->createMock(ActivityService::class);
-        $activityService->expects(self::never())->method('log');
-        $provider = $this->makeProvider(topic: new Topic(), activityService: $activityService);
-
-        // Act
-        $provider->onCommentCreated(new Comment());
+        $provider->onCommentCreated(7, 3);
     }
 
     private function makeProvider(
@@ -116,6 +100,7 @@ class TopicTargetProviderTest extends TestCase
         ?User $user = new User(),
         ?UrlGeneratorInterface $urlGenerator = null,
         ?ActivityService $activityService = null,
+        User $author = new User(),
     ): TopicTargetProvider {
         $topicService = $this->createStub(TopicService::class);
         $topicService->method('get')->willReturn($topic);
@@ -126,12 +111,16 @@ class TopicTargetProviderTest extends TestCase
         $security = $this->createStub(Security::class);
         $security->method('getUser')->willReturn($user);
 
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('getReference')->willReturn($author);
+
         return new TopicTargetProvider(
             $topicService,
             $accessService,
             $security,
             $urlGenerator ?? $this->createStub(UrlGeneratorInterface::class),
             $activityService ?? $this->createStub(ActivityService::class),
+            $em,
         );
     }
 }

@@ -4,8 +4,8 @@ namespace Plugin\Photos\Comment;
 
 use App\Activity\ActivityService;
 use App\Comment\TargetProviderInterface;
-use App\Entity\Comment;
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Plugin\Photos\Activity\Messages\CommentedOnPhoto;
 use Plugin\Photos\Service\PhotoService;
@@ -19,6 +19,7 @@ final readonly class PhotoTargetProvider implements TargetProviderInterface
         private AuthorizationCheckerInterface $authorizationChecker,
         private UrlGeneratorInterface $urlGenerator,
         private ActivityService $activityService,
+        private EntityManagerInterface $em,
     ) {}
 
     #[Override]
@@ -44,17 +45,12 @@ final readonly class PhotoTargetProvider implements TargetProviderInterface
     }
 
     #[Override]
-    public function onCommentCreated(Comment $comment): void
+    public function onCommentCreated(int $targetId, int $userId): void
     {
-        $user = $comment->getUser();
-        if (!$user instanceof User) {
-            return;
-        }
+        $photo = $this->photoService->get($targetId);
 
-        $photo = $this->photoService->get((int) $comment->getTargetId());
-
-        $this->activityService->log(CommentedOnPhoto::TYPE, $user, [
-            'photo_id' => $comment->getTargetId(),
+        $this->activityService->log(CommentedOnPhoto::TYPE, $this->em->getReference(User::class, $userId), [
+            'photo_id' => $targetId,
             'photo_title' => $photo?->getAnyTranslatedTitle() ?? '',
         ]);
     }

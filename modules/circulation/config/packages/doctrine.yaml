@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Circulation:
+                        dir: "%kernel.project_dir%/modules/circulation/src/Internal/Entity"
+                        is_bundle: false
+                        prefix: Module\Circulation\Internal\Entity
+                        alias: Circulation
+
+doctrine_migrations:
+    migrations_paths:
+        ModuleCirculationMigrations: "%kernel.project_dir%/modules/circulation/migrations"

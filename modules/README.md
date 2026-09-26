@@ -66,7 +66,9 @@ is the reason not to make it a module at all.
 ## How Mago Guard enforces it
 
 The rules live in `tests/config/mago.toml` and run as `just checkMagoGuard`, in the `just check` chain
-and as its own CI step. Three kinds of rule, all three needed:
+and as its own CI step. The generic inbound backstop sits in `tests/config/mago-rules.toml` instead, the
+shared rule file every plugin's config extends, so each plugin run enforces it too - with `--perimeter`,
+since plugins declare no structural rules. Three kinds of rule, all three needed:
 
 ```toml
 # Inbound: nothing outside the module may reach past its Contract namespace.

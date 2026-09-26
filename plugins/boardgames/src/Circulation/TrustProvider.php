@@ -2,12 +2,12 @@
 
 namespace Plugin\Boardgames\Circulation;
 
-use App\Circulation\Trust\EnabledProviderInterface;
+use Module\Circulation\Contract\TrustEnabledProviderInterface;
 use Override;
 use Plugin\Boardgames\Service\ConfigService;
 use Plugin\Boardgames\Service\GameService;
 
-final readonly class TrustProvider implements EnabledProviderInterface
+final readonly class TrustProvider implements TrustEnabledProviderInterface
 {
     public function __construct(
         private ConfigService $config,

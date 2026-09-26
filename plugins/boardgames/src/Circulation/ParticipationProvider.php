@@ -2,7 +2,7 @@
 
 namespace Plugin\Boardgames\Circulation;
 
-use App\Circulation\ParticipationProviderInterface;
+use Module\Circulation\Contract\ParticipationProviderInterface;
 use Override;
 use Plugin\Boardgames\Service\ConfigService;
 use Plugin\Boardgames\Service\GameService;

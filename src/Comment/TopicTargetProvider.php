@@ -4,10 +4,10 @@ namespace App\Comment;
 
 use App\Activity\ActivityService;
 use App\Activity\Messages\CommentedOnTopic;
-use App\Entity\Comment;
 use App\Entity\User;
 use App\Service\TownHall\AccessService;
 use App\Service\TownHall\TopicService;
+use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -20,6 +20,7 @@ final readonly class TopicTargetProvider implements TargetProviderInterface
         private Security $security,
         private UrlGeneratorInterface $urlGenerator,
         private ActivityService $activityService,
+        private EntityManagerInterface $em,
     ) {}
 
     #[Override]
@@ -47,18 +48,12 @@ final readonly class TopicTargetProvider implements TargetProviderInterface
     }
 
     #[Override]
-    public function onCommentCreated(Comment $comment): void
+    public function onCommentCreated(int $targetId, int $userId): void
     {
-        $user = $comment->getUser();
-        if (!$user instanceof User) {
-            return;
-        }
+        $topic = $this->topicService->get($targetId);
 
-        $topicId = (int) $comment->getTargetId();
-        $topic = $this->topicService->get($topicId);
-
-        $this->activityService->log(CommentedOnTopic::TYPE, $user, [
-            'topic_id' => $topicId,
+        $this->activityService->log(CommentedOnTopic::TYPE, $this->em->getReference(User::class, $userId), [
+            'topic_id' => $targetId,
             'topic_title' => $topic?->getTitle() ?? '',
         ]);
     }

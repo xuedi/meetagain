@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Module\Circulation\:
+        resource: '../src/'
+        exclude:
+            - '../src/Internal/Entity/'
+
+    Module\Circulation\Contract\CirculationInterface: '@Module\Circulation\Internal\ShelfArchive'

@@ -3,7 +3,6 @@
 namespace Plugin\Boardgames\Comment;
 
 use App\Comment\TargetProviderInterface;
-use App\Entity\Comment;
 use Override;
 use Plugin\Boardgames\Service\GameService;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -40,5 +39,5 @@ final readonly class GameTargetProvider implements TargetProviderInterface
     }
 
     #[Override]
-    public function onCommentCreated(Comment $comment): void {}
+    public function onCommentCreated(int $targetId, int $userId): void {}
 }

@@ -2,7 +2,6 @@
 
 namespace App\Portability\Section;
 
-use App\Circulation\ContextResolver;
 use App\Entity\User;
 use App\Portability\DataCategory;
 use App\Portability\ImageWriterInterface;
@@ -13,6 +12,7 @@ use App\Portability\SectionInterface;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use DateTimeInterface;
+use Module\Circulation\Contract\CirculationInterface;
 use Module\Trust\Contract\GrantTransferInterface;
 use Module\Trust\Contract\PortableGrant;
 use Module\Trust\Contract\TrustLevel;
@@ -23,7 +23,7 @@ readonly class TrustSection implements SectionInterface
     public function __construct(
         private GrantTransferInterface $grants,
         private UserRepository $userRepository,
-        private ContextResolver $contextResolver,
+        private CirculationInterface $circulation,
     ) {}
 
     #[Override]
@@ -95,7 +95,7 @@ readonly class TrustSection implements SectionInterface
             $createdAt = $this->date($row['created_at'] ?? null) ?? new DateTimeImmutable();
             $this->grants->restoreGrant(
                 new PortableGrant(
-                    $this->contextResolver->resolve($itemType),
+                    $this->circulation->contextFor($itemType),
                     $fromUserId,
                     $toUserId,
                     $level,
