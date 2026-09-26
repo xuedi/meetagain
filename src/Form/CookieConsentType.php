@@ -22,6 +22,10 @@ class CookieConsentType extends AbstractType
             'label' => 'cookie.option_osm',
             'required' => false,
             'data' => $options['osm_granted'],
+        ])->add('external_media', CheckboxType::class, [
+            'label' => 'cookie.option_external_media',
+            'required' => false,
+            'data' => $options['external_media_granted'],
         ])->add('save', SubmitType::class, [
             'label' => 'cookie.button_save',
             'attr' => ['class' => 'button is-primary'],
@@ -35,6 +39,7 @@ class CookieConsentType extends AbstractType
             'data_class' => null,
             'cookies_granted' => false,
             'osm_granted' => false,
+            'external_media_granted' => false,
         ]);
     }
 }

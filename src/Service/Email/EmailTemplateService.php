@@ -35,6 +35,8 @@ readonly class EmailTemplateService
             EmailType::UpcomingEvents->value => 'Upcoming events this week',
             EmailType::EventUpdateNotification->value => 'Update to event: {{eventTitle}}',
             EmailType::SeriesRescheduled->value => 'Series rescheduled: {{eventTitle}}',
+            EmailType::ItemReportReceipt->value => 'We received your report about {{itemLabel}}',
+            EmailType::ItemReportDecision->value => 'A decision on your report about {{itemLabel}}',
         ],
         'de' => [
             EmailType::VerificationRequest->value => 'Bitte bestätige deine E-Mail',
@@ -53,6 +55,8 @@ readonly class EmailTemplateService
             EmailType::UpcomingEvents->value => 'Deine Veranstaltungen diese Woche',
             EmailType::EventUpdateNotification->value => 'Änderung an Veranstaltung: {{eventTitle}}',
             EmailType::SeriesRescheduled->value => 'Terminserie verschoben: {{eventTitle}}',
+            EmailType::ItemReportReceipt->value => 'Wir haben deine Meldung zu {{itemLabel}} erhalten',
+            EmailType::ItemReportDecision->value => 'Entscheidung zu deiner Meldung über {{itemLabel}}',
         ],
         'zh' => [
             EmailType::VerificationRequest->value => '请确认您的邮箱',
@@ -71,6 +75,8 @@ readonly class EmailTemplateService
             EmailType::UpcomingEvents->value => '本周即将举行的活动',
             EmailType::EventUpdateNotification->value => '活动有变更：{{eventTitle}}',
             EmailType::SeriesRescheduled->value => '系列活动时间调整：{{eventTitle}}',
+            EmailType::ItemReportReceipt->value => '我们已收到你对 {{itemLabel}} 的举报',
+            EmailType::ItemReportDecision->value => '关于你对 {{itemLabel}} 的举报的处理结果',
         ],
         'fr' => [
             EmailType::VerificationRequest->value => 'Merci de confirmer ton adresse e-mail',
@@ -89,6 +95,8 @@ readonly class EmailTemplateService
             EmailType::UpcomingEvents->value => 'Événements à venir cette semaine',
             EmailType::EventUpdateNotification->value => 'Événement modifié : {{eventTitle}}',
             EmailType::SeriesRescheduled->value => 'Série reportée : {{eventTitle}}',
+            EmailType::ItemReportReceipt->value => 'Nous avons reçu ton signalement concernant {{itemLabel}}',
+            EmailType::ItemReportDecision->value => 'Décision sur ton signalement concernant {{itemLabel}}',
         ],
         'es' => [
             EmailType::VerificationRequest->value => 'Confirma tu correo electrónico',
@@ -107,6 +115,8 @@ readonly class EmailTemplateService
             EmailType::UpcomingEvents->value => 'Eventos próximos esta semana',
             EmailType::EventUpdateNotification->value => 'Cambio en el evento: {{eventTitle}}',
             EmailType::SeriesRescheduled->value => 'Serie reprogramada: {{eventTitle}}',
+            EmailType::ItemReportReceipt->value => 'Hemos recibido tu denuncia sobre {{itemLabel}}',
+            EmailType::ItemReportDecision->value => 'Decisión sobre tu denuncia de {{itemLabel}}',
         ],
     ];
 
@@ -222,6 +232,27 @@ readonly class EmailTemplateService
             'removedDatesHtml',
             'newStart',
         ],
+        EmailType::ItemReportReceipt->value => [
+            'name',
+            'itemLabel',
+            'itemPath',
+            'reason',
+            'reportId',
+            'host',
+            'url',
+            'lang',
+            'greeting',
+        ],
+        EmailType::ItemReportDecision->value => [
+            'name',
+            'itemLabel',
+            'decision',
+            'reportId',
+            'host',
+            'url',
+            'lang',
+            'greeting',
+        ],
     ];
 
     /** @param iterable<TemplateProviderInterface> $providers */
@@ -304,7 +335,7 @@ readonly class EmailTemplateService
     private function substitute(string $content, array $context, bool $escape): string
     {
         foreach ($context as $key => $value) {
-            if (!is_scalar($value)) {
+            if ($value !== null && !is_scalar($value)) {
                 continue;
             }
 

@@ -1,0 +1,26 @@
+{% set mode = viewMode ?? item_view_mode('song').value %}
+{% if mode not in ['list', 'tiles', 'row'] %}{% set mode = 'list' %}{% endif %}
+{% set showUrl = path('app_plugin_karaoke_show', {id: song.id}) %}
+
+{% if mode == 'row' %}
+    {% include '_components/item/styles/row.html.twig' with {
+        href: showUrl,
+        title: song.title,
+        subtitle: song.artist
+    } %}
+{% elseif mode == 'list' %}
+    <td style="vertical-align: middle;">
+        <a href="{{ showUrl }}" class="has-text-weight-medium" lang="{{ song.language }}">{{ song.title }}</a>
+    </td>
+    <td style="vertical-align: middle;" class="has-text-grey" lang="{{ song.language }}">{{ song.artist }}</td>
+    <td style="vertical-align: middle;">{{ languageName }}</td>
+    <td style="vertical-align: middle;" class="has-text-grey">{{ song.mediaProvider.label }}</td>
+{% else %}
+    <div class="card" style="height: 100%;">
+        <div class="card-content">
+            <p class="title is-5"><a href="{{ showUrl }}" lang="{{ song.language }}">{{ song.title }}</a></p>
+            {% if song.artist %}<p class="subtitle is-6 has-text-grey" lang="{{ song.language }}">{{ song.artist }}</p>{% endif %}
+            <p class="is-size-7 has-text-grey">{{ languageName }} - {{ song.mediaProvider.label }}</p>
+        </div>
+    </div>
+{% endif %}

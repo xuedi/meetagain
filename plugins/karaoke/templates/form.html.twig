@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+
+{% set heading = song ? 'karaoke.page_title_edit'|trans({'%title%': song.title}) : 'karaoke.button_new'|trans %}
+
+{% block title %}{{ heading }}{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <div class="level mb-4">
+                <div class="level-left">
+                    <h1 class="title is-4 mb-0">{{ heading }}</h1>
+                </div>
+                {% if song and lookupEnabled|default(false) %}
+                    <div class="level-right">
+                        <a href="{{ path('app_plugin_karaoke_lookup', {id: song.id}) }}" class="button">
+                            <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
+                            <span>{{ 'karaoke_lookup.button_find_for_song'|trans }}</span>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            {{ form_start(form) }}
+            {{ form_errors(form) }}
+            <div class="columns">
+                <div class="column is-5">
+                    <div class="box">
+                        {{ form_row(form.title) }}
+                        {{ form_row(form.artist) }}
+                        {{ form_row(form.language) }}
+                        {{ form_row(form.mediaLink) }}
+                        {% if form.itemTags is defined %}{{ form_row(form.itemTags) }}{% endif %}
+                    </div>
+                </div>
+                <div class="column is-7">
+                    <div class="box">
+                        {% if form.translationLanguage is defined %}
+                            {{ form_row(form.translationLanguage) }}
+                        {% else %}
+                            <p class="label">{{ 'karaoke.field_translation_language'|trans }}</p>
+                            <div class="tabs is-small is-toggle mb-3">
+                                <ul>
+                                    {% for code in translationLanguages %}
+                                        <li{% if code == translationLanguage %} class="is-active"{% endif %}>
+                                            <a href="{{ path('app_plugin_karaoke_edit', {id: song.id, lang: code}) }}">{{ ('language_' ~ code)|trans }}</a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <p class="help mb-3">{{ 'karaoke.help_translation_tabs'|trans }}</p>
+                        {% endif %}
+                        {{ form_row(form.lyrics) }}
+                    </div>
+                </div>
+            </div>
+            <div class="buttons is-right">
+                <a href="{{ song ? path('app_plugin_karaoke_show', {id: song.id}) : path('app_plugin_karaoke') }}" class="button">{{ 'global.button_cancel'|trans }}</a>
+                {{ form_widget(form.submit) }}
+            </div>
+            {{ form_end(form) }}
+
+            {% if song %}
+                <hr>
+                <a href="{{ path('app_plugin_karaoke_delete', {id: song.id}) }}"
+                   class="button is-danger is-light"
+                   data-post
+                   data-csrf-token="{{ csrf_token('app_plugin_karaoke_delete' ~ song.id) }}"
+                   data-confirm="{{ 'karaoke.confirm_delete'|trans }}">
+                    <span class="icon"><i class="fa fa-trash"></i></span>
+                    <span>{{ 'karaoke.button_delete'|trans }}</span>
+                </a>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'karaoke.page_title'|trans }}{% endblock %}
+
+{% block body %}
+    <section class="section">
+        <div class="container">
+            <div class="level mb-4">
+                <div class="level-left">
+                    <h1 class="title mb-0">{{ 'karaoke.page_title'|trans }}</h1>
+                </div>
+                {% if is_granted('ROLE_ORGANIZER') %}
+                    <div class="level-right">
+                        <a href="{{ path('app_plugin_karaoke_new') }}" class="button is-link">
+                            <span class="icon"><i class="fa fa-plus"></i></span>
+                            <span>{{ 'karaoke.button_new'|trans }}</span>
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% include '_components/item/list_layout.html.twig' with {
+                'itemType': 'song',
+                'modes': ['list', 'tiles'],
+                'infoKey': 'karaoke.sidebar_info'
+            } only %}
+        </div>
+    </section>
+{% endblock %}

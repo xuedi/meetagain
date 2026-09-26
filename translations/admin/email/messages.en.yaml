@@ -44,6 +44,8 @@ admin_email_templates:
     trigger_event_update_notification: 'when admin edits event start, location or cancellation'
     trigger_series_rescheduled: 'Recurring series rescheduled - attendee RSVPs removed'
     trigger_support_email_verify: 'someone asks for support-answer notifications by email'
+    trigger_item_report_receipt: 'someone reports an item - confirmation to the notifier'
+    trigger_item_report_decision: 'an item report is resolved - decision to the notifier'
     trigger_support_invitation: 'a steward invites the administrators into a request'
 admin_email_sendlog:
     col_subject: 'Subject'

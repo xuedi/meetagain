@@ -40,6 +40,10 @@ framework:
             policy: 'fixed_window'
             limit: 30
             interval: '1 hour'
+        item_report:
+            policy: 'fixed_window'
+            limit: 5
+            interval: '1 hour'
 
 when@test:
     framework:
@@ -81,6 +85,10 @@ when@test:
                 limit: 999999
                 interval: '15 minutes'
             login_measures_announcement:
+                policy: 'fixed_window'
+                limit: 999999
+                interval: '1 hour'
+            item_report:
                 policy: 'fixed_window'
                 limit: 999999
                 interval: '1 hour'

@@ -144,6 +144,7 @@ class EmailTemplateServiceTest extends TestCase
         yield 'int substitution' => ['Count: {{n}}', ['n' => 42], 'Count: 42'];
         yield 'bool substitution' => ['Flag: {{flag}}', ['flag' => true], 'Flag: 1'];
         yield 'float substitution' => ['Pi: {{pi}}', ['pi' => 3.14], 'Pi: 3.14'];
+        yield 'null becomes empty' => ['Mail: {{email}}', ['email' => null], 'Mail: '];
         yield 'non-scalar is skipped' => ['List: {{xs}}', ['xs' => [1, 2, 3]], 'List: {{xs}}'];
         yield 'object is skipped' => ['Obj: {{o}}', ['o' => new \stdClass()], 'Obj: {{o}}'];
         yield 'unknown placeholder left as-is' => ['Hi {{x}}', [], 'Hi {{x}}'];

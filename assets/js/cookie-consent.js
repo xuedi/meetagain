@@ -5,7 +5,7 @@
  *   1. On load, checks for the consent_cookies cookie client-side and opens the
  *      dropdown banner if absent. This avoids the issue where the server renders the
  *      banner hidden in cached HTML even when consent has not been given.
- *   2. On confirm (.cookieTrigger), POSTs the consent choice (with OSM map opt-in)
+ *   2. On confirm (.cookieTrigger), POSTs the consent choice (with the OSM map and external media opt-ins)
  *      via maFetch and reloads to apply the new consent state.
  *
  * Loaded in:  templates/base.html.twig (all pages)
@@ -34,10 +34,12 @@ document.addEventListener('DOMContentLoaded', function () {
     (document.querySelectorAll('.cookieTrigger') || []).forEach((el) => {
         el.addEventListener('click', (event) => {
             const osmConsent = document.getElementById('osm_consent_checkbox');
+            const externalMediaConsent = document.getElementById('external_media_consent_checkbox');
             const url = event.currentTarget.dataset.url;
             const token = event.currentTarget.dataset.token;
             const body = new FormData();
             body.append('osmConsent', String(osmConsent && osmConsent.checked));
+            body.append('externalMediaConsent', String(externalMediaConsent && externalMediaConsent.checked));
             body.append('_token', token);
             maFetch(url, false, body).then(() => location.reload()).catch(() => location.reload());
         });

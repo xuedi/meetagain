@@ -1,0 +1,6 @@
+framework:
+    cache:
+        pools:
+            cache.karaoke_lookup:
+                adapter: cache.adapter.redis_tag_aware
+                default_lifetime: 86400

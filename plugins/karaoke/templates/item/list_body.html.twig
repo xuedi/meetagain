@@ -1,0 +1,7 @@
+{% include '_components/item/list.html.twig' with {
+    'itemType': 'song',
+    'itemIds': itemIds,
+    'modes': ['list', 'tiles'],
+    'emptyMessage': 'karaoke.list_empty',
+    'listHeader': ['karaoke.col_title', 'karaoke.col_artist', 'karaoke.col_language', 'karaoke.col_video']
+} only %}

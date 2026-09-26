@@ -15,10 +15,12 @@ class Consent implements JsonSerializable
     public const string SESSION_NAME = 'session_key_consent';
     public const string TYPE_COOKIES = 'consent_cookies';
     public const string TYPE_OSM = 'consent_cookies_osm';
+    public const string TYPE_EXTERNAL_MEDIA = 'consent_cookies_external_media';
 
     public function __construct(
         private ?ConsentType $cookies = ConsentType::Unknown,
         private ?ConsentType $osm = ConsentType::Unknown,
+        private ?ConsentType $externalMedia = ConsentType::Unknown,
     ) {}
 
     public function getCookies(): ConsentType
@@ -46,12 +48,23 @@ class Consent implements JsonSerializable
         return $this->osm === ConsentType::Granted;
     }
 
+    public function getExternalMedia(): ConsentType
+    {
+        return $this->externalMedia;
+    }
+
+    public function setExternalMedia(ConsentType $consentType): void
+    {
+        $this->externalMedia = $consentType;
+    }
+
     public function getHtmlCookies(): array
     {
         $cookieExpires = new DateTime('+6 months');
 
         return [
             new Cookie(name: self::TYPE_OSM, value: $this->getOsm()->value, expire: $cookieExpires, httpOnly: false),
+            new Cookie(name: self::TYPE_EXTERNAL_MEDIA, value: $this->getExternalMedia()->value, expire: $cookieExpires, httpOnly: false),
             new Cookie(name: self::TYPE_COOKIES, value: $this->getCookies()->value, expire: $cookieExpires, httpOnly: false),
         ];
     }
@@ -63,6 +76,9 @@ class Consent implements JsonSerializable
             switch ($key) {
                 case self::TYPE_OSM:
                     $consent->osm = ConsentType::from($value);
+                    break;
+                case self::TYPE_EXTERNAL_MEDIA:
+                    $consent->externalMedia = ConsentType::from($value);
                     break;
                 case self::TYPE_COOKIES:
                     $consent->cookies = ConsentType::from($value);
@@ -81,6 +97,7 @@ class Consent implements JsonSerializable
             $data = json_decode((string) $json, true, 512, JSON_THROW_ON_ERROR);
             $consent->setCookies(ConsentType::from($data[self::TYPE_COOKIES] ?? 'unknown'));
             $consent->setOsm(ConsentType::from($data[self::TYPE_OSM] ?? 'unknown'));
+            $consent->setExternalMedia(ConsentType::from($data[self::TYPE_EXTERNAL_MEDIA] ?? 'unknown'));
         } catch (Throwable $e) {
             unset($e); // Session data missing/invalid - return empty consent object with default values
         }
@@ -98,6 +115,7 @@ class Consent implements JsonSerializable
         return [
             self::TYPE_COOKIES => $this->getCookies()->value,
             self::TYPE_OSM => $this->getOsm()->value,
+            self::TYPE_EXTERNAL_MEDIA => $this->getExternalMedia()->value,
         ];
     }
 }

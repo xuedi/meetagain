@@ -29,7 +29,7 @@
                    class="button is-success"
                    data-post
                    data-csrf-token="{{ csrfToken }}">
-                    {{ 'profile_review.button_approve'|trans }}
+                    {{ (item.approveLabelKey ?? 'profile_review.button_approve')|trans }}
                 </a>
                 {% if item.canDeny %}
                 <a href="{{ path('app_profile_review_deny', {providerIdentifier: providerIdentifier, itemId: item.id}) }}"

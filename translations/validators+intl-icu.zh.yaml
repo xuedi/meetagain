@@ -58,3 +58,7 @@ Error: 错误
 # Admin system security namespace - measure tuning
 'admin_system_security.validator_pow_difficulty': '难度必须介于 {min} 和 {max} 位之间。'
 'admin_system_security.validator_log_retention': '保留天数必须介于 {min} 和 {max} 之间。'
+'item_report.validator_explanation_blank': '请说明问题所在。'
+'item_report.validator_explanation_short': '请说明得更详细一些。'
+'item_report.validator_explanation_long': '说明太长了。'
+'item_report.validator_good_faith': '请确认你是出于善意提交此举报。'

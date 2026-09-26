@@ -697,7 +697,7 @@
     "announcements": [],
     "tags": [
         {
-            "ref": 38,
+            "ref": 41,
             "item_type": "boardgame",
             "parent_ref": null,
             "position": 0,
@@ -711,7 +711,7 @@
             "managed": false
         },
         {
-            "ref": 39,
+            "ref": 42,
             "item_type": "boardgame",
             "parent_ref": null,
             "position": 1,
@@ -725,9 +725,9 @@
             "managed": false
         },
         {
-            "ref": 40,
+            "ref": 43,
             "item_type": "boardgame",
-            "parent_ref": 38,
+            "parent_ref": 41,
             "position": 2,
             "labels": {
                 "de": "Deckbau",
@@ -739,9 +739,9 @@
             "managed": false
         },
         {
-            "ref": 41,
+            "ref": 44,
             "item_type": "boardgame",
-            "parent_ref": 38,
+            "parent_ref": 41,
             "position": 3,
             "labels": {
                 "de": "Arbeitereinsatz",
@@ -753,9 +753,9 @@
             "managed": false
         },
         {
-            "ref": 42,
+            "ref": 45,
             "item_type": "boardgame",
-            "parent_ref": 38,
+            "parent_ref": 41,
             "position": 4,
             "labels": {
                 "de": "Plättchenlegen",
@@ -767,9 +767,9 @@
             "managed": false
         },
         {
-            "ref": 43,
+            "ref": 46,
             "item_type": "boardgame",
-            "parent_ref": 38,
+            "parent_ref": 41,
             "position": 5,
             "labels": {
                 "de": "Gebietskontrolle",
@@ -781,9 +781,9 @@
             "managed": false
         },
         {
-            "ref": 44,
+            "ref": 47,
             "item_type": "boardgame",
-            "parent_ref": 38,
+            "parent_ref": 41,
             "position": 6,
             "labels": {
                 "de": "Kooperativ",
@@ -795,9 +795,9 @@
             "managed": false
         },
         {
-            "ref": 45,
+            "ref": 48,
             "item_type": "boardgame",
-            "parent_ref": 38,
+            "parent_ref": 41,
             "position": 7,
             "labels": {
                 "de": "Handel",
@@ -809,9 +809,9 @@
             "managed": false
         },
         {
-            "ref": 46,
+            "ref": 49,
             "item_type": "boardgame",
-            "parent_ref": 38,
+            "parent_ref": 41,
             "position": 8,
             "labels": {
                 "de": "Verdeckte Rollen",
@@ -823,9 +823,9 @@
             "managed": false
         },
         {
-            "ref": 47,
+            "ref": 50,
             "item_type": "boardgame",
-            "parent_ref": 39,
+            "parent_ref": 42,
             "position": 9,
             "labels": {
                 "de": "Partyspiel",
@@ -837,9 +837,9 @@
             "managed": false
         },
         {
-            "ref": 48,
+            "ref": 51,
             "item_type": "boardgame",
-            "parent_ref": 39,
+            "parent_ref": 42,
             "position": 10,
             "labels": {
                 "de": "Strategie",
@@ -851,9 +851,9 @@
             "managed": false
         },
         {
-            "ref": 49,
+            "ref": 52,
             "item_type": "boardgame",
-            "parent_ref": 39,
+            "parent_ref": 42,
             "position": 11,
             "labels": {
                 "de": "Familie",
@@ -865,9 +865,9 @@
             "managed": false
         },
         {
-            "ref": 50,
+            "ref": 53,
             "item_type": "boardgame",
-            "parent_ref": 39,
+            "parent_ref": 42,
             "position": 12,
             "labels": {
                 "de": "Abstrakt",
@@ -879,9 +879,9 @@
             "managed": false
         },
         {
-            "ref": 51,
+            "ref": 54,
             "item_type": "boardgame",
-            "parent_ref": 39,
+            "parent_ref": 42,
             "position": 13,
             "labels": {
                 "de": "Wortspiel",
@@ -1239,109 +1239,109 @@
             ],
             "tags": {
                 "1": [
-                    38,
-                    39,
-                    45,
-                    48
+                    41,
+                    42,
+                    48,
+                    51
                 ],
                 "2": [
-                    38,
-                    39,
+                    41,
                     42,
-                    49
+                    45,
+                    52
                 ],
                 "3": [
-                    39,
-                    48,
-                    49
+                    42,
+                    51,
+                    52
                 ],
                 "4": [
-                    38,
-                    39,
-                    44,
-                    48
+                    41,
+                    42,
+                    47,
+                    51
                 ],
                 "5": [
-                    39,
-                    48
+                    42,
+                    51
                 ],
                 "6": [
-                    38,
-                    39,
-                    40,
-                    48
+                    41,
+                    42,
+                    43,
+                    51
                 ],
                 "7": [
-                    39,
-                    49,
-                    50
+                    42,
+                    52,
+                    53
                 ],
                 "8": [
-                    39,
-                    48
-                ],
-                "9": [
-                    39,
-                    47,
+                    42,
                     51
                 ],
+                "9": [
+                    42,
+                    50,
+                    54
+                ],
                 "10": [
-                    39,
-                    48,
-                    50
+                    42,
+                    51,
+                    53
                 ],
                 "11": [
-                    39,
+                    42,
+                    52,
+                    53
+                ],
+                "12": [
+                    41,
+                    42,
+                    46,
+                    51
+                ],
+                "13": [
+                    42,
+                    51
+                ],
+                "14": [
+                    41,
+                    42,
+                    44,
+                    51
+                ],
+                "15": [
+                    41,
+                    42,
+                    44,
+                    51
+                ],
+                "16": [
+                    41,
+                    42,
                     49,
                     50
                 ],
-                "12": [
-                    38,
-                    39,
-                    43,
-                    48
-                ],
-                "13": [
-                    39,
-                    48
-                ],
-                "14": [
-                    38,
-                    39,
-                    41,
-                    48
-                ],
-                "15": [
-                    38,
-                    39,
-                    41,
-                    48
-                ],
-                "16": [
-                    38,
-                    39,
-                    46,
-                    47
-                ],
                 "17": [
-                    39,
-                    47,
-                    51
+                    42,
+                    50,
+                    54
                 ],
                 "18": [
-                    39,
-                    48,
-                    50
+                    42,
+                    51,
+                    53
                 ],
                 "19": [
-                    39,
-                    50
+                    42,
+                    53
                 ],
                 "20": [
-                    38,
-                    39,
-                    44,
-                    48
+                    41,
+                    42,
+                    47,
+                    51
                 ]
             }
         }

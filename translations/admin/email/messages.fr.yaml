@@ -44,6 +44,8 @@ admin_email_templates:
     trigger_event_update_notification: 'quand un admin modifie le début, le lieu ou l''annulation d''un événement'
     trigger_series_rescheduled: 'Série récurrente reprogrammée - RSVP des participants supprimés'
     trigger_support_email_verify: 'quelqu''un demande à être averti par e-mail des réponses du support'
+    trigger_item_report_receipt: 'quelqu''un signale un contenu - confirmation à l''auteur du signalement'
+    trigger_item_report_decision: 'un signalement est traité - décision à l''auteur du signalement'
     trigger_support_invitation: 'un steward invite les administrateurs sur une demande'
 admin_email_sendlog:
     col_subject: 'Objet'

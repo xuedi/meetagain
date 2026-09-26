@@ -28,6 +28,13 @@
                             <p class="help has-text-grey">{{ "cookie.option_osm_text" | trans }}</p>
                         </div>
 
+                        <div class="field">
+                            <label class="checkbox">
+                                {{ form_widget(form.external_media) }}
+                            </label>
+                            <p class="help has-text-grey">{{ "cookie.option_external_media_text" | trans }}</p>
+                        </div>
+
                         <div class="field mt-4">
                             {{ form_widget(form.save) }}
                         </div>
@@ -53,6 +60,16 @@
                                 {% if consent.osm.value == 'granted' %}
                                     <span class="tag is-success">{{ "cookie.status_granted"|trans }}</span>
                                 {% elseif consent.osm.value == 'denied' %}
+                                    <span class="tag is-danger">{{ "cookie.status_denied"|trans }}</span>
+                                {% else %}
+                                    <span class="tag is-warning">{{ "cookie.status_unknown"|trans }}</span>
+                                {% endif %}
+                            </li>
+                            <li>
+                                {{ "cookie.option_external_media"|trans }}:
+                                {% if consent.externalMedia.value == 'granted' %}
+                                    <span class="tag is-success">{{ "cookie.status_granted"|trans }}</span>
+                                {% elseif consent.externalMedia.value == 'denied' %}
                                     <span class="tag is-danger">{{ "cookie.status_denied"|trans }}</span>
                                 {% else %}
                                     <span class="tag is-warning">{{ "cookie.status_unknown"|trans }}</span>

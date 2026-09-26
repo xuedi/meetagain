@@ -1,0 +1,8 @@
+framework:
+    http_client:
+        scoped_clients:
+            karaoke.client:
+                scope: '^https://'
+                timeout: 4
+                max_duration: 8
+                max_redirects: 2

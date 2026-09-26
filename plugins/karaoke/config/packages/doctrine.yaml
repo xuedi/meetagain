@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Karaoke:
+                        dir: "%kernel.project_dir%/plugins/karaoke/src/Entity"
+                        is_bundle: false
+                        prefix: Plugin\Karaoke\Entity
+                        alias: Karaoke
+
+doctrine_migrations:
+    migrations_paths:
+        PluginKaraokeMigrations: "%kernel.project_dir%/plugins/karaoke/migrations"
