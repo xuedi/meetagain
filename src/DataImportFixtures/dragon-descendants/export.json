@@ -39,6 +39,10 @@
                 ],
                 "defaultAnswerMode": "flip",
                 "leaderboardEnabled": true
+            },
+            "karaoke": {
+                "lookupEnabled": true,
+                "lrclibEnabled": true
             }
         },
         "logo_file": "images/e1e0db56f64760f209bab36c57bd7cfe4482ad50.png"

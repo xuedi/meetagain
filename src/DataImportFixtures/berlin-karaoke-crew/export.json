@@ -21,7 +21,12 @@
             "send_upcoming_digest": true,
             "show_town_hall": false
         },
-        "plugin_settings": [],
+        "plugin_settings": {
+            "karaoke": {
+                "lookupEnabled": true,
+                "lrclibEnabled": true
+            }
+        },
         "logo_file": "images/fffdc1ec31587a16ea78f39b26775a88511f7775.png"
     },
     "locations": [
