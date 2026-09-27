@@ -8,9 +8,9 @@ use App\Activity\Messages\PasswordResetRequest;
 use App\Emails\Types\PasswordResetEmail;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\Email\BlocklistCheckerInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Email\Contract\BlocklistInterface;
 use Psr\Log\LoggerInterface;
 use SensitiveParameter;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -23,7 +23,7 @@ readonly class PasswordResetService
         private UserPasswordHasherInterface $hasher,
         private ActivityService $activityService,
         private PasswordResetEmail $passwordResetEmail,
-        private BlocklistCheckerInterface $blocklist,
+        private BlocklistInterface $blocklist,
         private LoggerInterface $logger,
     ) {}
 

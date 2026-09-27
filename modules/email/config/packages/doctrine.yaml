@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Email:
+                        dir: "%kernel.project_dir%/modules/email/src/Internal/Entity"
+                        is_bundle: false
+                        prefix: Module\Email\Internal\Entity
+                        alias: Email
+
+doctrine_migrations:
+    migrations_paths:
+        ModuleEmailMigrations: "%kernel.project_dir%/modules/email/migrations"

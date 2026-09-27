@@ -1,0 +1,5 @@
+chrome:
+    notification_stale_emails: '%count% stale email(s)'
+email_layout:
+    footer_sent_by: 'Sent by %site%'
+    footer_no_reply: 'Please do not reply to this email - this mailbox is not monitored. Use the contact form on the website to get in touch.'

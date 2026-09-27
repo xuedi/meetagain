@@ -2,8 +2,8 @@
 
 namespace Tests\Unit\Emails\Guard\Rule;
 
-use App\Emails\EmailGuardOutcome;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
+use Module\Email\Contract\GuardOutcome;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\Stubs\UserStub;
 
@@ -18,14 +18,14 @@ final class RecipientUserPresentRuleTest extends TestCase
         $result = $rule->evaluate(['user' => new UserStub()]);
 
         // Assert
-        $this->assertSame(EmailGuardOutcome::Pass, $result->outcome);
+        $this->assertSame(GuardOutcome::Pass, $result->outcome);
     }
 
     public function testErrorWhenKeyMissing(): void
     {
         $rule = new RecipientUserPresentRule();
         $result = $rule->evaluate([]);
-        $this->assertSame(EmailGuardOutcome::Error, $result->outcome);
+        $this->assertSame(GuardOutcome::Error, $result->outcome);
         $this->assertSame('user', $result->contextKey);
     }
 
@@ -33,6 +33,6 @@ final class RecipientUserPresentRuleTest extends TestCase
     {
         $rule = new RecipientUserPresentRule();
         $result = $rule->evaluate(['user' => 'string']);
-        $this->assertSame(EmailGuardOutcome::Error, $result->outcome);
+        $this->assertSame(GuardOutcome::Error, $result->outcome);
     }
 }

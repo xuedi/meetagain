@@ -4,6 +4,7 @@ admin_shell:
     section_system: 'Système'
     sidebar_info: 'Information'
     menu_cms: 'Pages'
+    menu_announcements: 'Annonces'
     menu_event: 'Événements'
     menu_host: 'Hôtes'
     menu_location: 'Lieux'
@@ -207,13 +208,6 @@ admin_cms:
     flash_block_validation_error: 'Le bloc n''a pas pu être enregistré.'
     block_delete_title: 'Supprimer ce bloc'
     block_delete_warning: 'Ce bloc et toute image qui y est attachée seront définitivement supprimés. Cette action est irréversible.'
-admin_email:
-    tab_templates: 'Modèles'
-    tab_sendlog: 'Journal d''envoi'
-    tab_announcements: 'Annonces'
-    tab_debugging: 'Débogage'
-    tab_blocklist: 'Liste de blocage'
-    tab_planned: 'Planifiés'
 admin_event:
     summary_total: 'événements'
     summary_total_all: 'au total'

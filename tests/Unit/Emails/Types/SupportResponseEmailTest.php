@@ -2,21 +2,23 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\SupportResponseEmail;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Enum\SupportAudience;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use DateTimeImmutable;
+use Module\Email\Contract\BlocklistInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
+use Tests\Unit\Emails\MailerTrait;
+use Tests\Unit\Emails\QueueSpy;
 use Tests\Unit\Emails\SampleFactoryTrait;
 
 class SupportResponseEmailTest extends TestCase
 {
+    use MailerTrait;
     use SampleFactoryTrait;
 
     public function testSendEnqueuesEmailToRequester(): void
@@ -25,11 +27,11 @@ class SupportResponseEmailTest extends TestCase
         $config = $this->createStub(ConfigService::class);
         $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
 
-        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklist = $this->createStub(BlocklistInterface::class);
         $blocklist->method('isBlocked')->willReturn(false);
 
         $enqueued = null;
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue
             ->expects($this->once())
             ->method('enqueue')
@@ -42,7 +44,7 @@ class SupportResponseEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'en');
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $this->mailer($queue), $config, 'en');
 
         // Act
         $emailType->send(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
@@ -62,11 +64,11 @@ class SupportResponseEmailTest extends TestCase
         // Arrange
         $config = $this->createStub(ConfigService::class);
         $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
-        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklist = $this->createStub(BlocklistInterface::class);
         $blocklist->method('isBlocked')->willReturn(false);
 
         $enqueued = null;
-        $queue = $this->createStub(EmailQueueInterface::class);
+        $queue = $this->createStub(QueueSpy::class);
         $queue
             ->method('enqueue')
             ->willReturnCallback(static function ($source, TemplatedEmail $email) use (&$enqueued): bool {
@@ -75,7 +77,7 @@ class SupportResponseEmailTest extends TestCase
                 return true;
             });
 
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'fr');
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $this->mailer($queue), $config, 'fr');
 
         // Act
         $emailType->send(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
@@ -91,13 +93,13 @@ class SupportResponseEmailTest extends TestCase
         $config = $this->createStub(ConfigService::class);
         $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
 
-        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklist = $this->createStub(BlocklistInterface::class);
         $blocklist->method('isBlocked')->willReturn(true);
 
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->never())->method('enqueue');
 
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'en');
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $this->mailer($queue), $config, 'en');
 
         // Act
         $emailType->send(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
@@ -107,9 +109,9 @@ class SupportResponseEmailTest extends TestCase
     {
         // Arrange
         $emailType = new SupportResponseEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->createStub(ConfigService::class),
             'en',
         );
@@ -124,13 +126,13 @@ class SupportResponseEmailTest extends TestCase
         $config = $this->createStub(ConfigService::class);
         $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
 
-        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklist = $this->createStub(BlocklistInterface::class);
         $blocklist->method('isBlocked')->willReturn(false);
 
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->never())->method('enqueue');
 
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'en');
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $this->mailer($queue), $config, 'en');
 
         // Act
         $emailType->send(['request' => $this->makeRequest(verified: false), 'response' => 'Here is your answer.']);
@@ -140,9 +142,9 @@ class SupportResponseEmailTest extends TestCase
     {
         // Arrange
         $emailType = new SupportResponseEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->createStub(ConfigService::class),
             'en',
         );

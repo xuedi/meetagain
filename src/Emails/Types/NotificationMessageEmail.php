@@ -2,25 +2,25 @@
 
 namespace App\Emails\Types;
 
-use App\Emails\DueContext;
 use App\Emails\EmailAbstract;
-use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
 use App\Emails\Guard\Rule\RecipientKeyUserPresentRule;
 use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\SenderUserPresentRule;
 use App\Emails\Guard\Rule\UserNotificationsMasterToggleRule;
 use App\Emails\MockSampleFactory;
-use App\Emails\ScheduledEmailInterface;
-use App\Emails\ScheduledMailItem;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Repository\MessageRepository;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use DateInterval;
 use DateTimeImmutable;
 use InvalidArgumentException;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\DueContext;
+use Module\Email\Contract\MailerInterface;
+use Module\Email\Contract\ScheduledEmailInterface;
+use Module\Email\Contract\ScheduledMailItem;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class NotificationMessageEmail extends EmailAbstract implements ScheduledEmailInterface
@@ -28,13 +28,13 @@ readonly class NotificationMessageEmail extends EmailAbstract implements Schedul
     public const string DELAY = 'PT3H';
 
     public function __construct(
-        BlocklistCheckerInterface $blocklist,
+        BlocklistInterface $blocklist,
         MockSampleFactory $samples,
-        private EmailQueueInterface $queue,
+        MailerInterface $mailer,
         private ConfigService $config,
         private MessageRepository $messageRepo,
     ) {
-        parent::__construct($blocklist, $samples);
+        parent::__construct($blocklist, $samples, $mailer);
     }
 
     public function getIdentifier(): string
@@ -81,7 +81,12 @@ readonly class NotificationMessageEmail extends EmailAbstract implements Schedul
         return $recipient instanceof User ? $recipient : null;
     }
 
-    public function send(array $context): void
+    public function pushOnEnqueue(): bool
+    {
+        return false;
+    }
+
+    public function compose(array $context): array
     {
         /** @var User $sender */
         $sender = $context['sender'];
@@ -101,7 +106,7 @@ readonly class NotificationMessageEmail extends EmailAbstract implements Schedul
             'lang' => $language,
         ]);
 
-        $this->queue->enqueue($this, $email, $context, dispatchPush: false);
+        return [$email];
     }
 
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable

@@ -2,8 +2,8 @@
 
 namespace App\Command;
 
-use App\Service\Email\PreviewSweepResult;
-use App\Service\Email\PreviewSweepService;
+use Module\Email\Contract\PreviewSweepInterface;
+use Module\Email\Contract\PreviewSweepResult;
 use Override;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -17,7 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class EmailPreviewCommand extends Command
 {
     public function __construct(
-        protected readonly PreviewSweepService $sweep,
+        protected readonly PreviewSweepInterface $sweep,
     ) {
         parent::__construct();
     }
@@ -27,7 +27,7 @@ class EmailPreviewCommand extends Command
     {
         $this->addOption('lang', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit the sweep to these languages');
         $this->addOption('type', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit the sweep to these email type identifiers');
-        $this->addOption('to', null, InputOption::VALUE_REQUIRED, 'Recipient domain', PreviewSweepService::DEFAULT_RECIPIENT_DOMAIN);
+        $this->addOption('to', null, InputOption::VALUE_REQUIRED, 'Recipient domain', PreviewSweepInterface::DEFAULT_RECIPIENT_DOMAIN);
         $this->addOption('plain', null, InputOption::VALUE_NONE, 'Leave subjects untagged, the way a recipient would see them');
     }
 

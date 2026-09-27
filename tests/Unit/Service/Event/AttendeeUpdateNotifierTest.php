@@ -8,6 +8,7 @@ use App\Entity\NotificationSettings;
 use App\Entity\User;
 use App\Service\Event\AttendeeUpdateNotifier;
 use DateTime;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
@@ -16,7 +17,7 @@ class AttendeeUpdateNotifierTest extends TestCase
     public function testAnUnchangedSnapshotSendsNothing(): void
     {
         // Arrange
-        $email = $this->createMock(EventUpdateNotificationEmail::class);
+        $email = $this->email();
         $email->expects(self::never())->method('send');
         $notifier = new AttendeeUpdateNotifier($email);
         $event = $this->event(attendees: [$this->user(2)]);
@@ -29,7 +30,7 @@ class AttendeeUpdateNotifierTest extends TestCase
     public function testAPastEventSendsNothing(): void
     {
         // Arrange
-        $email = $this->createMock(EventUpdateNotificationEmail::class);
+        $email = $this->email();
         $email->expects(self::never())->method('send');
         $notifier = new AttendeeUpdateNotifier($email);
         $event = $this->event(attendees: [$this->user(2)], start: '-1 day');
@@ -45,7 +46,7 @@ class AttendeeUpdateNotifierTest extends TestCase
     {
         // Arrange
         $editor = $this->user(2);
-        $email = $this->createMock(EventUpdateNotificationEmail::class);
+        $email = $this->email();
         $email->expects(self::never())->method('send');
         $notifier = new AttendeeUpdateNotifier($email);
         $event = $this->event(attendees: [$editor]);
@@ -58,7 +59,7 @@ class AttendeeUpdateNotifierTest extends TestCase
     {
         // Arrange
         $creator = $this->user(2);
-        $email = $this->createMock(EventUpdateNotificationEmail::class);
+        $email = $this->email();
         $email->expects(self::never())->method('send');
         $notifier = new AttendeeUpdateNotifier($email);
         $event = $this->event(attendees: [$creator], creator: $creator);
@@ -70,7 +71,7 @@ class AttendeeUpdateNotifierTest extends TestCase
     public function testAnAttendeeWhoOptedOutIsSkipped(): void
     {
         // Arrange
-        $email = $this->createMock(EventUpdateNotificationEmail::class);
+        $email = $this->email();
         $email->expects(self::never())->method('send');
         $notifier = new AttendeeUpdateNotifier($email);
         $event = $this->event(attendees: [$this->user(2, optedIn: false)]);
@@ -85,7 +86,7 @@ class AttendeeUpdateNotifierTest extends TestCase
     public function testEveryRemainingAttendeeIsMailed(): void
     {
         // Arrange
-        $email = $this->createMock(EventUpdateNotificationEmail::class);
+        $email = $this->email();
         $email->expects(self::exactly(2))->method('send');
         $notifier = new AttendeeUpdateNotifier($email);
         $event = $this->event(attendees: [$this->user(2), $this->user(3), $this->user(4, optedIn: false)]);
@@ -95,6 +96,16 @@ class AttendeeUpdateNotifierTest extends TestCase
 
         // Assert
         self::assertSame(2, $notifier->countNotifiable($event));
+    }
+
+    private function email(): MockObject&EventUpdateNotificationEmail
+    {
+        $email = $this->createMock(EventUpdateNotificationEmail::class);
+        $email
+            ->method('guardCheck')
+            ->willReturnCallback(static fn(array $context): bool => $context['user']->getNotificationSettings()->isActive('attendedEventUpdate'));
+
+        return $email;
     }
 
     /** @return array{start: int, startFormatted: string, locationId: ?int, locationName: string, canceled: bool} */

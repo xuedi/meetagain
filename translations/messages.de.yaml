@@ -30,7 +30,6 @@ chrome:
     burger_admin_section: 'Admin'
     notifications_view_all: 'Alle anzeigen'
     notification_unread_messages: '%count% ungelesene Nachricht(en)'
-    notification_stale_emails: '%count% verzögerte E-Mail(s)'
     notification_new_support_requests: '%count% neue Support-Anfrage(n)'
     notification_image_missing_alt: 'Bild #%id% ohne Alt-Text (%missing% Sprachen)'
     footer_powered_by: 'läuft mit'
@@ -717,9 +716,6 @@ global:
     button_no: 'Nein'
     flash_invalid_csrf: 'Ungueltiges CSRF-Token.'
 'notification.review.pending_count': '%count% Element wartet auf Ihre Überprüfung|%count% Elemente warten auf Ihre Überprüfung'
-email_layout:
-    footer_sent_by: 'Gesendet von %site%'
-    footer_no_reply: 'Bitte antworte nicht auf diese E-Mail - dieses Postfach wird nicht gelesen. Nutze das Kontaktformular auf der Website, um uns zu erreichen.'
 email_event_update:
     line_start: 'Beginn geändert von <b>%before%</b> auf <b>%after%</b>.'
     line_location: 'Veranstaltungsort geändert von <b>%before%</b> auf <b>%after%</b>.'

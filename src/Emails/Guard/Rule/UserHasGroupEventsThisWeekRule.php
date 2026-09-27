@@ -2,16 +2,16 @@
 
 namespace App\Emails\Guard\Rule;
 
-use App\Emails\EmailGuardCost;
-use App\Emails\EmailGuardResult;
-use App\Emails\EmailGuardRuleInterface;
 use App\Entity\User;
 use App\Filter\Event\UserEventDigestFilterInterface;
 use App\Repository\EventRepository;
 use DateTimeInterface;
+use Module\Email\Contract\GuardCost;
+use Module\Email\Contract\GuardResult;
+use Module\Email\Contract\GuardRuleInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-final readonly class UserHasGroupEventsThisWeekRule implements EmailGuardRuleInterface
+final readonly class UserHasGroupEventsThisWeekRule implements GuardRuleInterface
 {
     /**
      * @param iterable<UserEventDigestFilterInterface> $digestFilters
@@ -27,25 +27,21 @@ final readonly class UserHasGroupEventsThisWeekRule implements EmailGuardRuleInt
         return 'user_has_group_events_this_week';
     }
 
-    public function getCost(): EmailGuardCost
+    public function getCost(): GuardCost
     {
-        return EmailGuardCost::Database;
+        return GuardCost::Database;
     }
 
-    public function evaluate(array $context): EmailGuardResult
+    public function evaluate(array $context): GuardResult
     {
         $user = $context['user'] ?? null;
         if (!$user instanceof User) {
-            return EmailGuardResult::error($this->getName(), "Context is missing the 'user' key, or it is not a User instance.", 'user');
+            return GuardResult::error($this->getName(), "Context is missing the 'user' key, or it is not a User instance.", 'user');
         }
         $weekStart = $context['weekStart'] ?? null;
         $weekEnd = $context['weekEnd'] ?? null;
         if (!$weekStart instanceof DateTimeInterface || !$weekEnd instanceof DateTimeInterface) {
-            return EmailGuardResult::error(
-                $this->getName(),
-                "Context is missing valid 'weekStart' and/or 'weekEnd' (expected DateTimeInterface).",
-                'weekStart',
-            );
+            return GuardResult::error($this->getName(), "Context is missing valid 'weekStart' and/or 'weekEnd' (expected DateTimeInterface).", 'weekStart');
         }
 
         $events = $this->eventRepo->findUpcomingEventsNotRsvpdByUser($weekStart, $weekEnd, $user);
@@ -57,9 +53,9 @@ final readonly class UserHasGroupEventsThisWeekRule implements EmailGuardRuleInt
         }
 
         if ($events === []) {
-            return EmailGuardResult::skip($this->getName(), 'No events this week match this user (filtered out by group/digest filters or already RSVP\'d).');
+            return GuardResult::skip($this->getName(), 'No events this week match this user (filtered out by group/digest filters or already RSVP\'d).');
         }
 
-        return EmailGuardResult::pass($this->getName());
+        return GuardResult::pass($this->getName());
     }
 }

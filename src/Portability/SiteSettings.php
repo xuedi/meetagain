@@ -2,8 +2,6 @@
 
 namespace App\Portability;
 
-use App\Entity\EmailTemplate;
-use App\Entity\EmailTemplateTranslation;
 use App\Entity\Image;
 use App\Entity\Language;
 use App\Enum\ImageType;
@@ -12,10 +10,9 @@ use App\Repository\LanguageRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use App\Service\Config\PluginService;
-use App\Service\Email\EmailTemplateService;
 use App\Service\Media\ImageLocationService;
-use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Email\Contract\TemplatesInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\String\TruncateMode;
 
@@ -32,7 +29,7 @@ readonly class SiteSettings
         private LanguageRepository $languageRepository,
         private ImageRepository $imageRepository,
         private ImageLocationService $imageLocationService,
-        private EmailTemplateService $templateService,
+        private TemplatesInterface $templates,
         private EntityManagerInterface $em,
         private SluggerInterface $slugger,
         private PluginService $pluginService,
@@ -123,30 +120,11 @@ readonly class SiteSettings
         }
 
         foreach ($wanted as $code) {
-            $this->addTemplateTranslations($code);
+            $this->templates->seedLanguage($code);
         }
 
         $this->em->flush();
         $this->languageService->invalidateCache();
-    }
-
-    private function addTemplateTranslations(string $code): void
-    {
-        foreach ($this->templateService->getDefaultTemplates($code) as $identifier => $data) {
-            $template = $this->templateService->getTemplate($identifier);
-            if (!$template instanceof EmailTemplate || $template->findTranslation($code) instanceof EmailTemplateTranslation) {
-                continue;
-            }
-
-            $translation = new EmailTemplateTranslation();
-            $translation->setEmailTemplate($template);
-            $translation->setLanguage($code);
-            $translation->setSubject($data['subject']);
-            $translation->setBody($data['body']);
-            $translation->setUpdatedAt(new DateTimeImmutable());
-
-            $this->em->persist($translation);
-        }
     }
 
     /**

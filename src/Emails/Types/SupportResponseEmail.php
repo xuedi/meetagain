@@ -3,28 +3,28 @@
 namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
-use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
 use App\Emails\Guard\Rule\SupportRequestEmailVerifiedRule;
 use App\Emails\MockSampleFactory;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class SupportResponseEmail extends EmailAbstract
 {
     public function __construct(
-        BlocklistCheckerInterface $blocklist,
+        BlocklistInterface $blocklist,
         MockSampleFactory $samples,
-        private EmailQueueInterface $queue,
+        MailerInterface $mailer,
         private ConfigService $config,
         #[Autowire('%kernel.default_locale%')]
         private string $defaultLocale,
     ) {
-        parent::__construct($blocklist, $samples);
+        parent::__construct($blocklist, $samples, $mailer);
     }
 
     public function getIdentifier(): string
@@ -61,15 +61,11 @@ readonly class SupportResponseEmail extends EmailAbstract
         ];
     }
 
-    public function send(array $context): void
+    public function compose(array $context): array
     {
         /** @var SupportRequest $request */
         $request = $context['request'];
         $response = (string) $context['response'];
-
-        if (!$request->isEmailVerified() || $this->blocklist->isBlocked((string) $request->getEmail())) {
-            return;
-        }
 
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
@@ -82,6 +78,6 @@ readonly class SupportResponseEmail extends EmailAbstract
             'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),
         ]);
 
-        $this->queue->enqueue($this, $email, $context);
+        return [$email];
     }
 }

@@ -2,19 +2,21 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\VerificationRequestEmail;
 use App\Entity\User;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
+use Module\Email\Contract\BlocklistInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
+use Tests\Unit\Emails\MailerTrait;
+use Tests\Unit\Emails\QueueSpy;
 use Tests\Unit\Emails\SampleFactoryTrait;
 
 class VerificationRequestEmailTest extends TestCase
 {
+    use MailerTrait;
     use SampleFactoryTrait;
 
     public function testSendLeavesHostAndUrlToTheQueue(): void
@@ -28,7 +30,7 @@ class VerificationRequestEmailTest extends TestCase
         $host->method('getHost')->willReturn('dragondescendants.example.com');
 
         $capturedEmail = null;
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue
             ->expects($this->once())
             ->method('enqueue')
@@ -47,7 +49,7 @@ class VerificationRequestEmailTest extends TestCase
         $user->method('getRegcode')->willReturn('TOKEN123');
         $user->method('getName')->willReturn('Alice');
 
-        $email = new VerificationRequestEmail($this->createStub(BlocklistCheckerInterface::class), $this->mockSampleFactory(), $queue, $config, $host);
+        $email = new VerificationRequestEmail($this->createStub(BlocklistInterface::class), $this->mockSampleFactory(), $this->mailer($queue), $config, $host);
 
         // Act
         $email->send(['user' => $user]);

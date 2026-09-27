@@ -11,6 +11,7 @@ class ValidatorMessageTranslationKeysTest extends TestCase
 {
     private const string FORM_DIR = __DIR__ . '/../../../src/Form';
     private const string ENTITY_DIR = __DIR__ . '/../../../src/Entity';
+    private const string MODULES_DIR = __DIR__ . '/../../../modules';
 
     private const array MESSAGE_PARAMS = [
         'message',
@@ -62,6 +63,11 @@ class ValidatorMessageTranslationKeysTest extends TestCase
         }
         foreach (self::collectPhpFiles(self::ENTITY_DIR) as $file) {
             yield 'Entity/' . basename($file) => [$file];
+        }
+        foreach (glob(self::MODULES_DIR . '/*/src/Internal/{Form,Entity}', GLOB_BRACE | GLOB_ONLYDIR) ?: [] as $dir) {
+            foreach (self::collectPhpFiles($dir) as $file) {
+                yield basename(dirname($dir, 3)) . '/' . basename($dir) . '/' . basename($file) => [$file];
+            }
         }
     }
 

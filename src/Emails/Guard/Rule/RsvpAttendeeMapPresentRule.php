@@ -2,28 +2,28 @@
 
 namespace App\Emails\Guard\Rule;
 
-use App\Emails\EmailGuardCost;
-use App\Emails\EmailGuardResult;
-use App\Emails\EmailGuardRuleInterface;
+use Module\Email\Contract\GuardCost;
+use Module\Email\Contract\GuardResult;
+use Module\Email\Contract\GuardRuleInterface;
 
-final readonly class RsvpAttendeeMapPresentRule implements EmailGuardRuleInterface
+final readonly class RsvpAttendeeMapPresentRule implements GuardRuleInterface
 {
     public function getName(): string
     {
         return 'rsvp_attendee_map_present';
     }
 
-    public function getCost(): EmailGuardCost
+    public function getCost(): GuardCost
     {
-        return EmailGuardCost::Free;
+        return GuardCost::Free;
     }
 
-    public function evaluate(array $context): EmailGuardResult
+    public function evaluate(array $context): GuardResult
     {
         if (!array_key_exists('attendeeMap', $context) || $context['attendeeMap'] === null) {
-            return EmailGuardResult::error($this->getName(), "Context is missing the 'attendeeMap' key.", 'attendeeMap');
+            return GuardResult::error($this->getName(), "Context is missing the 'attendeeMap' key.", 'attendeeMap');
         }
 
-        return EmailGuardResult::pass($this->getName());
+        return GuardResult::pass($this->getName());
     }
 }

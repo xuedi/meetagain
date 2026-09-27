@@ -2,16 +2,16 @@
 
 namespace App\Emails\Guard\Rule;
 
-use App\Emails\EmailGuardCost;
-use App\Emails\EmailGuardResult;
-use App\Emails\EmailGuardRuleInterface;
 use App\Entity\User;
-use App\Service\Email\BlocklistCheckerInterface;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\GuardCost;
+use Module\Email\Contract\GuardResult;
+use Module\Email\Contract\GuardRuleInterface;
 
-final readonly class RecipientNotBlocklistedRule implements EmailGuardRuleInterface
+final readonly class RecipientNotBlocklistedRule implements GuardRuleInterface
 {
     public function __construct(
-        private BlocklistCheckerInterface $blocklist,
+        private BlocklistInterface $blocklist,
         private string $recipientKey = 'user',
     ) {}
 
@@ -20,16 +20,16 @@ final readonly class RecipientNotBlocklistedRule implements EmailGuardRuleInterf
         return 'recipient_not_blocklisted';
     }
 
-    public function getCost(): EmailGuardCost
+    public function getCost(): GuardCost
     {
-        return EmailGuardCost::Database;
+        return GuardCost::Database;
     }
 
-    public function evaluate(array $context): EmailGuardResult
+    public function evaluate(array $context): GuardResult
     {
         $user = $context[$this->recipientKey] ?? null;
         if (!$user instanceof User) {
-            return EmailGuardResult::error(
+            return GuardResult::error(
                 $this->getName(),
                 sprintf("Context is missing the '%s' key, or it is not a User instance.", $this->recipientKey),
                 $this->recipientKey,
@@ -37,9 +37,9 @@ final readonly class RecipientNotBlocklistedRule implements EmailGuardRuleInterf
         }
 
         if ($this->blocklist->isBlocked((string) $user->getEmail())) {
-            return EmailGuardResult::skip($this->getName(), 'Recipient address is on the global email blocklist.');
+            return GuardResult::skip($this->getName(), 'Recipient address is on the global email blocklist.');
         }
 
-        return EmailGuardResult::pass($this->getName());
+        return GuardResult::pass($this->getName());
     }
 }

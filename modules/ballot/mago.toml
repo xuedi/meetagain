@@ -1,0 +1,35 @@
+# The Ballot module's perimeter, pulled into core's run by `extends` in tests/config/mago.toml.
+# Paths resolve against the project root. See modules/README.md, "How Mago Guard enforces it".
+
+[analyzer]
+excludes = ["modules/ballot/tests/"]
+
+[[guard.perimeter.restrictions]]
+dependency = "Module\\Ballot\\Internal\\**"
+allow-from = ["Module\\Ballot\\**"]
+
+[[guard.perimeter.rules]]
+namespace = "Module\\Ballot\\"
+permit = [
+    "Module\\Ballot\\**",
+    "@global",                                                  # DateTimeImmutable, Override, PHP's own functions
+    "App\\Entity\\User",                                        # the vote FK - the one sanctioned core entity
+    "App\\Controller\\AbstractController",                      # module controllers extend core's, as plugin controllers do
+    "App\\CronTaskInterface",                                   # the deadline task registers on core's cron chain
+    "App\\ValueObject\\CronTaskResult",                         # that chain's return type
+    "App\\Enum\\CronTaskStatus",                                # that chain's status enum
+    "App\\Service\\Notification\\User\\NotificationProviderInterface", # members hear about open ballots on core's bell
+    "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
+    "Doctrine\\**",
+    "Symfony\\**",
+    "Twig\\**",
+    "Psr\\**",
+]
+
+[[guard.perimeter.rules]]
+namespace = "Module\\Ballot\\Tests\\"
+permit = ["Module\\Ballot\\**", "@global", "App\\**", "PHPUnit\\**", "Doctrine\\**", "Symfony\\**", "Psr\\**"]
+
+[[guard.perimeter.rules]]
+namespace = "ModuleBallotMigrations"
+permit = ["**"]

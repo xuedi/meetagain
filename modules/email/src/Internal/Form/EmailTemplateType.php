@@ -1,0 +1,63 @@
+<?php declare(strict_types=1);
+
+namespace Module\Email\Internal\Form;
+
+use App\Service\Config\LanguageService;
+use Module\Email\Internal\Entity\EmailTemplate;
+use Module\Email\Internal\Repository\EmailTemplateTranslationRepository;
+use Override;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+class EmailTemplateType extends AbstractType
+{
+    public function __construct(
+        private readonly LanguageService $languageService,
+        private readonly EmailTemplateTranslationRepository $translationRepo,
+        private readonly TranslatorInterface $translator,
+    ) {}
+
+    #[Override]
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        /** @var EmailTemplate|null $template */
+        $template = $options['data'] ?? null;
+        $templateId = $template?->getId();
+
+        if ($templateId !== null) {
+            foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
+                $translation = $this->translationRepo->findOneBy([
+                    'emailTemplate' => $templateId,
+                    'language' => $languageCode,
+                ]);
+                $builder->add("subject-{$languageCode}", TextType::class, [
+                    'label' => $this->translator->trans('admin_email_templates.field_subject_locale', [
+                        '%locale%' => $languageCode,
+                    ]),
+                    'data' => $translation?->getSubject() ?? '',
+                    'mapped' => false,
+                ]);
+                $builder->add("body-{$languageCode}", TextareaType::class, [
+                    'label' => $this->translator->trans('admin_email_templates.field_body_locale', [
+                        '%locale%' => $languageCode,
+                    ]),
+                    'data' => $translation?->getBody() ?? '',
+                    'mapped' => false,
+                    'attr' => ['rows' => 15],
+                ]);
+            }
+        }
+    }
+
+    #[Override]
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => EmailTemplate::class,
+        ]);
+    }
+}

@@ -1,0 +1,5 @@
+chrome:
+    notification_stale_emails: '%count% correo(s) obsoleto(s)'
+email_layout:
+    footer_sent_by: 'Enviado por %site%'
+    footer_no_reply: 'Por favor, no respondas a este correo - este buzón no se revisa. Usa el formulario de contacto de la web para escribirnos.'

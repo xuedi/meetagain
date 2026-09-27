@@ -3,27 +3,27 @@
 namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
-use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Emails\MockSampleFactory;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use DateInterval;
 use DateTimeImmutable;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class WelcomeEmail extends EmailAbstract
 {
     public function __construct(
-        BlocklistCheckerInterface $blocklist,
+        BlocklistInterface $blocklist,
         MockSampleFactory $samples,
-        private EmailQueueInterface $queue,
+        MailerInterface $mailer,
         private ConfigService $config,
     ) {
-        parent::__construct($blocklist, $samples);
+        parent::__construct($blocklist, $samples, $mailer);
     }
 
     public function getIdentifier(): string
@@ -65,7 +65,7 @@ readonly class WelcomeEmail extends EmailAbstract
         return $user instanceof User ? $user : null;
     }
 
-    public function send(array $context): void
+    public function compose(array $context): array
     {
         /** @var User $user */
         $user = $context['user'];
@@ -78,7 +78,7 @@ readonly class WelcomeEmail extends EmailAbstract
             'lang' => $user->getLocale(),
         ]);
 
-        $this->queue->enqueue($this, $email, $context);
+        return [$email];
     }
 
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable

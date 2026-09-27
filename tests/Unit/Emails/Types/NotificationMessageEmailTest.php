@@ -2,21 +2,23 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\DueContext;
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\NotificationMessageEmail;
 use App\Entity\NotificationSettings;
 use App\Repository\MessageRepository;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use DateTimeImmutable;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\DueContext;
+use Module\Email\Contract\MailerInterface;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Mime\Address;
+use Tests\Unit\Emails\MailerTrait;
+use Tests\Unit\Emails\QueueSpy;
 use Tests\Unit\Emails\SampleFactoryTrait;
 use Tests\Unit\Stubs\UserStub;
 
 final class NotificationMessageEmailTest extends TestCase
 {
+    use MailerTrait;
     use SampleFactoryTrait;
 
     public function testDueContextsAskForPairsWhoseFirstUnreadMessageIsThreeHoursOld(): void
@@ -68,32 +70,22 @@ final class NotificationMessageEmailTest extends TestCase
         // Assert
     }
 
-    public function testTheEmailIsQueuedWithoutAPing(): void
+    public function testTheEmailDoesNotPingOnEnqueue(): void
     {
         // Arrange
-        $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything(), true, null, false);
-        $config = $this->createStub(ConfigService::class);
-        $config->method('getMailerAddress')->willReturn(new Address('noreply@example.com'));
         $email = new NotificationMessageEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $queue,
-            $config,
+            $this->createStub(MailerInterface::class),
+            $this->createStub(ConfigService::class),
             $this->createStub(MessageRepository::class),
         );
-        $sender = new UserStub()
-            ->setId(1)
-            ->setName('Alice');
-        $recipient = new UserStub()
-            ->setId(2)
-            ->setName('Bob')
-            ->setEmail('bob@example.com');
 
         // Act
-        $email->send(['sender' => $sender, 'recipient' => $recipient]);
+        $pings = $email->pushOnEnqueue();
 
         // Assert
+        static::assertFalse($pings);
     }
 
     public function testAPlannedItemIsDueThreeHoursAfterTheFirstUnreadMessage(): void
@@ -127,9 +119,9 @@ final class NotificationMessageEmailTest extends TestCase
     private function email(MessageRepository $repo): NotificationMessageEmail
     {
         return new NotificationMessageEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->createStub(ConfigService::class),
             $repo,
         );

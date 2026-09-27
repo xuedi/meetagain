@@ -2,24 +2,26 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\SupportNotificationEmail;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\SupportAudience;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Support\RecipientResolver;
 use DateTimeImmutable;
+use Module\Email\Contract\BlocklistInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Tests\Unit\Emails\MailerTrait;
+use Tests\Unit\Emails\QueueSpy;
 use Tests\Unit\Emails\SampleFactoryTrait;
 
 class SupportNotificationEmailTest extends TestCase
 {
+    use MailerTrait;
     use SampleFactoryTrait;
 
     public function testSendEnqueuesOneEmailPerResolvedRecipient(): void
@@ -38,7 +40,7 @@ class SupportNotificationEmailTest extends TestCase
         $resolver->method('resolve')->willReturn([$admin1, $admin2]);
 
         $enqueuedEmails = [];
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue
             ->expects($this->exactly(2))
             ->method('enqueue')
@@ -57,9 +59,9 @@ class SupportNotificationEmailTest extends TestCase
         $translator->method('trans')->willReturn('The organizers');
 
         $emailType = new SupportNotificationEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $queue,
+            $this->mailer($queue),
             $config,
             $resolver,
             $this->createStub(LoggerInterface::class),
@@ -85,7 +87,7 @@ class SupportNotificationEmailTest extends TestCase
         $resolver = $this->createStub(RecipientResolver::class);
         $resolver->method('resolve')->willReturn([]);
 
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->never())->method('enqueue');
 
         $logger = $this->createMock(LoggerInterface::class);
@@ -94,9 +96,9 @@ class SupportNotificationEmailTest extends TestCase
         $request = $this->makeRequest();
 
         $emailType = new SupportNotificationEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $queue,
+            $this->mailer($queue),
             $config,
             $resolver,
             $logger,
@@ -121,7 +123,7 @@ class SupportNotificationEmailTest extends TestCase
         $resolver->method('resolve')->willReturn([$admin]);
 
         $enqueued = null;
-        $queue = $this->createStub(EmailQueueInterface::class);
+        $queue = $this->createStub(QueueSpy::class);
         $queue
             ->method('enqueue')
             ->willReturnCallback(static function ($type, TemplatedEmail $email) use (&$enqueued): bool {
@@ -145,9 +147,9 @@ class SupportNotificationEmailTest extends TestCase
             ]);
 
         $emailType = new SupportNotificationEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $queue,
+            $this->mailer($queue),
             $config,
             $resolver,
             $this->createStub(LoggerInterface::class),

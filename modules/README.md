@@ -18,6 +18,7 @@ modules/
   autoload.php               registers Module\<Name>\ and Module\<Name>\Tests\ as PSR-4 roots
   <name>/
     README.md                what this module does
+    mago.toml                the module's guard perimeter, pulled into core's Mago run
     config/
       services.yaml          the module's service definitions
       services_test.yaml     test-environment-only services (optional)
@@ -65,10 +66,23 @@ is the reason not to make it a module at all.
 
 ## How Mago Guard enforces it
 
-The rules live in `tests/config/mago.toml` and run as `just checkMagoGuard`, in the `just check` chain
-and as its own CI step. The generic inbound backstop sits in `tests/config/mago-rules.toml` instead, the
-shared rule file every plugin's config extends, so each plugin run enforces it too - with `--perimeter`,
-since plugins declare no structural rules. Three kinds of rule, all three needed:
+The rules run as `just checkMagoGuard`, in the `just check` chain and as its own CI step, and live in
+three places:
+
+- **`modules/<name>/mago.toml`** - the module's own entries: its inbound restriction, its outbound
+  permit list, the rules for its `Tests\` and migrations namespaces, and its analyzer exclusion.
+- **`tests/config/mago.toml`** - core's config. It lists every module file in `extends`, and holds what
+  all modules share: the catch-all rules and the structural rules on `Contract/`.
+- **`tests/config/mago-rules.toml`** - the generic inbound backstop, in the shared rule file every
+  plugin's config extends, so each plugin run enforces it too - with `--perimeter`, since plugins
+  declare no structural rules.
+
+A module file is a fragment, never a run of its own. An inbound violation is reported on the file
+doing the reaching, which is outside the module, and one outbound rule puts the whole run into
+allowlist mode, so every module's entries must sit in the same run as core. `extends` appends list
+entries from each file rather than replacing them, but it takes no globs - hence the explicit list.
+
+Three kinds of rule, all three needed:
 
 ```toml
 # Inbound: nothing outside the module may reach past its Contract namespace.
@@ -112,7 +126,7 @@ Three details of the tool that are easy to get wrong:
 - **`namespace` must be `@global` or end with a backslash.** Anything else is a config parse error.
 - **`[[guard.perimeter.rules]]` is global allowlist mode.** The moment one rule exists, a namespace
   with no matching rule has *every* dependency reported as `No matching architectural rule found`.
-  That is why `tests/config/mago.toml` carries `**` catch-all rules for `@global`, `App\`, `Plugin\`
+  That is why core's `tests/config/mago.toml` carries `**` catch-all rules for `@global`, `App\`, `Plugin\`
   and `Tests\`: they state the current reality, that everything outside `modules/` is not
   perimeter-guarded yet. The most specific matching rule wins, which is what lets the module rule bite.
 - **`@global` in a `permit` list covers PHP's own functions and classes** - `DateTimeImmutable`,
@@ -135,10 +149,13 @@ should trust.
 
 1. `modules/<name>/` with the directory shape above. Namespace root `Module\<Name>\`.
 2. The config files, copied from `modules/trust/config/` with the paths swapped.
-3. `tests/config/mago.toml`: the module already matches the `modules/*` source globs; add its
-   perimeter restriction, its outbound rule, and a rule for its `Tests\` namespace.
-   `tests/Unit/ModulePerimeterTest.php` fails with the exact line to paste if any of the three is
-   missing, so run `just testUnit tests/Unit/ModulePerimeterTest.php` and let it tell you.
+3. `modules/<name>/mago.toml`, copied from `modules/trust/mago.toml` with the names swapped: the
+   perimeter restriction, the outbound rule, a rule for its `Tests\` and its migrations namespace,
+   and the analyzer exclusion for its tests. Add the file to the `extends` list in
+   `tests/config/mago.toml`; the module already matches the `modules/*` source globs there.
+   `tests/Unit/ModulePerimeterTest.php` fails with the exact line to paste if the file, its `extends`
+   entry or one of the three rules is missing, so run `just testUnit tests/Unit/ModulePerimeterTest.php`
+   and let it tell you.
 4. Prove all three rule kinds fail on a deliberate violation.
 5. A `README.md` in the module saying what it does and how to consume it.
 

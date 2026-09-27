@@ -4,20 +4,20 @@ namespace App\Service\Admin;
 
 use App\Filter\Admin\Dashboard\DashboardScope;
 use App\Repository\ActivityRepository;
-use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\UserRepository;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\Criteria;
+use Module\Email\Contract\SendlogInterface;
 
 readonly class DashboardStatsService
 {
     public function __construct(
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
-        private EmailQueueRepository $mailRepo,
+        private SendlogInterface $sendlog,
         private NotFoundLogRepository $notFoundRepo,
         private ActivityRepository $activityRepo,
     ) {}
@@ -57,8 +57,8 @@ readonly class DashboardStatsService
                 'week' => $this->eventRepo->matching($this->timeCrit($dates, 'start'))->count(),
             ],
             'emails' => [
-                'count' => $this->mailRepo->count(),
-                'week' => $this->mailRepo->matching($this->timeCrit($dates))->count(),
+                'count' => $this->sendlog->countAll(),
+                'week' => $this->sendlog->countBetween($dates['start'], $dates['stop']),
             ],
         ];
     }

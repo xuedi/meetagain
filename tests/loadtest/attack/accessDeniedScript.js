@@ -26,7 +26,7 @@ const ADMIN_PATHS = [
     '/en/admin/security/incidents',
     '/en/admin/security/rate-limiting',
     '/en/admin/security/permissions',
-    '/en/admin/email/announcements',
+    '/en/admin/cms/announcements',
     '/en/admin/email/blocklist',
     '/en/admin/logs/cron',
     '/en/admin/logs/access-denied',

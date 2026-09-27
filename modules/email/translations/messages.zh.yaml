@@ -1,0 +1,5 @@
+chrome:
+    notification_stale_emails: '%count% 封延迟邮件'
+email_layout:
+    footer_sent_by: '由 %site% 发送'
+    footer_no_reply: '请不要回复此邮件 - 该邮箱无人查看。如需联系我们，请使用网站上的联系表单。'

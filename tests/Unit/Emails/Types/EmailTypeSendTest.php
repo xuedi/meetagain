@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\AdminNotificationEmail;
 use App\Emails\Types\AnnouncementEmail;
 use App\Emails\Types\EventReminderEmail;
@@ -28,7 +27,6 @@ use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
 use App\Service\Support\RecipientResolver;
 use DateTime;
@@ -37,18 +35,23 @@ use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Tests\Unit\Emails\MailerTrait;
+use Tests\Unit\Emails\QueueSpy;
 use Tests\Unit\Emails\SampleFactoryTrait;
 
 class EmailTypeSendTest extends TestCase
 {
+    use MailerTrait;
     use SampleFactoryTrait;
 
     private ConfigService $config;
-    private BlocklistCheckerInterface $blocklist;
+    private BlocklistInterface $blocklist;
     private RequestHostResolver $host;
 
     protected function setUp(): void
@@ -58,7 +61,7 @@ class EmailTypeSendTest extends TestCase
         $this->config->method('getHost')->willReturn('https://example.com');
         $this->config->method('getUrl')->willReturn('https://example.com');
 
-        $this->blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $this->blocklist = $this->createStub(BlocklistInterface::class);
 
         $this->host = $this->createStub(RequestHostResolver::class);
         $this->host->method('getSchemeAndHost')->willReturn('https://example.com');
@@ -104,10 +107,10 @@ class EmailTypeSendTest extends TestCase
 
     public function testAdminNotificationSend(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything());
 
-        new AdminNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config)->send([
+        new AdminNotificationEmail($this->blocklist, $this->mockSampleFactory(), $this->mailer($queue), $this->config)->send([
             'user' => $this->makeUser(),
             'sectionsHtml' => '<p>pending</p>',
         ]);
@@ -115,22 +118,22 @@ class EmailTypeSendTest extends TestCase
 
     public function testAnnouncementSend(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything(), false);
 
-        new AnnouncementEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->host)->send([
+        new AnnouncementEmail($this->blocklist, $this->mockSampleFactory(), $this->mailer($queue), $this->config, $this->host)->send([
             'user' => $this->makeUser(),
             'renderedContent' => ['title' => 'Hello', 'content' => '<p>body</p>'],
             'announcementUrl' => 'https://example.com/announcement/1',
-        ]);
+        ], flush: false);
     }
 
     public function testNotificationEventCanceledSend(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything());
 
-        new NotificationEventCanceledEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->host)->send([
+        new NotificationEventCanceledEmail($this->blocklist, $this->mockSampleFactory(), $this->mailer($queue), $this->config, $this->host)->send([
             'user' => $this->makeUser(),
             'event' => $this->makeEvent(),
         ]);
@@ -138,12 +141,18 @@ class EmailTypeSendTest extends TestCase
 
     public function testNotificationMessageSend(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything());
 
         $sender = $this->makeUser('sender@example.com', 'Bob', 'en', null, true, null, 2);
 
-        new NotificationMessageEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->createStub(MessageRepository::class))->send([
+        new NotificationMessageEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->mailer($queue),
+            $this->config,
+            $this->createStub(MessageRepository::class),
+        )->send([
             'sender' => $sender,
             'recipient' => $this->makeUser(),
         ]);
@@ -151,17 +160,17 @@ class EmailTypeSendTest extends TestCase
 
     public function testPasswordResetSend(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything());
 
-        new PasswordResetEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->host)->send([
+        new PasswordResetEmail($this->blocklist, $this->mockSampleFactory(), $this->mailer($queue), $this->config, $this->host)->send([
             'user' => $this->makeUser(),
         ]);
     }
 
     public function testSupportNotificationSend(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything());
 
         $request = $this->createStub(SupportRequest::class);
@@ -178,7 +187,7 @@ class EmailTypeSendTest extends TestCase
         new SupportNotificationEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $queue,
+            $this->mailer($queue),
             $this->config,
             $resolver,
             $this->createStub(LoggerInterface::class),
@@ -190,33 +199,33 @@ class EmailTypeSendTest extends TestCase
 
     public function testVerificationRequestSend(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything());
 
-        new VerificationRequestEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->host)->send([
+        new VerificationRequestEmail($this->blocklist, $this->mockSampleFactory(), $this->mailer($queue), $this->config, $this->host)->send([
             'user' => $this->makeUser(),
         ]);
     }
 
     public function testWelcomeSend(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything());
 
-        new WelcomeEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->host)->send([
+        new WelcomeEmail($this->blocklist, $this->mockSampleFactory(), $this->mailer($queue), $this->config, $this->host)->send([
             'user' => $this->makeUser(),
         ]);
     }
 
     public function testEventUpdateNotificationSend(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything());
 
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturn('changed line');
 
-        new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $translator, $this->host)->send([
+        new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $this->mailer($queue), $this->config, $translator, $this->host)->send([
             'user' => $this->makeUser(),
             'event' => $this->makeEvent(),
             'before' => [
@@ -238,13 +247,13 @@ class EmailTypeSendTest extends TestCase
 
     public function testEventReminderSend(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything());
 
         new EventReminderEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $queue,
+            $this->mailer($queue),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -254,37 +263,36 @@ class EmailTypeSendTest extends TestCase
         ]);
     }
 
-    public function testRsvpAggregatedSendEnqueuesWhenAttendeesPresent(): void
+    public function testRsvpAggregatedComposesWhenAttendeesPresent(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->once())->method('enqueue')->with($this->anything(), $this->anything(), $this->anything());
-
         $recipient = $this->makeUser(id: 5);
         $attendee = $this->makeUser('a@a.com', 'Eve', 'en', null, true, null, 6);
 
-        new RsvpAggregatedEmail(
+        $emails = new RsvpAggregatedEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $queue,
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
-        )->send([
+        )->compose([
             'user' => $recipient,
             'event' => $this->makeEvent(),
             'attendeeMap' => [5 => ['attendees' => [$attendee]]],
         ]);
+
+        static::assertCount(1, $emails);
     }
 
     public function testRsvpAggregatedSendSkipsWhenNoAttendees(): void
     {
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->never())->method('enqueue');
 
         new RsvpAggregatedEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $queue,
+            $this->mailer($queue),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -302,7 +310,7 @@ class EmailTypeSendTest extends TestCase
         static::assertTrue(new AnnouncementEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->host,
         )->guardCheck([
@@ -319,7 +327,7 @@ class EmailTypeSendTest extends TestCase
         static::assertFalse(new AnnouncementEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->host,
         )->guardCheck([
@@ -336,7 +344,7 @@ class EmailTypeSendTest extends TestCase
         static::assertFalse(new NotificationMessageEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(MessageRepository::class),
         )->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)]));
@@ -349,7 +357,7 @@ class EmailTypeSendTest extends TestCase
         static::assertFalse(new NotificationMessageEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(MessageRepository::class),
         )->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)]));
@@ -364,7 +372,7 @@ class EmailTypeSendTest extends TestCase
         static::assertTrue(new NotificationMessageEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(MessageRepository::class),
         )->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)]));
@@ -379,7 +387,7 @@ class EmailTypeSendTest extends TestCase
         static::assertTrue(new NotificationMessageEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(MessageRepository::class),
         )->guardCheck(['recipient' => $user, 'sender' => $this->makeUser('s@s.com', 'Sender', id: 99)]));
@@ -390,7 +398,7 @@ class EmailTypeSendTest extends TestCase
         $email = new EventReminderEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -405,7 +413,7 @@ class EmailTypeSendTest extends TestCase
         $email = new EventReminderEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -422,7 +430,7 @@ class EmailTypeSendTest extends TestCase
         $email = new EventReminderEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -437,7 +445,7 @@ class EmailTypeSendTest extends TestCase
         $email = new EventReminderEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -452,7 +460,7 @@ class EmailTypeSendTest extends TestCase
         $email = new RsvpAggregatedEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -470,7 +478,7 @@ class EmailTypeSendTest extends TestCase
         $email = new RsvpAggregatedEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -485,7 +493,7 @@ class EmailTypeSendTest extends TestCase
         $email = new RsvpAggregatedEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -504,7 +512,7 @@ class EmailTypeSendTest extends TestCase
         $email = new RsvpAggregatedEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -529,7 +537,7 @@ class EmailTypeSendTest extends TestCase
         $email = new RsvpAggregatedEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $eventRepo,
             $this->createStub(EntityManagerInterface::class),
@@ -559,7 +567,7 @@ class EmailTypeSendTest extends TestCase
         $email = new RsvpAggregatedEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $eventRepo,
             $this->createStub(EntityManagerInterface::class),
@@ -588,7 +596,7 @@ class EmailTypeSendTest extends TestCase
         $email = new RsvpAggregatedEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $eventRepo,
             $this->createStub(EntityManagerInterface::class),
@@ -632,7 +640,7 @@ class EmailTypeSendTest extends TestCase
         $email = new UpcomingDigestEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $eventRepo,
             $this->createStub(UserRepository::class),
@@ -655,7 +663,7 @@ class EmailTypeSendTest extends TestCase
         $email = new UpcomingDigestEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(UserRepository::class),

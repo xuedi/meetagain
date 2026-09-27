@@ -3,7 +3,6 @@
 namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
-use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
 use App\Emails\Guard\Rule\SupportRequestPresentRule;
 use App\Emails\MockSampleFactory;
@@ -11,8 +10,9 @@ use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Enum\SupportAudience;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Support\RecipientResolver;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -20,15 +20,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 readonly class SupportNotificationEmail extends EmailAbstract
 {
     public function __construct(
-        BlocklistCheckerInterface $blocklist,
+        BlocklistInterface $blocklist,
         MockSampleFactory $samples,
-        private EmailQueueInterface $queue,
+        MailerInterface $mailer,
         private ConfigService $config,
         private RecipientResolver $recipientResolver,
         private LoggerInterface $logger,
         private TranslatorInterface $translator,
     ) {
-        parent::__construct($blocklist, $samples);
+        parent::__construct($blocklist, $samples, $mailer);
     }
 
     public function getIdentifier(): string
@@ -66,7 +66,7 @@ readonly class SupportNotificationEmail extends EmailAbstract
         ];
     }
 
-    public function send(array $context): void
+    public function compose(array $context): array
     {
         /** @var SupportRequest $request */
         $request = $context['request'];
@@ -76,9 +76,10 @@ readonly class SupportNotificationEmail extends EmailAbstract
             $this->logger->warning('Support ticket received but no recipients could be resolved', [
                 'support_request_id' => $request->getId(),
             ]);
-            return;
+            return [];
         }
 
+        $emails = [];
         foreach ($recipients as $recipient) {
             $email = new TemplatedEmail();
             $email->from($this->config->getMailerAddress());
@@ -92,7 +93,9 @@ readonly class SupportNotificationEmail extends EmailAbstract
                 'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),
             ]);
 
-            $this->queue->enqueue($this, $email, $context);
+            $emails[] = $email;
         }
+
+        return $emails;
     }
 }

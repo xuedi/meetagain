@@ -1,0 +1,39 @@
+# The Email module's perimeter, pulled into core's run by `extends` in tests/config/mago.toml.
+# Paths resolve against the project root. See modules/README.md, "How Mago Guard enforces it".
+
+[analyzer]
+excludes = ["modules/email/tests/"]
+
+[[guard.perimeter.restrictions]]
+dependency = "Module\\Email\\Internal\\**"
+allow-from = ["Module\\Email\\**"]
+
+[[guard.perimeter.rules]]
+namespace = "Module\\Email\\"
+permit = [
+    "Module\\Email\\**",
+    "@global",                                                         # DateTimeImmutable, Override, PHP's own functions
+    "App\\Entity\\User",                                               # the blocklist entry's addedBy FK, and the admin who adds one - the one sanctioned core entity
+    "App\\Admin\\**",                                                  # the five admin pages build their tabs, top bar, sections and navigation from core's admin shell
+    "App\\CronTaskInterface",                                          # dispatch, the scheduled sweep and the delivery sync register on core's cron chain
+    "App\\ValueObject\\CronTaskResult",                                # that chain's return type
+    "App\\Enum\\CronTaskStatus",                                       # that chain's status enum
+    "App\\Service\\Notification\\User\\NotificationProviderInterface", # the stale-mail entry surfaces on core's bell
+    "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
+    "App\\Metrics\\GaugeInterface",                                    # the queue depth is a runtime gauge
+    "App\\Metrics\\Point",                                             # that gauge's sample type
+    "App\\Service\\Config\\ConfigService",                             # mailer address, theme accent for the layout snapshot, the delivery-sync toggle
+    "App\\Service\\Config\\LanguageService",                           # enabled locales for the template editor, seeding and the scheduled sweep
+    "Doctrine\\**",
+    "Symfony\\**",
+    "Twig\\**",
+    "Psr\\**",
+]
+
+[[guard.perimeter.rules]]
+namespace = "Module\\Email\\Tests\\"
+permit = ["Module\\Email\\**", "@global", "App\\**", "PHPUnit\\**", "Doctrine\\**", "Symfony\\**", "Twig\\**", "Psr\\**"]
+
+[[guard.perimeter.rules]]
+namespace = "ModuleEmailMigrations"
+permit = ["**"]

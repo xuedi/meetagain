@@ -169,7 +169,7 @@ restored rows under the importing instance's own context.
 
 ## What the module reaches for
 
-The outbound permit list in `tests/config/mago.toml` names every domain dependency, each with its reason.
+The outbound permit list in `mago.toml` names every domain dependency, each with its reason.
 Substrate (`@global`, `Doctrine\**`, `Symfony\**`, `Twig\**`, `Psr\**`) is permitted as for every module.
 
 | Dependency                                                          | Why                                                          |

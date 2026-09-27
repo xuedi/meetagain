@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\Portability;
 
-use App\Entity\EmailTemplate;
-use App\Entity\EmailTemplateTranslation;
 use App\Entity\Image;
 use App\Entity\Language;
 use App\Entity\User;
@@ -17,17 +15,17 @@ use App\Repository\LanguageRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use App\Service\Config\PluginService;
-use App\Service\Email\EmailTemplateService;
 use App\Service\Media\ImageLocationService;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Email\Contract\TemplatesInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 final class SiteSettingsTest extends TestCase
 {
-    /** @var list<object> */
-    private array $persisted = [];
+    /** @var list<string> */
+    private array $seeded = [];
 
     public function testNameDescriptionAndTheKnownFeatureSwitchesAreWritten(): void
     {
@@ -101,7 +99,7 @@ final class SiteSettingsTest extends TestCase
         static::assertFalse($german->isEnabled());
     }
 
-    public function testAnEnabledLanguageGetsItsMissingEmailTemplateTranslations(): void
+    public function testEveryEnabledLanguageIsSeededWithTheDefaultEmailTemplates(): void
     {
         // Arrange
         $languages = [$this->language('en', true, 1), $this->language('es', false, 11)];
@@ -110,9 +108,7 @@ final class SiteSettingsTest extends TestCase
         $this->siteSettings(languages: $languages)->apply(['languages' => ['en', 'es']], $this->context());
 
         // Assert
-        $translations = array_values(array_filter($this->persisted, static fn(object $entity): bool => $entity instanceof EmailTemplateTranslation));
-        static::assertSame(['en', 'es'], array_map(static fn(EmailTemplateTranslation $translation): ?string => $translation->getLanguage(), $translations));
-        static::assertSame('Welcome (es)', $translations[1]->getSubject());
+        static::assertSame(['en', 'es'], $this->seeded);
     }
 
     public function testNoKnownLanguageLeavesTheLanguagesAlone(): void
@@ -125,7 +121,7 @@ final class SiteSettingsTest extends TestCase
 
         // Assert
         static::assertTrue($english->isEnabled());
-        static::assertSame([], $this->persisted);
+        static::assertSame([], $this->seeded);
     }
 
     public function testThemeColorsAreSavedUnderTheirConfigKeys(): void
@@ -238,18 +234,12 @@ final class SiteSettingsTest extends TestCase
         $languageRepository = $this->createStub(LanguageRepository::class);
         $languageRepository->method('findAll')->willReturn($languages);
 
-        $templateService = $this->createStub(EmailTemplateService::class);
-        $templateService
-            ->method('getDefaultTemplates')
-            ->willReturnCallback(static fn(string $code): array => [
-                'welcome' => ['subject' => 'Welcome (' . $code . ')', 'body' => '<p>Hi</p>', 'variables' => []],
-            ]);
-        $templateService->method('getTemplate')->willReturn(new EmailTemplate()->setIdentifier('welcome'));
-
-        $em = $this->createStub(EntityManagerInterface::class);
-        $em->method('persist')->willReturnCallback(function (object $entity): void {
-            $this->persisted[] = $entity;
-        });
+        $templates = $this->createStub(TemplatesInterface::class);
+        $templates
+            ->method('seedLanguage')
+            ->willReturnCallback(function (string $code): void {
+                $this->seeded[] = $code;
+            });
 
         return new SiteSettings(
             $config ?? $this->createStub(ConfigService::class),
@@ -257,8 +247,8 @@ final class SiteSettingsTest extends TestCase
             $languageRepository,
             $this->createStub(ImageRepository::class),
             $locations ?? $this->createStub(ImageLocationService::class),
-            $templateService,
-            $em,
+            $templates,
+            $this->createStub(EntityManagerInterface::class),
             new AsciiSlugger(),
             $pluginService ?? $this->createStub(PluginService::class),
             $pluginSettings ?? $this->createStub(PluginSettings::class),

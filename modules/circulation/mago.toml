@@ -1,0 +1,45 @@
+# The Circulation module's perimeter, pulled into core's run by `extends` in tests/config/mago.toml.
+# Paths resolve against the project root. See modules/README.md, "How Mago Guard enforces it".
+
+[analyzer]
+excludes = ["modules/circulation/tests/"]
+
+[[guard.perimeter.restrictions]]
+dependency = "Module\\Circulation\\Internal\\**"
+allow-from = ["Module\\Circulation\\**"]
+
+[[guard.perimeter.rules]]
+namespace = "Module\\Circulation\\"
+permit = [
+    "Module\\Circulation\\**",
+    "Module\\Trust\\Contract\\**",                                     # the optional trust integration consumes the Trust module's contract
+    "@global",                                                         # DateTimeImmutable, Override, PHP's own functions
+    "App\\Entity\\User",                                               # the FKs on copy, request, handover and ledger - the one sanctioned core entity
+    "App\\Controller\\AbstractController",                             # module controllers extend core's, as plugin controllers do
+    "App\\CronTaskInterface",                                          # the daily maintenance task registers on core's cron chain
+    "App\\ValueObject\\CronTaskResult",                                # that chain's return type
+    "App\\Enum\\CronTaskStatus",                                       # that chain's status enum
+    "App\\Service\\AppStateService",                                   # the maintenance task throttles itself to once a day
+    "App\\Service\\Notification\\User\\NotificationProviderInterface", # handovers and queues surface on core's bell
+    "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
+    "App\\Item\\ActionInterface",                                      # copies of a deleted item are retired
+    "App\\Enum\\ItemAction",                                           # that chain's action enum
+    "App\\Item\\TypeRegistry",                                         # item type labels on the dashboard
+    "App\\Item\\FilterService",                                        # every read narrows through the item filter chain
+    "App\\Activity\\ActivityService",                                  # donations, requests and handovers land in the activity log
+    "App\\Activity\\MessageAbstract",                                  # the three activity messages extend core's base
+    "App\\Comment\\TargetProviderInterface",                           # the handover chat is a private comment target
+    "App\\Comment\\CommentService",                                    # the unread-chat bell entry asks it whether a thread is unread
+    "Doctrine\\**",
+    "Symfony\\**",
+    "Twig\\**",
+    "Psr\\**",
+]
+
+[[guard.perimeter.rules]]
+namespace = "Module\\Circulation\\Tests\\"
+permit = ["Module\\Circulation\\**", "Module\\Trust\\Contract\\**", "@global", "App\\**", "PHPUnit\\**", "Doctrine\\**", "Symfony\\**", "Psr\\**"]
+
+[[guard.perimeter.rules]]
+namespace = "ModuleCirculationMigrations"
+permit = ["**"]

@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\EventUpdateNotificationEmail;
 use App\Entity\Event;
 use App\Entity\Location;
@@ -10,22 +9,25 @@ use App\Entity\NotificationSettings;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
 use DateTime;
 use DateTimeImmutable;
+use Module\Email\Contract\BlocklistInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Tests\Unit\Emails\MailerTrait;
+use Tests\Unit\Emails\QueueSpy;
 use Tests\Unit\Emails\SampleFactoryTrait;
 
 class EventUpdateNotificationEmailTest extends TestCase
 {
+    use MailerTrait;
     use SampleFactoryTrait;
 
     private ConfigService $config;
-    private BlocklistCheckerInterface $blocklist;
+    private BlocklistInterface $blocklist;
     private TranslatorInterface $translator;
     private RequestHostResolver $host;
 
@@ -35,7 +37,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $this->config->method('getMailerAddress')->willReturn(new Address('noreply@example.com'));
         $this->config->method('getHost')->willReturn('https://example.com');
 
-        $this->blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $this->blocklist = $this->createStub(BlocklistInterface::class);
 
         $this->translator = $this->createStub(TranslatorInterface::class);
         $this->translator->method('trans')->willReturnCallback(static fn(string $id): string => $id);
@@ -47,7 +49,7 @@ class EventUpdateNotificationEmailTest extends TestCase
     public function testSendEnqueuesWhenStartChanged(): void
     {
         // Arrange
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue
             ->expects($this->once())
             ->method('enqueue')
@@ -63,7 +65,14 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->mailer($queue),
+            $this->config,
+            $this->translator,
+            $this->host,
+        );
 
         // Act
         $email->send([
@@ -77,7 +86,7 @@ class EventUpdateNotificationEmailTest extends TestCase
     public function testSendEnqueuesWhenLocationChanged(): void
     {
         // Arrange
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue
             ->expects($this->once())
             ->method('enqueue')
@@ -90,7 +99,14 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->mailer($queue),
+            $this->config,
+            $this->translator,
+            $this->host,
+        );
 
         // Act
         $email->send([
@@ -104,7 +120,7 @@ class EventUpdateNotificationEmailTest extends TestCase
     public function testSendEnqueuesWhenCanceledFlipped(): void
     {
         // Arrange
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue
             ->expects($this->once())
             ->method('enqueue')
@@ -117,7 +133,14 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->mailer($queue),
+            $this->config,
+            $this->translator,
+            $this->host,
+        );
 
         // Act
         $email->send([
@@ -131,7 +154,7 @@ class EventUpdateNotificationEmailTest extends TestCase
     public function testSendEnqueuesWhenUncanceled(): void
     {
         // Arrange
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue
             ->expects($this->once())
             ->method('enqueue')
@@ -144,7 +167,14 @@ class EventUpdateNotificationEmailTest extends TestCase
                 $this->anything(),
             );
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->mailer($queue),
+            $this->config,
+            $this->translator,
+            $this->host,
+        );
 
         // Act
         $email->send([
@@ -158,10 +188,17 @@ class EventUpdateNotificationEmailTest extends TestCase
     public function testSendDoesNotEnqueueWhenSnapshotsAreEqual(): void
     {
         // Arrange
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->never())->method('enqueue');
 
-        $email = new EventUpdateNotificationEmail($this->blocklist, $this->mockSampleFactory(), $queue, $this->config, $this->translator, $this->host);
+        $email = new EventUpdateNotificationEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->mailer($queue),
+            $this->config,
+            $this->translator,
+            $this->host,
+        );
 
         // Act
         $email->send([
@@ -178,7 +215,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $email = new EventUpdateNotificationEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->translator,
             $this->host,
@@ -198,7 +235,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $email = new EventUpdateNotificationEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->translator,
             $this->host,
@@ -217,7 +254,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $email = new EventUpdateNotificationEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->mailer($this->createStub(QueueSpy::class)),
             $this->config,
             $this->translator,
             $this->host,

@@ -3,7 +3,6 @@
 namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
-use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
 use App\Emails\Guard\Rule\SupportRequestPresentRule;
 use App\Emails\MockSampleFactory;
@@ -11,22 +10,23 @@ use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Support\RecipientResolver;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class SupportInvitationEmail extends EmailAbstract
 {
     public function __construct(
-        BlocklistCheckerInterface $blocklist,
+        BlocklistInterface $blocklist,
         MockSampleFactory $samples,
-        private EmailQueueInterface $queue,
+        MailerInterface $mailer,
         private ConfigService $config,
         private RecipientResolver $recipientResolver,
         private LoggerInterface $logger,
     ) {
-        parent::__construct($blocklist, $samples);
+        parent::__construct($blocklist, $samples, $mailer);
     }
 
     public function getIdentifier(): string
@@ -64,7 +64,7 @@ readonly class SupportInvitationEmail extends EmailAbstract
         ];
     }
 
-    public function send(array $context): void
+    public function compose(array $context): array
     {
         /** @var SupportRequest $request */
         $request = $context['request'];
@@ -74,11 +74,12 @@ readonly class SupportInvitationEmail extends EmailAbstract
             $this->logger->warning('Support request escalated but no admin recipients could be resolved', [
                 'support_request_id' => $request->getId(),
             ]);
-            return;
+            return [];
         }
 
         $invitedBy = $request->getInvitedAdminsBy();
 
+        $emails = [];
         foreach ($admins as $admin) {
             $email = new TemplatedEmail();
             $email->from($this->config->getMailerAddress());
@@ -92,7 +93,9 @@ readonly class SupportInvitationEmail extends EmailAbstract
                 'requestId' => (string) $request->getId(),
             ]);
 
-            $this->queue->enqueue($this, $email, $context);
+            $emails[] = $email;
         }
+
+        return $emails;
     }
 }

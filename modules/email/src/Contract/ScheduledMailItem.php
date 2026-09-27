@@ -1,0 +1,20 @@
+<?php declare(strict_types=1);
+
+namespace Module\Email\Contract;
+
+use DateTimeImmutable;
+
+final readonly class ScheduledMailItem
+{
+    public function __construct(
+        public string $mailType,
+        public string $label,
+        public DateTimeImmutable $expectedTime,
+        public int $expectedRecipients,
+    ) {}
+
+    public function getKey(): string
+    {
+        return $this->mailType . '_' . $this->expectedTime->getTimestamp();
+    }
+}

@@ -1,0 +1,5 @@
+chrome:
+    notification_stale_emails: '%count% e-mail(s) en attente'
+email_layout:
+    footer_sent_by: 'Envoyé par %site%'
+    footer_no_reply: 'Merci de ne pas répondre à cet e-mail - cette boîte n''est pas relevée. Utilise le formulaire de contact du site pour nous joindre.'

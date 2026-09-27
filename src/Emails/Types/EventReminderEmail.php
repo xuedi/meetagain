@@ -2,27 +2,27 @@
 
 namespace App\Emails\Types;
 
-use App\Emails\DueContext;
 use App\Emails\EmailAbstract;
-use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\EventInContextRule;
 use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
 use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
 use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Emails\Guard\Rule\UserNotificationsMasterToggleRule;
 use App\Emails\MockSampleFactory;
-use App\Emails\ScheduledEmailInterface;
-use App\Emails\ScheduledMailItem;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Repository\EventRepository;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\DueContext;
+use Module\Email\Contract\MailerInterface;
+use Module\Email\Contract\ScheduledEmailInterface;
+use Module\Email\Contract\ScheduledMailItem;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmailInterface
@@ -30,14 +30,14 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
     public const string WINDOW = 'PT5H';
 
     public function __construct(
-        BlocklistCheckerInterface $blocklist,
+        BlocklistInterface $blocklist,
         MockSampleFactory $samples,
-        private EmailQueueInterface $queue,
+        MailerInterface $mailer,
         private ConfigService $config,
         private EventRepository $eventRepo,
         private EntityManagerInterface $em,
     ) {
-        parent::__construct($blocklist, $samples);
+        parent::__construct($blocklist, $samples, $mailer);
     }
 
     public function getIdentifier(): string
@@ -87,7 +87,7 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
         return $event instanceof Event ? $event : null;
     }
 
-    public function send(array $context): void
+    public function compose(array $context): array
     {
         /** @var User $user */
         $user = $context['user'];
@@ -110,7 +110,7 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
             'lang' => $language,
         ]);
 
-        $this->queue->enqueue($this, $email, $context);
+        return [$email];
     }
 
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable

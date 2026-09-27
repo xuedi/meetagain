@@ -8,9 +8,9 @@ use App\Activity\Messages\PasswordResetRequest;
 use App\Emails\Types\PasswordResetEmail;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Member\PasswordResetService;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Email\Contract\BlocklistInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -24,7 +24,7 @@ class PasswordResetServiceTest extends TestCase
         ?UserPasswordHasherInterface $hasher = null,
         ?ActivityService $activityService = null,
         ?PasswordResetEmail $passwordResetEmail = null,
-        ?BlocklistCheckerInterface $blocklist = null,
+        ?BlocklistInterface $blocklist = null,
         ?LoggerInterface $logger = null,
     ): PasswordResetService {
         return new PasswordResetService(
@@ -33,7 +33,7 @@ class PasswordResetServiceTest extends TestCase
             $hasher ?? $this->createStub(UserPasswordHasherInterface::class),
             $activityService ?? $this->createStub(ActivityService::class),
             $passwordResetEmail ?? $this->createStub(PasswordResetEmail::class),
-            $blocklist ?? $this->createStub(BlocklistCheckerInterface::class),
+            $blocklist ?? $this->createStub(BlocklistInterface::class),
             $logger ?? new NullLogger(),
         );
     }
@@ -155,7 +155,7 @@ class PasswordResetServiceTest extends TestCase
 
     public function testRequestResetReturnsNullWhenEmailBlocklisted(): void
     {
-        $blocklistStub = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklistStub = $this->createStub(BlocklistInterface::class);
         $blocklistStub->method('isBlocked')->willReturn(true);
 
         $userRepoMock = $this->createMock(UserRepository::class);
@@ -171,7 +171,7 @@ class PasswordResetServiceTest extends TestCase
 
     public function testABlocklistRefusalNeverLogsTheAddress(): void
     {
-        $blocklistStub = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklistStub = $this->createStub(BlocklistInterface::class);
         $blocklistStub->method('isBlocked')->willReturn(true);
 
         $user = new User();
@@ -198,7 +198,7 @@ class PasswordResetServiceTest extends TestCase
         $user->setEmail('blocked@example.com');
         $user->setPassword('old-hashed-password');
 
-        $blocklistStub = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklistStub = $this->createStub(BlocklistInterface::class);
         $blocklistStub->method('isBlocked')->willReturn(true);
 
         $emMock = $this->createMock(EntityManagerInterface::class);

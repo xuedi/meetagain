@@ -2,20 +2,22 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\SupportEmailVerifyEmail;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
 use DateTimeImmutable;
+use Module\Email\Contract\BlocklistInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
+use Tests\Unit\Emails\MailerTrait;
+use Tests\Unit\Emails\QueueSpy;
 use Tests\Unit\Emails\SampleFactoryTrait;
 
 class SupportEmailVerifyEmailTest extends TestCase
 {
+    use MailerTrait;
     use SampleFactoryTrait;
 
     private const string REQUESTER_NAME = 'Mallory Attacker';
@@ -25,7 +27,7 @@ class SupportEmailVerifyEmailTest extends TestCase
     {
         // Arrange
         $enqueued = null;
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue
             ->expects($this->once())
             ->method('enqueue')
@@ -60,7 +62,7 @@ class SupportEmailVerifyEmailTest extends TestCase
     public function testSendSkipsWhenRecipientBlocklisted(): void
     {
         // Arrange
-        $queue = $this->createMock(EmailQueueInterface::class);
+        $queue = $this->createMock(QueueSpy::class);
         $queue->expects($this->never())->method('enqueue');
 
         $emailType = $this->createEmailType($queue, blocked: true);
@@ -77,7 +79,7 @@ class SupportEmailVerifyEmailTest extends TestCase
     public function testIdentifier(): void
     {
         // Arrange
-        $emailType = $this->createEmailType($this->createStub(EmailQueueInterface::class));
+        $emailType = $this->createEmailType($this->createStub(QueueSpy::class));
 
         // Act & Assert
         static::assertSame(EmailType::SupportEmailVerify->value, $emailType->getIdentifier());
@@ -86,7 +88,7 @@ class SupportEmailVerifyEmailTest extends TestCase
     public function testMockDataCarriesNoRequesterSuppliedField(): void
     {
         // Arrange
-        $emailType = $this->createEmailType($this->createStub(EmailQueueInterface::class));
+        $emailType = $this->createEmailType($this->createStub(QueueSpy::class));
 
         // Act
         $mock = $emailType->getDisplayMockData('en');
@@ -95,18 +97,18 @@ class SupportEmailVerifyEmailTest extends TestCase
         static::assertSame(['host', 'url', 'lang', 'token', 'expiresAt'], array_keys($mock['context']));
     }
 
-    private function createEmailType(EmailQueueInterface $queue, bool $blocked = false): SupportEmailVerifyEmail
+    private function createEmailType(QueueSpy $queue, bool $blocked = false): SupportEmailVerifyEmail
     {
         $config = $this->createStub(ConfigService::class);
         $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
 
-        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklist = $this->createStub(BlocklistInterface::class);
         $blocklist->method('isBlocked')->willReturn($blocked);
 
         $host = $this->createStub(RequestHostResolver::class);
         $host->method('getSchemeAndHost')->willReturn('https://platform.example.com');
         $host->method('getHost')->willReturn('platform.example.com');
 
-        return new SupportEmailVerifyEmail($blocklist, $this->mockSampleFactory(), $queue, $config, $host);
+        return new SupportEmailVerifyEmail($blocklist, $this->mockSampleFactory(), $this->mailer($queue), $config, $host);
     }
 }
