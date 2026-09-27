@@ -27,17 +27,15 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Tests\Unit\Emails\MailerTrait;
-use Tests\Unit\Emails\QueueSpy;
 use Tests\Unit\Emails\SampleFactoryTrait;
 
 final class GetMaxSendByTest extends TestCase
 {
-    use MailerTrait;
     use SampleFactoryTrait;
 
     private const string NOW = '2026-04-21 10:00:00';
@@ -61,7 +59,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new EventReminderEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -78,7 +76,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new EventReminderEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -103,7 +101,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new NotificationEventCanceledEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RequestHostResolver::class),
         );
@@ -120,7 +118,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new EventUpdateNotificationEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(TranslatorInterface::class),
             $this->createStub(RequestHostResolver::class),
@@ -137,7 +135,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new EventUpdateNotificationEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(TranslatorInterface::class),
             $this->createStub(RequestHostResolver::class),
@@ -162,7 +160,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new RsvpAggregatedEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -179,7 +177,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new UpcomingDigestEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(EventRepository::class),
             $this->createStub(UserRepository::class),
@@ -200,7 +198,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new NotificationMessageEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(MessageRepository::class),
         );
@@ -215,7 +213,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new AdminNotificationEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
         );
 
@@ -229,7 +227,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new WelcomeEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RequestHostResolver::class),
         );
@@ -244,7 +242,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new AnnouncementEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RequestHostResolver::class),
         );
@@ -259,7 +257,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new SupportNotificationEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RecipientResolver::class),
             $this->createStub(LoggerInterface::class),
@@ -274,7 +272,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new PasswordResetEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RequestHostResolver::class),
         );
@@ -287,7 +285,7 @@ final class GetMaxSendByTest extends TestCase
         $email = new VerificationRequestEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $this->createStub(RequestHostResolver::class),
         );

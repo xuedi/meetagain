@@ -21,9 +21,22 @@ permit = [
     "Psr\\**",
 ]
 
+# The module's tests reach what its code may, plus PHPUnit and the shared module test harness - no
+# other core test helper, and no other core class unless listed here with its reason.
 [[guard.perimeter.rules]]
 namespace = "Module\\Trust\\Tests\\"
-permit = ["Module\\Trust\\**", "@global", "App\\**", "PHPUnit\\**", "Doctrine\\**", "Symfony\\**", "Psr\\**"]
+permit = [
+    "Module\\Trust\\**",
+    "@global",                              # DateTimeImmutable, Override, PHP's own functions
+    "App\\Entity\\User",                    # the grant FK - the one sanctioned core entity
+    "App\\Controller\\AbstractController",  # module controllers extend core's, as plugin controllers do
+    "PHPUnit\\**",
+    "Tests\\Module\\**",                    # the shared module test harness: ModuleKernel and Members
+    "Doctrine\\**",
+    "Symfony\\**",
+    "Twig\\**",
+    "Psr\\**",
+]
 
 [[guard.perimeter.rules]]
 namespace = "ModuleTrustMigrations"

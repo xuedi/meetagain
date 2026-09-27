@@ -201,10 +201,12 @@ Nothing outside this directory may import `Module\Email\Internal\**`; Mago Guard
 
 ## Files
 
-| Path                                 | Holds                                                                            |
-|--------------------------------------|----------------------------------------------------------------------------------|
-| `modules/email/src/Contract/`        | the public surface: the seams, the facades, the value objects                    |
-| `modules/email/src/Internal/`        | mailer, queue and dispatch, templates, layout, blocklist, send log               |
-| `modules/email/src/Internal/Entity/` | `EmailQueue`, `EmailTemplate`, `EmailTemplateTranslation`, `EmailBlocklistEntry` |
-| `modules/email/templates/`           | the layout and the admin pages                                                   |
-| `modules/email/migrations/`          | namespace `ModuleEmailMigrations`; tables `mod_email_*`                          |
+| Path                                 | Holds                                                                                                      |
+|--------------------------------------|------------------------------------------------------------------------------------------------------------|
+| `modules/email/src/Contract/`        | the public surface: the seams, the facades, the value objects                                              |
+| `modules/email/src/Internal/`        | mailer, queue and dispatch, templates, layout, blocklist, send log                                         |
+| `modules/email/src/Internal/Entity/` | `EmailQueue`, `EmailTemplate`, `EmailTemplateTranslation`, `EmailBlocklistEntry`                           |
+| `modules/email/templates/`           | the layout and the admin pages                                                                             |
+| `modules/email/migrations/`          | namespace `ModuleEmailMigrations`; tables `mod_email_*`                                                    |
+| `modules/email/tests/Stub/`          | a stand-in for each seam: two types, template, identity, guard-rule, enricher, push and delivery providers |
+| `modules/email/tests/Functional/`    | the send pipeline, enqueue, dispatch, the sweep, delivery sync, send log, blocklist and the admin pages    |

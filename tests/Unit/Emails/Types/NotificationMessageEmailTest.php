@@ -11,14 +11,11 @@ use Module\Email\Contract\BlocklistInterface;
 use Module\Email\Contract\DueContext;
 use Module\Email\Contract\MailerInterface;
 use PHPUnit\Framework\TestCase;
-use Tests\Unit\Emails\MailerTrait;
-use Tests\Unit\Emails\QueueSpy;
 use Tests\Unit\Emails\SampleFactoryTrait;
 use Tests\Unit\Stubs\UserStub;
 
 final class NotificationMessageEmailTest extends TestCase
 {
-    use MailerTrait;
     use SampleFactoryTrait;
 
     public function testDueContextsAskForPairsWhoseFirstUnreadMessageIsThreeHoursOld(): void
@@ -121,7 +118,7 @@ final class NotificationMessageEmailTest extends TestCase
         return new NotificationMessageEmail(
             $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             $repo,
         );

@@ -13,17 +13,15 @@ use App\Service\Http\RequestHostResolver;
 use DateTime;
 use DateTimeImmutable;
 use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Tests\Unit\Emails\MailerTrait;
-use Tests\Unit\Emails\QueueSpy;
 use Tests\Unit\Emails\SampleFactoryTrait;
 
 class EventUpdateNotificationEmailTest extends TestCase
 {
-    use MailerTrait;
     use SampleFactoryTrait;
 
     private ConfigService $config;
@@ -46,167 +44,66 @@ class EventUpdateNotificationEmailTest extends TestCase
         $this->host->method('getSchemeAndHost')->willReturn('https://example.com');
     }
 
-    public function testSendEnqueuesWhenStartChanged(): void
+    /**
+     * @param array<string, mixed> $before
+     * @param array<string, mixed> $after
+     */
+    #[DataProvider('provideChanges')]
+    public function testTheMessageNamesWhatChanged(array $before, array $after, string $expectedLine): void
     {
         // Arrange
-        $queue = $this->createMock(QueueSpy::class);
-        $queue
-            ->expects($this->once())
-            ->method('enqueue')
-            ->with(
-                $this->anything(),
-                $this->callback(static function (TemplatedEmail $email): bool {
-                    $context = $email->getContext();
-                    return (
-                        str_contains($context['changesHtml'], 'email_event_update.line_start')
-                        && !str_contains($context['changesHtml'], 'email_event_update.line_location')
-                    );
-                }),
-                $this->anything(),
-            );
-
-        $email = new EventUpdateNotificationEmail(
-            $this->blocklist,
-            $this->mockSampleFactory(),
-            $this->mailer($queue),
-            $this->config,
-            $this->translator,
-            $this->host,
-        );
+        $email = $this->email();
 
         // Act
-        $email->send([
-            'user' => $this->makeUser(),
-            'event' => $this->makeEvent(),
-            'before' => $this->snapshot(start: 1_700_000_000, locationId: 7, canceled: false),
-            'after' => $this->snapshot(start: 1_700_000_999, locationId: 7, canceled: false),
-        ]);
+        $messages = $email->compose(['user' => $this->makeUser(), 'event' => $this->makeEvent(), 'before' => $before, 'after' => $after]);
+
+        // Assert
+        static::assertCount(1, $messages);
+        static::assertStringContainsString($expectedLine, $messages[0]->getContext()['changesHtml']);
     }
 
-    public function testSendEnqueuesWhenLocationChanged(): void
+    /**
+     * @return iterable<string, array{array<string, mixed>, array<string, mixed>, string}>
+     */
+    public static function provideChanges(): iterable
     {
-        // Arrange
-        $queue = $this->createMock(QueueSpy::class);
-        $queue
-            ->expects($this->once())
-            ->method('enqueue')
-            ->with(
-                $this->anything(),
-                $this->callback(static fn(TemplatedEmail $email): bool => str_contains(
-                    $email->getContext()['changesHtml'],
-                    'email_event_update.line_location',
-                )),
-                $this->anything(),
-            );
-
-        $email = new EventUpdateNotificationEmail(
-            $this->blocklist,
-            $this->mockSampleFactory(),
-            $this->mailer($queue),
-            $this->config,
-            $this->translator,
-            $this->host,
-        );
-
-        // Act
-        $email->send([
-            'user' => $this->makeUser(),
-            'event' => $this->makeEvent(),
-            'before' => $this->snapshot(locationId: 7, locationName: 'Old Hall'),
-            'after' => $this->snapshot(locationId: 8, locationName: 'New Hall'),
-        ]);
+        yield 'a new start time' => [self::snapshot(start: 1_700_000_000), self::snapshot(start: 1_700_000_999), 'email_event_update.line_start'];
+        yield 'a new location' => [
+            self::snapshot(locationId: 7, locationName: 'Old Hall'),
+            self::snapshot(locationId: 8, locationName: 'New Hall'),
+            'email_event_update.line_location',
+        ];
+        yield 'a cancellation' => [self::snapshot(canceled: false), self::snapshot(canceled: true), 'email_event_update.line_canceled'];
+        yield 'an event back on' => [self::snapshot(canceled: true), self::snapshot(canceled: false), 'email_event_update.line_uncanceled'];
     }
 
-    public function testSendEnqueuesWhenCanceledFlipped(): void
+    public function testAChangedStartDoesNotMentionTheUnchangedLocation(): void
     {
         // Arrange
-        $queue = $this->createMock(QueueSpy::class);
-        $queue
-            ->expects($this->once())
-            ->method('enqueue')
-            ->with(
-                $this->anything(),
-                $this->callback(static fn(TemplatedEmail $email): bool => str_contains(
-                    $email->getContext()['changesHtml'],
-                    'email_event_update.line_canceled',
-                )),
-                $this->anything(),
-            );
-
-        $email = new EventUpdateNotificationEmail(
-            $this->blocklist,
-            $this->mockSampleFactory(),
-            $this->mailer($queue),
-            $this->config,
-            $this->translator,
-            $this->host,
-        );
+        $email = $this->email();
 
         // Act
-        $email->send([
+        $messages = $email->compose([
             'user' => $this->makeUser(),
             'event' => $this->makeEvent(),
-            'before' => $this->snapshot(canceled: false),
-            'after' => $this->snapshot(canceled: true),
+            'before' => self::snapshot(start: 1_700_000_000, locationId: 7),
+            'after' => self::snapshot(start: 1_700_000_999, locationId: 7),
         ]);
+
+        // Assert
+        static::assertStringNotContainsString('email_event_update.line_location', $messages[0]->getContext()['changesHtml']);
     }
 
-    public function testSendEnqueuesWhenUncanceled(): void
+    public function testNothingIsComposedWhenTheSnapshotsAreEqual(): void
     {
         // Arrange
-        $queue = $this->createMock(QueueSpy::class);
-        $queue
-            ->expects($this->once())
-            ->method('enqueue')
-            ->with(
-                $this->anything(),
-                $this->callback(static fn(TemplatedEmail $email): bool => str_contains(
-                    $email->getContext()['changesHtml'],
-                    'email_event_update.line_uncanceled',
-                )),
-                $this->anything(),
-            );
-
-        $email = new EventUpdateNotificationEmail(
-            $this->blocklist,
-            $this->mockSampleFactory(),
-            $this->mailer($queue),
-            $this->config,
-            $this->translator,
-            $this->host,
-        );
+        $email = $this->email();
 
         // Act
-        $email->send([
-            'user' => $this->makeUser(),
-            'event' => $this->makeEvent(),
-            'before' => $this->snapshot(canceled: true),
-            'after' => $this->snapshot(canceled: false),
-        ]);
-    }
+        $messages = $email->compose(['user' => $this->makeUser(), 'event' => $this->makeEvent(), 'before' => self::snapshot(), 'after' => self::snapshot()]);
 
-    public function testSendDoesNotEnqueueWhenSnapshotsAreEqual(): void
-    {
-        // Arrange
-        $queue = $this->createMock(QueueSpy::class);
-        $queue->expects($this->never())->method('enqueue');
-
-        $email = new EventUpdateNotificationEmail(
-            $this->blocklist,
-            $this->mockSampleFactory(),
-            $this->mailer($queue),
-            $this->config,
-            $this->translator,
-            $this->host,
-        );
-
-        // Act
-        $email->send([
-            'user' => $this->makeUser(),
-            'event' => $this->makeEvent(),
-            'before' => $this->snapshot(),
-            'after' => $this->snapshot(),
-        ]);
+        // Assert
+        static::assertSame([], $messages);
     }
 
     public function testGuardCheckReturnsFalseWhenAttendedEventUpdateOff(): void
@@ -215,7 +112,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $email = new EventUpdateNotificationEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->translator,
             $this->host,
@@ -235,7 +132,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $email = new EventUpdateNotificationEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->translator,
             $this->host,
@@ -254,7 +151,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $email = new EventUpdateNotificationEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->mailer($this->createStub(QueueSpy::class)),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->translator,
             $this->host,
@@ -266,7 +163,19 @@ class EventUpdateNotificationEmailTest extends TestCase
     /**
      * @return array{start: int, startFormatted: string, locationId: ?int, locationName: string, canceled: bool}
      */
-    private function snapshot(int $start = 1_700_000_000, ?int $locationId = 7, string $locationName = 'Main Hall', bool $canceled = false): array
+    private function email(): EventUpdateNotificationEmail
+    {
+        return new EventUpdateNotificationEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->createStub(MailerInterface::class),
+            $this->config,
+            $this->translator,
+            $this->host,
+        );
+    }
+
+    private static function snapshot(int $start = 1_700_000_000, ?int $locationId = 7, string $locationName = 'Main Hall', bool $canceled = false): array
     {
         return [
             'start' => $start,

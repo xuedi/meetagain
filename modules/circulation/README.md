@@ -203,11 +203,13 @@ does.
 
 ## Files
 
-| Path                                       | Holds                                                               |
-|--------------------------------------------|---------------------------------------------------------------------|
-| `modules/circulation/src/Contract/`        | the public surface: the seams, the facade, the enums, the VOs       |
-| `modules/circulation/src/Internal/`        | queue, handover and ledger services, the replay, the export/restore |
-| `modules/circulation/src/Internal/Entity/` | `Copy`, `Request`, `Handover`, `LedgerEntry`                        |
-| `modules/circulation/src/Internal/Trust/`  | the Trust module integration                                        |
-| `modules/circulation/templates/`           | the dashboard, the handover page, the badge and panel components    |
-| `modules/circulation/migrations/`          | namespace `ModuleCirculationMigrations`                             |
+| Path                                       | Holds                                                                   |
+|--------------------------------------------|-------------------------------------------------------------------------|
+| `modules/circulation/src/Contract/`        | the public surface: the seams, the facade, the enums, the VOs           |
+| `modules/circulation/src/Internal/`        | queue, handover and ledger services, the replay, the export/restore     |
+| `modules/circulation/src/Internal/Entity/` | `Copy`, `Request`, `Handover`, `LedgerEntry`                            |
+| `modules/circulation/src/Internal/Trust/`  | the Trust module integration                                            |
+| `modules/circulation/templates/`           | the dashboard, the handover page, the badge and panel components        |
+| `modules/circulation/migrations/`          | namespace `ModuleCirculationMigrations`                                 |
+| `modules/circulation/tests/Stub/`          | `ParticipationProvider`, which switches circulation on for `stub_item`  |
+| `modules/circulation/tests/Functional/`    | the lending flow over HTTP, the maintenance task and the ledger rebuild |

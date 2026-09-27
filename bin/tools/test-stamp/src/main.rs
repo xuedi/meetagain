@@ -10,6 +10,10 @@
 //! leave the working tree alone, so they leave the stamp valid, and a `touch` changes nothing.
 //! Each `SCAN_ROOTS` entry is walked on its own with the git ignore rules of its own
 //! repository, which is how a nested checkout that the outer repository excludes is covered.
+//!
+//! `--config <name>` reads `config/tools/<name>.dist` instead, so a narrower stamp - one that
+//! only asks "did the inputs of this database change?" - reuses the same machinery, narrowed
+//! further by the `ONLY` globs.
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::env;
@@ -21,17 +25,20 @@ use std::path::Path;
 use std::process::ExitCode;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+use globset::{Glob, GlobSet, GlobSetBuilder};
 use ignore::WalkBuilder;
 use rayon::prelude::*;
 use toolconfig::Config;
 
 const FORMAT: &str = "test-stamp v1";
 const DIFF_LIMIT: usize = 10;
+const DEFAULT_CONFIG: &str = "test-stamp";
 
 struct Rules {
     roots: Vec<String>,
     include_ignored: Vec<String>,
     exclude: Vec<String>,
+    only: Vec<String>,
     always_run: Vec<String>,
     stamp_file: String,
 }
@@ -42,6 +49,7 @@ impl Rules {
             roots: config.list("SCAN_ROOTS"),
             include_ignored: config.list("INCLUDE_IGNORED"),
             exclude: config.list("EXCLUDE"),
+            only: config.list("ONLY"),
             always_run: config.list("ALWAYS_RUN"),
             stamp_file: config.require("STAMP_FILE"),
         }
@@ -49,17 +57,30 @@ impl Rules {
 
     fn describe(&self) -> String {
         format!(
-            "{}\nroots={}\ninclude_ignored={}\nexclude={}\nalways_run={}\n",
+            "{}\nroots={}\ninclude_ignored={}\nexclude={}\nonly={}\nalways_run={}\n",
             FORMAT,
             self.roots.join(","),
             self.include_ignored.join(","),
             self.exclude.join(","),
+            self.only.join(","),
             self.always_run.join(","),
         )
     }
 
     fn is_excluded(&self, path: &str) -> bool {
         path == self.stamp_file || self.exclude.iter().any(|prefix| is_under(path, prefix))
+    }
+
+    fn only_set(&self) -> Result<Option<GlobSet>, String> {
+        if self.only.is_empty() {
+            return Ok(None);
+        }
+        let mut builder = GlobSetBuilder::new();
+        for pattern in &self.only {
+            let glob = Glob::new(pattern).map_err(|e| format!("ONLY entry {}: {}", pattern, e))?;
+            builder.add(glob);
+        }
+        builder.build().map(Some).map_err(|e| e.to_string())
     }
 }
 
@@ -116,7 +137,8 @@ fn collect_paths(base: &Path, rules: &Rules) -> Result<BTreeSet<String>, String>
             walk(base, &start, false, &mut paths)?;
         }
     }
-    paths.retain(|path| !rules.is_excluded(path));
+    let only = rules.only_set()?;
+    paths.retain(|path| !rules.is_excluded(path) && only.as_ref().is_none_or(|set| set.is_match(path)));
     Ok(paths)
 }
 
@@ -273,12 +295,15 @@ fn print_help() {
     println!("  test-stamp always-run <hook> exit 0 when the hook runs even on a fresh stamp");
     println!("  test-stamp files             list every fingerprinted file with its hash");
     println!();
-    println!("config: config/tools/test-stamp.dist, overlaid by config/tools/test-stamp.local");
+    println!("options:");
+    println!("  --config <name>              read config/tools/<name>.dist (default: test-stamp)");
+    println!();
+    println!("config: config/tools/<name>.dist, overlaid by config/tools/<name>.local");
 }
 
-fn run(args: &[String]) -> Result<bool, String> {
+fn run(config: &str, args: &[String]) -> Result<bool, String> {
     let base = Path::new(".");
-    let rules = Rules::from_config(&Config::load_or_exit("test-stamp"));
+    let rules = Rules::from_config(&Config::load_or_exit(config));
     match args {
         [command] if command == "fingerprint" => {
             println!("{}", snapshot(base, &rules)?.digest);
@@ -303,12 +328,22 @@ fn run(args: &[String]) -> Result<bool, String> {
 }
 
 fn main() -> ExitCode {
-    let args: Vec<String> = env::args().skip(1).collect();
+    let mut args: Vec<String> = env::args().skip(1).collect();
     if matches!(args.first().map(String::as_str), Some("-h" | "--help")) {
         print_help();
         return ExitCode::SUCCESS;
     }
-    match run(&args) {
+    let mut config = DEFAULT_CONFIG.to_string();
+    if args.first().map(String::as_str) == Some("--config") {
+        if args.len() < 2 {
+            print_help();
+            eprintln!("test-stamp: --config needs a name");
+            return ExitCode::from(2);
+        }
+        config = args.remove(1);
+        args.remove(0);
+    }
+    match run(&config, &args) {
         Ok(true) => ExitCode::SUCCESS,
         Ok(false) => ExitCode::from(1),
         Err(message) => {
@@ -359,6 +394,7 @@ mod tests {
             roots: vec![".".to_string()],
             include_ignored: vec![],
             exclude: vec![],
+            only: vec![],
             always_run: vec!["01-leak-guard".to_string()],
             stamp_file: "testPassing.lock".to_string(),
         }
@@ -435,6 +471,22 @@ mod tests {
         excluding.exclude = vec!["docs/src".to_string()];
 
         assert_eq!(vec!["docs/srcx/b.md"], tree.paths(&excluding));
+    }
+
+    #[test]
+    fn only_keeps_the_paths_its_globs_match() {
+        let tree = Tree::new("only");
+        tree.put("src/Entity/User.php", "a");
+        tree.put("src/Service/Mailer.php", "b");
+        tree.put("modules/email/src/Internal/Entity/EmailQueue.php", "c");
+        tree.put("modules/email/src/Internal/Mailer.php", "d");
+        let mut narrowed = rules();
+        narrowed.only = vec!["src/Entity/**".to_string(), "modules/*/src/Internal/Entity/**".to_string()];
+
+        assert_eq!(
+            vec!["modules/email/src/Internal/Entity/EmailQueue.php", "src/Entity/User.php"],
+            tree.paths(&narrowed)
+        );
     }
 
     #[test]

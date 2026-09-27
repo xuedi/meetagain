@@ -89,6 +89,26 @@ class ModulePerimeterTest extends TestCase
         ));
     }
 
+    #[DataProvider('provideModulesWithTests')]
+    public function testAModuleTestSuitePermitsNoCatchAll(string $module, string $namespace): void
+    {
+        // Arrange
+        $rule = self::testRuleOf(self::read(self::moduleConfig($module)), $namespace);
+
+        // Act
+        $catchAlls = array_values(array_filter(['"**"', '"App\\\\**"', '"Tests\\\\**"'], static fn(string $permit): bool => str_contains($rule, $permit)));
+
+        // Assert
+        self::assertSame(
+            [],
+            $catchAlls,
+            sprintf(
+                "The Tests\\ rule in %s permits a catch-all.\nA module's tests reach what its code may, plus PHPUnit; list any other core class with its reason.",
+                self::moduleConfig($module),
+            ),
+        );
+    }
+
     public function testTheGenericBackstopIsInPlace(): void
     {
         // Arrange
@@ -147,6 +167,17 @@ class ModulePerimeterTest extends TestCase
         }
 
         return $dirs;
+    }
+
+    private static function testRuleOf(string $config, string $namespace): string
+    {
+        $start = strpos($config, 'namespace = "Module\\\\' . $namespace . '\\\\Tests\\\\"');
+        if ($start === false) {
+            return '';
+        }
+        $end = strpos($config, "\n]", $start);
+
+        return substr($config, $start, $end === false ? null : $end - $start);
     }
 
     private static function moduleConfig(string $module): string

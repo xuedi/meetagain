@@ -14,6 +14,21 @@ testUnit +parameter='':
     @echo
     @echo
 
+# Run the module suites: core and modules only, no plugins, on a schema-only database that is
+# rebuilt when test-stamp says its inputs changed
+[group('testing')]
+testModules +parameter='':
+    @PHP_RUN="{{PHP}}" tests/bin/module-db.sh
+    @{{PHP}} vendor/bin/phpunit -c tests/config/phpunit.modules.xml --no-coverage --log-junit tests/reports/junit-modules.xml {{parameter}}
+    @echo
+    @echo
+
+# Rebuild the module test database, then run the module suites
+[group('testing')]
+testModulesRebuild +parameter='':
+    @PHP_RUN="{{PHP}}" tests/bin/module-db.sh --rebuild
+    @{{JUST}} testModules {{parameter}}
+
 # Print AI-readable test results (for AI agent)
 [group('testing')]
 testPrintResults +parameter='':

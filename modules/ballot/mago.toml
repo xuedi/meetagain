@@ -26,9 +26,27 @@ permit = [
     "Psr\\**",
 ]
 
+# The module's tests reach what its code may, plus PHPUnit and the shared module test harness - no
+# other core test helper, and no other core class unless listed here with its reason.
 [[guard.perimeter.rules]]
 namespace = "Module\\Ballot\\Tests\\"
-permit = ["Module\\Ballot\\**", "@global", "App\\**", "PHPUnit\\**", "Doctrine\\**", "Symfony\\**", "Psr\\**"]
+permit = [
+    "Module\\Ballot\\**",
+    "@global",                                                  # DateTimeImmutable, Override, PHP's own functions
+    "App\\Entity\\User",                                        # the vote FK - the one sanctioned core entity
+    "App\\Controller\\AbstractController",                      # module controllers extend core's, as plugin controllers do
+    "App\\CronTaskInterface",                                   # the deadline task registers on core's cron chain
+    "App\\ValueObject\\CronTaskResult",                         # that chain's return type
+    "App\\Enum\\CronTaskStatus",                                # that chain's status enum
+    "App\\Service\\Notification\\User\\NotificationProviderInterface", # members hear about open ballots on core's bell
+    "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
+    "PHPUnit\\**",
+    "Tests\\Module\\**",                                        # the shared module test harness: ModuleKernel and Members
+    "Doctrine\\**",
+    "Symfony\\**",
+    "Twig\\**",
+    "Psr\\**",
+]
 
 [[guard.perimeter.rules]]
 namespace = "ModuleBallotMigrations"

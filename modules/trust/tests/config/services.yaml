@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    Module\Trust\Tests\Stub\:
+        resource: '../Stub/'
+        exclude: '../Stub/{ExplodingCache.php,ScoreProviders.php}'

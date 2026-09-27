@@ -21,7 +21,6 @@ modules/
     mago.toml                the module's guard perimeter, pulled into core's Mago run
     config/
       services.yaml          the module's service definitions
-      services_test.yaml     test-environment-only services (optional)
       routes.yaml            attribute routes over src/Internal/Controller
       packages/doctrine.yaml ORM mapping + migrations namespace
       packages/twig.yaml     the template namespace
@@ -32,21 +31,21 @@ modules/
     src/Internal/            everything else - unreachable from outside
     templates/
     translations/
-    tests/Unit/
+    tests/
+      Unit/Contract/         unit tests, mirroring src/ one class per file
+      Unit/Internal/
+      Functional/            the module driven through its contract by stub consumers
+      Stub/                  those stub consumers, shared with the unit tests
+      config/services.yaml   wires the stubs; loaded only by the module test kernel
 ```
 
 `App\Kernel::getModuleConfigDirs()` globs `modules/*/config` and feeds it to `configureContainer()`
 and `configureRoutes()`. A directory that exists is a module that loads; there is no registration list
 to keep in sync. Modules ship no bundles, so `registerBundles()` ignores them.
 
-Two notes on the config files, both learned the hard way:
-
-- **`packages/cache.yaml` must declare only the `pools` key it adds.** Symfony merges prototyped
-  config across imports, so the module's pool joins the list core already defines. Redeclaring `app`
-  or `default_redis_provider` fights core's file instead of extending it.
-- **`services_test.yaml` is picked up for free.** The Kernel imports `{services}_{env}.yaml` from
-  every config directory it loads, so a module can register test-only services - a stub consumer, for
-  instance - without any test-kernel machinery.
+One note on the config files: **`packages/cache.yaml` must declare only the `pools` key it adds.**
+Symfony merges prototyped config across imports, so the module's pool joins the list core already
+defines. Redeclaring `app` or `default_redis_provider` fights core's file instead of extending it.
 
 ## `Contract/` and `Internal/`
 
@@ -145,6 +144,39 @@ AND together, so stacking them keeps the precise rule binding.
 `just checkMagoGuard` go red, then delete the file. A guard nobody has seen fail is a guard nobody
 should trust.
 
+## A module tests itself
+
+A module proves its own behaviour, in this repository, on every commit. Its functional tests drive it the
+way a consumer would - through `Contract/` - with stand-in consumers it ships in `modules/<name>/tests/Stub/`, on a
+database that holds nothing but the schema and the install seed.
+
+`just testModules` runs them. Three pieces of test infrastructure in `tests/` make that possible:
+
+- **`tests/Module/ModuleKernel.php`** boots core and every module and no plugin, still in the `test`
+  environment, with its own cache directory and its own database (`meetAgain_test_modules`). It loads each
+  `modules/<name>/tests/config/services.yaml`, so stubs exist only in this kernel and never in any other
+  test container. `tests/config/phpunit.modules.xml` points the suite at it.
+- **`tests/bin/module-db.sh`** builds that database when `test-stamp --config test-stamp-modules` reports
+  that something shaping it changed (an entity, a mapping, the seed), or when it is missing. A run with
+  nothing changed skips the build entirely.
+- **`tests/Module/Members.php`** persists the members a test needs. Each test creates its own rows, and the
+  DAMA extension rolls them back.
+
+Three rules keep these tests honest:
+
+- **A stub claims only what it created.** Core's own consumers are loaded too - its email types, its
+  identity provider, its comment targets - so a stub answers for its own identifiers (`stub_item`,
+  `stub-context`, `module_test_triggered`) and stays silent for everything else.
+- **A stub whose state a test sets is a plain mutable service.** The kernel reboots between tests, so that
+  state never leaks into the next one.
+- **A test may reach its module's `Internal/`, not the rest of core.** The `Tests\` rule in the module's
+  `mago.toml` permits what the module's code may, plus PHPUnit and `Tests\Module\**`. Any further core class
+  is listed there with its reason, and `ModulePerimeterTest` rejects a catch-all.
+
+A module's unit tests mirror `src/`: `modules/<name>/tests/Unit/Contract/` and `.../Unit/Internal/`, one file per
+class, named after it. Tests that need real consumers on real data - a plugin driving a module, say -
+belong to the application's functional suite, not to the module.
+
 ## Adding a module
 
 1. `modules/<name>/` with the directory shape above. Namespace root `Module\<Name>\`.
@@ -157,7 +189,9 @@ should trust.
    entry or one of the three rules is missing, so run `just testUnit tests/Unit/ModulePerimeterTest.php`
    and let it tell you.
 4. Prove all three rule kinds fail on a deliberate violation.
-5. A `README.md` in the module saying what it does and how to consume it.
+5. `modules/<name>/tests/Stub/` with a stand-in consumer for each seam, wired by
+   `modules/<name>/tests/config/services.yaml`, and `modules/<name>/tests/Functional/` driving the module through its contract - copy the shape from `modules/trust/tests/`.
+6. A `README.md` in the module saying what it does and how to consume it.
 
 Nothing else needs touching - not `composer.json`, not `phpunit.xml`, not the Kernel. Those were wired
 once for the tree.

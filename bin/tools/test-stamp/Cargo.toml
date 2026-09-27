@@ -11,4 +11,5 @@ path = "src/main.rs"
 toolconfig.workspace = true
 blake3.workspace = true
 ignore.workspace = true
+globset.workspace = true
 rayon.workspace = true

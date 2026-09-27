@@ -71,7 +71,7 @@ VictoriaMetrics rather than plain Prometheus.
 Gauges are collected on every cron tick while metrics are enabled. Implement
 `App\Metrics\GaugeInterface` and yield `App\Metrics\Point`s. The interface is auto-tagged, so no
 configuration is needed, and plugins can add gauges the same way. A gauge that throws is skipped for
-that tick and reported in the cron log. `src/Metrics/Gauge/EmailQueueGauge.php` is a short example.
+that tick and reported in the cron log. `modules/email/src/Internal/Metrics/EmailQueueGauge.php` is a short example.
 
 A point's measurement and field names become the metric name in VictoriaMetrics: `new Point('email_queue',
 ['pending' => 3])` is queried as `email_queue_pending`. Keep tag values few and bounded - a tag that

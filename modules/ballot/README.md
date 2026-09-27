@@ -118,12 +118,12 @@ request's user, so nothing the deadline cron attempted on its behalf would be al
 
 Consumers split on one question: **do members need to look at the candidates, or only read them?**
 
-|                | The module's page                | Your own page                                               |
-|----------------|----------------------------------|-------------------------------------------------------------|
-| Candidates are | strings a member can read        | rows a member has to see - posters, photos, dishes          |
-| You implement  | the three seams                  | the three seams, plus a controller and a template           |
-| You call       | `open()`                         | `open()`, then `view()` to render and `cast()` to record    |
-| Example        | `App\Review\FieldBallotService`  | `App\Item\Ballot\*`, `Plugin\Photos\Service\ContestService` |
+|                | The module's page               | Your own page                                               |
+|----------------|---------------------------------|-------------------------------------------------------------|
+| Candidates are | strings a member can read       | rows a member has to see - posters, photos, dishes          |
+| You implement  | the three seams                 | the three seams, plus a controller and a template           |
+| You call       | `open()`                        | `open()`, then `view()` to render and `cast()` to record    |
+| Example        | `App\Review\FieldBallotService` | `App\Item\Ballot\*`, `Plugin\Photos\Service\ContestService` |
 
 The module renders `Candidate::$label` as plain text and will keep doing so. Teaching it to resolve a
 key into a picture would make it interpret its candidates, which is the one thing it refuses to do. So
@@ -140,8 +140,8 @@ moving one needs this module's own tables. That is deliberate, and it shapes how
 
 Prove your settlement listener through `cast()` and `settle()` - that the winning key becomes the right
 change in your system, and that a tie changes nothing. The step you cannot reach, that `ballot.settle-due`
-turns a passed deadline into exactly those calls, is covered by the project's own functional suite and
-needs no second proof per consumer.
+turns a passed deadline into exactly those calls, is covered by this module's own
+`modules/ballot/tests/Functional/DeadlineTest.php` and needs no second proof per consumer.
 
 Nothing outside this directory may import `Module\Ballot\Internal\**`; Mago Guard fails the build if it
 does. `Contract/` is the whole public surface and speaks in scalars, enums and readonly value objects.
@@ -155,9 +155,11 @@ application's archive section is the one caller, and it decides per purpose whic
 
 ## Files
 
-| Path                                  | Holds                                                           |
-|---------------------------------------|-----------------------------------------------------------------|
-| `modules/ballot/src/Contract/`        | the public surface: `BallotInterface`, the three seams, the VOs |
-| `modules/ballot/src/Internal/`        | the engine, the registries, the cron, the page                  |
-| `modules/ballot/src/Internal/Entity/` | `Ballot`, `BallotOption`, `BallotVote`                          |
-| `modules/ballot/migrations/`          | namespace `ModuleBallotMigrations`                              |
+| Path                                  | Holds                                                                             |
+|---------------------------------------|-----------------------------------------------------------------------------------|
+| `modules/ballot/src/Contract/`        | the public surface: `BallotInterface`, the three seams, the VOs                   |
+| `modules/ballot/src/Internal/`        | the engine, the registries, the cron, the page                                    |
+| `modules/ballot/src/Internal/Entity/` | `Ballot`, `BallotOption`, `BallotVote`                                            |
+| `modules/ballot/migrations/`          | namespace `ModuleBallotMigrations`                                                |
+| `modules/ballot/tests/Stub/`          | a stand-in for each seam: listener, electorate, visibility filter                 |
+| `modules/ballot/tests/Functional/`    | the engine, the seams, the deadline cron and the page, driven through those stubs |

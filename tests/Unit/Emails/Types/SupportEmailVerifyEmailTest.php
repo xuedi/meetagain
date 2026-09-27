@@ -8,16 +8,13 @@ use App\Service\Config\ConfigService;
 use App\Service\Http\RequestHostResolver;
 use DateTimeImmutable;
 use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
-use Tests\Unit\Emails\MailerTrait;
-use Tests\Unit\Emails\QueueSpy;
 use Tests\Unit\Emails\SampleFactoryTrait;
 
 class SupportEmailVerifyEmailTest extends TestCase
 {
-    use MailerTrait;
     use SampleFactoryTrait;
 
     private const string REQUESTER_NAME = 'Mallory Attacker';
@@ -26,24 +23,10 @@ class SupportEmailVerifyEmailTest extends TestCase
     public function testContextCarriesNoRequesterSuppliedField(): void
     {
         // Arrange
-        $enqueued = null;
-        $queue = $this->createMock(QueueSpy::class);
-        $queue
-            ->expects($this->once())
-            ->method('enqueue')
-            ->with(
-                $this->anything(),
-                $this->callback(static function (TemplatedEmail $email) use (&$enqueued): bool {
-                    $enqueued = $email;
-                    return true;
-                }),
-                $this->anything(),
-            );
-
-        $emailType = $this->createEmailType($queue);
+        $emailType = $this->createEmailType();
 
         // Act
-        $emailType->send([
+        $messages = $emailType->compose([
             'email' => 'victim@example.com',
             'token' => str_repeat('a', 64),
             'expiresAt' => new DateTimeImmutable('2026-01-02 12:00:00'),
@@ -53,33 +36,17 @@ class SupportEmailVerifyEmailTest extends TestCase
         ]);
 
         // Assert
-        static::assertInstanceOf(TemplatedEmail::class, $enqueued);
-        static::assertSame(['lang', 'token', 'expiresAt'], array_keys($enqueued->getContext()));
-        static::assertStringNotContainsString(self::REQUESTER_NAME, implode("\n", $enqueued->getContext()));
-        static::assertStringNotContainsString(self::REQUESTER_MESSAGE, implode("\n", $enqueued->getContext()));
-    }
-
-    public function testSendSkipsWhenRecipientBlocklisted(): void
-    {
-        // Arrange
-        $queue = $this->createMock(QueueSpy::class);
-        $queue->expects($this->never())->method('enqueue');
-
-        $emailType = $this->createEmailType($queue, blocked: true);
-
-        // Act
-        $emailType->send([
-            'email' => 'blocked@example.com',
-            'token' => str_repeat('a', 64),
-            'expiresAt' => new DateTimeImmutable('2026-01-02 12:00:00'),
-            'lang' => 'en',
-        ]);
+        static::assertCount(1, $messages);
+        $context = $messages[0]->getContext();
+        static::assertSame(['lang', 'token', 'expiresAt'], array_keys($context));
+        static::assertStringNotContainsString(self::REQUESTER_NAME, implode("\n", $context));
+        static::assertStringNotContainsString(self::REQUESTER_MESSAGE, implode("\n", $context));
     }
 
     public function testIdentifier(): void
     {
         // Arrange
-        $emailType = $this->createEmailType($this->createStub(QueueSpy::class));
+        $emailType = $this->createEmailType();
 
         // Act & Assert
         static::assertSame(EmailType::SupportEmailVerify->value, $emailType->getIdentifier());
@@ -88,7 +55,7 @@ class SupportEmailVerifyEmailTest extends TestCase
     public function testMockDataCarriesNoRequesterSuppliedField(): void
     {
         // Arrange
-        $emailType = $this->createEmailType($this->createStub(QueueSpy::class));
+        $emailType = $this->createEmailType();
 
         // Act
         $mock = $emailType->getDisplayMockData('en');
@@ -97,18 +64,21 @@ class SupportEmailVerifyEmailTest extends TestCase
         static::assertSame(['host', 'url', 'lang', 'token', 'expiresAt'], array_keys($mock['context']));
     }
 
-    private function createEmailType(QueueSpy $queue, bool $blocked = false): SupportEmailVerifyEmail
+    private function createEmailType(): SupportEmailVerifyEmail
     {
         $config = $this->createStub(ConfigService::class);
         $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
-
-        $blocklist = $this->createStub(BlocklistInterface::class);
-        $blocklist->method('isBlocked')->willReturn($blocked);
 
         $host = $this->createStub(RequestHostResolver::class);
         $host->method('getSchemeAndHost')->willReturn('https://platform.example.com');
         $host->method('getHost')->willReturn('platform.example.com');
 
-        return new SupportEmailVerifyEmail($blocklist, $this->mockSampleFactory(), $this->mailer($queue), $config, $host);
+        return new SupportEmailVerifyEmail(
+            $this->createStub(BlocklistInterface::class),
+            $this->mockSampleFactory(),
+            $this->createStub(MailerInterface::class),
+            $config,
+            $host,
+        );
     }
 }

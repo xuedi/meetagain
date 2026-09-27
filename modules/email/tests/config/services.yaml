@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    Module\Email\Tests\Stub\:
+        resource: '../Stub/'
+        exclude: '../Stub/{GuardRule.php,Origin.php}'
