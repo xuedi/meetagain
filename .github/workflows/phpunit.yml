@@ -101,8 +101,18 @@ jobs:
           echo "DATABASE_URL=${DATABASE_URL}" >> .env
           echo "REDIS_URL=${REDIS_URL}" >> .env
 
+      # Pinned to the version docker/php/Dockerfile bakes into the dev image, so CI and the
+      # container compile the same stylesheets.
+      - name: Install Sass
+        run: |
+          npm install -g --ignore-scripts sass@1.86.3
+          cp assets/styles/_config.scss.dist assets/styles/_config.scss
+
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-scripts
+
+      - name: Build assets
+        run: php bin/console sass:build
 
       # Core and the modules only, no plugin, on a schema-only database the script builds.
       - name: Run module tests
