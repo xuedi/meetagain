@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'item_tag_assignment')]
 #[ORM\UniqueConstraint(name: 'uniq_item_tag', columns: ['item_type', 'item_id', 'tag_id'])]
 #[ORM\Index(name: 'idx_item_tag_cloud', columns: ['item_type', 'tag_id'])]
+#[ORM\Index(name: 'fk_item_tag_assignment_tag', columns: ['tag_id'])]
 class ItemTagAssignment
 {
     #[ORM\Id]
