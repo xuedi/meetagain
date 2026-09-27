@@ -220,8 +220,35 @@ ignore = [
 ]
 
 # Every run that extends this file - core and each plugin - enforces the module perimeter inbound:
-# nothing outside a module may reach past its Contract namespace. Core's own config adds the
-# per-module entries and the outbound rules on top.
+# nothing outside a module may reach past its Contract namespace. That holds for core's modules and
+# for the modules a plugin ships under `plugins/<plugin>/modules/`. Each config adds its own
+# modules' entries and outbound rules on top.
 [[guard.perimeter.restrictions]]
 dependency = "Module\\*\\Internal\\**"
 allow-from = ["Module\\*\\**"]
+
+[[guard.perimeter.restrictions]]
+dependency = "Plugin\\*\\Module\\*\\Internal\\**"
+allow-from = ["Plugin\\*\\Module\\*\\**"]
+
+# Shape: a contract carries interfaces, enums and readonly value objects, nothing else. Here rather
+# than in core's config, so a plugin run holds its own modules to the same shape.
+[[guard.structural.rules]]
+on = "Module\\*\\Contract\\**"
+must-be = ["interface", "enum", "class"]
+
+[[guard.structural.rules]]
+on = "Module\\*\\Contract\\**"
+target = "class"
+must-be-final = true
+must-be-readonly = true
+
+[[guard.structural.rules]]
+on = "Plugin\\*\\Module\\*\\Contract\\**"
+must-be = ["interface", "enum", "class"]
+
+[[guard.structural.rules]]
+on = "Plugin\\*\\Module\\*\\Contract\\**"
+target = "class"
+must-be-final = true
+must-be-readonly = true

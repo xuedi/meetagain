@@ -34,7 +34,10 @@ final class ContainerTest extends KernelTestCase
         self::bootKernel();
 
         // Act
-        $pluginServices = array_filter(self::getContainer()->getServiceIds(), static fn(string $id): bool => str_starts_with($id, 'Plugin\\'));
+        $pluginServices = array_filter(
+            self::getContainer()->getServiceIds(),
+            static fn(string $id): bool => str_starts_with($id, 'Plugin\\') && preg_match('~^Plugin\\\\\w+\\\\Module\\\\~', $id) !== 1,
+        );
 
         // Assert
         self::assertSame([], array_values($pluginServices));

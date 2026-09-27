@@ -75,8 +75,9 @@ excludes = [
 ]
 
 # The module perimeter: the shared parts live here, each module's own entries in its `mago.toml`.
-# The generic inbound backstop `Module\*\Internal\**` sits in mago-rules.toml, so plugin runs
-# enforce it too; each module's own restriction narrows it to the owner.
+# The generic inbound backstop `Module\*\Internal\**` and the structural rules on `Contract/` sit in
+# mago-rules.toml, so plugin runs enforce them too; each module's own restriction narrows the
+# backstop to the owner.
 [guard]
 
 # Outbound: `[[guard.perimeter.rules]]` puts the whole project into allowlist mode, so every
@@ -109,14 +110,3 @@ permit = ["**"]
 [[guard.perimeter.rules]]
 namespace = "Symfony\\"
 permit = ["**"]
-
-# Shape: the contract carries interfaces, enums and readonly value objects, nothing else.
-[[guard.structural.rules]]
-on = "Module\\*\\Contract\\**"
-must-be = ["interface", "enum", "class"]
-
-[[guard.structural.rules]]
-on = "Module\\*\\Contract\\**"
-target = "class"
-must-be-final = true
-must-be-readonly = true

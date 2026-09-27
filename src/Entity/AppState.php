@@ -7,6 +7,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AppStateRepository::class)]
+#[ORM\UniqueConstraint(name: 'uniq_app_state_key_name', columns: ['key_name'])]
 class AppState
 {
     #[ORM\Id]
@@ -14,7 +15,7 @@ class AppState
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'key_name', length: 255, unique: true)]
+    #[ORM\Column(name: 'key_name', length: 255)]
     private string $keyName;
 
     #[ORM\Column(type: 'text')]

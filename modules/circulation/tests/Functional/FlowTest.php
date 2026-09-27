@@ -165,6 +165,58 @@ final class FlowTest extends WebTestCase
         self::assertSame([], self::getContainer()->get(CommentService::class)->getFor(CirculationInterface::COMMENT_TARGET, $handover));
     }
 
+    public function testAParticipantPostsInTheHandoverChat(): void
+    {
+        // Arrange
+        $handover = $this->reachAHandover();
+
+        // Act
+        $this->as($this->first)->post(
+            '/en/comment/' . CirculationInterface::COMMENT_TARGET . '/' . $handover,
+            'app_comment_create' . CirculationInterface::COMMENT_TARGET . $handover,
+            [
+                'content' => 'See you on Thursday',
+            ],
+        );
+
+        // Assert
+        self::assertCount(1, self::getContainer()->get(CommentService::class)->getFor(CirculationInterface::COMMENT_TARGET, $handover));
+    }
+
+    public function testAWaitingMemberLeavesTheQueue(): void
+    {
+        // Arrange
+        $this->reachAHandover();
+        $this->requestAs($this->second);
+        $request = $this->requestOf($this->second);
+        self::assertSame(RequestStatus::Waiting, $request?->status);
+
+        // Act
+        $this->as($this->second)->post('/en/circulation/request/' . $request->ref . '/cancel', 'app_circulation_request_cancel' . $request->ref);
+
+        // Assert
+        self::assertSame(RequestStatus::Cancelled, $this->requestOf($this->second)?->status);
+    }
+
+    public function testOnlyAStewardCanRetireACopy(): void
+    {
+        // Arrange
+        $this->donate();
+        $copy = $this->copy();
+        $steward = new Members(self::getContainer()->get(EntityManagerInterface::class))->admin('Steward');
+
+        // Act
+        $this->as($this->first)->post('/en/circulation/copy/' . $copy->ref . '/retire', 'app_circulation_copy_retire' . $copy->ref);
+        $memberStatus = $this->client->getResponse()->getStatusCode();
+        $statusAfterMember = $this->copy()->status;
+        $this->as($steward)->post('/en/circulation/copy/' . $copy->ref . '/retire', 'app_circulation_copy_retire' . $copy->ref);
+
+        // Assert
+        self::assertSame(403, $memberStatus);
+        self::assertSame(CopyStatus::Available, $statusAfterMember);
+        self::assertSame(CopyStatus::Retired, $this->copy()->status);
+    }
+
     public function testAStrangerCannotOpenTheHandoverPage(): void
     {
         // Arrange

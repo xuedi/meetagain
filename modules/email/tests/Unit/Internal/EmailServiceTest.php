@@ -134,6 +134,7 @@ final class EmailServiceTest extends TestCase
 
         // Assert
         static::assertSame('https://second.example', $capturedQueue->getContext()['host']);
+        static::assertSame('second.example', $capturedQueue->getContext()['url']);
         static::assertSame('Second Site', $capturedQueue->getContext()['_layout']['siteName']);
     }
 

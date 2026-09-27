@@ -10,6 +10,7 @@ use Module\Email\Contract\SendlogInterface;
 use Module\Email\Contract\SentEmail;
 use Module\Email\Contract\TemplatesInterface;
 use Module\Email\Internal\EmailService;
+use Module\Email\Tests\Stub\PushDispatcher;
 use Module\Email\Tests\Stub\TriggeredEmail;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -145,6 +146,19 @@ final class AdminPagesTest extends WebTestCase
         $row = $this->rowFor('debug@module-test.example');
         self::assertSame(QueueStatus::Pending, $row?->status);
         self::assertSame(TriggeredEmail::IDENTIFIER, $row?->template);
+    }
+
+    public function testADebuggingSendPingsNoPushDispatcher(): void
+    {
+        // Arrange
+        $this->loginAsAdmin();
+
+        // Act
+        $this->debuggingSend('debug@module-test.example');
+
+        // Assert
+        self::assertNotNull($this->rowFor('debug@module-test.example'));
+        self::assertSame([], self::getContainer()->get(PushDispatcher::class)->pings);
     }
 
     public function testADebuggingSendRefusesABlockedRecipient(): void

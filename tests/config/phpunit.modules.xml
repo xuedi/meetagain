@@ -21,6 +21,7 @@
     <testsuites>
         <testsuite name="modules">
             <directory>../../modules/*/tests/Functional</directory>
+            <directory>../../plugins/*/modules/*/tests/Functional</directory>
         </testsuite>
     </testsuites>
     <php>
