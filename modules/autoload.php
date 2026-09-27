@@ -12,13 +12,13 @@ if ($loader === true) {
 }
 
 foreach (glob(__DIR__ . '/*/src', GLOB_ONLYDIR) as $dir) {
-    $moduleName = str_replace('-', '', ucwords(basename(dirname($dir)), '-'));
-    $namespace = 'Module\\' . $moduleName . '\\';
+    $moduleName = basename(dirname($dir));
+    $namespace = 'Module\\' . ucfirst($moduleName) . '\\';
     $loader->addPsr4($namespace, $dir . '/');
 }
 
 foreach (glob(__DIR__ . '/*/tests', GLOB_ONLYDIR) as $dir) {
-    $moduleName = str_replace('-', '', ucwords(basename(dirname($dir)), '-'));
-    $namespace = 'Module\\' . $moduleName . '\\Tests\\';
+    $moduleName = basename(dirname($dir));
+    $namespace = 'Module\\' . ucfirst($moduleName) . '\\Tests\\';
     $loader->addPsr4($namespace, $dir . '/');
 }

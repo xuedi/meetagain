@@ -47,6 +47,14 @@ One note on the config files: **`packages/cache.yaml` must declare only the `poo
 Symfony merges prototyped config across imports, so the module's pool joins the list core already
 defines. Redeclaring `app` or `default_redis_provider` fights core's file instead of extending it.
 
+## A module's tables carry its name
+
+A module's name is one lowercase word - no dash, no underscore - used once across core and plugin
+modules, and every table its entities map is `mod_<name>` or starts with `mod_<name>_`. No entity
+outside a module may map a table starting with `mod_`. So a table name says which module owns it, and
+no plugin can quietly write into a module's namespace. `tests/Unit/ModuleTableTest.php` enforces all
+three and names the offending entity.
+
 ## `Contract/` and `Internal/`
 
 Everything private lives under `Internal/`. That is what makes the guard rule simple: the restriction
@@ -179,7 +187,8 @@ belong to the application's functional suite, not to the module.
 
 ## Adding a module
 
-1. `modules/<name>/` with the directory shape above. Namespace root `Module\<Name>\`.
+1. `modules/<name>/` with the directory shape above, `<name>` one lowercase word. Namespace root
+   `Module\<Name>\`, tables `mod_<name>_*`.
 2. The config files, copied from `modules/trust/config/` with the paths swapped.
 3. `modules/<name>/mago.toml`, copied from `modules/trust/mago.toml` with the names swapped: the
    perimeter restriction, the outbound rule, a rule for its `Tests\` and its migrations namespace,
@@ -198,8 +207,8 @@ once for the tree.
 
 ## Modules a plugin ships
 
-A plugin can carry modules of its own in `plugins/<plugin>/modules/<name>/`, built exactly as above. A
-kebab-case directory maps to PascalCase (`search-index` -> `SearchIndex`), in both trees. What changes:
+A plugin can carry modules of its own in `plugins/<plugin>/modules/<name>/`, built exactly as above. What
+changes:
 
 |                       | Core module              | Plugin module                                                                                 |
 |-----------------------|--------------------------|-----------------------------------------------------------------------------------------------|

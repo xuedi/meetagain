@@ -170,21 +170,16 @@ class ModulePerimeterTest extends TestCase
         $modules = [];
         foreach (glob(self::root() . '/modules/*/src', GLOB_ONLYDIR) ?: [] as $src) {
             $name = basename(dirname($src));
-            $modules['modules/' . $name] = ['Module\\\\' . self::pascal($name), self::CONFIG];
+            $modules['modules/' . $name] = ['Module\\\\' . ucfirst($name), self::CONFIG];
         }
         foreach (glob(self::root() . '/plugins/*/modules/*/src', GLOB_ONLYDIR) ?: [] as $src) {
             $name = basename(dirname($src));
             $plugin = basename(dirname($src, 3));
-            $namespace = 'Plugin\\\\' . ucfirst($plugin) . '\\\\Module\\\\' . self::pascal($name);
+            $namespace = 'Plugin\\\\' . ucfirst($plugin) . '\\\\Module\\\\' . ucfirst($name);
             $modules['plugins/' . $plugin . '/modules/' . $name] = [$namespace, 'plugins/' . $plugin . '/tests/config/mago.toml'];
         }
 
         return $modules;
-    }
-
-    private static function pascal(string $directory): string
-    {
-        return str_replace('-', '', ucwords($directory, '-'));
     }
 
     private static function testRuleOf(string $config, string $namespace): string
