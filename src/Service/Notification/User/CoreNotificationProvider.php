@@ -3,7 +3,6 @@
 namespace App\Service\Notification\User;
 
 use App\Entity\User;
-use App\Repository\EmailQueueRepository;
 use App\Service\Support\VisibilityResolver;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -11,7 +10,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 readonly class CoreNotificationProvider implements NotificationProviderInterface
 {
     public function __construct(
-        private EmailQueueRepository $emailRepo,
         private VisibilityResolver $visibilityResolver,
         private Security $security,
         private TranslatorInterface $translator,
@@ -32,21 +30,6 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
                 ]),
                 icon: 'fa-life-ring',
                 route: 'app_admin_support_list',
-            );
-        }
-
-        if (!$this->security->isGranted('ROLE_ADMIN')) {
-            return $items; // only Admin from here on
-        }
-
-        $staleEmails = $this->emailRepo->getStaleCount(60);
-        if ($staleEmails > 0) {
-            $items[] = new NotificationItem(
-                label: $this->translator->trans('chrome.notification_stale_emails', [
-                    '%count%' => $staleEmails,
-                ]),
-                icon: 'fa-envelope',
-                route: 'app_admin_email_sendlog',
             );
         }
 

@@ -1,0 +1,23 @@
+<?php declare(strict_types=1);
+
+namespace Module\Email\Contract;
+
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+
+/**
+ * Allows plugins to inject additional variables into the email context before rendering. Called at
+ * queue time, which may be a cron tick with no request; anything about the sending site belongs on
+ * SendingIdentityProviderInterface instead.
+ */
+#[AutoconfigureTag]
+interface ContextEnricherInterface
+{
+    /**
+     * Enrich the email context before template rendering.
+     *
+     * @param array<string, mixed> $context Existing context variables
+     * @param string $locale The recipient's locale (e.g. 'en', 'de', 'zh')
+     * @return array<string, mixed> The enriched context
+     */
+    public function enrich(array $context, string $locale): array;
+}

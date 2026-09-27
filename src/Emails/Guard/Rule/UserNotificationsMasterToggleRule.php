@@ -2,12 +2,12 @@
 
 namespace App\Emails\Guard\Rule;
 
-use App\Emails\EmailGuardCost;
-use App\Emails\EmailGuardResult;
-use App\Emails\EmailGuardRuleInterface;
 use App\Entity\User;
+use Module\Email\Contract\GuardCost;
+use Module\Email\Contract\GuardResult;
+use Module\Email\Contract\GuardRuleInterface;
 
-final readonly class UserNotificationsMasterToggleRule implements EmailGuardRuleInterface
+final readonly class UserNotificationsMasterToggleRule implements GuardRuleInterface
 {
     public function __construct(
         private string $recipientKey = 'user',
@@ -18,16 +18,16 @@ final readonly class UserNotificationsMasterToggleRule implements EmailGuardRule
         return 'user_notifications_master_toggle';
     }
 
-    public function getCost(): EmailGuardCost
+    public function getCost(): GuardCost
     {
-        return EmailGuardCost::InMemory;
+        return GuardCost::InMemory;
     }
 
-    public function evaluate(array $context): EmailGuardResult
+    public function evaluate(array $context): GuardResult
     {
         $user = $context[$this->recipientKey] ?? null;
         if (!$user instanceof User) {
-            return EmailGuardResult::error(
+            return GuardResult::error(
                 $this->getName(),
                 sprintf("Context is missing the '%s' key, or it is not a User instance.", $this->recipientKey),
                 $this->recipientKey,
@@ -35,9 +35,9 @@ final readonly class UserNotificationsMasterToggleRule implements EmailGuardRule
         }
 
         if (!$user->isNotification()) {
-            return EmailGuardResult::skip($this->getName(), 'User has globally disabled email notifications.');
+            return GuardResult::skip($this->getName(), 'User has globally disabled email notifications.');
         }
 
-        return EmailGuardResult::pass($this->getName());
+        return GuardResult::pass($this->getName());
     }
 }

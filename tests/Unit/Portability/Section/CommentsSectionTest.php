@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\Portability\Section;
 
-use App\Entity\CirculationCopy;
-use App\Entity\CirculationHandover;
 use App\Entity\Comment;
 use App\Entity\Event;
 use App\Entity\Topic;
@@ -45,12 +43,11 @@ final class CommentsSectionTest extends SectionTestCase
         // Arrange
         $exported = $this->section($this->comments(), topicIds: [3], handoverIds: [8])->export($this->scope(), $this->images());
         $member = new User();
-        $handover = new CirculationHandover(new CirculationCopy('book', 'book', 1, new DateTimeImmutable()), null, new User(), new DateTimeImmutable());
         $context = $this->context();
         $context->mapRef(User::class, 'member@example.org', $member);
         $context->mapRef(Event::class, 1, $this->withId(new Event(), 101));
         $context->mapRef(Topic::class, 3, $this->withId(new Topic(), 103));
-        $context->mapRef(CirculationHandover::class, 8, $this->withId($handover, 108));
+        $context->mapIds('circulation_handover', [8 => 108]);
         $context->mapItems('photo', [7 => 107]);
 
         // Act

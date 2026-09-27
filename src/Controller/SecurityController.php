@@ -19,7 +19,6 @@ use App\EventSubscriber\Security\LoginAttemptSubscriber;
 use App\Form\NewPasswordType;
 use App\Form\PasswordResetType;
 use App\Form\RegistrationType;
-use App\Repository\EmailBlocklistRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Member\ConsentService;
 use App\Service\Member\PasswordResetService;
@@ -29,6 +28,7 @@ use App\Service\Security\SecurityService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Email\Contract\BlocklistInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -57,7 +57,7 @@ final class SecurityController extends AbstractController
         private readonly PasswordResetService $passwordResetService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly ConfigService $configService,
-        private readonly EmailBlocklistRepository $emailBlocklistRepository,
+        private readonly BlocklistInterface $blocklist,
         private readonly TranslatorInterface $translator,
         #[Target('passwordReset')]
         private readonly RateLimiterFactoryInterface $passwordResetLimiter,
@@ -140,10 +140,10 @@ final class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $blocklistEntry = $this->emailBlocklistRepository->findByEmail((string) $user->getEmail());
-            if ($blocklistEntry !== null) {
+            $blockReason = $this->blocklist->reasonFor((string) $user->getEmail());
+            if ($blockReason !== null) {
                 return $this->render('security/register_blocked.html.twig', [
-                    'reason' => $blocklistEntry->getReason(),
+                    'reason' => $blockReason,
                     'supportPath' => $this->generateUrl('app_contact'),
                 ]);
             }
@@ -245,10 +245,10 @@ final class SecurityController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $email = $form->get('email')->getData();
 
-            $blocklistEntry = $this->emailBlocklistRepository->findByEmail($email);
-            if ($blocklistEntry !== null) {
+            $blockReason = $this->blocklist->reasonFor($email);
+            if ($blockReason !== null) {
                 return $this->render('security/reset_blocked.html.twig', [
-                    'reason' => $blocklistEntry->getReason(),
+                    'reason' => $blockReason,
                     'supportPath' => $this->generateUrl('app_contact'),
                 ]);
             }
@@ -275,10 +275,8 @@ final class SecurityController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $finalized = $this->passwordResetService->resetPassword($user, $form->get('password')->getData());
             if (!$finalized) {
-                $blocklistEntry = $this->emailBlocklistRepository->findByEmail((string) $user->getEmail());
-
                 return $this->render('security/reset_blocked.html.twig', [
-                    'reason' => $blocklistEntry?->getReason() ?? '',
+                    'reason' => $this->blocklist->reasonFor((string) $user->getEmail()) ?? '',
                     'supportPath' => $this->generateUrl('app_contact'),
                 ]);
             }

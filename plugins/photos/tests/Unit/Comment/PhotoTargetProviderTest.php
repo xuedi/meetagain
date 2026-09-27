@@ -3,8 +3,8 @@
 namespace Plugin\Photos\Tests\Unit\Comment;
 
 use App\Activity\ActivityService;
-use App\Entity\Comment;
 use App\Entity\User;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Plugin\Photos\Activity\Messages\CommentedOnPhoto;
 use Plugin\Photos\Comment\PhotoTargetProvider;
@@ -53,18 +53,7 @@ class PhotoTargetProviderTest extends TestCase
         $provider = $this->provider(photo: $this->photo(), activity: $activity);
 
         // Act
-        $provider->onCommentCreated($this->comment($this->createStub(User::class)));
-    }
-
-    public function testTheCreatedHookIsSilentForAVanishedAuthor(): void
-    {
-        // Arrange
-        $activity = $this->createMock(ActivityService::class);
-        $activity->expects(static::never())->method('log');
-        $provider = $this->provider(photo: $this->photo(), activity: $activity);
-
-        // Act
-        $provider->onCommentCreated($this->comment(null));
+        $provider->onCommentCreated(4, 3);
     }
 
     private function provider(?Photo $photo = null, bool $granted = true, ?ActivityService $activity = null): PhotoTargetProvider
@@ -78,7 +67,10 @@ class PhotoTargetProviderTest extends TestCase
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
         $urlGenerator->method('generate')->willReturnCallback(static fn(string $route, array $params = []): string => '/en/photos/' . $params['id']);
 
-        return new PhotoTargetProvider($photoService, $checker, $urlGenerator, $activity ?? $this->createStub(ActivityService::class));
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('getReference')->willReturn(new User());
+
+        return new PhotoTargetProvider($photoService, $checker, $urlGenerator, $activity ?? $this->createStub(ActivityService::class), $em);
     }
 
     private function photo(): Photo
@@ -91,17 +83,5 @@ class PhotoTargetProviderTest extends TestCase
         );
 
         return $photo;
-    }
-
-    private function comment(?User $user): Comment
-    {
-        $comment = new Comment();
-        $comment->setTargetType('photo');
-        $comment->setTargetId(4);
-        if ($user !== null) {
-            $comment->setUser($user);
-        }
-
-        return $comment;
     }
 }

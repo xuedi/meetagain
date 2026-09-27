@@ -7,48 +7,48 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 
 ## Capabilities at a glance
 
-| Interface                                    | When to use it                                        | Key method                                             |
-|----------------------------------------------|-------------------------------------------------------|--------------------------------------------------------|
-| `Plugin` (base interface)                    | Serve CSS/JS assets from your plugin                  | `getStylesheets()`, `getJavascripts()`                 |
-| `AdminNavigationInterface`                   | Add sections and links to the admin sidebar           | `getAdminNavigation()`                                 |
-| `EventFilterInterface`                       | Control which events are visible                      | `getEventIdFilter()`                                   |
-| `CmsFilterInterface`                         | Control which CMS pages are visible                   | `getCmsPageSlugs()`                                    |
-| `ReservedSlugProviderInterface`              | Reserve slugs the CMS editor must refuse to assign    | `getReservedSlugs()`                                   |
-| `HeadHtmlProviderInterface`                  | Add markup to the document `<head>`                   | `getHeadHtml()`                                        |
-| `MemberFilterInterface`                      | Filter which members appear in lists                  | `getUserIds()`                                         |
-| `EventFilterFormContributorInterface`        | Add fields to the event filter form                   | `addFields()`                                          |
-| `NotificationProviderInterface`              | Add informational items to the notification bell      | `getNotifications()`                                   |
-| `ReviewNotificationProviderInterface`        | Add approve/deny items to the review page             | `getReviewItems()`, `approveItem()`, `denyItem()`      |
-| `EntityActionInterface`                      | React to core entity lifecycle events                 | `handleEntityAction()`                                 |
-| `MetaEnricherInterface`                      | Enrich metadata on all activity types                 | `enrich()`                                             |
-| `MessageInterface`                           | Define a new activity type with display rendering     | `getType()`, `validate()`, `render()`                  |
-| `SitemapPublisherInterface`                  | Contribute URLs to `/sitemap.xml`                     | `getPriority()`, `getSitemapUrls()`                    |
-| `WellKnownProviderInterface`                 | Serve a document under `/.well-known/`                | `getSuffix()`, `getPriority()`, `provide()`            |
-| `UrlOwnerProviderInterface`                  | Name the host that owns a route                       | `getOwnerHost()`                                       |
-| `FollowerEventNotificationFilterInterface`   | Drop follower-RSVP email recipients per event         | `isFollowerAllowed()`                                  |
-| `ImageAttributionFilterInterface`            | Narrow which attributed images `/attributions` shows  | `getVisibleImageIdFilter()`                            |
-| `DataHotfixInterface`                        | Ship a one-off data repair that runs once per DB      | `getIdentifier()`, `execute()`                         |
-| `SecurityProviderInterface`                  | Participate in live security event detection          | `observe()`, `scanRetrospective()`                     |
-| `DescriptorInterface`                        | Add a settings section to your plugin's settings page | `getFormType()`, `createDefault()`, `applyForm()`      |
-| `TaggableTypeProviderInterface`              | Give an item type a tag vocabulary                    | `getPluginKey()`, `getTypeKey()`, `getLabelKey()`      |
-| `ReportableTypeProviderInterface`            | Let any visitor report an item of your type           | `getItemLabel()`, `getItemPath()`                      |
-| `Tag\CreationHandlerInterface`               | Claim a tag row the moment it is created              | `onTagCreated()`                                       |
-| `Tag\DeletionHandlerInterface`               | Release what you attached before a tag row is removed | `onTagDeleted()`                                       |
-| `Event\ImageBoxProviderInterface`            | Replace the event page's image box with your own      | `getPluginKey()`, `renderImageBox()`                   |
-| `Event\EventScopeProviderInterface`          | Run request-less work under an event's own narrowing  | `runForEvent()`                                        |
-| `Comment\TargetProviderInterface`            | Host the shared comment section on your own pages     | `getTypeKey()`, `getReturnUrl()`, `canComment()`       |
-| `Circulation\ParticipationProviderInterface` | Let your item type circulate as physical copies       | `isEnabled()`                                          |
-| `Circulation\ContextProviderInterface`       | Decide which shelf circulation rows are filed under   | `getContext()`, `getPriority()`                        |
-| `Circulation\EligibilityProviderInterface`   | Decide who may join a circulation waiting list        | `canRequest()`                                         |
-| `Circulation\DashboardTabInterface`          | Add a tab to the circulation dashboard                | `supports()`, `render()`                               |
-| `ContributorInterface`                       | Carry an item type through export archives            | `exportItems()`, `importItems()`                       |
-| `UploadsInterface`                           | Leave out uploads their uploader did not share        | `getUploaderIds()`                                     |
-| `PluginSectionInterface`                     | Carry your plugin's member data through archives      | `export()`, `import()`                                 |
-| `ChangeTargetProviderInterface`              | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()` |
-| `ConfigPrivacyToggleProviderInterface`       | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                          |
-| `SendingIdentityProviderInterface`           | Decide the name, logo and links a mail is sent under  | `resolve()`                                            |
-| `AudienceFilterInterface`                    | Narrow who receives installation-wide mail            | `filterInstallationWideAudience()`                     |
-| `PushDispatcherInterface`                    | Notice a queued message and deliver it another way    | `dispatch()`                                           |
+| Interface                                                    | When to use it                                        | Key method                                             |
+|--------------------------------------------------------------|-------------------------------------------------------|--------------------------------------------------------|
+| `Plugin` (base interface)                                    | Serve CSS/JS assets from your plugin                  | `getStylesheets()`, `getJavascripts()`                 |
+| `AdminNavigationInterface`                                   | Add sections and links to the admin sidebar           | `getAdminNavigation()`                                 |
+| `EventFilterInterface`                                       | Control which events are visible                      | `getEventIdFilter()`                                   |
+| `CmsFilterInterface`                                         | Control which CMS pages are visible                   | `getCmsPageSlugs()`                                    |
+| `ReservedSlugProviderInterface`                              | Reserve slugs the CMS editor must refuse to assign    | `getReservedSlugs()`                                   |
+| `HeadHtmlProviderInterface`                                  | Add markup to the document `<head>`                   | `getHeadHtml()`                                        |
+| `MemberFilterInterface`                                      | Filter which members appear in lists                  | `getUserIds()`                                         |
+| `EventFilterFormContributorInterface`                        | Add fields to the event filter form                   | `addFields()`                                          |
+| `NotificationProviderInterface`                              | Add informational items to the notification bell      | `getNotifications()`                                   |
+| `ReviewNotificationProviderInterface`                        | Add approve/deny items to the review page             | `getReviewItems()`, `approveItem()`, `denyItem()`      |
+| `EntityActionInterface`                                      | React to core entity lifecycle events                 | `handleEntityAction()`                                 |
+| `MetaEnricherInterface`                                      | Enrich metadata on all activity types                 | `enrich()`                                             |
+| `MessageInterface`                                           | Define a new activity type with display rendering     | `getType()`, `validate()`, `render()`                  |
+| `SitemapPublisherInterface`                                  | Contribute URLs to `/sitemap.xml`                     | `getPriority()`, `getSitemapUrls()`                    |
+| `WellKnownProviderInterface`                                 | Serve a document under `/.well-known/`                | `getSuffix()`, `getPriority()`, `provide()`            |
+| `UrlOwnerProviderInterface`                                  | Name the host that owns a route                       | `getOwnerHost()`                                       |
+| `FollowerEventNotificationFilterInterface`                   | Drop follower-RSVP email recipients per event         | `isFollowerAllowed()`                                  |
+| `ImageAttributionFilterInterface`                            | Narrow which attributed images `/attributions` shows  | `getVisibleImageIdFilter()`                            |
+| `DataHotfixInterface`                                        | Ship a one-off data repair that runs once per DB      | `getIdentifier()`, `execute()`                         |
+| `SecurityProviderInterface`                                  | Participate in live security event detection          | `observe()`, `scanRetrospective()`                     |
+| `DescriptorInterface`                                        | Add a settings section to your plugin's settings page | `getFormType()`, `createDefault()`, `applyForm()`      |
+| `TaggableTypeProviderInterface`                              | Give an item type a tag vocabulary                    | `getPluginKey()`, `getTypeKey()`, `getLabelKey()`      |
+| `ReportableTypeProviderInterface`                            | Let any visitor report an item of your type           | `getItemLabel()`, `getItemPath()`                      |
+| `Tag\CreationHandlerInterface`                               | Claim a tag row the moment it is created              | `onTagCreated()`                                       |
+| `Tag\DeletionHandlerInterface`                               | Release what you attached before a tag row is removed | `onTagDeleted()`                                       |
+| `Event\ImageBoxProviderInterface`                            | Replace the event page's image box with your own      | `getPluginKey()`, `renderImageBox()`                   |
+| `Event\EventScopeProviderInterface`                          | Run request-less work under an event's own narrowing  | `runForEvent()`                                        |
+| `Comment\TargetProviderInterface`                            | Host the shared comment section on your own pages     | `getTypeKey()`, `getReturnUrl()`, `canComment()`       |
+| `Module\Circulation\Contract\ParticipationProviderInterface` | Let your item type circulate as physical copies       | `isEnabled()`                                          |
+| `Module\Circulation\Contract\ContextProviderInterface`       | Decide which shelf circulation rows are filed under   | `getContext()`, `getPriority()`                        |
+| `Module\Circulation\Contract\EligibilityProviderInterface`   | Decide who may join a circulation waiting list        | `canRequest()`                                         |
+| `Module\Circulation\Contract\DashboardTabInterface`          | Add a tab to the circulation dashboard                | `supports()`, `render()`                               |
+| `ContributorInterface`                                       | Carry an item type through export archives            | `exportItems()`, `importItems()`                       |
+| `UploadsInterface`                                           | Leave out uploads their uploader did not share        | `getUploaderIds()`                                     |
+| `PluginSectionInterface`                                     | Carry your plugin's member data through archives      | `export()`, `import()`                                 |
+| `ChangeTargetProviderInterface`                              | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()` |
+| `ConfigPrivacyToggleProviderInterface`                       | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                          |
+| `Module\Email\Contract\SendingIdentityProviderInterface`     | Decide the name, logo and links a mail is sent under  | `resolve()`                                            |
+| `AudienceFilterInterface`                                    | Narrow who receives installation-wide mail            | `filterInstallationWideAudience()`                     |
+| `Module\Email\Contract\PushDispatcherInterface`              | Notice a queued message and deliver it another way    | `dispatch()`                                           |
 
 ---
 
@@ -583,8 +583,9 @@ Three rules:
   Account and security mail reaches you too, and pushing a password reset somewhere is a phishing lesson nobody
   needs.
 
-Callers that queue a message nothing actually happened about - a preview sweep, an operator sending a test - pass
-`dispatchPush: false`, so your dispatcher is not called for them.
+Messages nothing actually happened about - a preview sweep, an operator sending a test - never reach your
+dispatcher, and neither does mail from a type whose `pushOnEnqueue()` is false. That type's sender pings through
+`MailerInterface::dispatchPush()` instead, which reaches your dispatcher without a queued message.
 
 ### UrlOwnerProviderInterface
 
@@ -691,7 +692,6 @@ event page uses.
 namespace Plugin\YourPlugin\Comment;
 
 use App\Comment\TargetProviderInterface;
-use App\Entity\Comment;
 use Override;
 use Plugin\YourPlugin\Repository\PhotoRepository;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -724,7 +724,7 @@ final readonly class PhotoTargetProvider implements TargetProviderInterface
     }
 
     #[Override]
-    public function onCommentCreated(Comment $comment): void
+    public function onCommentCreated(int $targetId, int $userId): void
     {
         // optional: log activity, notify the uploader, invalidate a cache
     }
@@ -741,6 +741,8 @@ Notes:
 
 - `getReturnUrl()` is also the existence check. Returning `null` makes the controller respond 404, so a POST for a
   deleted target cannot create an orphan row.
+- `onCommentCreated()` receives ids, never the comment entity. Load whatever the side effect needs yourself;
+  `EntityManagerInterface::getReference(User::class, $userId)` gives you the author without a query.
 - Deletion is **not** yours to decide: the comment's author or a `ROLE_ADMIN` may remove it, always.
 - Content is sanitized to plain text on write and re-filtered on render. Do not re-implement either.
 - Your delete path **must** call `CommentService::deleteAllFor('photo', $id)`. Comments carry no foreign key to
@@ -750,13 +752,15 @@ Notes:
 
 ### Circulation seams
 
-**Purpose:** Turn your item type into something members lend each other in person. Core owns the copies, the
-per-title waiting list, the two-sided handover with its own private chat, and the append-only ledger that
-records every move; your plugin supplies three answers.
+**Purpose:** Turn your item type into something members lend each other in person. The circulation module owns
+the copies, the per-title waiting list, the two-sided handover with its own private chat, and the append-only
+ledger that records every move; your plugin supplies three answers.
 
-**Files:** `src/Circulation/ParticipationProviderInterface.php`,
-`src/Circulation/ContextProviderInterface.php`, `src/Circulation/EligibilityProviderInterface.php`,
-`src/Circulation/DashboardTabInterface.php`
+**Files:** `modules/circulation/src/Contract/ParticipationProviderInterface.php`,
+`ContextProviderInterface.php`, `EligibilityProviderInterface.php`, `DashboardTabInterface.php` and
+`TrustEnabledProviderInterface.php` in the same directory. Import only from `Module\Circulation\Contract\`: the
+build fails on anything under the module's `Internal` namespace. `modules/circulation/README.md` describes the
+whole system.
 
 **Tag:** `#[AutoconfigureTag]` on each interface - implementing one is enough.
 
@@ -766,7 +770,7 @@ records every move; your plugin supplies three answers.
 ```php
 namespace Plugin\YourPlugin\Circulation;
 
-use App\Circulation\ParticipationProviderInterface;
+use Module\Circulation\Contract\ParticipationProviderInterface;
 use Override;
 use Plugin\YourPlugin\Service\ConfigService;
 
@@ -793,7 +797,7 @@ switch is off, so they need no guard:
 ```
 
 **`ContextProviderInterface`** mints the opaque string every circulation row is filed under - one shelf per
-string. Core registers a fallback returning the item type key at the lowest priority, so implement this only
+string. The module registers a fallback returning the item type key at the lowest priority, so implement this only
 when one installation needs several separate shelves for the same type. Return the highest priority you want
 to win; circulation never parses what you return.
 
@@ -805,10 +809,13 @@ return EligibilityVerdict::refused('your_plugin.circulation_refused', ['%needed%
 ```
 
 It is consulted when someone *requests*, not when the copy changes hands, so a refused member is told before
-they ever join the queue.
+they ever join the queue. It receives the member as `int $userId`, never as an entity.
 
 **`DashboardTabInterface`** appends a tab to `/circulation/{itemType}`. Return your own markup from
 `render()` and decide in `supports()` whether the tab applies to the item type and context on screen.
+
+**`TrustEnabledProviderInterface`** switches on trust scoring for your type's circulation, when the trust module
+is in use. AND your own trust flag with your circulation flag, so a stale setting cannot turn trust on alone.
 
 ---
 
@@ -1061,31 +1068,42 @@ readonly class GroupContextEnricher implements MetaEnricherInterface
 
 ### Adding a custom email type
 
-Implement `EmailInterface` (or `ScheduledEmailInterface` for cron-driven emails) to add a new email type that
-automatically appears in the admin template preview and debugging pages.
-
-**File:** `src/Emails/EmailInterface.php` / `src/Emails/ScheduledEmailInterface.php`
+An email type describes a message; the Email module decides whether it goes out and sends it. Extend
+`App\Emails\EmailAbstract` (or implement `Module\Email\Contract\EmailInterface` yourself) and the type appears in
+the admin template list, the planned-mail page, the debugging page and the preview sweep on its own.
+Only `Module\Email\Contract\` may be imported from the module; `modules/email/README.md` describes the pipeline.
 
 ```php
 namespace Plugin\YourPlugin\Email;
 
-use App\Emails\EmailInterface;
-use App\Emails\EmailQueueInterface;
+use App\Emails\EmailAbstract;
+use App\Emails\Guard\Rule\RecipientNotBlocklistedRule;
+use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Emails\MockSampleFactory;
-use App\Enum\EmailType;
+use App\Service\Config\ConfigService;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
-readonly class MyPluginEmail implements EmailInterface
+readonly class MyPluginEmail extends EmailAbstract
 {
     public function __construct(
-        private EmailQueueInterface $queue,
+        BlocklistInterface $blocklist,
+        MockSampleFactory $samples,
+        MailerInterface $mailer,
         private ConfigService $config,
-        private MockSampleFactory $samples,
-    ) {}
+    ) {
+        parent::__construct($blocklist, $samples, $mailer);
+    }
 
     public function getIdentifier(): string
     {
-        return 'myplugin_custom_email'; // must match EmailType::* value if using core enum
+        return 'myplugin_custom_email';
+    }
+
+    public function getTriggerLabel(): string
+    {
+        return 'myplugin_email.trigger_custom';
     }
 
     public function getDisplayMockData(string $locale): array
@@ -1094,20 +1112,16 @@ readonly class MyPluginEmail implements EmailInterface
 
         return [
             'subject' => 'My Plugin Notification',
-            'context' => [
-                'username' => $sample->recipientName,
-                'host' => $sample->host,
-                'lang' => $locale,
-            ],
+            'context' => ['username' => $sample->recipientName, 'host' => $sample->host, 'lang' => $locale],
         ];
     }
 
-    public function guardCheck(array $context): bool
+    public function getGuardRules(): array
     {
-        return true; // or implement recipient eligibility checks
+        return [new RecipientUserPresentRule(), new RecipientNotBlocklistedRule($this->blocklist)];
     }
 
-    public function send(array $context): void
+    public function compose(array $context): array
     {
         $user = $context['user'];
 
@@ -1115,25 +1129,43 @@ readonly class MyPluginEmail implements EmailInterface
         $email->from($this->config->getMailerAddress());
         $email->to((string) $user->getEmail());
         $email->locale($user->getLocale());
-        $email->context([/* template variables */]);
+        $email->context(['username' => $user->getName(), 'lang' => $user->getLocale()]);
 
-        $this->queue->enqueue($email, EmailType::MyPluginType);
+        return [$email];
     }
 }
 ```
 
-Call it by injecting the class directly wherever you need to send it:
+Send it by injecting the class wherever the event happens:
 
 ```php
-$this->myPluginEmail->send(['user' => $user, ...]);
+$this->myPluginEmail->send(['user' => $user]);
 ```
+
+`send()` runs every rule `getGuardRules()` declares, then `compose()`, then drops any message whose recipient is on
+the blocklist, and queues the rest; cron dispatches them. `compose()` may return several messages or none. A rule
+that answers `Error` means the context you passed is incomplete, and `send()` throws. The context array is yours:
+the module hands it back to your rules and `compose()` without reading it.
+
+Optional overrides on `EmailAbstract`:
+
+- `getMaxSendBy()` - a deadline after which the mail is useless (a reminder after the event started). Leave it
+  `null` for mail carrying a token with its own expiry.
+- `getOrigin()` - the entity the mail is about, which decides who it is sent as (see below).
+- `getAttachments()` - file paths, read again at dispatch, so they must outlive the queue row.
+- `pushOnEnqueue()` - return `false` when you ping the member yourself and the mail only follows up.
+
+**Templates.** The subject and body an admin edits are keyed by `getIdentifier()`. Ship a default through
+`Module\Email\Contract\TemplateProviderInterface`, returning one `TemplateDefinition` (identifier, subject, body,
+variables) per type and language; `app:email-templates:seed` stores it. Every variable is HTML-escaped when it is
+substituted unless the definition lists it in `htmlVariables`. Reusing a shipped identifier replaces that template.
 
 **Mock data rules:**
 
 - `getDisplayMockData()` receives the locale the viewer selected, and every value it returns must be the
   one that locale would really produce. `lang` is that locale; names, titles and free text are written in
   it; hosts, ids, tokens and amounts do not vary.
-- A mock mirrors what the type's `send()` actually produces, defects included. If `send()` hardcodes an
+- A mock mirrors what the type's `compose()` actually produces, defects included. If `compose()` hardcodes an
   English label, the mock keeps it English - the preview sweep exists to make that visible.
 - `MockSampleFactory::create()` returns a shared per-locale sample (people, group, event, dates, sample
   text) so each type composes its context from one table rather than inventing its own.
@@ -1141,19 +1173,19 @@ $this->myPluginEmail->send(['user' => $user, ...]);
   cron to dispatch), so a mock that is missing a template variable shows up as a `{{placeholder}}` in a
   rendered mail.
 
-For **scheduled emails** (cron-driven), implement `ScheduledEmailInterface` additionally:
+For **scheduled emails** (cron-driven), implement `Module\Email\Contract\ScheduledEmailInterface` additionally:
 
-- `getDueContexts(DateTimeImmutable $now): DueContext[]` — return what is due now; return `[]` to skip
-- `markContextSent(DueContext $context): void` — persist the "sent" state after processing
-- `getPlannedItems(DateTimeImmutable $from, DateTimeImmutable $to): ScheduledMailItem[]` — shown on
+- `getDueContexts(DateTimeImmutable $now): DueContext[]` - return what is due now; return `[]` to skip. Each
+  context names its potential recipients; the module sends to each one through the same rules as `send()`.
+- `markContextSent(DueContext $context): void` - persist the "sent" state; called once per context
+- `getPlannedItems(DateTimeImmutable $from, DateTimeImmutable $to): ScheduledMailItem[]` - shown on
   `/admin/email/planned`
+- `getPreviewContexts(DateTimeImmutable $for): DueContext[]` - what the planned page evaluates the rules against
 
-`SendScheduledEmailsService` picks up all `ScheduledEmailInterface` implementations automatically via
-`#[AutowireIterator]`.
+Scheduled mail only goes out between 07:00 and 22:00; your type does not check the time.
 
-!!! note Plugin email identifiers must not collide with core `EmailType` enum values. If your email type does not have a
-corresponding `EmailType` entry, you will need to add one or use a string identifier and implement the template system
-separately.
+To add a rule to types you do not own, implement `Module\Email\Contract\GuardRuleProviderInterface`: its rules
+run after the type's own, for the identifiers it returns them for.
 
 ### Who a mail looks like it came from
 
@@ -1179,8 +1211,8 @@ provider chain - the first implementation to return non-null wins, and returning
 ```php
 namespace Plugin\YourPlugin\Email;
 
-use App\Emails\SendingIdentity;
-use App\Emails\SendingIdentityProviderInterface;
+use Module\Email\Contract\SendingIdentity;
+use Module\Email\Contract\SendingIdentityProviderInterface;
 
 readonly class MySendingIdentityProvider implements SendingIdentityProviderInterface
 {
@@ -1213,8 +1245,8 @@ Three rules that are easy to get wrong:
   before assembling it. It replaces the layout's default `Sent by` line when set.
 
 The result is frozen onto the queue row at enqueue. Nothing is re-resolved at send time, so a later change
-to the origin does not retro-brand mail that is already queued. `enqueue()` also owns the `host`, `url` and
-`greeting` context keys and takes them from the identity - do not set them in `send()`.
+to the origin does not retro-brand mail that is already queued. The queue also owns the `host`, `url` and
+`greeting` context keys and takes them from the identity - do not set them in `compose()`.
 
 ### Who receives installation-wide mail
 

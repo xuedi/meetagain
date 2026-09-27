@@ -1,0 +1,72 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <div class="columns">
+            <div class="column is-8">
+                {% if preview %}
+                    <div class="box">
+                        <div class="level">
+                            <div class="level-left">
+                                <h2 class="subtitle">{{ 'admin_cms.announcement_email_preview' | trans }}</h2>
+                            </div>
+                            <div class="level-right">
+                                <div class="buttons has-addons">
+                                    {% for locale in get_admin_language_codes() %}
+                                        <a href="{{ path('app_admin_cms_announcements_view', {'id': announcement.id, 'locale': locale}) }}"
+                                           class="button is-small {% if locale == previewLocale %}is-active is-info{% endif %}">
+                                            {{ locale }}
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <p><strong>{{ 'admin_cms.email_subject' | trans }}:</strong> {{ preview.subject }}</p>
+                        <hr>
+                        <div class="content">
+                            {{ preview.body | raw }}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="column">
+                <div class="box">
+                    <h2 class="subtitle">{{ 'admin_cms.announcement_details' | trans }}</h2>
+
+                    <table class="table is-fullwidth is-narrow">
+                        <tbody>
+                        <tr>
+                            <th>{{ 'admin_cms.announcement_cms_page' | trans }}</th>
+                            <td>{{ announcement.cmsPage.slug }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_cms.announcement_created' | trans }}</th>
+                            <td>{{ announcement.createdAt|date('Y-m-d H:i') }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_cms.announcement_created_by' | trans }}</th>
+                            <td>{{ announcement.createdBy.name }}</td>
+                        </tr>
+                        {% if announcement.sent %}
+                            <tr>
+                                <th>{{ 'admin_cms.announcement_sent_at' | trans }}</th>
+                                <td>{{ announcement.sentAt|date('Y-m-d H:i') }}</td>
+                            </tr>
+                            <tr>
+                                <th>{{ 'admin_cms.announcement_recipients' | trans }}</th>
+                                <td>{{ announcement.recipientCount }}</td>
+                            </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

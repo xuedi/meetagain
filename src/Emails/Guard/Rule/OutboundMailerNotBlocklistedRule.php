@@ -2,16 +2,16 @@
 
 namespace App\Emails\Guard\Rule;
 
-use App\Emails\EmailGuardCost;
-use App\Emails\EmailGuardResult;
-use App\Emails\EmailGuardRuleInterface;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\GuardCost;
+use Module\Email\Contract\GuardResult;
+use Module\Email\Contract\GuardRuleInterface;
 
-final readonly class OutboundMailerNotBlocklistedRule implements EmailGuardRuleInterface
+final readonly class OutboundMailerNotBlocklistedRule implements GuardRuleInterface
 {
     public function __construct(
-        private BlocklistCheckerInterface $blocklist,
+        private BlocklistInterface $blocklist,
         private ConfigService $config,
     ) {}
 
@@ -20,17 +20,17 @@ final readonly class OutboundMailerNotBlocklistedRule implements EmailGuardRuleI
         return 'outbound_mailer_not_blocklisted';
     }
 
-    public function getCost(): EmailGuardCost
+    public function getCost(): GuardCost
     {
-        return EmailGuardCost::Database;
+        return GuardCost::Database;
     }
 
-    public function evaluate(array $context): EmailGuardResult
+    public function evaluate(array $context): GuardResult
     {
         if ($this->blocklist->isBlocked($this->config->getMailerAddress()->getAddress())) {
-            return EmailGuardResult::skip($this->getName(), 'Outbound mailer address is on the global email blocklist.');
+            return GuardResult::skip($this->getName(), 'Outbound mailer address is on the global email blocklist.');
         }
 
-        return EmailGuardResult::pass($this->getName());
+        return GuardResult::pass($this->getName());
     }
 }

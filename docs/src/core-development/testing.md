@@ -139,10 +139,19 @@ public function testRemoveOrphanedImagesCallsFlush(): void
 
 ---
 
+## Module tests
+
+Each module under `modules/` proves its own behaviour in `modules/<name>/tests/Functional/`, driving it
+through its contract with stand-in consumers from `modules/<name>/tests/Stub/`. The suite runs on a
+database holding only the schema and the install seed, under a kernel that loads core and the modules but
+no plugin, so it behaves the same on every machine and in CI. `just testModules` builds that database the
+first time and again only when an entity, a mapping or the seed changes. See `modules/README.md`,
+"A module tests itself".
+
 ## Functional and smoke tests
 
-This repository ships unit tests only. The functional and smoke suites need a populated database and
-run in the maintainers' own pipeline outside this repository.
+The functional and smoke suites for core and the plugins need a populated database and run in the
+maintainers' own pipeline outside this repository.
 
 What CI checks here beyond the unit suite: the static analysis, and every demo archive imported with
 `--strict` into a fresh database built by the real migrations, exported again and compared row count
@@ -157,6 +166,8 @@ build an instance with `just devModeImport <archive>` (see [Demo Data](demo-data
 just testUnit                              # All unit tests
 just testUnit tests/Unit/Service/          # Specific directory
 just testUnit tests/Unit/Service/CleanupServiceTest.php  # Single file
+just testModules                           # The module suites
+just testModulesRebuild                    # The same, rebuilding their database first
 just test                                  # Unit tests + quality checks
 just testCoverage                          # HTML coverage report
 just testPrintResults                      # Machine-readable summary

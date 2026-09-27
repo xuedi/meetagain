@@ -1,0 +1,188 @@
+<?php declare(strict_types=1);
+
+namespace Module\Circulation\Internal\Repository;
+
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+use Module\Circulation\Contract\LedgerEntryType;
+use Module\Circulation\Internal\Entity\LedgerEntry;
+
+/**
+ * @extends ServiceEntityRepository<LedgerEntry>
+ */
+class LedgerEntryRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, LedgerEntry::class);
+    }
+
+    /**
+     * @return list<LedgerEntry> in append order
+     */
+    public function findChronological(?string $context = null): array
+    {
+        $qb = $this->createQueryBuilder('l')->orderBy('l.id', 'ASC');
+        if ($context !== null) {
+            $qb->where('l.context = :context')->setParameter('context', $context);
+        }
+
+        return array_values($qb->getQuery()->getResult());
+    }
+
+    /**
+     * @return array<string, string> context => item type
+     */
+    public function findContextItemTypes(): array
+    {
+        $rows = $this->createQueryBuilder('l')->select('DISTINCT l.context, l.itemType')->orderBy('l.context', 'ASC')->getQuery()->getArrayResult();
+
+        $itemTypes = [];
+        foreach ($rows as $row) {
+            $itemTypes[(string) $row['context']] = (string) $row['itemType'];
+        }
+
+        return $itemTypes;
+    }
+
+    /**
+     * @param list<int>|null $allowedItemIds
+     * @return list<LedgerEntry> newest first
+     */
+    public function findTimeline(string $context, string $itemType, int $limit, int $offset, ?array $allowedItemIds = null): array
+    {
+        $qb = $this
+            ->createQueryBuilder('l')
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('l.itemType = :itemType')
+            ->setParameter('itemType', $itemType)
+            ->orderBy('l.id', 'DESC')
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+
+        if ($allowedItemIds !== null) {
+            if ($allowedItemIds === []) {
+                return [];
+            }
+            $qb->andWhere('l.itemId IN (:allowed)')->setParameter('allowed', $allowedItemIds);
+        }
+
+        return array_values($qb->getQuery()->getResult());
+    }
+
+    public function countTimeline(string $context, string $itemType, ?array $allowedItemIds = null): int
+    {
+        $qb = $this
+            ->createQueryBuilder('l')
+            ->select('COUNT(l.id)')
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('l.itemType = :itemType')
+            ->setParameter('itemType', $itemType);
+
+        if ($allowedItemIds !== null) {
+            if ($allowedItemIds === []) {
+                return 0;
+            }
+            $qb->andWhere('l.itemId IN (:allowed)')->setParameter('allowed', $allowedItemIds);
+        }
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @return list<LedgerEntry>
+     */
+    public function findOfType(string $context, LedgerEntryType $entryType): array
+    {
+        return array_values(
+            $this
+                ->createQueryBuilder('l')
+                ->where('l.context = :context')
+                ->setParameter('context', $context)
+                ->andWhere('l.entryType = :entryType')
+                ->setParameter('entryType', $entryType)
+                ->orderBy('l.id', 'ASC')
+                ->getQuery()
+                ->getResult(),
+        );
+    }
+
+    public function getMaxId(string $context): ?int
+    {
+        $max = $this
+            ->createQueryBuilder('l')
+            ->select('MAX(l.id)')
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $max === null ? null : (int) $max;
+    }
+
+    public function countCompletedHandovers(string $context): int
+    {
+        return (int) $this
+            ->createQueryBuilder('l')
+            ->select('COUNT(l.id)')
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('l.entryType = :entryType')
+            ->setParameter('entryType', LedgerEntryType::HandoverCompleted)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * @return array<int, int> completed-handover count keyed by copy id
+     */
+    public function countHandoversPerCopy(string $context): array
+    {
+        $rows = $this
+            ->createQueryBuilder('l')
+            ->select('l.copyId AS copyId, COUNT(l.id) AS total')
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('l.entryType = :entryType')
+            ->setParameter('entryType', LedgerEntryType::HandoverCompleted)
+            ->andWhere('l.copyId IS NOT NULL')
+            ->groupBy('l.copyId')
+            ->getQuery()
+            ->getScalarResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['copyId']] = (int) $row['total'];
+        }
+
+        return $counts;
+    }
+
+    /**
+     * @return array<int, int> donation count keyed by donor user id
+     */
+    public function countDonationsPerUser(string $context): array
+    {
+        $rows = $this
+            ->createQueryBuilder('l')
+            ->select('l.actorUserId AS userId, COUNT(l.id) AS total')
+            ->where('l.context = :context')
+            ->setParameter('context', $context)
+            ->andWhere('l.entryType = :entryType')
+            ->setParameter('entryType', LedgerEntryType::Donated)
+            ->andWhere('l.actorUserId IS NOT NULL')
+            ->groupBy('l.actorUserId')
+            ->orderBy('total', 'DESC')
+            ->getQuery()
+            ->getScalarResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['userId']] = (int) $row['total'];
+        }
+
+        return $counts;
+    }
+}

@@ -4,6 +4,7 @@ admin_shell:
     section_system: 'Sistema'
     sidebar_info: 'Información'
     menu_cms: 'Páginas'
+    menu_announcements: 'Anuncios'
     menu_event: 'Eventos'
     menu_host: 'Anfitriones'
     menu_location: 'Lugar'
@@ -207,13 +208,6 @@ admin_cms:
     flash_block_validation_error: 'No se pudo guardar el bloque.'
     block_delete_title: 'Eliminar este bloque'
     block_delete_warning: 'Este bloque y cualquier imagen adjunta se eliminarán permanentemente. Esto no se puede deshacer.'
-admin_email:
-    tab_templates: 'Plantillas'
-    tab_sendlog: 'Registro de envíos'
-    tab_announcements: 'Anuncios'
-    tab_debugging: 'Depuración'
-    tab_blocklist: 'Lista de bloqueo'
-    tab_planned: 'Planificados'
 admin_event:
     summary_total: 'eventos'
     summary_total_all: 'en total'

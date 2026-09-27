@@ -8,7 +8,6 @@ use App\Entity\BlockType\Gallery as GalleryType;
 use App\Entity\BlockType\Text as TextType;
 use App\Entity\BlockType\TextMap as TextMapType;
 use App\Entity\Cms;
-use App\Entity\EmailTemplate;
 use App\Entity\User;
 use App\Enum\AnnouncementStatus;
 use App\Enum\CmsBlock\CmsBlockType;
@@ -16,10 +15,10 @@ use App\Enum\EmailType;
 use App\Filter\Email\AudienceFilterService;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
-use App\Service\Email\EmailTemplateService;
 use App\Service\Http\RequestHostResolver;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Email\Contract\TemplatesInterface;
 use RuntimeException;
 
 readonly class AnnouncementService
@@ -28,7 +27,7 @@ readonly class AnnouncementService
         private EntityManagerInterface $em,
         private UserRepository $userRepo,
         private ConfigService $configService,
-        private EmailTemplateService $templateService,
+        private TemplatesInterface $templates,
         private AnnouncementEmail $announcementEmail,
         private RequestHostResolver $hostResolver,
         private AudienceFilterService $audience,
@@ -57,7 +56,7 @@ readonly class AnnouncementService
                 'user' => $subscriber,
                 'renderedContent' => $renderedContent,
                 'announcementUrl' => $announcementUrl,
-            ]);
+            ], flush: false);
             ++$recipientCount;
         }
 
@@ -90,17 +89,7 @@ readonly class AnnouncementService
 
     public function renderPreview(Announcement $announcement, string $locale = 'en'): array
     {
-        $dbTemplate = $this->templateService->getTemplate(EmailType::Announcement->value);
-        if (!$dbTemplate instanceof EmailTemplate) {
-            throw new RuntimeException('Announcement email template not found in database. Run app:email-templates:seed command.');
-        }
-
-        $context = $this->getPreviewContext($announcement, $locale);
-
-        return [
-            'subject' => $this->templateService->renderSubject($dbTemplate->getSubject($locale), $context),
-            'body' => $this->templateService->renderContent($dbTemplate->getBody($locale), $context),
-        ];
+        return $this->templates->render(EmailType::Announcement->value, $locale, $this->getPreviewContext($announcement, $locale));
     }
 
     /**

@@ -46,9 +46,30 @@ final readonly class CommentService
         $this->em->persist($comment);
         $this->em->flush();
 
-        $this->registry->providerFor($targetType)?->onCommentCreated($comment);
+        $this->registry->providerFor($targetType)?->onCommentCreated($targetId, (int) $user->getId());
 
         return $comment;
+    }
+
+    public function isUnreadBy(string $targetType, int $targetId, int $userId): bool
+    {
+        $thread = $this->repository->findForTarget($targetType, $targetId);
+        if ($thread === []) {
+            return false;
+        }
+
+        $latest = $thread[0];
+        if ($latest->getUser()?->getId() === $userId) {
+            return false;
+        }
+
+        foreach ($thread as $comment) {
+            if ($comment->getUser()?->getId() === $userId) {
+                return $comment->getCreatedAt() < $latest->getCreatedAt();
+            }
+        }
+
+        return true;
     }
 
     public function canDelete(Comment $comment, User $user): bool

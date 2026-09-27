@@ -1,0 +1,13 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    Module\Circulation\Tests\Stub\:
+        resource: '../Stub/'
+        exclude: '../Stub/Users.php'
+
+    circulation.test.item_action_dispatcher:
+        alias: App\Item\ActionDispatcher
+        public: true

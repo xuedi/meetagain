@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Enum\UserRole;
 use App\Repository\CommentRepository;
 use App\Service\Security\ContentSanitizer;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -67,7 +68,7 @@ class CommentServiceTest extends TestCase
         // Arrange
         $provider = $this->createMock(TargetProviderInterface::class);
         $provider->method('getTypeKey')->willReturn('event');
-        $provider->expects(self::once())->method('onCommentCreated');
+        $provider->expects(self::once())->method('onCommentCreated')->with(42, 1);
         $service = $this->makeService($this->createStub(EntityManagerInterface::class), $provider);
 
         // Act
@@ -84,6 +85,39 @@ class CommentServiceTest extends TestCase
 
         // Act
         $service->create('photo', 42, $this->makeUser(1), 'Hello');
+    }
+
+    public static function unreadProvider(): iterable
+    {
+        yield 'empty thread' => [[], false];
+        yield 'last word is the viewer\'s' => [[[1, '-1 hour'], [2, '-2 hours']], false];
+        yield 'viewer never wrote' => [[[2, '-1 hour']], true];
+        yield 'viewer wrote before the latest' => [[[2, '-1 hour'], [1, '-2 hours']], true];
+    }
+
+    /**
+     * @param list<array{int, string}> $thread
+     */
+    #[DataProvider('unreadProvider')]
+    public function testIsUnreadBy(array $thread, bool $expected): void
+    {
+        // Arrange
+        $comments = array_map(function (array $row): Comment {
+            $comment = new Comment();
+            $comment->setUser($this->makeUser($row[0]));
+            $comment->setCreatedAt(new DateTimeImmutable($row[1]));
+
+            return $comment;
+        }, $thread);
+        $repository = $this->createStub(CommentRepository::class);
+        $repository->method('findForTarget')->willReturn($comments);
+        $service = $this->makeService($this->createStub(EntityManagerInterface::class), repository: $repository);
+
+        // Act
+        $result = $service->isUnreadBy('circulation_handover', 7, 1);
+
+        // Assert
+        self::assertSame($expected, $result);
     }
 
     public static function deletePermissionProvider(): iterable

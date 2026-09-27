@@ -28,6 +28,7 @@ walkdir = "2"
 libc = "0.2"
 blake3 = "1"
 ignore = "0.4"
+globset = "0.4"
 rayon = "1"
 
 [profile.release]

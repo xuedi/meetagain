@@ -3,27 +3,27 @@
 namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
-use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
 use App\Emails\MockSampleFactory;
 use App\Entity\ItemReport;
 use App\Enum\EmailType;
 use App\Enum\ItemReportStatus;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class ItemReportDecisionEmail extends EmailAbstract
 {
     public function __construct(
-        BlocklistCheckerInterface $blocklist,
+        BlocklistInterface $blocklist,
         MockSampleFactory $samples,
-        private EmailQueueInterface $queue,
+        MailerInterface $mailer,
         private ConfigService $config,
         private TranslatorInterface $translator,
     ) {
-        parent::__construct($blocklist, $samples);
+        parent::__construct($blocklist, $samples, $mailer);
     }
 
     public function getIdentifier(): string
@@ -61,15 +61,11 @@ readonly class ItemReportDecisionEmail extends EmailAbstract
         ];
     }
 
-    public function send(array $context): void
+    public function compose(array $context): array
     {
         /** @var ItemReport $report */
         $report = $context['report'];
         $locale = $report->getLocale();
-
-        if ($this->blocklist->isBlocked($report->getNotifierEmail())) {
-            return;
-        }
 
         $decisionKey = $report->getStatus() === ItemReportStatus::Removed ? 'item_report.decision_removed' : 'item_report.decision_kept';
 
@@ -85,6 +81,6 @@ readonly class ItemReportDecisionEmail extends EmailAbstract
             'lang' => $locale,
         ]);
 
-        $this->queue->enqueue($this, $email, $context);
+        return [$email];
     }
 }

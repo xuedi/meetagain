@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Module\Email\:
+        resource: '../src/'
+        exclude:
+            - '../src/Internal/Entity/'
+
+    Module\Email\Contract\MailerInterface: '@Module\Email\Internal\Mailer'
+    Module\Email\Contract\TemplatesInterface: '@Module\Email\Internal\EmailTemplateService'
+    Module\Email\Contract\BlocklistInterface: '@Module\Email\Internal\Blocklist'
+    Module\Email\Contract\SendlogInterface: '@Module\Email\Internal\Sendlog'
+    Module\Email\Contract\PreviewSweepInterface: '@Module\Email\Internal\PreviewSweepService'

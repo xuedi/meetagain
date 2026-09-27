@@ -218,3 +218,10 @@ ignore = [
     "non-documented-method",
     "non-documented-property",
 ]
+
+# Every run that extends this file - core and each plugin - enforces the module perimeter inbound:
+# nothing outside a module may reach past its Contract namespace. Core's own config adds the
+# per-module entries and the outbound rules on top.
+[[guard.perimeter.restrictions]]
+dependency = "Module\\*\\Internal\\**"
+allow-from = ["Module\\*\\**"]

@@ -2,18 +2,17 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\SupportNotificationEmail;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\SupportAudience;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Support\RecipientResolver;
 use DateTimeImmutable;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Tests\Unit\Emails\SampleFactoryTrait;
@@ -22,7 +21,7 @@ class SupportNotificationEmailTest extends TestCase
 {
     use SampleFactoryTrait;
 
-    public function testSendEnqueuesOneEmailPerResolvedRecipient(): void
+    public function testOneMessageIsComposedPerResolvedRecipient(): void
     {
         // Arrange
         $config = $this->createStub(ConfigService::class);
@@ -37,29 +36,15 @@ class SupportNotificationEmailTest extends TestCase
         $resolver = $this->createStub(RecipientResolver::class);
         $resolver->method('resolve')->willReturn([$admin1, $admin2]);
 
-        $enqueuedEmails = [];
-        $queue = $this->createMock(EmailQueueInterface::class);
-        $queue
-            ->expects($this->exactly(2))
-            ->method('enqueue')
-            ->with(
-                $this->anything(),
-                $this->callback(static function (TemplatedEmail $email) use (&$enqueuedEmails): bool {
-                    $enqueuedEmails[] = $email;
-                    return true;
-                }),
-                $this->anything(),
-            );
-
         $request = $this->makeRequest();
 
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturn('The organizers');
 
         $emailType = new SupportNotificationEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $queue,
+            $this->createStub(MailerInterface::class),
             $config,
             $resolver,
             $this->createStub(LoggerInterface::class),
@@ -67,16 +52,16 @@ class SupportNotificationEmailTest extends TestCase
         );
 
         // Act
-        $emailType->send(['request' => $request]);
+        $messages = $emailType->compose(['request' => $request]);
 
         // Assert
-        static::assertCount(2, $enqueuedEmails);
-        static::assertSame('admin1@example.com', $enqueuedEmails[0]->getTo()[0]->getAddress());
-        static::assertSame('admin2@example.com', $enqueuedEmails[1]->getTo()[0]->getAddress());
-        static::assertSame('The organizers', $enqueuedEmails[0]->getContext()['audience']);
+        static::assertCount(2, $messages);
+        static::assertSame('admin1@example.com', $messages[0]->getTo()[0]->getAddress());
+        static::assertSame('admin2@example.com', $messages[1]->getTo()[0]->getAddress());
+        static::assertSame('The organizers', $messages[0]->getContext()['audience']);
     }
 
-    public function testSendLogsWarningAndEnqueuesNothingWhenNobodyIsResolved(): void
+    public function testNobodyResolvedLogsAWarningAndComposesNothing(): void
     {
         // Arrange
         $config = $this->createStub(ConfigService::class);
@@ -85,18 +70,15 @@ class SupportNotificationEmailTest extends TestCase
         $resolver = $this->createStub(RecipientResolver::class);
         $resolver->method('resolve')->willReturn([]);
 
-        $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->never())->method('enqueue');
-
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('warning')->with('Support ticket received but no recipients could be resolved', $this->anything());
 
         $request = $this->makeRequest();
 
         $emailType = new SupportNotificationEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $queue,
+            $this->createStub(MailerInterface::class),
             $config,
             $resolver,
             $logger,
@@ -104,10 +86,13 @@ class SupportNotificationEmailTest extends TestCase
         );
 
         // Act
-        $emailType->send(['request' => $request]);
+        $messages = $emailType->compose(['request' => $request]);
+
+        // Assert
+        static::assertSame([], $messages);
     }
 
-    public function testSendLabelsGuestRequesterWithTranslatedGuestName(): void
+    public function testAGuestRequesterIsLabelledWithTheTranslatedGuestName(): void
     {
         // Arrange
         $config = $this->createStub(ConfigService::class);
@@ -119,15 +104,6 @@ class SupportNotificationEmailTest extends TestCase
 
         $resolver = $this->createStub(RecipientResolver::class);
         $resolver->method('resolve')->willReturn([$admin]);
-
-        $enqueued = null;
-        $queue = $this->createStub(EmailQueueInterface::class);
-        $queue
-            ->method('enqueue')
-            ->willReturnCallback(static function ($type, TemplatedEmail $email) use (&$enqueued): bool {
-                $enqueued = $email;
-                return true;
-            });
 
         $request = $this->createStub(SupportRequest::class);
         $request->method('getAudience')->willReturn(SupportAudience::Organizer);
@@ -145,9 +121,9 @@ class SupportNotificationEmailTest extends TestCase
             ]);
 
         $emailType = new SupportNotificationEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $queue,
+            $this->createStub(MailerInterface::class),
             $config,
             $resolver,
             $this->createStub(LoggerInterface::class),
@@ -155,12 +131,12 @@ class SupportNotificationEmailTest extends TestCase
         );
 
         // Act
-        $emailType->send(['request' => $request]);
+        $messages = $emailType->compose(['request' => $request]);
 
         // Assert
-        static::assertInstanceOf(TemplatedEmail::class, $enqueued);
-        static::assertSame('Gast', $enqueued->getContext()['name']);
-        static::assertNull($enqueued->getContext()['email']);
+        static::assertCount(1, $messages);
+        static::assertSame('Gast', $messages[0]->getContext()['name']);
+        static::assertNull($messages[0]->getContext()['email']);
     }
 
     private function makeRequest(): SupportRequest

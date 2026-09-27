@@ -3,7 +3,6 @@
 namespace Tests\Unit\Emails\Types;
 
 use App\Emails\EmailAbstract;
-use App\Emails\EmailQueueInterface;
 use App\Emails\MockSampleFactory;
 use App\Emails\Types\EventReminderEmail;
 use App\Emails\Types\EventUpdateNotificationEmail;
@@ -18,8 +17,9 @@ use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
@@ -98,38 +98,38 @@ class GetOriginTest extends TestCase
 
     private function build(string $class): EmailAbstract
     {
-        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklist = $this->createStub(BlocklistInterface::class);
         $samples = $this->mockSampleFactory();
-        $queue = $this->createStub(EmailQueueInterface::class);
+        $mailer = $this->createStub(MailerInterface::class);
         $config = $this->createStub(ConfigService::class);
 
         return match ($class) {
             EventReminderEmail::class => new EventReminderEmail(
                 $blocklist,
                 $samples,
-                $queue,
+                $mailer,
                 $config,
                 $this->createStub(EventRepository::class),
                 $this->createStub(EntityManagerInterface::class),
             ),
-            default => $this->buildViaReflection($class, $blocklist, $samples, $queue, $config),
+            default => $this->buildViaReflection($class, $blocklist, $samples, $mailer, $config),
         };
     }
 
     private function buildViaReflection(
         string $class,
-        BlocklistCheckerInterface $blocklist,
+        BlocklistInterface $blocklist,
         MockSampleFactory $samples,
-        EmailQueueInterface $queue,
+        MailerInterface $mailer,
         ConfigService $config,
     ): EmailAbstract {
         $arguments = [];
         foreach (new ReflectionClass($class)->getConstructor()?->getParameters() ?? [] as $parameter) {
             $type = (string) $parameter->getType();
             $arguments[] = match ($type) {
-                BlocklistCheckerInterface::class => $blocklist,
+                BlocklistInterface::class => $blocklist,
                 MockSampleFactory::class => $samples,
-                EmailQueueInterface::class => $queue,
+                MailerInterface::class => $mailer,
                 ConfigService::class => $config,
                 'iterable', 'array' => [],
                 default => $this->createStub($type),

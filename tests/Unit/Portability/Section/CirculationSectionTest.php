@@ -2,27 +2,27 @@
 
 namespace Tests\Unit\Portability\Section;
 
-use App\Circulation\ContextResolver;
-use App\Circulation\DefaultContextProvider;
-use App\Entity\CirculationCopy;
-use App\Entity\CirculationHandover;
-use App\Entity\CirculationLedgerEntry;
-use App\Entity\CirculationRequest;
 use App\Entity\User;
-use App\Enum\CirculationCopyStatus;
-use App\Enum\CirculationLedgerEntryType;
-use App\Enum\CirculationRequestStatus;
 use App\Portability\DataCategory;
 use App\Portability\Outcome;
 use App\Portability\Scope;
 use App\Portability\Section\CirculationSection;
 use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use ReflectionProperty;
+use Module\Circulation\Contract\CirculationInterface;
+use Module\Circulation\Contract\CopyStatus;
+use Module\Circulation\Contract\HandoverStatus;
+use Module\Circulation\Contract\LedgerEntryType;
+use Module\Circulation\Contract\PortableCopy;
+use Module\Circulation\Contract\PortableHandover;
+use Module\Circulation\Contract\PortableLedgerEntry;
+use Module\Circulation\Contract\PortableRequest;
+use Module\Circulation\Contract\PortableShelf;
+use Module\Circulation\Contract\RequestStatus;
 
 final class CirculationSectionTest extends SectionTestCase
 {
+    private ?PortableShelf $restored = null;
+
     public function testAMemberWhoKeepsTheirLendingPrivateLeavesNoRowsAndTheirCopyGoesToTheSteward(): void
     {
         // Arrange
@@ -45,36 +45,33 @@ final class CirculationSectionTest extends SectionTestCase
     {
         // Arrange
         $exported = $this->section($this->library())->export($this->scope(), $this->images());
-        $member = $this->user(201, 'member@example.org');
-        $steward = $this->user(209, 'steward@example.org');
         $context = $this->context();
-        $context->mapRef(User::class, 'member@example.org', $member);
-        $context->mapRef(User::class, 'steward@example.org', $steward);
+        $context->mapRef(User::class, 'member@example.org', $this->user(201, 'member@example.org'));
+        $context->mapRef(User::class, 'steward@example.org', $this->user(209, 'steward@example.org'));
         $context->mapItems('book', [5 => 50]);
 
         // Act
         $this->section()->import($exported, $context);
 
         // Assert
-        $copy = $context->resolveRef(CirculationCopy::class, 11);
-        $request = $context->resolveRef(CirculationRequest::class, 22);
-        $handover = $context->resolveRef(CirculationHandover::class, 32);
-        static::assertSame('book', $copy?->getContext());
-        static::assertSame(50, $copy?->getItemId());
-        static::assertSame($member, $copy?->getDonatedBy());
-        static::assertSame($steward, $copy?->getHolder());
-        static::assertSame(CirculationCopyStatus::Held, $copy?->getStatus());
-        static::assertSame($copy, $request?->getOfferedCopy());
-        static::assertSame(CirculationRequestStatus::Offered, $request?->getStatus());
-        static::assertSame($copy, $handover?->getCopy());
-        static::assertSame($request, $handover?->getRequest());
+        $shelf = $this->restored;
+        static::assertNotNull($shelf);
+        static::assertCount(1, $shelf->copies);
+        $copy = $shelf->copies[0];
+        static::assertSame(['book', 50, 201, 209, CopyStatus::Held], [
+            $copy->context,
+            $copy->itemId,
+            $copy->donatedByUserId,
+            $copy->holderUserId,
+            $copy->status,
+        ]);
+        static::assertSame([11, RequestStatus::Offered, 201], [$shelf->requests[0]->offeredCopyRef, $shelf->requests[0]->status, $shelf->requests[0]->userId]);
+        static::assertSame([11, 22, 209], [$shelf->handovers[0]->copyRef, $shelf->handovers[0]->requestRef, $shelf->handovers[0]->toUserId]);
 
-        $entries = $this->ledgerEntries();
-        static::assertCount(2, $entries);
-        static::assertSame($copy?->getId(), $entries[1]->getCopyId());
-        static::assertSame(201, $entries[1]->getFromUserId());
-        static::assertSame(209, $entries[1]->getToUserId());
-        static::assertSame(['handoverId' => $handover?->getId()], $entries[1]->getPayload());
+        static::assertCount(2, $shelf->ledger);
+        $opened = $shelf->ledger[1];
+        static::assertSame([11, 201, 209, 32, []], [$opened->copyRef, $opened->fromUserId, $opened->toUserId, $opened->handoverRef, $opened->payload]);
+        static::assertSame(132, $context->resolveId(CirculationInterface::COMMENT_TARGET, 32));
 
         $summary = $context->toSummary();
         static::assertSame(1, $summary->get(CirculationSection::KIND_COPIES, Outcome::Created));
@@ -96,7 +93,7 @@ final class CirculationSectionTest extends SectionTestCase
         $this->section()->import($rows, $context);
 
         // Assert
-        static::assertSame([], $this->persisted);
+        static::assertEquals(new PortableShelf(), $this->restored);
         static::assertSame(1, $context->toSummary()->get(CirculationSection::KIND_COPIES, Outcome::Skipped));
         static::assertSame(1, $context->toSummary()->get(CirculationSection::KIND_LEDGER, Outcome::Skipped));
     }
@@ -111,7 +108,7 @@ final class CirculationSectionTest extends SectionTestCase
         $this->section()->import(['handovers' => [['ref' => 1, 'copy_ref' => 99, 'to_email' => 'member@example.org']]], $context);
 
         // Assert
-        static::assertSame([], $this->persisted);
+        static::assertSame([], $this->restored?->handovers);
         static::assertSame(1, $context->toSummary()->get(CirculationSection::KIND_HANDOVERS, Outcome::Dropped));
     }
 
@@ -131,99 +128,65 @@ final class CirculationSectionTest extends SectionTestCase
             itemIds: ['book' => [5]],
             grants: [1 => [DataCategory::Collections], 2 => [DataCategory::Interactions], 9 => [DataCategory::Collections]],
             stewardEmail: 'steward@example.org',
-            circulationContexts: ['book'],
+            circulationContexts: ['book' => 'book'],
         );
     }
 
-    /**
-     * @return array<class-string, list<object>>
-     */
-    private function library(): array
+    private function library(): PortableShelf
     {
-        $member = $this->user(1, 'member@example.org');
-        $quiet = $this->user(2, 'quiet@example.org');
-        $steward = $this->user(9, 'steward@example.org');
-
-        $copy = $this->withId(new CirculationCopy('book', 'book', 5, new DateTimeImmutable('2030-01-01 10:00')), 11);
-        $copy->setLabel('Blue cover');
-        $copy->setDonatedBy($member);
-        $copy->setHolder($quiet);
-        $copy->setHeldSince(new DateTimeImmutable('2030-01-08 18:00'));
-        $copy->setStatus(CirculationCopyStatus::Held);
-        $otherBook = $this->withId(new CirculationCopy('book', 'book', 6, new DateTimeImmutable('2030-01-01 10:00')), 12);
-
-        $quietRequest = $this->withId(new CirculationRequest('book', 'book', 5, $quiet, new DateTimeImmutable('2030-01-02 10:00')), 21);
-        $memberRequest = $this->withId(new CirculationRequest('book', 'book', 5, $member, new DateTimeImmutable('2030-01-03 10:00')), 22);
-        $memberRequest->setStatus(CirculationRequestStatus::Offered);
-        $memberRequest->setOfferedCopy($copy);
-        $memberRequest->setOfferedAt(new DateTimeImmutable('2030-01-09 09:00'));
-
-        $toQuiet = $this->withId(new CirculationHandover($copy, $member, $quiet, new DateTimeImmutable('2030-01-08 10:00')), 31);
-        $toSteward = $this->withId(new CirculationHandover($copy, $member, $steward, new DateTimeImmutable('2030-01-09 18:00')), 32);
-        $toSteward->setRequest($memberRequest);
-
-        return [
-            CirculationCopy::class => [$copy, $otherBook],
-            CirculationRequest::class => [$quietRequest, $memberRequest],
-            CirculationHandover::class => [$toQuiet, $toSteward],
-            CirculationLedgerEntry::class => [
-                $this->entry(41, CirculationLedgerEntryType::Donated, null, 1, 1, ['label' => 'Blue cover']),
-                $this->entry(42, CirculationLedgerEntryType::HandoverOpened, 1, 2, 1, ['handoverId' => 31]),
-                $this->entry(43, CirculationLedgerEntryType::HandoverOpened, 1, 9, 9, ['handoverId' => 32]),
-            ],
-            User::class => [$member, $quiet, $steward],
-        ];
-    }
-
-    /**
-     * @param array<string, mixed> $payload
-     */
-    private function entry(
-        int $id,
-        CirculationLedgerEntryType $type,
-        ?int $fromUserId,
-        ?int $toUserId,
-        ?int $actorUserId,
-        array $payload,
-    ): CirculationLedgerEntry {
+        $donated = new DateTimeImmutable('2030-01-01 10:00');
         $occurredAt = new DateTimeImmutable('2030-01-08 10:00');
 
-        return $this->withId(new CirculationLedgerEntry($type, 'book', 'book', 5, $occurredAt, 11, $fromUserId, $toUserId, $actorUserId, $payload), $id);
+        return new PortableShelf(
+            copies: [
+                new PortableCopy(11, 'book', 'book', 5, $donated, CopyStatus::Held, 'Blue cover', 1, 2, new DateTimeImmutable('2030-01-08 18:00')),
+                new PortableCopy(12, 'book', 'book', 6, $donated, CopyStatus::Available),
+            ],
+            requests: [
+                new PortableRequest(21, 'book', 'book', 5, 2, new DateTimeImmutable('2030-01-02 10:00'), RequestStatus::Waiting),
+                new PortableRequest(
+                    22,
+                    'book',
+                    'book',
+                    5,
+                    1,
+                    new DateTimeImmutable('2030-01-03 10:00'),
+                    RequestStatus::Offered,
+                    11,
+                    new DateTimeImmutable('2030-01-09 09:00'),
+                ),
+            ],
+            handovers: [
+                new PortableHandover(31, 11, 2, new DateTimeImmutable('2030-01-08 10:00'), HandoverStatus::Open, 1),
+                new PortableHandover(32, 11, 9, new DateTimeImmutable('2030-01-09 18:00'), HandoverStatus::Open, 1, 22),
+            ],
+            ledger: [
+                new PortableLedgerEntry(LedgerEntryType::Donated, 'book', 'book', 5, $occurredAt, 11, null, 1, 1, payload: ['label' => 'Blue cover']),
+                new PortableLedgerEntry(LedgerEntryType::HandoverOpened, 'book', 'book', 5, $occurredAt, 11, 1, 2, 1, 31),
+                new PortableLedgerEntry(LedgerEntryType::HandoverOpened, 'book', 'book', 5, $occurredAt, 11, 1, 9, 9, 32),
+            ],
+        );
     }
 
-    /**
-     * @param array<class-string, list<object>> $found
-     */
-    private function section(array $found = []): CirculationSection
+    private function section(PortableShelf $shelf = new PortableShelf()): CirculationSection
     {
-        $em = $this->createStub(EntityManagerInterface::class);
-        $em->method('getRepository')->willReturnCallback(function (string $class) use ($found): EntityRepository {
-            $repository = $this->createStub(EntityRepository::class);
-            $repository->method('findBy')->willReturn($found[$class] ?? []);
+        $circulation = $this->createStub(CirculationInterface::class);
+        $circulation->method('contextFor')->willReturnArgument(0);
+        $circulation->method('export')->willReturn($shelf);
+        $circulation
+            ->method('restore')
+            ->willReturnCallback(function (PortableShelf $restored): array {
+                $this->restored = $restored;
 
-            return $repository;
-        });
-        $em->method('persist')->willReturnCallback(function (object $entity): void {
-            $this->persisted[] = $entity;
-        });
-        $em->method('flush')->willReturnCallback(function (): void {
-            foreach ($this->persisted as $index => $entity) {
-                $id = new ReflectionProperty($entity::class, 'id');
-                if ($id->getValue($entity) === null) {
-                    $id->setValue($entity, 100 + $index);
-                }
-            }
-        });
+                return array_combine(
+                    array_map(static fn(PortableHandover $handover): int => $handover->ref, $restored->handovers),
+                    array_map(static fn(PortableHandover $handover): int => $handover->ref + 100, $restored->handovers),
+                );
+            });
 
-        return new CirculationSection($em, new ContextResolver([new DefaultContextProvider()]));
-    }
+        $users = [$this->user(1, 'member@example.org'), $this->user(2, 'quiet@example.org'), $this->user(9, 'steward@example.org')];
 
-    /**
-     * @return list<CirculationLedgerEntry>
-     */
-    private function ledgerEntries(): array
-    {
-        return array_values(array_filter($this->persisted, static fn(object $entity): bool => $entity instanceof CirculationLedgerEntry));
+        return new CirculationSection($this->entityManager($users), $circulation);
     }
 
     private function user(int $id, string $email): User

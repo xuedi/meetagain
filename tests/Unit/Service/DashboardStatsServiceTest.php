@@ -3,12 +3,12 @@
 namespace Tests\Unit\Service;
 
 use App\Repository\ActivityRepository;
-use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\UserRepository;
 use App\Service\Admin\DashboardStatsService;
 use DateTimeImmutable;
+use Module\Email\Contract\SendlogInterface;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +16,7 @@ class DashboardStatsServiceTest extends TestCase
 {
     private Stub&EventRepository $eventRepoStub;
     private Stub&UserRepository $userRepoStub;
-    private Stub&EmailQueueRepository $mailRepoStub;
+    private Stub&SendlogInterface $sendlogStub;
     private Stub&NotFoundLogRepository $notFoundRepoStub;
     private Stub&ActivityRepository $activityRepoStub;
     private DashboardStatsService $subject;
@@ -25,14 +25,14 @@ class DashboardStatsServiceTest extends TestCase
     {
         $this->eventRepoStub = $this->createStub(EventRepository::class);
         $this->userRepoStub = $this->createStub(UserRepository::class);
-        $this->mailRepoStub = $this->createStub(EmailQueueRepository::class);
+        $this->sendlogStub = $this->createStub(SendlogInterface::class);
         $this->notFoundRepoStub = $this->createStub(NotFoundLogRepository::class);
         $this->activityRepoStub = $this->createStub(ActivityRepository::class);
 
         $this->subject = new DashboardStatsService(
             $this->eventRepoStub,
             $this->userRepoStub,
-            $this->mailRepoStub,
+            $this->sendlogStub,
             $this->notFoundRepoStub,
             $this->activityRepoStub,
         );
@@ -56,13 +56,13 @@ class DashboardStatsServiceTest extends TestCase
         $this->userRepoStub->method('count')->willReturn(50);
         $this->activityRepoStub->method('count')->willReturn(200);
         $this->eventRepoStub->method('count')->willReturn(25);
-        $this->mailRepoStub->method('count')->willReturn(75);
+        $this->sendlogStub->method('countAll')->willReturn(75);
 
         static::assertSame(100, $this->notFoundRepoStub->count());
         static::assertSame(50, $this->userRepoStub->count());
         static::assertSame(200, $this->activityRepoStub->count());
         static::assertSame(25, $this->eventRepoStub->count());
-        static::assertSame(75, $this->mailRepoStub->count());
+        static::assertSame(75, $this->sendlogStub->countAll());
     }
 
     public function testGetPagesNotFoundReturnsList(): void

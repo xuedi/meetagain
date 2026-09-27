@@ -1,0 +1,46 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>{{ 'admin_cms.announcement_cms_page' | trans }}</th>
+                <th>{{ 'admin_cms.announcement_status' | trans }}</th>
+                <th>{{ 'admin_cms.announcement_created' | trans }}</th>
+                <th>{{ 'admin_cms.announcement_sent_at' | trans }}</th>
+                <th>{{ 'admin_cms.announcement_recipients' | trans }}</th>
+                <th><a href="{{ path('app_admin_cms_announcements_new') }}"><span class="icon"><i class="fa fa-plus"></i></span></a></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for announcement in announcements %}
+                <tr>
+                    <td>{{ announcement.cmsPage ? announcement.cmsPage.slug : '-' }}</td>
+                    <td>
+                        {% if announcement.draft %}
+                            <span class="tag is-warning">{{ 'admin_cms.draft' | trans }}</span>
+                        {% else %}
+                            <span class="tag is-success">{{ 'admin_cms.sent' | trans }}</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ announcement.createdAt|date('Y-m-d H:i') }}</td>
+                    <td>{{ announcement.sentAt ? announcement.sentAt|date('Y-m-d H:i') : '-' }}</td>
+                    <td>{{ announcement.recipientCount ?? '-' }}</td>
+                    <td><a href="{{ path('app_admin_cms_announcements_view', {'id': announcement.id}) }}"><span class="icon"><i class="fa fa-eye"></i></span></a></td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="has-text-centered">{{ 'admin_cms.no_announcements' | trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

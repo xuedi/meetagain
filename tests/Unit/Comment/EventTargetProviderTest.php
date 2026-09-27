@@ -5,11 +5,11 @@ namespace Tests\Unit\Comment;
 use App\Activity\ActivityService;
 use App\Activity\Messages\CommentedOnEvent;
 use App\Comment\EventTargetProvider;
-use App\Entity\Comment;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\EventRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -65,26 +65,10 @@ class EventTargetProviderTest extends TestCase
         $user = new User();
         $activityService = $this->createMock(ActivityService::class);
         $activityService->expects(self::once())->method('log')->with(CommentedOnEvent::TYPE, $user, ['event_id' => 7]);
-        $provider = $this->makeProvider(event: new Event(), activityService: $activityService);
-
-        $comment = new Comment();
-        $comment->setTargetType(EventTargetProvider::TYPE);
-        $comment->setTargetId(7);
-        $comment->setUser($user);
+        $provider = $this->makeProvider(event: new Event(), activityService: $activityService, author: $user);
 
         // Act
-        $provider->onCommentCreated($comment);
-    }
-
-    public function testAuthorlessCommentIsNotLogged(): void
-    {
-        // Arrange
-        $activityService = $this->createMock(ActivityService::class);
-        $activityService->expects(self::never())->method('log');
-        $provider = $this->makeProvider(event: new Event(), activityService: $activityService);
-
-        // Act
-        $provider->onCommentCreated(new Comment());
+        $provider->onCommentCreated(7, 3);
     }
 
     private function makeProvider(
@@ -92,15 +76,20 @@ class EventTargetProviderTest extends TestCase
         ?AuthorizationCheckerInterface $authorizationChecker = null,
         ?UrlGeneratorInterface $urlGenerator = null,
         ?ActivityService $activityService = null,
+        User $author = new User(),
     ): EventTargetProvider {
         $events = $this->createStub(EventRepository::class);
         $events->method('find')->willReturn($event);
+
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('getReference')->willReturn($author);
 
         return new EventTargetProvider(
             $events,
             $authorizationChecker ?? $this->createStub(AuthorizationCheckerInterface::class),
             $urlGenerator ?? $this->createStub(UrlGeneratorInterface::class),
             $activityService ?? $this->createStub(ActivityService::class),
+            $em,
         );
     }
 }

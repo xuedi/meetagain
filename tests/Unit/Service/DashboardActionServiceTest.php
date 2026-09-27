@@ -5,13 +5,14 @@ namespace Tests\Unit\Service;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\CommandExecutionLogRepository;
-use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\Admin\DashboardActionService;
 use DateTimeImmutable;
+use Module\Email\Contract\QueueStats;
+use Module\Email\Contract\SendlogInterface;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
@@ -19,7 +20,7 @@ class DashboardActionServiceTest extends TestCase
 {
     private Stub&EventRepository $eventRepoStub;
     private Stub&UserRepository $userRepoStub;
-    private Stub&EmailQueueRepository $mailRepoStub;
+    private Stub&SendlogInterface $sendlogStub;
     private Stub&ImageRepository $imageRepoStub;
     private Stub&MessageRepository $messageRepoStub;
     private Stub&CommandExecutionLogRepository $commandLogRepoStub;
@@ -29,7 +30,7 @@ class DashboardActionServiceTest extends TestCase
     {
         $this->eventRepoStub = $this->createStub(EventRepository::class);
         $this->userRepoStub = $this->createStub(UserRepository::class);
-        $this->mailRepoStub = $this->createStub(EmailQueueRepository::class);
+        $this->sendlogStub = $this->createStub(SendlogInterface::class);
         $this->imageRepoStub = $this->createStub(ImageRepository::class);
         $this->messageRepoStub = $this->createStub(MessageRepository::class);
         $this->commandLogRepoStub = $this->createStub(CommandExecutionLogRepository::class);
@@ -37,7 +38,7 @@ class DashboardActionServiceTest extends TestCase
         $this->subject = new DashboardActionService(
             $this->eventRepoStub,
             $this->userRepoStub,
-            $this->mailRepoStub,
+            $this->sendlogStub,
             $this->imageRepoStub,
             $this->messageRepoStub,
             $this->commandLogRepoStub,
@@ -57,8 +58,7 @@ class DashboardActionServiceTest extends TestCase
     public function testGetActionItemsReturnsExpectedCounts(): void
     {
         $this->imageRepoStub->method('getReportedCount')->willReturn(3);
-        $this->mailRepoStub->method('getStaleCount')->willReturn(2);
-        $this->mailRepoStub->method('getPendingCount')->willReturn(10);
+        $this->sendlogStub->method('stats')->willReturn(new QueueStats(pending: 10, stale: 2));
 
         $result = $this->subject->getActionItems();
 
@@ -137,16 +137,6 @@ class DashboardActionServiceTest extends TestCase
         static::assertSame($stats, $result);
     }
 
-    public function testGetEmailQueueBreakdownReturnsBreakdown(): void
-    {
-        $breakdown = ['welcome' => 5, 'password_reset' => 2];
-        $this->mailRepoStub->method('getPendingByTemplate')->willReturn($breakdown);
-
-        $result = $this->subject->getEmailQueueBreakdown();
-
-        static::assertSame($breakdown, $result);
-    }
-
     public function testGetCommandExecutionStatsReturnsStats(): void
     {
         $stats = ['total' => 50, 'successful' => 48, 'failed' => 2];
@@ -165,24 +155,5 @@ class DashboardActionServiceTest extends TestCase
         $result = $this->subject->getLastCommandExecutions();
 
         static::assertSame($logs, $result);
-    }
-
-    public function testGetEmailDeliveryStatsReturnsStats(): void
-    {
-        $stats = ['total' => 100, 'sent' => 98, 'failed' => 2];
-        $this->mailRepoStub->method('getDeliveryStats')->willReturn($stats);
-
-        $result = $this->subject->getEmailDeliveryStats();
-
-        static::assertSame($stats, $result);
-    }
-
-    public function testGetEmailDeliverySuccessRateReturnsRate(): void
-    {
-        $this->mailRepoStub->method('getDeliverySuccessRate')->willReturn(98.5);
-
-        $result = $this->subject->getEmailDeliverySuccessRate();
-
-        static::assertSame(98.5, $result);
     }
 }

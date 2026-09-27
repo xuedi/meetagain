@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\EmailInterface;
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\AdminNotificationEmail;
 use App\Emails\Types\AnnouncementEmail;
 use App\Emails\Types\EventReminderEmail;
@@ -23,11 +21,13 @@ use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
 use App\Service\Support\RecipientResolver;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\EmailInterface;
+use Module\Email\Contract\MailerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -40,16 +40,14 @@ class EmailTypesTest extends TestCase
 
     private const array LOCALES = ['en', 'de', 'zh', 'fr', 'es'];
 
-    private EmailQueueInterface $queue;
     private ConfigService $config;
-    private BlocklistCheckerInterface $blocklist;
+    private BlocklistInterface $blocklist;
     private RequestHostResolver $host;
 
     protected function setUp(): void
     {
-        $this->queue = $this->createStub(EmailQueueInterface::class);
         $this->config = $this->createStub(ConfigService::class);
-        $this->blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $this->blocklist = $this->createStub(BlocklistInterface::class);
         $this->host = $this->createStub(RequestHostResolver::class);
     }
 
@@ -59,13 +57,31 @@ class EmailTypesTest extends TestCase
         $em = $this->createStub(EntityManagerInterface::class);
 
         return [
-            'AdminNotification' => new AdminNotificationEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config),
-            'Announcement' => new AnnouncementEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host),
-            'EventReminder' => new EventReminderEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $eventRepo, $em),
+            'AdminNotification' => new AdminNotificationEmail(
+                $this->blocklist,
+                $this->mockSampleFactory(),
+                $this->createStub(MailerInterface::class),
+                $this->config,
+            ),
+            'Announcement' => new AnnouncementEmail(
+                $this->blocklist,
+                $this->mockSampleFactory(),
+                $this->createStub(MailerInterface::class),
+                $this->config,
+                $this->host,
+            ),
+            'EventReminder' => new EventReminderEmail(
+                $this->blocklist,
+                $this->mockSampleFactory(),
+                $this->createStub(MailerInterface::class),
+                $this->config,
+                $eventRepo,
+                $em,
+            ),
             'EventUpdateNotification' => new EventUpdateNotificationEmail(
                 $this->blocklist,
                 $this->mockSampleFactory(),
-                $this->queue,
+                $this->createStub(MailerInterface::class),
                 $this->config,
                 $this->createStub(TranslatorInterface::class),
                 $this->host,
@@ -73,23 +89,36 @@ class EmailTypesTest extends TestCase
             'NotificationEventCanceled' => new NotificationEventCanceledEmail(
                 $this->blocklist,
                 $this->mockSampleFactory(),
-                $this->queue,
+                $this->createStub(MailerInterface::class),
                 $this->config,
                 $this->host,
             ),
             'NotificationMessage' => new NotificationMessageEmail(
                 $this->blocklist,
                 $this->mockSampleFactory(),
-                $this->queue,
+                $this->createStub(MailerInterface::class),
                 $this->config,
                 $this->createStub(MessageRepository::class),
             ),
-            'PasswordReset' => new PasswordResetEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host),
-            'RsvpAggregated' => new RsvpAggregatedEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $eventRepo, $em),
+            'PasswordReset' => new PasswordResetEmail(
+                $this->blocklist,
+                $this->mockSampleFactory(),
+                $this->createStub(MailerInterface::class),
+                $this->config,
+                $this->host,
+            ),
+            'RsvpAggregated' => new RsvpAggregatedEmail(
+                $this->blocklist,
+                $this->mockSampleFactory(),
+                $this->createStub(MailerInterface::class),
+                $this->config,
+                $eventRepo,
+                $em,
+            ),
             'SupportNotification' => new SupportNotificationEmail(
                 $this->blocklist,
                 $this->mockSampleFactory(),
-                $this->queue,
+                $this->createStub(MailerInterface::class),
                 $this->config,
                 $this->createStub(RecipientResolver::class),
                 $this->createStub(LoggerInterface::class),
@@ -98,7 +127,7 @@ class EmailTypesTest extends TestCase
             'UpcomingDigest' => new UpcomingDigestEmail(
                 $this->blocklist,
                 $this->mockSampleFactory(),
-                $this->queue,
+                $this->createStub(MailerInterface::class),
                 $this->config,
                 $eventRepo,
                 $this->createStub(UserRepository::class),
@@ -107,8 +136,14 @@ class EmailTypesTest extends TestCase
                 new AudienceFilterService([]),
                 $this->createStub(TranslatorInterface::class),
             ),
-            'VerificationRequest' => new VerificationRequestEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host),
-            'Welcome' => new WelcomeEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host),
+            'VerificationRequest' => new VerificationRequestEmail(
+                $this->blocklist,
+                $this->mockSampleFactory(),
+                $this->createStub(MailerInterface::class),
+                $this->config,
+                $this->host,
+            ),
+            'Welcome' => new WelcomeEmail($this->blocklist, $this->mockSampleFactory(), $this->createStub(MailerInterface::class), $this->config, $this->host),
         ];
     }
 
@@ -210,19 +245,31 @@ class EmailTypesTest extends TestCase
     public function testAdminNotificationGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        new AdminNotificationEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config)->guardCheck([]);
+        new AdminNotificationEmail($this->blocklist, $this->mockSampleFactory(), $this->createStub(MailerInterface::class), $this->config)->guardCheck([]);
     }
 
     public function testNotificationEventCanceledGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        new NotificationEventCanceledEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host)->guardCheck([]);
+        new NotificationEventCanceledEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->createStub(MailerInterface::class),
+            $this->config,
+            $this->host,
+        )->guardCheck([]);
     }
 
     public function testPasswordResetGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        new PasswordResetEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host)->guardCheck([]);
+        new PasswordResetEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->createStub(MailerInterface::class),
+            $this->config,
+            $this->host,
+        )->guardCheck([]);
     }
 
     public function testSupportNotificationGuardCheckThrowsOnEmptyContext(): void
@@ -231,7 +278,7 @@ class EmailTypesTest extends TestCase
         new SupportNotificationEmail(
             $this->blocklist,
             $this->mockSampleFactory(),
-            $this->queue,
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->createStub(RecipientResolver::class),
             $this->createStub(LoggerInterface::class),
@@ -242,12 +289,18 @@ class EmailTypesTest extends TestCase
     public function testVerificationRequestGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        new VerificationRequestEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host)->guardCheck([]);
+        new VerificationRequestEmail(
+            $this->blocklist,
+            $this->mockSampleFactory(),
+            $this->createStub(MailerInterface::class),
+            $this->config,
+            $this->host,
+        )->guardCheck([]);
     }
 
     public function testWelcomeGuardCheckThrowsOnEmptyContext(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        new WelcomeEmail($this->blocklist, $this->mockSampleFactory(), $this->queue, $this->config, $this->host)->guardCheck([]);
+        new WelcomeEmail($this->blocklist, $this->mockSampleFactory(), $this->createStub(MailerInterface::class), $this->config, $this->host)->guardCheck([]);
     }
 }

@@ -1,0 +1,259 @@
+<?php declare(strict_types=1);
+
+namespace App\Controller\Admin;
+
+use App\Admin\Navigation\AdminLink;
+use App\Admin\Navigation\AdminNavigationConfig;
+use App\Admin\Navigation\AdminNavigationInterface;
+use App\Admin\Top\Actions\AdminTopActionButton;
+use App\Admin\Top\Actions\AdminTopActionForm;
+use App\Admin\Top\AdminTop;
+use App\Admin\Top\Infos\AdminTopInfoHtml;
+use App\Admin\Top\Infos\AdminTopInfoText;
+use App\Entity\Announcement;
+use App\Entity\Cms;
+use App\EntityActionDispatcher;
+use App\Enum\AnnouncementStatus;
+use App\Enum\EntityAction;
+use App\Form\AnnouncementType;
+use App\Repository\AnnouncementRepository;
+use App\Service\Cms\AnnouncementService;
+use App\Service\Config\LanguageService;
+use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+#[IsGranted('ROLE_ADMIN'), Route('/admin/cms/announcements')]
+final class AnnouncementController extends AbstractController implements AdminNavigationInterface
+{
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        private readonly AnnouncementRepository $announcementRepo,
+        private readonly AnnouncementService $announcementService,
+        private readonly EntityManagerInterface $em,
+        private readonly EntityActionDispatcher $entityActionDispatcher,
+        private readonly LanguageService $languageService,
+    ) {}
+
+    public function getAdminNavigation(): ?AdminNavigationConfig
+    {
+        return new AdminNavigationConfig(
+            section: 'admin_shell.section_content',
+            links: [
+                new AdminLink(label: 'admin_shell.menu_announcements', route: 'app_admin_cms_announcements', active: 'announcements', role: 'ROLE_ADMIN'),
+            ],
+            sectionPriority: 50,
+        );
+    }
+
+    #[Route('', name: 'app_admin_cms_announcements')]
+    public function announcements(): Response
+    {
+        $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_cms.announcements_list_intro'))], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_cms.announcement_new'),
+                target: $this->generateUrl('app_admin_cms_announcements_new'),
+                icon: 'plus',
+            ),
+        ]);
+
+        return $this->render('admin/cms/announcements/list.html.twig', [
+            'active' => 'announcements',
+            'announcements' => $this->announcementRepo->findAllOrderedByDate(),
+            'adminTop' => $adminTop,
+        ]);
+    }
+
+    #[Route('/new', name: 'app_admin_cms_announcements_new', methods: ['GET', 'POST'])]
+    public function announcementsNew(Request $request): Response
+    {
+        $announcement = new Announcement();
+        $form = $this->createForm(AnnouncementType::class, $announcement);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $announcement->setCreatedBy($this->getUser());
+            $announcement->setCreatedAt(new DateTimeImmutable());
+            $announcement->setStatus(AnnouncementStatus::Draft);
+
+            $this->em->persist($announcement);
+            $this->em->flush();
+
+            $this->entityActionDispatcher->dispatch(EntityAction::CreateAnnouncement, $announcement->getId());
+
+            return $this->redirectToRoute('app_admin_cms_announcements_view', ['id' => $announcement->getId()]);
+        }
+
+        $adminTop = new AdminTop(info: [new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars(
+            $this->translator->trans('admin_cms.announcement_new'),
+            ENT_QUOTES | ENT_HTML5,
+            'UTF-8',
+        )))], actions: [
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_cms.button_create_cms_page'),
+                target: $this->generateUrl('app_admin_cms'),
+                icon: 'file-circle-plus',
+            ),
+            new AdminTopActionButton(
+                label: $this->translator->trans('global.button_back'),
+                target: $this->generateUrl('app_admin_cms_announcements'),
+                icon: 'arrow-left',
+            ),
+        ]);
+
+        return $this->render('admin/cms/announcements/new.html.twig', [
+            'active' => 'announcements',
+            'form' => $form,
+            'adminTop' => $adminTop,
+        ]);
+    }
+
+    #[Route('/from-cms/{id}', name: 'app_admin_cms_announcements_from_cms', methods: ['POST'])]
+    public function announcementsFromCms(Request $request, Cms $cmsPage): Response
+    {
+        if (!$this->isCsrfTokenValid('admin_cms_announcements_from_cms' . $cmsPage->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        $announcement = new Announcement();
+        $announcement->setCmsPage($cmsPage);
+        $announcement->setCreatedBy($this->getUser());
+        $announcement->setCreatedAt(new DateTimeImmutable());
+        $announcement->setStatus(AnnouncementStatus::Draft);
+
+        $this->em->persist($announcement);
+        $this->em->flush();
+
+        $this->entityActionDispatcher->dispatch(EntityAction::CreateAnnouncement, $announcement->getId());
+
+        return $this->redirectToRoute('app_admin_cms_announcements_view', ['id' => $announcement->getId()]);
+    }
+
+    #[Route('/{id}', name: 'app_admin_cms_announcements_view')]
+    public function announcementsView(Announcement $announcement, Request $request): Response
+    {
+        $locale = $request->query->get('locale', $this->languageService->getAdminFilteredEnabledCodes()[0]);
+        $preview = $this->announcementService->renderPreview($announcement, $locale);
+
+        $adminTop = new AdminTop(info: $this->buildViewInfo($announcement), actions: $this->buildViewActions($announcement));
+
+        return $this->render('admin/cms/announcements/view.html.twig', [
+            'active' => 'announcements',
+            'announcement' => $announcement,
+            'preview' => $preview,
+            'previewLocale' => $locale,
+            'adminTop' => $adminTop,
+        ]);
+    }
+
+    #[Route('/{id}/send', name: 'app_admin_cms_announcements_send', methods: ['POST'])]
+    public function announcementsSend(Request $request, Announcement $announcement): Response
+    {
+        if (!$this->isCsrfTokenValid('admin_cms_announcements_send' . $announcement->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        if (!$announcement->isDraft()) {
+            $this->addFlash('error', 'admin_cms.flash_error_already_sent');
+
+            return $this->redirectToRoute('app_admin_cms_announcements_view', ['id' => $announcement->getId()]);
+        }
+
+        $recipientCount = $this->announcementService->send($announcement);
+
+        $this->addFlash('success', $this->translator->trans('admin_cms.flash_success_sent', [
+            '%count%' => $recipientCount,
+        ]));
+
+        return $this->redirectToRoute('app_admin_cms_announcements_view', ['id' => $announcement->getId()]);
+    }
+
+    #[Route('/{id}/delete', name: 'app_admin_cms_announcements_delete', methods: ['POST'])]
+    public function announcementsDelete(Request $request, Announcement $announcement): Response
+    {
+        if (!$this->isCsrfTokenValid('admin_cms_announcements_delete' . $announcement->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        if (!$announcement->isDraft()) {
+            $this->addFlash('error', 'admin_cms.flash_error_cannot_delete_sent');
+
+            return $this->redirectToRoute('app_admin_cms_announcements');
+        }
+
+        $announcementId = $announcement->getId();
+        $this->em->remove($announcement);
+        $this->em->flush();
+
+        $this->entityActionDispatcher->dispatch(EntityAction::DeleteAnnouncement, $announcementId);
+
+        return $this->redirectToRoute('app_admin_cms_announcements');
+    }
+
+    /**
+     * @return list<AdminTopInfoHtml>
+     */
+    private function buildViewInfo(Announcement $announcement): array
+    {
+        $title = $announcement->getCmsPage() !== null ? (string) $announcement->getCmsPage()->getSlug() : 'Announcement #' . $announcement->getId();
+
+        $statusVariant = $announcement->isDraft() ? 'is-warning' : 'is-success';
+        $statusKey = $announcement->isDraft() ? 'admin_cms.draft' : 'admin_cms.sent';
+
+        return [
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars($title, ENT_QUOTES | ENT_HTML5, 'UTF-8'))),
+            new AdminTopInfoHtml(sprintf(
+                '<span class="tag %s is-medium">%s</span>',
+                $statusVariant,
+                htmlspecialchars($this->translator->trans($statusKey), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
+            )),
+        ];
+    }
+
+    /**
+     * @return list<AdminTopActionButton|AdminTopActionForm>
+     */
+    private function buildViewActions(Announcement $announcement): array
+    {
+        $actions = [];
+
+        if ($announcement->isDraft()) {
+            $actions[] = new AdminTopActionForm(
+                label: $this->translator->trans('global.button_delete'),
+                target: $this->generateUrl('app_admin_cms_announcements_delete', ['id' => $announcement->getId()]),
+                csrfTokenId: 'admin_cms_announcements_delete' . $announcement->getId(),
+                icon: 'trash',
+                variant: 'is-danger',
+            );
+        }
+        if ($announcement->getCmsPage() !== null) {
+            $actions[] = new AdminTopActionButton(
+                label: $this->translator->trans('admin_cms.button_edit_cms_page'),
+                target: $this->generateUrl('app_admin_cms_edit', ['id' => $announcement->getCmsPage()->getId()]),
+                icon: 'edit',
+            );
+        }
+        if ($announcement->isDraft()) {
+            $actions[] = new AdminTopActionForm(
+                label: $this->translator->trans('admin_cms.button_send_announcement'),
+                target: $this->generateUrl('app_admin_cms_announcements_send', ['id' => $announcement->getId()]),
+                csrfTokenId: 'admin_cms_announcements_send' . $announcement->getId(),
+                icon: 'paper-plane',
+                confirm: $this->translator->trans('admin_cms.confirm_send_announcement'),
+            );
+        }
+        $actions[] = new AdminTopActionButton(
+            label: $this->translator->trans('global.button_back'),
+            target: $this->generateUrl('app_admin_cms_announcements'),
+            icon: 'arrow-left',
+        );
+
+        return $actions;
+    }
+}

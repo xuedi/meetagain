@@ -138,6 +138,10 @@
             "commands": ["bin/commit-hooks/10-unit-tests.bash"]
         },
         {
+            "label": "Module tests",
+            "commands": ["bin/commit-hooks/15-module-tests.bash"]
+        },
+        {
             "label": "Build pa11y image",
             "commands": ["DOCKER build pa11y -q"]
         },
@@ -211,6 +215,7 @@
         "DOCKER exec php bash",
         "DB mariadb *",
         "PHP vendor/bin/phpunit *",
+        "PHP_RUN=\"PHP\" tests/bin/module-db.sh*",
         "PHP sh -c 'vendor/bin/paratest *",
         "PHP vendor/bin/mago *",
         "PHP php bin/check-*",

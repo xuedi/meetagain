@@ -16,7 +16,6 @@ public/install/TemplateRenderer.php::render // required ordering: loops run firs
 # --- Activity and notifications ---
 src/Activity/ActivityService.php::log // merge direction: caller keys must survive the defaults, and array order decides that
 src/Activity/NotificationService.php::sendRsvp // deliberate swallow: a cache write failure must not stop the notification going out
-src/Service/Notification/User/CoreNotificationProvider.php::getNotifications // the guard above it is the boundary, and everything past it is admin-only
 
 # --- Admin surfaces ---
 src/Admin/Top/Infos/AdminTopInfoHtml.php::__construct // XSS constraint: the renderer emits this with |raw, so callers own the escaping
@@ -114,7 +113,7 @@ tests/Unit/Service/AdminNotificationServiceTest.php::testSkipsProvidersWithNoIte
 tests/Unit/Service/BlockHydratorTest.php::testAppliesDefaultForOptionalMissingField // names the field deliberately left out, which is the whole case
 tests/Unit/Service/BlockHydratorTest.php::testThrowsOnMissingRequiredField // names the field deliberately left out, which is the whole case
 tests/Unit/Service/BlockHydratorTest.php::testThrowsWithAllMissingRequiredFields // lists the required fields, so the expected message can be read against them
-tests/Unit/Service/Email/SendScheduledEmailsServiceTest.php::testGuardErrorIsLoggedAndLoopContinues // marks which user survives the guard, which is what the assertion checks
+modules/email/tests/Unit/Internal/SendScheduledEmailsServiceTest.php::testGuardErrorIsLoggedAndLoopContinues // marks which user survives the guard, which is what the assertion checks
 tests/Unit/Service/Event/OccurrenceCalculatorTest.php::OccurrenceCalculatorTest // the matrix fixture pins rlanvin/php-rrule v2.6 behaviour, WKST=MO default included
 tests/Unit/Service/Event/OccurrenceCalculatorTest.php::testABiweeklyRuleCountsWeeksFromMondayNotFromTheAnchor // the eight-day gap is the point of the case and is not obvious from the dates
 tests/Unit/Service/Event/RecurringEventExtensionTest.php::NOW // the anchor date is a Monday, which is what makes the weekday maths readable

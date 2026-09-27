@@ -2,9 +2,7 @@
 
 namespace App\Emails\Types;
 
-use App\Emails\DueContext;
 use App\Emails\EmailAbstract;
-use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\EventInContextRule;
 use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
 use App\Emails\Guard\Rule\RecipientNotAlreadyRsvpdRule;
@@ -13,35 +11,37 @@ use App\Emails\Guard\Rule\RecipientUserPresentRule;
 use App\Emails\Guard\Rule\RsvpAttendeeMapPresentRule;
 use App\Emails\Guard\Rule\UserNotificationsMasterToggleRule;
 use App\Emails\MockSampleFactory;
-use App\Emails\ScheduledEmailInterface;
-use App\Emails\ScheduledMailItem;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Filter\Event\FollowerEventNotificationFilterInterface;
 use App\Repository\EventRepository;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use DateInterval;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\DueContext;
+use Module\Email\Contract\MailerInterface;
+use Module\Email\Contract\ScheduledEmailInterface;
+use Module\Email\Contract\ScheduledMailItem;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEmailInterface
 {
     public function __construct(
-        BlocklistCheckerInterface $blocklist,
+        BlocklistInterface $blocklist,
         MockSampleFactory $samples,
-        private EmailQueueInterface $queue,
+        MailerInterface $mailer,
         private ConfigService $config,
         private EventRepository $eventRepo,
         private EntityManagerInterface $em,
         #[AutowireIterator(FollowerEventNotificationFilterInterface::class)]
         private iterable $followerFilters = [],
     ) {
-        parent::__construct($blocklist, $samples);
+        parent::__construct($blocklist, $samples, $mailer);
     }
 
     public function getIdentifier(): string
@@ -93,7 +93,7 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
         return $event instanceof Event ? $event : null;
     }
 
-    public function send(array $context): void
+    public function compose(array $context): array
     {
         /** @var User $recipient */
         $recipient = $context['user'];
@@ -104,7 +104,7 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
 
         $attendees = $attendeeMap[$recipient->getId()]['attendees'] ?? [];
         if ($attendees === []) {
-            return;
+            return [];
         }
 
         $language = $recipient->getLocale();
@@ -124,7 +124,7 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
             'lang' => $language,
         ]);
 
-        $this->queue->enqueue($this, $email, $context);
+        return [$email];
     }
 
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable

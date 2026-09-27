@@ -6,9 +6,9 @@ use App\Emails\Types\SupportEmailVerifyEmail;
 use App\Entity\SupportRequest;
 use App\Enum\SecurityEventType;
 use App\Form\SupportThreadReplyType;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Security\SecurityService;
 use App\Service\Support\ThreadService;
+use Module\Email\Contract\BlocklistInterface;
 use SensitiveParameter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormInterface;
@@ -35,7 +35,7 @@ final class SupportThreadController extends AbstractController
         #[Autowire(service: 'limiter.support_email_verify')]
         private readonly RateLimiterFactoryInterface $emailVerifyLimiter,
         private readonly SupportEmailVerifyEmail $supportEmailVerifyEmail,
-        private readonly BlocklistCheckerInterface $blocklist,
+        private readonly BlocklistInterface $blocklist,
     ) {}
 
     #[Route('', name: 'app_support_thread', methods: ['GET'])]

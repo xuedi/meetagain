@@ -11,10 +11,12 @@ use App\Service\Admin\CommandExecutionService;
 use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -33,6 +35,12 @@ class CronCommand extends LoggedCommand
         parent::__construct($commandExecutionService);
     }
 
+    #[Override]
+    protected function configure(): void
+    {
+        $this->addOption('task', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Run only the tasks with these identifiers');
+    }
+
     protected function doExecute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock()) {
@@ -43,7 +51,12 @@ class CronCommand extends LoggedCommand
         $timed = [];
         $totalStart = hrtime(true);
 
+        $only = $input->getOption('task');
         foreach ($this->cronTasks as $task) {
+            if ($only !== [] && !in_array($task->getIdentifier(), $only, true)) {
+                continue;
+            }
+
             $taskStart = hrtime(true);
             $result = $task->runCronTask($output);
             $durationMs = (int) ((hrtime(true) - $taskStart) / 1_000_000);

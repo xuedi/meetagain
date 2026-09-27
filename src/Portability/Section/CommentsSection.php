@@ -2,9 +2,7 @@
 
 namespace App\Portability\Section;
 
-use App\Circulation\Comment\HandoverTargetProvider;
 use App\Comment\EventTargetProvider;
-use App\Entity\CirculationHandover;
 use App\Entity\Comment;
 use App\Entity\Event;
 use App\Entity\Topic;
@@ -19,11 +17,12 @@ use App\Service\TownHall\TopicService;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Circulation\Contract\CirculationInterface;
 use Override;
 
 readonly class CommentsSection implements SectionInterface
 {
-    private const array ENTITY_TARGETS = [EventTargetProvider::TYPE, TopicService::TYPE, HandoverTargetProvider::TYPE];
+    private const array ENTITY_TARGETS = [EventTargetProvider::TYPE, TopicService::TYPE, CirculationInterface::COMMENT_TARGET];
 
     public function __construct(
         private EntityManagerInterface $em,
@@ -50,7 +49,7 @@ readonly class CommentsSection implements SectionInterface
             ...$scope->itemIds,
             EventTargetProvider::TYPE => $scope->eventIds,
             TopicService::TYPE => $this->topics->exportedIds($scope),
-            HandoverTargetProvider::TYPE => $this->circulation->exportedHandoverIds($scope),
+            CirculationInterface::COMMENT_TARGET => $this->circulation->exportedHandoverIds($scope),
         ];
         ksort($targets);
 
@@ -122,7 +121,7 @@ readonly class CommentsSection implements SectionInterface
         return match ($targetType) {
             EventTargetProvider::TYPE => $context->resolveRef(Event::class, $ref)?->getId(),
             TopicService::TYPE => $context->resolveRef(Topic::class, $ref)?->getId(),
-            HandoverTargetProvider::TYPE => $context->resolveRef(CirculationHandover::class, $ref)?->getId(),
+            CirculationInterface::COMMENT_TARGET => $context->resolveId(CirculationInterface::COMMENT_TARGET, $ref),
             default => $context->resolveItem($targetType, $ref),
         };
     }

@@ -2,15 +2,15 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\SupportInvitationEmail;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Support\RecipientResolver;
 use DateTimeImmutable;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -24,69 +24,58 @@ class SupportInvitationEmailTest extends TestCase
     public function testEveryAdminIsInvitedRegardlessOfWhoOwnsTheRequest(): void
     {
         // Arrange
-        $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->exactly(2))->method('enqueue');
-
-        $emailType = $this->createEmailType($queue, admins: [
+        $emailType = $this->createEmailType(admins: [
             $this->user('one@example.com', 'Admin One'),
             $this->user('two@example.com', 'Admin Two'),
         ]);
 
         // Act
-        $emailType->send(['request' => $this->request()]);
+        $messages = $emailType->compose(['request' => $this->request()]);
+
+        // Assert
+        static::assertSame(
+            ['one@example.com', 'two@example.com'],
+            array_map(static fn(TemplatedEmail $email): string => $email->getTo()[0]->getAddress(), $messages),
+        );
     }
 
     public function testContextNamesTheStewardWhoInvited(): void
     {
         // Arrange
-        $enqueued = null;
-        $queue = $this->createMock(EmailQueueInterface::class);
-        $queue
-            ->expects($this->once())
-            ->method('enqueue')
-            ->with(
-                $this->anything(),
-                $this->callback(static function (TemplatedEmail $email) use (&$enqueued): bool {
-                    $enqueued = $email;
-                    return true;
-                }),
-                $this->anything(),
-            );
-
-        $emailType = $this->createEmailType($queue, admins: [$this->user('admin@example.com', 'Admin')]);
+        $emailType = $this->createEmailType(admins: [$this->user('admin@example.com', 'Admin')]);
 
         // Act
-        $emailType->send(['request' => $this->request()]);
+        $messages = $emailType->compose(['request' => $this->request()]);
 
         // Assert
-        static::assertInstanceOf(TemplatedEmail::class, $enqueued);
-        static::assertSame(['invitedBy', 'name', 'message', 'createdAt', 'requestId'], array_keys($enqueued->getContext()));
-        static::assertSame('Sam Steward', $enqueued->getContext()['invitedBy']);
+        static::assertCount(1, $messages);
+        static::assertSame(['invitedBy', 'name', 'message', 'createdAt', 'requestId'], array_keys($messages[0]->getContext()));
+        static::assertSame('Sam Steward', $messages[0]->getContext()['invitedBy']);
     }
 
-    public function testNothingIsSentWhenThereAreNoAdmins(): void
+    public function testNothingIsComposedWhenThereAreNoAdmins(): void
     {
         // Arrange
-        $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->never())->method('enqueue');
-
-        $emailType = $this->createEmailType($queue, admins: []);
+        $emailType = $this->createEmailType(admins: []);
 
         // Act
-        $emailType->send(['request' => $this->request()]);
+        $messages = $emailType->compose(['request' => $this->request()]);
+
+        // Assert
+        static::assertSame([], $messages);
     }
 
     public function testIdentifier(): void
     {
         // Arrange
-        $emailType = $this->createEmailType($this->createStub(EmailQueueInterface::class), admins: []);
+        $emailType = $this->createEmailType(admins: []);
 
         // Act & Assert
         static::assertSame(EmailType::SupportInvitation->value, $emailType->getIdentifier());
     }
 
     /** @param User[] $admins */
-    private function createEmailType(EmailQueueInterface $queue, array $admins): SupportInvitationEmail
+    private function createEmailType(array $admins): SupportInvitationEmail
     {
         $config = $this->createStub(ConfigService::class);
         $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
@@ -95,9 +84,9 @@ class SupportInvitationEmailTest extends TestCase
         $resolver->method('resolveAdmins')->willReturn($admins);
 
         return new SupportInvitationEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $queue,
+            $this->createStub(MailerInterface::class),
             $config,
             $resolver,
             $this->createStub(LoggerInterface::class),

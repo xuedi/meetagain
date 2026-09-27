@@ -4,20 +4,20 @@ namespace App\Service\Admin;
 
 use App\Filter\Admin\Dashboard\DashboardScope;
 use App\Repository\CommandExecutionLogRepository;
-use App\Repository\EmailQueueRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use DateTime;
 use DateTimeImmutable;
+use Module\Email\Contract\SendlogInterface;
 
 readonly class DashboardActionService
 {
     public function __construct(
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
-        private EmailQueueRepository $mailRepo,
+        private SendlogInterface $sendlog,
         private ImageRepository $imageRepo,
         private MessageRepository $messageRepo,
         private CommandExecutionLogRepository $commandLogRepo,
@@ -30,10 +30,12 @@ readonly class DashboardActionService
 
     public function getActionItems(): array
     {
+        $queue = $this->sendlog->stats();
+
         return [
             'reportedImages' => $this->imageRepo->getReportedCount(),
-            'staleEmails' => $this->mailRepo->getStaleCount(60),
-            'pendingEmails' => $this->mailRepo->getPendingCount(),
+            'staleEmails' => $queue->stale,
+            'pendingEmails' => $queue->pending,
         ];
     }
 
@@ -96,14 +98,6 @@ readonly class DashboardActionService
     }
 
     /**
-     * @return array<string, int>
-     */
-    public function getEmailQueueBreakdown(): array
-    {
-        return $this->mailRepo->getPendingByTemplate();
-    }
-
-    /**
      * @return array{total: int, successful: int, failed: int}
      */
     public function getCommandExecutionStats(): array
@@ -119,22 +113,5 @@ readonly class DashboardActionService
     public function getLastCommandExecutions(): array
     {
         return $this->commandLogRepo->getLastExecutionsByCommand();
-    }
-
-    /**
-     * @return array{total: int, sent: int, failed: int}
-     */
-    public function getEmailDeliveryStats(): array
-    {
-        $since = new DateTimeImmutable('-24 hours');
-
-        return $this->mailRepo->getDeliveryStats($since);
-    }
-
-    public function getEmailDeliverySuccessRate(): float
-    {
-        $since = new DateTimeImmutable('-24 hours');
-
-        return $this->mailRepo->getDeliverySuccessRate($since);
     }
 }

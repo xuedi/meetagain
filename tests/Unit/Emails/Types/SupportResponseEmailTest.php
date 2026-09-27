@@ -2,16 +2,15 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\SupportResponseEmail;
 use App\Entity\SupportRequest;
 use App\Enum\EmailType;
 use App\Enum\SupportAudience;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use DateTimeImmutable;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Address;
 use Tests\Unit\Emails\SampleFactoryTrait;
 
@@ -19,38 +18,24 @@ class SupportResponseEmailTest extends TestCase
 {
     use SampleFactoryTrait;
 
-    public function testSendEnqueuesEmailToRequester(): void
+    public function testTheMessageGoesToTheRequesterWithTheirQuestionAndTheAnswer(): void
     {
         // Arrange
         $config = $this->createStub(ConfigService::class);
         $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
 
-        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklist = $this->createStub(BlocklistInterface::class);
         $blocklist->method('isBlocked')->willReturn(false);
 
-        $enqueued = null;
-        $queue = $this->createMock(EmailQueueInterface::class);
-        $queue
-            ->expects($this->once())
-            ->method('enqueue')
-            ->with(
-                $this->anything(),
-                $this->callback(static function (TemplatedEmail $email) use (&$enqueued): bool {
-                    $enqueued = $email;
-                    return true;
-                }),
-                $this->anything(),
-            );
-
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'en');
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $this->createStub(MailerInterface::class), $config, 'en');
 
         // Act
-        $emailType->send(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
+        $messages = $emailType->compose(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
 
         // Assert
-        static::assertInstanceOf(TemplatedEmail::class, $enqueued);
-        static::assertSame('john@example.com', $enqueued->getTo()[0]->getAddress());
-        $context = $enqueued->getContext();
+        static::assertCount(1, $messages);
+        static::assertSame('john@example.com', $messages[0]->getTo()[0]->getAddress());
+        $context = $messages[0]->getContext();
         static::assertSame('John', $context['name']);
         static::assertSame('Help!', $context['originalMessage']);
         static::assertSame('Here is your answer.', $context['response']);
@@ -62,54 +47,25 @@ class SupportResponseEmailTest extends TestCase
         // Arrange
         $config = $this->createStub(ConfigService::class);
         $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
-        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
+        $blocklist = $this->createStub(BlocklistInterface::class);
         $blocklist->method('isBlocked')->willReturn(false);
 
-        $enqueued = null;
-        $queue = $this->createStub(EmailQueueInterface::class);
-        $queue
-            ->method('enqueue')
-            ->willReturnCallback(static function ($source, TemplatedEmail $email) use (&$enqueued): bool {
-                $enqueued = $email;
-
-                return true;
-            });
-
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'fr');
+        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $this->createStub(MailerInterface::class), $config, 'fr');
 
         // Act
-        $emailType->send(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
+        $messages = $emailType->compose(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
 
         // Assert
-        static::assertInstanceOf(TemplatedEmail::class, $enqueued);
-        static::assertSame('fr', $enqueued->getLocale());
-    }
-
-    public function testSendSkipsWhenRecipientBlocklisted(): void
-    {
-        // Arrange
-        $config = $this->createStub(ConfigService::class);
-        $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
-
-        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
-        $blocklist->method('isBlocked')->willReturn(true);
-
-        $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->never())->method('enqueue');
-
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'en');
-
-        // Act
-        $emailType->send(['request' => $this->makeRequest(), 'response' => 'Here is your answer.']);
+        static::assertSame('fr', $messages[0]->getLocale());
     }
 
     public function testIdentifier(): void
     {
         // Arrange
         $emailType = new SupportResponseEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             'en',
         );
@@ -118,31 +74,13 @@ class SupportResponseEmailTest extends TestCase
         static::assertSame(EmailType::SupportResponse->value, $emailType->getIdentifier());
     }
 
-    public function testSendSkipsWhenTheAddressWasNeverConfirmed(): void
-    {
-        // Arrange
-        $config = $this->createStub(ConfigService::class);
-        $config->method('getMailerAddress')->willReturn(new Address('noreply@platform.example.com'));
-
-        $blocklist = $this->createStub(BlocklistCheckerInterface::class);
-        $blocklist->method('isBlocked')->willReturn(false);
-
-        $queue = $this->createMock(EmailQueueInterface::class);
-        $queue->expects($this->never())->method('enqueue');
-
-        $emailType = new SupportResponseEmail($blocklist, $this->mockSampleFactory(), $queue, $config, 'en');
-
-        // Act
-        $emailType->send(['request' => $this->makeRequest(verified: false), 'response' => 'Here is your answer.']);
-    }
-
     public function testGuardSkipsWhenTheAddressWasNeverConfirmed(): void
     {
         // Arrange
         $emailType = new SupportResponseEmail(
-            $this->createStub(BlocklistCheckerInterface::class),
+            $this->createStub(BlocklistInterface::class),
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->createStub(ConfigService::class),
             'en',
         );

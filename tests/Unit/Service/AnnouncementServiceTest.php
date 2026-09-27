@@ -6,7 +6,6 @@ use App\Emails\Types\AnnouncementEmail;
 use App\Entity\Announcement;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
-use App\Entity\EmailTemplate;
 use App\Entity\NotificationSettings;
 use App\Entity\User;
 use App\Enum\AnnouncementStatus;
@@ -16,10 +15,10 @@ use App\Filter\Email\AudienceFilterService;
 use App\Repository\UserRepository;
 use App\Service\Cms\AnnouncementService;
 use App\Service\Config\ConfigService;
-use App\Service\Email\EmailTemplateService;
 use App\Service\Http\RequestHostResolver;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Email\Contract\TemplatesInterface;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -35,7 +34,7 @@ class AnnouncementServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
             configService: $this->createStub(ConfigService::class),
-            templateService: $this->createStub(EmailTemplateService::class),
+            templates: $this->createStub(TemplatesInterface::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
@@ -60,7 +59,7 @@ class AnnouncementServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
             configService: $this->createStub(ConfigService::class),
-            templateService: $this->createStub(EmailTemplateService::class),
+            templates: $this->createStub(TemplatesInterface::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
@@ -131,7 +130,7 @@ class AnnouncementServiceTest extends TestCase
             em: $emMock,
             userRepo: $userRepoMock,
             configService: $configService,
-            templateService: $this->createStub(EmailTemplateService::class),
+            templates: $this->createStub(TemplatesInterface::class),
             announcementEmail: $announcementEmailMock,
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
@@ -187,7 +186,7 @@ class AnnouncementServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $userRepoMock,
             configService: $configService,
-            templateService: $this->createStub(EmailTemplateService::class),
+            templates: $this->createStub(TemplatesInterface::class),
             announcementEmail: $announcementEmailMock,
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
@@ -228,7 +227,7 @@ class AnnouncementServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
-            templateService: $this->createStub(EmailTemplateService::class),
+            templates: $this->createStub(TemplatesInterface::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
@@ -262,7 +261,7 @@ class AnnouncementServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
-            templateService: $this->createStub(EmailTemplateService::class),
+            templates: $this->createStub(TemplatesInterface::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
@@ -291,7 +290,7 @@ class AnnouncementServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
-            templateService: $this->createStub(EmailTemplateService::class),
+            templates: $this->createStub(TemplatesInterface::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
@@ -303,33 +302,6 @@ class AnnouncementServiceTest extends TestCase
         // Assert
         static::assertNull($result['title']);
         static::assertSame('', $result['content']);
-    }
-
-    public function testRenderPreviewThrowsExceptionWhenTemplateNotFound(): void
-    {
-        // Arrange
-        $announcement = $this->createStub(Announcement::class);
-
-        // Arrange
-        $templateServiceMock = $this->createMock(EmailTemplateService::class);
-        $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement->value)->willReturn(null);
-
-        $subject = new AnnouncementService(
-            em: $this->createStub(EntityManagerInterface::class),
-            userRepo: $this->createStub(UserRepository::class),
-            configService: $this->createStub(ConfigService::class),
-            templateService: $templateServiceMock,
-            announcementEmail: $this->createStub(AnnouncementEmail::class),
-            hostResolver: $this->createStub(RequestHostResolver::class),
-            audience: new AudienceFilterService([]),
-        );
-
-        // Assert
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessageIsOrContains('Announcement email template not found in database');
-
-        // Act
-        $subject->renderPreview($announcement);
     }
 
     public function testRenderPreviewReturnsRenderedSubjectAndBody(): void
@@ -346,16 +318,12 @@ class AnnouncementServiceTest extends TestCase
         $announcement->method('getCmsPage')->willReturn($cmsPage);
 
         // Arrange
-        $emailTemplate = $this->createStub(EmailTemplate::class);
-        $emailTemplate->method('getSubject')->willReturn('Subject: {{title}}');
-        $emailTemplate->method('getBody')->willReturn('Body: {{content}}');
-
-        // Arrange
-        $templateServiceMock = $this->createMock(EmailTemplateService::class);
-        $templateServiceMock->expects($this->once())->method('getTemplate')->with(EmailType::Announcement->value)->willReturn($emailTemplate);
-        $render = static fn(string $content): string => str_replace(['{{title}}', '{{content}}'], ['My Title', ''], $content);
-        $templateServiceMock->expects($this->once())->method('renderSubject')->willReturnCallback($render);
-        $templateServiceMock->expects($this->once())->method('renderContent')->willReturnCallback($render);
+        $templates = $this->createMock(TemplatesInterface::class);
+        $templates
+            ->expects($this->once())
+            ->method('render')
+            ->with(EmailType::Announcement->value, 'en', static::callback(static fn(array $context): bool => $context['title'] === 'My Title'))
+            ->willReturn(['subject' => 'Subject: My Title', 'body' => 'Body']);
 
         // Arrange
         $configService = $this->createStub(ConfigService::class);
@@ -365,7 +333,7 @@ class AnnouncementServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
-            templateService: $templateServiceMock,
+            templates: $templates,
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
@@ -375,8 +343,7 @@ class AnnouncementServiceTest extends TestCase
         $result = $subject->renderPreview($announcement, 'en');
 
         // Assert
-        static::assertArrayHasKey('subject', $result);
-        static::assertArrayHasKey('body', $result);
+        static::assertSame(['subject' => 'Subject: My Title', 'body' => 'Body'], $result);
     }
 
     public function testRenderContentIncludesImageBlock(): void
@@ -410,7 +377,7 @@ class AnnouncementServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
-            templateService: $this->createStub(EmailTemplateService::class),
+            templates: $this->createStub(TemplatesInterface::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
@@ -457,7 +424,7 @@ class AnnouncementServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
-            templateService: $this->createStub(EmailTemplateService::class),
+            templates: $this->createStub(TemplatesInterface::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
@@ -498,7 +465,7 @@ class AnnouncementServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
             configService: $configService,
-            templateService: $this->createStub(EmailTemplateService::class),
+            templates: $this->createStub(TemplatesInterface::class),
             announcementEmail: $this->createStub(AnnouncementEmail::class),
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),

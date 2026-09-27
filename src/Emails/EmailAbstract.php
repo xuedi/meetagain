@@ -2,16 +2,31 @@
 
 namespace App\Emails;
 
-use App\Service\Email\BlocklistCheckerInterface;
 use DateTimeImmutable;
 use InvalidArgumentException;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\EmailInterface;
+use Module\Email\Contract\GuardOutcome;
+use Module\Email\Contract\GuardResult;
+use Module\Email\Contract\MailerInterface;
 
 abstract readonly class EmailAbstract implements EmailInterface
 {
     public function __construct(
-        protected BlocklistCheckerInterface $blocklist,
+        protected BlocklistInterface $blocklist,
         protected MockSampleFactory $samples,
+        protected MailerInterface $mailer,
     ) {}
+
+    public function send(array $context, bool $flush = true): void
+    {
+        $this->assertNotError($this->mailer->send($this, $context, $flush)->guard);
+    }
+
+    public function pushOnEnqueue(): bool
+    {
+        return true;
+    }
 
     public function getMaxSendBy(array $context, DateTimeImmutable $now): ?DateTimeImmutable
     {
@@ -35,26 +50,28 @@ abstract readonly class EmailAbstract implements EmailInterface
 
     public function guardCheck(array $context): bool
     {
-        $rules = $this->getGuardRules();
-        if ($rules === []) {
-            return true;
-        }
-
-        foreach ($rules as $rule) {
+        foreach ($this->getGuardRules() as $rule) {
             $result = $rule->evaluate($context);
-            if ($result->outcome === EmailGuardOutcome::Error) {
-                throw new InvalidArgumentException(sprintf(
-                    "Guard rule '%s' for email '%s' returned Error: %s",
-                    $result->ruleName,
-                    $this->getIdentifier(),
-                    $result->explanation,
-                ));
-            }
-            if ($result->outcome === EmailGuardOutcome::Skip) {
+            $this->assertNotError($result);
+            if ($result->outcome === GuardOutcome::Skip) {
                 return false;
             }
         }
 
         return true;
+    }
+
+    private function assertNotError(GuardResult $result): void
+    {
+        if ($result->outcome !== GuardOutcome::Error) {
+            return;
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            "Guard rule '%s' for email '%s' returned Error: %s",
+            $result->ruleName,
+            $this->getIdentifier(),
+            $result->explanation,
+        ));
     }
 }

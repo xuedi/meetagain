@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Emails\Guard\Rule;
 
-use App\Emails\EmailGuardOutcome;
 use App\Emails\Guard\Rule\NotificationToggleEnabledRule;
 use App\Entity\NotificationSettings;
+use Module\Email\Contract\GuardOutcome;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\Stubs\UserStub;
 
@@ -17,7 +17,7 @@ final class NotificationToggleEnabledRuleTest extends TestCase
 
         $result = $rule->evaluate(['user' => $user]);
 
-        $this->assertSame(EmailGuardOutcome::Pass, $result->outcome);
+        $this->assertSame(GuardOutcome::Pass, $result->outcome);
     }
 
     public function testSkipsWhenToggleOff(): void
@@ -27,6 +27,6 @@ final class NotificationToggleEnabledRuleTest extends TestCase
 
         $result = $rule->evaluate(['user' => $user]);
 
-        $this->assertSame(EmailGuardOutcome::Skip, $result->outcome);
+        $this->assertSame(GuardOutcome::Skip, $result->outcome);
     }
 }

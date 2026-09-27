@@ -3,24 +3,24 @@
 namespace App\Emails\Types;
 
 use App\Emails\EmailAbstract;
-use App\Emails\EmailQueueInterface;
 use App\Emails\Guard\Rule\OutboundMailerNotBlocklistedRule;
 use App\Emails\MockSampleFactory;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use DateTimeImmutable;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 readonly class SupportEmailVerifyEmail extends EmailAbstract
 {
     public function __construct(
-        BlocklistCheckerInterface $blocklist,
+        BlocklistInterface $blocklist,
         MockSampleFactory $samples,
-        private EmailQueueInterface $queue,
+        MailerInterface $mailer,
         private ConfigService $config,
     ) {
-        parent::__construct($blocklist, $samples);
+        parent::__construct($blocklist, $samples, $mailer);
     }
 
     public function getIdentifier(): string
@@ -56,16 +56,12 @@ readonly class SupportEmailVerifyEmail extends EmailAbstract
         ];
     }
 
-    public function send(array $context): void
+    public function compose(array $context): array
     {
         $recipient = (string) $context['email'];
         $token = (string) $context['token'];
         /** @var DateTimeImmutable $expiresAt */
         $expiresAt = $context['expiresAt'];
-
-        if ($this->blocklist->isBlocked($recipient)) {
-            return;
-        }
 
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
@@ -77,6 +73,6 @@ readonly class SupportEmailVerifyEmail extends EmailAbstract
             'expiresAt' => $expiresAt->format('Y-m-d H:i:s'),
         ]);
 
-        $this->queue->enqueue($this, $email, $context);
+        return [$email];
     }
 }

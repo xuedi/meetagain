@@ -15,6 +15,9 @@ class ImportContext
     /** @var array<string, array<int, int>> */
     private array $items = [];
 
+    /** @var array<string, array<int, int>> */
+    private array $ids = [];
+
     /** @var array<string, array<string, int>> */
     private array $counts = [];
 
@@ -103,6 +106,23 @@ class ImportContext
         }
 
         return $this->items[$itemType][(int) $ref] ?? null;
+    }
+
+    /**
+     * @param array<int, int> $refToId
+     */
+    public function mapIds(string $kind, array $refToId): void
+    {
+        $this->ids[$kind] = $refToId;
+    }
+
+    public function resolveId(string $kind, mixed $ref): ?int
+    {
+        if (!is_int($ref) && !is_string($ref)) {
+            return null;
+        }
+
+        return $this->ids[$kind][(int) $ref] ?? null;
     }
 
     public function count(string $kind, Outcome $outcome, int $rows = 1): void

@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\Portability;
 
-use App\Circulation\ContextResolver;
-use App\Circulation\DefaultContextProvider;
 use App\Entity\Announcement;
 use App\Entity\Cms;
 use App\Entity\Event;
@@ -18,13 +16,13 @@ use App\Portability\Item\Registry;
 use App\Portability\Site;
 use App\Portability\SiteSettings;
 use App\Repository\AnnouncementRepository;
-use App\Repository\CirculationLedgerEntryRepository;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\Repository\ItemTagRepository;
 use App\Repository\TopicRepository;
 use App\Repository\UserRepository;
 use App\Service\Config\PluginService;
+use Module\Circulation\Contract\CirculationInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
@@ -51,8 +49,9 @@ final class InstanceScopeBuilderTest extends TestCase
         $announcementRepository->method('findBy')->willReturn([$this->withId(new Announcement(), 31)]);
         $tagRepository = $this->createStub(ItemTagRepository::class);
         $tagRepository->method('findBy')->willReturn([$this->tag(41, 'film'), $this->tag(42, 'book'), $this->tag(43, 'film')]);
-        $ledgerRepository = $this->createStub(CirculationLedgerEntryRepository::class);
-        $ledgerRepository->method('findContextItemTypes')->willReturn(['book' => 'book']);
+        $circulation = $this->createStub(CirculationInterface::class);
+        $circulation->method('ledgerContexts')->willReturn(['book' => 'book']);
+        $circulation->method('contextFor')->willReturnArgument(0);
 
         $books = $this->createStub(ContributorInterface::class);
         $books->method('getItemType')->willReturn('book');
@@ -78,8 +77,7 @@ final class InstanceScopeBuilderTest extends TestCase
             $topicRepository,
             $announcementRepository,
             $tagRepository,
-            $ledgerRepository,
-            new ContextResolver([new DefaultContextProvider()]),
+            $circulation,
             $registry,
             $pluginService,
             $siteSettings,

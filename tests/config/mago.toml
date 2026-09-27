@@ -11,7 +11,20 @@
 # relaxed for that plugin alone.
 #
 # For more information, see https://mago.carthage.software/#/getting-started/configuration
-extends = ["mago-rules.toml"]
+
+# Each module's perimeter - its restriction, its outbound permit list, its test and migration
+# namespaces - lives in `modules/<name>/mago.toml` and joins this run through `extends`, which
+# appends list entries rather than replacing them. They cannot run on their own the way plugin
+# configs do: an inbound violation is reported on the file doing the reaching, which is outside the
+# module, and one outbound rule puts the whole run into allowlist mode. `extends` takes no globs, so
+# every module is listed; tests/Unit/ModulePerimeterTest.php fails if one is missing.
+extends = [
+    "mago-rules.toml",
+    "../../modules/ballot/mago.toml",
+    "../../modules/circulation/mago.toml",
+    "../../modules/email/mago.toml",
+    "../../modules/trust/mago.toml",
+]
 
 [source]
 paths = [
@@ -56,41 +69,20 @@ excludes = ["public/install/"]
 # narrowed statically. Both stay in `[source]`, so the formatter still covers them.
 excludes = [
     "bin/",
-    "modules/ballot/tests/",
-    "modules/trust/tests/",
     "public/install/",
     "tests/Unit/",
     "tests/bootstrap.php",
 ]
 
-# The module perimeter lives here, not in the shared rule file: it guards `modules/`, which only
-# this config covers. tests/Unit/ModulePerimeterTest.php asserts these rules are present in this
-# file, and a module added without an entry here is reported by that test, not by mago.
+# The module perimeter: the shared parts live here, each module's own entries in its `mago.toml`.
+# The generic inbound backstop `Module\*\Internal\**` sits in mago-rules.toml, so plugin runs
+# enforce it too; each module's own restriction narrows it to the owner.
 [guard]
-
-# Inbound: nothing outside the module may reach past its Contract namespace.
-#
-# Restrictions AND together, so the generic backstop and the per-module entry both bind. The
-# backstop closes the boundary against core, plugins and tests for every module, including one
-# whose specific entry someone forgot to add; the two `*` in it do NOT correlate, so on its own it
-# would still let one module reach into another's internals. The per-module entries below are what
-# narrow it to the owning module. Both are needed - keep adding a specific entry per module.
-[[guard.perimeter.restrictions]]
-dependency = "Module\\*\\Internal\\**"
-allow-from = ["Module\\*\\**"]
-
-[[guard.perimeter.restrictions]]
-dependency = "Module\\Trust\\Internal\\**"
-allow-from = ["Module\\Trust\\**"]
-
-[[guard.perimeter.restrictions]]
-dependency = "Module\\Ballot\\Internal\\**"
-allow-from = ["Module\\Ballot\\**"]
 
 # Outbound: `[[guard.perimeter.rules]]` puts the whole project into allowlist mode, so every
 # namespace below needs an entry or all of its dependencies are reported as unruled. The three
 # `**` catch-alls state the current reality: core and plugins are not perimeter-guarded yet.
-# The most specific matching rule wins, which is what makes the Trust entry bite.
+# The most specific matching rule wins, which is what makes a module entry bite.
 [[guard.perimeter.rules]]
 namespace = "@global"
 permit = ["**"]
@@ -107,65 +99,16 @@ permit = ["**"]
 namespace = "Tests\\"
 permit = ["**"]
 
-# Migration namespaces, and the two Symfony config-builder namespaces `config/` files declare.
-# They are listed for the same reason as the catch-alls above: `[[guard.perimeter.rules]]` puts
+# The core migration namespace, and the Symfony config-builder namespaces `config/` files
+# declare. They are listed for the same reason as the catch-alls above: `[[guard.perimeter.rules]]` puts
 # the run into allowlist mode, so a namespace with no entry has every dependency reported.
 [[guard.perimeter.rules]]
 namespace = "AppMigrations"
 permit = ["**"]
 
 [[guard.perimeter.rules]]
-namespace = "ModuleBallotMigrations"
-permit = ["**"]
-
-[[guard.perimeter.rules]]
-namespace = "ModuleTrustMigrations"
-permit = ["**"]
-
-[[guard.perimeter.rules]]
 namespace = "Symfony\\"
 permit = ["**"]
-
-[[guard.perimeter.rules]]
-namespace = "Module\\Trust\\"
-permit = [
-    "Module\\Trust\\**",
-    "@global",                              # DateTimeImmutable, Override, PHP's own functions
-    "App\\Entity\\User",                    # the grant FK - the one sanctioned core entity
-    "App\\Controller\\AbstractController",  # module controllers extend core's, as plugin controllers do
-    "Doctrine\\**",
-    "Symfony\\**",
-    "Twig\\**",
-    "Psr\\**",
-]
-
-# A module's own test suite is allowed the test toolchain and core fixture data; the perimeter
-# it proves is the one on the production namespace above, not on itself.
-[[guard.perimeter.rules]]
-namespace = "Module\\Trust\\Tests\\"
-permit = ["Module\\Trust\\**", "@global", "App\\**", "PHPUnit\\**", "Doctrine\\**", "Symfony\\**", "Psr\\**"]
-
-[[guard.perimeter.rules]]
-namespace = "Module\\Ballot\\"
-permit = [
-    "Module\\Ballot\\**",
-    "@global",                                                  # DateTimeImmutable, Override, PHP's own functions
-    "App\\Entity\\User",                                        # the vote FK - the one sanctioned core entity
-    "App\\Controller\\AbstractController",                      # module controllers extend core's, as plugin controllers do
-    "App\\CronTaskInterface",                                   # the deadline task registers on core's cron chain
-    "App\\ValueObject\\CronTaskResult",                         # that chain's return type
-    "App\\Enum\\CronTaskStatus",                                # that chain's status enum
-    "App\\Service\\Notification\\User\\NotificationProviderInterface", # members hear about open ballots on core's bell
-    "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
-    "Doctrine\\**",
-    "Symfony\\**",
-    "Twig\\**",
-    "Psr\\**",
-]
-
-[[guard.perimeter.rules]]
-namespace = "Module\\Ballot\\Tests\\"
-permit = ["Module\\Ballot\\**", "@global", "App\\**", "PHPUnit\\**", "Doctrine\\**", "Symfony\\**", "Psr\\**"]
 
 # Shape: the contract carries interfaces, enums and readonly value objects, nothing else.
 [[guard.structural.rules]]

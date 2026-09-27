@@ -101,6 +101,9 @@ Leak guard ...................................... OK
 - **Edits during a run are never stamped.** The fingerprint is taken before the first hook and
   compared again after the last one; if they differ, no stamp is written.
 - **`just test` always runs everything**, and so does a clone without the built binary.
+- **A second stamp** (`test-stamp --config test-stamp-modules`) fingerprints only what shapes the module
+  test database, narrowed by the `ONLY` globs in `config/tools/test-stamp-modules.dist`. `just testModules`
+  rebuilds that database when it goes stale and skips the build otherwise.
 
 The stamp proves what the hooks always proved: that the *working tree* passed. Neither checks the
 staged snapshot on its own.

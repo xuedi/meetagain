@@ -70,7 +70,7 @@ readonly class AttendeeUpdateNotifier
             if ($recipient->getId() === $creatorId || $recipient->getId() === $editorId) {
                 continue;
             }
-            if (!$recipient->getNotificationSettings()->isActive('attendedEventUpdate')) {
+            if (!$this->email->guardCheck(['user' => $recipient, 'event' => $event])) {
                 continue;
             }
 

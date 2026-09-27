@@ -24,9 +24,11 @@ shift
 
 status=0
 
-# `guard` enforces the module perimeter, which only core declares. Running it against a config
-# with no `[guard]` section prints four "checks were skipped" warnings and checks nothing, so the
-# run is skipped instead - and picked up automatically if a plugin ever declares its own rules.
+# `guard` enforces the module perimeter. Core declares all of it; the shared rules file carries the
+# inbound backstop, so every plugin run also fails on a reach into a module's Internal namespace.
+# Plugins declare no structural rules, so their runs are perimeter-only. Running guard against a
+# config with no `[guard]` section at all prints four "checks were skipped" warnings and checks
+# nothing, so such a run is skipped instead.
 has_guard_rules() {
     grep -qE '^\[+guard' "$1" && return 0
     sed -n 's/^extends *= *\[\{0,1\}"\([^"]*\)".*/\1/p' "$1" | while read -r parent; do
@@ -65,7 +67,11 @@ done
 
 for config in plugins/*/tests/config/mago.toml; do
     [ -f "$config" ] || continue
-    run "$config" "$@"
+    if [ "$command" = 'guard' ]; then
+        run "$config" --perimeter "$@"
+    else
+        run "$config" "$@"
+    fi
 done
 
 if [ -n "$missing" ]; then

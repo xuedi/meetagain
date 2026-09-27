@@ -2,8 +2,6 @@
 
 namespace Tests\Unit\Portability\Section;
 
-use App\Circulation\ContextResolver;
-use App\Circulation\DefaultContextProvider;
 use App\Entity\User;
 use App\Portability\DataCategory;
 use App\Portability\Outcome;
@@ -11,6 +9,7 @@ use App\Portability\Scope;
 use App\Portability\Section\TrustSection;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
+use Module\Circulation\Contract\CirculationInterface;
 use Module\Trust\Contract\GrantTransferInterface;
 use Module\Trust\Contract\PortableGrant;
 use Module\Trust\Contract\TrustLevel;
@@ -138,7 +137,10 @@ final class TrustSectionTest extends SectionTestCase
         $userRepository = $this->createStub(UserRepository::class);
         $userRepository->method('findBy')->willReturnCallback(fn(array $criteria): array => array_map($this->member(...), $criteria['id']));
 
-        return new TrustSection($grants, $userRepository, new ContextResolver([new DefaultContextProvider()]));
+        $circulation = $this->createStub(CirculationInterface::class);
+        $circulation->method('contextFor')->willReturnArgument(0);
+
+        return new TrustSection($grants, $userRepository, $circulation);
     }
 
     private function recordingGrants(): GrantTransferInterface

@@ -50,6 +50,76 @@ jobs:
       - name: Run unit tests
         run: vendor/bin/phpunit -c tests/config/phpunit.xml --testsuite=default --no-coverage
 
+  modules:
+    name: Module Tests
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:12.3.3@sha256:dd9b303aed4f4890ed09f766d8ca9ddfd176c0c6f6267feff53b3192ec65a979
+        env:
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=3s
+          --health-timeout=3s
+          --health-retries=5
+      redis:
+        image: redis:8@sha256:298e5b3bc566bade82f46ad5511777a4a07a294097ce16ada2f6a42be5239df5
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=3s
+          --health-timeout=3s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: mysql://root:root@127.0.0.1:3306/meetAgain
+      REDIS_URL: redis://127.0.0.1:6379
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
+        with:
+          php-version: '8.4'
+          extensions: bcmath, gd, apcu, pdo_mysql, imagick, intl, opcache, redis
+
+      - name: Cache Composer packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-php-
+
+      - name: Setup config
+        run: |
+          cp config/plugins.dist.php config/plugins.php
+          cp .env.dist .env
+          echo "DATABASE_URL=${DATABASE_URL}" >> .env
+          echo "REDIS_URL=${REDIS_URL}" >> .env
+
+      # Pinned to the version docker/php/Dockerfile bakes into the dev image, so CI and the
+      # container compile the same stylesheets.
+      - name: Install Sass
+        run: |
+          npm install -g --ignore-scripts sass@1.86.3
+          cp assets/styles/_config.scss.dist assets/styles/_config.scss
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-scripts
+
+      - name: Build assets
+        run: php bin/console sass:build
+
+      # Core and the modules only, no plugin, on a schema-only database the script builds.
+      - name: Run module tests
+        run: |
+          tests/bin/module-db.sh --rebuild
+          vendor/bin/phpunit -c tests/config/phpunit.modules.xml --no-coverage
+
   archives:
     name: Archive Imports
     runs-on: ubuntu-latest

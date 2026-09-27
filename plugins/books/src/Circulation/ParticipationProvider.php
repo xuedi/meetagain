@@ -2,7 +2,7 @@
 
 namespace Plugin\Books\Circulation;
 
-use App\Circulation\ParticipationProviderInterface;
+use Module\Circulation\Contract\ParticipationProviderInterface;
 use Override;
 use Plugin\Books\Service\BookService;
 use Plugin\Books\Service\ConfigService;

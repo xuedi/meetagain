@@ -203,8 +203,12 @@ primary anchor. That is the reasoning behind the two root defaults.
 3. Place the Twig fragments on your own page.
 4. Call `TrustInterface` where a decision depends on standing.
 
-The bundled reference is `src/Circulation/Trust/`: circulation's context describer, action source and
-access provider, each a few dozen lines.
+The bundled reference is `modules/circulation/src/Internal/Trust/`: circulation's context describer, action
+source and access provider, each a few dozen lines.
+
+`modules/trust/tests/Stub/` holds a complete stand-in consumer - describer, action source, access and root
+providers - which `modules/trust/tests/Functional/StubConsumerTest.php` drives through the contract. It is the shortest worked
+example of every seam at once.
 
 ## Out of scope
 

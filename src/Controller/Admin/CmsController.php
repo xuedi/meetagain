@@ -287,7 +287,7 @@ final class CmsController extends AbstractController implements AdminNavigationI
             if ($linkedAnnouncement !== null) {
                 $actions[] = new AdminTopActionButton(
                     label: $this->translator->trans('admin_cms.button_open_announcement'),
-                    target: $this->generateUrl('app_admin_email_announcements_view', [
+                    target: $this->generateUrl('app_admin_cms_announcements_view', [
                         'id' => $linkedAnnouncement->getId(),
                     ]),
                     icon: 'bullhorn',
@@ -295,8 +295,8 @@ final class CmsController extends AbstractController implements AdminNavigationI
             } else {
                 $actions[] = new AdminTopActionForm(
                     label: $this->translator->trans('admin_cms.button_create_announcement'),
-                    target: $this->generateUrl('app_admin_email_announcements_from_cms', ['id' => $cms->getId()]),
-                    csrfTokenId: 'admin_email_announcements_from_cms' . $cms->getId(),
+                    target: $this->generateUrl('app_admin_cms_announcements_from_cms', ['id' => $cms->getId()]),
+                    csrfTokenId: 'admin_cms_announcements_from_cms' . $cms->getId(),
                     icon: 'bullhorn',
                 );
             }

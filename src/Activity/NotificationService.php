@@ -9,8 +9,8 @@ use App\Entity\User;
 use App\Enum\EmailType;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
-use App\Service\Email\EmailService;
 use DateTimeImmutable;
+use Module\Email\Contract\MailerInterface;
 use Psr\Cache\InvalidArgumentException as CacheInvalidArgumentException;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -24,7 +24,7 @@ readonly class NotificationService
         private EventRepository $eventRepo,
         private UserRepository $userRepo,
         private TagAwareCacheInterface $appCache,
-        private EmailService $emailService,
+        private MailerInterface $mailer,
     ) {}
 
     public function notify(Activity $activity): void
@@ -84,6 +84,6 @@ readonly class NotificationService
             return;
         }
 
-        $this->emailService->dispatchPush(EmailType::NotificationMessage->value, $address, new DateTimeImmutable(self::MESSAGE_PING_DEADLINE));
+        $this->mailer->dispatchPush(EmailType::NotificationMessage->value, $address, new DateTimeImmutable(self::MESSAGE_PING_DEADLINE));
     }
 }

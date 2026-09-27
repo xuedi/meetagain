@@ -4,6 +4,7 @@ admin_shell:
     section_system: 'System'
     sidebar_info: 'Information'
     menu_cms: 'Pages'
+    menu_announcements: 'Announcements'
     menu_event: 'Events'
     menu_host: 'Hosts'
     menu_location: 'Venue'
@@ -207,13 +208,6 @@ admin_cms:
     flash_block_validation_error: 'Block could not be saved.'
     block_delete_title: 'Delete this block'
     block_delete_warning: 'This block and any image attached to it will be permanently removed. This cannot be undone.'
-admin_email:
-    tab_templates: 'Templates'
-    tab_sendlog: 'Send log'
-    tab_announcements: 'Announcements'
-    tab_debugging: 'Debugging'
-    tab_blocklist: 'Blocklist'
-    tab_planned: 'Planned'
 admin_event:
     summary_total: 'events'
     summary_total_all: 'in total'

@@ -4,6 +4,7 @@ admin_shell:
     section_system: 'System'
     sidebar_info: 'Information'
     menu_cms: 'Seiten'
+    menu_announcements: 'Ankündigungen'
     menu_event: 'Events'
     menu_host: 'Gastgeber'
     menu_location: 'Veranstaltungsort'
@@ -207,13 +208,6 @@ admin_cms:
     flash_block_validation_error: 'Block konnte nicht gespeichert werden.'
     block_delete_title: 'Diesen Block löschen'
     block_delete_warning: 'Dieser Block und ein eventuell angehängtes Bild werden dauerhaft entfernt. Dies kann nicht rückgängig gemacht werden.'
-admin_email:
-    tab_templates: 'Vorlagen'
-    tab_sendlog: 'Sendeprotokoll'
-    tab_announcements: 'Ankündigungen'
-    tab_debugging: 'Debugging'
-    tab_blocklist: 'Sperrliste'
-    tab_planned: 'Geplant'
 admin_event:
     summary_total: 'Veranstaltungen'
     summary_total_all: 'insgesamt'

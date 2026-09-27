@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Emails\Types;
 
-use App\Emails\EmailQueueInterface;
 use App\Emails\Types\AdminNotificationEmail;
 use App\Emails\Types\AnnouncementEmail;
 use App\Emails\Types\EventReminderEmail;
@@ -25,12 +24,13 @@ use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
-use App\Service\Email\BlocklistCheckerInterface;
 use App\Service\Http\RequestHostResolver;
 use App\Service\Support\RecipientResolver;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Email\Contract\BlocklistInterface;
+use Module\Email\Contract\MailerInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Mime\Address;
@@ -42,7 +42,7 @@ final class EmailTypeBlocklistTest extends TestCase
     use SampleFactoryTrait;
 
     private ConfigService $config;
-    private BlocklistCheckerInterface $blockingChecker;
+    private BlocklistInterface $blockingChecker;
     private RequestHostResolver $host;
 
     protected function setUp(): void
@@ -52,7 +52,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $this->config->method('getHost')->willReturn('https://example.com');
         $this->config->method('getUrl')->willReturn('https://example.com');
 
-        $this->blockingChecker = $this->createStub(BlocklistCheckerInterface::class);
+        $this->blockingChecker = $this->createStub(BlocklistInterface::class);
         $this->blockingChecker->method('isBlocked')->willReturn(true);
 
         $this->host = $this->createStub(RequestHostResolver::class);
@@ -60,7 +60,7 @@ final class EmailTypeBlocklistTest extends TestCase
 
     public function testAdminNotificationSkipsBlockedRecipient(): void
     {
-        $email = new AdminNotificationEmail($this->blockingChecker, $this->mockSampleFactory(), $this->createStub(EmailQueueInterface::class), $this->config);
+        $email = new AdminNotificationEmail($this->blockingChecker, $this->mockSampleFactory(), $this->createStub(MailerInterface::class), $this->config);
 
         static::assertFalse($email->guardCheck([
             'user' => $this->userWithEmail('blocked@example.com'),
@@ -73,7 +73,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $email = new AnnouncementEmail(
             $this->blockingChecker,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->host,
         );
@@ -92,7 +92,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $email = new EventReminderEmail(
             $this->blockingChecker,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -111,7 +111,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $email = new EventUpdateNotificationEmail(
             $this->blockingChecker,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->createStub(TranslatorInterface::class),
             $this->host,
@@ -130,7 +130,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $email = new NotificationEventCanceledEmail(
             $this->blockingChecker,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->host,
         );
@@ -146,7 +146,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $email = new NotificationMessageEmail(
             $this->blockingChecker,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->createStub(MessageRepository::class),
         );
@@ -162,7 +162,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $email = new PasswordResetEmail(
             $this->blockingChecker,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->host,
         );
@@ -177,7 +177,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $email = new RsvpAggregatedEmail(
             $this->blockingChecker,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(EntityManagerInterface::class),
@@ -197,7 +197,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $email = new SupportNotificationEmail(
             $this->blockingChecker,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->createStub(RecipientResolver::class),
             $this->createStub(LoggerInterface::class),
@@ -214,7 +214,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $email = new UpcomingDigestEmail(
             $this->blockingChecker,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->createStub(EventRepository::class),
             $this->createStub(UserRepository::class),
@@ -238,7 +238,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $email = new VerificationRequestEmail(
             $this->blockingChecker,
             $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
+            $this->createStub(MailerInterface::class),
             $this->config,
             $this->host,
         );
@@ -250,13 +250,7 @@ final class EmailTypeBlocklistTest extends TestCase
 
     public function testWelcomeSkipsBlockedRecipient(): void
     {
-        $email = new WelcomeEmail(
-            $this->blockingChecker,
-            $this->mockSampleFactory(),
-            $this->createStub(EmailQueueInterface::class),
-            $this->config,
-            $this->host,
-        );
+        $email = new WelcomeEmail($this->blockingChecker, $this->mockSampleFactory(), $this->createStub(MailerInterface::class), $this->config, $this->host);
 
         static::assertFalse($email->guardCheck([
             'user' => $this->userWithEmail('blocked@example.com'),

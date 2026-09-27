@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Emails\Guard\Rule;
 
-use App\Emails\EmailGuardOutcome;
 use App\Emails\Guard\Rule\SupportRequestEmailVerifiedRule;
 use App\Entity\SupportRequest;
 use DateTimeImmutable;
+use Module\Email\Contract\GuardOutcome;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -13,14 +13,14 @@ class SupportRequestEmailVerifiedRuleTest extends TestCase
 {
     public static function requestProvider(): iterable
     {
-        yield 'confirmed address passes' => ['john@example.com', new DateTimeImmutable('2026-01-01'), EmailGuardOutcome::Pass];
-        yield 'address given but never confirmed is skipped' => ['john@example.com', null, EmailGuardOutcome::Skip];
-        yield 'no address at all is skipped' => [null, null, EmailGuardOutcome::Skip];
-        yield 'confirmation without an address is skipped' => [null, new DateTimeImmutable('2026-01-01'), EmailGuardOutcome::Skip];
+        yield 'confirmed address passes' => ['john@example.com', new DateTimeImmutable('2026-01-01'), GuardOutcome::Pass];
+        yield 'address given but never confirmed is skipped' => ['john@example.com', null, GuardOutcome::Skip];
+        yield 'no address at all is skipped' => [null, null, GuardOutcome::Skip];
+        yield 'confirmation without an address is skipped' => [null, new DateTimeImmutable('2026-01-01'), GuardOutcome::Skip];
     }
 
     #[DataProvider('requestProvider')]
-    public function testEvaluate(?string $email, ?DateTimeImmutable $verifiedAt, EmailGuardOutcome $expected): void
+    public function testEvaluate(?string $email, ?DateTimeImmutable $verifiedAt, GuardOutcome $expected): void
     {
         // Arrange
         $request = new SupportRequest();
@@ -40,7 +40,7 @@ class SupportRequestEmailVerifiedRuleTest extends TestCase
         $result = new SupportRequestEmailVerifiedRule()->evaluate([]);
 
         // Assert
-        static::assertSame(EmailGuardOutcome::Error, $result->outcome);
+        static::assertSame(GuardOutcome::Error, $result->outcome);
         static::assertSame('request', $result->contextKey);
     }
 }
