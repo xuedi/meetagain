@@ -119,7 +119,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange
         $announcementEmailMock = $this->createMock(AnnouncementEmail::class);
-        $announcementEmailMock->expects($this->exactly(2))->method('send');
+        $announcementEmailMock->expects($this->exactly(2))->method('send')->willReturn(1);
 
         // Arrange
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -177,7 +177,7 @@ class AnnouncementServiceTest extends TestCase
 
         // Arrange
         $announcementEmailMock = $this->createMock(AnnouncementEmail::class);
-        $announcementEmailMock->expects($this->once())->method('send');
+        $announcementEmailMock->expects($this->once())->method('send')->willReturn(1);
 
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
@@ -188,6 +188,52 @@ class AnnouncementServiceTest extends TestCase
             configService: $configService,
             templates: $this->createStub(TemplatesInterface::class),
             announcementEmail: $announcementEmailMock,
+            hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
+        );
+
+        // Act
+        $result = $subject->send($announcement);
+
+        // Assert
+        static::assertSame(1, $result);
+    }
+
+    public function testASubscriberTheMailerSkipsIsNotCountedAsARecipient(): void
+    {
+        // Arrange
+        $cmsPage = $this->createStub(Cms::class);
+        $cmsPage->method('getPageTitle')->willReturn('Test Title');
+        $cmsPage->method('getBlocks')->willReturn(new ArrayCollection([]));
+
+        $announcement = $this->createMock(Announcement::class);
+        $announcement->method('isDraft')->willReturn(true);
+        $announcement->method('getCmsPage')->willReturn($cmsPage);
+        $announcement->expects($this->once())->method('setRecipientCount')->with(1);
+
+        $settings = $this->createStub(NotificationSettings::class);
+        $settings->method('isActive')->willReturn(true);
+
+        $delivered = $this->createStub(User::class);
+        $delivered->method('getLocale')->willReturn('en');
+        $delivered->method('getNotificationSettings')->willReturn($settings);
+
+        $blocklisted = $this->createStub(User::class);
+        $blocklisted->method('getLocale')->willReturn('en');
+        $blocklisted->method('getNotificationSettings')->willReturn($settings);
+
+        $userRepo = $this->createStub(UserRepository::class);
+        $userRepo->method('findAnnouncementSubscribers')->willReturn([$delivered, $blocklisted]);
+
+        $announcementEmail = $this->createStub(AnnouncementEmail::class);
+        $announcementEmail->method('send')->willReturnCallback(static fn(array $context): int => $context['user'] === $delivered ? 1 : 0);
+
+        $subject = new AnnouncementService(
+            em: $this->createStub(EntityManagerInterface::class),
+            userRepo: $userRepo,
+            configService: $this->createStub(ConfigService::class),
+            templates: $this->createStub(TemplatesInterface::class),
+            announcementEmail: $announcementEmail,
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
         );

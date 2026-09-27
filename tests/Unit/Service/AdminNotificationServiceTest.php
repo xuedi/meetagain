@@ -143,11 +143,52 @@ class AdminNotificationServiceTest extends TestCase
         $emailMock
             ->expects($this->once())
             ->method('send')
-            ->with(static::callback(static fn($ctx) => $ctx['user'] === $adminUser && str_contains($ctx['sectionsHtml'], 'Jane Smith')));
+            ->with(static::callback(static fn($ctx) => $ctx['user'] === $adminUser && str_contains($ctx['sectionsHtml'], 'Jane Smith')))
+            ->willReturn(1);
 
         $service = $this->buildService(
             providers: [$provider],
             adminNotificationEmail: $emailMock,
+            userRepository: $userRepository,
+            cache: $cache,
+            configService: $config,
+        );
+
+        // Act
+        $result = $service->processNotification();
+
+        // Assert
+        static::assertSame('1 sent', $result);
+    }
+
+    public function testAnAdminTheMailerSkipsIsNotCountedAsSent(): void
+    {
+        // Arrange
+        $config = $this->createStub(ConfigService::class);
+        $config->method('isSendAdminNotification')->willReturn(true);
+
+        $provider = $this->createStub(AdminNotificationProviderInterface::class);
+        $provider->method('getLatestPendingAt')->willReturn(new DateTimeImmutable('2026-01-01 09:00:00'));
+        $provider->method('getSection')->willReturn('Users Pending Approval');
+        $provider->method('getPendingItems')->willReturn([new AdminNotificationItem('Jane Smith', 'app_admin_member')]);
+
+        $cache = $this->createStub(TagAwareCacheInterface::class);
+        $cache->method('get')->willReturn(null);
+
+        $delivered = $this->createStub(User::class);
+        $delivered->method('getLocale')->willReturn('en');
+        $blocklisted = $this->createStub(User::class);
+        $blocklisted->method('getLocale')->willReturn('en');
+
+        $userRepository = $this->createStub(UserRepository::class);
+        $userRepository->method('findAdminUsers')->willReturn([$delivered, $blocklisted]);
+
+        $email = $this->createStub(AdminNotificationEmail::class);
+        $email->method('send')->willReturnCallback(static fn(array $context): int => $context['user'] === $delivered ? 1 : 0);
+
+        $service = $this->buildService(
+            providers: [$provider],
+            adminNotificationEmail: $email,
             userRepository: $userRepository,
             cache: $cache,
             configService: $config,
@@ -193,8 +234,10 @@ class AdminNotificationServiceTest extends TestCase
         $email = $this->createStub(AdminNotificationEmail::class);
         $email
             ->method('send')
-            ->willReturnCallback(static function (array $context) use (&$sent): void {
+            ->willReturnCallback(static function (array $context) use (&$sent): int {
                 $sent[$context['user']->getLocale()] = $context['sectionsHtml'];
+
+                return 1;
             });
 
         $service = $this->buildService(

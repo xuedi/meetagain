@@ -18,9 +18,12 @@ abstract readonly class EmailAbstract implements EmailInterface
         protected MailerInterface $mailer,
     ) {}
 
-    public function send(array $context, bool $flush = true): void
+    public function send(array $context, bool $flush = true): int
     {
-        $this->assertNotError($this->mailer->send($this, $context, $flush)->guard);
+        $outcome = $this->mailer->send($this, $context, $flush);
+        $this->assertNotError($outcome->guard);
+
+        return $outcome->queued;
     }
 
     public function pushOnEnqueue(): bool

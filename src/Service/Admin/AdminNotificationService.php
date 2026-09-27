@@ -94,11 +94,10 @@ readonly class AdminNotificationService implements CronTaskInterface
                 continue;
             }
 
-            $this->adminNotificationEmail->send([
+            $sent += $this->adminNotificationEmail->send([
                 'user' => $recipient,
                 'sectionsHtml' => $this->renderSectionsHtml($sections, $recipient->getLocale()),
             ]);
-            ++$sent;
         }
 
         if ($sent === 0) {

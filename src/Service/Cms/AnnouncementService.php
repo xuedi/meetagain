@@ -52,12 +52,11 @@ readonly class AnnouncementService
 
         foreach ($subscribers as $subscriber) {
             $renderedContent = $this->renderContent($cmsPage, $subscriber->getLocale());
-            $this->announcementEmail->send([
+            $recipientCount += $this->announcementEmail->send([
                 'user' => $subscriber,
                 'renderedContent' => $renderedContent,
                 'announcementUrl' => $announcementUrl,
             ], flush: false);
-            ++$recipientCount;
         }
 
         $announcement->setStatus(AnnouncementStatus::Sent);
