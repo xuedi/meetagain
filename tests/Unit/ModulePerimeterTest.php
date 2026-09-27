@@ -11,38 +11,38 @@ class ModulePerimeterTest extends TestCase
     private const string SHARED_RULES = 'tests/config/mago-rules.toml';
 
     #[DataProvider('provideModules')]
-    public function testEveryModuleHasItsOwnConfigInCoresRun(string $module, string $namespace): void
+    public function testEveryModuleHasItsOwnConfigInItsRun(string $module, string $namespace, string $runConfig): void
     {
         // Arrange
-        $config = self::read(self::CONFIG);
-        $expected = '"../../modules/' . $module . '/mago.toml"';
+        $config = self::read($runConfig);
+        $expected = '"../../modules/' . basename($module) . '/mago.toml"';
 
         // Act
         $declared = is_file(self::root() . '/' . self::moduleConfig($module)) && str_contains($config, $expected);
 
         // Assert
         self::assertTrue($declared, sprintf(
-            "modules/%s needs a mago.toml, listed in the extends of %s.\nExpected an extends entry: %s\n"
-            . 'Copy one from another module; without it core\'s run never sees the module\'s perimeter.',
+            "%s needs a mago.toml, listed in the extends of %s.\nExpected an extends entry: %s\n"
+            . 'Copy one from another module; without it the run never sees the module\'s perimeter.',
             $module,
-            self::CONFIG,
+            $runConfig,
             $expected,
         ));
     }
 
     #[DataProvider('provideModules')]
-    public function testEveryModuleDeclaresAnInboundRestriction(string $module, string $namespace): void
+    public function testEveryModuleDeclaresAnInboundRestriction(string $module, string $namespace, string $runConfig): void
     {
         // Arrange
         $config = self::read(self::moduleConfig($module));
-        $expected = 'dependency = "Module\\\\' . $namespace . '\\\\Internal\\\\**"';
+        $expected = 'dependency = "' . $namespace . '\\\\Internal\\\\**"';
 
         // Act
         $declared = str_contains($config, $expected);
 
         // Assert
         self::assertTrue($declared, sprintf(
-            "modules/%s has no inbound restriction in %s.\nExpected a line: %s\n"
+            "%s has no inbound restriction in %s.\nExpected a line: %s\n"
             . 'Without it the generic backstop still blocks core and plugins, but another module can reach its internals.',
             $module,
             self::moduleConfig($module),
@@ -51,18 +51,18 @@ class ModulePerimeterTest extends TestCase
     }
 
     #[DataProvider('provideModules')]
-    public function testEveryModuleDeclaresAnOutboundRule(string $module, string $namespace): void
+    public function testEveryModuleDeclaresAnOutboundRule(string $module, string $namespace, string $runConfig): void
     {
         // Arrange
         $config = self::read(self::moduleConfig($module));
-        $expected = 'namespace = "Module\\\\' . $namespace . '\\\\"';
+        $expected = 'namespace = "' . $namespace . '\\\\"';
 
         // Act
         $declared = str_contains($config, $expected);
 
         // Assert
         self::assertTrue($declared, sprintf(
-            "modules/%s has no outbound rule in %s.\nExpected a line: %s\n"
+            "%s has no outbound rule in %s.\nExpected a line: %s\n"
             . 'Perimeter rules are an allowlist, so the module would fail the guard on every dependency it has.',
             $module,
             self::moduleConfig($module),
@@ -71,26 +71,21 @@ class ModulePerimeterTest extends TestCase
     }
 
     #[DataProvider('provideModulesWithTests')]
-    public function testAModuleTestSuiteDeclaresItsOwnRule(string $module, string $namespace): void
+    public function testAModuleTestSuiteDeclaresItsOwnRule(string $module, string $namespace, string $runConfig): void
     {
         // Arrange
         $config = self::read(self::moduleConfig($module));
-        $expected = 'namespace = "Module\\\\' . $namespace . '\\\\Tests\\\\"';
+        $expected = 'namespace = "' . $namespace . '\\\\Tests\\\\"';
 
         // Act
         $declared = str_contains($config, $expected);
 
         // Assert
-        self::assertTrue($declared, sprintf(
-            "modules/%s/tests has no outbound rule in %s.\nExpected a line: %s",
-            $module,
-            self::moduleConfig($module),
-            $expected,
-        ));
+        self::assertTrue($declared, sprintf("%s/tests has no outbound rule in %s.\nExpected a line: %s", $module, self::moduleConfig($module), $expected));
     }
 
     #[DataProvider('provideModulesWithTests')]
-    public function testAModuleTestSuitePermitsNoCatchAll(string $module, string $namespace): void
+    public function testAModuleTestSuitePermitsNoCatchAll(string $module, string $namespace, string $runConfig): void
     {
         // Arrange
         $rule = self::testRuleOf(self::read(self::moduleConfig($module)), $namespace);
@@ -109,69 +104,92 @@ class ModulePerimeterTest extends TestCase
         );
     }
 
-    public function testTheGenericBackstopIsInPlace(): void
+    #[DataProvider('provideNamespaceRoots')]
+    public function testTheGenericBackstopIsInPlace(string $root): void
     {
         // Arrange
         $config = self::read(self::SHARED_RULES);
 
         // Act
-        $declared = str_contains($config, 'dependency = "Module\\\\*\\\\Internal\\\\**"');
+        $declared = str_contains($config, 'dependency = "' . $root . '\\\\Internal\\\\**"');
 
         // Assert
-        self::assertTrue($declared, 'The generic module backstop restriction is missing from ' . self::SHARED_RULES . '.');
+        self::assertTrue($declared, 'The generic backstop restriction on ' . $root . ' is missing from ' . self::SHARED_RULES . '.');
     }
 
-    public function testTheContractShapeIsEnforcedForEveryModule(): void
+    #[DataProvider('provideNamespaceRoots')]
+    public function testTheContractShapeIsEnforcedForEveryModule(string $root): void
     {
         // Arrange
-        $config = self::read(self::CONFIG);
+        $config = self::read(self::SHARED_RULES);
 
         // Act
-        $occurrences = substr_count($config, 'on = "Module\\\\*\\\\Contract\\\\**"');
+        $occurrences = substr_count($config, 'on = "' . $root . '\\\\Contract\\\\**"');
 
         // Assert
-        self::assertGreaterThanOrEqual(2, $occurrences, 'Both structural rules on module contracts must be present in ' . self::CONFIG . '.');
+        self::assertGreaterThanOrEqual(2, $occurrences, 'Both structural rules on ' . $root . ' contracts must be present in ' . self::SHARED_RULES . '.');
     }
 
     /**
-     * @return iterable<string, array{string, string}>
+     * @return iterable<string, array{string}>
+     */
+    public static function provideNamespaceRoots(): iterable
+    {
+        yield 'core modules' => ['Module\\\\*'];
+        yield 'plugin modules' => ['Plugin\\\\*\\\\Module\\\\*'];
+    }
+
+    /**
+     * @return iterable<string, array{string, string, string}>
      */
     public static function provideModules(): iterable
     {
-        foreach (self::moduleDirs() as $module) {
-            yield $module => [$module, ucfirst($module)];
+        foreach (self::modules() as $module => [$namespace, $runConfig]) {
+            yield $module => [$module, $namespace, $runConfig];
         }
     }
 
     /**
-     * @return iterable<string, array{string, string}>
+     * @return iterable<string, array{string, string, string}>
      */
     public static function provideModulesWithTests(): iterable
     {
-        foreach (self::moduleDirs() as $module) {
-            if (!is_dir(self::root() . '/modules/' . $module . '/tests')) {
+        foreach (self::modules() as $module => [$namespace, $runConfig]) {
+            if (!is_dir(self::root() . '/' . $module . '/tests')) {
                 continue;
             }
-            yield $module => [$module, ucfirst($module)];
+            yield $module => [$module, $namespace, $runConfig];
         }
     }
 
     /**
-     * @return list<string>
+     * @return array<string, array{string, string}> module directory => [namespace root as written in TOML, the config whose run owns it]
      */
-    private static function moduleDirs(): array
+    private static function modules(): array
     {
-        $dirs = [];
+        $modules = [];
         foreach (glob(self::root() . '/modules/*/src', GLOB_ONLYDIR) ?: [] as $src) {
-            $dirs[] = basename(dirname($src));
+            $name = basename(dirname($src));
+            $modules['modules/' . $name] = ['Module\\\\' . self::pascal($name), self::CONFIG];
+        }
+        foreach (glob(self::root() . '/plugins/*/modules/*/src', GLOB_ONLYDIR) ?: [] as $src) {
+            $name = basename(dirname($src));
+            $plugin = basename(dirname($src, 3));
+            $namespace = 'Plugin\\\\' . ucfirst($plugin) . '\\\\Module\\\\' . self::pascal($name);
+            $modules['plugins/' . $plugin . '/modules/' . $name] = [$namespace, 'plugins/' . $plugin . '/tests/config/mago.toml'];
         }
 
-        return $dirs;
+        return $modules;
+    }
+
+    private static function pascal(string $directory): string
+    {
+        return str_replace('-', '', ucwords($directory, '-'));
     }
 
     private static function testRuleOf(string $config, string $namespace): string
     {
-        $start = strpos($config, 'namespace = "Module\\\\' . $namespace . '\\\\Tests\\\\"');
+        $start = strpos($config, 'namespace = "' . $namespace . '\\\\Tests\\\\"');
         if ($start === false) {
             return '';
         }
@@ -182,7 +200,7 @@ class ModulePerimeterTest extends TestCase
 
     private static function moduleConfig(string $module): string
     {
-        return 'modules/' . $module . '/mago.toml';
+        return $module . '/mago.toml';
     }
 
     private static function read(string $relativePath): string

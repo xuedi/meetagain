@@ -23,6 +23,7 @@
             <directory>../Unit</directory>
             <directory>../../plugins/*/tests/Unit</directory>
             <directory>../../modules/*/tests/Unit</directory>
+            <directory>../../plugins/*/modules/*/tests/Unit</directory>
         </testsuite>
         <testsuite name="functional">
             <directory>../../plugins/*/tests/Functional</directory>

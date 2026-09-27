@@ -4,7 +4,9 @@
 # fingerprint changed, and reuses it otherwise. So it covers what shapes the schema or the seeded
 # rows, and nothing else: an edit anywhere else must not cost a rebuild.
 
-# One walk over the tree with git's ignore rules, narrowed by ONLY below.
+# One walk over the tree with git's ignore rules, narrowed by ONLY below. A plugin checked out as its
+# own repository is ignored by this one, so a plugin that ships modules adds its directory as a
+# second root in the gitignored `.local`.
 SCAN_ROOTS=.
 
 # The database URL can be overridden locally.
@@ -14,7 +16,7 @@ EXCLUDE=
 
 # Globs over repo-relative paths. Entities and the enums they map, the Doctrine configs, the
 # Doctrine version, the seed and the email bodies it copies, and the harness itself.
-ONLY=src/Entity/**,src/Enum/**,modules/*/src/Internal/Entity/**,modules/*/src/Contract/**,config/packages/doctrine.yaml,config/packages/test/**,modules/*/config/packages/doctrine.yaml,composer.lock,.env.test,.env.test.local,src/Command/InstallSeedCommand.php,modules/email/src/Internal/Command/EmailTemplateSeedCommand.php,src/Emails/CoreTemplateProvider.php,templates/email/defaults/**,tests/Module/ModuleKernel.php,tests/bootstrap-modules.php,tests/bin/**
+ONLY=src/Entity/**,src/Enum/**,modules/*/src/Internal/Entity/**,modules/*/src/Contract/**,plugins/*/modules/*/src/Internal/Entity/**,plugins/*/modules/*/src/Contract/**,config/packages/doctrine.yaml,config/packages/test/**,modules/*/config/packages/doctrine.yaml,plugins/*/modules/*/config/packages/doctrine.yaml,composer.lock,.env.test,.env.test.local,src/Command/InstallSeedCommand.php,modules/email/src/Internal/Command/EmailTemplateSeedCommand.php,src/Emails/CoreTemplateProvider.php,templates/email/defaults/**,tests/Module/ModuleKernel.php,tests/bootstrap-modules.php,tests/bin/**
 
 ALWAYS_RUN=
 

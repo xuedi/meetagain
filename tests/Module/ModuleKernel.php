@@ -12,11 +12,21 @@ final class ModuleKernel extends Kernel
 {
     public const string DATABASE_SUFFIX = '_test_modules';
     private const string STUB_CONFIG = '/*/tests/config/services.yaml';
+    private const string PLUGIN_STUB_CONFIG = '/*/modules/*/tests/config/services.yaml';
 
     #[Override]
     public function getPluginConfigDirs(): iterable
     {
         return [];
+    }
+
+    #[Override]
+    public function getModuleConfigDirs(): iterable
+    {
+        yield from parent::getModuleConfigDirs();
+        foreach (glob($this->getProjectDir() . '/plugins/*/config', GLOB_ONLYDIR) ?: [] as $pluginConfigDir) {
+            yield from $this->getPluginModuleConfigDirs($pluginConfigDir);
+        }
     }
 
     #[Override]
@@ -36,6 +46,7 @@ final class ModuleKernel extends Kernel
     {
         parent::build($container);
         $container->addResource(new GlobResource($this->getProjectDir() . '/modules', self::STUB_CONFIG, false));
+        $container->addResource(new GlobResource($this->getProjectDir() . '/plugins', self::PLUGIN_STUB_CONFIG, false));
     }
 
     #[Override]
@@ -43,6 +54,7 @@ final class ModuleKernel extends Kernel
     {
         parent::configureContainer($container);
         $container->import($this->getProjectDir() . '/modules' . self::STUB_CONFIG);
+        $container->import($this->getProjectDir() . '/plugins' . self::PLUGIN_STUB_CONFIG);
         $container->extension('doctrine', [
             'dbal' => ['dbname_suffix' => self::DATABASE_SUFFIX . '%env(default::TEST_TOKEN)%'],
         ]);

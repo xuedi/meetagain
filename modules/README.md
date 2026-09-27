@@ -70,11 +70,11 @@ three places:
 
 - **`modules/<name>/mago.toml`** - the module's own entries: its inbound restriction, its outbound
   permit list, the rules for its `Tests\` and migrations namespaces, and its analyzer exclusion.
-- **`tests/config/mago.toml`** - core's config. It lists every module file in `extends`, and holds what
-  all modules share: the catch-all rules and the structural rules on `Contract/`.
-- **`tests/config/mago-rules.toml`** - the generic inbound backstop, in the shared rule file every
-  plugin's config extends, so each plugin run enforces it too - with `--perimeter`, since plugins
-  declare no structural rules.
+- **`tests/config/mago.toml`** - core's config. It lists every module file in `extends`, and holds the
+  catch-all rules the allowlist mode needs.
+- **`tests/config/mago-rules.toml`** - the generic inbound backstops and the structural rules on
+  `Contract/`, in the shared rule file every plugin's config extends, so each plugin run enforces them
+  too.
 
 A module file is a fragment, never a run of its own. An inbound violation is reported on the file
 doing the reaching, which is outside the module, and one outbound rule puts the whole run into
@@ -195,3 +195,27 @@ belong to the application's functional suite, not to the module.
 
 Nothing else needs touching - not `composer.json`, not `phpunit.xml`, not the Kernel. Those were wired
 once for the tree.
+
+## Modules a plugin ships
+
+A plugin can carry modules of its own in `plugins/<plugin>/modules/<name>/`, built exactly as above. A
+kebab-case directory maps to PascalCase (`search-index` -> `SearchIndex`), in both trees. What changes:
+
+|                       | Core module              | Plugin module                                                                                 |
+|-----------------------|--------------------------|-----------------------------------------------------------------------------------------------|
+| Namespace root        | `Module\<Name>\`         | `Plugin\<Plugin>\Module\<Name>\`                                                              |
+| Loads                 | always                   | with its plugin: container whenever the plugin's config loads, routes only when it is enabled |
+| `mago.toml` listed in | `tests/config/mago.toml` | the plugin's `tests/config/mago.toml`                                                         |
+| Guard rules name      | `Module\<Name>\...`      | `Plugin\<Plugin>\Module\<Name>\...`                                                           |
+
+`plugins/autoload.php` registers the namespaces and `App\Kernel::getPluginModuleConfigDirs()` finds the
+config directories. The module test kernel loads every plugin module in the checkout, still without any
+plugin, and imports each one's stub wiring, so a plugin module tests itself under
+`just testModules` like any other. Its unit tests join the unit suite.
+
+Declaring a plugin module's outbound rule puts that plugin's whole run into allowlist mode, so the plugin's
+config carries the same catch-alls core's does (`@global`, `App\`, `Plugin\`, `Tests\`, its migration
+namespace). The backstop `Plugin\*\Module\*\Internal\**` and the structural rules sit in the shared rule
+file, so they hold in every run. A plugin kept in its own repository adds its directory to `SCAN_ROOTS` in the
+gitignored `config/tools/test-stamp-modules.local`, or changes to its entities never trigger a rebuild of the
+module test database.
