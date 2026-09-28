@@ -8,6 +8,7 @@
         {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
         <form method="post" action="{{ path('app_admin_email_debugging_send') }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('app_admin_email_debugging_send') }}">
             <input type="hidden" name="emailType" value="{{ currentType }}">
             <input type="hidden" name="language" value="{{ currentLanguage }}">
 

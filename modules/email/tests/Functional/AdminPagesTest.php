@@ -175,6 +175,19 @@ final class AdminPagesTest extends WebTestCase
         self::assertNull($this->rowFor('blocked@module-test.example'));
     }
 
+    public function testADebuggingSendWithoutAValidTokenIsRejected(): void
+    {
+        // Arrange
+        $this->loginAsAdmin();
+
+        // Act
+        $this->debuggingSend('forged@module-test.example', 'invalid-csrf-token');
+
+        // Assert
+        self::assertResponseStatusCodeSame(400);
+        self::assertNull($this->rowFor('forged@module-test.example'));
+    }
+
     public function testASendlogRowOpensWithItsDetails(): void
     {
         // Arrange
@@ -202,12 +215,26 @@ final class AdminPagesTest extends WebTestCase
             ->send(self::getContainer()->get(TriggeredEmail::class), ['recipients' => ['synced@module-test.example']]);
         self::getContainer()->get(EmailService::class)->sendQueue();
 
+        $sync = $this->client->request('GET', self::BASE . '/sendlog')->filter('a[href$="/sendlog/sync"][data-post]');
+
         // Act
-        $this->client->request('POST', self::BASE . '/sendlog/sync');
+        $this->client->request('POST', self::BASE . '/sendlog/sync', ['_token' => $sync->attr('data-csrf-token')]);
 
         // Assert
         self::assertResponseRedirects(self::BASE . '/sendlog');
         self::assertSame('delivered', $this->rowFor('synced@module-test.example')?->providerStatus);
+    }
+
+    public function testTheManualSyncWithoutAValidTokenIsRejected(): void
+    {
+        // Arrange
+        $this->loginAsAdmin();
+
+        // Act
+        $this->client->request('POST', self::BASE . '/sendlog/sync', ['_token' => 'invalid-csrf-token']);
+
+        // Assert
+        self::assertResponseStatusCodeSame(400);
     }
 
     public function testAnAdminAddsAndRemovesABlocklistEntry(): void
@@ -254,9 +281,14 @@ final class AdminPagesTest extends WebTestCase
         return self::getContainer()->get(TemplatesInterface::class)->render(TriggeredEmail::IDENTIFIER, 'en', [])['subject'];
     }
 
-    private function debuggingSend(string $recipient): void
+    private function debuggingSend(string $recipient, #[\SensitiveParameter] ?string $token = null): void
     {
+        $token ??= (string) $this->client
+            ->request('GET', self::BASE . '/debugging')
+            ->filter('form[action$="/debugging/send"] input[name="_token"]')
+            ->attr('value');
         $this->client->request('POST', self::BASE . '/debugging/send', [
+            '_token' => $token,
             'emailType' => TriggeredEmail::IDENTIFIER,
             'recipient' => $recipient,
             'language' => 'en',

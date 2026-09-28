@@ -11,7 +11,8 @@
             <div class="mb-4">
                 <a href="{{ path('app_admin_email_sendlog_sync') }}"
                    class="button is-small is-info"
-                   data-post>
+                   data-post
+                   data-csrf-token="{{ csrf_token('app_admin_email_sendlog_sync') }}">
                     <span class="icon"><i class="fa fa-refresh"></i></span>
                     <span>{{ 'admin_email_sendlog.button_sync'|trans }}</span>
                 </a>
