@@ -83,8 +83,7 @@ function showStep1(Installer $installer): void
             'db_name' => $installer->getSessionData('db_name', 'meetAgain'),
             'db_user' => $installer->getSessionData('db_user', 'meetAgain'),
             'db_password' => $installer->getSessionData('db_password', ''),
-        ])
-    ;
+        ]);
 }
 
 function handleStep1(Installer $installer): void
@@ -133,8 +132,7 @@ function showStep2(Installer $installer): void
             'ses_region' => $installer->getSessionData('ses_region', 'eu-west-1'),
             'ses_access_key' => $installer->getSessionData('ses_access_key', ''),
             'ses_secret_key' => $installer->getSessionData('ses_secret_key', ''),
-        ])
-    ;
+        ]);
 }
 
 function handleStep2(Installer $installer): void
@@ -177,8 +175,7 @@ function showStep3(Installer $installer): void
             'site_name' => $installer->getSessionData('site_name', 'MeetAgain'),
             'admin_email' => $installer->getSessionData('admin_email', ''),
             'admin_name' => $installer->getSessionData('admin_name', 'Admin'),
-        ])
-    ;
+        ]);
 }
 
 function handleStep3(Installer $installer): void
@@ -221,13 +218,11 @@ function handleStep3(Installer $installer): void
             $installer->render('success', [
                 'site_url' => $data['site_url'],
                 'admin_email' => $data['admin_email'],
-            ])
-        ;
+            ]);
     } else {
         echo
             $installer->render('error', [
                 'message' => 'Installation failed',
-            ])
-        ;
+            ]);
     }
 }

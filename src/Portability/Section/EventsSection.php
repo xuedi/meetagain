@@ -183,9 +183,9 @@ readonly class EventsSection implements SectionInterface
     private function resolveLocation(array $row, ImportContext $context): Location
     {
         return (
-            $context->resolveRef(Location::class, $row['location_ref'] ?? null) ?? $this->locationRepository->findOneBy([]) ?? $this->createFallbackLocation(
-                $context->getSystemUser(),
-            )
+            $context->resolveRef(Location::class, $row['location_ref'] ?? null)
+            ?? $this->locationRepository->findOneBy([])
+            ?? $this->createFallbackLocation($context->getSystemUser())
         );
     }
 
