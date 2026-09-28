@@ -1,0 +1,9 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: true
+
+    Module\Suggestion\Tests\Stub\:
+        resource: '../Stub/'
+        exclude: '../Stub/Draft.php'

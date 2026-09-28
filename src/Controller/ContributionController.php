@@ -14,8 +14,7 @@ use App\Item\Tag\TagService;
 use App\Item\Tag\TypeRegistry;
 use App\Review\ChangeProposalService;
 use App\Review\FieldChange;
-use App\Suggestion\SuggestionException;
-use App\Suggestion\SuggestionService;
+use Module\Suggestion\Contract\SuggestionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -28,7 +27,7 @@ final class ContributionController extends AbstractController
 {
     public function __construct(
         private readonly Registry $registry,
-        private readonly SuggestionService $suggestionService,
+        private readonly SuggestionInterface $suggestions,
         private readonly ChangeProposalService $changeProposalService,
         private readonly TypeRegistry $tagTypes,
         private readonly TagService $tagService,
@@ -54,12 +53,12 @@ final class ContributionController extends AbstractController
     #[Route('/{type}/suggest', name: 'app_contribution_suggest', methods: ['GET', 'POST'])]
     public function suggest(Request $request, string $type, #[CurrentUser] User $user): Response
     {
-        if (!$this->registry->has($type) || !$this->suggestionService->hasProvider($type)) {
+        $provider = $this->registry->has($type) ? $this->suggestions->providerFor($type) : null;
+        if ($provider === null) {
             throw $this->createNotFoundException();
         }
 
-        $provider = $this->suggestionService->providerFor($type);
-        if (!$provider->canPropose($user)) {
+        if (!$provider->canPropose((int) $user->getId())) {
             throw $this->createAccessDeniedException();
         }
 
@@ -67,14 +66,14 @@ final class ContributionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->suggestionService->propose($type, $user, $form->getData());
+            $error = $this->suggestions->propose($type, (int) $user->getId(), $form->getData());
+            if ($error === null) {
                 $this->addFlash('success', 'contribution.flash_suggested');
 
                 return $this->redirectToRoute('app_contribution_suggest', ['type' => $type]);
-            } catch (SuggestionException $e) {
-                $this->addFlash('error', $e->getMessage());
             }
+
+            $this->addFlash('error', $error);
         }
 
         return $this->render(
@@ -83,7 +82,7 @@ final class ContributionController extends AbstractController
             + [
                 'form' => $form,
                 'typeLabelKey' => $provider->getLabelKey(),
-                'pending' => $this->pendingSuggestionCards($user, $type),
+                'pending' => $this->suggestions->pendingFor((int) $user->getId(), $type),
             ],
         );
     }
@@ -221,38 +220,13 @@ final class ContributionController extends AbstractController
     {
         $types = [];
         foreach ($sections as $section) {
-            if (!$this->suggestionService->hasProvider($section->type)) {
-                continue;
-            }
-
-            $provider = $this->suggestionService->providerFor($section->type);
-            if ($provider->canPropose($user)) {
+            $provider = $this->suggestions->providerFor($section->type);
+            if ($provider !== null && $provider->canPropose((int) $user->getId())) {
                 $types[$section->type] = $provider->getLabelKey();
             }
         }
 
         return $types;
-    }
-
-    /**
-     * @return list<array{id: int, description: string, rows: list<array{label: string, value: string}>}>
-     */
-    private function pendingSuggestionCards(User $user, string $targetType): array
-    {
-        $cards = [];
-        foreach ($this->suggestionService->pendingFor($user) as $suggestion) {
-            if ($suggestion->getTargetType() !== $targetType) {
-                continue;
-            }
-
-            $cards[] = [
-                'id' => (int) $suggestion->getId(),
-                'description' => $this->suggestionService->describe($suggestion),
-                'rows' => $this->suggestionService->summaryRows($suggestion),
-            ];
-        }
-
-        return $cards;
     }
 
     /**

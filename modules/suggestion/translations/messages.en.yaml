@@ -1,0 +1,25 @@
+profile_review:
+    suggestion_description: '%proposer% suggested %target%'
+
+profile_social:
+    activity_suggestion_created: 'Suggested: %target%'
+    activity_suggestion_approved: 'Approved the suggestion: %target%'
+    activity_suggestion_rejected: 'Rejected the suggestion: %target%'
+
+review_suggestion:
+    page_title: 'Suggestion'
+    submitted_by: '%proposer% suggested a new %type%'
+    intro: 'Correct anything that needs fixing, then save and approve.'
+    resolved_state: 'This suggestion is %status%.'
+    button_save_approve: 'Save & Approve'
+    button_reject: 'Reject'
+    button_withdraw: 'Withdraw'
+    link_back: 'Back to pending reviews'
+    flash_approved: 'Suggestion approved.'
+    flash_rejected: 'Suggestion rejected.'
+    flash_withdrawn: 'Suggestion withdrawn.'
+    flash_not_pending: 'This suggestion has already been resolved.'
+    status_pending: 'Pending'
+    status_approved: 'Approved'
+    status_rejected: 'Rejected'
+    status_withdrawn: 'Withdrawn'

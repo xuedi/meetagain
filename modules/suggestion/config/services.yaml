@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Module\Suggestion\:
+        resource: '../src/'
+        exclude:
+            - '../src/Internal/Entity/'
+
+    Module\Suggestion\Contract\SuggestionInterface: '@Module\Suggestion\Internal\SuggestionService'

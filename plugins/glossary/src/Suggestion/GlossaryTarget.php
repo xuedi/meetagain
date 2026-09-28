@@ -2,9 +2,8 @@
 
 namespace Plugin\Glossary\Suggestion;
 
-use App\Entity\User;
-use App\Suggestion\SuggestionException;
-use App\Suggestion\SuggestionTargetProviderInterface;
+use InvalidArgumentException;
+use Module\Suggestion\Contract\TargetProviderInterface;
 use Override;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Form\GlossaryType;
@@ -15,7 +14,7 @@ use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class GlossaryTarget implements SuggestionTargetProviderInterface
+final readonly class GlossaryTarget implements TargetProviderInterface
 {
     public const string TARGET_TYPE = GlossaryTaggableTypeProvider::ITEM_TYPE;
 
@@ -120,13 +119,13 @@ final readonly class GlossaryTarget implements SuggestionTargetProviderInterface
     }
 
     #[Override]
-    public function canPropose(User $user): bool
+    public function canPropose(int $userId): bool
     {
         return $this->security->isGranted('ROLE_USER');
     }
 
     #[Override]
-    public function canReview(User $user): bool
+    public function canReview(int $userId): bool
     {
         return $this->security->isGranted('ROLE_ORGANIZER');
     }
@@ -144,10 +143,10 @@ final readonly class GlossaryTarget implements SuggestionTargetProviderInterface
     }
 
     #[Override]
-    public function create(object $draft, User $proposer): int
+    public function create(object $draft, int $proposerId): int
     {
         $entry = $this->entry($draft);
-        $this->service->create($entry, (int) $proposer->getId());
+        $this->service->create($entry, $proposerId);
 
         return (int) $entry->getId();
     }
@@ -155,7 +154,7 @@ final readonly class GlossaryTarget implements SuggestionTargetProviderInterface
     private function entry(object $draft): Glossary
     {
         if (!$draft instanceof Glossary) {
-            throw new SuggestionException(sprintf('Expected a Glossary draft, got %s', $draft::class));
+            throw new InvalidArgumentException(sprintf('Expected a Glossary draft, got %s', $draft::class));
         }
 
         return $draft;

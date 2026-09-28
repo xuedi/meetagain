@@ -1,0 +1,25 @@
+profile_review:
+    suggestion_description: '%proposer% hat %target% vorgeschlagen'
+
+profile_social:
+    activity_suggestion_created: 'Vorgeschlagen: %target%'
+    activity_suggestion_approved: 'Vorschlag angenommen: %target%'
+    activity_suggestion_rejected: 'Vorschlag abgelehnt: %target%'
+
+review_suggestion:
+    page_title: 'Vorschlag'
+    submitted_by: '%proposer% hat %type% neu vorgeschlagen'
+    intro: 'Korrigiere, was nicht stimmt, und übernimm den Vorschlag.'
+    resolved_state: 'Dieser Vorschlag ist %status%.'
+    button_save_approve: 'Speichern & übernehmen'
+    button_reject: 'Ablehnen'
+    button_withdraw: 'Zurückziehen'
+    link_back: 'Zurück zu den offenen Prüfungen'
+    flash_approved: 'Vorschlag übernommen.'
+    flash_rejected: 'Vorschlag abgelehnt.'
+    flash_withdrawn: 'Vorschlag zurückgezogen.'
+    flash_not_pending: 'Dieser Vorschlag wurde bereits bearbeitet.'
+    status_pending: 'Offen'
+    status_approved: 'Übernommen'
+    status_rejected: 'Abgelehnt'
+    status_withdrawn: 'Zurückgezogen'

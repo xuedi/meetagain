@@ -23,6 +23,7 @@ extends = [
     "../../modules/ballot/mago.toml",
     "../../modules/circulation/mago.toml",
     "../../modules/email/mago.toml",
+    "../../modules/suggestion/mago.toml",
     "../../modules/trust/mago.toml",
 ]
 
