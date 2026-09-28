@@ -26,7 +26,7 @@ final class Version20260912100000 extends AbstractMigration
 
     private function renameStoredField(string $from, string $to): void
     {
-        foreach (['suggestion' => 'payload', 'change_proposal' => 'changes'] as $table => $column) {
+        foreach ([$this->suggestionTable() => 'payload', 'change_proposal' => 'changes'] as $table => $column) {
             $rows = $this->connection->fetchAllAssociative(sprintf("SELECT id, %s AS data FROM %s WHERE target_type = 'glossary'", $column, $table));
             foreach ($rows as $row) {
                 $data = json_decode((string) $row['data'], true);
@@ -39,5 +39,10 @@ final class Version20260912100000 extends AbstractMigration
                 $this->addSql(sprintf('UPDATE %s SET %s = ? WHERE id = ?', $table, $column), [json_encode($data, JSON_UNESCAPED_UNICODE), (int) $row['id']]);
             }
         }
+    }
+
+    private function suggestionTable(): string
+    {
+        return $this->connection->createSchemaManager()->tablesExist(['mod_suggestion']) ? 'mod_suggestion' : 'suggestion';
     }
 }

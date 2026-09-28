@@ -3,9 +3,9 @@
 namespace Plugin\Photos\Event;
 
 use App\Entity\Event;
+use App\Item\AssociationService;
 use App\Item\Tag\FacetSelection;
 use App\Item\Tag\FacetService;
-use App\Service\Item\AssociationService;
 use Plugin\Photos\Entity\Photo;
 use Plugin\Photos\Service\PhotoService;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;

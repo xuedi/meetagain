@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Index(fields: ['type'])]
+#[ORM\Index(fields: ['createdAt'])]
+#[ORM\Index(fields: ['user', 'createdAt'])]
 class Activity
 {
     #[ORM\Id]

@@ -17,6 +17,7 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -73,6 +74,10 @@ final class DebuggingController extends AbstractEmailController implements Admin
     #[Route('/send', name: 'app_admin_email_debugging_send', methods: ['POST'])]
     public function send(Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('app_admin_email_debugging_send', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $emailTypeValue = $request->request->getString('emailType');
         $recipient = $request->request->getString('recipient');
         $language = $request->request->getString('language');

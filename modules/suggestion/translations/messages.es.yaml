@@ -1,0 +1,25 @@
+profile_review:
+    suggestion_description: '%proposer% propuso %target%'
+
+profile_social:
+    activity_suggestion_created: 'Propuso: %target%'
+    activity_suggestion_approved: 'Aceptó la propuesta: %target%'
+    activity_suggestion_rejected: 'Rechazó la propuesta: %target%'
+
+review_suggestion:
+    page_title: 'Propuesta'
+    submitted_by: '%proposer% propuso un nuevo %type%'
+    intro: 'Corrige lo que haga falta y luego guarda y acepta.'
+    resolved_state: 'Esta propuesta está %status%.'
+    button_save_approve: 'Guardar y aceptar'
+    button_reject: 'Rechazar'
+    button_withdraw: 'Retirar'
+    link_back: 'Volver a las revisiones pendientes'
+    flash_approved: 'Propuesta aceptada.'
+    flash_rejected: 'Propuesta rechazada.'
+    flash_withdrawn: 'Propuesta retirada.'
+    flash_not_pending: 'Esta propuesta ya se ha resuelto.'
+    status_pending: 'Pendiente'
+    status_approved: 'Aceptada'
+    status_rejected: 'Rechazada'
+    status_withdrawn: 'Retirada'

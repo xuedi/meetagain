@@ -2,12 +2,12 @@
 
 namespace Module\Trust\Internal\Controller;
 
-use App\Controller\AbstractController;
 use InvalidArgumentException;
 use Module\Trust\Contract\TrustLevel;
 use Module\Trust\Internal\AccessResolver;
 use Module\Trust\Internal\ContextRegistry;
 use Module\Trust\Internal\VouchService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -37,7 +37,7 @@ final class VouchController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $viewerId = $this->getAuthedUser()->getId();
+        $viewerId = $this->accessResolver->getViewerId();
         if ($viewerId === null || !$this->accessResolver->canView($context, $viewerId)) {
             throw $this->createAccessDeniedException();
         }

@@ -7,7 +7,7 @@
         {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
         {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
-        <table id="filteredTable" class="table is-fullwidth">
+        <table class="table is-fullwidth">
             <thead>
             <tr>
                 <th colspan="2">{{ 'admin_logs.col_created_at'|trans }}</th>
@@ -42,6 +42,22 @@
             {% endfor %}
             </tbody>
         </table>
+
+        {% if pageTotal > 1 %}
+            <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                {% if pageCurrent > 1 %}
+                    <a href="{{ path('app_admin_activity_log', pageParams|merge({'page': pageCurrent - 1})) }}"
+                       class="pagination-previous">{{ 'admin_logs.pagination_previous'|trans }}</a>
+                {% endif %}
+                {% if pageCurrent < pageTotal %}
+                    <a href="{{ path('app_admin_activity_log', pageParams|merge({'page': pageCurrent + 1})) }}"
+                       class="pagination-next">{{ 'admin_logs.pagination_next'|trans }}</a>
+                {% endif %}
+                <p class="pagination-list has-text-grey">
+                    {{ 'admin_logs.pagination_page'|trans({'%page%': pageCurrent, '%pages%': pageTotal}) }}
+                </p>
+            </nav>
+        {% endif %}
 
     </div>
 

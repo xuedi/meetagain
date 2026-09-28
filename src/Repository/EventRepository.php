@@ -225,11 +225,19 @@ class EventRepository extends ServiceEntityRepository
             return $this->eventNameLists[$language];
         }
 
-        $events = $this->createQueryBuilder('e')->leftJoin('e.translations', 't')->addSelect('t')->getQuery()->getResult();
+        $rows = $this
+            ->getEntityManager()
+            ->createQuery(sprintf(
+                'SELECT e.id, (SELECT t.title FROM %s t WHERE t.event = e AND t.language = :language) AS title FROM %s e',
+                EventTranslation::class,
+                Event::class,
+            ))
+            ->setParameter('language', $language)
+            ->getArrayResult();
 
         $list = [];
-        foreach ($events as $event) {
-            $list[$event->getId()] = $event->getTitle($language);
+        foreach ($rows as $row) {
+            $list[$row['id']] = $row['title'] ?? '';
         }
 
         return $this->eventNameLists[$language] = $list;

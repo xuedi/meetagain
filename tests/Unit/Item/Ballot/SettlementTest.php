@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Item\Ballot;
 
+use App\Item\AssociationService;
 use App\Item\Ballot\Purpose;
 use App\Item\Ballot\Settlement;
-use App\Service\Item\AssociationService;
 use Module\Ballot\Contract\BallotOutcome;
 use Module\Ballot\Contract\BallotStatus;
 use Module\Ballot\Contract\BallotSubject;

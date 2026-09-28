@@ -4,7 +4,7 @@ namespace App\Twig;
 
 use App\Enum\ItemViewType;
 use App\Item\ListCellRegistry;
-use App\Service\Item\ViewResolver;
+use App\Item\ViewResolver;
 use Twig\Extension\RuntimeExtensionInterface;
 
 final readonly class ItemViewRuntime implements RuntimeExtensionInterface

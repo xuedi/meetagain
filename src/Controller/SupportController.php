@@ -53,8 +53,13 @@ final class SupportController extends AbstractController
     #[Route('/contact', name: 'app_contact')]
     public function index(Request $request): Response
     {
-        $limiter = $this->supportLimiter->create($request->getClientIp());
-        if (!$limiter->consume()->isAccepted()) {
+        $user = $this->getUser();
+        $isGuest = !$user instanceof User;
+
+        $form = $this->createForm(SupportRequestType::class, null, ['guest' => $isGuest]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && !$this->supportLimiter->create($request->getClientIp())->consume()->isAccepted()) {
             $this->securityService->event(SecurityEventType::RateLimit, $request, ['limiter' => 'support']);
             return $this->render(
                 'rate_limited.html.twig',
@@ -64,12 +69,6 @@ final class SupportController extends AbstractController
                 new Response('', 429),
             );
         }
-
-        $user = $this->getUser();
-        $isGuest = !$user instanceof User;
-
-        $form = $this->createForm(SupportRequestType::class, null, ['guest' => $isGuest]);
-        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $supportRequest = new SupportRequest();

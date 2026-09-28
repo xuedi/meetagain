@@ -1,0 +1,53 @@
+# The Suggestion module's perimeter, pulled into core's run by `extends` in tests/config/mago.toml.
+# Paths resolve against the project root. See modules/README.md, "How Mago Guard enforces it".
+
+[analyzer]
+excludes = ["modules/suggestion/tests/"]
+
+[[guard.perimeter.restrictions]]
+dependency = "Module\\Suggestion\\Internal\\**"
+allow-from = ["Module\\Suggestion\\**"]
+
+[[guard.perimeter.rules]]
+namespace = "Module\\Suggestion\\"
+permit = [
+    "Module\\Suggestion\\**",
+    "@global",                                                               # DateTimeImmutable, Override, PHP's own functions
+    "App\\Entity\\User",                                                     # the proposer and reviewer FKs - the one sanctioned core entity
+    "App\\Controller\\AbstractController",                                   # module controllers extend core's, as plugin controllers do
+    "App\\Activity\\ActivityService",                                        # created, approved and rejected land in the activity log
+    "App\\Activity\\MessageAbstract",                                        # the three activity messages extend core's base
+    "App\\Service\\Notification\\User\\ReviewNotificationProviderInterface", # pending suggestions surface in core's review hub
+    "App\\Service\\Notification\\User\\ReviewNotificationItem",              # that chain's item type
+    "App\\Service\\Config\\PluginService",                                   # the registry drops providers of globally inactive plugins
+    "Doctrine\\**",
+    "Symfony\\**",
+    "Twig\\**",
+    "Psr\\**",
+]
+
+# The module's tests reach what its code may, plus PHPUnit and the shared module test harness - no
+# other core test helper, and no other core class unless listed here with its reason.
+[[guard.perimeter.rules]]
+namespace = "Module\\Suggestion\\Tests\\"
+permit = [
+    "Module\\Suggestion\\**",
+    "@global",                                                               # DateTimeImmutable, Override, PHP's own functions
+    "App\\Entity\\User",                                                     # the proposer and reviewer FKs - the one sanctioned core entity
+    "App\\Controller\\AbstractController",                                   # module controllers extend core's, as plugin controllers do
+    "App\\Activity\\ActivityService",                                        # created, approved and rejected land in the activity log
+    "App\\Activity\\MessageAbstract",                                        # the three activity messages extend core's base
+    "App\\Service\\Notification\\User\\ReviewNotificationProviderInterface", # pending suggestions surface in core's review hub
+    "App\\Service\\Notification\\User\\ReviewNotificationItem",              # that chain's item type
+    "App\\Service\\Config\\PluginService",                                   # the registry drops providers of globally inactive plugins
+    "PHPUnit\\**",
+    "Tests\\Module\\**",                                                     # the shared module test harness: ModuleKernel and Members
+    "Doctrine\\**",
+    "Symfony\\**",
+    "Twig\\**",
+    "Psr\\**",
+]
+
+[[guard.perimeter.rules]]
+namespace = "ModuleSuggestionMigrations"
+permit = ["**"]

@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Enum\ItemViewType;
 use App\Item\ListRegistry;
 use App\Item\Tag\FacetService;
-use App\Service\Item\ViewResolver;
+use App\Item\ViewResolver;
 use App\Twig\ItemListRuntime;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;

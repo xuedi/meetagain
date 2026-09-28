@@ -4,12 +4,12 @@ namespace Plugin\Photos\Tests\Unit\Form;
 
 use App\Filter\Event\EventFilterResult;
 use App\Filter\Event\EventFilterService;
+use App\Item\AssociationService;
 use App\Item\Tag\AssignmentFormHelper;
 use App\Item\Tag\TagService;
 use App\Item\TranslationFormHelper;
 use App\Repository\EventRepository;
 use App\Service\Config\LanguageService;
-use App\Service\Item\AssociationService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Photos\Entity\Photo;
 use Plugin\Photos\Entity\PhotoTranslation;

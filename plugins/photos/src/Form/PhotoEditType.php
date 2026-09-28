@@ -3,10 +3,10 @@
 namespace Plugin\Photos\Form;
 
 use App\Filter\Event\EventFilterService;
+use App\Item\AssociationService;
 use App\Item\Tag\AssignmentFormHelper;
 use App\Item\TranslationFormHelper;
 use App\Repository\EventRepository;
-use App\Service\Item\AssociationService;
 use Override;
 use Plugin\Photos\Entity\Photo;
 use Plugin\Photos\Service\PhotoService;

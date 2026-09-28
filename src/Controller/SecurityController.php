@@ -118,8 +118,11 @@ final class SecurityController extends AbstractController
     #[Route('/register', name: 'app_register')]
     public function register(Request $request, EntityManagerInterface $em): Response
     {
-        $limiter = $this->registrationLimiter->create($request->getClientIp());
-        if (!$limiter->consume()->isAccepted()) {
+        $user = new User();
+        $form = $this->createForm(RegistrationType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && !$this->registrationLimiter->create($request->getClientIp())->consume()->isAccepted()) {
             $submittedEmail = $request->request->all('registration')['email'] ?? null;
             $context = ['limiter' => 'registration'];
             if (is_string($submittedEmail) && $submittedEmail !== '') {
@@ -134,10 +137,6 @@ final class SecurityController extends AbstractController
                 new Response('', 429),
             );
         }
-
-        $user = new User();
-        $form = $this->createForm(RegistrationType::class, $user);
-        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $blockReason = $this->blocklist->reasonFor((string) $user->getEmail());
@@ -222,8 +221,10 @@ final class SecurityController extends AbstractController
     #[Route(path: '/reset', name: 'app_reset')]
     public function reset(Request $request): Response
     {
-        $limiter = $this->passwordResetLimiter->create($request->getClientIp());
-        if (!$limiter->consume()->isAccepted()) {
+        $form = $this->createForm(PasswordResetType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && !$this->passwordResetLimiter->create($request->getClientIp())->consume()->isAccepted()) {
             $submittedEmail = $request->request->all('password_reset')['email'] ?? null;
             $context = ['limiter' => 'password_reset'];
             if (is_string($submittedEmail) && $submittedEmail !== '') {
@@ -238,9 +239,6 @@ final class SecurityController extends AbstractController
                 new Response('', 429),
             );
         }
-
-        $form = $this->createForm(PasswordResetType::class);
-        $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $email = $form->get('email')->getData();

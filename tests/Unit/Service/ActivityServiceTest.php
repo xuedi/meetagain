@@ -126,7 +126,7 @@ class ActivityServiceTest extends TestCase
 
         // Arrange
         $repoMock = $this->createMock(ActivityRepository::class);
-        $repoMock->expects($this->once())->method('findRecentForAdmin')->with(250, null, null)->willReturn($activities);
+        $repoMock->expects($this->once())->method('findRecentForAdmin')->with(250, 0, null, null)->willReturn($activities);
 
         // Arrange
         $message1 = $this->createMock(MessageInterface::class);

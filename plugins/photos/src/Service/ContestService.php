@@ -10,14 +10,17 @@ use Module\Ballot\Contract\BallotRequest;
 use Module\Ballot\Contract\BallotStatus;
 use Module\Ballot\Contract\BallotView;
 use Module\Ballot\Contract\Candidate;
+use Module\Ballot\Contract\PageProviderInterface;
 use Module\Ballot\Contract\SettlementMode;
 use Module\Ballot\Contract\TallyMode;
+use Override;
 use Plugin\Photos\Entity\Photo;
 use Plugin\Photos\Repository\PhotoRepository;
 use RuntimeException;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-readonly class ContestService
+readonly class ContestService implements PageProviderInterface
 {
     public const string PURPOSE = 'photo.contest';
     public const int DURATION_DAYS = 14;
@@ -30,7 +33,20 @@ readonly class ContestService
         private BallotInterface $ballots,
         private TranslatorInterface $translator,
         private EntityManagerInterface $em,
+        private UrlGeneratorInterface $urlGenerator,
     ) {}
+
+    #[Override]
+    public function supports(string $purpose): bool
+    {
+        return $purpose === self::PURPOSE;
+    }
+
+    #[Override]
+    public function url(BallotView $ballot): string
+    {
+        return $this->urlGenerator->generate('app_plugin_photos_contest');
+    }
 
     public function isLive(): bool
     {

@@ -15,7 +15,7 @@
             {% else %}
                 <div class="panel">
                     {% for ballot in ballots %}
-                        <a class="panel-block is-justify-content-space-between" href="{{ path('app_ballot_show', {'id': ballot.id}) }}">
+                        <a class="panel-block is-justify-content-space-between" href="{{ urls[loop.index0] }}">
                             <span>
                                 <span class="panel-icon"><i class="fas fa-check-to-slot" aria-hidden="true"></i></span>
                                 {{ ballot.title ?? (ballot.tallyMode.label()|trans) }}

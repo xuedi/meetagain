@@ -141,8 +141,12 @@ final class SendlogController extends AbstractEmailController implements AdminNa
     }
 
     #[Route('/sync', name: 'app_admin_email_sendlog_sync', methods: ['POST'])]
-    public function sync(): Response
+    public function sync(Request $request): Response
     {
+        if (!$this->isCsrfTokenValid('app_admin_email_sendlog_sync', (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
         $result = $this->syncService->syncPending(200);
 
         if ($result->available) {

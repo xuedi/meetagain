@@ -28,22 +28,41 @@ class ActivityRepository extends ServiceEntityRepository
         parent::__construct($registry, Activity::class);
     }
 
-    public function countAll(): int
+    /**
+     * @param array<string, DateTimeImmutable|null> $sinceByRange
+     * @return array{total: int, ranges: array<string, int>}
+     */
+    public function countByRange(array $sinceByRange, ?int $userId = null): array
     {
-        return (int) $this->createQueryBuilder('a')->select('COUNT(a.id)')->getQuery()->getSingleScalarResult();
-    }
-
-    public function countSince(?DateTimeImmutable $since, ?int $userId = null): int
-    {
-        $qb = $this->createQueryBuilder('a')->select('COUNT(a.id)');
-        if ($since !== null) {
-            $qb->andWhere('a.createdAt >= :since')->setParameter('since', $since);
+        $qb = $this->createQueryBuilder('a')->select('COUNT(a.id) AS total');
+        $aliases = [];
+        foreach (array_keys($sinceByRange) as $index => $range) {
+            $conditions = [];
+            if ($userId !== null) {
+                $conditions[] = 'IDENTITY(a.user) = :user';
+            }
+            if ($sinceByRange[$range] !== null) {
+                $conditions[] = 'a.createdAt >= :since' . $index;
+                $qb->setParameter('since' . $index, $sinceByRange[$range]);
+            }
+            $aliases[$range] = 'range' . $index;
+            $qb->addSelect(
+                $conditions === []
+                    ? sprintf('COUNT(a.id) AS %s', $aliases[$range])
+                    : sprintf('SUM(CASE WHEN %s THEN 1 ELSE 0 END) AS %s', implode(' AND ', $conditions), $aliases[$range]),
+            );
         }
         if ($userId !== null) {
-            $qb->andWhere('a.user = :user')->setParameter('user', $userId);
+            $qb->setParameter('user', $userId);
         }
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        $row = $qb->getQuery()->getSingleResult();
+        $ranges = [];
+        foreach ($aliases as $range => $alias) {
+            $ranges[$range] = (int) $row[$alias];
+        }
+
+        return ['total' => (int) $row['total'], 'ranges' => $ranges];
     }
 
     public function findMostRecent(): ?Activity
@@ -54,9 +73,16 @@ class ActivityRepository extends ServiceEntityRepository
     /**
      * @return Activity[]
      */
-    public function findRecentForAdmin(int $limit, ?DateTimeImmutable $since = null, ?int $userId = null): array
+    public function findRecentForAdmin(int $limit, int $offset = 0, ?DateTimeImmutable $since = null, ?int $userId = null): array
     {
-        $qb = $this->createQueryBuilder('a')->leftJoin('a.user', 'u')->addSelect('u')->orderBy('a.createdAt', 'DESC')->setMaxResults($limit);
+        $qb = $this
+            ->createQueryBuilder('a')
+            ->leftJoin('a.user', 'u')
+            ->addSelect('u')
+            ->orderBy('a.createdAt', 'DESC')
+            ->addOrderBy('a.id', 'DESC')
+            ->setFirstResult($offset)
+            ->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->andWhere('a.createdAt >= :since')->setParameter('since', $since);

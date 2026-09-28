@@ -5,7 +5,10 @@ namespace Module\Ballot\Internal\Controller;
 use App\Controller\AbstractController;
 use DomainException;
 use Module\Ballot\Contract\BallotInterface;
+use Module\Ballot\Contract\BallotView;
+use Module\Ballot\Contract\PageProviderInterface;
 use Module\Ballot\Contract\TallyMode;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,15 +19,26 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_USER'), Route('/ballots')]
 final class BallotController extends AbstractController
 {
+    /**
+     * @param iterable<PageProviderInterface> $pageProviders
+     */
     public function __construct(
         private readonly BallotInterface $ballots,
+        #[AutowireIterator(PageProviderInterface::class)]
+        private readonly iterable $pageProviders,
     ) {}
 
     #[Route('', name: 'app_ballot_index', methods: ['GET'])]
     public function index(): Response
     {
+        $ballots = $this->ballots->listOpenFor($this->viewerId());
+
         return $this->render('@Ballot/index.html.twig', [
-            'ballots' => $this->ballots->listOpenFor($this->viewerId()),
+            'ballots' => $ballots,
+            'urls' => array_map(
+                fn(BallotView $ballot): string => $this->claimedUrl($ballot) ?? $this->generateUrl('app_ballot_show', ['id' => $ballot->id]),
+                $ballots,
+            ),
         ]);
     }
 
@@ -34,6 +48,11 @@ final class BallotController extends AbstractController
         $ballot = $this->ballots->view($id, $this->viewerId());
         if ($ballot === null) {
             throw $this->createNotFoundException();
+        }
+
+        $claimedUrl = $this->claimedUrl($ballot);
+        if ($claimedUrl !== null) {
+            return $this->redirect($claimedUrl);
         }
 
         return $this->render('@Ballot/show.html.twig', [
@@ -72,6 +91,17 @@ final class BallotController extends AbstractController
         $submitted = $request->request->all('candidates');
 
         return array_values(array_map(strval(...), array_filter($submitted, is_scalar(...))));
+    }
+
+    private function claimedUrl(BallotView $ballot): ?string
+    {
+        foreach ($this->pageProviders as $provider) {
+            if ($provider->supports($ballot->purpose)) {
+                return $provider->url($ballot);
+            }
+        }
+
+        return null;
     }
 
     private function viewerId(): int

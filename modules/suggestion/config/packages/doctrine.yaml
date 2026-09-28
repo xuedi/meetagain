@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Suggestion:
+                        dir: "%kernel.project_dir%/modules/suggestion/src/Internal/Entity"
+                        is_bundle: false
+                        prefix: Module\Suggestion\Internal\Entity
+                        alias: Suggestion
+
+doctrine_migrations:
+    migrations_paths:
+        ModuleSuggestionMigrations: "%kernel.project_dir%/modules/suggestion/migrations"

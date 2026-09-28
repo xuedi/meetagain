@@ -14,7 +14,6 @@ permit = [
     "Module\\Trust\\**",
     "@global",                              # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                    # the grant FK - the one sanctioned core entity
-    "App\\Controller\\AbstractController",  # module controllers extend core's, as plugin controllers do
     "Doctrine\\**",
     "Symfony\\**",
     "Twig\\**",
@@ -29,7 +28,6 @@ permit = [
     "Module\\Trust\\**",
     "@global",                              # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                    # the grant FK - the one sanctioned core entity
-    "App\\Controller\\AbstractController",  # module controllers extend core's, as plugin controllers do
     "PHPUnit\\**",
     "Tests\\Module\\**",                    # the shared module test harness: ModuleKernel and Members
     "Doctrine\\**",
