@@ -48,6 +48,13 @@ final class AjaxController extends AbstractController
         return $response;
     }
 
+    #[Route('/ajax/cookie/accept', name: 'app_ajax_cookie_accept_get', methods: ['GET'])]
+    #[Route('/ajax/cookie/deny', name: 'app_ajax_cookie_deny_get', methods: ['GET'])]
+    public function rejectCookieGet(): Response
+    {
+        return new Response('', Response::HTTP_METHOD_NOT_ALLOWED, ['Allow' => 'POST']);
+    }
+
     #[Route('/ajax/consent/external-media', name: 'app_ajax_consent_external_media', methods: ['POST'])]
     public function grantExternalMedia(Request $request): Response
     {

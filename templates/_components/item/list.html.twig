@@ -30,6 +30,8 @@
                                                  tiles/grid/gallery layouts (list mode relies on the
                                                  page's own header button). Shown even when empty.
         - addLabel     (string, optional)     -- translation key for the add tile; default: 'item.add'
+        - tilesPerRowMobile (int, optional)   -- tiles per row below the tablet breakpoint, 1 or 2;
+                                                 2 suits image-first cells. Default: 1
     Depends on: item_view_mode(), item_list_cell() (ItemViewExtension); assets/js/item-gallery.js
                 and js/vendor/fancybox.umd.js (loaded by the list page) for the gallery layout
 #}
@@ -80,10 +82,11 @@
             </tbody>
         </table>
     {% elseif current == 'tiles' %}
-        <div class="columns is-multiline">
-            {% if showAdd %}<div class="column is-one-quarter item-cell">{{ itemList.add_tile(addUrl, addLabel) }}</div>{% endif %}
+        {% set twoUp = tilesPerRowMobile|default(1) == 2 %}
+        <div class="columns is-multiline{% if twoUp %} is-mobile{% endif %}">
+            {% if showAdd %}<div class="column is-one-quarter-tablet{% if twoUp %} is-half-mobile{% endif %} item-cell">{{ itemList.add_tile(addUrl, addLabel) }}</div>{% endif %}
             {% for id in itemIds %}
-                <div class="column is-one-quarter item-cell">{{ item_list_cell(itemType, id) }}</div>
+                <div class="column is-one-quarter-tablet{% if twoUp %} is-half-mobile{% endif %} item-cell">{{ item_list_cell(itemType, id) }}</div>
             {% endfor %}
         </div>
     {% elseif current == 'grid' %}
