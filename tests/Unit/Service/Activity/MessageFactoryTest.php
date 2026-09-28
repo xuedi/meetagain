@@ -99,4 +99,36 @@ class MessageFactoryTest extends TestCase
         // Assert
         static::assertInstanceOf(UnknownMessage::class, $result);
     }
+
+    public function testEveryBuildResolvesItsOwnTypeAmongSeveralMessages(): void
+    {
+        // Arrange
+        $login = $this->createStub(MessageInterface::class);
+        $login->method('getType')->willReturn('core.login');
+        $login->method('injectServices')->willReturn($login);
+        $rsvp = $this->createStub(MessageInterface::class);
+        $rsvp->method('getType')->willReturn('core.rsvp_yes');
+        $rsvp->method('injectServices')->willReturn($rsvp);
+        $loginActivity = $this->createStub(Activity::class);
+        $loginActivity->method('getType')->willReturn('core.login');
+        $rsvpActivity = $this->createStub(Activity::class);
+        $rsvpActivity->method('getType')->willReturn('core.rsvp_yes');
+        $factory = new MessageFactory(
+            [$login, $rsvp],
+            $this->router,
+            $this->userRepository,
+            $this->eventRepository,
+            $this->requestStack,
+            $this->imageRenderer,
+            $this->translator,
+        );
+
+        // Act
+        $first = $factory->build($rsvpActivity);
+        $second = $factory->build($loginActivity);
+
+        // Assert
+        static::assertSame($rsvp, $first);
+        static::assertSame($login, $second);
+    }
 }

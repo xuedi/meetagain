@@ -24,7 +24,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ActivityLogController extends AbstractLogsController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';
-    private const int LIST_LIMIT = 5000;
+    private const int PAGE_SIZE = 100;
 
     /** @var array<string, string|null> */
     private const array RANGE_OFFSETS = [
@@ -57,18 +57,20 @@ final class ActivityLogController extends AbstractLogsController implements Admi
         if (!array_key_exists($range, self::RANGE_OFFSETS)) {
             $range = self::DEFAULT_RANGE;
         }
-        $rangeOffset = self::RANGE_OFFSETS[$range];
-        $since = $rangeOffset !== null ? new DateTimeImmutable($rangeOffset) : null;
+        $sinceByRange = $this->sinceByRange();
+        $since = $sinceByRange[$range];
 
         $userFilterId = $request->query->getInt('user') ?: null;
         $userFilter = $userFilterId !== null ? $this->userRepository->find($userFilterId) : null;
         $resolvedUserId = $userFilter?->getId();
 
-        $totalCount = $this->activityRepository->countAll();
-        $rangeCount = $this->activityRepository->countSince($since, $resolvedUserId);
-        $activities = $this->activityService->getAdminList(self::LIST_LIMIT, $since, $resolvedUserId);
+        $counts = $this->activityRepository->countByRange($sinceByRange, $resolvedUserId);
+        $rangeCount = $counts['ranges'][$range];
+        $pageTotal = max(1, (int) ceil($rangeCount / self::PAGE_SIZE));
+        $page = min(max(1, $request->query->getInt('page', 1)), $pageTotal);
+        $activities = $this->activityService->getAdminList(self::PAGE_SIZE, ($page - 1) * self::PAGE_SIZE, $since, $resolvedUserId);
 
-        $actions = [$this->buildRangeDropdown($range, $resolvedUserId)];
+        $actions = [$this->buildRangeDropdown($range, $resolvedUserId, $counts['ranges'])];
         if ($userFilter !== null) {
             $actions[] = new AdminTopActionButton(
                 label: $this->translator->trans('admin_logs.remove_user_filter', [
@@ -79,7 +81,7 @@ final class ActivityLogController extends AbstractLogsController implements Admi
             );
         }
 
-        $adminTop = new AdminTop(info: $this->buildInfo($totalCount, $rangeCount, $since, $userFilter), actions: $actions);
+        $adminTop = new AdminTop(info: $this->buildInfo($counts['total'], $rangeCount, $since, $userFilter), actions: $actions);
 
         return $this->render('admin/logs/logs_activity_list.html.twig', [
             'active' => 'logs',
@@ -88,6 +90,9 @@ final class ActivityLogController extends AbstractLogsController implements Admi
             'currentRange' => $range,
             'defaultRange' => self::DEFAULT_RANGE,
             'userFilterId' => $resolvedUserId,
+            'pageCurrent' => $page,
+            'pageTotal' => $pageTotal,
+            'pageParams' => array_filter(['range' => $range === self::DEFAULT_RANGE ? null : $range, 'user' => $resolvedUserId]),
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
@@ -141,20 +146,22 @@ final class ActivityLogController extends AbstractLogsController implements Admi
         return $info;
     }
 
-    private function buildRangeDropdown(string $current, ?int $userId): AdminTopActionDropdown
+    /**
+     * @param array<string, int> $rangeCounts
+     */
+    private function buildRangeDropdown(string $current, ?int $userId, array $rangeCounts): AdminTopActionDropdown
     {
         $options = [];
-        foreach (self::RANGE_OFFSETS as $key => $offset) {
+        foreach (array_keys(self::RANGE_OFFSETS) as $key) {
             $params = $key === self::DEFAULT_RANGE ? [] : ['range' => $key];
             if ($userId !== null) {
                 $params['user'] = $userId;
             }
-            $optionSince = $offset !== null ? new DateTimeImmutable($offset) : null;
             $options[] = new AdminTopActionDropdownOption(
                 label: $this->translator->trans('admin_logs.range_' . $key),
                 target: $this->generateUrl('app_admin_activity_log', $params),
                 isActive: $key === $current,
-                count: $this->activityRepository->countSince($optionSince, $userId),
+                count: $rangeCounts[$key],
             );
         }
 
@@ -163,6 +170,14 @@ final class ActivityLogController extends AbstractLogsController implements Admi
             options: $options,
             icon: 'clock',
         );
+    }
+
+    /**
+     * @return array<string, DateTimeImmutable|null>
+     */
+    private function sinceByRange(): array
+    {
+        return array_map(static fn(?string $offset): ?DateTimeImmutable => $offset !== null ? new DateTimeImmutable($offset) : null, self::RANGE_OFFSETS);
     }
 
     /**
