@@ -4,7 +4,6 @@ namespace Tests\Unit\Command;
 
 use App\Command\PluginListCommand;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -47,10 +46,6 @@ class PluginListCommandTest extends TestCase
 
             protected function execute($input, $output): int
             {
-                $reflection = new ReflectionClass($this);
-                $method = $reflection->getMethod('getPluginsWithKeys');
-                $method->setAccessible(true);
-
                 $plugins = $this->getTestPlugins();
 
                 if ($plugins === []) {

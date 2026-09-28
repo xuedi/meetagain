@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1.9.0-php8.4.10-bookworm@sha256:0b6617c1cc1a77f49bebad093fa0d38e8a95d666facec7543f8f41e2ef17af24
+FROM dunglas/frankenphp:1.12.7-php8.5.11-bookworm@sha256:d502c4823f75f7738b463919ae993a6a4c7ccccab034e3e3020d3b9d042ec83e
 
 WORKDIR /var/www/html
 
@@ -18,7 +18,7 @@ RUN set -eux; \
     install-php-extensions \
     bcmath \
     gd \
-    xdebug-3.4.0 \
+    xdebug-3.5.3 \
 	pdo_mysql \
 	imagick \
 	intl \
