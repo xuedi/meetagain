@@ -23,6 +23,7 @@ Everything that varies between one kind of decision and another is answered by t
 | Who may vote?                  | `ElectorateProviderInterface`, matched on the purpose            |
 | What does winning *mean*?      | `SettlementListenerInterface`, matched on the purpose            |
 | Who may see it?                | `VisibilityFilterInterface`, an AND-intersection over ballot ids |
+| Where is it voted on?          | `PageProviderInterface`, matched on the purpose                  |
 
 **A candidate is a key, not a row.** `Candidate` carries an opaque `string $key` chosen by the opener
 plus a display `string $label`. One ballot's options can come from a curated list and another's be typed
@@ -32,7 +33,7 @@ in by hand, because the module never resolves a key: it counts them and hands th
 as two scalars, and it is nullable because a decision need not attach to anything. This is why the only
 foreign key the module holds into the rest of the application is the voter on `mod_ballot_vote`.
 
-**`purpose` is the routing key.** It is the string all three seams match on. Consumers namespace theirs.
+**`purpose` is the routing key.** It is the string all four seams match on. Consumers namespace theirs.
 
 **The title is opaque too.** `BallotRequest::$title` is an optional pre-translated string the ballot
 page shows as its heading, falling back to the tally mode's own label. The module stores and echoes it
@@ -66,15 +67,16 @@ key cannot enter a tally.
 Zero votes is reported as undecided, not as every candidate being tied. Both are undecided; they are not
 the same situation, and the deadline cron needs to tell an empty ballot from a genuine deadlock.
 
-## The three seams
+## The four seams
 
-All three are `#[AutoconfigureTag]`ed and resolved inside the module.
+All four are `#[AutoconfigureTag]`ed and resolved inside the module.
 
 | Interface                     | Chain shape                                              | With nothing registered  |
 |-------------------------------|----------------------------------------------------------|--------------------------|
 | `SettlementListenerInterface` | first match on the purpose, by priority                  | settles, writes nothing  |
 | `ElectorateProviderInterface` | first match on the purpose                               | any authenticated member |
 | `VisibilityFilterInterface`   | AND-intersection (`null` = no opinion, `[]` = block all) | everything visible       |
+| `PageProviderInterface`       | first match on the purpose                               | the module's own page    |
 
 A ballot whose purpose nobody claims settles and writes nothing. That is the correct behaviour rather
 than an error: the arithmetic is still true, there is simply nobody who wanted the answer.
@@ -118,17 +120,22 @@ request's user, so nothing the deadline cron attempted on its behalf would be al
 
 Consumers split on one question: **do members need to look at the candidates, or only read them?**
 
-|                | The module's page               | Your own page                                               |
-|----------------|---------------------------------|-------------------------------------------------------------|
-| Candidates are | strings a member can read       | rows a member has to see - posters, photos, dishes          |
-| You implement  | the three seams                 | the three seams, plus a controller and a template           |
-| You call       | `open()`                        | `open()`, then `view()` to render and `cast()` to record    |
-| Example        | `App\Review\FieldBallotService` | `App\Item\Ballot\*`, `Plugin\Photos\Service\ContestService` |
+|                | The module's page               | Your own page                                                         |
+|----------------|---------------------------------|-----------------------------------------------------------------------|
+| Candidates are | strings a member can read       | rows a member has to see - posters, photos, dishes                    |
+| You implement  | the seams you need              | the seams you need, `PageProviderInterface`, a controller, a template |
+| You call       | `open()`                        | `open()`, then `view()` to render and `cast()` to record              |
+| Example        | `App\Review\FieldBallotService` | `App\Item\Ballot\*`, `Plugin\Photos\Service\ContestService`           |
 
 The module renders `Candidate::$label` as plain text and will keep doing so. Teaching it to resolve a
 key into a picture would make it interpret its candidates, which is the one thing it refuses to do. So
 a consumer whose ballot is a wall of film posters keeps its own page and drives this contract from it -
-the module still owns the decision, the arithmetic and all three seams; only the pixels are yours.
+the module still owns the decision, the arithmetic and the other seams; only the pixels are yours.
+
+**Claim that page, or members still land on the text one.** The module's ballot list, which the
+notification bell links to, shows every open ballot. For a purpose a `PageProviderInterface` claims,
+the list links to the claimed URL and `/ballots/{id}` redirects there; for any other it renders the
+labels as text. `App\Item\Ballot\Page` and `ContestService` are the two claims today.
 
 `templates/_components/ballot_tiles.html.twig` in the application is the shared tile grid those pages
 render, so a second such consumer copies a template rather than inventing one.
@@ -157,7 +164,7 @@ application's archive section is the one caller, and it decides per purpose whic
 
 | Path                                  | Holds                                                                             |
 |---------------------------------------|-----------------------------------------------------------------------------------|
-| `modules/ballot/src/Contract/`        | the public surface: `BallotInterface`, the three seams, the VOs                   |
+| `modules/ballot/src/Contract/`        | the public surface: `BallotInterface`, the four seams, the VOs                    |
 | `modules/ballot/src/Internal/`        | the engine, the registries, the cron, the page                                    |
 | `modules/ballot/src/Internal/Entity/` | `Ballot`, `BallotOption`, `BallotVote`                                            |
 | `modules/ballot/migrations/`          | namespace `ModuleBallotMigrations`                                                |

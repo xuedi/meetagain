@@ -4,10 +4,10 @@ namespace Plugin\Photos\Event;
 
 use App\Entity\Event;
 use App\Entity\ItemTag;
+use App\Item\AssociationService;
 use App\Item\Tag\ManagedWriter;
 use App\Item\Tag\TagService;
 use App\Repository\EventRepository;
-use App\Service\Item\AssociationService;
 use Plugin\Photos\Entity\Photo;
 use Plugin\Photos\Service\PhotoService;
 

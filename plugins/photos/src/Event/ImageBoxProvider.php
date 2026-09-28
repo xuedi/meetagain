@@ -3,9 +3,9 @@
 namespace Plugin\Photos\Event;
 
 use App\Entity\Event;
+use App\Item\AssociationService;
 use App\Repository\EventRepository;
 use App\Service\Event\ImageBoxProviderInterface;
-use App\Service\Item\AssociationService;
 use Override;
 use Plugin\Photos\Entity\Photo;
 use Plugin\Photos\Form\EventUploadType;

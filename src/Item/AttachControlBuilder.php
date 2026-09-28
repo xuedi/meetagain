@@ -1,12 +1,7 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Item;
+namespace App\Item;
 
-use App\Item\AttachControl;
-use App\Item\AttachControlType;
-use App\Item\AttachSlot;
-use App\Item\AttachSlotProviderInterface;
-use App\Item\TypeRegistry;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class AttachControlBuilder

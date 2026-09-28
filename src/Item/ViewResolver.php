@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Service\Item;
+namespace App\Item;
 
 use App\Enum\ItemViewType;
 use Symfony\Component\HttpFoundation\RequestStack;

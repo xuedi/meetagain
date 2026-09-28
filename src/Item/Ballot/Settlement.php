@@ -2,7 +2,7 @@
 
 namespace App\Item\Ballot;
 
-use App\Service\Item\AssociationService;
+use App\Item\AssociationService;
 use Module\Ballot\Contract\BallotOutcome;
 use Module\Ballot\Contract\SettlementListenerInterface;
 use Override;

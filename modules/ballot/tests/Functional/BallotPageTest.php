@@ -9,6 +9,7 @@ use Module\Ballot\Contract\BallotInterface;
 use Module\Ballot\Contract\BallotRequest;
 use Module\Ballot\Contract\Candidate;
 use Module\Ballot\Tests\Stub\BlindfoldVisibilityFilter;
+use Module\Ballot\Tests\Stub\ClaimedPage;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Tests\Module\Members;
@@ -51,6 +52,36 @@ final class BallotPageTest extends WebTestCase
         $crawler = $client->request('GET', '/en/ballots/' . $id);
         self::assertResponseIsSuccessful();
         self::assertCount(2, $crawler->filter('input[name="candidates[]"]'));
+    }
+
+    public function testTheIndexLinksAClaimedBallotToItsOwnersPage(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $client->loginUser($this->member($client));
+        $id = $this->openBallot($client, ClaimedPage::PURPOSE);
+
+        // Act
+        $crawler = $client->request('GET', '/en/ballots');
+
+        // Assert
+        self::assertResponseIsSuccessful();
+        self::assertCount(1, $crawler->filter('a[href="/elsewhere/' . $id . '"]'));
+        self::assertCount(0, $crawler->filter('a[href$="/en/ballots/' . $id . '"]'));
+    }
+
+    public function testTheModulePageOfAClaimedBallotRedirectsToItsOwnersPage(): void
+    {
+        // Arrange
+        $client = static::createClient();
+        $client->loginUser($this->member($client));
+        $id = $this->openBallot($client, ClaimedPage::PURPOSE);
+
+        // Act
+        $client->request('GET', '/en/ballots/' . $id);
+
+        // Assert
+        self::assertResponseRedirects('/elsewhere/' . $id);
     }
 
     public function testAMemberCanCastAVoteFromThePage(): void
