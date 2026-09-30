@@ -112,6 +112,7 @@ services:
       - DATABASE_URL=mysql://${MARIADB_USER}:${MARIADB_PASSWORD}@${MARIADB_HOST}:3306/meetagain_loadtest?charset=utf8mb4
       - REDIS_URL=redis://valkey:6379/3
       - MOLLIE_WEBHOOK_SECRET=loadtest-webhook-secret-0000000000000000
+      - PHP_INI_SCAN_DIR=:/var/www/html/var/loadtest/php
     mem_limit: ${LOADTEST_PHP_MEMORY:-16g}
     memswap_limit: ${LOADTEST_PHP_MEMORY:-16g}
     depends_on:
@@ -121,7 +122,7 @@ services:
     profiles:
       - loadtest
 
-  # Load and attack testing tool (run via: just testLoad / just testAttack)
+  # k6 for load and attack runs (attack runs via: just testAttack)
   loadtest:
     image: grafana/k6:2.2.0@sha256:9bd01d6941fca969cb61bb57d2da5ee9b385fe2aa8881df3798c196564d6ace6
     container_name: "ma-loadtest"
