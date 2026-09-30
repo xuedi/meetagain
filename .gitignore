@@ -26,6 +26,7 @@ installed.lock
 !/tests/reports/load/.gitkeep
 /tests/reports/attack/*
 !/tests/reports/attack/.gitkeep
+/tests/reports/loadtest/
 /var/
 /vendor/
 /.idea/
