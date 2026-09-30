@@ -31,6 +31,8 @@ services:
     volumes:
       - ma-mysql-data:/var/lib/mysql
       - ./mariadb/init:/docker-entrypoint-initdb.d:ro
+    mem_limit: 8g
+    memswap_limit: 8g
     ports:
       - "127.0.0.1:3306:3306"
     environment:
@@ -56,6 +58,8 @@ services:
     container_name: "ma-valkey"
     image: valkey/valkey:9.1@sha256:c123e3715db63d06d4ad6964884037aa0d5d4d703939b9929954112889708e1d
     command: valkey-server --save 60 1 --loglevel warning
+    mem_limit: 2g
+    memswap_limit: 2g
     volumes:
       - ma-valkey-data:/data
 
@@ -107,6 +111,9 @@ services:
       - APP_DEBUG=0
       - DATABASE_URL=mysql://${MARIADB_USER}:${MARIADB_PASSWORD}@${MARIADB_HOST}:3306/meetagain_loadtest?charset=utf8mb4
       - REDIS_URL=redis://valkey:6379/3
+      - MOLLIE_WEBHOOK_SECRET=loadtest-webhook-secret-0000000000000000
+    mem_limit: ${LOADTEST_PHP_MEMORY:-16g}
+    memswap_limit: ${LOADTEST_PHP_MEMORY:-16g}
     depends_on:
       - mariadb
       - valkey
@@ -125,6 +132,8 @@ services:
       - ../tests/reports:/reports
     environment:
       - K6_WEB_DASHBOARD=true
+    mem_limit: 4g
+    memswap_limit: 4g
     profiles:
       - tools
 
