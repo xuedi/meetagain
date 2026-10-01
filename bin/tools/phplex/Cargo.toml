@@ -1,0 +1,8 @@
+[package]
+name = "phplex"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+name = "phplex"
+path = "src/lib.rs"

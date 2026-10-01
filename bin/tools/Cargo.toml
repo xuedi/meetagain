@@ -4,6 +4,7 @@ members = [
     "api",
     "bing",
     "bugsink",
+    "code-drift",
     "comment-guard",
     "docs-guard",
     "gsc",
@@ -11,6 +12,7 @@ members = [
     "mermaid-guard",
     "metrics",
     "output-filter",
+    "phplex",
     "test-stamp",
     "toolconfig",
 ]
@@ -21,6 +23,7 @@ edition = "2021"
 
 [workspace.dependencies]
 toolconfig = { path = "toolconfig" }
+phplex = { path = "phplex" }
 clap = { version = "4", features = ["derive"] }
 ureq = { version = "3", features = ["json"] }
 serde_json = "1"
@@ -30,6 +33,7 @@ blake3 = "1"
 ignore = "0.4"
 globset = "0.4"
 rayon = "1"
+regex = "1"
 
 [profile.release]
 opt-level = 3

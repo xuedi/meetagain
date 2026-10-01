@@ -1,7 +1,6 @@
 mod baseline;
 mod classify;
 mod config;
-mod lexer;
 
 use std::collections::BTreeSet;
 use std::fs;
@@ -164,7 +163,7 @@ fn main() -> ExitCode {
         };
 
         let mut file_violations = 0usize;
-        for comment in lexer::scan(&source) {
+        for comment in phplex::scan(&source) {
             repos[repo_index].counts.total += 1;
             match classify::classify(&comment, &config) {
                 Verdict::Directive => repos[repo_index].counts.directive += 1,

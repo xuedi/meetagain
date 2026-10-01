@@ -126,6 +126,10 @@
             "commands": ["bin/commit-hooks/05-mermaid-guard.bash"]
         },
         {
+            "label": "Code drift",
+            "commands": ["bin/commit-hooks/06-code-drift.bash"]
+        },
+        {
             "label": "Comment guard",
             "commands": ["bin/commit-hooks/06-comment-guard.bash"]
         },

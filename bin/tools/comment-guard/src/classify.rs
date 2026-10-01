@@ -1,5 +1,5 @@
 use crate::config::Config;
-use crate::lexer::Comment;
+use phplex::Comment;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Verdict {
@@ -142,7 +142,7 @@ fn starts_with_ignore_case(haystack: &str, needle: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::lexer::scan;
+    use phplex::scan;
 
     fn config() -> Config {
         Config {

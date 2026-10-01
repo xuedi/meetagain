@@ -31,9 +31,9 @@ just testTools    # run their test suite
 ## The guards
 
 Each runs as a numbered script in `bin/commit-hooks/`, which `bin/commit-hooks.sh` executes for
-both the git pre-commit hook and `just test`. All three scan the **whole tree** rather than just
+both the git pre-commit hook and `just test`. They scan the **whole tree** rather than just
 the staged files, so a violation that arrived through a merge or a `--no-verify` commit is still
-caught. A full scan takes single-digit milliseconds.
+caught. A full scan takes single-digit milliseconds; `code-drift` takes a fraction of a second.
 
 ### `leak-guard` (slot 01)
 
@@ -73,6 +73,33 @@ Enforces the project's comment policy over PHP: comments are scarce by default, 
 not allowed by shape must be justified by a line in that repository's
 `tests/importantCodeComments.txt`. Run `comment-guard --suggest` for ready-to-fill lines.
 Twig, JavaScript and SCSS are out of its scope.
+
+### `code-drift` (slot 06)
+
+Reports PHP that has drifted from the [best practices](best-practices.md): classes too small to
+have earned their file, the longest classes and methods, repositories injected into controllers,
+services that are not `readonly`, inline fully-qualified class names, static methods, catch
+blocks that log and rethrow, native SQL in repositories, and class names that repeat their
+folder. Production code only: `src/`, `plugins/*/src/` and `modules/*/src/`.
+
+```bash
+bin/tools/bin/code-drift              # every detector, top 10 rows each
+bin/tools/bin/code-drift static 25    # one detector, top 25 rows
+bin/tools/bin/code-drift --check      # what the commit hook runs
+```
+
+The hook fails on any finding, except the two informational lists (the longest code, and small
+classes that inject something). A finding that is right in its context is kept with one line in
+that repository's `tests/codeDriftAllow.txt`:
+
+```text
+raw-sql src/Repository/ImageLocationRepository.php::insertForType // DQL has no INSERT IGNORE
+```
+
+The path names one file; the optional symbol narrows the entry to the enclosing method, or the
+injected repository for `repo-in-controller`. An entry that no longer matches anything fails the
+hook too, so a renamed file takes its entry with it. Rules that cover a whole kind of class, such
+as the name families of the filter and provider chains, live in `config/tools/code-drift.dist`.
 
 ---
 
