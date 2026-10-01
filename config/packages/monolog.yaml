@@ -36,7 +36,7 @@ when@test:
                 path: "%kernel.logs_dir%/%kernel.environment%.log"
                 level: debug
 
-when@prod:
+when@prod: &prod
     monolog:
         handlers:
             main:
@@ -52,3 +52,5 @@ when@prod:
                 type: service
                 id: Sentry\Monolog\Handler
                 channels: ["!event"]
+
+when@loadtest: *prod

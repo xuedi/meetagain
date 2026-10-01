@@ -50,20 +50,6 @@ testPerformance:
     {{DOCKER}} stop php-bench
     xdg-open "$(find tests/reports/performance/sitespeed-result -name 'index.html' -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2)"
 
-# Run a load-test scenario (small | medium | cliff). Targets the running dev stack.
-[group('testing')]
-testLoad scenario='small':
-    mkdir -p tests/reports/load
-    {{DOCKER}} run --rm -e K6_WEB_DASHBOARD_EXPORT=/reports/load/{{scenario}}.html loadtest run /scripts/load/{{scenario}}.js
-    @echo "Report: tests/reports/load/{{scenario}}.html"
-    -xdg-open tests/reports/load/{{scenario}}.html
-
-# Run small + medium back to back. cliff is opt-in via testLoad cliff.
-[group('testing')]
-testLoadAll:
-    {{JUST}} testLoad small
-    {{JUST}} testLoad medium
-
 # Run an attack-test scenario (notFoundProbe | rateLimitLogin | accessDeniedScript | fuseCookieRotation).
 [group('testing')]
 testAttack scenario='notFoundProbe':

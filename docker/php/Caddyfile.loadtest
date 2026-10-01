@@ -1,0 +1,42 @@
+{
+	admin off
+	auto_https off
+	log default {
+		output stdout
+		format console
+		level WARN
+	}
+
+	frankenphp {
+		php_ini {
+			memory_limit 1G
+			max_execution_time 300
+			upload_max_filesize 256M
+			post_max_size 512M
+		}
+	}
+}
+
+:80 {
+	root * /var/www/html/public
+	encode zstd br gzip
+
+	handle /media/* {
+		header Cache-Control "public, max-age=86400"
+		file_server {
+			pass_thru
+		}
+	}
+
+	@phpRoute {
+		not file {path}
+	}
+	rewrite @phpRoute index.php
+
+	@frontController path index.php
+	php @frontController
+
+	file_server {
+		hide *.php
+	}
+}

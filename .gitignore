@@ -22,10 +22,9 @@ installed.lock
 /tests/reports/junit-modules.xml
 /tests/reports/query-profile.json
 /tests/reports/performance/*
-/tests/reports/load/*
-!/tests/reports/load/.gitkeep
 /tests/reports/attack/*
 !/tests/reports/attack/.gitkeep
+/tests/reports/loadtest/
 /var/
 /vendor/
 /.idea/

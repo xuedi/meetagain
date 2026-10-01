@@ -25,12 +25,9 @@ class ActivityServiceTest extends TestCase
         $meta = ['key' => 'value'];
 
         // Arrange
-        $messageMock = $this->createMock(MessageInterface::class);
-        $messageMock->expects($this->once())->method('validate');
-
-        // Arrange
         $messageFactoryMock = $this->createMock(MessageFactory::class);
-        $messageFactoryMock->expects($this->once())->method('build')->willReturn($messageMock);
+        $messageFactoryMock->expects($this->once())->method('validate')->with(static::isInstanceOf(Activity::class));
+        $messageFactoryMock->expects($this->never())->method('build');
 
         // Arrange
         $notificationServiceMock = $this->createMock(ActivityNotificationService::class);

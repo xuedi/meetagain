@@ -4,11 +4,13 @@ namespace Tests\Unit\Service\Activity;
 
 use App\Activity\MessageFactory;
 use App\Activity\MessageInterface;
+use App\Activity\Messages\RsvpYes;
 use App\Activity\UnknownMessage;
 use App\Entity\Activity;
 use App\Repository\EventRepository;
 use App\Repository\UserRepository;
 use App\Service\Media\ImageHtmlRenderer;
+use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -130,5 +132,36 @@ class MessageFactoryTest extends TestCase
         // Assert
         static::assertSame($rsvp, $first);
         static::assertSame($login, $second);
+    }
+
+    public function testValidateChecksTheMetaWithoutLoadingTheNameLists(): void
+    {
+        // Arrange
+        $userRepository = $this->createMock(UserRepository::class);
+        $userRepository->expects($this->never())->method('getUserNameList');
+        $eventRepository = $this->createMock(EventRepository::class);
+        $eventRepository->expects($this->never())->method('getEventNameList');
+        $valid = $this->createStub(Activity::class);
+        $valid->method('getType')->willReturn(RsvpYes::TYPE);
+        $valid->method('getMeta')->willReturn(['event_id' => 7]);
+        $invalid = $this->createStub(Activity::class);
+        $invalid->method('getType')->willReturn(RsvpYes::TYPE);
+        $invalid->method('getMeta')->willReturn([]);
+        $factory = new MessageFactory(
+            [new RsvpYes()],
+            $this->router,
+            $userRepository,
+            $eventRepository,
+            $this->requestStack,
+            $this->imageRenderer,
+            $this->translator,
+        );
+
+        // Act
+        $factory->validate($valid);
+
+        // Assert
+        $this->expectException(InvalidArgumentException::class);
+        $factory->validate($invalid);
     }
 }

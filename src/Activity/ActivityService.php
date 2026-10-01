@@ -44,7 +44,7 @@ readonly class ActivityService
         $activity->setMeta($meta);
 
         try {
-            $this->messageFactory->build($activity)->validate();
+            $this->messageFactory->validate($activity);
             $this->notificationService->notify($activity);
 
             $this->em->persist($activity);
@@ -88,7 +88,7 @@ readonly class ActivityService
 
         foreach ($activities as $activity) {
             try {
-                $this->messageFactory->build($activity)->validate();
+                $this->messageFactory->validate($activity);
             } catch (Throwable $e) {
                 $invalidActivities[] = [
                     'id' => $activity->getId(),

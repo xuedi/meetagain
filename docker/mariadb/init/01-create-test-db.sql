@@ -4,3 +4,8 @@
 CREATE DATABASE IF NOT EXISTS meetAgain_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON `meetAgain\_test%`.* TO 'meetAgain'@'%';
 FLUSH PRIVILEGES;
+
+-- Database of the load-test environment, restored from a dump before every run.
+CREATE DATABASE IF NOT EXISTS meetagain_loadtest CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON `meetagain\_loadtest`.* TO 'meetAgain'@'%';
+FLUSH PRIVILEGES;

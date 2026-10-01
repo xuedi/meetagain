@@ -1,6 +1,14 @@
 security:
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        legacy:
+            algorithm: bcrypt
+            cost: 13
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+            algorithm: argon2id
+            memory_cost: 12288
+            time_cost: 3
+            migrate_from:
+                - legacy
 
     role_hierarchy:
         ROLE_ORGANIZER: ROLE_USER
@@ -48,11 +56,15 @@ when@test:
             # important to generate secure password hashes. In tests however, secure hashes
             # are not important, waste resources and increase test times. The following
             # reduces the work factor to the lowest possible values.
-            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
-                algorithm: auto
+            legacy:
+                algorithm: bcrypt
                 cost: 4 # Lowest possible value for bcrypt
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: argon2id
                 time_cost: 3 # Lowest possible value for argon
                 memory_cost: 10 # Lowest possible value for argon
+                migrate_from:
+                    - legacy
         firewalls:
             main:
                 login_throttling:
