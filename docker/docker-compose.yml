@@ -45,7 +45,7 @@ services:
   # Mail catcher for development (UI at localhost:8025)
   mailpit:
     container_name: "ma-mailpit"
-    image: axllent/mailpit:v1.31.1@sha256:98b916bd3c8d61f7633a52d3ea2f58d00620cb01ca57ab59edde68c347a95365
+    image: axllent/mailpit:v1.31.3@sha256:ed9b00c609e77e99c79b93f1178255ebc271868920f2c69a8d166bd5634ed10d
     user: ${HOST_UID}:${HOST_GID}
     ports:
       - "127.0.0.1:1025:1025"
