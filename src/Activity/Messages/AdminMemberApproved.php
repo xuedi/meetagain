@@ -31,9 +31,4 @@ class AdminMemberApproved extends MessageAbstract
 
         return $this->translator->trans('profile_social.activity_admin_member_approved', ['%user%' => $userName]);
     }
-
-    protected function renderHtml(): string
-    {
-        return $this->renderText();
-    }
 }

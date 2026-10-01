@@ -13,6 +13,7 @@ use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Enum\ImageType;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
+use App\Filter\Event\EventFilterService;
 use App\Filter\Image\ImageGalleryFilterService;
 use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
@@ -48,6 +49,7 @@ final class ImageUploadController extends AbstractController
         private readonly ImageLocationService $imageLocationService,
         private readonly Security $security,
         private readonly AvatarService $avatarService,
+        private readonly EventFilterService $eventFilterService,
     ) {}
 
     #[Route('/image/{entity}/{id}/modal', name: 'app_image_modal', requirements: [
@@ -95,6 +97,10 @@ final class ImageUploadController extends AbstractController
         }
         $entityName = $entity;
         $data = $this->prepare($entityName, $id);
+        $selectableIds = array_map(static fn(array $item): ?int => $item['image']->getId(), $data['gallery']);
+        if (!in_array($newImage, $selectableIds, true)) {
+            throw $this->createNotFoundException('Image is not in the selectable gallery.');
+        }
         $entity = $data['entity'];
         $imageType = $data['imageType'];
         $previousImage = $entity?->getImage()?->getId() ?? 0;
@@ -256,6 +262,9 @@ final class ImageUploadController extends AbstractController
             case 'event':
                 $imageType = ImageType::EventUpload;
                 $entity = $this->em->getRepository(Event::class)->findOneBy(['id' => $id]);
+                if ($entity === null || !$this->eventFilterService->isEventAccessible($id)) {
+                    throw $this->createNotFoundException('Event not found');
+                }
                 $image = null;
                 $extendedGallery = array_map(static fn(Image $item) => [
                     'image' => $item,

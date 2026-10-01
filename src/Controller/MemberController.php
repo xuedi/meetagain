@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Enum\ImageType;
+use App\Enum\UserRole;
 use App\Filter\Member\MemberFilterService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
@@ -11,6 +12,7 @@ use App\Service\Member\BlockingService;
 use App\Service\Member\FriendshipService;
 use App\Service\Member\UserService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -23,6 +25,7 @@ final class MemberController extends AbstractController
 {
     public const string ROUTE_MEMBER = 'app_member';
     private const int PAGE_SIZE = 24;
+    private const array MODERATION_RANKS = ['ROLE_ADMIN', 'ROLE_STEWARD', 'ROLE_ORGANIZER'];
 
     public function __construct(
         private readonly UserService $userService,
@@ -31,6 +34,7 @@ final class MemberController extends AbstractController
         private readonly BlockingService $blockingService,
         private readonly MemberFilterService $memberFilterService,
         private readonly ImageLocationService $imageLocationService,
+        private readonly Security $security,
     ) {}
 
     #[Route('/members/{page}', name: self::ROUTE_MEMBER)]
@@ -90,6 +94,7 @@ final class MemberController extends AbstractController
                     'userDetails' => $userDetails,
                     'isFollow' => $currentUser->getFollowing()->contains($userDetails),
                     'isBlocked' => $hasBlockedTarget,
+                    'canModerate' => $this->mayModerate($currentUser, $userDetails),
                 ],
                 $response,
             );
@@ -142,26 +147,22 @@ final class MemberController extends AbstractController
 
     #[Route('/members/restrict/{id}', name: 'app_member_restrict', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
-    public function restrictUser(Request $request, EntityManagerInterface $em, int $id): Response
+    public function restrictUser(Request $request, int $id): Response
     {
         $user = $this->findModeratableMember($request, 'app_member_restrict', $id);
 
-        $user->setRestricted(!$user->isRestricted());
-        $em->persist($user);
-        $em->flush();
+        $this->userService->toggleRestricted($this->getAuthedUser(), $user);
 
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
 
     #[Route('/members/verify/{id}', name: 'app_member_verify', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
-    public function verifyUser(Request $request, EntityManagerInterface $em, int $id): Response
+    public function verifyUser(Request $request, int $id): Response
     {
         $user = $this->findModeratableMember($request, 'app_member_verify', $id);
 
-        $user->setVerified(!$user->isVerified());
-        $em->persist($user);
-        $em->flush();
+        $this->userService->toggleVerified($this->getAuthedUser(), $user);
 
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
@@ -176,7 +177,36 @@ final class MemberController extends AbstractController
         if ($user === null || !$this->memberFilterService->isMemberAccessible($id)) {
             throw $this->createNotFoundException('Member not found in current context.');
         }
+        if (!$this->mayModerate($this->getAuthedUser(), $user)) {
+            throw $this->createAccessDeniedException('Members of equal or higher rank cannot be moderated.');
+        }
 
         return $user;
+    }
+
+    private function mayModerate(User $actor, User $target): bool
+    {
+        if ($actor->getId() === $target->getId() || $target->getRole() === UserRole::System) {
+            return false;
+        }
+
+        $actorRank = $this->moderationRank(fn(string $role): bool => $this->security->isGranted($role));
+        $targetRank = $this->moderationRank(fn(string $role): bool => $this->security->isGrantedForUser($target, $role));
+
+        return $actorRank > $targetRank;
+    }
+
+    /**
+     * @param callable(string): bool $isGranted
+     */
+    private function moderationRank(callable $isGranted): int
+    {
+        foreach (self::MODERATION_RANKS as $index => $role) {
+            if ($isGranted($role)) {
+                return count(self::MODERATION_RANKS) - $index;
+            }
+        }
+
+        return 0;
     }
 }

@@ -41,7 +41,10 @@ abstract class MessageAbstract implements MessageInterface
 
     abstract protected function renderText(): string;
 
-    abstract protected function renderHtml(): string;
+    protected function renderHtml(): string
+    {
+        return $this->escapeHtml($this->renderText());
+    }
 
     protected function escapeHtml(string $value): string
     {
