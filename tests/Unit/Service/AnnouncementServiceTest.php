@@ -20,6 +20,7 @@ use App\Service\Http\RequestHostResolver;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\TemplatesInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -536,5 +537,88 @@ class AnnouncementServiceTest extends TestCase
         // Assert
         static::assertStringContainsString('ERROR', $result['content']);
         static::assertStringContainsString('[en]', $result['content']);
+    }
+
+    public static function provideTextMapBlocks(): iterable
+    {
+        yield 'map with marker label links under that label' => [
+            ['content' => 'Meet at the park', 'latitude' => '52.52', 'longitude' => '13.405', 'zoom' => '12', 'markerLabel' => 'Tom & Jerry\'s'],
+            '<p>Meet at the park</p>'
+                . "\n"
+                . '<p><a href="https://www.openstreetmap.org/?mlat=52.52&amp;mlon=13.405#map=12/52.52/13.405">Tom &amp; Jerry&apos;s</a></p>',
+        ];
+        yield 'map without marker label falls back to OpenStreetMap' => [
+            ['content' => 'Meet at the park', 'latitude' => '52.52', 'longitude' => '13.405'],
+            '<p>Meet at the park</p>'
+                . "\n"
+                . '<p><a href="https://www.openstreetmap.org/?mlat=52.52&amp;mlon=13.405#map=15/52.52/13.405">OpenStreetMap</a></p>',
+        ];
+        yield 'invalid coordinates render the text only' => [
+            ['content' => 'Meet at the park', 'latitude' => '123', 'longitude' => '13.405', 'markerLabel' => 'Park'],
+            '<p>Meet at the park</p>',
+        ];
+    }
+
+    #[DataProvider('provideTextMapBlocks')]
+    public function testRenderContentRendersTextMapBlockWithMapLink(array $json, string $expected): void
+    {
+        // Arrange
+        $block = $this->createStub(CmsBlock::class);
+        $block->method('getLanguage')->willReturn('en');
+        $block->method('getType')->willReturn(CmsBlockType::TextMap);
+        $block->method('getJson')->willReturn($json);
+        $subject = $this->createPreviewSubject();
+
+        // Act
+        $result = $subject->getPreviewContext($this->createAnnouncementWithBlocks([$block]), 'en');
+
+        // Assert
+        static::assertSame($expected, $result['content']);
+    }
+
+    public function testRenderContentTreatsBlocksWithoutEmailRenderingAsMissingContent(): void
+    {
+        // Arrange
+        $block = $this->createStub(CmsBlock::class);
+        $block->method('getLanguage')->willReturn('en');
+        $block->method('getType')->willReturn(CmsBlockType::Hero);
+        $block->method('getJson')->willReturn(['title' => 'Welcome']);
+        $subject = $this->createPreviewSubject();
+
+        // Act
+        $result = $subject->getPreviewContext($this->createAnnouncementWithBlocks([$block]), 'en');
+
+        // Assert
+        static::assertSame('ERROR: The CMS page has no content for the language [en]', $result['content']);
+    }
+
+    private function createPreviewSubject(): AnnouncementService
+    {
+        $configService = $this->createStub(ConfigService::class);
+        $configService->method('getHost')->willReturn('https://example.com');
+
+        return new AnnouncementService(
+            em: $this->createStub(EntityManagerInterface::class),
+            userRepo: $this->createStub(UserRepository::class),
+            configService: $configService,
+            templates: $this->createStub(TemplatesInterface::class),
+            announcementEmail: $this->createStub(AnnouncementEmail::class),
+            hostResolver: $this->createStub(RequestHostResolver::class),
+            audience: new AudienceFilterService([]),
+            announcementRepo: $this->createStub(AnnouncementRepository::class),
+        );
+    }
+
+    private function createAnnouncementWithBlocks(array $blocks): Announcement
+    {
+        $cmsPage = $this->createStub(Cms::class);
+        $cmsPage->method('getBlocks')->willReturn(new ArrayCollection($blocks));
+
+        $announcement = $this->createStub(Announcement::class);
+        $announcement->method('getId')->willReturn(1);
+        $announcement->method('getLinkHash')->willReturn('hash');
+        $announcement->method('getCmsPage')->willReturn($cmsPage);
+
+        return $announcement;
     }
 }

@@ -4,15 +4,22 @@ namespace Tests\Unit\Service;
 
 use App\Emails\Types\AdminNotificationEmail;
 use App\Entity\User;
+use App\Enum\CronTaskStatus;
 use App\Repository\UserRepository;
 use App\Service\Admin\AdminNotificationService;
 use App\Service\Config\ConfigService;
 use App\Service\Notification\Admin\AdminNotificationItem;
 use App\Service\Notification\Admin\AdminNotificationProviderInterface;
 use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
@@ -26,6 +33,7 @@ class AdminNotificationServiceTest extends TestCase
         UserRepository $userRepository,
         TagAwareCacheInterface $cache,
         ConfigService $configService,
+        string $now = '2026-01-01 10:00:00',
     ): AdminNotificationService {
         return new AdminNotificationService(
             providers: $providers,
@@ -34,7 +42,7 @@ class AdminNotificationServiceTest extends TestCase
             appCache: $cache,
             configService: $configService,
             logger: $this->createStub(LoggerInterface::class),
-            clock: new MockClock(new DateTimeImmutable('2026-01-01 10:00:00')),
+            clock: new MockClock(new DateTimeImmutable($now)),
             translator: $this->translator(),
         );
     }
@@ -284,6 +292,152 @@ class AdminNotificationServiceTest extends TestCase
 
         // Assert
         static::assertSame('no items', $result);
+    }
+
+    #[DataProvider('quietHoursProvider')]
+    public function testCronTaskSkipsDuringQuietHours(string $now): void
+    {
+        // Arrange
+        $config = $this->createMock(ConfigService::class);
+        $config->expects($this->never())->method('isSendAdminNotification');
+
+        $service = $this->buildService(
+            providers: [],
+            adminNotificationEmail: $this->createStub(AdminNotificationEmail::class),
+            userRepository: $this->createStub(UserRepository::class),
+            cache: $this->createStub(TagAwareCacheInterface::class),
+            configService: $config,
+            now: $now,
+        );
+        $output = new BufferedOutput();
+
+        // Act
+        $result = $service->runCronTask($output);
+
+        // Assert
+        static::assertSame('admin-notifications', $result->identifier);
+        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertStringStartsWith('skipped', $result->message);
+        static::assertStringContainsString('skipped', $output->fetch());
+    }
+
+    public static function quietHoursProvider(): iterable
+    {
+        yield 'just before seven' => ['2026-01-01 06:59:59'];
+        yield 'at twenty-two' => ['2026-01-01 22:00:00'];
+        yield 'midnight' => ['2026-01-01 00:00:00'];
+    }
+
+    #[DataProvider('activeHoursProvider')]
+    public function testCronTaskProcessesDuringActiveHours(string $now): void
+    {
+        // Arrange
+        $config = $this->createStub(ConfigService::class);
+        $config->method('isSendAdminNotification')->willReturn(false);
+
+        $service = $this->buildService(
+            providers: [],
+            adminNotificationEmail: $this->createStub(AdminNotificationEmail::class),
+            userRepository: $this->createStub(UserRepository::class),
+            cache: $this->createStub(TagAwareCacheInterface::class),
+            configService: $config,
+            now: $now,
+        );
+        $output = new BufferedOutput();
+
+        // Act
+        $result = $service->runCronTask($output);
+
+        // Assert
+        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame('disabled', $result->message);
+        static::assertStringContainsString('Admin notifications: disabled', $output->fetch());
+    }
+
+    public static function activeHoursProvider(): iterable
+    {
+        yield 'at seven' => ['2026-01-01 07:00:00'];
+        yield 'just before twenty-two' => ['2026-01-01 21:59:59'];
+    }
+
+    public function testCronTaskReportsAnExceptionInsteadOfThrowing(): void
+    {
+        // Arrange
+        $config = $this->createStub(ConfigService::class);
+        $config->method('isSendAdminNotification')->willThrowException(new RuntimeException('config unavailable'));
+
+        $service = $this->buildService(
+            providers: [],
+            adminNotificationEmail: $this->createStub(AdminNotificationEmail::class),
+            userRepository: $this->createStub(UserRepository::class),
+            cache: $this->createStub(TagAwareCacheInterface::class),
+            configService: $config,
+        );
+        $output = new BufferedOutput();
+
+        // Act
+        $result = $service->runCronTask($output);
+
+        // Assert
+        static::assertSame(CronTaskStatus::exception, $result->status);
+        static::assertSame('config unavailable', $result->message);
+        static::assertStringContainsString('config unavailable', $output->fetch());
+    }
+
+    public function testASecondRunDoesNotResendTheSameItems(): void
+    {
+        // Arrange
+        $service = $this->buildSendingService(new TagAwareAdapter(new ArrayAdapter()));
+
+        // Act
+        $first = $service->processNotification();
+        $second = $service->processNotification();
+
+        // Assert
+        static::assertSame('1 sent', $first);
+        static::assertSame('no new items', $second);
+    }
+
+    public function testCacheFailuresNeitherBlockNorFailTheSend(): void
+    {
+        // Arrange
+        $cache = $this->createStub(TagAwareCacheInterface::class);
+        $cache->method('get')->willThrowException(new InvalidArgumentException('bad key'));
+        $service = $this->buildSendingService($cache);
+
+        // Act
+        $result = $service->processNotification();
+
+        // Assert
+        static::assertSame('1 sent', $result);
+    }
+
+    private function buildSendingService(TagAwareCacheInterface $cache): AdminNotificationService
+    {
+        $config = $this->createStub(ConfigService::class);
+        $config->method('isSendAdminNotification')->willReturn(true);
+
+        $provider = $this->createStub(AdminNotificationProviderInterface::class);
+        $provider->method('getLatestPendingAt')->willReturn(new DateTimeImmutable('2026-01-01 09:00:00'));
+        $provider->method('getSection')->willReturn('Users Pending Approval');
+        $provider->method('getPendingItems')->willReturn([new AdminNotificationItem('Jane Smith', 'app_admin_member')]);
+
+        $admin = $this->createStub(User::class);
+        $admin->method('getLocale')->willReturn('en');
+
+        $userRepository = $this->createStub(UserRepository::class);
+        $userRepository->method('findAdminUsers')->willReturn([$admin]);
+
+        $email = $this->createStub(AdminNotificationEmail::class);
+        $email->method('send')->willReturn(1);
+
+        return $this->buildService(
+            providers: [$provider],
+            adminNotificationEmail: $email,
+            userRepository: $userRepository,
+            cache: $cache,
+            configService: $config,
+        );
     }
 
     private function translator(): Translator
