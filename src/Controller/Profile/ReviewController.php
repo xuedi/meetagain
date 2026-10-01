@@ -4,7 +4,7 @@ namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
 use App\Entity\User;
-use App\Service\Notification\User\ReviewNotificationService;
+use App\Service\Notification\User\ReviewService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,7 +16,7 @@ use Throwable;
 final class ReviewController extends AbstractController
 {
     public function __construct(
-        private readonly ReviewNotificationService $service,
+        private readonly ReviewService $service,
     ) {}
 
     #[Route('/profile/review', name: 'app_profile_review', methods: ['GET'])]

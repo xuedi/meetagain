@@ -10,12 +10,12 @@ use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use Plugin\Films\Repository\FilmRepository;
 
-final class FilmPosterImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class FilmPosterImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function __construct(
         ImageLocationRepository $repo,
         Connection $connection,
-        private readonly FilmRepository $filmRepository,
+        private FilmRepository $filmRepository,
     ) {
         parent::__construct($repo, $connection);
     }

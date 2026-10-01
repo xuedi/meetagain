@@ -12,10 +12,14 @@ use Override;
 
 readonly class ItemPurpose implements PurposeInterface
 {
+    public function __construct(
+        private Purpose $purpose,
+    ) {}
+
     #[Override]
     public function supports(string $purpose): bool
     {
-        return Purpose::itemTypeOf($purpose) !== null;
+        return $this->purpose->itemTypeOf($purpose) !== null;
     }
 
     #[Override]
@@ -35,7 +39,7 @@ readonly class ItemPurpose implements PurposeInterface
     #[Override]
     public function importKey(string $purpose, string $key, ImportContext $context): ?string
     {
-        $itemType = Purpose::itemTypeOf($purpose);
+        $itemType = $this->purpose->itemTypeOf($purpose);
         $itemId = $itemType === null ? null : $context->resolveItem($itemType, $key);
 
         return $itemId === null ? null : (string) $itemId;

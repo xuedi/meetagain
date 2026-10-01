@@ -5,7 +5,7 @@ namespace Plugin\Wishlist\Controller;
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Item\TypeRegistry;
-use App\Repository\EventRepository;
+use App\Service\Event\EventService;
 use Plugin\Wishlist\Activity\Messages\WishlistAdded;
 use Plugin\Wishlist\Service\WishlistService;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +21,7 @@ final class WishlistController extends AbstractController
     public function __construct(
         private readonly WishlistService $wishlistService,
         private readonly TypeRegistry $registry,
-        private readonly EventRepository $eventRepo,
+        private readonly EventService $eventService,
         private readonly ActivityService $activityService,
     ) {}
 
@@ -54,7 +54,7 @@ final class WishlistController extends AbstractController
     #[IsGranted('ROLE_ORGANIZER')]
     public function pick(int $eventId, string $itemType): Response
     {
-        $event = $this->eventRepo->find($eventId);
+        $event = $this->eventService->findEvent($eventId);
         if ($event === null || !$this->registry->has($itemType)) {
             throw $this->createNotFoundException('Event or item type not found');
         }

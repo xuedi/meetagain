@@ -5,11 +5,11 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Enum\ImageType;
 use App\Filter\Member\MemberFilterService;
-use App\Repository\UserRepository;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Member\BlockingService;
 use App\Service\Member\FriendshipService;
+use App\Service\Member\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +25,7 @@ final class MemberController extends AbstractController
     private const int PAGE_SIZE = 24;
 
     public function __construct(
-        private readonly UserRepository $repo,
+        private readonly UserService $userService,
         private readonly FriendshipService $service,
         private readonly ImageService $imageService,
         private readonly BlockingService $blockingService,
@@ -44,12 +44,9 @@ final class MemberController extends AbstractController
         $restrictToUserIds = $filterResult->getUserIds();
 
         $excludeIds = $currentUser instanceof User ? $this->blockingService->getExcludedUserIds($currentUser) : [];
-        $userTotal = $currentUser instanceof User
-            ? $this->repo->getNumberOfActiveMembers($excludeIds, $restrictToUserIds)
-            : $this->repo->getNumberOfActivePublicMembers($restrictToUserIds);
-        $users = $currentUser instanceof User
-            ? $this->repo->findActiveMembers(self::PAGE_SIZE, $offset, $excludeIds, $restrictToUserIds)
-            : $this->repo->findActivePublicMembers(self::PAGE_SIZE, $offset, $restrictToUserIds);
+        $publicOnly = !$currentUser instanceof User;
+        $userTotal = $this->userService->countDirectoryMembers($publicOnly, $excludeIds, $restrictToUserIds);
+        $users = $this->userService->findDirectoryMembers($publicOnly, self::PAGE_SIZE, $offset, $excludeIds, $restrictToUserIds);
 
         return $this->render(
             'member/index.html.twig',
@@ -74,7 +71,7 @@ final class MemberController extends AbstractController
         $response = $this->getResponse();
         try {
             $currentUser = $this->getAuthedUser();
-            $userDetails = $this->repo->findOneBy(['id' => $id]);
+            $userDetails = $this->userService->findUser($id);
 
             if ($userDetails === null || !$this->memberFilterService->isMemberAccessible($id)) {
                 throw $this->createNotFoundException();
@@ -175,7 +172,7 @@ final class MemberController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $user = $this->repo->findOneBy(['id' => $id]);
+        $user = $this->userService->findUser($id);
         if ($user === null || !$this->memberFilterService->isMemberAccessible($id)) {
             throw $this->createNotFoundException('Member not found in current context.');
         }

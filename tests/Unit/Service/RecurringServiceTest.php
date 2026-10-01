@@ -16,7 +16,7 @@ use App\Repository\RsvpGuestRepository;
 use App\Service\Cms\CmsService;
 use App\Service\Event\OccurrenceCalculator;
 use App\Service\Event\RecurrenceResolver;
-use App\Service\Event\RecurringEventService;
+use App\Service\Event\RecurringService;
 use App\ValueObject\RealignmentItem;
 use App\ValueObject\RealignmentPlan;
 use App\ValueObject\ScheduleChange;
@@ -31,7 +31,7 @@ use Tests\Unit\Stubs\EventSeriesStub;
 use Tests\Unit\Stubs\EventStub;
 use Tests\Unit\Stubs\UserStub;
 
-class RecurringEventServiceTest extends TestCase
+class RecurringServiceTest extends TestCase
 {
     private const string NOW = '2026-06-15 12:00:00'; // a Monday, so weekday maths in the fixtures is readable
 
@@ -61,8 +61,8 @@ class RecurringEventServiceTest extends TestCase
         EntityManagerInterface $em,
         ?EventSeriesRepository $seriesRepo = null,
         string $now = self::NOW,
-    ): RecurringEventService {
-        return new RecurringEventService(
+    ): RecurringService {
+        return new RecurringService(
             repo: $repo,
             seriesRepo: $seriesRepo ?? $this->createStub(EventSeriesRepository::class),
             rsvpGuestRepo: $this->createStub(RsvpGuestRepository::class),
@@ -851,7 +851,7 @@ class RecurringEventServiceTest extends TestCase
         $dispatcher = $this->createMock(EntityActionDispatcher::class);
         $dispatcher->expects($this->once())->method('dispatch')->with(EntityAction::UpdateEvent, 3);
 
-        $service = new RecurringEventService(
+        $service = new RecurringService(
             repo: $repo,
             seriesRepo: $this->createStub(EventSeriesRepository::class),
             rsvpGuestRepo: $this->createStub(RsvpGuestRepository::class),

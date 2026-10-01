@@ -60,7 +60,7 @@ class OpaqueMediaPathResolverTest extends TestCase
         $logicalPath = 'images/logo.png';
 
         // Act
-        $hash = OpaqueMediaPathResolver::hashLogicalPath($logicalPath);
+        $hash = $this->resolver->hashLogicalPath($logicalPath);
 
         // Assert
         $this->assertSame(OpaqueMediaPathResolver::HASH_LENGTH, strlen($hash));

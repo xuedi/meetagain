@@ -19,7 +19,7 @@ src/Activity/NotificationService.php::sendRsvp // deliberate swallow: a cache wr
 
 # --- Admin surfaces ---
 src/Admin/Top/Infos/AdminTopInfoHtml.php::__construct // XSS constraint: the renderer emits this with |raw, so callers own the escaping
-src/Service/Admin/AdminNavigationService.php::getSidebarSections // required ordering for routeExists(), plus why links dedup by route
+src/Service/Admin/NavigationService.php::getSidebarSections // required ordering for routeExists(), plus why links dedup by route
 
 # --- Assets ---
 src/AssetMapper/AppBundle.php::SOURCES // required ordering: ma-fetch defines maFetch, which the later sources depend on
@@ -64,7 +64,7 @@ src/Repository/EventRepository.php::getPastEvents // two-step query so setMaxRes
 src/Repository/UserRepository.php::findAnnouncementSubscribers // the announcements flag is a JSON column, so that filter cannot live in the query
 
 # --- Caching and config ---
-src/Service/Cache/RedisCacheService.php::intResult // upstream behaviour: phpredis returns the client itself inside MULTI/PIPELINE
+src/Service/Cache/RedisService.php::intResult // upstream behaviour: phpredis returns the client itself inside MULTI/PIPELINE
 src/Service/Config/LanguageService.php::invalidateCache // deliberate swallow: a failed invalidation self-heals on the next request
 src/Service/Config/LanguageService.php::getFilteredEnabledCodes // an empty filter result must fall back to all codes, or the site loses every language
 src/Service/Config/LanguageService.php::getAdminFilteredEnabledCodes // an empty filter result must fall back to all codes, or admin loses every language
@@ -80,9 +80,9 @@ src/Service/Event/RecurrenceDescriber.php::sentenceKey // translation keys embed
 src/Service/Event/RecurrenceDescriber.php::parameters // both day forms are passed because catalogues need different ones per language
 src/Service/Event/RecurrencePreviewService.php::candidates // a yearly rule needs a BYMONTH only the picked date supplies, and why takeFrom not take
 src/Service/Event/RecurrenceResolver.php::resolve // an unparseable spec resolves to null on purpose: one bad row must not fatal a listing
-src/Service/Event/RecurringEventService.php::updateRecurringEvents // the series-keyed query can return the anchor itself, which the filter below removes
-src/Service/Event/RecurringEventService.php::planRealignment // a finite rule can run out, and the remaining members keep their dates rather than move
-src/Service/Event/RecurringEventService.php::fillRecurringEvents // extension needs a non-locked member, and the comparison uses the composed start
+src/Service/Event/RecurringService.php::updateRecurringEvents // the series-keyed query can return the anchor itself, which the filter below removes
+src/Service/Event/RecurringService.php::planRealignment // a finite rule can run out, and the remaining members keep their dates rather than move
+src/Service/Event/RecurringService.php::fillRecurringEvents // extension needs a non-locked member, and the comparison uses the composed start
 src/ValueObject/RecurrencePattern.php::dayOfMonth // "last day" is a different sentence from a numbered day, so it never joins a list
 
 # --- Media ---
@@ -121,7 +121,7 @@ tests/Unit/Service/Event/RecurringEventExtensionTest.php::testExtendKeepsTheFirs
 tests/Unit/Service/ImageServiceTest.php::testGetObsoleteThumbnails // labels which fixture rows are valid vs obsolete, and why the size check is limited
 tests/Unit/Service/Notification/User/MissingAltImageNotificationProviderTest.php::testEmitsItemPerIncompleteImageWithMissingLanguageCount // shows how each fixture row adds up to its expected missing-language count
 tests/Unit/Service/PasswordResetServiceTest.php::testRequestResetSetsRegcodeAndPersistsUser // magic constant: 64 is bin2hex(random_bytes(32)), not an arbitrary length
-tests/Unit/Service/RecurringEventServiceTest.php::NOW // the anchor date is a Monday, which is what makes the weekday maths readable
+tests/Unit/Service/RecurringServiceTest.php::NOW // the anchor date is a Monday, which is what makes the weekday maths readable
 tests/Unit/Service/Seo/EventSimilarityServiceTest.php::testFieldsEmptyOnBothSidesDoNotDistortTheWeighting // spells out which weights remain, which is the arithmetic behind the expectation
 tests/Unit/Service/System/CronIntervalCheckServiceTest.php::gapProvider // fixes the reference "now" and the thresholds every provider row is measured against
 tests/Unit/Service/System/HealthCheckServiceTest.php::makeService // why disk-space lookups are stubbed: runAll() would otherwise touch the real filesystem

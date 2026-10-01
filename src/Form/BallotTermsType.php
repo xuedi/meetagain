@@ -79,7 +79,7 @@ final class BallotTermsType extends AbstractType
      * @param  array<string, mixed> $terms
      * @return array{deadline: string, tallyMode: TallyMode}
      */
-    public static function read(array $terms, TallyMode $default = TallyMode::Approval): array
+    public function read(array $terms, TallyMode $default = TallyMode::Approval): array
     {
         $days = (int) ($terms[self::FIELD_DURATION] ?? self::DEFAULT_DURATION_DAYS);
         $days = max(1, min(self::MAXIMUM_DURATION_DAYS, $days));

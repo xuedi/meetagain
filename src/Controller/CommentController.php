@@ -6,7 +6,6 @@ use App\Comment\CommentService;
 use App\Comment\InvalidContentException;
 use App\Comment\TargetProviderInterface;
 use App\Comment\TargetRegistry;
-use App\Repository\CommentRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -19,7 +18,6 @@ final class CommentController extends AbstractController
     public function __construct(
         private readonly CommentService $commentService,
         private readonly TargetRegistry $registry,
-        private readonly CommentRepository $comments,
     ) {}
 
     #[Route('/comment/{targetType}/{targetId}', name: 'app_comment_create', requirements: ['targetType' => '[a-z_]+', 'targetId' => '\d+'], methods: ['POST'])]
@@ -66,7 +64,7 @@ final class CommentController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $comment = $this->comments->find($id);
+        $comment = $this->commentService->findComment($id);
         if ($comment === null || $comment->getTargetType() !== $targetType || $comment->getTargetId() !== $targetId) {
             throw $this->createNotFoundException();
         }

@@ -8,7 +8,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 readonly class ReviewNotificationProvider implements NotificationProviderInterface
 {
     public function __construct(
-        private ReviewNotificationService $service,
+        private ReviewService $service,
         private TranslatorInterface $translator,
     ) {}
 

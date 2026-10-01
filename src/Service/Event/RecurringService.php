@@ -29,7 +29,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-readonly class RecurringEventService implements CronTaskInterface
+readonly class RecurringService implements CronTaskInterface
 {
     public function __construct(
         private EventRepository $repo,

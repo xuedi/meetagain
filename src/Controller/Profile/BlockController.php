@@ -3,8 +3,8 @@
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
-use App\Repository\UserRepository;
 use App\Service\Member\BlockingService;
+use App\Service\Member\UserService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +17,7 @@ final class BlockController extends AbstractController
 {
     public function __construct(
         private readonly BlockingService $blockingService,
-        private readonly UserRepository $userRepo,
+        private readonly UserService $userService,
     ) {}
 
     #[Route('/profile/block/{id}', name: 'app_profile_block_user', methods: ['POST'])]
@@ -26,7 +26,7 @@ final class BlockController extends AbstractController
         $this->assertToken($request, 'app_profile_block_user' . $id);
 
         $currentUser = $this->getAuthedUser();
-        $targetUser = $this->userRepo->findOneBy(['id' => $id]);
+        $targetUser = $this->userService->findUser($id);
 
         if ($targetUser === null) {
             throw $this->createNotFoundException();
@@ -68,7 +68,7 @@ final class BlockController extends AbstractController
         $this->assertToken($request, 'app_profile_unblock_user' . $id);
 
         $currentUser = $this->getAuthedUser();
-        $targetUser = $this->userRepo->findOneBy(['id' => $id]);
+        $targetUser = $this->userService->findUser($id);
 
         if ($targetUser === null) {
             throw $this->createNotFoundException();

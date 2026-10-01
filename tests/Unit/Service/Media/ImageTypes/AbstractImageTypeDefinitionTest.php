@@ -10,13 +10,15 @@ use Doctrine\DBAL\Connection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-class TestImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class TestImageTypeDefinition extends AbstractImageTypeDefinition
 {
-    /** @var array<array{imageId: int, locationId: int}> */
-    public array $discovered = [];
-
-    /** @var array<int, array{0: int, 1: int}> */
-    public array $rawSizes = [[400, 400]];
+    public function __construct(
+        ImageLocationRepository $repo,
+        Connection $connection,
+        public TestImageTypeDefinitionControl $control = new TestImageTypeDefinitionControl(),
+    ) {
+        parent::__construct($repo, $connection);
+    }
 
     public function getType(): ImageType
     {
@@ -25,7 +27,7 @@ class TestImageTypeDefinition extends AbstractImageTypeDefinition
 
     protected function sizes(): array
     {
-        return $this->rawSizes;
+        return $this->control->rawSizes;
     }
 
     public function getEditLink(int $locationId): ?array
@@ -35,8 +37,17 @@ class TestImageTypeDefinition extends AbstractImageTypeDefinition
 
     public function discoverImageIds(): array
     {
-        return $this->discovered;
+        return $this->control->discovered;
     }
+}
+
+class TestImageTypeDefinitionControl
+{
+    /** @var array<array{imageId: int, locationId: int}> */
+    public array $discovered = [];
+
+    /** @var array<int, array{0: int, 1: int}> */
+    public array $rawSizes = [[400, 400]];
 }
 
 class AbstractImageTypeDefinitionTest extends TestCase
@@ -49,7 +60,7 @@ class AbstractImageTypeDefinitionTest extends TestCase
     public function testThumbnailSizesAppendsUniversalReportAndMicroSizes(): void
     {
         $definition = $this->makeDefinition();
-        $definition->rawSizes = [[400, 400], [350, 350]];
+        $definition->control->rawSizes = [[400, 400], [350, 350]];
 
         static::assertSame([[400, 400], [350, 350], [100, 100], [50, 50]], $definition->thumbnailSizes());
     }
@@ -57,7 +68,7 @@ class AbstractImageTypeDefinitionTest extends TestCase
     public function testThumbnailSizesDeduplicatesWhenDefinitionAlreadyListsUniversalSizes(): void
     {
         $definition = $this->makeDefinition();
-        $definition->rawSizes = [[350, 350], [100, 100]];
+        $definition->control->rawSizes = [[350, 350], [100, 100]];
 
         static::assertSame([[350, 350], [100, 100], [50, 50]], $definition->thumbnailSizes());
     }
@@ -94,7 +105,7 @@ class AbstractImageTypeDefinitionTest extends TestCase
         }
 
         $definition = $this->makeDefinition($repoMock);
-        $definition->discovered = $discoveredPairs;
+        $definition->control->discovered = $discoveredPairs;
 
         // Act
         $definition->sync();

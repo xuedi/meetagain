@@ -4,7 +4,7 @@ twig:
     date:
         timezone: 'Europe/Berlin'
     globals:
-        admin_navigation: '@App\Service\Admin\AdminNavigationService'
+        admin_navigation: '@App\Service\Admin\NavigationService'
 
 when@test:
     twig:

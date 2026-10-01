@@ -16,8 +16,8 @@ use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Filter\Image\ImageGalleryFilterService;
 use App\Form\EventUploadType;
 use App\Form\ImageUploadType;
-use App\Repository\CmsBlockRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use App\Service\Cms\CmsBlockService;
 use App\Service\Media\AvatarService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
@@ -40,7 +40,7 @@ final class ImageUploadController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly ImageService $imageService,
-        private readonly CmsBlockRepository $cmsBlockRepo,
+        private readonly CmsBlockService $cmsBlockService,
         private readonly ActivityService $activityService,
         private readonly ImageGalleryFilterService $imageGalleryFilterService,
         private readonly AdminCmsListFilterService $adminCmsListFilterService,
@@ -303,7 +303,7 @@ final class ImageUploadController extends AbstractController
         return match ($entity) {
             'user' => $this->redirectToRoute('app_profile'),
             'cmsBlock' => $this->redirectToRoute('app_admin_cms_edit', [
-                'id' => $this->cmsBlockRepo->findOneBy(['id' => $id])->getPage()->getId(),
+                'id' => $this->cmsBlockService->findBlock($id)->getPage()->getId(),
             ]),
             default => throw new RuntimeException('Invalid entity'),
         };

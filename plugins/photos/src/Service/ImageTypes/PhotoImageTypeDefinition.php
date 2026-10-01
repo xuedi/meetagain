@@ -9,12 +9,12 @@ use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use Plugin\Photos\Repository\PhotoRepository;
 
-final class PhotoImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class PhotoImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function __construct(
         ImageLocationRepository $repo,
         Connection $connection,
-        private readonly PhotoRepository $photoRepository,
+        private PhotoRepository $photoRepository,
     ) {
         parent::__construct($repo, $connection);
     }

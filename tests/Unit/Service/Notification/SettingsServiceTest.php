@@ -3,18 +3,18 @@
 namespace Tests\Unit\Service\Notification;
 
 use App\Entity\User;
-use App\Service\Notification\NotificationSettingsService;
+use App\Service\Notification\SettingsService;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
-class NotificationSettingsServiceTest extends TestCase
+class SettingsServiceTest extends TestCase
 {
     public function testTogglingEachKnownKeyFlipsOnlyThatKey(): void
     {
         // Arrange
         $user = new User();
-        $service = new NotificationSettingsService($this->entityManager());
+        $service = new SettingsService($this->entityManager());
         $before = $user->getNotificationSettings()->jsonSerialize();
 
         // Act
@@ -32,7 +32,7 @@ class NotificationSettingsServiceTest extends TestCase
     {
         // Arrange
         $user = new User();
-        $service = new NotificationSettingsService($this->entityManager());
+        $service = new SettingsService($this->entityManager());
 
         // Act
         $first = $service->toggle($user, 'announcements');
@@ -47,7 +47,7 @@ class NotificationSettingsServiceTest extends TestCase
     {
         // Arrange
         $user = new User();
-        $service = new NotificationSettingsService($this->entityManager());
+        $service = new SettingsService($this->entityManager());
 
         // Assert
         $this->expectException(InvalidArgumentException::class);
@@ -60,7 +60,7 @@ class NotificationSettingsServiceTest extends TestCase
     {
         // Arrange
         $user = new User();
-        $service = new NotificationSettingsService($this->entityManager());
+        $service = new SettingsService($this->entityManager());
 
         // Act
         $service->apply($user, ['announcements' => false, 'followingUpdates' => true]);
@@ -77,7 +77,7 @@ class NotificationSettingsServiceTest extends TestCase
     {
         // Arrange
         $user = new User();
-        $service = new NotificationSettingsService($this->entityManager());
+        $service = new SettingsService($this->entityManager());
 
         // Assert
         $this->expectException(InvalidArgumentException::class);
@@ -91,7 +91,7 @@ class NotificationSettingsServiceTest extends TestCase
         // Arrange
         $user = new User();
         $user->setNotification(true);
-        $service = new NotificationSettingsService($this->entityManager());
+        $service = new SettingsService($this->entityManager());
 
         // Act
         $service->toggle($user, 'receivedMessage');
@@ -106,7 +106,7 @@ class NotificationSettingsServiceTest extends TestCase
         // Arrange
         $user = new User();
         $user->setNotification(true);
-        $service = new NotificationSettingsService($this->entityManager());
+        $service = new SettingsService($this->entityManager());
 
         // Act
         $service->setMasterSwitch($user, false);

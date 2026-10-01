@@ -3,8 +3,7 @@
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
-use App\Enum\ImageType;
-use App\Repository\ImageRepository;
+use App\Service\Media\ImageService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -13,7 +12,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ImageController extends AbstractController
 {
     public function __construct(
-        private readonly ImageRepository $imageRepo,
+        private readonly ImageService $imageService,
     ) {}
 
     #[Route('/profile/images/{action}/{id}/{imageId}', name: 'app_profile_images', requirements: [
@@ -28,12 +27,8 @@ final class ImageController extends AbstractController
                 $image = $this->getAuthedUser()->getImage();
                 break;
             case 'event':
-                $imageList = $this->imageRepo->findBy([
-                    'uploader' => $this->getUser(),
-                    'event' => $id,
-                    'type' => ImageType::EventUpload,
-                ]);
-                $image = $imageId === null ? null : $this->imageRepo->findOneBy(['id' => $imageId]);
+                $imageList = $this->imageService->findEventUploads($this->getAuthedUser(), $id);
+                $image = $imageId === null ? null : $this->imageService->findImage($imageId);
                 break;
         }
 
@@ -42,7 +37,7 @@ final class ImageController extends AbstractController
             'id' => $id,
             'image' => $image,
             'imageList' => $imageList,
-            'eventList' => $this->imageRepo->getEventList($this->getAuthedUser()),
+            'eventList' => $this->imageService->getEventList($this->getAuthedUser()),
         ]);
     }
 }

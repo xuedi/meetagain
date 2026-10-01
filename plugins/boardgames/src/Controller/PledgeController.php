@@ -5,7 +5,7 @@ namespace Plugin\Boardgames\Controller;
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Entity\Event;
-use App\Repository\EventRepository;
+use App\Service\Event\EventService;
 use Plugin\Boardgames\Activity\Messages\GamePledged;
 use Plugin\Boardgames\Activity\Messages\PledgeWithdrawn;
 use Plugin\Boardgames\Service\GameService;
@@ -24,7 +24,7 @@ final class PledgeController extends AbstractController
     public function __construct(
         private readonly PledgeService $pledgeService,
         private readonly GameService $gameService,
-        private readonly EventRepository $eventRepository,
+        private readonly EventService $eventService,
         private readonly ActivityService $activityService,
     ) {}
 
@@ -35,7 +35,7 @@ final class PledgeController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $event = $this->eventRepository->find($eventId);
+        $event = $this->eventService->findEvent($eventId);
         if (!$event instanceof Event) {
             throw $this->createNotFoundException('Event not found');
         }

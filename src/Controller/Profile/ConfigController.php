@@ -9,7 +9,7 @@ use App\Form\ChangePassword;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Member\BlockingService;
 use App\Service\Member\ConsentService;
-use App\Service\Notification\NotificationSettingsService;
+use App\Service\Notification\SettingsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,7 +29,7 @@ final class ConfigController extends AbstractController
         private readonly ActivityService $activityService,
         private readonly BlockingService $blockingService,
         private readonly ConsentService $consentService,
-        private readonly NotificationSettingsService $notificationSettings,
+        private readonly SettingsService $notificationSettings,
     ) {}
 
     #[Route('/profile/config', name: 'app_profile_config')]

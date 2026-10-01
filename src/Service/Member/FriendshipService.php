@@ -28,6 +28,29 @@ readonly class FriendshipService
         private ActivityService $activityService,
     ) {}
 
+    public function getFriends(User $user): array
+    {
+        return $this->repo->getFriends($user);
+    }
+
+    public function getFollowers(User $user, bool $excludeFriends = false): array
+    {
+        return $this->repo->getFollowers($user, $excludeFriends);
+    }
+
+    public function getFollowing(User $user, bool $excludeFriends = false): array
+    {
+        return $this->repo->getFollowing($user, $excludeFriends);
+    }
+
+    /**
+     * @return array{following: int, followers: int, rsvp: int}
+     */
+    public function getSocialCounts(User $user): array
+    {
+        return $this->repo->getSocialCounts($user);
+    }
+
     public function follow(User $actor, User $target): void
     {
         if ($actor->getId() === $target->getId()) {

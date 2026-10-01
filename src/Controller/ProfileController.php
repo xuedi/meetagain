@@ -6,11 +6,11 @@ use App\Entity\Event;
 use App\Exception\Event\RsvpRefusedException;
 use App\Filter\Event\EventFilterService;
 use App\Form\ProfileType;
-use App\Repository\EventRepository;
-use App\Repository\MessageRepository;
-use App\Repository\UserRepository;
+use App\Service\Event\EventService;
 use App\Service\Event\RsvpService;
 use App\Service\Member\BlockingService;
+use App\Service\Member\FriendshipService;
+use App\Service\Member\MessageService;
 use App\Service\Member\ProfileService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,9 +25,9 @@ final class ProfileController extends AbstractController
     public const string ROUTE_PROFILE = 'app_profile';
 
     public function __construct(
-        private readonly EventRepository $repo,
-        private readonly MessageRepository $msgRepo,
-        private readonly UserRepository $userRepo,
+        private readonly EventService $eventService,
+        private readonly MessageService $messageService,
+        private readonly FriendshipService $friendshipService,
         private readonly BlockingService $blockingService,
         private readonly EventFilterService $eventFilterService,
         private readonly ProfileService $profileService,
@@ -60,12 +60,12 @@ final class ProfileController extends AbstractController
             'profile/index.html.twig',
             [
                 'lastLogin' => $request->getSession()->get('lastLogin', null),
-                'messageCount' => $this->msgRepo->getMessageCount($user),
-                'socialCounts' => $this->userRepo->getSocialCounts($user),
+                'messageCount' => $this->messageService->getMessageCount($user),
+                'socialCounts' => $this->friendshipService->getSocialCounts($user),
                 'blockedCount' => count($this->blockingService->getBlockedUsers($user)),
                 'user' => $this->getAuthedUser(),
-                'upcoming' => $this->repo->getUpcomingEvents(10, $eventIds),
-                'past' => $this->repo->getPastAttendedEvents($user, 20, $eventIds),
+                'upcoming' => $this->eventService->getUpcomingEvents(10, $eventIds),
+                'past' => $this->eventService->getPastAttendedEvents($user, 20, $eventIds),
                 'form' => $form,
             ],
             $response,

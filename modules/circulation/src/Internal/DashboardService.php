@@ -32,6 +32,11 @@ final readonly class DashboardService
         private FilterService $itemFilter,
     ) {}
 
+    public function findHandover(int $id): ?Handover
+    {
+        return $this->handovers->find($id);
+    }
+
     /**
      * @return list<Copy>
      */

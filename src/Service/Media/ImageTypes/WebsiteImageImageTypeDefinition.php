@@ -5,7 +5,7 @@ namespace App\Service\Media\ImageTypes;
 use App\Entity\Image;
 use App\Enum\ImageType;
 
-final class WebsiteImageImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class WebsiteImageImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function getType(): ImageType
     {

@@ -68,7 +68,7 @@ class AccessDeniedProviderTest extends TestCase
         $exception = new RuntimeException('Invalid CSRF token');
 
         // Act
-        $reason = AccessDeniedProvider::resolveReason($exception, false);
+        $reason = $this->buildProvider()->resolveReason($exception, false);
 
         // Assert
         static::assertSame('csrf', $reason);
@@ -80,7 +80,7 @@ class AccessDeniedProviderTest extends TestCase
         $exception = new AccessDeniedHttpException('forbidden');
 
         // Act
-        $reason = AccessDeniedProvider::resolveReason($exception, true);
+        $reason = $this->buildProvider()->resolveReason($exception, true);
 
         // Assert
         static::assertSame('controller', $reason);

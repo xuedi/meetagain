@@ -11,8 +11,7 @@ use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\User;
-use App\Repository\ActivityRepository;
-use App\Repository\UserRepository;
+use App\Service\Member\UserService;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,8 +37,7 @@ final class ActivityLogController extends AbstractLogsController implements Admi
     public function __construct(
         TranslatorInterface $translator,
         private readonly ActivityService $activityService,
-        private readonly ActivityRepository $activityRepository,
-        private readonly UserRepository $userRepository,
+        private readonly UserService $userService,
     ) {
         parent::__construct($translator, 'activity');
     }
@@ -61,10 +59,10 @@ final class ActivityLogController extends AbstractLogsController implements Admi
         $since = $sinceByRange[$range];
 
         $userFilterId = $request->query->getInt('user') ?: null;
-        $userFilter = $userFilterId !== null ? $this->userRepository->find($userFilterId) : null;
+        $userFilter = $userFilterId !== null ? $this->userService->findUser($userFilterId) : null;
         $resolvedUserId = $userFilter?->getId();
 
-        $counts = $this->activityRepository->countByRange($sinceByRange, $resolvedUserId);
+        $counts = $this->activityService->countByRange($sinceByRange, $resolvedUserId);
         $rangeCount = $counts['ranges'][$range];
         $pageTotal = max(1, (int) ceil($rangeCount / self::PAGE_SIZE));
         $page = min(max(1, $request->query->getInt('page', 1)), $pageTotal);

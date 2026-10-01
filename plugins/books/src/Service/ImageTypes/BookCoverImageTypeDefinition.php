@@ -9,12 +9,12 @@ use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use Plugin\Books\Repository\BookRepository;
 
-final class BookCoverImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class BookCoverImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function __construct(
         ImageLocationRepository $repo,
         Connection $connection,
-        private readonly BookRepository $bookRepository,
+        private BookRepository $bookRepository,
     ) {
         parent::__construct($repo, $connection);
     }

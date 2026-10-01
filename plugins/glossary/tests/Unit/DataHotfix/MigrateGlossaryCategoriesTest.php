@@ -7,6 +7,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\DataHotfix\Hotfixes\MigrateGlossaryCategories;
+use Plugin\Glossary\Migration\LegacyGlossaryCategoryConverter;
 
 class MigrateGlossaryCategoriesTest extends TestCase
 {
@@ -83,6 +84,6 @@ class MigrateGlossaryCategoriesTest extends TestCase
         $languageService = $this->createStub(LanguageService::class);
         $languageService->method('getFilteredDefaultLocale')->willReturn('en');
 
-        return new MigrateGlossaryCategories($em, $languageService);
+        return new MigrateGlossaryCategories($em, $languageService, new LegacyGlossaryCategoryConverter());
     }
 }

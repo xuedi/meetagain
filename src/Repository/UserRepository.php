@@ -401,7 +401,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return ['total' => $count];
         }
 
-        $total = (int) $em->getConnection()->executeQuery('SELECT COUNT(*) FROM user_user')->fetchOne();
+        $total = (int) $em
+            ->createQueryBuilder()
+            ->select('COUNT(f.id)')
+            ->from(User::class, 'u')
+            ->innerJoin('u.following', 'f')
+            ->getQuery()
+            ->getSingleScalarResult();
 
         return [
             'total' => $total,

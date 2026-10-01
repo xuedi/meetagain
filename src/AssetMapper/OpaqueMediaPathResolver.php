@@ -4,7 +4,7 @@ namespace App\AssetMapper;
 
 use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolverInterface;
 
-final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
+final readonly class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
 {
     public const int HASH_LENGTH = 16;
     private const string SECRET_SALT = 'meetagain-media-v1';
@@ -14,15 +14,15 @@ final class OpaqueMediaPathResolver implements PublicAssetsPathResolverInterface
         $ext = pathinfo($logicalPath, PATHINFO_EXTENSION);
         $stablePath = preg_replace('/-[A-Za-z0-9_-]{7}(\.\w+)$/', '$1', $logicalPath);
 
-        return '/media/' . self::hashLogicalPath($stablePath) . '.' . self::normalizeExtension($ext);
+        return '/media/' . $this->hashLogicalPath($stablePath) . '.' . $this->normalizeExtension($ext);
     }
 
-    public static function hashLogicalPath(string $logicalPath): string
+    public function hashLogicalPath(string $logicalPath): string
     {
         return substr(hash('sha256', self::SECRET_SALT . '|' . $logicalPath), 0, self::HASH_LENGTH);
     }
 
-    private static function normalizeExtension(string $ext): string
+    private function normalizeExtension(string $ext): string
     {
         return match ($ext) {
             'scss', 'sass' => 'css',

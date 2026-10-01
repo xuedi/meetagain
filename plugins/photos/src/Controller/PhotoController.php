@@ -12,8 +12,8 @@ use App\Item\ListRegistry;
 use App\Item\Tag\AssignmentFormHelper;
 use App\Item\Tag\TagService;
 use App\Item\TranslationFormHelper;
-use App\Repository\EventRepository;
-use App\Repository\UserRepository;
+use App\Service\Event\EventService;
+use App\Service\Member\UserService;
 use App\Service\Seo\BreadcrumbBuilder;
 use Plugin\Photos\Activity\Messages\PhotoAdded;
 use Plugin\Photos\Entity\Photo;
@@ -65,12 +65,12 @@ final class PhotoController extends AbstractController
     }
 
     #[Route('/streams', name: 'app_plugin_photos_streams', methods: ['GET'])]
-    public function memberStreams(ListRegistry $listRegistry, UserRepository $userRepository): Response
+    public function memberStreams(ListRegistry $listRegistry, UserService $userService): Response
     {
         $this->denyUnlessStreamsLive($listRegistry);
 
         $counts = $this->photoService->getStreamAuthors();
-        $users = $this->usersById(array_keys($counts), $userRepository);
+        $users = $this->usersById(array_keys($counts), $userService);
         $streams = $this->photoService->getStreams(array_keys($users), self::STRIP_LENGTH);
 
         $authors = [];
@@ -86,11 +86,11 @@ final class PhotoController extends AbstractController
     }
 
     #[Route('/streams/{id}', name: 'app_plugin_photos_stream', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function memberStream(int $id, ListRegistry $listRegistry, UserRepository $userRepository, BreadcrumbBuilder $breadcrumbBuilder): Response
+    public function memberStream(int $id, ListRegistry $listRegistry, UserService $userService, BreadcrumbBuilder $breadcrumbBuilder): Response
     {
         $this->denyUnlessStreamsLive($listRegistry);
 
-        $user = $userRepository->find($id);
+        $user = $userService->findUser($id);
         $photos = $user instanceof User ? $this->photoService->getStream($id) : [];
         if (!$user instanceof User || $photos === []) {
             throw $this->createNotFoundException('Stream not found');
@@ -142,10 +142,10 @@ final class PhotoController extends AbstractController
 
     #[Route('/event/{id}/upload', name: 'app_plugin_photos_event_upload', methods: ['POST'], requirements: ['id' => '\d+'])]
     #[IsGranted('ROLE_USER')]
-    public function eventUpload(int $id, Request $request, EventFilterService $eventFilterService, EventRepository $eventRepository): Response
+    public function eventUpload(int $id, Request $request, EventFilterService $eventFilterService, EventService $eventService): Response
     {
         $this->denyUnlessUploadAllowed();
-        $event = $eventRepository->find($id);
+        $event = $eventService->findEvent($id);
         if (!$this->configService->getConfig()->isEventBox() || !$eventFilterService->isEventAccessible($id) || !$event instanceof Event) {
             throw $this->createNotFoundException();
         }
@@ -176,7 +176,7 @@ final class PhotoController extends AbstractController
         ListRegistry $listRegistry,
         BreadcrumbBuilder $breadcrumbBuilder,
         EventFilterService $eventFilterService,
-        EventRepository $eventRepository,
+        EventService $eventService,
     ): Response {
         if (!$listRegistry->has(PhotoService::ITEM_TYPE)) {
             throw $this->createNotFoundException();
@@ -190,7 +190,7 @@ final class PhotoController extends AbstractController
         return $this->render('@Photos/photo/detail.html.twig', [
             'photo' => $photo,
             'contest' => $this->contestPanel($photo),
-            'event' => $this->eventOf((int) $photo->getId(), $eventFilterService, $eventRepository),
+            'event' => $this->eventOf((int) $photo->getId(), $eventFilterService, $eventService),
             'canManage' => $this->canManage($photo),
             'showCameraMeta' => $this->configService->getConfig()->isShowCameraMeta(),
             'breadcrumbs' => $breadcrumbBuilder->build('app_photos_photolist', 'photos.menu_main', $this->label($photo, $request->getLocale())),
@@ -199,7 +199,7 @@ final class PhotoController extends AbstractController
 
     #[Route('/{id}/edit', name: 'app_plugin_photos_photo_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     #[IsGranted('ROLE_USER')]
-    public function edit(int $id, Request $request, EventFilterService $eventFilterService, EventRepository $eventRepository): Response
+    public function edit(int $id, Request $request, EventFilterService $eventFilterService, EventService $eventService): Response
     {
         $photo = $this->photoService->getManaged($id);
         if ($photo === null) {
@@ -213,7 +213,7 @@ final class PhotoController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->photoService->updateTranslations($photo, $this->translationFormHelper->extractTranslations($form, self::TRANSLATED_FIELDS));
             $this->tagService->setTags(PhotoService::ITEM_TYPE, (int) $photo->getId(), $this->assignmentFormHelper->extractAssignment($form));
-            $this->associationWriter->setEvent($photo, $this->selectedEvent($form, $eventFilterService, $eventRepository));
+            $this->associationWriter->setEvent($photo, $this->selectedEvent($form, $eventFilterService, $eventService));
             $this->addFlash('success', 'photos_photo.flash_updated');
 
             return $this->redirectToRoute('app_plugin_photos_photo_show', ['id' => $photo->getId()]);
@@ -270,14 +270,14 @@ final class PhotoController extends AbstractController
         return $added;
     }
 
-    private function selectedEvent(FormInterface $form, EventFilterService $eventFilterService, EventRepository $eventRepository): ?Event
+    private function selectedEvent(FormInterface $form, EventFilterService $eventFilterService, EventService $eventService): ?Event
     {
         $eventId = $form->get(PhotoEditType::EVENT_FIELD)->getData();
         if (!is_numeric($eventId) || !$eventFilterService->isEventAccessible((int) $eventId)) {
             return null;
         }
 
-        return $eventRepository->find((int) $eventId);
+        return $eventService->findEvent((int) $eventId);
     }
 
     /** @return array{live: bool, owner: bool, remaining: int} */
@@ -293,10 +293,10 @@ final class PhotoController extends AbstractController
         ];
     }
 
-    private function eventOf(int $photoId, EventFilterService $eventFilterService, EventRepository $eventRepository): ?Event
+    private function eventOf(int $photoId, EventFilterService $eventFilterService, EventService $eventService): ?Event
     {
         foreach ($this->associations->eventIdsForItem(PhotoService::ITEM_TYPE, $photoId) as $eventId) {
-            $event = $eventFilterService->isEventAccessible($eventId) ? $eventRepository->find($eventId) : null;
+            $event = $eventFilterService->isEventAccessible($eventId) ? $eventService->findEvent($eventId) : null;
             if ($event instanceof Event) {
                 return $event;
             }
@@ -317,10 +317,10 @@ final class PhotoController extends AbstractController
      *
      * @return array<int, User>
      */
-    private function usersById(array $userIds, UserRepository $userRepository): array
+    private function usersById(array $userIds, UserService $userService): array
     {
         $byId = [];
-        foreach ($userRepository->findBy(['id' => $userIds]) as $user) {
+        foreach ($userService->findByIds($userIds) as $user) {
             $byId[(int) $user->getId()] = $user;
         }
 

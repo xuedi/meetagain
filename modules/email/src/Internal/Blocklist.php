@@ -35,6 +35,19 @@ final class Blocklist implements BlocklistInterface
         return isset($this->blockedSet[$key]);
     }
 
+    /**
+     * @return array<EmailBlocklistEntry>
+     */
+    public function listEntries(): array
+    {
+        return $this->repository->findAllOrdered();
+    }
+
+    public function findEntry(string $email): ?EmailBlocklistEntry
+    {
+        return $this->repository->findByEmail($email);
+    }
+
     public function reasonFor(string $email): ?string
     {
         return $this->repository->findByEmail($email)?->getReason();

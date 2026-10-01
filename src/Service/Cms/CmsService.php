@@ -2,6 +2,7 @@
 
 namespace App\Service\Cms;
 
+use App\Entity\Cms;
 use App\Filter\Cms\CmsFilterService;
 use App\Filter\Event\EventFilterService;
 use App\Repository\CmsRepository;
@@ -30,6 +31,20 @@ readonly class CmsService
     public function getSites(): array
     {
         return $this->repo->findAll();
+    }
+
+    public function findPage(int $id): ?Cms
+    {
+        return $this->repo->find($id);
+    }
+
+    /**
+     * @param array<int>|null $ids
+     * @return array<Cms>
+     */
+    public function findPagesByIds(?array $ids): array
+    {
+        return $this->repo->findByIds($ids);
     }
 
     public function handle(string $locale, string $slug, Response $response): Response

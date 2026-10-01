@@ -30,6 +30,11 @@ readonly class ThreadService
         private ClockInterface $clock,
     ) {}
 
+    public function findRequest(int $id): ?SupportRequest
+    {
+        return $this->requestRepo->find($id);
+    }
+
     public function mintToken(): string
     {
         return bin2hex(random_bytes(32));

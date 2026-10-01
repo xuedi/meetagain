@@ -28,10 +28,10 @@ use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Form\CmsType;
-use App\Repository\AnnouncementRepository;
-use App\Repository\CmsBlockRepository;
-use App\Repository\CmsRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use App\Service\Cms\AnnouncementService;
+use App\Service\Cms\CmsBlockService;
+use App\Service\Cms\CmsService;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -54,10 +54,10 @@ final class CmsController extends AbstractController implements AdminNavigationI
     private const string ADD_TOKEN_ID = 'app_admin_cms_add';
 
     public function __construct(
-        private readonly CmsRepository $repo,
+        private readonly CmsService $cmsService,
         private readonly EntityManagerInterface $em,
-        private readonly CmsBlockRepository $blockRepo,
-        private readonly AnnouncementRepository $announcementRepo,
+        private readonly CmsBlockService $blockService,
+        private readonly AnnouncementService $announcementService,
         private readonly AdminCmsListFilterService $adminCmsListFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly LoggerInterface $logger,
@@ -91,12 +91,12 @@ final class CmsController extends AbstractController implements AdminNavigationI
         ]);
 
         $filterResult = $this->adminCmsListFilterService->getCmsIdFilter();
-        $cmsPages = $this->repo->findByIds($filterResult->getCmsIds());
+        $cmsPages = $this->cmsService->findPagesByIds($filterResult->getCmsIds());
 
         $cmsIdsWithAnnouncements = [];
         $publishedCount = 0;
         foreach ($cmsPages as $page) {
-            $announcement = $this->announcementRepo->findByCmsPage($page->getId());
+            $announcement = $this->announcementService->findByCmsPage($page->getId());
             if ($announcement !== null) {
                 $cmsIdsWithAnnouncements[] = $page->getId();
             }
@@ -175,13 +175,13 @@ final class CmsController extends AbstractController implements AdminNavigationI
             TextMap::getType(),
         ];
 
-        $linkedAnnouncement = $this->announcementRepo->findByCmsPage($cms->getId());
+        $linkedAnnouncement = $this->announcementService->findByCmsPage($cms->getId());
 
         return $this->render('admin/cms/cms_edit.html.twig', [
             'active' => 'cms',
             'newBlocks' => $newBlocks,
             'editLocale' => $locale,
-            'blocks' => $this->blockRepo->getBlocks($cms->getId(), $locale),
+            'blocks' => $this->blockService->getBlocks($cms->getId(), $locale),
             'form' => $form,
             'cms' => $cms,
             'linkedAnnouncement' => $linkedAnnouncement,
@@ -199,7 +199,7 @@ final class CmsController extends AbstractController implements AdminNavigationI
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $cmsPage = $this->repo->find($id);
+        $cmsPage = $this->cmsService->findPage($id);
         if ($cmsPage !== null) {
             $this->denyAccessUnlessGranted(PermissionAttribute::CMS_PAGE_DELETE, $cmsPage);
 

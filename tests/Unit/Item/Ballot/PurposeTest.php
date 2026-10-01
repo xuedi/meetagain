@@ -10,10 +10,10 @@ class PurposeTest extends TestCase
     public function testAnItemTypeSurvivesTheRoundTrip(): void
     {
         // Arrange
-        $purpose = Purpose::forType('film');
+        $purpose = new Purpose()->forType('film');
 
         // Act
-        $itemType = Purpose::itemTypeOf($purpose);
+        $itemType = new Purpose()->itemTypeOf($purpose);
 
         // Assert
         self::assertSame('event.item.film', $purpose);
@@ -23,8 +23,8 @@ class PurposeTest extends TestCase
     public function testAnotherConsumersPurposeIsNotClaimed(): void
     {
         // Arrange & Act & Assert
-        self::assertNull(Purpose::itemTypeOf('event.location'));
-        self::assertNull(Purpose::itemTypeOf('contribution.field'));
-        self::assertNull(Purpose::itemTypeOf('event.item.'));
+        self::assertNull(new Purpose()->itemTypeOf('event.location'));
+        self::assertNull(new Purpose()->itemTypeOf('contribution.field'));
+        self::assertNull(new Purpose()->itemTypeOf('event.item.'));
     }
 }

@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Event;
 use App\Filter\Event\EventFilterService;
-use App\Repository\EventRepository;
+use App\Service\Event\EventService;
 use App\Service\Event\ShareService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class EventShareController extends AbstractController
 {
     public function __construct(
-        private readonly EventRepository $repo,
+        private readonly EventService $eventService,
         private readonly EventFilterService $eventFilterService,
         private readonly ShareService $shareService,
     ) {}
@@ -81,7 +81,7 @@ final class EventShareController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $event = $this->repo->findOneForDetails($id);
+        $event = $this->eventService->findOneForDetails($id);
         if (!$event instanceof Event) {
             throw $this->createNotFoundException();
         }

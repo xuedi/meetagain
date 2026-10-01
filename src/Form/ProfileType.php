@@ -24,6 +24,7 @@ class ProfileType extends AbstractType
     public function __construct(
         private readonly LanguageService $languageService,
         private readonly TranslatorInterface $translator,
+        private readonly ProfileService $profileService,
     ) {}
 
     #[Override]
@@ -81,8 +82,10 @@ class ProfileType extends AbstractType
 
     private function cappedOnlyWhenRenamed(string $originalName): Callback
     {
-        return new Callback(static function (?string $value, ExecutionContextInterface $context) use ($originalName): void {
-            $limit = $value === null ? null : ProfileService::nameLimitExceeded($originalName, $value);
+        $profileService = $this->profileService;
+
+        return new Callback(static function (?string $value, ExecutionContextInterface $context) use ($originalName, $profileService): void {
+            $limit = $value === null ? null : $profileService->nameLimitExceeded($originalName, $value);
             if ($limit === null) {
                 return;
             }

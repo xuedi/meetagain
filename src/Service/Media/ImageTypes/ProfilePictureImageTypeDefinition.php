@@ -8,12 +8,12 @@ use App\Repository\ImageLocationRepository;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Connection;
 
-final class ProfilePictureImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class ProfilePictureImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function __construct(
         ImageLocationRepository $repo,
         Connection $connection,
-        private readonly UserRepository $userRepository,
+        private UserRepository $userRepository,
     ) {
         parent::__construct($repo, $connection);
     }

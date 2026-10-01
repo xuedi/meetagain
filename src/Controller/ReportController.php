@@ -6,7 +6,7 @@ use App\Activity\ActivityService;
 use App\Activity\Messages\ReportedImage;
 use App\Entity\ImageReport;
 use App\Form\ReportImageType;
-use App\Repository\ImageRepository;
+use App\Service\Media\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +18,7 @@ final class ReportController extends AbstractController
 {
     public function __construct(
         private readonly ActivityService $activityService,
-        private readonly ImageRepository $repo,
+        private readonly ImageService $imageService,
         private readonly EntityManagerInterface $em,
     ) {}
 
@@ -27,7 +27,7 @@ final class ReportController extends AbstractController
     {
         $response = $this->getResponse();
         $user = $this->getAuthedUser();
-        $image = $this->repo->findOneBy(['id' => $id]);
+        $image = $id === null ? null : $this->imageService->findImage($id);
 
         $form = $this->createForm(ReportImageType::class);
         $form->handleRequest($request);

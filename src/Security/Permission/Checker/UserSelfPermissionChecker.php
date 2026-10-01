@@ -8,7 +8,7 @@ use App\Security\Permission\CheckerInterface;
 use App\Security\Permission\Context;
 use Override;
 
-final class UserSelfPermissionChecker implements CheckerInterface
+final readonly class UserSelfPermissionChecker implements CheckerInterface
 {
     private const array SELF_ATTRIBUTES = [
         Attr::USER_VIEW_SELF,

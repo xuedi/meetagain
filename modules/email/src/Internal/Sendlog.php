@@ -32,6 +32,22 @@ final readonly class Sendlog implements SendlogInterface
         return array_values(array_map($this->toSentEmail(...), $rows));
     }
 
+    /**
+     * @return array<EmailQueue>
+     */
+    public function findRows(int $limit, ?DateTimeImmutable $since, ?string $template, ?string $recipient): array
+    {
+        return $this->repo->findFiltered($limit, $since, $template, $recipient);
+    }
+
+    /**
+     * @param list<QueueStatus>|null $statuses
+     */
+    public function countFiltered(?DateTimeImmutable $since, ?string $template, ?string $recipient, ?array $statuses = null): int
+    {
+        return $this->repo->countFiltered($since, $template, $recipient, $statuses);
+    }
+
     public function countAll(): int
     {
         return $this->repo->countAll();

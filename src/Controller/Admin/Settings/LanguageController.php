@@ -9,7 +9,6 @@ use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\Language;
 use App\Form\LanguageType;
-use App\Repository\LanguageRepository;
 use App\Service\Config\LanguageService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +23,6 @@ final class LanguageController extends AbstractSettingsController implements Adm
 {
     public function __construct(
         TranslatorInterface $translator,
-        private readonly LanguageRepository $repo,
         private readonly EntityManagerInterface $em,
         private readonly LanguageService $languageService,
     ) {
@@ -34,7 +32,7 @@ final class LanguageController extends AbstractSettingsController implements Adm
     #[Route('', name: 'app_admin_language')]
     public function list(): Response
     {
-        $languages = $this->repo->findAllOrdered();
+        $languages = $this->languageService->getAllLanguages();
         $enabledCount = 0;
         foreach ($languages as $language) {
             if (!$language->isEnabled()) {

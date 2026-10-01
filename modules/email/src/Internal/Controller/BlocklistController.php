@@ -10,9 +10,9 @@ use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Email\Internal\Blocklist;
 use Module\Email\Internal\Entity\EmailBlocklistEntry;
 use Module\Email\Internal\Form\EmailBlocklistType;
-use Module\Email\Internal\Repository\EmailBlocklistRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -25,7 +25,7 @@ final class BlocklistController extends AbstractEmailController implements Admin
 {
     public function __construct(
         TranslatorInterface $translator,
-        private readonly EmailBlocklistRepository $repo,
+        private readonly Blocklist $blocklist,
         private readonly EntityManagerInterface $em,
     ) {
         parent::__construct($translator, 'blocklist');
@@ -34,7 +34,7 @@ final class BlocklistController extends AbstractEmailController implements Admin
     #[Route('', name: 'app_admin_email_blocklist')]
     public function list(): Response
     {
-        $entries = $this->repo->findAllOrdered();
+        $entries = $this->blocklist->listEntries();
 
         $adminTop = new AdminTop(info: [
             new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', count($entries), $this->translator->trans('admin_email_blocklist.summary_total'))),
@@ -62,7 +62,7 @@ final class BlocklistController extends AbstractEmailController implements Admin
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $existing = $this->repo->findByEmail((string) $entry->getEmail());
+            $existing = $this->blocklist->findEntry((string) $entry->getEmail());
             if ($existing !== null) {
                 $this->addFlash('warning', $this->translator->trans('admin_email_blocklist.flash_already_blocklisted', [
                     '%email%' => $existing->getEmail(),

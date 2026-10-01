@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
 
-final class NotFoundProvider extends AbstractSecurityProvider
+final readonly class NotFoundProvider extends AbstractSecurityProvider
 {
     public const string KEY = 'not_found';
 
@@ -46,9 +46,9 @@ final class NotFoundProvider extends AbstractSecurityProvider
     public function __construct(
         CacheItemPoolInterface $securityCachePool,
         LoggerInterface $logger,
-        private readonly EntityManagerInterface $em,
-        private readonly NotFoundLogRepository $logRepo,
-        private readonly SuspiciousUrlMatcher $suspiciousUrls,
+        private EntityManagerInterface $em,
+        private NotFoundLogRepository $logRepo,
+        private SuspiciousUrlMatcher $suspiciousUrls,
     ) {
         parent::__construct($securityCachePool, $logger);
     }

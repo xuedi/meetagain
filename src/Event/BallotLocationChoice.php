@@ -33,6 +33,7 @@ final readonly class BallotLocationChoice implements LocationChoiceProviderInter
         private AdminLocationListFilterService $locationFilter,
         private Security $security,
         private TranslatorInterface $translator,
+        private BallotTermsType $ballotTerms,
     ) {}
 
     #[Override]
@@ -73,7 +74,7 @@ final readonly class BallotLocationChoice implements LocationChoiceProviderInter
             return;
         }
 
-        $settings = BallotTermsType::read($terms);
+        $settings = $this->ballotTerms->read($terms);
         $this->ballots->open(
             new BallotRequest(
                 self::PURPOSE,

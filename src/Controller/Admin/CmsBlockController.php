@@ -19,10 +19,9 @@ use App\Exception\BlockValidationException;
 use App\Filter\Admin\Cms\AdminCmsListFilterService;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Form\EventUploadType;
-use App\Repository\CmsBlockRepository;
-use App\Repository\CmsRepository;
 use App\Repository\LocationRepository;
 use App\Service\Cms\CmsBlockService;
+use App\Service\Cms\CmsService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use DateTimeImmutable;
@@ -43,9 +42,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class CmsBlockController extends AbstractController
 {
     public function __construct(
-        private readonly CmsRepository $cmsRepo,
+        private readonly CmsService $cmsService,
         private readonly EntityManagerInterface $em,
-        private readonly CmsBlockRepository $blockRepo,
         private readonly CmsBlockService $blockService,
         private readonly AdminCmsListFilterService $adminCmsListFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
@@ -154,7 +152,7 @@ final class CmsBlockController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $cmsPage = $this->cmsRepo->find($id);
+        $cmsPage = $this->cmsService->findPage($id);
         if ($cmsPage === null) {
             throw $this->createNotFoundException('Page not found');
         }
@@ -449,7 +447,7 @@ final class CmsBlockController extends AbstractController
 
     private function findAccessibleBlock(int $blockId): CmsBlock
     {
-        $block = $this->blockRepo->find($blockId);
+        $block = $this->blockService->findBlock($blockId);
         if ($block === null) {
             throw $this->createNotFoundException('Block not found');
         }

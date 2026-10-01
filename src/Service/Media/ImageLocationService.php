@@ -19,6 +19,22 @@ readonly class ImageLocationService
         private LoggerInterface $logger,
     ) {}
 
+    /**
+     * @return array<int, int>
+     */
+    public function countPerImageId(): array
+    {
+        return $this->locationRepository->countPerImageId();
+    }
+
+    /**
+     * @return ImageLocation[]
+     */
+    public function findByImageId(int $imageId): array
+    {
+        return $this->locationRepository->findByImageId($imageId);
+    }
+
     public function addLocation(int $imageId, ImageType $type, int $locationId): void
     {
         $this->locationRepository->insertForType($type, [['imageId' => $imageId, 'locationId' => $locationId]]);

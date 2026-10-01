@@ -17,6 +17,7 @@ readonly class MigrateGlossaryCategories implements DataHotfixInterface
     public function __construct(
         private EntityManagerInterface $em,
         private LanguageService $languageService,
+        private LegacyGlossaryCategoryConverter $converter,
     ) {}
 
     #[Override]
@@ -70,7 +71,7 @@ readonly class MigrateGlossaryCategories implements DataHotfixInterface
             return;
         }
 
-        $converted = LegacyGlossaryCategoryConverter::convert($data, $this->languageService->getFilteredDefaultLocale());
+        $converted = $this->converter->convert($data, $this->languageService->getFilteredDefaultLocale());
         if ($converted === null) {
             return;
         }

@@ -8,14 +8,14 @@ use App\Repository\CmsBlockRepository;
 use App\Repository\ImageLocationRepository;
 use Doctrine\DBAL\Connection;
 
-final class CmsGalleryImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class CmsGalleryImageTypeDefinition extends AbstractImageTypeDefinition
 {
     use ResolvesCmsBlockLocation;
 
     public function __construct(
         ImageLocationRepository $repo,
         Connection $connection,
-        private readonly CmsBlockRepository $cmsBlockRepository,
+        private CmsBlockRepository $cmsBlockRepository,
     ) {
         parent::__construct($repo, $connection);
     }

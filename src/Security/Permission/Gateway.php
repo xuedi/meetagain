@@ -11,15 +11,15 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-final class Gateway implements VoterInterface
+final readonly class Gateway implements VoterInterface
 {
     /**
      * @param iterable<CheckerInterface> $checkers
      */
     public function __construct(
-        private readonly Security $security,
+        private Security $security,
         #[AutowireIterator(CheckerInterface::class)]
-        private readonly iterable $checkers,
+        private iterable $checkers,
     ) {}
 
     #[Override]
