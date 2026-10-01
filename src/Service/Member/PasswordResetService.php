@@ -7,6 +7,7 @@ use App\Activity\Messages\PasswordReset;
 use App\Activity\Messages\PasswordResetRequest;
 use App\Emails\Types\PasswordResetEmail;
 use App\Entity\User;
+use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,7 +37,7 @@ readonly class PasswordResetService
         }
 
         $user = $this->userRepository->findOneBy(['email' => $email]);
-        if ($user === null) {
+        if ($user === null || $this->isClosed($user)) {
             return null;
         }
 
@@ -55,7 +56,7 @@ readonly class PasswordResetService
     {
         $user = $this->userRepository->findOneBy(['regcode' => $code]);
 
-        if ($user === null || $user->isRegcodeExpired()) {
+        if ($user === null || $user->isRegcodeExpired() || $this->isClosed($user)) {
             return null;
         }
 
@@ -82,6 +83,11 @@ readonly class PasswordResetService
         $this->activityService->log(PasswordReset::TYPE, $user);
 
         return true;
+    }
+
+    private function isClosed(User $user): bool
+    {
+        return in_array($user->getStatus(), [UserStatus::Blocked, UserStatus::Deleted, UserStatus::Denied], true);
     }
 
     private function generateResetToken(): string

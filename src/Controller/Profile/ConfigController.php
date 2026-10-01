@@ -5,6 +5,7 @@ namespace App\Controller\Profile;
 use App\Activity\ActivityService;
 use App\Activity\Messages\PasswordChanged;
 use App\Controller\AbstractController;
+use App\Entity\NotificationSettings;
 use App\Form\ChangePassword;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Member\BlockingService;
@@ -108,6 +109,9 @@ final class ConfigController extends AbstractController
     {
         if (!$this->isCsrfTokenValid('app_profile_config_toggle_notification' . $type, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+        if (!NotificationSettings::isKnownKey($type)) {
+            throw $this->createNotFoundException();
         }
 
         $user = $this->getAuthedUser();

@@ -77,11 +77,19 @@ class TrustServiceTest extends TestCase
         $grants = $this->grantsWithoutEdges();
         $scoreProvider = $this->scoreProvider([$source], $grants, configStore: $configStore);
 
+        $accessResolver = new AccessResolver([$access], $security);
+
         return new TrustService(
             $scoreProvider,
             $configStore,
-            new VouchService($grants, $this->createStub(EntityManagerInterface::class), new ContextRegistry([new ContextDescriber()]), $scoreProvider),
-            new AccessResolver([$access], $security),
+            new VouchService(
+                $grants,
+                $this->createStub(EntityManagerInterface::class),
+                new ContextRegistry([new ContextDescriber()]),
+                $scoreProvider,
+                $accessResolver,
+            ),
+            $accessResolver,
         );
     }
 }
