@@ -71,6 +71,11 @@ readonly class EventService
         return $this->recurringEventService->updateRecurringEvents($event, $syncFrom);
     }
 
+    public function fillUntitledFollowers(Event $event): int
+    {
+        return $this->recurringEventService->fillUntitledFollowers($event);
+    }
+
     public function planRealignment(Event $anchor, ScheduleChange $change): RealignmentPlan
     {
         return $this->recurringEventService->planRealignment($anchor, $change);

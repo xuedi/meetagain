@@ -98,18 +98,7 @@ readonly class RecurringEventService implements CronTaskInterface
             $child->setLocation($event->getLocation());
             $child->setPreviewImage($event->getPreviewImage());
             foreach ($event->getTranslation() as $eventTranslation) {
-                $childTranslation = $child->findTranslation($eventTranslation->getLanguage());
-                if ($childTranslation === null) {
-                    $childTranslation = new EventTranslation();
-                    $childTranslation->setEvent($child);
-                    $childTranslation->setLanguage($eventTranslation->getLanguage());
-                    $child->addTranslation($childTranslation);
-                }
-                $childTranslation->setTitle($eventTranslation->getTitle());
-                $childTranslation->setTeaser($eventTranslation->getTeaser());
-                $childTranslation->setDescription($eventTranslation->getDescription());
-
-                $this->em->persist($childTranslation);
+                $this->copyTranslation($eventTranslation, $child);
             }
             $this->em->persist($child);
             ++$updatedCount;
@@ -117,6 +106,45 @@ readonly class RecurringEventService implements CronTaskInterface
         $this->em->flush();
 
         return $updatedCount;
+    }
+
+    public function fillUntitledFollowers(Event $event): int
+    {
+        $series = $event->getSeries();
+        if ($series === null) {
+            return 0;
+        }
+
+        $filled = [];
+        foreach ($this->repo->findFollowUpEvents(seriesId: (int) $series->getId(), greaterThan: $event->getStart()) as $child) {
+            if ($child->getId() === $event->getId() || $child->getStatus() === EventStatus::Locked) {
+                continue;
+            }
+            foreach ($event->getTranslation() as $eventTranslation) {
+                if ((string) $eventTranslation->getTitle() === '') {
+                    continue;
+                }
+                if ((string) $child->findTranslation($eventTranslation->getLanguage())?->getTitle() !== '') {
+                    continue;
+                }
+                $this->copyTranslation($eventTranslation, $child);
+                $filled[(int) $child->getId()] = true;
+            }
+        }
+
+        if ($filled === []) {
+            return 0;
+        }
+
+        $this->em->flush();
+        foreach (array_keys($filled) as $childId) {
+            $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $childId);
+        }
+        foreach ($this->cmsBlockRepository->findPageIdsWithType(CmsBlockType::EventTeaser) as $pageId) {
+            $this->cmsService->invalidatePage($pageId);
+        }
+
+        return count($filled);
     }
 
     public function planRealignment(Event $anchor, ScheduleChange $change): RealignmentPlan
@@ -307,6 +335,22 @@ readonly class RecurringEventService implements CronTaskInterface
         }
 
         return $recurringEvent;
+    }
+
+    private function copyTranslation(EventTranslation $source, Event $target): void
+    {
+        $translation = $target->findTranslation($source->getLanguage());
+        if ($translation === null) {
+            $translation = new EventTranslation();
+            $translation->setEvent($target);
+            $translation->setLanguage($source->getLanguage());
+            $target->addTranslation($translation);
+        }
+        $translation->setTitle($source->getTitle());
+        $translation->setTeaser($source->getTeaser());
+        $translation->setDescription($source->getDescription());
+
+        $this->em->persist($translation);
     }
 
     private function updateDate(?DateTimeInterface $target, DateTimeImmutable $occurrence): ?DateTime

@@ -362,6 +362,8 @@ final class EventController extends AbstractController implements AdminNavigatio
             $syncCount = 0;
             if ($form->get('allFollowing')->getData() === true) {
                 $syncCount = $this->eventService->updateRecurringEvents($event, $oldStart);
+            } else {
+                $this->eventService->fillUntitledFollowers($event);
             }
 
             // A confirmed rule change realigns without allFollowing; closing the series never realigns
