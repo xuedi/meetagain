@@ -189,7 +189,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         bool $excludeSystemUser = false,
         ?int $limit = null,
         ?int $offset = null,
-    ): \Doctrine\ORM\QueryBuilder {
+    ): QueryBuilder {
         $qb = $this
             ->createQueryBuilder('u')
             ->select('u, i')

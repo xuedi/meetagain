@@ -78,7 +78,7 @@ class EventRepository extends ServiceEntityRepository
             $qb->andWhere('e.type = :type')->setParameter('type', $type->value);
         }
 
-        if ($rsvp instanceof EventRsvpFilter && $rsvp !== EventRsvpFilter::All && $user instanceof \App\Entity\User) {
+        if ($rsvp instanceof EventRsvpFilter && $rsvp !== EventRsvpFilter::All && $user instanceof User) {
             if ($rsvp === EventRsvpFilter::My) {
                 $qb->innerJoin('e.rsvp', 'u', 'WITH', 'u.id = :userId')->setParameter('userId', $user->getId());
             }
