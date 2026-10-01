@@ -48,6 +48,13 @@ class MessageFactory
         );
     }
 
+    public function validate(Activity $activity): void
+    {
+        $message = $this->messagesByType()[$activity->getType() ?? ''] ?? new UnknownMessage($activity->getType() ?? 'unknown');
+
+        $message->injectServices($this->router, $this->imageRenderer, $this->translator, $activity->getMeta())->validate();
+    }
+
     /**
      * @return array<string, MessageInterface>
      */
