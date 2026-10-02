@@ -73,14 +73,14 @@ final readonly class SitemapService
     private function renderUrl(SitemapUrl $url): string
     {
         $parts = ['  <url>'];
-        $parts[] = '    <loc>' . self::escape($url->loc) . '</loc>';
+        $parts[] = '    <loc>' . $this->escape($url->loc) . '</loc>';
 
         if ($url->lastmod !== null) {
             $parts[] = '    <lastmod>' . $url->lastmod->format('Y-m-d') . '</lastmod>';
         }
 
         if ($url->changefreq !== null) {
-            $parts[] = '    <changefreq>' . self::escape($url->changefreq) . '</changefreq>';
+            $parts[] = '    <changefreq>' . $this->escape($url->changefreq) . '</changefreq>';
         }
 
         if ($url->priority !== null) {
@@ -88,7 +88,7 @@ final readonly class SitemapService
         }
 
         foreach ($url->alternates as $locale => $href) {
-            $parts[] = sprintf('    <xhtml:link rel="alternate" hreflang="%s" href="%s"/>', self::escape($locale), self::escape($href));
+            $parts[] = sprintf('    <xhtml:link rel="alternate" hreflang="%s" href="%s"/>', $this->escape($locale), $this->escape($href));
         }
 
         $parts[] = '  </url>';
@@ -96,7 +96,7 @@ final readonly class SitemapService
         return implode("\n", $parts);
     }
 
-    private static function escape(string $value): string
+    private function escape(string $value): string
     {
         return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }

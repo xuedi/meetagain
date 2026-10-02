@@ -40,6 +40,58 @@ readonly class UserService
         private WelcomeEmail $welcomeEmail,
     ) {}
 
+    public function findUser(int $id): ?User
+    {
+        return $this->userRepo->find($id);
+    }
+
+    /**
+     * @return list<User>
+     */
+    public function findUnconfirmedRegistrations(): array
+    {
+        return $this->userRepo->findUnconfirmedRegistrations();
+    }
+
+    /**
+     * @param array<int> $ids
+     * @return array<User>
+     */
+    public function findByIds(array $ids): array
+    {
+        return $this->userRepo->findBy(['id' => $ids]);
+    }
+
+    /**
+     * @param array<int>|null $restrictToUserIds
+     */
+    public function findAllForAdmin(?array $restrictToUserIds = null): array
+    {
+        return $this->userRepo->findAllForAdmin($restrictToUserIds);
+    }
+
+    /**
+     * @param int[] $excludeIds
+     * @param array<int>|null $restrictToUserIds
+     */
+    public function countDirectoryMembers(bool $publicOnly, array $excludeIds, ?array $restrictToUserIds): int
+    {
+        return $publicOnly
+            ? $this->userRepo->getNumberOfActivePublicMembers($restrictToUserIds)
+            : $this->userRepo->getNumberOfActiveMembers($excludeIds, $restrictToUserIds);
+    }
+
+    /**
+     * @param int[] $excludeIds
+     * @param array<int>|null $restrictToUserIds
+     */
+    public function findDirectoryMembers(bool $publicOnly, int $limit, int $offset, array $excludeIds, ?array $restrictToUserIds): array
+    {
+        return $publicOnly
+            ? $this->userRepo->findActivePublicMembers($limit, $offset, $restrictToUserIds)
+            : $this->userRepo->findActiveMembers($limit, $offset, $excludeIds, $restrictToUserIds);
+    }
+
     public function resolveUserName(int $id): string
     {
         return $this->userRepo->resolveUserName($id);

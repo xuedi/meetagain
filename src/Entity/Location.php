@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
+use App\Repository\LocationRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: \App\Repository\LocationRepository::class)]
+#[ORM\Entity(repositoryClass: LocationRepository::class)]
 class Location
 {
     #[ORM\Id]

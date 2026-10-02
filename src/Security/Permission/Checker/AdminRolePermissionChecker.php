@@ -8,7 +8,7 @@ use App\Security\Permission\Context;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 
-final class AdminRolePermissionChecker implements CheckerInterface
+final readonly class AdminRolePermissionChecker implements CheckerInterface
 {
     private const array ORGANIZER_ATTRIBUTES = [
         Attr::EVENT_CREATE,
@@ -71,7 +71,7 @@ final class AdminRolePermissionChecker implements CheckerInterface
     ];
 
     public function __construct(
-        private readonly Security $security,
+        private Security $security,
     ) {}
 
     #[Override]

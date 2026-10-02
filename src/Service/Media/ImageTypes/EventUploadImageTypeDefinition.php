@@ -5,7 +5,7 @@ namespace App\Service\Media\ImageTypes;
 use App\Entity\Image;
 use App\Enum\ImageType;
 
-final class EventUploadImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class EventUploadImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function getType(): ImageType
     {

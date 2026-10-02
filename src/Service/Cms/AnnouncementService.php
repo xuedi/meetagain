@@ -13,6 +13,7 @@ use App\Enum\AnnouncementStatus;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EmailType;
 use App\Filter\Email\AudienceFilterService;
+use App\Repository\AnnouncementRepository;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Http\RequestHostResolver;
@@ -31,7 +32,26 @@ readonly class AnnouncementService
         private AnnouncementEmail $announcementEmail,
         private RequestHostResolver $hostResolver,
         private AudienceFilterService $audience,
+        private AnnouncementRepository $announcementRepo,
     ) {}
+
+    /**
+     * @return Announcement[]
+     */
+    public function findAllOrderedByDate(): array
+    {
+        return $this->announcementRepo->findAllOrderedByDate();
+    }
+
+    public function findByLinkHash(string $hash): ?Announcement
+    {
+        return $this->announcementRepo->findByLinkHash($hash);
+    }
+
+    public function findByCmsPage(int $cmsPageId): ?Announcement
+    {
+        return $this->announcementRepo->findByCmsPage($cmsPageId);
+    }
 
     public function send(Announcement $announcement): int
     {

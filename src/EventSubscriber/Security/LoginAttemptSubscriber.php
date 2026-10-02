@@ -47,7 +47,7 @@ readonly class LoginAttemptSubscriber implements EventSubscriberInterface
     public function onCheckPassport(CheckPassportEvent $event): void
     {
         $request = $this->requestStack->getCurrentRequest();
-        if ($request === null || !self::isLoginAttempt($request) || !$this->loginGuard->isActive($request)) {
+        if ($request === null || !$this->isLoginAttempt($request) || !$this->loginGuard->isActive($request)) {
             return;
         }
 
@@ -73,7 +73,7 @@ readonly class LoginAttemptSubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        if (!self::isLoginAttempt($request)) {
+        if (!$this->isLoginAttempt($request)) {
             return;
         }
 
@@ -92,7 +92,7 @@ readonly class LoginAttemptSubscriber implements EventSubscriberInterface
         $this->loginGuard->reset($event->getRequest());
     }
 
-    private static function isLoginAttempt(Request $request): bool
+    private function isLoginAttempt(Request $request): bool
     {
         return $request->attributes->getBoolean(self::ROUTE_DEFAULT);
     }

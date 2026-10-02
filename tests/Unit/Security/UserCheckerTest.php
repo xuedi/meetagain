@@ -64,9 +64,11 @@ class UserCheckerTest extends TestCase
         $inactiveUser = $this->createStub(User::class);
         $inactiveUser->method('getStatus')->willReturn($status);
 
+        $subject = $this->createSubject();
+
         // Act & Assert
         $this->expectException(CustomUserMessageAccountStatusException::class);
-        UserChecker::assertActive($inactiveUser);
+        $subject->assertActive($inactiveUser);
     }
 
     #[DataProvider('statusMessageProvider')]

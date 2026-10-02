@@ -19,7 +19,6 @@ services:
         exclude:
             - '../src/Kernel.php'
             - '../src/Activity/UnknownMessage.php'
-            - '../src/Service/Security/LoadtestBypass.php'
             - '../src/Entity/'
             - '../src/Security/Permission/Attribute/'
 
@@ -33,27 +32,23 @@ services:
         arguments:
             $inner: '@.inner'
             $requestStack: '@request_stack'
-            $environment: '%kernel.environment%'
     loadtest_bypass.limiter.registration:
         class: App\Service\Security\LoadtestBypassRateLimiterFactory
         decorates: limiter.registration
         arguments:
             $inner: '@.inner'
             $requestStack: '@request_stack'
-            $environment: '%kernel.environment%'
     loadtest_bypass.limiter.support:
         class: App\Service\Security\LoadtestBypassRateLimiterFactory
         decorates: limiter.support
         arguments:
             $inner: '@.inner'
             $requestStack: '@request_stack'
-            $environment: '%kernel.environment%'
     loadtest_bypass.security.login_throttling:
         class: App\Service\Security\LoadtestBypassRequestRateLimiter
         decorates: security.login_throttling.main.limiter
         arguments:
             $inner: '@.inner'
-            $environment: '%kernel.environment%'
 
     Doctrine\Migrations\DependencyFactory:
         alias: 'doctrine.migrations.dependency_factory'

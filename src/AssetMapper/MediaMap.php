@@ -8,6 +8,7 @@ final readonly class MediaMap
 {
     public function __construct(
         private AssetMapperInterface $assetMapper,
+        private OpaqueMediaPathResolver $pathResolver,
     ) {}
 
     /** @return array<string, string> hash => logicalPath */
@@ -15,7 +16,7 @@ final readonly class MediaMap
     {
         $map = [];
         foreach ($this->assetMapper->allAssets() as $asset) {
-            $hash = OpaqueMediaPathResolver::hashLogicalPath($asset->logicalPath);
+            $hash = $this->pathResolver->hashLogicalPath($asset->logicalPath);
             $map[$hash] = $asset->logicalPath;
         }
         return $map;

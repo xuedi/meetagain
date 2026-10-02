@@ -66,6 +66,15 @@ readonly class ActivityService
         return $this->prepareActivityList($this->repo->findRecentForAdmin($limit, $offset, $since, $userId));
     }
 
+    /**
+     * @param array<string, DateTimeImmutable|null> $sinceByRange
+     * @return array{total: int, ranges: array<string, int>}
+     */
+    public function countByRange(array $sinceByRange, ?int $userId = null): array
+    {
+        return $this->repo->countByRange($sinceByRange, $userId);
+    }
+
     public function getAdminDetail(int $id): ?Activity
     {
         $activity = $this->repo->find($id);

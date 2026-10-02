@@ -2,11 +2,15 @@
 
 namespace Tests\Unit\Service\Security\Provider;
 
+use App\Entity\SecurityMeasureLog;
 use App\Enum\SecurityEventType;
+use App\Enum\SecurityMeasure;
+use App\Enum\SecurityMeasureOutcome;
 use App\Enum\SecurityRecommendation;
 use App\Repository\SecurityMeasureLogRepository;
 use App\Service\Security\Provider\FormMeasureProvider;
 use App\Service\Security\ProviderReport;
+use DateTimeImmutable;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -125,9 +129,77 @@ class FormMeasureProviderTest extends TestCase
         static::assertFalse($provider->handles(SecurityEventType::NotFound));
     }
 
-    private function provider(): FormMeasureProvider
+    public function testRetrospectiveScanWeighsEachBlockByItsReasonAndForm(): void
     {
-        return new FormMeasureProvider(new ArrayAdapter(), new NullLogger(), $this->createStub(SecurityMeasureLogRepository::class));
+        // Arrange
+        $provider = $this->provider([
+            $this->blockRow(SecurityMeasure::SubmitTiming, 'app_login', ['reason' => 'too_fast']),
+            $this->blockRow(SecurityMeasure::SubmitTiming, 'app_register', ['reason' => 'too_fast']),
+            $this->blockRow(SecurityMeasure::ImageCaptcha, 'app_register', ['reason' => 'wrong_code']),
+        ]);
+
+        // Act
+        $report = $provider->scanRetrospective(new DateTimeImmutable('-1 hour'), new DateTimeImmutable());
+
+        // Assert
+        static::assertSame(65, $report->threatLevel);
+        static::assertSame(['rows' => 3, 'byReason' => ['too_fast' => 2, 'wrong_code' => 1]], $report->details);
+        static::assertSame(SecurityRecommendation::Handled, $report->recommendation);
+    }
+
+    public function testRetrospectiveScanFallsBackToTheMeasureWhenNoReasonWasLogged(): void
+    {
+        // Arrange
+        $provider = $this->provider([$this->blockRow(SecurityMeasure::Honeypot, 'app_register', null)]);
+
+        // Act
+        $report = $provider->scanRetrospective(new DateTimeImmutable('-1 hour'), new DateTimeImmutable());
+
+        // Assert
+        static::assertSame(['rows' => 1, 'byReason' => ['honeypot' => 1]], $report->details);
+    }
+
+    public function testRetrospectiveScanCapsAtASessionBlock(): void
+    {
+        // Arrange
+        $provider = $this->provider([
+            $this->blockRow(SecurityMeasure::ProofOfWork, 'app_contact', ['reason' => 'invalid_proof']),
+            $this->blockRow(SecurityMeasure::Honeypot, 'app_contact', ['reason' => 'filled']),
+        ]);
+
+        // Act
+        $report = $provider->scanRetrospective(new DateTimeImmutable('-1 hour'), new DateTimeImmutable());
+
+        // Assert
+        static::assertSame(100, $report->threatLevel);
+        static::assertSame(SecurityRecommendation::BlockSession, $report->recommendation);
+    }
+
+    /**
+     * @param list<SecurityMeasureLog> $rows
+     */
+    private function provider(array $rows = []): FormMeasureProvider
+    {
+        $repo = $this->createStub(SecurityMeasureLogRepository::class);
+        $repo->method('findBlocksBetween')->willReturn($rows);
+
+        return new FormMeasureProvider(new ArrayAdapter(), new NullLogger(), $repo);
+    }
+
+    /**
+     * @param array<string, scalar|null>|null $detail
+     */
+    private function blockRow(SecurityMeasure $measure, string $context, ?array $detail): SecurityMeasureLog
+    {
+        $now = new DateTimeImmutable();
+
+        return new SecurityMeasureLog()
+            ->setDay($now->setTime(0, 0))
+            ->setCreatedAt($now)
+            ->setMeasure($measure)
+            ->setOutcome(SecurityMeasureOutcome::Blocked)
+            ->setContext($context)
+            ->setDetail($detail);
     }
 
     /**

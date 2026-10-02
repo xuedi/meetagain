@@ -36,8 +36,6 @@ use App\Exception\Event\InvalidRecurrencePatternException;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventType;
 use App\Form\LocationType;
-use App\Repository\EventRepository;
-use App\Repository\EventTranslationRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Config\LanguageService;
 use App\Service\Event\AttendeeUpdateNotifier;
@@ -86,9 +84,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         private readonly ImageService $imageService,
         private readonly EntityManagerInterface $entityManager,
         private readonly LanguageService $languageService,
-        private readonly EventTranslationRepository $eventTransRepo,
         private readonly EventService $eventService,
-        private readonly EventRepository $repo,
         private readonly AdminEventListFilterService $eventFilterService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly ActivityService $activityService,
@@ -157,7 +153,7 @@ final class EventController extends AbstractController implements AdminNavigatio
     {
         $filterResult = $this->eventFilterService->getEventIdFilter();
         $eventIds = $filterResult->getEventIds();
-        $allEvents = $this->repo->findAllForAdmin($eventIds);
+        $allEvents = $this->eventService->findAllForAdmin($eventIds);
 
         $range = $request->query->getString('range', self::DEFAULT_RANGE);
         if (!array_key_exists($range, self::RANGE_OFFSETS)) {
@@ -210,9 +206,9 @@ final class EventController extends AbstractController implements AdminNavigatio
         ];
 
         return $this->render('admin/event/list.html.twig', [
-            'nextEvent' => $this->repo->getNextEventId($eventIds),
+            'nextEvent' => $this->eventService->getNextEventId($eventIds),
             'events' => $events,
-            'rsvpCounts' => $this->repo->getRsvpCounts($eventIds),
+            'rsvpCounts' => $this->eventService->getRsvpCounts($eventIds),
             'active' => 'event',
             'adminTop' => new AdminTop(info: $info, actions: $actions),
         ]);
@@ -362,6 +358,8 @@ final class EventController extends AbstractController implements AdminNavigatio
             $syncCount = 0;
             if ($form->get('allFollowing')->getData() === true) {
                 $syncCount = $this->eventService->updateRecurringEvents($event, $oldStart);
+            } else {
+                $this->eventService->fillUntitledFollowers($event);
             }
 
             // A confirmed rule change realigns without allFollowing; closing the series never realigns
@@ -799,9 +797,9 @@ final class EventController extends AbstractController implements AdminNavigatio
         }
     }
 
-    private function getTranslation(mixed $languageCode, ?int $getId): EventTranslation
+    private function getTranslation(string $languageCode, ?int $getId): EventTranslation
     {
-        $translation = $this->eventTransRepo->findOneBy(['language' => $languageCode, 'event' => $getId]);
+        $translation = $this->eventService->findTranslation($languageCode, $getId);
         if ($translation !== null) {
             return $translation;
         }

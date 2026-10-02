@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Announcement;
 use App\Entity\Cms;
-use App\Repository\AnnouncementRepository;
+use App\Service\Cms\AnnouncementService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -12,13 +12,13 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AnnouncementController extends AbstractController
 {
     public function __construct(
-        private readonly AnnouncementRepository $announcementRepo,
+        private readonly AnnouncementService $announcementService,
     ) {}
 
     #[Route('/announcement/{hash}', name: 'app_announcement_redirect')]
     public function show(string $hash, Request $request): Response
     {
-        $announcement = $this->announcementRepo->findByLinkHash($hash);
+        $announcement = $this->announcementService->findByLinkHash($hash);
         $cmsPage = $announcement->getCmsPage();
 
         if (!$announcement instanceof Announcement || !$cmsPage instanceof Cms) {

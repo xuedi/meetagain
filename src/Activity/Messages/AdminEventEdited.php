@@ -31,9 +31,4 @@ class AdminEventEdited extends MessageAbstract
 
         return $this->translator->trans('profile_social.activity_admin_event_edited', ['%event%' => $eventName]);
     }
-
-    protected function renderHtml(): string
-    {
-        return $this->renderText();
-    }
 }

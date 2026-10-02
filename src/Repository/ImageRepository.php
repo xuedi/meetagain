@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Image;
+use App\Entity\ImageLocation;
 use App\Entity\User;
 use App\Enum\ImageType;
 use DateTime;
@@ -300,15 +301,16 @@ class ImageRepository extends ServiceEntityRepository
     public function findHighUsageMissingAlt(int $limit = 50): array
     {
         $rows = $this
-            ->getEntityManager()
-            ->getConnection()
-            ->fetchAllAssociative('SELECT i.id AS id, COUNT(il.id) AS cnt
-             FROM image i
-             INNER JOIN image_location il ON il.image_id = i.id
-             GROUP BY i.id
-             HAVING cnt > 1
-             ORDER BY cnt DESC, i.id ASC
-             LIMIT ' . $limit);
+            ->createQueryBuilder('i')
+            ->select('i.id AS id', 'COUNT(il.id) AS cnt')
+            ->innerJoin(ImageLocation::class, 'il', 'WITH', 'il.image = i')
+            ->groupBy('i.id')
+            ->having('COUNT(il.id) > 1')
+            ->orderBy('cnt', 'DESC')
+            ->addOrderBy('i.id', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getArrayResult();
 
         if ($rows === []) {
             return [];

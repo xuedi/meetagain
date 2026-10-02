@@ -31,9 +31,4 @@ class AdminCmsBlockDeleted extends MessageAbstract
             '%slug%' => $this->meta['cms_slug'] ?? $this->meta['cms_id'],
         ]);
     }
-
-    protected function renderHtml(): string
-    {
-        return $this->renderText();
-    }
 }

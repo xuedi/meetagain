@@ -4,7 +4,6 @@ namespace App\Controller\Profile;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
-use App\Repository\UserRepository;
 use App\Service\Member\FriendshipService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,7 +16,6 @@ final class SocialController extends AbstractController
 {
     public function __construct(
         private readonly ActivityService $activityService,
-        private readonly UserRepository $repo,
         private readonly FriendshipService $service,
     ) {}
 
@@ -25,9 +23,9 @@ final class SocialController extends AbstractController
     public function social(string $show = 'friends'): Response
     {
         return $this->render('profile/social.html.twig', [
-            'followers' => $this->repo->getFollowers($this->getAuthedUser(), true),
-            'following' => $this->repo->getFollowing($this->getAuthedUser(), true),
-            'friends' => $this->repo->getFriends($this->getAuthedUser()),
+            'followers' => $this->service->getFollowers($this->getAuthedUser(), true),
+            'following' => $this->service->getFollowing($this->getAuthedUser(), true),
+            'friends' => $this->service->getFriends($this->getAuthedUser()),
             'activities' => $this->activityService->getUserList($this->getAuthedUser()),
             'user' => $this->getAuthedUser(),
             'show' => $show,

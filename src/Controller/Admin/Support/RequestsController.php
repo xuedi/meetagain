@@ -18,7 +18,6 @@ use App\Entity\User;
 use App\Enum\SupportChannel;
 use App\Enum\SupportRequestStatus;
 use App\Form\SupportReplyType;
-use App\Repository\SupportRequestRepository;
 use App\Service\Support\ThreadService;
 use App\Service\Support\VisibilityResolver;
 use DateTimeImmutable;
@@ -35,7 +34,6 @@ final class RequestsController extends AbstractSupportController implements Admi
 {
     public function __construct(
         TranslatorInterface $translator,
-        private readonly SupportRequestRepository $supportRequestRepo,
         private readonly EntityManagerInterface $em,
         private readonly SupportResponseEmail $supportResponseEmail,
         private readonly SupportInvitationEmail $supportInvitationEmail,
@@ -282,7 +280,7 @@ final class RequestsController extends AbstractSupportController implements Admi
 
     private function requireRequest(int $id): SupportRequest
     {
-        $request = $this->supportRequestRepo->find($id);
+        $request = $this->threadService->findRequest($id);
         if (!$request instanceof SupportRequest || !$this->visibilityResolver->canView($request)) {
             throw $this->createNotFoundException();
         }

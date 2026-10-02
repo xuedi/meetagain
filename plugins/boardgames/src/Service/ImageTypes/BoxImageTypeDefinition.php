@@ -9,12 +9,12 @@ use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use Plugin\Boardgames\Repository\GameRepository;
 
-final class BoxImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class BoxImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function __construct(
         ImageLocationRepository $repo,
         Connection $connection,
-        private readonly GameRepository $gameRepository,
+        private GameRepository $gameRepository,
     ) {
         parent::__construct($repo, $connection);
     }

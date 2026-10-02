@@ -5,15 +5,15 @@ namespace Tests\Unit\Service\Notification\User;
 use App\Entity\User;
 use App\Service\Notification\User\NotificationItem;
 use App\Service\Notification\User\ReviewNotificationProvider;
-use App\Service\Notification\User\ReviewNotificationService;
+use App\Service\Notification\User\ReviewService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReviewNotificationProviderTest extends TestCase
 {
-    private function makeService(int $count): ReviewNotificationService
+    private function makeService(int $count): ReviewService
     {
-        $mock = $this->createStub(ReviewNotificationService::class);
+        $mock = $this->createStub(ReviewService::class);
         $mock->method('countForUser')->willReturn($count);
 
         return $mock;

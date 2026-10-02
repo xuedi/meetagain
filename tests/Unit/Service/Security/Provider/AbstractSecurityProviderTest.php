@@ -10,6 +10,7 @@ use Override;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -21,7 +22,7 @@ class AbstractSecurityProviderTest extends TestCase
     {
         // Arrange
         $provider = new FakeSecurityProvider(new ArrayAdapter(), new NullLogger());
-        $provider->processEventShouldFail = true;
+        $provider->control->processEventShouldFail = true;
 
         // Act
         $report = $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], 'sess', '1.2.3.4', readOnly: true);
@@ -35,8 +36,8 @@ class AbstractSecurityProviderTest extends TestCase
     {
         // Arrange
         $provider = new FakeSecurityProvider(new ArrayAdapter(), new NullLogger());
-        $provider->handles = false;
-        $provider->processEventShouldFail = true;
+        $provider->control->handles = false;
+        $provider->control->processEventShouldFail = true;
 
         // Act
         $report = $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], 'sess', '1.2.3.4');
@@ -50,7 +51,7 @@ class AbstractSecurityProviderTest extends TestCase
         // Arrange
         $cache = new ArrayAdapter();
         $provider = new FakeSecurityProvider($cache, new NullLogger());
-        $provider->nextResult = [
+        $provider->control->nextResult = [
             'state' => ['attempts' => 1],
             'threatLevel' => 50,
             'summary' => 'noted',
@@ -65,7 +66,7 @@ class AbstractSecurityProviderTest extends TestCase
         static::assertSame('noted', $report->summary);
         static::assertSame(SecurityRecommendation::Handled, $report->recommendation);
         static::assertSame(['x' => 'y'], $report->details);
-        static::assertSame(1, $provider->persistLogCalls);
+        static::assertSame(1, $provider->control->persistLogCalls);
     }
 
     public function testAlreadyBlockedStateSkipsReprocessing(): void
@@ -73,7 +74,7 @@ class AbstractSecurityProviderTest extends TestCase
         // Arrange
         $cache = new ArrayAdapter();
         $provider = new FakeSecurityProvider($cache, new NullLogger());
-        $provider->nextResult = [
+        $provider->control->nextResult = [
             'state' => ['attempts' => 1],
             'threatLevel' => 100,
             'summary' => 'blocked!',
@@ -81,7 +82,7 @@ class AbstractSecurityProviderTest extends TestCase
         ];
         $provider->observe(SecurityEventType::NotFound, Request::create('/foo'), [], 'sess', '1.2.3.4');
 
-        $provider->processEventShouldFail = true;
+        $provider->control->processEventShouldFail = true;
 
         // Act
         $report = $provider->observe(SecurityEventType::NotFound, Request::create('/foo'), [], 'sess', '1.2.3.4');
@@ -95,7 +96,7 @@ class AbstractSecurityProviderTest extends TestCase
     {
         // Arrange
         $provider = new FakeSecurityProvider(new ArrayAdapter(), new NullLogger());
-        $provider->nextResult = [
+        $provider->control->nextResult = [
             'state' => [],
             'threatLevel' => 150,
             'summary' => 'too much',
@@ -113,7 +114,7 @@ class AbstractSecurityProviderTest extends TestCase
     {
         // Arrange
         $provider = new FakeSecurityProvider(new ArrayAdapter(), new NullLogger());
-        $provider->scanLogsResult = [
+        $provider->control->scanLogsResult = [
             'threatLevel' => 7,
             'summary' => 'historical scan',
             'details' => ['hits' => 3],
@@ -135,7 +136,7 @@ class AbstractSecurityProviderTest extends TestCase
         $cache->method('getItem')->willThrowException(new RuntimeException('cache broken'));
 
         $provider = new FakeSecurityProvider($cache, new NullLogger());
-        $provider->nextResult = [
+        $provider->control->nextResult = [
             'state' => ['x' => 1],
             'threatLevel' => 10,
             'summary' => 'fresh',
@@ -148,7 +149,7 @@ class AbstractSecurityProviderTest extends TestCase
         // Assert
         static::assertSame(10, $report->threatLevel);
         static::assertSame('fresh', $report->summary);
-        static::assertSame([], $provider->lastLoadedState);
+        static::assertSame([], $provider->control->lastLoadedState);
     }
 
     public function testClearAllStateRemovesIndexedKeys(): void
@@ -156,7 +157,7 @@ class AbstractSecurityProviderTest extends TestCase
         // Arrange
         $cache = new ArrayAdapter();
         $provider = new FakeSecurityProvider($cache, new NullLogger());
-        $provider->nextResult = [
+        $provider->control->nextResult = [
             'state' => [],
             'threatLevel' => 1,
             'summary' => 'noted',
@@ -198,7 +199,7 @@ class AbstractSecurityProviderTest extends TestCase
         // Arrange
         $cache = new ArrayAdapter();
         $provider = new FakeSecurityProvider($cache, new NullLogger());
-        $provider->nextResult = [
+        $provider->control->nextResult = [
             'state' => [],
             'threatLevel' => 1,
             'summary' => '',
@@ -213,17 +214,15 @@ class AbstractSecurityProviderTest extends TestCase
     }
 }
 
-class FakeSecurityProvider extends AbstractSecurityProvider
+final readonly class FakeSecurityProvider extends AbstractSecurityProvider
 {
-    public bool $handles = true;
-    public bool $processEventShouldFail = false;
-    public int $persistLogCalls = 0;
-    /** @var array<string, mixed> */
-    public array $lastLoadedState = [];
-    /** @var array{state: array<string, mixed>, threatLevel: int, summary: string, details: array<string, mixed>}|null */
-    public ?array $nextResult = null;
-    /** @var array{threatLevel: int, summary: string, details: array<string, mixed>} */
-    public array $scanLogsResult = ['threatLevel' => 0, 'summary' => '', 'details' => []];
+    public function __construct(
+        CacheItemPoolInterface $securityCachePool,
+        LoggerInterface $logger,
+        public FakeSecurityProviderControl $control = new FakeSecurityProviderControl(),
+    ) {
+        parent::__construct($securityCachePool, $logger);
+    }
 
     public function getKey(): string
     {
@@ -237,19 +236,19 @@ class FakeSecurityProvider extends AbstractSecurityProvider
 
     protected function handlesType(SecurityEventType $type): bool
     {
-        return $this->handles;
+        return $this->control->handles;
     }
 
     #[Override]
     protected function processEvent(SecurityEventType $type, Request $request, array $context, string $ip, array $state): array
     {
-        if ($this->processEventShouldFail) {
+        if ($this->control->processEventShouldFail) {
             throw new RuntimeException('processEvent should not have been invoked');
         }
-        $this->lastLoadedState = $state;
+        $this->control->lastLoadedState = $state;
 
         return (
-            $this->nextResult ?? [
+            $this->control->nextResult ?? [
                 'state' => [],
                 'threatLevel' => 0,
                 'summary' => 'noop',
@@ -261,12 +260,25 @@ class FakeSecurityProvider extends AbstractSecurityProvider
     #[Override]
     protected function scanLogs(DateTimeImmutable $from, DateTimeImmutable $to): array
     {
-        return $this->scanLogsResult;
+        return $this->control->scanLogsResult;
     }
 
     #[Override]
     protected function persistLog(Request $request, array $context): void
     {
-        $this->persistLogCalls++;
+        $this->control->persistLogCalls++;
     }
+}
+
+class FakeSecurityProviderControl
+{
+    public bool $handles = true;
+    public bool $processEventShouldFail = false;
+    public int $persistLogCalls = 0;
+    /** @var array<string, mixed> */
+    public array $lastLoadedState = [];
+    /** @var array{state: array<string, mixed>, threatLevel: int, summary: string, details: array<string, mixed>}|null */
+    public ?array $nextResult = null;
+    /** @var array{threatLevel: int, summary: string, details: array<string, mixed>} */
+    public array $scanLogsResult = ['threatLevel' => 0, 'summary' => '', 'details' => []];
 }

@@ -14,7 +14,6 @@ use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Entity\EventSeries;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\EventCanonicalSettingsType;
-use App\Repository\EventSeriesRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use App\Service\Seo\EventCanonicalOverviewService;
@@ -37,7 +36,6 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
         TranslatorInterface $translator,
         private readonly EventCanonicalOverviewService $overviewService,
         private readonly EventCanonicalRebuildService $rebuildService,
-        private readonly EventSeriesRepository $seriesRepository,
         private readonly AdminEventListFilterService $eventListFilterService,
         private readonly LanguageService $languageService,
         private readonly ConfigService $configService,
@@ -107,7 +105,7 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $series = $this->seriesRepository->find($id);
+        $series = $this->rebuildService->findSeries($id);
         if (!$series instanceof EventSeries) {
             throw new NotFoundHttpException();
         }

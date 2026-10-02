@@ -4,13 +4,15 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Enum\ImageType;
+use App\Enum\UserRole;
 use App\Filter\Member\MemberFilterService;
-use App\Repository\UserRepository;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Member\BlockingService;
 use App\Service\Member\FriendshipService;
+use App\Service\Member\UserService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -23,14 +25,16 @@ final class MemberController extends AbstractController
 {
     public const string ROUTE_MEMBER = 'app_member';
     private const int PAGE_SIZE = 24;
+    private const array MODERATION_RANKS = ['ROLE_ADMIN', 'ROLE_STEWARD', 'ROLE_ORGANIZER'];
 
     public function __construct(
-        private readonly UserRepository $repo,
+        private readonly UserService $userService,
         private readonly FriendshipService $service,
         private readonly ImageService $imageService,
         private readonly BlockingService $blockingService,
         private readonly MemberFilterService $memberFilterService,
         private readonly ImageLocationService $imageLocationService,
+        private readonly Security $security,
     ) {}
 
     #[Route('/members/{page}', name: self::ROUTE_MEMBER)]
@@ -44,12 +48,9 @@ final class MemberController extends AbstractController
         $restrictToUserIds = $filterResult->getUserIds();
 
         $excludeIds = $currentUser instanceof User ? $this->blockingService->getExcludedUserIds($currentUser) : [];
-        $userTotal = $currentUser instanceof User
-            ? $this->repo->getNumberOfActiveMembers($excludeIds, $restrictToUserIds)
-            : $this->repo->getNumberOfActivePublicMembers($restrictToUserIds);
-        $users = $currentUser instanceof User
-            ? $this->repo->findActiveMembers(self::PAGE_SIZE, $offset, $excludeIds, $restrictToUserIds)
-            : $this->repo->findActivePublicMembers(self::PAGE_SIZE, $offset, $restrictToUserIds);
+        $publicOnly = !$currentUser instanceof User;
+        $userTotal = $this->userService->countDirectoryMembers($publicOnly, $excludeIds, $restrictToUserIds);
+        $users = $this->userService->findDirectoryMembers($publicOnly, self::PAGE_SIZE, $offset, $excludeIds, $restrictToUserIds);
 
         return $this->render(
             'member/index.html.twig',
@@ -74,7 +75,7 @@ final class MemberController extends AbstractController
         $response = $this->getResponse();
         try {
             $currentUser = $this->getAuthedUser();
-            $userDetails = $this->repo->findOneBy(['id' => $id]);
+            $userDetails = $this->userService->findUser($id);
 
             if ($userDetails === null || !$this->memberFilterService->isMemberAccessible($id)) {
                 throw $this->createNotFoundException();
@@ -93,6 +94,7 @@ final class MemberController extends AbstractController
                     'userDetails' => $userDetails,
                     'isFollow' => $currentUser->getFollowing()->contains($userDetails),
                     'isBlocked' => $hasBlockedTarget,
+                    'canModerate' => $this->mayModerate($currentUser, $userDetails),
                 ],
                 $response,
             );
@@ -145,26 +147,22 @@ final class MemberController extends AbstractController
 
     #[Route('/members/restrict/{id}', name: 'app_member_restrict', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
-    public function restrictUser(Request $request, EntityManagerInterface $em, int $id): Response
+    public function restrictUser(Request $request, int $id): Response
     {
         $user = $this->findModeratableMember($request, 'app_member_restrict', $id);
 
-        $user->setRestricted(!$user->isRestricted());
-        $em->persist($user);
-        $em->flush();
+        $this->userService->toggleRestricted($this->getAuthedUser(), $user);
 
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
 
     #[Route('/members/verify/{id}', name: 'app_member_verify', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
-    public function verifyUser(Request $request, EntityManagerInterface $em, int $id): Response
+    public function verifyUser(Request $request, int $id): Response
     {
         $user = $this->findModeratableMember($request, 'app_member_verify', $id);
 
-        $user->setVerified(!$user->isVerified());
-        $em->persist($user);
-        $em->flush();
+        $this->userService->toggleVerified($this->getAuthedUser(), $user);
 
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
@@ -175,11 +173,40 @@ final class MemberController extends AbstractController
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $user = $this->repo->findOneBy(['id' => $id]);
+        $user = $this->userService->findUser($id);
         if ($user === null || !$this->memberFilterService->isMemberAccessible($id)) {
             throw $this->createNotFoundException('Member not found in current context.');
         }
+        if (!$this->mayModerate($this->getAuthedUser(), $user)) {
+            throw $this->createAccessDeniedException('Members of equal or higher rank cannot be moderated.');
+        }
 
         return $user;
+    }
+
+    private function mayModerate(User $actor, User $target): bool
+    {
+        if ($actor->getId() === $target->getId() || $target->getRole() === UserRole::System) {
+            return false;
+        }
+
+        $actorRank = $this->moderationRank(fn(string $role): bool => $this->security->isGranted($role));
+        $targetRank = $this->moderationRank(fn(string $role): bool => $this->security->isGrantedForUser($target, $role));
+
+        return $actorRank > $targetRank;
+    }
+
+    /**
+     * @param callable(string): bool $isGranted
+     */
+    private function moderationRank(callable $isGranted): int
+    {
+        foreach (self::MODERATION_RANKS as $index => $role) {
+            if ($isGranted($role)) {
+                return count(self::MODERATION_RANKS) - $index;
+            }
+        }
+
+        return 0;
     }
 }

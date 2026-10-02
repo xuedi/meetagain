@@ -9,7 +9,6 @@ use App\Entity\User;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Filter\Admin\Member\AdminMemberListFilterService;
-use App\Repository\UserRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Member\ActionException;
 use App\Service\Member\ActionFailure;
@@ -26,7 +25,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class MemberController extends AbstractController implements AdminNavigationInterface
 {
     public function __construct(
-        private readonly UserRepository $repo,
         private readonly AdminMemberListFilterService $filterService,
         private readonly UserService $userService,
     ) {}
@@ -46,7 +44,7 @@ final class MemberController extends AbstractController implements AdminNavigati
     public function list(): Response
     {
         $filterResult = $this->filterService->getUserIdFilter();
-        $users = $this->repo->findAllForAdmin($filterResult->getUserIds());
+        $users = $this->userService->findAllForAdmin($filterResult->getUserIds());
 
         return $this->render('admin/member/list.html.twig', [
             'active' => 'member',

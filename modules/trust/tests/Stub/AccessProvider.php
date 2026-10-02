@@ -9,10 +9,13 @@ final class AccessProvider implements AccessProviderInterface
 {
     public ?int $administratorId = null;
 
+    /** @var list<int> */
+    public array $outsiderIds = [];
+
     #[Override]
     public function canView(string $context, int $userId): ?bool
     {
-        return $context === ContextDescriber::CONTEXT ? true : null;
+        return $context === ContextDescriber::CONTEXT ? !in_array($userId, $this->outsiderIds, true) : null;
     }
 
     #[Override]

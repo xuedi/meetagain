@@ -33,6 +33,34 @@ class EmailTemplateService implements TemplatesInterface
     }
 
     /**
+     * @return array<EmailTemplate>
+     */
+    public function listTemplates(): array
+    {
+        return $this->repo->findAll();
+    }
+
+    /**
+     * @param array<string, array{subject: string, body: string}> $contentByLanguage
+     */
+    public function saveTranslations(EmailTemplate $template, array $contentByLanguage): void
+    {
+        foreach ($contentByLanguage as $languageCode => $content) {
+            $translation = $template->findTranslation($languageCode) ?? new EmailTemplateTranslation();
+            $translation->setEmailTemplate($template);
+            $translation->setLanguage($languageCode);
+            $translation->setSubject($content['subject']);
+            $translation->setBody($content['body']);
+            $translation->setUpdatedAt(new DateTimeImmutable());
+
+            $this->em->persist($translation);
+        }
+
+        $template->setUpdatedAt(new DateTimeImmutable());
+        $this->em->flush();
+    }
+
+    /**
      * @return array{subject: string, body: string}
      */
     public function getTemplateContent(string $identifier, string $language): array

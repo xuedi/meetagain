@@ -18,7 +18,6 @@ use App\Filter\Event\EventFilterService;
 use App\Form\EventFilterType;
 use App\Item\AssociationService;
 use App\Item\AttachControlBuilder;
-use App\Repository\EventRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\CalendarFeedService;
 use App\Service\Event\EventService;
@@ -48,7 +47,6 @@ final class EventController extends AbstractController
         private readonly ActivityService $activityService,
         private readonly EventService $eventService,
         private readonly CalendarFeedService $calendarFeedService,
-        private readonly EventRepository $repo,
         private readonly EventFilterService $eventFilterService,
         private readonly EventSchemaService $eventSchemaService,
         private readonly CanonicalUrlService $canonicalUrlService,
@@ -95,7 +93,7 @@ final class EventController extends AbstractController
         }
 
         $response = $this->getResponse();
-        $event = $this->repo->findOneForDetails($id);
+        $event = $this->eventService->findOneForDetails($id);
         if (!$event instanceof Event) {
             throw $this->createNotFoundException();
         }
@@ -149,7 +147,7 @@ final class EventController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $event = $this->repo->findOneForDetails($id);
+        $event = $this->eventService->findOneForDetails($id);
         if (!$event instanceof Event) {
             throw $this->createNotFoundException();
         }
@@ -178,7 +176,7 @@ final class EventController extends AbstractController
             'events/featured.html.twig',
             [
                 'featured' => $this->getFeaturedEvents($allowedEventIds, $locale),
-                'last' => $this->repo->getPastEvents(3, $allowedEventIds, $locale),
+                'last' => $this->eventService->getPastEvents(3, $allowedEventIds, $locale),
             ],
             $response,
         );
@@ -307,7 +305,7 @@ final class EventController extends AbstractController
     {
         $provided = $this->getProvidedFeaturedEvents();
         if ($provided === null) {
-            return $this->repo->findFeatured($allowedEventIds, $locale);
+            return $this->eventService->findFeatured($allowedEventIds, $locale);
         }
 
         return $this->eventService->keepTranslatedIn($provided, $locale);

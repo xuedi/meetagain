@@ -146,6 +146,10 @@ Nobody may learn how many points flowed from whom. The public fact is a count.
 - The vouch control is offered for every member other than yourself, regardless of whose score is
   higher. Hiding it above a threshold would itself reveal that the other person outranks you - exactly
   what the model exists to prevent. A low-standing member's vouch simply carries little weight.
+- A vouch is refused when its target cannot view the context: `grant()` asks the same
+  `AccessProviderInterface` chain the surfaces use, so a member can only vouch for someone inside it.
+- After a vouch the member returns to the context's `returnUrl`; without one, to the referring page only
+  when it is on the same host, otherwise to `/`.
 
 ## Surfaces
 

@@ -27,9 +27,4 @@ class AdminMemberRestricted extends MessageAbstract
             '%user%' => $this->userNames[$this->meta['user_id']] ?? '',
         ]);
     }
-
-    protected function renderHtml(): string
-    {
-        return $this->renderText();
-    }
 }

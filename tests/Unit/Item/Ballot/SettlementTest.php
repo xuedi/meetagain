@@ -20,7 +20,7 @@ class SettlementTest extends TestCase
         $associations->expects(self::once())->method('attach')->with(7, 'film', 42, 3);
 
         // Act & Assert
-        new Settlement($associations)->settled($this->outcome('42'));
+        new Settlement($associations, new Purpose())->settled($this->outcome('42'));
     }
 
     public function testATieAttachesNothing(): void
@@ -30,7 +30,7 @@ class SettlementTest extends TestCase
         $associations->expects(self::never())->method('attach');
 
         // Act & Assert
-        new Settlement($associations)->settled($this->outcome(null, ['42', '43']));
+        new Settlement($associations, new Purpose())->settled($this->outcome(null, ['42', '43']));
     }
 
     public function testACandidateThatIsNotAnItemIdAttachesNothing(): void
@@ -40,16 +40,16 @@ class SettlementTest extends TestCase
         $associations->expects(self::never())->method('attach');
 
         // Act & Assert
-        new Settlement($associations)->settled($this->outcome('undecided'));
+        new Settlement($associations, new Purpose())->settled($this->outcome('undecided'));
     }
 
     public function testOnlyItemPurposesAreClaimed(): void
     {
         // Arrange
-        $settlement = new Settlement($this->createStub(AssociationService::class));
+        $settlement = new Settlement($this->createStub(AssociationService::class), new Purpose());
 
         // Act & Assert
-        self::assertTrue($settlement->supports(Purpose::forType('film')));
+        self::assertTrue($settlement->supports(new Purpose()->forType('film')));
         self::assertFalse($settlement->supports('event.location'));
     }
 
@@ -60,7 +60,7 @@ class SettlementTest extends TestCase
     {
         return new BallotOutcome(
             1,
-            Purpose::forType('film'),
+            new Purpose()->forType('film'),
             BallotStatus::Settled,
             $winningKey,
             $tiedKeys,

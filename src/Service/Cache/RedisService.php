@@ -4,7 +4,7 @@ namespace App\Service\Cache;
 
 use Redis;
 
-final readonly class RedisCacheService
+final readonly class RedisService
 {
     private const int SCAN_BATCH = 1000;
     private const int LIST_HARD_CAP = 5000;

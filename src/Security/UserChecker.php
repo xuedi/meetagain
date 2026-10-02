@@ -30,11 +30,11 @@ readonly class UserChecker implements UserCheckerInterface
     #[Override]
     public function checkPreAuth(UserInterface $user): void {}
 
-    public static function assertActive(User $user): void
+    public function assertActive(User $user): void
     {
         $status = $user->getStatus();
         if ($status !== UserStatus::Active) {
-            throw new CustomUserMessageAccountStatusException(self::statusMessage($status));
+            throw new CustomUserMessageAccountStatusException($this->statusMessage($status));
         }
     }
 
@@ -45,7 +45,7 @@ readonly class UserChecker implements UserCheckerInterface
             return;
         }
 
-        self::assertActive($user);
+        $this->assertActive($user);
 
         $request = $this->requestStack->getCurrentRequest();
         if (!$request instanceof Request || $request->attributes->getBoolean('_stateless')) {
@@ -65,7 +65,7 @@ readonly class UserChecker implements UserCheckerInterface
         }
     }
 
-    private static function statusMessage(?UserStatus $status): string
+    private function statusMessage(?UserStatus $status): string
     {
         return match ($status) {
             UserStatus::Registered => 'security.account_status_registered',

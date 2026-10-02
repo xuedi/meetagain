@@ -16,7 +16,6 @@ use App\EntityActionDispatcher;
 use App\Enum\AnnouncementStatus;
 use App\Enum\EntityAction;
 use App\Form\AnnouncementType;
-use App\Repository\AnnouncementRepository;
 use App\Service\Cms\AnnouncementService;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
@@ -34,7 +33,6 @@ final class AnnouncementController extends AbstractController implements AdminNa
 {
     public function __construct(
         private readonly TranslatorInterface $translator,
-        private readonly AnnouncementRepository $announcementRepo,
         private readonly AnnouncementService $announcementService,
         private readonly EntityManagerInterface $em,
         private readonly EntityActionDispatcher $entityActionDispatcher,
@@ -65,7 +63,7 @@ final class AnnouncementController extends AbstractController implements AdminNa
 
         return $this->render('admin/cms/announcements/list.html.twig', [
             'active' => 'announcements',
-            'announcements' => $this->announcementRepo->findAllOrderedByDate(),
+            'announcements' => $this->announcementService->findAllOrderedByDate(),
             'adminTop' => $adminTop,
         ]);
     }

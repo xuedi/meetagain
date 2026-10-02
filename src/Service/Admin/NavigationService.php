@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\RouterInterface;
 
-readonly class AdminNavigationService
+readonly class NavigationService
 {
     /**
      * @param iterable<AdminNavigationInterface> $controllers

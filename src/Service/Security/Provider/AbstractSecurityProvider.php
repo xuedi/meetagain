@@ -13,13 +13,13 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
 
-abstract class AbstractSecurityProvider implements SecurityProviderInterface
+abstract readonly class AbstractSecurityProvider implements SecurityProviderInterface
 {
     private const int STATE_TTL_SECONDS = 86_400;
 
     public function __construct(
-        protected readonly CacheItemPoolInterface $securityCachePool,
-        protected readonly LoggerInterface $logger,
+        protected CacheItemPoolInterface $securityCachePool,
+        protected LoggerInterface $logger,
     ) {}
 
     abstract public function getKey(): string;

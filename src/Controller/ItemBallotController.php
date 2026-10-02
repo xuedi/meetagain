@@ -7,7 +7,7 @@ use App\Form\ItemBallotType;
 use App\Item\Ballot\Candidates;
 use App\Item\Ballot\Purpose;
 use App\Item\TypeRegistry;
-use App\Repository\EventRepository;
+use App\Service\Event\EventService;
 use DateTimeImmutable;
 use DomainException;
 use InvalidArgumentException;
@@ -32,16 +32,18 @@ final class ItemBallotController extends AbstractController
     public function __construct(
         private readonly BallotInterface $ballots,
         private readonly Candidates $candidates,
-        private readonly EventRepository $eventRepo,
+        private readonly EventService $eventService,
         private readonly TypeRegistry $types,
         private readonly TranslatorInterface $translator,
+        private readonly BallotTermsType $ballotTerms,
+        private readonly Purpose $purpose,
     ) {}
 
     #[Route('/create/{eventId}/{itemType}', name: 'app_item_ballot_create', requirements: ['eventId' => '\d+'], methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
     public function create(int $eventId, string $itemType, Request $request): Response
     {
-        $event = $this->eventRepo->find($eventId);
+        $event = $this->eventService->findEvent($eventId);
         if ($event === null || !$this->types->has($itemType)) {
             throw $this->createNotFoundException();
         }
@@ -140,10 +142,10 @@ final class ItemBallotController extends AbstractController
      */
     private function requestFor(int $eventId, string $eventTitle, string $itemType, array $itemIds, FormInterface $form): BallotRequest
     {
-        $terms = BallotTermsType::read((array) $form->get(ItemBallotType::FIELD_TERMS)->getData());
+        $terms = $this->ballotTerms->read((array) $form->get(ItemBallotType::FIELD_TERMS)->getData());
 
         return new BallotRequest(
-            Purpose::forType($itemType),
+            $this->purpose->forType($itemType),
             $this->candidates->forBallot($itemType, $itemIds),
             new DateTimeImmutable($terms['deadline']),
             (int) $this->getAuthedUser()->getId(),
@@ -160,7 +162,7 @@ final class ItemBallotController extends AbstractController
     private function mustView(int $id): BallotView
     {
         $ballot = $this->ballots->view($id, (int) $this->getAuthedUser()->getId());
-        if ($ballot === null || Purpose::itemTypeOf($ballot->purpose) === null) {
+        if ($ballot === null || $this->purpose->itemTypeOf($ballot->purpose) === null) {
             throw $this->createNotFoundException();
         }
 
@@ -169,7 +171,7 @@ final class ItemBallotController extends AbstractController
 
     private function itemTypeOf(BallotView $ballot): string
     {
-        return (string) Purpose::itemTypeOf($ballot->purpose);
+        return (string) $this->purpose->itemTypeOf($ballot->purpose);
     }
 
     /**

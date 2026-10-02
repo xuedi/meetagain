@@ -5,6 +5,10 @@ namespace App\Service\Event;
 use App\Emails\Types\NotificationEventCanceledEmail;
 use App\Entity\Event;
 use App\Entity\EventItemAssociation;
+use App\Entity\EventTranslation;
+use App\Entity\Host;
+use App\Entity\Location;
+use App\Entity\User;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTileLocation;
@@ -14,6 +18,7 @@ use App\Item\AssociationService;
 use App\Item\TypeRegistry;
 use App\Plugin;
 use App\Repository\EventRepository;
+use App\Repository\EventTranslationRepository;
 use App\Service\Config\PluginService;
 use App\ValueObject\RealignmentPlan;
 use App\ValueObject\RealignmentResult;
@@ -31,14 +36,161 @@ readonly class EventService
         private EntityManagerInterface $em,
         private NotificationEventCanceledEmail $notificationEventCanceledEmail,
         private PluginService $pluginService,
-        private RecurringEventService $recurringEventService,
+        private RecurringService $recurringEventService,
         private AssociationService $itemAssociationService,
         private TypeRegistry $itemTypeRegistry,
         #[AutowireIterator(Plugin::class)]
         private iterable $plugins,
         #[AutowireIterator(ImageBoxProviderInterface::class)]
         private iterable $imageBoxProviders,
+        private EventTranslationRepository $translationRepo,
     ) {}
+
+    public function findEvent(int $id): ?Event
+    {
+        return $this->repo->find($id);
+    }
+
+    public function findOneForDetails(int $id): ?Event
+    {
+        return $this->repo->findOneForDetails($id);
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds
+     * @return array{items: list<Event>, total: int}
+     */
+    public function findPublicUpcoming(
+        DateTimeInterface $from,
+        ?DateTimeInterface $to,
+        int $limit,
+        int $offset,
+        ?array $restrictToEventIds,
+        ?string $translatedIn = null,
+    ): array {
+        return $this->repo->findPublicUpcoming($from, $to, $limit, $offset, $restrictToEventIds, $translatedIn);
+    }
+
+    /**
+     * @return array<int, Event>
+     */
+    public function findSeriesMembers(int $seriesId): array
+    {
+        return $this->repo->findSeriesMembers([$seriesId]);
+    }
+
+    /**
+     * @param list<int> $eventIds
+     * @return array{items: Event[], total: int}
+     */
+    public function findUpcomingByIds(array $eventIds, DateTimeInterface $from, int $limit, int $offset, ?string $translatedIn = null): array
+    {
+        return $this->repo->findUpcomingByIds($eventIds, $from, $limit, $offset, $translatedIn);
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds
+     */
+    public function countAttendedEvents(User $user, ?array $restrictToEventIds = null): int
+    {
+        return $this->repo->countAttendedEvents($user, $restrictToEventIds);
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds
+     */
+    public function countUpcomingRsvpEvents(User $user, ?array $restrictToEventIds = null): int
+    {
+        return $this->repo->countUpcomingRsvpEvents($user, $restrictToEventIds);
+    }
+
+    public function hasEvents(): bool
+    {
+        return $this->repo->count([]) > 0;
+    }
+
+    public function findTranslation(string $languageCode, ?int $eventId): ?EventTranslation
+    {
+        return $this->translationRepo->findOneBy(['language' => $languageCode, 'event' => $eventId]);
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds
+     * @return array<Event>
+     */
+    public function findAllForAdmin(?array $restrictToEventIds = null): array
+    {
+        return $this->repo->findAllForAdmin($restrictToEventIds);
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds
+     */
+    public function getNextEventId(?array $restrictToEventIds = null): ?int
+    {
+        return $this->repo->getNextEventId($restrictToEventIds);
+    }
+
+    /**
+     * @param array<int>|null $eventIds
+     * @return array<int, int>
+     */
+    public function getRsvpCounts(?array $eventIds = null): array
+    {
+        return $this->repo->getRsvpCounts($eventIds);
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds
+     * @return array<Event>
+     */
+    public function getUpcomingEvents(int $number, ?array $restrictToEventIds = null): array
+    {
+        return $this->repo->getUpcomingEvents($number, $restrictToEventIds);
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds
+     * @return array<Event>
+     */
+    public function getPastEvents(int $number, ?array $restrictToEventIds = null, ?string $translatedIn = null): array
+    {
+        return $this->repo->getPastEvents($number, $restrictToEventIds, $translatedIn);
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds
+     * @return array<Event>
+     */
+    public function getPastAttendedEvents(User $user, int $number, ?array $restrictToEventIds = null): array
+    {
+        return $this->repo->getPastAttendedEvents($user, $number, $restrictToEventIds);
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds
+     * @return array<Event>
+     */
+    public function findFeatured(?array $restrictToEventIds = null, ?string $translatedIn = null): array
+    {
+        return $this->repo->findFeatured($restrictToEventIds, $translatedIn);
+    }
+
+    /**
+     * @return Event[]
+     */
+    public function findByHost(Host $host): array
+    {
+        return $this->repo->findByHost($host);
+    }
+
+    /**
+     * @return Event[]
+     */
+    public function findByLocation(Location $location): array
+    {
+        return $this->repo->findBy(['location' => $location]);
+    }
 
     /**
      * @param array<int>|null $restrictToEventIds Optional event ID filter
@@ -69,6 +221,11 @@ readonly class EventService
     public function updateRecurringEvents(Event $event, ?DateTimeInterface $syncFrom = null): int
     {
         return $this->recurringEventService->updateRecurringEvents($event, $syncFrom);
+    }
+
+    public function fillUntitledFollowers(Event $event): int
+    {
+        return $this->recurringEventService->fillUntitledFollowers($event);
     }
 
     public function planRealignment(Event $anchor, ScheduleChange $change): RealignmentPlan

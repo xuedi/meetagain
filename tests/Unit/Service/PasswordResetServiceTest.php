@@ -7,6 +7,7 @@ use App\Activity\Messages\PasswordReset;
 use App\Activity\Messages\PasswordResetRequest;
 use App\Emails\Types\PasswordResetEmail;
 use App\Entity\User;
+use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use App\Service\Member\PasswordResetService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -53,6 +54,7 @@ class PasswordResetServiceTest extends TestCase
     public function testRequestResetSetsRegcodeAndPersistsUser(): void
     {
         $user = new User();
+        $user->setStatus(UserStatus::Active);
         $user->setEmail('test@example.com');
 
         $userRepoStub = $this->createStub(UserRepository::class);
@@ -74,6 +76,7 @@ class PasswordResetServiceTest extends TestCase
     public function testRequestResetLogsActivityAndSendsEmail(): void
     {
         $user = new User();
+        $user->setStatus(UserStatus::Active);
         $user->setEmail('test@example.com');
 
         $userRepoStub = $this->createStub(UserRepository::class);
@@ -93,6 +96,7 @@ class PasswordResetServiceTest extends TestCase
     public function testFindUserByResetCodeReturnsUser(): void
     {
         $user = new User();
+        $user->setStatus(UserStatus::Active);
         $user->setRegcode('abc123');
 
         $userRepoStub = $this->createStub(UserRepository::class);

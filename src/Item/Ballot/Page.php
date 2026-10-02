@@ -11,12 +11,13 @@ final readonly class Page implements PageProviderInterface
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
+        private Purpose $purpose,
     ) {}
 
     #[Override]
     public function supports(string $purpose): bool
     {
-        return Purpose::itemTypeOf($purpose) !== null;
+        return $this->purpose->itemTypeOf($purpose) !== null;
     }
 
     #[Override]

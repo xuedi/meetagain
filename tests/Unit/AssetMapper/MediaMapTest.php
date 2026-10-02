@@ -19,14 +19,14 @@ class MediaMapTest extends TestCase
         $assetMapper = $this->createStub(AssetMapperInterface::class);
         $assetMapper->method('allAssets')->willReturn([$assetA, $assetB]);
 
-        $mediaMap = new MediaMap($assetMapper);
+        $mediaMap = new MediaMap($assetMapper, new OpaqueMediaPathResolver());
 
         // Act
         $map = $mediaMap->build();
 
         // Assert
-        $expectedHashA = OpaqueMediaPathResolver::hashLogicalPath('images/logo.png');
-        $expectedHashB = OpaqueMediaPathResolver::hashLogicalPath('images/banner.webp');
+        $expectedHashA = new OpaqueMediaPathResolver()->hashLogicalPath('images/logo.png');
+        $expectedHashB = new OpaqueMediaPathResolver()->hashLogicalPath('images/banner.webp');
 
         $this->assertArrayHasKey($expectedHashA, $map);
         $this->assertArrayHasKey($expectedHashB, $map);
@@ -40,7 +40,7 @@ class MediaMapTest extends TestCase
         $assetMapper = $this->createStub(AssetMapperInterface::class);
         $assetMapper->method('allAssets')->willReturn([]);
 
-        $mediaMap = new MediaMap($assetMapper);
+        $mediaMap = new MediaMap($assetMapper, new OpaqueMediaPathResolver());
 
         // Act & Assert
         $this->assertSame([], $mediaMap->build());

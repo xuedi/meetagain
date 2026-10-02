@@ -9,9 +9,6 @@ use Module\Circulation\Internal\CirculationService;
 use Module\Circulation\Internal\DashboardService;
 use Module\Circulation\Internal\DashboardTabRegistry;
 use Module\Circulation\Internal\HandoverService;
-use Module\Circulation\Internal\Repository\CopyRepository;
-use Module\Circulation\Internal\Repository\HandoverRepository;
-use Module\Circulation\Internal\Repository\RequestRepository;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,9 +29,6 @@ final class CirculationController extends AbstractController
         private readonly DashboardService $dashboard,
         private readonly DashboardTabRegistry $tabs,
         private readonly HandoverService $handovers,
-        private readonly CopyRepository $copies,
-        private readonly RequestRepository $requests,
-        private readonly HandoverRepository $handoverRepo,
         private readonly TypeRegistry $itemTypes,
     ) {}
 
@@ -75,7 +69,7 @@ final class CirculationController extends AbstractController
     {
         $this->guardCsrf($request, 'app_circulation_request_cancel' . $id);
 
-        $circulationRequest = $this->requests->find($id);
+        $circulationRequest = $this->circulation->findRequest($id);
         if ($circulationRequest === null || $circulationRequest->getUser()->getId() !== $this->getAuthedUser()->getId()) {
             throw $this->createNotFoundException();
         }
@@ -91,7 +85,7 @@ final class CirculationController extends AbstractController
     {
         $this->guardCsrf($request, 'app_circulation_copy_finished' . $id);
 
-        $copy = $this->copies->find($id);
+        $copy = $this->circulation->findCopy($id);
         if ($copy === null || !$copy->isHeldBy($this->getAuthedUser())) {
             throw $this->createNotFoundException();
         }
@@ -112,7 +106,7 @@ final class CirculationController extends AbstractController
     {
         $this->guardCsrf($request, 'app_circulation_copy_retire' . $id);
 
-        $copy = $this->copies->find($id);
+        $copy = $this->circulation->findCopy($id);
         if ($copy === null) {
             throw $this->createNotFoundException();
         }
@@ -126,7 +120,7 @@ final class CirculationController extends AbstractController
     #[Route('/handover/{id}', name: 'app_circulation_handover', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function handover(int $id): Response
     {
-        $handover = $this->handoverRepo->find($id);
+        $handover = $this->dashboard->findHandover($id);
         if ($handover === null) {
             throw $this->createNotFoundException();
         }
@@ -156,7 +150,7 @@ final class CirculationController extends AbstractController
     {
         $this->guardCsrf($request, 'app_circulation_handover_confirm' . $id);
 
-        $handover = $this->handoverRepo->find($id);
+        $handover = $this->dashboard->findHandover($id);
         if ($handover === null || !$handover->isParticipant($this->getAuthedUser())) {
             throw $this->createNotFoundException();
         }
@@ -176,7 +170,7 @@ final class CirculationController extends AbstractController
     {
         $this->guardCsrf($request, 'app_circulation_handover_cancel' . $id);
 
-        $handover = $this->handoverRepo->find($id);
+        $handover = $this->dashboard->findHandover($id);
         if ($handover === null || !$handover->isParticipant($this->getAuthedUser())) {
             throw $this->createNotFoundException();
         }

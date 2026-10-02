@@ -11,12 +11,13 @@ final readonly class Electorate implements ElectorateProviderInterface
 {
     public function __construct(
         private EventFilterService $eventFilter,
+        private Purpose $purpose,
     ) {}
 
     #[Override]
     public function supports(string $purpose): bool
     {
-        return Purpose::itemTypeOf($purpose) !== null;
+        return $this->purpose->itemTypeOf($purpose) !== null;
     }
 
     #[Override]

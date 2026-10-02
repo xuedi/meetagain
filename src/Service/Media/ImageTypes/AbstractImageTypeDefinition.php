@@ -7,13 +7,13 @@ use App\Enum\ImageFitMode;
 use App\Repository\ImageLocationRepository;
 use Doctrine\DBAL\Connection;
 
-abstract class AbstractImageTypeDefinition implements ImageTypeDefinitionInterface
+abstract readonly class AbstractImageTypeDefinition implements ImageTypeDefinitionInterface
 {
     private const array UNIVERSAL_SIZES = [[100, 100], [50, 50]];
 
     public function __construct(
-        protected readonly ImageLocationRepository $repo,
-        protected readonly Connection $connection,
+        protected ImageLocationRepository $repo,
+        protected Connection $connection,
     ) {}
 
     final public function thumbnailSizes(): array

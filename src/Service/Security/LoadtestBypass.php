@@ -4,6 +4,7 @@ namespace App\Service\Security;
 
 use DateTimeImmutable;
 use Override;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireDecorated;
 use Symfony\Component\HttpFoundation\RateLimiter\RequestRateLimiterInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,14 +14,19 @@ use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\RateLimiter\Reservation;
 
-final class LoadtestBypass
+final readonly class LoadtestBypass
 {
     public const string HEADER = 'X-Loadtest-Bypass';
 
+    public function __construct(
+        #[Autowire('%kernel.environment%')]
+        private string $environment,
+    ) {}
+
     // Both conditions must hold; in prod the header is silently ignored
-    public static function isActive(?Request $request, string $environment): bool
+    public function isActive(?Request $request): bool
     {
-        if ($environment === 'prod') {
+        if ($this->environment === 'prod') {
             return false;
         }
         if ($request === null) {
@@ -29,7 +35,7 @@ final class LoadtestBypass
         return $request->headers->get(self::HEADER) === '1';
     }
 
-    public static function accepted(): RateLimit
+    public function accepted(): RateLimit
     {
         return new RateLimit(availableTokens: PHP_INT_MAX, retryAfter: new DateTimeImmutable('@0'), accepted: true, limit: PHP_INT_MAX);
     }
@@ -41,24 +47,28 @@ final readonly class LoadtestBypassRateLimiterFactory implements RateLimiterFact
         #[AutowireDecorated]
         private RateLimiterFactoryInterface $inner,
         private RequestStack $requestStack,
-        private string $environment,
+        private LoadtestBypass $bypass,
     ) {}
 
     #[Override]
     public function create(?string $key = null): LimiterInterface
     {
-        if (LoadtestBypass::isActive($this->requestStack->getMainRequest(), $this->environment)) {
-            return new class implements LimiterInterface {
+        if ($this->bypass->isActive($this->requestStack->getMainRequest())) {
+            return new readonly class($this->bypass) implements LimiterInterface {
+                public function __construct(
+                    private LoadtestBypass $bypass,
+                ) {}
+
                 #[Override]
                 public function reserve(int $tokens = 1, ?float $maxTime = null): Reservation
                 {
-                    return new Reservation(0.0, LoadtestBypass::accepted());
+                    return new Reservation(0.0, $this->bypass->accepted());
                 }
 
                 #[Override]
                 public function consume(int $tokens = 1): RateLimit
                 {
-                    return LoadtestBypass::accepted();
+                    return $this->bypass->accepted();
                 }
 
                 #[Override]
@@ -75,14 +85,14 @@ final readonly class LoadtestBypassRequestRateLimiter implements RequestRateLimi
     public function __construct(
         #[AutowireDecorated]
         private RequestRateLimiterInterface $inner,
-        private string $environment,
+        private LoadtestBypass $bypass,
     ) {}
 
     #[Override]
     public function consume(Request $request): RateLimit
     {
-        if (LoadtestBypass::isActive($request, $this->environment)) {
-            return LoadtestBypass::accepted();
+        if ($this->bypass->isActive($request)) {
+            return $this->bypass->accepted();
         }
 
         return $this->inner->consume($request);

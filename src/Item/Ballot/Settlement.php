@@ -11,6 +11,7 @@ final readonly class Settlement implements SettlementListenerInterface
 {
     public function __construct(
         private AssociationService $associations,
+        private Purpose $purpose,
     ) {}
 
     #[Override]
@@ -22,13 +23,13 @@ final readonly class Settlement implements SettlementListenerInterface
     #[Override]
     public function supports(string $purpose): bool
     {
-        return Purpose::itemTypeOf($purpose) !== null;
+        return $this->purpose->itemTypeOf($purpose) !== null;
     }
 
     #[Override]
     public function settled(BallotOutcome $outcome): void
     {
-        $itemType = Purpose::itemTypeOf($outcome->purpose);
+        $itemType = $this->purpose->itemTypeOf($outcome->purpose);
         $subject = $outcome->subject;
         $winner = $outcome->winningKey;
 

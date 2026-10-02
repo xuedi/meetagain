@@ -21,15 +21,16 @@ class ImageLocationRepository extends ServiceEntityRepository
     public function findPairsByType(ImageType $type): array
     {
         $rows = $this
-            ->getEntityManager()
-            ->getConnection()
-            ->fetchAllAssociative('SELECT image_id, location_id FROM image_location WHERE location_type = ?', [
-                $type->value,
-            ]);
+            ->createQueryBuilder('il')
+            ->select('IDENTITY(il.image) AS imageId', 'il.locationId')
+            ->where('il.locationType = :type')
+            ->setParameter('type', $type)
+            ->getQuery()
+            ->getArrayResult();
 
         return array_map(static fn(array $r) => [
-            'imageId' => (int) $r['image_id'],
-            'locationId' => (int) $r['location_id'],
+            'imageId' => (int) $r['imageId'],
+            'locationId' => (int) $r['locationId'],
         ], $rows);
     }
 
@@ -43,16 +44,15 @@ class ImageLocationRepository extends ServiceEntityRepository
             return [];
         }
 
-        $typeValues = array_map(static fn(ImageType $type) => $type->value, $types);
-        $placeholders = implode(', ', array_fill(0, count($typeValues), '?'));
-
         $rows = $this
-            ->getEntityManager()
-            ->getConnection()
-            ->fetchFirstColumn(
-                "SELECT DISTINCT image_id FROM image_location WHERE location_id = ? AND location_type IN ({$placeholders})",
-                array_merge([$locationId], $typeValues),
-            );
+            ->createQueryBuilder('il')
+            ->select('DISTINCT IDENTITY(il.image) AS imageId')
+            ->where('il.locationId = :locationId')
+            ->andWhere('il.locationType IN (:types)')
+            ->setParameter('locationId', $locationId)
+            ->setParameter('types', $types)
+            ->getQuery()
+            ->getSingleColumnResult();
 
         return array_map('intval', $rows);
     }
@@ -68,22 +68,19 @@ class ImageLocationRepository extends ServiceEntityRepository
             return [];
         }
 
-        $typeValues = array_map(static fn(ImageType $type) => $type->value, $types);
-        $imagePlaceholders = implode(', ', array_fill(0, count($imageIds), '?'));
-        $typePlaceholders = implode(', ', array_fill(0, count($typeValues), '?'));
-
         $rows = $this
-            ->getEntityManager()
-            ->getConnection()
-            ->fetchAllAssociative(
-                "SELECT DISTINCT image_id, location_id FROM image_location
-                 WHERE image_id IN ({$imagePlaceholders}) AND location_type IN ({$typePlaceholders})",
-                array_merge($imageIds, $typeValues),
-            );
+            ->createQueryBuilder('il')
+            ->select('DISTINCT IDENTITY(il.image) AS imageId', 'il.locationId')
+            ->where('il.image IN (:imageIds)')
+            ->andWhere('il.locationType IN (:types)')
+            ->setParameter('imageIds', $imageIds)
+            ->setParameter('types', $types)
+            ->getQuery()
+            ->getArrayResult();
 
         $result = [];
         foreach ($rows as $row) {
-            $result[(int) $row['image_id']][] = (int) $row['location_id'];
+            $result[(int) $row['imageId']][] = (int) $row['locationId'];
         }
 
         return $result;
@@ -95,16 +92,16 @@ class ImageLocationRepository extends ServiceEntityRepository
     public function findTypesPerImageId(): array
     {
         $rows = $this
-            ->getEntityManager()
-            ->getConnection()
-            ->fetchAllAssociative('SELECT DISTINCT image_id, location_type FROM image_location ORDER BY image_id, location_type');
+            ->createQueryBuilder('il')
+            ->select('DISTINCT IDENTITY(il.image) AS imageId', 'il.locationType')
+            ->orderBy('imageId')
+            ->addOrderBy('il.locationType')
+            ->getQuery()
+            ->getArrayResult();
 
         $result = [];
         foreach ($rows as $row) {
-            $type = ImageType::tryFrom((int) $row['location_type']);
-            if ($type !== null) {
-                $result[(int) $row['image_id']][] = $type;
-            }
+            $result[(int) $row['imageId']][] = $row['locationType'];
         }
 
         return $result;
@@ -119,13 +116,16 @@ class ImageLocationRepository extends ServiceEntityRepository
             return;
         }
 
-        $conn = $this->getEntityManager()->getConnection();
+        $query = $this
+            ->createQueryBuilder('il')
+            ->delete()
+            ->where('il.locationType = :type')
+            ->andWhere('il.image = :imageId')
+            ->andWhere('il.locationId = :locationId')
+            ->setParameter('type', $type)
+            ->getQuery();
         foreach ($pairs as $pair) {
-            $conn->executeStatement('DELETE FROM image_location WHERE location_type = ? AND image_id = ? AND location_id = ?', [
-                $type->value,
-                $pair['imageId'],
-                $pair['locationId'],
-            ]);
+            $query->setParameter('imageId', $pair['imageId'])->setParameter('locationId', $pair['locationId'])->execute();
         }
     }
 
@@ -138,9 +138,9 @@ class ImageLocationRepository extends ServiceEntityRepository
             return;
         }
 
-        $conn = $this->getEntityManager()->getConnection();
+        $insertIgnore = $this->getEntityManager()->getConnection();
         foreach ($pairs as $pair) {
-            $conn->executeStatement('INSERT IGNORE INTO image_location (image_id, location_type, location_id) VALUES (?, ?, ?)', [
+            $insertIgnore->executeStatement('INSERT IGNORE INTO image_location (image_id, location_type, location_id) VALUES (?, ?, ?)', [
                 $pair['imageId'],
                 $type->value,
                 $pair['locationId'],
@@ -153,11 +153,16 @@ class ImageLocationRepository extends ServiceEntityRepository
      */
     public function countPerImageId(): array
     {
-        $rows = $this->getEntityManager()->getConnection()->fetchAllAssociative('SELECT image_id, COUNT(*) AS cnt FROM image_location GROUP BY image_id');
+        $rows = $this
+            ->createQueryBuilder('il')
+            ->select('IDENTITY(il.image) AS imageId', 'COUNT(il.id) AS cnt')
+            ->groupBy('il.image')
+            ->getQuery()
+            ->getArrayResult();
 
         $result = [];
         foreach ($rows as $row) {
-            $result[(int) $row['image_id']] = (int) $row['cnt'];
+            $result[(int) $row['imageId']] = (int) $row['cnt'];
         }
 
         return $result;

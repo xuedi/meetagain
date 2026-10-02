@@ -11,7 +11,7 @@ use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Security\Permission\Attribute\PermissionAttribute;
-use App\Service\Cache\RedisCacheService;
+use App\Service\Cache\RedisService;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +26,7 @@ final class RedisCacheController extends AbstractSettingsController implements A
 {
     public function __construct(
         TranslatorInterface $translator,
-        private readonly RedisCacheService $redisCacheService,
+        private readonly RedisService $redisCacheService,
         #[Autowire(service: 'cache.global_clearer')]
         private readonly Psr6CacheClearer $cacheClearer,
     ) {

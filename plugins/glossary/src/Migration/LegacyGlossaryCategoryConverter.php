@@ -2,13 +2,13 @@
 
 namespace Plugin\Glossary\Migration;
 
-final class LegacyGlossaryCategoryConverter
+final readonly class LegacyGlossaryCategoryConverter
 {
     /**
      * @param array<string, mixed> $config
      * @return array<string, mixed>|null
      */
-    public static function convert(array $config, string $sourceLocale): ?array
+    public function convert(array $config, string $sourceLocale): ?array
     {
         if (array_key_exists('taxonomy', $config) || !array_key_exists('categories', $config)) {
             return null;

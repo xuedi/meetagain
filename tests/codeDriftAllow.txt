@@ -1,0 +1,64 @@
+# code-drift findings in the core that were judged and kept. One entry per file, and every entry
+# needs a reason. Enforced by `code-drift --check` on every commit: an entry that matches no
+# finding any more fails the run until it is deleted or moved with its file.
+#
+# Format: <detector> <path>[::<symbol>] // why the finding stays
+#
+# The symbol is the enclosing method (static, raw-sql, log-rethrow, fqcn) or the injected
+# repository (repo-in-controller). Without one, the entry covers the whole file. A rule that
+# covers a kind of class belongs in config/tools/code-drift.dist, not here.
+
+# --- raw-sql ---
+raw-sql src/Repository/ImageLocationRepository.php::insertForType // INSERT IGNORE keeps the per-type sync idempotent against the unique key; DQL has no INSERT and the DBAL query builder has no IGNORE
+
+# --- static ---
+# CMS block types are a static contract: CmsController and the block hydrator call getType(),
+# getCapabilities() and getFieldDefinitions() on the class before any block instance exists.
+static src/Entity/BlockType/BlockType.php // static block-type contract, called on the class before an instance exists
+static src/Entity/BlockType/EventTeaser.php // implements the static block-type contract
+static src/Entity/BlockType/FactsRow.php // implements the static block-type contract
+static src/Entity/BlockType/Gallery.php // implements the static block-type contract
+static src/Entity/BlockType/Headline.php // implements the static block-type contract
+static src/Entity/BlockType/Hero.php // implements the static block-type contract
+static src/Entity/BlockType/Text.php // implements the static block-type contract
+static src/Entity/BlockType/TextMap.php // implements the static block-type contract, and its static parsers serve fromJson
+static src/Entity/BlockType/TrioCards.php // implements the static block-type contract
+static src/Entity/NotificationSettings.php // entities have no injection point; it owns the vocabulary of notification keys and push categories and validates against it
+
+# --- repo-in-controller ---
+# A read-only page with no service of its own domain to move the call into stays on the
+# repository; a pass-through service would fail the tiny rule.
+repo-in-controller src/Controller/Admin/Logs/AccessDeniedLogController.php::AccessDeniedLogRepository // read-only log viewer, no log service exists
+repo-in-controller src/Controller/Admin/Logs/CronLogController.php::CronLogRepository // read-only log viewer, no log service exists
+repo-in-controller src/Controller/Admin/Logs/NotFoundLogController.php::NotFoundLogRepository // read-only log viewer, no log service exists
+repo-in-controller src/Controller/Admin/Logs/NotFoundLogController.php::SuspiciousUrlRepository // read-only log viewer, no log service exists
+repo-in-controller src/Controller/Admin/Security/IncidentsController.php::IncidentRepository // read-only incident viewer, no service of its own
+repo-in-controller src/Controller/Admin/Security/MeasureLogController.php::SecurityMeasureLogRepository // read-only measure log viewer, no service of its own
+repo-in-controller src/Controller/Admin/Security/RateLimitingController.php::RateLimitLogRepository // read-only rate-limit log viewer, no service of its own
+repo-in-controller src/Controller/Admin/Security/ViolationLogController.php::AccessDeniedLogRepository // read-only violation log viewer, no service of its own
+repo-in-controller src/Controller/Admin/Settings/MeasuresController.php::SecurityMeasureLogRepository // read-only counters beside the measure toggles, no service of their own
+repo-in-controller src/Controller/Admin/Settings/MeasuresController.php::IncidentRepository // read-only counters beside the measure toggles, no service of their own
+repo-in-controller src/Controller/Admin/Settings/MeasuresController.php::RateLimitLogRepository // read-only counters beside the measure toggles, no service of their own
+repo-in-controller src/Controller/Admin/HostController.php::HostRepository // list and map reads, no host service exists
+repo-in-controller src/Controller/Admin/LocationController.php::LocationRepository // list and map reads, no location service exists
+repo-in-controller src/Controller/Admin/CmsBlockController.php::LocationRepository // venue list for the block form, no location service exists
+repo-in-controller src/Controller/Admin/Support/ReportsController.php::ImageReportRepository // list and detail reads, no image report service exists
+
+# --- echo-name ---
+echo-name src/Emails/EmailAbstract.php // public plugin contract every email type extends; plugin developer docs name it
+echo-name src/Emails/Guard/Rule/SupportRequestEmailVerifiedRule.php // "EmailVerified" names the verification state, not the Emails/ folder
+echo-name src/Filter/Admin/Dashboard/DashboardScope.php // reduced to Scope it would collide with EventScope beside it
+echo-name src/Service/Event/EventScope.php // reduced to Scope it would collide with DashboardScope
+echo-name src/Form/EventFilterFormContributorInterface.php // public plugin contract, named in the plugin developer docs
+echo-name src/Publisher/AlternateLinks/EventAlternateLinkProvider.php // keeps its chain's name, AlternateLinkProviderInterface
+echo-name src/Publisher/CanonicalUrl/EventCanonicalUrlProvider.php // keeps its chain's name, CanonicalUrlProviderInterface
+echo-name src/Publisher/Sitemap/SitemapPublisherInterface.php // public plugin contract of the sitemap publisher family
+echo-name src/Publisher/Sitemap/SitemapUrl.php // public plugin contract: sitemap publishers in plugins return it
+echo-name src/Publisher/WellKnown/WellKnownDocument.php // public plugin contract: well-known providers in plugins return it
+echo-name src/Service/Admin/AdminNotificationService.php // reduced it would be a second NotificationService beside the user one
+echo-name src/Service/Media/ImageTypes/ImageTypeDefinitionInterface.php // contract of the image type definition family
+echo-name src/Service/Notification/Admin/AdminNotificationItem.php // reduced to NotificationItem it would collide with the user-side item
+echo-name src/Service/Notification/Admin/AdminNotificationSection.php // stays in the AdminNotification family beside its item and service
+echo-name src/Service/Notification/User/NotificationItem.php // public plugin contract: notification providers in plugins return it
+echo-name src/Service/Notification/User/ReviewNotificationItem.php // public plugin contract: review notification providers return it
+echo-name src/Service/Notification/User/NotificationSummary.php // stays in the family of the NotificationItem contract it sums up
