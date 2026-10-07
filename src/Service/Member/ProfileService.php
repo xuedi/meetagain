@@ -29,7 +29,7 @@ final readonly class ProfileService
 
     public const string NAME_VIOLATION_MESSAGE = 'security.validator_username_max';
 
-    public static function nameLimitExceeded(?string $current, string $name): ?int
+    public function nameLimitExceeded(?string $current, string $name): ?int
     {
         if (mb_strlen($name) > self::NAME_STORAGE_LIMIT) {
             return self::NAME_STORAGE_LIMIT;

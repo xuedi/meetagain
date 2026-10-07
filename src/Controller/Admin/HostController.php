@@ -14,9 +14,9 @@ use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Host\AdminHostListFilterService;
 use App\Form\HostType;
-use App\Repository\EventRepository;
 use App\Repository\HostRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use App\Service\Event\EventService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,7 +31,7 @@ final class HostController extends AbstractController implements AdminNavigation
 {
     public function __construct(
         private readonly HostRepository $repo,
-        private readonly EventRepository $eventRepo,
+        private readonly EventService $eventService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly AdminHostListFilterService $hostFilterService,
         private readonly TranslatorInterface $translator,
@@ -91,7 +91,7 @@ final class HostController extends AbstractController implements AdminNavigation
             return $this->redirectToRoute('app_admin_host_edit', ['id' => $host->getId()]);
         }
 
-        $eventsUsingHost = $this->eventRepo->findByHost($host);
+        $eventsUsingHost = $this->eventService->findByHost($host);
 
         return $this->render('admin/host/edit.html.twig', [
             'active' => 'host',

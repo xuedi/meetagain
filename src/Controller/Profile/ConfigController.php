@@ -5,11 +5,12 @@ namespace App\Controller\Profile;
 use App\Activity\ActivityService;
 use App\Activity\Messages\PasswordChanged;
 use App\Controller\AbstractController;
+use App\Entity\NotificationSettings;
 use App\Form\ChangePassword;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Member\BlockingService;
 use App\Service\Member\ConsentService;
-use App\Service\Notification\NotificationSettingsService;
+use App\Service\Notification\SettingsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,7 +30,7 @@ final class ConfigController extends AbstractController
         private readonly ActivityService $activityService,
         private readonly BlockingService $blockingService,
         private readonly ConsentService $consentService,
-        private readonly NotificationSettingsService $notificationSettings,
+        private readonly SettingsService $notificationSettings,
     ) {}
 
     #[Route('/profile/config', name: 'app_profile_config')]
@@ -108,6 +109,9 @@ final class ConfigController extends AbstractController
     {
         if (!$this->isCsrfTokenValid('app_profile_config_toggle_notification' . $type, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+        if (!NotificationSettings::isKnownKey($type)) {
+            throw $this->createNotFoundException();
         }
 
         $user = $this->getAuthedUser();

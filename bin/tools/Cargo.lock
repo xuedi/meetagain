@@ -234,6 +234,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 
 [[package]]
+name = "code-drift"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "libc",
+ "phplex",
+ "regex",
+ "toolconfig",
+ "walkdir",
+]
+
+[[package]]
 name = "colorchoice"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -244,6 +256,7 @@ name = "comment-guard"
 version = "0.1.0"
 dependencies = [
  "libc",
+ "phplex",
  "toolconfig",
  "walkdir",
 ]
@@ -1075,6 +1088,10 @@ name = "percent-encoding"
 version = "2.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220"
+
+[[package]]
+name = "phplex"
+version = "0.1.0"
 
 [[package]]
 name = "pin-project-lite"

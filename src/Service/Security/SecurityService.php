@@ -42,7 +42,7 @@ readonly class SecurityService implements CronTaskInterface
         private AppStateService $appState,
         private ClockInterface $clock,
         private LoggerInterface $logger,
-        private string $environment,
+        private LoadtestBypass $loadtestBypass,
         private NotFoundLogRepository $notFoundLogRepository,
         private AccessDeniedLogRepository $accessDeniedLogRepository,
         private RequestIdentityResolver $identityResolver,
@@ -55,7 +55,7 @@ readonly class SecurityService implements CronTaskInterface
      */
     public function event(SecurityEventType $type, Request $request, array $context = []): void
     {
-        if ($this->isLoadtestBypass($request)) {
+        if ($this->loadtestBypass->isActive($request)) {
             return;
         }
 
@@ -182,11 +182,6 @@ readonly class SecurityService implements CronTaskInterface
     public function isIpBlocked(string $ip): bool
     {
         return $this->blockStore->isIpBlocked($ip);
-    }
-
-    private function isLoadtestBypass(Request $request): bool
-    {
-        return LoadtestBypass::isActive($request, $this->environment);
     }
 
     /**

@@ -5,8 +5,8 @@ namespace Plugin\Boardgames\Controller;
 use App\Controller\AbstractController;
 use App\Entity\Event;
 use App\Entity\User;
-use App\Repository\EventRepository;
-use App\Repository\UserRepository;
+use App\Service\Event\EventService;
+use App\Service\Member\UserService;
 use Plugin\Boardgames\Entity\BringRequest;
 use Plugin\Boardgames\Service\BringRequestService;
 use Plugin\Boardgames\Service\GameService;
@@ -26,8 +26,8 @@ final class RequestController extends AbstractController
         private readonly BringRequestService $requestService,
         private readonly GameService $gameService,
         private readonly ShelfService $shelfService,
-        private readonly EventRepository $eventRepository,
-        private readonly UserRepository $userRepository,
+        private readonly EventService $eventService,
+        private readonly UserService $userService,
     ) {}
 
     #[Route('/ask/{eventId}', name: 'app_plugin_boardgames_request_ask', requirements: ['eventId' => '\d+'], methods: ['GET'])]
@@ -65,7 +65,7 @@ final class RequestController extends AbstractController
 
         $event = $this->requireEvent($eventId);
         $game = $this->gameService->get($request->request->getInt('game_id'));
-        $owner = $this->userRepository->find($request->request->getInt('owner_id'));
+        $owner = $this->userService->findUser($request->request->getInt('owner_id'));
 
         if ($game === null || !$owner instanceof User) {
             throw $this->createNotFoundException('Board game or owner not found');
@@ -137,7 +137,7 @@ final class RequestController extends AbstractController
 
     private function requireEvent(int $eventId): Event
     {
-        $event = $this->eventRepository->find($eventId);
+        $event = $this->eventService->findEvent($eventId);
         if (!$event instanceof Event) {
             throw $this->createNotFoundException('Event not found');
         }

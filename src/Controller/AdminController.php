@@ -15,9 +15,9 @@ use App\Admin\Dashboard\TileListItem;
 use App\Admin\Dashboard\TileRow;
 use App\Filter\Admin\Dashboard\DashboardScope;
 use App\Filter\Admin\Dashboard\DashboardScopeFilterService;
-use App\Repository\EventRepository;
 use App\Service\Admin\DashboardActionService;
 use App\Service\Admin\DashboardStatsService;
+use App\Service\Event\EventService;
 use App\Service\System\HealthCheckService;
 use DateTime;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,7 +36,7 @@ final class AdminController extends AbstractController
         private readonly DashboardActionService $dashboardAction,
         private readonly HealthCheckService $healthCheckService,
         private readonly DashboardScopeFilterService $scopeFilterService,
-        private readonly EventRepository $eventRepo,
+        private readonly EventService $eventService,
         private readonly TranslatorInterface $translator,
     ) {}
 
@@ -209,7 +209,7 @@ final class AdminController extends AbstractController
         }
 
         if ($isOrganizer) {
-            $pastEvents = $this->eventRepo->getPastEvents(3, $scope?->eventIds());
+            $pastEvents = $this->eventService->getPastEvents(3, $scope?->eventIds());
             $pastItems = [];
             $rsvpsLabel = $this->translator->trans('admin_shell.dashboard_past_events_rsvps');
             foreach ($pastEvents as $event) {

@@ -18,12 +18,30 @@ final readonly class CommentService
         private TargetRegistry $registry,
     ) {}
 
+    public function findComment(int $id): ?Comment
+    {
+        return $this->repository->find($id);
+    }
+
     /**
      * @return array<Comment>
      */
     public function getFor(string $targetType, int $targetId): array
     {
         return $this->repository->findForTarget($targetType, $targetId);
+    }
+
+    /**
+     * @return array<Comment>
+     */
+    public function getPageBefore(string $targetType, int $targetId, ?int $before, int $limit): array
+    {
+        return $this->repository->findForTargetBefore($targetType, $targetId, $before, $limit);
+    }
+
+    public function countFor(string $targetType, int $targetId): int
+    {
+        return $this->repository->countForTarget($targetType, $targetId);
     }
 
     public function create(string $targetType, int $targetId, User $user, string $content): Comment

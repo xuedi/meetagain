@@ -25,6 +25,65 @@ readonly class MessageService
         private ActivityService $activityService,
     ) {}
 
+    public function getMessages(User $user, ?User $partner = null): ?array
+    {
+        return $this->repo->getMessages($user, $partner);
+    }
+
+    public function hasNewMessages(User $user): bool
+    {
+        return $this->repo->hasNewMessages($user);
+    }
+
+    public function getMessageCount(User $user): int
+    {
+        return $this->repo->getMessageCount($user);
+    }
+
+    /**
+     * @param int[] $excludeUserIds
+     * @return array<int, array{messages: int, unread: int, lastMessage: DateTimeImmutable, user: User}>
+     */
+    public function getConversations(User $user, ?int $id = null, array $excludeUserIds = []): array
+    {
+        return $this->repo->getConversations($user, $id, $excludeUserIds);
+    }
+
+    /**
+     * @param int[] $excludeUserIds
+     * @return array<int, array{messages: int, unread: int, lastMessage: DateTimeImmutable, user: User}>
+     */
+    public function getConversationPage(User $user, array $excludeUserIds, int $limit, int $offset): array
+    {
+        return $this->repo->getConversations($user, null, $excludeUserIds, $limit, $offset);
+    }
+
+    /**
+     * @param int[] $excludeUserIds
+     */
+    public function countConversations(User $user, array $excludeUserIds): int
+    {
+        return $this->repo->countConversations($user, $excludeUserIds);
+    }
+
+    /**
+     * @return Message[]
+     */
+    public function getThreadPage(User $user, User $partner, int $limit, int $offset): array
+    {
+        return $this->repo->getThreadPage($user, $partner, $limit, $offset);
+    }
+
+    public function countThread(User $user, User $partner): int
+    {
+        return $this->repo->countThread($user, $partner);
+    }
+
+    public function findMessage(int $id): ?Message
+    {
+        return $this->repo->find($id);
+    }
+
     public function send(User $from, User $to, string $content): Message
     {
         if ($from->getId() === $to->getId()) {

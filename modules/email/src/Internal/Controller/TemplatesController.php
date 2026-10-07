@@ -13,15 +13,10 @@ use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Service\Config\LanguageService;
-use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\EmailInterface;
 use Module\Email\Internal\EmailTemplateService;
 use Module\Email\Internal\Entity\EmailTemplate;
-use Module\Email\Internal\Entity\EmailTemplateTranslation;
 use Module\Email\Internal\Form\EmailTemplateType;
-use Module\Email\Internal\Repository\EmailTemplateRepository;
-use Module\Email\Internal\Repository\EmailTemplateTranslationRepository;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -40,11 +35,8 @@ final class TemplatesController extends AbstractEmailController implements Admin
         TranslatorInterface $translator,
         #[AutowireIterator(EmailInterface::class)]
         private readonly iterable $emailTypes,
-        private readonly EmailTemplateRepository $templateRepo,
         private readonly EmailTemplateService $templateService,
-        private readonly EntityManagerInterface $em,
         private readonly LanguageService $languageService,
-        private readonly EmailTemplateTranslationRepository $translationRepo,
     ) {
         parent::__construct($translator, 'templates');
     }
@@ -52,7 +44,7 @@ final class TemplatesController extends AbstractEmailController implements Admin
     #[Route('', name: 'app_admin_email_templates')]
     public function templates(): Response
     {
-        $templates = $this->templateRepo->findAll();
+        $templates = $this->templateService->listTemplates();
         $templatesByIdentifier = $this->buildTemplatesByMockKey($templates);
         $language = $this->languageService->getAdminFilteredEnabledCodes()[0];
 
@@ -104,19 +96,14 @@ final class TemplatesController extends AbstractEmailController implements Admin
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $contentByLanguage = [];
             foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
-                $translation = $this->getOrCreateTranslation($languageCode, $template->getId());
-                $translation->setEmailTemplate($template);
-                $translation->setLanguage($languageCode);
-                $translation->setSubject($form->get("subject-{$languageCode}")->getData());
-                $translation->setBody($form->get("body-{$languageCode}")->getData());
-                $translation->setUpdatedAt(new DateTimeImmutable());
-
-                $this->em->persist($translation);
+                $contentByLanguage[$languageCode] = [
+                    'subject' => $form->get("subject-{$languageCode}")->getData(),
+                    'body' => $form->get("body-{$languageCode}")->getData(),
+                ];
             }
-
-            $template->setUpdatedAt(new DateTimeImmutable());
-            $this->em->flush();
+            $this->templateService->saveTranslations($template, $contentByLanguage);
 
             $this->addFlash('success', $this->translator->trans('admin_email_templates.flash_saved'));
 
@@ -198,6 +185,7 @@ final class TemplatesController extends AbstractEmailController implements Admin
 
         $identifier = $template->getIdentifier();
 
+        $contentByLanguage = [];
         foreach ($this->languageService->getAdminFilteredEnabledCodes() as $languageCode) {
             $langDefaults = $this->templateService->getDefaultTemplates($languageCode);
 
@@ -205,18 +193,12 @@ final class TemplatesController extends AbstractEmailController implements Admin
                 continue;
             }
 
-            $translation = $this->getOrCreateTranslation($languageCode, $template->getId());
-            $translation->setEmailTemplate($template);
-            $translation->setLanguage($languageCode);
-            $translation->setSubject($langDefaults[$identifier]['subject']);
-            $translation->setBody($langDefaults[$identifier]['body']);
-            $translation->setUpdatedAt(new DateTimeImmutable());
-
-            $this->em->persist($translation);
+            $contentByLanguage[$languageCode] = [
+                'subject' => $langDefaults[$identifier]['subject'],
+                'body' => $langDefaults[$identifier]['body'],
+            ];
         }
-
-        $template->setUpdatedAt(new DateTimeImmutable());
-        $this->em->flush();
+        $this->templateService->saveTranslations($template, $contentByLanguage);
 
         $this->addFlash('success', $this->translator->trans('admin_email_templates.flash_reset'));
 
@@ -247,19 +229,5 @@ final class TemplatesController extends AbstractEmailController implements Admin
         }
 
         return [];
-    }
-
-    private function getOrCreateTranslation(string $languageCode, ?int $templateId): EmailTemplateTranslation
-    {
-        $translation = $this->translationRepo->findOneBy([
-            'language' => $languageCode,
-            'emailTemplate' => $templateId,
-        ]);
-
-        if ($translation !== null) {
-            return $translation;
-        }
-
-        return new EmailTemplateTranslation();
     }
 }

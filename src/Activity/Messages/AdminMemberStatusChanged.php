@@ -38,9 +38,4 @@ class AdminMemberStatusChanged extends MessageAbstract
             '%new%' => $new,
         ]);
     }
-
-    protected function renderHtml(): string
-    {
-        return $this->renderText();
-    }
 }

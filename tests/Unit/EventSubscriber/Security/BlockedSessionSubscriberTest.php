@@ -214,7 +214,7 @@ class BlockedSessionSubscriberTest extends TestCase
             $blockStore ?? $this->createStub(BlockedSessionStore::class),
             $twigDefault,
             new NullLogger(),
-            $environment,
+            new LoadtestBypass($environment),
             $resolver,
         );
     }

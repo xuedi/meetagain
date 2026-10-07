@@ -8,12 +8,12 @@ use App\Repository\EventRepository;
 use App\Repository\ImageLocationRepository;
 use Doctrine\DBAL\Connection;
 
-final class EventTeaserImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class EventTeaserImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function __construct(
         ImageLocationRepository $repo,
         Connection $connection,
-        private readonly EventRepository $eventRepository,
+        private EventRepository $eventRepository,
     ) {
         parent::__construct($repo, $connection);
     }

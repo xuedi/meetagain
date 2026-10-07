@@ -70,7 +70,7 @@
 
             </div>
 
-            {% if is_granted('ROLE_ORGANIZER') %}
+            {% if canModerate %}
                 <div class="box mt-5 member-admin-bar">
                     <p class="heading mb-3">{{ 'member.admin_panel_heading'|trans }}</p>
                     <div class="buttons">

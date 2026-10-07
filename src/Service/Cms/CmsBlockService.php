@@ -20,6 +20,27 @@ readonly class CmsBlockService
         private EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
+    public function findBlock(int $id): ?CmsBlock
+    {
+        return $this->blockRepo->find($id);
+    }
+
+    /**
+     * @return array<CmsBlock>
+     */
+    public function getBlocks(int $pageId, string $locale): array
+    {
+        return $this->blockRepo->getBlocks($pageId, $locale);
+    }
+
+    /**
+     * @return array<int, array<string, int>>
+     */
+    public function countPerPageAndLanguage(): array
+    {
+        return $this->blockRepo->countPerPageAndLanguage();
+    }
+
     public function createBlock(Cms $page, string $locale, CmsBlockType $type, array $payload): CmsBlock
     {
         $blockObject = $this->hydrator->hydrate($type, $payload);

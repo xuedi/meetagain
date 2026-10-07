@@ -4,10 +4,10 @@ namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
 use App\Form\CommentType;
-use App\Repository\MessageRepository;
-use App\Repository\UserRepository;
 use App\Service\Member\BlockingService;
+use App\Service\Member\FriendshipService;
 use App\Service\Member\MessageService;
+use App\Service\Member\UserService;
 use DateTimeImmutable;
 use Knp\Bundle\TimeBundle\DateTimeFormatter;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,8 +20,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class MessageController extends AbstractController
 {
     public function __construct(
-        private readonly MessageRepository $msgRepo,
-        private readonly UserRepository $userRepo,
+        private readonly UserService $userService,
+        private readonly FriendshipService $friendshipService,
         private readonly BlockingService $blockingService,
         private readonly DateTimeFormatter $dateTimeFormatter,
         private readonly MessageService $messageService,
@@ -35,7 +35,7 @@ final class MessageController extends AbstractController
         $messages = null;
         $isBlocked = false;
 
-        $conversationPartner = $this->userRepo->findOneBy(['id' => $id]);
+        $conversationPartner = $id === null ? null : $this->userService->findUser($id);
         if ($conversationPartner !== null) {
             $isBlocked = $this->blockingService->isBlocked($user, $conversationPartner);
 
@@ -46,9 +46,9 @@ final class MessageController extends AbstractController
                     $this->messageService->send($user, $conversationPartner, (string) $form->getData()['comment']);
                 }
             }
-            $messages = $this->msgRepo->getMessages($user, $conversationPartner);
+            $messages = $this->messageService->getMessages($user, $conversationPartner);
             $this->messageService->markRead($user, $conversationPartner);
-            if (!$this->msgRepo->hasNewMessages($user)) {
+            if (!$this->messageService->hasNewMessages($user)) {
                 $request->getSession()->set('hasNewMessage', false);
             }
         }
@@ -59,9 +59,9 @@ final class MessageController extends AbstractController
 
         return $this->render('profile/messages/index.html.twig', [
             'conversationsId' => $id,
-            'conversations' => $this->msgRepo->getConversations($user, $id, $excludeUserIds),
+            'conversations' => $this->messageService->getConversations($user, $id, $excludeUserIds),
             'messages' => $messages,
-            'friends' => $this->userRepo->getFriends($user),
+            'friends' => $this->friendshipService->getFriends($user),
             'user' => $user,
             'form' => $form,
             'isBlocked' => $isBlocked,

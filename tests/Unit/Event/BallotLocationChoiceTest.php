@@ -6,6 +6,7 @@ use App\Entity\Location;
 use App\Event\BallotLocationChoice;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Filter\Location\LocationFilterResult;
+use App\Form\BallotTermsType;
 use App\Repository\LocationRepository;
 use Module\Ballot\Contract\BallotInterface;
 use PHPUnit\Framework\TestCase;
@@ -58,6 +59,7 @@ class BallotLocationChoiceTest extends TestCase
             $filter,
             $this->createStub(Security::class),
             $this->createStub(TranslatorInterface::class),
+            new BallotTermsType($this->createStub(TranslatorInterface::class)),
         );
     }
 }

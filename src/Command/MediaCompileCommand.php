@@ -20,6 +20,7 @@ final class MediaCompileCommand extends Command
     public function __construct(
         private readonly AssetMapperInterface $assetMapper,
         private readonly AppBundle $appBundle,
+        private readonly OpaqueMediaPathResolver $pathResolver,
         private readonly string $kernelProjectDir,
     ) {
         parent::__construct();
@@ -43,7 +44,7 @@ final class MediaCompileCommand extends Command
                 'mjs' => 'js',
                 default => $rawExt,
             };
-            $hash = OpaqueMediaPathResolver::hashLogicalPath($asset->logicalPath);
+            $hash = $this->pathResolver->hashLogicalPath($asset->logicalPath);
             $filename = "{$hash}.{$ext}";
 
             if (isset($seen[$filename])) {

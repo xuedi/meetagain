@@ -9,7 +9,7 @@ use DateTimeImmutable;
 use Override;
 use Symfony\Component\HttpFoundation\Request;
 
-final class FuseSecurityProvider extends AbstractSecurityProvider
+final readonly class FuseSecurityProvider extends AbstractSecurityProvider
 {
     public const string KEY = 'fuse';
     public const int EVENTS_PER_IP_FUSE = 100;

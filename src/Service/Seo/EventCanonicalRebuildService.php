@@ -27,6 +27,11 @@ final readonly class EventCanonicalRebuildService
         private EntityManagerInterface $entityManager,
     ) {}
 
+    public function findSeries(int $id): ?EventSeries
+    {
+        return $this->seriesRepository->find($id);
+    }
+
     /**
      * @return array<CanonicalRebuildSummary> one entry per locale present in the series
      */

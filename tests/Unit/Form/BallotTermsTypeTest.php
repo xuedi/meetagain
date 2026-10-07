@@ -45,7 +45,7 @@ final class BallotTermsTypeTest extends TestCase
     public function testTheDefaultsApplyWhenTheOverlayWasNeverOpened(): void
     {
         // Act
-        $terms = BallotTermsType::read([]);
+        $terms = $this->ballotTerms()->read([]);
 
         // Assert
         static::assertSame('+' . BallotTermsType::DEFAULT_DURATION_DAYS . ' days', $terms['deadline']);
@@ -64,7 +64,7 @@ final class BallotTermsTypeTest extends TestCase
     public function testAnUntouchedOverlayFallsBackToTheModeTheCallerAskedFor(): void
     {
         // Act
-        $terms = BallotTermsType::read([], TallyMode::Single);
+        $terms = $this->ballotTerms()->read([], TallyMode::Single);
 
         // Assert
         static::assertSame(TallyMode::Single, $terms['tallyMode'], 'a consumer whose vote picks one value keeps that default');
@@ -73,8 +73,8 @@ final class BallotTermsTypeTest extends TestCase
     public function testAnOutOfRangeDurationIsPulledBackIntoRange(): void
     {
         // Act
-        $tooShort = BallotTermsType::read([BallotTermsType::FIELD_DURATION => '0']);
-        $tooLong = BallotTermsType::read([BallotTermsType::FIELD_DURATION => '4000']);
+        $tooShort = $this->ballotTerms()->read([BallotTermsType::FIELD_DURATION => '0']);
+        $tooLong = $this->ballotTerms()->read([BallotTermsType::FIELD_DURATION => '4000']);
 
         // Assert
         static::assertSame('+1 days', $tooShort['deadline']);
@@ -83,9 +83,14 @@ final class BallotTermsTypeTest extends TestCase
 
     private function factory(): FormFactoryInterface
     {
+        return Forms::createFormFactoryBuilder()->addType($this->ballotTerms())->getFormFactory();
+    }
+
+    private function ballotTerms(): BallotTermsType
+    {
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
 
-        return Forms::createFormFactoryBuilder()->addType(new BallotTermsType($translator))->getFormFactory();
+        return new BallotTermsType($translator);
     }
 }

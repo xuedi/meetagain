@@ -7,7 +7,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 
-readonly class NotificationSettingsService
+readonly class SettingsService
 {
     public function __construct(
         private EntityManagerInterface $em,

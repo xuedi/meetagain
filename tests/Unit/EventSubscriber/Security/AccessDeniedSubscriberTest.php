@@ -4,9 +4,15 @@ namespace Tests\Unit\EventSubscriber\Security;
 
 use App\Enum\SecurityEventType;
 use App\EventSubscriber\Security\AccessDeniedSubscriber;
+use App\Repository\AccessDeniedLogRepository;
+use App\Service\Security\Provider\AccessDeniedProvider;
 use App\Service\Security\SecurityService;
+use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use RuntimeException;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -37,7 +43,7 @@ class AccessDeniedSubscriberTest extends TestCase
                 $captured = $args;
             });
 
-        $subscriber = new AccessDeniedSubscriber($securityService);
+        $subscriber = $this->createSubscriber($securityService);
         $event = $this->createEvent(new AccessDeniedHttpException('forbidden'));
 
         // Act
@@ -61,7 +67,7 @@ class AccessDeniedSubscriberTest extends TestCase
                 $captured = $args;
             });
 
-        $subscriber = new AccessDeniedSubscriber($securityService);
+        $subscriber = $this->createSubscriber($securityService);
         $event = $this->createEvent(new AccessDeniedException('nope'));
 
         // Act
@@ -77,7 +83,7 @@ class AccessDeniedSubscriberTest extends TestCase
         $securityService = $this->createMock(SecurityService::class);
         $securityService->expects($this->never())->method('event');
 
-        $subscriber = new AccessDeniedSubscriber($securityService);
+        $subscriber = $this->createSubscriber($securityService);
         $event = $this->createEvent(new RuntimeException('unrelated'));
 
         // Act
@@ -85,6 +91,19 @@ class AccessDeniedSubscriberTest extends TestCase
 
         // Assert
         static::assertTrue(true);
+    }
+
+    private function createSubscriber(SecurityService $securityService): AccessDeniedSubscriber
+    {
+        $provider = new AccessDeniedProvider(
+            new ArrayAdapter(),
+            new NullLogger(),
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(AccessDeniedLogRepository::class),
+            $this->createStub(Security::class),
+        );
+
+        return new AccessDeniedSubscriber($securityService, $provider);
     }
 
     private function createEvent(Throwable $throwable): ExceptionEvent

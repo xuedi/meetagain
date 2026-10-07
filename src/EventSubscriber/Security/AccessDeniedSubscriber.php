@@ -16,6 +16,7 @@ readonly class AccessDeniedSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private SecurityService $securityService,
+        private AccessDeniedProvider $accessDeniedProvider,
     ) {}
 
     #[Override]
@@ -39,7 +40,7 @@ readonly class AccessDeniedSubscriber implements EventSubscriberInterface
         }
 
         $this->securityService->event(SecurityEventType::AccessDenied, $event->getRequest(), [
-            'reason' => AccessDeniedProvider::resolveReason($exception, $isHttpAccessDenied),
+            'reason' => $this->accessDeniedProvider->resolveReason($exception, $isHttpAccessDenied),
             'isHttpAccessDenied' => $isHttpAccessDenied,
         ]);
     }

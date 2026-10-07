@@ -15,6 +15,7 @@ final readonly class AttachSlotProvider implements AttachSlotProviderInterface
     public function __construct(
         private BallotInterface $ballots,
         private UrlGeneratorInterface $urlGenerator,
+        private Purpose $purpose,
     ) {}
 
     #[Override]
@@ -38,7 +39,7 @@ final readonly class AttachSlotProvider implements AttachSlotProviderInterface
 
     private function runningBallot(int $eventId, string $itemType): ?BallotView
     {
-        $purpose = Purpose::forType($itemType);
+        $purpose = $this->purpose->forType($itemType);
         foreach ($this->ballots->listForSubject(new BallotSubject(Purpose::SUBJECT_TYPE, $eventId), null) as $view) {
             if ($view->purpose === $purpose && !$view->status->isResolved()) {
                 return $view;

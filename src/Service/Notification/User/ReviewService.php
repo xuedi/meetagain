@@ -6,7 +6,7 @@ use App\Entity\User;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
-readonly class ReviewNotificationService
+readonly class ReviewService
 {
     public function __construct(
         #[AutowireIterator(ReviewNotificationProviderInterface::class)]

@@ -9,12 +9,12 @@ use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use Plugin\Dishes\Repository\DishRepository;
 
-final class DishPreviewImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class DishPreviewImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function __construct(
         ImageLocationRepository $repo,
         Connection $connection,
-        private readonly DishRepository $dishRepository,
+        private DishRepository $dishRepository,
     ) {
         parent::__construct($repo, $connection);
     }

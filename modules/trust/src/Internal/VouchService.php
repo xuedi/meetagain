@@ -17,6 +17,7 @@ final readonly class VouchService
         private EntityManagerInterface $entityManager,
         private ContextRegistry $registry,
         private ScoreProvider $scoreProvider,
+        private AccessResolver $accessResolver,
     ) {}
 
     public function grant(string $context, int $fromUserId, int $toUserId, TrustLevel $level): void
@@ -26,6 +27,9 @@ final readonly class VouchService
         }
         if (!$this->registry->exists($context)) {
             throw new InvalidArgumentException('Unknown trust context.');
+        }
+        if (!$this->accessResolver->canView($context, $toUserId)) {
+            throw new InvalidArgumentException('The member is not part of this trust context.');
         }
 
         $existing = $this->repository->findEdge($context, $fromUserId, $toUserId);

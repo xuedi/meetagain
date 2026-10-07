@@ -9,7 +9,6 @@ use App\Service\Security\RequestIdentityResolver;
 use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -28,7 +27,7 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
         private BlockedSessionStore $blockStore,
         private Environment $twig,
         private LoggerInterface $logger,
-        private string $environment,
+        private LoadtestBypass $loadtestBypass,
         private RequestIdentityResolver $identityResolver,
     ) {}
 
@@ -56,7 +55,7 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        if ($this->isLoadtestBypass($request)) {
+        if ($this->loadtestBypass->isActive($request)) {
             return;
         }
 
@@ -79,11 +78,6 @@ readonly class BlockedSessionSubscriber implements EventSubscriberInterface
         $request->attributes->set(TerminateSubscriber::ROUTE_ATTRIBUTE, '_blocked');
         $event->setResponse($this->buildBlockResponse());
         $event->stopPropagation();
-    }
-
-    private function isLoadtestBypass(Request $request): bool
-    {
-        return LoadtestBypass::isActive($request, $this->environment);
     }
 
     private function buildBlockResponse(): Response

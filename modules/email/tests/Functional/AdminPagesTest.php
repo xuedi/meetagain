@@ -2,6 +2,7 @@
 
 namespace Module\Email\Tests\Functional;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\BlocklistInterface;
 use Module\Email\Contract\MailerInterface;
@@ -10,9 +11,11 @@ use Module\Email\Contract\SendlogInterface;
 use Module\Email\Contract\SentEmail;
 use Module\Email\Contract\TemplatesInterface;
 use Module\Email\Internal\EmailService;
+use Module\Email\Internal\Entity\EmailQueue;
 use Module\Email\Tests\Stub\PushDispatcher;
 use Module\Email\Tests\Stub\TriggeredEmail;
 use PHPUnit\Framework\Attributes\DataProvider;
+use SensitiveParameter;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Tests\Module\Members;
@@ -261,6 +264,62 @@ final class AdminPagesTest extends WebTestCase
         self::assertNull($blocklist->reasonFor('added@module-test.example'));
     }
 
+    public function testALateMailIsReleasedFromItsCapFromItsPage(): void
+    {
+        // Arrange
+        $this->loginAsAdmin();
+        self::getContainer()
+            ->get(MailerInterface::class)
+            ->send(self::getContainer()->get(TriggeredEmail::class), ['recipients' => ['late@module-test.example']]);
+        $id = (int) $this->rowFor('late@module-test.example')?->id;
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+        $em->find(EmailQueue::class, $id)?->setStatus(QueueStatus::Late);
+        $em->flush();
+        $clear = $this->client->request('GET', self::BASE . '/sendlog/' . $id)->filter('a[href$="/clear-cap"][data-post]');
+
+        // Act
+        $this->client->request('POST', (string) $clear->attr('href'), ['_token' => $clear->attr('data-csrf-token')]);
+
+        // Assert
+        self::assertResponseRedirects(self::BASE . '/sendlog/' . $id);
+        self::assertSame(
+            QueueStatus::Pending->value,
+            self::getContainer()->get(Connection::class)->fetchOne('SELECT status FROM mod_email_queue WHERE id = ?', [$id]),
+        );
+    }
+
+    public function testABlocklistEntryIsNotRemovedWithAForgedToken(): void
+    {
+        // Arrange
+        $this->loginAsAdmin();
+        $blocklist = self::getContainer()->get(BlocklistInterface::class);
+        $blocklist->add('kept@module-test.example', 'bounced');
+        $delete = $this->client->request('GET', self::BASE . '/blocklist')->filter('a[href$="/delete"][data-post]');
+
+        // Act
+        $this->client->request('POST', (string) $delete->attr('href'), ['_token' => 'invalid-csrf-token']);
+
+        // Assert
+        self::assertResponseStatusCodeSame(400);
+        self::assertSame('bounced', $blocklist->reasonFor('kept@module-test.example'));
+    }
+
+    public function testATemplateIsNotResetWithAForgedToken(): void
+    {
+        // Arrange
+        $this->loginAsAdmin();
+        $path = $this->templatePath();
+        $crawler = $this->client->request('GET', $path . '/edit');
+        $this->client->submit($crawler->filter('form[name="email_template"]')->form(['email_template[subject-en]' => 'Changed']));
+
+        // Act
+        $this->client->request('POST', $path . '/reset', ['_token' => 'invalid-csrf-token']);
+
+        // Assert
+        self::assertResponseStatusCodeSame(400);
+        self::assertSame('Changed', $this->storedSubject());
+    }
+
     private function loginAsAdmin(): void
     {
         $this->client->loginUser(new Members(self::getContainer()->get(EntityManagerInterface::class))->admin('Admin'));
@@ -281,7 +340,7 @@ final class AdminPagesTest extends WebTestCase
         return self::getContainer()->get(TemplatesInterface::class)->render(TriggeredEmail::IDENTIFIER, 'en', [])['subject'];
     }
 
-    private function debuggingSend(string $recipient, #[\SensitiveParameter] ?string $token = null): void
+    private function debuggingSend(string $recipient, #[SensitiveParameter] ?string $token = null): void
     {
         $token ??= (string) $this->client
             ->request('GET', self::BASE . '/debugging')

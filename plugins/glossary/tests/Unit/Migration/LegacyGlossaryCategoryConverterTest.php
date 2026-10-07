@@ -20,7 +20,7 @@ class LegacyGlossaryCategoryConverterTest extends TestCase
         ];
 
         // Act
-        $new = LegacyGlossaryCategoryConverter::convert($old, 'en');
+        $new = new LegacyGlossaryCategoryConverter()->convert($old, 'en');
 
         // Assert
         static::assertNotNull($new);
@@ -38,7 +38,7 @@ class LegacyGlossaryCategoryConverterTest extends TestCase
         $already = ['taxonomy' => ['categoriesEnabled' => true, 'categories' => []]];
 
         // Act + Assert
-        static::assertNull(LegacyGlossaryCategoryConverter::convert($already, 'en'));
+        static::assertNull(new LegacyGlossaryCategoryConverter()->convert($already, 'en'));
     }
 
     public function testReturnsNullWhenNoCategoriesKey(): void
@@ -47,7 +47,7 @@ class LegacyGlossaryCategoryConverterTest extends TestCase
         $noCategories = ['secondaryEnabled' => false];
 
         // Act + Assert
-        static::assertNull(LegacyGlossaryCategoryConverter::convert($noCategories, 'en'));
+        static::assertNull(new LegacyGlossaryCategoryConverter()->convert($noCategories, 'en'));
     }
 
     public function testDisablesCategoriesWhenOldListWasEmpty(): void
@@ -56,7 +56,7 @@ class LegacyGlossaryCategoryConverterTest extends TestCase
         $old = ['categories' => []];
 
         // Act
-        $new = LegacyGlossaryCategoryConverter::convert($old, 'en');
+        $new = new LegacyGlossaryCategoryConverter()->convert($old, 'en');
 
         // Assert
         static::assertNotNull($new);

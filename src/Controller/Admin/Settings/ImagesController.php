@@ -14,8 +14,6 @@ use App\Entity\Image;
 use App\Enum\AttributionStatus;
 use App\Enum\ImageIssueFilter;
 use App\Enum\ImageType;
-use App\Repository\ImageLocationRepository;
-use App\Repository\ImageRepository;
 use App\Service\Config\LanguageService;
 use App\Service\Media\AltLocaleRequirementResolver;
 use App\Service\Media\ImageAltService;
@@ -50,8 +48,6 @@ final class ImagesController extends AbstractSettingsController implements Admin
     public function __construct(
         TranslatorInterface $translator,
         private readonly ImageService $imageService,
-        private readonly ImageRepository $imageRepository,
-        private readonly ImageLocationRepository $imageLocationRepository,
         private readonly ImageLocationService $imageLocationService,
         private readonly ImageTypeRegistry $imageTypeRegistry,
         private readonly EntityManagerInterface $entityManager,
@@ -78,9 +74,9 @@ final class ImagesController extends AbstractSettingsController implements Admin
         $locationFilter = $this->resolveLocation($locationParam);
         $issuesFilter = ImageIssueFilter::tryFrom($request->query->getString('issues')) ?? ImageIssueFilter::All;
 
-        $totalCount = $this->imageRepository->countFiltered(null, null);
-        $images = $this->imageRepository->findFiltered($locationFilter, $since);
-        $usageCounts = $this->imageLocationRepository->countPerImageId();
+        $totalCount = $this->imageService->countFiltered(null, null);
+        $images = $this->imageService->findFiltered($locationFilter, $since);
+        $usageCounts = $this->imageLocationService->countPerImageId();
 
         $issuesByImageId = $this->classifyIssues($images);
         $issueCounts = $this->countIssues($issuesByImageId);
@@ -127,12 +123,12 @@ final class ImagesController extends AbstractSettingsController implements Admin
     #[Route('/{id}', name: 'app_admin_system_images_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(int $id): Response
     {
-        $image = $this->imageRepository->find($id);
+        $image = $this->imageService->findImage($id);
         if ($image === null) {
             throw $this->createNotFoundException('Image not found');
         }
 
-        $locations = $this->imageLocationRepository->findByImageId($id);
+        $locations = $this->imageLocationService->findByImageId($id);
 
         $editLinks = [];
         foreach ($locations as $location) {
@@ -165,7 +161,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
     #[Route('/{id}/alt', name: 'app_admin_system_images_update_alt', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function updateAlt(int $id, Request $request): Response
     {
-        $image = $this->imageRepository->find($id);
+        $image = $this->imageService->findImage($id);
         if ($image === null) {
             throw $this->createNotFoundException('Image not found');
         }
@@ -189,7 +185,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
     #[Route('/{id}/attribution', name: 'app_admin_system_images_update_attribution', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function updateAttribution(int $id, Request $request): Response
     {
-        $image = $this->imageRepository->find($id);
+        $image = $this->imageService->findImage($id);
         if ($image === null) {
             throw $this->createNotFoundException('Image not found');
         }
@@ -222,7 +218,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
         $startTime = microtime(true);
 
         $this->imageLocationService->discover();
-        $this->imageAltStatusCache->warm($this->imageRepository->findFiltered(null, null));
+        $this->imageAltStatusCache->warm($this->imageService->findFiltered(null, null));
         $deleted = $this->imageService->deleteObsoleteThumbnails();
         $created = $this->imageService->regenerateAllThumbnails();
 
@@ -364,7 +360,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
                 label: $case->name,
                 target: $this->generateUrl('app_admin_system_images', $params),
                 isActive: $current === $case,
-                count: $this->imageRepository->countFiltered($case, $since),
+                count: $this->imageService->countFiltered($case, $since),
             );
         }
 
@@ -395,7 +391,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
                 label: $this->translator->trans('admin_system_images.range_' . $key),
                 target: $this->generateUrl('app_admin_system_images', $params),
                 isActive: $key === $current,
-                count: $key === self::DEFAULT_RANGE ? null : $this->imageRepository->countFiltered($location, $optionSince),
+                count: $key === self::DEFAULT_RANGE ? null : $this->imageService->countFiltered($location, $optionSince),
             );
         }
 

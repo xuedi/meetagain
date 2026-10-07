@@ -15,7 +15,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
 
-final class AccessDeniedProvider extends AbstractSecurityProvider
+final readonly class AccessDeniedProvider extends AbstractSecurityProvider
 {
     public const string KEY = 'access_denied';
 
@@ -24,9 +24,9 @@ final class AccessDeniedProvider extends AbstractSecurityProvider
     public function __construct(
         CacheItemPoolInterface $securityCachePool,
         LoggerInterface $logger,
-        private readonly EntityManagerInterface $em,
-        private readonly AccessDeniedLogRepository $logRepo,
-        private readonly Security $security,
+        private EntityManagerInterface $em,
+        private AccessDeniedLogRepository $logRepo,
+        private Security $security,
     ) {
         parent::__construct($securityCachePool, $logger);
     }
@@ -43,7 +43,7 @@ final class AccessDeniedProvider extends AbstractSecurityProvider
         return 0;
     }
 
-    public static function resolveReason(Throwable $exception, bool $isHttpAccessDenied): string
+    public function resolveReason(Throwable $exception, bool $isHttpAccessDenied): string
     {
         $message = $exception->getMessage();
         if (str_starts_with($message, 'Invalid CSRF')) {

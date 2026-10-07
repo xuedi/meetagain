@@ -12,7 +12,6 @@ use App\Entity\User;
 use App\Enum\ImageType;
 use App\Form\SettingsType;
 use App\Form\WebsiteImageType;
-use App\Repository\ImageRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Cms\CmsService;
 use App\Service\Config\ConfigService;
@@ -37,7 +36,6 @@ final class ConfigController extends AbstractSettingsController implements Admin
         private readonly ConfigService $configService,
         private readonly ImageService $imageService,
         private readonly ImageLocationService $imageLocationService,
-        private readonly ImageRepository $imageRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly CmsService $cmsService,
     ) {
@@ -89,7 +87,7 @@ final class ConfigController extends AbstractSettingsController implements Admin
         $currentWebsiteImage = null;
         $currentWebsiteImageId = $this->configService->getWebsiteImageId();
         if ($currentWebsiteImageId !== null) {
-            $currentWebsiteImage = $this->imageRepository->find($currentWebsiteImageId);
+            $currentWebsiteImage = $this->imageService->findImage($currentWebsiteImageId);
         }
 
         $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_system_config.intro'))], actions: [

@@ -28,9 +28,4 @@ class AdminEventDeleted extends MessageAbstract
             '%event%' => $this->meta['event_name'],
         ]);
     }
-
-    protected function renderHtml(): string
-    {
-        return $this->renderText();
-    }
 }

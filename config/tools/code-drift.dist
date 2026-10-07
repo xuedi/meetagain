@@ -1,0 +1,49 @@
+# code-drift reads this on every run; changing it needs no rebuild.
+#
+# The tool reports PHP that has drifted from the written coding standards. The rules that cover a
+# kind of class live here, as policy. A single judged exception does not: it goes into the owning
+# repo's tests/codeDriftAllow.txt as `<detector> <path>[::<symbol>] // <reason>`.
+#
+# Values here can be extended by an optional config/tools/code-drift.local overlay:
+# list keys (SCAN_PATHS, NAME_FAMILIES, ...) concatenate, scalar keys replace.
+
+# Roots of the scan, relative to the repo root. A root named SOURCE_SUBDIR is scanned as it is;
+# any other root is a folder of packages, and only each package's SOURCE_SUBDIR is scanned. With
+# the values below that is src/, plugins/*/src/ and modules/*/src/: production code only, never
+# tests or vendor.
+SCAN_PATHS=src,plugins,modules
+SOURCE_SUBDIR=src
+
+# Directory names skipped anywhere below a root. A Doctrine migration is a frozen artefact, not
+# code under maintenance.
+EXCLUDE_DIRS=Migrations
+
+# Where `tiny` counts the callers of a class: every file with one of REFERENCE_EXTENSIONS that
+# mentions the class name as a whole word, its own file excluded. A `*` segment means every
+# directory at that level.
+REFERENCE_PATHS=src,templates,plugins/*/src,plugins/*/templates,modules/*/src,modules/*/templates
+REFERENCE_EXTENSIONS=php,twig,yaml
+
+# Where `tiny` looks for a class's own unit test, `<Class>Test.php`. Having one earns the file.
+TEST_PATHS=tests,plugins/*/tests,modules/*/tests
+
+# A class under this many lines is a `tiny` candidate; a longer one has earned its file by size.
+TINY_MAX_LINES=60
+
+# `echo-name`: a reduction that would leave only the folder name plus one of these words is not
+# a repeat. Config/ConfigService stays, because "Service" alone says nothing.
+LAYER_WORDS=Service,Interface,Repository,Command,Voter,Subscriber,Listener,Controller,Plugin,Type,Registry,Provider
+
+# `echo-name`: class-name suffixes of the extension-slot families. Every member of a filter chain,
+# a provider chain or a folder of implementations of one shape keeps the family's name, so
+# EventFilterInterface, EventFilterService and EventFilterResult read as one family, and a reduced
+# name would mint one more ProviderInterface or FilterInterface beside the others.
+NAME_FAMILIES=ProviderInterface,FilterInterface,FilterService,FilterResult,NotificationProvider,SitemapPublisher,DeliveryProvider,AccessChecker,SecurityProvider,PermissionAttribute,PermissionChecker,ImageTypeDefinition
+
+# `echo-name`: folders whose class names are public plugin API. The admin UI kit (navigation,
+# tabs, top bar, sections) is used by every plugin's admin controllers and by the plugin developer
+# docs, and its reduced names (Top, Tab, Link, Section) would collide at every use site.
+NAME_FAMILY_PATHS=src/Admin
+
+# Document stating the rules, named in the tool's help output.
+POLICY_DOC=docs/src/core-development/best-practices.md

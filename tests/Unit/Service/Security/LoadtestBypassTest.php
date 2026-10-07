@@ -12,7 +12,7 @@ class LoadtestBypassTest extends TestCase
     #[DataProvider('provideIsActiveCases')]
     public function testIsActiveCombinesEnvironmentAndHeader(?Request $request, string $environment, bool $expected): void
     {
-        static::assertSame($expected, LoadtestBypass::isActive($request, $environment));
+        static::assertSame($expected, new LoadtestBypass($environment)->isActive($request));
     }
 
     public static function provideIsActiveCases(): iterable
@@ -32,7 +32,7 @@ class LoadtestBypassTest extends TestCase
     public function testAcceptedReturnsFullyOpenRateLimit(): void
     {
         // Act
-        $limit = LoadtestBypass::accepted();
+        $limit = new LoadtestBypass('test')->accepted();
 
         // Assert
         static::assertTrue($limit->isAccepted());

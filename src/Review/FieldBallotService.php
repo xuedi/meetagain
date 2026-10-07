@@ -38,6 +38,7 @@ final readonly class FieldBallotService implements SettlementListenerInterface
         private UserRepository $users,
         private TranslatorInterface $translator,
         private LoggerInterface $logger,
+        private BallotTermsType $ballotTerms,
     ) {}
 
     /**
@@ -55,7 +56,7 @@ final readonly class FieldBallotService implements SettlementListenerInterface
             throw new ChangeProposalException('review.flash_ballot_impossible');
         }
 
-        $settings = BallotTermsType::read($terms, self::DEFAULT_MODE);
+        $settings = $this->ballotTerms->read($terms, self::DEFAULT_MODE);
 
         return $this->ballots->open(
             new BallotRequest(

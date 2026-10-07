@@ -1,0 +1,18 @@
+[package]
+name = "code-drift"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "code-drift"
+path = "src/main.rs"
+
+[dependencies]
+toolconfig.workspace = true
+phplex.workspace = true
+walkdir.workspace = true
+regex.workspace = true
+clap.workspace = true
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"

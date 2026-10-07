@@ -19,7 +19,6 @@ use App\Entity\User;
 use App\Enum\ImageType;
 use App\Form\SiteLogoType;
 use App\Form\ThemeColorsType;
-use App\Repository\ImageRepository;
 use App\Service\Admin\CommandService;
 use App\Service\Config\ConfigService;
 use App\Service\Media\ImageLocationService;
@@ -73,7 +72,6 @@ final class ThemeController extends AbstractSettingsController implements AdminN
         private readonly CommandService $commandService,
         private readonly ImageService $imageService,
         private readonly ImageLocationService $imageLocationService,
-        private readonly ImageRepository $imageRepository,
         private readonly EntityManagerInterface $entityManager,
     ) {
         parent::__construct($translator, 'theme');
@@ -114,7 +112,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
         $currentLogo = null;
         $currentLogoId = $this->configService->getSiteLogoId();
         if ($currentLogoId !== null) {
-            $currentLogo = $this->imageRepository->find($currentLogoId);
+            $currentLogo = $this->imageService->findImage($currentLogoId);
         }
 
         $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_system_theme.intro'))], actions: [

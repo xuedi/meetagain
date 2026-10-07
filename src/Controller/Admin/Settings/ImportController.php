@@ -14,9 +14,9 @@ use App\Portability\Importer;
 use App\Portability\ImportSummary;
 use App\Portability\KindLabels;
 use App\Portability\Outcome;
-use App\Repository\EventRepository;
 use App\Service\Admin\CommandService;
 use App\Service\Config\PluginService;
+use App\Service\Event\EventService;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -37,7 +37,7 @@ final class ImportController extends AbstractSettingsController implements Admin
         TranslatorInterface $translator,
         private readonly Importer $importer,
         private readonly ArchiveReader $archiveReader,
-        private readonly EventRepository $eventRepository,
+        private readonly EventService $eventService,
         private readonly PluginService $pluginService,
         private readonly KindLabels $kindLabels,
         private readonly CommandService $commandService,
@@ -130,7 +130,7 @@ final class ImportController extends AbstractSettingsController implements Admin
             'outcomes' => Outcome::cases(),
             'labels' => $this->kindLabels->labelsFor($kinds),
             'pluginNames' => $pluginNames,
-            'siteSettingsDefault' => $this->eventRepository->count([]) === 0,
+            'siteSettingsDefault' => !$this->eventService->hasEvents(),
             'adminTop' => $this->buildAdminTop($archive, $summary),
             'adminTabs' => $this->getTabs(),
         ]);

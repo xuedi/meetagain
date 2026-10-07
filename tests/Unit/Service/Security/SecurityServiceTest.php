@@ -14,6 +14,7 @@ use App\Repository\NotFoundLogRepository;
 use App\Repository\SecurityMeasureLogRepository;
 use App\Service\AppStateService;
 use App\Service\Security\BlockedSessionStore;
+use App\Service\Security\LoadtestBypass;
 use App\Service\Security\ProviderReport;
 use App\Service\Security\RequestIdentityResolver;
 use App\Service\Security\SecurityProviderInterface;
@@ -365,7 +366,7 @@ class SecurityServiceTest extends TestCase
             appState: $appState,
             clock: new MockClock(new DateTimeImmutable('2026-05-09 12:00:00')),
             logger: new NullLogger(),
-            environment: 'test',
+            loadtestBypass: new LoadtestBypass('test'),
             notFoundLogRepository: $notFoundLogRepository,
             accessDeniedLogRepository: $accessDeniedLogRepository,
             identityResolver: new RequestIdentityResolver(new NullLogger()),

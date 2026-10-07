@@ -13,15 +13,15 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
 
-final class RateLimitProvider extends AbstractSecurityProvider
+final readonly class RateLimitProvider extends AbstractSecurityProvider
 {
     public const string KEY = 'rate_limit';
 
     public function __construct(
         CacheItemPoolInterface $securityCachePool,
         LoggerInterface $logger,
-        private readonly EntityManagerInterface $em,
-        private readonly RateLimitLogRepository $logRepo,
+        private EntityManagerInterface $em,
+        private RateLimitLogRepository $logRepo,
     ) {
         parent::__construct($securityCachePool, $logger);
     }

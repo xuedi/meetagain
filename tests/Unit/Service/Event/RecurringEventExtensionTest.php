@@ -14,7 +14,7 @@ use App\Repository\RsvpGuestRepository;
 use App\Service\Cms\CmsService;
 use App\Service\Event\OccurrenceCalculator;
 use App\Service\Event\RecurrenceResolver;
-use App\Service\Event\RecurringEventService;
+use App\Service\Event\RecurringService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,9 +51,9 @@ class RecurringEventExtensionTest extends TestCase
         return $event;
     }
 
-    private function createService(EventRepository $repo, EntityManagerInterface $em, EventSeriesRepository $seriesRepo, string $now): RecurringEventService
+    private function createService(EventRepository $repo, EntityManagerInterface $em, EventSeriesRepository $seriesRepo, string $now): RecurringService
     {
-        return new RecurringEventService(
+        return new RecurringService(
             repo: $repo,
             seriesRepo: $seriesRepo,
             rsvpGuestRepo: $this->createStub(RsvpGuestRepository::class),
@@ -79,7 +79,7 @@ class RecurringEventExtensionTest extends TestCase
     }
 
     /**
-     * @return array{RecurringEventService, callable(): array<Event>}
+     * @return array{RecurringService, callable(): array<Event>}
      */
     private function createExtensionService(EventSeriesStub $series, ?EventStub $template, string $now = self::NOW): array
     {

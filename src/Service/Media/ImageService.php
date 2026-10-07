@@ -56,6 +56,41 @@ readonly class ImageService
         private ImageLocationRepository $imageLocationRepo,
     ) {}
 
+    public function findImage(int $id): ?Image
+    {
+        return $this->imageRepo->find($id);
+    }
+
+    /**
+     * @return list<Image>
+     */
+    public function findFiltered(?ImageType $type, ?DateTimeImmutable $since): array
+    {
+        return $this->imageRepo->findFiltered($type, $since);
+    }
+
+    public function countFiltered(?ImageType $type, ?DateTimeImmutable $since): int
+    {
+        return $this->imageRepo->countFiltered($type, $since);
+    }
+
+    /**
+     * @return Image[]
+     */
+    public function findEventUploads(User $uploader, ?int $eventId): array
+    {
+        return $this->imageRepo->findBy([
+            'uploader' => $uploader,
+            'event' => $eventId,
+            'type' => ImageType::EventUpload,
+        ]);
+    }
+
+    public function getEventList(User $user): array
+    {
+        return $this->imageRepo->getEventList($user);
+    }
+
     public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
     {
         $hash = sha1($imageData->getContent());
@@ -278,7 +313,7 @@ readonly class ImageService
         return $cnt;
     }
 
-    public static function normaliseMimeType(string $mimeType): string
+    private function normaliseMimeType(string $mimeType): string
     {
         $lower = strtolower(trim($mimeType));
 
@@ -424,7 +459,7 @@ readonly class ImageService
             throw new RuntimeException('Could not determine MIME type for uploaded file.');
         }
 
-        $mimeType = self::normaliseMimeType($serverMime);
+        $mimeType = $this->normaliseMimeType($serverMime);
         if (!in_array($mimeType, self::ACCEPTED_MIME_TYPES, true)) {
             throw new RuntimeException(sprintf('Refusing upload of unsupported image type "%s".', $mimeType));
         }

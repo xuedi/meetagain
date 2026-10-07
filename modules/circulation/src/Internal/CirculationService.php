@@ -52,6 +52,16 @@ class CirculationService
         return $this->eligibilityResolver->resolve($this->getContext($itemType), $itemType, $itemId, $user);
     }
 
+    public function findCopy(int $id): ?Copy
+    {
+        return $this->copies->find($id);
+    }
+
+    public function findRequest(int $id): ?Request
+    {
+        return $this->requests->find($id);
+    }
+
     /**
      * @return list<Copy>
      */

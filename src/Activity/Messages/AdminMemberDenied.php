@@ -31,9 +31,4 @@ class AdminMemberDenied extends MessageAbstract
 
         return $this->translator->trans('profile_social.activity_admin_member_denied', ['%user%' => $userName]);
     }
-
-    protected function renderHtml(): string
-    {
-        return $this->renderText();
-    }
 }

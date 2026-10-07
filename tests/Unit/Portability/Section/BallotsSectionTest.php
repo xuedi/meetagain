@@ -4,6 +4,7 @@ namespace Tests\Unit\Portability\Section;
 
 use App\Entity\Event;
 use App\Entity\User;
+use App\Item\Ballot\Purpose;
 use App\Portability\Ballot\Purpose\ItemPurpose;
 use App\Portability\DataCategory;
 use App\Portability\ImportContext;
@@ -155,7 +156,7 @@ final class BallotsSectionTest extends SectionTestCase
         $userRepository = $this->createStub(UserRepository::class);
         $userRepository->method('findBy')->willReturnCallback(fn(array $criteria): array => array_map($this->user(...), $criteria['id']));
 
-        return new BallotsSection($ballotInterface, $userRepository, [new ItemPurpose()]);
+        return new BallotsSection($ballotInterface, $userRepository, [new ItemPurpose(new Purpose())]);
     }
 
     private function importContext(): ImportContext

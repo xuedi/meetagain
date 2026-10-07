@@ -11,10 +11,11 @@ use App\Enum\EventType;
 use App\Item\AssociationService;
 use App\Item\TypeRegistry;
 use App\Repository\EventRepository;
+use App\Repository\EventTranslationRepository;
 use App\Service\Config\PluginService;
 use App\Service\Event\EventService;
 use App\Service\Event\ImageBoxProviderInterface;
-use App\Service\Event\RecurringEventService;
+use App\Service\Event\RecurringService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -54,11 +55,12 @@ class EventServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
-            recurringEventService: $this->createStub(RecurringEventService::class),
+            recurringEventService: $this->createStub(RecurringService::class),
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
 
         // Act
@@ -91,11 +93,12 @@ class EventServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
-            recurringEventService: $this->createStub(RecurringEventService::class),
+            recurringEventService: $this->createStub(RecurringService::class),
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
 
         // Act
@@ -139,11 +142,12 @@ class EventServiceTest extends TestCase
             em: $emMock,
             notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
-            recurringEventService: $this->createStub(RecurringEventService::class),
+            recurringEventService: $this->createStub(RecurringService::class),
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
 
         // Act
@@ -172,11 +176,12 @@ class EventServiceTest extends TestCase
             em: $emMock,
             notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
-            recurringEventService: $this->createStub(RecurringEventService::class),
+            recurringEventService: $this->createStub(RecurringService::class),
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
 
         // Act
@@ -207,11 +212,12 @@ class EventServiceTest extends TestCase
             em: $emMock,
             notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
-            recurringEventService: $this->createStub(RecurringEventService::class),
+            recurringEventService: $this->createStub(RecurringService::class),
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
 
         // Act
@@ -236,11 +242,12 @@ class EventServiceTest extends TestCase
             em: $emMock,
             notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $this->createStub(PluginService::class),
-            recurringEventService: $this->createStub(RecurringEventService::class),
+            recurringEventService: $this->createStub(RecurringService::class),
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
 
         // Act
@@ -255,7 +262,7 @@ class EventServiceTest extends TestCase
         // Arrange
         $event = new EventStub()->setId(1);
 
-        $recurringServiceMock = $this->createMock(RecurringEventService::class);
+        $recurringServiceMock = $this->createMock(RecurringService::class);
         $recurringServiceMock->expects($this->once())->method('updateRecurringEvents')->with($event)->willReturn(0);
 
         $subject = new EventService(
@@ -268,6 +275,7 @@ class EventServiceTest extends TestCase
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
 
         // Act & Assert
@@ -286,7 +294,7 @@ class EventServiceTest extends TestCase
             );
         $parent->setStart(new DateTime('2025-01-01 10:00:00'));
 
-        $recurringServiceMock = $this->createMock(RecurringEventService::class);
+        $recurringServiceMock = $this->createMock(RecurringService::class);
         $recurringServiceMock->expects($this->once())->method('updateRecurringEvents')->with($parent)->willReturn(1);
 
         $subject = new EventService(
@@ -299,6 +307,7 @@ class EventServiceTest extends TestCase
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
 
         // Act & Assert
@@ -328,11 +337,12 @@ class EventServiceTest extends TestCase
             em: $emMock,
             notificationEventCanceledEmail: $emailMock,
             pluginService: $this->createStub(PluginService::class),
-            recurringEventService: $this->createStub(RecurringEventService::class),
+            recurringEventService: $this->createStub(RecurringService::class),
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
 
         // Act & Assert
@@ -352,7 +362,7 @@ class EventServiceTest extends TestCase
             )
             ->setStart(new DateTime('+1 week'));
 
-        $recurringServiceMock = $this->createMock(RecurringEventService::class);
+        $recurringServiceMock = $this->createMock(RecurringService::class);
         $recurringServiceMock->expects($this->once())->method('updateRecurringEvents')->with($child)->willReturn(1);
 
         $subject = new EventService(
@@ -365,6 +375,7 @@ class EventServiceTest extends TestCase
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
 
         // Act & Assert
@@ -383,7 +394,7 @@ class EventServiceTest extends TestCase
             )
             ->setStart(new DateTime('+1 week'));
 
-        $recurringServiceMock = $this->createMock(RecurringEventService::class);
+        $recurringServiceMock = $this->createMock(RecurringService::class);
         $recurringServiceMock->expects($this->once())->method('updateRecurringEvents')->with($child)->willReturn(0);
 
         $subject = new EventService(
@@ -396,6 +407,7 @@ class EventServiceTest extends TestCase
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
 
         // Act & Assert
@@ -448,11 +460,12 @@ class EventServiceTest extends TestCase
             em: $this->createStub(EntityManagerInterface::class),
             notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
             pluginService: $pluginService,
-            recurringEventService: $this->createStub(RecurringEventService::class),
+            recurringEventService: $this->createStub(RecurringService::class),
             itemAssociationService: $this->createStub(AssociationService::class),
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: $providers,
+            translationRepo: $this->createStub(EventTranslationRepository::class),
         );
     }
 }

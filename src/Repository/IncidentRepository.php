@@ -54,7 +54,7 @@ class IncidentRepository extends ServiceEntityRepository
         if ($minSeverity !== null) {
             $allowed = [];
             foreach (IncidentSeverity::cases() as $case) {
-                if (self::severityRank($case) < self::severityRank($minSeverity)) {
+                if ($this->severityRank($case) < $this->severityRank($minSeverity)) {
                     continue;
                 }
 
@@ -106,7 +106,7 @@ class IncidentRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    private static function severityRank(IncidentSeverity $severity): int
+    private function severityRank(IncidentSeverity $severity): int
     {
         return match ($severity) {
             IncidentSeverity::Low => 0,

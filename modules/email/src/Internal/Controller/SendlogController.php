@@ -18,7 +18,7 @@ use Module\Email\Internal\Delivery\ProviderChain;
 use Module\Email\Internal\Delivery\StatusSyncService;
 use Module\Email\Internal\Entity\EmailQueue;
 use Module\Email\Internal\LayoutRenderer;
-use Module\Email\Internal\Repository\EmailQueueRepository;
+use Module\Email\Internal\Sendlog;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,7 +50,7 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         TranslatorInterface $translator,
         #[AutowireIterator(EmailInterface::class)]
         private readonly iterable $emailTypes,
-        private readonly EmailQueueRepository $emailQueueRepo,
+        private readonly Sendlog $sendlog,
         private readonly ProviderChain $provider,
         private readonly StatusSyncService $syncService,
         private readonly LayoutRenderer $layoutRenderer,
@@ -75,10 +75,10 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         $recipient = trim($request->query->getString('recipient'));
         $recipient = $recipient !== '' ? $recipient : null;
 
-        $emails = $this->emailQueueRepo->findFiltered(self::LIST_LIMIT, $since, $template, $recipient);
-        $totalCount = $this->emailQueueRepo->countAll();
-        $rangeCount = $this->emailQueueRepo->countFiltered($since, $template, $recipient);
-        $problemCount = $this->emailQueueRepo->countFiltered($since, $template, $recipient, self::PROBLEM_STATUSES);
+        $emails = $this->sendlog->findRows(self::LIST_LIMIT, $since, $template, $recipient);
+        $totalCount = $this->sendlog->countAll();
+        $rangeCount = $this->sendlog->countFiltered($since, $template, $recipient);
+        $problemCount = $this->sendlog->countFiltered($since, $template, $recipient, self::PROBLEM_STATUSES);
 
         $actions = [
             $this->buildTemplateDropdown($template, $range, $recipient, $since),
@@ -206,7 +206,7 @@ final class SendlogController extends AbstractEmailController implements AdminNa
                 label: $this->humanizeTemplate($identifier),
                 target: $this->generateUrl('app_admin_email_sendlog', $this->preserveParams($range, $identifier, $recipient)),
                 isActive: $current === $identifier,
-                count: $this->emailQueueRepo->countFiltered($since, $identifier, $recipient),
+                count: $this->sendlog->countFiltered($since, $identifier, $recipient),
             );
         }
 
@@ -228,7 +228,7 @@ final class SendlogController extends AbstractEmailController implements AdminNa
                 label: $this->translator->trans('admin_logs.range_' . $key),
                 target: $this->generateUrl('app_admin_email_sendlog', $this->preserveParams($key, $template, $recipient)),
                 isActive: $key === $current,
-                count: $this->emailQueueRepo->countFiltered($optionSince, $template, $recipient),
+                count: $this->sendlog->countFiltered($optionSince, $template, $recipient),
             );
         }
 

@@ -54,6 +54,9 @@ final class VouchController extends AbstractController
             throw new BadRequestHttpException('Invalid vouch.');
         }
 
-        return $this->redirect($descriptor->returnUrl ?? $request->headers->get('referer') ?? '/');
+        $referer = (string) $request->headers->get('referer');
+        $sameHostReferer = str_starts_with($referer, $request->getSchemeAndHttpHost() . '/') ? $referer : null;
+
+        return $this->redirect($descriptor->returnUrl ?? $sameHostReferer ?? '/');
     }
 }

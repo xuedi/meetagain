@@ -13,11 +13,11 @@ use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Form\LocationType;
-use App\Repository\EventRepository;
 use App\Repository\LocationRepository;
 use App\Review\ChangeProposalService;
 use App\Review\LocationChangeTarget;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use App\Service\Event\EventService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -36,7 +36,7 @@ final class LocationController extends AbstractController implements AdminNaviga
 {
     public function __construct(
         private readonly LocationRepository $repo,
-        private readonly EventRepository $eventRepo,
+        private readonly EventService $eventService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly AdminLocationListFilterService $locationFilterService,
         private readonly ChangeProposalService $changeProposalService,
@@ -99,7 +99,7 @@ final class LocationController extends AbstractController implements AdminNaviga
             return $this->redirectToRoute('app_admin_location_edit', ['id' => $location->getId()]);
         }
 
-        $eventsUsingLocation = $this->eventRepo->findBy(['location' => $location]);
+        $eventsUsingLocation = $this->eventService->findByLocation($location);
 
         return $this->render('admin/location/edit.html.twig', [
             'active' => 'location',
@@ -123,7 +123,7 @@ final class LocationController extends AbstractController implements AdminNaviga
             throw $this->createNotFoundException('Location not found in current context.');
         }
 
-        $eventsUsingLocation = $this->eventRepo->findBy(['location' => $location]);
+        $eventsUsingLocation = $this->eventService->findByLocation($location);
         if (count($eventsUsingLocation) > 0) {
             $this->addFlash('error', $this->translator->trans('admin_location.flash_delete_blocked', [
                 '%count%' => count($eventsUsingLocation),

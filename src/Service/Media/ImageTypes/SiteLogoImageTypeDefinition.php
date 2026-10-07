@@ -6,7 +6,7 @@ use App\Entity\Image;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
 
-final class SiteLogoImageTypeDefinition extends AbstractImageTypeDefinition
+final readonly class SiteLogoImageTypeDefinition extends AbstractImageTypeDefinition
 {
     public function getType(): ImageType
     {

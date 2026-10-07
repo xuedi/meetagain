@@ -28,9 +28,4 @@ class AdminCmsPageCreated extends MessageAbstract
             '%slug%' => $this->meta['cms_slug'],
         ]);
     }
-
-    protected function renderHtml(): string
-    {
-        return $this->renderText();
-    }
 }

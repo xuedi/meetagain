@@ -5,6 +5,7 @@ namespace Tests\Unit\Service;
 use App\Entity\EventTranslation;
 use App\EntityActionDispatcher;
 use App\Enum\CronTaskStatus;
+use App\Enum\EntityAction;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
 use App\Enum\RealignmentOutcome;
@@ -15,7 +16,7 @@ use App\Repository\RsvpGuestRepository;
 use App\Service\Cms\CmsService;
 use App\Service\Event\OccurrenceCalculator;
 use App\Service\Event\RecurrenceResolver;
-use App\Service\Event\RecurringEventService;
+use App\Service\Event\RecurringService;
 use App\ValueObject\RealignmentItem;
 use App\ValueObject\RealignmentPlan;
 use App\ValueObject\ScheduleChange;
@@ -30,7 +31,7 @@ use Tests\Unit\Stubs\EventSeriesStub;
 use Tests\Unit\Stubs\EventStub;
 use Tests\Unit\Stubs\UserStub;
 
-class RecurringEventServiceTest extends TestCase
+class RecurringServiceTest extends TestCase
 {
     private const string NOW = '2026-06-15 12:00:00'; // a Monday, so weekday maths in the fixtures is readable
 
@@ -60,8 +61,8 @@ class RecurringEventServiceTest extends TestCase
         EntityManagerInterface $em,
         ?EventSeriesRepository $seriesRepo = null,
         string $now = self::NOW,
-    ): RecurringEventService {
-        return new RecurringEventService(
+    ): RecurringService {
+        return new RecurringService(
             repo: $repo,
             seriesRepo: $seriesRepo ?? $this->createStub(EventSeriesRepository::class),
             rsvpGuestRepo: $this->createStub(RsvpGuestRepository::class),
@@ -760,5 +761,148 @@ class RecurringEventServiceTest extends TestCase
         static::assertSame('Neuer Titel', $childTranslation->getTitle());
         static::assertSame('Neuer Teaser', $childTranslation->getTeaser());
         static::assertSame('Neue Beschreibung', $childTranslation->getDescription());
+    }
+
+    public function testFillUntitledFollowersWithoutSeriesReturnsZero(): void
+    {
+        // Arrange
+        $event = $this->makeEvent(1);
+        $event->addTranslation($this->makeTranslation('en', 'Title'));
+
+        $repo = $this->createMock(EventRepository::class);
+        $repo->expects($this->never())->method('findFollowUpEvents');
+
+        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
+
+        // Act
+        $result = $service->fillUntitledFollowers($event);
+
+        // Assert
+        static::assertSame(0, $result);
+    }
+
+    public function testFillUntitledFollowersFillsAnEmptyTitleAndCreatesAMissingLocale(): void
+    {
+        // Arrange
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
+        $anchor->addTranslation($this->makeTranslation('en', 'Film night', 'Teaser', 'Description'));
+        $anchor->addTranslation($this->makeTranslation('de', 'Filmabend'));
+
+        $child = $this->makeEvent(2);
+        $child->addTranslation($this->makeTranslation('en', ''));
+
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$child]);
+
+        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
+
+        // Act
+        $result = $service->fillUntitledFollowers($anchor);
+
+        // Assert
+        static::assertSame(1, $result);
+        static::assertSame('Film night', $child->findTranslation('en')?->getTitle());
+        static::assertSame('Teaser', $child->findTranslation('en')?->getTeaser());
+        static::assertSame('Description', $child->findTranslation('en')?->getDescription());
+        static::assertSame('Filmabend', $child->findTranslation('de')?->getTitle());
+    }
+
+    public function testFillUntitledFollowersLeavesATitledFollowerAlone(): void
+    {
+        // Arrange
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
+        $anchor->addTranslation($this->makeTranslation('en', 'New title', 'New teaser'));
+
+        $child = $this->makeEvent(2);
+        $child->addTranslation($this->makeTranslation('en', 'Own title', 'Own teaser'));
+
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$child]);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->never())->method('flush');
+
+        $service = $this->createService($repo, $em);
+
+        // Act
+        $result = $service->fillUntitledFollowers($anchor);
+
+        // Assert
+        static::assertSame(0, $result);
+        static::assertSame('Own title', $child->findTranslation('en')?->getTitle());
+        static::assertSame('Own teaser', $child->findTranslation('en')?->getTeaser());
+    }
+
+    public function testFillUntitledFollowersSkipsLockedMembersAndTheAnchor(): void
+    {
+        // Arrange
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
+        $anchor->addTranslation($this->makeTranslation('en', 'Title'));
+
+        $locked = $this->makeEvent(2, EventStatus::Locked);
+        $open = $this->makeEvent(3);
+
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$anchor, $locked, $open]);
+
+        $dispatcher = $this->createMock(EntityActionDispatcher::class);
+        $dispatcher->expects($this->once())->method('dispatch')->with(EntityAction::UpdateEvent, 3);
+
+        $service = new RecurringService(
+            repo: $repo,
+            seriesRepo: $this->createStub(EventSeriesRepository::class),
+            rsvpGuestRepo: $this->createStub(RsvpGuestRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
+            entityActionDispatcher: $dispatcher,
+            cmsBlockRepository: $this->createStub(CmsBlockRepository::class),
+            cmsService: $this->createStub(CmsService::class),
+            recurrenceResolver: new RecurrenceResolver(),
+            calculator: new OccurrenceCalculator(),
+            clock: new MockClock(new DateTimeImmutable(self::NOW)),
+        );
+
+        // Act
+        $result = $service->fillUntitledFollowers($anchor);
+
+        // Assert
+        static::assertSame(1, $result);
+        static::assertNull($locked->findTranslation('en'));
+        static::assertSame('Title', $open->findTranslation('en')?->getTitle());
+    }
+
+    public function testFillUntitledFollowersIgnoresAnUntitledSourceLocale(): void
+    {
+        // Arrange
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
+        $anchor->addTranslation($this->makeTranslation('de', ''));
+
+        $child = $this->makeEvent(2);
+
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$child]);
+
+        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
+
+        // Act
+        $result = $service->fillUntitledFollowers($anchor);
+
+        // Assert
+        static::assertSame(0, $result);
+        static::assertNull($child->findTranslation('de'));
+    }
+
+    private function makeTranslation(string $language, string $title, ?string $teaser = null, string $description = ''): EventTranslation
+    {
+        $translation = new EventTranslation();
+        $translation->setLanguage($language);
+        $translation->setTitle($title);
+        $translation->setTeaser($teaser);
+        $translation->setDescription($description);
+
+        return $translation;
     }
 }

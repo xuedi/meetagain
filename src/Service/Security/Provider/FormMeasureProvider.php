@@ -12,7 +12,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-final class FormMeasureProvider extends AbstractSecurityProvider
+final readonly class FormMeasureProvider extends AbstractSecurityProvider
 {
     public const string KEY = 'form_measure';
     public const string LOGIN_CONTEXT = 'app_login';
@@ -39,7 +39,7 @@ final class FormMeasureProvider extends AbstractSecurityProvider
     public function __construct(
         CacheItemPoolInterface $securityCachePool,
         LoggerInterface $logger,
-        private readonly SecurityMeasureLogRepository $logRepo,
+        private SecurityMeasureLogRepository $logRepo,
     ) {
         parent::__construct($securityCachePool, $logger);
     }

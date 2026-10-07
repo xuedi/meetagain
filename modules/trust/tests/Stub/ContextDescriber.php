@@ -6,9 +6,11 @@ use Module\Trust\Contract\ContextDescriberInterface;
 use Module\Trust\Contract\ContextDescriptor;
 use Override;
 
-final readonly class ContextDescriber implements ContextDescriberInterface
+final class ContextDescriber implements ContextDescriberInterface
 {
     public const string CONTEXT = 'stub-context';
+
+    public ?string $returnUrl = '/';
 
     #[Override]
     public function describe(string $context): ?ContextDescriptor
@@ -24,6 +26,6 @@ final readonly class ContextDescriber implements ContextDescriberInterface
 
     private function descriptor(): ContextDescriptor
     {
-        return new ContextDescriptor(self::CONTEXT, 'Stub context', '/');
+        return new ContextDescriptor(self::CONTEXT, 'Stub context', $this->returnUrl);
     }
 }
