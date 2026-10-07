@@ -31,6 +31,7 @@ final class HumanCheckTypeTest extends TestCase
 {
     private const string CONTEXT = 'app_register';
     private const string CAPTCHA_IMAGE = 'base64-captcha-image';
+    private const string UNSIGNED_HONEYPOT = 'f_0123abcd';
 
     private MockClock $clock;
     private ChallengeSigner $signer;
@@ -86,13 +87,13 @@ final class HumanCheckTypeTest extends TestCase
 
         // Assert
         static::assertTrue($all->has('captcha'));
-        static::assertTrue($all->has(HumanCheckType::HONEYPOT_FIELD));
+        static::assertNotNull($this->honeypotName($all));
         static::assertTrue($all->has('stamp'));
         static::assertTrue($all->has('proof'));
 
         static::assertFalse($honeypotOnly->has('captcha'));
-        static::assertTrue($honeypotOnly->has(HumanCheckType::HONEYPOT_FIELD));
-        static::assertFalse($honeypotOnly->has('stamp'));
+        static::assertNotNull($this->honeypotName($honeypotOnly));
+        static::assertTrue($honeypotOnly->has('stamp'));
         static::assertFalse($honeypotOnly->has('proof'));
     }
 
@@ -137,15 +138,31 @@ final class HumanCheckTypeTest extends TestCase
         static::assertFalse($view->vars['powEnabled']);
     }
 
+    public function testEveryRenderNamesTheHoneypotAfterItsOwnSignedNonce(): void
+    {
+        // Arrange
+        $form = $this->humanCheck([SecurityMeasure::Honeypot]);
+
+        // Act
+        $first = $form->createView();
+        $second = $this->humanCheck([SecurityMeasure::Honeypot])->createView();
+
+        // Assert
+        $nonce = (string) $this->signer->verify($first->children['stamp']->vars['value'], self::CONTEXT)['nonce'];
+        static::assertSame($this->signer->fieldName($nonce), $first->vars['honeypotField']);
+        static::assertArrayHasKey($first->vars['honeypotField'], $first->children);
+        static::assertNotSame($first->vars['honeypotField'], $second->vars['honeypotField']);
+    }
+
     public function testAnUntouchedFormPassesEveryEnabledMeasure(): void
     {
         // Arrange
+        [$stamp, $honeypot] = $this->render([SecurityMeasure::Honeypot, SecurityMeasure::SubmitTiming]);
         $form = $this->humanCheck([SecurityMeasure::Honeypot, SecurityMeasure::SubmitTiming], captchaValid: true);
-        $stamp = $this->signer->issue(self::CONTEXT, 18);
         $this->clock->modify('+5 seconds');
 
         // Act
-        $form->submit([HumanCheckType::HONEYPOT_FIELD => '', 'stamp' => $stamp]);
+        $form->submit([$honeypot => '', 'stamp' => $stamp]);
 
         // Assert
         static::assertSame([], $this->blocks);
@@ -156,14 +173,47 @@ final class HumanCheckTypeTest extends TestCase
     public function testAFilledHoneypotIsBlockedAndLogged(): void
     {
         // Arrange
+        [$stamp, $honeypot] = $this->render([SecurityMeasure::Honeypot]);
         $form = $this->humanCheck([SecurityMeasure::Honeypot]);
 
         // Act
-        $form->submit([HumanCheckType::HONEYPOT_FIELD => 'https://spam.example']);
+        $form->submit([$honeypot => 'https://spam.example', 'stamp' => $stamp]);
 
         // Assert
         static::assertSame([[SecurityMeasure::Honeypot, 'filled']], $this->blocks);
         static::assertCount(1, $form->getErrors(true));
+    }
+
+    public function testAFilledHoneypotWithoutAStampIsStillCaught(): void
+    {
+        // Arrange
+        $form = $this->humanCheck([SecurityMeasure::Honeypot]);
+
+        // Act
+        $form->submit([self::UNSIGNED_HONEYPOT => 'https://spam.example', 'stamp' => '']);
+
+        // Assert
+        static::assertSame([[SecurityMeasure::Honeypot, 'filled']], $this->blocks);
+    }
+
+    #[DataProvider('unsignedFieldNameProvider')]
+    public function testWithAValidStampOnlyTheSignedFieldNameIsAccepted(string $fieldName): void
+    {
+        // Arrange
+        [$stamp] = $this->render([SecurityMeasure::Honeypot]);
+        $form = $this->humanCheck([SecurityMeasure::Honeypot]);
+
+        // Act
+        $form->submit([$fieldName => '', 'stamp' => $stamp]);
+
+        // Assert
+        static::assertFalse($form->isValid());
+    }
+
+    public static function unsignedFieldNameProvider(): Generator
+    {
+        yield 'a learned fixed name' => ['reference'];
+        yield 'a name signed for another render' => [self::UNSIGNED_HONEYPOT];
     }
 
     public function testASubmissionFasterThanTwoSecondsIsBlocked(): void
@@ -263,7 +313,7 @@ final class HumanCheckTypeTest extends TestCase
         $form = $this->humanCheck([SecurityMeasure::Honeypot, SecurityMeasure::SubmitTiming]);
 
         // Act
-        $form->submit([HumanCheckType::HONEYPOT_FIELD => 'spam', 'stamp' => '']);
+        $form->submit([self::UNSIGNED_HONEYPOT => 'spam', 'stamp' => '']);
 
         // Assert
         static::assertCount(2, $this->blocks);
@@ -276,7 +326,7 @@ final class HumanCheckTypeTest extends TestCase
         $form = $this->humanCheck([SecurityMeasure::Honeypot, SecurityMeasure::SubmitTiming, SecurityMeasure::ProofOfWork]);
 
         // Act
-        $form->submit([HumanCheckType::HONEYPOT_FIELD => 'spam', 'stamp' => '', 'proof' => '']);
+        $form->submit([self::UNSIGNED_HONEYPOT => 'spam', 'stamp' => '', 'proof' => '']);
 
         // Assert
         static::assertCount(1, $this->events);
@@ -292,7 +342,7 @@ final class HumanCheckTypeTest extends TestCase
         $form = $this->humanCheck([SecurityMeasure::Honeypot]);
 
         // Act
-        $form->submit([HumanCheckType::HONEYPOT_FIELD => 'spam']);
+        $form->submit([self::UNSIGNED_HONEYPOT => 'spam']);
 
         // Assert
         static::assertSame([[SecurityMeasure::Honeypot, 'filled']], $this->blocks);
@@ -317,7 +367,7 @@ final class HumanCheckTypeTest extends TestCase
         $form = $this->humanCheck([SecurityMeasure::Honeypot]);
 
         // Act
-        $form->submit([HumanCheckType::HONEYPOT_FIELD => 'spam']);
+        $form->submit([self::UNSIGNED_HONEYPOT => 'spam']);
 
         // Assert
         static::assertCount(1, $this->events);
@@ -336,7 +386,7 @@ final class HumanCheckTypeTest extends TestCase
         $form = $this->humanCheck([SecurityMeasure::Honeypot]);
 
         // Act
-        $form->submit([HumanCheckType::HONEYPOT_FIELD => '']);
+        $form->submit([self::UNSIGNED_HONEYPOT => '']);
 
         // Assert
         static::assertSame([], $this->events);
@@ -354,6 +404,23 @@ final class HumanCheckTypeTest extends TestCase
 
         // Assert
         static::assertSame([[SecurityMeasure::SubmitTiming, 'expired_stamp']], $this->blocks);
+    }
+
+    /**
+     * @param list<SecurityMeasure> $enabled
+     *
+     * @return array{0: string, 1: string}
+     */
+    private function render(array $enabled): array
+    {
+        $view = $this->humanCheck($enabled)->createView();
+
+        return [(string) $view->children['stamp']->vars['value'], (string) $view->vars['honeypotField']];
+    }
+
+    private function honeypotName(FormInterface $form): ?string
+    {
+        return array_find(array_keys($form->all()), static fn(string $name): bool => preg_match(HumanCheckType::HONEYPOT_PATTERN, $name) === 1);
     }
 
     /**

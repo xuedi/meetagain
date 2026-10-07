@@ -27,7 +27,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class HumanCheckType extends AbstractType
 {
-    public const string HONEYPOT_FIELD = 'reference';
+    public const string HONEYPOT_PATTERN = '/^f_[0-9a-f]{8}$/';
+    private const string NONCE = 'nonce';
+    private const string HONEYPOT = 'honeypot';
 
     public function __construct(
         private readonly MeasureSettings $measureSettings,
@@ -52,16 +54,24 @@ final class HumanCheckType extends AbstractType
             ]);
         }
 
+        $nonce = $this->signer->mintNonce();
+
+        if ($this->needsStamp()) {
+            $builder->setAttribute(self::NONCE, $nonce);
+            $builder->add('stamp', HiddenType::class, ['required' => false]);
+        }
+
         if ($this->isEnabled(SecurityMeasure::Honeypot)) {
-            $builder->add(self::HONEYPOT_FIELD, TextType::class, [
+            $honeypot = $this->signer->fieldName($nonce);
+            $builder->setAttribute(self::HONEYPOT, $honeypot);
+            $builder->add($honeypot, TextType::class, [
                 'label' => false,
                 'required' => false,
                 'attr' => ['autocomplete' => 'off', 'tabindex' => '-1'],
             ]);
-        }
-
-        if ($this->needsStamp()) {
-            $builder->add('stamp', HiddenType::class, ['required' => false]);
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) use ($context, $honeypot): void {
+                $this->relocateHoneypot($event, $context, $honeypot);
+            });
         }
 
         if ($this->isEnabled(SecurityMeasure::ProofOfWork)) {
@@ -80,7 +90,7 @@ final class HumanCheckType extends AbstractType
         $difficulty = $this->measureSettings->proofOfWorkDifficulty();
 
         if (isset($view->children['stamp'])) {
-            $view->children['stamp']->vars['value'] = $this->signer->issue($context, $difficulty);
+            $view->children['stamp']->vars['value'] = $this->signer->issue($context, $difficulty, $form->getConfig()->getAttribute(self::NONCE));
         }
 
         if (isset($view->children['proof'])) {
@@ -93,6 +103,7 @@ final class HumanCheckType extends AbstractType
         }
 
         $view->vars['context'] = $context;
+        $view->vars['honeypotField'] = $form->getConfig()->getAttribute(self::HONEYPOT);
         $view->vars['captchaImage'] = $captchaImage;
         $view->vars['powDifficulty'] = $difficulty;
         $view->vars['powEnabled'] = $this->isEnabled(SecurityMeasure::ProofOfWork);
@@ -112,6 +123,40 @@ final class HumanCheckType extends AbstractType
         ]);
         $resolver->setRequired('context');
         $resolver->setAllowedTypes('context', 'string');
+    }
+
+    private function relocateHoneypot(FormEvent $event, string $context, string $honeypot): void
+    {
+        $data = $event->getData();
+        if (!is_array($data)) {
+            return;
+        }
+
+        $submitted = $this->submittedHoneypotKey($data, $context);
+        if ($submitted === null || $submitted === $honeypot) {
+            return;
+        }
+
+        $data[$honeypot] = $data[$submitted];
+        unset($data[$submitted]);
+        $event->setData($data);
+    }
+
+    /**
+     * @param array<array-key, mixed> $data
+     */
+    private function submittedHoneypotKey(array $data, string $context): ?string
+    {
+        $stamp = $this->signer->verify((string) ($data['stamp'] ?? ''), $context);
+        if ($stamp !== null) {
+            $name = $this->signer->fieldName($stamp['nonce']);
+
+            return array_key_exists($name, $data) ? $name : null;
+        }
+
+        $key = array_find_key($data, static fn(mixed $value, int|string $key): bool => is_string($key) && preg_match(self::HONEYPOT_PATTERN, $key) === 1);
+
+        return is_string($key) ? $key : null;
     }
 
     private function validateMeasures(FormInterface $form, string $context): void
@@ -215,7 +260,7 @@ final class HumanCheckType extends AbstractType
      */
     private function checkHoneypot(FormInterface $form): ?array
     {
-        $value = (string) $form->get(self::HONEYPOT_FIELD)->getData();
+        $value = (string) $form->get((string) $form->getConfig()->getAttribute(self::HONEYPOT))->getData();
 
         return $value === '' ? null : ['reason' => 'filled'];
     }
@@ -266,7 +311,7 @@ final class HumanCheckType extends AbstractType
 
     private function needsStamp(): bool
     {
-        return $this->isEnabled(SecurityMeasure::SubmitTiming) || $this->isEnabled(SecurityMeasure::ProofOfWork);
+        return $this->isEnabled(SecurityMeasure::Honeypot) || $this->isEnabled(SecurityMeasure::SubmitTiming) || $this->isEnabled(SecurityMeasure::ProofOfWork);
     }
 
     private function isEnabled(SecurityMeasure $measure): bool
