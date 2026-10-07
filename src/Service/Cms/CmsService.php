@@ -2,7 +2,9 @@
 
 namespace App\Service\Cms;
 
+use App\Entity\BlockType\BlockType;
 use App\Entity\Cms;
+use App\Enum\CmsBlock\CmsBlockType;
 use App\Filter\Cms\CmsFilterService;
 use App\Filter\Event\EventFilterService;
 use App\Repository\CmsRepository;
@@ -17,6 +19,8 @@ use Twig\Environment;
 
 readonly class CmsService
 {
+    private const string EVENT_TEASER_TAG = 'cms_event_teaser';
+
     public function __construct(
         private Environment $twig,
         private CmsRepository $repo,
@@ -71,7 +75,8 @@ readonly class CmsService
             }
 
             $body = $this->twig->render('cms/_blocks.html.twig', ['blocks' => $blocks]);
-            $this->storeCachedBody($cacheKey, $pageId, $body);
+            $hasEventTeaser = $blocks->exists(static fn(int|string $key, BlockType $block): bool => $block::getType() === CmsBlockType::EventTeaser);
+            $this->storeCachedBody($cacheKey, $pageId, $body, $hasEventTeaser);
         }
 
         $content = $this->twig->render('cms/index.html.twig', [
@@ -88,6 +93,11 @@ readonly class CmsService
     public function invalidatePage(int $pageId): void
     {
         $this->cache->invalidateTags(['cms_page_' . $pageId]);
+    }
+
+    public function invalidateEventTeasers(): void
+    {
+        $this->cache->invalidateTags([self::EVENT_TEASER_TAG]);
     }
 
     public function invalidateAll(): void
@@ -143,14 +153,17 @@ readonly class CmsService
         return $miss ? null : $body;
     }
 
-    private function storeCachedBody(string $cacheKey, int $pageId, string $body): void
+    private function storeCachedBody(string $cacheKey, int $pageId, string $body, bool $hasEventTeaser): void
     {
-        $tag = 'cms_page_' . $pageId;
+        $tags = ['cms_page_' . $pageId, 'cms_page_all'];
+        if ($hasEventTeaser) {
+            $tags[] = self::EVENT_TEASER_TAG;
+        }
 
         $this->cache->get(
             $cacheKey,
-            static function (ItemInterface $item) use ($body, $tag): string {
-                $item->tag([$tag, 'cms_page_all']);
+            static function (ItemInterface $item) use ($body, $tags): string {
+                $item->tag($tags);
 
                 return $body;
             },

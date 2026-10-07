@@ -42,9 +42,33 @@ class CacheInvalidationHandlerTest extends TestCase
         $handler = new CacheInvalidationHandler($cmsServiceMock);
 
         // Act
-        $handler->onEntityAction(EntityAction::UpdateEvent, 7);
+        $handler->onEntityAction(EntityAction::CreateUser, 7);
 
         // Assert
+    }
+
+    #[DataProvider('provideEventActions')]
+    public function testAnEventChangeInvalidatesEveryEventTeaserPageAndNothingElse(EntityAction $action): void
+    {
+        // Arrange
+        $cmsServiceMock = $this->createMock(CmsService::class);
+        $cmsServiceMock->expects($this->once())->method('invalidateEventTeasers');
+        $cmsServiceMock->expects($this->never())->method('invalidatePage');
+        $cmsServiceMock->expects($this->never())->method('invalidateMenuCaches');
+
+        $handler = new CacheInvalidationHandler($cmsServiceMock);
+
+        // Act
+        $handler->onEntityAction($action, 7);
+
+        // Assert
+    }
+
+    public static function provideEventActions(): iterable
+    {
+        yield 'CreateEvent' => [EntityAction::CreateEvent];
+        yield 'UpdateEvent' => [EntityAction::UpdateEvent];
+        yield 'DeleteEvent' => [EntityAction::DeleteEvent];
     }
 
     public function testOnEntityActionInvalidatesPageOnlyForBlockUpdate(): void

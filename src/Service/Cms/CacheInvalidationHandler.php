@@ -16,6 +16,7 @@ readonly class CacheInvalidationHandler implements EntityActionInterface
         match ($action) {
             EntityAction::UpdateCms, EntityAction::DeleteCms => $this->invalidateCmsAndMenus($entityId),
             EntityAction::UpdateCmsBlock => $this->cmsService->invalidatePage($entityId),
+            EntityAction::CreateEvent, EntityAction::UpdateEvent, EntityAction::DeleteEvent => $this->cmsService->invalidateEventTeasers(),
             default => null,
         };
     }

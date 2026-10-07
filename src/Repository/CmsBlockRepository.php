@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\CmsBlock;
-use App\Enum\CmsBlock\CmsBlockType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Throwable;
@@ -25,23 +24,6 @@ class CmsBlockRepository extends ServiceEntityRepository
         } catch (Throwable) {
             return 1;
         }
-    }
-
-    /**
-     * @return array<int>
-     */
-    public function findPageIdsWithType(CmsBlockType $type): array
-    {
-        $rows = $this
-            ->createQueryBuilder('cb')
-            ->select('IDENTITY(cb.page) as page_id')
-            ->where('cb.type = :type')
-            ->setParameter('type', $type)
-            ->distinct()
-            ->getQuery()
-            ->getScalarResult();
-
-        return array_map(static fn(array $row): int => (int) $row['page_id'], $rows);
     }
 
     /**

@@ -420,6 +420,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         $user = $this->getAuthedUser();
         $rsvpCount = $event->getRsvp()->count();
         $this->eventService->cancelEvent($event);
+        $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $event->getId());
         $this->activityService->log(AdminEventCancelled::TYPE, $user, ['event_id' => $event->getId()]);
         if ($rsvpCount > 0) {
             $this->addFlash('success', $this->translator->trans('admin_event.flash_canceled', [
@@ -437,6 +438,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         $this->assertEventActionAllowed($request, 'app_admin_event_uncancel', $event);
 
         $this->eventService->uncancelEvent($event);
+        $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $event->getId());
 
         return $this->redirectToRoute('app_admin_event_edit', ['id' => $event->getId()]);
     }
