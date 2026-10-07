@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       redis:
-        image: redis:8@sha256:298e5b3bc566bade82f46ad5511777a4a07a294097ce16ada2f6a42be5239df5
+        image: redis:8@sha256:6f81e8915c60b065a524e6967e0ad1c639ba6efa84d669f823683ea04d9150ee
         ports:
           - 6379:6379
         options: >-
@@ -66,7 +66,7 @@ jobs:
           --health-timeout=3s
           --health-retries=5
       redis:
-        image: redis:8@sha256:298e5b3bc566bade82f46ad5511777a4a07a294097ce16ada2f6a42be5239df5
+        image: redis:8@sha256:6f81e8915c60b065a524e6967e0ad1c639ba6efa84d669f823683ea04d9150ee
         ports:
           - 6379:6379
         options: >-
@@ -136,7 +136,7 @@ jobs:
           --health-timeout=3s
           --health-retries=5
       redis:
-        image: redis:8@sha256:298e5b3bc566bade82f46ad5511777a4a07a294097ce16ada2f6a42be5239df5
+        image: redis:8@sha256:6f81e8915c60b065a524e6967e0ad1c639ba6efa84d669f823683ea04d9150ee
         ports:
           - 6379:6379
         options: >-
