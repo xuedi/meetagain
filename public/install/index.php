@@ -8,9 +8,7 @@ require_once __DIR__ . '/MailProviderRegistry.php';
 require_once __DIR__ . '/Providers/NullMailProvider.php';
 require_once __DIR__ . '/Providers/MailpitMailProvider.php';
 require_once __DIR__ . '/Providers/SmtpMailProvider.php';
-require_once __DIR__ . '/Providers/SendgridMailProvider.php';
-require_once __DIR__ . '/Providers/MailgunMailProvider.php';
-require_once __DIR__ . '/Providers/SesMailProvider.php';
+require_once __DIR__ . '/Providers/SweegoMailProvider.php';
 
 $installer = new Installer();
 $mailProviderRegistry = MailProviderRegistry::createDefault();
@@ -125,13 +123,7 @@ function showStep2(Installer $installer): void
             'smtp_user' => $installer->getSessionData('smtp_user', ''),
             'smtp_password' => $installer->getSessionData('smtp_password', ''),
             'smtp_encryption' => $installer->getSessionData('smtp_encryption', 'tls'),
-            'sendgrid_api_key' => $installer->getSessionData('sendgrid_api_key', ''),
-            'mailgun_api_key' => $installer->getSessionData('mailgun_api_key', ''),
-            'mailgun_domain' => $installer->getSessionData('mailgun_domain', ''),
-            'mailgun_region' => $installer->getSessionData('mailgun_region', 'us'),
-            'ses_region' => $installer->getSessionData('ses_region', 'eu-west-1'),
-            'ses_access_key' => $installer->getSessionData('ses_access_key', ''),
-            'ses_secret_key' => $installer->getSessionData('ses_secret_key', ''),
+            'sweego_api_key' => $installer->getSessionData('sweego_api_key', ''),
         ]);
 }
 

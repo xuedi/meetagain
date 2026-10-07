@@ -37,26 +37,11 @@
                     </div>
                     <div class="column is-half">
                         <label class="radio box p-3 mb-2 is-block is-clickable">
-                            <input type="radio" name="mail_provider" value="sendgrid" {% if provider == 'sendgrid' %}checked{% endif %}>
-                            <strong>SendGrid</strong>
+                            <input type="radio" name="mail_provider" value="sweego" {% if provider == 'sweego' %}checked{% endif %}>
+                            <strong>Sweego</strong>
+                            <span class="tag is-info is-light ml-2">EU</span>
                             <br>
-                            <small class="has-text-grey">Cloud email delivery service</small>
-                        </label>
-                    </div>
-                    <div class="column is-half">
-                        <label class="radio box p-3 mb-2 is-block is-clickable">
-                            <input type="radio" name="mail_provider" value="mailgun" {% if provider == 'mailgun' %}checked{% endif %}>
-                            <strong>Mailgun</strong>
-                            <br>
-                            <small class="has-text-grey">Email automation service</small>
-                        </label>
-                    </div>
-                    <div class="column is-half">
-                        <label class="radio box p-3 mb-2 is-block is-clickable">
-                            <input type="radio" name="mail_provider" value="ses" {% if provider == 'ses' %}checked{% endif %}>
-                            <strong>Amazon SES</strong>
-                            <br>
-                            <small class="has-text-grey">AWS email service</small>
+                            <small class="has-text-grey">European email delivery service</small>
                         </label>
                     </div>
                     <div class="column is-half">
@@ -135,76 +120,18 @@
                     </div>
                 </div>
             </div>
+            <p class="help">SendGrid, Mailgun, Amazon SES and most other services accept SMTP - use their SMTP host and credentials here.</p>
         </div>
 
-        <!-- SendGrid Fields -->
-        <div id="fields-sendgrid" class="provider-fields box has-background-light mt-4 is-hidden">
-            <h4 class="title is-5">SendGrid Settings</h4>
+        <!-- Sweego Fields -->
+        <div id="fields-sweego" class="provider-fields box has-background-light mt-4 is-hidden">
+            <h4 class="title is-5">Sweego Settings</h4>
             <div class="field">
                 <label class="label">API Key</label>
                 <div class="control">
-                    <input class="input" type="password" name="sendgrid_api_key" value="{{ sendgrid_api_key }}" placeholder="SG.xxxxx">
+                    <input class="input" type="password" name="sweego_api_key" value="{{ sweego_api_key }}">
                 </div>
-                <p class="help">Get your API key from <a href="https://app.sendgrid.com/settings/api_keys" target="_blank">SendGrid Dashboard</a></p>
-            </div>
-        </div>
-
-        <!-- Mailgun Fields -->
-        <div id="fields-mailgun" class="provider-fields box has-background-light mt-4 is-hidden">
-            <h4 class="title is-5">Mailgun Settings</h4>
-            <div class="field">
-                <label class="label">API Key</label>
-                <div class="control">
-                    <input class="input" type="password" name="mailgun_api_key" value="{{ mailgun_api_key }}">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Domain</label>
-                <div class="control">
-                    <input class="input" type="text" name="mailgun_domain" value="{{ mailgun_domain }}" placeholder="mg.example.com">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Region</label>
-                <div class="control">
-                    <div class="select">
-                        <select name="mailgun_region">
-                            <option value="us" {% if mailgun_region == 'us' %}selected{% endif %}>US</option>
-                            <option value="eu" {% if mailgun_region == 'eu' %}selected{% endif %}>EU</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Amazon SES Fields -->
-        <div id="fields-ses" class="provider-fields box has-background-light mt-4 is-hidden">
-            <h4 class="title is-5">Amazon SES Settings</h4>
-            <div class="field">
-                <label class="label">Region</label>
-                <div class="control">
-                    <div class="select">
-                        <select name="ses_region">
-                            <option value="us-east-1" {% if ses_region == 'us-east-1' %}selected{% endif %}>US East (N. Virginia)</option>
-                            <option value="us-west-2" {% if ses_region == 'us-west-2' %}selected{% endif %}>US West (Oregon)</option>
-                            <option value="eu-west-1" {% if ses_region == 'eu-west-1' %}selected{% endif %}>EU (Ireland)</option>
-                            <option value="eu-central-1" {% if ses_region == 'eu-central-1' %}selected{% endif %}>EU (Frankfurt)</option>
-                            <option value="ap-southeast-1" {% if ses_region == 'ap-southeast-1' %}selected{% endif %}>Asia Pacific (Singapore)</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Access Key ID</label>
-                <div class="control">
-                    <input class="input" type="text" name="ses_access_key" value="{{ ses_access_key }}">
-                </div>
-            </div>
-            <div class="field">
-                <label class="label">Secret Access Key</label>
-                <div class="control">
-                    <input class="input" type="password" name="ses_secret_key" value="{{ ses_secret_key }}">
-                </div>
+                <p class="help">Create an API key in your <a href="https://app.sweego.io" target="_blank">Sweego account</a>. The admin send log then shows each mail's delivery status.</p>
             </div>
         </div>
 

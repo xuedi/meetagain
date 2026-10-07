@@ -4,6 +4,7 @@ namespace Module\Email\Tests\Unit\Internal\Delivery\Provider;
 
 use DateTimeImmutable;
 use Exception;
+use Generator;
 use Module\Email\Contract\DeliveryLogFilter;
 use Module\Email\Internal\Delivery\Provider\SweegoEmailDeliveryProvider;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -186,6 +187,24 @@ class SweegoEmailDeliveryProviderTest extends TestCase
 
         // Act / Assert
         static::assertTrue($provider->isAvailable());
+    }
+
+    #[DataProvider('foreignDsnProvider')]
+    public function testADsnForAnotherTransportIsNotClaimed(string $dsn): void
+    {
+        // Arrange
+        $provider = new SweegoEmailDeliveryProvider(new MockHttpClient(), new NullLogger(), $dsn);
+
+        // Act / Assert
+        static::assertFalse($provider->isAvailable());
+    }
+
+    public static function foreignDsnProvider(): Generator
+    {
+        yield 'smtp with a username' => ['smtp://mailer-user@smtp.example.com:587?encryption=tls'];
+        yield 'smtps with a username' => ['smtps://mailer-user@smtp.example.com:465'];
+        yield 'mailpit' => ['smtp://mailpit:1025'];
+        yield 'null transport' => ['null://null'];
     }
 
     public function testGetLogsReturnsEmptyCollectionWhenHttpThrows(): void
