@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Service\Security;
 
+use App\Form\HumanCheckType;
 use App\Service\Security\ChallengeSigner;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -24,6 +25,36 @@ final class ChallengeSignerTest extends TestCase
         static::assertNotNull($payload);
         static::assertSame(18, $payload['difficulty']);
         static::assertSame(32, strlen($payload['nonce']));
+    }
+
+    public function testAStampSignsTheNonceItWasGiven(): void
+    {
+        // Arrange
+        $signer = $this->signer();
+        $nonce = $signer->mintNonce();
+
+        // Act
+        $payload = $signer->verify($signer->issue(self::CONTEXT, 18, $nonce), self::CONTEXT);
+
+        // Assert
+        static::assertSame($nonce, $payload['nonce'] ?? null);
+    }
+
+    public function testTheFieldNameIsStablePerNonceAndDiffersAcrossNoncesAndSecrets(): void
+    {
+        // Arrange
+        $signer = $this->signer();
+        $foreign = new ChallengeSigner('another-secret', new ArrayAdapter(), new MockClock('2026-09-18 10:00:00'));
+        $nonce = $signer->mintNonce();
+
+        // Act
+        $name = $signer->fieldName($nonce);
+
+        // Assert
+        static::assertMatchesRegularExpression(HumanCheckType::HONEYPOT_PATTERN, $name);
+        static::assertSame($name, $signer->fieldName($nonce));
+        static::assertNotSame($name, $signer->fieldName($signer->mintNonce()));
+        static::assertNotSame($name, $foreign->fieldName($nonce));
     }
 
     public function testAStampIssuedForAnotherFormDoesNotVerify(): void

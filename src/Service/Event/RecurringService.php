@@ -7,16 +7,13 @@ use App\Entity\Event;
 use App\Entity\EventSeries;
 use App\Entity\EventTranslation;
 use App\EntityActionDispatcher;
-use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\CronTaskStatus;
 use App\Enum\EntityAction;
 use App\Enum\EventStatus;
 use App\Enum\RealignmentOutcome;
-use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
 use App\Repository\EventSeriesRepository;
 use App\Repository\RsvpGuestRepository;
-use App\Service\Cms\CmsService;
 use App\ValueObject\CronTaskResult;
 use App\ValueObject\RealignmentItem;
 use App\ValueObject\RealignmentPlan;
@@ -37,8 +34,6 @@ readonly class RecurringService implements CronTaskInterface
         private RsvpGuestRepository $rsvpGuestRepo,
         private EntityManagerInterface $em,
         private EntityActionDispatcher $entityActionDispatcher,
-        private CmsBlockRepository $cmsBlockRepository,
-        private CmsService $cmsService,
         private RecurrenceResolver $recurrenceResolver,
         private OccurrenceCalculator $calculator,
         private ClockInterface $clock,
@@ -69,12 +64,6 @@ readonly class RecurringService implements CronTaskInterface
             }
         }
 
-        if ($totalCreated > 0) {
-            foreach ($this->cmsBlockRepository->findPageIdsWithType(CmsBlockType::EventTeaser) as $pageId) {
-                $this->cmsService->invalidatePage($pageId);
-            }
-        }
-
         return $totalCreated;
     }
 
@@ -87,7 +76,7 @@ readonly class RecurringService implements CronTaskInterface
 
         $children = $this->repo->findFollowUpEvents(seriesId: (int) $series->getId(), greaterThan: $syncFrom ?? $event->getStart());
 
-        $updatedCount = 0;
+        $updatedIds = [];
         foreach ($children as $child) {
             if ($child->getId() === $event->getId()) {
                 continue; // the series-keyed query can return the anchor itself
@@ -101,11 +90,15 @@ readonly class RecurringService implements CronTaskInterface
                 $this->copyTranslation($eventTranslation, $child);
             }
             $this->em->persist($child);
-            ++$updatedCount;
+            $updatedIds[] = (int) $child->getId();
         }
         $this->em->flush();
 
-        return $updatedCount;
+        foreach ($updatedIds as $updatedId) {
+            $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $updatedId);
+        }
+
+        return count($updatedIds);
     }
 
     public function fillUntitledFollowers(Event $event): int
@@ -139,9 +132,6 @@ readonly class RecurringService implements CronTaskInterface
         $this->em->flush();
         foreach (array_keys($filled) as $childId) {
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $childId);
-        }
-        foreach ($this->cmsBlockRepository->findPageIdsWithType(CmsBlockType::EventTeaser) as $pageId) {
-            $this->cmsService->invalidatePage($pageId);
         }
 
         return count($filled);
@@ -253,12 +243,6 @@ readonly class RecurringService implements CronTaskInterface
 
         foreach ($movedIds as $movedId) {
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $movedId);
-        }
-
-        if ($movedIds !== []) {
-            foreach ($this->cmsBlockRepository->findPageIdsWithType(CmsBlockType::EventTeaser) as $pageId) {
-                $this->cmsService->invalidatePage($pageId);
-            }
         }
 
         return new RealignmentResult(count($movedIds), $removedAttendees);

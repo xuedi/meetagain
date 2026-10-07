@@ -18,9 +18,9 @@
 #}
 <div data-form-meta{% if form.vars.powEnabled %} data-form-meta-bits="{{ form.vars.powDifficulty }}" data-form-meta-worker="{{ asset('js/human-check-worker.js') }}"{% endif %}>
 
-    {% if form.reference is defined %}
+    {% if form.vars.honeypotField %}
         <div class="is-offscreen" aria-hidden="true">
-            {{ form_widget(form.reference) }}
+            {{ form_widget(form[form.vars.honeypotField]) }}
         </div>
     {% endif %}
 

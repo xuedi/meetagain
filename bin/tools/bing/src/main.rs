@@ -1,7 +1,8 @@
 // API reference: https://learn.microsoft.com/en-us/dotnet/api/microsoft.bing.webmaster.api.interfaces.iwebmasterapi
 // JSON endpoint base: https://ssl.bing.com/webmaster/api.svc/json/<MethodName>?apikey=<KEY>&...
 // Auth: single API key generated in the Bing Webmaster Tools UI under Settings -> API Access.
-// Verified endpoints: GetUserSites, GetFeeds, GetFeedDetails, GetQueryStats, GetPageStats, GetUrlInfo.
+// Verified endpoints: GetUserSites, GetFeeds, GetFeedDetails, GetQueryStats, GetPageStats, GetUrlInfo,
+// GetLinkCounts, GetUrlLinks.
 
 use std::collections::BTreeMap;
 use std::process::ExitCode;
@@ -13,6 +14,7 @@ const API_BASE: &str = "https://ssl.bing.com/webmaster/api.svc/json";
 // BWT exposes ~6 months of stats with no date params; we filter client-side.
 const MAX_DAYS: u32 = 200;
 const TOP_ROWS: usize = 50;
+const MAX_LINK_PAGES: u64 = 50;
 
 #[derive(Parser)]
 #[command(name = "bing", about = "Bing Webmaster Tools CLI")]
@@ -58,6 +60,15 @@ enum Command {
         #[arg(long)]
         site: Option<String>,
     },
+    /// Inbound links per page of the site, or the pages linking to one URL; exits non-zero when Bing refuses
+    Links {
+        /// Show the referring pages and anchor texts for this URL instead of the per-page counts
+        #[arg(long)]
+        url: Option<String>,
+        /// Override the default site
+        #[arg(long)]
+        site: Option<String>,
+    },
     /// Crawl-issues feed plus a recent crawl-stats summary; exits non-zero on dangerous signals
     Issues {
         /// How many recent days of crawl-stats to summarize
@@ -83,13 +94,43 @@ fn load_config() -> Config {
     }
 }
 
+// BWT answers a refused call (an unverified site, a bad key) with HTTP 400 and an ErrorCode body, so the
+// body is read whatever the status. Every message names the URL with the API key redacted.
 fn http_get(url: &str) -> Value {
-    ureq::get(url)
+    let mut response = ureq::get(url)
+        .config()
+        .http_status_as_error(false)
+        .build()
         .call()
-        .unwrap_or_else(|e| panic!("GET {} failed: {}", url, e))
+        .unwrap_or_else(|e| fail(&format!("GET {} failed: {}", redact_key(url), e)));
+    let status = response.status();
+    let body: Value = response
         .body_mut()
         .read_json()
-        .unwrap_or_else(|e| panic!("GET {} JSON parse failed: {}", url, e))
+        .unwrap_or_else(|e| fail(&format!("GET {} returned HTTP {} without JSON: {}", redact_key(url), status, e)));
+    if !status.is_success() {
+        match refusal(&body) {
+            Some(reason) => fail(&format!("Bing refused the call: {}", reason)),
+            None => fail(&format!("GET {} failed: HTTP {}", redact_key(url), status)),
+        }
+    }
+    body
+}
+
+fn fail(message: &str) -> ! {
+    eprintln!("{}", message);
+    std::process::exit(1);
+}
+
+fn redact_key(url: &str) -> String {
+    match url.find("apikey=") {
+        Some(start) => {
+            let value_start = start + "apikey=".len();
+            let value_end = url[value_start..].find('&').map(|i| value_start + i).unwrap_or(url.len());
+            format!("{}<redacted>{}", &url[..value_start], &url[value_end..])
+        }
+        None => url.to_string(),
+    }
 }
 
 // Percent-encode a value for safe substitution into a URL query parameter.
@@ -630,6 +671,83 @@ fn format_issues(issues: &Value, stats: &Value, days: u32) -> (String, bool) {
     (out, !danger)
 }
 
+// ---------- links ----------
+
+fn cmd_links(api_key: &str, site: &str, target: Option<&str>) -> ExitCode {
+    let (method, rows_key) = match target {
+        Some(_) => ("GetUrlLinks", "Details"),
+        None => ("GetLinkCounts", "Links"),
+    };
+    let mut rows: Vec<Value> = Vec::new();
+    let mut page: u64 = 0;
+    loop {
+        let mut url = format!(
+            "{}/{}?apikey={}&siteUrl={}&page={}",
+            API_BASE,
+            method,
+            url_encode(api_key),
+            url_encode(site),
+            page
+        );
+        if let Some(link) = target {
+            url.push_str(&format!("&link={}", url_encode(link)));
+        }
+        let data = http_get(&url);
+        let (page_rows, total_pages) = link_page(&data, rows_key);
+        rows.extend(page_rows);
+        page += 1;
+        if page >= total_pages.min(MAX_LINK_PAGES) {
+            break;
+        }
+    }
+    match target {
+        Some(link) => print!("{}", format_url_links(&rows, link)),
+        None => print!("{}", format_link_counts(&rows)),
+    }
+    ExitCode::SUCCESS
+}
+
+fn refusal(data: &Value) -> Option<String> {
+    let code = data.get("ErrorCode")?;
+    Some(format!("error code {} - {}", code, data["Message"].as_str().unwrap_or("no message")))
+}
+
+fn link_page(data: &Value, rows_key: &str) -> (Vec<Value>, u64) {
+    let inner = unwrap_d(data);
+    let rows = inner[rows_key].as_array().cloned().unwrap_or_default();
+    (rows, inner["TotalPages"].as_u64().unwrap_or(0))
+}
+
+fn format_link_counts(rows: &[Value]) -> String {
+    if rows.is_empty() {
+        return "No inbound links known to Bing.\n".to_string();
+    }
+    let mut sorted: Vec<&Value> = rows.iter().collect();
+    sorted.sort_by_key(|r| std::cmp::Reverse(r["Count"].as_i64().unwrap_or(0)));
+    let total: i64 = sorted.iter().map(|r| r["Count"].as_i64().unwrap_or(0)).sum();
+    let mut out = format!("{} inbound links to {} pages\n\n", total, sorted.len());
+    for r in sorted {
+        out.push_str(&format!("{:>6}  {}\n", r["Count"].as_i64().unwrap_or(0), r["Url"].as_str().unwrap_or("?")));
+    }
+    out
+}
+
+fn format_url_links(rows: &[Value], target: &str) -> String {
+    if rows.is_empty() {
+        return format!("No pages known to Bing link to {}.\n", target);
+    }
+    let mut out = format!("{} pages link to {}\n\n", rows.len(), target);
+    for r in rows {
+        let anchor = r["AnchorText"].as_str().unwrap_or("").trim();
+        out.push_str(&format!(
+            "{}\n    anchor: {}\n",
+            r["Url"].as_str().unwrap_or("?"),
+            if anchor.is_empty() { "(none)" } else { anchor }
+        ));
+    }
+    out
+}
+
 fn main() -> ExitCode {
     let cli = Cli::parse();
     let cfg = load_config();
@@ -648,6 +766,10 @@ fn main() -> ExitCode {
             let site_url = site.unwrap_or_else(|| cfg.default_site.clone());
             cmd_inspect(&cfg.api_key, &site_url, &url)
         }
+        Command::Links { url, site } => {
+            let site_url = site.unwrap_or_else(|| cfg.default_site.clone());
+            cmd_links(&cfg.api_key, &site_url, url.as_deref())
+        }
         Command::Issues { days, site } => {
             let site_url = site.unwrap_or_else(|| cfg.default_site.clone());
             cmd_issues(&cfg.api_key, &site_url, days)
@@ -658,6 +780,65 @@ fn main() -> ExitCode {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn link_counts_are_summed_and_sorted_by_count() {
+        // Arrange
+        let v: Value = serde_json::from_str(include_str!("../tests/fixtures/link_counts.json")).unwrap();
+        let (rows, total_pages) = link_page(&v, "Links");
+
+        // Act
+        let out = format_link_counts(&rows);
+
+        // Assert
+        assert_eq!(total_pages, 1);
+        assert!(out.starts_with("8 inbound links to 3 pages"));
+        let first = out.lines().nth(2).unwrap();
+        assert!(first.contains("https://meetagain.org/") && first.trim_start().starts_with('5'));
+    }
+
+    #[test]
+    fn link_counts_without_links_say_so() {
+        // Arrange
+        let v: Value = serde_json::from_str(r#"{"d":{"Links":[],"TotalPages":0}}"#).unwrap();
+        let (rows, total_pages) = link_page(&v, "Links");
+
+        // Act / Assert
+        assert_eq!(total_pages, 0);
+        assert_eq!(format_link_counts(&rows), "No inbound links known to Bing.\n");
+    }
+
+    #[test]
+    fn url_links_list_each_referring_page_with_its_anchor() {
+        // Arrange
+        let v: Value = serde_json::from_str(include_str!("../tests/fixtures/url_links.json")).unwrap();
+        let (rows, _) = link_page(&v, "Details");
+
+        // Act
+        let out = format_url_links(&rows, "https://meetagain.org/");
+
+        // Assert
+        assert!(out.starts_with("2 pages link to https://meetagain.org/"));
+        assert!(out.contains("anchor: MeetAgain"));
+        assert!(out.contains("anchor: (none)"));
+    }
+
+    #[test]
+    fn a_refused_call_is_reported_not_read_as_empty() {
+        // Arrange
+        let v: Value = serde_json::from_str(include_str!("../tests/fixtures/not_authorized.json")).unwrap();
+
+        // Act / Assert
+        assert_eq!(refusal(&v).as_deref(), Some("error code 14 - ERROR!!! NotAuthorized"));
+        assert_eq!(refusal(&serde_json::from_str::<Value>(r#"{"d":{"Links":[]}}"#).unwrap()), None);
+    }
+
+    #[test]
+    fn redact_key_hides_the_api_key_wherever_it_sits() {
+        assert_eq!(redact_key("https://x/GetFeeds?apikey=SECRET&siteUrl=a"), "https://x/GetFeeds?apikey=<redacted>&siteUrl=a");
+        assert_eq!(redact_key("https://x/GetUserSites?apikey=SECRET"), "https://x/GetUserSites?apikey=<redacted>");
+        assert_eq!(redact_key("https://x/no-key"), "https://x/no-key");
+    }
 
     #[test]
     fn url_encode_handles_bing_property_forms() {

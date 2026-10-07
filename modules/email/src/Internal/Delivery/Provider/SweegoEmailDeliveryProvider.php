@@ -25,7 +25,8 @@ final readonly class SweegoEmailDeliveryProvider implements DeliveryProviderInte
         string $mailerDsn,
     ) {
         $parsed = parse_url($mailerDsn);
-        $this->apiKey = urldecode($parsed['user'] ?? '');
+        $isSweego = str_starts_with((string) ($parsed['scheme'] ?? ''), 'sweego');
+        $this->apiKey = $isSweego ? urldecode($parsed['user'] ?? '') : '';
     }
 
     public function isAvailable(): bool

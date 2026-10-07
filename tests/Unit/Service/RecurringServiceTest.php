@@ -9,11 +9,9 @@ use App\Enum\EntityAction;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
 use App\Enum\RealignmentOutcome;
-use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
 use App\Repository\EventSeriesRepository;
 use App\Repository\RsvpGuestRepository;
-use App\Service\Cms\CmsService;
 use App\Service\Event\OccurrenceCalculator;
 use App\Service\Event\RecurrenceResolver;
 use App\Service\Event\RecurringService;
@@ -61,15 +59,14 @@ class RecurringServiceTest extends TestCase
         EntityManagerInterface $em,
         ?EventSeriesRepository $seriesRepo = null,
         string $now = self::NOW,
+        ?EntityActionDispatcher $dispatcher = null,
     ): RecurringService {
         return new RecurringService(
             repo: $repo,
             seriesRepo: $seriesRepo ?? $this->createStub(EventSeriesRepository::class),
             rsvpGuestRepo: $this->createStub(RsvpGuestRepository::class),
             em: $em,
-            entityActionDispatcher: $this->createStub(EntityActionDispatcher::class),
-            cmsBlockRepository: $this->createStub(CmsBlockRepository::class),
-            cmsService: $this->createStub(CmsService::class),
+            entityActionDispatcher: $dispatcher ?? $this->createStub(EntityActionDispatcher::class),
             recurrenceResolver: new RecurrenceResolver(),
             calculator: new OccurrenceCalculator(),
             clock: new MockClock(new DateTimeImmutable($now)),
@@ -178,6 +175,39 @@ class RecurringServiceTest extends TestCase
 
         // Assert
         static::assertSame(0, $result);
+    }
+
+    public function testUpdateRecurringEventsDispatchesAnUpdateForEachSyncedFollower(): void
+    {
+        // Arrange
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
+
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$anchor, $this->makeEvent(2, EventStatus::Locked), $this->makeEvent(3), $this->makeEvent(4)]);
+
+        $dispatched = [];
+        $dispatcher = $this->createMock(EntityActionDispatcher::class);
+        $dispatcher
+            ->expects($this->exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(static function (EntityAction $action, int $id) use (&$dispatched): void {
+                $dispatched[] = [$action, $id];
+            });
+
+        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class), dispatcher: $dispatcher);
+
+        // Act
+        $service->updateRecurringEvents($anchor);
+
+        // Assert
+        static::assertSame(
+            [
+                [EntityAction::UpdateEvent, 3],
+                [EntityAction::UpdateEvent, 4],
+            ],
+            $dispatched,
+        );
     }
 
     public function testUpdateRecurringEventsMixedFollowUpsSkipsLockedReturnsTwoUpdated(): void
@@ -857,8 +887,6 @@ class RecurringServiceTest extends TestCase
             rsvpGuestRepo: $this->createStub(RsvpGuestRepository::class),
             em: $this->createStub(EntityManagerInterface::class),
             entityActionDispatcher: $dispatcher,
-            cmsBlockRepository: $this->createStub(CmsBlockRepository::class),
-            cmsService: $this->createStub(CmsService::class),
             recurrenceResolver: new RecurrenceResolver(),
             calculator: new OccurrenceCalculator(),
             clock: new MockClock(new DateTimeImmutable(self::NOW)),

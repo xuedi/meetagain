@@ -21,10 +21,15 @@ readonly class ChallengeSigner
         private ClockInterface $clock,
     ) {}
 
-    public function issue(string $context, int $difficulty): string
+    public function mintNonce(): string
+    {
+        return bin2hex(random_bytes(16));
+    }
+
+    public function issue(string $context, int $difficulty, ?string $nonce = null): string
     {
         $encoded = $this->encode([
-            'n' => bin2hex(random_bytes(16)),
+            'n' => $nonce ?? $this->mintNonce(),
             't' => $this->nowMs(),
             'd' => $difficulty,
             'c' => $context,
@@ -64,6 +69,11 @@ readonly class ChallengeSigner
         });
 
         return $fresh;
+    }
+
+    public function fieldName(string $nonce): string
+    {
+        return 'f_' . substr($this->sign('field.' . $nonce), 0, 8);
     }
 
     public function isProofValid(string $nonce, string $proof, int $difficulty): bool

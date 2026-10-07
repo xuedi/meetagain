@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Service;
 
+use App\Entity\BlockType\EventTeaser;
+use App\Entity\BlockType\Text;
 use App\Entity\Cms;
 use App\Filter\Cms\CmsFilterResult;
 use App\Filter\Cms\CmsFilterService;
@@ -12,6 +14,8 @@ use App\Service\Cms\CmsService;
 use DateInterval;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -140,14 +144,17 @@ class CmsServiceTest extends TestCase
         static::assertSame(Response::HTTP_NO_CONTENT, $response->getStatusCode());
     }
 
-    public function testHandleReturns200WithContentWhenPageExists(): void
+    /**
+     * @param list<string> $expectedTags
+     */
+    #[DataProvider('cachedPageTagsProvider')]
+    public function testHandleReturns200AndTagsTheCachedBody(ArrayCollection $blocks, array $expectedTags): void
     {
         // Arrange
         $locale = 'en';
         $slug = 'existing-page';
         $pageTitle = 'Page Title';
         $expectedContent = 'rendered page content';
-        $blocks = new ArrayCollection(['block1', 'block2']);
 
         $cmsMock = $this->createMock(Cms::class);
         $cmsMock->expects($this->once())->method('getLanguageFilteredBlockJsonList')->with($locale)->willReturn($blocks);
@@ -263,7 +270,31 @@ class CmsServiceTest extends TestCase
         static::assertSame(Response::HTTP_OK, $response->getStatusCode());
         static::assertNotNull($capturedKey);
         static::assertStringStartsWith('cms_page.123.', $capturedKey);
-        static::assertSame(['cms_page_123', 'cms_page_all'], $capturedTags);
+        static::assertSame($expectedTags, $capturedTags);
+    }
+
+    public static function cachedPageTagsProvider(): Generator
+    {
+        yield 'a page without an event teaser' => [
+            new ArrayCollection([self::textBlock(), self::textBlock()]),
+            ['cms_page_123', 'cms_page_all'],
+        ];
+        yield 'a page with an event teaser' => [
+            new ArrayCollection([self::textBlock(), EventTeaser::fromJson(['headline' => 'Next up', 'text' => ''])]),
+            ['cms_page_123', 'cms_page_all', 'cms_event_teaser'],
+        ];
+    }
+
+    public function testInvalidateEventTeasersInvalidatesTheTeaserTag(): void
+    {
+        // Arrange
+        $cacheMock = $this->createMock(TagAwareCacheInterface::class);
+        $cacheMock->expects($this->once())->method('invalidateTags')->with(['cms_event_teaser']);
+
+        $subject = $this->createServiceWithCache($cacheMock);
+
+        // Act
+        $subject->invalidateEventTeasers();
     }
 
     public function testHandleUsesDefaultTitleWhenPageTitleIsNull(): void
@@ -272,7 +303,7 @@ class CmsServiceTest extends TestCase
         $locale = 'en';
         $slug = 'page-without-title';
         $expectedContent = 'rendered page content';
-        $blocks = new ArrayCollection(['block1']);
+        $blocks = new ArrayCollection([self::textBlock()]);
 
         // Arrange
         $cmsStub = $this->createStub(Cms::class);
@@ -394,7 +425,7 @@ class CmsServiceTest extends TestCase
         $cmsStub = $this->createStub(Cms::class);
         $cmsStub->method('getId')->willReturn(42);
         $cmsStub->method('getPageTitle')->willReturn('About');
-        $cmsStub->method('getLanguageFilteredBlockJsonList')->willReturn(new ArrayCollection(['block']));
+        $cmsStub->method('getLanguageFilteredBlockJsonList')->willReturn(new ArrayCollection([self::textBlock()]));
 
         $cmsRepoStub = $this->createStub(CmsRepository::class);
         $cmsRepoStub->method('findPublishedBySlug')->willReturn($cmsStub);
@@ -487,6 +518,11 @@ class CmsServiceTest extends TestCase
             translator: new IdentityTranslator(),
             requestStack: $this->createStub(RequestStack::class),
         );
+    }
+
+    private static function textBlock(): Text
+    {
+        return Text::fromJson(['content' => 'Body']);
     }
 
     private static function createCacheItem(): ItemInterface

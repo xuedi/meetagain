@@ -128,7 +128,7 @@ reporter cannot disagree. With none available, the send log hides its sync butto
 | Provider                       | Claims when `MAILER_DSN` is          | Reports                                                  |
 |--------------------------------|--------------------------------------|----------------------------------------------------------|
 | `MailpitEmailDeliveryProvider` | `smtp://mailpit:...` (the dev stack) | `delivered` for anything Mailpit holds, `null` otherwise |
-| `SweegoEmailDeliveryProvider`  | carrying an API key in its user part | the provider's status, bounce type and mailbox provider  |
+| `SweegoEmailDeliveryProvider`  | a `sweego*` scheme with an API key   | the provider's status, bounce type and mailbox provider  |
 
 ## The contract
 

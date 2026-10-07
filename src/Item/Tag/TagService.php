@@ -421,7 +421,7 @@ readonly class TagService implements ActionInterface
         }
         foreach ($tags as $tag) {
             $parentId = $tag->getParent()?->getId();
-            $children[isset($present[$parentId]) ? (int) $parentId : 0][] = $tag;
+            $children[$parentId !== null && isset($present[$parentId]) ? $parentId : 0][] = $tag;
         }
 
         $ordered = [];

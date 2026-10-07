@@ -37,9 +37,7 @@ class MailProviderRegistry
 
         $registry->register(new MailpitMailProvider());
         $registry->register(new SmtpMailProvider());
-        $registry->register(new SendgridMailProvider());
-        $registry->register(new MailgunMailProvider());
-        $registry->register(new SesMailProvider());
+        $registry->register(new SweegoMailProvider());
         $registry->register(new NullMailProvider());
 
         return $registry;

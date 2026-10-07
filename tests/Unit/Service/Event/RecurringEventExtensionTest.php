@@ -7,11 +7,9 @@ use App\Entity\EventTranslation;
 use App\EntityActionDispatcher;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
-use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
 use App\Repository\EventSeriesRepository;
 use App\Repository\RsvpGuestRepository;
-use App\Service\Cms\CmsService;
 use App\Service\Event\OccurrenceCalculator;
 use App\Service\Event\RecurrenceResolver;
 use App\Service\Event\RecurringService;
@@ -59,8 +57,6 @@ class RecurringEventExtensionTest extends TestCase
             rsvpGuestRepo: $this->createStub(RsvpGuestRepository::class),
             em: $em,
             entityActionDispatcher: $this->createStub(EntityActionDispatcher::class),
-            cmsBlockRepository: $this->createStub(CmsBlockRepository::class),
-            cmsService: $this->createStub(CmsService::class),
             recurrenceResolver: new RecurrenceResolver(),
             calculator: new OccurrenceCalculator(),
             clock: new MockClock(new DateTimeImmutable($now)),

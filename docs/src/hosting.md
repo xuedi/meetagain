@@ -8,7 +8,8 @@ For the local development environment, see [Getting Started](getting-started.md)
 
 ## Requirements
 
-- **PHP 8.4** with extensions: `gd`, `pdo_mysql`, `intl`, `redis`, `imagick`, `opcache`, `zip`
+- **PHP 8.4 or newer** (the Docker image runs 8.5) with extensions: `gd`, `pdo_mysql`, `intl`, `redis`, `imagick`,
+  `opcache`, `sodium`, `zip`
 - **MariaDB 10.6+**
 - **Redis or Valkey** (session and application cache)
 - Writable `var/` and `data/` directories (owned by the PHP process user)
@@ -72,7 +73,12 @@ APP_SECRET=<random 32-character string>
 DATABASE_URL=mysql://user:password@127.0.0.1:3306/meetagain
 MAILER_DSN=smtp://user:password@smtp.example.com:587
 REDIS_URL=redis://127.0.0.1:6379
+APP_SECRET_BOX_KEY=<base64-encoded 32-byte key>
 ```
+
+`APP_SECRET_BOX_KEY` encrypts stored secrets such as plugin API keys. Generate your own with
+`php -r 'echo base64_encode(random_bytes(32)), PHP_EOL;'` - never keep the value from `.env.dist`, which is public.
+Keep it stable afterwards: secrets stored under one key cannot be read with another.
 
 Optionally, set `METRICS_DSN` to send runtime metrics to a VictoriaMetrics collector. See
 [Metrics](core-development/metrics.md).
@@ -132,5 +138,5 @@ WantedBy = timers.target
 
 The PHP process user must have write access to:
 
-- `var/` — Symfony cache and logs
-- `data/images/` — user-uploaded images
+- `var/` - Symfony cache and logs
+- `data/images/` - user-uploaded images
