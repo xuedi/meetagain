@@ -29,6 +29,26 @@ class UserStatusTest extends TestCase
         yield 'denied' => [UserStatus::Denied, 'admin_member.status_denied'];
     }
 
+    #[DataProvider('provideTagVariantCases')]
+    public function testTagVariantReturnsBulmaModifier(UserStatus $status, string $expected): void
+    {
+        // Act
+        $actual = $status->tagVariant();
+
+        // Assert
+        static::assertSame($expected, $actual);
+    }
+
+    public static function provideTagVariantCases(): iterable
+    {
+        yield 'registered' => [UserStatus::Registered, 'is-light'];
+        yield 'email_verified' => [UserStatus::EmailVerified, 'is-warning'];
+        yield 'active' => [UserStatus::Active, 'is-success'];
+        yield 'blocked' => [UserStatus::Blocked, 'is-danger'];
+        yield 'deleted' => [UserStatus::Deleted, 'is-light'];
+        yield 'denied' => [UserStatus::Denied, 'is-danger'];
+    }
+
     public function testGetChoicesReturnsAllCasesKeyedByTranslationKey(): void
     {
         // Arrange
