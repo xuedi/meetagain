@@ -3,16 +3,21 @@
 namespace Module\Suggestion\Tests\Functional;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Email\Contract\SendlogInterface;
 use Module\Suggestion\Contract\PortableSuggestion;
 use Module\Suggestion\Contract\Status;
 use Module\Suggestion\Contract\SuggestionInterface;
+use Module\Suggestion\Internal\Emails\Approved;
+use Module\Suggestion\Internal\Emails\Rejected;
 use Module\Suggestion\Internal\Entity\Suggestion;
 use Module\Suggestion\Internal\SuggestionException;
 use Module\Suggestion\Internal\SuggestionService;
 use Module\Suggestion\Tests\Stub\Draft;
 use Module\Suggestion\Tests\Stub\InactivePluginTarget;
+use Module\Suggestion\Tests\Stub\Scope;
 use Module\Suggestion\Tests\Stub\Target;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Tests\Module\Members;
 
 final class LifecycleTest extends KernelTestCase
@@ -65,7 +70,7 @@ final class LifecycleTest extends KernelTestCase
         $createdId = $service->approve($this->stored($id), $this->draft('Cafe Central'), $reviewer);
 
         // Assert
-        self::assertSame([['name' => 'Cafe Central', 'proposerId' => (int) $proposer->getId()]], $this->target()->created);
+        self::assertSame([['name' => 'Cafe Central', 'proposerId' => (int) $proposer->getId(), 'scope' => null]], $this->target()->created);
         $view = $this->suggestions()->find($id);
         self::assertSame(Status::Approved, $view?->status);
         self::assertSame($createdId, $view->createdId);
@@ -128,6 +133,108 @@ final class LifecycleTest extends KernelTestCase
         self::assertNull($view->createdId);
     }
 
+    public function testAScopedSuggestionIsReviewableOnlyByReviewersOfItsScope(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $proposer = $this->members()->member('Proposer');
+        $insider = $this->members()->member('Insider');
+        $outsider = $this->members()->member('Outsider');
+        $this->target()->reviewerIds = [(int) $insider->getId(), (int) $outsider->getId()];
+        $this->target()->reviewerScopes = [(int) $insider->getId() => 'here', (int) $outsider->getId() => 'elsewhere'];
+        $this->scope()->current = 'here';
+        $this->suggestions()->propose(Target::TYPE, (int) $proposer->getId(), $this->draft('Cafe'));
+        $this->scope()->current = null;
+        $service = $this->service();
+
+        // Act
+        $insiderSees = $service->pendingReviewableBy($insider);
+        $outsiderSees = $service->pendingReviewableBy($outsider);
+
+        // Assert
+        self::assertCount(1, $insiderSees);
+        self::assertSame('here', $insiderSees[0]->getScope());
+        self::assertSame([], $outsiderSees);
+    }
+
+    public function testApprovingAScopedSuggestionCreatesTheRowInItsScope(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $proposer = $this->members()->member('Proposer');
+        $reviewer = $this->members()->member('Reviewer');
+        $this->target()->reviewerIds = [(int) $reviewer->getId()];
+        $this->target()->reviewerScopes = [(int) $reviewer->getId() => 'here'];
+        $this->scope()->current = 'here';
+        $this->suggestions()->propose(Target::TYPE, (int) $proposer->getId(), $this->draft('Cafe'));
+        $id = $this->suggestions()->pendingFor((int) $proposer->getId(), Target::TYPE)[0]->id;
+        $this->scope()->current = null;
+
+        // Act
+        $this->service()->approve($this->stored($id), $this->draft('Cafe'), $reviewer);
+
+        // Assert
+        self::assertSame('here', $this->target()->created[0]['scope']);
+        self::assertNull($this->scope()->current);
+    }
+
+    public function testRejectingAScopedSuggestionIsDeniedOutsideItsScope(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $proposer = $this->members()->member('Proposer');
+        $outsider = $this->members()->member('Outsider');
+        $this->target()->reviewerIds = [(int) $outsider->getId()];
+        $this->target()->reviewerScopes = [(int) $outsider->getId() => 'elsewhere'];
+        $this->scope()->current = 'here';
+        $this->suggestions()->propose(Target::TYPE, (int) $proposer->getId(), $this->draft('Cafe'));
+        $id = $this->suggestions()->pendingFor((int) $proposer->getId(), Target::TYPE)[0]->id;
+        $this->scope()->current = null;
+
+        // Assert
+        $this->expectException(AccessDeniedException::class);
+
+        // Act
+        $this->service()->reject($this->stored($id), $outsider);
+    }
+
+    public function testApprovalMailsTheProposer(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $proposer = $this->members()->member('Proposer');
+        $reviewer = $this->members()->member('Reviewer');
+        $this->target()->reviewerIds = [(int) $reviewer->getId()];
+        $this->suggestions()->propose(Target::TYPE, (int) $proposer->getId(), $this->draft('Cafe'));
+        $id = $this->suggestions()->pendingFor((int) $proposer->getId(), Target::TYPE)[0]->id;
+
+        // Act
+        $this->service()->approve($this->stored($id), $this->draft('Cafe'), $reviewer);
+
+        // Assert
+        $mails = $this->sendlog()->list(recipient: (string) $proposer->getEmail(), template: Approved::IDENTIFIER);
+        self::assertCount(1, $mails);
+        self::assertSame('Stub Cafe', $mails[0]->context['description'] ?? null);
+    }
+
+    public function testRejectionMailsTheProposer(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $proposer = $this->members()->member('Proposer');
+        $reviewer = $this->members()->member('Reviewer');
+        $this->target()->reviewerIds = [(int) $reviewer->getId()];
+        $this->suggestions()->propose(Target::TYPE, (int) $proposer->getId(), $this->draft('Cafe'));
+        $id = $this->suggestions()->pendingFor((int) $proposer->getId(), Target::TYPE)[0]->id;
+
+        // Act
+        $this->service()->reject($this->stored($id), $reviewer);
+
+        // Assert
+        self::assertCount(1, $this->sendlog()->list(recipient: (string) $proposer->getEmail(), template: Rejected::IDENTIFIER));
+        self::assertSame([], $this->sendlog()->list(recipient: (string) $proposer->getEmail(), template: Approved::IDENTIFIER));
+    }
+
     private function draft(string $name): Draft
     {
         $draft = new Draft();
@@ -154,6 +261,16 @@ final class LifecycleTest extends KernelTestCase
     private function service(): SuggestionService
     {
         return self::getContainer()->get(SuggestionService::class);
+    }
+
+    private function sendlog(): SendlogInterface
+    {
+        return self::getContainer()->get(SendlogInterface::class);
+    }
+
+    private function scope(): Scope
+    {
+        return self::getContainer()->get(Scope::class);
     }
 
     private function target(): Target

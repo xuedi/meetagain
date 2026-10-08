@@ -13,6 +13,7 @@ final class PermissionAttribute
     public const string EVENT_IMAGE_UPLOAD = 'event.image.upload';
     public const string EVENT_IMAGE_DELETE = 'event.image.delete';
 
+    public const string EVENT_PROPOSE = 'event.propose';
     public const string EVENT_CREATE = 'event.create';
     public const string EVENT_UPDATE = 'event.update';
     public const string EVENT_CANCEL = 'event.cancel';

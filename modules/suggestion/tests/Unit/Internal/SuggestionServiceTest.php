@@ -12,6 +12,8 @@ use Module\Suggestion\Contract\TargetProviderInterface;
 use Module\Suggestion\Internal\Activity\Approved;
 use Module\Suggestion\Internal\Activity\Created;
 use Module\Suggestion\Internal\Activity\Rejected;
+use Module\Suggestion\Internal\Emails\Approved as ApprovedEmail;
+use Module\Suggestion\Internal\Emails\Rejected as RejectedEmail;
 use Module\Suggestion\Internal\Entity\Suggestion;
 use Module\Suggestion\Internal\Registry;
 use Module\Suggestion\Internal\Repository\SuggestionRepository;
@@ -212,7 +214,14 @@ class SuggestionServiceTest extends TestCase
         $repo = $this->createStub(SuggestionRepository::class);
         $repo->method('findPending')->willReturn([$reviewable, $foreign]);
 
-        $service = new SuggestionService($this->createStub(EntityManagerInterface::class), $repo, $registry, $this->createStub(ActivityService::class));
+        $service = new SuggestionService(
+            $this->createStub(EntityManagerInterface::class),
+            $repo,
+            $registry,
+            $this->createStub(ActivityService::class),
+            $this->createStub(ApprovedEmail::class),
+            $this->createStub(RejectedEmail::class),
+        );
 
         // Act
         $result = $service->pendingReviewableBy($this->user(9));
@@ -309,6 +318,8 @@ class SuggestionServiceTest extends TestCase
             $repo ?? $this->createStub(SuggestionRepository::class),
             $registry,
             $activity ?? $this->createStub(ActivityService::class),
+            $this->createStub(ApprovedEmail::class),
+            $this->createStub(RejectedEmail::class),
         );
     }
 

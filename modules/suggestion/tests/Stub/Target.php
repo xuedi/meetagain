@@ -15,8 +15,15 @@ class Target implements TargetProviderInterface
     /** @var list<int> */
     public array $reviewerIds = [];
 
-    /** @var list<array{name: string, proposerId: int}> */
+    /** @var array<int, string> */
+    public array $reviewerScopes = [];
+
+    /** @var list<array{name: string, proposerId: int, scope: ?string}> */
     public array $created = [];
+
+    public function __construct(
+        private readonly Scope $scope,
+    ) {}
 
     #[Override]
     public function getPluginKey(): string
@@ -84,7 +91,11 @@ class Target implements TargetProviderInterface
     #[Override]
     public function canReview(int $userId): bool
     {
-        return in_array($userId, $this->reviewerIds, true);
+        if (!in_array($userId, $this->reviewerIds, true)) {
+            return false;
+        }
+
+        return !isset($this->reviewerScopes[$userId]) || $this->reviewerScopes[$userId] === $this->scope->current;
     }
 
     #[Override]
@@ -96,7 +107,7 @@ class Target implements TargetProviderInterface
     #[Override]
     public function create(object $draft, int $proposerId): int
     {
-        $this->created[] = ['name' => $this->draft($draft)->name, 'proposerId' => $proposerId];
+        $this->created[] = ['name' => $this->draft($draft)->name, 'proposerId' => $proposerId, 'scope' => $this->scope->current];
 
         return 1000 + count($this->created);
     }

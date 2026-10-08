@@ -865,6 +865,26 @@ location:
     validator_blank: 'Dieses Feld darf nicht leer sein.'
     validator_unknown_field: 'Dieses Feld gehört nicht zu einem Ort.'
 
+event_proposal:
+    type_label: 'Veranstaltung'
+    suggestion_description: '%title% am %date%'
+    form_label_title: 'Titel'
+    form_label_start: 'Beginn'
+    form_label_stop: 'Ende'
+    form_label_type: 'Art'
+    form_placeholder_type: 'Art wählen'
+    form_label_location: 'Ort'
+    form_placeholder_location: 'Noch offen'
+    form_label_teaser: 'Kurztext'
+    form_label_description: 'Beschreibung'
+    summary_language: 'Sprache'
+    type_regular: 'Regulär'
+    type_outdoor: 'Draußen'
+    type_dinner: 'Essen'
+    validator_incomplete: 'Eine Veranstaltung braucht einen Titel, eine Beschreibung und einen Beginn.'
+    validator_start_past: 'Die Veranstaltung muss in der Zukunft beginnen.'
+    validator_stop_before_start: 'Die Veranstaltung muss nach ihrem Beginn enden.'
+
 contribution:
     page_title: 'Mithelfen'
     section_venues: 'Orte'

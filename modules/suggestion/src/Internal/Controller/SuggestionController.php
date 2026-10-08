@@ -27,7 +27,7 @@ final class SuggestionController extends AbstractController
     {
         $suggestion = $this->visibleSuggestion($id, $user);
 
-        return $this->renderDetail($suggestion, $user, $this->buildForm($suggestion));
+        return $this->service->inScope($suggestion, fn(): Response => $this->renderDetail($suggestion, $user, $this->buildForm($suggestion)));
     }
 
     #[Route('/approve', name: 'app_review_suggestion_approve', methods: ['POST'])]
@@ -38,23 +38,7 @@ final class SuggestionController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $form = $this->buildForm($suggestion);
-        $form->handleRequest($request);
-        if (!$form->isSubmitted() || !$form->isValid()) {
-            return $this->renderDetail($suggestion, $user, $form);
-        }
-
-        try {
-            $this->service->approve($suggestion, $form->getData(), $user);
-        } catch (SuggestionException $e) {
-            $this->addFlash('error', $e->getMessage());
-
-            return $this->renderDetail($suggestion, $user, $form);
-        }
-
-        $this->addFlash('success', 'review_suggestion.flash_approved');
-
-        return $this->redirectToRoute('app_profile_review');
+        return $this->service->inScope($suggestion, fn(): Response => $this->approveSubmitted($request, $suggestion, $user));
     }
 
     #[Route('/reject', name: 'app_review_suggestion_reject', methods: ['POST'])]
@@ -87,6 +71,27 @@ final class SuggestionController extends AbstractController
         return $this->redirectToRoute('app_review_suggestion', ['id' => $id]);
     }
 
+    private function approveSubmitted(Request $request, Suggestion $suggestion, User $user): Response
+    {
+        $form = $this->buildForm($suggestion);
+        $form->handleRequest($request);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return $this->renderDetail($suggestion, $user, $form);
+        }
+
+        try {
+            $this->service->approve($suggestion, $form->getData(), $user);
+        } catch (SuggestionException $e) {
+            $this->addFlash('error', $e->getMessage());
+
+            return $this->renderDetail($suggestion, $user, $form);
+        }
+
+        $this->addFlash('success', 'review_suggestion.flash_approved');
+
+        return $this->redirectToRoute('app_profile_review');
+    }
+
     private function guardedSuggestion(Request $request, int $id, User $user): Suggestion
     {
         if (!$this->isCsrfTokenValid('suggestion' . $id, $request->request->getString('_token'))) {
@@ -114,7 +119,7 @@ final class SuggestionController extends AbstractController
 
     private function canReview(Suggestion $suggestion, User $user): bool
     {
-        return $this->service->canReviewTargetType($suggestion->getTargetType(), $user);
+        return $this->service->canReview($suggestion, $user);
     }
 
     private function isProposer(Suggestion $suggestion, User $user): bool

@@ -7,6 +7,8 @@ profile_social:
     activity_suggestion_rejected: 'Rejected the suggestion: %target%'
 
 review_suggestion:
+    trigger_approved: 'when a suggestion is approved'
+    trigger_rejected: 'when a suggestion is rejected'
     page_title: 'Suggestion'
     submitted_by: '%proposer% suggested a new %type%'
     intro: 'Correct anything that needs fixing, then save and approve.'

@@ -865,6 +865,26 @@ location:
     validator_blank: '此项不能为空。'
     validator_unknown_field: '该字段不属于场地。'
 
+event_proposal:
+    type_label: '活动'
+    suggestion_description: '%title%（%date%）'
+    form_label_title: '标题'
+    form_label_start: '开始'
+    form_label_stop: '结束'
+    form_label_type: '类型'
+    form_placeholder_type: '选择类型'
+    form_label_location: '地点'
+    form_placeholder_location: '尚未确定'
+    form_label_teaser: '简介'
+    form_label_description: '描述'
+    summary_language: '语言'
+    type_regular: '常规'
+    type_outdoor: '户外'
+    type_dinner: '聚餐'
+    validator_incomplete: '活动需要标题、描述和开始时间。'
+    validator_start_past: '活动的开始时间必须在未来。'
+    validator_stop_before_start: '活动的结束时间必须晚于开始时间。'
+
 contribution:
     page_title: '帮忙纠错'
     section_venues: '场地'

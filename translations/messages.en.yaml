@@ -875,6 +875,26 @@ location:
     validator_blank: 'This field cannot be empty.'
     validator_unknown_field: 'That field does not belong to a venue.'
 
+event_proposal:
+    type_label: 'Event'
+    suggestion_description: '%title% on %date%'
+    form_label_title: 'Title'
+    form_label_start: 'Start'
+    form_label_stop: 'End'
+    form_label_type: 'Type'
+    form_placeholder_type: 'Choose a type'
+    form_label_location: 'Venue'
+    form_placeholder_location: 'Not decided yet'
+    form_label_teaser: 'Teaser'
+    form_label_description: 'Description'
+    summary_language: 'Language'
+    type_regular: 'Regular'
+    type_outdoor: 'Outdoor'
+    type_dinner: 'Dinner'
+    validator_incomplete: 'An event needs a title, a description and a start.'
+    validator_start_past: 'The event has to start in the future.'
+    validator_stop_before_start: 'The event has to end after it starts.'
+
 contribution:
     page_title: 'Help fix things'
     section_venues: 'Venues'

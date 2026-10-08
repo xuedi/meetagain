@@ -68,7 +68,7 @@ final class ReviewPageTest extends WebTestCase
 
         // Assert
         self::assertResponseRedirects();
-        self::assertSame([['name' => 'Edited', 'proposerId' => (int) $proposer->getId()]], $target->created);
+        self::assertSame([['name' => 'Edited', 'proposerId' => (int) $proposer->getId(), 'scope' => null]], $target->created);
         self::assertSame(Status::Approved, $this->suggestions($client)->find($id)?->status);
     }
 

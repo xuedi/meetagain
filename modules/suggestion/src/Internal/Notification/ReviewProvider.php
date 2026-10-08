@@ -47,7 +47,7 @@ readonly class ReviewProvider implements ReviewNotificationProviderInterface
     public function approveItem(User $user, string $itemId): void
     {
         $suggestion = $this->pendingSuggestion($itemId);
-        $this->service->approve($suggestion, $this->service->draftFor($suggestion), $user);
+        $this->service->inScope($suggestion, fn(): int => $this->service->approve($suggestion, $this->service->draftFor($suggestion), $user));
     }
 
     public function denyItem(User $user, string $itemId): void

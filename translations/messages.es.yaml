@@ -875,6 +875,26 @@ location:
     validator_blank: 'Este campo no puede estar vacío.'
     validator_unknown_field: 'Ese campo no pertenece a un lugar.'
 
+event_proposal:
+    type_label: 'Evento'
+    suggestion_description: '%title% el %date%'
+    form_label_title: 'Título'
+    form_label_start: 'Inicio'
+    form_label_stop: 'Fin'
+    form_label_type: 'Tipo'
+    form_placeholder_type: 'Elige un tipo'
+    form_label_location: 'Lugar'
+    form_placeholder_location: 'Aún sin decidir'
+    form_label_teaser: 'Resumen'
+    form_label_description: 'Descripción'
+    summary_language: 'Idioma'
+    type_regular: 'Normal'
+    type_outdoor: 'Al aire libre'
+    type_dinner: 'Cena'
+    validator_incomplete: 'Un evento necesita un título, una descripción y un inicio.'
+    validator_start_past: 'El evento tiene que empezar en el futuro.'
+    validator_stop_before_start: 'El evento tiene que terminar después de empezar.'
+
 contribution:
     page_title: 'Ayuda a corregir'
     section_venues: 'Lugares'

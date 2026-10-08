@@ -7,6 +7,8 @@ profile_social:
     activity_suggestion_rejected: '拒绝了建议：%target%'
 
 review_suggestion:
+    trigger_approved: '提议获批准时'
+    trigger_rejected: '提议被拒绝时'
     page_title: '建议'
     submitted_by: '%proposer% 建议新增%type%'
     intro: '修正需要调整的内容，然后保存并通过。'

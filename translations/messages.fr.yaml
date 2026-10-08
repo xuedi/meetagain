@@ -875,6 +875,26 @@ location:
     validator_blank: 'Ce champ ne peut pas être vide.'
     validator_unknown_field: 'Ce champ n''appartient pas à un lieu.'
 
+event_proposal:
+    type_label: 'Événement'
+    suggestion_description: '%title% le %date%'
+    form_label_title: 'Titre'
+    form_label_start: 'Début'
+    form_label_stop: 'Fin'
+    form_label_type: 'Type'
+    form_placeholder_type: 'Choisir un type'
+    form_label_location: 'Lieu'
+    form_placeholder_location: 'Pas encore décidé'
+    form_label_teaser: 'Accroche'
+    form_label_description: 'Description'
+    summary_language: 'Langue'
+    type_regular: 'Régulier'
+    type_outdoor: 'En plein air'
+    type_dinner: 'Dîner'
+    validator_incomplete: 'Un événement a besoin d''un titre, d''une description et d''un début.'
+    validator_start_past: 'L''événement doit commencer dans le futur.'
+    validator_stop_before_start: 'L''événement doit se terminer après son début.'
+
 contribution:
     page_title: 'Aider à corriger'
     section_venues: 'Lieux'
