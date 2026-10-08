@@ -142,6 +142,10 @@ security:
     label_password: 'Mot de passe'
     label_agree_terms: 'J''accepte les conditions'
 events:
+    button_new_event: 'Nouvel événement'
+    button_suggest_event: 'Proposer un événement'
+    link_edit_event: 'Modifier cet événement'
+    link_correct_event: 'Proposer une correction pour cet événement'
     page_title_event: 'Événements'
     page_title_featured: 'Événements à la une'
     button_featured: 'À la une'

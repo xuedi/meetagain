@@ -18,7 +18,16 @@
     </div>
 {% endfor %}
 <div class="box mt-5">
-    <strong>{{ event.start|date('d. F Y') }}</strong>
+    <div class="level is-mobile mb-0">
+        <div class="level-left">
+            <strong>{{ event.start|date('d. F Y') }}</strong>
+        </div>
+        {% if editLink %}
+            <div class="level-right">
+                {% include 'events/_partials/edit_icon.html.twig' with {link: editLink, sizeClass: ''} only %}
+            </div>
+        {% endif %}
+    </div>
     <p>
         {{ 'events.time_range'|trans({'%from%': event.start|date('H:i'), '%to%': event.stop|date('H:i')}) }}<br>
         {% if event.series and event.series.rule %}

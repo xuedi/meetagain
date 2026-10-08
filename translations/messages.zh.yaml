@@ -142,6 +142,10 @@ security:
     label_password: '密码'
     label_agree_terms: '我同意条款'
 events:
+    button_new_event: '新建活动'
+    button_suggest_event: '提议活动'
+    link_edit_event: '编辑此活动'
+    link_correct_event: '为此活动提出更正'
     page_title_event: '活动'
     page_title_featured: '推荐会议'
     button_featured: '精选'

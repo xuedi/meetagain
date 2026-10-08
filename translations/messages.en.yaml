@@ -142,6 +142,10 @@ security:
     label_password: 'Password'
     label_agree_terms: 'I agree to the terms'
 events:
+    button_new_event: 'New event'
+    button_suggest_event: 'Suggest an event'
+    link_edit_event: 'Edit this event'
+    link_correct_event: 'Suggest a correction for this event'
     page_title_event: 'Events'
     page_title_featured: 'Featured events'
     button_featured: 'Featured'

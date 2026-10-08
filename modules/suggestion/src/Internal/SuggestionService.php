@@ -262,11 +262,7 @@ readonly class SuggestionService implements SuggestionInterface
 
     private function scopeProvider(): ?ScopeProviderInterface
     {
-        foreach ($this->scopeProviders as $provider) {
-            return $provider;
-        }
-
-        return null;
+        return iterator_to_array($this->scopeProviders, false)[0] ?? null;
     }
 
     private function ensurePending(Suggestion $suggestion): void

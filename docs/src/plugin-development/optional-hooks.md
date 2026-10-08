@@ -330,6 +330,27 @@ Implement the interface only if your plugin *is* the thing that narrows. Everyon
 
 ---
 
+### Event\AdminEntryProviderInterface
+
+**Purpose:** Offer a way into an event's admin page when the current request cannot open it. The public event pages
+show an edit pencil to whoever may edit an event. If the admin would refuse the viewer here but would let them in
+after a switch your plugin controls, return an entry: a form that performs the switch and then opens the route.
+
+**File:** `src/Event/AdminEntryProviderInterface.php`
+
+**Returns:** `App\Event\AdminEntry` - the form's `action` URL and its hidden `fields` - or `null` when you have nothing
+to offer. The first non-null entry wins. The pencil posts the form, so the target must accept POST, check its own
+CSRF token, and still run every access check of the page it redirects to.
+
+```php
+public function entryFor(int $eventId, string $route, array $parameters): ?AdminEntry
+```
+
+Keep it cheap: it is asked once per event on the event list, for every logged-in viewer who cannot edit the event
+directly.
+
+---
+
 ### ReservedSlugProviderInterface
 
 **Purpose:** Reserve URL slugs so the CMS editor refuses to assign them to a page. Useful when your plugin registers a

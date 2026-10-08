@@ -142,6 +142,10 @@ security:
     label_password: 'Contraseña'
     label_agree_terms: 'Acepto los términos'
 events:
+    button_new_event: 'Nuevo evento'
+    button_suggest_event: 'Sugerir un evento'
+    link_edit_event: 'Editar este evento'
+    link_correct_event: 'Sugerir una corrección para este evento'
     page_title_event: 'Eventos'
     page_title_featured: 'Eventos destacados'
     button_featured: 'Destacados'

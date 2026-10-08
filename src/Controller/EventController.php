@@ -4,16 +4,22 @@ namespace App\Controller;
 
 use App\Activity\ActivityService;
 use App\Activity\Messages\AdminEventEdited;
+use App\Contribution\EventSection;
+use App\Contribution\Registry as ContributionRegistry;
 use App\Entity\Event;
 use App\Entity\RsvpGuest;
+use App\Entity\User;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTileLocation;
 use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
 use App\Enum\RsvpRefusal;
+use App\Event\AdminEntry;
+use App\Event\AdminEntryProviderInterface;
 use App\Exception\Event\RsvpRefusedException;
 use App\FeaturedEventProviderInterface;
+use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Filter\Event\EventFilterService;
 use App\Form\EventFilterType;
 use App\Item\AssociationService;
@@ -26,6 +32,7 @@ use App\Service\Seo\BreadcrumbBuilder;
 use App\Service\Seo\CanonicalUrlService;
 use App\Service\Seo\EventSchemaService;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Suggestion\Contract\SuggestionInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,8 +60,13 @@ final class EventController extends AbstractController
         private readonly AssociationService $itemAssociationService,
         private readonly AttachControlBuilder $itemAttachControlBuilder,
         private readonly BreadcrumbBuilder $breadcrumbBuilder,
+        private readonly AdminEventListFilterService $adminEventFilterService,
+        private readonly ContributionRegistry $contributionRegistry,
+        private readonly SuggestionInterface $suggestions,
         #[AutowireIterator(FeaturedEventProviderInterface::class)]
         private readonly iterable $featuredEventProviders = [],
+        #[AutowireIterator(AdminEntryProviderInterface::class)]
+        private readonly iterable $adminEntryProviders = [],
     ) {}
 
     #[Route('/events', name: self::ROUTE_EVENT)]
@@ -74,12 +86,16 @@ final class EventController extends AbstractController
         $allowedEventIds = $filterResult->getEventIds();
         $locale = $request->getLocale();
 
+        $structuredList = $this->eventService->getFilteredList($time, $sort, $type, $rsvp, $this->getUser(), $allowedEventIds, $locale);
+
         return $this->render(
             'events/index.html.twig',
             [
-                'structuredList' => $this->eventService->getFilteredList($time, $sort, $type, $rsvp, $this->getUser(), $allowedEventIds, $locale),
+                'structuredList' => $structuredList,
                 'filter' => $form,
                 'hasFeatured' => $this->getFeaturedEvents($allowedEventIds, $locale) !== [],
+                'editLinks' => $this->editLinks(array_merge(...array_column($structuredList, 'events'))),
+                'newEventLink' => $this->newEventLink(),
             ],
             $response,
         );
@@ -118,6 +134,7 @@ final class EventController extends AbstractController
                 'json_ld' => $this->eventSchemaService->buildSchema($event, $canonicalUrl, $locale),
                 'breadcrumbs' => $this->breadcrumbBuilder->build(self::ROUTE_EVENT, 'chrome.menu_events', $event->getTitle($locale)),
                 'canEditExternalRsvp' => $this->isGranted(PermissionAttribute::EVENT_UPDATE, $event),
+                'editLink' => $this->editLinks([$event])[$id] ?? null,
             ],
             $response,
         );
@@ -326,6 +343,67 @@ final class EventController extends AbstractController
             }
 
             return $provider->getFeaturedEvents();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<mixed> $events
+     *
+     * @return array<int, array{url: string, admin: bool, entry?: AdminEntry}>
+     */
+    private function editLinks(array $events): array
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return [];
+        }
+
+        $links = [];
+        foreach ($events as $event) {
+            if (!$event instanceof Event) {
+                continue;
+            }
+            $id = (int) $event->getId();
+            if ($this->isGranted(PermissionAttribute::EVENT_UPDATE, $event) && $this->adminEventFilterService->isEventAccessible($id)) {
+                $links[$id] = ['url' => $this->generateUrl('app_admin_event_edit', ['id' => $id]), 'admin' => true];
+            } elseif (($entry = $this->adminEntry($id)) !== null) {
+                $links[$id] = ['url' => $entry->action, 'admin' => true, 'entry' => $entry];
+            } elseif ($this->contributionRegistry->mayTouch(EventSection::TYPE, $user, $id)) {
+                $links[$id] = ['url' => $this->generateUrl('app_contribution_correct', ['type' => EventSection::TYPE, 'id' => $id]), 'admin' => false];
+            }
+        }
+
+        return $links;
+    }
+
+    private function adminEntry(int $eventId): ?AdminEntry
+    {
+        foreach ($this->adminEntryProviders as $provider) {
+            $entry = $provider->entryFor($eventId, 'app_admin_event_edit', ['id' => $eventId]);
+            if ($entry !== null) {
+                return $entry;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return array{url: string, admin: bool}|null
+     */
+    private function newEventLink(): ?array
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return null;
+        }
+        if ($this->isGranted(PermissionAttribute::EVENT_CREATE)) {
+            return ['url' => $this->generateUrl('app_admin_event_add'), 'admin' => true];
+        }
+        if ($this->suggestions->providerFor(EventSection::TYPE)?->canPropose((int) $user->getId()) === true) {
+            return ['url' => $this->generateUrl('app_contribution_suggest', ['type' => EventSection::TYPE]), 'admin' => false];
         }
 
         return null;
