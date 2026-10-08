@@ -34,6 +34,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventType extends AbstractType
 {
+    private const int SNIPPET_MIN = 110;
+    private const int SNIPPET_MAX = 160;
+    private const int START_FORMAT_LENGTH = 16;
+
     public function __construct(
         private readonly TranslatorInterface $translator,
         private readonly LanguageService $languageService,
@@ -181,10 +185,28 @@ class EventType extends AbstractType
                     'data' => $translation?->getTeaser() ?? '',
                     'mapped' => false,
                     'required' => false,
-                    'attr' => ['rows' => 2],
+                    'help' => $this->translator->trans('admin_event.help_teaser_snippet', [
+                        '%min%' => self::SNIPPET_MIN,
+                        '%max%' => self::SNIPPET_MAX,
+                    ]),
+                    'attr' => [
+                        'rows' => 2,
+                        'data-snippet-meter' => $this->translator->trans('admin_event.snippet_meter'),
+                        'data-snippet-meter-empty' => $this->translator->trans('admin_event.snippet_meter_empty'),
+                        'data-snippet-reserved' => $this->snippetSuffixLength($languageCode),
+                        'data-snippet-min' => self::SNIPPET_MIN,
+                        'data-snippet-max' => self::SNIPPET_MAX,
+                    ],
                 ]);
             }
         }
+    }
+
+    private function snippetSuffixLength(string $languageCode): int
+    {
+        $label = $this->translator->trans('events.meta_description_meeting_at', [], null, $languageCode);
+
+        return mb_strlen(' - ' . $label . ' ') + self::START_FORMAT_LENGTH;
     }
 
     #[Override]
