@@ -101,6 +101,57 @@ readonly class RecurringService implements CronTaskInterface
         return count($updatedIds);
     }
 
+    /** @return array{writable: list<Event>, locked: int} */
+    public function seriesFollowers(Event $anchor): array
+    {
+        $series = $anchor->getSeries();
+        if ($series === null) {
+            return ['writable' => [], 'locked' => 0];
+        }
+
+        $writable = [];
+        $locked = 0;
+        foreach ($this->repo->findFollowUpEvents(seriesId: (int) $series->getId(), greaterThan: $anchor->getStart()) as $follower) {
+            if ($follower->getId() === $anchor->getId()) {
+                continue;
+            }
+            if ($follower->getStatus() === EventStatus::Locked) {
+                $locked++;
+                continue;
+            }
+            $writable[] = $follower;
+        }
+
+        return ['writable' => $writable, 'locked' => $locked];
+    }
+
+    /** @param callable(EventTranslation): void $write */
+    public function writeFollowerTranslations(Event $anchor, string $locale, callable $write): int
+    {
+        $source = $anchor->findTranslation($locale);
+        if ($source === null) {
+            return 0;
+        }
+
+        $updatedIds = [];
+        foreach ($this->seriesFollowers($anchor)['writable'] as $follower) {
+            $translation = $follower->findTranslation($locale);
+            if ($translation === null) {
+                $this->copyTranslation($source, $follower);
+            } else {
+                $write($translation);
+            }
+            $updatedIds[] = (int) $follower->getId();
+        }
+        $this->em->flush();
+
+        foreach ($updatedIds as $updatedId) {
+            $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $updatedId);
+        }
+
+        return count($updatedIds);
+    }
+
     public function fillUntitledFollowers(Event $event): int
     {
         $series = $event->getSeries();

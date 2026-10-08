@@ -65,6 +65,7 @@ final class ChangeProposalController extends AbstractController
             'targetId' => $targetId,
             'cards' => $cards,
             'canReview' => $canReview,
+            'applyScope' => $canReview ? $this->service->applyScopeFor($targetType, $targetId) : null,
         ]);
     }
 
@@ -94,7 +95,7 @@ final class ChangeProposalController extends AbstractController
         $this->assertMayReview($request, $targetType, $targetId, $user);
 
         try {
-            $this->fieldBallots->confirm($ballotId, $user);
+            $this->fieldBallots->confirm($ballotId, $user, $this->scopeOf($request));
             $this->addFlash('success', 'review.flash_ballot_confirmed');
         } catch (ChangeProposalException $e) {
             $this->addFlash('error', $e->getMessage());
@@ -109,7 +110,7 @@ final class ChangeProposalController extends AbstractController
         $proposal = $this->pendingProposal($request, $id);
 
         try {
-            $this->service->applyField($proposal, $field, $user);
+            $this->service->applyField($proposal, $field, $user, $this->scopeOf($request));
             $this->addFlash('success', 'review.flash_field_applied');
         } catch (ChangeProposalException $e) {
             $this->addFlash('error', $e->getMessage());
@@ -151,6 +152,13 @@ final class ChangeProposalController extends AbstractController
         }
 
         return $this->redirectToProposals($proposal);
+    }
+
+    private function scopeOf(Request $request): ?string
+    {
+        $scope = $request->query->getString('scope');
+
+        return $scope === '' ? null : $scope;
     }
 
     private function assertMayReview(Request $request, string $targetType, int $targetId, User $user): void

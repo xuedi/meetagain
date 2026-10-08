@@ -1,6 +1,7 @@
 {% set proposal = card.proposal %}
 {% set csrfToken = csrf_token('change_proposal' ~ proposal.id) %}
 {% set ballotToken = canReview ? csrf_token('field_ballot' ~ targetType ~ targetId) : null %}
+{% set applyScope = canReview ? applyScope|default(null) : null %}
 <div class="box">
     <p class="mb-3">
         <strong>{{ proposal.proposedBy.name }}</strong>
@@ -47,6 +48,16 @@
                                data-csrf-token="{{ ballotToken }}">
                                 {{ 'review.button_ballot_confirm'|trans }}
                             </a>
+                            {% if applyScope %}
+                                <a href="{{ path('app_review_field_ballot_confirm', {targetType: targetType, targetId: targetId, ballotId: ballot.id, scope: applyScope.key}) }}"
+                                   class="button is-small is-success is-light"
+                                   title="{{ applyScope.label }}"
+                                   data-post
+                                   data-csrf-token="{{ ballotToken }}"
+                                   data-confirm="{{ applyScope.label }}">
+                                    <span class="icon is-small"><i class="fas fa-calendar-week" aria-hidden="true"></i></span>
+                                </a>
+                            {% endif %}
                         {% endif %}
                     {% elseif canReview %}
                         <div class="is-flex is-justify-content-flex-end is-align-items-center">
@@ -62,6 +73,16 @@
                                         title="{{ 'review.button_ballot_title'|trans }}">
                                     <span class="icon is-small"><i class="fas fa-check-to-slot" aria-hidden="true"></i></span>
                                 </button>
+                            {% endif %}
+                            {% if applyScope %}
+                                <a href="{{ path('app_review_proposal_apply', {id: proposal.id, field: row.field, scope: applyScope.key}) }}"
+                                   class="button is-small is-success is-light mr-2"
+                                   title="{{ applyScope.label }}"
+                                   data-post
+                                   data-csrf-token="{{ csrfToken }}"
+                                   data-confirm="{{ applyScope.label }}">
+                                    <span class="icon is-small"><i class="fas fa-calendar-week" aria-hidden="true"></i></span>
+                                </a>
                             {% endif %}
                             {% include '_components/approve_deny.html.twig' with {
                                 approveUrl: path('app_review_proposal_apply', {id: proposal.id, field: row.field}),
