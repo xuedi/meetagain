@@ -55,10 +55,11 @@ readonly class ChangeProposalService
         return $proposal;
     }
 
-    public function applyField(ChangeProposal $proposal, string $field, User $reviewer): void
+    public function applyField(ChangeProposal $proposal, string $field, User $reviewer, ?string $scope = null): void
     {
         $provider = $this->reviewableProvider($proposal, $reviewer);
         $change = $this->unresolvedChange($proposal, $field);
+        $scoped = $scope === null ? null : $this->scopedProvider($provider, $proposal->getTargetId(), $scope);
 
         $error = $provider->validate($proposal->getTargetId(), $field, $change->after);
         if ($error !== null) {
@@ -66,9 +67,34 @@ readonly class ChangeProposalService
         }
 
         $provider->apply($proposal->getTargetId(), $field, $change->after);
+        $scoped?->applyToScope($proposal->getTargetId(), (string) $scope, $field, $change->after);
         $proposal->resolveField($field, FieldResolution::Applied);
 
         $this->finalizeIfResolved($proposal, $reviewer);
+    }
+
+    public function applyAppliedFieldToScope(ChangeProposal $proposal, string $field, User $reviewer, string $scope): void
+    {
+        $provider = $this->reviewableProvider($proposal, $reviewer);
+        $change = $proposal->getChange($field);
+        if ($change->resolution !== FieldResolution::Applied) {
+            throw new ChangeProposalException('review.flash_scope_unavailable');
+        }
+
+        $this->scopedProvider($provider, $proposal->getTargetId(), $scope)->applyToScope($proposal->getTargetId(), $scope, $field, $change->after);
+    }
+
+    /** @return array{key: string, label: string}|null */
+    public function applyScopeFor(string $targetType, int $targetId): ?array
+    {
+        $provider = $this->registry->providerFor($targetType);
+
+        return $provider instanceof ScopedChangeTargetInterface ? $provider->getApplyScope($targetId) : null;
+    }
+
+    public function assertApplyScope(string $targetType, int $targetId, string $scope): void
+    {
+        $this->scopedProvider($this->providerFor($targetType), $targetId, $scope);
     }
 
     public function denyField(ChangeProposal $proposal, string $field, User $reviewer): void
@@ -229,6 +255,15 @@ readonly class ChangeProposalService
         $provider = $this->registry->providerFor($targetType);
         if ($provider === null) {
             throw new InvalidArgumentException(sprintf('No active change target registered for type "%s"', $targetType));
+        }
+
+        return $provider;
+    }
+
+    private function scopedProvider(ChangeTargetProviderInterface $provider, int $targetId, string $scope): ScopedChangeTargetInterface
+    {
+        if (!$provider instanceof ScopedChangeTargetInterface || ($provider->getApplyScope($targetId)['key'] ?? null) !== $scope) {
+            throw new ChangeProposalException('review.flash_scope_unavailable');
         }
 
         return $provider;

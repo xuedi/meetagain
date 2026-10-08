@@ -12,15 +12,17 @@ use App\Enum\EntityAction;
 use App\Filter\Event\EventFilterService;
 use App\Repository\EventRepository;
 use App\Security\Permission\Attribute\PermissionAttribute;
+use App\Service\Event\RecurringService;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class EventChangeTarget implements ChangeTargetProviderInterface
+final readonly class EventChangeTarget implements ChangeTargetProviderInterface, ScopedChangeTargetInterface
 {
     public const string TARGET_TYPE = 'event';
+    public const string SCOPE_SERIES = 'series';
 
     private const array PROPERTIES = ['title', 'teaser', 'description'];
     private const array REQUIRED_PROPERTIES = ['title'];
@@ -29,6 +31,7 @@ final readonly class EventChangeTarget implements ChangeTargetProviderInterface
         private EntityManagerInterface $em,
         private EventRepository $repo,
         private EventFilterService $eventFilter,
+        private RecurringService $recurringService,
         private Registry $contributions,
         private EntityActionDispatcher $entityActionDispatcher,
         private Security $security,
@@ -127,15 +130,47 @@ final readonly class EventChangeTarget implements ChangeTargetProviderInterface
             return;
         }
 
-        match ($this->propertyOf($field)) {
-            'title' => $translation->setTitle((string) $value),
-            'teaser' => $translation->setTeaser($value === '' ? null : $value),
-            'description' => $translation->setDescription((string) $value),
-            default => null,
-        };
+        $this->write($translation, $field, $value);
 
         $this->em->flush();
         $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $targetId);
+    }
+
+    #[Override]
+    public function getApplyScope(int $targetId): ?array
+    {
+        $event = $this->visibleEvent($targetId);
+        if ($event === null) {
+            return null;
+        }
+
+        $followers = $this->recurringService->seriesFollowers($event);
+        $count = count($followers['writable']);
+        if ($count === 0) {
+            return null;
+        }
+
+        return [
+            'key' => self::SCOPE_SERIES,
+            'label' => $followers['locked'] === 0
+                ? $this->translator->trans('review.button_apply_series', ['%count%' => $count])
+                : $this->translator->trans('review.button_apply_series_locked', ['%count%' => $count, '%locked%' => $followers['locked']]),
+        ];
+    }
+
+    #[Override]
+    public function applyToScope(int $targetId, string $scope, string $field, ?string $value): void
+    {
+        $event = $this->visibleEvent($targetId);
+        if ($scope !== self::SCOPE_SERIES || $event === null) {
+            return;
+        }
+
+        $this->recurringService->writeFollowerTranslations($event, $this->localeOf($field), fn(EventTranslation $translation) => $this->write(
+            $translation,
+            $field,
+            $value,
+        ));
     }
 
     /**
@@ -164,6 +199,16 @@ final readonly class EventChangeTarget implements ChangeTargetProviderInterface
             'title' => $translation->getTitle(),
             'teaser' => $translation->getTeaser(),
             'description' => $translation->getDescription(),
+            default => null,
+        };
+    }
+
+    private function write(EventTranslation $translation, string $field, ?string $value): void
+    {
+        match ($this->propertyOf($field)) {
+            'title' => $translation->setTitle((string) $value),
+            'teaser' => $translation->setTeaser($value === '' ? null : $value),
+            'description' => $translation->setDescription((string) $value),
             default => null,
         };
     }

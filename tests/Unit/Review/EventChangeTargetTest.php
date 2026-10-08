@@ -9,6 +9,7 @@ use App\EntityActionDispatcher;
 use App\Filter\Event\EventFilterService;
 use App\Repository\EventRepository;
 use App\Review\EventChangeTarget;
+use App\Service\Event\RecurringService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -91,17 +92,58 @@ class EventChangeTargetTest extends TestCase
         yield 'a property outside the translated text falls back to the raw key' => ['start_en', 'start_en'];
     }
 
-    private function target(): EventChangeTarget
+    public function testAnEventWithoutUnlockedFollowersOffersNoScope(): void
+    {
+        // Arrange
+        $target = $this->target(['writable' => [], 'locked' => 2]);
+
+        // Act
+        $scope = $target->getApplyScope(7);
+
+        // Assert
+        self::assertNull($scope);
+    }
+
+    /** @return iterable<string, array{int, string}> */
+    public static function provideScopeLabels(): iterable
+    {
+        yield 'no locked member' => [0, 'review.button_apply_series|3'];
+        yield 'locked members are named' => [2, 'review.button_apply_series_locked|3,2'];
+    }
+
+    #[DataProvider('provideScopeLabels')]
+    public function testTheSeriesScopeStatesTheFollowersItWouldTouch(int $locked, string $expected): void
+    {
+        // Arrange
+        $target = $this->target(['writable' => [new Event(), new Event(), new Event()], 'locked' => $locked]);
+
+        // Act
+        $scope = $target->getApplyScope(7);
+
+        // Assert
+        self::assertSame(['key' => EventChangeTarget::SCOPE_SERIES, 'label' => $expected], $scope);
+    }
+
+    /** @param array{writable: list<Event>, locked: int}|null $followers */
+    private function target(?array $followers = null): EventChangeTarget
     {
         $translator = $this->createStub(TranslatorInterface::class);
         $translator
             ->method('trans')
             ->willReturnCallback(static fn(string $id, array $parameters = []): string => $id . ($parameters === [] ? '' : '|' . implode(',', $parameters)));
 
+        $filter = $this->createStub(EventFilterService::class);
+        $filter->method('isEventAccessible')->willReturn(true);
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('find')->willReturn(new Event());
+        $recurring = $this->createStub(RecurringService::class);
+        $recurring->method('seriesFollowers')->willReturn($followers ?? ['writable' => [], 'locked' => 0]);
+
         return new EventChangeTarget(
             $this->createStub(EntityManagerInterface::class),
-            $this->createStub(EventRepository::class),
-            $this->createStub(EventFilterService::class),
+            $repo,
+            $filter,
+            $recurring,
             $this->createStub(Registry::class),
             $this->createStub(EntityActionDispatcher::class),
             $this->createStub(Security::class),

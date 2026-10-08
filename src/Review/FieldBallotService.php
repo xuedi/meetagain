@@ -4,6 +4,7 @@ namespace App\Review;
 
 use App\Entity\ChangeProposal;
 use App\Entity\User;
+use App\Enum\FieldResolution;
 use App\Form\BallotTermsType;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
@@ -75,7 +76,7 @@ final readonly class FieldBallotService implements SettlementListenerInterface
         );
     }
 
-    public function confirm(int $ballotId, User $steward): void
+    public function confirm(int $ballotId, User $steward, ?string $scope = null): void
     {
         $view = $this->ballots->view($ballotId, (int) $steward->getId());
         if ($view === null || $view->purpose !== self::PURPOSE) {
@@ -91,7 +92,17 @@ final readonly class FieldBallotService implements SettlementListenerInterface
             throw new ChangeProposalException('review.flash_ballot_undecided');
         }
 
+        $winner = $this->parse($winningKey);
+        $winningProposal = $winner === null || $winner[0] === self::KEEP ? null : $this->proposals->get($winner[0]);
+        if ($scope !== null && $view->subject !== null) {
+            $this->proposals->assertApplyScope($view->subject->type, $view->subject->id, $scope);
+        }
+
         $this->ballots->settle($ballotId, $winningKey, (int) $steward->getId());
+
+        if ($scope !== null && $winningProposal !== null && $winningProposal->getChange($winner[1])->resolution === FieldResolution::Applied) {
+            $this->proposals->applyAppliedFieldToScope($winningProposal, $winner[1], $steward, $scope);
+        }
     }
 
     public function stateOf(BallotView $ballot): string

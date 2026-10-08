@@ -923,6 +923,72 @@ class RecurringServiceTest extends TestCase
         static::assertNull($child->findTranslation('de'));
     }
 
+    public function testSeriesFollowersSeparatesTheLockedMembersAndDropsTheAnchor(): void
+    {
+        // Arrange
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$anchor, $this->makeEvent(2, EventStatus::Locked), $this->makeEvent(3), $this->makeEvent(4)]);
+        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
+
+        // Act
+        $followers = $service->seriesFollowers($anchor);
+
+        // Assert
+        static::assertSame([3, 4], array_map(static fn($event): ?int => $event->getId(), $followers['writable']));
+        static::assertSame(1, $followers['locked']);
+    }
+
+    public function testWriteFollowerTranslationsTouchesOnlyTheGivenLocaleOnUnlockedFollowers(): void
+    {
+        // Arrange
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
+        $anchor->addTranslation($this->makeTranslation('en', 'Fixed title'));
+        $locked = $this->makeEvent(2, EventStatus::Locked);
+        $locked->addTranslation($this->makeTranslation('en', 'Wrong title'));
+        $open = $this->makeEvent(3);
+        $open->addTranslation($this->makeTranslation('en', 'Wrong title', 'Own teaser'));
+        $open->addTranslation($this->makeTranslation('de', 'Falscher Titel'));
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$anchor, $locked, $open]);
+        $dispatcher = $this->createMock(EntityActionDispatcher::class);
+        $dispatcher->expects($this->once())->method('dispatch')->with(EntityAction::UpdateEvent, 3);
+        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class), dispatcher: $dispatcher);
+
+        // Act
+        $written = $service->writeFollowerTranslations($anchor, 'en', static fn(EventTranslation $translation) => $translation->setTitle('Fixed title'));
+
+        // Assert
+        static::assertSame(1, $written);
+        static::assertSame('Fixed title', $open->findTranslation('en')?->getTitle());
+        static::assertSame('Own teaser', $open->findTranslation('en')?->getTeaser());
+        static::assertSame('Falscher Titel', $open->findTranslation('de')?->getTitle());
+        static::assertSame('Wrong title', $locked->findTranslation('en')?->getTitle());
+    }
+
+    public function testWriteFollowerTranslationsCopiesTheAnchorLocaleIntoAFollowerWithoutIt(): void
+    {
+        // Arrange
+        $anchor = $this->makeEvent(1);
+        $anchor->setSeries($this->makeSeries(9, EventInterval::Weekly));
+        $anchor->addTranslation($this->makeTranslation('fr', 'Soirée film', 'Accroche', 'Description'));
+        $child = $this->makeEvent(2);
+        $child->addTranslation($this->makeTranslation('en', 'Film night'));
+        $repo = $this->createStub(EventRepository::class);
+        $repo->method('findFollowUpEvents')->willReturn([$child]);
+        $service = $this->createService($repo, $this->createStub(EntityManagerInterface::class));
+
+        // Act
+        $service->writeFollowerTranslations($anchor, 'fr', static fn(EventTranslation $translation) => $translation->setTeaser('never called'));
+
+        // Assert
+        static::assertSame('Soirée film', $child->findTranslation('fr')?->getTitle());
+        static::assertSame('Accroche', $child->findTranslation('fr')?->getTeaser());
+        static::assertSame('Film night', $child->findTranslation('en')?->getTitle());
+    }
+
     private function makeTranslation(string $language, string $title, ?string $teaser = null, string $description = ''): EventTranslation
     {
         $translation = new EventTranslation();
