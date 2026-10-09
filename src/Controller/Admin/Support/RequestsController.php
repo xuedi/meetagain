@@ -12,23 +12,31 @@ use App\Emails\Types\SupportInvitationEmail;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\Form\SupportReplyType;
+use App\Service\Support\RequestDetailProviderInterface;
 use App\Service\Support\ThreadService;
 use App\Service\Support\VisibilityResolver;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Traversable;
 
 #[IsGranted('ROLE_STEWARD'), Route('/admin/support')]
 final class RequestsController extends AbstractSupportController implements AdminNavigationInterface, AdminTabsInterface
 {
+    /**
+     * @param Traversable<RequestDetailProviderInterface> $detailProviders
+     */
     public function __construct(
         TranslatorInterface $translator,
         private readonly SupportInvitationEmail $supportInvitationEmail,
         private readonly ThreadService $threadService,
         private readonly VisibilityResolver $visibilityResolver,
+        #[AutowireIterator(RequestDetailProviderInterface::class)]
+        private readonly Traversable $detailProviders,
     ) {
         parent::__construct($translator, 'requests');
     }
@@ -135,6 +143,7 @@ final class RequestsController extends AbstractSupportController implements Admi
             'active' => 'support',
             'request' => $request,
             'messages' => $this->threadService->getThread($request),
+            'details' => $this->collectDetails($request),
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
             'replyForm' => $this->createForm(SupportReplyType::class),
@@ -220,6 +229,19 @@ final class RequestsController extends AbstractSupportController implements Admi
         $this->addFlash('success', 'admin_support.flash_admins_invited');
 
         return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function collectDetails(SupportRequest $request): array
+    {
+        $details = [];
+        foreach ($this->detailProviders as $provider) {
+            $details = [...$details, ...$provider->getDetails($request)];
+        }
+
+        return $details;
     }
 
     private function requireRequest(int $id): SupportRequest
