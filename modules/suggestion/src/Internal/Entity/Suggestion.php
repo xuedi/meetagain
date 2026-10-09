@@ -46,6 +46,9 @@ class Suggestion
     #[ORM\Column(nullable: true)]
     private ?int $createdId = null;
 
+    #[ORM\Column(length: 64, nullable: true)]
+    private ?string $scope = null;
+
     public function __construct()
     {
         $this->createdAt = new DateTimeImmutable();
@@ -148,6 +151,18 @@ class Suggestion
     public function setCreatedId(?int $createdId): static
     {
         $this->createdId = $createdId;
+
+        return $this;
+    }
+
+    public function getScope(): ?string
+    {
+        return $this->scope;
+    }
+
+    public function setScope(?string $scope): static
+    {
+        $this->scope = $scope;
 
         return $this;
     }

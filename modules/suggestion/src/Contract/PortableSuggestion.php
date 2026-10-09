@@ -11,5 +11,6 @@ final readonly class PortableSuggestion
         public string $targetType,
         public int $proposerId,
         public array $payload,
+        public ?string $scope = null,
     ) {}
 }

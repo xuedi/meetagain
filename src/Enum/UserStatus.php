@@ -25,6 +25,16 @@ enum UserStatus: int
         };
     }
 
+    public function tagVariant(): string
+    {
+        return match ($this) {
+            self::Active => 'is-success',
+            self::EmailVerified => 'is-warning',
+            self::Blocked, self::Denied => 'is-danger',
+            self::Registered, self::Deleted => 'is-light',
+        };
+    }
+
     public static function getChoices(TranslatorInterface $translator): array
     {
         return [

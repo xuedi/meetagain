@@ -111,6 +111,22 @@ context, not once per recipient. It runs between 07:00 and 22:00 only; types do 
 event starts. It is frozen at enqueue, and a row past its cap is marked late instead of sent. Token-carrying
 mail does not set one - the token has its own expiry.
 
+## The queue drains on a time budget, not a count
+
+`email-queue` takes `Pending` rows in chunks of 200 and keeps going until a chunk comes back short or 150 s have
+passed - half the 5-minute cron interval, so the tasks after it in the same `app:cron` run still get their turn. A
+count would only fit the transport it was tuned for; a budget sends as much as SMTP, an HTTP API or `null://` allow
+in the same wall time. Almost all of a send is the transport: the module's own work per row is well under a
+millisecond.
+
+Each chunk is flushed and its rows detached before the next is fetched. A process that dies mid-run therefore sends
+at most one chunk a second time, and memory stays flat however long the queue is. The sweep writes the same way from
+the other end: it enqueues without flushing and flushes every 200 mails, and always before `markContextSent()`, so a
+context is never marked done while its mails are still unwritten.
+
+There is no dedicated queue worker. A long-running consumer would be one more process to deploy, supervise and
+watch, for throughput the budget already gets inside the cron run.
+
 ## Push notifications ride the enqueue
 
 Every `PushDispatcherInterface` is called for each queued message, after the row is persisted and before the

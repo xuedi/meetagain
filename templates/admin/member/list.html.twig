@@ -19,15 +19,7 @@
             </thead>
             <tbody>
             {% for user in users %}
-                {% set rowClass = '' %}
-                {% if user.status.value == 1 %}
-                    {% set rowClass = 'has-background-warning-light' %}
-                {% elseif user.status.value in [3, 4, 5] %}
-                    {% set rowClass = 'has-background-danger-light' %}
-                {% elseif user.status.value == 0 %}
-                    {% set rowClass = 'has-background-info-light' %}
-                {% endif %}
-                <tr class="{{ rowClass }}">
+                <tr>
                     <td>{{ user.name }}</td>
                     <td>{{ user.email }}</td>
                     <td>{{ user.locale }}</td>
@@ -36,7 +28,7 @@
                         {% set color = 'ROLE_ADMIN' in user.roles ? 'has-text-success' : 'has-text-grey' %}
                         <span class="icon {{ color }}"><i class="fa fa-user"></i></span>
                     </td>
-                    <td>{{ user.status.label()|trans }}</td>
+                    <td><span class="tag {{ user.status.tagVariant() }}">{{ user.status.label()|trans }}</span></td>
                     <td>{{ user.createdAt|date('Y-m-d') }}</td>
                     <td>
                         {% if user.lastLogin %}

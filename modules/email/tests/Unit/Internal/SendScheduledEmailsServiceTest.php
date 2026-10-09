@@ -4,6 +4,7 @@ namespace Module\Email\Tests\Unit\Internal;
 
 use App\Entity\User;
 use DateTimeImmutable;
+use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\BlocklistInterface;
 use Module\Email\Contract\DueContext;
 use Module\Email\Contract\GuardResult;
@@ -30,7 +31,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $email = $this->createMock(ScheduledEmailInterface::class);
         $email->expects($this->never())->method('getDueContexts');
 
-        $service = new SendScheduledEmailsService([$email], $clock, new NullLogger(), $this->mailer());
+        $service = new SendScheduledEmailsService([$email], $clock, new NullLogger(), $this->mailer(), $this->createStub(EntityManagerInterface::class));
 
         // Act
         $output = new BufferedOutput();
@@ -47,7 +48,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $email = $this->createStub(ScheduledEmailInterface::class);
         $email->method('getDueContexts')->willReturn([]);
 
-        $service = new SendScheduledEmailsService([$email], $clock, new NullLogger(), $this->mailer());
+        $service = new SendScheduledEmailsService([$email], $clock, new NullLogger(), $this->mailer(), $this->createStub(EntityManagerInterface::class));
 
         // Act
         $output = new BufferedOutput();
@@ -77,7 +78,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $email->expects($this->once())->method('compose')->willReturn([$this->message()]);
         $email->expects($this->once())->method('markContextSent')->with($dueContext);
 
-        $service = new SendScheduledEmailsService([$email], $clock, new NullLogger(), $this->mailer());
+        $service = new SendScheduledEmailsService([$email], $clock, new NullLogger(), $this->mailer(), $this->createStub(EntityManagerInterface::class));
 
         // Act
         $output = new BufferedOutput();
@@ -104,7 +105,13 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $email2->method('getDueContexts')->willReturn([$ctx2]);
         $email2->method('compose')->willReturn([$this->message()]);
 
-        $service = new SendScheduledEmailsService([$email1, $email2], $clock, new NullLogger(), $this->mailer());
+        $service = new SendScheduledEmailsService(
+            [$email1, $email2],
+            $clock,
+            new NullLogger(),
+            $this->mailer(),
+            $this->createStub(EntityManagerInterface::class),
+        );
 
         // Act
         $output = new BufferedOutput();
@@ -137,7 +144,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('error')->with('guard rule returned Error - email skipped', $this->anything());
 
-        $service = new SendScheduledEmailsService([$email], $clock, $logger, $this->mailer());
+        $service = new SendScheduledEmailsService([$email], $clock, $logger, $this->mailer(), $this->createStub(EntityManagerInterface::class));
 
         // Act
         $result = $service->runCronTask(new BufferedOutput());
@@ -164,7 +171,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('error');
 
-        $service = new SendScheduledEmailsService([$email], $clock, $logger, $this->mailer());
+        $service = new SendScheduledEmailsService([$email], $clock, $logger, $this->mailer(), $this->createStub(EntityManagerInterface::class));
 
         // Act
         $service->runCronTask(new BufferedOutput());
@@ -192,7 +199,7 @@ final class SendScheduledEmailsServiceTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->exactly(2))->method('error');
 
-        $service = new SendScheduledEmailsService([$email], $clock, $logger, $this->mailer());
+        $service = new SendScheduledEmailsService([$email], $clock, $logger, $this->mailer(), $this->createStub(EntityManagerInterface::class));
 
         // Act
         $service->runCronTask(new BufferedOutput());
@@ -201,6 +208,52 @@ final class SendScheduledEmailsServiceTest extends TestCase
     private function message(): TemplatedEmail
     {
         return new TemplatedEmail()->to('member@example.com');
+    }
+
+    public function testTheSweepFlushesEveryChunkAndBeforeTheContextIsMarkedSent(): void
+    {
+        // Arrange
+        $clock = new MockClock(new DateTimeImmutable('2026-04-12 10:00:00'));
+        $users = array_map($this->user(...), range(1, 450));
+        $dueContext = new DueContext(['event' => 'mock'], $users);
+        $log = [];
+
+        $email = $this->createStub(ScheduledEmailInterface::class);
+        $email->method('getDueContexts')->willReturn([$dueContext]);
+        $email->method('getGuardRules')->willReturn([]);
+        $email->method('compose')->willReturnCallback(fn(): array => [$this->message()]);
+        $email
+            ->method('markContextSent')
+            ->willReturnCallback(static function () use (&$log): void {
+                $log[] = 'marked';
+            });
+
+        $queue = $this->createStub(EmailQueueInterface::class);
+        $queue
+            ->method('enqueue')
+            ->willReturnCallback(static function (mixed $source, mixed $message, array $context, bool $flush) use (&$log): bool {
+                $log[] = $flush ? 'enqueue+flush' : 'enqueue';
+
+                return true;
+            });
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('flush')->willReturnCallback(static function () use (&$log): void {
+            $log[] = 'flush';
+        });
+
+        $mailer = new Mailer(new GuardEvaluator(), $queue, $this->createStub(BlocklistInterface::class));
+        $service = new SendScheduledEmailsService([$email], $clock, new NullLogger(), $mailer, $em);
+
+        // Act
+        $result = $service->runCronTask(new BufferedOutput());
+
+        // Assert
+        static::assertSame('450 emails queued', $result->message);
+        static::assertNotContains('enqueue+flush', $log);
+        $flushes = array_keys($log, 'flush', true);
+        static::assertCount(3, $flushes);
+        static::assertSame(200, $flushes[0]);
+        static::assertSame(['flush', 'marked'], array_slice($log, -2));
     }
 
     private function mailer(): Mailer

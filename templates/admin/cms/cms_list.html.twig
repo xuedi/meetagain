@@ -52,9 +52,9 @@
                     <td>{{ page.createdAt|date('Y-m-d') }}</td>
                     <td>
                         {% if page.published %}
-                            <span class="has-text-success">{{ 'admin_cms.published' | trans }}</span>
+                            <span class="tag is-success">{{ 'admin_cms.published' | trans }}</span>
                         {% else %}
-                            <span class="has-text-grey-light">{{ 'admin_cms.draft' | trans }}</span>
+                            <span class="tag is-light">{{ 'admin_cms.draft' | trans }}</span>
                         {% endif %}
                     </td>
                     <td>

@@ -18,6 +18,7 @@ use Module\Email\Internal\Entity\EmailQueue;
 use Module\Email\Internal\Repository\EmailQueueRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -29,6 +30,9 @@ use Throwable;
 
 readonly class EmailService implements CronTaskInterface, EmailQueueInterface
 {
+    private const int CHUNK_SIZE = 200;
+    private const int SEND_BUDGET_SECONDS = 150;
+
     /**
      * @param iterable<ContextEnricherInterface> $enrichers
      * @param iterable<SendingIdentityProviderInterface> $identityProviders
@@ -47,6 +51,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         private iterable $identityProviders,
         #[AutowireIterator(PushDispatcherInterface::class)]
         private iterable $pushDispatchers,
+        private ClockInterface $clock,
     ) {}
 
     public function enqueue(
@@ -133,48 +138,58 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         $send = 0;
         $failed = 0;
         $late = 0;
-        $now = new DateTimeImmutable();
-        $mails = $this->mailRepo->findBy(['status' => QueueStatus::Pending], ['id' => 'ASC'], 1000);
-        foreach ($mails as $mail) {
-            $cutoff = $mail->getMaxSendBy();
-            if ($cutoff !== null && $now > $cutoff) {
-                $mail->setStatus(QueueStatus::Late);
-                $mail->setErrorMessage(sprintf('Dispatch cutoff passed: max_send_by=%s, now=%s', $cutoff->format('c'), $now->format('c')));
-                $this->logger->error('Email dispatch skipped: past max_send_by cutoff', [
-                    'email_queue_id' => $mail->getId(),
-                    'template' => $mail->getTemplate(),
-                    'recipient' => $mail->getRecipient(),
-                    'created_at' => $mail->getCreatedAt()?->format('c'),
-                    'max_send_by' => $cutoff->format('c'),
-                    'now' => $now->format('c'),
-                ]);
-                $this->em->persist($mail);
-                $late++;
-                continue;
-            }
-
-            try {
-                $sentMessage = $this->transport->send($this->queueToTemplate($mail));
-                $mail->setProviderDispatchedAt(new DateTimeImmutable());
-                $mail->setStatus(QueueStatus::Sent);
-                if ($sentMessage->getMessageId() !== '') {
-                    $mail->setProviderMessageId($sentMessage->getMessageId());
+        $startedAt = $this->clock->now();
+        $stopAt = $startedAt->modify(sprintf('+%d seconds', self::SEND_BUDGET_SECONDS));
+        do {
+            $mails = $this->mailRepo->findBy(['status' => QueueStatus::Pending], ['id' => 'ASC'], self::CHUNK_SIZE);
+            foreach ($mails as $mail) {
+                $now = $this->clock->now();
+                $cutoff = $mail->getMaxSendBy();
+                if ($cutoff !== null && $now > $cutoff) {
+                    $mail->setStatus(QueueStatus::Late);
+                    $mail->setErrorMessage(sprintf('Dispatch cutoff passed: max_send_by=%s, now=%s', $cutoff->format('c'), $now->format('c')));
+                    $this->logger->error('Email dispatch skipped: past max_send_by cutoff', [
+                        'email_queue_id' => $mail->getId(),
+                        'template' => $mail->getTemplate(),
+                        'recipient' => $mail->getRecipient(),
+                        'created_at' => $mail->getCreatedAt()?->format('c'),
+                        'max_send_by' => $cutoff->format('c'),
+                        'now' => $now->format('c'),
+                    ]);
+                    $this->em->persist($mail);
+                    $late++;
+                    continue;
                 }
-                $send++;
-            } catch (TransportExceptionInterface $e) {
-                $mail->setStatus(QueueStatus::Failed);
-                $mail->setErrorMessage($e->getMessage());
-                $failed++;
+
+                try {
+                    $sentMessage = $this->transport->send($this->queueToTemplate($mail));
+                    $mail->setProviderDispatchedAt($this->clock->now());
+                    $mail->setStatus(QueueStatus::Sent);
+                    if ($sentMessage->getMessageId() !== '') {
+                        $mail->setProviderMessageId($sentMessage->getMessageId());
+                    }
+                    $send++;
+                } catch (TransportExceptionInterface $e) {
+                    $mail->setStatus(QueueStatus::Failed);
+                    $mail->setErrorMessage($e->getMessage());
+                    $failed++;
+                }
+                $this->em->persist($mail);
             }
-            $this->em->persist($mail);
-        }
-        $this->em->flush();
+            $this->em->flush();
+            foreach ($mails as $mail) {
+                $this->em->detach($mail);
+            }
+        } while (count($mails) === self::CHUNK_SIZE && $this->clock->now() < $stopAt);
+
+        $pending = count($mails) === self::CHUNK_SIZE ? $this->mailRepo->count(['status' => QueueStatus::Pending]) : 0;
 
         if ($failed > 0 || $late > 0) {
             $this->logger->warning('Email queue processed with issues', [
                 'sent' => $send,
                 'failed' => $failed,
                 'late' => $late,
+                'pending' => $pending,
             ]);
 
             $parts = [];
@@ -184,11 +199,18 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
             if ($late > 0) {
                 $parts[] = sprintf('Late: %d', $late);
             }
+            if ($pending > 0) {
+                $parts[] = sprintf('Pending: %d', $pending);
+            }
 
             return sprintf('%d (%s)', $send, implode(', ', $parts));
         }
 
-        $this->logger->info('Email queue processed', ['sent' => $send]);
+        $this->logger->info('Email queue processed', ['sent' => $send, 'pending' => $pending]);
+        if ($pending > 0) {
+            return sprintf('%d (Pending: %d)', $send, $pending);
+        }
+
         return sprintf('%d', $send);
     }
 

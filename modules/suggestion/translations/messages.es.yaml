@@ -7,6 +7,8 @@ profile_social:
     activity_suggestion_rejected: 'Rechazó la propuesta: %target%'
 
 review_suggestion:
+    trigger_approved: 'cuando se aprueba una sugerencia'
+    trigger_rejected: 'cuando se rechaza una sugerencia'
     page_title: 'Propuesta'
     submitted_by: '%proposer% propuso un nuevo %type%'
     intro: 'Corrige lo que haga falta y luego guarda y acepta.'

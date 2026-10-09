@@ -62,3 +62,4 @@ Error: 错误
 'item_report.validator_explanation_short': '请说明得更详细一些。'
 'item_report.validator_explanation_long': '说明太长了。'
 'item_report.validator_good_faith': '请确认你是出于善意提交此举报。'
+'report.validator_remarks_long': '备注太长了。'

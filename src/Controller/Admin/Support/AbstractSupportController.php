@@ -41,6 +41,12 @@ abstract class AbstractSupportController extends AbstractController
                 icon: 'flag',
                 isActive: $this->activeSupportTab === 'reports',
             );
+            $tabs[] = new AdminTab(
+                label: $this->translator->trans('admin_support.tab_moderation'),
+                target: $this->generateUrl('app_admin_support_moderation'),
+                icon: 'user-shield',
+                isActive: $this->activeSupportTab === 'moderation',
+            );
         }
 
         return new AdminTabs($tabs);

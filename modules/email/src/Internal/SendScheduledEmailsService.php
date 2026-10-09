@@ -5,6 +5,7 @@ namespace Module\Email\Internal;
 use App\CronTaskInterface;
 use App\Enum\CronTaskStatus;
 use App\ValueObject\CronTaskResult;
+use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Module\Email\Contract\GuardOutcome;
 use Module\Email\Contract\MailerInterface;
@@ -17,6 +18,8 @@ use Throwable;
 
 final readonly class SendScheduledEmailsService implements CronTaskInterface
 {
+    private const int FLUSH_EVERY = 200;
+
     /**
      * @param iterable<ScheduledEmailInterface> $scheduledEmails
      */
@@ -26,6 +29,7 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
         private ClockInterface $clock,
         private LoggerInterface $logger,
         private MailerInterface $mailer,
+        private EntityManagerInterface $em,
     ) {}
 
     public function getIdentifier(): string
@@ -47,6 +51,7 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
             }
 
             $totalSent = 0;
+            $unflushed = 0;
             $loggedGuardErrors = [];
 
             foreach ($this->scheduledEmails as $email) {
@@ -55,7 +60,7 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
                     foreach ($dueContext->potentialRecipients as $user) {
                         $ctx = array_merge($dueContext->data, ['user' => $user]);
                         try {
-                            $outcome = $this->mailer->send($email, $ctx);
+                            $outcome = $this->mailer->send($email, $ctx, flush: false);
                         } catch (InvalidArgumentException $e) {
                             $dedupKey = $email->getIdentifier() . ':' . $e->getMessage();
                             if (!isset($loggedGuardErrors[$dedupKey])) {
@@ -87,7 +92,14 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
                         }
 
                         $sent += $outcome->queued;
+                        $unflushed += $outcome->queued;
+                        if ($unflushed >= self::FLUSH_EVERY) {
+                            $this->em->flush();
+                            $unflushed = 0;
+                        }
                     }
+                    $this->em->flush();
+                    $unflushed = 0;
                     $email->markContextSent($dueContext);
                     $totalSent += $sent;
                 }

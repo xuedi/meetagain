@@ -73,6 +73,29 @@ is no retention job.
 second run is the staleness and uniqueness guard. A duplicate that appeared while the suggestion sat in the
 queue is caught *before* the first write, so a collision never leaves a half-created row behind.
 
+## A suggestion is reviewed where it was made
+
+The module asks a provider `canReview(int $userId)` without naming the suggestion, and every provider answers from
+the reviewer's current context. On its own that lets a reviewer from one place approve a suggestion made in another,
+and the created row lands in the reviewer's place, not the proposer's.
+
+`Contract\ScopeProviderInterface` closes that gap and stays mechanical. `capture()` returns an opaque key for the
+place the current request runs in; `propose()` stores it in the suggestion's `scope` column. Every later check and
+write for that suggestion runs inside `runIn(scope, ...)`: the review listing, the detail page with its form, inline
+approve and deny, and the second `validate()` plus `create()` at approval. A reviewer therefore sees only the
+suggestions their role covers in the place each was made, and the row is created there.
+
+The module takes the first registered implementation. With none, or a null key, everything runs in the reviewer's
+own context. `restore()` takes the key from `PortableSuggestion::$scope`, so seeded suggestions can be scoped too.
+
+## The proposer hears the outcome
+
+Approving sends `suggestion_approved` and rejecting sends `suggestion_rejected` to the proposer, for every target
+type. Both carry the provider's `describe()` text and link to `/contribute`; withdrawing sends nothing. They are core
+email types (`Internal\Emails\`), their default bodies live in `modules/suggestion/templates/email/defaults/`, and
+`Internal\Emails\TemplateProvider` seeds them. They are sent inside the suggestion's scope, so the mail carries the
+branding of the place it was made in.
+
 ## The empty plugin key means core
 
 `Internal\Registry` drops the providers of plugins that are not globally active
@@ -85,10 +108,11 @@ provider would be silently dropped, because the empty string is never in the act
 | Member                    | What it is for                                                                           |
 |---------------------------|------------------------------------------------------------------------------------------|
 | `TargetProviderInterface` | the seam: one implementation per suggestible type, auto-tagged                           |
+| `ScopeProviderInterface`  | the second seam: where a suggestion was made, and running work there; at most one        |
 | `SuggestionInterface`     | the facade: `providerFor()`, `propose()`, `pendingFor()`, `find()`, `restore()`          |
 | `View`                    | a suggestion as callers see it: id, type, `Status`, description, summary rows, createdId |
 | `Status`                  | the four states, with their label keys                                                   |
-| `PortableSuggestion`      | a pending suggestion to store as given, for seeding                                      |
+| `PortableSuggestion`      | a pending suggestion to store as given, with its scope, for seeding                      |
 
 `propose()` returns the provider's refusal as a translated string rather than throwing, because a contract
 class must be final and readonly, and an exception cannot be. `restore()` skips permission checks,
@@ -134,6 +158,9 @@ Meta carries `target_type`, `created_id` and the provider's `describe()` string.
 | `App\Activity\ActivityService`, `MessageAbstract`                                             | the three activity messages                      |
 | `App\Service\Notification\User\ReviewNotificationProviderInterface`, `ReviewNotificationItem` | the review hub entry                             |
 | `App\Service\Config\PluginService`                                                            | the registry drops providers of inactive plugins |
+| `App\Emails\EmailAbstract`, `MockSampleFactory`, two recipient guard rules                    | the approved and rejected mails                  |
+| `App\ExtendedFilesystem`, `App\Service\Config\ConfigService`                                  | the mails' default bodies and sender address     |
+| `Module\Email\Contract\**`                                                                    | mailer, blocklist and template seams             |
 
 The list lives in `mago.toml`, one comment per entry.
 
@@ -146,6 +173,9 @@ The list lives in `mago.toml`, one comment per entry.
 | `modules/suggestion/src/Internal/Registry.php`          | providers keyed by target type, gated on active plugins                        |
 | `modules/suggestion/src/Internal/Controller/`           | the detail page, rendered from `modules/suggestion/templates/review.html.twig` |
 | `modules/suggestion/src/Internal/Notification/`         | the review hub entry                                                           |
+| `modules/suggestion/src/Internal/Emails/`               | the approved and rejected mails and their template provider                    |
+| `modules/suggestion/templates/email/defaults/`          | the mails' default bodies, one folder per locale                               |
 | `modules/suggestion/src/Internal/Activity/`             | the three activity messages                                                    |
 | `modules/suggestion/migrations/`                        | namespace `ModuleSuggestionMigrations`                                         |
 | `modules/suggestion/tests/Stub/Target.php`              | a stand-in provider whose verdict, reviewers and created rows a test controls  |
+| `modules/suggestion/tests/Stub/Scope.php`               | a stand-in scope provider whose current scope a test sets                      |

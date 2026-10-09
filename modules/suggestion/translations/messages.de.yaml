@@ -7,6 +7,8 @@ profile_social:
     activity_suggestion_rejected: 'Vorschlag abgelehnt: %target%'
 
 review_suggestion:
+    trigger_approved: 'wenn ein Vorschlag angenommen wird'
+    trigger_rejected: 'wenn ein Vorschlag abgelehnt wird'
     page_title: 'Vorschlag'
     submitted_by: '%proposer% hat %type% neu vorgeschlagen'
     intro: 'Korrigiere, was nicht stimmt, und übernimm den Vorschlag.'

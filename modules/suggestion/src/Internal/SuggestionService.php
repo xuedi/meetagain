@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Module\Suggestion\Contract\PortableSuggestion;
+use Module\Suggestion\Contract\ScopeProviderInterface;
 use Module\Suggestion\Contract\Status;
 use Module\Suggestion\Contract\SuggestionInterface;
 use Module\Suggestion\Contract\TargetProviderInterface;
@@ -15,18 +16,28 @@ use Module\Suggestion\Contract\View;
 use Module\Suggestion\Internal\Activity\Approved;
 use Module\Suggestion\Internal\Activity\Created;
 use Module\Suggestion\Internal\Activity\Rejected;
+use Module\Suggestion\Internal\Emails\Approved as ApprovedEmail;
+use Module\Suggestion\Internal\Emails\Rejected as RejectedEmail;
 use Module\Suggestion\Internal\Entity\Suggestion;
 use Module\Suggestion\Internal\Repository\SuggestionRepository;
 use Override;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 readonly class SuggestionService implements SuggestionInterface
 {
+    /**
+     * @param iterable<ScopeProviderInterface> $scopeProviders
+     */
     public function __construct(
         private EntityManagerInterface $em,
         private SuggestionRepository $repo,
         private Registry $registry,
         private ActivityService $activityService,
+        private ApprovedEmail $approvedEmail,
+        private RejectedEmail $rejectedEmail,
+        #[AutowireIterator(ScopeProviderInterface::class)]
+        private iterable $scopeProviders = [],
     ) {}
 
     #[Override]
@@ -54,6 +65,7 @@ readonly class SuggestionService implements SuggestionInterface
         $suggestion->setTargetType($targetType);
         $suggestion->setProposedBy($proposer);
         $suggestion->setPayload($provider->toPayload($draft));
+        $suggestion->setScope($this->scopeProvider()?->capture());
 
         $this->em->persist($suggestion);
         $this->em->flush();
@@ -91,6 +103,7 @@ readonly class SuggestionService implements SuggestionInterface
         $row->setTargetType($suggestion->targetType);
         $row->setProposedBy($this->em->getReference(User::class, $suggestion->proposerId));
         $row->setPayload($suggestion->payload);
+        $row->setScope($suggestion->scope);
 
         $this->em->persist($row);
         $this->em->flush();
@@ -99,6 +112,42 @@ readonly class SuggestionService implements SuggestionInterface
     }
 
     public function approve(Suggestion $suggestion, object $editedDraft, User $reviewer): int
+    {
+        return $this->inScope($suggestion, fn(): int => $this->approveHere($suggestion, $editedDraft, $reviewer));
+    }
+
+    public function reject(Suggestion $suggestion, User $reviewer): void
+    {
+        $this->inScope($suggestion, function () use ($suggestion, $reviewer): void {
+            $this->reviewableProvider($suggestion, $reviewer);
+            $this->ensurePending($suggestion);
+
+            $this->resolve($suggestion, $reviewer, Status::Rejected);
+
+            $this->activityService->log(Rejected::TYPE, $reviewer, $this->activityMeta($suggestion));
+            $this->rejectedEmail->send($this->mailContext($suggestion));
+        });
+    }
+
+    /**
+     * @template T
+     *
+     * @param callable(): T $work
+     *
+     * @return T
+     */
+    public function inScope(Suggestion $suggestion, callable $work): mixed
+    {
+        $scope = $suggestion->getScope();
+        $provider = $this->scopeProvider();
+        if ($scope === null || $provider === null) {
+            return $work();
+        }
+
+        return $provider->runIn($scope, $work);
+    }
+
+    private function approveHere(Suggestion $suggestion, object $editedDraft, User $reviewer): int
     {
         $provider = $this->reviewableProvider($suggestion, $reviewer);
         $this->ensurePending($suggestion);
@@ -115,18 +164,9 @@ readonly class SuggestionService implements SuggestionInterface
         $this->resolve($suggestion, $reviewer, Status::Approved);
 
         $this->activityService->log(Approved::TYPE, $reviewer, $this->activityMeta($suggestion));
+        $this->approvedEmail->send($this->mailContext($suggestion));
 
         return $createdId;
-    }
-
-    public function reject(Suggestion $suggestion, User $reviewer): void
-    {
-        $this->reviewableProvider($suggestion, $reviewer);
-        $this->ensurePending($suggestion);
-
-        $this->resolve($suggestion, $reviewer, Status::Rejected);
-
-        $this->activityService->log(Rejected::TYPE, $reviewer, $this->activityMeta($suggestion));
     }
 
     public function withdraw(Suggestion $suggestion, User $user): void
@@ -149,12 +189,9 @@ readonly class SuggestionService implements SuggestionInterface
     {
         $reviewable = [];
         foreach ($this->repo->findPending() as $suggestion) {
-            $provider = $this->registry->providerFor($suggestion->getTargetType());
-            if ($provider === null || !$provider->canReview((int) $user->getId())) {
-                continue;
+            if ($this->canReview($suggestion, $user)) {
+                $reviewable[] = $suggestion;
             }
-
-            $reviewable[] = $suggestion;
         }
 
         return $reviewable;
@@ -165,9 +202,14 @@ readonly class SuggestionService implements SuggestionInterface
         return $this->registry->has($targetType);
     }
 
-    public function canReviewTargetType(string $targetType, User $user): bool
+    public function canReview(Suggestion $suggestion, User $user): bool
     {
-        return $this->registry->providerFor($targetType)?->canReview((int) $user->getId()) === true;
+        $provider = $this->registry->providerFor($suggestion->getTargetType());
+        if ($provider === null) {
+            return false;
+        }
+
+        return $this->inScope($suggestion, static fn(): bool => $provider->canReview((int) $user->getId()));
     }
 
     public function draftFor(Suggestion $suggestion): object
@@ -218,6 +260,11 @@ readonly class SuggestionService implements SuggestionInterface
         return $provider;
     }
 
+    private function scopeProvider(): ?ScopeProviderInterface
+    {
+        return iterator_to_array($this->scopeProviders, false)[0] ?? null;
+    }
+
     private function ensurePending(Suggestion $suggestion): void
     {
         if (!$suggestion->isPending()) {
@@ -231,6 +278,12 @@ readonly class SuggestionService implements SuggestionInterface
         $suggestion->setReviewedBy($reviewer);
         $suggestion->setResolvedAt(new DateTimeImmutable());
         $this->em->flush();
+    }
+
+    /** @return array{user: User, description: string} */
+    private function mailContext(Suggestion $suggestion): array
+    {
+        return ['user' => $suggestion->getProposedBy(), 'description' => $this->describe($suggestion)];
     }
 
     /** @return array{target_type: string, created_id: ?int, description: string} */

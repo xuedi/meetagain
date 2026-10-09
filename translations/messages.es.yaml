@@ -142,6 +142,10 @@ security:
     label_password: 'Contraseña'
     label_agree_terms: 'Acepto los términos'
 events:
+    button_new_event: 'Nuevo evento'
+    button_suggest_event: 'Sugerir un evento'
+    link_edit_event: 'Editar este evento'
+    link_correct_event: 'Sugerir una corrección para este evento'
     page_title_event: 'Eventos'
     page_title_featured: 'Eventos destacados'
     button_featured: 'Destacados'
@@ -242,6 +246,7 @@ comment:
     flash_not_allowed: 'No tienes permiso para hacer eso.'
     flash_empty: 'Escribe algo antes de enviar.'
     flash_too_long: 'Tu comentario es demasiado largo.'
+    action_report: 'Denunciar comentario'
 error:
     page_title: 'Error'
     404_heading: 'Error: Página no encontrada'
@@ -304,6 +309,7 @@ member:
     admin_action_remove_avatar: 'Eliminar imagen'
     admin_action_restrict_user: 'Restringir usuario'
     admin_action_verify_user: 'Verificar usuario'
+    button_report: 'Denunciar'
 profile:
     page_title: 'Perfil'
     section_info: 'Información'
@@ -426,6 +432,8 @@ profile_social:
     activity_change_proposal_created: 'Propuso un cambio en: %target%'
     activity_change_proposal_applied: 'Aplicó un cambio propuesto en: %target%'
     activity_change_proposal_rejected: 'Rechazó un cambio propuesto en: %target%'
+    activity_reported_subject: 'Denuncia enviada a los moderadores: %reason%'
+    activity_reported_subject_remarks: '%message% - Observaciones: %remarks%'
 profile_images:
     page_heading: 'Imágenes'
     sidebar_general: 'General'
@@ -453,6 +461,7 @@ profile_messages:
     edit_too_long: 'El texto del mensaje es demasiado largo.'
     edit_no_change: 'No hay cambios que guardar.'
     system_support_question: 'Pregunta enviada a través del formulario de soporte:'
+    report_button: 'Denunciar mensaje'
 profile_notifications:
     page_title: 'Notificaciones'
     empty_state: 'No hay notificaciones nuevas'
@@ -592,6 +601,15 @@ report:
     reason_copyright: 'Derechos de autor'
     reason_inappropriate: 'Inapropiado'
     reason_irrelevant: 'Irrelevante'
+    page_title_subject: 'Denunciar a los moderadores'
+    subject_intro: 'Cuéntales a los moderadores qué está mal. Solo ellos ven tu denuncia, y la persona denunciada no sabe quién la envió.'
+    subject_success_body: 'Gracias. Un moderador revisará tu denuncia.'
+    rate_limited_message: 'Has enviado demasiadas denuncias. Inténtalo de nuevo más tarde.'
+    subject_reason_spam: 'Spam o publicidad'
+    subject_reason_harassment: 'Acoso u odio'
+    subject_reason_inappropriate: 'Contenido inapropiado'
+    subject_reason_impersonation: 'Se hace pasar por otra persona'
+    subject_reason_other: 'Otra cosa'
 item_report:
     link_report: 'Denunciar'
     page_title: 'Denunciar contenido'
@@ -738,6 +756,8 @@ notifications:
     section_reported_images: 'Imágenes denunciadas'
     item_reported_image: 'Imagen n.º %image% denunciada por: %reason%'
     image_deleted: 'eliminada'
+    section_moderation_reports: 'Denuncias de miembros'
+    item_moderation_report: '%subject% denunciado por: %reason%'
 town_hall:
     forum_page_title: 'Foro'
     forum_sidebar_heading: 'Temas'
@@ -874,6 +894,26 @@ location:
     validator_gone: 'Ese lugar ya no existe.'
     validator_blank: 'Este campo no puede estar vacío.'
     validator_unknown_field: 'Ese campo no pertenece a un lugar.'
+
+event_proposal:
+    type_label: 'Evento'
+    suggestion_description: '%title% el %date%'
+    form_label_title: 'Título'
+    form_label_start: 'Inicio'
+    form_label_stop: 'Fin'
+    form_label_type: 'Tipo'
+    form_placeholder_type: 'Elige un tipo'
+    form_label_location: 'Lugar'
+    form_placeholder_location: 'Aún sin decidir'
+    form_label_teaser: 'Resumen'
+    form_label_description: 'Descripción'
+    summary_language: 'Idioma'
+    type_regular: 'Normal'
+    type_outdoor: 'Al aire libre'
+    type_dinner: 'Cena'
+    validator_incomplete: 'Un evento necesita un título, una descripción y un inicio.'
+    validator_start_past: 'El evento tiene que empezar en el futuro.'
+    validator_stop_before_start: 'El evento tiene que terminar después de empezar.'
 
 contribution:
     page_title: 'Ayuda a corregir'

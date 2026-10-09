@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'report.page_title_subject'|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-6">
+                    <div class="box">
+
+                        <h1 class="title is-4">{{ 'report.page_title_subject'|trans }}</h1>
+                        <p class="mb-4">{{ 'report.subject_intro'|trans }}</p>
+
+                        {{ form_start(form) }}
+                        {{ form_errors(form) }}
+                        {{ form_row(form.reason) }}
+                        {{ form_row(form.remarks) }}
+
+                        <div class="field">
+                            <button class="button is-danger is-medium is-fullwidth">
+                                <span class="icon is-small">
+                                    <i class="fa-solid fa-flag"></i>
+                                </span>
+                                <span>{{ 'report.button_submit'|trans }}</span>
+                            </button>
+                        </div>
+                        {{ form_end(form) }}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

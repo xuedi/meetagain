@@ -1,11 +1,10 @@
 {#
-    Gallery: Status display -- Topbar tag vs in-cell text/`tag is-light`
+    Gallery: Status display -- Topbar tag vs in-cell tag
 
     `architecture/ux/ux-admin.md` Design Rules and Bulma allowlist:
       - status as a tag belongs in the topbar (`tag is-warning/is-danger/is-success/is-light`,
         sized `is-medium`)
-      - in-cell status uses plain coloured text; for type-like categorical labels a small
-        `tag is-light` is acceptable.
+      - in-cell status is a coloured tag; type-like categorical labels are a plain `tag is-light`.
 
     Used in:    admin/system/theme/gallery/index.html.twig
     Parameters: none
@@ -36,15 +35,15 @@
     <tbody>
         <tr>
             <td>about</td>
-            <td><span class="has-text-success">{{ 'admin_system_gallery.plain_status_published'|trans }}</span></td>
+            <td><span class="tag is-success">{{ 'admin_system_gallery.plain_status_published'|trans }}</span></td>
         </tr>
         <tr>
             <td>contact</td>
-            <td><span class="has-text-grey-light">{{ 'admin_system_gallery.plain_status_draft'|trans }}</span></td>
+            <td><span class="tag is-light">{{ 'admin_system_gallery.plain_status_draft'|trans }}</span></td>
         </tr>
         <tr>
             <td>imprint</td>
-            <td><span class="has-text-danger">{{ 'admin_system_gallery.plain_status_locked'|trans }}</span></td>
+            <td><span class="tag is-danger">{{ 'admin_system_gallery.plain_status_locked'|trans }}</span></td>
         </tr>
     </tbody>
 </table>

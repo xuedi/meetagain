@@ -122,6 +122,12 @@
                                                 {% if message.editedAt is not null %}
                                                     <small class="has-text-grey ml-1 edited-marker">{{ 'profile_messages.edited_marker'|trans }}</small>
                                                 {% endif %}
+                                                <a href="{{ path('app_report_subject', {'type': 'message', 'id': message.id}) }}"
+                                                   class="ml-1 has-text-grey"
+                                                   title="{{ 'profile_messages.report_button'|trans }}"
+                                                   aria-label="{{ 'profile_messages.report_button'|trans }}">
+                                                    <span class="icon is-small"><i class="fa fa-flag"></i></span>
+                                                </a>
                                                 <br>
                                                 {% include 'profile/messages/_message_body.html.twig' with {'content': message.content} only %}
                                             </div>

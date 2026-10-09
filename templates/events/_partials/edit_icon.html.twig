@@ -1,0 +1,15 @@
+{% set label = (link.admin ? 'events.link_edit_event' : 'events.link_correct_event')|trans %}
+{% if link.entry is defined %}
+    <form method="post" action="{{ link.entry.action }}" class="is-inline">
+        {% for name, value in link.entry.fields %}
+            <input type="hidden" name="{{ name }}" value="{{ value }}">
+        {% endfor %}
+        <button type="submit" class="button-as-icon icon has-text-grey {{ sizeClass }}" title="{{ label }}" aria-label="{{ label }}">
+            <i class="fas fa-pen" aria-hidden="true"></i>
+        </button>
+    </form>
+{% else %}
+    <a href="{{ link.url }}" class="icon has-text-grey {{ sizeClass }}" title="{{ label }}" aria-label="{{ label }}">
+        <i class="fas fa-pen" aria-hidden="true"></i>
+    </a>
+{% endif %}

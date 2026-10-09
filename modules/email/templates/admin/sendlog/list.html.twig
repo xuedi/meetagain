@@ -52,11 +52,8 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if email.status.value == 'late' or email.status.value == 'failed' %}
-                            <span class="has-text-danger">{{ email.status.value }}</span>
-                        {% else %}
-                            {{ email.status.value }}
-                        {% endif %}
+                        {% set statusVariants = {'sent': 'is-success', 'pending': 'is-warning', 'late': 'is-danger', 'failed': 'is-danger'} %}
+                        <span class="tag {{ statusVariants[email.status.value] }}">{{ email.status.value }}</span>
                     </td>
                     <td>
                         {% set ps = email.providerStatus %}

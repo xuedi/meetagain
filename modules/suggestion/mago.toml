@@ -20,6 +20,13 @@ permit = [
     "App\\Service\\Notification\\User\\ReviewNotificationProviderInterface", # pending suggestions surface in core's review hub
     "App\\Service\\Notification\\User\\ReviewNotificationItem",              # that chain's item type
     "App\\Service\\Config\\PluginService",                                   # the registry drops providers of globally inactive plugins
+    "App\\Emails\\EmailAbstract",                                            # the approved and rejected mails are core email types
+    "App\\Emails\\MockSampleFactory",                                        # their preview samples
+    "App\\Emails\\Guard\\Rule\\RecipientUserPresentRule",                    # the two recipient guards both mails declare
+    "App\\Emails\\Guard\\Rule\\RecipientNotBlocklistedRule",                 # and the second of them
+    "App\\ExtendedFilesystem",                                               # the template provider reads the default bodies from disk
+    "App\\Service\\Config\\ConfigService",                                   # the mails' sender address
+    "Module\\Email\\Contract\\**",                                           # mailer, blocklist and template seams
     "Doctrine\\**",
     "Symfony\\**",
     "Twig\\**",
@@ -40,6 +47,13 @@ permit = [
     "App\\Service\\Notification\\User\\ReviewNotificationProviderInterface", # pending suggestions surface in core's review hub
     "App\\Service\\Notification\\User\\ReviewNotificationItem",              # that chain's item type
     "App\\Service\\Config\\PluginService",                                   # the registry drops providers of globally inactive plugins
+    "App\\Emails\\EmailAbstract",                                            # the approved and rejected mails are core email types
+    "App\\Emails\\MockSampleFactory",                                        # their preview samples
+    "App\\Emails\\Guard\\Rule\\RecipientUserPresentRule",                    # the two recipient guards both mails declare
+    "App\\Emails\\Guard\\Rule\\RecipientNotBlocklistedRule",                 # and the second of them
+    "App\\ExtendedFilesystem",                                               # the template provider reads the default bodies from disk
+    "App\\Service\\Config\\ConfigService",                                   # the mails' sender address
+    "Module\\Email\\Contract\\**",                                           # mailer, blocklist and template seams
     "PHPUnit\\**",
     "Tests\\Module\\**",                                                     # the shared module test harness: ModuleKernel and Members
     "Doctrine\\**",

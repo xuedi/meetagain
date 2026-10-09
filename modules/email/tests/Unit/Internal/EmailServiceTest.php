@@ -21,6 +21,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -169,6 +171,59 @@ final class EmailServiceTest extends TestCase
         static::assertInstanceOf(DateTimeImmutable::class, $queued->getProviderDispatchedAt());
     }
 
+    public function testSendQueueWorksThroughFullChunksUntilAShortOneAndFlushesAndDetachesEach(): void
+    {
+        // Arrange
+        $chunks = [$this->pendingRows(200), $this->pendingRows(200), $this->pendingRows(3)];
+        $mailRepoStub = $this->createStub(EmailQueueRepository::class);
+        $mailRepoStub->method('findBy')->willReturnOnConsecutiveCalls(...$chunks);
+
+        $sentMessage = $this->createStub(SentMessage::class);
+        $sentMessage->method('getMessageId')->willReturn('id');
+        $mailerStub = $this->createStub(TransportInterface::class);
+        $mailerStub->method('send')->willReturn($sentMessage);
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->exactly(3))->method('flush');
+        $emMock->expects($this->exactly(403))->method('detach');
+
+        $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, em: $emMock);
+
+        // Act
+        $result = $service->sendQueue();
+
+        // Assert
+        static::assertSame('403', $result);
+    }
+
+    public function testSendQueueStopsOnceTheTimeBudgetIsSpentAndReportsWhatIsLeft(): void
+    {
+        // Arrange
+        $clock = new MockClock();
+        $mailRepoMock = $this->createMock(EmailQueueRepository::class);
+        $mailRepoMock->expects($this->once())->method('findBy')->willReturn($this->pendingRows(200));
+        $mailRepoMock->method('count')->willReturn(800);
+
+        $sentMessage = $this->createStub(SentMessage::class);
+        $sentMessage->method('getMessageId')->willReturn('id');
+        $mailerStub = $this->createStub(TransportInterface::class);
+        $mailerStub
+            ->method('send')
+            ->willReturnCallback(static function () use ($clock, $sentMessage): SentMessage {
+                $clock->sleep(1);
+
+                return $sentMessage;
+            });
+
+        $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoMock, clock: $clock);
+
+        // Act
+        $result = $service->sendQueue();
+
+        // Assert
+        static::assertSame('200 (Pending: 800)', $result);
+    }
+
     public function testSendQueueTransportExceptionSetsFailedStatusAndReturnsFailedCount(): void
     {
         // Arrange
@@ -247,7 +302,10 @@ final class EmailServiceTest extends TestCase
         $mailerStub->method('send')->willReturnOnConsecutiveCalls($sentMessage, $this->throwException($exception));
 
         $loggerMock = $this->createMock(LoggerInterface::class);
-        $loggerMock->expects($this->once())->method('warning')->with('Email queue processed with issues', ['sent' => 1, 'failed' => 1, 'late' => 0]);
+        $loggerMock
+            ->expects($this->once())
+            ->method('warning')
+            ->with('Email queue processed with issues', ['sent' => 1, 'failed' => 1, 'late' => 0, 'pending' => 0]);
 
         $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, logger: $loggerMock);
 
@@ -275,6 +333,7 @@ final class EmailServiceTest extends TestCase
             enrichers: [],
             identityProviders: [$deferring],
             pushDispatchers: [],
+            clock: new MockClock(),
         );
 
         // Assert
@@ -439,6 +498,25 @@ final class EmailServiceTest extends TestCase
         return $source;
     }
 
+    /**
+     * @return list<EmailQueue>
+     */
+    private function pendingRows(int $count): array
+    {
+        $rows = [];
+        for ($i = 0; $i < $count; ++$i) {
+            $rows[] = new EmailQueue()
+                ->setSender('"email sender" <sender@email.com>')
+                ->setRecipient(sprintf('user%d@example.com', $i))
+                ->setSubject('Subject')
+                ->setRenderedBody('<p>body</p>')
+                ->setLang('en')
+                ->setContext([]);
+        }
+
+        return $rows;
+    }
+
     private function createService(
         ?TransportInterface $mailer = null,
         ?EmailQueueRepository $mailRepo = null,
@@ -450,6 +528,7 @@ final class EmailServiceTest extends TestCase
         iterable $identityProviders = [],
         ?SendingIdentity $fallbackIdentity = null,
         iterable $pushDispatchers = [],
+        ?ClockInterface $clock = null,
     ): EmailService {
         if ($templateService === null) {
             $templateService = $this->createStub(EmailTemplateService::class);
@@ -477,6 +556,7 @@ final class EmailServiceTest extends TestCase
             enrichers: $enrichers,
             identityProviders: [...$identityProviders, $this->answering($fallbackIdentity ?? self::identity())],
             pushDispatchers: $pushDispatchers,
+            clock: $clock ?? new MockClock(),
         );
     }
 
