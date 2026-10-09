@@ -1,0 +1,73 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <table class="table is-fullwidth">
+            <tbody>
+                <tr>
+                    <th>{{ 'admin_support_moderation.col_date'|trans }}</th>
+                    <td>{{ report.createdAt|date('Y-m-d H:i:s') }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support_moderation.col_type'|trans }}</th>
+                    <td><span class="tag is-light">{{ report.subjectType }}</span> <code>{{ report.subjectId }}</code></td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support_moderation.col_subject'|trans }}</th>
+                    <td>{{ report.subjectLabel }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support_moderation.col_excerpt'|trans }}</th>
+                    <td><span class="breakText">{{ report.excerpt|default('-')|safe_message }}</span></td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support_moderation.col_author'|trans }}</th>
+                    <td>
+                        {% if report.author %}
+                            <a href="{{ path('app_admin_member_edit', {'id': report.author.id}) }}">{{ report.author.name }}</a>
+                            <span class="tag {{ report.author.status.tagVariant() }} ml-1">{{ report.author.status.label()|trans }}</span>
+                        {% else %}
+                            <span class="has-text-grey">{{ 'admin_support_moderation.label_deleted'|trans }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support_moderation.col_reporter'|trans }}</th>
+                    <td>
+                        {% if report.reporter %}
+                            <a href="{{ path('app_admin_member_edit', {'id': report.reporter.id}) }}">{{ report.reporter.name }}</a>
+                        {% else %}
+                            <span class="has-text-grey">{{ 'admin_support_moderation.label_deleted'|trans }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support_moderation.col_reason'|trans }}</th>
+                    <td>{{ report.reason.label()|trans }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support_moderation.col_remarks'|trans }}</th>
+                    <td><span class="breakText">{{ report.remarks|default('-')|safe_message }}</span></td>
+                </tr>
+                <tr>
+                    <th>{{ 'admin_support_moderation.col_status'|trans }}</th>
+                    <td>
+                        <span class="tag {{ report.status.tagVariant() }}">{{ report.status.label()|trans }}</span>
+                        {% if report.resolvedAt %}
+                            <small class="has-text-grey ml-1">
+                                {{ report.resolvedAt|date('Y-m-d H:i') }}{% if report.resolvedBy %}, {{ report.resolvedBy.name }}{% endif %}
+                            </small>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

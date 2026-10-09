@@ -246,6 +246,7 @@ comment:
     flash_not_allowed: '您没有权限执行此操作。'
     flash_empty: '提交前请先写点内容。'
     flash_too_long: '您的评论太长了。'
+    action_report: '举报评论'
 error:
     page_title: '错误'
     404_heading: '错误：找不到页面'
@@ -308,6 +309,7 @@ member:
     admin_action_remove_avatar: '移除头像'
     admin_action_restrict_user: '限制用户'
     admin_action_verify_user: '验证用户'
+    button_report: '举报'
 profile:
     page_title: '概况'
     section_info: '信息'
@@ -430,6 +432,8 @@ profile_social:
     activity_change_proposal_created: '提出了修改建议：%target%'
     activity_change_proposal_applied: '采纳了修改建议：%target%'
     activity_change_proposal_rejected: '拒绝了修改建议：%target%'
+    activity_reported_subject: '已向管理员举报：%reason%'
+    activity_reported_subject_remarks: '%message% - 备注：%remarks%'
 profile_images:
     page_heading: '图片'
     sidebar_general: '常规'
@@ -457,6 +461,7 @@ profile_messages:
     edit_too_long: '消息内容过长。'
     edit_no_change: '没有要保存的更改。'
     system_support_question: '通过支持表单提问：'
+    report_button: '举报消息'
 profile_notifications:
     page_title: '通知'
     empty_state: '暂无新通知'
@@ -596,6 +601,15 @@ report:
     reason_copyright: '版权'
     reason_inappropriate: '不恰当'
     reason_irrelevant: 'Irrelevant'
+    page_title_subject: '向管理员举报'
+    subject_intro: '告诉管理员哪里有问题。只有管理员能看到你的举报，被举报的人不会知道是谁举报的。'
+    subject_success_body: '谢谢。管理员会查看你的举报。'
+    rate_limited_message: '你发送的举报太多了，请稍后再试。'
+    subject_reason_spam: '垃圾信息或广告'
+    subject_reason_harassment: '骚扰或仇恨言论'
+    subject_reason_inappropriate: '不当内容'
+    subject_reason_impersonation: '冒充他人'
+    subject_reason_other: '其他'
 item_report:
     link_report: '举报'
     page_title: '举报内容'
@@ -732,6 +746,8 @@ notifications:
     section_reported_images: '被举报的图片'
     item_reported_image: '图片 #%image% 被举报，原因：%reason%'
     image_deleted: '已删除'
+    section_moderation_reports: '成员举报'
+    item_moderation_report: '%subject% 被举报，原因：%reason%'
 town_hall:
     forum_page_title: '论坛'
     forum_sidebar_heading: '话题'

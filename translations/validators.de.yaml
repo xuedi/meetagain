@@ -231,3 +231,4 @@ Error: Fehler
 'item_report.validator_explanation_short': 'Bitte beschreib es etwas genauer.'
 'item_report.validator_explanation_long': 'Die Begründung ist zu lang.'
 'item_report.validator_good_faith': 'Bitte bestätige, dass du die Meldung in gutem Glauben machst.'
+'report.validator_remarks_long': 'Die Bemerkungen sind zu lang.'

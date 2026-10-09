@@ -63,6 +63,14 @@
                     {% if message.editedAt is not null %}
                         <small class="has-text-grey ml-1 edited-marker">{{ 'profile_messages.edited_marker'|trans }}</small>
                     {% endif %}
+                    {% if not isOwn %}
+                        <a href="{{ path('app_report_subject', {'type': 'message', 'id': message.id}) }}"
+                           class="ml-1 has-text-grey"
+                           title="{{ 'profile_messages.report_button'|trans }}"
+                           aria-label="{{ 'profile_messages.report_button'|trans }}">
+                            <span class="icon is-small"><i class="fa fa-flag"></i></span>
+                        </a>
+                    {% endif %}
                     {% if withinWindow %}
                         <a href="#" class="message-edit-trigger ml-1"
                            title="{{ 'profile_messages.edit_button'|trans }}"

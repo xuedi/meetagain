@@ -58,6 +58,12 @@
                                     {% endif %}
 
                                     {{ get_member_view_actions(currentUser, userDetails) }}
+
+                                    <a href="{{ path('app_report_subject', {'type': 'user', 'id': userDetails.id}) }}"
+                                       class="button is-light is-small">
+                                        <span class="icon"><i class="fa fa-flag"></i></span>
+                                        <span>{{ 'member.button_report'|trans }}</span>
+                                    </a>
                                 </div>
                             </div>
                         {% endif %}

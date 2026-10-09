@@ -246,6 +246,7 @@ comment:
     flash_not_allowed: 'You are not allowed to do that.'
     flash_empty: 'Please write something before submitting.'
     flash_too_long: 'Your comment is too long.'
+    action_report: 'Report comment'
 error:
     page_title: 'Error'
     404_heading: 'Error: Page not found'
@@ -308,6 +309,7 @@ member:
     admin_action_remove_avatar: 'Remove image'
     admin_action_restrict_user: 'Restrict user'
     admin_action_verify_user: 'Verify user'
+    button_report: 'Report'
 profile:
     page_title: 'Profile'
     section_info: 'Info'
@@ -430,6 +432,8 @@ profile_social:
     activity_change_proposal_created: 'Proposed a change to: %target%'
     activity_change_proposal_applied: 'Applied a proposed change to: %target%'
     activity_change_proposal_rejected: 'Rejected a proposed change to: %target%'
+    activity_reported_subject: 'Sent a report to the moderators: %reason%'
+    activity_reported_subject_remarks: '%message% - Remarks: %remarks%'
 profile_images:
     page_heading: 'Images'
     sidebar_general: 'General'
@@ -457,6 +461,7 @@ profile_messages:
     edit_too_long: 'Message text is too long.'
     edit_no_change: 'No changes to save.'
     system_support_question: 'Via Support form asked:'
+    report_button: 'Report message'
 profile_notifications:
     page_title: 'Notifications'
     empty_state: 'No new notifications'
@@ -596,6 +601,15 @@ report:
     reason_copyright: 'Copyright'
     reason_inappropriate: 'Inappropriate'
     reason_irrelevant: 'Irrelevant'
+    page_title_subject: 'Report to the moderators'
+    subject_intro: 'Tell the moderators what is wrong. Only they see your report, and the person you report is not told who sent it.'
+    subject_success_body: 'Thank you. A moderator will look at your report.'
+    rate_limited_message: 'You have sent too many reports. Please try again later.'
+    subject_reason_spam: 'Spam or advertising'
+    subject_reason_harassment: 'Harassment or hate'
+    subject_reason_inappropriate: 'Inappropriate content'
+    subject_reason_impersonation: 'Pretending to be someone else'
+    subject_reason_other: 'Something else'
 item_report:
     link_report: 'Report'
     page_title: 'Report content'
@@ -742,6 +756,8 @@ notifications:
     section_reported_images: 'Reported images'
     item_reported_image: 'Image #%image% reported for: %reason%'
     image_deleted: 'deleted'
+    section_moderation_reports: 'Member reports'
+    item_moderation_report: '%subject% reported for: %reason%'
 town_hall:
     forum_page_title: 'Forum'
     forum_sidebar_heading: 'Topics'

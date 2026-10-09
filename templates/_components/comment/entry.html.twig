@@ -2,7 +2,7 @@
     Comment Entry -- Single comment box with avatar, author name, timestamp, and action links
 
     Renders a Bulma media card for one comment. Shows a delete link when the viewer may remove
-    the comment, a reply button when viewing someone else's, and a message link to the author.
+    the comment, reply and report links when viewing someone else's, and a message link to the author.
     All action links are visible only to authenticated users; an author whose account is gone
     renders as a deleted-user placeholder.
 
@@ -40,6 +40,12 @@
                                    title="{{ 'comment.action_reply'|trans }}">
                                     <span class="icon is-small">
                                         <i class="fas fa-reply" aria-hidden="true"></i>
+                                    </span>
+                                </a>
+                                <a class="level-item" href="{{ path('app_report_subject', {'type': 'comment', 'id': comment.id}) }}"
+                                   title="{{ 'comment.action_report'|trans }}">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-flag" aria-hidden="true"></i>
                                     </span>
                                 </a>
                             {% endif %}

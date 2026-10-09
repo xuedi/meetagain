@@ -246,6 +246,7 @@ comment:
     flash_not_allowed: 'No tienes permiso para hacer eso.'
     flash_empty: 'Escribe algo antes de enviar.'
     flash_too_long: 'Tu comentario es demasiado largo.'
+    action_report: 'Denunciar comentario'
 error:
     page_title: 'Error'
     404_heading: 'Error: Página no encontrada'
@@ -308,6 +309,7 @@ member:
     admin_action_remove_avatar: 'Eliminar imagen'
     admin_action_restrict_user: 'Restringir usuario'
     admin_action_verify_user: 'Verificar usuario'
+    button_report: 'Denunciar'
 profile:
     page_title: 'Perfil'
     section_info: 'Información'
@@ -430,6 +432,8 @@ profile_social:
     activity_change_proposal_created: 'Propuso un cambio en: %target%'
     activity_change_proposal_applied: 'Aplicó un cambio propuesto en: %target%'
     activity_change_proposal_rejected: 'Rechazó un cambio propuesto en: %target%'
+    activity_reported_subject: 'Denuncia enviada a los moderadores: %reason%'
+    activity_reported_subject_remarks: '%message% - Observaciones: %remarks%'
 profile_images:
     page_heading: 'Imágenes'
     sidebar_general: 'General'
@@ -457,6 +461,7 @@ profile_messages:
     edit_too_long: 'El texto del mensaje es demasiado largo.'
     edit_no_change: 'No hay cambios que guardar.'
     system_support_question: 'Pregunta enviada a través del formulario de soporte:'
+    report_button: 'Denunciar mensaje'
 profile_notifications:
     page_title: 'Notificaciones'
     empty_state: 'No hay notificaciones nuevas'
@@ -596,6 +601,15 @@ report:
     reason_copyright: 'Derechos de autor'
     reason_inappropriate: 'Inapropiado'
     reason_irrelevant: 'Irrelevante'
+    page_title_subject: 'Denunciar a los moderadores'
+    subject_intro: 'Cuéntales a los moderadores qué está mal. Solo ellos ven tu denuncia, y la persona denunciada no sabe quién la envió.'
+    subject_success_body: 'Gracias. Un moderador revisará tu denuncia.'
+    rate_limited_message: 'Has enviado demasiadas denuncias. Inténtalo de nuevo más tarde.'
+    subject_reason_spam: 'Spam o publicidad'
+    subject_reason_harassment: 'Acoso u odio'
+    subject_reason_inappropriate: 'Contenido inapropiado'
+    subject_reason_impersonation: 'Se hace pasar por otra persona'
+    subject_reason_other: 'Otra cosa'
 item_report:
     link_report: 'Denunciar'
     page_title: 'Denunciar contenido'
@@ -742,6 +756,8 @@ notifications:
     section_reported_images: 'Imágenes denunciadas'
     item_reported_image: 'Imagen n.º %image% denunciada por: %reason%'
     image_deleted: 'eliminada'
+    section_moderation_reports: 'Denuncias de miembros'
+    item_moderation_report: '%subject% denunciado por: %reason%'
 town_hall:
     forum_page_title: 'Foro'
     forum_sidebar_heading: 'Temas'

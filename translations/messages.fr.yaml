@@ -246,6 +246,7 @@ comment:
     flash_not_allowed: 'Tu n''es pas autorisé à faire cela.'
     flash_empty: 'Écris quelque chose avant d''envoyer.'
     flash_too_long: 'Ton commentaire est trop long.'
+    action_report: 'Signaler le commentaire'
 error:
     page_title: 'Erreur'
     404_heading: 'Erreur : page introuvable'
@@ -308,6 +309,7 @@ member:
     admin_action_remove_avatar: 'Supprimer l''image'
     admin_action_restrict_user: 'Restreindre l''utilisateur'
     admin_action_verify_user: 'Vérifier l''utilisateur'
+    button_report: 'Signaler'
 profile:
     page_title: 'Profil'
     section_info: 'Infos'
@@ -430,6 +432,8 @@ profile_social:
     activity_change_proposal_created: 'A proposé une modification de : %target%'
     activity_change_proposal_applied: 'A appliqué une modification proposée de : %target%'
     activity_change_proposal_rejected: 'A rejeté une modification proposée de : %target%'
+    activity_reported_subject: 'Signalement envoyé aux modérateurs : %reason%'
+    activity_reported_subject_remarks: '%message% - Remarques : %remarks%'
 profile_images:
     page_heading: 'Images'
     sidebar_general: 'Général'
@@ -457,6 +461,7 @@ profile_messages:
     edit_too_long: 'Le texte du message est trop long.'
     edit_no_change: 'Aucune modification à enregistrer.'
     system_support_question: 'Question posée via le formulaire de support :'
+    report_button: 'Signaler le message'
 profile_notifications:
     page_title: 'Notifications'
     empty_state: 'Aucune nouvelle notification'
@@ -596,6 +601,15 @@ report:
     reason_copyright: 'Droit d''auteur'
     reason_inappropriate: 'Inapproprié'
     reason_irrelevant: 'Non pertinent'
+    page_title_subject: 'Signaler aux modérateurs'
+    subject_intro: 'Explique aux modérateurs ce qui ne va pas. Eux seuls voient ton signalement, et la personne signalée ne sait pas qui l''a envoyé.'
+    subject_success_body: 'Merci. Un modérateur va examiner ton signalement.'
+    rate_limited_message: 'Tu as envoyé trop de signalements. Réessaie plus tard.'
+    subject_reason_spam: 'Spam ou publicité'
+    subject_reason_harassment: 'Harcèlement ou haine'
+    subject_reason_inappropriate: 'Contenu inapproprié'
+    subject_reason_impersonation: 'Se fait passer pour quelqu''un d''autre'
+    subject_reason_other: 'Autre chose'
 item_report:
     link_report: 'Signaler'
     page_title: 'Signaler un contenu'
@@ -742,6 +756,8 @@ notifications:
     section_reported_images: 'Images signalées'
     item_reported_image: 'Image n°%image% signalée pour : %reason%'
     image_deleted: 'supprimée'
+    section_moderation_reports: 'Signalements de membres'
+    item_moderation_report: '%subject% signalé pour : %reason%'
 town_hall:
     forum_page_title: 'Forum'
     forum_sidebar_heading: 'Sujets'

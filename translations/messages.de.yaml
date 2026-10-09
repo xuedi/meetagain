@@ -246,6 +246,7 @@ comment:
     flash_not_allowed: 'Das ist dir nicht erlaubt.'
     flash_empty: 'Bitte schreibe etwas, bevor du absendest.'
     flash_too_long: 'Dein Kommentar ist zu lang.'
+    action_report: 'Kommentar melden'
 error:
     page_title: 'Fehler'
     404_heading: 'Fehler: Seite nicht gefunden'
@@ -308,6 +309,7 @@ member:
     admin_action_remove_avatar: 'Bild entfernen'
     admin_action_restrict_user: 'Nutzer einschränken'
     admin_action_verify_user: 'Nutzer verifizieren'
+    button_report: 'Melden'
 profile:
     page_title: 'Profil'
     section_info: 'Info'
@@ -430,6 +432,8 @@ profile_social:
     activity_change_proposal_created: 'Änderung vorgeschlagen für: %target%'
     activity_change_proposal_applied: 'Vorgeschlagene Änderung übernommen für: %target%'
     activity_change_proposal_rejected: 'Vorgeschlagene Änderung abgelehnt für: %target%'
+    activity_reported_subject: 'Meldung an die Moderation gesendet: %reason%'
+    activity_reported_subject_remarks: '%message% - Bemerkungen: %remarks%'
 profile_images:
     page_heading: 'Bilder'
     sidebar_general: 'Allgemein'
@@ -457,6 +461,7 @@ profile_messages:
     edit_too_long: 'Der Nachrichtentext ist zu lang.'
     edit_no_change: 'Keine Änderungen zu speichern.'
     system_support_question: 'Über das Support-Formular gefragt:'
+    report_button: 'Nachricht melden'
 profile_notifications:
     page_title: 'Benachrichtigungen'
     empty_state: 'Keine neuen Benachrichtigungen'
@@ -596,6 +601,15 @@ report:
     reason_copyright: 'Copyright'
     reason_inappropriate: 'Unangemessen'
     reason_irrelevant: 'Nicht relevant'
+    page_title_subject: 'An die Moderation melden'
+    subject_intro: 'Sag der Moderation, was nicht stimmt. Nur sie sieht deine Meldung, und die gemeldete Person erfährt nicht, von wem sie kommt.'
+    subject_success_body: 'Danke. Jemand aus der Moderation sieht sich deine Meldung an.'
+    rate_limited_message: 'Du hast zu viele Meldungen gesendet. Bitte versuche es später noch einmal.'
+    subject_reason_spam: 'Spam oder Werbung'
+    subject_reason_harassment: 'Belästigung oder Hass'
+    subject_reason_inappropriate: 'Unangemessener Inhalt'
+    subject_reason_impersonation: 'Gibt sich als jemand anderes aus'
+    subject_reason_other: 'Etwas anderes'
 item_report:
     link_report: 'Melden'
     page_title: 'Inhalt melden'
@@ -732,6 +746,8 @@ notifications:
     section_reported_images: 'Gemeldete Bilder'
     item_reported_image: 'Bild #%image% gemeldet wegen: %reason%'
     image_deleted: 'gelöscht'
+    section_moderation_reports: 'Mitgliedermeldungen'
+    item_moderation_report: '%subject% gemeldet wegen: %reason%'
 town_hall:
     forum_page_title: 'Forum'
     forum_sidebar_heading: 'Themen'
