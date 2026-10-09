@@ -50,6 +50,12 @@
                             <th>{{ 'admin_support.col_channel'|trans }}</th>
                             <td>{{ request.channel.label()|trans }}</td>
                         </tr>
+                        {% for label, value in details %}
+                            <tr>
+                                <th>{{ label }}</th>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
                         {% if request.token %}
                             <tr>
                                 <th>{{ 'admin_support.col_external'|trans }}</th>
