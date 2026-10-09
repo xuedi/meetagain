@@ -163,7 +163,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Natali.Craig@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 71,
@@ -192,7 +192,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Koray.Okumus@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/c83b57689112253d5a396f7f691b7192171c6d26.jpg"
         },
         {
             "ref": 72,
@@ -221,7 +221,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Natali.Craig@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 73,
@@ -250,7 +250,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Natali.Craig@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 74,
@@ -279,7 +279,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Natali.Craig@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 75,
@@ -308,7 +308,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Natali.Craig@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 76,
@@ -337,7 +337,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Natali.Craig@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 77,
@@ -366,7 +366,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Natali.Craig@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 78,
@@ -395,7 +395,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Koray.Okumus@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/c83b57689112253d5a396f7f691b7192171c6d26.jpg"
         },
         {
             "ref": 79,
@@ -424,7 +424,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Koray.Okumus@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/c83b57689112253d5a396f7f691b7192171c6d26.jpg"
         }
     ],
     "rsvps": [
@@ -1097,12 +1097,20 @@
             "attribution": "Stefano Mortellaro from Catania, Italy, CC BY 2.0, via Wikimedia Commons",
             "attribution_not_required": false
         },
+        "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg": {
+            "attribution": "Nazareth College from Rochester, NY, USA, CC BY 2.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
         "images/874899d615c761eb7429a65e6abb4b44ae417e81.jpg": {
             "attribution": "8w9d, CC0, via Wikimedia Commons",
             "attribution_not_required": false
         },
         "images/bbdba4ad8a3aa04af373dabe795bcf772a3cbea4.jpg": {
             "attribution": "Gmelfi, Public domain, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/c83b57689112253d5a396f7f691b7192171c6d26.jpg": {
+            "attribution": "Swathivishwakarma, CC BY-SA 4.0, via Wikimedia Commons",
             "attribution_not_required": false
         },
         "images/e827d32b41ee24f9a600fc9f02c8f7882eaaeff9.jpg": {

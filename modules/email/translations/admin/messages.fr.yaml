@@ -53,6 +53,7 @@ admin_email_templates:
     trigger_item_report_receipt: 'quelqu''un signale un contenu - confirmation à l''auteur du signalement'
     trigger_item_report_decision: 'un signalement est traité - décision à l''auteur du signalement'
     trigger_support_invitation: 'un steward invite les administrateurs sur une demande'
+    trigger_moderation_warning: 'la modération avertit l''auteur d''un membre, commentaire ou message signalé'
 admin_email_sendlog:
     col_subject: 'Objet'
     page_title: 'Journal d''envoi des e-mails'

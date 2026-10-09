@@ -41,7 +41,12 @@
                             <span class="has-text-grey">{{ 'admin_support_moderation.label_deleted'|trans }}</span>
                         {% endif %}
                     </td>
-                    <td><span class="tag {{ report.status.tagVariant() }}">{{ report.status.label()|trans }}</span></td>
+                    <td>
+                        <span class="tag {{ report.status.tagVariant() }}">{{ report.status.label()|trans }}</span>
+                        {% if report.resolutionNote %}
+                            <br><small class="has-text-grey">{{ report.resolutionNote|shortened(50) }}</small>
+                        {% endif %}
+                    </td>
                     <td>
                         <a href="{{ path('app_admin_support_moderation_show', {id: report.id}) }}">
                             <span class="icon"><i class="fa fa-eye"></i></span>

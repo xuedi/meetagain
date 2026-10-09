@@ -31,11 +31,25 @@
                         {% if report.author %}
                             <a href="{{ path('app_admin_member_edit', {'id': report.author.id}) }}">{{ report.author.name }}</a>
                             <span class="tag {{ report.author.status.tagVariant() }} ml-1">{{ report.author.status.label()|trans }}</span>
+                            {% if report.author.blockedUntil %}
+                                <small class="has-text-grey ml-1">{{ 'admin_support_moderation.label_blocked_until'|trans({'%date%': report.author.blockedUntil|date('Y-m-d H:i')}) }}</small>
+                            {% endif %}
                         {% else %}
                             <span class="has-text-grey">{{ 'admin_support_moderation.label_deleted'|trans }}</span>
                         {% endif %}
                     </td>
                 </tr>
+                {% if history %}
+                    <tr>
+                        <th>{{ 'admin_support_moderation.col_history'|trans }}</th>
+                        <td>
+                            {{ 'admin_support_moderation.history_counts'|trans({'%total%': history.total, '%open%': history.open, '%dismissed%': history.dismissed, '%actioned%': history.actioned}) }}
+                            {% if history.lastActionedAt %}
+                                <br><small class="has-text-grey">{{ 'admin_support_moderation.history_last_actioned'|trans({'%date%': history.lastActionedAt|date('Y-m-d')}) }}</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
                 <tr>
                     <th>{{ 'admin_support_moderation.col_reporter'|trans }}</th>
                     <td>
@@ -65,8 +79,74 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% if report.resolutionNote %}
+                    <tr>
+                        <th>{{ 'admin_support_moderation.col_resolution_note'|trans }}</th>
+                        <td><span class="breakText">{{ report.resolutionNote|safe_message }}</span></td>
+                    </tr>
+                {% endif %}
             </tbody>
         </table>
+
+        {% if report.open %}
+            <form method="post" class="box">
+                <h2 class="title is-5">{{ 'admin_support_moderation.title_decision'|trans }}</h2>
+                <input type="hidden" name="_token" value="{{ csrf_token(decideTokenId) }}">
+                <div class="field">
+                    <label class="label" for="moderation-note">{{ 'admin_support_moderation.label_note'|trans }}</label>
+                    <div class="control">
+                        <textarea class="textarea" id="moderation-note" name="note" rows="3" maxlength="2000"></textarea>
+                    </div>
+                    <p class="help">{{ 'admin_support_moderation.help_note'|trans }}</p>
+                </div>
+                <div class="field is-grouped is-grouped-multiline">
+                    <div class="control">
+                        <button type="submit" class="button is-warning" formaction="{{ path('app_admin_support_moderation_dismiss', {id: report.id}) }}">
+                            {{ 'admin_support_moderation.button_dismiss'|trans }}
+                        </button>
+                    </div>
+                    {% if canWarn %}
+                        <div class="control">
+                            <button type="submit" class="button is-warning" formaction="{{ path('app_admin_support_moderation_warn', {id: report.id}) }}">
+                                {{ 'admin_support_moderation.button_warn_author'|trans }}
+                            </button>
+                        </div>
+                    {% endif %}
+                    {% if removeLabelKey %}
+                        <div class="control">
+                            <button type="submit" class="button is-danger" formaction="{{ path('app_admin_support_moderation_remove', {id: report.id}) }}">
+                                {{ removeLabelKey|trans }}
+                            </button>
+                        </div>
+                    {% endif %}
+                    {% if canBlock %}
+                        <div class="control">
+                            <div class="field has-addons">
+                                <div class="control">
+                                    <div class="select">
+                                        <select name="days" aria-label="{{ 'admin_support_moderation.label_days'|trans }}">
+                                            {% for days in suspensionDays %}
+                                                <option value="{{ days }}"{% if days == 7 %} selected{% endif %}>{{ 'admin_support_moderation.option_days'|trans({'%count%': days}) }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="control">
+                                    <button type="submit" class="button is-danger" formaction="{{ path('app_admin_support_moderation_suspend', {id: report.id}) }}">
+                                        {{ 'admin_support_moderation.button_suspend_author'|trans }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <button type="submit" class="button is-danger" formaction="{{ path('app_admin_support_moderation_block', {id: report.id}) }}">
+                                {{ 'admin_support_moderation.button_block_author'|trans }}
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </form>
+        {% endif %}
 
     </div>
 

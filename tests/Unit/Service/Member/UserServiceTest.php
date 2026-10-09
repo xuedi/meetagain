@@ -22,10 +22,12 @@ use App\Repository\UserRepository;
 use App\Service\Member\ActionException;
 use App\Service\Member\ActionFailure;
 use App\Service\Member\UserService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Tests\Unit\Stubs\UserStub;
 
 #[AllowMockObjectsWithoutExpectations]
 class UserServiceTest extends TestCase
@@ -271,6 +273,50 @@ class UserServiceTest extends TestCase
 
         // Act
         $subject->transitionStatus($actor, $target, UserStatus::Blocked);
+    }
+
+    public function testTransitionStatusToBlockedWithAnEndDateRecordsTheSuspension(): void
+    {
+        // Arrange
+        $actor = $this->makeUser(self::ACTOR_ID, UserRole::Admin);
+        $target = new UserStub()
+            ->setId(self::TARGET_ID)
+            ->setStatus(UserStatus::Active);
+        $until = new DateTimeImmutable('2026-10-16 12:00');
+
+        $activity = $this->createMock(ActivityService::class);
+        $activity->expects($this->once())->method('log')->with(AdminMemberStatusChanged::TYPE, $actor, [
+            'user_id' => self::TARGET_ID,
+            'old' => UserStatus::Active->value,
+            'new' => UserStatus::Blocked->value,
+            'until' => '2026-10-16 12:00',
+        ]);
+        $subject = $this->makeService(activityService: $activity);
+
+        // Act
+        $subject->transitionStatus($actor, $target, UserStatus::Blocked, $until);
+
+        // Assert
+        static::assertSame(UserStatus::Blocked, $target->getStatus());
+        static::assertSame($until, $target->getBlockedUntil());
+    }
+
+    public function testTransitionStatusOutOfBlockedClearsTheEndDate(): void
+    {
+        // Arrange
+        $actor = $this->makeUser(self::ACTOR_ID, UserRole::Admin);
+        $target = new UserStub()
+            ->setId(self::TARGET_ID)
+            ->setStatus(UserStatus::Blocked)
+            ->setBlockedUntil(new DateTimeImmutable('2026-10-16 12:00'));
+        $subject = $this->makeService();
+
+        // Act
+        $subject->transitionStatus($actor, $target, UserStatus::Active);
+
+        // Assert
+        static::assertSame(UserStatus::Active, $target->getStatus());
+        static::assertNull($target->getBlockedUntil());
     }
 
     public function testTransitionStatusInvalidTransitionThrows(): void

@@ -5,7 +5,6 @@ namespace App\Controller\Admin\Support;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
-use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\ModerationReport;
@@ -21,6 +20,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[IsGranted('ROLE_ADMIN'), Route('/admin/support/moderation')]
 final class ModerationController extends AbstractSupportController implements AdminNavigationInterface, AdminTabsInterface
 {
+    private const string DECIDE_TOKEN = 'app_admin_support_moderation_decide';
+    private const array SUSPENSION_DAYS = [1, 7, 30];
+
     public function __construct(
         TranslatorInterface $translator,
         private readonly ReportService $reportService,
@@ -77,39 +79,6 @@ final class ModerationController extends AbstractSupportController implements Ad
         ];
 
         $actions = [];
-        if ($report->isOpen()) {
-            $actions[] = new AdminTopActionForm(
-                label: $this->translator->trans('admin_support_moderation.button_dismiss'),
-                target: $this->generateUrl('app_admin_support_moderation_dismiss', ['id' => $reportId]),
-                csrfTokenId: 'app_admin_support_moderation_dismiss' . $reportId,
-                icon: 'check',
-                variant: 'is-warning',
-            );
-
-            $removeLabelKey = $this->reportService->getRemoveLabelKey($report);
-            if ($removeLabelKey !== null) {
-                $actions[] = new AdminTopActionForm(
-                    label: $this->translator->trans($removeLabelKey),
-                    target: $this->generateUrl('app_admin_support_moderation_remove', ['id' => $reportId]),
-                    csrfTokenId: 'app_admin_support_moderation_remove' . $reportId,
-                    icon: 'trash',
-                    variant: 'is-danger',
-                    confirm: $this->translator->trans('admin_support_moderation.confirm_remove'),
-                );
-            }
-
-            if ($this->reportService->canBlockAuthor($report, $admin)) {
-                $actions[] = new AdminTopActionForm(
-                    label: $this->translator->trans('admin_support_moderation.button_block_author'),
-                    target: $this->generateUrl('app_admin_support_moderation_block', ['id' => $reportId]),
-                    csrfTokenId: 'app_admin_support_moderation_block' . $reportId,
-                    icon: 'ban',
-                    variant: 'is-danger',
-                    confirm: $this->translator->trans('admin_support_moderation.confirm_block_author'),
-                );
-            }
-        }
-
         $subjectPath = $this->reportService->getAdminPath($report);
         if ($subjectPath !== null) {
             $actions[] = new AdminTopActionButton(
@@ -124,9 +93,17 @@ final class ModerationController extends AbstractSupportController implements Ad
             icon: 'arrow-left',
         );
 
+        $author = $report->getAuthor();
+
         return $this->render('admin/support/moderation/show.html.twig', [
             'active' => 'support',
             'report' => $report,
+            'history' => $author instanceof User ? $this->reportService->authorHistory($author) : null,
+            'removeLabelKey' => $this->reportService->getRemoveLabelKey($report),
+            'canBlock' => $this->reportService->canBlockAuthor($report, $admin),
+            'canWarn' => $this->reportService->canWarnAuthor($report, $admin),
+            'suspensionDays' => self::SUSPENSION_DAYS,
+            'decideTokenId' => self::DECIDE_TOKEN . $reportId,
             'adminTop' => new AdminTop(info: $info, actions: $actions),
             'adminTabs' => $this->getTabs(),
         ]);
@@ -135,8 +112,8 @@ final class ModerationController extends AbstractSupportController implements Ad
     #[Route('/{id}/dismiss', name: 'app_admin_support_moderation_dismiss', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function dismiss(Request $request, int $id): Response
     {
-        $report = $this->findValidatedReport($request, 'app_admin_support_moderation_dismiss', $id);
-        $this->reportService->dismiss($report, $this->getAdmin());
+        $report = $this->findValidatedReport($request, $id);
+        $this->reportService->dismiss($report, $this->getAdmin(), $this->note($request));
 
         return $this->redirectToRoute('app_admin_support_moderation_show', ['id' => $id]);
     }
@@ -144,8 +121,8 @@ final class ModerationController extends AbstractSupportController implements Ad
     #[Route('/{id}/remove', name: 'app_admin_support_moderation_remove', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function remove(Request $request, int $id): Response
     {
-        $report = $this->findValidatedReport($request, 'app_admin_support_moderation_remove', $id);
-        $this->reportService->removeSubject($report, $this->getAdmin());
+        $report = $this->findValidatedReport($request, $id);
+        $this->reportService->removeSubject($report, $this->getAdmin(), $this->note($request));
 
         return $this->redirectToRoute('app_admin_support_moderation_show', ['id' => $id]);
     }
@@ -153,15 +130,47 @@ final class ModerationController extends AbstractSupportController implements Ad
     #[Route('/{id}/block', name: 'app_admin_support_moderation_block', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function block(Request $request, int $id): Response
     {
-        $report = $this->findValidatedReport($request, 'app_admin_support_moderation_block', $id);
-        $this->reportService->blockAuthor($report, $this->getAdmin());
+        $report = $this->findValidatedReport($request, $id);
+        $this->reportService->blockAuthor($report, $this->getAdmin(), $this->note($request));
 
         return $this->redirectToRoute('app_admin_support_moderation_show', ['id' => $id]);
     }
 
-    private function findValidatedReport(Request $request, string $intention, int $id): ModerationReport
+    #[Route('/{id}/suspend', name: 'app_admin_support_moderation_suspend', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function suspend(Request $request, int $id): Response
     {
-        if (!$this->isCsrfTokenValid($intention . $id, (string) $request->request->get('_token'))) {
+        $report = $this->findValidatedReport($request, $id);
+        $days = $request->request->getInt('days');
+        if (!in_array($days, self::SUSPENSION_DAYS, true)) {
+            throw new BadRequestHttpException('Invalid suspension length.');
+        }
+
+        $this->reportService->suspendAuthor($report, $this->getAdmin(), $days, $this->note($request));
+
+        return $this->redirectToRoute('app_admin_support_moderation_show', ['id' => $id]);
+    }
+
+    #[Route('/{id}/warn', name: 'app_admin_support_moderation_warn', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function warn(Request $request, int $id): Response
+    {
+        $report = $this->findValidatedReport($request, $id);
+        if (!$this->reportService->warnAuthor($report, $this->getAdmin(), (string) $this->note($request))) {
+            $this->addFlash('error', 'admin_support_moderation.flash_warn_needs_note');
+        }
+
+        return $this->redirectToRoute('app_admin_support_moderation_show', ['id' => $id]);
+    }
+
+    private function note(Request $request): ?string
+    {
+        $note = trim((string) $request->request->get('note'));
+
+        return $note === '' ? null : $note;
+    }
+
+    private function findValidatedReport(Request $request, int $id): ModerationReport
+    {
+        if (!$this->isCsrfTokenValid(self::DECIDE_TOKEN . $id, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 

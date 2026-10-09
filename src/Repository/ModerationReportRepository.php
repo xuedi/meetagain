@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\ModerationReport;
 use App\Entity\User;
 use App\Enum\ModerationReportStatus;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -59,5 +60,41 @@ class ModerationReportRepository extends ServiceEntityRepository
             'subjectId' => $subjectId,
             'status' => ModerationReportStatus::Open,
         ]);
+    }
+
+    /** @return array<string, int> */
+    public function countByAuthorPerStatus(User $author): array
+    {
+        $rows = $this
+            ->createQueryBuilder('mr')
+            ->select('mr.status AS status', 'COUNT(mr.id) AS total')
+            ->where('mr.author = :author')
+            ->setParameter('author', $author)
+            ->groupBy('mr.status')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $status = $row['status'] instanceof ModerationReportStatus ? $row['status']->value : (string) $row['status'];
+            $counts[$status] = (int) $row['total'];
+        }
+
+        return $counts;
+    }
+
+    public function findLastActionedAtForAuthor(User $author): ?DateTimeImmutable
+    {
+        $last = $this
+            ->createQueryBuilder('mr')
+            ->select('MAX(mr.resolvedAt)')
+            ->where('mr.author = :author')
+            ->andWhere('mr.status = :status')
+            ->setParameter('author', $author)
+            ->setParameter('status', ModerationReportStatus::Actioned)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $last === null ? null : new DateTimeImmutable((string) $last);
     }
 }

@@ -20,6 +20,7 @@
 'security.account_status_registered': '请先确认您的电子邮件地址。我们在您注册时已发送了确认链接。'
 'security.account_status_email_verified': '您的电子邮件地址已确认。管理员仍需激活您的账号。'
 'security.account_status_blocked': '此账号已被封禁。如果您认为这是错误，请联系支持人员。'
+'security.account_status_suspended': '此账号已被暂停使用，直至 %date%。如果您认为这是错误，请联系支持人员。'
 'security.account_status_denied': '此注册申请已被拒绝。'
 'security.account_status_inactive': '此账号无法用于登录。'
 'security.human_check_failed': '无法确认此表单由真人填写，请重试。'

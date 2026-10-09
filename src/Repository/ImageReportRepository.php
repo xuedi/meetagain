@@ -37,4 +37,15 @@ class ImageReportRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /** @return ImageReport[] */
+    public function findNewestFirst(?ImageReportStatus $status = null): array
+    {
+        $qb = $this->createQueryBuilder('ir')->orderBy('ir.createdAt', 'DESC');
+        if ($status !== null) {
+            $qb->where('ir.status = :status')->setParameter('status', $status);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

@@ -9,10 +9,8 @@ use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\ImageReport;
-use App\Enum\ImageReportStatus;
-use App\Repository\ImageReportRepository;
 use App\Service\Media\ImageLocationService;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\Media\ImageReportService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -25,9 +23,8 @@ final class ReportsController extends AbstractSupportController implements Admin
 {
     public function __construct(
         TranslatorInterface $translator,
-        private readonly ImageReportRepository $imageReportRepo,
+        private readonly ImageReportService $imageReportService,
         private readonly ImageLocationService $imageLocationService,
-        private readonly EntityManagerInterface $em,
     ) {
         parent::__construct($translator, 'reports');
     }
@@ -35,7 +32,7 @@ final class ReportsController extends AbstractSupportController implements Admin
     #[Route('', name: 'app_admin_support_reports')]
     public function list(): Response
     {
-        $reports = $this->imageReportRepo->createQueryBuilder('ir')->orderBy('ir.createdAt', 'DESC')->getQuery()->getResult();
+        $reports = $this->imageReportService->findNewestFirst();
 
         $openCount = 0;
         foreach ($reports as $report) {
@@ -71,7 +68,7 @@ final class ReportsController extends AbstractSupportController implements Admin
     #[Route('/{id}', name: 'app_admin_support_report_show', requirements: ['id' => '\d+'])]
     public function show(int $id): Response
     {
-        $report = $this->imageReportRepo->find($id);
+        $report = $this->imageReportService->find($id);
         if ($report === null) {
             throw $this->createNotFoundException();
         }
@@ -134,11 +131,9 @@ final class ReportsController extends AbstractSupportController implements Admin
         if (!$this->isCsrfTokenValid('app_admin_support_report_resolve' . $id, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
-        $report = $this->imageReportRepo->find($id);
+        $report = $this->imageReportService->find($id);
         if ($report instanceof ImageReport) {
-            $report->setStatus(ImageReportStatus::Resolved);
-            $this->em->persist($report);
-            $this->em->flush();
+            $this->imageReportService->resolve($report);
         }
 
         return $this->redirectToRoute('app_admin_support_reports');

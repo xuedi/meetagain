@@ -20,6 +20,7 @@
 'security.account_status_registered': 'Confirma primero tu dirección de correo electrónico. Te enviamos un enlace al registrarte.'
 'security.account_status_email_verified': 'Tu dirección de correo electrónico está confirmada. Un administrador todavía tiene que activar tu cuenta.'
 'security.account_status_blocked': 'Esta cuenta ha sido bloqueada. Ponte en contacto con soporte si crees que es un error.'
+'security.account_status_suspended': 'Esta cuenta está suspendida hasta el %date%. Ponte en contacto con soporte si crees que es un error.'
 'security.account_status_denied': 'Este registro fue rechazado.'
 'security.account_status_inactive': 'Esta cuenta no se puede usar para iniciar sesión.'
 'security.human_check_failed': 'No hemos podido verificar que este formulario lo haya rellenado una persona. Inténtalo de nuevo.'

@@ -29,6 +29,13 @@ class AdminMemberStatusChanged extends MessageAbstract
     protected function renderText(): string
     {
         $userId = $this->meta['user_id'];
+        if (isset($this->meta['until'])) {
+            return $this->translator->trans('profile_social.activity_admin_member_suspended', [
+                '%user%' => $this->userNames[$userId] ?? '',
+                '%until%' => (string) $this->meta['until'],
+            ]);
+        }
+
         $old = $this->translator->trans(UserStatus::from((int) $this->meta['old'])->label());
         $new = $this->translator->trans(UserStatus::from((int) $this->meta['new'])->label());
 

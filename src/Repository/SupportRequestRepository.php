@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\SupportRequest;
+use App\Entity\User;
 use App\Enum\SupportAudience;
 use App\Enum\SupportRequestStatus;
 use DateTimeImmutable;
@@ -43,6 +44,19 @@ class SupportRequestRepository extends ServiceEntityRepository
             ->setParameter('status', SupportRequestStatus::New)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /** @return SupportRequest[] */
+    public function findRecentForRequester(User $requester, int $limit): array
+    {
+        return $this
+            ->createQueryBuilder('sr')
+            ->where('sr.requester = :requester')
+            ->setParameter('requester', $requester)
+            ->orderBy('sr.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
     /** @return SupportRequest[] */

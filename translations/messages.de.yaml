@@ -423,6 +423,7 @@ profile_social:
     activity_admin_member_restricted: 'Mitglied eingeschränkt: %user%'
     activity_admin_member_unrestricted: 'Einschränkung aufgehoben: %user%'
     activity_admin_member_status_changed: 'Status von %user% von %old% zu %new% geändert'
+    activity_admin_member_suspended: '%user% bis %until% gesperrt'
     activity_admin_cms_page_created: 'CMS-Seite erstellt: %slug%'
     activity_admin_cms_page_updated: 'CMS-Seite aktualisiert: %slug%'
     activity_admin_cms_page_deleted: 'CMS-Seite gelöscht: %slug%'

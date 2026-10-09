@@ -53,6 +53,7 @@ admin_email_templates:
     trigger_item_report_receipt: '有人举报内容 - 向举报人发送确认'
     trigger_item_report_decision: '举报处理完毕 - 向举报人发送结果'
     trigger_support_invitation: '协管员邀请管理员参与某条请求时'
+    trigger_moderation_warning: '管理员警告被举报成员、评论或私信的作者时'
 admin_email_sendlog:
     col_subject: '主题'
     page_title: '邮件发送日志'

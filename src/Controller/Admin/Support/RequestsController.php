@@ -2,8 +2,6 @@
 
 namespace App\Controller\Admin\Support;
 
-use App\Activity\ActivityService;
-use App\Activity\Messages\SendMessage;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
@@ -11,17 +9,11 @@ use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Emails\Types\SupportInvitationEmail;
-use App\Emails\Types\SupportResponseEmail;
-use App\Entity\Message;
 use App\Entity\SupportRequest;
 use App\Entity\User;
-use App\Enum\SupportChannel;
-use App\Enum\SupportRequestStatus;
 use App\Form\SupportReplyType;
 use App\Service\Support\ThreadService;
 use App\Service\Support\VisibilityResolver;
-use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -34,10 +26,7 @@ final class RequestsController extends AbstractSupportController implements Admi
 {
     public function __construct(
         TranslatorInterface $translator,
-        private readonly EntityManagerInterface $em,
-        private readonly SupportResponseEmail $supportResponseEmail,
         private readonly SupportInvitationEmail $supportInvitationEmail,
-        private readonly ActivityService $activityService,
         private readonly ThreadService $threadService,
         private readonly VisibilityResolver $visibilityResolver,
     ) {
@@ -158,9 +147,7 @@ final class RequestsController extends AbstractSupportController implements Admi
         $request = $this->requireRequest($id);
         $this->requireCsrf($httpRequest, 'app_admin_support_mark_read' . $id);
 
-        $request->setStatus(SupportRequestStatus::Read);
-        $this->em->persist($request);
-        $this->em->flush();
+        $this->threadService->markRead($request);
 
         return $this->redirectToRoute('app_admin_support_list');
     }
@@ -182,15 +169,9 @@ final class RequestsController extends AbstractSupportController implements Admi
             return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
         }
 
-        $isFirstResponse = !$request->getRespondedBy() instanceof User;
-        $message = $this->threadService->postAdminMessage($request, (string) $form->get('response')->getData(), $actingAdmin);
-
-        if ($request->getChannel() === SupportChannel::Message) {
-            $this->mirrorToInbox($request, $message->getContent(), $isFirstResponse);
-        }
-
-        if ($request->getChannel() === SupportChannel::Thread && $request->isEmailVerified()) {
-            $this->supportResponseEmail->send(['request' => $request, 'response' => $message->getContent()]);
+        $this->threadService->answer($request, (string) $form->get('response')->getData(), $actingAdmin);
+        if ($this->threadService->hasLostRequester($request)) {
+            $this->addFlash('error', 'admin_support.flash_reply_no_user');
         }
 
         return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
@@ -239,43 +220,6 @@ final class RequestsController extends AbstractSupportController implements Admi
         $this->addFlash('success', 'admin_support.flash_admins_invited');
 
         return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
-    }
-
-    private function mirrorToInbox(SupportRequest $request, string $response, bool $isFirstResponse): void
-    {
-        $receiver = $request->getRequester();
-        if (!$receiver instanceof User) {
-            $this->addFlash('error', 'admin_support.flash_reply_no_user');
-            return;
-        }
-
-        $owner = $request->getRespondedBy();
-        if (!$owner instanceof User) {
-            return;
-        }
-
-        if ($isFirstResponse) {
-            $question = new Message();
-            $question->setDeleted(false);
-            $question->setWasRead(true);
-            $question->setSender($receiver);
-            $question->setReceiver($owner);
-            $question->setCreatedAt($request->getCreatedAt());
-            $question->setContent(Message::SUPPORT_QUESTION_MARKER . $request->getMessage());
-            $this->em->persist($question);
-        }
-
-        $answer = new Message();
-        $answer->setDeleted(false);
-        $answer->setWasRead(false);
-        $answer->setSender($owner);
-        $answer->setReceiver($receiver);
-        $answer->setCreatedAt(new DateTimeImmutable());
-        $answer->setContent($response);
-        $this->em->persist($answer);
-        $this->em->flush();
-
-        $this->activityService->log(SendMessage::TYPE, $owner, ['user_id' => $receiver->getId()]);
     }
 
     private function requireRequest(int $id): SupportRequest

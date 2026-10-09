@@ -60,6 +60,9 @@
                                 {% if user.status.value == 3 %}
                                     <strong class="has-text-danger">{{ user.status.label()|trans }}</strong>
                                     <span class="has-text-grey is-size-7 ml-2">{{ 'admin_member.status_blocked_hint'|trans }}</span>
+                                    {% if user.blockedUntil %}
+                                        <span class="has-text-grey is-size-7 ml-2">{{ 'admin_member.status_blocked_until'|trans({'%date%': user.blockedUntil|date('Y-m-d H:i')}) }}</span>
+                                    {% endif %}
                                 {% else %}
                                     {{ user.status.label()|trans }}
                                 {% endif %}

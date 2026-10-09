@@ -423,6 +423,7 @@ profile_social:
     activity_admin_member_restricted: 'Restringió al miembro: %user%'
     activity_admin_member_unrestricted: 'Quitó la restricción al miembro: %user%'
     activity_admin_member_status_changed: 'Cambió el estado de %user% de %old% a %new%'
+    activity_admin_member_suspended: 'Suspendió a %user% hasta el %until%'
     activity_admin_cms_page_created: 'Creó la página CMS: %slug%'
     activity_admin_cms_page_updated: 'Actualizó la página CMS: %slug%'
     activity_admin_cms_page_deleted: 'Eliminó la página CMS: %slug%'

@@ -36,6 +36,7 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             EmailType::SeriesRescheduled->value => 'Series rescheduled: {{eventTitle}}',
             EmailType::ItemReportReceipt->value => 'We received your report about {{itemLabel}}',
             EmailType::ItemReportDecision->value => 'A decision on your report about {{itemLabel}}',
+            EmailType::ModerationWarning->value => 'A note from the moderators of {{url}}',
         ],
         'de' => [
             EmailType::VerificationRequest->value => 'Bitte bestätige deine E-Mail',
@@ -56,6 +57,7 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             EmailType::SeriesRescheduled->value => 'Terminserie verschoben: {{eventTitle}}',
             EmailType::ItemReportReceipt->value => 'Wir haben deine Meldung zu {{itemLabel}} erhalten',
             EmailType::ItemReportDecision->value => 'Entscheidung zu deiner Meldung über {{itemLabel}}',
+            EmailType::ModerationWarning->value => 'Ein Hinweis der Moderation von {{url}}',
         ],
         'zh' => [
             EmailType::VerificationRequest->value => '请确认您的邮箱',
@@ -76,6 +78,7 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             EmailType::SeriesRescheduled->value => '系列活动时间调整：{{eventTitle}}',
             EmailType::ItemReportReceipt->value => '我们已收到你对 {{itemLabel}} 的举报',
             EmailType::ItemReportDecision->value => '关于你对 {{itemLabel}} 的举报的处理结果',
+            EmailType::ModerationWarning->value => '来自 {{url}} 管理团队的提醒',
         ],
         'fr' => [
             EmailType::VerificationRequest->value => 'Merci de confirmer ton adresse e-mail',
@@ -96,6 +99,7 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             EmailType::SeriesRescheduled->value => 'Série reportée : {{eventTitle}}',
             EmailType::ItemReportReceipt->value => 'Nous avons reçu ton signalement concernant {{itemLabel}}',
             EmailType::ItemReportDecision->value => 'Décision sur ton signalement concernant {{itemLabel}}',
+            EmailType::ModerationWarning->value => 'Un message de la modération de {{url}}',
         ],
         'es' => [
             EmailType::VerificationRequest->value => 'Confirma tu correo electrónico',
@@ -116,6 +120,7 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             EmailType::SeriesRescheduled->value => 'Serie reprogramada: {{eventTitle}}',
             EmailType::ItemReportReceipt->value => 'Hemos recibido tu denuncia sobre {{itemLabel}}',
             EmailType::ItemReportDecision->value => 'Decisión sobre tu denuncia de {{itemLabel}}',
+            EmailType::ModerationWarning->value => 'Un aviso de la moderación de {{url}}',
         ],
     ];
 
@@ -247,6 +252,15 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             'itemLabel',
             'decision',
             'reportId',
+            'host',
+            'url',
+            'lang',
+            'greeting',
+        ],
+        EmailType::ModerationWarning->value => [
+            'name',
+            'reason',
+            'note',
             'host',
             'url',
             'lang',

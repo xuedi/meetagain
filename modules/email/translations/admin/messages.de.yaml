@@ -53,6 +53,7 @@ admin_email_templates:
     trigger_item_report_receipt: 'jemand meldet einen Inhalt - Bestätigung an die meldende Person'
     trigger_item_report_decision: 'eine Meldung wird entschieden - Entscheidung an die meldende Person'
     trigger_support_invitation: 'ein Steward holt die Administratoren dazu'
+    trigger_moderation_warning: 'die Moderation verwarnt den Urheber eines gemeldeten Mitglieds, Kommentars oder einer Nachricht'
 admin_email_sendlog:
     col_subject: 'Betreff'
     page_title: 'E-Mail-Sendeprotokoll'

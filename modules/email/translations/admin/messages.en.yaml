@@ -53,6 +53,7 @@ admin_email_templates:
     trigger_item_report_receipt: 'someone reports an item - confirmation to the notifier'
     trigger_item_report_decision: 'an item report is resolved - decision to the notifier'
     trigger_support_invitation: 'a steward invites the administrators into a request'
+    trigger_moderation_warning: 'a moderator warns the author of a reported member, comment or message'
 admin_email_sendlog:
     col_subject: 'Subject'
     page_title: 'Email Send Log'

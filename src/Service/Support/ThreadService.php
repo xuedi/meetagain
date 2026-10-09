@@ -2,6 +2,10 @@
 
 namespace App\Service\Support;
 
+use App\Activity\ActivityService;
+use App\Activity\Messages\SendMessage;
+use App\Emails\Types\SupportResponseEmail;
+use App\Entity\Message;
 use App\Entity\SupportMessage;
 use App\Entity\SupportRequest;
 use App\Entity\User;
@@ -28,11 +32,19 @@ readonly class ThreadService
         private SupportMessageRepository $messageRepo,
         private ContentSanitizer $sanitizer,
         private ClockInterface $clock,
+        private SupportResponseEmail $responseEmail,
+        private ActivityService $activityService,
     ) {}
 
     public function findRequest(int $id): ?SupportRequest
     {
         return $this->requestRepo->find($id);
+    }
+
+    /** @return SupportRequest[] */
+    public function findRecentForRequester(User $requester, int $limit): array
+    {
+        return $this->requestRepo->findRecentForRequester($requester, $limit);
     }
 
     public function mintToken(): string
@@ -111,6 +123,38 @@ readonly class ThreadService
         return $message;
     }
 
+    public function markRead(SupportRequest $request): void
+    {
+        if (!$request->isNew()) {
+            return;
+        }
+
+        $request->setStatus(SupportRequestStatus::Read);
+        $this->em->persist($request);
+        $this->em->flush();
+    }
+
+    public function answer(SupportRequest $request, string $body, User $actingAdmin): SupportMessage
+    {
+        $isFirstResponse = !$request->getRespondedBy() instanceof User;
+        $message = $this->postAdminMessage($request, $body, $actingAdmin);
+
+        if ($request->getChannel() === SupportChannel::Message) {
+            $this->mirrorToInbox($request, $message->getContent(), $isFirstResponse);
+        }
+
+        if ($request->getChannel() === SupportChannel::Thread && $request->isEmailVerified()) {
+            $this->responseEmail->send(['request' => $request, 'response' => $message->getContent()]);
+        }
+
+        return $message;
+    }
+
+    public function hasLostRequester(SupportRequest $request): bool
+    {
+        return $request->getChannel() === SupportChannel::Message && !$request->getRequester() instanceof User;
+    }
+
     public function inviteAdmins(SupportRequest $request, User $invitedBy): void
     {
         $now = $this->clock->now();
@@ -186,6 +230,38 @@ readonly class ThreadService
         $request->setEmailVerifyToken(null);
         $request->setEmailVerifyExpiresAt(null);
         $this->em->persist($request);
+    }
+
+    private function mirrorToInbox(SupportRequest $request, string $response, bool $isFirstResponse): void
+    {
+        $receiver = $request->getRequester();
+        $owner = $request->getRespondedBy();
+        if (!$receiver instanceof User || !$owner instanceof User) {
+            return;
+        }
+
+        if ($isFirstResponse) {
+            $question = new Message();
+            $question->setDeleted(false);
+            $question->setWasRead(true);
+            $question->setSender($receiver);
+            $question->setReceiver($owner);
+            $question->setCreatedAt($request->getCreatedAt());
+            $question->setContent(Message::SUPPORT_QUESTION_MARKER . $request->getMessage());
+            $this->em->persist($question);
+        }
+
+        $answer = new Message();
+        $answer->setDeleted(false);
+        $answer->setWasRead(false);
+        $answer->setSender($owner);
+        $answer->setReceiver($receiver);
+        $answer->setCreatedAt($this->clock->now());
+        $answer->setContent($response);
+        $this->em->persist($answer);
+        $this->em->flush();
+
+        $this->activityService->log(SendMessage::TYPE, $owner, ['user_id' => $receiver->getId()]);
     }
 
     private function appendMessage(

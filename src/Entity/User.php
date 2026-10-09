@@ -58,6 +58,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     #[ORM\Column(enumType: UserStatus::class)]
     private ?UserStatus $status = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $blockedUntil = null;
+
     #[ORM\Column]
     private bool $public = true;
 
@@ -265,6 +268,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     public function setStatus(UserStatus $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    public function getBlockedUntil(): ?DateTimeImmutable
+    {
+        return $this->blockedUntil;
+    }
+
+    public function setBlockedUntil(?DateTimeImmutable $blockedUntil): static
+    {
+        $this->blockedUntil = $blockedUntil;
 
         return $this;
     }
