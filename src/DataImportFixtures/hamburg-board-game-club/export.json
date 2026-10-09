@@ -176,7 +176,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Aston.Hood@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/eea6ce028483024577e484b75ceb759600dc8b74.jpg"
         },
         {
             "ref": 106,
@@ -205,7 +205,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Erica.Wyatt@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/72a6200e405c2930326aee97b43cd5d27b00880e.jpg"
         },
         {
             "ref": 107,
@@ -234,7 +234,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Aston.Hood@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/eea6ce028483024577e484b75ceb759600dc8b74.jpg"
         },
         {
             "ref": 108,
@@ -263,7 +263,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Aston.Hood@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/eea6ce028483024577e484b75ceb759600dc8b74.jpg"
         },
         {
             "ref": 109,
@@ -292,7 +292,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Aston.Hood@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/eea6ce028483024577e484b75ceb759600dc8b74.jpg"
         },
         {
             "ref": 110,
@@ -321,7 +321,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Aston.Hood@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/eea6ce028483024577e484b75ceb759600dc8b74.jpg"
         },
         {
             "ref": 111,
@@ -350,7 +350,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Aston.Hood@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/eea6ce028483024577e484b75ceb759600dc8b74.jpg"
         },
         {
             "ref": 112,
@@ -379,7 +379,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Aston.Hood@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/eea6ce028483024577e484b75ceb759600dc8b74.jpg"
         },
         {
             "ref": 113,
@@ -408,7 +408,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Aston.Hood@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/eea6ce028483024577e484b75ceb759600dc8b74.jpg"
         },
         {
             "ref": 114,
@@ -437,7 +437,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Erica.Wyatt@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/72a6200e405c2930326aee97b43cd5d27b00880e.jpg"
         },
         {
             "ref": 115,
@@ -466,7 +466,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Erica.Wyatt@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/72a6200e405c2930326aee97b43cd5d27b00880e.jpg"
         },
         {
             "ref": 116,
@@ -495,7 +495,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Erica.Wyatt@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/72a6200e405c2930326aee97b43cd5d27b00880e.jpg"
         },
         {
             "ref": 117,
@@ -524,7 +524,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Erica.Wyatt@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/72a6200e405c2930326aee97b43cd5d27b00880e.jpg"
         },
         {
             "ref": 118,
@@ -553,7 +553,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Erica.Wyatt@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/72a6200e405c2930326aee97b43cd5d27b00880e.jpg"
         }
     ],
     "rsvps": [
@@ -1714,6 +1714,10 @@
             "attribution": "Mshuang2, CC0, via Wikimedia Commons",
             "attribution_not_required": false
         },
+        "images/72a6200e405c2930326aee97b43cd5d27b00880e.jpg": {
+            "attribution": "Júlio Reis (User:Tintazul), CC BY-SA 2.5, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
         "images/769f29c7ff9225dc519e97e0c56de3c5a067d5b0.jpg": {
             "attribution": "Charlestpt, CC BY-SA 4.0, via Wikimedia Commons",
             "attribution_not_required": false
@@ -1736,6 +1740,10 @@
         },
         "images/e72183382332ad6f8e20f478c9fbc7443b20c9bd.jpg": {
             "attribution": "Paterm, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/eea6ce028483024577e484b75ceb759600dc8b74.jpg": {
+            "attribution": "Tohaomg, CC0, via Wikimedia Commons",
             "attribution_not_required": false
         },
         "images/faff881ccd7915d779ed47c5537fd24940fa5950.jpg": {

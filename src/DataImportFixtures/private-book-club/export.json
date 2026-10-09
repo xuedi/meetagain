@@ -153,7 +153,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Kaden.Scott@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/4541a48762e31be642a163464ddadd7ec2cbd823.jpg"
         },
         {
             "ref": 24,
@@ -182,7 +182,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Elisa.Nishikawa@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/230972623d21a33de1574f265e9b927af39c2a60.jpg"
         },
         {
             "ref": 25,
@@ -211,7 +211,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Kaden.Scott@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/4541a48762e31be642a163464ddadd7ec2cbd823.jpg"
         },
         {
             "ref": 26,
@@ -240,7 +240,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Kaden.Scott@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/4541a48762e31be642a163464ddadd7ec2cbd823.jpg"
         },
         {
             "ref": 27,
@@ -269,7 +269,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Kaden.Scott@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/4541a48762e31be642a163464ddadd7ec2cbd823.jpg"
         },
         {
             "ref": 28,
@@ -298,7 +298,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Kaden.Scott@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/4541a48762e31be642a163464ddadd7ec2cbd823.jpg"
         },
         {
             "ref": 29,
@@ -327,7 +327,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Kaden.Scott@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/4541a48762e31be642a163464ddadd7ec2cbd823.jpg"
         },
         {
             "ref": 30,
@@ -356,7 +356,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Kaden.Scott@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/4541a48762e31be642a163464ddadd7ec2cbd823.jpg"
         },
         {
             "ref": 31,
@@ -385,7 +385,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Elisa.Nishikawa@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/230972623d21a33de1574f265e9b927af39c2a60.jpg"
         },
         {
             "ref": 32,
@@ -414,7 +414,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Elisa.Nishikawa@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/230972623d21a33de1574f265e9b927af39c2a60.jpg"
         },
         {
             "ref": 33,
@@ -443,7 +443,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Elisa.Nishikawa@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/230972623d21a33de1574f265e9b927af39c2a60.jpg"
         },
         {
             "ref": 34,
@@ -472,7 +472,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Elisa.Nishikawa@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/230972623d21a33de1574f265e9b927af39c2a60.jpg"
         },
         {
             "ref": 35,
@@ -501,7 +501,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Elisa.Nishikawa@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/230972623d21a33de1574f265e9b927af39c2a60.jpg"
         }
     ],
     "rsvps": [
@@ -2346,5 +2346,14 @@
     "trust": [],
     "wishlist": [],
     "ballots": [],
-    "images": []
+    "images": {
+        "images/230972623d21a33de1574f265e9b927af39c2a60.jpg": {
+            "attribution": "Asturio Cantabrio, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/4541a48762e31be642a163464ddadd7ec2cbd823.jpg": {
+            "attribution": "Alea, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        }
+    }
 }

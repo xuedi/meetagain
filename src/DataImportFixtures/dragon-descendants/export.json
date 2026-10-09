@@ -148,7 +148,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Crystal.Liu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 94,
@@ -177,7 +177,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Demi.Wilkinson@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/fad86562bb480707e113b92c29ae5597b86ae2c4.jpg"
         },
         {
             "ref": 95,
@@ -206,7 +206,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Crystal.Liu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 96,
@@ -235,7 +235,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Crystal.Liu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 97,
@@ -264,7 +264,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Crystal.Liu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 98,
@@ -293,7 +293,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Crystal.Liu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 99,
@@ -322,7 +322,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Crystal.Liu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 100,
@@ -351,7 +351,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Crystal.Liu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg"
         },
         {
             "ref": 101,
@@ -380,7 +380,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Demi.Wilkinson@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/fad86562bb480707e113b92c29ae5597b86ae2c4.jpg"
         },
         {
             "ref": 102,
@@ -409,7 +409,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Demi.Wilkinson@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/fad86562bb480707e113b92c29ae5597b86ae2c4.jpg"
         },
         {
             "ref": 103,
@@ -438,7 +438,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Demi.Wilkinson@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/fad86562bb480707e113b92c29ae5597b86ae2c4.jpg"
         },
         {
             "ref": 104,
@@ -467,7 +467,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Demi.Wilkinson@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/fad86562bb480707e113b92c29ae5597b86ae2c4.jpg"
         }
     ],
     "rsvps": [
@@ -4696,5 +4696,14 @@
     "glossary": [],
     "wishlist": [],
     "ballots": [],
-    "images": []
+    "images": {
+        "images/532959ec2e4aa6efb8304465773efba1dda7b4c1.jpg": {
+            "attribution": "Nazareth College from Rochester, NY, USA, CC BY 2.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/fad86562bb480707e113b92c29ae5597b86ae2c4.jpg": {
+            "attribution": "Liming Huang, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        }
+    }
 }

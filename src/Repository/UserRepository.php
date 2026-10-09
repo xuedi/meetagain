@@ -364,6 +364,22 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * @return list<User>
      */
+    public function findExpiredSuspensions(DateTimeImmutable $now): array
+    {
+        return $this
+            ->createQueryBuilder('u')
+            ->where('u.status = :status')
+            ->andWhere('u.blockedUntil IS NOT NULL')
+            ->andWhere('u.blockedUntil <= :now')
+            ->setParameter('status', UserStatus::Blocked)
+            ->setParameter('now', $now)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return list<User>
+     */
     public function findByStatus(UserStatus $status): array
     {
         return $this

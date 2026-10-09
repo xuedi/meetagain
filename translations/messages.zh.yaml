@@ -423,6 +423,7 @@ profile_social:
     activity_admin_member_restricted: '限制了成员：%user%'
     activity_admin_member_unrestricted: '解除了成员的限制：%user%'
     activity_admin_member_status_changed: '将 %user% 的状态从 %old% 更改为 %new%'
+    activity_admin_member_suspended: '已暂停 %user% 的账号，直至 %until%'
     activity_admin_cms_page_created: '创建了CMS页面：%slug%'
     activity_admin_cms_page_updated: '更新了CMS页面：%slug%'
     activity_admin_cms_page_deleted: '删除了CMS页面：%slug%'

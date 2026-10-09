@@ -22,4 +22,5 @@ enum EmailType: string
     case SeriesRescheduled = 'series_rescheduled';
     case ItemReportReceipt = 'item_report_receipt';
     case ItemReportDecision = 'item_report_decision';
+    case ModerationWarning = 'moderation_warning';
 }

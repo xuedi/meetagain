@@ -57,6 +57,9 @@ class ModerationReport
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $resolvedAt = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $resolutionNote = null;
+
     #[ORM\Column]
     private DateTimeImmutable $createdAt;
 
@@ -158,11 +161,12 @@ class ModerationReport
         return $this->status === ModerationReportStatus::Open;
     }
 
-    public function resolve(ModerationReportStatus $status, User $resolvedBy, DateTimeImmutable $resolvedAt): static
+    public function resolve(ModerationReportStatus $status, User $resolvedBy, DateTimeImmutable $resolvedAt, ?string $note = null): static
     {
         $this->status = $status;
         $this->resolvedBy = $resolvedBy;
         $this->resolvedAt = $resolvedAt;
+        $this->resolutionNote = $note;
 
         return $this;
     }
@@ -175,6 +179,11 @@ class ModerationReport
     public function getResolvedAt(): ?DateTimeImmutable
     {
         return $this->resolvedAt;
+    }
+
+    public function getResolutionNote(): ?string
+    {
+        return $this->resolutionNote;
     }
 
     public function getCreatedAt(): DateTimeImmutable

@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\MessageRepository;
 use App\Security\UserChecker;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -86,6 +87,25 @@ class UserCheckerTest extends TestCase
 
         // Act
         $subject->checkPostAuth($inactiveUser);
+    }
+
+    public function testCheckPostAuthNamesTheEndOfASuspension(): void
+    {
+        // Arrange
+        $suspended = $this->createStub(User::class);
+        $suspended->method('getStatus')->willReturn(UserStatus::Blocked);
+        $suspended->method('getBlockedUntil')->willReturn(new DateTimeImmutable('2026-10-16 12:00'));
+        $subject = $this->createSubject();
+
+        // Act
+        try {
+            $subject->checkPostAuth($suspended);
+            static::fail('A suspended user must be rejected.');
+        } catch (CustomUserMessageAccountStatusException $e) {
+            // Assert
+            static::assertSame('security.account_status_suspended', $e->getMessageKey());
+            static::assertSame(['%date%' => '2026-10-16 12:00'], $e->getMessageData());
+        }
     }
 
     public static function inactiveStatusProvider(): iterable

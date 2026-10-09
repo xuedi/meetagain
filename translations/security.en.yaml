@@ -20,6 +20,7 @@
 'security.account_status_registered': 'Please confirm your email address first. We sent you a link when you registered.'
 'security.account_status_email_verified': 'Your email address is confirmed. An administrator still has to activate your account.'
 'security.account_status_blocked': 'This account has been blocked. Please contact support if you think this is a mistake.'
+'security.account_status_suspended': 'This account is suspended until %date%. Please contact support if you think this is a mistake.'
 'security.account_status_denied': 'This registration was declined.'
 'security.account_status_inactive': 'This account cannot be used to log in.'
 'security.human_check_failed': 'We could not verify that this form was filled in by a person. Please try again.'

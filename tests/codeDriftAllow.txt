@@ -42,7 +42,6 @@ repo-in-controller src/Controller/Admin/Settings/MeasuresController.php::RateLim
 repo-in-controller src/Controller/Admin/HostController.php::HostRepository // list and map reads, no host service exists
 repo-in-controller src/Controller/Admin/LocationController.php::LocationRepository // list and map reads, no location service exists
 repo-in-controller src/Controller/Admin/CmsBlockController.php::LocationRepository // venue list for the block form, no location service exists
-repo-in-controller src/Controller/Admin/Support/ReportsController.php::ImageReportRepository // list and detail reads, no image report service exists
 
 # --- echo-name ---
 echo-name src/Emails/EmailAbstract.php // public plugin contract every email type extends; plugin developer docs name it

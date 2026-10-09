@@ -133,7 +133,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/280b1dadc0381798e9a7c97a16d92d86778eca4a.jpg"
         },
         {
             "ref": 81,
@@ -162,7 +162,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/b1c637697a38b3b87e36556d671199ec13fada32.jpg"
         },
         {
             "ref": 82,
@@ -191,7 +191,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/280b1dadc0381798e9a7c97a16d92d86778eca4a.jpg"
         },
         {
             "ref": 83,
@@ -220,7 +220,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/280b1dadc0381798e9a7c97a16d92d86778eca4a.jpg"
         },
         {
             "ref": 84,
@@ -249,7 +249,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/280b1dadc0381798e9a7c97a16d92d86778eca4a.jpg"
         },
         {
             "ref": 85,
@@ -278,7 +278,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/280b1dadc0381798e9a7c97a16d92d86778eca4a.jpg"
         },
         {
             "ref": 86,
@@ -307,7 +307,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/280b1dadc0381798e9a7c97a16d92d86778eca4a.jpg"
         },
         {
             "ref": 87,
@@ -336,7 +336,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/280b1dadc0381798e9a7c97a16d92d86778eca4a.jpg"
         },
         {
             "ref": 88,
@@ -365,7 +365,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/b1c637697a38b3b87e36556d671199ec13fada32.jpg"
         },
         {
             "ref": 89,
@@ -394,7 +394,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/b1c637697a38b3b87e36556d671199ec13fada32.jpg"
         },
         {
             "ref": 90,
@@ -423,7 +423,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/b1c637697a38b3b87e36556d671199ec13fada32.jpg"
         },
         {
             "ref": 91,
@@ -452,7 +452,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/b1c637697a38b3b87e36556d671199ec13fada32.jpg"
         },
         {
             "ref": 92,
@@ -481,7 +481,7 @@
             ],
             "external_rsvp": 0,
             "creator_email": "Candice.Wu@example.org",
-            "image_file": "images/71a185614cb3c6315672b3a450b768a6f5ef4d87.jpg"
+            "image_file": "images/b1c637697a38b3b87e36556d671199ec13fada32.jpg"
         }
     ],
     "rsvps": [
@@ -593,5 +593,14 @@
     "trust": [],
     "wishlist": [],
     "ballots": [],
-    "images": []
+    "images": {
+        "images/280b1dadc0381798e9a7c97a16d92d86778eca4a.jpg": {
+            "attribution": "Christophe95, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        },
+        "images/b1c637697a38b3b87e36556d671199ec13fada32.jpg": {
+            "attribution": "Martín Vasco, CC BY-SA 4.0, via Wikimedia Commons",
+            "attribution_not_required": false
+        }
+    }
 }

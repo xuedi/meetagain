@@ -19,6 +19,7 @@ use App\Enum\EntityAction;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class UserService
@@ -140,7 +141,7 @@ readonly class UserService
         return $newValue;
     }
 
-    public function transitionStatus(User $actor, User $target, UserStatus $newStatus): void
+    public function transitionStatus(User $actor, User $target, UserStatus $newStatus, ?DateTimeImmutable $blockedUntil = null): void
     {
         $this->assertStructural($actor, $target);
 
@@ -155,6 +156,7 @@ readonly class UserService
         }
 
         $target->setStatus($newStatus);
+        $target->setBlockedUntil($newStatus === UserStatus::Blocked ? $blockedUntil : null);
         $this->em->flush();
 
         if ($oldStatus === UserStatus::EmailVerified && $newStatus === UserStatus::Active) {
@@ -176,6 +178,9 @@ readonly class UserService
         if ($type === AdminMemberStatusChanged::TYPE) {
             $meta['old'] = $oldStatus->value;
             $meta['new'] = $newStatus->value;
+        }
+        if ($target->getBlockedUntil() instanceof DateTimeImmutable) {
+            $meta['until'] = $target->getBlockedUntil()->format('Y-m-d H:i');
         }
         $this->activityService->log($type, $actor, $meta);
     }

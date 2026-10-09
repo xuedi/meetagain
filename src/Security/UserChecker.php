@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\MessageRepository;
 use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use SensitiveParameter;
@@ -33,6 +34,13 @@ readonly class UserChecker implements UserCheckerInterface
     public function assertActive(User $user): void
     {
         $status = $user->getStatus();
+        $blockedUntil = $user->getBlockedUntil();
+        if ($status === UserStatus::Blocked && $blockedUntil instanceof DateTimeImmutable) {
+            throw new CustomUserMessageAccountStatusException('security.account_status_suspended', [
+                '%date%' => $blockedUntil->format('Y-m-d H:i'),
+            ]);
+        }
+
         if ($status !== UserStatus::Active) {
             throw new CustomUserMessageAccountStatusException($this->statusMessage($status));
         }
