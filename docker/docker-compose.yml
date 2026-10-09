@@ -154,7 +154,7 @@ services:
   # Metrics collector, opt-in (run via: just dockerMetricsStart)
   victoriametrics:
     container_name: "ma-victoriametrics"
-    image: victoriametrics/victoria-metrics:v1.152.0@sha256:86ca5fdb6d87d56ba047b044039019ba2bd9042b36e35f6ea34e437b6c825cef
+    image: victoriametrics/victoria-metrics:v1.153.0@sha256:5eff7af5341e401471002f58d106d399e614a62f3d240f2dbc21901e49eed5dd
     command:
       - "-storageDataPath=/storage"
       - "-retentionPeriod=30d"
