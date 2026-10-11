@@ -56,7 +56,7 @@ services:
   # Redis-compatible cache server
   valkey:
     container_name: "ma-valkey"
-    image: valkey/valkey:9.1@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd
+    image: valkey/valkey:9.2@sha256:247b5e730bdc9dc29fddb8274d1731b203a1a1a46af63eae3a9d55b4bf74853f
     command: valkey-server --save 60 1 --loglevel warning
     mem_limit: 2g
     memswap_limit: 2g
