@@ -2,7 +2,7 @@
 // JSON endpoint base: https://ssl.bing.com/webmaster/api.svc/json/<MethodName>?apikey=<KEY>&...
 // Auth: single API key generated in the Bing Webmaster Tools UI under Settings -> API Access.
 // Verified endpoints: GetUserSites, GetFeeds, GetFeedDetails, GetQueryStats, GetPageStats, GetUrlInfo,
-// GetLinkCounts, GetUrlLinks.
+// GetLinkCounts, GetUrlLinks, GetKeyword, GetRelatedKeywords.
 
 use std::collections::BTreeMap;
 use std::process::ExitCode;
@@ -15,6 +15,7 @@ const API_BASE: &str = "https://ssl.bing.com/webmaster/api.svc/json";
 const MAX_DAYS: u32 = 200;
 const TOP_ROWS: usize = 50;
 const MAX_LINK_PAGES: u64 = 50;
+const DEFAULT_KEYWORD_DAYS: u32 = 90;
 
 #[derive(Parser)]
 #[command(name = "bing", about = "Bing Webmaster Tools CLI")]
@@ -68,6 +69,24 @@ enum Command {
         /// Override the default site
         #[arg(long)]
         site: Option<String>,
+    },
+    /// Bing search demand for terms (impressions across all of Bing, not this site); read as relative demand
+    Keywords {
+        /// One or more terms; several are compared side by side
+        #[arg(required = true)]
+        terms: Vec<String>,
+        /// Market country code
+        #[arg(long, default_value = "de")]
+        country: String,
+        /// Market language code
+        #[arg(long, default_value = "de-DE")]
+        language: String,
+        /// Window size in days, ending today
+        #[arg(long, default_value_t = DEFAULT_KEYWORD_DAYS)]
+        days: u32,
+        /// List the terms people search around each term instead
+        #[arg(long)]
+        related: bool,
     },
     /// Crawl-issues feed plus a recent crawl-stats summary; exits non-zero on dangerous signals
     Issues {
@@ -748,6 +767,90 @@ fn format_url_links(rows: &[Value], target: &str) -> String {
     out
 }
 
+// ---------- keywords ----------
+
+// Keyword data is market-wide, so no siteUrl. Exact impressions count the term alone, broad ones every search
+// containing it.
+fn cmd_keywords(api_key: &str, terms: &[String], country: &str, language: &str, days: u32, related: bool) -> ExitCode {
+    if days == 0 || days > MAX_DAYS {
+        eprintln!("error: --days must be 1..={}", MAX_DAYS);
+        return ExitCode::FAILURE;
+    }
+    let end_ms = cutoff_ms(0);
+    let start = days_to_date(cutoff_ms(days).div_euclid(86_400_000));
+    let end = days_to_date(end_ms.div_euclid(86_400_000));
+    let method = if related { "GetRelatedKeywords" } else { "GetKeyword" };
+    let mut out = format!("market:     {} / {}, {} to {}\n", country, language, start, end);
+    let mut rows: Vec<Value> = Vec::new();
+    for term in terms {
+        let url = format!(
+            "{}/{}?apikey={}&q={}&country={}&language={}&startDate={}T00:00:00&endDate={}T00:00:00",
+            API_BASE,
+            method,
+            url_encode(api_key),
+            url_encode(term),
+            url_encode(country),
+            url_encode(language),
+            start,
+            end
+        );
+        let data = http_get(&url);
+        if related {
+            out.push_str(&format_related_keywords(&data, term));
+        } else {
+            rows.push(keyword_row(&data, term));
+        }
+    }
+    if !related {
+        out.push_str(&format_keywords(&rows));
+    }
+    print!("{}", out);
+    ExitCode::SUCCESS
+}
+
+// Bing answers an unknown term with a null "d" or zero counts; either way the term is kept as a zero row.
+fn keyword_row(data: &Value, term: &str) -> Value {
+    let inner = unwrap_d(data);
+    serde_json::json!({
+        "Query": term,
+        "Impressions": inner["Impressions"].as_i64().unwrap_or(0),
+        "BroadImpressions": inner["BroadImpressions"].as_i64().unwrap_or(0),
+    })
+}
+
+fn format_keywords(rows: &[Value]) -> String {
+    let mut sorted: Vec<&Value> = rows.iter().collect();
+    sorted.sort_by_key(|r| std::cmp::Reverse((r["Impressions"].as_i64().unwrap_or(0), r["BroadImpressions"].as_i64().unwrap_or(0))));
+    let mut out = format!("\n{:>10} {:>10}  {}\n", "exact", "broad", "term");
+    for r in sorted {
+        out.push_str(&format!(
+            "{:>10} {:>10}  {}\n",
+            r["Impressions"].as_i64().unwrap_or(0),
+            r["BroadImpressions"].as_i64().unwrap_or(0),
+            r["Query"].as_str().unwrap_or("?")
+        ));
+    }
+    out
+}
+
+fn format_related_keywords(data: &Value, term: &str) -> String {
+    let mut rows: Vec<&Value> = unwrap_d(data).as_array().map(|a| a.iter().collect()).unwrap_or_default();
+    if rows.is_empty() {
+        return format!("\nNo related terms for \"{}\".\n", term);
+    }
+    rows.sort_by_key(|r| std::cmp::Reverse(r["Impressions"].as_i64().unwrap_or(0)));
+    let mut out = format!("\nrelated to \"{}\" ({} terms)\n{:>10} {:>10}  {}\n", term, rows.len(), "exact", "broad", "term");
+    for r in rows.iter().take(TOP_ROWS) {
+        out.push_str(&format!(
+            "{:>10} {:>10}  {}\n",
+            r["Impressions"].as_i64().unwrap_or(0),
+            r["BroadImpressions"].as_i64().unwrap_or(0),
+            r["Query"].as_str().unwrap_or("?")
+        ));
+    }
+    out
+}
+
 fn main() -> ExitCode {
     let cli = Cli::parse();
     let cfg = load_config();
@@ -769,6 +872,9 @@ fn main() -> ExitCode {
         Command::Links { url, site } => {
             let site_url = site.unwrap_or_else(|| cfg.default_site.clone());
             cmd_links(&cfg.api_key, &site_url, url.as_deref())
+        }
+        Command::Keywords { terms, country, language, days, related } => {
+            cmd_keywords(&cfg.api_key, &terms, &country, &language, days, related)
         }
         Command::Issues { days, site } => {
             let site_url = site.unwrap_or_else(|| cfg.default_site.clone());
@@ -831,6 +937,37 @@ mod tests {
         // Act / Assert
         assert_eq!(refusal(&v).as_deref(), Some("error code 14 - ERROR!!! NotAuthorized"));
         assert_eq!(refusal(&serde_json::from_str::<Value>(r#"{"d":{"Links":[]}}"#).unwrap()), None);
+    }
+
+    #[test]
+    fn keywords_are_ranked_by_exact_impressions_and_unknown_terms_read_as_zero() {
+        // Arrange
+        let known: Value = serde_json::from_str(include_str!("../tests/fixtures/keyword.json")).unwrap();
+        let unknown: Value = serde_json::from_str(r#"{"d":null}"#).unwrap();
+        let rows = vec![keyword_row(&unknown, "vereinsplaner app"), keyword_row(&known, "meetup")];
+
+        // Act
+        let out = format_keywords(&rows);
+
+        // Assert
+        let lines: Vec<&str> = out.lines().filter(|l| !l.is_empty()).collect();
+        assert!(lines[1].ends_with("meetup") && lines[1].contains("1787") && lines[1].contains("2655"));
+        assert!(lines[2].ends_with("vereinsplaner app") && lines[2].trim_start().starts_with('0'));
+    }
+
+    #[test]
+    fn related_keywords_are_sorted_by_exact_impressions() {
+        // Arrange
+        let v: Value = serde_json::from_str(include_str!("../tests/fixtures/related_keywords.json")).unwrap();
+
+        // Act
+        let out = format_related_keywords(&v, "meetup alternative");
+
+        // Assert
+        assert!(out.contains("related to \"meetup alternative\" (3 terms)"));
+        let terms: Vec<&str> = out.lines().skip(3).map(|l| l.split("  ").last().unwrap()).collect();
+        assert_eq!(terms, vec!["meet up", "meetup groups", "stranger meetup"]);
+        assert!(format_related_keywords(&serde_json::from_str(r#"{"d":[]}"#).unwrap(), "x").contains("No related terms"));
     }
 
     #[test]
