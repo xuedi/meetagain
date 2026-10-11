@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "events.page_title_event"|trans }}{% endblock %}
+{% block title %}{{ "events.page_title_listing"|trans({'%site%': get_site_name()}) }}{% endblock %}
 {% block meta_description %}{{ get_meta_description('events') }}{% endblock %}
 {% block calendar_link %}<link rel="alternate" type="text/calendar" title="{{ 'events.calendar_feed_title'|trans }}" href="{{ url('app_event_calendar_feed') }}" />{% endblock %}
 

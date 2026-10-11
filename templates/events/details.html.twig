@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ "events.page_title_label"|trans }} - {{ event.title(app.locale) }} - {{ event.start|date(get_date_format()) }}{% endblock %}
+{% block title %}{{ event.title(app.locale) }} - {{ event.start|date(get_date_format()) }} - {{ get_site_name() }}{% endblock %}
 {% block meta_description %}{{ event.metaDescription(app.locale, 'events.meta_description_meeting_at'|trans) }}{% endblock %}
 {% block og_type %}event{% endblock %}
 {% block og_image %}{% if event.previewImage %}<meta property="og:image" content="{{ json_ld.image[0]|default('') }}"/><meta property="og:image:alt" content="{{ event.title(app.locale) }}"/>{% endif %}{% endblock %}
