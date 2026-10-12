@@ -159,20 +159,18 @@ readonly class DishService
         $existing = $this->likeRepo->findByDishAndUser($dish, $userId);
         if ($existing !== null) {
             $this->em->remove($existing);
-            $dish->setLikes($dish->getLikes() - 1);
-            $this->em->flush();
-
-            return false;
+        } else {
+            $like = new DishLike();
+            $like->setDish($dish);
+            $like->setUserId($userId);
+            $this->em->persist($like);
         }
-
-        $like = new DishLike();
-        $like->setDish($dish);
-        $like->setUserId($userId);
-        $this->em->persist($like);
-        $dish->setLikes($dish->getLikes() + 1);
         $this->em->flush();
 
-        return true;
+        $dish->setLikes($this->likeRepo->count(['dish' => $dish]));
+        $this->em->flush();
+
+        return $existing === null;
     }
 
     public function isLikedByUser(Dish $dish, int $userId): bool

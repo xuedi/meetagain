@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\Lock\LockFactory;
 
 #[AsCommand(name: 'app:cron', description: 'cron manager to be called often, maybe every 5 min or so')]
 class CronCommand extends LoggedCommand
@@ -29,10 +30,12 @@ class CronCommand extends LoggedCommand
         private readonly EntityManagerInterface $em,
         CommandExecutionService $commandExecutionService,
         private readonly Recorder $recorder,
+        LockFactory $lockFactory,
         #[AutowireIterator(CronTaskInterface::class)]
         private readonly iterable $cronTasks = [],
     ) {
         parent::__construct($commandExecutionService);
+        $this->lockFactory = $lockFactory;
     }
 
     #[Override]
@@ -44,6 +47,8 @@ class CronCommand extends LoggedCommand
     protected function doExecute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock()) {
+            $output->writeln('app:cron is already running elsewhere, skipping this run');
+
             return Command::SUCCESS;
         }
 
@@ -57,6 +62,7 @@ class CronCommand extends LoggedCommand
                 continue;
             }
 
+            $this->lock?->refresh();
             $taskStart = hrtime(true);
             $result = $task->runCronTask($output);
             $durationMs = (int) ((hrtime(true) - $taskStart) / 1_000_000);

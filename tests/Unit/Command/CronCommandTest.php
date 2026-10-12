@@ -12,6 +12,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\InMemoryStore;
 
 class CronCommandTest extends TestCase
 {
@@ -22,7 +24,7 @@ class CronCommandTest extends TestCase
 
         // Act
         $emStub = $this->createStub(EntityManagerInterface::class);
-        $command = new CronCommand($emStub, $commandExecServiceStub, new Recorder(null, 'test'));
+        $command = new CronCommand($emStub, $commandExecServiceStub, new Recorder(null, 'test'), new LockFactory(new InMemoryStore()));
 
         // Assert
         static::assertSame('app:cron', $command->getName());
@@ -35,7 +37,7 @@ class CronCommandTest extends TestCase
 
         // Act
         $emStub = $this->createStub(EntityManagerInterface::class);
-        $command = new CronCommand($emStub, $commandExecServiceStub, new Recorder(null, 'test'));
+        $command = new CronCommand($emStub, $commandExecServiceStub, new Recorder(null, 'test'), new LockFactory(new InMemoryStore()));
 
         // Assert
         static::assertSame('cron manager to be called often, maybe every 5 min or so', $command->getDescription());
@@ -50,6 +52,7 @@ class CronCommandTest extends TestCase
             $this->createStub(EntityManagerInterface::class),
             $this->createStub(CommandExecutionService::class),
             new Recorder(null, 'test'),
+            new LockFactory(new InMemoryStore()),
             $tasks,
         );
 
@@ -58,6 +61,28 @@ class CronCommandTest extends TestCase
 
         // Assert
         static::assertSame(['beta', 'gamma'], $ran);
+    }
+
+    public function testARunHoldingTheSharedLockElsewhereStopsThisOne(): void
+    {
+        // Arrange
+        $ran = [];
+        $store = new InMemoryStore();
+        $otherWorker = new LockFactory($store)->createLock('app:cron');
+        $otherWorker->acquire();
+        $command = new CronCommand(
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CommandExecutionService::class),
+            new Recorder(null, 'test'),
+            new LockFactory($store),
+            [$this->task('alpha', $ran)],
+        );
+
+        // Act
+        new CommandTester($command)->execute([]);
+
+        // Assert
+        static::assertSame([], $ran);
     }
 
     /**
