@@ -88,7 +88,7 @@ readonly class SupportNotificationEmail extends EmailAbstract
             $email->context([
                 'audience' => $this->translator->trans($request->getAudience()->label(), [], null, $recipient->getLocale()),
                 'name' => $request->getRequesterLabel() ?? $this->translator->trans('admin_support.requester_guest', [], null, $recipient->getLocale()),
-                'email' => $request->getEmail(),
+                'email' => $request->getEmail() ?? '-',
                 'message' => $request->getMessage(),
                 'createdAt' => $request->getCreatedAt()->format('Y-m-d H:i:s'),
             ]);

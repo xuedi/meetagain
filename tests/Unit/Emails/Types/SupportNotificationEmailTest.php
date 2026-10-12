@@ -136,7 +136,7 @@ class SupportNotificationEmailTest extends TestCase
         // Assert
         static::assertCount(1, $messages);
         static::assertSame('Gast', $messages[0]->getContext()['name']);
-        static::assertNull($messages[0]->getContext()['email']);
+        static::assertSame('-', $messages[0]->getContext()['email']);
     }
 
     private function makeRequest(): SupportRequest
