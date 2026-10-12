@@ -18,7 +18,8 @@
                                 'entity': 'user',
                                 'id': user.id,
                                 'image': user.image,
-                                'rotate': true
+                                'rotate': user.image is not null,
+                                'showWhenEmpty': true
                             } %}
                             </div>
                             <div class="column is-6">

@@ -21,6 +21,9 @@ enum Command {
         /// Only show unresolved issues
         #[arg(long)]
         unresolved: bool,
+        /// Project id to list, overriding BUGTRACKER_PROJECT
+        #[arg(long)]
+        project: Option<String>,
     },
     /// Show issue metadata and latest event stack trace
     Show {
@@ -88,11 +91,12 @@ fn issue_count(issue: &Value) -> String {
         .unwrap_or_else(|| "?".to_string())
 }
 
-fn cmd_list(cfg: &Config, n: usize, offset: usize, unresolved: bool) {
+fn cmd_list(cfg: &Config, project: Option<&str>, n: usize, offset: usize, unresolved: bool) {
+    let project = project.unwrap_or(&cfg.project);
     let resolved_filter = if unresolved { "&is_resolved=false" } else { "" };
     let url = format!(
         "{}/api/canonical/0/issues/?project={}&sort=last_seen&order=desc{}",
-        cfg.url, cfg.project, resolved_filter
+        cfg.url, project, resolved_filter
     );
     let data = get(&url, &cfg.token);
     let issues = issues_from(data);
@@ -171,7 +175,9 @@ fn main() {
     let cfg = load_config();
 
     match cli.command {
-        Command::List { n, offset, unresolved } => cmd_list(&cfg, n, offset, unresolved),
+        Command::List { n, offset, unresolved, project } => {
+            cmd_list(&cfg, project.as_deref(), n, offset, unresolved)
+        }
         Command::Show { uuid } => cmd_show(&cfg, &uuid),
     }
 }
