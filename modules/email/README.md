@@ -92,14 +92,16 @@ looked up by it, and the admin pages list by it. Default subjects, bodies and va
 `TemplateProviderInterface` implementations, merged in priority order, so a provider registered after the
 application's can replace a shipped template by reusing its identifier.
 
-Substitution escapes every value except the variables a `TemplateDefinition` lists in `htmlVariables`. The
-list is per template: reusing a variable name in another template does not make it raw there. Subjects are
-never escaped.
+Substitution escapes every value except the variables a `TemplateDefinition` lists in `htmlVariables`, and
+keeps the line breaks of an escaped value as `<br>`. The list is per template: reusing a variable name in
+another template does not make it raw there. Subjects are never escaped.
 
 A stored row must exist before an identifier can be queued. `app:email-templates:seed` creates the missing
 ones and, with `--overwrite`, resets every translation to the shipped default - discarding admin edits.
 Editing a default on disk does not otherwise reach an existing install. `TemplatesInterface::seedLanguage()`
-adds a newly enabled language to every stored template that lacks it.
+adds a newly enabled language to every stored template that lacks it, and `resetToDefault()` resets one
+template in every stored language - the call for a data hotfix after a default changed its variables.
+`remove()` deletes a stored template whose definition is gone.
 
 ## Scheduled mail is swept, not triggered
 
@@ -161,7 +163,7 @@ Everything outside the module talks to it through `Module\Email\Contract\`.
 | `ContextEnricherInterface`                                                               | chain                   | extra template variables at enqueue                |
 | `PushDispatcherInterface`                                                                | all run                 | a push for each queued message                     |
 | `TemplateDefinition`, `TemplateProviderInterface`                                        | VO, merged by priority  | default subject, body, variables                   |
-| `TemplatesInterface`                                                                     | facade                  | render a stored template, seed a language          |
+| `TemplatesInterface`                                                                     | facade                  | render, seed a language, reset one template        |
 | `BlocklistInterface`                                                                     | facade                  | is an address blocked, why, block one              |
 | `SendlogInterface`, `SentEmail`, `QueueStatus`, `QueueStats`                             | facade, VOs, enum       | what was queued and sent                           |
 | `DeliveryProviderInterface`, `DeliveryLog`, `DeliveryLogCollection`, `DeliveryLogFilter` | first available wins    | delivery status from the sending provider          |

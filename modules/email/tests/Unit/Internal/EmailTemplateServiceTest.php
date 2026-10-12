@@ -97,6 +97,8 @@ class EmailTemplateServiceTest extends TestCase
         yield 'object is skipped' => ['Obj: {{o}}', ['o' => new stdClass()], 'Obj: {{o}}'];
         yield 'unknown placeholder left as-is' => ['Hi {{x}}', [], 'Hi {{x}}'];
         yield 'placeholder used twice' => ['{{a}} and {{a}}', ['a' => 'foo'], 'foo and foo'];
+        yield 'line break kept as br' => ['<p>{{greeting}}</p>', ['greeting' => "The Board\nGame Club"], "<p>The Board<br>\nGame Club</p>"];
+        yield 'markup escaped before the break is added' => ['{{greeting}}', ['greeting' => "<b>A</b>\nB"], "&lt;b&gt;A&lt;/b&gt;<br>\nB"];
     }
 
     public function testRenderContentEscapesMarkupInASubstitutedValue(): void
@@ -207,6 +209,53 @@ class EmailTemplateServiceTest extends TestCase
         static::assertSame('de', $persisted[0]->getLanguage());
         static::assertSame('Digest', $persisted[0]->getSubject());
         static::assertSame($stored, $persisted[0]->getEmailTemplate());
+    }
+
+    public function testResetToDefaultOverwritesEveryStoredTranslationOfTheTemplate(): void
+    {
+        // Arrange
+        $stored = $this->template('en', 'Edited', '<p>{{contactType}}</p>');
+        $repo = $this->createMock(EmailTemplateRepository::class);
+        $repo->expects($this->once())->method('findByIdentifier')->with(self::IDENTIFIER)->willReturn($stored);
+        $service = $this->service(null, $repo);
+
+        // Act
+        $service->resetToDefault(self::IDENTIFIER);
+
+        // Assert
+        $translation = $stored->findTranslation('en');
+        static::assertSame('Digest', $translation?->getSubject());
+        static::assertSame('<p>{{eventsHtml}}</p>', $translation?->getBody());
+        static::assertSame(['eventsHtml'], $stored->getAvailableVariables());
+    }
+
+    public function testResetToDefaultIgnoresATemplateThatIsNotStored(): void
+    {
+        // Arrange
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->never())->method('flush');
+        $service = $this->service(null, null, $em);
+
+        // Act
+        $service->resetToDefault(self::IDENTIFIER);
+    }
+
+    public function testRemoveDeletesTheTemplateWithItsTranslations(): void
+    {
+        // Arrange
+        $stored = $this->template('en', 'Digest', '<p>stored</p>');
+        $removed = [];
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('remove')->willReturnCallback(static function (object $entity) use (&$removed): void {
+            $removed[] = $entity::class;
+        });
+        $service = $this->service($stored, null, $em);
+
+        // Act
+        $service->remove(self::IDENTIFIER);
+
+        // Assert
+        static::assertSame([EmailTemplateTranslation::class, EmailTemplate::class], $removed);
     }
 
     public function testALaterProviderAddsItsTemplatesToTheEarlierOnes(): void

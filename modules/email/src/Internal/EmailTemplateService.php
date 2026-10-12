@@ -112,6 +112,43 @@ class EmailTemplateService implements TemplatesInterface
         $this->em->flush();
     }
 
+    public function resetToDefault(string $identifier): void
+    {
+        $template = $this->repo->findByIdentifier($identifier);
+        if (!$template instanceof EmailTemplate) {
+            return;
+        }
+
+        foreach ($template->getTranslations() as $translation) {
+            $default = $this->getDefaultTemplates((string) $translation->getLanguage())[$identifier] ?? null;
+            if ($default === null) {
+                continue;
+            }
+
+            $translation->setSubject($default['subject']);
+            $translation->setBody($default['body']);
+            $translation->setUpdatedAt(new DateTimeImmutable());
+            $template->setAvailableVariables($default['variables']);
+        }
+
+        $template->setUpdatedAt(new DateTimeImmutable());
+        $this->em->flush();
+    }
+
+    public function remove(string $identifier): void
+    {
+        $template = $this->repo->findByIdentifier($identifier);
+        if (!$template instanceof EmailTemplate) {
+            return;
+        }
+
+        foreach ($template->getTranslations() as $translation) {
+            $this->em->remove($translation);
+        }
+        $this->em->remove($template);
+        $this->em->flush();
+    }
+
     public function renderContent(string $identifier, string $content, array $context): string
     {
         return $this->substitute($content, $context, escape: true, raw: $this->htmlVariablesOf($identifier));
@@ -155,7 +192,7 @@ class EmailTemplateService implements TemplatesInterface
 
             $replacement = (string) $value;
             if ($escape && !in_array($key, $raw, true)) {
-                $replacement = htmlspecialchars($replacement, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                $replacement = nl2br(htmlspecialchars($replacement, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), false);
             }
 
             $content = str_replace('{{' . $key . '}}', $replacement, $content);
