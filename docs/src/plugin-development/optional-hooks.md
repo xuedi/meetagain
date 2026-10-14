@@ -15,6 +15,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `CmsFilterInterface`                                         | Control which CMS pages are visible                   | `getCmsPageSlugs()`                                    |
 | `ReservedSlugProviderInterface`                              | Reserve slugs the CMS editor must refuse to assign    | `getReservedSlugs()`                                   |
 | `HeadHtmlProviderInterface`                                  | Add markup to the document `<head>`                   | `getHeadHtml()`                                        |
+| `Footer\BarProviderInterface`                                | Add a full-width bar under the footer columns         | `getFooterBarHtml()`                                   |
 | `MemberFilterInterface`                                      | Filter which members appear in lists                  | `getUserIds()`                                         |
 | `EventFilterFormContributorInterface`                        | Add fields to the event filter form                   | `addFields()`                                          |
 | `NotificationProviderInterface`                              | Add informational items to the notification bell      | `getNotifications()`                                   |
@@ -417,6 +418,42 @@ final readonly class MyHeadProvider implements HeadHtmlProviderInterface
             '<meta name="my-plugin" content="%s">',
             htmlspecialchars($value, ENT_QUOTES | ENT_HTML5, 'UTF-8'),
         );
+    }
+}
+```
+
+---
+
+### Footer\BarProviderInterface
+
+**Purpose:** Contribute markup to a full-width bar under the footer columns, on every page that renders the footer -
+a copyright line, a licence note, a row of small links. Content for the left footer column belongs in
+`getFooterAbout()` instead.
+
+**File:** `src/Publisher/Footer/BarProviderInterface.php`
+
+**Tag:** auto-applied by `#[AutoconfigureTag]` on the interface - just implement it, no attribute needed.
+
+**When called:** Once per rendered page, from `base_footer.html.twig`. All providers are unioned; returning `null` or an
+empty string contributes nothing, and core renders no bar at all when every provider is silent. Core adds no wrapper
+or styling, so ship your own wrapper element and its CSS through `getStylesheets()`.
+
+**The output is rendered unescaped.** Render it from a Twig template, which escapes for you, rather than concatenating
+strings.
+
+```php
+namespace Plugin\YourPlugin\Footer;
+
+use App\Publisher\Footer\BarProviderInterface;
+use Twig\Environment;
+
+final readonly class FooterBar implements BarProviderInterface
+{
+    public function __construct(private Environment $twig) {}
+
+    public function getFooterBarHtml(): ?string
+    {
+        return $this->twig->render('@YourPlugin/footer_bar.html.twig');
     }
 }
 ```

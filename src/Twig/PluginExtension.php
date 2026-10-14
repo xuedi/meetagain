@@ -18,6 +18,7 @@ final class PluginExtension extends AbstractExtension
             new TwigFunction('get_plugin_javascripts', [PluginRuntime::class, 'getPluginJavascripts']),
             new TwigFunction('get_plugin_footer_about', [PluginRuntime::class, 'getPluginFooterAbout']),
             new TwigFunction('get_plugin_footer_links', [PluginRuntime::class, 'getPluginFooterLinks']),
+            new TwigFunction('get_footer_bar_html', [PluginRuntime::class, 'getFooterBarHtml'], ['is_safe' => ['html']]),
             new TwigFunction('get_plugin_profile_dropdown_links', [
                 PluginRuntime::class,
                 'getPluginProfileDropdownLinks',
