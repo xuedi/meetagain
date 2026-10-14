@@ -6,6 +6,7 @@ use App\Entity\EventListItemTag;
 use App\Entity\Link;
 use App\Enum\WarmCacheType;
 use App\Plugin;
+use App\Publisher\Footer\BarProviderInterface;
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Throwable;
@@ -24,6 +25,8 @@ final class PluginRuntime implements RuntimeExtensionInterface
         private readonly iterable $plugins,
         private readonly PluginService $pluginService,
         private readonly Environment $twig,
+        #[AutowireIterator(BarProviderInterface::class)]
+        private readonly iterable $footerBarProviders,
     ) {}
 
     public function getPluginsLinks(): array
@@ -71,6 +74,19 @@ final class PluginRuntime implements RuntimeExtensionInterface
     public function getPluginFooterAbout(): ?string
     {
         return $this->findFirstFromPlugins(static fn(Plugin $p) => $p->getFooterAbout());
+    }
+
+    public function getFooterBarHtml(): string
+    {
+        $fragments = [];
+        foreach ($this->footerBarProviders as $provider) {
+            $fragment = trim((string) $provider->getFooterBarHtml());
+            if ($fragment !== '') {
+                $fragments[] = $fragment;
+            }
+        }
+
+        return implode("\n", $fragments);
     }
 
     public function getPluginFooterLinks(string $column): array
