@@ -18,7 +18,6 @@ readonly class BoxImageService
         private ImageService $imageService,
         private UserRepository $userRepository,
         private LoggerInterface $logger,
-        private string $kernelProjectDir,
     ) {}
 
     public function uploadFromFile(UploadedFile $file, int $userId): ?Image
@@ -71,12 +70,7 @@ readonly class BoxImageService
                 return null;
             }
 
-            $tempDir = $this->kernelProjectDir . '/var/tmp/';
-            if (!is_dir($tempDir)) {
-                mkdir($tempDir, 0o755, true);
-            }
-
-            $tempFile = $tempDir . uniqid('box_') . '.jpg';
+            $tempFile = sys_get_temp_dir() . '/' . uniqid('box_') . '.jpg';
             file_put_contents($tempFile, $content);
 
             $uploadedFile = new UploadedFile($tempFile, 'box.jpg', 'image/jpeg', null, true);
