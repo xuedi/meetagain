@@ -18,7 +18,6 @@ readonly class CoverImageService
         private ImageService $imageService,
         private UserRepository $userRepository,
         private LoggerInterface $logger,
-        private string $kernelProjectDir,
     ) {}
 
     public function uploadFromFile(UploadedFile $file, int $userId): ?Image
@@ -71,12 +70,7 @@ readonly class CoverImageService
                 return null;
             }
 
-            $tempDir = $this->kernelProjectDir . '/var/tmp/';
-            if (!is_dir($tempDir)) {
-                mkdir($tempDir, 0o755, true);
-            }
-
-            $tempFile = $tempDir . uniqid('cover_') . '.jpg';
+            $tempFile = sys_get_temp_dir() . '/' . uniqid('cover_') . '.jpg';
             file_put_contents($tempFile, $content);
 
             $uploadedFile = new UploadedFile($tempFile, 'cover.jpg', 'image/jpeg', null, true);
