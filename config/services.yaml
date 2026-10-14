@@ -58,7 +58,7 @@ services:
         factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
         arguments:
             - '%env(REDIS_URL)%'
-            - { persistent: 1 }
+            - { persistent: 1, lazy: true }
 
     Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
         arguments:
