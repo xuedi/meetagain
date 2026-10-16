@@ -6,8 +6,8 @@
     },
     "aliases": {
         "DOCKER": "docker-compose --env-file .env.dist -f docker/docker-compose.yml",
-        "PHP": "docker-compose --env-file .env.dist -f docker/docker-compose.yml exec -T -e XDEBUG_MODE=off php",
-        "PHP_COVERAGE": "docker-compose --env-file .env.dist -f docker/docker-compose.yml exec -T -e XDEBUG_MODE=coverage php",
+        "PHP": "docker-compose --env-file .env.dist -f docker/docker-compose.yml exec -T -w /var/www/html -e XDEBUG_MODE=off php",
+        "PHP_COVERAGE": "docker-compose --env-file .env.dist -f docker/docker-compose.yml exec -T -w /var/www/html -e XDEBUG_MODE=coverage php",
         "DB": "docker-compose --env-file .env.dist -f docker/docker-compose.yml exec -T mariadb"
     },
     "rules": [

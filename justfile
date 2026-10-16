@@ -11,8 +11,9 @@ set quiet
 set shell := ["bin/just-shell", "sh", "-cu"]
 
 DOCKER := "docker-compose --env-file .env.dist -f docker/docker-compose.yml"
-PHP := DOCKER + " exec -T -e XDEBUG_MODE=off php"
-PHP_COVERAGE := DOCKER + " exec -T -e XDEBUG_MODE=coverage php"
+CONTAINER_DIR := env("CONTAINER_DIR", "/var/www/html")
+PHP := DOCKER + " exec -T -w " + CONTAINER_DIR + " -e XDEBUG_MODE=off php"
+PHP_COVERAGE := DOCKER + " exec -T -w " + CONTAINER_DIR + " -e XDEBUG_MODE=coverage php"
 DB := DOCKER + " exec -T mariadb"
 JUST := just_executable() + " --justfile=" + justfile()
 
