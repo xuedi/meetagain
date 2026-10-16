@@ -2,8 +2,15 @@
 
 # Run once per clone, and again when a plugin adds recipes or commit hooks
 [group('development')]
-install: buildTools
+install: buildTools installPluginFiles
     git config core.hooksPath .githooks
+    {{JUST}} devSecretBoxKey
+    @echo "Pre-commit dispatcher activated. Scripts in bin/commit-hooks/ will run on every commit."
+    @echo "Next, once per machine: just devCerts"
+
+# Copy the commit hooks and the plugin recipes into place
+[group('development')]
+installPluginFiles:
     mkdir -p bin/commit-hooks
     rm -f bin/commit-hooks/*.bash
     cp tests/config/commit-hooks/*.bash bin/commit-hooks/
@@ -11,9 +18,6 @@ install: buildTools
     chmod +x bin/commit-hooks/*.bash
     cat /dev/null > .just/local.just
     for recipes in plugins/*/just/*.just; do if [ -f "$recipes" ]; then cat "$recipes" >> .just/local.just; fi; done
-    {{JUST}} devSecretBoxKey
-    @echo "Pre-commit dispatcher activated. Scripts in bin/commit-hooks/ will run on every commit."
-    @echo "Next, once per machine: just devCerts"
 
 # Give this clone its own APP_SECRET_BOX_KEY in .env.local, which no dev reset overwrites
 [group('development')]
