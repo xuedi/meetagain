@@ -26,6 +26,8 @@ installed.lock
 !/tests/reports/attack/.gitkeep
 /tests/reports/loadtest/
 /var/
+/data/*
+!/data/images/
 /vendor/
 /.idea/
 /.deptrac.cache
