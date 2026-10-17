@@ -2,7 +2,7 @@
 
 namespace Module\Email\Internal;
 
-use App\Service\Config\ConfigService;
+use App\Theme\Colors;
 use Module\Email\Contract\SendingIdentity;
 use Module\Email\Internal\Entity\EmailQueue;
 use Psr\Log\LoggerInterface;
@@ -18,7 +18,7 @@ readonly class LayoutRenderer
 
     public function __construct(
         private Environment $twig,
-        private ConfigService $configService,
+        private Colors $colors,
         private LoggerInterface $logger,
     ) {}
 
@@ -27,7 +27,7 @@ readonly class LayoutRenderer
      */
     public function snapshot(SendingIdentity $identity): array
     {
-        $colors = $this->configService->getThemeColors();
+        $colors = $this->colors->all();
 
         $snapshot = [
             'siteName' => $identity->siteName,

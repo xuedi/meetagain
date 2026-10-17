@@ -9,6 +9,7 @@ use App\Repository\SecurityMeasureLogRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Lock\LockFactory;
 
 readonly class MeasureLogger
 {
@@ -16,6 +17,7 @@ readonly class MeasureLogger
         private SecurityMeasureLogRepository $repo,
         private EntityManagerInterface $em,
         private ClockInterface $clock,
+        private LockFactory $lockFactory,
     ) {}
 
     public function recordPass(SecurityMeasure $measure, ?string $context = null): void
@@ -27,11 +29,21 @@ readonly class MeasureLogger
             return;
         }
 
-        $counter = new SecurityMeasureLog();
-        $counter->setDay($day)->setCreatedAt($now)->setMeasure($measure)->setOutcome(SecurityMeasureOutcome::Passed)->setCount(1)->setContext($context);
+        $lock = $this->lockFactory->createLock(sprintf('security-measure-pass.%s.%s.%s', $day->format('Y-m-d'), $measure->value, hash('xxh3', $context ?? '')));
+        $lock->acquire(true);
+        try {
+            if ($this->repo->incrementPassCounter($measure, $day, $context, $now) > 0) {
+                return;
+            }
 
-        $this->em->persist($counter);
-        $this->em->flush();
+            $counter = new SecurityMeasureLog();
+            $counter->setDay($day)->setCreatedAt($now)->setMeasure($measure)->setOutcome(SecurityMeasureOutcome::Passed)->setCount(1)->setContext($context);
+
+            $this->em->persist($counter);
+            $this->em->flush();
+        } finally {
+            $lock->release();
+        }
     }
 
     /**

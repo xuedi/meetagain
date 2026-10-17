@@ -5,10 +5,10 @@ namespace App\Service\Security\Provider;
 use App\Entity\RateLimitLog;
 use App\Enum\SecurityEventType;
 use App\Repository\RateLimitLogRepository;
+use App\Service\Cache\AtomicStoreInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
@@ -18,12 +18,12 @@ final readonly class RateLimitProvider extends AbstractSecurityProvider
     public const string KEY = 'rate_limit';
 
     public function __construct(
-        CacheItemPoolInterface $securityCachePool,
+        AtomicStoreInterface $store,
         LoggerInterface $logger,
         private EntityManagerInterface $em,
         private RateLimitLogRepository $logRepo,
     ) {
-        parent::__construct($securityCachePool, $logger);
+        parent::__construct($store, $logger);
     }
 
     #[Override]

@@ -25,6 +25,8 @@ use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\InMemoryStore;
 
 class ImageServiceTest extends TestCase
 {
@@ -62,6 +64,7 @@ class ImageServiceTest extends TestCase
             $kernelProjectDir ?? $this->kernelProjectDir,
             $this->createStub(ImageLocationService::class),
             $imageLocationRepo ?? $this->createStub(ImageLocationRepository::class),
+            new LockFactory(new InMemoryStore()),
         );
     }
 
@@ -85,6 +88,49 @@ class ImageServiceTest extends TestCase
         $image->method('getType')->willReturn($type);
 
         return $image;
+    }
+
+    public function testAnUploadThatLosesTheInsertRaceReturnsTheStoredRow(): void
+    {
+        // Arrange
+        $stored = $this->createStub(Image::class);
+        $imageRepo = $this->createStub(ImageRepository::class);
+        $imageRepo->method('findOneBy')->willReturn(null, $stored);
+        $uploadedFile = $this->createStub(UploadedFile::class);
+        $uploadedFile->method('getContent')->willReturn('raced content');
+        $uploadedFile->method('getMimeType')->willReturn('image/jpeg');
+        $uploadedFile->method('guessExtension')->willReturn('jpg');
+        $uploadedFile->method('getSize')->willReturn(1);
+        $uploadedFile->method('getRealPath')->willReturn('/tmp/raced.jpg');
+        $subject = $this->createService(imageRepo: $imageRepo);
+
+        // Act
+        $result = $subject->upload($uploadedFile, $this->storedUser(), ImageType::ProfilePicture);
+
+        // Assert
+        static::assertSame($stored, $result);
+    }
+
+    public function testAnUploaderNotYetStoredLeavesTheInsertToTheCallersFlush(): void
+    {
+        // Arrange
+        $imageRepo = $this->createStub(ImageRepository::class);
+        $imageRepo->method('findOneBy')->willReturn(null);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->never())->method('flush');
+        $uploadedFile = $this->createStub(UploadedFile::class);
+        $uploadedFile->method('getContent')->willReturn('fixture content');
+        $uploadedFile->method('getMimeType')->willReturn('image/jpeg');
+        $uploadedFile->method('guessExtension')->willReturn('jpg');
+        $uploadedFile->method('getSize')->willReturn(1);
+        $uploadedFile->method('getRealPath')->willReturn('/tmp/fixture.jpg');
+        $subject = $this->createService(imageRepo: $imageRepo, entityManager: $entityManager);
+
+        // Act
+        $result = $subject->upload($uploadedFile, $this->createStub(User::class), ImageType::ProfilePicture);
+
+        // Assert
+        static::assertSame(sha1('fixture content'), $result?->getHash());
     }
 
     public function testUploadExistingImage(): void
@@ -132,12 +178,12 @@ class ImageServiceTest extends TestCase
         $extension = 'jpg';
         $size = 12345;
         $realPath = '/tmp/uploaded_file.jpg';
-        $user = $this->createStub(User::class);
+        $user = $this->storedUser();
         $type = ImageType::ProfilePicture;
 
         // Arrange
         $imageRepoMock = $this->createMock(ImageRepository::class);
-        $imageRepoMock->expects($this->once())->method('findOneBy')->with(['hash' => $hash])->willReturn(null);
+        $imageRepoMock->expects($this->exactly(2))->method('findOneBy')->with(['hash' => $hash])->willReturn(null);
 
         // Arrange
         $uploadedFile = $this->createStub(UploadedFile::class);
@@ -170,6 +216,7 @@ class ImageServiceTest extends TestCase
                     && $image->getCreatedAt() instanceof DateTimeImmutable
                 ),
             ));
+        $entityManagerMock->expects($this->once())->method('flush');
 
         $subject = $this->createService(imageRepo: $imageRepoMock, entityManager: $entityManagerMock, filesystemService: $filesystemMock);
 
@@ -201,6 +248,7 @@ class ImageServiceTest extends TestCase
                 $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
+                new LockFactory(new InMemoryStore()),
             ])
             ->onlyMethods(['createThumbnails'])
             ->getMock();
@@ -236,6 +284,7 @@ class ImageServiceTest extends TestCase
                 $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
+                new LockFactory(new InMemoryStore()),
             ])
             ->onlyMethods(['rotateThumbNail'])
             ->getMock();
@@ -299,6 +348,7 @@ class ImageServiceTest extends TestCase
                 $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
+                new LockFactory(new InMemoryStore()),
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
             ->getMock();
@@ -533,6 +583,7 @@ class ImageServiceTest extends TestCase
                 $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
+                new LockFactory(new InMemoryStore()),
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
             ->getMock();
@@ -763,6 +814,7 @@ class ImageServiceTest extends TestCase
             $this->kernelProjectDir,
             $locationService,
             $this->createStub(ImageLocationRepository::class),
+            new LockFactory(new InMemoryStore()),
         );
 
         // Act
@@ -1056,5 +1108,13 @@ class ImageServiceTest extends TestCase
         $imagick->pingImage(sprintf('%s/public/images/thumbnails/%s.webp', $workspace, $name));
 
         return [$imagick->getImageWidth(), $imagick->getImageHeight()];
+    }
+
+    private function storedUser(): User
+    {
+        $user = $this->createStub(User::class);
+        $user->method('getId')->willReturn(1);
+
+        return $user;
     }
 }

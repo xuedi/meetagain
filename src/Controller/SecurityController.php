@@ -23,17 +23,21 @@ use App\Service\Config\ConfigService;
 use App\Service\Member\ConsentService;
 use App\Service\Member\PasswordResetService;
 use App\Service\Member\RegistrationApprovalProviderInterface;
+use App\Service\Member\UserService;
 use App\Service\Security\LoginGuard;
 use App\Service\Security\SecurityService;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\BlocklistInterface;
+use SensitiveParameter;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\DependencyInjection\Attribute\Target;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -65,6 +69,8 @@ final class SecurityController extends AbstractController
         private readonly RateLimiterFactoryInterface $registrationLimiter,
         private readonly SecurityService $securityService,
         private readonly LoginGuard $loginGuard,
+        private readonly LockFactory $lockFactory,
+        private readonly UserService $userService,
         #[AutowireIterator(RegistrationApprovalProviderInterface::class)]
         private readonly iterable $registrationApprovalProviders,
     ) {}
@@ -147,24 +153,19 @@ final class SecurityController extends AbstractController
                 ]);
             }
 
-            $plainPassword = $form->get('plainPassword')->getData();
+            $lock = $this->lockFactory->createLock('register.' . hash('xxh3', mb_strtolower((string) $user->getEmail())));
+            $lock->acquire(true);
+            try {
+                if ($em->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]) instanceof User) {
+                    $form->get('email')->addError(new FormError($this->translator->trans('security.validator_email_unique', [], 'validators')));
 
-            $user->setPassword($this->hasher->hashPassword($user, $plainPassword));
-            $user->setRole(UserRole::User);
-            $user->setNotification(true);
-            $user->setStatus(UserStatus::Registered);
-            $user->setPublic(true);
-            $user->setVerified(false);
-            $user->setLocale($request->getLocale());
-            $user->setRegcode(bin2hex(random_bytes(32)));
-            $user->setRegcodeExpiresAt(new DateTimeImmutable('+24 hours'));
-            $user->setLastLogin(new DateTime());
-            $user->setCreatedAt(new DateTimeImmutable());
-            $user->setBio(null);
-            $user->setOsmConsent($this->consentService->getShowOsm());
+                    return $this->render('security/register.html.twig', ['form' => $form]);
+                }
 
-            $em->persist($user);
-            $em->flush();
+                $this->persistNewRegistration($em, $request, $user, $form->get('plainPassword')->getData());
+            } finally {
+                $lock->release();
+            }
 
             $this->entityActionDispatcher->dispatch(EntityAction::CreateUser, $user->getId());
 
@@ -181,12 +182,10 @@ final class SecurityController extends AbstractController
     public function verifyUserEmail(EntityManagerInterface $em, string $code): Response
     {
         $user = $em->getRepository(User::class)->findOneBy(['regcode' => $code]);
-        if ($user === null || $user->isRegcodeExpired()) {
+        if ($user === null || $user->isRegcodeExpired() || !$this->userService->claimRegistrationCode($user, $code)) {
             return $this->render('security/register_error.html.twig');
         }
 
-        $user->setRegcode(null);
-        $user->setRegcodeExpiresAt(null);
         $this->activityService->log(RegistrationEmailConfirmed::TYPE, $user, []);
 
         if (!$this->requiresApproval($user)) {
@@ -271,6 +270,10 @@ final class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (!$this->passwordResetService->claimResetCode($user, $code)) {
+                return $this->render('security/reset_error.html.twig');
+            }
+
             $finalized = $this->passwordResetService->resetPassword($user, $form->get('password')->getData());
             if (!$finalized) {
                 return $this->render('security/reset_blocked.html.twig', [
@@ -285,6 +288,26 @@ final class SecurityController extends AbstractController
         return $this->render('security/reset_password.html.twig', [
             'form' => $form,
         ]);
+    }
+
+    private function persistNewRegistration(EntityManagerInterface $em, Request $request, User $user, #[SensitiveParameter] string $plainPassword): void
+    {
+        $user->setPassword($this->hasher->hashPassword($user, $plainPassword));
+        $user->setRole(UserRole::User);
+        $user->setNotification(true);
+        $user->setStatus(UserStatus::Registered);
+        $user->setPublic(true);
+        $user->setVerified(false);
+        $user->setLocale($request->getLocale());
+        $user->setRegcode(bin2hex(random_bytes(32)));
+        $user->setRegcodeExpiresAt(new DateTimeImmutable('+24 hours'));
+        $user->setLastLogin(new DateTime());
+        $user->setCreatedAt(new DateTimeImmutable());
+        $user->setBio(null);
+        $user->setOsmConsent($this->consentService->getShowOsm());
+
+        $em->persist($user);
+        $em->flush();
     }
 
     /**

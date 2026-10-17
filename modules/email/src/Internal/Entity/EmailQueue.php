@@ -12,6 +12,7 @@ use Module\Email\Contract\QueueStatus;
 #[ORM\Table(name: 'mod_email_queue')]
 #[ORM\Index(name: 'idx_email_queue_status', columns: ['status'])]
 #[ORM\Index(name: 'idx_email_queue_provider_message_id', columns: ['provider_message_id'])]
+#[ORM\Index(name: 'idx_email_queue_claim', columns: ['claim_token'])]
 class EmailQueue
 {
     #[ORM\Id]
@@ -63,6 +64,12 @@ class EmailQueue
 
     #[ORM\Column(length: 32, nullable: true)]
     private ?string $providerStatus = null;
+
+    #[ORM\Column(length: 32, nullable: true)]
+    private ?string $claimToken = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $claimedAt = null;
 
     public function getId(): ?int
     {
@@ -270,5 +277,16 @@ class EmailQueue
         $this->providerStatus = $providerStatus;
 
         return $this;
+    }
+
+    public function isClaimed(): bool
+    {
+        return $this->claimToken !== null && $this->claimedAt !== null;
+    }
+
+    public function releaseClaim(): void
+    {
+        $this->claimToken = null;
+        $this->claimedAt = null;
     }
 }

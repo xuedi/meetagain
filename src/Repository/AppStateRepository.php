@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\AppState;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,6 +18,21 @@ class AppStateRepository extends ServiceEntityRepository
     public function findByKey(string $key): ?AppState
     {
         return $this->findOneBy(['keyName' => $key]);
+    }
+
+    public function findValue(string $key): ?string
+    {
+        return $this->findValuesByKeys([$key])[$key] ?? null;
+    }
+
+    public function upsert(string $key, string $value, DateTimeImmutable $at): void
+    {
+        $this->write('ON DUPLICATE KEY UPDATE value = VALUES(value), updated_at = VALUES(updated_at)', $key, $value, $at);
+    }
+
+    public function insertIfAbsent(string $key, string $value, DateTimeImmutable $at): void
+    {
+        $this->write('ON DUPLICATE KEY UPDATE key_name = key_name', $key, $value, $at);
     }
 
     /**
@@ -38,5 +54,17 @@ class AppStateRepository extends ServiceEntityRepository
             ->getArrayResult();
 
         return array_column($rows, 'value', 'keyName');
+    }
+
+    private function write(string $onDuplicate, string $key, string $value, DateTimeImmutable $at): void
+    {
+        $this
+            ->getEntityManager()
+            ->getConnection()
+            ->executeStatement('INSERT INTO app_state (key_name, value, updated_at) VALUES (:key, :value, :at) ' . $onDuplicate, [
+                'key' => $key,
+                'value' => $value,
+                'at' => $at->format('Y-m-d H:i:s'),
+            ]);
     }
 }

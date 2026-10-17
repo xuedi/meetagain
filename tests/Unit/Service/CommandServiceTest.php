@@ -82,18 +82,6 @@ class CommandServiceTest extends TestCase
         static::assertStringNotContainsString('Available commands', $output);
     }
 
-    public function testRebuildThemeRunsTheFullRebuildChain(): void
-    {
-        // Arrange
-        $service = $this->createService();
-
-        // Act
-        $output = $service->rebuildTheme();
-
-        // Assert
-        static::assertMatchesRegularExpression('/&quot;sass&quot;.*&quot;asset-map&quot;.*&quot;cache&quot;.*&quot;cache:pool&quot;/s', $output);
-    }
-
     public function testSubprocessMigrationsFailLoudlyWhenTheProjectDirIsMissing(): void
     {
         // Arrange

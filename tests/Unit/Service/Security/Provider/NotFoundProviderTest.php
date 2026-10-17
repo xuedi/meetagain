@@ -15,8 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
+use Tests\Unit\Service\Cache\InMemoryAtomicStore;
 
 class NotFoundProviderTest extends TestCase
 {
@@ -339,7 +339,7 @@ class NotFoundProviderTest extends TestCase
         $suspiciousRepo->method('findAllUrls')->willReturn($flaggedUrls);
 
         return new NotFoundProvider(
-            new ArrayAdapter(),
+            new InMemoryAtomicStore(),
             $logger ?? new NullLogger(),
             $em ?? $this->createStub(EntityManagerInterface::class),
             $logRepo,

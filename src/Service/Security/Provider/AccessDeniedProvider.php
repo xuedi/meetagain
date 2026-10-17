@@ -6,10 +6,10 @@ use App\Entity\AccessDeniedLog;
 use App\Entity\User;
 use App\Enum\SecurityEventType;
 use App\Repository\AccessDeniedLogRepository;
+use App\Service\Cache\AtomicStoreInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,13 +22,13 @@ final readonly class AccessDeniedProvider extends AbstractSecurityProvider
     private const int RECENT_PATHS_CAP = 10;
 
     public function __construct(
-        CacheItemPoolInterface $securityCachePool,
+        AtomicStoreInterface $store,
         LoggerInterface $logger,
         private EntityManagerInterface $em,
         private AccessDeniedLogRepository $logRepo,
         private Security $security,
     ) {
-        parent::__construct($securityCachePool, $logger);
+        parent::__construct($store, $logger);
     }
 
     #[Override]

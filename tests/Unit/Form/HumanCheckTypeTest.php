@@ -16,7 +16,6 @@ use App\Service\Security\SecurityService;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -26,6 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Tests\Unit\Service\Cache\InMemoryAtomicStore;
 
 final class HumanCheckTypeTest extends TestCase
 {
@@ -46,7 +46,7 @@ final class HumanCheckTypeTest extends TestCase
     protected function setUp(): void
     {
         $this->clock = new MockClock('2026-09-18 10:00:00');
-        $this->signer = new ChallengeSigner('a-test-secret', new ArrayAdapter(), $this->clock);
+        $this->signer = new ChallengeSigner('a-test-secret', new InMemoryAtomicStore(), $this->clock);
         $this->blocks = [];
         $this->passes = [];
         $this->events = [];

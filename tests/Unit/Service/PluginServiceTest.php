@@ -33,6 +33,20 @@ class PluginServiceTest extends TestCase
         $this->removeDirectory($this->tempDir);
     }
 
+    public function testTheConfigIsWritableOnlyWhenPluginsPhpIsWritable(): void
+    {
+        // Arrange
+        $fs = $this->createStub(ExtendedFilesystem::class);
+        $fs->method('isWritable')->willReturnMap([[$this->tempDir . '/config/plugins.php', false]]);
+        $subject = new PluginService($this->createStub(CommandService::class), $fs, $this->tempDir, 'test');
+
+        // Act
+        $writable = $subject->isConfigWritable();
+
+        // Assert
+        static::assertFalse($writable);
+    }
+
     public function testGetAdminListReturnsPluginManifestData(): void
     {
         // Arrange

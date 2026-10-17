@@ -153,7 +153,7 @@ final class EmailServiceTest extends TestCase
             ->setMaxSendBy(new DateTimeImmutable('+1 hour'));
 
         $mailRepoStub = $this->createStub(EmailQueueRepository::class);
-        $mailRepoStub->method('findBy')->willReturn([$queued]);
+        $mailRepoStub->method('claimPending')->willReturn([$queued]);
 
         $sentMessage = $this->createStub(SentMessage::class);
         $sentMessage->method('getMessageId')->willReturn('id');
@@ -171,12 +171,12 @@ final class EmailServiceTest extends TestCase
         static::assertInstanceOf(DateTimeImmutable::class, $queued->getProviderDispatchedAt());
     }
 
-    public function testSendQueueWorksThroughFullChunksUntilAShortOneAndFlushesAndDetachesEach(): void
+    public function testSendQueueWorksThroughFullChunksUntilAShortOneWritingEachMailAndDetachingEachChunk(): void
     {
         // Arrange
         $chunks = [$this->pendingRows(200), $this->pendingRows(200), $this->pendingRows(3)];
         $mailRepoStub = $this->createStub(EmailQueueRepository::class);
-        $mailRepoStub->method('findBy')->willReturnOnConsecutiveCalls(...$chunks);
+        $mailRepoStub->method('claimPending')->willReturnOnConsecutiveCalls(...$chunks);
 
         $sentMessage = $this->createStub(SentMessage::class);
         $sentMessage->method('getMessageId')->willReturn('id');
@@ -184,7 +184,7 @@ final class EmailServiceTest extends TestCase
         $mailerStub->method('send')->willReturn($sentMessage);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->exactly(3))->method('flush');
+        $emMock->expects($this->exactly(403))->method('flush');
         $emMock->expects($this->exactly(403))->method('detach');
 
         $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub, em: $emMock);
@@ -196,12 +196,32 @@ final class EmailServiceTest extends TestCase
         static::assertSame('403', $result);
     }
 
+    public function testASentMailGivesUpItsClaim(): void
+    {
+        // Arrange
+        $queued = $this->pendingRows(1)[0];
+        $mailRepoStub = $this->createStub(EmailQueueRepository::class);
+        $mailRepoStub->method('claimPending')->willReturn([$queued]);
+        $sentMessage = $this->createStub(SentMessage::class);
+        $sentMessage->method('getMessageId')->willReturn('id');
+        $mailerStub = $this->createStub(TransportInterface::class);
+        $mailerStub->method('send')->willReturn($sentMessage);
+        $service = $this->createService(mailer: $mailerStub, mailRepo: $mailRepoStub);
+
+        // Act
+        $service->sendQueue();
+
+        // Assert
+        static::assertFalse($queued->isClaimed());
+        static::assertSame(QueueStatus::Sent, $queued->getStatus());
+    }
+
     public function testSendQueueStopsOnceTheTimeBudgetIsSpentAndReportsWhatIsLeft(): void
     {
         // Arrange
         $clock = new MockClock();
         $mailRepoMock = $this->createMock(EmailQueueRepository::class);
-        $mailRepoMock->expects($this->once())->method('findBy')->willReturn($this->pendingRows(200));
+        $mailRepoMock->expects($this->once())->method('claimPending')->willReturn($this->pendingRows(200));
         $mailRepoMock->method('count')->willReturn(800);
 
         $sentMessage = $this->createStub(SentMessage::class);
@@ -236,7 +256,7 @@ final class EmailServiceTest extends TestCase
             ->setContext([]);
 
         $mailRepoStub = $this->createStub(EmailQueueRepository::class);
-        $mailRepoStub->method('findBy')->willReturn([$queued]);
+        $mailRepoStub->method('claimPending')->willReturn([$queued]);
 
         $exception = new class('Connection refused') extends RuntimeException implements TransportExceptionInterface {
             public function getDebug(): string
@@ -284,7 +304,7 @@ final class EmailServiceTest extends TestCase
             ->setContext([]);
 
         $mailRepoStub = $this->createStub(EmailQueueRepository::class);
-        $mailRepoStub->method('findBy')->willReturn([$good, $bad]);
+        $mailRepoStub->method('claimPending')->willReturn([$good, $bad]);
 
         $sentMessage = $this->createStub(SentMessage::class);
         $sentMessage->method('getMessageId')->willReturn('ok-id');
@@ -355,7 +375,7 @@ final class EmailServiceTest extends TestCase
             ->setContext([]);
 
         $mailRepoStub = $this->createStub(EmailQueueRepository::class);
-        $mailRepoStub->method('findBy')->willReturn([$queued]);
+        $mailRepoStub->method('claimPending')->willReturn([$queued]);
 
         $captured = null;
         $sentMessage = $this->createStub(SentMessage::class);
@@ -461,7 +481,7 @@ final class EmailServiceTest extends TestCase
     private function repoWith(EmailQueue $row): EmailQueueRepository
     {
         $repo = $this->createStub(EmailQueueRepository::class);
-        $repo->method('findBy')->willReturn([$row]);
+        $repo->method('claimPending')->willReturn([$row]);
 
         return $repo;
     }

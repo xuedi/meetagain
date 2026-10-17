@@ -12,13 +12,13 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Tests\Unit\Service\Cache\InMemoryAtomicStore;
 use Throwable;
 
 class AccessDeniedSubscriberTest extends TestCase
@@ -96,7 +96,7 @@ class AccessDeniedSubscriberTest extends TestCase
     private function createSubscriber(SecurityService $securityService): AccessDeniedSubscriber
     {
         $provider = new AccessDeniedProvider(
-            new ArrayAdapter(),
+            new InMemoryAtomicStore(),
             new NullLogger(),
             $this->createStub(EntityManagerInterface::class),
             $this->createStub(AccessDeniedLogRepository::class),

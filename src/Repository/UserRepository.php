@@ -532,4 +532,28 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
         return $qb->getQuery()->getResult();
     }
+
+    public function consumeRegcode(User $user, #[SensitiveParameter] string $code): bool
+    {
+        $claimed = $this
+            ->createQueryBuilder('u')
+            ->update()
+            ->set('u.regcode', 'NULL')
+            ->set('u.regcodeExpiresAt', 'NULL')
+            ->where('u.id = :id')
+            ->andWhere('u.regcode = :code')
+            ->setParameter('id', $user->getId())
+            ->setParameter('code', $code)
+            ->getQuery()
+            ->execute();
+
+        if ($claimed !== 1) {
+            return false;
+        }
+
+        $user->setRegcode(null);
+        $user->setRegcodeExpiresAt(null);
+
+        return true;
+    }
 }

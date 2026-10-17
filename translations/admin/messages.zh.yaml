@@ -441,6 +441,8 @@ admin_logs:
     status_exception: '异常'
     tag_deleted: '已删除'
     empty_cron: '暂无 Cron 日志。'
+    empty_system: '此时间范围内没有日志记录。'
+    empty_system_no_files: '没有日志文件。此安装将日志写到别处，例如 stderr。'
     back: '返回'
     duration_ms_total: 'ms 总计'
     summary_total: '总运行次数'

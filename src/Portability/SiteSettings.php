@@ -11,6 +11,7 @@ use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use App\Service\Config\PluginService;
 use App\Service\Media\ImageLocationService;
+use App\Theme\Colors;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\TemplatesInterface;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -34,6 +35,7 @@ readonly class SiteSettings
         private SluggerInterface $slugger,
         private PluginService $pluginService,
         private PluginSettings $pluginSettings,
+        private Colors $colors,
     ) {}
 
     public function current(): Site
@@ -42,7 +44,7 @@ readonly class SiteSettings
         $logoId = $this->configService->getSiteLogoId();
 
         $themeColors = [];
-        foreach ($this->configService->getThemeColors() as $key => $color) {
+        foreach ($this->colors->all() as $key => $color) {
             $themeColors[str_replace('_', '-', substr((string) $key, strlen('color_')))] = (string) $color;
         }
 
@@ -138,7 +140,7 @@ readonly class SiteSettings
         }
 
         if ($colors !== []) {
-            $this->configService->saveColors($colors);
+            $this->colors->save($colors);
         }
     }
 

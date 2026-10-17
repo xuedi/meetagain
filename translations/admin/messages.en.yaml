@@ -441,6 +441,8 @@ admin_logs:
     status_exception: 'exception'
     tag_deleted: 'deleted'
     empty_cron: 'No cron logs yet.'
+    empty_system: 'No log entries in this range.'
+    empty_system_no_files: 'No log files. This install writes its log somewhere else, for example to stderr.'
     back: 'Back'
     duration_ms_total: 'ms total'
     summary_total: 'total runs'

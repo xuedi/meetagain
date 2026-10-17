@@ -10,6 +10,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SensitiveParameter;
 
 /** @extends ServiceEntityRepository<SupportRequest> */
 class SupportRequestRepository extends ServiceEntityRepository
@@ -17,6 +18,33 @@ class SupportRequestRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, SupportRequest::class);
+    }
+
+    public function consumeEmailVerifyToken(SupportRequest $request, #[SensitiveParameter] string $token, DateTimeImmutable $verifiedAt): bool
+    {
+        $claimed = $this
+            ->createQueryBuilder('sr')
+            ->update()
+            ->set('sr.emailVerifyToken', 'NULL')
+            ->set('sr.emailVerifyExpiresAt', 'NULL')
+            ->set('sr.emailVerifiedAt', ':verifiedAt')
+            ->where('sr.id = :id')
+            ->andWhere('sr.emailVerifyToken = :token')
+            ->setParameter('verifiedAt', $verifiedAt)
+            ->setParameter('id', $request->getId())
+            ->setParameter('token', $token)
+            ->getQuery()
+            ->execute();
+
+        if ($claimed !== 1) {
+            return false;
+        }
+
+        $request->setEmailVerifiedAt($verifiedAt);
+        $request->setEmailVerifyToken(null);
+        $request->setEmailVerifyExpiresAt(null);
+
+        return true;
     }
 
     /**

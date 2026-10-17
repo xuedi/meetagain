@@ -5,10 +5,10 @@ namespace App\Service\Security\Provider;
 use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
 use App\Repository\SecurityMeasureLogRepository;
+use App\Service\Cache\AtomicStoreInterface;
 use App\Service\Security\ProviderReport;
 use DateTimeImmutable;
 use Override;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -37,11 +37,11 @@ final readonly class FormMeasureProvider extends AbstractSecurityProvider
     ];
 
     public function __construct(
-        CacheItemPoolInterface $securityCachePool,
+        AtomicStoreInterface $store,
         LoggerInterface $logger,
         private SecurityMeasureLogRepository $logRepo,
     ) {
-        parent::__construct($securityCachePool, $logger);
+        parent::__construct($store, $logger);
     }
 
     #[Override]

@@ -215,14 +215,7 @@ readonly class ThreadService
             return null;
         }
 
-        $request->setEmailVerifiedAt($this->clock->now());
-        $request->setEmailVerifyToken(null);
-        $request->setEmailVerifyExpiresAt(null);
-
-        $this->em->persist($request);
-        $this->em->flush();
-
-        return $request;
+        return $this->requestRepo->consumeEmailVerifyToken($request, $token, $this->clock->now()) ? $request : null;
     }
 
     public function clearEmailVerification(SupportRequest $request): void

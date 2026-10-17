@@ -121,6 +121,23 @@ class PasswordResetServiceTest extends TestCase
         static::assertNull($result);
     }
 
+    public function testAResetCodeCanBeClaimedOnlyOnce(): void
+    {
+        // Arrange
+        $user = new User();
+        $userRepo = $this->createStub(UserRepository::class);
+        $userRepo->method('consumeRegcode')->willReturnOnConsecutiveCalls(true, false);
+        $service = $this->createService(userRepo: $userRepo);
+
+        // Act
+        $first = $service->claimResetCode($user, 'abc123');
+        $second = $service->claimResetCode($user, 'abc123');
+
+        // Assert
+        static::assertTrue($first);
+        static::assertFalse($second);
+    }
+
     public function testResetPasswordHashesPasswordAndClearsRegcode(): void
     {
         $user = new User();

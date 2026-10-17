@@ -9,6 +9,7 @@
 # covers a kind of class belongs in config/tools/code-drift.dist, not here.
 
 # --- raw-sql ---
+raw-sql src/Repository/AppStateRepository.php::write // INSERT ... ON DUPLICATE KEY makes set and setIfAbsent atomic against the unique key across workers without flushing the caller's unit of work; DQL has no INSERT
 raw-sql src/Repository/ImageLocationRepository.php::insertForType // INSERT IGNORE keeps the per-type sync idempotent against the unique key; DQL has no INSERT and the DBAL query builder has no IGNORE
 
 # --- static ---

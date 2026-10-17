@@ -22,7 +22,8 @@ permit = [
     "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
     "App\\Metrics\\GaugeInterface",                                    # the queue depth is a runtime gauge
     "App\\Metrics\\Point",                                             # that gauge's sample type
-    "App\\Service\\Config\\ConfigService",                             # mailer address, theme accent for the layout snapshot, the delivery-sync toggle
+    "App\\Service\\Config\\ConfigService",                             # mailer address and the delivery-sync toggle
+    "App\\Theme\\Colors",                                              # the theme accent for the layout snapshot
     "App\\Service\\Config\\LanguageService",                           # enabled locales for the template editor, seeding and the scheduled sweep
     "Doctrine\\**",
     "Symfony\\**",
@@ -46,7 +47,8 @@ permit = [
     "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
     "App\\Metrics\\GaugeInterface",                                    # the queue depth is a runtime gauge
     "App\\Metrics\\Point",                                             # that gauge's sample type
-    "App\\Service\\Config\\ConfigService",                             # mailer address, theme accent for the layout snapshot, the delivery-sync toggle
+    "App\\Service\\Config\\ConfigService",                             # mailer address and the delivery-sync toggle
+    "App\\Theme\\Colors",                                              # the theme accent for the layout snapshot
     "App\\Service\\Config\\LanguageService",                           # enabled locales for the template editor, seeding and the scheduled sweep
     "PHPUnit\\**",
     "Tests\\Module\\**",                                               # the shared module test harness: ModuleKernel and Members

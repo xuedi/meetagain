@@ -3,3 +3,7 @@ services:
         autowire: true
         autoconfigure: true
         public: true
+
+    Tests\Unit\Service\Cache\InMemoryAtomicStore: ~
+
+    App\Service\Cache\AtomicStoreInterface: '@Tests\Unit\Service\Cache\InMemoryAtomicStore'

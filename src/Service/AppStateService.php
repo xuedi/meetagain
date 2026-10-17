@@ -2,7 +2,6 @@
 
 namespace App\Service;
 
-use App\Entity\AppState;
 use App\Repository\AppStateRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +16,8 @@ use Throwable;
 
 class AppStateService implements ResetInterface
 {
+    private const int MISS_TTL_SECONDS = 60;
+
     private bool $cacheFailureLogged = false;
 
     /** @var array<string, string|null> */
@@ -38,13 +39,14 @@ class AppStateService implements ResetInterface
 
         try {
             $value = $this->cache->get($this->cacheKey($key), function (ItemInterface $item) use ($key): ?string {
-                $item->expiresAfter(null);
+                $value = $this->repository->findValue($key);
+                $item->expiresAfter($value === null ? self::MISS_TTL_SECONDS : null);
 
-                return $this->repository->findByKey($key)?->getValue();
+                return $value;
             });
         } catch (Throwable $exception) {
             $this->logCacheFailureOnce($exception);
-            $value = $this->repository->findByKey($key)?->getValue();
+            $value = $this->repository->findValue($key);
         }
 
         return $this->memo[$key] = $value;
@@ -86,7 +88,7 @@ class AppStateService implements ResetInterface
                 $rows = $this->repository->findValuesByKeys(array_keys($missing));
                 foreach ($missing as $key => $item) {
                     $value = $rows[$key] ?? null;
-                    $item->expiresAfter(null);
+                    $item->expiresAfter($value === null ? self::MISS_TTL_SECONDS : null);
                     $item->set($value);
                     $this->cache->saveDeferred($item);
                     $this->memo[$key] = $value;
@@ -108,20 +110,16 @@ class AppStateService implements ResetInterface
 
     public function set(string $key, string $value): void
     {
-        $entry = $this->repository->findByKey($key);
-
-        if ($entry === null) {
-            $entry = new AppState($key, $value, new DateTimeImmutable('now'));
-            $this->entityManager->persist($entry);
-            $this->entityManager->flush();
-            $this->invalidate($key);
-            return;
-        }
-        $entry->setValue($value);
-        $entry->setUpdatedAt(new DateTimeImmutable('now'));
-
-        $this->entityManager->flush();
+        $this->repository->upsert($key, $value, new DateTimeImmutable('now'));
         $this->invalidate($key);
+    }
+
+    public function setIfAbsent(string $key, string $value): string
+    {
+        $this->repository->insertIfAbsent($key, $value, new DateTimeImmutable('now'));
+        $this->invalidate($key);
+
+        return $this->repository->findValue($key) ?? $value;
     }
 
     public function remove(string $key): void

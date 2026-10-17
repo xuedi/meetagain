@@ -7,15 +7,15 @@ use App\Enum\SecurityRecommendation;
 use App\Service\Security\Provider\FuseSecurityProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
+use Tests\Unit\Service\Cache\InMemoryAtomicStore;
 
 class FuseSecurityProviderTest extends TestCase
 {
     public function testDoesNotTripBelowThreshold(): void
     {
         // Arrange
-        $provider = new FuseSecurityProvider(new ArrayAdapter(), new NullLogger());
+        $provider = new FuseSecurityProvider(new InMemoryAtomicStore(), new NullLogger());
 
         // Act
         $report = $provider->observe(SecurityEventType::NotFound, new Request(), [], 'session-1', '1.2.3.4');
@@ -27,7 +27,7 @@ class FuseSecurityProviderTest extends TestCase
     public function testTripsAtThresholdAndReturnsBlockShortCircuit(): void
     {
         // Arrange
-        $provider = new FuseSecurityProvider(new ArrayAdapter(), new NullLogger());
+        $provider = new FuseSecurityProvider(new InMemoryAtomicStore(), new NullLogger());
 
         // Act
         $finalReport = null;
@@ -44,7 +44,7 @@ class FuseSecurityProviderTest extends TestCase
     public function testStateIsKeyedByIpNotSession(): void
     {
         // Arrange
-        $provider = new FuseSecurityProvider(new ArrayAdapter(), new NullLogger());
+        $provider = new FuseSecurityProvider(new InMemoryAtomicStore(), new NullLogger());
 
         // Act
         $finalReport = null;
@@ -60,7 +60,7 @@ class FuseSecurityProviderTest extends TestCase
     public function testReadOnlyDoesNotIncrement(): void
     {
         // Arrange
-        $provider = new FuseSecurityProvider(new ArrayAdapter(), new NullLogger());
+        $provider = new FuseSecurityProvider(new InMemoryAtomicStore(), new NullLogger());
         for ($i = 0; $i < 5; ++$i) {
             $provider->observe(SecurityEventType::NotFound, new Request(), [], 'sess', '9.9.9.9');
         }
@@ -76,7 +76,7 @@ class FuseSecurityProviderTest extends TestCase
     public function testHandlesAllEventTypes(): void
     {
         // Arrange
-        $provider = new FuseSecurityProvider(new ArrayAdapter(), new NullLogger());
+        $provider = new FuseSecurityProvider(new InMemoryAtomicStore(), new NullLogger());
 
         // Act + Assert
         static::assertTrue($provider->handles(SecurityEventType::NotFound));
@@ -87,7 +87,7 @@ class FuseSecurityProviderTest extends TestCase
     public function testPriorityIsHigherThanZero(): void
     {
         // Arrange
-        $provider = new FuseSecurityProvider(new ArrayAdapter(), new NullLogger());
+        $provider = new FuseSecurityProvider(new InMemoryAtomicStore(), new NullLogger());
 
         // Act + Assert
         static::assertGreaterThan(0, $provider->getPriority());

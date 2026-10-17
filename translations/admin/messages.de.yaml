@@ -441,6 +441,8 @@ admin_logs:
     status_exception: 'Ausnahme'
     tag_deleted: 'gelöscht'
     empty_cron: 'Noch keine Cron-Protokolle.'
+    empty_system: 'Keine Protokolleinträge in diesem Zeitraum.'
+    empty_system_no_files: 'Keine Protokolldateien. Diese Installation schreibt ihr Protokoll anderswohin, zum Beispiel nach stderr.'
     back: 'Zurück'
     duration_ms_total: 'ms gesamt'
     summary_total: 'Ausführungen gesamt'

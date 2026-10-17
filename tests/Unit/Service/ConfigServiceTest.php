@@ -4,7 +4,6 @@ namespace Tests\Unit\Service;
 
 use App\Entity\Config;
 use App\Enum\ConfigType;
-use App\ExtendedFilesystem;
 use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
@@ -13,7 +12,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -22,7 +20,6 @@ class ConfigServiceTest extends TestCase
     private Stub&ConfigRepository $configRepoStub;
     private Stub&EntityManagerInterface $entityManagerStub;
     private Stub&CacheInterface $cacheStub;
-    private Stub&KernelInterface $kernelStub;
     private ConfigService $subject;
 
     protected function setUp(): void
@@ -30,15 +27,12 @@ class ConfigServiceTest extends TestCase
         $this->configRepoStub = $this->createStub(ConfigRepository::class);
         $this->entityManagerStub = $this->createStub(EntityManagerInterface::class);
         $this->cacheStub = $this->createStub(CacheInterface::class);
-        $this->kernelStub = $this->createStub(KernelInterface::class);
         $this->cacheStub->method('get')->willReturnCallback(fn(string $key, callable $callback): mixed => $callback($this->createStub(ItemInterface::class)));
         $this->subject = new ConfigService(
             repo: $this->configRepoStub,
             em: $this->entityManagerStub,
             cache: $this->cacheStub,
-            kernel: $this->kernelStub,
             appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
         );
     }
 
@@ -142,14 +136,7 @@ class ConfigServiceTest extends TestCase
 
         $cacheStub = $this->createStub(CacheInterface::class);
 
-        $subject = new ConfigService(
-            repo: $configRepoStub,
-            em: $entityManagerMock,
-            cache: $cacheStub,
-            kernel: $this->createStub(KernelInterface::class),
-            appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
-        );
+        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub, appState: $this->createStub(AppStateService::class));
 
         $subject->saveForm([
             'url' => 'example.com',
@@ -176,14 +163,7 @@ class ConfigServiceTest extends TestCase
 
         $cacheStub = $this->createStub(CacheInterface::class);
 
-        $subject = new ConfigService(
-            repo: $configRepoStub,
-            em: $entityManagerMock,
-            cache: $cacheStub,
-            kernel: $this->createStub(KernelInterface::class),
-            appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
-        );
+        $subject = new ConfigService(repo: $configRepoStub, em: $entityManagerMock, cache: $cacheStub, appState: $this->createStub(AppStateService::class));
 
         $subject->saveForm([
             'url' => 'new-example.com',
@@ -300,14 +280,7 @@ class ConfigServiceTest extends TestCase
         $appStateStub = $this->createStub(AppStateService::class);
         $appStateStub->method('getMany')->willReturn(['footer_col1_title' => 'News']);
 
-        $subject = new ConfigService(
-            repo: $this->configRepoStub,
-            em: $this->entityManagerStub,
-            cache: $this->cacheStub,
-            kernel: $this->kernelStub,
-            appState: $appStateStub,
-            fs: $this->createStub(ExtendedFilesystem::class),
-        );
+        $subject = new ConfigService(repo: $this->configRepoStub, em: $this->entityManagerStub, cache: $this->cacheStub, appState: $appStateStub);
 
         // Act & Assert
         static::assertSame('News', $subject->getFooterColumnTitle('col1'));
@@ -319,14 +292,7 @@ class ConfigServiceTest extends TestCase
         $appStateStub = $this->createStub(AppStateService::class);
         $appStateStub->method('getMany')->willReturn(['footer_col1_title' => null]);
 
-        $subject = new ConfigService(
-            repo: $this->configRepoStub,
-            em: $this->entityManagerStub,
-            cache: $this->cacheStub,
-            kernel: $this->kernelStub,
-            appState: $appStateStub,
-            fs: $this->createStub(ExtendedFilesystem::class),
-        );
+        $subject = new ConfigService(repo: $this->configRepoStub, em: $this->entityManagerStub, cache: $this->cacheStub, appState: $appStateStub);
 
         // Act & Assert
         static::assertSame('', $subject->getFooterColumnTitle('col2'));
@@ -349,14 +315,7 @@ class ConfigServiceTest extends TestCase
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_some_feature');
 
-        $subject = new ConfigService(
-            repo: $repoMock,
-            em: $emMock,
-            cache: $cacheMock,
-            kernel: $this->createStub(KernelInterface::class),
-            appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
-        );
+        $subject = new ConfigService(repo: $repoMock, em: $emMock, cache: $cacheMock, appState: $this->createStub(AppStateService::class));
 
         // Act
         $result = $subject->toggleBoolean('some_feature');
@@ -381,14 +340,7 @@ class ConfigServiceTest extends TestCase
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_some_feature');
 
-        $subject = new ConfigService(
-            repo: $repoStub,
-            em: $emMock,
-            cache: $cacheMock,
-            kernel: $this->createStub(KernelInterface::class),
-            appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
-        );
+        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, appState: $this->createStub(AppStateService::class));
 
         // Act
         $result = $subject->toggleBoolean('some_feature');
@@ -408,9 +360,7 @@ class ConfigServiceTest extends TestCase
             repo: $repoMock,
             em: $this->createStub(EntityManagerInterface::class),
             cache: $this->createStub(CacheInterface::class),
-            kernel: $this->createStub(KernelInterface::class),
             appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
         );
 
         // Act & Assert
@@ -432,9 +382,7 @@ class ConfigServiceTest extends TestCase
             repo: $repoStub,
             em: $emMock,
             cache: $this->createStub(CacheInterface::class),
-            kernel: $this->createStub(KernelInterface::class),
             appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
         );
 
         // Act
@@ -461,9 +409,7 @@ class ConfigServiceTest extends TestCase
             repo: $repoStub,
             em: $emMock,
             cache: $this->createStub(CacheInterface::class),
-            kernel: $this->createStub(KernelInterface::class),
             appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
         );
 
         // Act
@@ -506,14 +452,7 @@ class ConfigServiceTest extends TestCase
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_new_key');
 
-        $subject = new ConfigService(
-            repo: $repoStub,
-            em: $emMock,
-            cache: $cacheMock,
-            kernel: $this->createStub(KernelInterface::class),
-            appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
-        );
+        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, appState: $this->createStub(AppStateService::class));
 
         // Act
         $subject->setString('new_key', 'hello');
@@ -537,9 +476,7 @@ class ConfigServiceTest extends TestCase
             repo: $repoStub,
             em: $emMock,
             cache: $this->createStub(CacheInterface::class),
-            kernel: $this->createStub(KernelInterface::class),
             appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
         );
 
         // Act
@@ -565,14 +502,7 @@ class ConfigServiceTest extends TestCase
         $cacheMock = $this->createMock(CacheInterface::class);
         $cacheMock->expects($this->once())->method('delete')->with('config_count_key');
 
-        $subject = new ConfigService(
-            repo: $repoStub,
-            em: $emMock,
-            cache: $cacheMock,
-            kernel: $this->createStub(KernelInterface::class),
-            appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
-        );
+        $subject = new ConfigService(repo: $repoStub, em: $emMock, cache: $cacheMock, appState: $this->createStub(AppStateService::class));
 
         // Act
         $subject->setInt('count_key', 7);
@@ -596,9 +526,7 @@ class ConfigServiceTest extends TestCase
             repo: $repoStub,
             em: $emMock,
             cache: $this->createStub(CacheInterface::class),
-            kernel: $this->createStub(KernelInterface::class),
             appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
         );
 
         // Act
@@ -618,9 +546,7 @@ class ConfigServiceTest extends TestCase
             repo: $repoMock,
             em: $this->createStub(EntityManagerInterface::class),
             cache: $this->createStub(CacheInterface::class),
-            kernel: $this->createStub(KernelInterface::class),
             appState: $this->createStub(AppStateService::class),
-            fs: $this->createStub(ExtendedFilesystem::class),
         );
 
         // Act

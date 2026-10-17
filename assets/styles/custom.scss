@@ -21,8 +21,8 @@ body {
 }
 
 // Accessibility: Bulma's default grey fails WCAG on white — use our darker overrides.
-.has-text-grey       { color: cfg.$text-grey       !important; }
-.has-text-grey-light { color: cfg.$text-grey-light !important; }
+.has-text-grey       { color: var(--theme-text-grey, #{cfg.$text-grey})             !important; }
+.has-text-grey-light { color: var(--theme-text-grey-light, #{cfg.$text-grey-light}) !important; }
 
 // ── Layout utilities ─────────────────────────────────────────────────────────
 
@@ -66,7 +66,7 @@ body {
 // ── Forms ────────────────────────────────────────────────────────────────────
 
 .fieldset-warning  { border: 2px solid #f14668; border-radius: 4px; }
-.fieldset-info     { border: 2px solid cfg.$info; border-radius: 4px; }
+.fieldset-info     { border: 2px solid var(--bulma-info); border-radius: 4px; }
 .fieldset-default  { border: 1px solid #dbdbdb; border-radius: 4px; }
 .col-narrow        { width: 60px; }
 .col-medium        { width: 200px; }
@@ -197,7 +197,7 @@ details.activities-load-more {
     font-size: inherit;
     line-height: 1;
 }
-.button-as-icon:hover { color: #3e8ed0; }
+.button-as-icon:hover { color: var(--bulma-info); }
 
 // Admin charts: canvas fills its wrapper (each dashboard chart partial wraps the
 // <canvas> in a div with explicit height/max-height, so we no longer need a global cap).

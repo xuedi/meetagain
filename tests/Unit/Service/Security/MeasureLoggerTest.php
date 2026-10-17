@@ -11,6 +11,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\Store\InMemoryStore;
 
 final class MeasureLoggerTest extends TestCase
 {
@@ -26,7 +28,12 @@ final class MeasureLoggerTest extends TestCase
             });
 
         $request = Request::create('/en/register', 'POST', server: ['REMOTE_ADDR' => '203.0.113.7', 'HTTP_USER_AGENT' => 'curl/8']);
-        $logger = new MeasureLogger($this->createStub(SecurityMeasureLogRepository::class), $entityManager, new MockClock('2026-09-18 14:30:00'));
+        $logger = new MeasureLogger(
+            $this->createStub(SecurityMeasureLogRepository::class),
+            $entityManager,
+            new MockClock('2026-09-18 14:30:00'),
+            new LockFactory(new InMemoryStore()),
+        );
 
         // Act
         $logger->recordBlock(SecurityMeasure::Honeypot, 'app_register', $request, ['reason' => 'filled']);
@@ -57,7 +64,7 @@ final class MeasureLoggerTest extends TestCase
                 $stored = $entity;
             });
 
-        $logger = new MeasureLogger($repo, $entityManager, new MockClock('2026-09-18 14:30:00'));
+        $logger = new MeasureLogger($repo, $entityManager, new MockClock('2026-09-18 14:30:00'), new LockFactory(new InMemoryStore()));
 
         // Act
         $logger->recordPass(SecurityMeasure::SubmitTiming, 'app_contact');
@@ -78,7 +85,20 @@ final class MeasureLoggerTest extends TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(static::never())->method('persist');
 
-        $logger = new MeasureLogger($repo, $entityManager, new MockClock('2026-09-18 14:30:00'));
+        $logger = new MeasureLogger($repo, $entityManager, new MockClock('2026-09-18 14:30:00'), new LockFactory(new InMemoryStore()));
+
+        // Act
+        $logger->recordPass(SecurityMeasure::SubmitTiming, 'app_contact');
+    }
+
+    public function testAPassThatLosesTheFirstInsertRaceIncrementsTheWinnersRow(): void
+    {
+        // Arrange
+        $repo = $this->createStub(SecurityMeasureLogRepository::class);
+        $repo->method('incrementPassCounter')->willReturnOnConsecutiveCalls(0, 1);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(static::never())->method('persist');
+        $logger = new MeasureLogger($repo, $entityManager, new MockClock('2026-09-18 14:30:00'), new LockFactory(new InMemoryStore()));
 
         // Act
         $logger->recordPass(SecurityMeasure::SubmitTiming, 'app_contact');
@@ -94,7 +114,12 @@ final class MeasureLoggerTest extends TestCase
             ->with(static::callback(static fn($cutoff): bool => $cutoff->format('Y-m-d H:i:s') === '2026-08-19 00:00:00'))
             ->willReturn(12);
 
-        $logger = new MeasureLogger($repo, $this->createStub(EntityManagerInterface::class), new MockClock('2026-09-18 14:30:00'));
+        $logger = new MeasureLogger(
+            $repo,
+            $this->createStub(EntityManagerInterface::class),
+            new MockClock('2026-09-18 14:30:00'),
+            new LockFactory(new InMemoryStore()),
+        );
 
         // Act
         $deleted = $logger->purgeOlderThan(30);

@@ -2,11 +2,10 @@
 
 namespace App\Service\Security;
 
+use App\Service\Cache\AtomicStoreInterface;
 use Psr\Clock\ClockInterface;
 use SensitiveParameter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 readonly class ChallengeSigner
 {
@@ -16,8 +15,7 @@ readonly class ChallengeSigner
         #[SensitiveParameter]
         #[Autowire('%kernel.secret%')]
         private string $secret,
-        #[Autowire(service: 'cache.security_challenge')]
-        private CacheInterface $cache,
+        private AtomicStoreInterface $store,
         private ClockInterface $clock,
     ) {}
 
@@ -60,15 +58,7 @@ readonly class ChallengeSigner
 
     public function burn(string $nonce): bool
     {
-        $fresh = false;
-        $this->cache->get('challenge_' . $nonce, static function (ItemInterface $item) use (&$fresh): bool {
-            $item->expiresAfter((int) (self::MAX_AGE_MS / 1000));
-            $fresh = true;
-
-            return true;
-        });
-
-        return $fresh;
+        return $this->store->claim('challenge:' . $nonce, intdiv(self::MAX_AGE_MS, 1000));
     }
 
     public function fieldName(string $nonce): string

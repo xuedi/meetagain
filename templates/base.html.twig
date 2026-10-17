@@ -60,6 +60,10 @@
     {% for stylesheetPath in get_plugin_stylesheets() %}
         <link rel="stylesheet" href="{{ asset(stylesheetPath) }}"/>
     {% endfor %}
+    {% set themeStyle = theme_style() %}
+    {% if themeStyle != '' %}
+        <style>:root{ {{- themeStyle -}} }</style>
+    {% endif %}
     {% if app.environment == 'prod' %}
         <script src="{{ get_app_bundle_url() }}" defer></script>
     {% else %}

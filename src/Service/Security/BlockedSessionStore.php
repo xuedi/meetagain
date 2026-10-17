@@ -2,6 +2,7 @@
 
 namespace App\Service\Security;
 
+use App\Service\Cache\AtomicStoreInterface;
 use DateTimeImmutable;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
@@ -11,11 +12,12 @@ readonly class BlockedSessionStore
 {
     public const int DEFAULT_TTL_SECONDS = 43_200;
 
-    private const string SESSION_INDEX_KEY = 'security_blocked_sessions_index';
-    private const string IP_INDEX_KEY = 'security_blocked_ips_index';
+    private const string SESSION_INDEX_KEY = 'security:blocked:sessions';
+    private const string IP_INDEX_KEY = 'security:blocked:ips';
 
     public function __construct(
         private CacheItemPoolInterface $securityCachePool,
+        private AtomicStoreInterface $store,
         private LoggerInterface $logger,
     ) {}
 
@@ -67,8 +69,7 @@ readonly class BlockedSessionStore
         foreach (array_keys($this->loadIndex(self::IP_INDEX_KEY)) as $ip) {
             $this->deleteKey($this->ipKey($ip));
         }
-        $this->deleteKey(self::SESSION_INDEX_KEY);
-        $this->deleteKey(self::IP_INDEX_KEY);
+        $this->guard('Failed to clear block indexes', fn() => $this->store->delete(self::SESSION_INDEX_KEY, self::IP_INDEX_KEY));
     }
 
     /**
@@ -176,27 +177,17 @@ readonly class BlockedSessionStore
 
     private function addToIndex(string $indexKey, string $entry, int $ttlSeconds): void
     {
-        $index = $this->loadIndex($indexKey);
-        $now = time();
-        $index[$entry] = $now + $ttlSeconds;
-        foreach ($index as $key => $expiresAt) {
-            if ($expiresAt >= $now) {
-                continue;
-            }
-
-            unset($index[$key]);
-        }
-        $this->saveIndex($indexKey, $index);
+        $this->guard('Failed to update block index', fn() => $this->store->indexAdd(
+            $indexKey,
+            $entry,
+            time() + $ttlSeconds,
+            max($ttlSeconds, self::DEFAULT_TTL_SECONDS) * 2,
+        ));
     }
 
     private function removeFromIndex(string $indexKey, string $entry): void
     {
-        $index = $this->loadIndex($indexKey);
-        if (!array_key_exists($entry, $index)) {
-            return;
-        }
-        unset($index[$entry]);
-        $this->saveIndex($indexKey, $index);
+        $this->guard('Failed to update block index', fn() => $this->store->indexRemove($indexKey, $entry));
     }
 
     /**
@@ -205,47 +196,23 @@ readonly class BlockedSessionStore
     private function loadIndex(string $indexKey): array
     {
         try {
-            $item = $this->securityCachePool->getItem($indexKey);
-            $value = $item->isHit() ? $item->get() : [];
+            return $this->store->indexEntries($indexKey);
         } catch (Throwable $e) {
             $this->logger->warning('Failed to load block index: ' . $e->getMessage(), [
                 'exception' => $e,
                 'indexKey' => $indexKey,
             ]);
+
             return [];
         }
-
-        if (!is_array($value)) {
-            return [];
-        }
-
-        $result = [];
-        foreach ($value as $key => $expiresAt) {
-            if (!(is_string($key) && is_int($expiresAt))) {
-                continue;
-            }
-
-            $result[$key] = $expiresAt;
-        }
-
-        return $result;
     }
 
-    /**
-     * @param array<string, int> $index
-     */
-    private function saveIndex(string $indexKey, array $index): void
+    private function guard(string $message, callable $operation): void
     {
         try {
-            $item = $this->securityCachePool->getItem($indexKey);
-            $item->set($index);
-            $item->expiresAfter(self::DEFAULT_TTL_SECONDS * 2);
-            $this->securityCachePool->save($item);
+            $operation();
         } catch (Throwable $e) {
-            $this->logger->warning('Failed to save block index: ' . $e->getMessage(), [
-                'exception' => $e,
-                'indexKey' => $indexKey,
-            ]);
+            $this->logger->warning($message . ': ' . $e->getMessage(), ['exception' => $e]);
         }
     }
 
@@ -255,26 +222,14 @@ readonly class BlockedSessionStore
      */
     private function listFromIndex(string $indexKey, callable $loader): array
     {
-        $index = $this->loadIndex($indexKey);
-        $now = time();
         $result = [];
-        $changed = false;
-        foreach ($index as $entry => $expiresAt) {
-            if ($expiresAt < $now) {
-                unset($index[$entry]);
-                $changed = true;
-                continue;
-            }
+        foreach (array_keys($this->loadIndex($indexKey)) as $entry) {
             $snapshot = $loader($entry);
             if ($snapshot === null) {
-                unset($index[$entry]);
-                $changed = true;
+                $this->removeFromIndex($indexKey, $entry);
                 continue;
             }
             $result[] = ['key' => $entry, 'snapshot' => $snapshot];
-        }
-        if ($changed) {
-            $this->saveIndex($indexKey, $index);
         }
 
         return $result;

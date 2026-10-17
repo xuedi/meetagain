@@ -29,13 +29,14 @@ use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\HttpFoundation\Request;
 use Tests\Unit\Metrics\UdpListener;
+use Tests\Unit\Service\Cache\InMemoryAtomicStore;
 
 class SecurityServiceTest extends TestCase
 {
     public function testEventNoOpsWhenIpIsBlocked(): void
     {
         // Arrange
-        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
         $blockStore->blockIp('1.2.3.4', ['reason' => 'fuse']);
 
         $provider = $this->createMock(SecurityProviderInterface::class);
@@ -55,7 +56,7 @@ class SecurityServiceTest extends TestCase
     public function testEventNoOpsWhenSessionIsBlocked(): void
     {
         // Arrange
-        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
         $blockStore->blockSession('ip:1.2.3.4', ['reason' => 'provider']);
 
         $provider = $this->createMock(SecurityProviderInterface::class);
@@ -91,7 +92,7 @@ class SecurityServiceTest extends TestCase
     public function testShortCircuitPutsRestInReadOnlyAndSkipsIncident(): void
     {
         // Arrange
-        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
 
         $fuse = $this->makeProvider('fuse', priority: 1000, recommendation: SecurityRecommendation::BlockShortCircuit);
         $detector = $this->createMock(SecurityProviderInterface::class);
@@ -121,7 +122,7 @@ class SecurityServiceTest extends TestCase
     public function testDetectionBlockWritesIncidentAndBlocksBoth(): void
     {
         // Arrange
-        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
 
         $detector = $this->makeProvider('not_found', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 95);
 
@@ -156,7 +157,7 @@ class SecurityServiceTest extends TestCase
     public function testASessionOnlyBlockWritesAnIncidentButLeavesTheIpOpen(): void
     {
         // Arrange
-        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
         $detector = $this->makeProvider('form_measure', priority: 0, recommendation: SecurityRecommendation::BlockSession, threatLevel: 100);
 
         $persistedIncident = null;
@@ -245,7 +246,7 @@ class SecurityServiceTest extends TestCase
     public function testNotFoundBlockStampsLatestNotFoundLogRow(): void
     {
         // Arrange
-        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
         $detector = $this->makeProvider('not_found', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
 
         $logRow = new NotFoundLog();
@@ -271,7 +272,7 @@ class SecurityServiceTest extends TestCase
     public function testAccessDeniedBlockStampsLatestAccessDeniedLogRow(): void
     {
         // Arrange
-        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
         $detector = $this->makeProvider('access_denied', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
 
         $logRow = new AccessDeniedLog();
@@ -297,7 +298,7 @@ class SecurityServiceTest extends TestCase
     public function testUnrecognisedTriggeredByDoesNotStampAnyLogRow(): void
     {
         // Arrange
-        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $blockStore = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
         $detector = $this->makeProvider('rate_limit', priority: 0, recommendation: SecurityRecommendation::Block, threatLevel: 80);
 
         $notFoundRepo = $this->createMock(NotFoundLogRepository::class);
@@ -353,7 +354,7 @@ class SecurityServiceTest extends TestCase
         ?AccessDeniedLogRepository $accessDeniedLogRepository = null,
         ?Recorder $recorder = null,
     ): SecurityService {
-        $blockStore ??= new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $blockStore ??= new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
         $em ??= $this->createStub(EntityManagerInterface::class);
         $appState ??= $this->createStub(AppStateService::class);
         $notFoundLogRepository ??= $this->createStub(NotFoundLogRepository::class);
