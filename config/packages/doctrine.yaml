@@ -5,7 +5,7 @@ doctrine:
             default:
                 url: '%env(resolve:DATABASE_URL)%'
                 profiling_collect_backtrace: '%kernel.debug%'
-                server_version: 'mariadb-11.8.2'
+                server_version: 'mariadb-13.0.2'
     orm:
         default_entity_manager: default
         controller_resolver:
