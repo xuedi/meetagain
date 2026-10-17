@@ -20,6 +20,38 @@ class EmailQueueRepository extends ServiceEntityRepository
         parent::__construct($registry, EmailQueue::class);
     }
 
+    /**
+     * @return list<EmailQueue>
+     */
+    public function claimPending(int $limit, DateTimeImmutable $now, DateTimeImmutable $leaseExpiredBefore): array
+    {
+        $candidates = $this
+            ->claimableQuery($leaseExpiredBefore)
+            ->select('eq.id')
+            ->orderBy('eq.id', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getSingleColumnResult();
+        if ($candidates === []) {
+            return [];
+        }
+
+        $token = bin2hex(random_bytes(16));
+        $this
+            ->claimableQuery($leaseExpiredBefore)
+            ->update()
+            ->set('eq.claimToken', ':token')
+            ->set('eq.claimedAt', ':now')
+            ->andWhere('eq.id IN (:candidates)')
+            ->setParameter('token', $token)
+            ->setParameter('now', $now)
+            ->setParameter('candidates', $candidates)
+            ->getQuery()
+            ->execute();
+
+        return array_values($this->findBy(['claimToken' => $token], ['id' => 'ASC']));
+    }
+
     public function countAll(): int
     {
         return (int) $this->createQueryBuilder('eq')->select('COUNT(eq.id)')->getQuery()->getSingleScalarResult();
@@ -165,5 +197,15 @@ class EmailQueueRepository extends ServiceEntityRepository
         if ($statuses !== null && $statuses !== []) {
             $qb->andWhere('eq.status IN (:statuses)')->setParameter('statuses', $statuses);
         }
+    }
+
+    private function claimableQuery(DateTimeImmutable $leaseExpiredBefore): QueryBuilder
+    {
+        return $this
+            ->createQueryBuilder('eq')
+            ->where('eq.status = :pending')
+            ->andWhere('(eq.claimedAt IS NULL OR eq.claimedAt < :expired)')
+            ->setParameter('pending', QueueStatus::Pending)
+            ->setParameter('expired', $leaseExpiredBefore);
     }
 }

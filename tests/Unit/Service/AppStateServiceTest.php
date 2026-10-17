@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[AllowMockObjectsWithoutExpectations]
 class AppStateServiceTest extends TestCase
@@ -44,7 +45,7 @@ class AppStateServiceTest extends TestCase
     public function testGetReturnsNullWhenNoRowExists(): void
     {
         // Arrange
-        $this->repository->method('findByKey')->willReturn(null);
+        $this->repository->method('findValue')->willReturn(null);
 
         // Act
         $result = $this->makeService()->get('some_key');
@@ -56,8 +57,7 @@ class AppStateServiceTest extends TestCase
     public function testGetReturnsValueWhenRowExists(): void
     {
         // Arrange
-        $entry = new AppState('some_key', 'stored_value', new DateTimeImmutable());
-        $this->repository->method('findByKey')->willReturn($entry);
+        $this->repository->method('findValue')->willReturn('stored_value');
 
         // Act
         $result = $this->makeService()->get('some_key');
@@ -69,8 +69,7 @@ class AppStateServiceTest extends TestCase
     public function testGetReadsThroughCacheOnFirstCallAndReusesItOnSecondCall(): void
     {
         // Arrange
-        $entry = new AppState('cached_key', 'cached_value', new DateTimeImmutable());
-        $this->repository->expects($this->once())->method('findByKey')->with('cached_key')->willReturn($entry);
+        $this->repository->expects($this->once())->method('findValue')->with('cached_key')->willReturn('cached_value');
         $service = $this->makeService();
 
         // Act
@@ -85,7 +84,7 @@ class AppStateServiceTest extends TestCase
     public function testGetReturnsNullForUnknownKeyAndCachesTheMiss(): void
     {
         // Arrange
-        $this->repository->expects($this->once())->method('findByKey')->with('missing')->willReturn(null);
+        $this->repository->expects($this->once())->method('findValue')->with('missing')->willReturn(null);
         $service = $this->makeService();
 
         // Act
@@ -100,14 +99,8 @@ class AppStateServiceTest extends TestCase
     public function testSetInvalidatesTheCache(): void
     {
         // Arrange
-        $entry = new AppState('mutated_key', 'old_value', new DateTimeImmutable());
-        $updated = new AppState('mutated_key', 'new_value', new DateTimeImmutable());
-        $this->repository->method('findByKey')->willReturnOnConsecutiveCalls($entry, $entry, $updated);
-
-        /** @var EntityManagerInterface&MockObject $em */
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('flush');
-        $service = $this->makeService($em);
+        $this->repository->method('findValue')->willReturnOnConsecutiveCalls('old_value', 'new_value');
+        $service = $this->makeService();
 
         // Act
         $primed = $service->get('mutated_key');
@@ -123,7 +116,8 @@ class AppStateServiceTest extends TestCase
     {
         // Arrange
         $entry = new AppState('rm_key', 'value', new DateTimeImmutable());
-        $this->repository->method('findByKey')->willReturnOnConsecutiveCalls($entry, $entry, null);
+        $this->repository->method('findValue')->willReturnOnConsecutiveCalls('value', null);
+        $this->repository->method('findByKey')->willReturn($entry);
 
         /** @var EntityManagerInterface&MockObject $em */
         $em = $this->createMock(EntityManagerInterface::class);
@@ -141,39 +135,53 @@ class AppStateServiceTest extends TestCase
         static::assertNull($afterRemove);
     }
 
-    public function testSetCreatesNewRowWhenKeyDoesNotExist(): void
+    public function testSetWritesThroughOneUpsert(): void
     {
         // Arrange
-        $this->repository->method('findByKey')->willReturn(null);
-
-        /** @var EntityManagerInterface&MockObject $em */
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em
-            ->expects($this->once())
-            ->method('persist')
-            ->with(static::callback(static fn(AppState $state): bool => $state->getKeyName() === 'new_key' && $state->getValue() === 'new_value'));
-        $em->expects($this->once())->method('flush');
+        $this->repository->expects($this->never())->method('findByKey');
+        $this->repository->expects($this->once())->method('upsert')->with('new_key', 'new_value', static::isInstanceOf(DateTimeImmutable::class));
 
         // Act
-        $this->makeService($em)->set('new_key', 'new_value');
+        $this->makeService()->set('new_key', 'new_value');
     }
 
-    public function testSetUpdatesExistingRowWhenKeyExists(): void
+    public function testSetIfAbsentReturnsTheValueAlreadyStored(): void
     {
         // Arrange
-        $existing = new AppState('existing_key', 'old_value', new DateTimeImmutable('2026-01-01'));
-        $this->repository->method('findByKey')->willReturn($existing);
-
-        /** @var EntityManagerInterface&MockObject $em */
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->expects($this->never())->method('persist');
-        $em->expects($this->once())->method('flush');
+        $this->repository->expects($this->once())->method('insertIfAbsent')->with('race_key', 'loser_value');
+        $this->repository->expects($this->once())->method('findValue')->with('race_key')->willReturn('winner_value');
 
         // Act
-        $this->makeService($em)->set('existing_key', 'updated_value');
+        $result = $this->makeService()->setIfAbsent('race_key', 'loser_value');
 
         // Assert
-        static::assertSame('updated_value', $existing->getValue());
+        static::assertSame('winner_value', $result);
+    }
+
+    public function testAMissIsCachedForAMinuteOnly(): void
+    {
+        // Arrange
+        $this->repository->method('findValue')->willReturn(null);
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->once())->method('expiresAfter')->with(60);
+        $cache = $this->createStubForIntersectionOfInterfaces([CacheInterface::class, CacheItemPoolInterface::class]);
+        $cache->method('get')->willReturnCallback(static fn(string $key, callable $callback): mixed => $callback($item));
+
+        // Act
+        $this->makeService(cache: $cache)->get('missing_key');
+    }
+
+    public function testAStoredValueIsCachedWithoutExpiry(): void
+    {
+        // Arrange
+        $this->repository->method('findValue')->willReturn('present');
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->once())->method('expiresAfter')->with(null);
+        $cache = $this->createStubForIntersectionOfInterfaces([CacheInterface::class, CacheItemPoolInterface::class]);
+        $cache->method('get')->willReturnCallback(static fn(string $key, callable $callback): mixed => $callback($item));
+
+        // Act
+        $this->makeService(cache: $cache)->get('present_key');
     }
 
     public function testRemoveDeletesExistingRow(): void
@@ -208,8 +216,7 @@ class AppStateServiceTest extends TestCase
     public function testGetFallsBackToRepositoryWhenCacheThrows(): void
     {
         // Arrange
-        $entry = new AppState('fallback_key', 'fallback_value', new DateTimeImmutable());
-        $this->repository->method('findByKey')->willReturn($entry);
+        $this->repository->method('findValue')->willReturn('fallback_value');
 
         $cache = $this->makeFailingCache();
 
@@ -229,8 +236,7 @@ class AppStateServiceTest extends TestCase
     public function testCacheBackendFailureIsLoggedAtMostOnce(): void
     {
         // Arrange
-        $entry = new AppState('flap_key', 'value', new DateTimeImmutable());
-        $this->repository->method('findByKey')->willReturn($entry);
+        $this->repository->method('findValue')->willReturn('value');
 
         $cache = $this->makeFailingCache();
 
@@ -249,7 +255,7 @@ class AppStateServiceTest extends TestCase
     public function testGetManyReadsEveryMissingKeyInOneRepositoryCall(): void
     {
         // Arrange
-        $this->repository->expects($this->never())->method('findByKey');
+        $this->repository->expects($this->never())->method('findValue');
         $this->repository->expects($this->once())->method('findValuesByKeys')->with(['a_key', 'b_key'])->willReturn(['a_key' => 'a_value']);
         $service = $this->makeService();
 
@@ -280,7 +286,7 @@ class AppStateServiceTest extends TestCase
     public function testGetManyOnlyResolvesKeysThatAreNotMemoizedYet(): void
     {
         // Arrange
-        $this->repository->method('findByKey')->willReturn(new AppState('primed', 'primed_value', new DateTimeImmutable()));
+        $this->repository->method('findValue')->willReturn('primed_value');
         $this->repository->expects($this->once())->method('findValuesByKeys')->with(['fresh'])->willReturn(['fresh' => 'fresh_value']);
         $service = $this->makeService();
 
@@ -313,14 +319,9 @@ class AppStateServiceTest extends TestCase
     public function testSetDropsTheMemoizedValue(): void
     {
         // Arrange
-        $entry = new AppState('memo_invalidated', 'old_value', new DateTimeImmutable());
         $this->repository->method('findValuesByKeys')->willReturn(['memo_invalidated' => 'old_value']);
-        $this->repository->method('findByKey')->willReturn($entry);
-
-        /** @var EntityManagerInterface&MockObject $em */
-        $em = $this->createMock(EntityManagerInterface::class);
-        $em->method('flush');
-        $service = $this->makeService($em);
+        $this->repository->method('findValue')->willReturn('new_value');
+        $service = $this->makeService();
 
         // Act
         $primed = $service->getMany(['memo_invalidated'])['memo_invalidated'];

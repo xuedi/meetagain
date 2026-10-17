@@ -2,7 +2,7 @@
 
 namespace Module\Email\Tests\Unit\Internal;
 
-use App\Service\Config\ConfigService;
+use App\Theme\Colors;
 use Module\Email\Contract\SendingIdentity;
 use Module\Email\Internal\Entity\EmailQueue;
 use Module\Email\Internal\LayoutRenderer;
@@ -228,13 +228,13 @@ final class LayoutRendererTest extends TestCase
 
     private function hostileRenderer(): LayoutRenderer
     {
-        $configService = $this->createStub(ConfigService::class);
-        $configService->method('getThemeColors')->willThrowException(new RuntimeException('The send path resolved the sending identity live'));
+        $colors = $this->createStub(Colors::class);
+        $colors->method('all')->willThrowException(new RuntimeException('The send path resolved the sending identity live'));
 
         $twig = new Environment($this->moduleTemplates());
         $twig->addExtension(new TranslationExtension(new Translator('en')));
 
-        return new LayoutRenderer(twig: $twig, configService: $configService, logger: $this->createStub(LoggerInterface::class));
+        return new LayoutRenderer(twig: $twig, colors: $colors, logger: $this->createStub(LoggerInterface::class));
     }
 
     private function renderer(?Environment $twig = null, ?LoggerInterface $logger = null): LayoutRenderer
@@ -244,10 +244,10 @@ final class LayoutRendererTest extends TestCase
             $twig->addExtension(new TranslationExtension(new Translator('en')));
         }
 
-        $configService = $this->createStub(ConfigService::class);
-        $configService->method('getThemeColors')->willReturn(['color_link' => '#123456']);
+        $colors = $this->createStub(Colors::class);
+        $colors->method('all')->willReturn(['color_link' => '#123456']);
 
-        return new LayoutRenderer(twig: $twig, configService: $configService, logger: $logger ?? $this->createStub(LoggerInterface::class));
+        return new LayoutRenderer(twig: $twig, colors: $colors, logger: $logger ?? $this->createStub(LoggerInterface::class));
     }
 
     private function moduleTemplates(): FilesystemLoader

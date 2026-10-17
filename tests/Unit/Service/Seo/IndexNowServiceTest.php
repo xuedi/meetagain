@@ -66,7 +66,11 @@ class IndexNowServiceTest extends TestCase
         // Arrange
         $appStateMock = $this->createMock(AppStateService::class);
         $appStateMock->method('get')->willReturn(null);
-        $appStateMock->expects($this->once())->method('set')->with('seo_indexnow_key', static::matchesRegularExpression('/^[a-f0-9]{32}$/'));
+        $appStateMock
+            ->expects($this->once())
+            ->method('setIfAbsent')
+            ->with('seo_indexnow_key', static::matchesRegularExpression('/^[a-f0-9]{32}$/'))
+            ->willReturnArgument(1);
 
         $service = $this->makeService(appStateService: $appStateMock);
 
@@ -75,6 +79,21 @@ class IndexNowServiceTest extends TestCase
 
         // Assert
         static::assertMatchesRegularExpression('/^[a-f0-9]{32}$/', $key);
+    }
+
+    public function testGetOrCreateKeyReturnsTheKeyAParallelRequestStoredFirst(): void
+    {
+        // Arrange
+        $appStateStub = $this->createStub(AppStateService::class);
+        $appStateStub->method('get')->willReturn(null);
+        $appStateStub->method('setIfAbsent')->willReturn('storedbyotherrequest0000000000000');
+        $service = $this->makeService(appStateService: $appStateStub);
+
+        // Act
+        $key = $service->getOrCreateKey();
+
+        // Assert
+        static::assertSame('storedbyotherrequest0000000000000', $key);
     }
 
     public function testGetOrCreateKeyReturnsSameKeyOnConsecutiveCalls(): void
@@ -88,9 +107,9 @@ class IndexNowServiceTest extends TestCase
                 return $generatedKey;
             });
         $appStateStub
-            ->method('set')
-            ->willReturnCallback(static function (string $name, string $value) use (&$generatedKey): void {
-                $generatedKey = $value;
+            ->method('setIfAbsent')
+            ->willReturnCallback(static function (string $name, string $value) use (&$generatedKey): string {
+                return $generatedKey ??= $value;
             });
 
         $service = $this->makeService(appStateService: $appStateStub);

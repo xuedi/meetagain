@@ -4,11 +4,11 @@ namespace App\Service\Security\Provider;
 
 use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
+use App\Service\Cache\AtomicStoreInterface;
 use App\Service\Security\ProviderReport;
 use App\Service\Security\SecurityProviderInterface;
 use DateTimeImmutable;
 use Override;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
@@ -18,7 +18,7 @@ abstract readonly class AbstractSecurityProvider implements SecurityProviderInte
     private const int STATE_TTL_SECONDS = 86_400;
 
     public function __construct(
-        protected CacheItemPoolInterface $securityCachePool,
+        protected AtomicStoreInterface $store,
         protected LoggerInterface $logger,
     ) {}
 
@@ -42,33 +42,53 @@ abstract readonly class AbstractSecurityProvider implements SecurityProviderInte
         bool $readOnly = false,
     ): ProviderReport {
         $stateKey = $this->resolveStateKey($sessionId, $ip);
-        $state = $this->loadState($stateKey);
-
-        $alreadyBlocked = SecurityRecommendation::tryFrom((string) ($state['recommendation'] ?? ''))?->isBlocking() ?? false;
-
-        if ($readOnly || !$this->handlesType($type) || $alreadyBlocked) {
-            $details = $state['details'] ?? [];
-            return $this->buildReport(
-                threatLevel: (int) ($state['threatLevel'] ?? 0),
-                summary: (string) ($state['summary'] ?? 'No issues'),
-                details: is_array($details) ? $details : [],
-            );
+        if ($readOnly || !$this->handlesType($type)) {
+            return $this->reportFromState($this->loadState($stateKey));
         }
 
-        $result = $this->processEvent($type, $request, $context, $ip, $state);
+        $report = null;
+        $processed = false;
+        $process = function (array $state) use ($type, $request, $context, $ip, &$report, &$processed): ?array {
+            if ($this->isBlocked($state)) {
+                $report = $this->reportFromState($state);
+                $processed = false;
 
-        $newState = $result['state'];
-        $newState['threatLevel'] = $result['threatLevel'];
-        $newState['summary'] = $result['summary'];
-        $newState['details'] = $result['details'];
+                return null;
+            }
 
-        $report = $this->buildReport($result['threatLevel'], $result['summary'], $result['details']);
-        $newState['recommendation'] = $report->recommendation->value;
+            $result = $this->processEvent($type, $request, $context, $ip, $state);
+            $report = $this->buildReport($result['threatLevel'], $result['summary'], $result['details']);
+            $processed = true;
 
-        $this->saveState($stateKey, $newState);
-        $this->persistLog($request, $context);
+            return [
+                ...$result['state'],
+                'threatLevel' => $result['threatLevel'],
+                'summary' => $result['summary'],
+                'details' => $result['details'],
+                'recommendation' => $report->recommendation->value,
+            ];
+        };
 
-        return $report;
+        try {
+            $this->store->update($this->stateStoreKey($stateKey), self::STATE_TTL_SECONDS, $process);
+            if ($processed) {
+                $this->store->indexAdd($this->indexStoreKey(), $stateKey, time() + self::STATE_TTL_SECONDS, self::STATE_TTL_SECONDS * 2);
+            }
+        } catch (Throwable $e) {
+            $this->logger->warning('Failed to update security provider state: ' . $e->getMessage(), [
+                'exception' => $e,
+                'providerKey' => $this->getKey(),
+            ]);
+            if ($report === null) {
+                $process([]);
+            }
+        }
+
+        if ($processed) {
+            $this->persistLog($request, $context);
+        }
+
+        return $report ?? $this->reportFromState([]);
     }
 
     #[Override]
@@ -82,10 +102,11 @@ abstract readonly class AbstractSecurityProvider implements SecurityProviderInte
     public function clearAllState(): void
     {
         try {
-            foreach ($this->loadIndex() as $stateKey => $expiresAt) {
-                $this->securityCachePool->deleteItem($this->cacheKey($stateKey));
-            }
-            $this->securityCachePool->deleteItem($this->indexCacheKey());
+            $stateKeys = array_keys($this->store->indexEntries($this->indexStoreKey()));
+            $this->store->delete(...[
+                ...array_map($this->stateStoreKey(...), $stateKeys),
+                $this->indexStoreKey(),
+            ]);
         } catch (Throwable $e) {
             $this->logger->warning('Failed to clear security provider state: ' . $e->getMessage(), [
                 'exception' => $e,
@@ -139,106 +160,49 @@ abstract readonly class AbstractSecurityProvider implements SecurityProviderInte
      */
     protected function loadState(string $stateKey): array
     {
-        $cacheKey = $this->cacheKey($stateKey);
         try {
-            $item = $this->securityCachePool->getItem($cacheKey);
-            if (!$item->isHit()) {
-                return [];
-            }
-            $value = $item->get();
+            return $this->store->read($this->stateStoreKey($stateKey)) ?? [];
         } catch (Throwable $e) {
             $this->logger->warning('Failed to load security provider state: ' . $e->getMessage(), [
                 'exception' => $e,
-                'cacheKey' => $cacheKey,
+                'providerKey' => $this->getKey(),
             ]);
+
             return [];
         }
-
-        return is_array($value) ? $value : [];
     }
 
     /**
      * @param array<string, mixed> $state
      */
-    protected function saveState(string $stateKey, array $state): void
+    private function isBlocked(array $state): bool
     {
-        $cacheKey = $this->cacheKey($stateKey);
-        try {
-            $item = $this->securityCachePool->getItem($cacheKey);
-            $item->set($state);
-            $item->expiresAfter(self::STATE_TTL_SECONDS);
-            $this->securityCachePool->save($item);
-            $this->addToIndex($stateKey);
-        } catch (Throwable $e) {
-            $this->logger->warning('Failed to save security provider state: ' . $e->getMessage(), [
-                'exception' => $e,
-                'cacheKey' => $cacheKey,
-            ]);
-        }
-    }
-
-    private function addToIndex(string $stateKey): void
-    {
-        try {
-            $index = $this->loadIndex();
-            $now = time();
-            $index[$stateKey] = $now + self::STATE_TTL_SECONDS;
-            foreach ($index as $key => $expiresAt) {
-                if ($expiresAt >= $now) {
-                    continue;
-                }
-
-                unset($index[$key]);
-            }
-            $item = $this->securityCachePool->getItem($this->indexCacheKey());
-            $item->set($index);
-            $item->expiresAfter(self::STATE_TTL_SECONDS * 2);
-            $this->securityCachePool->save($item);
-        } catch (Throwable $e) {
-            $this->logger->warning('Failed to update security provider index: ' . $e->getMessage(), [
-                'exception' => $e,
-                'providerKey' => $this->getKey(),
-            ]);
-        }
+        return SecurityRecommendation::tryFrom((string) ($state['recommendation'] ?? ''))?->isBlocking() ?? false;
     }
 
     /**
-     * @return array<string, int>
+     * @param array<string, mixed> $state
      */
-    private function loadIndex(): array
+    private function reportFromState(array $state): ProviderReport
     {
-        try {
-            $item = $this->securityCachePool->getItem($this->indexCacheKey());
-            $value = $item->isHit() ? $item->get() : [];
-        } catch (Throwable) {
-            return [];
-        }
+        $details = $state['details'] ?? [];
 
-        if (!is_array($value)) {
-            return [];
-        }
-
-        $result = [];
-        foreach ($value as $key => $expiresAt) {
-            if (!(is_string($key) && is_int($expiresAt))) {
-                continue;
-            }
-
-            $result[$key] = $expiresAt;
-        }
-
-        return $result;
+        return $this->buildReport(
+            threatLevel: (int) ($state['threatLevel'] ?? 0),
+            summary: (string) ($state['summary'] ?? 'No issues'),
+            details: is_array($details) ? $details : [],
+        );
     }
 
-    private function cacheKey(string $stateKey): string
+    private function stateStoreKey(string $stateKey): string
     {
         $sanitized = preg_replace('/[^A-Za-z0-9_.\-]/', '_', $stateKey) ?? 'unknown';
 
-        return 'security_provider_' . $this->getKey() . '_' . $sanitized;
+        return 'security:state:' . $this->getKey() . ':' . $sanitized;
     }
 
-    private function indexCacheKey(): string
+    private function indexStoreKey(): string
     {
-        return 'security_provider_state_index_' . $this->getKey();
+        return 'security:index:' . $this->getKey();
     }
 }

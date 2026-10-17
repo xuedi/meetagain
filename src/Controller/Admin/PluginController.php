@@ -7,6 +7,7 @@ use App\Admin\Navigation\AdminNavigationConfig;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
+use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Service\Admin\CommandService;
 use App\Service\Admin\PluginSettingsService;
 use App\Service\Config\PluginService;
@@ -48,7 +49,7 @@ final class PluginController extends AbstractController implements AdminNavigati
         $installedCount = count(array_filter($plugins, static fn(array $p): bool => (bool) ($p['installed'] ?? false)));
         $enabledCount = count(array_filter($plugins, static fn(array $p): bool => (bool) ($p['enabled'] ?? false)));
 
-        $adminTop = new AdminTop(info: [
+        $info = [
             new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalCount, $this->translator->trans('admin_system_plugins.summary_available'))),
             new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $installedCount, $this->translator->trans('admin_system_plugins.summary_installed'))),
             new AdminTopInfoHtml(sprintf(
@@ -56,13 +57,18 @@ final class PluginController extends AbstractController implements AdminNavigati
                 $enabledCount,
                 $this->translator->trans('admin_system_plugins.summary_enabled'),
             )),
-        ]);
+        ];
+        $configWritable = $this->pluginService->isConfigWritable();
+        if (!$configWritable) {
+            $info[] = new AdminTopInfoText($this->translator->trans('admin_system_plugins.config_read_only'));
+        }
 
         return $this->render('admin/system/plugin_list.html.twig', [
             'plugins' => $plugins,
             'configurableKeys' => $this->pluginSettingsService->getConfigurablePluginKeys(),
             'active' => 'plugin',
-            'adminTop' => $adminTop,
+            'adminTop' => new AdminTop(info: $info),
+            'configWritable' => $configWritable,
         ]);
     }
 
@@ -70,6 +76,9 @@ final class PluginController extends AbstractController implements AdminNavigati
     public function install(string $key, Request $request): Response
     {
         $this->assertToken($request, 'admin_plugin_install' . $key);
+        if (!$this->pluginService->isConfigWritable()) {
+            return $this->refuseReadOnlyConfig();
+        }
 
         try {
             $this->pluginService->install($key);
@@ -90,6 +99,9 @@ final class PluginController extends AbstractController implements AdminNavigati
     public function uninstall(string $key, Request $request): Response
     {
         $this->assertToken($request, 'admin_plugin_uninstall' . $key);
+        if (!$this->pluginService->isConfigWritable()) {
+            return $this->refuseReadOnlyConfig();
+        }
 
         $this->pluginService->uninstall($key);
         $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_uninstalled', [
@@ -103,6 +115,9 @@ final class PluginController extends AbstractController implements AdminNavigati
     public function enable(string $key, Request $request): Response
     {
         $this->assertToken($request, 'admin_plugin_enable' . $key);
+        if (!$this->pluginService->isConfigWritable()) {
+            return $this->refuseReadOnlyConfig();
+        }
 
         $this->pluginService->enable($key);
         $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_enabled', [
@@ -116,11 +131,21 @@ final class PluginController extends AbstractController implements AdminNavigati
     public function disable(string $key, Request $request): Response
     {
         $this->assertToken($request, 'admin_plugin_disable' . $key);
+        if (!$this->pluginService->isConfigWritable()) {
+            return $this->refuseReadOnlyConfig();
+        }
 
         $this->pluginService->disable($key);
         $this->addFlash('success', $this->translator->trans('admin_system_plugins.flash_disabled', [
             '%plugin%' => $key,
         ]));
+
+        return $this->redirectToRoute('app_admin_plugin');
+    }
+
+    private function refuseReadOnlyConfig(): Response
+    {
+        $this->addFlash('error', $this->translator->trans('admin_system_plugins.config_read_only'));
 
         return $this->redirectToRoute('app_admin_plugin');
     }

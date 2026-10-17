@@ -5,11 +5,11 @@ namespace App\Service\Security\Provider;
 use App\Entity\NotFoundLog;
 use App\Enum\SecurityEventType;
 use App\Repository\NotFoundLogRepository;
+use App\Service\Cache\AtomicStoreInterface;
 use App\Service\Security\SuspiciousUrlMatcher;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
@@ -44,13 +44,13 @@ final readonly class NotFoundProvider extends AbstractSecurityProvider
     ];
 
     public function __construct(
-        CacheItemPoolInterface $securityCachePool,
+        AtomicStoreInterface $store,
         LoggerInterface $logger,
         private EntityManagerInterface $em,
         private NotFoundLogRepository $logRepo,
         private SuspiciousUrlMatcher $suspiciousUrls,
     ) {
-        parent::__construct($securityCachePool, $logger);
+        parent::__construct($store, $logger);
     }
 
     #[Override]

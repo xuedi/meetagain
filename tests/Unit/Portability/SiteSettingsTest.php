@@ -16,6 +16,7 @@ use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use App\Service\Config\PluginService;
 use App\Service\Media\ImageLocationService;
+use App\Theme\Colors;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\TemplatesInterface;
 use PHPUnit\Framework\TestCase;
@@ -127,11 +128,11 @@ final class SiteSettingsTest extends TestCase
     public function testThemeColorsAreSavedUnderTheirConfigKeys(): void
     {
         // Arrange
-        $config = $this->createMock(ConfigService::class);
-        $config->expects($this->once())->method('saveColors')->with(['color_primary' => '#111111', 'color_text_grey' => '#222222']);
+        $colors = $this->createMock(Colors::class);
+        $colors->expects($this->once())->method('save')->with(['color_primary' => '#111111', 'color_text_grey' => '#222222']);
 
         // Act
-        $this->siteSettings(config: $config)->apply(['theme_colors' => ['primary' => '#111111', 'text-grey' => '#222222']], $this->context());
+        $this->siteSettings(colors: $colors)->apply(['theme_colors' => ['primary' => '#111111', 'text-grey' => '#222222']], $this->context());
     }
 
     public function testTheLogoReplacesThePreviousSiteLogo(): void
@@ -156,13 +157,14 @@ final class SiteSettingsTest extends TestCase
         $config = $this->createMock(ConfigService::class);
         $config->expects($this->never())->method('setString');
         $config->expects($this->never())->method('setBoolean');
-        $config->expects($this->never())->method('saveColors');
         $config->expects($this->never())->method('setSiteLogoId');
+        $colors = $this->createMock(Colors::class);
+        $colors->expects($this->never())->method('save');
         $pluginSettings = $this->createMock(PluginSettings::class);
         $pluginSettings->expects($this->never())->method('apply');
 
         // Act
-        $this->siteSettings(config: $config, pluginSettings: $pluginSettings)->apply([], $this->context());
+        $this->siteSettings(config: $config, pluginSettings: $pluginSettings, colors: $colors)->apply([], $this->context());
     }
 
     public function testThePluginSettingsAreHandedOnToBeWrittenAtTheGlobalScope(): void
@@ -185,7 +187,6 @@ final class SiteSettingsTest extends TestCase
         $config->method('getSiteName')->willReturn('Weiqi Club');
         $config->method('getSeoDescription')->willReturn('Go in Berlin');
         $config->method('getSiteLogoId')->willReturn(null);
-        $config->method('getThemeColors')->willReturn(['color_primary' => '#111111', 'color_text_grey_light' => '#cccccc']);
         $config->method('isShowTownHall')->willReturn(true);
         $languageService = $this->createStub(LanguageService::class);
         $languageService->method('getEnabledCodes')->willReturn(['en', 'de']);
@@ -197,6 +198,8 @@ final class SiteSettingsTest extends TestCase
             ->method('export')
             ->with(['books'])
             ->willReturn(['books' => ['circulation' => true]]);
+        $colors = $this->createStub(Colors::class);
+        $colors->method('all')->willReturn(['color_primary' => '#111111', 'color_text_grey_light' => '#cccccc']);
 
         // Act
         $site = $this->siteSettings(
@@ -204,6 +207,7 @@ final class SiteSettingsTest extends TestCase
             languageService: $languageService,
             pluginService: $pluginService,
             pluginSettings: $pluginSettings,
+            colors: $colors,
         )->current();
 
         // Assert
@@ -230,6 +234,7 @@ final class SiteSettingsTest extends TestCase
         ?LanguageService $languageService = null,
         ?PluginService $pluginService = null,
         ?PluginSettings $pluginSettings = null,
+        ?Colors $colors = null,
     ): SiteSettings {
         $languageRepository = $this->createStub(LanguageRepository::class);
         $languageRepository->method('findAll')->willReturn($languages);
@@ -252,6 +257,7 @@ final class SiteSettingsTest extends TestCase
             new AsciiSlugger(),
             $pluginService ?? $this->createStub(PluginService::class),
             $pluginSettings ?? $this->createStub(PluginSettings::class),
+            $colors ?? $this->createStub(Colors::class),
         );
     }
 

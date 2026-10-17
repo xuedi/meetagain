@@ -15,8 +15,8 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
+use Tests\Unit\Service\Cache\InMemoryAtomicStore;
 
 class FormMeasureProviderTest extends TestCase
 {
@@ -183,7 +183,7 @@ class FormMeasureProviderTest extends TestCase
         $repo = $this->createStub(SecurityMeasureLogRepository::class);
         $repo->method('findBlocksBetween')->willReturn($rows);
 
-        return new FormMeasureProvider(new ArrayAdapter(), new NullLogger(), $repo);
+        return new FormMeasureProvider(new InMemoryAtomicStore(), new NullLogger(), $repo);
     }
 
     /**

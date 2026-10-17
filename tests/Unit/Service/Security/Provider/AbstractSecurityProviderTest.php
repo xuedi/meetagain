@@ -4,24 +4,23 @@ namespace Tests\Unit\Service\Security\Provider;
 
 use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
+use App\Service\Cache\AtomicStoreInterface;
 use App\Service\Security\Provider\AbstractSecurityProvider;
 use DateTimeImmutable;
 use Override;
 use PHPUnit\Framework\TestCase;
-use Psr\Cache\CacheItemInterface;
-use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
+use Tests\Unit\Service\Cache\InMemoryAtomicStore;
 
 class AbstractSecurityProviderTest extends TestCase
 {
     public function testReadOnlyShortCircuitsBeforeProcessEvent(): void
     {
         // Arrange
-        $provider = new FakeSecurityProvider(new ArrayAdapter(), new NullLogger());
+        $provider = new FakeSecurityProvider(new InMemoryAtomicStore(), new NullLogger());
         $provider->control->processEventShouldFail = true;
 
         // Act
@@ -35,7 +34,7 @@ class AbstractSecurityProviderTest extends TestCase
     public function testHandlesTypeFilterPreventsProcessing(): void
     {
         // Arrange
-        $provider = new FakeSecurityProvider(new ArrayAdapter(), new NullLogger());
+        $provider = new FakeSecurityProvider(new InMemoryAtomicStore(), new NullLogger());
         $provider->control->handles = false;
         $provider->control->processEventShouldFail = true;
 
@@ -49,8 +48,8 @@ class AbstractSecurityProviderTest extends TestCase
     public function testProcessEventRunsAndPersistsState(): void
     {
         // Arrange
-        $cache = new ArrayAdapter();
-        $provider = new FakeSecurityProvider($cache, new NullLogger());
+        $store = new InMemoryAtomicStore();
+        $provider = new FakeSecurityProvider($store, new NullLogger());
         $provider->control->nextResult = [
             'state' => ['attempts' => 1],
             'threatLevel' => 50,
@@ -72,8 +71,8 @@ class AbstractSecurityProviderTest extends TestCase
     public function testAlreadyBlockedStateSkipsReprocessing(): void
     {
         // Arrange
-        $cache = new ArrayAdapter();
-        $provider = new FakeSecurityProvider($cache, new NullLogger());
+        $store = new InMemoryAtomicStore();
+        $provider = new FakeSecurityProvider($store, new NullLogger());
         $provider->control->nextResult = [
             'state' => ['attempts' => 1],
             'threatLevel' => 100,
@@ -95,7 +94,7 @@ class AbstractSecurityProviderTest extends TestCase
     public function testThreatLevelAtOrAbove100RecommendsBlock(): void
     {
         // Arrange
-        $provider = new FakeSecurityProvider(new ArrayAdapter(), new NullLogger());
+        $provider = new FakeSecurityProvider(new InMemoryAtomicStore(), new NullLogger());
         $provider->control->nextResult = [
             'state' => [],
             'threatLevel' => 150,
@@ -113,7 +112,7 @@ class AbstractSecurityProviderTest extends TestCase
     public function testScanRetrospectiveBuildsReportFromScanLogs(): void
     {
         // Arrange
-        $provider = new FakeSecurityProvider(new ArrayAdapter(), new NullLogger());
+        $provider = new FakeSecurityProvider(new InMemoryAtomicStore(), new NullLogger());
         $provider->control->scanLogsResult = [
             'threatLevel' => 7,
             'summary' => 'historical scan',
@@ -129,13 +128,13 @@ class AbstractSecurityProviderTest extends TestCase
         static::assertSame(['hits' => 3], $report->details);
     }
 
-    public function testLoadStateReturnsEmptyArrayOnCacheException(): void
+    public function testABrokenStoreStillReturnsAFreshReport(): void
     {
         // Arrange
-        $cache = $this->createStub(CacheItemPoolInterface::class);
-        $cache->method('getItem')->willThrowException(new RuntimeException('cache broken'));
+        $store = $this->createStub(AtomicStoreInterface::class);
+        $store->method('update')->willThrowException(new RuntimeException('valkey broken'));
 
-        $provider = new FakeSecurityProvider($cache, new NullLogger());
+        $provider = new FakeSecurityProvider($store, new NullLogger());
         $provider->control->nextResult = [
             'state' => ['x' => 1],
             'threatLevel' => 10,
@@ -155,8 +154,8 @@ class AbstractSecurityProviderTest extends TestCase
     public function testClearAllStateRemovesIndexedKeys(): void
     {
         // Arrange
-        $cache = new ArrayAdapter();
-        $provider = new FakeSecurityProvider($cache, new NullLogger());
+        $store = new InMemoryAtomicStore();
+        $provider = new FakeSecurityProvider($store, new NullLogger());
         $provider->control->nextResult = [
             'state' => [],
             'threatLevel' => 1,
@@ -167,38 +166,36 @@ class AbstractSecurityProviderTest extends TestCase
             $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], $sess, '1.2.3.4');
         }
 
-        static::assertTrue($cache->getItem('security_provider_fake_sess-a')->isHit());
+        static::assertNotNull($store->read('security:state:fake:sess-a'));
 
         // Act
         $provider->clearAllState();
 
         // Assert
-        static::assertFalse($cache->getItem('security_provider_fake_sess-a')->isHit());
-        static::assertFalse($cache->getItem('security_provider_fake_sess-b')->isHit());
-        static::assertFalse($cache->getItem('security_provider_state_index_fake')->isHit());
+        static::assertNull($store->read('security:state:fake:sess-a'));
+        static::assertNull($store->read('security:state:fake:sess-b'));
+        static::assertSame([], $store->indexEntries('security:index:fake'));
     }
 
-    public function testClearAllStateSwallowsCacheErrors(): void
+    public function testClearAllStateSwallowsStoreErrors(): void
     {
         // Arrange
-        $cache = $this->createStub(CacheItemPoolInterface::class);
-        $item = $this->createStub(CacheItemInterface::class);
-        $item->method('isHit')->willReturn(false);
-        $cache->method('getItem')->willReturn($item);
-        $cache->method('deleteItem')->willThrowException(new RuntimeException('cannot delete'));
+        $store = $this->createStub(AtomicStoreInterface::class);
+        $store->method('indexEntries')->willReturn([]);
+        $store->method('delete')->willThrowException(new RuntimeException('cannot delete'));
 
-        $provider = new FakeSecurityProvider($cache, new NullLogger());
+        $provider = new FakeSecurityProvider($store, new NullLogger());
 
         // Act / Assert
         $provider->clearAllState();
         static::assertTrue(true);
     }
 
-    public function testCacheKeySanitisesUnsafeStateKey(): void
+    public function testStoreKeySanitisesUnsafeStateKey(): void
     {
         // Arrange
-        $cache = new ArrayAdapter();
-        $provider = new FakeSecurityProvider($cache, new NullLogger());
+        $store = new InMemoryAtomicStore();
+        $provider = new FakeSecurityProvider($store, new NullLogger());
         $provider->control->nextResult = [
             'state' => [],
             'threatLevel' => 1,
@@ -210,18 +207,18 @@ class AbstractSecurityProviderTest extends TestCase
         $provider->observe(SecurityEventType::NotFound, Request::create('/'), [], 'weird:session/key', '1.2.3.4');
 
         // Assert
-        static::assertTrue($cache->getItem('security_provider_fake_weird_session_key')->isHit());
+        static::assertNotNull($store->read('security:state:fake:weird_session_key'));
     }
 }
 
 final readonly class FakeSecurityProvider extends AbstractSecurityProvider
 {
     public function __construct(
-        CacheItemPoolInterface $securityCachePool,
+        AtomicStoreInterface $store,
         LoggerInterface $logger,
         public FakeSecurityProviderControl $control = new FakeSecurityProviderControl(),
     ) {
-        parent::__construct($securityCachePool, $logger);
+        parent::__construct($store, $logger);
     }
 
     public function getKey(): string

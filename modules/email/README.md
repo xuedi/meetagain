@@ -121,9 +121,12 @@ count would only fit the transport it was tuned for; a budget sends as much as S
 in the same wall time. Almost all of a send is the transport: the module's own work per row is well under a
 millisecond.
 
-Each chunk is flushed and its rows detached before the next is fetched. A process that dies mid-run therefore sends
-at most one chunk a second time, and memory stays flat however long the queue is. The sweep writes the same way from
-the other end: it enqueues without flushing and flushes every 200 mails, and always before `markContextSent()`, so a
+A chunk is claimed, not just selected: `EmailQueueRepository::claimPending()` stamps a token and a time on up to 200
+`Pending` rows in an UPDATE that repeats the claim condition, and the run sends only the rows carrying its token. Two
+runs on two workers therefore never send the same mail. Each mail's outcome is flushed as soon as it is known, which
+releases its claim, and the chunk is detached before the next is claimed, so memory stays flat however long the queue
+is. A process that dies mid-send leaves at most the one mail in flight unrecorded; its claim expires after 10 minutes
+and a later run sends it again. The sweep writes the same way from the other end: it enqueues without flushing and flushes every 200 mails, and always before `markContextSent()`, so a
 context is never marked done while its mails are still unwritten.
 
 There is no dedicated queue worker. A long-running consumer would be one more process to deploy, supervise and

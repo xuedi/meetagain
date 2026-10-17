@@ -32,6 +32,7 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
 {
     private const int CHUNK_SIZE = 200;
     private const int SEND_BUDGET_SECONDS = 150;
+    private const int CLAIM_LEASE_SECONDS = 600;
 
     /**
      * @param iterable<ContextEnricherInterface> $enrichers
@@ -141,7 +142,8 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         $startedAt = $this->clock->now();
         $stopAt = $startedAt->modify(sprintf('+%d seconds', self::SEND_BUDGET_SECONDS));
         do {
-            $mails = $this->mailRepo->findBy(['status' => QueueStatus::Pending], ['id' => 'ASC'], self::CHUNK_SIZE);
+            $claimedAt = $this->clock->now();
+            $mails = $this->mailRepo->claimPending(self::CHUNK_SIZE, $claimedAt, $claimedAt->modify(sprintf('-%d seconds', self::CLAIM_LEASE_SECONDS)));
             foreach ($mails as $mail) {
                 $now = $this->clock->now();
                 $cutoff = $mail->getMaxSendBy();
@@ -156,7 +158,8 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
                         'max_send_by' => $cutoff->format('c'),
                         'now' => $now->format('c'),
                     ]);
-                    $this->em->persist($mail);
+                    $mail->releaseClaim();
+                    $this->em->flush();
                     $late++;
                     continue;
                 }
@@ -174,9 +177,9 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
                     $mail->setErrorMessage($e->getMessage());
                     $failed++;
                 }
-                $this->em->persist($mail);
+                $mail->releaseClaim();
+                $this->em->flush();
             }
-            $this->em->flush();
             foreach ($mails as $mail) {
                 $this->em->detach($mail);
             }

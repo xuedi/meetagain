@@ -14,7 +14,6 @@ use App\Portability\Importer;
 use App\Portability\ImportSummary;
 use App\Portability\KindLabels;
 use App\Portability\Outcome;
-use App\Service\Admin\CommandService;
 use App\Service\Config\PluginService;
 use App\Service\Event\EventService;
 use RuntimeException;
@@ -40,9 +39,8 @@ final class ImportController extends AbstractSettingsController implements Admin
         private readonly EventService $eventService,
         private readonly PluginService $pluginService,
         private readonly KindLabels $kindLabels,
-        private readonly CommandService $commandService,
         private readonly ExtendedFilesystem $fs,
-        #[Autowire('%kernel.project_dir%/var/import')]
+        #[Autowire('%kernel.project_dir%/data/import/archive')]
         private readonly string $pendingDir,
     ) {
         parent::__construct($translator, 'import');
@@ -69,7 +67,8 @@ final class ImportController extends AbstractSettingsController implements Admin
         }
 
         $this->discardPendingArchive($request->getSession());
-        $pending = $file->move($this->pendingDir, bin2hex(random_bytes(16)) . '.zip')->getPathname();
+        $pendingId = bin2hex(random_bytes(16));
+        $pending = $file->move($this->pendingDir, $pendingId . '.zip')->getPathname();
 
         try {
             $archive = $this->archiveReader->describe($pending);
@@ -79,7 +78,7 @@ final class ImportController extends AbstractSettingsController implements Admin
             return $this->renderPage(error: $e->getMessage());
         }
 
-        $request->getSession()->set(self::PENDING_ARCHIVE, $pending);
+        $request->getSession()->set(self::PENDING_ARCHIVE, $pendingId);
 
         return $this->renderPage(archive: $archive);
     }
@@ -91,8 +90,8 @@ final class ImportController extends AbstractSettingsController implements Admin
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $pending = $request->getSession()->get(self::PENDING_ARCHIVE);
-        if (!is_string($pending) || !$this->fs->fileExists($pending)) {
+        $pending = $this->pendingPath($request->getSession()->get(self::PENDING_ARCHIVE));
+        if ($pending === null || !$this->fs->fileExists($pending)) {
             return $this->renderPage(error: $this->translator->trans('admin_system_import.error_expired'));
         }
 
@@ -102,10 +101,6 @@ final class ImportController extends AbstractSettingsController implements Admin
             return $this->renderPage(error: $e->getMessage());
         } finally {
             $this->discardPendingArchive($request->getSession());
-        }
-
-        if ($summary->siteApplied) {
-            $this->commandService->rebuildTheme();
         }
 
         return $this->renderPage(summary: $summary);
@@ -177,11 +172,16 @@ final class ImportController extends AbstractSettingsController implements Admin
 
     private function discardPendingArchive(SessionInterface $session): void
     {
-        $pending = $session->get(self::PENDING_ARCHIVE);
-        if (is_string($pending) && $this->fs->fileExists($pending)) {
+        $pending = $this->pendingPath($session->get(self::PENDING_ARCHIVE));
+        if ($pending !== null && $this->fs->fileExists($pending)) {
             $this->fs->deleteFile($pending);
         }
 
         $session->remove(self::PENDING_ARCHIVE);
+    }
+
+    private function pendingPath(mixed $pendingId): ?string
+    {
+        return is_string($pendingId) && preg_match('/^[a-f0-9]{32}$/', $pendingId) === 1 ? $this->pendingDir . '/' . $pendingId . '.zip' : null;
     }
 }

@@ -28,7 +28,7 @@
                     <td>{{ plugin.name }}</td>
                     <td>{{ plugin.description|shortened(70) }}</td>
                     <td class="has-text-right is-nowrap">
-                        {% if plugin.installed %}
+                        {% if configWritable and plugin.installed %}
                             {% if plugin.enabled %}
                                 <button class="button is-danger is-light" disabled>{{ 'admin_system_plugins.button_uninstall'|trans }}</button>
                                 <a href="{{ path('admin_plugin_disable', {key: plugin.key}) }}"
@@ -45,7 +45,7 @@
                                    data-post
                                    data-csrf-token="{{ csrf_token('admin_plugin_enable' ~ plugin.key) }}">{{ 'admin_system_plugins.button_enable'|trans }}</a>
                             {% endif %}
-                        {% else %}
+                        {% elseif configWritable %}
                             <a href="{{ path('admin_plugin_install', {key: plugin.key}) }}"
                                class="button is-success is-light"
                                data-post

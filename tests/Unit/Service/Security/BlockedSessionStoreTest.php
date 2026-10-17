@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Service\Security;
 
+use App\Service\Cache\AtomicStoreInterface;
 use App\Service\Security\BlockedSessionStore;
 use Closure;
 use Exception;
@@ -11,6 +12,7 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Tests\Unit\Service\Cache\InMemoryAtomicStore;
 
 class BlockedSessionStoreTest extends TestCase
 {
@@ -25,7 +27,7 @@ class BlockedSessionStoreTest extends TestCase
     public function testBlockAndUnblockLifecycleAcrossBothAxes(Closure $block, Closure $isBlocked, Closure $getSnapshot, Closure $unblock, Closure $list): void
     {
         // Arrange
-        $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $store = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
 
         // Act
         $block($store, 'subject', ['k' => 'v']);
@@ -65,7 +67,7 @@ class BlockedSessionStoreTest extends TestCase
     public function testSessionAndIpNamespacesDoNotCollide(): void
     {
         // Arrange
-        $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $store = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
 
         // Act
         $store->blockSession('same', ['axis' => 'session']);
@@ -79,7 +81,7 @@ class BlockedSessionStoreTest extends TestCase
     public function testUnblockUnknownEntryIsSilentNoOp(): void
     {
         // Arrange
-        $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $store = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
 
         // Act & Assert
         $store->unblockSession('never-blocked');
@@ -91,7 +93,7 @@ class BlockedSessionStoreTest extends TestCase
     public function testClearAllWipesEverySessionAndIpEntry(): void
     {
         // Arrange
-        $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $store = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
         $store->blockSession('s1', ['a' => 1]);
         $store->blockSession('s2', ['a' => 2]);
         $store->blockIp('1.1.1.1', ['a' => 3]);
@@ -110,7 +112,7 @@ class BlockedSessionStoreTest extends TestCase
     public function testListBlockedReturnsKeyAndSnapshotPairs(): void
     {
         // Arrange
-        $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $store = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
         $store->blockSession('s1', ['primaryProvider' => 'not_found']);
         $store->blockIp('1.2.3.4', ['primaryProvider' => 'fuse']);
 
@@ -126,7 +128,7 @@ class BlockedSessionStoreTest extends TestCase
     public function testGetSessionBlockExpiresAtReturnsFutureTimestampWithinTtl(): void
     {
         // Arrange
-        $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $store = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
         $store->blockSession('abc', ['k' => 'v'], 3600);
 
         // Act
@@ -142,26 +144,20 @@ class BlockedSessionStoreTest extends TestCase
     public function testGetBlockExpiresAtReturnsNullForUnknownEntryOnBothAxes(): void
     {
         // Arrange
-        $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $store = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
 
         // Act / Assert
         static::assertNull($store->getSessionBlockExpiresAt('never'));
         static::assertNull($store->getIpBlockExpiresAt('never'));
     }
 
-    public function testListPrunesStaleEntriesAndStillReturnsLiveOnes(): void
+    public function testListSkipsExpiredIndexEntriesAndStillReturnsLiveOnes(): void
     {
         // Arrange
-        $pool = new ArrayAdapter();
-        $store = new BlockedSessionStore($pool, new NullLogger());
+        $index = new InMemoryAtomicStore();
+        $store = new BlockedSessionStore(new ArrayAdapter(), $index, new NullLogger());
         $store->blockSession('fresh', ['k' => 'v']);
-
-        $indexItem = $pool->getItem('security_blocked_sessions_index');
-        $index = $indexItem->get();
-        static::assertIsArray($index);
-        $index['stale'] = time() - 60;
-        $indexItem->set($index);
-        $pool->save($indexItem);
+        $index->indexAdd('security:blocked:sessions', 'stale', time() - 60, 3600);
 
         // Act
         $entries = $store->listBlockedSessions();
@@ -170,11 +166,12 @@ class BlockedSessionStoreTest extends TestCase
         static::assertSame([['key' => 'fresh', 'snapshot' => ['k' => 'v']]], $entries);
     }
 
-    public function testListPrunesIndexedEntriesWhenTheirSnapshotIsMissing(): void
+    public function testListDropsIndexedEntriesWhenTheirSnapshotIsMissing(): void
     {
         // Arrange
         $pool = new ArrayAdapter();
-        $store = new BlockedSessionStore($pool, new NullLogger());
+        $index = new InMemoryAtomicStore();
+        $store = new BlockedSessionStore($pool, $index, new NullLogger());
         $store->blockSession('orphan', ['k' => 'v']);
         $pool->deleteItem('security_blocked_session_orphan');
 
@@ -183,24 +180,23 @@ class BlockedSessionStoreTest extends TestCase
 
         // Assert
         static::assertSame([], $entries);
+        static::assertSame([], $index->indexEntries('security:blocked:sessions'));
     }
 
-    public function testAddToIndexPrunesPreviouslyStaleEntries(): void
+    public function testClearAllRemovesBothIndexes(): void
     {
         // Arrange
-        $pool = new ArrayAdapter();
-        $item = $pool->getItem('security_blocked_sessions_index');
-        $item->set(['stale' => time() - 60]);
-        $pool->save($item);
-
-        $store = new BlockedSessionStore($pool, new NullLogger());
+        $index = new InMemoryAtomicStore();
+        $store = new BlockedSessionStore(new ArrayAdapter(), $index, new NullLogger());
+        $store->blockSession('sess', ['k' => 'v']);
+        $store->blockIp('1.2.3.4', ['k' => 'v']);
 
         // Act
-        $store->blockSession('fresh', ['k' => 'v']);
+        $store->clearAll();
 
         // Assert
-        $entries = $store->listBlockedSessions();
-        static::assertSame([['key' => 'fresh', 'snapshot' => ['k' => 'v']]], $entries);
+        static::assertSame([], $index->indexEntries('security:blocked:sessions'));
+        static::assertSame([], $index->indexEntries('security:blocked:ips'));
     }
 
     /**
@@ -215,7 +211,7 @@ class BlockedSessionStoreTest extends TestCase
         $item = $pool->getItem($cacheKey);
         $item->set($plantedValue);
         $pool->save($item);
-        $store = new BlockedSessionStore($pool, new NullLogger());
+        $store = new BlockedSessionStore($pool, new InMemoryAtomicStore(), new NullLogger());
 
         // Act
         $actual = $invoke($store);
@@ -238,35 +234,6 @@ class BlockedSessionStoreTest extends TestCase
             static fn(BlockedSessionStore $s): bool => $s->isSessionBlocked('garbage'),
             false,
         ];
-        yield 'non-array index falls back to empty list' => [
-            'security_blocked_sessions_index',
-            'not-an-index',
-            static fn(BlockedSessionStore $s): array => $s->listBlockedSessions(),
-            [],
-        ];
-    }
-
-    public function testLoadIndexFiltersOutEntriesWithUnexpectedShape(): void
-    {
-        // Arrange
-        $pool = new ArrayAdapter();
-        $item = $pool->getItem('security_blocked_sessions_index');
-        $item->set([
-            'good' => time() + 3600,
-            123 => time() + 3600,
-            'bad' => 'not-an-int',
-        ]);
-        $pool->save($item);
-        $snap = $pool->getItem('security_blocked_session_good');
-        $snap->set(['k' => 'v']);
-        $pool->save($snap);
-        $store = new BlockedSessionStore($pool, new NullLogger());
-
-        // Act
-        $entries = $store->listBlockedSessions();
-
-        // Assert
-        static::assertSame([['key' => 'good', 'snapshot' => ['k' => 'v']]], $entries);
     }
 
     /**
@@ -276,7 +243,7 @@ class BlockedSessionStoreTest extends TestCase
     public function testKeySanitizationCollapsesSpecialChars(array $variants): void
     {
         // Arrange
-        $store = new BlockedSessionStore(new ArrayAdapter(), new NullLogger());
+        $store = new BlockedSessionStore(new ArrayAdapter(), new InMemoryAtomicStore(), new NullLogger());
         $store->blockSession($variants[0], ['from' => $variants[0]]);
 
         // Act / Assert
@@ -300,13 +267,18 @@ class BlockedSessionStoreTest extends TestCase
      * @param Closure(BlockedSessionStore): mixed $invoke
      */
     #[DataProvider('provideThrowingPoolCases')]
-    public function testCachePoolExceptionsAreSwallowed(Closure $invoke, mixed $expected): void
+    public function testStorageExceptionsAreSwallowed(Closure $invoke, mixed $expected): void
     {
         // Arrange
         $pool = $this->createStub(CacheItemPoolInterface::class);
         $pool->method('getItem')->willThrowException(new Exception('boom'));
         $pool->method('deleteItem')->willThrowException(new Exception('boom'));
-        $store = new BlockedSessionStore($pool, new NullLogger());
+        $index = $this->createStub(AtomicStoreInterface::class);
+        $index->method('indexAdd')->willThrowException(new Exception('boom'));
+        $index->method('indexRemove')->willThrowException(new Exception('boom'));
+        $index->method('indexEntries')->willThrowException(new Exception('boom'));
+        $index->method('delete')->willThrowException(new Exception('boom'));
+        $store = new BlockedSessionStore($pool, $index, new NullLogger());
 
         // Act
         $result = $invoke($store);
@@ -363,7 +335,7 @@ class BlockedSessionStoreTest extends TestCase
         $miss->method('isHit')->willReturn(false);
         $pool = $this->createStub(CacheItemPoolInterface::class);
         $pool->method('getItem')->willReturn($miss);
-        $store = new BlockedSessionStore($pool, new NullLogger());
+        $store = new BlockedSessionStore($pool, new InMemoryAtomicStore(), new NullLogger());
 
         // Act / Assert
         static::assertNull($store->getSessionSnapshot('abc'));

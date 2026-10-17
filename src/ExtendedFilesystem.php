@@ -77,6 +77,11 @@ class ExtendedFilesystem extends SymfonyFilesystem
         return is_file($path);
     }
 
+    public function isWritable(string $path): bool
+    {
+        return is_writable($path);
+    }
+
     public function getDirname(string $path, int $levels = 1): string
     {
         return dirname($path, $levels);

@@ -17,9 +17,9 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Tests\Unit\Service\Cache\InMemoryAtomicStore;
 use Throwable;
 
 class AccessDeniedProviderTest extends TestCase
@@ -168,7 +168,7 @@ class AccessDeniedProviderTest extends TestCase
         $security = $this->createStub(Security::class);
 
         return new AccessDeniedProvider(
-            new ArrayAdapter(),
+            new InMemoryAtomicStore(),
             $logger ?? new NullLogger(),
             $em ?? $this->createStub(EntityManagerInterface::class),
             $repo,

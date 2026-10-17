@@ -30,6 +30,10 @@
                         </a>
                     </td>
                 </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="has-text-grey has-text-centered">{% if hasLogFiles %}{{ 'admin_logs.empty_system'|trans }}{% else %}{{ 'admin_logs.empty_system_no_files'|trans }}{% endif %}</td>
+                </tr>
             {% endfor %}
             </tbody>
         </table>

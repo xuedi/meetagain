@@ -121,7 +121,7 @@ class CmsServiceTest extends TestCase
         $cacheMock
             ->expects($this->once())
             ->method('get')
-            ->willReturnCallback(static fn(string $key, callable $callback): string => $callback(self::createCacheItem()));
+            ->willReturnCallback(static fn(string $key, callable $callback): ?string => $callback(self::createCacheItem()));
 
         $eventFilterServiceStub = $this->createStub(EventFilterService::class);
         $eventFilterServiceStub->method('getEventIdFilter')->willReturn(new EventFilterResult(null, false));
@@ -190,9 +190,9 @@ class CmsServiceTest extends TestCase
         $capturedTags = null;
         $cacheMock = $this->createMock(TagAwareCacheInterface::class);
         $cacheMock
-            ->expects($this->exactly(2))
+            ->expects($this->once())
             ->method('get')
-            ->willReturnCallback(static function (string $key, callable $callback, ?float $beta = null) use (&$capturedKey, &$capturedTags): string {
+            ->willReturnCallback(static function (string $key, callable $callback) use (&$capturedKey, &$capturedTags): ?string {
                 $capturedKey = $key;
                 $item = new class implements ItemInterface {
                     /** @var list<string> */
@@ -246,9 +246,7 @@ class CmsServiceTest extends TestCase
                     }
                 };
                 $result = $callback($item);
-                if ($beta === \INF) {
-                    $capturedTags = $item->getTags();
-                }
+                $capturedTags = $item->getTags();
                 return $result;
             });
 
@@ -444,7 +442,7 @@ class CmsServiceTest extends TestCase
         $cacheStub = $this->createStub(TagAwareCacheInterface::class);
         $cacheStub
             ->method('get')
-            ->willReturnCallback(static function (string $key, callable $callback, ?float $beta = null) use (&$capturedKeys): string {
+            ->willReturnCallback(static function (string $key, callable $callback) use (&$capturedKeys): ?string {
                 $capturedKeys[] = $key;
                 return $callback(self::createCacheItem());
             });
@@ -466,8 +464,7 @@ class CmsServiceTest extends TestCase
         $subject->handle($locale, $slug, new Response());
 
         // Assert
-        static::assertCount(2, $capturedKeys);
-        static::assertSame($capturedKeys[0], $capturedKeys[1]);
+        static::assertCount(1, $capturedKeys);
         static::assertStringStartsWith('cms_page.42.', $capturedKeys[0]);
     }
 

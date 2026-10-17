@@ -19,10 +19,10 @@ use App\Entity\User;
 use App\Enum\ImageType;
 use App\Form\SiteLogoType;
 use App\Form\ThemeColorsType;
-use App\Service\Admin\CommandService;
 use App\Service\Config\ConfigService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
+use App\Theme\Colors;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -69,7 +69,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
     public function __construct(
         TranslatorInterface $translator,
         private readonly ConfigService $configService,
-        private readonly CommandService $commandService,
+        private readonly Colors $colors,
         private readonly ImageService $imageService,
         private readonly ImageLocationService $imageLocationService,
         private readonly EntityManagerInterface $entityManager,
@@ -84,8 +84,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
         $colorsForm->handleRequest($request);
 
         if ($colorsForm->isSubmitted() && $colorsForm->isValid()) {
-            $this->configService->saveColors($colorsForm->getData());
-            $this->commandService->rebuildTheme();
+            $this->colors->save($colorsForm->getData());
             $this->addFlash('success', $this->translator->trans('admin_system_theme.flash_saved'));
         }
 

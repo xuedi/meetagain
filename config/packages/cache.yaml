@@ -18,9 +18,6 @@ framework:
             cache.calendar_feed:
                 adapter: cache.adapter.redis_tag_aware
                 default_lifetime: 3600
-            cache.security_challenge:
-                adapter: cache.adapter.redis_tag_aware
-                default_lifetime: 7200
             cache.image_attribution:
                 adapter: cache.adapter.redis_tag_aware
                 default_lifetime: 3600

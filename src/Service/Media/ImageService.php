@@ -20,6 +20,7 @@ use ImagickPixel;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Mime\MimeTypes;
 
 readonly class ImageService
@@ -54,6 +55,7 @@ readonly class ImageService
         private string $kernelProjectDir,
         private ImageLocationService $imageLocationService,
         private ImageLocationRepository $imageLocationRepo,
+        private LockFactory $lockFactory,
     ) {}
 
     public function findImage(int $id): ?Image
@@ -115,7 +117,28 @@ readonly class ImageService
         $image->setUploader($user);
 
         $this->filesystem->copy($imageData->getRealPath(), $this->getSourcePath($image));
-        $this->entityManager->persist($image);
+        if ($user->getId() === null) {
+            $this->entityManager->persist($image);
+
+            return $image;
+        }
+
+        $lock = $this->lockFactory->createLock('image.hash.' . $hash);
+        $lock->acquire(true);
+        try {
+            $stored = $this->imageRepo->findOneBy(['hash' => $hash]);
+            if ($stored !== null) {
+                $stored->setUpdatedAt(new DateTimeImmutable());
+                $this->entityManager->persist($stored);
+
+                return $stored;
+            }
+
+            $this->entityManager->persist($image);
+            $this->entityManager->flush();
+        } finally {
+            $lock->release();
+        }
 
         return $image;
     }

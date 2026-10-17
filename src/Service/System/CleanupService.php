@@ -42,7 +42,7 @@ readonly class CleanupService implements CronTaskInterface
         private ClockInterface $clock,
         private LoggerInterface $logger,
         private ExtendedFilesystem $fs,
-        #[Autowire('%kernel.project_dir%/var/import')]
+        #[Autowire('%kernel.project_dir%/data/import/archive')]
         private string $pendingImportDir,
     ) {}
 

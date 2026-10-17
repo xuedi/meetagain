@@ -10,6 +10,7 @@ use App\Service\Admin\CommandExecutionService;
 use App\ValueObject\CronTaskResult;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Lock\LockFactory;
@@ -83,6 +84,58 @@ class CronCommandTest extends TestCase
 
         // Assert
         static::assertSame([], $ran);
+    }
+
+    public function testAFailingTaskStillReleasesTheLock(): void
+    {
+        // Arrange
+        $store = new InMemoryStore();
+        $failing = $this->createStub(CronTaskInterface::class);
+        $failing->method('getIdentifier')->willReturn('broken');
+        $failing->method('runCronTask')->willThrowException(new RuntimeException('task failed'));
+        $command = new CronCommand(
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CommandExecutionService::class),
+            new Recorder(null, 'test'),
+            new LockFactory($store),
+            [$failing],
+        );
+
+        // Act
+        $thrown = null;
+        try {
+            new CommandTester($command)->execute([]);
+        } catch (RuntimeException $e) {
+            $thrown = $e;
+        }
+
+        // Assert
+        static::assertInstanceOf(RuntimeException::class, $thrown);
+        static::assertTrue(
+            new LockFactory($store)
+                ->createLock('app:cron')
+                ->acquire(),
+        );
+    }
+
+    public function testTheLockOutlivesTheFactoryDefaultTtl(): void
+    {
+        // Arrange
+        $lockFactory = $this->createMock(LockFactory::class);
+        $lockFactory
+            ->expects(static::once())
+            ->method('createLock')
+            ->with('app:cron', 900.0)
+            ->willReturn(new LockFactory(new InMemoryStore())->createLock('app:cron'));
+        $command = new CronCommand(
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CommandExecutionService::class),
+            new Recorder(null, 'test'),
+            $lockFactory,
+        );
+
+        // Act
+        new CommandTester($command)->execute([]);
     }
 
     /**

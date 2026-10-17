@@ -441,6 +441,8 @@ admin_logs:
     status_exception: 'excepción'
     tag_deleted: 'eliminado'
     empty_cron: 'Aún no hay registros de cron.'
+    empty_system: 'No hay entradas de registro en este rango.'
+    empty_system_no_files: 'No hay archivos de registro. Esta instalación escribe su registro en otro lugar, por ejemplo en stderr.'
     back: 'Volver'
     duration_ms_total: 'ms en total'
     summary_total: 'ejecuciones totales'

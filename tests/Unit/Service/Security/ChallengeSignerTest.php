@@ -5,8 +5,8 @@ namespace Tests\Unit\Service\Security;
 use App\Form\HumanCheckType;
 use App\Service\Security\ChallengeSigner;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
+use Tests\Unit\Service\Cache\InMemoryAtomicStore;
 
 final class ChallengeSignerTest extends TestCase
 {
@@ -44,7 +44,7 @@ final class ChallengeSignerTest extends TestCase
     {
         // Arrange
         $signer = $this->signer();
-        $foreign = new ChallengeSigner('another-secret', new ArrayAdapter(), new MockClock('2026-09-18 10:00:00'));
+        $foreign = new ChallengeSigner('another-secret', new InMemoryAtomicStore(), new MockClock('2026-09-18 10:00:00'));
         $nonce = $signer->mintNonce();
 
         // Act
@@ -86,7 +86,7 @@ final class ChallengeSignerTest extends TestCase
     public function testAStampSignedWithAnotherSecretDoesNotVerify(): void
     {
         // Arrange
-        $foreign = new ChallengeSigner('another-secret', new ArrayAdapter(), new MockClock('2026-09-18 10:00:00'));
+        $foreign = new ChallengeSigner('another-secret', new InMemoryAtomicStore(), new MockClock('2026-09-18 10:00:00'));
 
         // Act
         $payload = $this->signer()->verify($foreign->issue(self::CONTEXT, 18), self::CONTEXT);
@@ -99,7 +99,7 @@ final class ChallengeSignerTest extends TestCase
     {
         // Arrange
         $clock = new MockClock('2026-09-18 10:00:00');
-        $signer = new ChallengeSigner(self::SECRET, new ArrayAdapter(), $clock);
+        $signer = new ChallengeSigner(self::SECRET, new InMemoryAtomicStore(), $clock);
         $stamp = $signer->issue(self::CONTEXT, 18);
 
         // Act
@@ -114,7 +114,7 @@ final class ChallengeSignerTest extends TestCase
     {
         // Arrange
         $clock = new MockClock('2026-09-18 10:00:00');
-        $signer = new ChallengeSigner(self::SECRET, new ArrayAdapter(), $clock);
+        $signer = new ChallengeSigner(self::SECRET, new InMemoryAtomicStore(), $clock);
         $stamp = $signer->issue(self::CONTEXT, 18);
 
         // Act
@@ -129,7 +129,7 @@ final class ChallengeSignerTest extends TestCase
     {
         // Arrange
         $signer = $this->signer();
-        $foreign = new ChallengeSigner('another-secret', new ArrayAdapter(), new MockClock('2026-09-18 10:00:00'));
+        $foreign = new ChallengeSigner('another-secret', new InMemoryAtomicStore(), new MockClock('2026-09-18 10:00:00'));
 
         // Act & Assert
         static::assertSame('invalid_stamp', $signer->rejectionReason($foreign->issue(self::CONTEXT, 18), self::CONTEXT));
@@ -173,6 +173,6 @@ final class ChallengeSignerTest extends TestCase
 
     private function signer(): ChallengeSigner
     {
-        return new ChallengeSigner(self::SECRET, new ArrayAdapter(), new MockClock('2026-09-18 10:00:00'));
+        return new ChallengeSigner(self::SECRET, new InMemoryAtomicStore(), new MockClock('2026-09-18 10:00:00'));
     }
 }

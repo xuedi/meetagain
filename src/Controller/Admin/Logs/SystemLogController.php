@@ -70,24 +70,33 @@ final class SystemLogController extends AbstractLogsController implements AdminN
         $allEntries = $this->systemLogService->getAllEntries();
         $totalCount = count($allEntries);
         $filteredEntries = $this->systemLogService->filterEntries($allEntries, $since, $levels);
+        $hasLogFiles = $this->systemLogService->getLogFiles() !== [];
 
-        $adminTop = new AdminTop(info: $this->buildInfo($totalCount, $allEntries, $since), actions: [
-            new AdminTopActionForm(
-                label: $this->translator->trans('global.button_clear'),
-                target: $this->generateUrl('app_admin_system_log_clear'),
-                csrfTokenId: 'admin_system_log_clear',
-                icon: 'trash',
-                variant: 'is-danger is-light',
-                confirm: $this->translator->trans('admin_logs.confirm_clear'),
-            ),
+        $actions = [
             $this->buildLevelDropdown($level, $range, $allEntries, $since),
             $this->buildRangeDropdown($range, $level, $allEntries, $levels),
-        ]);
+        ];
+        if ($hasLogFiles) {
+            array_unshift(
+                $actions,
+                new AdminTopActionForm(
+                    label: $this->translator->trans('global.button_clear'),
+                    target: $this->generateUrl('app_admin_system_log_clear'),
+                    csrfTokenId: 'admin_system_log_clear',
+                    icon: 'trash',
+                    variant: 'is-danger is-light',
+                    confirm: $this->translator->trans('admin_logs.confirm_clear'),
+                ),
+            );
+        }
+
+        $adminTop = new AdminTop(info: $this->buildInfo($totalCount, $allEntries, $since), actions: $actions);
 
         return $this->render('admin/logs/logs_system_list.html.twig', [
             'active' => 'logs',
             'activeLog' => 'logs',
             'logs' => $filteredEntries,
+            'hasLogFiles' => $hasLogFiles,
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);

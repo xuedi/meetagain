@@ -2,7 +2,7 @@
 
 namespace App\Form;
 
-use App\Service\Config\ConfigService;
+use App\Theme\Colors;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
@@ -13,14 +13,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class ThemeColorsType extends AbstractType
 {
     public function __construct(
-        private readonly ConfigService $configService,
+        private readonly Colors $colors,
         private readonly TranslatorInterface $translator,
     ) {}
 
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $colors = $this->configService->getThemeColors();
+        $colors = $this->colors->all();
         $t = $this->translator;
 
         $builder

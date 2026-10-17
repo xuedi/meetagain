@@ -15,8 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\HttpFoundation\Request;
+use Tests\Unit\Service\Cache\InMemoryAtomicStore;
 
 class RateLimitProviderTest extends TestCase
 {
@@ -25,7 +25,7 @@ class RateLimitProviderTest extends TestCase
         // Arrange
         $em = $this->createStub(EntityManagerInterface::class);
         $repo = $this->createStub(RateLimitLogRepository::class);
-        $provider = new RateLimitProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
+        $provider = new RateLimitProvider(new InMemoryAtomicStore(), new NullLogger(), $em, $repo);
 
         // Act
         $report = $provider->observe(SecurityEventType::RateLimit, new Request(), ['limiter' => 'login_throttling'], 'sess', '1.2.3.4');
@@ -40,7 +40,7 @@ class RateLimitProviderTest extends TestCase
         // Arrange
         $em = $this->createStub(EntityManagerInterface::class);
         $repo = $this->createStub(RateLimitLogRepository::class);
-        $provider = new RateLimitProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
+        $provider = new RateLimitProvider(new InMemoryAtomicStore(), new NullLogger(), $em, $repo);
 
         // Act
         $report = null;
@@ -59,7 +59,7 @@ class RateLimitProviderTest extends TestCase
         // Arrange
         $em = $this->createStub(EntityManagerInterface::class);
         $repo = $this->createStub(RateLimitLogRepository::class);
-        $provider = new RateLimitProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
+        $provider = new RateLimitProvider(new InMemoryAtomicStore(), new NullLogger(), $em, $repo);
 
         // Act
         $reports = [];
@@ -76,7 +76,7 @@ class RateLimitProviderTest extends TestCase
         // Arrange
         $em = $this->createStub(EntityManagerInterface::class);
         $repo = $this->createStub(RateLimitLogRepository::class);
-        $provider = new RateLimitProvider(new ArrayAdapter(), new NullLogger(), $em, $repo);
+        $provider = new RateLimitProvider(new InMemoryAtomicStore(), new NullLogger(), $em, $repo);
 
         // Act + Assert
         static::assertFalse($provider->handles(SecurityEventType::NotFound));
@@ -93,7 +93,7 @@ class RateLimitProviderTest extends TestCase
         $em->method('persist')->willReturnCallback(static function (object $entity) use (&$persisted): void {
             $persisted[] = $entity;
         });
-        $provider = new RateLimitProvider(new ArrayAdapter(), new NullLogger(), $em, $this->createStub(RateLimitLogRepository::class));
+        $provider = new RateLimitProvider(new InMemoryAtomicStore(), new NullLogger(), $em, $this->createStub(RateLimitLogRepository::class));
 
         // Act
         $provider->observe(SecurityEventType::RateLimit, Request::create('/login'), $context, 'sess', '1.2.3.4');
@@ -119,7 +119,7 @@ class RateLimitProviderTest extends TestCase
         $em->method('flush')->willThrowException(new RuntimeException('db down'));
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects(static::once())->method('warning')->with(static::stringContains('db down'));
-        $provider = new RateLimitProvider(new ArrayAdapter(), $logger, $em, $this->createStub(RateLimitLogRepository::class));
+        $provider = new RateLimitProvider(new InMemoryAtomicStore(), $logger, $em, $this->createStub(RateLimitLogRepository::class));
 
         // Act
         $report = $provider->observe(SecurityEventType::RateLimit, new Request(), ['limiter' => 'login_throttling'], 'sess', '1.2.3.4');
@@ -179,7 +179,7 @@ class RateLimitProviderTest extends TestCase
         $repo = $this->createStub(RateLimitLogRepository::class);
         $repo->method('findFiltered')->willReturn($rows);
 
-        return new RateLimitProvider(new ArrayAdapter(), new NullLogger(), $this->createStub(EntityManagerInterface::class), $repo);
+        return new RateLimitProvider(new InMemoryAtomicStore(), new NullLogger(), $this->createStub(EntityManagerInterface::class), $repo);
     }
 
     private function logRow(string $limiter): RateLimitLog

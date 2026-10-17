@@ -207,6 +207,11 @@ readonly class PluginService
         return $config[$pluginKey] === true;
     }
 
+    public function isConfigWritable(): bool
+    {
+        return $this->filesystem->isWritable($this->configDir . '/plugins.php');
+    }
+
     public function setPluginConfig(array $config): void
     {
         $configFile = $this->configDir . '/plugins.php';

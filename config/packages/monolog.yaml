@@ -42,7 +42,6 @@ when@prod: &prod
             main:
                 type: rotating_file
                 path: '%kernel.logs_dir%/%kernel.environment%.log'
-                handler: nested
                 level: warning
                 max_files: 30
             sentry_logs:

@@ -21,6 +21,7 @@ use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use SensitiveParameter;
 
 readonly class UserService
 {
@@ -40,6 +41,11 @@ readonly class UserService
         private ActivityService $activityService,
         private WelcomeEmail $welcomeEmail,
     ) {}
+
+    public function claimRegistrationCode(User $user, #[SensitiveParameter] string $code): bool
+    {
+        return $this->userRepo->consumeRegcode($user, $code);
+    }
 
     public function findUser(int $id): ?User
     {

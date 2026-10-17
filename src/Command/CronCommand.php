@@ -14,28 +14,27 @@ use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 
 #[AsCommand(name: 'app:cron', description: 'cron manager to be called often, maybe every 5 min or so')]
 class CronCommand extends LoggedCommand
 {
-    use LockableTrait;
+    private const float LOCK_TTL_SECONDS = 900.0;
 
     public function __construct(
         private readonly EntityManagerInterface $em,
         CommandExecutionService $commandExecutionService,
         private readonly Recorder $recorder,
-        LockFactory $lockFactory,
+        private readonly LockFactory $lockFactory,
         #[AutowireIterator(CronTaskInterface::class)]
         private readonly iterable $cronTasks = [],
     ) {
         parent::__construct($commandExecutionService);
-        $this->lockFactory = $lockFactory;
     }
 
     #[Override]
@@ -46,12 +45,24 @@ class CronCommand extends LoggedCommand
 
     protected function doExecute(InputInterface $input, OutputInterface $output): int
     {
-        if (!$this->lock()) {
+        $lock = $this->lockFactory->createLock('app:cron', self::LOCK_TTL_SECONDS);
+        if (!$lock->acquire()) {
             $output->writeln('app:cron is already running elsewhere, skipping this run');
 
             return Command::SUCCESS;
         }
 
+        try {
+            $this->runTasks($input, $output, $lock);
+        } finally {
+            $lock->release();
+        }
+
+        return Command::SUCCESS;
+    }
+
+    private function runTasks(InputInterface $input, OutputInterface $output, LockInterface $lock): void
+    {
         /** @var array<int, array{result: CronTaskResult, duration_ms: int}> $timed */
         $timed = [];
         $totalStart = hrtime(true);
@@ -62,7 +73,7 @@ class CronCommand extends LoggedCommand
                 continue;
             }
 
-            $this->lock?->refresh();
+            $lock->refresh();
             $taskStart = hrtime(true);
             $result = $task->runCronTask($output);
             $durationMs = (int) ((hrtime(true) - $taskStart) / 1_000_000);
@@ -90,10 +101,6 @@ class CronCommand extends LoggedCommand
         if ($this->recorder->isEnabled()) {
             $this->recordMetrics($tasks, $aggregated, $totalDurationMs);
         }
-
-        $this->release();
-
-        return Command::SUCCESS;
     }
 
     /**

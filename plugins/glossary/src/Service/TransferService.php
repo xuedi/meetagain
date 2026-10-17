@@ -37,7 +37,7 @@ readonly class TransferService
         private ItemTagAssignmentRepository $assignmentRepo,
         private ActivityService $activityService,
         private Filesystem $filesystem,
-        #[Autowire('%kernel.project_dir%/var/glossary_import')]
+        #[Autowire('%kernel.project_dir%/data/import/glossary')]
         private string $stashDir,
     ) {}
 

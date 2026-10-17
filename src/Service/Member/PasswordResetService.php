@@ -63,6 +63,11 @@ readonly class PasswordResetService
         return $user;
     }
 
+    public function claimResetCode(User $user, #[SensitiveParameter] string $code): bool
+    {
+        return $this->userRepository->consumeRegcode($user, $code);
+    }
+
     public function resetPassword(User $user, #[SensitiveParameter] string $newPassword): bool
     {
         if ($this->blocklist->isBlocked((string) $user->getEmail())) {

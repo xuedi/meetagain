@@ -5,20 +5,17 @@ namespace App\Service\Config;
 use App\Entity\Config;
 use App\Enum\ConfigType;
 use App\Enum\SecurityMeasure;
-use App\ExtendedFilesystem;
 use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 readonly class ConfigService
 {
-    private const string CACHE_KEY_THEME_COLORS = 'theme_colors';
     private const string CACHE_KEY_PREFIX = 'config_';
     private const array FOOTER_COLUMN_KEYS = ['footer_col1_title', 'footer_col2_title', 'footer_col3_title', 'footer_col4_title'];
 
@@ -27,9 +24,7 @@ readonly class ConfigService
         private EntityManagerInterface $em,
         #[Autowire(service: 'cache.config')]
         private CacheInterface $cache,
-        private KernelInterface $kernel,
         private AppStateService $appState,
-        private ExtendedFilesystem $fs,
     ) {}
 
     public function getHost(): string
@@ -229,53 +224,6 @@ readonly class ConfigService
         $this->setInt('event_canonical_threshold', (int) ($formData['eventCanonicalThreshold'] ?? 20));
     }
 
-    public function getThemeColors(): array
-    {
-        return $this->cache->get(self::CACHE_KEY_THEME_COLORS, function (ItemInterface $item): array {
-            $item->expiresAfter(null);
-
-            return $this->parseConfigScss();
-        });
-    }
-
-    public function saveColors(array $colors): void
-    {
-        $path = $this->kernel->getProjectDir() . '/assets/styles/_config.scss';
-        $content = $this->fs->getFileContents($path);
-        if ($content === false) {
-            return;
-        }
-
-        $scssToKey = [
-            'primary' => 'color_primary',
-            'link' => 'color_link',
-            'info' => 'color_info',
-            'success' => 'color_success',
-            'warning' => 'color_warning',
-            'danger' => 'color_danger',
-            'text-grey' => 'color_text_grey',
-            'text-grey-light' => 'color_text_grey_light',
-        ];
-
-        foreach ($scssToKey as $scssVar => $key) {
-            if (!isset($colors[$key])) {
-                continue;
-            }
-
-            $value = (string) $colors[$key];
-            if (!preg_match('/^#[0-9A-Fa-f]{6}$/', $value)) {
-                continue;
-            }
-
-            $content = preg_replace('/(\$' . preg_quote($scssVar, '/') . '\s*:\s*)#[0-9a-fA-F]{3,6}(\s*;)/', '${1}' . $value . '${2}', $content);
-        }
-
-        if (is_string($content)) {
-            $this->fs->putFileContents($path, $content);
-        }
-        $this->cache->delete(self::CACHE_KEY_THEME_COLORS);
-    }
-
     public function getBoolean(string $name, bool $default = false): bool
     {
         return ($this->getCachedValue($name) ?? ($default ? 'true' : 'false')) === 'true';
@@ -336,38 +284,6 @@ readonly class ConfigService
         $this->em->persist($setting);
         $this->em->flush();
         $this->cache->delete(self::CACHE_KEY_PREFIX . $name);
-    }
-
-    private function parseConfigScss(): array
-    {
-        $path = $this->kernel->getProjectDir() . '/assets/styles/_config.scss';
-        $content = $this->fs->getFileContents($path);
-        if ($content === false) {
-            return [];
-        }
-
-        $scssToKey = [
-            'primary' => 'color_primary',
-            'link' => 'color_link',
-            'info' => 'color_info',
-            'success' => 'color_success',
-            'warning' => 'color_warning',
-            'danger' => 'color_danger',
-            'text-grey' => 'color_text_grey',
-            'text-grey-light' => 'color_text_grey_light',
-        ];
-
-        $map = [];
-        foreach ($scssToKey as $scssVar => $key) {
-            $m = [];
-            if (!preg_match('/\$' . preg_quote($scssVar, '/') . '\s*:\s*(#[0-9a-fA-F]{3,6})\s*;/', $content, $m)) {
-                continue;
-            }
-
-            $map[$key] = $m[1];
-        }
-
-        return $map;
     }
 
     private function getCachedValue(string $name): ?string

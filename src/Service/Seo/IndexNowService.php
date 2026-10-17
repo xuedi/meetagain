@@ -42,10 +42,7 @@ readonly class IndexNowService
             return $key;
         }
 
-        $key = bin2hex(random_bytes(16));
-        $this->appStateService->set(self::STATE_KEY, $key);
-
-        return $key;
+        return $this->appStateService->setIfAbsent(self::STATE_KEY, bin2hex(random_bytes(16)));
     }
 
     /**
