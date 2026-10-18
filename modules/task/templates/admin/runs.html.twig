@@ -16,6 +16,7 @@
                 <th>{{ 'admin_task.col_duration'|trans }}</th>
                 <th>{{ 'admin_task.col_host'|trans }}</th>
                 <th>{{ 'admin_task.col_message'|trans }}</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -27,10 +28,16 @@
                     <td class="has-text-grey has-unit" data-unit="ms">{{ run.durationMs }}</td>
                     <td class="has-text-grey">{{ run.host }}</td>
                     <td>{{ run.message }}</td>
+                    <td>
+                        <a href="{{ path('app_admin_task_show', {'identifier': run.identifier}) }}"
+                           title="{{ 'admin_task.action_details'|trans }}">
+                            <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
+                        </a>
+                    </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6" class="has-text-grey has-text-centered">{{ 'admin_task.empty_runs'|trans }}</td>
+                    <td colspan="7" class="has-text-grey has-text-centered">{{ 'admin_task.empty_runs'|trans }}</td>
                 </tr>
             {% endfor %}
             </tbody>

@@ -2,9 +2,13 @@
 
 namespace Module\Task\Tests\Functional;
 
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Task\Contract\Status;
+use Module\Task\Internal\Entity\Run;
 use Module\Task\Internal\Message\RunTask;
 use Module\Task\Internal\Queue;
+use Module\Task\Internal\Repository\RunRepository;
 use Module\Task\Tests\Stub\Task;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
@@ -73,6 +77,64 @@ final class AdminPagesTest extends WebTestCase
         yield 'schedules' => [''];
         yield 'runs' => ['/runs'];
         yield 'queue' => ['/queue'];
+        yield 'task' => ['/' . Task::IDENTIFIER];
+    }
+
+    public function testTheDetailPageSummarisesTheRecordedRunsOfItsTask(): void
+    {
+        // Arrange
+        $this->client->loginUser($this->members()->admin('Admin'));
+        $runs = self::getContainer()->get(RunRepository::class);
+        $runs->record(new Run(Task::IDENTIFIER, new DateTimeImmutable('-2 minutes'), 40, Status::ok, 'first pass', 'host-a'));
+        $runs->record(new Run(Task::IDENTIFIER, new DateTimeImmutable('-1 minute'), 90, Status::warning, "second pass\nwith a detail", 'host-a'));
+
+        // Act
+        $crawler = $this->client->request('GET', self::BASE . '/' . Task::IDENTIFIER);
+
+        // Assert
+        self::assertResponseIsSuccessful();
+        $details = $crawler->filter('.columns table')->first()->text();
+        self::assertStringContainsString('with a detail', $details);
+        self::assertStringContainsString('1 of the last 2 runs ok', $details);
+    }
+
+    public function testBackFromTheRunsOfOneTaskLeadsToItsDetailPage(): void
+    {
+        // Arrange
+        $this->client->loginUser($this->members()->admin('Admin'));
+
+        // Act
+        $crawler = $this->client->request('GET', self::BASE . '/runs?range=all&task=' . Task::IDENTIFIER);
+
+        // Assert
+        self::assertSame(self::BASE . '/' . Task::IDENTIFIER, $crawler->filter('a:has(i.fa-arrow-left)')->attr('href'));
+    }
+
+    public function testAnUnknownTaskHasNoDetailPage(): void
+    {
+        // Arrange
+        $this->client->loginUser($this->members()->admin('Admin'));
+
+        // Act
+        $this->client->request('GET', self::BASE . '/no-such-task');
+
+        // Assert
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testRunNowFromTheDetailPageReturnsToIt(): void
+    {
+        // Arrange
+        $this->client->loginUser($this->members()->admin('Admin'));
+        $runNow = $this->client->request('GET', self::BASE . '/' . Task::IDENTIFIER)->filter('a[href*="/' . Task::IDENTIFIER . '/run"]');
+
+        // Act
+        $this->client->request('POST', (string) $runNow->attr('href'), ['_token' => $runNow->attr('data-csrf-token')]);
+
+        // Assert
+        self::assertResponseRedirects(self::BASE . '/' . Task::IDENTIFIER);
+        $sent = array_map(static fn(Envelope $envelope): object => $envelope->getMessage(), $this->async()->getSent());
+        self::assertEquals([new RunTask(Task::IDENTIFIER)], $sent);
     }
 
     public function testTheOldCronLogAddressRedirectsAnAdminToTheTasksPage(): void

@@ -105,7 +105,7 @@ final class ReportsController extends AbstractSupportController implements Admin
             $actions[] = new AdminTopActionButton(
                 label: $this->translator->trans('admin_support.button_image_details'),
                 target: $this->generateUrl('app_admin_system_images_show', ['id' => $report->getImage()->getId()]),
-                icon: 'eye',
+                icon: 'magnifying-glass',
             );
         }
         $actions[] = new AdminTopActionButton(

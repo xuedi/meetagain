@@ -31,7 +31,7 @@
                     <td>{{ announcement.createdAt|date('Y-m-d H:i') }}</td>
                     <td>{{ announcement.sentAt ? announcement.sentAt|date('Y-m-d H:i') : '-' }}</td>
                     <td>{{ announcement.recipientCount ?? '-' }}</td>
-                    <td><a href="{{ path('app_admin_cms_announcements_view', {'id': announcement.id}) }}"><span class="icon"><i class="fa fa-eye"></i></span></a></td>
+                    <td><a href="{{ path('app_admin_cms_announcements_view', {'id': announcement.id}) }}"><span class="icon"><i class="fa fa-magnifying-glass"></i></span></a></td>
                 </tr>
             {% else %}
                 <tr>

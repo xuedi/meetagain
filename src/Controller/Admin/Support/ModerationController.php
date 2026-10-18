@@ -84,7 +84,7 @@ final class ModerationController extends AbstractSupportController implements Ad
             $actions[] = new AdminTopActionButton(
                 label: $this->translator->trans('admin_support_moderation.button_view_subject'),
                 target: $subjectPath,
-                icon: 'eye',
+                icon: 'magnifying-glass',
             );
         }
         $actions[] = new AdminTopActionButton(

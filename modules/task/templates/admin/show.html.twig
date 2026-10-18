@@ -1,0 +1,119 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/vendor/chart.js') }}"></script>
+    <script src="{{ asset('js/admin/dashboard.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <div class="columns">
+            <div class="column is-5">
+                <table class="table is-fullwidth">
+                    <tbody>
+                    <tr>
+                        <th>{{ 'admin_task.col_task'|trans }}</th>
+                        <td><code>{{ identifier }}</code></td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'admin_task.field_class'|trans }}</th>
+                        <td class="is-size-7"><code class="breakText">{{ taskClass }}</code></td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'admin_task.col_cadence'|trans }}</th>
+                        <td><code>{{ cadence.cron }}</code></td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'admin_task.field_spread'|trans }}</th>
+                        <td>
+                            {% if cadence.jitterSeconds > 0 %}
+                                {{ 'admin_task.spread_value'|trans({'%seconds%': cadence.jitterSeconds}) }}
+                            {% else %}
+                                <span class="has-text-grey">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'admin_task.field_runs_in'|trans }}</th>
+                        <td>
+                            <span class="tag is-light">{{ (cadence.offloaded ? 'admin_task.runs_in_worker' : 'admin_task.runs_in_scheduler')|trans }}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'admin_task.field_next_runs'|trans }}</th>
+                        <td>
+                            {% for next in nextRuns %}
+                                <div>{{ next|date('Y-m-d H:i:s') }}</div>
+                            {% else %}
+                                <span class="has-text-grey">-</span>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>{{ 'admin_task.col_last_run'|trans }}</th>
+                        <td>
+                            {% if last %}
+                                {{ last.startedAt|date('Y-m-d H:i:s') }}
+                                <span class="tag {{ last.status.tagVariant }}">{{ last.status.label|trans }}</span>
+                            {% else %}
+                                <span class="has-text-grey">{{ 'admin_task.never_ran'|trans }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if last %}
+                        <tr>
+                            <th>{{ 'admin_task.field_last_message'|trans }}</th>
+                            <td>{{ last.message|nl2br }}</td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <th>{{ 'admin_task.field_kept'|trans }}</th>
+                        <td>{{ 'admin_task.kept_value'|trans({'%count%': keptCount, '%days%': keepDays}) }}</td>
+                    </tr>
+                    {% if stats %}
+                        <tr>
+                            <th>{{ 'admin_task.field_success'|trans }}</th>
+                            <td>{{ 'admin_task.success_value'|trans({'%ok%': stats.ok, '%count%': history|length}) }}</td>
+                        </tr>
+                        <tr>
+                            <th>{{ 'admin_task.col_duration'|trans }}</th>
+                            <td>
+                                <table class="table is-narrow is-bordered">
+                                    <tbody>
+                                    <tr>
+                                        <th>{{ 'admin_task.duration_average'|trans }}</th>
+                                        <td class="has-unit" data-unit="ms">{{ stats.average }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{ 'admin_task.duration_median'|trans }}</th>
+                                        <td class="has-unit" data-unit="ms">{{ stats.median }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{ 'admin_task.duration_p95'|trans }}</th>
+                                        <td class="has-unit" data-unit="ms">{{ stats.p95 }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>{{ 'admin_task.duration_max'|trans }}</th>
+                                        <td class="has-unit" data-unit="ms">{{ stats.max }}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="column is-7">
+                {% include 'admin/_components/dashboard/multi_chart.html.twig' with {'tile': chartTile} only %}
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}

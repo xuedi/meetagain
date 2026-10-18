@@ -7,18 +7,6 @@
         {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
         {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
-        {% if providerAvailable %}
-            <div class="mb-4">
-                <a href="{{ path('app_admin_email_sendlog_sync') }}"
-                   class="button is-small is-info"
-                   data-post
-                   data-csrf-token="{{ csrf_token('app_admin_email_sendlog_sync') }}">
-                    <span class="icon"><i class="fa fa-refresh"></i></span>
-                    <span>{{ 'admin_email_sendlog.button_sync'|trans }}</span>
-                </a>
-            </div>
-        {% endif %}
-
         <table id="filteredTable" class="table is-fullwidth">
             <thead>
             <tr>
@@ -87,7 +75,7 @@
                     </td>
                     <td>
                         <a href="{{ path('app_admin_email_sendlog_show', {'id': email.id}) }}">
-                            <span class="icon"><i class="fa fa-eye"></i></span>
+                            <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
                         </a>
                     </td>
                 </tr>
