@@ -63,7 +63,7 @@
             {% if detailRoute is not null %}
                 <td>
                     <a href="{{ path(detailRoute, {'id': image.id}) }}">
-                        <span class="icon"><i class="fa fa-eye"></i></span>
+                        <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
                     </a>
                     {% if imageIssues is not null %}
                         {% set issues = imageIssues[image.id] ?? [] %}

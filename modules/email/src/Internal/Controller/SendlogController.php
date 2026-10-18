@@ -86,7 +86,7 @@ final class SendlogController extends AbstractEmailController implements AdminNa
                 label: $this->translator->trans('admin_email_sendlog.button_sync'),
                 target: $this->generateUrl('app_admin_email_sendlog_sync'),
                 csrfTokenId: 'app_admin_email_sendlog_sync',
-                icon: 'refresh',
+                icon: 'rotate',
                 variant: 'is-warning',
             );
         }
