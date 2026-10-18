@@ -15,9 +15,7 @@ permit = [
     "@global",                                                  # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                                        # the vote FK - the one sanctioned core entity
     "App\\Controller\\AbstractController",                      # module controllers extend core's, as plugin controllers do
-    "App\\CronTaskInterface",                                   # the deadline task registers on core's cron chain
-    "App\\ValueObject\\CronTaskResult",                         # that chain's return type
-    "App\\Enum\\CronTaskStatus",                                # that chain's status enum
+    "Module\\Task\\Contract\\**",                               # the deadline task registers on the task module's schedule
     "App\\Service\\Notification\\User\\NotificationProviderInterface", # members hear about open ballots on core's bell
     "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
     "Doctrine\\**",
@@ -35,9 +33,7 @@ permit = [
     "@global",                                                  # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                                        # the vote FK - the one sanctioned core entity
     "App\\Controller\\AbstractController",                      # module controllers extend core's, as plugin controllers do
-    "App\\CronTaskInterface",                                   # the deadline task registers on core's cron chain
-    "App\\ValueObject\\CronTaskResult",                         # that chain's return type
-    "App\\Enum\\CronTaskStatus",                                # that chain's status enum
+    "Module\\Task\\Contract\\**",                               # the deadline task registers on the task module's schedule
     "App\\Service\\Notification\\User\\NotificationProviderInterface", # members hear about open ballots on core's bell
     "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
     "PHPUnit\\**",

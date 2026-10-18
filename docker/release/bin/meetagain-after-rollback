@@ -1,0 +1,5 @@
+#!/bin/bash
+set -euo pipefail
+cd /var/www/html
+
+php bin/console cache:pool:clear cache.app cache.cms_page_cache --no-interaction

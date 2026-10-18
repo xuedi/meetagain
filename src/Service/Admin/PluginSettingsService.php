@@ -2,11 +2,13 @@
 
 namespace App\Service\Admin;
 
+use App\DependencyInjection\SeesInactivePlugins;
 use App\Publisher\PluginSettings\DescriptorInterface;
 use LogicException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Traversable;
 
+#[SeesInactivePlugins]
 final readonly class PluginSettingsService
 {
     /** @var array<string, DescriptorInterface> */

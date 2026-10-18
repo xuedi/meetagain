@@ -6,8 +6,8 @@ use App\Entity\Image;
 use App\Portability\Item\Registry;
 use App\Portability\Item\UploadsInterface;
 use DateTimeInterface;
+use League\Flysystem\FilesystemOperator;
 use Symfony\Component\Clock\ClockInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use ZipArchive;
 
@@ -26,8 +26,7 @@ readonly class Exporter
         private ArchiveReader $archiveReader,
         private DateShifter $dateShifter,
         private ClockInterface $clock,
-        #[Autowire('%kernel.project_dir%')]
-        private string $projectDir,
+        private FilesystemOperator $imageStorage,
     ) {}
 
     public function export(Scope $scope, ?DateTimeInterface $anchor = null): string
@@ -36,7 +35,7 @@ readonly class Exporter
 
         $zip = new ZipArchive();
         $zip->open($zipPath, ZipArchive::CREATE);
-        $images = new ZipImageWriter($zip, $this->projectDir);
+        $images = new ZipImageWriter($zip, $this->imageStorage);
 
         $now = $this->clock->now();
         $exportedAt = $anchor === null ? $now : $this->dateShifter->mondayOf($anchor);
@@ -63,6 +62,7 @@ readonly class Exporter
             json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n",
         );
         $zip->close();
+        $images->removeCopies();
 
         return $zipPath;
     }
@@ -72,7 +72,7 @@ readonly class Exporter
      */
     public function preview(Scope $scope): array
     {
-        return $this->archiveReader->countRows($this->exportSections($scope, new ZipImageWriter(null, $this->projectDir)));
+        return $this->archiveReader->countRows($this->exportSections($scope, new ZipImageWriter(null, $this->imageStorage)));
     }
 
     /**

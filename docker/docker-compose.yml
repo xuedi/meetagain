@@ -5,6 +5,8 @@ services:
     build: php
     container_name: "ma-php"
     user: ${HOST_UID}:${HOST_GID}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost/favicon.ico"]
     ports:
       - "80:80" # HTTP
       - "443:443" # HTTPS
@@ -20,9 +22,71 @@ services:
       - GID=${HOST_GID}
       - USERNAME=${HOST_USERNAME}
       - REDIS_URL=redis://valkey:6379
+      - STORAGE_DSN=s3://GK6d656574616761696e646576:4469dab6ad31edf40ec5e2dafc7f9aec9c6e0a1a4394bf42d557483570d2b4b3@garage:3900/meetagain?region=garage&tls=false&web=garage:3902
+      - MEETAGAIN_THUMBNAILS_UPSTREAM=garage:3902
+      - MEETAGAIN_THUMBNAILS_HOST=meetagain-thumbnails
     depends_on:
       - valkey
+      - garage
     tty: true
+
+  # Message worker: handles what requests and schedules hand to the async transport
+  worker:
+    build: php
+    container_name: "ma-worker"
+    user: ${HOST_UID}:${HOST_GID}
+    healthcheck:
+      disable: true
+    command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=60", "--memory-limit=256M"]
+    restart: unless-stopped
+    volumes:
+      - ../:/var/www/html/
+    environment:
+      - UID=${HOST_UID}
+      - GID=${HOST_GID}
+      - USERNAME=${HOST_USERNAME}
+      - REDIS_URL=redis://valkey:6379
+      - STORAGE_DSN=s3://GK6d656574616761696e646576:4469dab6ad31edf40ec5e2dafc7f9aec9c6e0a1a4394bf42d557483570d2b4b3@garage:3900/meetagain?region=garage&tls=false&web=garage:3902
+      - XDEBUG_MODE=off
+    depends_on:
+      - mariadb
+      - valkey
+      - garage
+
+  # Scheduler: triggers every task on its cadence
+  scheduler:
+    build: php
+    container_name: "ma-scheduler"
+    user: ${HOST_UID}:${HOST_GID}
+    healthcheck:
+      disable: true
+    command: ["php", "bin/console", "messenger:consume", "scheduler_default", "--time-limit=60", "--memory-limit=256M"]
+    restart: unless-stopped
+    volumes:
+      - ../:/var/www/html/
+    environment:
+      - UID=${HOST_UID}
+      - GID=${HOST_GID}
+      - USERNAME=${HOST_USERNAME}
+      - REDIS_URL=redis://valkey:6379
+      - STORAGE_DSN=s3://GK6d656574616761696e646576:4469dab6ad31edf40ec5e2dafc7f9aec9c6e0a1a4394bf42d557483570d2b4b3@garage:3900/meetagain?region=garage&tls=false&web=garage:3902
+      - XDEBUG_MODE=off
+    depends_on:
+      - mariadb
+      - valkey
+      - garage
+
+  # S3 storage for images, thumbnails and private files (prepared by: just storageInit)
+  garage:
+    image: dxflrs/garage:v2.1.0@sha256:4c9b34c113e61358466e83fd6e7d66e6d18657ede14b776eb78a93ee8da7cf6a
+    container_name: "ma-garage"
+    volumes:
+      - ./garage/garage.toml:/etc/garage.toml:ro
+      - ma-garage-meta:/var/lib/garage/meta
+      - ma-garage-data:/var/lib/garage/data
+    ports:
+      - "127.0.0.1:3900:3900"
+      - "127.0.0.1:3902:3902"
 
   # Database server
   mariadb:
@@ -193,5 +257,7 @@ volumes:
   ma-caddy_data:
   ma-caddy_config:
   ma-valkey-data:
+  ma-garage-meta:
+  ma-garage-data:
   ma-victoriametrics-data:
   ma-grafana-data:

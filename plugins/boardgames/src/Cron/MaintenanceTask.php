@@ -2,19 +2,19 @@
 
 namespace Plugin\Boardgames\Cron;
 
-use App\CronTaskInterface;
-use App\Enum\CronTaskStatus;
-use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use Override;
 use Plugin\Boardgames\Entity\BringRequest;
 use Plugin\Boardgames\Repository\BringRequestRepository;
 use Plugin\Boardgames\Repository\GameOwnershipRepository;
 use Plugin\Boardgames\Service\BringRequestService;
-use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
-final readonly class MaintenanceTask implements CronTaskInterface
+final readonly class MaintenanceTask implements TaskInterface
 {
     public const string IDENTIFIER = 'boardgames-maintenance';
 
@@ -31,20 +31,23 @@ final readonly class MaintenanceTask implements CronTaskInterface
     }
 
     #[Override]
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('25 * * * *');
+    }
+
+    #[Override]
+    public function run(): Result
     {
         try {
             $expired = $this->expireStartedEvents();
             $swept = $this->sweepStaleRequests();
 
             $message = sprintf('%d requests expired, %d stale requests swept', $expired, $swept);
-            $output->writeln('BoardgamesMaintenance: ' . $message);
 
-            return new CronTaskResult(self::IDENTIFIER, CronTaskStatus::ok, $message);
+            return new Result(Status::ok, $message);
         } catch (Throwable $exception) {
-            $output->writeln('BoardgamesMaintenance exception: ' . $exception->getMessage());
-
-            return new CronTaskResult(self::IDENTIFIER, CronTaskStatus::exception, $exception->getMessage());
+            return new Result(Status::exception, $exception->getMessage());
         }
     }
 

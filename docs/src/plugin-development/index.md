@@ -18,7 +18,7 @@ event filters, authorization, notifications, and more.
 | `getFooterAbout()`                            | Add content to the footer's About section            | filmclub                |
 | `Item\ContributorInterface`                   | Carry an item type through export archives           | books, dishes           |
 | `PluginSectionInterface`                      | Carry your plugin's member data through archives     | wishlist, boardgames    |
-| `runCronTasks()`                              | Schedule periodic background tasks                   | filmclub                |
+| `Module\Task\Contract\TaskInterface`          | Run periodic work on a cron cadence                  | boardgames              |
 | `AdminNavigationInterface`                    | Add sections and links to the admin sidebar          | filmclub, bookclub      |
 | `EventFilterInterface`                        | Filter which events are visible                      | (custom)                |
 | `CmsFilterInterface`                          | Filter which CMS pages are visible                   | (custom)                |
@@ -39,7 +39,8 @@ event filters, authorization, notifications, and more.
 3. **Choose optional interfaces** — add only the hooks your plugin needs
 4. **Make it portable** - implement an item contributor or a plugin section, so export archives carry your data
 5. **Test** - unit-test services in isolation
-6. **Enable** - build an instance with `just devModeImport <archive>`, then run `just plugin-enable your-plugin`
+6. **Switch it on** - build an instance with `just devModeImport <archive>`; every plugin under `plugins/` is installed,
+   so switch yours on at `/admin/plugin` or with `just plugin-enable your-plugin`
 
 ---
 
@@ -48,7 +49,7 @@ event filters, authorization, notifications, and more.
 | Level        | Example     | Interfaces used                                                          |
 |--------------|-------------|--------------------------------------------------------------------------|
 | Simple       | `dishes`    | `Plugin` only — one menu link, no tiles                                  |
-| Intermediate | `filmclub`  | `Plugin` + `AdminNavigationInterface` - event tiles, cron, portability   |
+| Intermediate | `filmclub`  | `Plugin` + `AdminNavigationInterface` - event tiles, portability         |
 | Advanced     | `multisite` | `Plugin` + 6 optional interfaces — multi-tenant filtering, authorization |
 
 ---

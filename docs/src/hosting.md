@@ -1,84 +1,93 @@
 # Hosting
 
-Deploying MeetAgain to a production server.
+Running MeetAgain on your own server.
 
 For the local development environment, see [Getting Started](getting-started.md).
 
 ---
 
-## Requirements
+## One image, several roles
 
-- **PHP 8.4 or newer** (the Docker image runs 8.5) with extensions: `gd`, `pdo_mysql`, `intl`, `redis`, `imagick`,
-  `opcache`, `sodium`, `zip`
-- **MariaDB 10.6+**
-- **Redis or Valkey** (session and application cache)
-- Writable `var/` and `data/` directories (owned by the PHP process user)
+MeetAgain runs as containers. The public image `ghcr.io/xuedi/meetagain` holds the core and every bundled
+plugin. Every tag is a core commit (`ghcr.io/xuedi/meetagain:<commit>`), and `latest` follows the newest one.
 
----
+The first argument of the container picks what it does:
 
-## Recommended: FrankenPHP
+| Role             | What it runs                                                                         |
+|------------------|--------------------------------------------------------------------------------------|
+| `web` (default)  | The web server, plain HTTP on port 8080                                              |
+| `worker`         | The message worker: mail, push and everything a request hands off. Run one or more  |
+| `scheduler`      | The periodic tasks. Run one; a second waits as a standby                            |
+| `all`            | `web`, `worker` and `scheduler` in one container                                     |
+| `migrate`        | Database migrations, the rows every install needs, one-off data fixes. Run it first |
+| `pending-sql`    | Prints the SQL the next `migrate` would run, without running it                      |
+| `after-rollback` | Clears the caches after going back to an older image                                 |
 
-[FrankenPHP](https://frankenphp.dev) is a single binary that embeds PHP with built-in HTTPS,
-HTTP/2, and HTTP/3. No separate web server needed.
+Any other command runs as given, for example `php bin/console app:plugin:list`. Every role writes its warnings
+and errors to stderr, so `docker compose logs` shows them.
 
-Minimal `Caddyfile`:
-
-```
-your-domain.com {
-    root * /var/www/meetagain/public
-    encode zstd br gzip
-    @phpRoute { not file {path} }
-    rewrite @phpRoute index.php
-    @frontController path index.php
-    php @frontController
-    file_server { hide *.php }
-}
-```
+Beside the image you need MariaDB and Valkey (or Redis), and a reverse proxy that terminates TLS and forwards
+to port 8080 with an `X-Forwarded-Proto` header.
 
 ---
 
-## Alternative: Nginx + PHP-FPM
+## Docker Compose
 
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    root /var/www/meetagain/public;
+A `compose.yaml` for a small install, everything in one `app` container:
 
-    location / {
-        try_files $uri /index.php$is_args$args;
-    }
+```yaml
+services:
+  app:
+    image: ghcr.io/xuedi/meetagain:latest
+    command: all
+    restart: unless-stopped
+    env_file: meetagain.env
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - data:/var/www/html/data
+      - thumbnails:/var/www/html/public/images/thumbnails
+    depends_on:
+      - mariadb
+      - valkey
 
-    location ~ ^/index\.php {
-        fastcgi_pass unix:/var/run/php/php8.4-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
-        include fastcgi_params;
-    }
+  mariadb:
+    image: mariadb:13
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: meetagain
+      MARIADB_USER: meetagain
+      MARIADB_PASSWORD: change-me
+      MARIADB_RANDOM_ROOT_PASSWORD: "1"
+    volumes:
+      - db:/var/lib/mysql
 
-    location ~ \.php$ {
-        return 404;
-    }
-}
+  valkey:
+    image: valkey/valkey:9
+    restart: unless-stopped
+    volumes:
+      - valkey:/data
+
+volumes:
+  data:
+  thumbnails:
+  db:
+  valkey:
 ```
 
----
-
-## Environment
-
-Copy `.env.dist` to `.env` and set the required values:
+And `meetagain.env` beside it:
 
 ```bash
-APP_ENV=prod
 APP_SECRET=<random 32-character string>
-DATABASE_URL=mysql://user:password@127.0.0.1:3306/meetagain
-MAILER_DSN=smtp://user:password@smtp.example.com:587
-REDIS_URL=redis://127.0.0.1:6379
 APP_SECRET_BOX_KEY=<base64-encoded 32-byte key>
+DATABASE_URL=mysql://meetagain:change-me@mariadb:3306/meetagain?serverVersion=13.0.2-MariaDB&charset=utf8mb4
+REDIS_URL=redis://valkey:6379
+MAILER_DSN=smtp://user:password@smtp.example.com:587
 ```
 
-`APP_SECRET_BOX_KEY` encrypts stored secrets such as plugin API keys. Generate your own with
-`php -r 'echo base64_encode(random_bytes(32)), PHP_EOL;'` - never keep the value from `.env.dist`, which is public.
-Keep it stable afterwards: secrets stored under one key cannot be read with another.
+Generate both secrets with `openssl rand -hex 16` and `openssl rand -base64 32`. Never keep the values from
+the repository's `.env.dist`, which is public. Keep `APP_SECRET_BOX_KEY` stable afterwards: it encrypts stored
+secrets such as plugin API keys, and they cannot be read with another key.
 
 Optionally, set `METRICS_DSN` to send runtime metrics to a VictoriaMetrics collector. See
 [Metrics](core-development/metrics.md).
@@ -87,56 +96,126 @@ Optionally, set `METRICS_DSN` to send runtime metrics to a VictoriaMetrics colle
 
 ## First-time setup
 
-After configuring the environment, navigate to `/install/` in your browser to run the
-web installer. The wizard creates your admin account and initialises the database.
+```bash
+docker compose up -d mariadb valkey
+docker compose run --rm app migrate
+docker compose run --rm app php bin/console app:bootstrap --email=you@example.org --site-url=https://events.example.org
+docker compose up -d
+```
+
+`app:bootstrap` seeds the empty database, creates your admin account and a starter home page, and prints a
+link. Open it within 24 hours to set the admin's password, then replace the starter page under Admin, CMS. The
+command refuses to run on a database that already has an admin.
+
+Every plugin starts switched off. Switch the ones you want on at `/admin/plugin`.
 
 ---
 
-## Deploying updates
+## Updating
 
 ```bash
-git pull
-composer install --no-dev --optimize-autoloader
-php bin/console doctrine:migrations:migrate -n
-php bin/console cache:clear --env=prod
+docker compose pull
+docker compose run --rm app migrate
+docker compose up -d
 ```
+
+Migrations always keep the previous version running, so the old containers can serve while `migrate` runs.
+To go back, pin the previous tag in `compose.yaml`, run `docker compose up -d`, then
+`docker compose run --rm app after-rollback`.
 
 ---
 
-## Cron job
+## Splitting the roles
 
-The `app:cron` command must run every minute for scheduled tasks (email sends, recurring
-event generation, etc.).
+On a busier install, run the roles as separate services from the same image. They share the environment and
+the volumes:
 
-**crontab (as web server user):**
+```yaml
+x-app: &app
+  image: ghcr.io/xuedi/meetagain:latest
+  restart: unless-stopped
+  env_file: meetagain.env
+  volumes:
+    - data:/var/www/html/data
+    - thumbnails:/var/www/html/public/images/thumbnails
+  depends_on:
+    - mariadb
+    - valkey
 
+services:
+  web:
+    <<: *app
+    command: web
+    ports:
+      - "127.0.0.1:8080:8080"
+  worker:
+    <<: *app
+    command: worker
+    deploy:
+      replicas: 2
+  scheduler:
+    <<: *app
+    command: scheduler
 ```
-* * * * * php /var/www/meetagain/bin/console app:cron >> /dev/null 2>&1
-```
 
-**Systemd timer alternative:**
-
-```ini
-# /etc/systemd/system/meetagain-cron.service
-[Service]
-Type = oneshot
-User = www-data
-ExecStart = /usr/bin/php /var/www/meetagain/bin/console app:cron
-```
-
-```ini
-# /etc/systemd/system/meetagain-cron.timer
-[Timer]
-OnCalendar = *:*:00
-[Install]
-WantedBy = timers.target
-```
+`mariadb`, `valkey` and the `volumes` stay as above. Workers stop after an hour, or when a plugin is switched
+on or off, and the `restart` policy starts them again with a fresh state.
 
 ---
 
-## File permissions
+## Object storage
 
-The PHP process user must have write access to:
+By default, uploads live on the `data` and `thumbnails` volumes. To keep them in an S3-compatible store
+instead, set `STORAGE_DSN`:
 
-- `var/` - Symfony cache and logs
-- `data/images/` - user-uploaded images
+```bash
+STORAGE_DSN=s3://<key>:<secret>@<host>:<port>/<prefix>?region=<region>&tls=true&web=<host>:<port>
+```
+
+The path is a bucket prefix: MeetAgain uses the buckets `<prefix>-images`, `<prefix>-thumbnails` and
+`<prefix>-private`. Thumbnails are served straight from the store, so `<prefix>-thumbnails` needs public
+read access, and the optional `web` parameter names the address of the store's website endpoint the
+container fetches them from. The volumes are then no longer needed.
+
+To move existing files into the store, start the app with `STORAGE_DSN` set and run
+`docker compose run --rm app php bin/console app:storage:copy`. Add `--reverse` to copy back to the local disk.
+
+[Garage](https://garagehq.deuxfleurs.fr) is a small self-hosted store that fits beside MeetAgain. As an
+optional Compose profile:
+
+```yaml
+services:
+  garage:
+    image: dxflrs/garage:v2.1.0
+    profiles: [garage]
+    restart: unless-stopped
+    volumes:
+      - ./garage.toml:/etc/garage.toml:ro
+      - garage:/var/lib/garage
+```
+
+`docker compose --profile garage up -d` starts it. Then, with `garage` standing for
+`docker compose exec garage /garage`, create the layout, a key and the buckets:
+
+```bash
+garage layout assign -z dc1 -c 10G "$(garage node id -q | cut -d@ -f1)"
+garage layout apply --version 1
+garage key create meetagain
+for bucket in images thumbnails private; do
+    garage bucket create "meetagain-$bucket"
+    garage bucket allow --read --write --owner "meetagain-$bucket" --key meetagain
+done
+garage bucket website --allow meetagain-thumbnails
+```
+
+With Garage's S3 API on port 3900 and its website endpoint on 3902, the value is
+`s3://<key id>:<secret>@garage:3900/meetagain?region=garage&tls=false&web=garage:3902`. Garage's own
+documentation covers `garage.toml`.
+
+---
+
+## Static media
+
+All assets (CSS, fonts, images) are compiled into the image under `public/media/` and served by the `web`
+role with a one-day cache header. A CDN or proxy cache in front may cache `/media/*` freely: every file name
+carries a content hash.

@@ -2,15 +2,14 @@
 
 namespace Tests\Unit\Moderation;
 
-use App\Enum\CronTaskStatus;
 use App\Enum\UserStatus;
 use App\Moderation\SuspensionExpiry;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Member\UserService;
+use Module\Task\Contract\Status;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
-use Symfony\Component\Console\Output\NullOutput;
 use Tests\Unit\Stubs\UserStub;
 
 class SuspensionExpiryTest extends TestCase
@@ -37,10 +36,10 @@ class SuspensionExpiryTest extends TestCase
         $task = $this->makeTask($repository, $userService);
 
         // Act
-        $result = $task->runCronTask(new NullOutput());
+        $result = $task->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame(Status::ok, $result->status);
         static::assertSame('2 lifted', $result->message);
         static::assertSame([$first, $second], $lifted);
     }
@@ -55,10 +54,10 @@ class SuspensionExpiryTest extends TestCase
         $task = $this->makeTask($repository, $userService);
 
         // Act
-        $result = $task->runCronTask(new NullOutput());
+        $result = $task->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame(Status::ok, $result->status);
         static::assertSame('0 lifted', $result->message);
     }
 
@@ -71,10 +70,10 @@ class SuspensionExpiryTest extends TestCase
         $task = $this->makeTask($repository, $this->createStub(UserService::class));
 
         // Act
-        $result = $task->runCronTask(new NullOutput());
+        $result = $task->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::error, $result->status);
+        static::assertSame(Status::error, $result->status);
     }
 
     private function makeTask(UserRepository $repository, UserService $userService): SuspensionExpiry

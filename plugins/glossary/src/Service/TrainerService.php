@@ -25,8 +25,9 @@ use Plugin\Glossary\ValueObject\Question;
 use Plugin\Glossary\ValueObject\TrainerSession;
 use Random\Engine\Mt19937;
 use Random\Randomizer;
+use Symfony\Contracts\Service\ResetInterface;
 
-class TrainerService
+class TrainerService implements ResetInterface
 {
     public const int CHOICE_COUNT = 4;
     private const int WORST_LIMIT = 50;
@@ -408,5 +409,10 @@ class TrainerService
         }
 
         return $cards;
+    }
+
+    public function reset(): void
+    {
+        $this->visible = null;
     }
 }

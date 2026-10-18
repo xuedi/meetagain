@@ -317,8 +317,10 @@ class EventExtentCommand extends Command
 }
 ```
 
-For scheduled (cron-like) commands, implement `CronTaskInterface` so the Symfony Scheduler
-picks them up automatically.
+Periodic work is not a command: implement `Module\Task\Contract\TaskInterface` and the scheduler runs it on
+its `Cadence`, while `app:task:run <identifier>` runs one by hand. See
+[Periodic and background work](../plugin-development/required-hooks.md#periodic-and-background-work) and
+`modules/task/README.md`.
 
 ---
 

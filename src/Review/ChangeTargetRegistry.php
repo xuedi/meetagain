@@ -4,10 +4,11 @@ namespace App\Review;
 
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Service\ResetInterface;
 
 // Gated on the global plugin list, never the request context: a proposal must stay resolvable on
 // every host a reviewer works from
-class ChangeTargetRegistry
+class ChangeTargetRegistry implements ResetInterface
 {
     private const string CORE_PLUGIN_KEY = '';
 
@@ -69,5 +70,10 @@ class ChangeTargetRegistry
         }
 
         return $this->active = $map;
+    }
+
+    public function reset(): void
+    {
+        $this->active = null;
     }
 }

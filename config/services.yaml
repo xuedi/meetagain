@@ -18,6 +18,7 @@ services:
         resource: '../src/'
         exclude:
             - '../src/Kernel.php'
+            - '../src/DependencyInjection/'
             - '../src/Activity/UnknownMessage.php'
             - '../src/Entity/'
             - '../src/Security/Permission/Attribute/'

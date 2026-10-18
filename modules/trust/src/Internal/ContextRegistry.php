@@ -5,8 +5,9 @@ namespace Module\Trust\Internal;
 use Module\Trust\Contract\ContextDescriberInterface;
 use Module\Trust\Contract\ContextDescriptor;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Service\ResetInterface;
 
-final class ContextRegistry
+final class ContextRegistry implements ResetInterface
 {
     /** @var array<string, ContextDescriptor|null> */
     private array $memo = [];
@@ -53,5 +54,10 @@ final class ContextRegistry
         }
 
         return array_values($all);
+    }
+
+    public function reset(): void
+    {
+        $this->memo = [];
     }
 }

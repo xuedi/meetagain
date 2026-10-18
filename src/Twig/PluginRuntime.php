@@ -9,11 +9,12 @@ use App\Plugin;
 use App\Publisher\Footer\BarProviderInterface;
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Service\ResetInterface;
 use Throwable;
 use Twig\Environment;
 use Twig\Extension\RuntimeExtensionInterface;
 
-final class PluginRuntime implements RuntimeExtensionInterface
+final class PluginRuntime implements RuntimeExtensionInterface, ResetInterface
 {
     /**
      * @var array<int, list<EventListItemTag>>
@@ -238,5 +239,10 @@ final class PluginRuntime implements RuntimeExtensionInterface
         return $this->twig->render('_components/event_list_item_tags.html.twig', [
             'tags' => $tags,
         ]);
+    }
+
+    public function reset(): void
+    {
+        $this->tagCache = [];
     }
 }

@@ -5,9 +5,10 @@ namespace App\Twig;
 use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\RsvpGuestRepository;
+use Symfony\Contracts\Service\ResetInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 
-final class RsvpGuestRuntime implements RuntimeExtensionInterface
+final class RsvpGuestRuntime implements RuntimeExtensionInterface, ResetInterface
 {
     /** @var array<int, array<int, int>> */
     private array $countsByEvent = [];
@@ -22,5 +23,10 @@ final class RsvpGuestRuntime implements RuntimeExtensionInterface
         $this->countsByEvent[$eventId] ??= $this->repo->getCountsForEvent($event);
 
         return $this->countsByEvent[$eventId][(int) $user->getId()] ?? 0;
+    }
+
+    public function reset(): void
+    {
+        $this->countsByEvent = [];
     }
 }

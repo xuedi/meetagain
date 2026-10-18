@@ -2,15 +2,15 @@
 
 namespace App\Metrics;
 
-use App\CronTaskInterface;
-use App\Enum\CronTaskStatus;
-use App\ValueObject\CronTaskResult;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use ReflectionClass;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Throwable;
 
-final readonly class GaugeCronTask implements CronTaskInterface
+final readonly class GaugeCronTask implements TaskInterface
 {
     /**
      * @param iterable<GaugeInterface> $gauges
@@ -26,10 +26,15 @@ final readonly class GaugeCronTask implements CronTaskInterface
         return 'metrics-gauges';
     }
 
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('* * * * *');
+    }
+
+    public function run(): Result
     {
         if (!$this->recorder->isEnabled()) {
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, 'disabled');
+            return new Result(Status::ok, 'disabled');
         }
 
         $points = 0;
@@ -49,8 +54,7 @@ final readonly class GaugeCronTask implements CronTaskInterface
         if ($failed !== []) {
             $message .= ', failed: ' . implode('; ', $failed);
         }
-        $output->writeln('GaugeCronTask: ' . $message);
 
-        return new CronTaskResult($this->getIdentifier(), $failed === [] ? CronTaskStatus::ok : CronTaskStatus::warning, $message);
+        return new Result($failed === [] ? Status::ok : Status::warning, $message);
     }
 }

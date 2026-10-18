@@ -5,6 +5,9 @@ namespace Module\Email\Tests\Unit\Internal;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use LogicException;
 use Module\Email\Contract\Attachment;
 use Module\Email\Contract\ContextEnricherInterface;
@@ -26,6 +29,7 @@ use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\RawMessage;
@@ -354,6 +358,8 @@ final class EmailServiceTest extends TestCase
             identityProviders: [$deferring],
             pushDispatchers: [],
             clock: new MockClock(),
+            bus: new MessageBus(),
+            privateStorage: new Filesystem(new InMemoryFilesystemAdapter()),
         );
 
         // Assert
@@ -420,7 +426,7 @@ final class EmailServiceTest extends TestCase
         static::assertInstanceOf(EmailQueue::class, $stored);
         static::assertSame('invoice_receipt', $stored->getTemplate());
         static::assertSame(
-            [['path' => self::ATTACHMENT_PATH, 'filename' => 'INV-1.pdf']],
+            [['path' => self::ATTACHMENT_PATH, 'filename' => 'INV-1.pdf', 'stored' => false]],
             array_map(static fn(Attachment $attachment): array => $attachment->toArray(), $stored->getAttachments()),
         );
     }
@@ -443,6 +449,48 @@ final class EmailServiceTest extends TestCase
         static::assertInstanceOf(Email::class, $sent);
         static::assertCount(1, $sent->getAttachments());
         static::assertSame('INV-1.pdf', $sent->getAttachments()[0]->getFilename());
+    }
+
+    public function testAnAttachmentFromThePrivateStorageIsAttachedAsAPdf(): void
+    {
+        // Arrange
+        $storage = new Filesystem(new InMemoryFilesystemAdapter());
+        $storage->write('invoices/2026/INV-1.pdf', '%PDF-1.4 pretend');
+        $sent = null;
+        $transport = $this->capturingTransport($sent);
+
+        // Act
+        $this->createService(
+            mailer: $transport,
+            mailRepo: $this->repoWith($this->queuedRow([new Attachment('invoices/2026/INV-1.pdf', 'INV-1.pdf', stored: true)])),
+            privateStorage: $storage,
+        )->sendQueue();
+
+        // Assert
+        static::assertInstanceOf(Email::class, $sent);
+        static::assertCount(1, $sent->getAttachments());
+        static::assertSame('%PDF-1.4 pretend', $sent->getAttachments()[0]->getBody());
+        static::assertSame('application/pdf', $sent->getAttachments()[0]->getContentType());
+    }
+
+    public function testAVanishedStoredAttachmentIsLoggedAndTheMailStillGoesOut(): void
+    {
+        // Arrange
+        $sent = null;
+        $transport = $this->capturingTransport($sent);
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->once())->method('warning')->with('Email attachment is missing and was skipped');
+
+        // Act
+        $this->createService(
+            mailer: $transport,
+            mailRepo: $this->repoWith($this->queuedRow([new Attachment('invoices/2026/gone.pdf', 'INV-1.pdf', stored: true)])),
+            logger: $logger,
+        )->sendQueue();
+
+        // Assert
+        static::assertInstanceOf(Email::class, $sent);
+        static::assertSame([], $sent->getAttachments());
     }
 
     public function testAVanishedAttachmentIsLoggedAndTheMailStillGoesOut(): void
@@ -549,6 +597,7 @@ final class EmailServiceTest extends TestCase
         ?SendingIdentity $fallbackIdentity = null,
         iterable $pushDispatchers = [],
         ?ClockInterface $clock = null,
+        ?FilesystemOperator $privateStorage = null,
     ): EmailService {
         if ($templateService === null) {
             $templateService = $this->createStub(EmailTemplateService::class);
@@ -577,6 +626,8 @@ final class EmailServiceTest extends TestCase
             identityProviders: [...$identityProviders, $this->answering($fallbackIdentity ?? self::identity())],
             pushDispatchers: $pushDispatchers,
             clock: $clock ?? new MockClock(),
+            bus: new MessageBus(),
+            privateStorage: $privateStorage ?? new Filesystem(new InMemoryFilesystemAdapter()),
         );
     }
 

@@ -4,8 +4,9 @@ namespace App\Cms\ReservedSlug;
 
 use App\Repository\CmsRepository;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Service\ResetInterface;
 
-class Registry
+class Registry implements ResetInterface
 {
     /**
      * @var array<string, true>|null
@@ -73,5 +74,10 @@ class Registry
     private function normalize(string $slug): string
     {
         return mb_strtolower(trim($slug));
+    }
+
+    public function reset(): void
+    {
+        $this->reserved = null;
     }
 }

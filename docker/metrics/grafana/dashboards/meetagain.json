@@ -633,7 +633,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Cron task duration",
+      "title": "Task duration",
       "id": 11,
       "datasource": {
         "type": "prometheus",
@@ -674,7 +674,7 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max by (task) (max_over_time(cron_task_duration_ms{app=~\"$app\",env=~\"$env\"}[10m]))",
+          "expr": "max by (task) (max_over_time(task_run_duration_ms{app=~\"$app\",env=~\"$env\"}[10m]))",
           "legendFormat": "{{task}}",
           "refId": "A"
         }
@@ -682,7 +682,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Cron run",
+      "title": "Task runs per hour by status",
       "id": 12,
       "datasource": {
         "type": "prometheus",
@@ -696,7 +696,7 @@
       },
       "fieldConfig": {
         "defaults": {
-          "unit": "ms",
+          "unit": "short",
           "custom": {
             "lineWidth": 1,
             "fillOpacity": 10,
@@ -723,15 +723,15 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max(max_over_time(cron_run_duration_ms{app=~\"$app\",env=~\"$env\"}[10m]))",
-          "legendFormat": "duration",
+          "expr": "sum by (status) (count_over_time(task_run_duration_ms{app=~\"$app\",env=~\"$env\"}[1h]))",
+          "legendFormat": "{{status}}",
           "refId": "A"
         }
       ]
     },
     {
       "type": "timeseries",
-      "title": "Cron run peak memory",
+      "title": "Task peak memory",
       "id": 13,
       "datasource": {
         "type": "prometheus",
@@ -772,8 +772,8 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "max(max_over_time(cron_run_memory_peak_mb{app=~\"$app\",env=~\"$env\"}[10m]))",
-          "legendFormat": "memory",
+          "expr": "max by (task) (max_over_time(task_run_memory_peak_mb{app=~\"$app\",env=~\"$env\"}[10m]))",
+          "legendFormat": "{{task}}",
           "refId": "A"
         }
       ]

@@ -2,9 +2,7 @@
 
 namespace App\Service\Security;
 
-use App\CronTaskInterface;
 use App\Entity\Incident;
-use App\Enum\CronTaskStatus;
 use App\Enum\IncidentSeverity;
 use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
@@ -14,22 +12,23 @@ use App\Repository\AccessDeniedLogRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\SecurityMeasureLogRepository;
 use App\Service\AppStateService;
-use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\ClockInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
 
-readonly class SecurityService implements CronTaskInterface
+readonly class SecurityService implements TaskInterface
 {
     public const string KEY_LAST_RETROSPECTIVE_RUN = 'security.retrospective_scan.last_run';
     public const int BLOCK_TTL_SECONDS = 43_200;
     public const string BLOCK_DURATION_LABEL = '12h';
-    private const int RETROSPECTIVE_THROTTLE_SECONDS = 3600;
 
     /**
      * @param iterable<SecurityProviderInterface> $providers
@@ -139,18 +138,15 @@ readonly class SecurityService implements CronTaskInterface
         return 'security.retrospective-scan';
     }
 
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('10 * * * *', offloaded: true);
+    }
+
+    public function run(): Result
     {
         $now = $this->clock->now();
         $lastRunRaw = $this->appState->get(self::KEY_LAST_RETROSPECTIVE_RUN);
-
-        if ($lastRunRaw !== null) {
-            $elapsed = $now->getTimestamp() - (int) $lastRunRaw;
-            if ($elapsed < self::RETROSPECTIVE_THROTTLE_SECONDS) {
-                $output->writeln(sprintf('SecurityRetrospectiveScan: skipped (last run %d min ago)', (int) round($elapsed / 60)));
-                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, 'Skipped - throttled');
-            }
-        }
 
         try {
             $from = $lastRunRaw !== null ? new DateTimeImmutable()->setTimestamp((int) $lastRunRaw) : $now->modify('-1 hour');
@@ -164,13 +160,10 @@ readonly class SecurityService implements CronTaskInterface
             $this->appState->set(self::KEY_LAST_RETROSPECTIVE_RUN, (string) $now->getTimestamp());
 
             $message = $parts === [] ? 'No providers registered' : implode(' | ', $parts);
-            $output->writeln('SecurityRetrospectiveScan: ' . $message);
 
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
+            return new Result(Status::ok, $message);
         } catch (Throwable $e) {
-            $output->writeln('SecurityRetrospectiveScan exception: ' . $e->getMessage());
-
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
+            return new Result(Status::exception, $e->getMessage());
         }
     }
 

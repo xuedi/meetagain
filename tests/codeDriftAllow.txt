@@ -30,7 +30,6 @@ static src/Entity/NotificationSettings.php // entities have no injection point; 
 # A read-only page with no service of its own domain to move the call into stays on the
 # repository; a pass-through service would fail the tiny rule.
 repo-in-controller src/Controller/Admin/Logs/AccessDeniedLogController.php::AccessDeniedLogRepository // read-only log viewer, no log service exists
-repo-in-controller src/Controller/Admin/Logs/CronLogController.php::CronLogRepository // read-only log viewer, no log service exists
 repo-in-controller src/Controller/Admin/Logs/NotFoundLogController.php::NotFoundLogRepository // read-only log viewer, no log service exists
 repo-in-controller src/Controller/Admin/Logs/NotFoundLogController.php::SuspiciousUrlRepository // read-only log viewer, no log service exists
 repo-in-controller src/Controller/Admin/Security/IncidentsController.php::IncidentRepository // read-only incident viewer, no service of its own

@@ -2,15 +2,10 @@
 <?php declare(strict_types=1);
 
 $root = dirname(__DIR__);
-$generatedConfig = $root . '/config/plugins_prod.php';
 $cacheDir = $root . '/var/cache/prod';
 
 if (file_exists($root . '/.env.local.php')) {
     echo 'Refusing to run on a deployed install: this check deletes var/cache/prod.' . PHP_EOL;
-    exit(1);
-}
-if (file_exists($generatedConfig)) {
-    echo 'Refusing to overwrite an existing config/plugins_prod.php - remove it first.' . PHP_EOL;
     exit(1);
 }
 
@@ -26,22 +21,6 @@ foreach (glob($root . '/plugins/*/manifest.json') ?: [] as $manifestFile) {
 if ($installed === []) {
     echo 'No plugins installed - nothing to check.' . PHP_EOL;
     exit(0);
-}
-
-$cleanup = static function () use ($generatedConfig): void {
-    if (file_exists($generatedConfig)) {
-        unlink($generatedConfig);
-    }
-};
-register_shutdown_function($cleanup);
-if (function_exists('pcntl_async_signals')) {
-    pcntl_async_signals(true);
-    foreach ([SIGINT, SIGTERM] as $signal) {
-        pcntl_signal($signal, static function () use ($cleanup): void {
-            $cleanup();
-            exit(130);
-        });
-    }
 }
 
 function removeDirectory(string $dir): void
@@ -81,15 +60,15 @@ function setWithout(array $installed, string $dropped): array
 $failures = [];
 foreach (array_keys($installed) as $dropped) {
     $kept = setWithout($installed, $dropped);
-    $lines = ['<?php declare(strict_types=1);', '', 'return ['];
-    foreach ($kept as $key) {
-        $lines[] = sprintf("    '%s' => true,", $key);
-    }
-    $lines[] = '];';
-    file_put_contents($generatedConfig, implode(PHP_EOL, $lines) . PHP_EOL);
+    $excluded = implode(',', array_diff(array_keys($installed), $kept));
 
     removeDirectory($cacheDir);
-    $command = sprintf('COLUMNS=240 %s %s lint:container --env=prod --no-ansi 2>&1', escapeshellarg(PHP_BINARY), escapeshellarg($root . '/bin/console'));
+    $command = sprintf(
+        'COLUMNS=240 APP_PLUGINS_EXCLUDE=%s %s %s lint:container --env=prod --no-ansi 2>&1',
+        escapeshellarg($excluded),
+        escapeshellarg(PHP_BINARY),
+        escapeshellarg($root . '/bin/console'),
+    );
     exec($command, $output, $exitCode);
 
     $alsoDropped = array_diff(array_keys($installed), $kept, [$dropped]);
@@ -110,7 +89,6 @@ foreach (array_keys($installed) as $dropped) {
     $output = [];
 }
 
-$cleanup();
 removeDirectory($cacheDir);
 
 if ($failures === []) {

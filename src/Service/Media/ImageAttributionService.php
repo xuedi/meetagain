@@ -9,8 +9,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class ImageAttributionService
+class ImageAttributionService implements ResetInterface
 {
     public const string CACHE_TAG = 'image_attribution';
 
@@ -68,5 +69,12 @@ class ImageAttributionService
     private function scope(): string
     {
         return sha1((string) $this->requestStack->getCurrentRequest()?->getHost());
+    }
+
+    public function reset(): void
+    {
+        $this->visibleIds = null;
+        $this->visibleIdsResolved = false;
+        $this->hasAny = null;
     }
 }

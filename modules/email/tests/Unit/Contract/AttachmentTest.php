@@ -20,6 +20,27 @@ final class AttachmentTest extends TestCase
         static::assertEquals($attachment, $restored);
     }
 
+    public function testAStoredAttachmentKeepsItsFlagThroughTheRow(): void
+    {
+        // Arrange
+        $attachment = new Attachment('invoices/2026/INV-1.pdf', 'INV-1.pdf', stored: true);
+
+        // Act
+        $restored = Attachment::fromArray($attachment->toArray());
+
+        // Assert
+        static::assertEquals($attachment, $restored);
+    }
+
+    public function testARowWrittenBeforeTheFlagExistedIsALocalFile(): void
+    {
+        // Act
+        $restored = Attachment::fromArray(['path' => '/var/www/html/data/invoices/2026/INV-1.pdf', 'filename' => 'INV-1.pdf']);
+
+        // Assert
+        static::assertFalse($restored?->stored);
+    }
+
     /**
      * @param array{path?: mixed, filename?: mixed} $row
      */

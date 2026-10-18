@@ -2,10 +2,13 @@
 
 namespace App\Item;
 
+use App\DependencyInjection\SeesInactivePlugins;
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Service\ResetInterface;
 
-class ListRegistry
+#[SeesInactivePlugins]
+class ListRegistry implements ResetInterface
 {
     /**
      * @var array<string, ListProviderInterface>|null
@@ -98,5 +101,10 @@ class ListRegistry
         }
 
         return $this->active = $map;
+    }
+
+    public function reset(): void
+    {
+        $this->active = null;
     }
 }

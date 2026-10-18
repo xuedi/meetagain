@@ -1,0 +1,25 @@
+framework:
+    messenger:
+        failure_transport: failed
+
+        transports:
+            async:
+                dsn: 'task-stream:%env(REDIS_URL)%'
+                options:
+                    redeliver_timeout: 300
+                retry_strategy:
+                    max_retries: 3
+                    delay: 5000
+                    multiplier: 4
+            failed: 'doctrine://default?queue_name=failed&table_name=mod_task_message&auto_setup=0'
+
+        buses:
+            messenger.bus.default:
+                middleware:
+                    - doctrine_ping_connection
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                async: 'in-memory://'

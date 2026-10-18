@@ -50,7 +50,7 @@ class EmailPreviewCommand extends Command
     protected function report(SymfonyStyle $io, PreviewSweepResult $result): int
     {
         $io->success(sprintf(
-            'Queued %d (%d templates x %d languages) - dispatch with: just appCron',
+            'Queued %d (%d templates x %d languages) - a worker sends them within seconds',
             $result->enqueued,
             count($result->identifiers),
             count($result->locales),

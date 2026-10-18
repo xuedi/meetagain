@@ -4,9 +4,16 @@
 [group('docker')]
 dockerStart:
 	{{DOCKER}} up -d
+	{{JUST}} storageInit
 	{{PHP}} mkdir -p var/log
 	{{PHP}} touch var/log/dev.log
 	{{PHP}} truncate -s 0 var/log/dev.log
+
+# Prepare the dev Garage (layout, key, buckets) and copy the local images, thumbnails and invoices into it
+[group('docker')]
+storageInit:
+	DOCKER="{{DOCKER}}" docker/garage/init.sh
+	{{PHP}} php bin/console app:storage:copy -q
 
 # Stop containers
 [group('docker')]
@@ -42,3 +49,19 @@ dockerEnter:
 [group('docker')]
 dockerDatabase query:
     {{DB}} mariadb -u$MARIADB_USER -p$MARIADB_PASSWORD $MARIADB_DATABASE -e "{{query}}"
+
+# Stop the message worker and the scheduler, so nothing consumes while the database is rebuilt
+[group('docker')]
+workerStop:
+    {{DOCKER}} stop worker scheduler
+
+# Empty the task stream and start the message worker and the scheduler
+[group('docker')]
+workerStart:
+    {{DOCKER}} exec -T valkey valkey-cli DEL tasks
+    {{DOCKER}} up -d worker scheduler
+
+# Make every running worker exit after its current message, so the restarted ones run the new code
+[group('docker')]
+workerRestart:
+    {{PHP}} php bin/console messenger:stop-workers

@@ -9,10 +9,6 @@ bin/check-get-routes.php::routeIsGetReachable // Symfony rule: an omitted `metho
 bin/check-get-routes.php::findUnguardedMutationCalls // name collision: `$form->remove()` is a Form call, not the EntityManager one the scan hunts
 config/packages/asset_mapper.php:: // upstream layout: only Bulma's sass/ tree is an input, the rest is pre-built output
 
-# --- Standalone web installer (runs before composer install, no autoloading) ---
-public/install/Installer.php::createUser // magic literal: the installer cannot reach the UserStatus enum, so the status column is a bare int
-public/install/TemplateRenderer.php::render // required ordering: loops run first because conditionals inside a loop body need the loop variables
-
 # --- Activity and notifications ---
 src/Activity/ActivityService.php::log // merge direction: caller keys must survive the defaults, and array order decides that
 src/Activity/NotificationService.php::sendRsvp // deliberate swallow: a cache write failure must not stop the notification going out
@@ -68,7 +64,6 @@ src/Service/Cache/RedisService.php::intResult // upstream behaviour: phpredis re
 src/Service/Config/LanguageService.php::invalidateCache // deliberate swallow: a failed invalidation self-heals on the next request
 src/Service/Config/LanguageService.php::getFilteredEnabledCodes // an empty filter result must fall back to all codes, or the site loses every language
 src/Service/Config/LanguageService.php::getAdminFilteredEnabledCodes // an empty filter result must fall back to all codes, or admin loses every language
-src/Service/Config/PluginService.php::getPluginConfig // deliberate fallthrough: a corrupt environment config must degrade to plugins.php
 
 # --- Recurrence engine: RFC-5545 semantics the code cannot state on its own ---
 src/Service/Event/OccurrenceCalculator.php::MAX_PERIOD_STEPS // magic constant: bounds the walk for sparse rules like a yearly leap-day series
@@ -99,7 +94,6 @@ src/Twig/ContentRuntime.php::safeMessage // re-applies the allow-list on output 
 
 # --- System ---
 src/DataHotfix/Hotfixes/RemoveOrphanedClubPluginTables.php::execute // FK checks are disabled so the interdependent tables drop in any order
-src/Service/System/CronIntervalCheckService.php::WARNING_THRESHOLD_SECONDS // magic constant: the budget behind the 10/20 minute thresholds
 src/Portability/Section/EventsSection.php::import // pre-1.1 exports carried the rule on the event, so a series has to be synthesized
 
 # --- Tests: fixture facts a reader would otherwise have to recompute ---
@@ -123,6 +117,5 @@ tests/Unit/Service/Notification/User/MissingAltImageNotificationProviderTest.php
 tests/Unit/Service/PasswordResetServiceTest.php::testRequestResetSetsRegcodeAndPersistsUser // magic constant: 64 is bin2hex(random_bytes(32)), not an arbitrary length
 tests/Unit/Service/RecurringServiceTest.php::NOW // the anchor date is a Monday, which is what makes the weekday maths readable
 tests/Unit/Service/Seo/EventSimilarityServiceTest.php::testFieldsEmptyOnBothSidesDoNotDistortTheWeighting // spells out which weights remain, which is the arithmetic behind the expectation
-tests/Unit/Service/System/CronIntervalCheckServiceTest.php::gapProvider // fixes the reference "now" and the thresholds every provider row is measured against
 tests/Unit/Service/System/HealthCheckServiceTest.php::makeService // why disk-space lookups are stubbed: runAll() would otherwise touch the real filesystem
 tests/stubs/imagick.stub.php::ImagickPixel // states the stub's scope: only the API surface the tests touch, so a gap is expected

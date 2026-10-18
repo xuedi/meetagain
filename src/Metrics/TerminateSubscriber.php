@@ -7,6 +7,8 @@ use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
+use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
 
 final readonly class TerminateSubscriber implements EventSubscriberInterface
 {
@@ -25,6 +27,8 @@ final readonly class TerminateSubscriber implements EventSubscriberInterface
         return [
             KernelEvents::TERMINATE => ['onKernelTerminate', 1024],
             ConsoleEvents::TERMINATE => ['onConsoleTerminate', -1024],
+            WorkerMessageHandledEvent::class => ['onMessageDone', -1024],
+            WorkerMessageFailedEvent::class => ['onMessageDone', -1024],
         ];
     }
 
@@ -67,6 +71,11 @@ final readonly class TerminateSubscriber implements EventSubscriberInterface
     }
 
     public function onConsoleTerminate(): void
+    {
+        $this->recorder->flush();
+    }
+
+    public function onMessageDone(): void
     {
         $this->recorder->flush();
     }

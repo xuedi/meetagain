@@ -5,8 +5,9 @@ namespace Plugin\Photos\Service;
 use App\Publisher\PluginSettings\Resolver;
 use Plugin\Photos\ValueObject\Config;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class ConfigService
+class ConfigService implements ResetInterface
 {
     private ?Config $memo = null;
 
@@ -34,5 +35,10 @@ class ConfigService
         }
 
         return $this->authorizationChecker->isGranted('ROLE_USER') && $this->getConfig()->isMemberUploads();
+    }
+
+    public function reset(): void
+    {
+        $this->memo = null;
     }
 }

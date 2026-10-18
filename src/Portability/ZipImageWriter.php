@@ -3,6 +3,7 @@
 namespace App\Portability;
 
 use App\Entity\Image;
+use League\Flysystem\FilesystemOperator;
 use Override;
 use ZipArchive;
 
@@ -14,9 +15,12 @@ class ZipImageWriter implements ImageWriterInterface
     /** @var array<string, array{attribution: string|null, attribution_not_required: bool}> */
     private array $attributions = [];
 
+    /** @var list<string> */
+    private array $copies = [];
+
     public function __construct(
         private readonly ?ZipArchive $zip,
-        private readonly string $projectDir,
+        private readonly FilesystemOperator $imageStorage,
     ) {}
 
     #[Override]
@@ -28,12 +32,16 @@ class ZipImageWriter implements ImageWriterInterface
             return $zipPath;
         }
 
-        $sourcePath = $this->projectDir . '/data/images/' . $fileName;
-        if (!file_exists($sourcePath)) {
+        if (!$this->imageStorage->fileExists($fileName)) {
             return null;
         }
 
-        $this->zip?->addFile($sourcePath, $zipPath);
+        if ($this->zip !== null) {
+            $copy = (string) tempnam(sys_get_temp_dir(), 'meetagain-export-image-');
+            file_put_contents($copy, $this->imageStorage->readStream($fileName));
+            $this->copies[] = $copy;
+            $this->zip->addFile($copy, $zipPath);
+        }
         $this->written[$zipPath] = true;
 
         $hasAttribution = $image->getAttribution() !== null && $image->getAttribution() !== '';
@@ -56,5 +64,15 @@ class ZipImageWriter implements ImageWriterInterface
         ksort($attributions);
 
         return $attributions;
+    }
+
+    public function removeCopies(): void
+    {
+        foreach ($this->copies as $copy) {
+            if (is_file($copy)) {
+                unlink($copy);
+            }
+        }
+        $this->copies = [];
     }
 }

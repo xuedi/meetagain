@@ -23,4 +23,6 @@ interface EmailQueueInterface
     ): bool;
 
     public function dispatchPush(string $identifier, string $recipient, ?DateTimeImmutable $deadline): void;
+
+    public function wake(): void;
 }

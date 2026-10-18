@@ -2,10 +2,13 @@
 
 namespace App\Item;
 
+use App\DependencyInjection\SeesInactivePlugins;
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Service\ResetInterface;
 
-class TypeRegistry
+#[SeesInactivePlugins]
+class TypeRegistry implements ResetInterface
 {
     /**
      * @var array<string, TypeProviderInterface>|null
@@ -72,5 +75,10 @@ class TypeRegistry
         uasort($map, static fn(TypeProviderInterface $a, TypeProviderInterface $b): int => $a->getPriority() <=> $b->getPriority());
 
         return $this->active = $map;
+    }
+
+    public function reset(): void
+    {
+        $this->active = null;
     }
 }

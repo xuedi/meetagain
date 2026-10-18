@@ -15,9 +15,7 @@ permit = [
     "@global",                                                         # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                                               # the blocklist entry's addedBy FK, and the admin who adds one - the one sanctioned core entity
     "App\\Admin\\**",                                                  # the five admin pages build their tabs, top bar, sections and navigation from core's admin shell
-    "App\\CronTaskInterface",                                          # dispatch, the scheduled sweep and the delivery sync register on core's cron chain
-    "App\\ValueObject\\CronTaskResult",                                # that chain's return type
-    "App\\Enum\\CronTaskStatus",                                       # that chain's status enum
+    "Module\\Task\\Contract\\**",                                      # dispatch, the scheduled sweep and the delivery sync register on the task module's schedule
     "App\\Service\\Notification\\User\\NotificationProviderInterface", # the stale-mail entry surfaces on core's bell
     "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
     "App\\Metrics\\GaugeInterface",                                    # the queue depth is a runtime gauge
@@ -25,6 +23,7 @@ permit = [
     "App\\Service\\Config\\ConfigService",                             # mailer address and the delivery-sync toggle
     "App\\Theme\\Colors",                                              # the theme accent for the layout snapshot
     "App\\Service\\Config\\LanguageService",                           # enabled locales for the template editor, seeding and the scheduled sweep
+    "League\\Flysystem\\**",                                           # a stored attachment is read from the application's private storage
     "Doctrine\\**",
     "Symfony\\**",
     "Twig\\**",
@@ -40,9 +39,7 @@ permit = [
     "@global",                                                         # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                                               # the blocklist entry's addedBy FK, and the admin who adds one - the one sanctioned core entity
     "App\\Admin\\**",                                                  # the five admin pages build their tabs, top bar, sections and navigation from core's admin shell
-    "App\\CronTaskInterface",                                          # dispatch, the scheduled sweep and the delivery sync register on core's cron chain
-    "App\\ValueObject\\CronTaskResult",                                # that chain's return type
-    "App\\Enum\\CronTaskStatus",                                       # that chain's status enum
+    "Module\\Task\\Contract\\**",                                      # dispatch, the scheduled sweep and the delivery sync register on the task module's schedule
     "App\\Service\\Notification\\User\\NotificationProviderInterface", # the stale-mail entry surfaces on core's bell
     "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
     "App\\Metrics\\GaugeInterface",                                    # the queue depth is a runtime gauge
@@ -50,6 +47,7 @@ permit = [
     "App\\Service\\Config\\ConfigService",                             # mailer address and the delivery-sync toggle
     "App\\Theme\\Colors",                                              # the theme accent for the layout snapshot
     "App\\Service\\Config\\LanguageService",                           # enabled locales for the template editor, seeding and the scheduled sweep
+    "League\\Flysystem\\**",                                           # a stored attachment is read from the application's private storage
     "PHPUnit\\**",
     "Tests\\Module\\**",                                               # the shared module test harness: ModuleKernel and Members
     "Doctrine\\**",

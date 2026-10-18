@@ -18,8 +18,9 @@ use Module\Circulation\Internal\Entity\Request;
 use Module\Circulation\Internal\Repository\CopyRepository;
 use Module\Circulation\Internal\Repository\RequestRepository;
 use RuntimeException;
+use Symfony\Contracts\Service\ResetInterface;
 
-class CirculationService
+class CirculationService implements ResetInterface
 {
     /** @var array<string, Summary> */
     private array $summaries = [];
@@ -327,5 +328,10 @@ class CirculationService
     private function memoKey(string $itemType, int $itemId, ?User $viewer): string
     {
         return $itemType . "\0" . $itemId . "\0" . ($viewer?->getId() ?? 0);
+    }
+
+    public function reset(): void
+    {
+        $this->summaries = [];
     }
 }

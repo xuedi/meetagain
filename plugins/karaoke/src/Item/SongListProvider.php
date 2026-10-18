@@ -10,9 +10,10 @@ use Plugin\Karaoke\Entity\Song;
 use Plugin\Karaoke\Service\SongService;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Intl\Languages;
+use Symfony\Contracts\Service\ResetInterface;
 use Twig\Environment;
 
-final class SongListProvider implements ListCellProviderInterface, ListProviderInterface
+final class SongListProvider implements ListCellProviderInterface, ListProviderInterface, ResetInterface
 {
     /** @var array<int, Song>|null */
     private ?array $songs = null;
@@ -103,5 +104,10 @@ final class SongListProvider implements ListCellProviderInterface, ListProviderI
         }
 
         return $stamps;
+    }
+
+    public function reset(): void
+    {
+        $this->songs = null;
     }
 }

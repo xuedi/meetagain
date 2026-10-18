@@ -40,7 +40,6 @@ jobs:
 
       - name: Setup config
         run: |
-          cp config/plugins.dist.php config/plugins.php
           cp .env.dist .env
           echo "REDIS_URL=redis://127.0.0.1:6379" >> .env
 
@@ -96,7 +95,6 @@ jobs:
 
       - name: Setup config
         run: |
-          cp config/plugins.dist.php config/plugins.php
           cp .env.dist .env
           echo "DATABASE_URL=${DATABASE_URL}" >> .env
           echo "REDIS_URL=${REDIS_URL}" >> .env
@@ -166,7 +164,6 @@ jobs:
 
       - name: Setup config
         run: |
-          cp config/plugins.dist.php config/plugins.php
           cp .env.dist .env
           echo "DATABASE_URL=${DATABASE_URL}" >> .env
           echo "REDIS_URL=${REDIS_URL}" >> .env
@@ -175,19 +172,18 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-scripts
 
       # Each archive gets a fresh database built by the real migrations, only the plugins it
-      # names, a strict import, and a whole-instance export whose row counts must match the archive.
+      # names switched on, a strict import, and a whole-instance export whose row counts must match the archive.
       - name: Import every archive and export it again
         run: |
           set -euo pipefail
           for archive in src/DataImportFixtures/*/; do
             echo "::group::${archive}"
-            php bin/console app:plugin disable all
-            php bin/console app:plugin enable $(php bin/console app:import:inspect "${archive}" --format=plugins)
-            php bin/console cache:clear -q
             php bin/console doctrine:database:drop --force --if-exists -q
             php bin/console doctrine:database:create -q
             php bin/console doctrine:migrations:migrate -n -q
             php bin/console app:install:seed -q
+            plugins="$(php bin/console app:import:inspect "${archive}" --format=plugins)"
+            if [ -n "${plugins}" ]; then php bin/console app:plugin:toggle on ${plugins}; fi
             php bin/console app:import "${archive}" --shift-dates --site-settings --strict
             php bin/console app:export /tmp/round-trip.zip
             diff <(php bin/console app:import:inspect "${archive}" | jq -S .counts) <(php bin/console app:import:inspect /tmp/round-trip.zip | jq -S .counts)
@@ -214,7 +210,6 @@ jobs:
 
       - name: Setup config
         run: |
-          cp config/plugins.dist.php config/plugins.php
           cp .env.dist .env
 
       - name: Install dependencies
@@ -243,7 +238,6 @@ jobs:
 
       - name: Setup config
         run: |
-          cp config/plugins.dist.php config/plugins.php
           cp .env.dist .env
 
       - name: Install dependencies
@@ -264,7 +258,3 @@ jobs:
       - name: GET-route purity check
         run: php bin/check-get-routes.php
 
-      - name: Plugin config check against the shipped test defaults
-        run: |
-          cp config/plugins_test.dist.php config/plugins_test.php
-          php bin/check-plugin-config.php test

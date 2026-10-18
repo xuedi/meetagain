@@ -5,7 +5,6 @@ namespace Tests\Unit\Service\Security;
 use App\Entity\AccessDeniedLog;
 use App\Entity\Incident;
 use App\Entity\NotFoundLog;
-use App\Enum\CronTaskStatus;
 use App\Enum\SecurityEventType;
 use App\Enum\SecurityRecommendation;
 use App\Metrics\Recorder;
@@ -21,12 +20,12 @@ use App\Service\Security\SecurityProviderInterface;
 use App\Service\Security\SecurityService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Task\Contract\Status;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\HttpFoundation\Request;
 use Tests\Unit\Metrics\UdpListener;
 use Tests\Unit\Service\Cache\InMemoryAtomicStore;
@@ -335,10 +334,10 @@ class SecurityServiceTest extends TestCase
         $service = $this->buildService([$detector], appState: $appState);
 
         // Act
-        $result = $service->runCronTask(new NullOutput());
+        $result = $service->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame(Status::ok, $result->status);
     }
 
     /**

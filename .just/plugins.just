@@ -5,12 +5,12 @@
 plugin-list:
     {{PHP}} php bin/console app:plugin:list
 
-# Enable a specific plugin without affecting others
+# Switch plugins on, by key or "all"
 [group('plugins')]
-plugin-enable name:
-    {{PHP}} php bin/console app:plugin enable {{name}}
+plugin-enable +names:
+    {{PHP}} php bin/console app:plugin:toggle on {{names}}
 
-# Disable a specific plugin without affecting others
+# Switch plugins off, by key or "all"
 [group('plugins')]
-plugin-disable name:
-    {{PHP}} php bin/console app:plugin disable {{name}}
+plugin-disable +names:
+    {{PHP}} php bin/console app:plugin:toggle off {{names}}

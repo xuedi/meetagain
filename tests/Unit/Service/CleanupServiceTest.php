@@ -7,8 +7,6 @@ use App\Entity\Image;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\EntityActionDispatcher;
-use App\Enum\CronTaskStatus;
-use App\ExtendedFilesystem;
 use App\Repository\ImageRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\SupportRequestRepository;
@@ -21,12 +19,15 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
+use Module\Task\Contract\Status;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Clock\MockClock;
-use Symfony\Component\Console\Output\BufferedOutput;
 
 class CleanupServiceTest extends TestCase
 {
@@ -39,7 +40,7 @@ class CleanupServiceTest extends TestCase
         ?SupportRequestRepository $supportRequestRepo = null,
         ?ThreadService $threadService = null,
         ?ClockInterface $clock = null,
-        ?ExtendedFilesystem $fs = null,
+        ?FilesystemOperator $privateStorage = null,
         ?IncidentRepository $incidentRepo = null,
         ?MeasureLogger $measureLogger = null,
         ?MeasureSettings $measureSettings = null,
@@ -56,8 +57,7 @@ class CleanupServiceTest extends TestCase
             entityActionDispatcher: $entityActionDispatcher ?? $this->createStub(EntityActionDispatcher::class),
             clock: $clock ?? new MockClock('2026-08-19 12:00:00', 'UTC'),
             logger: $logger ?? $this->createStub(LoggerInterface::class),
-            fs: $fs ?? $this->createStub(ExtendedFilesystem::class),
-            pendingImportDir: '/app/data/import/archive',
+            privateStorage: $privateStorage ?? new Filesystem(new InMemoryFilesystemAdapter()),
         );
     }
 
@@ -83,28 +83,21 @@ class CleanupServiceTest extends TestCase
     {
         // Arrange
         $now = new DateTimeImmutable('2026-08-19 12:00:00', new DateTimeZone('UTC'));
-        $fs = $this->createMock(ExtendedFilesystem::class);
-        $fs
-            ->expects($this->once())
-            ->method('glob')
-            ->with('/app/data/import/archive/*.zip')
-            ->willReturn(['/app/data/import/archive/stale.zip', '/app/data/import/archive/fresh.zip']);
-        $fs
-            ->expects($this->exactly(2))
-            ->method('getFileModifiedTime')
-            ->willReturnMap([
-                ['/app/data/import/archive/stale.zip', $now->modify('-25 hours')->getTimestamp()],
-                ['/app/data/import/archive/fresh.zip', $now->modify('-1 hour')->getTimestamp()],
-            ]);
-        $fs->expects($this->once())->method('deleteFile')->with('/app/data/import/archive/stale.zip')->willReturn(true);
+        $storage = new Filesystem(new InMemoryFilesystemAdapter());
+        $storage->write('import/archive/stale.zip', 'zip', ['timestamp' => $now->modify('-25 hours')->getTimestamp()]);
+        $storage->write('import/archive/fresh.zip', 'zip', ['timestamp' => $now->modify('-1 hour')->getTimestamp()]);
+        $storage->write('invoices/2026/INV-1.pdf', 'pdf', ['timestamp' => $now->modify('-1 year')->getTimestamp()]);
 
-        $subject = $this->createService(fs: $fs);
+        $subject = $this->createService(privateStorage: $storage);
 
         // Act
         $count = $subject->removeStaleImportArchives();
 
         // Assert
         static::assertSame(1, $count);
+        static::assertFalse($storage->fileExists('import/archive/stale.zip'));
+        static::assertTrue($storage->fileExists('import/archive/fresh.zip'));
+        static::assertTrue($storage->fileExists('invoices/2026/INV-1.pdf'));
     }
 
     public function testRemoveImageCacheUpdatesOldImagesAndPersists(): void
@@ -240,8 +233,6 @@ class CleanupServiceTest extends TestCase
         $supportRepo = $this->createStub(SupportRequestRepository::class);
         $supportRepo->method('findStaleUnresolved')->willReturn([new SupportRequest(), new SupportRequest(), new SupportRequest()]);
         $supportRepo->method('findExpiredEmailVerifications')->willReturn([]);
-        $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('glob')->willReturn([]);
         $measureLogger = $this->createStub(MeasureLogger::class);
         $measureLogger->method('purgeOlderThan')->willReturn(5);
         $incidentRepo = $this->createStub(IncidentRepository::class);
@@ -250,23 +241,19 @@ class CleanupServiceTest extends TestCase
             imageRepo: $imageRepo,
             userRepo: $userRepo,
             supportRequestRepo: $supportRepo,
-            fs: $fs,
             incidentRepo: $incidentRepo,
             measureLogger: $measureLogger,
         );
-        $output = new BufferedOutput();
 
         // Act
-        $result = $subject->runCronTask($output);
+        $result = $subject->run();
 
         // Assert
-        static::assertSame('cleanup', $result->identifier);
-        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame(Status::ok, $result->status);
         static::assertSame(
             'image_cache: 2, registrations: 1, support_threads_auto_resolved: 3, support_email_verifications_expired: 0, import_archives: 0, security_measure_logs: 5, security_incidents: 6',
             $result->message,
         );
-        static::assertStringContainsString('Remove expired security incidents: 6', $output->fetch());
     }
 
     public function testRunCronTaskReportsAnExceptionWhenACleanupStepFails(): void
@@ -275,14 +262,12 @@ class CleanupServiceTest extends TestCase
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('getOldImageUpdates')->willThrowException(new RuntimeException('database gone'));
         $subject = $this->createService(imageRepo: $imageRepo);
-        $output = new BufferedOutput();
 
         // Act
-        $result = $subject->runCronTask($output);
+        $result = $subject->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::exception, $result->status);
+        static::assertSame(Status::exception, $result->status);
         static::assertSame('database gone', $result->message);
-        static::assertStringContainsString('CleanupService exception: database gone', $output->fetch());
     }
 }

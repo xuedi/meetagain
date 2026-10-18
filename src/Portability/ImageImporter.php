@@ -9,15 +9,14 @@ use App\ExtendedFilesystem;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use finfo;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use League\Flysystem\FilesystemOperator;
 
 readonly class ImageImporter
 {
     public function __construct(
         private EntityManagerInterface $em,
         private ExtendedFilesystem $fs,
-        #[Autowire('%kernel.project_dir%')]
-        private string $projectDir,
+        private FilesystemOperator $imageStorage,
     ) {}
 
     public function import(string $imagePath, ImageType $type, User $uploader, ?string $attribution = null, bool $attributionNotRequired = false): ?Image
@@ -42,12 +41,10 @@ readonly class ImageImporter
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($content) ?: 'application/octet-stream';
 
-        $targetDir = $this->projectDir . '/data/images/';
-        if (!$this->fs->isDirectory($targetDir)) {
-            $this->fs->makeDirectory($targetDir);
+        $key = $hash . '.' . $extension;
+        if (!$this->imageStorage->fileExists($key)) {
+            $this->imageStorage->write($key, $content);
         }
-
-        $this->fs->putFileContents($targetDir . $hash . '.' . $extension, $content);
 
         $image = new Image();
         $image->setHash($hash);

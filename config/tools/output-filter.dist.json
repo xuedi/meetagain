@@ -18,16 +18,34 @@
         {
             "label": "Reset generated files",
             "commands": [
-                "rm -rf .env installed.lock config/plugins.php var/",
+                "rm -rf .env config/plugins.php var/",
                 "cp .env.dist .env",
+                "if [ -n \"*\" ]; then echo \"APP_PLUGINS_EXCLUDE=*",
                 "cp assets/styles/_config.scss.dist assets/styles/_config.scss",
-                "touch installed.lock",
-                "rm -rf .env installed.lock config/plugins.php vendor/ var/ public/bundles/ public/assets/"
+                "rm -rf .env config/plugins.php vendor/ var/ public/bundles/ public/assets/"
             ]
         },
         {
             "label": "Start containers",
             "commands": ["DOCKER up -d"]
+        },
+        {
+            "label": "Prepare storage",
+            "commands": [
+                "DOCKER=\"DOCKER\" docker/garage/init.sh",
+                "PHP php bin/console app:storage:copy -q"
+            ]
+        },
+        {
+            "label": "Stop workers",
+            "commands": ["DOCKER stop worker scheduler"]
+        },
+        {
+            "label": "Start workers",
+            "commands": [
+                "DOCKER exec -T valkey valkey-cli DEL tasks",
+                "DOCKER up -d worker scheduler"
+            ]
         },
         {
             "label": "Install Composer packages",
@@ -44,10 +62,10 @@
             ]
         },
         {
-            "label": "Enable plugins",
+            "label": "Switch plugins on",
             "commands": [
-                "PHP php bin/console app:plugin disable all",
-                "PHP php bin/console app:plugin enable*"
+                "PHP php bin/console app:plugin:toggle on*",
+                "if [ -n \"*\" ]; then PHP php bin/console app:plugin:toggle on*"
             ]
         },
         {
@@ -64,6 +82,10 @@
         {
             "label": "Seed email templates",
             "commands": ["PHP php bin/console app:email-templates:seed"]
+        },
+        {
+            "label": "Run data hotfixes",
+            "commands": ["PHP php bin/console app:data-hotfix:run"]
         },
         {
             "label": "Seed install baseline",
@@ -152,10 +174,6 @@
         {
             "label": "Build documentation",
             "commands": ["docker run * zensical/zensical build *"]
-        },
-        {
-            "label": "Switch to installer mode",
-            "commands": ["rm -f .env installed.lock"]
         },
         {
             "label": "Empty Mailpit",

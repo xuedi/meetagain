@@ -48,11 +48,30 @@ Once started, the following services are available:
 | Service     | Container                     | Address                 | Purpose                    |
 |-------------|-------------------------------|-------------------------|----------------------------|
 | Application | `ma-php` (FrankenPHP + Caddy) | https://meetagain.local | The app                    |
+| Worker      | `ma-worker`                   | internal                | Runs handed-off work       |
+| Scheduler   | `ma-scheduler`                | internal                | Runs the periodic tasks    |
 | Database    | `ma-db` (MariaDB 13)          | localhost:3306          | Relational DB              |
 | Email       | `ma-mailpit` (Mailpit)        | http://localhost:8025   | Catches all outgoing email |
-| Cache       | `ma-valkey` (Valkey)          | internal                | Redis-compatible cache     |
+| Cache       | `ma-valkey` (Valkey)          | internal                | Cache, sessions, queue     |
+| Storage     | `ma-garage` (Garage)          | internal                | S3 store for uploads       |
 
-Mail is queued, not sent: `just appCron` dispatches the queue, and Mailpit then captures every outgoing email - no real mail is sent in dev mode.
+Mail is queued and the worker sends it within a second; Mailpit captures every outgoing email - no real mail is sent
+in dev mode. The worker and the scheduler restart every minute, so they pick up code changes on their own; `just
+workerRestart` makes them restart now. The periodic tasks are listed at Admin, Logs, Tasks, or with `just app
+app:task:list`.
+
+### Debugging a handler or a task
+
+The worker containers run without Xdebug. To step through a task or a message handler, run it inside `ma-php` with
+the step debugger switched on, so your IDE gets the session:
+
+```bash
+docker exec -it -e XDEBUG_MODE=debug -e XDEBUG_SESSION=1 ma-php php bin/console app:task:run <identifier>
+docker exec -it -e XDEBUG_MODE=debug -e XDEBUG_SESSION=1 ma-php php bin/console messenger:consume async --limit=1
+```
+
+The first runs one task now; the second handles the next waiting message. Stop the worker first (`just workerStop`,
+and `just workerStart` afterwards) when the message must not be taken by it.
 
 The database and Mailpit are published to `127.0.0.1` only, so they are reachable from your own machine and from
 nowhere else. Mailpit has no authentication and holds every password-reset link the dev site produces, and the
@@ -66,7 +85,7 @@ hands both to anyone who can reach your host. Keep the `127.0.0.1:` prefix on th
 ```bash
 just devModeImport               # List the demo archives
 just devModeImport <archive>     # Fresh instance built from one demo archive
-just devModeInstaller            # Empty instance, set up through the web installer
+just devModeBootstrap            # Empty instance with one admin, as a fresh install starts
 ```
 
 ---

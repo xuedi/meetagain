@@ -5,8 +5,9 @@ namespace Module\Circulation\Internal\Trust;
 use App\Item\TypeRegistry;
 use Module\Circulation\Internal\ContextResolver;
 use Module\Circulation\Internal\Repository\CopyRepository;
+use Symfony\Contracts\Service\ResetInterface;
 
-class ContextIndex
+class ContextIndex implements ResetInterface
 {
     /** @var array<string, string>|null context => item type */
     private ?array $memo = null;
@@ -46,5 +47,10 @@ class ContextIndex
     public function itemTypeFor(string $context): ?string
     {
         return $this->all()[$context] ?? null;
+    }
+
+    public function reset(): void
+    {
+        $this->memo = null;
     }
 }

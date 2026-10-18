@@ -15,11 +15,12 @@ use SensitiveParameter;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
  */
-class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
+class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface, ResetInterface
 {
     private ?array $userNameList = null;
 
@@ -555,5 +556,10 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setRegcodeExpiresAt(null);
 
         return true;
+    }
+
+    public function reset(): void
+    {
+        $this->userNameList = null;
     }
 }

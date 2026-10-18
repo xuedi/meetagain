@@ -2,11 +2,9 @@
 
 namespace App\Service\System;
 
-use App\CronTaskInterface;
 use App\EntityActionDispatcher;
-use App\Enum\CronTaskStatus;
 use App\Enum\EntityAction;
-use App\ExtendedFilesystem;
+use App\Portability\Importer;
 use App\Repository\ImageRepository;
 use App\Repository\IncidentRepository;
 use App\Repository\SupportRequestRepository;
@@ -14,15 +12,18 @@ use App\Repository\UserRepository;
 use App\Service\Security\MeasureLogger;
 use App\Service\Security\MeasureSettings;
 use App\Service\Support\ThreadService;
-use App\ValueObject\CronTaskResult;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Flysystem\FileAttributes;
+use League\Flysystem\FilesystemOperator;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Throwable;
 
-readonly class CleanupService implements CronTaskInterface
+readonly class CleanupService implements TaskInterface
 {
     public const int SUPPORT_THREAD_STALE_DAYS = 180;
     public const int GHOSTED_REGISTRATION_DAYS = 10;
@@ -41,9 +42,7 @@ readonly class CleanupService implements CronTaskInterface
         private EntityActionDispatcher $entityActionDispatcher,
         private ClockInterface $clock,
         private LoggerInterface $logger,
-        private ExtendedFilesystem $fs,
-        #[Autowire('%kernel.project_dir%/data/import/archive')]
-        private string $pendingImportDir,
+        private FilesystemOperator $privateStorage,
     ) {}
 
     public function getIdentifier(): string
@@ -51,35 +50,33 @@ readonly class CleanupService implements CronTaskInterface
         return 'cleanup';
     }
 
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('5 * * * *', jitterSeconds: 600, offloaded: true);
+    }
+
+    public function run(): Result
     {
         try {
             $imageCount = $this->removeImageCache();
-            $output->writeln('Clean image cache: ' . $imageCount);
             $this->logger->info('Image cache cleaned', ['count' => $imageCount]);
 
             $regCount = $this->removeGhostedRegistrations();
-            $output->writeln('Clean registrations: ' . $regCount);
             $this->logger->info('Ghosted registrations removed', ['count' => $regCount]);
 
             $autoResolvedCount = $this->autoResolveStaleSupportThreads();
-            $output->writeln('Auto-resolve support threads: ' . $autoResolvedCount);
             $this->logger->info('Stale support threads auto-resolved', ['count' => $autoResolvedCount]);
 
             $verifyCount = $this->expireSupportEmailVerifications();
-            $output->writeln('Expire support email verifications: ' . $verifyCount);
             $this->logger->info('Expired support email verifications cleared', ['count' => $verifyCount]);
 
             $importCount = $this->removeStaleImportArchives();
-            $output->writeln('Remove stale import archives: ' . $importCount);
             $this->logger->info('Stale import archives removed', ['count' => $importCount]);
 
             $measureLogCount = $this->removeExpiredSecurityMeasureLogs();
-            $output->writeln('Remove expired security measure logs: ' . $measureLogCount);
             $this->logger->info('Expired security measure logs removed', ['count' => $measureLogCount]);
 
             $incidentCount = $this->removeExpiredIncidents();
-            $output->writeln('Remove expired security incidents: ' . $incidentCount);
             $this->logger->info('Expired security incidents removed', ['count' => $incidentCount]);
 
             $message = sprintf(
@@ -93,11 +90,9 @@ readonly class CleanupService implements CronTaskInterface
                 $incidentCount,
             );
 
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
+            return new Result(Status::ok, $message);
         } catch (Throwable $e) {
-            $output->writeln('CleanupService exception: ' . $e->getMessage());
-
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
+            return new Result(Status::exception, $e->getMessage());
         }
     }
 
@@ -155,9 +150,13 @@ readonly class CleanupService implements CronTaskInterface
         $cutoff = $this->clock->now()->modify(sprintf('-%d hours', self::PENDING_IMPORT_MAX_HOURS))->getTimestamp();
 
         $count = 0;
-        foreach ($this->fs->glob($this->pendingImportDir . '/*.zip') as $file) {
-            $modifiedAt = $this->fs->getFileModifiedTime($file);
-            if ($modifiedAt !== false && $modifiedAt < $cutoff && $this->fs->deleteFile($file)) {
+        foreach ($this->privateStorage->listContents(Importer::PENDING_DIRECTORY, false) as $item) {
+            if (!$item instanceof FileAttributes || !str_ends_with($item->path(), '.zip')) {
+                continue;
+            }
+            $modifiedAt = $item->lastModified() ?? $this->privateStorage->lastModified($item->path());
+            if ($modifiedAt < $cutoff) {
+                $this->privateStorage->delete($item->path());
                 $count++;
             }
         }

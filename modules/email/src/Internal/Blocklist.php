@@ -7,8 +7,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\BlocklistInterface;
 use Module\Email\Internal\Entity\EmailBlocklistEntry;
 use Module\Email\Internal\Repository\EmailBlocklistRepository;
+use Symfony\Contracts\Service\ResetInterface;
 
-final class Blocklist implements BlocklistInterface
+final class Blocklist implements BlocklistInterface, ResetInterface
 {
     /** @var array<string, true>|null */
     private ?array $blockedSet = null;
@@ -69,5 +70,10 @@ final class Blocklist implements BlocklistInterface
         if ($this->blockedSet !== null) {
             $this->blockedSet[(string) $entry->getEmail()] = true;
         }
+    }
+
+    public function reset(): void
+    {
+        $this->blockedSet = null;
     }
 }

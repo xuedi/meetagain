@@ -12,7 +12,7 @@ SCAN_ROOTS=.
 # contribute, the enabled-plugin lists and the local environment files. Walked without ignore
 # rules. Keep out anything a test run writes, or the tree never holds still long enough to be
 # stamped.
-INCLUDE_IGNORED=bin/commit-hooks,.just/local.just,.env.local,config/plugins.php,config/plugins_test.php,.env.test.local
+INCLUDE_IGNORED=bin/commit-hooks,.just/local.just,.env.local,.env.test.local
 
 # Path prefixes whose edits cannot change the result of a skipped hook. A wrong entry here is a
 # false "fresh", so only list what is checked solely by an ALWAYS_RUN hook.

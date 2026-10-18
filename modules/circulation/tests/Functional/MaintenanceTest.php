@@ -15,7 +15,6 @@ use Module\Circulation\Internal\Cron\MaintenanceTask;
 use Module\Circulation\Tests\Stub\ParticipationProvider;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Tester\CommandTester;
 use Tests\Module\Members;
 
@@ -56,18 +55,6 @@ final class MaintenanceTest extends KernelTestCase
         // Assert
         self::assertStringContainsString('1 handovers closed', $message);
         self::assertNotSame(HandoverStatus::Open, $this->handover($handover)?->status);
-    }
-
-    public function testTheTaskRunsAtMostOnceADay(): void
-    {
-        // Arrange
-        $this->runMaintenance();
-
-        // Act
-        $second = self::getContainer()->get(MaintenanceTask::class)->runCronTask(new BufferedOutput());
-
-        // Assert
-        self::assertSame('throttled', $second->message);
     }
 
     public function testRebuildFindsNoDriftWhileTheLedgerAndTheCopiesAgree(): void
@@ -112,7 +99,7 @@ final class MaintenanceTest extends KernelTestCase
 
     private function runMaintenance(): string
     {
-        return self::getContainer()->get(MaintenanceTask::class)->runCronTask(new BufferedOutput())->message;
+        return self::getContainer()->get(MaintenanceTask::class)->run()->message;
     }
 
     /**

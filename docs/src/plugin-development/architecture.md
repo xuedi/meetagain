@@ -178,7 +178,7 @@ The migration file is placed in `plugins/your-plugin/migrations/VersionXXX.php`.
     Never put plugin DDL in `AppMigrations` and never put core DDL in a plugin namespace.
     Wrong selection = migrations written to the wrong directory.
 
-`just appMigrate` applies all pending migrations (core + all active plugins) in timestamp order.
+`just appMigrate` applies all pending migrations (core and every installed plugin) in timestamp order.
 
 ---
 
@@ -188,5 +188,6 @@ Core discovers plugins by scanning `plugins/*/src/Kernel.php`. Each `Kernel.php`
 and registered as a service. The plugin key returned by `getPluginKey()` is used as the identifier
 throughout the system.
 
-Plugins are enabled/disabled via `config/plugins.php` in the core application.
-Use `just plugin-enable your-plugin` to add a plugin to that file.
+Every plugin on disk is installed. An admin switches each one on or off at `/admin/plugin`, or with
+`just plugin-enable your-plugin` and `just plugin-disable your-plugin` (`app:plugin:toggle`). A switched-off
+plugin's routes answer 404 and its services drop out of every core chain; its tables and data stay.

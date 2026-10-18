@@ -2,21 +2,21 @@
 
 namespace Module\Email\Internal;
 
-use App\CronTaskInterface;
-use App\Enum\CronTaskStatus;
-use App\ValueObject\CronTaskResult;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Module\Email\Contract\GuardOutcome;
 use Module\Email\Contract\MailerInterface;
 use Module\Email\Contract\ScheduledEmailInterface;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\ClockInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Throwable;
 
-final readonly class SendScheduledEmailsService implements CronTaskInterface
+final readonly class SendScheduledEmailsService implements TaskInterface
 {
     private const int FLUSH_EVERY = 200;
 
@@ -30,6 +30,7 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
         private LoggerInterface $logger,
         private MailerInterface $mailer,
         private EntityManagerInterface $em,
+        private EmailQueueInterface $queue,
     ) {}
 
     public function getIdentifier(): string
@@ -37,19 +38,15 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
         return 'scheduled-emails';
     }
 
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('*/5 7-21 * * *', offloaded: true);
+    }
+
+    public function run(): Result
     {
         try {
             $now = $this->clock->now();
-            $currentHour = (int) $now->format('H');
-
-            if ($currentHour < 7 || $currentHour >= 22) {
-                $message = 'skipped: outside allowed hours (07:00-22:00)';
-                $output->writeln('SendScheduledEmailsService: ' . $message);
-
-                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
-            }
-
             $totalSent = 0;
             $unflushed = 0;
             $loggedGuardErrors = [];
@@ -67,7 +64,7 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
                                 $loggedGuardErrors[$dedupKey] = true;
                                 $this->logger->error('guard rule threw - email skipped', [
                                     'email' => $email->getIdentifier(),
-                                    'caller' => 'SendScheduledEmailsService::runCronTask',
+                                    'caller' => 'SendScheduledEmailsService::run',
                                     'context_keys' => array_keys($ctx),
                                     'exception' => $e->getMessage(),
                                 ]);
@@ -82,7 +79,7 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
                                 $loggedGuardErrors[$dedupKey] = true;
                                 $this->logger->error('guard rule returned Error - email skipped', [
                                     'email' => $email->getIdentifier(),
-                                    'caller' => 'SendScheduledEmailsService::runCronTask',
+                                    'caller' => 'SendScheduledEmailsService::run',
                                     'rule' => $result->ruleName,
                                     'explanation' => $result->explanation,
                                     'context_key' => $result->contextKey,
@@ -95,10 +92,12 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
                         $unflushed += $outcome->queued;
                         if ($unflushed >= self::FLUSH_EVERY) {
                             $this->em->flush();
+                            $this->queue->wake();
                             $unflushed = 0;
                         }
                     }
                     $this->em->flush();
+                    $this->queue->wake();
                     $unflushed = 0;
                     $email->markContextSent($dueContext);
                     $totalSent += $sent;
@@ -106,13 +105,10 @@ final readonly class SendScheduledEmailsService implements CronTaskInterface
             }
 
             $message = $totalSent . ' emails queued';
-            $output->writeln('SendScheduledEmailsService: ' . $message);
 
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
+            return new Result(Status::ok, $message);
         } catch (Throwable $e) {
-            $output->writeln('SendScheduledEmailsService exception: ' . $e->getMessage());
-
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
+            return new Result(Status::exception, $e->getMessage());
         }
     }
 }

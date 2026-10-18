@@ -1,0 +1,67 @@
+{
+	admin off
+	auto_https off
+	log default {
+		output stdout
+		format console
+		level WARN
+	}
+
+	frankenphp
+}
+
+(thumbnails) {
+	@remoteThumbnails {
+		path /images/thumbnails/*
+		expression `{env.MEETAGAIN_THUMBNAILS_UPSTREAM} != ""`
+	}
+	handle @remoteThumbnails {
+		uri strip_prefix /images/thumbnails
+		reverse_proxy {env.MEETAGAIN_THUMBNAILS_UPSTREAM} {
+			header_up Host {env.MEETAGAIN_THUMBNAILS_HOST}
+			header_down Cache-Control "public, max-age=31536000, immutable"
+		}
+	}
+}
+
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+		-x-powered-by
+	}
+}
+
+:8080 {
+	import security_headers
+	import thumbnails
+
+	root * /var/www/html/public
+	encode zstd br gzip
+
+	handle /media/* {
+		file_server {
+			pass_thru
+		}
+		header Cache-Control "public, max-age=86400"
+	}
+
+	@phpRoute {
+		not file {path}
+		not {
+			path /images/thumbnails/*
+			expression `{env.MEETAGAIN_THUMBNAILS_UPSTREAM} != ""`
+		}
+	}
+	rewrite @phpRoute index.php
+
+	@frontController path index.php
+	php @frontController
+
+	file_server {
+		hide *.php
+	}
+}

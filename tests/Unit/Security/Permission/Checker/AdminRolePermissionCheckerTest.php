@@ -31,7 +31,7 @@ class AdminRolePermissionCheckerTest extends TestCase
 
     public function testSupportsAdminAttribute(): void
     {
-        self::assertTrue($this->checker->supports(Attr::SYSTEM_LOGS_CRON_READ, null));
+        self::assertTrue($this->checker->supports(Attr::SYSTEM_LOGS_TASKS_READ, null));
         self::assertTrue($this->checker->supports(Attr::EMAIL_TEMPLATE_UPDATE, null));
         self::assertTrue($this->checker->supports(Attr::MEMBER_DELETE, null));
     }
@@ -53,7 +53,7 @@ class AdminRolePermissionCheckerTest extends TestCase
     {
         $this->security->method('isGranted')->willReturn(true);
         $ctx = new Context(actor: new User(), subject: null, isAdmin: false);
-        self::assertFalse($this->checker->vote(Attr::SYSTEM_LOGS_CRON_READ, $ctx));
+        self::assertFalse($this->checker->vote(Attr::SYSTEM_LOGS_TASKS_READ, $ctx));
         self::assertFalse($this->checker->vote(Attr::MEMBER_DELETE, $ctx));
     }
 

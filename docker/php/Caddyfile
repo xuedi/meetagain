@@ -16,6 +16,20 @@
 	}
 }
 
+(thumbnails) {
+	@remoteThumbnails {
+		path /images/thumbnails/*
+		expression `{env.MEETAGAIN_THUMBNAILS_UPSTREAM} != ""`
+	}
+	handle @remoteThumbnails {
+		uri strip_prefix /images/thumbnails
+		reverse_proxy {env.MEETAGAIN_THUMBNAILS_UPSTREAM} {
+			header_up Host {env.MEETAGAIN_THUMBNAILS_HOST}
+			header_down Cache-Control "public, max-age=31536000, immutable"
+		}
+	}
+}
+
 (security_headers) {
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
@@ -32,12 +46,17 @@
 	tls /certs/meetagain.local.crt /certs/meetagain.local.key
 
 	import security_headers
+	import thumbnails
 
 	root * /var/www/html/public
 	encode zstd br gzip
 
 	@phpRoute {
 		not file {path}
+		not {
+			path /images/thumbnails/*
+			expression `{env.MEETAGAIN_THUMBNAILS_UPSTREAM} != ""`
+		}
 	}
 	rewrite @phpRoute index.php
 
@@ -52,12 +71,17 @@
 # Localhost (HTTP only, no certificate needed)
 http://localhost {
 	import security_headers
+	import thumbnails
 
 	root * /var/www/html/public
 	encode zstd br gzip
 
 	@phpRoute {
 		not file {path}
+		not {
+			path /images/thumbnails/*
+			expression `{env.MEETAGAIN_THUMBNAILS_UPSTREAM} != ""`
+		}
 	}
 	rewrite @phpRoute index.php
 

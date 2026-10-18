@@ -2,7 +2,7 @@
 
 # Run all tests and checks
 [group('checks')]
-check: checkMago checkMagoFormat checkMagoAnalyze checkMagoGuard checkPluginConfig checkPluginIsolation
+check: checkMago checkMagoFormat checkMagoAnalyze checkMagoGuard checkPluginIsolation
     {{PHP}} composer validate --strict
     {{PHP}} php bin/check-get-routes.php
     {{PHP}} php bin/check-new-parentheses.php
@@ -43,8 +43,3 @@ checkA11y url='http://meetagain.local/':
 [group('checks')]
 checkPluginIsolation:
     {{PHP}} php bin/check-plugin-isolation.php
-
-# Check config/plugins.php against the plugins on disk (run before deploying)
-[group('checks')]
-checkPluginConfig:
-    {{PHP}} php bin/check-plugin-config.php

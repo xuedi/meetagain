@@ -5,6 +5,8 @@ namespace Plugin\Glossary\Tests\Unit\Service;
 use App\Activity\ActivityService;
 use App\Item\Tag\TagService;
 use App\Repository\ItemTagAssignmentRepository;
+use League\Flysystem\Filesystem;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Enum\DuplicatePolicy;
@@ -13,7 +15,6 @@ use Plugin\Glossary\Service\ImportException;
 use Plugin\Glossary\Service\TransferService;
 use Plugin\Glossary\ValueObject\ImportMapping;
 use ReflectionProperty;
-use Symfony\Component\Filesystem\Filesystem;
 
 class TransferServiceTest extends TestCase
 {
@@ -137,26 +138,22 @@ class TransferServiceTest extends TestCase
             $tagService ?? $this->createStub(TagService::class),
             $assignments ?? $this->createStub(ItemTagAssignmentRepository::class),
             $this->createStub(ActivityService::class),
-            new Filesystem(),
-            sys_get_temp_dir(),
+            new Filesystem(new InMemoryFilesystemAdapter()),
         );
     }
 
     public function testAStashedUploadIsReadBackReplacedAndSweptOnceStale(): void
     {
         // Arrange
-        $dir = sys_get_temp_dir() . '/glossary-stash-' . bin2hex(random_bytes(4));
-        $filesystem = new Filesystem();
+        $storage = new Filesystem(new InMemoryFilesystemAdapter());
         $abandoned = str_repeat('a', 32);
-        $filesystem->dumpFile($dir . '/' . $abandoned . '.txt', 'abandoned');
-        touch($dir . '/' . $abandoned . '.txt', time() - (2 * 86_400));
+        $storage->write('import/glossary/' . $abandoned . '.txt', 'abandoned', ['timestamp' => time() - (2 * 86_400)]);
         $service = new TransferService(
             $this->createStub(GlossaryService::class),
             $this->createStub(TagService::class),
             $this->createStub(ItemTagAssignmentRepository::class),
             $this->createStub(ActivityService::class),
-            $filesystem,
-            $dir,
+            $storage,
         );
 
         // Act
@@ -168,7 +165,7 @@ class TransferServiceTest extends TestCase
         self::assertSame('second', $service->stashed($second));
         self::assertNull($service->stashed($abandoned));
         self::assertNull($service->stashed('../../etc/passwd'));
-        $filesystem->remove($dir);
+        self::assertFalse($storage->fileExists('import/glossary/' . $abandoned . '.txt'));
     }
 
     private function mapping(?int $tagsColumn = null): ImportMapping

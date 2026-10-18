@@ -2,20 +2,20 @@
 
 namespace App\Service\Admin;
 
-use App\CronTaskInterface;
 use App\Emails\Types\AdminNotificationEmail;
 use App\Entity\User;
-use App\Enum\CronTaskStatus;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Notification\Admin\AdminNotificationProviderInterface;
 use App\Service\Notification\Admin\AdminNotificationSection;
-use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\ClockInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -23,7 +23,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
-readonly class AdminNotificationService implements CronTaskInterface
+readonly class AdminNotificationService implements TaskInterface
 {
     private const string CACHE_KEY = 'admin_notification_last_sent_at';
     private const int CACHE_TTL = 365 * 24 * 3600;
@@ -48,26 +48,20 @@ readonly class AdminNotificationService implements CronTaskInterface
         return 'admin-notifications';
     }
 
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('0 7-21 * * *');
+    }
+
+    public function run(): Result
     {
         try {
-            $currentHour = (int) $this->clock->now()->format('H');
-            if ($currentHour < 7 || $currentHour >= 22) {
-                $message = 'skipped: outside allowed hours (07:00-22:00)';
-                $output->writeln('Admin notifications ' . $message);
-
-                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
-            }
-
             $result = $this->processNotification();
-            $output->writeln('Admin notifications: ' . $result);
             $this->logger->info('Admin notifications processed', ['result' => $result]);
 
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $result);
+            return new Result(Status::ok, $result);
         } catch (Throwable $e) {
-            $output->writeln('AdminNotificationService exception: ' . $e->getMessage());
-
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
+            return new Result(Status::exception, $e->getMessage());
         }
     }
 

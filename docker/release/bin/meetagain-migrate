@@ -1,0 +1,10 @@
+#!/bin/bash
+set -euo pipefail
+cd /var/www/html
+
+php bin/console doctrine:migrations:migrate --allow-no-migration --no-interaction
+php bin/console app:install:seed --no-interaction
+php bin/console app:email-templates:seed --no-interaction
+php bin/console app:data-hotfix:run --no-interaction
+php bin/console cache:pool:clear cache.config cache.app_state cache.cms_page_cache --no-interaction
+php bin/console app:metrics:deploy-marker --rev="${SENTRY_RELEASE:-unknown}" || true

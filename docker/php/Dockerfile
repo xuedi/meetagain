@@ -23,6 +23,7 @@ RUN set -eux; \
 	imagick \
 	intl \
 	apcu \
+    pcntl \
     zip \
     redis \
 	opcache

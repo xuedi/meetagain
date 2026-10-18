@@ -9,7 +9,6 @@ use Module\Email\Internal\SendScheduledEmailsService;
 use Module\Email\Tests\Stub\ScheduledEmail;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Clock\Test\ClockSensitiveTrait;
-use Symfony\Component\Console\Output\BufferedOutput;
 
 final class ScheduledSweepTest extends KernelTestCase
 {
@@ -42,26 +41,9 @@ final class ScheduledSweepTest extends KernelTestCase
         self::assertCount(1, $this->type->marked);
     }
 
-    public function testNothingIsSentOutsideTheAllowedHours(): void
-    {
-        // Arrange
-        self::mockTime('2031-03-04 23:00');
-
-        // Act
-        $message = $this->sweep();
-
-        // Assert
-        self::assertStringContainsString('outside allowed hours', $message);
-        self::assertSame([], $this->queuedRecipients());
-        self::assertSame([], $this->type->marked);
-    }
-
     private function sweep(): string
     {
-        $output = new BufferedOutput();
-        self::getContainer()->get(SendScheduledEmailsService::class)->runCronTask($output);
-
-        return $output->fetch();
+        return self::getContainer()->get(SendScheduledEmailsService::class)->run()->message;
     }
 
     /**

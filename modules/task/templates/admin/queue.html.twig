@@ -1,0 +1,94 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <h2 class="title is-6">{{ 'admin_task.heading_processes'|trans }}</h2>
+        <table class="table is-fullwidth is-narrow">
+            <thead>
+            <tr>
+                <th>{{ 'admin_task.col_host'|trans }}</th>
+                <th>{{ 'admin_task.col_pid'|trans }}</th>
+                <th>{{ 'admin_task.col_transports'|trans }}</th>
+                <th>{{ 'admin_task.col_started_at'|trans }}</th>
+                <th>{{ 'admin_task.col_seen_at'|trans }}</th>
+                <th class="has-text-right">{{ 'admin_task.col_handled'|trans }}</th>
+                <th class="has-text-right">{{ 'admin_task.col_failed'|trans }}</th>
+                <th class="has-text-right">{{ 'admin_task.col_memory'|trans }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for process in processes %}
+                <tr>
+                    <td>{{ process.host }}</td>
+                    <td class="has-text-grey">{{ process.pid }}</td>
+                    <td>
+                        {% for transport in process.transports %}
+                            <span class="tag is-light">{{ transport }}</span>
+                        {% endfor %}
+                    </td>
+                    <td class="is-nowrap has-text-grey">{{ process.startedAt|date('Y-m-d H:i:s') }}</td>
+                    <td class="is-nowrap has-text-grey">{{ process.seenAt|date('H:i:s') }}</td>
+                    <td class="has-text-right">{{ process.handled }}</td>
+                    <td class="has-text-right{% if process.failed > 0 %} has-text-danger{% endif %}">{{ process.failed }}</td>
+                    <td class="has-text-right has-text-grey has-unit" data-unit="MB">{{ (process.memoryBytes / 1048576)|round }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="has-text-danger has-text-centered">{{ 'admin_task.empty_processes'|trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <h2 class="title is-6">{{ 'admin_task.heading_failed'|trans }}</h2>
+        <table class="table is-fullwidth is-narrow">
+            <thead>
+            <tr>
+                <th>{{ 'admin_task.col_failed_at'|trans }}</th>
+                <th>{{ 'admin_task.col_message'|trans }}</th>
+                <th>{{ 'admin_task.col_error'|trans }}</th>
+                <th>{{ 'admin_task.col_transport'|trans }}</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for failed in failedMessages %}
+                <tr>
+                    <td class="is-nowrap has-text-grey">{{ failed.failedAt ? failed.failedAt|date('Y-m-d H:i:s') : '-' }}</td>
+                    <td><code>{{ failed.message }}</code></td>
+                    <td class="has-text-danger">{{ failed.error }}</td>
+                    <td><span class="tag is-light">{{ failed.transport }}</span></td>
+                    <td class="is-nowrap">
+                        <a href="{{ path('app_admin_task_failed_retry', {'id': failed.id}) }}"
+                           class="button-as-icon"
+                           title="{{ 'admin_task.action_retry'|trans }}"
+                           data-post
+                           data-csrf-token="{{ csrf_token('app_admin_task_failed_retry' ~ failed.id) }}">
+                            <span class="icon"><i class="fa fa-redo"></i></span>
+                        </a>
+                        <a href="{{ path('app_admin_task_failed_delete', {'id': failed.id}) }}"
+                           class="button-as-icon"
+                           title="{{ 'global.button_delete'|trans }}"
+                           data-post
+                           data-confirm="{{ 'admin_task.confirm_delete'|trans }}"
+                           data-csrf-token="{{ csrf_token('app_admin_task_failed_delete' ~ failed.id) }}">
+                            <span class="icon"><i class="fa fa-trash"></i></span>
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="has-text-grey has-text-centered">{{ 'admin_task.empty_failed'|trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

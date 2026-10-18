@@ -10,11 +10,18 @@ use App\Portability\ImageImporter;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\UnitOfWork;
+use League\Flysystem\Filesystem;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 
 class ImageImporterTest extends TestCase
 {
-    private const string PROJECT_DIR = '/app';
+    private Filesystem $images;
+
+    protected function setUp(): void
+    {
+        $this->images = new Filesystem(new InMemoryFilesystemAdapter());
+    }
 
     public function testReturnsNullWhenSourcePathDoesNotExist(): void
     {
@@ -59,15 +66,10 @@ class ImageImporterTest extends TestCase
         $bytes = 'shared-avatar-bytes';
         $pending = new Image();
         $pending->setHash(sha1($bytes));
-        $written = false;
 
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(true);
         $fs->method('getFileContents')->willReturn($bytes);
-        $fs->method('putFileContents')->willReturnCallback(static function () use (&$written): bool {
-            $written = true;
-            return true;
-        });
 
         $imageRepo = $this->createStub(EntityRepository::class);
         $imageRepo->method('findOneBy')->willReturn(null);
@@ -86,7 +88,7 @@ class ImageImporterTest extends TestCase
 
         // Assert
         static::assertSame($pending, $result);
-        static::assertFalse($written);
+        static::assertSame([], iterator_to_array($this->images->listContents('')));
     }
 
     public function testReturnsNullWhenExtensionIsEmpty(): void
@@ -116,17 +118,11 @@ class ImageImporterTest extends TestCase
         // Arrange
         $bytes = 'png-bytes';
         $expectedHash = sha1($bytes);
-        $writtenPath = null;
         $persisted = null;
 
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(true);
         $fs->method('getFileContents')->willReturn($bytes);
-        $fs->method('isDirectory')->willReturn(true);
-        $fs->method('putFileContents')->willReturnCallback(static function (string $path) use (&$writtenPath): bool {
-            $writtenPath = $path;
-            return true;
-        });
 
         $imageRepo = $this->createStub(EntityRepository::class);
         $imageRepo->method('findOneBy')->willReturn(null);
@@ -150,7 +146,7 @@ class ImageImporterTest extends TestCase
         static::assertSame('png', $result->getExtension());
         static::assertSame(strlen($bytes), $result->getSize());
         static::assertSame($result, $persisted);
-        static::assertSame(self::PROJECT_DIR . '/data/images/' . $expectedHash . '.png', $writtenPath);
+        static::assertSame($bytes, $this->images->read($expectedHash . '.png'));
     }
 
     public function testANewImageCarriesTheArchivedAttribution(): void
@@ -159,7 +155,6 @@ class ImageImporterTest extends TestCase
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(true);
         $fs->method('getFileContents')->willReturn('photo-bytes');
-        $fs->method('isDirectory')->willReturn(true);
 
         $imageRepo = $this->createStub(EntityRepository::class);
         $imageRepo->method('findOneBy')->willReturn(null);
@@ -181,6 +176,6 @@ class ImageImporterTest extends TestCase
 
     private function buildImporter(ExtendedFilesystem $fs, ?EntityManagerInterface $em = null): ImageImporter
     {
-        return new ImageImporter(em: $em ?? $this->createStub(EntityManagerInterface::class), fs: $fs, projectDir: self::PROJECT_DIR);
+        return new ImageImporter(em: $em ?? $this->createStub(EntityManagerInterface::class), fs: $fs, imageStorage: $this->images);
     }
 }

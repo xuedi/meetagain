@@ -56,7 +56,7 @@ enum Command {
         page_slug: String,
     },
 
-    /// Admin log family (cron, sendlog, incidents). Requires user token.
+    /// Admin log family (tasks, sendlog, incidents). Requires user token.
     Logs {
         #[command(subcommand)]
         action: LogsCommand,
@@ -102,13 +102,17 @@ enum Command {
 
 #[derive(Subcommand)]
 enum LogsCommand {
-    /// GET /api/v1/logs/cron
-    Cron {
+    /// GET /api/v1/logs/tasks
+    Tasks {
         #[arg(long)]
         limit: Option<u32>,
+        #[arg(long)]
+        task: Option<String>,
+        #[arg(long)]
+        status: Option<String>,
     },
-    /// GET /api/v1/logs/cron/{id}
-    CronDetail { id: String },
+    /// GET /api/v1/logs/tasks/{id}
+    TaskDetail { id: String },
     /// GET /api/v1/logs/sendlog
     Sendlog {
         #[arg(long)]
@@ -482,14 +486,22 @@ fn dispatch(cli: Cli, cfg: &mut Config) -> ExitCode {
             ),
         ),
         Command::Logs { action } => match action {
-            LogsCommand::Cron { limit } => {
-                let qs = QueryBuilder::new().add_u32("limit", limit).build();
-                run_get(cfg, TokenKind::User, &format!("/api/v1/logs/cron{}", qs));
+            LogsCommand::Tasks {
+                limit,
+                task,
+                status,
+            } => {
+                let qs = QueryBuilder::new()
+                    .add_u32("limit", limit)
+                    .add_str("task", task.as_deref())
+                    .add_str("status", status.as_deref())
+                    .build();
+                run_get(cfg, TokenKind::User, &format!("/api/v1/logs/tasks{}", qs));
             }
-            LogsCommand::CronDetail { id } => run_get(
+            LogsCommand::TaskDetail { id } => run_get(
                 cfg,
                 TokenKind::User,
-                &format!("/api/v1/logs/cron/{}", percent_encode(&id)),
+                &format!("/api/v1/logs/tasks/{}", percent_encode(&id)),
             ),
             LogsCommand::Sendlog { limit } => {
                 let qs = QueryBuilder::new().add_u32("limit", limit).build();

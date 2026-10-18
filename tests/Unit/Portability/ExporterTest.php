@@ -16,6 +16,8 @@ use App\Portability\SectionInterface;
 use App\Portability\Site;
 use App\Service\Config\PluginService;
 use DateTimeImmutable;
+use League\Flysystem\Filesystem;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
 use ZipArchive;
@@ -186,7 +188,14 @@ final class ExporterTest extends TestCase
 
         $archiveReader = new ArchiveReader($this->createStub(ExtendedFilesystem::class), $this->createStub(PluginService::class));
 
-        return new Exporter($sections, $registry, $archiveReader, new DateShifter(), new MockClock('2026-09-16 10:30:00'), '/nonexistent');
+        return new Exporter(
+            $sections,
+            $registry,
+            $archiveReader,
+            new DateShifter(),
+            new MockClock('2026-09-16 10:30:00'),
+            new Filesystem(new InMemoryFilesystemAdapter()),
+        );
     }
 
     /**

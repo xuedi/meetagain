@@ -82,18 +82,6 @@ readonly class LogService
         return $entries[0]->getDate();
     }
 
-    public function getLogFilePath(): string
-    {
-        $files = $this->fs->glob($this->logsDir . '/' . $this->environment . '-*.log');
-
-        if ($files !== []) {
-            usort($files, fn($a, $b) => ($this->fs->getFileModifiedTime($b) ?: 0) <=> ($this->fs->getFileModifiedTime($a) ?: 0));
-            return $files[0];
-        }
-
-        return $this->logsDir . '/' . $this->environment . '.log';
-    }
-
     /**
      * @return list<LogEntry>
      */
@@ -174,16 +162,9 @@ readonly class LogService
      */
     public function getLogFiles(): array
     {
-        $files = [];
-        $single = $this->logsDir . '/' . $this->environment . '.log';
-        if ($this->fs->isFile($single)) {
-            $files[] = $single;
-        }
-        $rotated = $this->fs->glob($this->logsDir . '/' . $this->environment . '-*.log');
-        $files = [...$files, ...$rotated];
-        sort($files);
+        $file = $this->logsDir . '/' . $this->environment . '.log';
 
-        return $files;
+        return $this->fs->isFile($file) ? [$file] : [];
     }
 
     /**

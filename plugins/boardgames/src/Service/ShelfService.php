@@ -8,8 +8,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Boardgames\Entity\Game;
 use Plugin\Boardgames\Entity\GameOwnership;
 use Plugin\Boardgames\Repository\GameOwnershipRepository;
+use Symfony\Contracts\Service\ResetInterface;
 
-class ShelfService
+class ShelfService implements ResetInterface
 {
     /** @var array<int, list<GameOwnership>> */
     private array $publicOwnerMemo = [];
@@ -103,5 +104,10 @@ class ShelfService
     public function getBringableShelf(User $user): array
     {
         return array_values(array_filter($this->getShelf($user), static fn(GameOwnership $ownership): bool => $ownership->isWillingToBring()));
+    }
+
+    public function reset(): void
+    {
+        $this->publicOwnerMemo = [];
     }
 }

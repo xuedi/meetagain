@@ -3,10 +3,10 @@
 namespace App\DataHotfix\Hotfixes;
 
 use App\DataHotfix\DataHotfixInterface;
+use App\DataHotfix\DeferredException;
 use App\Service\AppStateService;
 use Doctrine\DBAL\Connection;
 use Override;
-use RuntimeException;
 
 readonly class DropItemCategoryAssignment implements DataHotfixInterface
 {
@@ -30,13 +30,13 @@ readonly class DropItemCategoryAssignment implements DataHotfixInterface
     public function execute(): void
     {
         if ($this->appState->get(self::CONVERSION_LOCK) === null) {
-            throw new RuntimeException('Deferring until ItemTaxonomyToTags has completed.');
+            throw new DeferredException('Deferring until ItemTaxonomyToTags has completed.');
         }
 
         if ($this->appState->get(self::ARMED_KEY) === null) {
             $this->appState->set(self::ARMED_KEY, 'armed');
 
-            throw new RuntimeException('Deferring one tick so every re-keying hotfix has had its turn.');
+            throw new DeferredException('Deferring one tick so every re-keying hotfix has had its turn.');
         }
 
         $this->connection->executeStatement('DELETE a FROM item_tag_assignment a LEFT JOIN item_tag t ON t.id = a.tag_id WHERE t.id IS NULL');

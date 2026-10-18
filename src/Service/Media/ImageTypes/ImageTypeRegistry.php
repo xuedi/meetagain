@@ -2,12 +2,14 @@
 
 namespace App\Service\Media\ImageTypes;
 
+use App\DependencyInjection\SeesInactivePlugins;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
 use App\Service\Media\ThumbnailSizeFormat;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
+#[SeesInactivePlugins]
 class ImageTypeRegistry
 {
     /** @var array<int, ImageTypeDefinitionInterface> keyed by ImageType->value */
