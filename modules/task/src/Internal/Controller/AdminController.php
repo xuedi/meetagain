@@ -2,21 +2,26 @@
 
 namespace Module\Task\Internal\Controller;
 
+use App\Admin\Dashboard\MultiSeriesChartTile;
+use App\Admin\Dashboard\TileDataset;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
+use App\Admin\Top\Actions\AdminTopActionForm;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Controller\Admin\Logs\AbstractLogsController;
 use DateTimeImmutable;
+use Module\Task\Contract\FinishedRun;
 use Module\Task\Contract\Status;
 use Module\Task\Contract\TriggerInterface;
 use Module\Task\Internal\CadenceTrigger;
 use Module\Task\Internal\Queue;
 use Module\Task\Internal\Registry;
 use Module\Task\Internal\RunLog;
+use Module\Task\Internal\RunRetention;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,6 +36,8 @@ final class AdminController extends AbstractLogsController implements AdminNavig
     private const string BASE = '/admin/logs/tasks';
     private const string DEFAULT_RANGE = '1h';
     private const int LIST_LIMIT = 5000;
+    private const int HISTORY_LIMIT = 200;
+    private const int NEXT_RUNS = 3;
 
     /** @var array<string, string|null> */
     private const array RANGE_OFFSETS = [
@@ -127,6 +134,10 @@ final class AdminController extends AbstractLogsController implements AdminNavig
         $this->tasks->runSoon($identifier);
         $this->addFlash('success', $this->translator->trans('admin_task.flash_run_queued', ['%task%' => $identifier]));
 
+        if ($request->query->getString('return') === 'show') {
+            return $this->redirectToRoute('app_admin_task_show', ['identifier' => $identifier]);
+        }
+
         return $this->redirectToRoute('app_admin_task');
     }
 
@@ -162,7 +173,7 @@ final class AdminController extends AbstractLogsController implements AdminNavig
             $this->buildTaskDropdown($identifier, $range, $status, $since, $statuses),
             $this->buildStatusDropdown($status, $range, $identifier, $since),
             $this->buildRangeDropdown($range, $status, $identifier),
-            $this->backToSchedules(),
+            $this->back($identifier),
         ]);
 
         return $this->render('@Task/admin/runs.html.twig', [
@@ -206,7 +217,70 @@ final class AdminController extends AbstractLogsController implements AdminNavig
             'active' => 'logs',
             'processes' => $this->queue->processes(),
             'failedMessages' => $this->queue->failedMessages(),
-            'adminTop' => new AdminTop(info: $info, actions: [$this->backToSchedules()]),
+            'adminTop' => new AdminTop(info: $info, actions: [$this->back()]),
+            'adminTabs' => $this->getTabs(),
+        ]);
+    }
+
+    #[Route(self::BASE . '/{identifier}', name: 'app_admin_task_show', requirements: ['identifier' => '[a-z0-9._\-]+'])]
+    public function show(string $identifier): Response
+    {
+        $task = $this->registry->find($identifier);
+        if ($task === null) {
+            throw $this->createNotFoundException();
+        }
+
+        $cadence = $task->getCadence();
+        $trigger = new CadenceTrigger($identifier, $cadence, date_default_timezone_get());
+        $nextRuns = [];
+        $next = new DateTimeImmutable();
+        while (count($nextRuns) < self::NEXT_RUNS && ($next = $trigger->getNextRunDate($next)) !== null) {
+            $nextRuns[] = $next;
+        }
+
+        $history = $this->runLog->filtered(self::HISTORY_LIMIT, null, $identifier, null);
+        $last = $history[0] ?? null;
+        $keptCount = $this->runLog->count(null, $identifier);
+
+        $info = [new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars($identifier)))];
+        if ($last !== null) {
+            $info[] = new AdminTopInfoHtml(sprintf(
+                '<span class="tag %s is-medium">%s</span>',
+                $last->status->tagVariant(),
+                $this->translator->trans($last->status->label()),
+            ));
+        }
+        $info[] = new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $keptCount, $this->translator->trans('admin_task.summary_total_runs')));
+
+        $adminTop = new AdminTop(info: $info, actions: [
+            new AdminTopActionForm(
+                label: $this->translator->trans('admin_task.action_run_now'),
+                target: $this->generateUrl('app_admin_task_run_now', ['identifier' => $identifier, 'return' => 'show']),
+                csrfTokenId: 'app_admin_task_run_now' . $identifier,
+                icon: 'play',
+                variant: 'is-warning',
+            ),
+            new AdminTopActionButton(
+                label: $this->translator->trans('admin_task.section_runs'),
+                target: $this->generateUrl('app_admin_task_runs', $this->runsParams('all', 'all', $identifier)),
+                icon: 'list',
+            ),
+            $this->back(),
+        ]);
+
+        return $this->render('@Task/admin/show.html.twig', [
+            'active' => 'logs',
+            'identifier' => $identifier,
+            'taskClass' => $task::class,
+            'cadence' => $cadence,
+            'nextRuns' => $nextRuns,
+            'last' => $last,
+            'keptCount' => $keptCount,
+            'keepDays' => RunRetention::KEEP_DAYS,
+            'history' => $history,
+            'stats' => $this->durationStats($history),
+            'chartTile' => $this->durationChart($history),
+            'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
         ]);
     }
@@ -257,11 +331,54 @@ final class AdminController extends AbstractLogsController implements AdminNavig
         ));
     }
 
-    private function backToSchedules(): AdminTopActionButton
+    /**
+     * @param list<FinishedRun> $history
+     *
+     * @return array{average: int, median: int, p95: int, max: int, ok: int}|null
+     */
+    private function durationStats(array $history): ?array
+    {
+        if ($history === []) {
+            return null;
+        }
+
+        $durations = array_map(static fn(FinishedRun $run): int => $run->durationMs, $history);
+        sort($durations);
+        $count = count($durations);
+
+        return [
+            'average' => (int) round(array_sum($durations) / $count),
+            'median' => $durations[intdiv($count, 2)],
+            'p95' => $durations[min($count - 1, (int) ceil($count * 0.95) - 1)],
+            'max' => $durations[$count - 1],
+            'ok' => count(array_filter($history, static fn(FinishedRun $run): bool => $run->status === Status::ok)),
+        ];
+    }
+
+    /**
+     * @param list<FinishedRun> $history
+     */
+    private function durationChart(array $history): MultiSeriesChartTile
+    {
+        $chronological = array_reverse($history);
+
+        return new MultiSeriesChartTile(
+            title: 'admin_task.chart_duration',
+            canvasId: 'taskDurationChart',
+            labels: array_map(static fn(FinishedRun $run): string => $run->startedAt->format('m-d H:i'), $chronological),
+            datasets: [new TileDataset(
+                label: $this->translator->trans('admin_task.chart_duration_label'),
+                data: array_map(static fn(FinishedRun $run): int => $run->durationMs, $chronological),
+                borderColor: 'rgba(54, 162, 235, 1)',
+            )],
+        );
+    }
+
+    private function back(?string $identifier = null): AdminTopActionButton
     {
         return new AdminTopActionButton(
             label: $this->translator->trans('global.button_back'),
-            target: $this->generateUrl('app_admin_task'),
+            target: $identifier === null ? $this->generateUrl('app_admin_task') : $this->generateUrl('app_admin_task_show', ['identifier' => $identifier]),
             icon: 'arrow-left',
         );
     }

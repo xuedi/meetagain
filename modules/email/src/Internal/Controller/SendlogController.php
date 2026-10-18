@@ -80,10 +80,18 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         $rangeCount = $this->sendlog->countFiltered($since, $template, $recipient);
         $problemCount = $this->sendlog->countFiltered($since, $template, $recipient, self::PROBLEM_STATUSES);
 
-        $actions = [
-            $this->buildTemplateDropdown($template, $range, $recipient, $since),
-            $this->buildRangeDropdown($range, $template, $recipient),
-        ];
+        $actions = [];
+        if ($this->provider->isAvailable()) {
+            $actions[] = new AdminTopActionForm(
+                label: $this->translator->trans('admin_email_sendlog.button_sync'),
+                target: $this->generateUrl('app_admin_email_sendlog_sync'),
+                csrfTokenId: 'app_admin_email_sendlog_sync',
+                icon: 'refresh',
+                variant: 'is-warning',
+            );
+        }
+        $actions[] = $this->buildTemplateDropdown($template, $range, $recipient, $since);
+        $actions[] = $this->buildRangeDropdown($range, $template, $recipient);
         if ($recipient !== null) {
             $actions[] = new AdminTopActionButton(
                 label: $this->translator->trans('admin_email_sendlog.remove_recipient_filter', [
@@ -99,7 +107,6 @@ final class SendlogController extends AbstractEmailController implements AdminNa
         return $this->render('@Email/admin/sendlog/list.html.twig', [
             'active' => 'email',
             'emails' => $emails,
-            'providerAvailable' => $this->provider->isAvailable(),
             'currentRange' => $range,
             'defaultRange' => self::DEFAULT_RANGE,
             'currentTemplate' => $template,
