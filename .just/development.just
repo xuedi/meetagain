@@ -78,6 +78,7 @@ devFreshDatabaseSteps:
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
     {{PHP}} php bin/console app:install:seed -q
+    {{PHP}} php bin/console app:data-hotfix:baseline -q
     {{PHP}} php bin/console app:security:reset-state
 
 # Dev environment built from an archive in src/DataImportFixtures - without an argument, lists the archives

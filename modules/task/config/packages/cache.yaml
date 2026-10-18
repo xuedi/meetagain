@@ -1,0 +1,5 @@
+framework:
+    cache:
+        pools:
+            cache.task_schedule:
+                adapter: cache.adapter.redis

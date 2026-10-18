@@ -22,8 +22,9 @@ flowchart LR
 ```
 
 - **The scheduler** consumes the `scheduler_default` transport. Its schedule is locked through the Valkey lock store
-  and stateful in `cache.app`, so a second scheduler stands by without doubling a run, and a restart neither skips
-  nor repeats one.
+  and stateful in its own pool, `cache.task_schedule`, so a second scheduler stands by without doubling a run, and a
+  restart neither skips nor repeats one. The pool stays out of `cache.app` because every deploy clears that: a lost
+  checkpoint restarts at "now", a moment past the slot that is due, and that slot is skipped.
 - **The workers** consume `async`, a Valkey stream on the database `REDIS_URL` names. Each consumer is named after its
   host, so every pod or container claims its own messages. A message whose consumer died is taken over after five
   minutes.

@@ -5,7 +5,7 @@ namespace App\DataHotfix;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * One-off data repair that runs once per database lifetime, locked via AppState.
+ * One-off data repair an admin runs once per database lifetime, locked via AppState.
  * Implementations are responsible for their own batching and flushing.
  */
 #[AutoconfigureTag]
@@ -19,7 +19,7 @@ interface DataHotfixInterface
 
     /**
      * Apply the data fix. Throwing aborts the run; the AppState lock is NOT written,
-     * so the next cron tick will retry.
+     * so the hotfix stays pending.
      */
     public function execute(): void;
 }

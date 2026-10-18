@@ -3,6 +3,7 @@
 namespace Module\Task\Internal;
 
 use Module\Task\Internal\Message\RunTask;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Messenger\Message\RedispatchMessage;
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
@@ -20,6 +21,7 @@ readonly class ScheduleProvider implements ScheduleProviderInterface
     public function __construct(
         private Registry $registry,
         private LockFactory $lockFactory,
+        #[Autowire(service: 'cache.task_schedule')]
         private CacheInterface $cache,
     ) {}
 

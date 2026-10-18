@@ -621,6 +621,7 @@ admin_system:
     tab_language: '语言'
     tab_import: '导入'
     tab_secretbox: '密钥管理'
+    tab_hotfixes: '数据修复'
     flash_invalid_csrf: 'CSRF令牌无效'
 admin_secretbox:
     heading_configuration: '密钥配置'
