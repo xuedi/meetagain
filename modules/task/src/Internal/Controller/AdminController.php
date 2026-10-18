@@ -272,6 +272,7 @@ final class AdminController extends AbstractLogsController implements AdminNavig
             'active' => 'logs',
             'identifier' => $identifier,
             'taskClass' => $task::class,
+            'description' => $task->getDescription(),
             'cadence' => $cadence,
             'nextRuns' => $nextRuns,
             'last' => $last,

@@ -30,6 +30,11 @@ class Task implements TaskInterface
         return $this->cadence;
     }
 
+    public function getDescription(): string
+    {
+        return 'A stub task for tests.';
+    }
+
     public function run(): Result
     {
         $this->runs++;

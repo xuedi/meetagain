@@ -28,6 +28,14 @@ readonly class RunRetention implements TaskInterface
         return new Cadence('15 3 * * *', jitterSeconds: 1800);
     }
 
+    public function getDescription(): string
+    {
+        return sprintf(
+            'Keeps the task run history from growing without bound. Once a night it deletes every recorded run that started more than %d days ago - the history shown on these pages and used by the duration graph.',
+            self::KEEP_DAYS,
+        );
+    }
+
     public function run(): Result
     {
         $deleted = $this->runRepository->deleteStartedBefore($this->clock->now()->modify(sprintf('-%d days', self::KEEP_DAYS)));

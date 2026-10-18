@@ -143,6 +143,11 @@ readonly class SecurityService implements TaskInterface
         return new Cadence('10 * * * *', offloaded: true);
     }
 
+    public function getDescription(): string
+    {
+        return 'Looks back over the security logs for patterns that single requests do not reveal. Every security provider scans its own log table for the window since the previous run - a missed run widens the next window instead of leaving a gap - and reports a threat level and summary, which make up the run message. The scan only observes; blocking happens in the live per-request checks.';
+    }
+
     public function run(): Result
     {
         $now = $this->clock->now();

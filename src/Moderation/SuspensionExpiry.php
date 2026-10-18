@@ -33,6 +33,11 @@ final readonly class SuspensionExpiry implements TaskInterface
         return new Cadence('* * * * *');
     }
 
+    public function getDescription(): string
+    {
+        return 'Lifts temporary suspensions that have run out. Every member whose suspension end date has passed is set back to active in the name of the system user, so the change is logged like any other status change. It runs every minute so a suspension ends close to the moment the moderator chose.';
+    }
+
     public function run(): Result
     {
         try {

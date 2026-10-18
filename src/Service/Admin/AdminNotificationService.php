@@ -53,6 +53,11 @@ readonly class AdminNotificationService implements TaskInterface
         return new Cadence('0 7-21 * * *');
     }
 
+    public function getDescription(): string
+    {
+        return 'Mails admins a digest of what is waiting for them. Every notification provider contributes its pending items - members awaiting approval, reported images, moderation reports and whatever plugins add - and each admin receives the sections that apply to them. It runs hourly from 07:00 to 21:00 and only mails when something new arrived since the last digest. When admin notifications are switched off in the config it reports disabled.';
+    }
+
     public function run(): Result
     {
         try {

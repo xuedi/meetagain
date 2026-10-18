@@ -59,6 +59,11 @@ final readonly class StatusSyncService implements TaskInterface
         return new Cadence('*/10 * * * *', offloaded: true);
     }
 
+    public function getDescription(): string
+    {
+        return 'Fetches the delivery status of sent emails from the mail provider. Every ten minutes it takes up to 100 sent mails that have a provider message id but no status yet, asks the provider what happened to each - delivered, bounced and so on - and stores the answer on the send log. It does nothing when delivery sync is switched off in the config or the provider offers no status lookup.';
+    }
+
     public function run(): Result
     {
         try {

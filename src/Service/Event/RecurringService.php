@@ -51,6 +51,11 @@ readonly class RecurringService implements TaskInterface
         return new Cadence('20 2 * * *', jitterSeconds: 1800, offloaded: true);
     }
 
+    public function getDescription(): string
+    {
+        return 'Keeps recurring event series filled ahead. Once a night, for every open series, the newest unlocked event serves as the template and the future occurrences its recurrence rule produces are created up to the rule look-ahead window, each a copy of the template on its new date.';
+    }
+
     public function run(): Result
     {
         $count = $this->extentRecurringEvents();

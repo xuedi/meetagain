@@ -37,6 +37,12 @@ final readonly class MaintenanceTask implements TaskInterface
     }
 
     #[Override]
+    public function getDescription(): string
+    {
+        return 'Tidies up requests to bring a game to an event. Hourly, open requests whose event has started expire, and so do requests whose owner, game or event no longer exists or whose owner no longer offers the game to be asked for.';
+    }
+
+    #[Override]
     public function run(): Result
     {
         try {

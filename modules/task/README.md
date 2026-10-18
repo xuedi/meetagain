@@ -33,9 +33,9 @@ flowchart LR
 
 ## A task declares its own cadence
 
-A class implementing `Contract\TaskInterface` is a task: a stable identifier, a `Cadence` and a `run()` that returns
-a `Result`. It needs no wiring. `Registry` collects every implementation, and `ScheduleProvider` turns each one into a
-recurring message.
+A class implementing `Contract\TaskInterface` is a task: a stable identifier, a `Cadence`, a one-paragraph English
+description shown on its detail page, and a `run()` that returns a `Result`. It needs no wiring. `Registry` collects
+every implementation, and `ScheduleProvider` turns each one into a recurring message.
 
 - `Cadence::$cron` is a cron expression in the server's timezone. A time window such as "only between 07:00 and
   22:00" belongs in the expression, not in an `if` inside the task.
