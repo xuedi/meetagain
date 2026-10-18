@@ -5,9 +5,10 @@ namespace App\Activity;
 use App\Service\Media\ImageHtmlRenderer;
 use InvalidArgumentException;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-abstract class MessageAbstract implements MessageInterface
+abstract class MessageAbstract implements MessageInterface, ResetInterface
 {
     protected RouterInterface $router;
     protected ImageHtmlRenderer $imageRenderer;
@@ -63,5 +64,12 @@ abstract class MessageAbstract implements MessageInterface
         if (!is_numeric($this->meta[$key])) {
             throw new InvalidArgumentException(sprintf("Value '%s' has to be numeric in '%s'", $key, $this->getType()));
         }
+    }
+
+    public function reset(): void
+    {
+        $this->meta = [];
+        $this->userNames = [];
+        $this->eventNames = [];
     }
 }

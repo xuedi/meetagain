@@ -3,8 +3,9 @@
 namespace App\Service\Security;
 
 use App\Repository\SuspiciousUrlRepository;
+use Symfony\Contracts\Service\ResetInterface;
 
-final class SuspiciousUrlMatcher
+final class SuspiciousUrlMatcher implements ResetInterface
 {
     /** @var array<string, true>|null */
     private ?array $urlSet = null;
@@ -27,5 +28,10 @@ final class SuspiciousUrlMatcher
         }
 
         return isset($this->urlSet[$url]);
+    }
+
+    public function reset(): void
+    {
+        $this->urlSet = null;
     }
 }

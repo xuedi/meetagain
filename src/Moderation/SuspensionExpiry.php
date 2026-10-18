@@ -2,19 +2,19 @@
 
 namespace App\Moderation;
 
-use App\CronTaskInterface;
 use App\Entity\User;
-use App\Enum\CronTaskStatus;
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Member\UserService;
-use App\ValueObject\CronTaskResult;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use Psr\Clock\ClockInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
-final readonly class SuspensionExpiry implements CronTaskInterface
+final readonly class SuspensionExpiry implements TaskInterface
 {
     public function __construct(
         private UserRepository $userRepository,
@@ -28,30 +28,32 @@ final readonly class SuspensionExpiry implements CronTaskInterface
         return 'suspension-expiry';
     }
 
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('* * * * *');
+    }
+
+    public function run(): Result
     {
         try {
             $expired = $this->userRepository->findExpiredSuspensions($this->clock->now());
             if ($expired === []) {
-                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, '0 lifted');
+                return new Result(Status::ok, '0 lifted');
             }
 
             $systemUser = $this->userRepository->find($this->config->getSystemUserId());
             if (!$systemUser instanceof User) {
-                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::error, 'system user missing');
+                return new Result(Status::error, 'system user missing');
             }
 
             foreach ($expired as $user) {
                 $this->userService->transitionStatus($systemUser, $user, UserStatus::Active);
             }
             $message = sprintf('%d lifted', count($expired));
-            $output->writeln('SuspensionExpiry: ' . $message);
 
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
+            return new Result(Status::ok, $message);
         } catch (Throwable $e) {
-            $output->writeln('SuspensionExpiry exception: ' . $e->getMessage());
-
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
+            return new Result(Status::exception, $e->getMessage());
         }
     }
 }

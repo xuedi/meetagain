@@ -8,7 +8,6 @@ use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Admin\Top\Infos\AdminTopInfoText;
-use App\ExtendedFilesystem;
 use App\Portability\ArchiveReader;
 use App\Portability\Importer;
 use App\Portability\ImportSummary;
@@ -16,8 +15,8 @@ use App\Portability\KindLabels;
 use App\Portability\Outcome;
 use App\Service\Config\PluginService;
 use App\Service\Event\EventService;
+use League\Flysystem\FilesystemOperator;
 use RuntimeException;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,9 +38,7 @@ final class ImportController extends AbstractSettingsController implements Admin
         private readonly EventService $eventService,
         private readonly PluginService $pluginService,
         private readonly KindLabels $kindLabels,
-        private readonly ExtendedFilesystem $fs,
-        #[Autowire('%kernel.project_dir%/data/import/archive')]
-        private readonly string $pendingDir,
+        private readonly FilesystemOperator $privateStorage,
     ) {
         parent::__construct($translator, 'import');
     }
@@ -67,15 +64,22 @@ final class ImportController extends AbstractSettingsController implements Admin
         }
 
         $this->discardPendingArchive($request->getSession());
-        $pendingId = bin2hex(random_bytes(16));
-        $pending = $file->move($this->pendingDir, $pendingId . '.zip')->getPathname();
 
         try {
-            $archive = $this->archiveReader->describe($pending);
+            $archive = $this->archiveReader->describe($file->getPathname());
         } catch (RuntimeException $e) {
-            $this->fs->deleteFile($pending);
-
             return $this->renderPage(error: $e->getMessage());
+        }
+
+        $pendingId = bin2hex(random_bytes(16));
+        $stream = fopen($file->getPathname(), 'rb');
+        if ($stream === false) {
+            return $this->renderPage(error: $this->translator->trans('admin_system_import.error_no_file'));
+        }
+        try {
+            $this->privateStorage->writeStream((string) $this->pendingKey($pendingId), $stream);
+        } finally {
+            fclose($stream);
         }
 
         $request->getSession()->set(self::PENDING_ARCHIVE, $pendingId);
@@ -90,16 +94,19 @@ final class ImportController extends AbstractSettingsController implements Admin
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
-        $pending = $this->pendingPath($request->getSession()->get(self::PENDING_ARCHIVE));
-        if ($pending === null || !$this->fs->fileExists($pending)) {
+        $pending = $this->pendingKey($request->getSession()->get(self::PENDING_ARCHIVE));
+        if ($pending === null || !$this->privateStorage->fileExists($pending)) {
             return $this->renderPage(error: $this->translator->trans('admin_system_import.error_expired'));
         }
 
+        $copy = (string) tempnam(sys_get_temp_dir(), 'meetagain-import-');
         try {
-            $summary = $this->importer->import($pending, applySite: $request->request->getBoolean('site_settings'));
+            file_put_contents($copy, $this->privateStorage->readStream($pending));
+            $summary = $this->importer->import($copy, applySite: $request->request->getBoolean('site_settings'));
         } catch (RuntimeException $e) {
             return $this->renderPage(error: $e->getMessage());
         } finally {
+            unlink($copy);
             $this->discardPendingArchive($request->getSession());
         }
 
@@ -172,16 +179,16 @@ final class ImportController extends AbstractSettingsController implements Admin
 
     private function discardPendingArchive(SessionInterface $session): void
     {
-        $pending = $this->pendingPath($session->get(self::PENDING_ARCHIVE));
-        if ($pending !== null && $this->fs->fileExists($pending)) {
-            $this->fs->deleteFile($pending);
+        $pending = $this->pendingKey($session->get(self::PENDING_ARCHIVE));
+        if ($pending !== null) {
+            $this->privateStorage->delete($pending);
         }
 
         $session->remove(self::PENDING_ARCHIVE);
     }
 
-    private function pendingPath(mixed $pendingId): ?string
+    private function pendingKey(mixed $pendingId): ?string
     {
-        return is_string($pendingId) && preg_match('/^[a-f0-9]{32}$/', $pendingId) === 1 ? $this->pendingDir . '/' . $pendingId . '.zip' : null;
+        return is_string($pendingId) && preg_match('/^[a-f0-9]{32}$/', $pendingId) === 1 ? Importer::PENDING_DIRECTORY . '/' . $pendingId . '.zip' : null;
     }
 }

@@ -15,7 +15,6 @@ use Module\Ballot\Internal\Cron\SettleDueBallotsCron;
 use Module\Ballot\Internal\Notification\OpenBallotNotificationProvider;
 use Module\Ballot\Tests\Stub\RecordingSettlementListener;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Tests\Module\Members;
 
 final class DeadlineTest extends KernelTestCase
@@ -135,10 +134,7 @@ final class DeadlineTest extends KernelTestCase
 
     private function runCron(): string
     {
-        $output = new BufferedOutput();
-        $result = self::getContainer()->get(SettleDueBallotsCron::class)->runCronTask($output);
-
-        return $result->message . "\n" . $output->fetch();
+        return self::getContainer()->get(SettleDueBallotsCron::class)->run()->message;
     }
 
     /**

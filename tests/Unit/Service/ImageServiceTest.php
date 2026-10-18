@@ -7,7 +7,6 @@ use App\Entity\Image;
 use App\Entity\User;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
-use App\ExtendedFilesystem;
 use App\Repository\ImageLocationRepository;
 use App\Repository\ImageRepository;
 use App\Service\Media\ImageLocationService;
@@ -19,6 +18,9 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
 use ImagickPixel;
+use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemOperator;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -32,26 +34,34 @@ class ImageServiceTest extends TestCase
 {
     private const int FREE = ImageTypeDefinitionInterface::FREE_AXIS;
 
-    private string $kernelProjectDir = '/tmp/project';
+    private FilesystemOperator $imageStorage;
+
+    private FilesystemOperator $thumbnailStorage;
 
     /** @var list<string> */
-    private array $workspaces = [];
+    private array $uploads = [];
+
+    protected function setUp(): void
+    {
+        $this->imageStorage = new Filesystem(new InMemoryFilesystemAdapter());
+        $this->thumbnailStorage = new Filesystem(new InMemoryFilesystemAdapter());
+    }
 
     protected function tearDown(): void
     {
-        foreach ($this->workspaces as $workspace) {
-            exec(sprintf('rm -rf %s', escapeshellarg($workspace)));
+        foreach ($this->uploads as $upload) {
+            if (is_file($upload)) {
+                unlink($upload);
+            }
         }
-        $this->workspaces = [];
+        $this->uploads = [];
     }
 
     private function createService(
         ?ImageRepository $imageRepo = null,
         ?EntityManagerInterface $entityManager = null,
         ?ImageTypeRegistry $imageTypeRegistry = null,
-        ?ExtendedFilesystem $filesystemService = null,
         ?LoggerInterface $logger = null,
-        ?string $kernelProjectDir = null,
         ?ImageLocationRepository $imageLocationRepo = null,
     ): ImageService {
         return new ImageService(
@@ -59,9 +69,9 @@ class ImageServiceTest extends TestCase
             $entityManager ?? $this->createStub(EntityManagerInterface::class),
             $imageTypeRegistry ?? $this->createStub(ImageTypeRegistry::class),
             new ThumbnailSizeFormat(),
-            $filesystemService ?? $this->createStub(ExtendedFilesystem::class),
+            $this->imageStorage,
+            $this->thumbnailStorage,
             $logger ?? $this->createStub(LoggerInterface::class),
-            $kernelProjectDir ?? $this->kernelProjectDir,
             $this->createStub(ImageLocationService::class),
             $imageLocationRepo ?? $this->createStub(ImageLocationRepository::class),
             new LockFactory(new InMemoryStore()),
@@ -101,7 +111,7 @@ class ImageServiceTest extends TestCase
         $uploadedFile->method('getMimeType')->willReturn('image/jpeg');
         $uploadedFile->method('guessExtension')->willReturn('jpg');
         $uploadedFile->method('getSize')->willReturn(1);
-        $uploadedFile->method('getRealPath')->willReturn('/tmp/raced.jpg');
+        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes('raced content'));
         $subject = $this->createService(imageRepo: $imageRepo);
 
         // Act
@@ -123,7 +133,7 @@ class ImageServiceTest extends TestCase
         $uploadedFile->method('getMimeType')->willReturn('image/jpeg');
         $uploadedFile->method('guessExtension')->willReturn('jpg');
         $uploadedFile->method('getSize')->willReturn(1);
-        $uploadedFile->method('getRealPath')->willReturn('/tmp/fixture.jpg');
+        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes('fixture content'));
         $subject = $this->createService(imageRepo: $imageRepo, entityManager: $entityManager);
 
         // Act
@@ -177,7 +187,6 @@ class ImageServiceTest extends TestCase
         $mimeType = 'image/jpeg';
         $extension = 'jpg';
         $size = 12345;
-        $realPath = '/tmp/uploaded_file.jpg';
         $user = $this->storedUser();
         $type = ImageType::ProfilePicture;
 
@@ -191,14 +200,7 @@ class ImageServiceTest extends TestCase
         $uploadedFile->method('getMimeType')->willReturn($mimeType);
         $uploadedFile->method('guessExtension')->willReturn($extension);
         $uploadedFile->method('getSize')->willReturn($size);
-        $uploadedFile->method('getRealPath')->willReturn($realPath);
-
-        // Arrange
-        $filesystemMock = $this->createMock(ExtendedFilesystem::class);
-        $filesystemMock
-            ->expects($this->once())
-            ->method('copy')
-            ->with($realPath, $this->kernelProjectDir . '/data/images/' . $hash . '.' . $extension);
+        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes($imageContent));
 
         // Arrange
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
@@ -218,7 +220,7 @@ class ImageServiceTest extends TestCase
             ));
         $entityManagerMock->expects($this->once())->method('flush');
 
-        $subject = $this->createService(imageRepo: $imageRepoMock, entityManager: $entityManagerMock, filesystemService: $filesystemMock);
+        $subject = $this->createService(imageRepo: $imageRepoMock, entityManager: $entityManagerMock);
 
         // Act
         $result = $subject->upload($uploadedFile, $user, $type);
@@ -231,6 +233,7 @@ class ImageServiceTest extends TestCase
         static::assertEquals($type, $result->getType());
         static::assertEquals($size, $result->getSize());
         static::assertEquals($user, $result->getUploader());
+        static::assertSame($imageContent, $this->imageStorage->read($hash . '.' . $extension));
     }
 
     public function testCreateThumbnails(): void
@@ -243,9 +246,9 @@ class ImageServiceTest extends TestCase
                 $this->createStub(EntityManagerInterface::class),
                 $this->createStub(ImageTypeRegistry::class),
                 new ThumbnailSizeFormat(),
-                $this->createStub(ExtendedFilesystem::class),
+                $this->imageStorage,
+                $this->thumbnailStorage,
                 $this->createStub(LoggerInterface::class),
-                $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
                 new LockFactory(new InMemoryStore()),
@@ -279,9 +282,9 @@ class ImageServiceTest extends TestCase
                 $this->createStub(EntityManagerInterface::class),
                 $this->createStub(ImageTypeRegistry::class),
                 new ThumbnailSizeFormat(),
-                $this->createStub(ExtendedFilesystem::class),
+                $this->imageStorage,
+                $this->thumbnailStorage,
                 $this->createStub(LoggerInterface::class),
-                $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
                 new LockFactory(new InMemoryStore()),
@@ -310,12 +313,7 @@ class ImageServiceTest extends TestCase
         ], new ThumbnailSizeFormat());
 
         // Arrange
-        $filesystemMock = $this->createMock(ExtendedFilesystem::class);
-        $filesystemMock
-            ->expects($this->once())
-            ->method('scanDirectory')
-            ->with($this->kernelProjectDir . '/public/images/thumbnails/')
-            ->willReturn(['.', '..', 'hash1_100x100.webp', 'hash2_200x200.webp']);
+        $this->storeThumbnails('hash1_100x100.webp', 'hash2_200x200.webp');
 
         // Arrange
         $imageRepoMock = $this->createMock(ImageRepository::class);
@@ -343,9 +341,9 @@ class ImageServiceTest extends TestCase
                 $this->createStub(EntityManagerInterface::class),
                 $imageTypeRegistryMock,
                 new ThumbnailSizeFormat(),
-                $filesystemMock,
+                $this->imageStorage,
+                $this->thumbnailStorage,
                 $this->createStub(LoggerInterface::class),
-                $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
                 new LockFactory(new InMemoryStore()),
@@ -387,19 +385,12 @@ class ImageServiceTest extends TestCase
             ]);
 
         // Arrange
-        $filesystemMock = $this->createMock(ExtendedFilesystem::class);
-        $filesystemMock
-            ->expects($this->once())
-            ->method('scanDirectory')
-            ->with($this->kernelProjectDir . '/public/images/thumbnails/')
-            ->willReturn([
-                '.',
-                '..',
-                'hash1_100x100.webp', // Valid
-                'hash2_200x200.webp', // Valid
-                'hash3_100x100.webp', // Obsolete (hash not in image list)
-                'hash1_300x300.webp', // Obsolete (invalid size)
-            ]);
+        $this->storeThumbnails(
+            'hash1_100x100.webp', // Valid
+            'hash2_200x200.webp', // Valid
+            'hash3_100x100.webp', // Obsolete (hash not in image list)
+            'hash1_300x300.webp', // Obsolete (invalid size)
+        );
 
         // Arrange
         $imageTypeRegistryMock = new ImageTypeRegistry([
@@ -407,7 +398,7 @@ class ImageServiceTest extends TestCase
             $this->definition(ImageType::EventTeaser, [[200, 200]]),
         ], new ThumbnailSizeFormat());
 
-        $subject = $this->createService(imageRepo: $imageRepoMock, imageTypeRegistry: $imageTypeRegistryMock, filesystemService: $filesystemMock);
+        $subject = $this->createService(imageRepo: $imageRepoMock, imageTypeRegistry: $imageTypeRegistryMock);
 
         // Act
         $result = $subject->getObsoleteThumbnails();
@@ -430,15 +421,11 @@ class ImageServiceTest extends TestCase
             $this->definition(ImageType::GroupLogo, [[self::FREE, 120]]),
         ], new ThumbnailSizeFormat());
 
-        $filesystem = $this->createStub(ExtendedFilesystem::class);
-        $filesystem->method('scanDirectory')->willReturn(['shared_400x400.webp', 'shared_h120.webp']);
+        $this->storeThumbnails('shared_400x400.webp', 'shared_h120.webp');
 
-        $subject = $this->createService(
-            imageRepo: $imageRepo,
-            imageTypeRegistry: $registry,
-            filesystemService: $filesystem,
-            imageLocationRepo: $this->locationRepoFor([7 => [ImageType::GroupLogo]]),
-        );
+        $subject = $this->createService(imageRepo: $imageRepo, imageTypeRegistry: $registry, imageLocationRepo: $this->locationRepoFor([7 => [
+            ImageType::GroupLogo,
+        ]]));
 
         // Act
         $result = $subject->getObsoleteThumbnails();
@@ -458,15 +445,9 @@ class ImageServiceTest extends TestCase
             $this->definition(ImageType::GroupLogo, [[self::FREE, 120]]),
         ], new ThumbnailSizeFormat());
 
-        $filesystem = $this->createStub(ExtendedFilesystem::class);
-        $filesystem->method('scanDirectory')->willReturn(['shared_400x400.webp', 'shared_h120.webp']);
+        $this->storeThumbnails('shared_400x400.webp', 'shared_h120.webp');
 
-        $subject = $this->createService(
-            imageRepo: $imageRepo,
-            imageTypeRegistry: $registry,
-            filesystemService: $filesystem,
-            imageLocationRepo: $this->locationRepoFor([]),
-        );
+        $subject = $this->createService(imageRepo: $imageRepo, imageTypeRegistry: $registry, imageLocationRepo: $this->locationRepoFor([]));
 
         // Act
         $result = $subject->getObsoleteThumbnails();
@@ -478,8 +459,7 @@ class ImageServiceTest extends TestCase
     public function testRegenerateAllThumbnailsCreatesRenditionsARecordedLocationDemands(): void
     {
         // Arrange
-        $workspace = $this->createWorkspace();
-        $this->writeSourceImage($workspace, 'shared', 400, 200);
+        $this->writeSourceImage('shared', 400, 200);
 
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findAll')->willReturn([$this->storedImage(7, 'shared', ImageType::GroupPreview)]);
@@ -489,27 +469,22 @@ class ImageServiceTest extends TestCase
             $this->definition(ImageType::GroupLogo, [[self::FREE, 120]]),
         ], new ThumbnailSizeFormat());
 
-        $subject = $this->createService(
-            imageRepo: $imageRepo,
-            imageTypeRegistry: $registry,
-            filesystemService: $this->missingThumbnails(),
-            kernelProjectDir: $workspace,
-            imageLocationRepo: $this->locationRepoFor([7 => [ImageType::GroupLogo]]),
-        );
+        $subject = $this->createService(imageRepo: $imageRepo, imageTypeRegistry: $registry, imageLocationRepo: $this->locationRepoFor([7 => [
+            ImageType::GroupLogo,
+        ]]));
 
         // Act
         $created = $subject->regenerateAllThumbnails();
 
         // Assert
         static::assertSame(2, $created);
-        static::assertSame([240, 120], $this->thumbnailSize($workspace, 'shared_h120'));
+        static::assertSame([240, 120], $this->thumbnailSize('shared_h120'));
     }
 
     public function testRegenerateAllThumbnailsRestrictedToOneTypeSkipsTheOtherUsages(): void
     {
         // Arrange
-        $workspace = $this->createWorkspace();
-        $this->writeSourceImage($workspace, 'shared', 400, 200);
+        $this->writeSourceImage('shared', 400, 200);
 
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findAll')->willReturn([$this->storedImage(7, 'shared', ImageType::GroupPreview)]);
@@ -519,28 +494,23 @@ class ImageServiceTest extends TestCase
             $this->definition(ImageType::GroupLogo, [[self::FREE, 120]]),
         ], new ThumbnailSizeFormat());
 
-        $subject = $this->createService(
-            imageRepo: $imageRepo,
-            imageTypeRegistry: $registry,
-            filesystemService: $this->missingThumbnails(),
-            kernelProjectDir: $workspace,
-            imageLocationRepo: $this->locationRepoFor([7 => [ImageType::GroupLogo]]),
-        );
+        $subject = $this->createService(imageRepo: $imageRepo, imageTypeRegistry: $registry, imageLocationRepo: $this->locationRepoFor([7 => [
+            ImageType::GroupLogo,
+        ]]));
 
         // Act
         $created = $subject->regenerateAllThumbnails(ImageType::GroupLogo);
 
         // Assert
         static::assertSame(1, $created);
-        static::assertSame([240, 120], $this->thumbnailSize($workspace, 'shared_h120'));
-        static::assertFileDoesNotExist($workspace . '/public/images/thumbnails/shared_400x400.webp');
+        static::assertSame([240, 120], $this->thumbnailSize('shared_h120'));
+        static::assertFalse($this->thumbnailStorage->fileExists('shared_400x400.webp'));
     }
 
     public function testTheRowTypeOwnsTheFitModeWhenTwoUsagesDeclareTheSameSize(): void
     {
         // Arrange
-        $workspace = $this->createWorkspace();
-        $this->writeSourceImage($workspace, 'shared', 400, 200);
+        $this->writeSourceImage('shared', 400, 200);
 
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findAll')->willReturn([$this->storedImage(7, 'shared', ImageType::GroupPreview)]);
@@ -550,26 +520,22 @@ class ImageServiceTest extends TestCase
             $this->definition(ImageType::GroupLogo, [[100, 100]], ImageFitMode::Fit),
         ], new ThumbnailSizeFormat());
 
-        $subject = $this->createService(
-            imageRepo: $imageRepo,
-            imageTypeRegistry: $registry,
-            filesystemService: $this->realThumbnailPresence(),
-            kernelProjectDir: $workspace,
-            imageLocationRepo: $this->locationRepoFor([7 => [ImageType::GroupLogo]]),
-        );
+        $subject = $this->createService(imageRepo: $imageRepo, imageTypeRegistry: $registry, imageLocationRepo: $this->locationRepoFor([7 => [
+            ImageType::GroupLogo,
+        ]]));
 
         // Act
         $created = $subject->regenerateAllThumbnails();
 
         // Assert
         static::assertSame(1, $created);
-        static::assertSame([100, 100], $this->thumbnailSize($workspace, 'shared_100x100'));
+        static::assertSame([100, 100], $this->thumbnailSize('shared_100x100'));
     }
 
     public function testDeleteObsoleteThumbnails(): void
     {
         // Arrange
-        $filesystemMock = $this->createMock(ExtendedFilesystem::class);
+        $this->storeThumbnails('hash3_100x100.webp', 'hash1_300x300.webp', 'hash1_100x100.webp');
 
         $subject = $this
             ->getMockBuilder(ImageService::class)
@@ -578,9 +544,9 @@ class ImageServiceTest extends TestCase
                 $this->createStub(EntityManagerInterface::class),
                 $this->createStub(ImageTypeRegistry::class),
                 new ThumbnailSizeFormat(),
-                $filesystemMock,
+                $this->imageStorage,
+                $this->thumbnailStorage,
                 $this->createStub(LoggerInterface::class),
-                $this->kernelProjectDir,
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
                 new LockFactory(new InMemoryStore()),
@@ -591,31 +557,13 @@ class ImageServiceTest extends TestCase
         $obsoleteThumbnails = ['hash3_100x100.webp', 'hash1_300x300.webp'];
         $subject->expects($this->once())->method('getObsoleteThumbnails')->willReturn($obsoleteThumbnails);
 
-        // Arrange
-        $filesystemMock
-            ->expects($this->exactly(2))
-            ->method('exists')
-            ->willReturnMap([
-                [$this->kernelProjectDir . '/public/images/thumbnails/hash3_100x100.webp', true],
-                [$this->kernelProjectDir . '/public/images/thumbnails/hash1_300x300.webp', true],
-            ]);
-
-        $removedFiles = [];
-        $filesystemMock
-            ->expects($this->exactly(2))
-            ->method('remove')
-            ->willReturnCallback(static function ($path) use (&$removedFiles) {
-                $removedFiles[] = $path;
-
-                return true;
-            });
-
         // Act
         $result = $subject->deleteObsoleteThumbnails();
 
         // Assert
-        static::assertContains($this->kernelProjectDir . '/public/images/thumbnails/hash3_100x100.webp', $removedFiles);
-        static::assertContains($this->kernelProjectDir . '/public/images/thumbnails/hash1_300x300.webp', $removedFiles);
+        static::assertFalse($this->thumbnailStorage->fileExists('hash3_100x100.webp'));
+        static::assertFalse($this->thumbnailStorage->fileExists('hash1_300x300.webp'));
+        static::assertTrue($this->thumbnailStorage->fileExists('hash1_100x100.webp'));
         static::assertSame(2, $result);
     }
 
@@ -633,7 +581,7 @@ class ImageServiceTest extends TestCase
         $uploadedFile->method('getClientMimeType')->willReturn($mimeData['client']);
         $uploadedFile->method('guessExtension')->willReturn('jpg');
         $uploadedFile->method('getSize')->willReturn(1);
-        $uploadedFile->method('getRealPath')->willReturn('/tmp/x');
+        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes($imageContent));
 
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findOneBy')->willReturn(null);
@@ -721,7 +669,7 @@ class ImageServiceTest extends TestCase
         $uploadedFile->method('guessExtension')->willReturn($extData['server']);
         $uploadedFile->method('getClientOriginalExtension')->willReturn($extData['client']);
         $uploadedFile->method('getSize')->willReturn(1);
-        $uploadedFile->method('getRealPath')->willReturn('/tmp/x');
+        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes('payload'));
 
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findOneBy')->willReturn(null);
@@ -800,7 +748,7 @@ class ImageServiceTest extends TestCase
             $f->method('getMimeType')->willReturn('image/jpeg');
             $f->method('guessExtension')->willReturn('jpg');
             $f->method('getSize')->willReturn(10);
-            $f->method('getRealPath')->willReturn('/tmp/' . $i);
+            $f->method('getRealPath')->willReturn($this->uploadedBytes('payload-' . $i));
             $files[] = $f;
         }
 
@@ -809,9 +757,9 @@ class ImageServiceTest extends TestCase
             $em,
             $imageTypeRegistry,
             new ThumbnailSizeFormat(),
-            $this->createStub(ExtendedFilesystem::class),
+            $this->imageStorage,
+            $this->thumbnailStorage,
             $this->createStub(LoggerInterface::class),
-            $this->kernelProjectDir,
             $locationService,
             $this->createStub(ImageLocationRepository::class),
             new LockFactory(new InMemoryStore()),
@@ -831,15 +779,14 @@ class ImageServiceTest extends TestCase
         $imageTypeRegistry->method('getThumbnailSizes')->willReturn([[100, 100], [200, 200]]);
         $imageTypeRegistry->method('getFitMode')->willReturn(ImageFitMode::Fit);
 
-        $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('fileExists')->willReturn(true);
+        $this->storeThumbnails('h_100x100.webp', 'h_200x200.webp');
 
         $image = $this->createStub(Image::class);
         $image->method('getHash')->willReturn('h');
         $image->method('getExtension')->willReturn('jpg');
         $image->method('getType')->willReturn(ImageType::ProfilePicture);
 
-        $subject = $this->createService(imageTypeRegistry: $imageTypeRegistry, filesystemService: $fs);
+        $subject = $this->createService(imageTypeRegistry: $imageTypeRegistry);
 
         // Act
         $created = $subject->createThumbnails($image);
@@ -856,18 +803,17 @@ class ImageServiceTest extends TestCase
         $imageTypeRegistry->method('getThumbnailSizes')->willReturn([[50, 50]]);
         $imageTypeRegistry->method('getFitMode')->willReturn($fitMode);
 
-        $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('fileExists')->willReturn(false);
+        $this->imageStorage->write('unreadable_hash.jpg', 'not an image');
 
         $image = $this->createStub(Image::class);
-        $image->method('getHash')->willReturn('nonexistent_hash');
+        $image->method('getHash')->willReturn('unreadable_hash');
         $image->method('getExtension')->willReturn('jpg');
         $image->method('getType')->willReturn(ImageType::ProfilePicture);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('error');
 
-        $subject = $this->createService(imageTypeRegistry: $imageTypeRegistry, filesystemService: $fs, logger: $logger);
+        $subject = $this->createService(imageTypeRegistry: $imageTypeRegistry, logger: $logger);
 
         // Act
         $created = $subject->createThumbnails($image);
@@ -900,10 +846,7 @@ class ImageServiceTest extends TestCase
         $imageTypeRegistry->method('getThumbnailSizes')->willReturn([[10, 10]]);
         $imageTypeRegistry->method('getFitMode')->willReturn(ImageFitMode::Fit);
 
-        $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('fileExists')->willReturn(false);
-
-        $subject = $this->createService(imageRepo: $imageRepo, imageTypeRegistry: $imageTypeRegistry, filesystemService: $fs);
+        $subject = $this->createService(imageRepo: $imageRepo, imageTypeRegistry: $imageTypeRegistry);
 
         // Act
         $count = $subject->regenerateAllThumbnails();
@@ -916,20 +859,15 @@ class ImageServiceTest extends TestCase
     public function testCreateThumbnailsScalesAFreeWidthProportionally(int $sourceWidth, int $sourceHeight, int $expectedWidth, int $expectedHeight): void
     {
         // Arrange
-        $workspace = $this->createWorkspace();
-        $this->writeSourceImage($workspace, 'freewidth', $sourceWidth, $sourceHeight);
-        $subject = $this->createService(
-            imageTypeRegistry: $this->registryFor([[self::FREE, 120]]),
-            filesystemService: $this->missingThumbnails(),
-            kernelProjectDir: $workspace,
-        );
+        $this->writeSourceImage('freewidth', $sourceWidth, $sourceHeight);
+        $subject = $this->createService(imageTypeRegistry: $this->registryFor([[self::FREE, 120]]));
 
         // Act
         $created = $subject->createThumbnails($this->sourceImage('freewidth'));
 
         // Assert
         static::assertSame(1, $created);
-        static::assertSame([$expectedWidth, $expectedHeight], $this->thumbnailSize($workspace, 'freewidth_h120'));
+        static::assertSame([$expectedWidth, $expectedHeight], $this->thumbnailSize('freewidth_h120'));
     }
 
     public static function provideFreeWidthCases(): iterable
@@ -945,36 +883,25 @@ class ImageServiceTest extends TestCase
     public function testCreateThumbnailsScalesAFreeHeightProportionally(): void
     {
         // Arrange
-        $workspace = $this->createWorkspace();
-        $this->writeSourceImage($workspace, 'freeheight', 768, 120);
-        $subject = $this->createService(
-            imageTypeRegistry: $this->registryFor([[350, self::FREE]]),
-            filesystemService: $this->missingThumbnails(),
-            kernelProjectDir: $workspace,
-        );
+        $this->writeSourceImage('freeheight', 768, 120);
+        $subject = $this->createService(imageTypeRegistry: $this->registryFor([[350, self::FREE]]));
 
         // Act
         $created = $subject->createThumbnails($this->sourceImage('freeheight'));
 
         // Assert
         static::assertSame(1, $created);
-        static::assertSame([350, 55], $this->thumbnailSize($workspace, 'freeheight_w350'));
+        static::assertSame([350, 55], $this->thumbnailSize('freeheight_w350'));
     }
 
     public function testCreateThumbnailsWarnsOnlyWhenTheFreeAxisCeilingIsHit(): void
     {
         // Arrange
-        $workspace = $this->createWorkspace();
-        $this->writeSourceImage($workspace, 'calm', 768, 120);
-        $this->writeSourceImage($workspace, 'extreme', 12000, 100);
+        $this->writeSourceImage('calm', 768, 120);
+        $this->writeSourceImage('extreme', 12000, 100);
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('warning');
-        $subject = $this->createService(
-            imageTypeRegistry: $this->registryFor([[self::FREE, 120]]),
-            filesystemService: $this->missingThumbnails(),
-            logger: $logger,
-            kernelProjectDir: $workspace,
-        );
+        $subject = $this->createService(imageTypeRegistry: $this->registryFor([[self::FREE, 120]]), logger: $logger);
 
         // Act & Assert
         $subject->createThumbnails($this->sourceImage('calm'));
@@ -987,23 +914,9 @@ class ImageServiceTest extends TestCase
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findAll')->willReturn([$this->storedImage(1, 'hash1', ImageType::SiteLogo)]);
 
-        $filesystem = $this->createStub(ExtendedFilesystem::class);
-        $filesystem
-            ->method('scanDirectory')
-            ->willReturn([
-                '.',
-                '..',
-                'hash1_h120.webp',
-                'hash1_w350.webp',
-                'hash1_h999.webp',
-                'hash1_840x120.webp',
-            ]);
+        $this->storeThumbnails('hash1_h120.webp', 'hash1_w350.webp', 'hash1_h999.webp', 'hash1_840x120.webp');
 
-        $subject = $this->createService(
-            imageRepo: $imageRepo,
-            imageTypeRegistry: $this->registryFor([[self::FREE, 120], [350, self::FREE]]),
-            filesystemService: $filesystem,
-        );
+        $subject = $this->createService(imageRepo: $imageRepo, imageTypeRegistry: $this->registryFor([[self::FREE, 120], [350, self::FREE]]));
 
         // Act
         $result = $subject->getObsoleteThumbnails();
@@ -1021,6 +934,7 @@ class ImageServiceTest extends TestCase
         $image = $this->createStub(Image::class);
         $image->method('getHash')->willReturn('rotate_hash');
         $image->method('getType')->willReturn(ImageType::ProfilePicture);
+        $this->storeThumbnails('rotate_hash_10x10.webp', 'rotate_hash_20x20.webp');
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->exactly(2))->method('error');
@@ -1055,22 +969,6 @@ class ImageServiceTest extends TestCase
         return $definition;
     }
 
-    private function missingThumbnails(): ExtendedFilesystem
-    {
-        $filesystem = $this->createStub(ExtendedFilesystem::class);
-        $filesystem->method('fileExists')->willReturn(false);
-
-        return $filesystem;
-    }
-
-    private function realThumbnailPresence(): ExtendedFilesystem
-    {
-        $filesystem = $this->createStub(ExtendedFilesystem::class);
-        $filesystem->method('fileExists')->willReturnCallback(static fn(string $path): bool => file_exists($path));
-
-        return $filesystem;
-    }
-
     private function sourceImage(string $hash): Image
     {
         $image = $this->createStub(Image::class);
@@ -1081,31 +979,37 @@ class ImageServiceTest extends TestCase
         return $image;
     }
 
-    private function createWorkspace(): string
+    private function uploadedBytes(string $content): string
     {
-        $workspace = sys_get_temp_dir() . '/image-service-' . bin2hex(random_bytes(8));
-        mkdir($workspace . '/data/images', 0o775, true);
-        mkdir($workspace . '/public/images/thumbnails', 0o775, true);
-        $this->workspaces[] = $workspace;
+        $path = (string) tempnam(sys_get_temp_dir(), 'image-service-upload-');
+        file_put_contents($path, $content);
+        $this->uploads[] = $path;
 
-        return $workspace;
+        return $path;
     }
 
-    private function writeSourceImage(string $workspace, string $hash, int $width, int $height): void
+    private function storeThumbnails(string ...$keys): void
+    {
+        foreach ($keys as $key) {
+            $this->thumbnailStorage->write($key, 'not a real webp');
+        }
+    }
+
+    private function writeSourceImage(string $hash, int $width, int $height): void
     {
         $imagick = new Imagick();
         $imagick->newImage($width, $height, new ImagickPixel('red'));
-        $imagick->setFormat('png');
-        $imagick->writeImage(sprintf('%s/data/images/%s.png', $workspace, $hash));
+        $imagick->setImageFormat('png');
+        $this->imageStorage->write($hash . '.png', $imagick->getImageBlob());
     }
 
     /**
      * @return array{0: int, 1: int}
      */
-    private function thumbnailSize(string $workspace, string $name): array
+    private function thumbnailSize(string $name): array
     {
         $imagick = new Imagick();
-        $imagick->pingImage(sprintf('%s/public/images/thumbnails/%s.webp', $workspace, $name));
+        $imagick->pingImageBlob($this->thumbnailStorage->read($name . '.webp'));
 
         return [$imagick->getImageWidth(), $imagick->getImageHeight()];
     }

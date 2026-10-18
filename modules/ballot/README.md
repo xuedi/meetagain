@@ -19,7 +19,7 @@ Everything that varies between one kind of decision and another is answered by t
 | What are the candidates?       | the caller, when it opens the ballot                             |
 | How long is it open?           | the caller, as a deadline on the request                         |
 | Approve many, or pick one?     | `TallyMode` on the request                                       |
-| Settled by a person or a cron? | `SettlementMode` on the request                                  |
+| Settled by a person or a task? | `SettlementMode` on the request                                  |
 | Who may vote?                  | `ElectorateProviderInterface`, matched on the purpose            |
 | What does winning *mean*?      | `SettlementListenerInterface`, matched on the purpose            |
 | Who may see it?                | `VisibilityFilterInterface`, an AND-intersection over ballot ids |
@@ -65,7 +65,7 @@ than adding to them, and a selection is **intersected with the ballot's own opti
 key cannot enter a tally.
 
 Zero votes is reported as undecided, not as every candidate being tied. Both are undecided; they are not
-the same situation, and the deadline cron needs to tell an empty ballot from a genuine deadlock.
+the same situation, and the deadline task needs to tell an empty ballot from a genuine deadlock.
 
 ## The four seams
 
@@ -81,7 +81,7 @@ All four are `#[AutoconfigureTag]`ed and resolved inside the module.
 A ballot whose purpose nobody claims settles and writes nothing. That is the correct behaviour rather
 than an error: the arithmetic is still true, there is simply nobody who wanted the answer.
 
-`BallotOutcome` carries **both** user ids: `settledByUserId`, which is null when the deadline cron
+`BallotOutcome` carries **both** user ids: `settledByUserId`, which is null when the deadline task
 settled it, and `openedByUserId`, which never is. A listener that has to write as somebody - because
 the write it makes is permissioned - reads the second one and does not have to call back into the
 module to find out who asked the question.
@@ -92,7 +92,7 @@ on visibility alone, so a member who was never entitled to vote can still read a
 
 ## Deadlines
 
-`ballot.settle-due` runs on the application's cron chain. It tallies every ballot past its deadline and
+`ballot.settle-due` is a task that runs every minute (see `modules/task/README.md`). It tallies every ballot past its deadline and
 settles **only** those whose `SettlementMode` is `Automatic` and whose tally has a single winner. A tie,
 or a ballot marked `Confirmed`, is left for a person. Failures are per-ballot: one broken ballot is
 logged and the batch continues.
@@ -114,7 +114,7 @@ only the consumer knows what actually changed.
 one candidate per competing value proposed for a field plus one for leaving it alone, and a settlement
 that writes the winner through the application's own change-proposal tool. It is also why `Confirmed`
 earns its place beside `Automatic`: that consumer's write is permission-checked against the current
-request's user, so nothing the deadline cron attempted on its behalf would be allowed through.
+request's user, so nothing the deadline task attempted on its behalf would be allowed through.
 
 ### Use the module's page, or keep your own
 
@@ -165,8 +165,8 @@ application's archive section is the one caller, and it decides per purpose whic
 | Path                                  | Holds                                                                             |
 |---------------------------------------|-----------------------------------------------------------------------------------|
 | `modules/ballot/src/Contract/`        | the public surface: `BallotInterface`, the four seams, the VOs                    |
-| `modules/ballot/src/Internal/`        | the engine, the registries, the cron, the page                                    |
+| `modules/ballot/src/Internal/`        | the engine, the registries, the task, the page                                    |
 | `modules/ballot/src/Internal/Entity/` | `Ballot`, `BallotOption`, `BallotVote`                                            |
 | `modules/ballot/migrations/`          | namespace `ModuleBallotMigrations`                                                |
 | `modules/ballot/tests/Stub/`          | a stand-in for each seam: listener, electorate, visibility filter                 |
-| `modules/ballot/tests/Functional/`    | the engine, the seams, the deadline cron and the page, driven through those stubs |
+| `modules/ballot/tests/Functional/`    | the engine, the seams, the deadline task and the page, driven through those stubs |

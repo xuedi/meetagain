@@ -5,8 +5,9 @@ namespace Plugin\Karaoke\Service;
 use App\Publisher\PluginSettings\Resolver;
 use App\Service\Security\SecretBox;
 use Plugin\Karaoke\ValueObject\Config;
+use Symfony\Contracts\Service\ResetInterface;
 
-class ConfigService
+class ConfigService implements ResetInterface
 {
     private ?Config $memo = null;
 
@@ -32,5 +33,10 @@ class ConfigService
         $encrypted = $this->getConfig()->getEncryptedYoutubeApiKey();
 
         return $encrypted === null ? null : $this->secretBox->decrypt($encrypted);
+    }
+
+    public function reset(): void
+    {
+        $this->memo = null;
     }
 }

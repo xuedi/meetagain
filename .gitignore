@@ -1,12 +1,10 @@
 .env
-installed.lock
 /.env.local
 /.env.local.php
 /.env.*.local
 /config/secrets/prod/prod.decrypt.private.php
 /config/plugins.php
 /config/plugins_test.php
-/config/plugins_prod.php
 /config/plugins-post-fixtures.sh
 /.just/local.just
 /justFail.log

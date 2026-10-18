@@ -1,0 +1,41 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <table id="filteredTable" class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>{{ 'admin_task.col_started_at'|trans }}</th>
+                <th>{{ 'admin_task.col_task'|trans }}</th>
+                <th>{{ 'admin_task.col_status'|trans }}</th>
+                <th>{{ 'admin_task.col_duration'|trans }}</th>
+                <th>{{ 'admin_task.col_host'|trans }}</th>
+                <th>{{ 'admin_task.col_message'|trans }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for run in runs %}
+                <tr>
+                    <td class="is-nowrap">{{ run.startedAt|date('Y-m-d H:i:s') }}</td>
+                    <td><code>{{ run.identifier }}</code></td>
+                    <td><span class="tag {{ run.status.tagVariant }}">{{ run.status.label|trans }}</span></td>
+                    <td class="has-text-grey has-unit" data-unit="ms">{{ run.durationMs }}</td>
+                    <td class="has-text-grey">{{ run.host }}</td>
+                    <td>{{ run.message }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="has-text-grey has-text-centered">{{ 'admin_task.empty_runs'|trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

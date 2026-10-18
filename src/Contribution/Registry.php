@@ -5,10 +5,11 @@ namespace App\Contribution;
 use App\Entity\User;
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Service\ResetInterface;
 
 // Gated on getActiveList(), not getGloballyActiveList(): the hub is a UI surface, so a section
 // follows whether its plugin is on for this request
-class Registry
+class Registry implements ResetInterface
 {
     private const string CORE_PLUGIN_KEY = '';
 
@@ -98,5 +99,10 @@ class Registry
     public function mayTouch(string $type, User $user, int|string $id): bool
     {
         return $this->providerFor($type)?->mayTouch($user, $id) ?? false;
+    }
+
+    public function reset(): void
+    {
+        $this->active = null;
     }
 }

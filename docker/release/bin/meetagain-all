@@ -1,0 +1,24 @@
+#!/bin/bash
+# The web, worker and scheduler roles in one container: each restarts when it exits, SIGTERM stops all three.
+set -uo pipefail
+
+supervise() {
+    child=''
+    trap '[ -z "$child" ] || kill -TERM "$child" 2>/dev/null; wait "$child" 2>/dev/null; exit 0' TERM INT
+    while true; do
+        meetagain-entrypoint "$1" &
+        child=$!
+        wait "$child"
+        echo "meetagain-all: the $1 role exited with $?, restarting" >&2
+        sleep 1
+    done
+}
+
+roles=()
+for role in web worker scheduler; do
+    supervise "$role" &
+    roles+=("$!")
+done
+
+trap 'kill -TERM "${roles[@]}" 2>/dev/null; wait; exit 0' TERM INT
+wait

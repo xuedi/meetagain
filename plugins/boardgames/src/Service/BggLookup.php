@@ -8,9 +8,10 @@ use Psr\Log\LoggerInterface;
 use SensitiveParameter;
 use SimpleXMLElement;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\Service\ResetInterface;
 use Throwable;
 
-class BggLookup implements GameMetadataLookupInterface
+class BggLookup implements GameMetadataLookupInterface, ResetInterface
 {
     private const string BASE_URL = 'https://boardgamegeek.com/xmlapi2';
 
@@ -209,5 +210,10 @@ class BggLookup implements GameMetadataLookupInterface
         $trimmed = trim($value);
 
         return $trimmed === '' ? null : $trimmed;
+    }
+
+    public function reset(): void
+    {
+        $this->lastFailure = null;
     }
 }

@@ -29,6 +29,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `FollowerEventNotificationFilterInterface`                   | Drop follower-RSVP email recipients per event         | `isFollowerAllowed()`                                  |
 | `ImageAttributionFilterInterface`                            | Narrow which attributed images `/attributions` shows  | `getVisibleImageIdFilter()`                            |
 | `DataHotfixInterface`                                        | Ship a one-off data repair that runs once per DB      | `getIdentifier()`, `execute()`                         |
+| `Module\Task\Contract\TaskInterface`                         | Run periodic work on a cron cadence                   | `getIdentifier()`, `getCadence()`, `run()`             |
 | `SecurityProviderInterface`                                  | Participate in live security event detection          | `observe()`, `scanRetrospective()`                     |
 | `DescriptorInterface`                                        | Add a settings section to your plugin's settings page | `getFormType()`, `createDefault()`, `applyForm()`      |
 | `TaggableTypeProviderInterface`                              | Give an item type a tag vocabulary                    | `getPluginKey()`, `getTypeKey()`, `getLabelKey()`      |
@@ -313,7 +314,7 @@ plugin existed; suppressing the box must not hide them, so render what is there 
 
 ### Event\EventScopeProviderInterface
 
-**Purpose:** Let request-less code read an event's world the way a visitor of that event would. A cron task, an
+**Purpose:** Let request-less code read an event's world the way a visitor of that event would. A scheduled task, an
 import, a data hotfix and a test all run without a request, so anything your installation narrows by - host, language,
 whatever else - has nothing to narrow by, and reads come back either empty or from the wrong place.
 
@@ -1201,9 +1202,9 @@ $this->myPluginEmail->send(['user' => $user]);
 ```
 
 `send()` runs every rule `getGuardRules()` declares, then `compose()`, then drops any message whose recipient is on
-the blocklist, and queues the rest; cron dispatches them. `compose()` may return several messages or none. A rule
-that answers `Error` means the context you passed is incomplete, and `send()` throws. The context array is yours:
-the module hands it back to your rules and `compose()` without reading it.
+the blocklist, and queues the rest; a message worker sends them. `compose()` may return several messages or none.
+A rule that answers `Error` means the context you passed is incomplete, and `send()` throws. The context array is
+yours: the module hands it back to your rules and `compose()` without reading it.
 
 Optional overrides on `EmailAbstract`:
 
@@ -1227,11 +1228,12 @@ substituted unless the definition lists it in `htmlVariables`. Reusing a shipped
   English label, the mock keeps it English - the preview sweep exists to make that visible.
 - `MockSampleFactory::create()` returns a shared per-locale sample (people, group, event, dates, sample
   text) so each type composes its context from one table rather than inventing its own.
-- `app:email:preview` queues every registered type in every enabled language for the dev mailbox (run the
-  cron to dispatch), so a mock that is missing a template variable shows up as a `{{placeholder}}` in a
+- `app:email:preview` queues every registered type in every enabled language for the dev mailbox (a message worker
+  sends them), so a mock that is missing a template variable shows up as a `{{placeholder}}` in a
   rendered mail.
 
-For **scheduled emails** (cron-driven), implement `Module\Email\Contract\ScheduledEmailInterface` additionally:
+For **scheduled emails** (sent by the `scheduled-emails` task), implement
+`Module\Email\Contract\ScheduledEmailInterface` additionally:
 
 - `getDueContexts(DateTimeImmutable $now): DueContext[]` - return what is due now; return `[]` to skip. Each
   context names its potential recipients; the module sends to each one through the same rules as `send()`.
@@ -1248,7 +1250,8 @@ run after the type's own, for the identifiers it returns them for.
 ### Who a mail looks like it came from
 
 By default every mail is branded from the live request, which is right for a single-site install but wrong
-for anything cron-driven - cron has no request. Two hooks let a plugin decide it from stored data instead.
+for anything sent from a task or a message worker - neither has a request. Two hooks let a plugin decide it from
+stored data instead.
 
 `EmailInterface::getOrigin(array $context): ?object` reports **the entity a message is about**, taken from
 the send context. `EmailAbstract` returns `null`, so overriding it is optional; the shipped event mails
@@ -1294,8 +1297,8 @@ readonly class MySendingIdentityProvider implements SendingIdentityProviderInter
 
 Three rules that are easy to get wrong:
 
-- **Resolve from repositories, never from the request.** The whole point is that a cron send reaches the
-  same answer as a web send. Injecting `RequestStack` defeats it.
+- **Resolve from repositories, never from the request.** The whole point is that a send from a task reaches
+  the same answer as a web send. Injecting `RequestStack` defeats it.
 - **A deferring chain means "ask the request", not "the installation".** If your plugin owns the concept of
   a site, answer for the installation's own site explicitly instead of deferring, or request-time mail
   picks up whichever site the sender happened to be browsing.
@@ -1353,11 +1356,21 @@ on top via AND-intersection with that one.
 
 ---
 
+## Background work
+
+A periodic task (`Module\Task\Contract\TaskInterface`) and work a request hands off to a message worker are
+described in [Required Hooks](required-hooks.md#periodic-and-background-work).
+
+---
+
 ## Data Hotfix
 
-Implement `DataHotfixInterface` to ship a one-off data repair that runs once per database lifetime. The runner
-(`Runner`) discovers all implementations on every cron tick, checks the per-identifier AppState lock, runs the hotfix if
-not yet locked, and writes the lock on success. Throwing leaves the lock unwritten so the next tick retries.
+Implement `DataHotfixInterface` to ship a one-off data repair that runs once per database lifetime.
+`app:data-hotfix:run` runs every time the database is migrated - the image's `migrate` role and `just appMigrate` both
+call it. It skips every hotfix whose per-identifier AppState lock is written, runs the rest in identifier order and
+writes the lock on success. Throwing leaves the lock unwritten, so the hotfix runs again at the next migrate. Throw
+`App\DataHotfix\DeferredException` when the data the hotfix needs is not there yet: it is reported as deferred, not
+as a failure.
 
 ```php
 namespace Plugin\YourPlugin\DataHotfix;

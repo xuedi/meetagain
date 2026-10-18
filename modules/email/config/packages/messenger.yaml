@@ -1,0 +1,4 @@
+framework:
+    messenger:
+        routing:
+            Module\Email\Internal\Message\Drain: async

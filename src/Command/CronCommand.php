@@ -2,133 +2,20 @@
 
 namespace App\Command;
 
-use App\CronTaskInterface;
-use App\Entity\CronLog;
-use App\Enum\CronTaskStatus;
-use App\Metrics\Point;
-use App\Metrics\Recorder;
-use App\Service\Admin\CommandExecutionService;
-use App\ValueObject\CronTaskResult;
-use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use Symfony\Component\Lock\LockFactory;
-use Symfony\Component\Lock\LockInterface;
 
-#[AsCommand(name: 'app:cron', description: 'cron manager to be called often, maybe every 5 min or so')]
-class CronCommand extends LoggedCommand
+#[AsCommand(name: 'app:cron', description: 'Does nothing: the task workers and the scheduler replaced it')]
+class CronCommand extends Command
 {
-    private const float LOCK_TTL_SECONDS = 900.0;
-
-    public function __construct(
-        private readonly EntityManagerInterface $em,
-        CommandExecutionService $commandExecutionService,
-        private readonly Recorder $recorder,
-        private readonly LockFactory $lockFactory,
-        #[AutowireIterator(CronTaskInterface::class)]
-        private readonly iterable $cronTasks = [],
-    ) {
-        parent::__construct($commandExecutionService);
-    }
-
     #[Override]
-    protected function configure(): void
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->addOption('task', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Run only the tasks with these identifiers');
-    }
-
-    protected function doExecute(InputInterface $input, OutputInterface $output): int
-    {
-        $lock = $this->lockFactory->createLock('app:cron', self::LOCK_TTL_SECONDS);
-        if (!$lock->acquire()) {
-            $output->writeln('app:cron is already running elsewhere, skipping this run');
-
-            return Command::SUCCESS;
-        }
-
-        try {
-            $this->runTasks($input, $output, $lock);
-        } finally {
-            $lock->release();
-        }
+        $output->writeln('app:cron is replaced by the task workers and the scheduler (messenger:consume).');
 
         return Command::SUCCESS;
-    }
-
-    private function runTasks(InputInterface $input, OutputInterface $output, LockInterface $lock): void
-    {
-        /** @var array<int, array{result: CronTaskResult, duration_ms: int}> $timed */
-        $timed = [];
-        $totalStart = hrtime(true);
-
-        $only = $input->getOption('task');
-        foreach ($this->cronTasks as $task) {
-            if ($only !== [] && !in_array($task->getIdentifier(), $only, true)) {
-                continue;
-            }
-
-            $lock->refresh();
-            $taskStart = hrtime(true);
-            $result = $task->runCronTask($output);
-            $durationMs = (int) ((hrtime(true) - $taskStart) / 1_000_000);
-            $timed[] = ['result' => $result, 'duration_ms' => $durationMs];
-        }
-
-        $totalDurationMs = (int) ((hrtime(true) - $totalStart) / 1_000_000);
-
-        $aggregated = CronTaskStatus::ok;
-        foreach ($timed as $entry) {
-            $aggregated = $aggregated->worst($entry['result']->status);
-        }
-
-        $tasks = array_map(static fn(array $entry) => [
-            'identifier' => $entry['result']->identifier,
-            'status' => $entry['result']->status->value,
-            'message' => $entry['result']->message,
-            'duration_ms' => $entry['duration_ms'],
-        ], $timed);
-
-        $log = new CronLog(runAt: new DateTimeImmutable(), status: $aggregated, durationMs: $totalDurationMs, tasks: $tasks);
-        $this->em->persist($log);
-        $this->em->flush();
-
-        if ($this->recorder->isEnabled()) {
-            $this->recordMetrics($tasks, $aggregated, $totalDurationMs);
-        }
-    }
-
-    /**
-     * @param list<array{identifier: string, status: string, message: string, duration_ms: int}> $tasks
-     */
-    private function recordMetrics(array $tasks, CronTaskStatus $aggregated, int $totalDurationMs): void
-    {
-        foreach ($tasks as $task) {
-            $this->recorder->add(
-                new Point(
-                    'cron_task',
-                    ['duration_ms' => $task['duration_ms']],
-                    [
-                        'task' => $task['identifier'],
-                        'status' => $task['status'],
-                    ],
-                ),
-            );
-        }
-        $this->recorder->add(
-            new Point(
-                'cron_run',
-                [
-                    'duration_ms' => $totalDurationMs,
-                    'memory_peak_mb' => round(memory_get_peak_usage(true) / 1_048_576, 1),
-                ],
-                ['status' => $aggregated->value],
-            ),
-        );
     }
 }

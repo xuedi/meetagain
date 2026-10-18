@@ -4,8 +4,9 @@ namespace App\Portability\Item;
 
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Service\ResetInterface;
 
-class Registry
+class Registry implements ResetInterface
 {
     /**
      * @var array<string, array<string, ContributorInterface>>
@@ -60,5 +61,10 @@ class Registry
         }
 
         return $this->active[$key] = $map;
+    }
+
+    public function reset(): void
+    {
+        $this->active = [];
     }
 }

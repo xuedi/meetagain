@@ -15,7 +15,6 @@ class LogServiceTest extends TestCase
     {
         // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('glob')->willReturn([]);
         $fs->method('isFile')->willReturn(false);
         $service = new LogService($fs, self::LOGS_DIR, self::ENV);
 
@@ -30,7 +29,6 @@ class LogServiceTest extends TestCase
     {
         // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('glob')->willReturn([]);
         $fs->method('isFile')->willReturn(true);
         $fs->method('getFileContents')->willReturn(implode("\n", [
             '[2026-05-12T10:00:00+00:00] app.INFO: first',
@@ -54,7 +52,6 @@ class LogServiceTest extends TestCase
     {
         // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('glob')->willReturn([]);
         $fs->method('isFile')->willReturn(true);
         $fs->method('getFileContents')->willReturn(implode("\n", [
             '[2026-05-12T10:00:00+00:00] app.INFO: keep me out',
@@ -78,7 +75,6 @@ class LogServiceTest extends TestCase
             $lines[] = sprintf('[2026-05-12T10:00:0%d+00:00] app.INFO: msg%d', $i, $i);
         }
         $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('glob')->willReturn([]);
         $fs->method('isFile')->willReturn(true);
         $fs->method('getFileContents')->willReturn(implode("\n", $lines));
         $service = new LogService($fs, self::LOGS_DIR, self::ENV);
@@ -92,49 +88,12 @@ class LogServiceTest extends TestCase
         static::assertSame('msg3', $entries[1]->getMessage());
     }
 
-    public function testGetLogFilePathFallsBackToBaseWhenNoRotatedFiles(): void
-    {
-        // Arrange
-        $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('glob')->willReturn([]);
-        $service = new LogService($fs, self::LOGS_DIR, self::ENV);
-
-        // Act
-        $path = $service->getLogFilePath();
-
-        // Assert
-        static::assertSame(self::LOGS_DIR . '/' . self::ENV . '.log', $path);
-    }
-
-    public function testGetLogFilePathPicksNewestRotatedFile(): void
-    {
-        // Arrange
-        $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('glob')->willReturn([
-            self::LOGS_DIR . '/prod-2026-05-10.log',
-            self::LOGS_DIR . '/prod-2026-05-12.log',
-        ]);
-        $fs->method('getFileModifiedTime')->willReturnCallback(static fn(string $p): int => match ($p) {
-            '/var/log/prod-2026-05-10.log' => 100,
-            '/var/log/prod-2026-05-12.log' => 200,
-            default => 0,
-        });
-        $service = new LogService($fs, self::LOGS_DIR, self::ENV);
-
-        // Act
-        $path = $service->getLogFilePath();
-
-        // Assert
-        static::assertSame('/var/log/prod-2026-05-12.log', $path);
-    }
-
-    public function testClearDeletesTheCurrentFileAndEveryRotatedSibling(): void
+    public function testClearDeletesTheLogFile(): void
     {
         // Arrange
         $deleted = [];
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('isFile')->willReturn(true);
-        $fs->method('glob')->willReturn(['/var/log/prod-2026-05-11.log', '/var/log/prod-2026-05-12.log']);
         $fs->method('deleteFile')->willReturnCallback(static function (string $path) use (&$deleted): bool {
             $deleted[] = $path;
             return true;
@@ -145,54 +104,23 @@ class LogServiceTest extends TestCase
         $count = $service->clear();
 
         // Assert
-        static::assertSame(3, $count);
-        static::assertSame(
-            [
-                '/var/log/prod-2026-05-11.log',
-                '/var/log/prod-2026-05-12.log',
-                '/var/log/prod.log',
-            ],
-            $deleted,
-        );
+        static::assertSame(1, $count);
+        static::assertSame(['/var/log/prod.log'], $deleted);
     }
 
     public function testClearOnlyCountsFilesItActuallyRemoved(): void
     {
         // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('isFile')->willReturn(false);
-        $fs->method('glob')->willReturn(['/var/log/prod-2026-05-11.log', '/var/log/prod-2026-05-12.log']);
-        $fs->method('deleteFile')->willReturnCallback(static fn(string $path): bool => $path === '/var/log/prod-2026-05-11.log');
+        $fs->method('isFile')->willReturn(true);
+        $fs->method('deleteFile')->willReturn(false);
         $service = new LogService($fs, self::LOGS_DIR, self::ENV);
 
         // Act
         $count = $service->clear();
 
         // Assert
-        static::assertSame(1, $count);
-    }
-
-    public function testGetAllEntriesConcatenatesAllLogFiles(): void
-    {
-        // Arrange
-        $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('isFile')->willReturn(true);
-        $fs->method('glob')->willReturn(['/var/log/prod-2026-05-11.log']);
-        $fs->method('getFileContents')->willReturnCallback(static fn(string $p): string => match ($p) {
-            '/var/log/prod.log' => '[2026-05-12T10:00:00+00:00] app.INFO: today',
-            '/var/log/prod-2026-05-11.log' => '[2026-05-11T10:00:00+00:00] app.INFO: yesterday',
-            default => '',
-        });
-        $service = new LogService($fs, self::LOGS_DIR, self::ENV);
-
-        // Act
-        $entries = $service->getAllEntries();
-
-        // Assert
-        static::assertCount(2, $entries);
-        $messages = array_map(static fn($e) => $e->getMessage(), $entries);
-        static::assertContains('today', $messages);
-        static::assertContains('yesterday', $messages);
+        static::assertSame(0, $count);
     }
 
     public function testFindByHashReturnsMatchingEntry(): void
@@ -201,7 +129,6 @@ class LogServiceTest extends TestCase
         $line = '[2026-05-12T10:00:00+00:00] app.ERROR: trackable {"k":"v"}';
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('isFile')->willReturn(true);
-        $fs->method('glob')->willReturn([]);
         $fs->method('getFileContents')->willReturn($line);
         $service = new LogService($fs, self::LOGS_DIR, self::ENV);
 
@@ -219,7 +146,6 @@ class LogServiceTest extends TestCase
         // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('isFile')->willReturn(true);
-        $fs->method('glob')->willReturn([]);
         $fs->method('getFileContents')->willReturn('[2026-05-12T10:00:00+00:00] app.INFO: msg');
         $service = new LogService($fs, self::LOGS_DIR, self::ENV);
 
@@ -234,7 +160,6 @@ class LogServiceTest extends TestCase
     {
         // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('glob')->willReturn([]);
         $fs->method('isFile')->willReturn(false);
         $service = new LogService($fs, self::LOGS_DIR, self::ENV);
 
@@ -242,53 +167,39 @@ class LogServiceTest extends TestCase
         static::assertSame(0, $service->countAllLines());
     }
 
-    public function testCountAllLinesSumsTheCurrentFileAndTheRotatedOnes(): void
+    public function testCountAllLinesCountsAnUnterminatedLastLine(): void
     {
         // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('isFile')->willReturn(true);
-        $fs->method('glob')->willReturn(['/var/log/prod-2026-05-11.log']);
-        $fs->method('getFileContents')->willReturnCallback(static fn(string $p): string => match ($p) {
-            '/var/log/prod.log' => "one\ntwo\nthree\n",
-            '/var/log/prod-2026-05-11.log' => "four\nfive",
-            default => '',
-        });
+        $fs->method('getFileContents')->willReturn("one\ntwo\nthree");
         $service = new LogService($fs, self::LOGS_DIR, self::ENV);
 
         // Act / Assert
-        static::assertSame(5, $service->countAllLines());
+        static::assertSame(3, $service->countAllLines());
     }
 
-    public function testGetTotalSizeSumsEveryLogFile(): void
+    public function testGetTotalSizeIsTheLogFileSize(): void
     {
         // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('isFile')->willReturn(true);
-        $fs->method('glob')->willReturn(['/var/log/prod-2026-05-11.log']);
-        $fs->method('getFileSize')->willReturnCallback(static fn(string $p): int|false => match ($p) {
-            '/var/log/prod.log' => 1200,
-            '/var/log/prod-2026-05-11.log' => 800,
-            default => false,
-        });
-        $service = new LogService($fs, self::LOGS_DIR, self::ENV);
-
-        // Act / Assert
-        static::assertSame(2000, $service->getTotalSize());
-    }
-
-    public function testGetTotalSizeIgnoresUnreadableFiles(): void
-    {
-        // Arrange
-        $fs = $this->createStub(ExtendedFilesystem::class);
-        $fs->method('isFile')->willReturn(true);
-        $fs->method('glob')->willReturn(['/var/log/prod-2026-05-11.log']);
-        $fs->method('getFileSize')->willReturnCallback(static fn(string $p): int|false => match ($p) {
-            '/var/log/prod.log' => 1200,
-            default => false,
-        });
+        $fs->method('getFileSize')->willReturn(1200);
         $service = new LogService($fs, self::LOGS_DIR, self::ENV);
 
         // Act / Assert
         static::assertSame(1200, $service->getTotalSize());
+    }
+
+    public function testGetTotalSizeIgnoresAnUnreadableFile(): void
+    {
+        // Arrange
+        $fs = $this->createStub(ExtendedFilesystem::class);
+        $fs->method('isFile')->willReturn(true);
+        $fs->method('getFileSize')->willReturn(false);
+        $service = new LogService($fs, self::LOGS_DIR, self::ENV);
+
+        // Act / Assert
+        static::assertSame(0, $service->getTotalSize());
     }
 }

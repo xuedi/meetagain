@@ -2,20 +2,20 @@
 
 namespace Module\Ballot\Internal\Cron;
 
-use App\CronTaskInterface;
-use App\Enum\CronTaskStatus;
-use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
 use Module\Ballot\Contract\BallotInterface;
 use Module\Ballot\Contract\SettlementMode;
 use Module\Ballot\Internal\Entity\Ballot;
 use Module\Ballot\Internal\Repository\BallotRepository;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use Override;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
-readonly class SettleDueBallotsCron implements CronTaskInterface
+readonly class SettleDueBallotsCron implements TaskInterface
 {
     public function __construct(
         private BallotRepository $ballots,
@@ -30,7 +30,13 @@ readonly class SettleDueBallotsCron implements CronTaskInterface
     }
 
     #[Override]
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('* * * * *');
+    }
+
+    #[Override]
+    public function run(): Result
     {
         $settled = 0;
         $waiting = 0;
@@ -38,7 +44,7 @@ readonly class SettleDueBallotsCron implements CronTaskInterface
 
         foreach ($this->ballots->findDue(new DateTimeImmutable('now')) as $ballot) {
             try {
-                if ($this->process($ballot, $output)) {
+                if ($this->process($ballot)) {
                     $settled++;
                     continue;
                 }
@@ -49,30 +55,22 @@ readonly class SettleDueBallotsCron implements CronTaskInterface
                     'ballot_id' => $ballot->getId(),
                     'error' => $e->getMessage(),
                 ]);
-                $output->writeln(sprintf('SettleDueBallotsCron: error on ballot %d: %s', (int) $ballot->getId(), $e->getMessage()));
             }
         }
 
-        return new CronTaskResult(
-            $this->getIdentifier(),
-            $errors > 0 ? CronTaskStatus::error : CronTaskStatus::ok,
-            sprintf('%d settled, %d left for a person, %d errors', $settled, $waiting, $errors),
-        );
+        return new Result($errors > 0 ? Status::error : Status::ok, sprintf('%d settled, %d left for a person, %d errors', $settled, $waiting, $errors));
     }
 
-    private function process(Ballot $ballot, OutputInterface $output): bool
+    private function process(Ballot $ballot): bool
     {
         $ballotId = (int) $ballot->getId();
         $outcome = $this->ballotService->tally($ballotId);
 
         if ($ballot->getSettlementMode() !== SettlementMode::Automatic || $outcome->winningKey === null) {
-            $output->writeln(sprintf('SettleDueBallotsCron: ballot %d tallied, awaiting a decision', $ballotId));
-
             return false;
         }
 
         $this->ballotService->settle($ballotId, $outcome->winningKey);
-        $output->writeln(sprintf('SettleDueBallotsCron: settled ballot %d on %s', $ballotId, $outcome->winningKey));
 
         return true;
     }

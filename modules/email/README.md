@@ -23,12 +23,12 @@ Everything else in this README is the module's.
 ## One pipeline, whatever triggered the mail
 
 A type only **composes**. Calling `send()` on it hands the type to `MailerInterface::send()`, and the
-scheduled sweep calls the same method once per recipient, so a triggered mail and a cron mail take the same
+scheduled sweep calls the same method once per recipient, so a triggered mail and a scheduled mail take the same
 path and meet the same checks.
 
 ```mermaid
 flowchart TD
-    subgraph req["Request or cron tick - the caller is waiting; a rule Error is the caller's bug"]
+    subgraph req["Request or sweep - the caller is waiting; a rule Error is the caller's bug"]
         S["EmailAbstract::send(context)"] --> M["MailerInterface::send(type, context)"]
         Sch["scheduled sweep<br/>per due context, per recipient"] --> M
         M --> G{"guard chain<br/>type rules + provider rules"}
@@ -39,8 +39,8 @@ flowchart TD
         B -->|yes| N
         B -->|no| E["enqueue: identity, enrichers,<br/>render, freeze the row, push"]
     end
-    subgraph cron["Cron - retryable, resolves nothing"]
-        E -.-> D["dispatch: max_send_by, wrap, SMTP"]
+    subgraph wrk["Worker time - retryable, resolves nothing"]
+        E -.->|"drain message after the flush"| D["dispatch: max_send_by, wrap, SMTP"]
         D -.-> P["delivery status sync"]
     end
 ```
@@ -61,8 +61,8 @@ written here rather than enforced.
 ## Enqueue decides everything, the send path resolves nothing
 
 Enqueue resolves the sending identity, runs the context enrichers, renders subject and body, and freezes the
-result onto the queue row: the rendered fragment, and the identity as a `_layout` snapshot. Dispatch, under
-cron, reads only the row, lookups keyed by stored values, the layout template and the translation catalogue.
+result onto the queue row: the rendered fragment, and the identity as a `_layout` snapshot. Dispatch, on a
+worker, reads only the row, lookups keyed by stored values, the layout template and the translation catalogue.
 No request, no membership query, no provider chain. `LayoutRendererTest` proves it by wrapping a frozen row
 with every live resolver replaced by one that throws.
 
@@ -80,7 +80,7 @@ in priority order, may turn it into a `SendingIdentity` - name, URL, logo URL, s
 optional attribution - and the first non-null answer wins. The application registers
 `RequestSendingIdentityProvider` at the lowest priority, which answers from the live request; if every
 provider defers, enqueue throws. A provider that answers for types with no origin must do so from stored
-data or the request host, never from anything only a cron run lacks.
+data or the request host, never from anything only a worker lacks.
 
 The logo is a remote image URL, never a MIME part. The URL is frozen; the bytes behind it are not, so a changed
 logo reaches mail already sent. A `null` logo URL means no header image.
@@ -107,30 +107,35 @@ template in every stored language - the call for a data hotfix after a default c
 
 A `ScheduledEmailInterface` returns `DueContext`s from `getDueContexts(now)`, each with its potential
 recipients. The sweep runs every recipient through the pipeline above and calls `markContextSent()` once per
-context, not once per recipient. It runs between 07:00 and 22:00 only; types do not check the time.
+context, not once per recipient. Its cadence (`*/5 7-21 * * *`) keeps it between 07:00 and 22:00; types do not
+check the time.
 
 `getMaxSendBy()` lets a type refuse to be sent late: a reminder or a cancellation notice is useless after the
 event starts. It is frozen at enqueue, and a row past its cap is marked late instead of sent. Token-carrying
 mail does not set one - the token has its own expiry.
 
-## The queue drains on a time budget, not a count
+## A queued row wakes a worker; the queue drains on a time budget
 
-`email-queue` takes `Pending` rows in chunks of 200 and keeps going until a chunk comes back short or 150 s have
-passed - half the 5-minute cron interval, so the tasks after it in the same `app:cron` run still get their turn. A
-count would only fit the transport it was tuned for; a budget sends as much as SMTP, an HTTP API or `null://` allow
-in the same wall time. Almost all of a send is the transport: the module's own work per row is well under a
+The row is the record and the message is only a doorbell (see `modules/task/README.md`). `enqueue()` dispatches a
+`Drain` message to `async` right after its flush, and the scheduled sweep does the same after each of its flushes, so
+a triggered mail leaves within about a second. The `email-queue` task (every 5 minutes) runs the same drain as the
+backstop for a message that never arrived, or for a row committed inside a caller's own transaction, which a drain
+can claim only after that commit.
+
+A drain takes `Pending` rows in chunks of 200 and keeps going until a chunk comes back short or 50 s have passed; a
+drain that stopped on its budget with a full chunk dispatches another `Drain` and ends, so no worker is held for
+long. A count would only fit the transport it was tuned for; a budget sends as much as SMTP, an HTTP API or `null://`
+allow in the same wall time. Almost all of a send is the transport: the module's own work per row is well under a
 millisecond.
 
 A chunk is claimed, not just selected: `EmailQueueRepository::claimPending()` stamps a token and a time on up to 200
 `Pending` rows in an UPDATE that repeats the claim condition, and the run sends only the rows carrying its token. Two
-runs on two workers therefore never send the same mail. Each mail's outcome is flushed as soon as it is known, which
-releases its claim, and the chunk is detached before the next is claimed, so memory stays flat however long the queue
-is. A process that dies mid-send leaves at most the one mail in flight unrecorded; its claim expires after 10 minutes
-and a later run sends it again. The sweep writes the same way from the other end: it enqueues without flushing and flushes every 200 mails, and always before `markContextSent()`, so a
-context is never marked done while its mails are still unwritten.
-
-There is no dedicated queue worker. A long-running consumer would be one more process to deploy, supervise and
-watch, for throughput the budget already gets inside the cron run.
+drains on two workers therefore never send the same mail, and an empty one costs one UPDATE, so drains are not
+deduplicated. Each mail's outcome is flushed as soon as it is known, which releases its claim, and the chunk is
+detached before the next is claimed, so memory stays flat however long the queue is. A process that dies mid-send
+leaves at most the one mail in flight unrecorded; its claim expires after 10 minutes and a later run sends it again.
+The sweep writes the same way from the other end: it enqueues without flushing and flushes every 200 mails, and
+always before `markContextSent()`, so a context is never marked done while its mails are still unwritten.
 
 ## Push notifications ride the enqueue
 
@@ -182,29 +187,30 @@ templates under `@Email/`:
 - **Templates** - list, edit per language, preview with the type's mock data, reset to the default.
 - **Planned** - scheduled mail due in the next 14 days, and every rule's verdict for one of them.
 - **Debugging** - queue any type with mock context to a chosen address. It goes through the queue and the
-  blocklist, so the mail waits for cron like any other.
+  blocklist, so it is sent by a worker like any other.
 - **Send log** - queued and sent mail, the frozen layout rendered in a sandboxed frame, delivery status sync,
   and "Clear cap & retry" for a row that went late.
 - **Blocklist** - add and remove addresses. Adding one that is already blocked keeps its first reason.
 
 It also contributes a bell entry for mail pending longer than an hour, the `email_queue` metrics gauge, and
-three cron tasks: `email-queue` (dispatch), `scheduled-emails` (the sweep) and `email-delivery-sync`.
-`app:cron --task <identifier>` runs one of them alone.
+three tasks: `email-queue` (the backstop drain, every 5 minutes), `scheduled-emails` (the sweep, every 5 minutes
+from 07:00 to 21:55) and `email-delivery-sync` (every 10 minutes). `app:task:run <identifier>` runs one of them
+alone.
 
 ## What the module reaches for
 
 The outbound permit list in `mago.toml` names every domain dependency. Substrate (`@global`,
 `Doctrine\**`, `Symfony\**`, `Twig\**`, `Psr\**`) is permitted as for every module.
 
-| Dependency                                                  | Why                                                                   |
-|-------------------------------------------------------------|-----------------------------------------------------------------------|
-| `App\Entity\User`                                           | the blocklist entry's `addedBy` foreign key                           |
-| `App\Admin\**`                                              | the admin pages build their tabs, top bar, sections and navigation    |
-| `App\CronTaskInterface`, `CronTaskResult`, `CronTaskStatus` | the three cron tasks                                                  |
-| `NotificationProviderInterface`, `NotificationItem`         | the pending-mail bell entry                                           |
-| `App\Metrics\GaugeInterface`, `App\Metrics\Point`           | the queue gauge                                                       |
-| `App\Service\Config\ConfigService`                          | mailer address, theme accent for the layout, the delivery sync switch |
-| `App\Service\Config\LanguageService`                        | enabled languages for the editor, seeding and the sweep               |
+| Dependency                                          | Why                                                                   |
+|-----------------------------------------------------|-----------------------------------------------------------------------|
+| `App\Entity\User`                                   | the blocklist entry's `addedBy` foreign key                           |
+| `App\Admin\**`                                      | the admin pages build their tabs, top bar, sections and navigation    |
+| `Module\Task\Contract\**`                           | the three tasks register on the task module's schedule                |
+| `NotificationProviderInterface`, `NotificationItem` | the pending-mail bell entry                                           |
+| `App\Metrics\GaugeInterface`, `App\Metrics\Point`   | the queue gauge                                                       |
+| `App\Service\Config\ConfigService`                  | mailer address, theme accent for the layout, the delivery sync switch |
+| `App\Service\Config\LanguageService`                | enabled languages for the editor, seeding and the sweep               |
 
 ## How to write a type
 

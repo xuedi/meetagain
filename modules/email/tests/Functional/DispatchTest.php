@@ -8,11 +8,11 @@ use Module\Email\Contract\QueueStatus;
 use Module\Email\Contract\SendlogInterface;
 use Module\Email\Contract\SentEmail;
 use Module\Email\Internal\EmailService;
+use Module\Email\Internal\Message\Drain;
 use Module\Email\Tests\Stub\IdentityProvider;
 use Module\Email\Tests\Stub\Origin;
 use Module\Email\Tests\Stub\TriggeredEmail;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Mime\Email;
 
 final class DispatchTest extends KernelTestCase
@@ -73,7 +73,33 @@ final class DispatchTest extends KernelTestCase
         $second = $this->runQueueTask();
 
         // Assert
-        self::assertSame('EmailService: 0', trim($second));
+        self::assertSame('0', $second);
+    }
+
+    public function testQueueingAMailWakesAWorker(): void
+    {
+        // Arrange
+        $transport = self::getContainer()->get('messenger.transport.async');
+
+        // Act
+        $this->queue();
+
+        // Assert
+        $sent = array_map(static fn($envelope): object => $envelope->getMessage(), $transport->getSent());
+        self::assertCount(1, array_filter($sent, static fn(object $message): bool => $message instanceof Drain));
+    }
+
+    public function testTheWokenWorkerSendsTheRow(): void
+    {
+        // Arrange
+        $this->queue();
+
+        // Act
+        self::getContainer()->get(EmailService::class)->drain(new Drain());
+
+        // Assert
+        self::assertSame(QueueStatus::Sent, $this->row()->status);
+        self::assertEmailCount(1);
     }
 
     private function queue(): void
@@ -85,10 +111,7 @@ final class DispatchTest extends KernelTestCase
 
     private function runQueueTask(): string
     {
-        $output = new BufferedOutput();
-        self::getContainer()->get(EmailService::class)->runCronTask($output);
-
-        return $output->fetch();
+        return self::getContainer()->get(EmailService::class)->run()->message;
     }
 
     private function row(): SentEmail

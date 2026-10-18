@@ -4,8 +4,9 @@ namespace App\Item;
 
 use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Service\ResetInterface;
 
-class ListCellRegistry
+class ListCellRegistry implements ResetInterface
 {
     private const string CORE_PLUGIN_KEY = '';
 
@@ -54,5 +55,10 @@ class ListCellRegistry
         }
 
         return $this->active = $map;
+    }
+
+    public function reset(): void
+    {
+        $this->active = null;
     }
 }

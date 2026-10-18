@@ -7,8 +7,9 @@ use App\Entity\EventSeries;
 use App\Enum\EventCanonicalRootType;
 use App\Repository\EventCanonicalRootRepository;
 use App\Repository\EventRepository;
+use Symfony\Contracts\Service\ResetInterface;
 
-final class EventCanonicalResolver
+final class EventCanonicalResolver implements ResetInterface
 {
     /** @var array<int, array<int, Event>> seriesId => members ordered by start */
     private array $membersBySeriesId = [];
@@ -165,5 +166,10 @@ final class EventCanonicalResolver
         }
 
         return $this->markersBySeriesId[$seriesId][$locale] ?? [];
+    }
+
+    public function reset(): void
+    {
+        $this->clearMemo();
     }
 }

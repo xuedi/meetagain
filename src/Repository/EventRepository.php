@@ -17,9 +17,10 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /** @extends ServiceEntityRepository<Event> */
-class EventRepository extends ServiceEntityRepository
+class EventRepository extends ServiceEntityRepository implements ResetInterface
 {
     private const int IN_PROGRESS_GRACE_HOURS = 4;
 
@@ -975,5 +976,10 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('host', $host)
             ->getQuery()
             ->getResult();
+    }
+
+    public function reset(): void
+    {
+        $this->eventNameLists = [];
     }
 }

@@ -7,20 +7,22 @@ use App\Entity\ItemTag;
 use App\Entity\User;
 use App\Item\Tag\TagService;
 use App\Repository\ItemTagAssignmentRepository;
+use League\Flysystem\FileAttributes;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use Plugin\Glossary\Activity\Messages\EntriesImported;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Enum\DuplicatePolicy;
 use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\ValueObject\ImportFile;
 use Plugin\Glossary\ValueObject\ImportMapping;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\Filesystem\Filesystem;
 
 readonly class TransferService
 {
     public const int ROW_CAP = 10_000;
     public const int PREVIEW_ROWS = 10;
     private const int STASH_TTL_SECONDS = 86_400;
+    private const string STASH_DIRECTORY = 'import/glossary';
 
     private const array SEPARATORS = [
         'tab' => "\t",
@@ -36,9 +38,7 @@ readonly class TransferService
         private TagService $tagService,
         private ItemTagAssignmentRepository $assignmentRepo,
         private ActivityService $activityService,
-        private Filesystem $filesystem,
-        #[Autowire('%kernel.project_dir%/data/import/glossary')]
-        private string $stashDir,
+        private FilesystemOperator $privateStorage,
     ) {}
 
     public function parse(string $content): ImportFile
@@ -198,7 +198,7 @@ readonly class TransferService
         $this->sweepStale();
 
         $stashId = bin2hex(random_bytes(16));
-        $this->filesystem->dumpFile($this->stashDir . '/' . $stashId . '.txt', $content);
+        $this->privateStorage->write(self::STASH_DIRECTORY . '/' . $stashId . '.txt', $content);
 
         return $stashId;
     }
@@ -206,30 +206,36 @@ readonly class TransferService
     public function stashed(?string $stashId): ?string
     {
         $path = $this->stashPath($stashId);
+        if ($path === null) {
+            return null;
+        }
 
-        return $path !== null && is_file($path) ? (string) file_get_contents($path) : null;
+        try {
+            return $this->privateStorage->read($path);
+        } catch (FilesystemException) {
+            return null;
+        }
     }
 
     public function discard(?string $stashId): void
     {
         $path = $this->stashPath($stashId);
         if ($path !== null) {
-            $this->filesystem->remove($path);
+            $this->privateStorage->delete($path);
         }
     }
 
     private function stashPath(?string $stashId): ?string
     {
-        return preg_match('/^[a-f0-9]{32}$/', (string) $stashId) === 1 ? $this->stashDir . '/' . $stashId . '.txt' : null;
+        return preg_match('/^[a-f0-9]{32}$/', (string) $stashId) === 1 ? self::STASH_DIRECTORY . '/' . $stashId . '.txt' : null;
     }
 
     private function sweepStale(): void
     {
         $cutoff = time() - self::STASH_TTL_SECONDS;
-        foreach (glob($this->stashDir . '/*.txt') ?: [] as $file) {
-            $modified = filemtime($file);
-            if ($modified !== false && $modified < $cutoff) {
-                $this->filesystem->remove($file);
+        foreach ($this->privateStorage->listContents(self::STASH_DIRECTORY, false) as $item) {
+            if ($item instanceof FileAttributes && ($item->lastModified() ?? 0) < $cutoff) {
+                $this->privateStorage->delete($item->path());
             }
         }
     }

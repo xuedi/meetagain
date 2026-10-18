@@ -16,10 +16,7 @@ permit = [
     "@global",                                                         # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                                               # the FKs on copy, request, handover and ledger - the one sanctioned core entity
     "App\\Controller\\AbstractController",                             # module controllers extend core's, as plugin controllers do
-    "App\\CronTaskInterface",                                          # the daily maintenance task registers on core's cron chain
-    "App\\ValueObject\\CronTaskResult",                                # that chain's return type
-    "App\\Enum\\CronTaskStatus",                                       # that chain's status enum
-    "App\\Service\\AppStateService",                                   # the maintenance task throttles itself to once a day
+    "Module\\Task\\Contract\\**",                                      # the daily maintenance task registers on the task module's schedule
     "App\\Service\\Notification\\User\\NotificationProviderInterface", # handovers and queues surface on core's bell
     "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
     "App\\Item\\ActionInterface",                                      # copies of a deleted item are retired
@@ -46,10 +43,7 @@ permit = [
     "@global",                                                         # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                                               # the FKs on copy, request, handover and ledger - the one sanctioned core entity
     "App\\Controller\\AbstractController",                             # module controllers extend core's, as plugin controllers do
-    "App\\CronTaskInterface",                                          # the daily maintenance task registers on core's cron chain
-    "App\\ValueObject\\CronTaskResult",                                # that chain's return type
-    "App\\Enum\\CronTaskStatus",                                       # that chain's status enum
-    "App\\Service\\AppStateService",                                   # the maintenance task throttles itself to once a day
+    "Module\\Task\\Contract\\**",                                      # the daily maintenance task registers on the task module's schedule
     "App\\Service\\Notification\\User\\NotificationProviderInterface", # handovers and queues surface on core's bell
     "App\\Service\\Notification\\User\\NotificationItem",              # that chain's item type
     "App\\Item\\ActionInterface",                                      # copies of a deleted item are retired

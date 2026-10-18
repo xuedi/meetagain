@@ -20,7 +20,7 @@ at different complexity levels:
 
 - Multiple menu links with priorities
 - Event tiles (voting box on event detail page)
-- Cron tasks to close expired votes
+- Export and import sections (`src/Portability/`)
 - `AdminNavigationInterface` for admin sidebar
 - **See:** `plugins/films/src/Kernel.php`
 
@@ -38,9 +38,12 @@ at different complexity levels:
 
 ### Plugin not showing up
 
-1. Check `config/plugins.php` — is the plugin key listed?
-2. Run `just plugin-enable your-plugin` to add it.
-3. Clear the cache: `just app cache:clear`
+Every plugin folder under `plugins/` is installed; an admin switches each one on or off.
+
+1. Check its state: `just plugin-list` (runs `app:plugin:list`).
+2. Switch it on at `/admin/plugin`, or run `just plugin-enable your-plugin` (`app:plugin:toggle on your-plugin`).
+   A plugin whose `"requires"` lists another plugin stays off until that one is on.
+3. A plugin folder that is new to the instance needs the container rebuilt: `just app cache:clear`
 
 ---
 
@@ -66,8 +69,8 @@ at different complexity levels:
 
 **Symptom:** The import summary counts your plugin's rows as skipped, or your items never arrive.
 
-1. The plugin must be enabled on the importing instance - a section of an inactive plugin is skipped.
-2. `getPluginKey()` on your contributor or section must return the key listed in `config/plugins.php`.
+1. The plugin must be switched on on the importing instance - a section of a switched-off plugin is skipped.
+2. `getPluginKey()` on your contributor or section must return the plugin key - its folder name under `plugins/`.
 3. Every exported item row needs a `ref` equal to the source item id, and `importItems()` must flush
    before returning - see [Optional Hooks](optional-hooks.md#export-and-import).
 
@@ -141,9 +144,8 @@ After changing service configuration, routes, or Twig templates:
 just app cache:clear
 ```
 
-After enabling or disabling a plugin:
+Switching a plugin on or off needs no cache clear - it takes effect on the next request:
 
 ```bash
 just plugin-enable your-plugin   # or plugin-disable
-just app cache:clear
 ```

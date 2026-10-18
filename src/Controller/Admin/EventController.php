@@ -44,6 +44,7 @@ use App\Service\Event\RecurrenceBuilderStateResolver;
 use App\Service\Event\RecurrenceDescriber;
 use App\Service\Event\RecurrencePreviewService;
 use App\Service\Event\RecurrenceResolver;
+use App\Service\Event\RecurringService;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Seo\EventCanonicalRebuildService;
@@ -53,6 +54,7 @@ use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Ballot\Contract\BallotView;
+use Module\Task\Contract\TriggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -99,6 +101,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         private readonly RecurrenceDescriber $recurrenceDescriber,
         private readonly RecurrenceBuilderStateResolver $recurrenceBuilderStateResolver,
         private readonly LocationChoiceService $locationChoices,
+        private readonly TriggerInterface $tasks,
     ) {}
 
     public function getAdminNavigation(): ?AdminNavigationConfig
@@ -338,6 +341,9 @@ final class EventController extends AbstractController implements AdminNavigatio
 
             $this->entityManager->persist($event);
             $this->entityManager->flush();
+            if ($event->getSeries() !== null) {
+                $this->tasks->runSoon(RecurringService::IDENTIFIER);
+            }
 
             $this->activityService->log(AdminEventEdited::TYPE, $user, ['event_id' => $event->getId()]);
             $this->entityActionDispatcher->dispatch(EntityAction::UpdateEvent, $event->getId());
@@ -492,6 +498,9 @@ final class EventController extends AbstractController implements AdminNavigatio
 
             $entityManager->persist($event);
             $entityManager->flush();
+            if ($event->getSeries() !== null) {
+                $this->tasks->runSoon(RecurringService::IDENTIFIER);
+            }
 
             $this->activityService->log(AdminEventCreated::TYPE, $user, ['event_id' => $event->getId()]);
             $this->entityActionDispatcher->dispatch(EntityAction::CreateEvent, $event->getId());

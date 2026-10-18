@@ -4,8 +4,9 @@ namespace Plugin\Books\Service;
 
 use App\Publisher\PluginSettings\Resolver;
 use Plugin\Books\ValueObject\Config;
+use Symfony\Contracts\Service\ResetInterface;
 
-class ConfigService
+class ConfigService implements ResetInterface
 {
     private ?Config $memo = null;
 
@@ -23,5 +24,10 @@ class ConfigService
         \assert($config instanceof Config);
 
         return $this->memo = $config;
+    }
+
+    public function reset(): void
+    {
+        $this->memo = null;
     }
 }

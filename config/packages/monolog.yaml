@@ -40,10 +40,9 @@ when@prod: &prod
     monolog:
         handlers:
             main:
-                type: rotating_file
-                path: '%kernel.logs_dir%/%kernel.environment%.log'
+                type: stream
+                path: 'php://stderr'
                 level: warning
-                max_files: 30
             sentry_logs:
                 type: service
                 id: Sentry\SentryBundle\Monolog\LogsHandler

@@ -5,11 +5,6 @@
 app +parameter='':
     {{PHP}} php bin/console {{parameter}}
 
-# Run cron tasks
-[group('app')]
-appCron:
-    {{PHP}} php bin/console app:cron
-
 # Clear cache and autoload
 [group('app')]
 appClearCache:
@@ -22,6 +17,7 @@ appClearCache:
 appMigrate:
     {{PHP}} php bin/console doctrine:migrations:migrate -n -q
     {{PHP}} php bin/console app:email-templates:seed
+    {{PHP}} php bin/console app:data-hotfix:run
     {{PHP}} php bin/console app:cache:app-state:clear -q
     {{PHP}} php bin/console app:cache:config:clear -q
 

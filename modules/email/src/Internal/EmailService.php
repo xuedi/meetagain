@@ -2,12 +2,12 @@
 
 namespace Module\Email\Internal;
 
-use App\CronTaskInterface;
-use App\Enum\CronTaskStatus;
-use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use LogicException;
+use Module\Email\Contract\Attachment;
 use Module\Email\Contract\ContextEnricherInterface;
 use Module\Email\Contract\EmailInterface;
 use Module\Email\Contract\PushDispatcherInterface;
@@ -15,23 +15,30 @@ use Module\Email\Contract\QueueStatus;
 use Module\Email\Contract\SendingIdentity;
 use Module\Email\Contract\SendingIdentityProviderInterface;
 use Module\Email\Internal\Entity\EmailQueue;
+use Module\Email\Internal\Message\Drain;
 use Module\Email\Internal\Repository\EmailQueueRepository;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Clock\ClockInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\File;
 use Throwable;
 
-readonly class EmailService implements CronTaskInterface, EmailQueueInterface
+readonly class EmailService implements TaskInterface, EmailQueueInterface
 {
     private const int CHUNK_SIZE = 200;
-    private const int SEND_BUDGET_SECONDS = 150;
+    private const int SEND_BUDGET_SECONDS = 50;
     private const int CLAIM_LEASE_SECONDS = 600;
 
     /**
@@ -53,6 +60,8 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         #[AutowireIterator(PushDispatcherInterface::class)]
         private iterable $pushDispatchers,
         private ClockInterface $clock,
+        private MessageBusInterface $bus,
+        private FilesystemOperator $privateStorage,
     ) {}
 
     public function enqueue(
@@ -98,9 +107,23 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         }
         if ($flush) {
             $this->em->flush();
+            $this->wake();
         }
 
         return true;
+    }
+
+    public function wake(): void
+    {
+        $this->bus->dispatch(new Drain());
+    }
+
+    #[AsMessageHandler]
+    public function drain(Drain $message): void
+    {
+        if ($this->drainQueue()['more']) {
+            $this->wake();
+        }
     }
 
     public function dispatchPush(string $identifier, string $recipient, ?DateTimeImmutable $deadline): void
@@ -119,22 +142,32 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         return 'email-queue';
     }
 
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('*/5 * * * *', offloaded: true);
+    }
+
+    public function run(): Result
     {
         try {
             $result = $this->sendQueue();
-            $output->writeln('EmailService: ' . $result);
-            $status = str_contains($result, '(Failed:') || str_contains($result, '(Late:') ? CronTaskStatus::warning : CronTaskStatus::ok;
+            $status = str_contains($result, '(Failed:') || str_contains($result, '(Late:') ? Status::warning : Status::ok;
 
-            return new CronTaskResult($this->getIdentifier(), $status, $result);
+            return new Result($status, $result);
         } catch (Throwable $e) {
-            $output->writeln('EmailService exception: ' . $e->getMessage());
-
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
+            return new Result(Status::exception, $e->getMessage());
         }
     }
 
     public function sendQueue(): string
+    {
+        return $this->drainQueue()['message'];
+    }
+
+    /**
+     * @return array{message: string, more: bool}
+     */
+    private function drainQueue(): array
     {
         $send = 0;
         $failed = 0;
@@ -185,7 +218,8 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
             }
         } while (count($mails) === self::CHUNK_SIZE && $this->clock->now() < $stopAt);
 
-        $pending = count($mails) === self::CHUNK_SIZE ? $this->mailRepo->count(['status' => QueueStatus::Pending]) : 0;
+        $more = count($mails) === self::CHUNK_SIZE;
+        $pending = $more ? $this->mailRepo->count(['status' => QueueStatus::Pending]) : 0;
 
         if ($failed > 0 || $late > 0) {
             $this->logger->warning('Email queue processed with issues', [
@@ -206,15 +240,15 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
                 $parts[] = sprintf('Pending: %d', $pending);
             }
 
-            return sprintf('%d (%s)', $send, implode(', ', $parts));
+            return ['message' => sprintf('%d (%s)', $send, implode(', ', $parts)), 'more' => $more];
         }
 
         $this->logger->info('Email queue processed', ['sent' => $send, 'pending' => $pending]);
         if ($pending > 0) {
-            return sprintf('%d (Pending: %d)', $send, $pending);
+            return ['message' => sprintf('%d (Pending: %d)', $send, $pending), 'more' => $more];
         }
 
-        return sprintf('%d', $send);
+        return ['message' => sprintf('%d', $send), 'more' => $more];
     }
 
     private function resolveIdentity(?object $origin, string $locale): SendingIdentity
@@ -247,7 +281,8 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
         $template->html($this->layoutRenderer->wrap($mail));
 
         foreach ($mail->getAttachments() as $attachment) {
-            if (!is_readable($attachment->path)) {
+            $part = $this->attachmentPart($attachment);
+            if ($part === null) {
                 $this->logger->warning('Email attachment is missing and was skipped', [
                     'email_queue_id' => $mail->getId(),
                     'path' => $attachment->path,
@@ -255,9 +290,24 @@ readonly class EmailService implements CronTaskInterface, EmailQueueInterface
                 continue;
             }
 
-            $template->addPart(new DataPart(new File($attachment->path), $attachment->filename));
+            $template->addPart($part);
         }
 
         return $template;
+    }
+
+    private function attachmentPart(Attachment $attachment): ?DataPart
+    {
+        if (!$attachment->stored) {
+            return is_readable($attachment->path) ? new DataPart(new File($attachment->path), $attachment->filename) : null;
+        }
+
+        try {
+            $contentType = MimeTypes::getDefault()->getMimeTypes(pathinfo($attachment->filename, PATHINFO_EXTENSION))[0] ?? null;
+
+            return new DataPart($this->privateStorage->read($attachment->path), $attachment->filename, $contentType);
+        } catch (FilesystemException) {
+            return null;
+        }
     }
 }

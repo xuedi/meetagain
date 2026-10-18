@@ -1,0 +1,27 @@
+parameters:
+    app.storage.dsn_default: ''
+    app.storage.dsn: '%env(string:default:app.storage.dsn_default:STORAGE_DSN)%'
+    app.storage.local_root: '%kernel.project_dir%'
+
+services:
+    app.storage.images:
+        class: League\Flysystem\FilesystemOperator
+        factory: ['@App\Storage\AdapterFactory', 'create']
+        arguments: ['images']
+    app.storage.thumbnails:
+        class: League\Flysystem\FilesystemOperator
+        factory: ['@App\Storage\AdapterFactory', 'create']
+        arguments: ['thumbnails']
+    app.storage.private:
+        class: League\Flysystem\FilesystemOperator
+        factory: ['@App\Storage\AdapterFactory', 'create']
+        arguments: ['private']
+
+    League\Flysystem\FilesystemOperator $imageStorage: '@app.storage.images'
+    League\Flysystem\FilesystemOperator $thumbnailStorage: '@app.storage.thumbnails'
+    League\Flysystem\FilesystemOperator $privateStorage: '@app.storage.private'
+
+when@test:
+    parameters:
+        app.storage.dsn: ''
+        app.storage.local_root: '%kernel.project_dir%/var/test-storage'

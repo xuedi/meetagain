@@ -10,7 +10,6 @@ use App\Plugin;
 use App\Service\TownHall\AccessService;
 use App\ValueObject\LinkCollection;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -58,8 +57,6 @@ readonly class NavigationPlugin implements Plugin
     {
         return null;
     }
-
-    public function runCronTasks(OutputInterface $output): void {}
 
     public function getEventListItemTags(int $eventId): array
     {

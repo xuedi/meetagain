@@ -14,7 +14,6 @@ Every plugin must implement `App\Plugin`. This page is the full reference for ea
 | `getEventListItemTags()`   | `array<EventListItemTag>` | Event list rendering            | Yes              |
 | `getMemberPageTop()`       | `?string`                 | Admin member list render        | Yes              |
 | `getFooterAbout()`         | `?string`                 | Every page load (footer)        | Yes              |
-| `runCronTasks()`           | `void`                    | Every cron run (~5 min)         | Yes              |
 | `getAdminSystemLinks()`    | `?AdminSection`           | Admin page render               | Yes (deprecated) |
 
 ---
@@ -227,38 +226,74 @@ export and import seams in [Optional Hooks](optional-hooks.md#export-and-import)
 
 ---
 
-## Maintenance hook
+## Periodic and background work
 
-### `runCronTasks(OutputInterface $output): void`
+Neither is a `Plugin` method. Both are classes the container finds on its own, and both stop while an admin has the
+plugin switched off.
 
-**Purpose:** Run periodic background tasks.
-
-**When called:** By `app:cron` command (typically every 5 minutes via cron job).
-
-**Use case:** Cleanup, notifications, data processing, scheduled operations.
+### A periodic task implements `TaskInterface`
 
 ```php
-public function runCronTasks(OutputInterface $output): void
-{
-    $expiredVotes = $this->voteRepository->findExpired();
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 
-    foreach ($expiredVotes as $vote) {
-        $vote->setIsClosed(true);
+readonly class CloseExpiredVotesTask implements TaskInterface
+{
+    public function __construct(
+        private VoteRepository $votes,
+    ) {}
+
+    public function getIdentifier(): string
+    {
+        return 'your-plugin.close-expired-votes';
     }
-    $this->em->flush();
 
-    $output->writeln(sprintf('Closed %d expired votes', count($expiredVotes)));
+    public function getCadence(): Cadence
+    {
+        return new Cadence('*/15 * * * *');
+    }
+
+    public function run(): Result
+    {
+        $closed = $this->votes->closeExpired();
+
+        return new Result(Status::ok, sprintf('%d votes closed', $closed));
+    }
 }
 ```
 
-Leave empty if not needed:
+- The identifier is stable: the run log and the admin's Tasks page are keyed by it.
+- The cron expression carries the timing, a time window included (`0 7-21 * * *`); the task does not check the clock.
+- `new Cadence('30 3 * * *', jitterSeconds: 1800, offloaded: true)` spreads a nightly task over half an hour and runs
+  it on a message worker instead of in the scheduler. Offload anything that takes more than a few seconds.
+- Every run is recorded with its `Result`. A thrown exception is recorded as `exception` and logged.
+- `php bin/console app:task:run your-plugin.close-expired-votes` runs it once, now.
+
+### Work a request hands off is a message
+
+A request that must not wait - sending, calling a slow API - writes its work to a table and dispatches a small message
+to the `async` transport; a worker handles it within about a second.
 
 ```php
-public function runCronTasks(OutputInterface $output): void
+#[AsMessageHandler]
+readonly class ProcessUploadHandler
 {
-    // No cron tasks
+    public function __invoke(ProcessUpload $message): void
+    {
+        // claim the rows the message stands for and work them
+    }
 }
 ```
+
+- The table row is the record and the message is only a doorbell: it carries an id at most. Add a periodic task that
+  works whatever a lost message left behind.
+- Route the message class to `async` in `plugins/<name>/config/packages/messenger.yaml`.
+- A handler runs in a long-lived process. A service that keeps rows, entities or the current user in a property
+  implements `Symfony\Contracts\Service\ResetInterface` and clears them in `reset()`, which runs between messages.
+- `Module\Task\Contract\TriggerInterface::runSoon('<identifier>')` sends one run of a periodic task to a worker now,
+  for when a change should not wait for the next scheduled run.
 
 ---
 

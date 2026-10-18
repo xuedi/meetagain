@@ -55,7 +55,7 @@ final class PermissionAttribute
     public const string EMAIL_ANNOUNCEMENT_SEND = 'email.announcement.send';
 
     public const string SYSTEM_LOGS_ACTIVITY_READ = 'system.logs.activity.read';
-    public const string SYSTEM_LOGS_CRON_READ = 'system.logs.cron.read';
+    public const string SYSTEM_LOGS_TASKS_READ = 'system.logs.tasks.read';
     public const string SYSTEM_LOGS_NOTFOUND_READ = 'system.logs.notfound.read';
     public const string SYSTEM_LOGS_SYSTEM_READ = 'system.logs.system.read';
     public const string SYSTEM_LOGS_PLATFORM_READ = 'system.logs.platform.read';

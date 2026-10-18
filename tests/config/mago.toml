@@ -24,6 +24,7 @@ extends = [
     "../../modules/circulation/mago.toml",
     "../../modules/email/mago.toml",
     "../../modules/suggestion/mago.toml",
+    "../../modules/task/mago.toml",
     "../../modules/trust/mago.toml",
 ]
 
@@ -40,23 +41,15 @@ paths = [
     "tests/",
 ]
 includes = ["vendor"]
-# Generated files. `reference.php` says so in its own header, three more are Symfony Flex recipe
-# files it rewrites when a bundle or importmap entry changes, and `plugins.php` is written by the
-# installer and by every dev reset - formatting any of them is undone the next time it is written.
+# Generated files. `reference.php` says so in its own header and the other three are Symfony Flex
+# recipe files it rewrites when a bundle or importmap entry changes - formatting any of them is
+# undone the next time it is written.
 excludes = [
     "config/bundles.php",
     "config/importmap.php",
-    "config/plugins.php",
     "config/preload.php",
     "config/reference.php",
 ]
-
-[linter]
-# The standalone install wizard runs before composer's autoloader and the app's own classes exist,
-# so it cannot follow the conventions the rest of the tree is linted against - it declares plain
-# functions and uses `empty()` on form and $_SERVER keys that may be absent. It stays in `[source]`
-# so the formatter still covers it; only the rule set is lifted.
-excludes = ["public/install/"]
 
 [analyzer]
 # The analyzer produces PHPUnit false positives (createMock/createStub return MockObject&T, which
@@ -64,13 +57,12 @@ excludes = ["public/install/"]
 # style and structure. tests/stubs/ is intentionally NOT excluded, so extension stubs (e.g.
 # Imagick) stay visible to the analyzer.
 #
-# `bin/` and `public/install/` are standalone entry points, each its own program at runtime. The
-# analyzer reads them as one, so two scripts that both declare a `phpFilesIn()` helper collide as
+# The scripts in `bin/` are standalone entry points, each its own program at runtime. The analyzer
+# reads them as one, so two scripts that both declare a `phpFilesIn()` helper collide as
 # duplicate-definition; the check scripts also walk php-parser nodes whose concrete type cannot be
-# narrowed statically. Both stay in `[source]`, so the formatter still covers them.
+# narrowed statically. They stay in `[source]`, so the formatter still covers them.
 excludes = [
     "bin/",
-    "public/install/",
     "tests/Unit/",
     "tests/bootstrap.php",
 ]

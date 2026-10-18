@@ -1,8 +1,8 @@
 # Metrics
 
 MeetAgain can push runtime metrics to a [VictoriaMetrics](https://victoriametrics.com/) collector and
-show them in Grafana: response times and memory per route, database queries per request, cron task
-durations, queue backlogs, and Valkey, MariaDB and OPcache health. Deploys show up as markers, so a
+show them in Grafana: response times and memory per route, database queries per request, the duration
+and outcome of every background task run, queue backlogs, and Valkey, MariaDB and OPcache health. Deploys show up as markers, so a
 slowdown after a release is visible at a glance.
 
 Metrics are **off by default** and cost nothing while off. They switch on with one environment
@@ -24,7 +24,7 @@ The collector and Grafana are part of the dev compose file, but `just start` doe
     METRICS_DSN=udp://victoriametrics:8089?app=meetagain
     ```
 
-3. Browse the site and run `just app app:cron` once or twice, then open
+3. Browse the site and run `just app app:task:run metrics-gauges` once or twice, then open
    [http://localhost:3001](http://localhost:3001). The MeetAgain dashboard opens as the home page.
 
 `just dockerMetricsStop` stops both services and keeps their data. `just stop` stops them too.
@@ -68,10 +68,10 @@ VictoriaMetrics rather than plain Prometheus.
 
 ## Adding a gauge
 
-Gauges are collected on every cron tick while metrics are enabled. Implement
+Gauges are collected every minute by the `metrics-gauges` task while metrics are enabled. Implement
 `App\Metrics\GaugeInterface` and yield `App\Metrics\Point`s. The interface is auto-tagged, so no
 configuration is needed, and plugins can add gauges the same way. A gauge that throws is skipped for
-that tick and reported in the cron log. `modules/email/src/Internal/Metrics/EmailQueueGauge.php` is a short example.
+that run and reported as a warning in the task's run log (**Admin > Logs > Tasks**). `modules/email/src/Internal/Metrics/EmailQueueGauge.php` is a short example.
 
 A point's measurement and field names become the metric name in VictoriaMetrics: `new Point('email_queue',
 ['pending' => 3])` is queried as `email_queue_pending`. Keep tag values few and bounded - a tag that

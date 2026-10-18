@@ -2,17 +2,17 @@
 
 namespace Module\Email\Internal\Delivery;
 
-use App\CronTaskInterface;
-use App\Enum\CronTaskStatus;
 use App\Service\Config\ConfigService;
-use App\ValueObject\CronTaskResult;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Internal\Repository\EmailQueueRepository;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
-final readonly class StatusSyncService implements CronTaskInterface
+final readonly class StatusSyncService implements TaskInterface
 {
     public function __construct(
         private ProviderChain $provider,
@@ -54,27 +54,29 @@ final readonly class StatusSyncService implements CronTaskInterface
         return 'email-delivery-sync';
     }
 
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('*/10 * * * *', offloaded: true);
+    }
+
+    public function run(): Result
     {
         try {
             if (!$this->configService->isEmailDeliverySyncEnabled()) {
-                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, 'disabled');
+                return new Result(Status::ok, 'disabled');
             }
 
             $result = $this->syncPending(100);
 
             if (!$result->available) {
-                return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, 'provider unavailable');
+                return new Result(Status::ok, 'provider unavailable');
             }
 
             $message = sprintf('%d/%d synced', $result->updated, $result->checked);
-            $output->writeln('StatusSyncService: ' . $message);
 
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $message);
+            return new Result(Status::ok, $message);
         } catch (Throwable $e) {
-            $output->writeln('StatusSyncService exception: ' . $e->getMessage());
-
-            return new CronTaskResult($this->getIdentifier(), CronTaskStatus::exception, $e->getMessage());
+            return new Result(Status::exception, $e->getMessage());
         }
     }
 }

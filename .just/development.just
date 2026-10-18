@@ -48,25 +48,33 @@ devCertsFirefox:
     @CA="$(mkcert -CAROOT)/rootCA.pem"; found=0; for p in ~/.mozilla/firefox/*/ ~/.config/mozilla/firefox/*/; do [ -f "$p/cert9.db" ] || continue; found=1; certutil -d sql:"$p" -D -n "mkcert development CA" >/dev/null 2>&1 || true; certutil -d sql:"$p" -A -t "C,," -n "mkcert development CA" -i "$CA" && echo "trusted in $p"; done; [ "$found" = 1 ] || echo "no Firefox profile found - nothing to do"
     @echo "Restart Firefox to pick this up."
 
-# Shared reset sequence used by devModeImport and the recipes plugins contribute
+# Shared reset sequence used by devModeImport and the recipes plugins contribute: switches the named plugins on
+# and leaves the excluded ones out of the build
 [group('development')]
-devModeReset plugins='':
+devModeReset plugins='' exclude='':
     {{JUST}} dockerStop
     {{JUST}} devResetConfigs
     cp .env.dist .env
+    if [ -n "{{exclude}}" ]; then echo "APP_PLUGINS_EXCLUDE={{exclude}}" >> .env; fi
     cp assets/styles/_config.scss.dist assets/styles/_config.scss
-    touch installed.lock
     {{JUST}} dockerStart
+    {{JUST}} workerStop
     {{JUST}} do "composer install"
     {{JUST}} appAssets
-    {{PHP}} php bin/console app:plugin disable all
-    {{PHP}} php bin/console app:plugin enable {{plugins}}
     {{PHP}} php bin/console cache:clear -q
-    {{JUST}} devFreshDatabase
+    {{JUST}} devFreshDatabaseSteps
+    if [ -n "{{plugins}}" ]; then {{PHP}} php bin/console app:plugin:toggle on {{plugins}}; fi
 
 # Rebuild only the dev database - migrated and seeded, no content - leaving containers, packages and assets alone
 [group('development')]
 devFreshDatabase:
+    {{JUST}} workerStop
+    {{JUST}} devFreshDatabaseSteps
+    {{JUST}} workerStart
+
+# The database rebuild itself, for recipes that keep the workers stopped until their own data is loaded
+[private]
+devFreshDatabaseSteps:
     {{JUST}} devResetDatabase
     {{JUST}} appMigrate
     {{PHP}} php bin/console app:install:seed -q
@@ -86,34 +94,30 @@ devModeImport archive='':
         echo "No archive at $archive - run 'just devModeImport' to list them"
         exit 1
     fi
-    {{JUST}} devModeReset
-    {{PHP}} php bin/console app:plugin enable $({{PHP}} php bin/console app:import:inspect "$archive" --format=plugins)
-    {{PHP}} php bin/console cache:clear -q
-    {{JUST}} appMigrate
+    {{JUST}} devModeReset '' multisite
+    plugins="$({{PHP}} php bin/console app:import:inspect "$archive" --format=plugins)"
+    if [ -n "$plugins" ]; then {{PHP}} php bin/console app:plugin:toggle on $plugins; fi
     {{PHP}} php bin/console app:import "$archive" --shift-dates --site-settings --strict
     {{JUST}} appAssets
     {{JUST}} appClearCache
+    {{JUST}} workerStart
 
-# Switch to installer mode
+# Empty instance as a fresh install starts: every plugin off, one admin, a one-time login link
 [group('development')]
-devModeInstaller:
-    {{JUST}} dockerStop
-    {{JUST}} devResetConfigs
-    {{JUST}} dockerStart
-    {{JUST}} devResetDatabase
-    rm -f .env installed.lock
-    @echo ""
-    @echo "Access: https://meetagain.local/install/"
+devModeBootstrap email='admin@meetagain.local':
+    {{JUST}} devModeReset '' multisite
+    {{PHP}} php bin/console app:bootstrap --email={{email}} --site-url=https://meetagain.local
+    {{JUST}} workerStart
 
 # Clean generated files
 [group('development')]
 devResetConfigs:
-    rm -rf .env installed.lock config/plugins.php var/
+    rm -rf .env config/plugins.php var/
 
 # Reset to fresh clone state
 [group('development')]
 devResetToFreshCloneState:
-    rm -rf .env installed.lock config/plugins.php vendor/ var/ public/bundles/ public/assets/
+    rm -rf .env config/plugins.php vendor/ var/ public/bundles/ public/assets/
     cp assets/styles/_config.scss.dist assets/styles/_config.scss
 
 # Reset database
@@ -127,6 +131,6 @@ devResetDatabase:
 devEmailPreview *options='':
     curl -sS -X DELETE http://localhost:8025/api/v1/messages
     {{PHP}} php bin/console app:email:preview {{options}}
-    @echo "Queued - dispatch with: just appCron"
+    @echo "Queued - the worker sends them within seconds"
     @echo "Sendlog: https://meetagain.local/en/admin/email/sendlog"
     @echo "Inbox: http://localhost:8025"

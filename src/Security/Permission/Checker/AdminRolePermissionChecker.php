@@ -49,7 +49,7 @@ final readonly class AdminRolePermissionChecker implements CheckerInterface
         Attr::EMAIL_ANNOUNCEMENT_DELETE,
         Attr::EMAIL_ANNOUNCEMENT_SEND,
         Attr::SYSTEM_LOGS_ACTIVITY_READ,
-        Attr::SYSTEM_LOGS_CRON_READ,
+        Attr::SYSTEM_LOGS_TASKS_READ,
         Attr::SYSTEM_LOGS_NOTFOUND_READ,
         Attr::SYSTEM_LOGS_SYSTEM_READ,
         Attr::SYSTEM_LOGS_PLATFORM_READ,

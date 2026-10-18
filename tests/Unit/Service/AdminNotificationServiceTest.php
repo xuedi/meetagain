@@ -4,13 +4,13 @@ namespace Tests\Unit\Service;
 
 use App\Emails\Types\AdminNotificationEmail;
 use App\Entity\User;
-use App\Enum\CronTaskStatus;
 use App\Repository\UserRepository;
 use App\Service\Admin\AdminNotificationService;
 use App\Service\Config\ConfigService;
 use App\Service\Notification\Admin\AdminNotificationItem;
 use App\Service\Notification\Admin\AdminNotificationProviderInterface;
 use DateTimeImmutable;
+use Module\Task\Contract\Status;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -19,7 +19,6 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Clock\MockClock;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Translation\Translator;
@@ -294,38 +293,23 @@ class AdminNotificationServiceTest extends TestCase
         static::assertSame('no items', $result);
     }
 
-    #[DataProvider('quietHoursProvider')]
-    public function testCronTaskSkipsDuringQuietHours(string $now): void
+    public function testTheDigestOnlyRunsInTheDaytimeWindow(): void
     {
         // Arrange
-        $config = $this->createMock(ConfigService::class);
-        $config->expects($this->never())->method('isSendAdminNotification');
-
         $service = $this->buildService(
             providers: [],
             adminNotificationEmail: $this->createStub(AdminNotificationEmail::class),
             userRepository: $this->createStub(UserRepository::class),
             cache: $this->createStub(TagAwareCacheInterface::class),
-            configService: $config,
-            now: $now,
+            configService: $this->createStub(ConfigService::class),
+            now: '2026-01-01 12:00:00',
         );
-        $output = new BufferedOutput();
 
         // Act
-        $result = $service->runCronTask($output);
+        $cadence = $service->getCadence();
 
         // Assert
-        static::assertSame('admin-notifications', $result->identifier);
-        static::assertSame(CronTaskStatus::ok, $result->status);
-        static::assertStringStartsWith('skipped', $result->message);
-        static::assertStringContainsString('skipped', $output->fetch());
-    }
-
-    public static function quietHoursProvider(): iterable
-    {
-        yield 'just before seven' => ['2026-01-01 06:59:59'];
-        yield 'at twenty-two' => ['2026-01-01 22:00:00'];
-        yield 'midnight' => ['2026-01-01 00:00:00'];
+        static::assertSame('0 7-21 * * *', $cadence->cron);
     }
 
     #[DataProvider('activeHoursProvider')]
@@ -343,15 +327,13 @@ class AdminNotificationServiceTest extends TestCase
             configService: $config,
             now: $now,
         );
-        $output = new BufferedOutput();
 
         // Act
-        $result = $service->runCronTask($output);
+        $result = $service->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame(Status::ok, $result->status);
         static::assertSame('disabled', $result->message);
-        static::assertStringContainsString('Admin notifications: disabled', $output->fetch());
     }
 
     public static function activeHoursProvider(): iterable
@@ -373,15 +355,13 @@ class AdminNotificationServiceTest extends TestCase
             cache: $this->createStub(TagAwareCacheInterface::class),
             configService: $config,
         );
-        $output = new BufferedOutput();
 
         // Act
-        $result = $service->runCronTask($output);
+        $result = $service->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::exception, $result->status);
+        static::assertSame(Status::exception, $result->status);
         static::assertSame('config unavailable', $result->message);
-        static::assertStringContainsString('config unavailable', $output->fetch());
     }
 
     public function testASecondRunDoesNotResendTheSameItems(): void

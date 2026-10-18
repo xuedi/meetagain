@@ -67,12 +67,12 @@ exports the instance again and fails when the row counts differ.
 ## Start empty instead
 
 ```bash
-just devModeInstaller
-# Open https://meetagain.local/install/
+just devModeBootstrap
 ```
 
-The installer walks through the database, mail and the first admin account - the same path a self-hoster
-takes.
+It migrates an empty database, runs `app:bootstrap` for `admin@meetagain.local`, which also creates a starter
+home page, and prints a one-time link that sets the admin's password. Every plugin starts switched off, as on a fresh self-hosted install; switch
+them on at `/admin/plugin`.
 
 ---
 

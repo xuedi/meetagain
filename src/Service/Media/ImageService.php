@@ -7,7 +7,6 @@ use App\Entity\Image;
 use App\Entity\User;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
-use App\ExtendedFilesystem;
 use App\Repository\ImageLocationRepository;
 use App\Repository\ImageRepository;
 use App\Service\Media\ImageTypes\ImageTypeDefinitionInterface;
@@ -17,6 +16,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Imagick;
 use ImagickException;
 use ImagickPixel;
+use League\Flysystem\FileAttributes;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -50,9 +52,9 @@ readonly class ImageService
         private EntityManagerInterface $entityManager,
         private ImageTypeRegistry $imageTypeRegistry,
         private ThumbnailSizeFormat $thumbnailSizeFormat,
-        private ExtendedFilesystem $filesystem,
+        private FilesystemOperator $imageStorage,
+        private FilesystemOperator $thumbnailStorage,
         private LoggerInterface $logger,
-        private string $kernelProjectDir,
         private ImageLocationService $imageLocationService,
         private ImageLocationRepository $imageLocationRepo,
         private LockFactory $lockFactory,
@@ -116,7 +118,15 @@ readonly class ImageService
         $image->setCreatedAt(new DateTimeImmutable());
         $image->setUploader($user);
 
-        $this->filesystem->copy($imageData->getRealPath(), $this->getSourcePath($image));
+        $stream = fopen($imageData->getRealPath(), 'rb');
+        if ($stream === false) {
+            throw new RuntimeException('Could not read the uploaded file.');
+        }
+        try {
+            $this->imageStorage->writeStream($this->sourceKey($image), $stream);
+        } finally {
+            fclose($stream);
+        }
         if ($user->getId() === null) {
             $this->entityManager->persist($image);
 
@@ -176,42 +186,57 @@ readonly class ImageService
         $this->entityManager->createQuery('DELETE App\Entity\ImageReport r WHERE r.image = :image')->setParameter('image', $image)->execute();
 
         $hash = (string) $image->getHash();
-        $source = $this->getSourcePath($image);
+        $source = $this->sourceKey($image);
         $this->entityManager->remove($image);
         $this->entityManager->flush();
 
-        $this->filesystem->remove($source);
-        $this->filesystem->remove($this->filesystem->glob($this->getThumbnailDir() . $hash . '_*.webp'));
+        $this->imageStorage->delete($source);
+        foreach (array_keys($this->imageTypeRegistry->getThumbnailSizeList()) as $token) {
+            $this->thumbnailStorage->delete(sprintf('%s_%s.webp', $hash, $token));
+        }
 
         return true;
     }
 
     public function createThumbnails(Image $image, ?ImageType $imageType = null): int
     {
-        $cnt = 0;
-        $source = $this->getSourcePath($image);
         $imageType ??= $image->getType();
-        $sizes = $this->imageTypeRegistry->getThumbnailSizes($imageType);
         $fitMode = $this->imageTypeRegistry->getFitMode($imageType);
-        foreach ($sizes as [$width, $height]) {
-            $target = $this->getThumbnailFile($image, $width, $height);
-            if ($this->filesystem->fileExists($target)) {
-                continue;
+        $missing = [];
+        foreach ($this->imageTypeRegistry->getThumbnailSizes($imageType) as [$width, $height]) {
+            $target = $this->thumbnailKey($image, $width, $height);
+            if (!$this->thumbnailStorage->fileExists($target)) {
+                $missing[$target] = [$width, $height];
             }
+        }
+        if ($missing === []) {
+            return 0;
+        }
 
-            try {
-                $imagick = new Imagick();
-                $imagick->readImage($source);
-                $imagick->setImageCompressionQuality(90);
-                $imagick->autoOrient();
-                $this->scaleThumbnail($imagick, $width, $height, $fitMode, $target);
-                $imagick->stripImage();
-                $imagick->setFormat('webp');
-                $imagick->writeImage($target);
-                ++$cnt;
-            } catch (ImagickException $e) {
-                $this->logger->error(sprintf("Error creating thumbnail '%s': %s", $target, $e->getMessage()));
+        $source = $this->localCopy($image);
+        if ($source === null) {
+            return 0;
+        }
+
+        $cnt = 0;
+        try {
+            foreach ($missing as $target => [$width, $height]) {
+                try {
+                    $imagick = new Imagick();
+                    $imagick->readImage($source);
+                    $imagick->setImageCompressionQuality(90);
+                    $imagick->autoOrient();
+                    $this->scaleThumbnail($imagick, $width, $height, $fitMode, $target);
+                    $imagick->stripImage();
+                    $imagick->setFormat('webp');
+                    $this->thumbnailStorage->write($target, $imagick->getImageBlob());
+                    ++$cnt;
+                } catch (ImagickException $e) {
+                    $this->logger->error(sprintf("Error creating thumbnail '%s': %s", $target, $e->getMessage()));
+                }
             }
+        } finally {
+            unlink($source);
         }
 
         return $cnt;
@@ -238,15 +263,16 @@ readonly class ImageService
     {
         $sizes = $this->imageTypeRegistry->getThumbnailSizes($image->getType());
         foreach ($sizes as [$width, $height]) {
-            $thumbnail = $this->getThumbnailFile($image, $width, $height);
+            $thumbnail = $this->thumbnailKey($image, $width, $height);
 
             try {
                 $imagick = new Imagick();
-                $imagick->readImage($thumbnail);
+                $imagick->readImageBlob($this->thumbnailStorage->read($thumbnail));
                 $imagick->rotateImage(new ImagickPixel('white'), 90);
                 $imagick->setOption('webp:lossless', 'true');
-                $imagick->writeImage($thumbnail);
-            } catch (ImagickException $e) {
+                $imagick->setFormat('webp');
+                $this->thumbnailStorage->write($thumbnail, $imagick->getImageBlob());
+            } catch (ImagickException|FilesystemException $e) {
                 $this->logger->error(sprintf("Error rotating thumbnail '%s': %s", $thumbnail, $e->getMessage()));
             }
         }
@@ -264,12 +290,9 @@ readonly class ImageService
     {
         $thumpFileList = [];
         $sizeListCount = $this->imageTypeRegistry->getThumbnailSizeList();
-        foreach ($this->filesystem->scanDirectory($this->getThumbnailDir()) as $file) {
-            if (str_starts_with((string) $file, '.')) {
-                continue;
-            }
+        foreach ($this->thumbnailFiles() as $file) {
             $thumpFileList[$file] = true;
-            $size = $this->sizeTokenOf((string) $file);
+            $size = $this->sizeTokenOf($file);
             if ($size === null) {
                 continue;
             }
@@ -307,12 +330,9 @@ readonly class ImageService
         $tokensByHash = $this->requiredSizeTokensByHash();
 
         $list = [];
-        foreach ($this->filesystem->scanDirectory($this->getThumbnailDir()) as $file) {
-            if (str_starts_with((string) $file, '.')) {
-                continue;
-            }
-            $hash = explode('_', explode('.', (string) $file)[0], 2)[0];
-            $token = $this->sizeTokenOf((string) $file);
+        foreach ($this->thumbnailFiles() as $file) {
+            $hash = explode('_', explode('.', $file)[0], 2)[0];
+            $token = $this->sizeTokenOf($file);
             if ($token === null || !isset($tokensByHash[$hash][$token])) {
                 $list[] = $file;
             }
@@ -325,11 +345,11 @@ readonly class ImageService
     {
         $cnt = 0;
         foreach ($this->getObsoleteThumbnails() as $file) {
-            if (!$this->filesystem->exists($this->getThumbnailDir() . $file)) {
+            if (!$this->thumbnailStorage->fileExists($file)) {
                 continue;
             }
 
-            $this->filesystem->remove($this->getThumbnailDir() . $file);
+            $this->thumbnailStorage->delete($file);
             ++$cnt;
         }
 
@@ -343,11 +363,13 @@ readonly class ImageService
         return self::MIME_ALIASES[$lower] ?? $lower;
     }
 
-    public function getSourcePath(Image $image): string
+    public function readOriginal(Image $image): ?string
     {
-        $path = $this->kernelProjectDir . '/data/images/';
-
-        return $path . $image->getHash() . '.' . $image->getExtension();
+        try {
+            return $this->imageStorage->read($this->sourceKey($image));
+        } catch (FilesystemException) {
+            return null;
+        }
     }
 
     /**
@@ -355,8 +377,8 @@ readonly class ImageService
      */
     public function renderPreview(Image $image, int $maxEdge = 1024): ?array
     {
-        $source = $this->getSourcePath($image);
-        if (!$this->filesystem->fileExists($source)) {
+        $source = $this->localCopy($image);
+        if ($source === null) {
             return null;
         }
 
@@ -375,19 +397,21 @@ readonly class ImageService
         } catch (ImagickException $e) {
             $this->logger->error(sprintf("Error rendering preview for image '%s': %s", $image->getHash(), $e->getMessage()));
 
-            return ['content' => (string) $this->filesystem->getFileContents($source), 'mimeType' => $image->getMimeType()];
+            return ['content' => (string) file_get_contents($source), 'mimeType' => $image->getMimeType()];
+        } finally {
+            unlink($source);
         }
     }
 
-    public function renderPng(string $sourcePath, int $maxHeight): ?string
+    public function renderPng(string $content, int $maxHeight): ?string
     {
-        if (!$this->filesystem->fileExists($sourcePath)) {
+        if ($content === '') {
             return null;
         }
 
         try {
             $imagick = new Imagick();
-            $imagick->readImage($sourcePath);
+            $imagick->readImageBlob($content);
             $imagick->autoOrient();
             if ($imagick->getImageHeight() > $maxHeight) {
                 $imagick->thumbnailImage(self::FREE_AXIS_CEILING, $maxHeight, true);
@@ -397,7 +421,7 @@ readonly class ImageService
 
             return $imagick->getImageBlob();
         } catch (ImagickException $e) {
-            $this->logger->error(sprintf("Error rendering PNG for '%s': %s", $sourcePath, $e->getMessage()));
+            $this->logger->error(sprintf('Error rendering a PNG: %s', $e->getMessage()));
 
             return null;
         }
@@ -430,7 +454,7 @@ readonly class ImageService
      */
     private function usedTypes(Image $image, array $typesByImageId): array
     {
-        return [$image->getType(), ...($typesByImageId[$image->getId()] ?? [])];
+        return [$image->getType(), ...($typesByImageId[(int) $image->getId()] ?? [])];
     }
 
     private function scaleThumbnail(Imagick $imagick, int $width, int $height, ImageFitMode $fitMode, string $target): void
@@ -510,18 +534,48 @@ readonly class ImageService
         throw new RuntimeException('Could not determine file extension for uploaded file.');
     }
 
-    private function getThumbnailFile(Image $image, int $width, int $height): string
+    private function sourceKey(Image $image): string
     {
-        return sprintf('%s%s_%s.webp', $this->getThumbnailDir(), $image->getHash(), $this->thumbnailSizeFormat->format($width, $height));
+        return $image->getHash() . '.' . $image->getExtension();
+    }
+
+    private function thumbnailKey(Image $image, int $width, int $height): string
+    {
+        return sprintf('%s_%s.webp', $image->getHash(), $this->thumbnailSizeFormat->format($width, $height));
+    }
+
+    private function localCopy(Image $image): ?string
+    {
+        $content = $this->readOriginal($image);
+        if ($content === null) {
+            $this->logger->error(sprintf("The original of image '%s' is missing from the storage.", $image->getHash()));
+
+            return null;
+        }
+
+        $path = sprintf('%s/meetagain-image-%s.%s', sys_get_temp_dir(), bin2hex(random_bytes(8)), $image->getExtension());
+        file_put_contents($path, $content);
+
+        return $path;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function thumbnailFiles(): array
+    {
+        $files = [];
+        foreach ($this->thumbnailStorage->listContents('', false) as $item) {
+            if ($item instanceof FileAttributes && !str_starts_with(basename($item->path()), '.')) {
+                $files[] = $item->path();
+            }
+        }
+
+        return $files;
     }
 
     private function sizeTokenOf(string $file): ?string
     {
         return explode('_', explode('.', $file)[0], 2)[1] ?? null;
-    }
-
-    private function getThumbnailDir(): string
-    {
-        return $this->kernelProjectDir . '/public/images/thumbnails/';
     }
 }

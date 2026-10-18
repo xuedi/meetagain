@@ -29,16 +29,17 @@ readonly class SiteLogoPngRenderer
     {
         $image = $this->logoResolver->resolveImage();
 
-        $source = $image !== null ? $this->imageService->getSourcePath($image) : $this->projectDir . self::FALLBACK_ASSET;
+        $fallback = $this->projectDir . self::FALLBACK_ASSET;
 
         $version = $image !== null
             ? $image->getHash() . '_' . ($image->getUpdatedAt()?->format('YmdHis') ?? '0')
-            : 'packaged_' . (string) (is_file($source) ? filemtime($source) : 0);
+            : 'packaged_' . (string) (is_file($fallback) ? filemtime($fallback) : 0);
 
-        $content = $this->cache->get(self::CACHE_PREFIX . sha1($version), function (ItemInterface $item) use ($source): string {
+        $content = $this->cache->get(self::CACHE_PREFIX . sha1($version), function (ItemInterface $item) use ($image, $fallback): string {
             $item->expiresAfter(self::CACHE_TTL);
+            $source = $image !== null ? $this->imageService->readOriginal($image) : (is_file($fallback) ? (string) file_get_contents($fallback) : null);
 
-            return $this->imageService->renderPng($source, self::HEIGHT) ?? '';
+            return $source === null ? '' : $this->imageService->renderPng($source, self::HEIGHT) ?? '';
         });
 
         if ($content === '') {

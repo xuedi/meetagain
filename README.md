@@ -55,46 +55,10 @@ Run `just` to see all available commands.
 
 ## Production Installation
 
-**Requirements:** PHP >= 8.4 (apcu, pdo_mysql, imagick, intl, iconv, ctype, redis), MariaDB/MySQL, web server (Caddy,
-Nginx, Apache)
-
-1. Clone repository from https://github.com/xuedi/meetagain.git and configure web server to serve `public/`
-2. Configure your web server to serve `public/media/` as static files (required — see below)
-3. Navigate to your domain - redirects to `/install/`
-3. Follow the wizard:
-    - **Step 1:** Verify PHP requirements, configure database
-    - **Step 2:** Choose mail provider (SMTP, SendGrid, Mailgun, Amazon SES, or Null)
-    - **Step 3:** Set site URL/name, create admin account
-4. Installer auto-runs composer, migrations, and user creation
-
-The `installed.lock` file prevents re-running the installer.
-
-### Webserver Configuration
-
-All assets (CSS, fonts, images) are served from `public/media/` as opaque hashed files. The web server
-must handle `/media/*` as static files directly — without this, all asset requests return 503.
-
-**Caddy (recommended):**
-```caddy
-root * /path/to/public
-handle /media/* {
-    file_server { pass_thru }
-    header Cache-Control "public, max-age=86400"
-}
-php_server
-```
-
-**Nginx:**
-```nginx
-location /media/ {
-    try_files $uri =404;
-    expires 1d;
-    add_header Cache-Control "public";
-}
-```
-
-The `public/media/` directory is generated at deploy time by `php bin/console app:media:compile` and
-is not included in the repository.
+MeetAgain runs as containers. The public image `ghcr.io/xuedi/meetagain` holds the core and every bundled
+plugin, and runs as web server, message worker or scheduler, or as all three in one container. It needs
+MariaDB and Valkey (or Redis) beside it. [Hosting](docs/src/hosting.md) has a Docker Compose example, the
+first-time setup and the update steps.
 
 ## PhpStorm Setup
 

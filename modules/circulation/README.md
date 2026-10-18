@@ -56,7 +56,7 @@ Two things the diagram encodes that are easy to get wrong:
   `Available` means it is up for grabs. A donor holds their own copy from the moment they add it, and a
   member who marks a copy finished keeps holding it until a handover completes.
 - **A cancelled handover returns the copy to `Available` and the requester to `Waiting`.** It does not
-  re-offer immediately - that would hand it straight back to the person who just cancelled. The daily cron
+  re-offer immediately - that would hand it straight back to the person who just cancelled. The daily task
   re-matches free copies to waiting queues.
 
 ## The handover is two-sided, and its chat is a comment target
@@ -144,10 +144,10 @@ contract - circulation depends on Trust, never the reverse. See [modules/trust/R
 - `TrustEnabledProviderInterface` is the second switch: a plugin ANDs its own trust flag with its circulation
   flag so a stale setting cannot activate trust on its own.
 
-## Cron
+## Maintenance
 
-`Internal\Cron\MaintenanceTask` (`circulation-maintenance`) throttles itself to once a day through the
-application's state store and does four things: expire offers older than `QueueService::OFFER_WINDOW_DAYS`,
+`Internal\Cron\MaintenanceTask` (`circulation-maintenance`) is a task that runs daily at 03:40, with up to 30
+minutes of jitter, on a message worker (see `modules/task/README.md`). It does four things: expire offers older than `QueueService::OFFER_WINDOW_DAYS`,
 close handovers open longer than `MaintenanceTask::CLOSE_AFTER_DAYS`, re-match free copies against waiting
 queues, and count the handovers waiting on a confirmation. The nudge itself needs no work: the bell entry for
 an unconfirmed handover is derived live by `Internal\Notification\NotificationProvider`.
@@ -176,8 +176,7 @@ Substrate (`@global`, `Doctrine\**`, `Symfony\**`, `Twig\**`, `Psr\**`) is permi
 |---------------------------------------------------------------------|--------------------------------------------------------------|
 | `App\Entity\User`                                                   | the foreign keys on copy, request, handover and ledger       |
 | `App\Controller\AbstractController`                                 | the controller extends core's, as plugin controllers do      |
-| `App\CronTaskInterface`, `CronTaskResult`, `CronTaskStatus`         | the maintenance task on the cron chain                       |
-| `App\Service\AppStateService`                                       | the maintenance task throttles itself to once a day          |
+| `Module\Task\Contract\**`                                           | the daily maintenance task on the task module's schedule     |
 | `NotificationProviderInterface`, `NotificationItem`                 | handovers and queues on the notification bell                |
 | `App\Item\ActionInterface`, `App\Enum\ItemAction`                   | copies of a deleted item are retired                         |
 | `App\Item\TypeRegistry`, `App\Item\FilterService`                   | type labels, and every read narrows through the filter chain |

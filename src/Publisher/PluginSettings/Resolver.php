@@ -5,8 +5,9 @@ namespace App\Publisher\PluginSettings;
 use App\Service\Admin\PluginSettingsService;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Service\ResetInterface;
 
-class Resolver
+class Resolver implements ResetInterface
 {
     /** @var array<string, object> */
     private array $memo = [];
@@ -76,5 +77,10 @@ class Resolver
         }
 
         return $best;
+    }
+
+    public function reset(): void
+    {
+        $this->memo = [];
     }
 }

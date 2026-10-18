@@ -4,7 +4,6 @@ namespace Tests\Unit\Service;
 
 use App\Entity\EventTranslation;
 use App\EntityActionDispatcher;
-use App\Enum\CronTaskStatus;
 use App\Enum\EntityAction;
 use App\Enum\EventInterval;
 use App\Enum\EventStatus;
@@ -21,10 +20,10 @@ use App\ValueObject\ScheduleChange;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Task\Contract\Status;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
-use Symfony\Component\Console\Output\OutputInterface;
 use Tests\Unit\Stubs\EventSeriesStub;
 use Tests\Unit\Stubs\EventStub;
 use Tests\Unit\Stubs\UserStub;
@@ -81,11 +80,10 @@ class RecurringServiceTest extends TestCase
         $service = $this->createService($this->createStub(EventRepository::class), $this->createStub(EntityManagerInterface::class), $seriesRepo);
 
         // Act
-        $result = $service->runCronTask($this->createStub(OutputInterface::class));
+        $result = $service->run();
 
         // Assert
-        static::assertSame('recurring-events', $result->identifier);
-        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame(Status::ok, $result->status);
         static::assertSame('0 events extended', $result->message);
     }
 

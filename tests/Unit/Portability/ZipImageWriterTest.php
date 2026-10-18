@@ -4,12 +4,16 @@ namespace Tests\Unit\Portability;
 
 use App\Entity\Image;
 use App\Portability\ZipImageWriter;
+use League\Flysystem\Filesystem;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 use ZipArchive;
 
 final class ZipImageWriterTest extends TestCase
 {
-    private string $projectDir = '';
+    private string $directory = '';
+
+    private Filesystem $images;
 
     private ZipArchive $zip;
 
@@ -17,11 +21,12 @@ final class ZipImageWriterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->projectDir = sys_get_temp_dir() . '/zip-image-writer-' . uniqid('', true);
-        mkdir($this->projectDir . '/data/images', 0o777, true);
+        $this->directory = sys_get_temp_dir() . '/zip-image-writer-' . uniqid('', true);
+        mkdir($this->directory, 0o777, true);
+        $this->images = new Filesystem(new InMemoryFilesystemAdapter());
 
         $this->zip = new ZipArchive();
-        $this->zip->open($this->projectDir . '/export.zip', ZipArchive::CREATE);
+        $this->zip->open($this->directory . '/export.zip', ZipArchive::CREATE);
         $this->zipOpen = true;
     }
 
@@ -31,21 +36,16 @@ final class ZipImageWriterTest extends TestCase
             $this->zip->close();
         }
 
-        foreach (glob($this->projectDir . '/data/images/*') ?: [] as $file) {
-            unlink($file);
+        if (file_exists($this->directory . '/export.zip')) {
+            unlink($this->directory . '/export.zip');
         }
-        rmdir($this->projectDir . '/data/images');
-        rmdir($this->projectDir . '/data');
-        if (file_exists($this->projectDir . '/export.zip')) {
-            unlink($this->projectDir . '/export.zip');
-        }
-        rmdir($this->projectDir);
+        rmdir($this->directory);
     }
 
     public function testAnImageIsStoredOnceUnderItsContentHash(): void
     {
         // Arrange
-        $writer = new ZipImageWriter($this->zip, $this->projectDir);
+        $writer = new ZipImageWriter($this->zip, $this->images);
         $first = $this->image('abc123');
         $sameContent = $this->image('abc123');
 
@@ -57,6 +57,23 @@ final class ZipImageWriterTest extends TestCase
         static::assertSame('images/abc123.jpg', $firstPath);
         static::assertSame('images/abc123.jpg', $secondPath);
         static::assertSame(1, $this->closedZipFileCount());
+        $writer->removeCopies();
+    }
+
+    public function testTheCopiesHandedToTheArchiveAreRemovedAfterItIsClosed(): void
+    {
+        // Arrange
+        $writer = new ZipImageWriter($this->zip, $this->images);
+        $writer->addImage($this->image('abc123'));
+        $this->closedZipFileCount();
+        $before = glob(sys_get_temp_dir() . '/meetagain-export-image-*') ?: [];
+
+        // Act
+        $writer->removeCopies();
+
+        // Assert
+        $after = glob(sys_get_temp_dir() . '/meetagain-export-image-*') ?: [];
+        static::assertCount(count($before) - 1, $after);
     }
 
     public function testAnImageWithoutItsFileIsLeftOut(): void
@@ -67,7 +84,7 @@ final class ZipImageWriterTest extends TestCase
             ->setExtension('jpg');
 
         // Act
-        $path = new ZipImageWriter($this->zip, $this->projectDir)->addImage($missing);
+        $path = new ZipImageWriter($this->zip, $this->images)->addImage($missing);
 
         // Assert
         static::assertNull($path);
@@ -76,7 +93,7 @@ final class ZipImageWriterTest extends TestCase
     public function testOnlyImagesWithAnAttributionStatementAreListed(): void
     {
         // Arrange
-        $writer = new ZipImageWriter($this->zip, $this->projectDir);
+        $writer = new ZipImageWriter($this->zip, $this->images);
         $writer->addImage($this->image('ccc')->setAttributionNotRequired(true));
         $writer->addImage($this->image('bbb'));
         $writer->addImage($this->image('aaa')->setAttribution('Photo: Ada, CC BY 4.0'));
@@ -96,7 +113,7 @@ final class ZipImageWriterTest extends TestCase
 
     private function image(string $hash): Image
     {
-        file_put_contents($this->projectDir . '/data/images/' . $hash . '.jpg', $hash);
+        $this->images->write($hash . '.jpg', $hash);
 
         return new Image()
             ->setHash($hash)
@@ -108,7 +125,7 @@ final class ZipImageWriterTest extends TestCase
         $this->zip->close();
         $this->zipOpen = false;
         $zip = new ZipArchive();
-        $zip->open($this->projectDir . '/export.zip');
+        $zip->open($this->directory . '/export.zip');
         $count = $zip->numFiles;
         $zip->close();
 

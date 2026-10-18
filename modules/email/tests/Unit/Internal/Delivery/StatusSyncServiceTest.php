@@ -2,7 +2,6 @@
 
 namespace Module\Email\Tests\Unit\Internal\Delivery;
 
-use App\Enum\CronTaskStatus;
 use App\Service\Config\ConfigService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,11 +11,11 @@ use Module\Email\Internal\Delivery\ProviderChain;
 use Module\Email\Internal\Delivery\StatusSyncService;
 use Module\Email\Internal\Entity\EmailQueue;
 use Module\Email\Internal\Repository\EmailQueueRepository;
+use Module\Task\Contract\Status;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use ReflectionClass;
 use RuntimeException;
-use Symfony\Component\Console\Output\BufferedOutput;
 
 class StatusSyncServiceTest extends TestCase
 {
@@ -119,10 +118,10 @@ class StatusSyncServiceTest extends TestCase
         $service = $this->makeService(provider: $provider, configService: $config);
 
         // Act
-        $result = $service->runCronTask(new BufferedOutput());
+        $result = $service->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame(Status::ok, $result->status);
         static::assertSame('disabled', $result->message);
     }
 
@@ -138,10 +137,10 @@ class StatusSyncServiceTest extends TestCase
         $service = $this->makeService(provider: $provider, configService: $config);
 
         // Act
-        $result = $service->runCronTask(new BufferedOutput());
+        $result = $service->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame(Status::ok, $result->status);
         static::assertSame('provider unavailable', $result->message);
     }
 
@@ -160,15 +159,13 @@ class StatusSyncServiceTest extends TestCase
         $repo->method('findWithProviderMessageIdAndNoStatus')->willReturn([$email]);
 
         $service = $this->makeService(provider: $provider, repo: $repo, configService: $config);
-        $output = new BufferedOutput();
 
         // Act
-        $result = $service->runCronTask($output);
+        $result = $service->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame(Status::ok, $result->status);
         static::assertSame('1/1 synced', $result->message);
-        static::assertStringContainsString('1/1 synced', $output->fetch());
     }
 
     public function testRunCronTaskCatchesExceptions(): void
@@ -178,15 +175,13 @@ class StatusSyncServiceTest extends TestCase
         $config->method('isEmailDeliverySyncEnabled')->willThrowException(new RuntimeException('config blew up'));
 
         $service = $this->makeService(configService: $config);
-        $output = new BufferedOutput();
 
         // Act
-        $result = $service->runCronTask($output);
+        $result = $service->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::exception, $result->status);
+        static::assertSame(Status::exception, $result->status);
         static::assertSame('config blew up', $result->message);
-        static::assertStringContainsString('config blew up', $output->fetch());
     }
 
     private function makeService(

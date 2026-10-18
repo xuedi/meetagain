@@ -28,7 +28,7 @@ const ADMIN_PATHS = [
     '/en/admin/security/permissions',
     '/en/admin/cms/announcements',
     '/en/admin/email/blocklist',
-    '/en/admin/logs/cron',
+    '/en/admin/logs/tasks',
     '/en/admin/logs/access-denied',
     '/en/admin/logs/404',
     '/en/admin/logs/activity',

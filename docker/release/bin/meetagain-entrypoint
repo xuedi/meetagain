@@ -1,0 +1,31 @@
+#!/bin/bash
+# Runs the role named by the first argument (web when none is given); any other command runs as given.
+# Points Caddy's /images/thumbnails/* at the storage's website endpoint when STORAGE_DSN names one (its `web` parameter).
+set -euo pipefail
+cd /var/www/html
+
+if [ -n "${STORAGE_DSN:-}" ]; then
+    eval "$(php -r '
+        $dsn = parse_url((string) getenv("STORAGE_DSN"));
+        parse_str($dsn["query"] ?? "", $query);
+        $prefix = trim($dsn["path"] ?? "", "/");
+        if (is_string($query["web"] ?? null) && $query["web"] !== "" && $prefix !== "") {
+            echo "export MEETAGAIN_THUMBNAILS_UPSTREAM=" . escapeshellarg($query["web"]) . "\n";
+            echo "export MEETAGAIN_THUMBNAILS_HOST=" . escapeshellarg($prefix . "-thumbnails") . "\n";
+        }
+    ')"
+fi
+
+role="${1:-web}"
+[ "$#" -eq 0 ] || shift
+
+case "$role" in
+    web) exec docker-php-entrypoint frankenphp run --config /etc/frankenphp/Caddyfile --adapter caddyfile "$@" ;;
+    worker) exec php bin/console messenger:consume async --time-limit=3600 --memory-limit=256M "$@" ;;
+    scheduler) exec php bin/console messenger:consume scheduler_default --time-limit=3600 --memory-limit=256M "$@" ;;
+    migrate) exec meetagain-migrate "$@" ;;
+    pending-sql) exec meetagain-pending-sql "$@" ;;
+    after-rollback) exec meetagain-after-rollback "$@" ;;
+    all) exec meetagain-all "$@" ;;
+    *) exec docker-php-entrypoint "$role" "$@" ;;
+esac

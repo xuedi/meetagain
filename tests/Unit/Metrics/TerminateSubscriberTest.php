@@ -3,6 +3,7 @@
 namespace Tests\Unit\Metrics;
 
 use App\Metrics\Dbal\Stats;
+use App\Metrics\Point;
 use App\Metrics\Recorder;
 use App\Metrics\TerminateSubscriber;
 use PHPUnit\Framework\TestCase;
@@ -33,6 +34,22 @@ class TerminateSubscriberTest extends TestCase
         static::assertStringStartsWith('http_request,app=test,env=prod,route=app_event,method=GET,status=4xx,host=example.org ', $line);
         static::assertStringContainsString('db_queries=2i', $line);
         static::assertStringNotContainsString('secret', $line);
+    }
+
+    public function testWhatAWorkerRecordsIsSentWhenItsMessageIsDoneBeforeTheResetEmptiesTheBuffer(): void
+    {
+        // Arrange
+        $listener = new UdpListener();
+        $recorder = new Recorder($listener->dsn(), 'prod');
+        $subscriber = new TerminateSubscriber($recorder, new Stats());
+        $recorder->add(new Point('gauge', ['value' => 3]));
+
+        // Act
+        $subscriber->onMessageDone();
+        $recorder->reset();
+
+        // Assert
+        static::assertStringStartsWith('gauge,app=test,env=prod value=3i', $listener->receive()[0]);
     }
 
     public function testUnmatchedRouteIsTaggedAsNone(): void

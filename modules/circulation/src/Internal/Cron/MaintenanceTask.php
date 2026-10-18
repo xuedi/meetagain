@@ -2,23 +2,21 @@
 
 namespace Module\Circulation\Internal\Cron;
 
-use App\CronTaskInterface;
-use App\Enum\CronTaskStatus;
-use App\Service\AppStateService;
-use App\ValueObject\CronTaskResult;
 use DateTimeImmutable;
 use Module\Circulation\Internal\HandoverService;
 use Module\Circulation\Internal\QueueService;
 use Module\Circulation\Internal\Repository\CopyRepository;
 use Module\Circulation\Internal\Repository\HandoverRepository;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use Override;
-use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 
-readonly class MaintenanceTask implements CronTaskInterface
+readonly class MaintenanceTask implements TaskInterface
 {
     public const string IDENTIFIER = 'circulation-maintenance';
-    public const string STATE_KEY = 'circulation.maintenance_last_run';
     public const int NUDGE_AFTER_DAYS = 7;
     public const int CLOSE_AFTER_DAYS = 30;
 
@@ -27,7 +25,6 @@ readonly class MaintenanceTask implements CronTaskInterface
         private HandoverService $handovers,
         private HandoverRepository $handoverRepo,
         private CopyRepository $copies,
-        private AppStateService $appState,
     ) {}
 
     #[Override]
@@ -37,19 +34,19 @@ readonly class MaintenanceTask implements CronTaskInterface
     }
 
     #[Override]
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('40 3 * * *', jitterSeconds: 1800, offloaded: true);
+    }
+
+    #[Override]
+    public function run(): Result
     {
         try {
-            if (!$this->isDue()) {
-                return new CronTaskResult(self::IDENTIFIER, CronTaskStatus::ok, 'throttled');
-            }
-
             $expiredOffers = $this->expireStaleOffers();
             $closed = $this->closeAbandonedHandovers();
             $matched = $this->matchFreeCopies();
             $nudged = count($this->handoverRepo->findOpenOlderThan(new DateTimeImmutable(sprintf('-%d days', self::NUDGE_AFTER_DAYS))));
-
-            $this->appState->set(self::STATE_KEY, new DateTimeImmutable()->format(DATE_ATOM));
 
             $message = sprintf(
                 '%d offers expired, %d handovers closed, %d copies offered, %d awaiting confirmation',
@@ -58,24 +55,11 @@ readonly class MaintenanceTask implements CronTaskInterface
                 $matched,
                 $nudged,
             );
-            $output->writeln('CirculationMaintenance: ' . $message);
 
-            return new CronTaskResult(self::IDENTIFIER, CronTaskStatus::ok, $message);
+            return new Result(Status::ok, $message);
         } catch (Throwable $exception) {
-            $output->writeln('CirculationMaintenance exception: ' . $exception->getMessage());
-
-            return new CronTaskResult(self::IDENTIFIER, CronTaskStatus::exception, $exception->getMessage());
+            return new Result(Status::exception, $exception->getMessage());
         }
-    }
-
-    private function isDue(): bool
-    {
-        $last = $this->appState->get(self::STATE_KEY);
-        if ($last === null) {
-            return true;
-        }
-
-        return new DateTimeImmutable($last) < new DateTimeImmutable('-1 day');
     }
 
     private function expireStaleOffers(): int

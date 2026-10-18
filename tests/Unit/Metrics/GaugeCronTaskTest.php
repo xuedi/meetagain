@@ -2,14 +2,13 @@
 
 namespace Tests\Unit\Metrics;
 
-use App\Enum\CronTaskStatus;
 use App\Metrics\GaugeCronTask;
 use App\Metrics\GaugeInterface;
 use App\Metrics\Point;
 use App\Metrics\Recorder;
+use Module\Task\Contract\Status;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Symfony\Component\Console\Output\NullOutput;
 
 class GaugeCronTaskTest extends TestCase
 {
@@ -21,10 +20,10 @@ class GaugeCronTaskTest extends TestCase
         $task = new GaugeCronTask(new Recorder(null, 'test'), [$gauge]);
 
         // Act
-        $result = $task->runCronTask(new NullOutput());
+        $result = $task->run();
 
         // Assert
-        static::assertSame(CronTaskStatus::ok, $result->status);
+        static::assertSame(Status::ok, $result->status);
         static::assertSame('disabled', $result->message);
     }
 
@@ -40,11 +39,11 @@ class GaugeCronTaskTest extends TestCase
         $task = new GaugeCronTask($recorder, [$failing, $working]);
 
         // Act
-        $result = $task->runCronTask(new NullOutput());
+        $result = $task->run();
         $recorder->flush();
 
         // Assert
-        static::assertSame(CronTaskStatus::warning, $result->status);
+        static::assertSame(Status::warning, $result->status);
         static::assertStringContainsString('down', $result->message);
         static::assertSame(['valkey,app=test,env=prod connected_clients=3i'], $listener->receive());
     }

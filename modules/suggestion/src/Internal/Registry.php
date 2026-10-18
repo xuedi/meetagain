@@ -5,8 +5,9 @@ namespace Module\Suggestion\Internal;
 use App\Service\Config\PluginService;
 use Module\Suggestion\Contract\TargetProviderInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Service\ResetInterface;
 
-class Registry
+class Registry implements ResetInterface
 {
     private const string CORE_PLUGIN_KEY = '';
 
@@ -55,5 +56,10 @@ class Registry
         }
 
         return $this->active = $map;
+    }
+
+    public function reset(): void
+    {
+        $this->active = null;
     }
 }

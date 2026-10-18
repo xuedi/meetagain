@@ -1,0 +1,45 @@
+# The Task module's perimeter, pulled into core's run by `extends` in tests/config/mago.toml.
+# Paths resolve against the project root. See modules/README.md, "How Mago Guard enforces it".
+
+[analyzer]
+excludes = ["modules/task/tests/"]
+
+[[guard.perimeter.restrictions]]
+dependency = "Module\\Task\\Internal\\**"
+allow-from = ["Module\\Task\\**"]
+
+[[guard.perimeter.rules]]
+namespace = "Module\\Task\\"
+permit = [
+    "Module\\Task\\**",
+    "@global",                                              # DateTimeImmutable, Override, Redis, PHP's own functions
+    "App\\Admin\\**",                                       # the Tasks page builds its top bar and navigation from core's admin shell
+    "App\\Controller\\Admin\\Logs\\AbstractLogsController", # the Tasks page is a tab in core's Logs strip
+    "App\\Metrics\\Recorder",                               # every run is sent as a metric point, like a request
+    "App\\Metrics\\Point",                                  # that point's type
+    "Doctrine\\**",
+    "Symfony\\**",
+    "Psr\\**",
+]
+
+# The module's tests reach what its code may, plus PHPUnit and the shared module test harness - no
+# other core test helper, and no other core class unless listed here with its reason.
+[[guard.perimeter.rules]]
+namespace = "Module\\Task\\Tests\\"
+permit = [
+    "Module\\Task\\**",
+    "@global",                                              # DateTimeImmutable, Override, Redis, PHP's own functions
+    "App\\Admin\\**",                                       # the Tasks page builds its top bar and navigation from core's admin shell
+    "App\\Controller\\Admin\\Logs\\AbstractLogsController", # the Tasks page is a tab in core's Logs strip
+    "App\\Metrics\\Recorder",                               # every run is sent as a metric point, like a request
+    "App\\Metrics\\Point",                                  # that point's type
+    "PHPUnit\\**",
+    "Tests\\Module\\**",                                    # the shared module test harness: ModuleKernel and Members
+    "Doctrine\\**",
+    "Symfony\\**",
+    "Psr\\**",
+]
+
+[[guard.perimeter.rules]]
+namespace = "ModuleTaskMigrations"
+permit = ["**"]

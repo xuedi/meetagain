@@ -2,74 +2,92 @@
 
 namespace App\Service\Config;
 
-use App\ExtendedFilesystem;
 use App\Filter\Plugin\PluginListFilterInterface;
-use App\Service\Admin\CommandService;
-use JsonException;
+use App\Kernel;
+use App\Repository\PluginActivationRepository;
+use Doctrine\DBAL\Exception as DbalException;
+use LogicException;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use Throwable;
+use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-readonly class PluginService
+class PluginService implements ResetInterface
 {
-    private string $configDir;
-    private string $pluginDir;
+    public const string NAVIGATION_KEY = 'core_navigation';
+    private const string CACHE_KEY = 'plugin_activation';
+    private const int CACHE_TTL = 3600;
 
+    /** @var list<string>|null */
+    private ?array $globallyActive = null;
+
+    /**
+     * @param array<string, array{name: string, version: string, description: string, icon: string, group_activatable: bool, system: bool, requires: list<string>}> $plugins
+     * @param iterable<PluginListFilterInterface> $pluginListFilters
+     */
     public function __construct(
-        private CommandService $commandService,
-        private ExtendedFilesystem $filesystem,
-        string $kernelProjectDir,
-        private string $environment,
+        #[Autowire(param: Kernel::PLUGINS_PARAMETER)]
+        private readonly array $plugins,
+        private readonly PluginActivationRepository $activations,
+        private readonly CacheInterface $cache,
+        #[Autowire(service: 'cache.cms_page_cache')]
+        private readonly CacheItemPoolInterface $cmsPageCache,
+        #[Autowire(service: 'cache.messenger.restart_workers_signal')]
+        private readonly CacheItemPoolInterface $workerRestartSignal,
+        private readonly ClockInterface $clock,
         #[AutowireIterator(PluginListFilterInterface::class)]
-        private iterable $pluginListFilters = [],
-    ) {
-        $this->configDir = $kernelProjectDir . '/config';
-        $this->pluginDir = $kernelProjectDir . '/plugins';
-    }
+        private readonly iterable $pluginListFilters = [],
+    ) {}
 
+    /**
+     * @return list<array{key: string, name: string, version: string, description: string, system: bool, enabled: bool, requires: list<string>}>
+     */
     public function getAdminList(): array
     {
-        $plugins = [];
-        foreach ($this->parsePluginDir() as $pluginPath) {
-            $manifest = $pluginPath . '/manifest.json';
-            if (!$this->filesystem->fileExists($manifest)) {
-                continue;
-            }
-            $manifestContent = $this->filesystem->getFileContents($manifest);
-            if ($manifestContent === false) {
-                continue;
-            }
-            try {
-                $pluginData = json_decode($manifestContent, true, 512, JSON_THROW_ON_ERROR);
-            } catch (JsonException) {
-                continue;
-            }
-
-            $pluginKey = basename((string) $pluginPath);
-            $plugins[] = [
-                'key' => $pluginKey,
-                'name' => $pluginData['name'] ?? $pluginKey,
-                'version' => $pluginData['version'] ?? '0.0.0',
-                'description' => $pluginData['description'] ?? '',
-                'installed' => $this->isInstalled($pluginKey),
-                'enabled' => $this->isEnabled($pluginKey),
+        $active = $this->getGloballyActiveList();
+        $list = [];
+        foreach ($this->plugins as $key => $plugin) {
+            $list[] = [
+                'key' => $key,
+                'name' => $plugin['name'],
+                'version' => $plugin['version'],
+                'description' => $plugin['description'],
+                'system' => $plugin['system'],
+                'enabled' => in_array($key, $active, true),
+                'requires' => $plugin['requires'],
             ];
         }
 
-        return $plugins;
+        return $list;
     }
 
     /**
-     * @return array<string>
+     * @return list<string>
      */
     public function getGloballyActiveList(): array
     {
-        $config = $this->getPluginConfig();
+        if ($this->globallyActive !== null) {
+            return $this->globallyActive;
+        }
 
-        $activePlugins = array_keys(array_filter($config, static fn($enabled) => $enabled === true));
+        $state = $this->activationState();
+        $active = [];
+        foreach ($this->plugins as $key => $plugin) {
+            if ($plugin['system'] || ($state === null ? true : $state[$key] ?? false)) {
+                $active[] = $key;
+            }
+        }
+        $active[] = self::NAVIGATION_KEY;
 
-        $activePlugins[] = 'core_navigation';
+        if ($state === null) {
+            return $active;
+        }
 
-        return $activePlugins;
+        return $this->globallyActive = $active;
     }
 
     /**
@@ -100,163 +118,137 @@ readonly class PluginService
     {
         $globallyActive = $this->getGloballyActiveList();
         $result = [];
-
-        foreach ($this->parsePluginDir() as $pluginPath) {
-            $pluginKey = basename((string) $pluginPath);
-
-            if (!in_array($pluginKey, $globallyActive, true)) {
-                continue;
-            }
-
-            $manifest = $pluginPath . '/manifest.json';
-            if (!$this->filesystem->fileExists($manifest)) {
-                continue;
-            }
-
-            $manifestContent = $this->filesystem->getFileContents($manifest);
-            if ($manifestContent === false) {
-                continue;
-            }
-
-            try {
-                $pluginData = json_decode($manifestContent, true, 512, JSON_THROW_ON_ERROR);
-            } catch (JsonException) {
-                continue;
-            }
-
-            if (isset($pluginData['group_activatable']) && $pluginData['group_activatable'] === false) {
+        foreach ($this->plugins as $key => $plugin) {
+            if (!$plugin['group_activatable'] || !in_array($key, $globallyActive, true)) {
                 continue;
             }
 
             $result[] = [
-                'key' => $pluginKey,
-                'name' => $pluginData['name'] ?? $pluginKey,
-                'description' => $pluginData['description'] ?? '',
-                'icon' => $pluginData['icon'] ?? 'plug',
+                'key' => $key,
+                'name' => $plugin['name'],
+                'description' => $plugin['description'],
+                'icon' => $plugin['icon'],
             ];
         }
 
         return $result;
     }
 
-    public function install(string $pluginKey): void
+    /**
+     * @return list<string>
+     */
+    public function getInstalledKeys(): array
     {
-        if ($this->isInstalled($pluginKey)) {
-            return;
-        }
-        $config = $this->getPluginConfig();
-        $config[$pluginKey] = false;
-        $this->setPluginConfig($config);
-    }
-
-    public function uninstall(string $pluginKey): void
-    {
-        if (!$this->isInstalled($pluginKey)) {
-            return;
-        }
-        $config = $this->getPluginConfig();
-        unset($config[$pluginKey]);
-        $this->setPluginConfig($config);
-    }
-
-    public function enable(string $pluginKey): void
-    {
-        if (!$this->isInstalled($pluginKey) || $this->isEnabled($pluginKey)) {
-            return;
-        }
-        $config = $this->getPluginConfig();
-        $config[$pluginKey] = true;
-        $this->setPluginConfig($config);
-    }
-
-    public function disable(string $pluginKey): void
-    {
-        if (!$this->isInstalled($pluginKey) || !$this->isEnabled($pluginKey)) {
-            return;
-        }
-        $config = $this->getPluginConfig();
-        $config[$pluginKey] = false;
-        $this->setPluginConfig($config);
+        return array_keys($this->plugins);
     }
 
     public function getName(string $pluginKey): string
     {
-        foreach ($this->getAdminList() as $plugin) {
-            if ($plugin['key'] === $pluginKey) {
-                return (string) $plugin['name'];
-            }
-        }
-
-        return $pluginKey;
+        return $this->plugins[$pluginKey]['name'] ?? $pluginKey;
     }
 
     public function isInstalled(string $pluginKey): bool
     {
-        $config = $this->getPluginConfig();
+        return isset($this->plugins[$pluginKey]);
+    }
 
-        return isset($config[$pluginKey]);
+    public function isSystem(string $pluginKey): bool
+    {
+        return $this->plugins[$pluginKey]['system'] ?? false;
     }
 
     public function isEnabled(string $pluginKey): bool
     {
-        $config = $this->getPluginConfig();
-        if (!isset($config[$pluginKey])) {
-            return false;
-        }
-
-        return $config[$pluginKey] === true;
+        return in_array($pluginKey, $this->getGloballyActiveList(), true);
     }
 
-    public function isConfigWritable(): bool
+    /**
+     * @return list<string> the plugins this one requires that are switched off
+     */
+    public function missingRequirements(string $pluginKey): array
     {
-        return $this->filesystem->isWritable($this->configDir . '/plugins.php');
+        return array_values(array_filter($this->plugins[$pluginKey]['requires'] ?? [], fn(string $required): bool => !$this->isEnabled($required)));
     }
 
-    public function setPluginConfig(array $config): void
+    /**
+     * @return list<string> the switched-on plugins that require this one
+     */
+    public function activeDependents(string $pluginKey): array
     {
-        $configFile = $this->configDir . '/plugins.php';
-        $content = '<?php declare(strict_types=1);' . PHP_EOL . 'return ' . var_export($config, true) . ';' . PHP_EOL;
-        if ($this->filesystem->putFileContents($configFile, $content)) {
-            if (function_exists('opcache_invalidate')) {
-                opcache_invalidate($configFile, true);
-            }
-            $this->commandService->clearCache();
-        }
-    }
-
-    private function parsePluginDir(): array
-    {
-        if (!$this->filesystem->exists($this->pluginDir)) {
-            return [];
-        }
-
-        return $this->filesystem->glob($this->pluginDir . '/*', GLOB_ONLYDIR);
-    }
-
-    private function getPluginConfig(): array
-    {
-        $envConfigFile = $this->configDir . '/plugins_' . $this->environment . '.php';
-        if ($this->filesystem->fileExists($envConfigFile)) {
-            try {
-                $config = include $envConfigFile;
-
-                return is_array($config) ? $config : [];
-            } catch (Throwable $e) {
-                unset($e); // Environment config invalid/corrupt - fall through to default plugins.php below
+        $dependents = [];
+        foreach ($this->plugins as $key => $plugin) {
+            if (in_array($pluginKey, $plugin['requires'], true) && $this->isEnabled($key)) {
+                $dependents[] = $key;
             }
         }
 
-        $configFile = $this->configDir . '/plugins.php';
-        if (!$this->filesystem->fileExists($configFile)) {
-            return [];
+        return $dependents;
+    }
+
+    public function toggle(string $pluginKey, bool $enabled): void
+    {
+        if (!$this->isInstalled($pluginKey) || $this->isSystem($pluginKey)) {
+            throw new LogicException(sprintf('Plugin "%s" is not installed or cannot be switched.', $pluginKey));
+        }
+        $blockers = $enabled ? $this->missingRequirements($pluginKey) : $this->activeDependents($pluginKey);
+        if ($blockers !== []) {
+            throw new LogicException(sprintf(
+                'Plugin "%s" cannot be switched %s because of: %s.',
+                $pluginKey,
+                $enabled ? 'on' : 'off',
+                implode(', ', $blockers),
+            ));
         }
 
+        $this->activations->save($pluginKey, $enabled, $this->clock->now());
+        $this->changed();
+    }
+
+    /**
+     * @param array<string, bool> $state
+     */
+    public function adopt(array $state): void
+    {
+        foreach ($state as $pluginKey => $enabled) {
+            if ($this->isInstalled($pluginKey) && !$this->isSystem($pluginKey)) {
+                $this->activations->save($pluginKey, $enabled, $this->clock->now());
+            }
+        }
+        $this->changed();
+    }
+
+    public function hasState(): bool
+    {
+        return $this->activationState() !== [];
+    }
+
+    public function reset(): void
+    {
+        $this->globallyActive = null;
+    }
+
+    private function changed(): void
+    {
+        $this->cache->delete(self::CACHE_KEY);
+        $this->cmsPageCache->clear();
+        $restart = $this->workerRestartSignal->getItem(StopWorkerOnRestartSignalListener::RESTART_REQUESTED_TIMESTAMP_KEY);
+        $this->workerRestartSignal->save($restart->set((float) $this->clock->now()->format('U.u')));
+        $this->reset();
+    }
+
+    /**
+     * @return array<string, bool>|null null while the table cannot be read, as during an image build or a first migration
+     */
+    private function activationState(): ?array
+    {
         try {
-            $config = include $configFile;
+            return $this->cache->get(self::CACHE_KEY, function (ItemInterface $item): array {
+                $item->expiresAfter(self::CACHE_TTL);
 
-            return is_array($config) ? $config : [];
-        } catch (Throwable) {
-            return [];
+                return $this->activations->stateByKey();
+            });
+        } catch (DbalException) {
+            return null;
         }
     }
 }

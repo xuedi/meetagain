@@ -5,8 +5,9 @@ namespace App\Item\Tag;
 use App\Item\ListRegistry;
 use App\Repository\ItemTagAssignmentRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ResetInterface;
 
-class FacetService
+class FacetService implements ResetInterface
 {
     private bool $suppressed = false;
 
@@ -99,5 +100,11 @@ class FacetService
         }
 
         return new FacetSelection(array_values(array_unique($tags)));
+    }
+
+    public function reset(): void
+    {
+        $this->memo = [];
+        $this->suppressed = false;
     }
 }

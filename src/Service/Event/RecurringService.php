@@ -2,19 +2,16 @@
 
 namespace App\Service\Event;
 
-use App\CronTaskInterface;
 use App\Entity\Event;
 use App\Entity\EventSeries;
 use App\Entity\EventTranslation;
 use App\EntityActionDispatcher;
-use App\Enum\CronTaskStatus;
 use App\Enum\EntityAction;
 use App\Enum\EventStatus;
 use App\Enum\RealignmentOutcome;
 use App\Repository\EventRepository;
 use App\Repository\EventSeriesRepository;
 use App\Repository\RsvpGuestRepository;
-use App\ValueObject\CronTaskResult;
 use App\ValueObject\RealignmentItem;
 use App\ValueObject\RealignmentPlan;
 use App\ValueObject\RealignmentResult;
@@ -23,11 +20,16 @@ use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Task\Contract\Cadence;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+use Module\Task\Contract\TaskInterface;
 use Symfony\Component\Clock\ClockInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
-readonly class RecurringService implements CronTaskInterface
+readonly class RecurringService implements TaskInterface
 {
+    public const string IDENTIFIER = 'recurring-events';
+
     public function __construct(
         private EventRepository $repo,
         private EventSeriesRepository $seriesRepo,
@@ -41,14 +43,19 @@ readonly class RecurringService implements CronTaskInterface
 
     public function getIdentifier(): string
     {
-        return 'recurring-events';
+        return self::IDENTIFIER;
     }
 
-    public function runCronTask(OutputInterface $output): CronTaskResult
+    public function getCadence(): Cadence
+    {
+        return new Cadence('20 2 * * *', jitterSeconds: 1800, offloaded: true);
+    }
+
+    public function run(): Result
     {
         $count = $this->extentRecurringEvents();
 
-        return new CronTaskResult($this->getIdentifier(), CronTaskStatus::ok, $count . ' events extended');
+        return new Result(Status::ok, $count . ' events extended');
     }
 
     public function extentRecurringEvents(): int

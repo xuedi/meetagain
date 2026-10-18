@@ -6,9 +6,10 @@ use Plugin\Boardgames\Enum\ExternalSource;
 use Plugin\Boardgames\Enum\LookupFailure;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\Service\ResetInterface;
 use Throwable;
 
-class WikidataLookup implements GameMetadataLookupInterface
+class WikidataLookup implements GameMetadataLookupInterface, ResetInterface
 {
     private const string ENDPOINT = 'https://query.wikidata.org/sparql';
 
@@ -130,5 +131,10 @@ class WikidataLookup implements GameMetadataLookupInterface
     private function escape(string $value): string
     {
         return str_replace(['\\', '"', "\n", "\r"], ['\\\\', '\"', ' ', ' '], $value);
+    }
+
+    public function reset(): void
+    {
+        $this->lastFailure = null;
     }
 }

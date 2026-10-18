@@ -1,0 +1,69 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <table class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>{{ 'admin_task.col_task'|trans }}</th>
+                <th>{{ 'admin_task.col_cadence'|trans }}</th>
+                <th>{{ 'admin_task.col_next_run'|trans }}</th>
+                <th>{{ 'admin_task.col_last_run'|trans }}</th>
+                <th>{{ 'admin_task.col_status'|trans }}</th>
+                <th>{{ 'admin_task.col_duration'|trans }}</th>
+                <th>{{ 'admin_task.col_message'|trans }}</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for schedule in schedules %}
+                <tr>
+                    <td>
+                        <code>{{ schedule.identifier }}</code>
+                        {% if schedule.cadence.offloaded %}
+                            <span class="tag is-light">{{ 'admin_task.tag_worker'|trans }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="is-nowrap">
+                        <code>{{ schedule.cadence.cron }}</code>
+                        {% if schedule.cadence.jitterSeconds > 0 %}
+                            <span class="has-text-grey is-size-7">{{ 'admin_task.jitter'|trans({'%seconds%': schedule.cadence.jitterSeconds}) }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="is-nowrap has-text-grey">{{ schedule.next ? schedule.next|date('Y-m-d H:i') : '-' }}</td>
+                    {% if schedule.last %}
+                        <td class="is-nowrap">
+                            <a href="{{ path('app_admin_task_runs', {'task': schedule.identifier, 'range': 'all'}) }}">{{ schedule.last.startedAt|date('Y-m-d H:i:s') }}</a>
+                        </td>
+                        <td><span class="tag {{ schedule.last.status.tagVariant }}">{{ schedule.last.status.label|trans }}</span></td>
+                        <td class="has-text-grey has-unit" data-unit="ms">{{ schedule.last.durationMs }}</td>
+                        <td>{{ schedule.last.message }}</td>
+                    {% else %}
+                        <td colspan="4" class="has-text-grey">{{ 'admin_task.never_ran'|trans }}</td>
+                    {% endif %}
+                    <td>
+                        <a href="{{ path('app_admin_task_run_now', {'identifier': schedule.identifier}) }}"
+                           class="button-as-icon"
+                           title="{{ 'admin_task.action_run_now'|trans }}"
+                           data-post
+                           data-csrf-token="{{ csrf_token('app_admin_task_run_now' ~ schedule.identifier) }}">
+                            <span class="icon"><i class="fa fa-play"></i></span>
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8" class="has-text-grey has-text-centered">{{ 'admin_task.empty_schedules'|trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

@@ -13,9 +13,10 @@ use Plugin\Glossary\Service\ConfigService;
 use Plugin\Glossary\Service\GlossaryService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Contracts\Service\ResetInterface;
 use Twig\Environment;
 
-final class GlossaryListCellProvider implements ListCellProviderInterface, ListProviderInterface
+final class GlossaryListCellProvider implements ListCellProviderInterface, ListProviderInterface, ResetInterface
 {
     /** @var array<int, Glossary>|null */
     private ?array $entries = null;
@@ -201,5 +202,15 @@ final class GlossaryListCellProvider implements ListCellProviderInterface, ListP
         }
 
         return $byId;
+    }
+
+    public function reset(): void
+    {
+        $this->entries = null;
+        $this->hasTags = null;
+        $this->listedIds = [];
+        $this->tagLabels = [];
+        $this->tagLabelsLoaded = [];
+        $this->pendingProposalIds = null;
     }
 }

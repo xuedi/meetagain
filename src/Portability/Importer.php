@@ -16,6 +16,8 @@ use ZipArchive;
 
 readonly class Importer
 {
+    public const string PENDING_DIRECTORY = 'import/archive';
+
     /**
      * @param iterable<SectionInterface> $sections
      */

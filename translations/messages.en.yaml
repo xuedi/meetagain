@@ -41,7 +41,7 @@ security:
     page_title_register: 'Register'
     headline_register: 'Please register'
     page_title_reset: 'Reset password'
-    headline_reset_password: 'New passwort'
+    headline_reset_password: 'New password'
     page_title_reset_success: 'Reset successfully'
     headline_reset_success: 'Reset successfully'
     button_send_reset_link: 'reset password'
