@@ -95,7 +95,7 @@ final class SystemLogController extends AbstractLogsController implements AdminN
         return $this->render('admin/logs/logs_system_list.html.twig', [
             'active' => 'logs',
             'activeLog' => 'logs',
-            'logs' => $filteredEntries,
+            'logs' => array_slice($filteredEntries, -LogService::MAX_LIMIT),
             'hasLogFiles' => $hasLogFiles,
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),

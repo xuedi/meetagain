@@ -112,12 +112,12 @@ class BootstrapCommand extends Command
             $this->createStarterPage($admin);
         }
 
-        $hotfixes = $this->getApplication()?->find('app:data-hotfix:run')->run(new ArrayInput([]), $output) ?? Command::FAILURE;
+        $baseline = $this->getApplication()?->find('app:data-hotfix:baseline')->run(new ArrayInput([]), $output) ?? Command::FAILURE;
 
         $io->success(sprintf('Created admin %s. Open this link within 24 hours to set the password:', $email));
         $output->writeln($siteUrl . $path);
 
-        return $hotfixes;
+        return $baseline;
     }
 
     private function createAdmin(string $email, string $name): User

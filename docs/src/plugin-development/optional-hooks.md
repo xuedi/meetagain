@@ -1365,12 +1365,16 @@ described in [Required Hooks](required-hooks.md#periodic-and-background-work).
 
 ## Data Hotfix
 
-Implement `DataHotfixInterface` to ship a one-off data repair that runs once per database lifetime.
-`app:data-hotfix:run` runs every time the database is migrated - the image's `migrate` role and `just appMigrate` both
-call it. It skips every hotfix whose per-identifier AppState lock is written, runs the rest in identifier order and
-writes the lock on success. Throwing leaves the lock unwritten, so the hotfix runs again at the next migrate. Throw
-`App\DataHotfix\DeferredException` when the data the hotfix needs is not there yet: it is reported as deferred, not
-as a failure.
+Implement `DataHotfixInterface` to ship a one-off data repair that runs once per database lifetime. A migration
+does not run it: the administrator starts it from Admin, System, Hotfixes, which lists every registered hotfix as done
+or pending. A successful run writes the hotfix's per-identifier AppState lock. Throwing leaves the lock unwritten, so
+the hotfix stays pending. Throw `App\DataHotfix\DeferredException` when the data the hotfix needs is not there yet:
+it is reported as deferred, not as a failure. Keep a hotfix to a few seconds - it runs inside the admin's request.
+
+A new database never runs a hotfix: `app:bootstrap` ends with `app:data-hotfix:baseline`, which records every hotfix
+as done without executing it. A hotfix therefore must not be the only code that creates something a new install
+needs - seed that in your plugin's own setup or fixtures, and let the hotfix bring older databases up to the same
+state.
 
 ```php
 namespace Plugin\YourPlugin\DataHotfix;
@@ -1410,7 +1414,7 @@ readonly class FixOrphanedThings implements DataHotfixInterface
 
 Identifiers must be stable - they are AppState row keys. Once a hotfix has shipped, never rename its identifier; treat
 it like a Doctrine migration version. To force a rerun on a single environment, delete the `app_state` row with key
-`data_hotfix.{identifier}`.
+`data_hotfix.{identifier}` and run it again from the Hotfixes tab.
 
 ---
 

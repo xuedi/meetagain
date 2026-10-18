@@ -66,6 +66,12 @@ abstract class AbstractSettingsController extends AbstractController
                 icon: 'key',
                 isActive: $this->activeSettingsTab === 'secretbox',
             ),
+            new AdminTab(
+                label: $this->translator->trans('admin_system.tab_hotfixes'),
+                target: $this->generateUrl('app_admin_system_hotfixes'),
+                icon: 'wrench',
+                isActive: $this->activeSettingsTab === 'hotfixes',
+            ),
         ]);
     }
 }

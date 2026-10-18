@@ -621,6 +621,7 @@ admin_system:
     tab_language: 'Idioma'
     tab_import: 'Importar'
     tab_secretbox: 'Claves secretas'
+    tab_hotfixes: 'Correcciones'
     flash_invalid_csrf: 'Token CSRF no válido'
 admin_secretbox:
     heading_configuration: 'Configuración de claves'

@@ -84,8 +84,8 @@
             "commands": ["PHP php bin/console app:email-templates:seed"]
         },
         {
-            "label": "Run data hotfixes",
-            "commands": ["PHP php bin/console app:data-hotfix:run"]
+            "label": "Record data hotfixes",
+            "commands": ["PHP php bin/console app:data-hotfix:baseline -q"]
         },
         {
             "label": "Seed install baseline",

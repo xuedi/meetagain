@@ -6,12 +6,6 @@
 
         {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
 
-        {% for type, messages in app.flashes %}
-            {% for message in messages %}
-                <div class="notification is-{{ type == 'error' ? 'danger' : type }}">{{ message }}</div>
-            {% endfor %}
-        {% endfor %}
-
         <table class="table is-fullwidth">
             <thead>
             <tr>
@@ -29,39 +23,23 @@
                     <td>{{ plugin.name }}</td>
                     <td>{{ plugin.description|shortened(70) }}</td>
                     <td>
-                        {% if plugin.system %}
-                            <span class="tag is-light">{{ 'admin_system_plugins.tag_system'|trans }}</span>
-                        {% elseif plugin.enabled %}
-                            <span class="tag is-success">{{ 'admin_system_plugins.tag_on'|trans }}</span>
-                        {% else %}
-                            <span class="tag is-light">{{ 'admin_system_plugins.tag_off'|trans }}</span>
-                        {% endif %}
+                        {% include '_components/toggle.html.twig' with {
+                            'link': path('app_admin_plugin_toggle', {key: plugin.key}),
+                            'status': plugin.enabled,
+                            'csrfTokenId': 'app_admin_plugin_toggle' ~ plugin.key,
+                            'noAjax': true,
+                            'disabled': plugin.system,
+                        } %}
                     </td>
-                    <td class="has-text-right is-nowrap">
-                        {% if not plugin.system %}
-                            <a href="{{ path('app_admin_plugin_toggle', {key: plugin.key}) }}"
-                               class="button-as-icon"
-                               title="{{ (plugin.enabled ? 'admin_system_plugins.button_disable' : 'admin_system_plugins.button_enable')|trans }}"
-                               data-post
-                               data-csrf-token="{{ csrf_token('app_admin_plugin_toggle' ~ plugin.key) }}">
-                                <span class="icon"><i class="fa {{ plugin.enabled ? 'fa-toggle-on has-text-success' : 'fa-toggle-off has-text-grey' }}"></i></span>
-                            </a>
-                        {% endif %}
-                        {% if plugin.enabled and plugin.key in configurableKeys %}
-                            <a href="{{ path('app_admin_plugin_settings', {key: plugin.key}) }}"
-                               class="button is-light"
-                               title="{{ 'admin_system_plugins.button_configure'|trans }}">
-                                <span class="icon"><i class="fa fa-cog"></i></span>
-                            </a>
-                        {% else %}
-                            {# title sits on the wrapper: a disabled button takes no mouse events and never shows its own #}
-                            <span title="{{ (plugin.key in configurableKeys
-                                ? 'admin_system_plugins.button_configure_inactive'
-                                : 'admin_system_plugins.button_configure_none')|trans }}">
-                                <button class="button is-light" disabled>
+                    <td>
+                        {% if plugin.key in configurableKeys %}
+                            {% if plugin.enabled %}
+                                <a href="{{ path('app_admin_plugin_settings', {key: plugin.key}) }}" title="{{ 'admin_system_plugins.button_configure'|trans }}">
                                     <span class="icon"><i class="fa fa-cog"></i></span>
-                                </button>
-                            </span>
+                                </a>
+                            {% else %}
+                                <span class="icon has-text-grey-light" title="{{ 'admin_system_plugins.button_configure_inactive'|trans }}"><i class="fa fa-cog"></i></span>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>

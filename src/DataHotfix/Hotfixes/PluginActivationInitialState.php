@@ -16,6 +16,8 @@ readonly class PluginActivationInitialState implements DataHotfixInterface
         private UserRepository $userRepository,
         #[Autowire('%kernel.project_dir%/config/plugins.php')]
         private string $legacyConfigFile,
+        #[Autowire('%kernel.project_dir%/config/plugins_%kernel.environment%.php')]
+        private string $legacyEnvironmentFile,
     ) {}
 
     #[Override]
@@ -31,8 +33,9 @@ readonly class PluginActivationInitialState implements DataHotfixInterface
             return;
         }
 
-        if (is_file($this->legacyConfigFile)) {
-            $legacy = require $this->legacyConfigFile;
+        $legacyFile = is_file($this->legacyEnvironmentFile) ? $this->legacyEnvironmentFile : $this->legacyConfigFile;
+        if (is_file($legacyFile)) {
+            $legacy = require $legacyFile;
             $state = [];
             foreach (is_array($legacy) ? $legacy : [] as $pluginKey => $enabled) {
                 $state[(string) $pluginKey] = $enabled === true;

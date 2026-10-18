@@ -1,0 +1,52 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <table class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>{{ 'admin_system_hotfix.col_hotfix'|trans }}</th>
+                <th>{{ 'admin_system_hotfix.col_status'|trans }}</th>
+                <th>{{ 'admin_system_hotfix.col_ran_at'|trans }}</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for hotfix in hotfixes %}
+                <tr>
+                    <td><code>{{ hotfix.identifier }}</code></td>
+                    {% if hotfix.ranAt %}
+                        <td><span class="tag is-success">{{ 'admin_system_hotfix.status_done'|trans }}</span></td>
+                        <td class="is-nowrap has-text-grey">{{ hotfix.ranAt|date('Y-m-d H:i') }}</td>
+                        <td></td>
+                    {% else %}
+                        <td><span class="tag is-warning">{{ 'admin_system_hotfix.status_pending'|trans }}</span></td>
+                        <td class="has-text-grey">-</td>
+                        <td>
+                            <a href="{{ path('app_admin_system_hotfix_run', {'identifier': hotfix.identifier}) }}"
+                               class="button-as-icon"
+                               title="{{ 'admin_system_hotfix.action_run'|trans }}"
+                               data-post
+                               data-confirm="{{ 'admin_system_hotfix.confirm_run'|trans({'%hotfix%': hotfix.identifier}) }}"
+                               data-csrf-token="{{ csrf_token('app_admin_system_hotfix_run' ~ hotfix.identifier) }}">
+                                <span class="icon"><i class="fa fa-play"></i></span>
+                            </a>
+                        </td>
+                    {% endif %}
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" class="has-text-grey has-text-centered">{{ 'admin_system_hotfix.empty'|trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}
