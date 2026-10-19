@@ -125,7 +125,9 @@ ARG CREATED \
     SOURCE="https://github.com/xuedi/meetagain" \
     LICENSES="EUPL-1.2"
 
-ENV SENTRY_RELEASE="${RELEASE}"
+ENV SENTRY_RELEASE="${RELEASE}" \
+    APP_VERSION="${VERSION}" \
+    APP_BUILT="${CREATED}"
 
 EXPOSE 8080
 

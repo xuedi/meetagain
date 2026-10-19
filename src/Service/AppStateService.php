@@ -17,6 +17,7 @@ use Throwable;
 class AppStateService implements ResetInterface
 {
     private const int MISS_TTL_SECONDS = 60;
+    private const int HIT_TTL_SECONDS = 300;
 
     private bool $cacheFailureLogged = false;
 
@@ -40,7 +41,7 @@ class AppStateService implements ResetInterface
         try {
             $value = $this->cache->get($this->cacheKey($key), function (ItemInterface $item) use ($key): ?string {
                 $value = $this->repository->findValue($key);
-                $item->expiresAfter($value === null ? self::MISS_TTL_SECONDS : null);
+                $item->expiresAfter($value === null ? self::MISS_TTL_SECONDS : self::HIT_TTL_SECONDS);
 
                 return $value;
             });
@@ -88,7 +89,7 @@ class AppStateService implements ResetInterface
                 $rows = $this->repository->findValuesByKeys(array_keys($missing));
                 foreach ($missing as $key => $item) {
                     $value = $rows[$key] ?? null;
-                    $item->expiresAfter($value === null ? self::MISS_TTL_SECONDS : null);
+                    $item->expiresAfter($value === null ? self::MISS_TTL_SECONDS : self::HIT_TTL_SECONDS);
                     $item->set($value);
                     $this->cache->saveDeferred($item);
                     $this->memo[$key] = $value;
