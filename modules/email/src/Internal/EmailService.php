@@ -214,6 +214,15 @@ readonly class EmailService implements TaskInterface, EmailQueueInterface
                     $mail->setStatus(QueueStatus::Failed);
                     $mail->setErrorMessage($e->getMessage());
                     $failed++;
+                } catch (Throwable $e) {
+                    $mail->setStatus(QueueStatus::Failed);
+                    $mail->setErrorMessage($e->getMessage());
+                    $this->logger->error('Email could not be built and was marked failed', [
+                        'email_queue_id' => $mail->getId(),
+                        'template' => $mail->getTemplate(),
+                        'exception' => $e,
+                    ]);
+                    $failed++;
                 }
                 $mail->releaseClaim();
                 $this->em->flush();
