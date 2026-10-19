@@ -78,7 +78,7 @@ services:
 
   # S3 storage for images, thumbnails and private files (prepared by: just storageInit)
   garage:
-    image: dxflrs/garage:v2.4.1@sha256:9c96caa2612d3411acc5b0e6701fb238dbfba33e533a6d7d3d811a4b12d0d020
+    image: ${GARAGE_IMAGE:?pinned in docker/services.env}
     container_name: "ma-garage"
     volumes:
       - ./garage/garage.toml:/etc/garage.toml:ro
@@ -90,7 +90,7 @@ services:
 
   # Database server
   mariadb:
-    image: mariadb:13.0.2@sha256:f1bba652ba57bea3099ca2fe1af692af537c27d96e0bcde39dce29e2ba1ec4f3
+    image: ${MARIADB_IMAGE:?pinned in docker/services.env}
     container_name: "ma-db"
     volumes:
       - ma-mysql-data:/var/lib/mysql
@@ -120,7 +120,7 @@ services:
   # Redis-compatible cache server
   valkey:
     container_name: "ma-valkey"
-    image: valkey/valkey:9.2@sha256:247b5e730bdc9dc29fddb8274d1731b203a1a1a46af63eae3a9d55b4bf74853f
+    image: ${VALKEY_IMAGE:?pinned in docker/services.env}
     command: valkey-server --save 60 1 --loglevel warning
     mem_limit: 2g
     memswap_limit: 2g
