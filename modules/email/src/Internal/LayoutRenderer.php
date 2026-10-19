@@ -27,13 +27,11 @@ readonly class LayoutRenderer
      */
     public function snapshot(SendingIdentity $identity): array
     {
-        $colors = $this->colors->all();
-
         $snapshot = [
             'siteName' => $identity->siteName,
             'siteUrl' => $identity->siteUrl,
             'logoUrl' => $identity->logoUrl,
-            'accent' => $colors['color_link'] ?? $colors['color_primary'] ?? self::DEFAULT_ACCENT,
+            'accent' => $identity->accent ?? $this->globalAccent(),
             'links' => $identity->links,
         ];
 
@@ -78,5 +76,12 @@ readonly class LayoutRenderer
 
             return null;
         }
+    }
+
+    private function globalAccent(): string
+    {
+        $colors = $this->colors->forScope(null);
+
+        return $colors['color_link'] ?? $colors['color_primary'] ?? self::DEFAULT_ACCENT;
     }
 }

@@ -84,7 +84,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
         $colorsForm->handleRequest($request);
 
         if ($colorsForm->isSubmitted() && $colorsForm->isValid()) {
-            $this->colors->save($colorsForm->getData());
+            $this->colors->save($colorsForm->getData(), null);
             $this->addFlash('success', $this->translator->trans('admin_system_theme.flash_saved'));
         }
 

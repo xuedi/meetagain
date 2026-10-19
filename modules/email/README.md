@@ -70,7 +70,8 @@ type or an enricher set, so a mail's links land on the same place its logo and f
 
 `EmailInterface::getOrigin()` names the entity a message is about. Each `SendingIdentityProviderInterface`, in
 priority order, may turn it into a `SendingIdentity` - name, URL, logo URL, sign-off, footer links, optional
-attribution - and the first non-null answer wins. The application registers `RequestSendingIdentityProvider` at the
+attribution, optional accent colour - and the first non-null answer wins. Without an accent the layout takes the
+global theme colours. The application registers `RequestSendingIdentityProvider` at the
 lowest priority, answering from the live request; if every provider defers, enqueue throws. A provider that answers
 for types with no origin must do so from stored data or the request host, never from anything only a worker lacks.
 

@@ -179,6 +179,18 @@ final class LayoutRendererTest extends TestCase
         );
     }
 
+    public function testAnAccentOnTheIdentityWinsOverTheThemeColours(): void
+    {
+        // Arrange
+        $identity = new SendingIdentity(siteName: 'Example Site', siteUrl: 'https://example.org', accent: '#abcdef');
+
+        // Act
+        $snapshot = $this->renderer()->snapshot($identity);
+
+        // Assert
+        static::assertSame('#abcdef', $snapshot['accent']);
+    }
+
     private function queued(?string $body, array $overrides = []): EmailQueue
     {
         return new EmailQueue()
@@ -229,7 +241,7 @@ final class LayoutRendererTest extends TestCase
     private function hostileRenderer(): LayoutRenderer
     {
         $colors = $this->createStub(Colors::class);
-        $colors->method('all')->willThrowException(new RuntimeException('The send path resolved the sending identity live'));
+        $colors->method('forScope')->willThrowException(new RuntimeException('The send path resolved the sending identity live'));
 
         $twig = new Environment($this->moduleTemplates());
         $twig->addExtension(new TranslationExtension(new Translator('en')));
@@ -245,7 +257,7 @@ final class LayoutRendererTest extends TestCase
         }
 
         $colors = $this->createStub(Colors::class);
-        $colors->method('all')->willReturn(['color_link' => '#123456']);
+        $colors->method('forScope')->willReturn(['color_link' => '#123456']);
 
         return new LayoutRenderer(twig: $twig, colors: $colors, logger: $logger ?? $this->createStub(LoggerInterface::class));
     }
