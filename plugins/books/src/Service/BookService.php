@@ -169,7 +169,7 @@ readonly class BookService
         return $this->bookRepo->findByIsbn($this->normalizeIsbn($isbn));
     }
 
-    private function normalizeIsbn(string $isbn): string
+    public function normalizeIsbn(string $isbn): string
     {
         return preg_replace('/[^0-9X]/', '', strtoupper($isbn)) ?? $isbn;
     }

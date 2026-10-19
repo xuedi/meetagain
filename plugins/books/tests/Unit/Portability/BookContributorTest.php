@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Plugin\Books\Entity\Book;
 use Plugin\Books\Portability\BookContributor;
 use Plugin\Books\Repository\BookRepository;
+use Plugin\Books\Service\BookService;
 use ReflectionProperty;
 
 class BookContributorTest extends TestCase
@@ -92,6 +93,73 @@ class BookContributorTest extends TestCase
         self::assertSame(0, $result->matched);
     }
 
+    public function testHyphenatedIsbnMatchesTheStoredDigits(): void
+    {
+        // Arrange
+        $existing = $this->book(77, '9781234567897', 'Dune');
+        $repo = $this->createMock(BookRepository::class);
+        $repo->expects(self::once())->method('findOneBy')->with(['isbn' => '9781234567897'])->willReturn($existing);
+
+        $contributor = $this->contributor($this->createStub(EntityManagerInterface::class), $repo);
+
+        // Act
+        $result = $contributor->importItems([['ref' => 4, 'isbn' => '978-1-234-56789-7', 'title' => 'Dune']], $this->context());
+
+        // Assert
+        self::assertSame([4 => 77], $result->refToItemId);
+        self::assertSame(1, $result->matched);
+    }
+
+    public function testRowWithoutIsbnIsSkipped(): void
+    {
+        // Arrange
+        $repo = $this->createStub(BookRepository::class);
+        $repo->method('findOneBy')->willReturn(null);
+
+        $persisted = [];
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist')->willReturnCallback(static function (object $entity) use (&$persisted): void {
+            $persisted[] = $entity;
+        });
+
+        $contributor = $this->contributor($em, $repo);
+        $rows = [['ref' => 4, 'isbn' => '', 'title' => 'Dune'], ['ref' => 5, 'isbn' => null, 'title' => 'Emma']];
+
+        // Act
+        $result = $contributor->importItems($rows, $this->context());
+
+        // Assert
+        self::assertSame([], $result->refToItemId);
+        self::assertSame(0, $result->created);
+        self::assertSame([], $persisted);
+    }
+
+    public function testSameIsbnTwiceInOneArchiveCreatesOneBook(): void
+    {
+        // Arrange
+        $repo = $this->createStub(BookRepository::class);
+        $repo->method('findOneBy')->willReturn(null);
+
+        $persisted = [];
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist')->willReturnCallback(static function (object $entity) use (&$persisted): void {
+            new ReflectionProperty(Book::class, 'id')->setValue($entity, 55);
+            $persisted[] = $entity;
+        });
+
+        $contributor = $this->contributor($em, $repo);
+        $rows = [['ref' => 4, 'isbn' => '9781234567897', 'title' => 'Dune'], ['ref' => 9, 'isbn' => '978-1234567897', 'title' => 'Dune']];
+
+        // Act
+        $result = $contributor->importItems($rows, $this->context());
+
+        // Assert
+        self::assertSame([4 => 55, 9 => 55], $result->refToItemId);
+        self::assertSame(1, $result->created);
+        self::assertSame(1, $result->matched);
+        self::assertCount(1, $persisted);
+    }
+
     private function book(int $id, string $isbn, string $title): Book
     {
         $book = new Book();
@@ -111,6 +179,9 @@ class BookContributorTest extends TestCase
 
     private function contributor(EntityManagerInterface $em, BookRepository $repo): BookContributor
     {
-        return new BookContributor($em, $repo, $this->createStub(ImageLocationService::class));
+        $bookService = $this->createStub(BookService::class);
+        $bookService->method('normalizeIsbn')->willReturnCallback(static fn(string $isbn): string => preg_replace('/[^0-9X]/', '', strtoupper($isbn)) ?? $isbn);
+
+        return new BookContributor($em, $repo, $this->createStub(ImageLocationService::class), $bookService);
     }
 }

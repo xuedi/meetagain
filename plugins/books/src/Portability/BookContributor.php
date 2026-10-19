@@ -22,6 +22,7 @@ readonly class BookContributor implements ContributorInterface
         private EntityManagerInterface $em,
         private BookRepository $bookRepo,
         private ImageLocationService $imageLocationService,
+        private BookService $bookService,
     ) {}
 
     #[Override]
@@ -78,14 +79,19 @@ readonly class BookContributor implements ContributorInterface
         $created = 0;
         $matched = 0;
         $imageLocations = [];
+        $byIsbn = [];
 
         foreach ($rows as $row) {
             $ref = (int) ($row['ref'] ?? 0);
-            $isbn = (string) ($row['isbn'] ?? '');
+            $isbn = $this->bookService->normalizeIsbn((string) ($row['isbn'] ?? ''));
+            if ($isbn === '') {
+                continue;
+            }
 
-            $existing = $isbn !== '' ? $this->bookRepo->findOneBy(['isbn' => $isbn]) : null;
+            $existing = $byIsbn[$isbn] ?? $this->bookRepo->findOneBy(['isbn' => $isbn]);
             if ($existing instanceof Book) {
                 $refToItemId[$ref] = $existing;
+                $byIsbn[$isbn] = $existing;
                 ++$matched;
                 continue;
             }
@@ -108,6 +114,7 @@ readonly class BookContributor implements ContributorInterface
 
             $this->em->persist($book);
             $refToItemId[$ref] = $book;
+            $byIsbn[$isbn] = $book;
             ++$created;
         }
 

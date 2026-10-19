@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Plugin\Boardgames\Cron;
+namespace Plugin\Boardgames\Service;
 
 use DateTimeImmutable;
 use Module\Task\Contract\Cadence;
@@ -11,7 +11,6 @@ use Override;
 use Plugin\Boardgames\Entity\BringRequest;
 use Plugin\Boardgames\Repository\BringRequestRepository;
 use Plugin\Boardgames\Repository\GameOwnershipRepository;
-use Plugin\Boardgames\Service\BringRequestService;
 use Throwable;
 
 final readonly class MaintenanceTask implements TaskInterface

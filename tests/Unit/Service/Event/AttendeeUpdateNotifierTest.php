@@ -39,7 +39,7 @@ class AttendeeUpdateNotifierTest extends TestCase
         $notifier->notify($event, null, $this->before(), $this->after());
 
         // Assert
-        self::assertSame(0, $notifier->countNotifiable($event));
+        self::assertSame(0, $notifier->countNotifiable($event, null));
     }
 
     public function testTheEditorIsSkipped(): void
@@ -53,6 +53,9 @@ class AttendeeUpdateNotifierTest extends TestCase
 
         // Act
         $notifier->notify($event, $editor, $this->before(), $this->after());
+
+        // Assert
+        self::assertSame(0, $notifier->countNotifiable($event, $editor));
     }
 
     public function testTheCreatorIsSkipped(): void
@@ -80,7 +83,7 @@ class AttendeeUpdateNotifierTest extends TestCase
         $notifier->notify($event, null, $this->before(), $this->after());
 
         // Assert
-        self::assertSame(0, $notifier->countNotifiable($event));
+        self::assertSame(0, $notifier->countNotifiable($event, null));
     }
 
     public function testEveryRemainingAttendeeIsMailed(): void
@@ -95,7 +98,7 @@ class AttendeeUpdateNotifierTest extends TestCase
         $notifier->notify($event, null, $this->before(), $this->after());
 
         // Assert
-        self::assertSame(2, $notifier->countNotifiable($event));
+        self::assertSame(2, $notifier->countNotifiable($event, null));
     }
 
     private function email(): MockObject&EventUpdateNotificationEmail

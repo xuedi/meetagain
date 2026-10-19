@@ -29,6 +29,7 @@ readonly class SecurityService implements TaskInterface
     public const string KEY_LAST_RETROSPECTIVE_RUN = 'security.retrospective_scan.last_run';
     public const int BLOCK_TTL_SECONDS = 43_200;
     public const string BLOCK_DURATION_LABEL = '12h';
+    private const int FORM_MEASURE_LINK_WINDOW_SECONDS = 86_400;
 
     /**
      * @param iterable<SecurityProviderInterface> $providers
@@ -267,7 +268,10 @@ readonly class SecurityService implements TaskInterface
             $logs = match ($triggeredBy) {
                 'not_found' => [$this->notFoundLogRepository->findLatestUnlinkedForOffender($ip, $sessionId)],
                 'access_denied' => [$this->accessDeniedLogRepository->findLatestUnlinkedForOffender($ip)],
-                'form_measure' => $this->securityMeasureLogRepository->findUnlinkedBlocksForIp($ip, $this->clock->now()->modify('-24 hours')),
+                'form_measure' => $this->securityMeasureLogRepository->findUnlinkedBlocksForIp(
+                    $ip,
+                    $this->clock->now()->modify(sprintf('-%d seconds', self::FORM_MEASURE_LINK_WINDOW_SECONDS)),
+                ),
                 default => [],
             };
             $logs = array_filter($logs);

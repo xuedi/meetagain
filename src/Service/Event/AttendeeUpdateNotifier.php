@@ -47,7 +47,7 @@ readonly class AttendeeUpdateNotifier
         }
     }
 
-    public function countNotifiable(Event $event, ?User $editor = null): int
+    public function countNotifiable(Event $event, ?User $editor): int
     {
         return count($this->recipients($event, $editor));
     }

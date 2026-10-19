@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag]
 interface ChangeTargetProviderInterface
 {
-    /** Directory key of the owning plugin, matched against the active-plugin list. */
+    /** Directory key of the owning plugin; empty for core. */
     public function getPluginKey(): string;
 
     /** Registry key for this target type; the value stored in ChangeProposal::targetType. */
