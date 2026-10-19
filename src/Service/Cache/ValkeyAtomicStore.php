@@ -4,7 +4,9 @@ namespace App\Service\Cache;
 
 use Override;
 use Redis;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Throwable;
 
 final readonly class ValkeyAtomicStore implements AtomicStoreInterface
 {
@@ -38,10 +40,15 @@ final readonly class ValkeyAtomicStore implements AtomicStoreInterface
     public function update(string $key, int $ttlSeconds, callable $mutate): void
     {
         $fullKey = $this->prefix . $key;
-        $next = null;
         for ($attempt = 1; $attempt <= self::UPDATE_ATTEMPTS; $attempt++) {
             $this->redis->watch($fullKey);
-            $next = $mutate($this->decode($this->redis->get($fullKey)) ?? []);
+            try {
+                $next = $mutate($this->decode($this->redis->get($fullKey)) ?? []);
+            } catch (Throwable $e) {
+                $this->redis->unwatch();
+
+                throw $e;
+            }
             if ($next === null) {
                 $this->redis->unwatch();
 
@@ -55,7 +62,7 @@ final readonly class ValkeyAtomicStore implements AtomicStoreInterface
             }
         }
 
-        $this->redis->set($fullKey, $this->encode($next), ['ex' => $ttlSeconds]);
+        throw new RuntimeException(sprintf('Gave up updating %s after %d conflicting writes', $key, self::UPDATE_ATTEMPTS));
     }
 
     #[Override]
