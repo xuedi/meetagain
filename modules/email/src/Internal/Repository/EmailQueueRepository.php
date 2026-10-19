@@ -25,13 +25,32 @@ class EmailQueueRepository extends ServiceEntityRepository
      */
     public function claimPending(int $limit, DateTimeImmutable $now, DateTimeImmutable $leaseExpiredBefore): array
     {
-        $candidates = $this
-            ->claimableQuery($leaseExpiredBefore)
-            ->select('eq.id')
-            ->orderBy('eq.id', 'ASC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getSingleColumnResult();
+        return $this->claim($this->findClaimableIds($limit, $leaseExpiredBefore), $now, $leaseExpiredBefore);
+    }
+
+    /**
+     * @return list<int>
+     */
+    public function findClaimableIds(int $limit, DateTimeImmutable $leaseExpiredBefore): array
+    {
+        return array_map(
+            intval(...),
+            $this
+                ->claimableQuery($leaseExpiredBefore)
+                ->select('eq.id')
+                ->orderBy('eq.id', 'ASC')
+                ->setMaxResults($limit)
+                ->getQuery()
+                ->getSingleColumnResult(),
+        );
+    }
+
+    /**
+     * @param list<int> $candidates
+     * @return list<EmailQueue>
+     */
+    public function claim(array $candidates, DateTimeImmutable $now, DateTimeImmutable $leaseExpiredBefore): array
+    {
         if ($candidates === []) {
             return [];
         }

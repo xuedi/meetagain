@@ -65,7 +65,7 @@ body {
 
 // ── Forms ────────────────────────────────────────────────────────────────────
 
-.fieldset-warning  { border: 2px solid #f14668; border-radius: 4px; }
+.fieldset-warning  { border: 2px solid var(--bulma-danger); border-radius: 4px; }
 .fieldset-info     { border: 2px solid var(--bulma-info); border-radius: 4px; }
 .fieldset-default  { border: 1px solid #dbdbdb; border-radius: 4px; }
 .col-narrow        { width: 60px; }
@@ -382,7 +382,7 @@ label.ballot-option .ballot-option__card a {
     align-items: center;
     justify-content: center;
     border-radius: 8px;
-    background: hsl(171deg 100% 29% / 65%);
+    background: hsl(var(--bulma-primary-h) var(--bulma-primary-s) var(--bulma-primary-30-l) / 65%);
     color: #fff;
     opacity: 0;
     transition: opacity 120ms ease-out;
@@ -392,9 +392,9 @@ label.ballot-option .ballot-option__card a {
 .ballot-option__input:checked ~ .ballot-option__card    { filter: saturate(0.6); }
 .ballot-option__input:focus-visible ~ .ballot-option__overlay { opacity: 0.35; }
 
-.ballot-option:has(.ballot-option__input:checked)       { outline-color: hsl(171deg 100% 29%); }
-.ballot-option:has(.ballot-option__input:focus-visible) { outline-color: hsl(217deg 71% 53%); }
-.ballot-option.is-winning                               { outline-color: hsl(171deg 100% 29%); }
+.ballot-option:has(.ballot-option__input:checked)       { outline-color: var(--bulma-primary-30); }
+.ballot-option:has(.ballot-option__input:focus-visible) { outline-color: var(--bulma-link); }
+.ballot-option.is-winning                               { outline-color: var(--bulma-primary-30); }
 
 .ballot-option__count {
     position: absolute;
@@ -403,7 +403,7 @@ label.ballot-option .ballot-option__card a {
     min-width: 1.75rem;
     padding: 0 0.4rem;
     border-radius: 999px;
-    background: hsl(171deg 100% 29%);
+    background: var(--bulma-primary-30);
     color: #fff;
     font-weight: 600;
     text-align: center;
@@ -442,6 +442,16 @@ label.ballot-option .ballot-option__card a {
 .flatpickr-calendar.hasTime .flatpickr-time {
     border-top: 1px solid rgba(10, 10, 10, .1);
     height: calc(2.25rem + 1px);
+}
+
+.flatpickr-day.today { border-color: var(--bulma-primary); }
+.flatpickr-day.today:focus,
+.flatpickr-day.today:hover { border-color: var(--bulma-primary); background: var(--bulma-primary); color: var(--bulma-primary-invert); }
+.flatpickr-day:is(.selected, .startRange, .endRange),
+.flatpickr-day:is(.selected, .startRange, .endRange):is(:focus, :hover) {
+    border-color: var(--bulma-link);
+    background: var(--bulma-link);
+    color: var(--bulma-link-invert);
 }
 
 // -- FactsRow CMS block --
@@ -698,13 +708,13 @@ body.admin-shell-no-scroll {
         transition: border-color 120ms ease-out, background-color 120ms ease-out;
 
         &:hover {
-            border-color: hsl(171deg 100% 29%);
-            background: hsl(171deg 100% 29% / 6%);
+            border-color: var(--bulma-primary-30);
+            background: hsl(var(--bulma-primary-h) var(--bulma-primary-s) var(--bulma-primary-30-l) / 6%);
         }
 
         &:has(input:checked) {
-            border-color: hsl(171deg 100% 29%);
-            background: hsl(171deg 100% 29% / 10%);
+            border-color: var(--bulma-primary-30);
+            background: hsl(var(--bulma-primary-h) var(--bulma-primary-s) var(--bulma-primary-30-l) / 10%);
             font-weight: 600;
         }
     }

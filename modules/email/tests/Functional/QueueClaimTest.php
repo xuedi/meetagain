@@ -31,6 +31,22 @@ final class QueueClaimTest extends KernelTestCase
         self::assertSame([], array_intersect($this->ids($first), $this->ids($second)));
     }
 
+    public function testASenderWhoseCandidatesWereClaimedMeanwhileGetsNothing(): void
+    {
+        // Arrange
+        $repository = $this->queueThreeMails();
+        $now = new DateTimeImmutable();
+        $staleCandidates = $repository->findClaimableIds(3, $now->modify('-600 seconds'));
+        $repository->claimPending(3, $now, $now->modify('-600 seconds'));
+
+        // Act
+        $late = $repository->claim($staleCandidates, $now, $now->modify('-600 seconds'));
+
+        // Assert
+        self::assertCount(3, $staleCandidates);
+        self::assertSame([], $late);
+    }
+
     public function testAClaimOlderThanTheLeaseIsTakenOver(): void
     {
         // Arrange

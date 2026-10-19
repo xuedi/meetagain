@@ -171,12 +171,12 @@ class AppStateServiceTest extends TestCase
         $this->makeService(cache: $cache)->get('missing_key');
     }
 
-    public function testAStoredValueIsCachedWithoutExpiry(): void
+    public function testAStoredValueIsCachedForFiveMinutes(): void
     {
         // Arrange
         $this->repository->method('findValue')->willReturn('present');
         $item = $this->createMock(ItemInterface::class);
-        $item->expects($this->once())->method('expiresAfter')->with(null);
+        $item->expects($this->once())->method('expiresAfter')->with(300);
         $cache = $this->createStubForIntersectionOfInterfaces([CacheInterface::class, CacheItemPoolInterface::class]);
         $cache->method('get')->willReturnCallback(static fn(string $key, callable $callback): mixed => $callback($item));
 
