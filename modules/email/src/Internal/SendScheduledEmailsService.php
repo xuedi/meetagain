@@ -43,6 +43,11 @@ final readonly class SendScheduledEmailsService implements TaskInterface
         return new Cadence('*/5 7-21 * * *', offloaded: true);
     }
 
+    public function getDescription(): string
+    {
+        return 'Queues the emails that go out on a schedule rather than in response to an action, such as event reminders and the upcoming-events digest. Each scheduled email type reports which mailings are due; this task queues one mail per recipient after the usual guard rules and marks the mailing as sent so it is never repeated. It runs every five minutes from 07:00 to 21:00 so nobody is mailed at night, and the email-queue task delivers what it queued.';
+    }
+
     public function run(): Result
     {
         try {

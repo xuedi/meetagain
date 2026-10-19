@@ -121,6 +121,26 @@ class ImageServiceTest extends TestCase
         static::assertSame($stored, $result);
     }
 
+    public function testAnUploadThatLosesTheInsertRaceWritesNoFile(): void
+    {
+        // Arrange
+        $imageRepo = $this->createStub(ImageRepository::class);
+        $imageRepo->method('findOneBy')->willReturn(null, $this->createStub(Image::class));
+        $uploadedFile = $this->createStub(UploadedFile::class);
+        $uploadedFile->method('getContent')->willReturn('raced content');
+        $uploadedFile->method('getMimeType')->willReturn('image/jpeg');
+        $uploadedFile->method('guessExtension')->willReturn('jpg');
+        $uploadedFile->method('getSize')->willReturn(1);
+        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes('raced content'));
+        $subject = $this->createService(imageRepo: $imageRepo);
+
+        // Act
+        $subject->upload($uploadedFile, $this->storedUser(), ImageType::ProfilePicture);
+
+        // Assert
+        static::assertSame([], $this->imageStorage->listContents('', true)->toArray());
+    }
+
     public function testAnUploaderNotYetStoredLeavesTheInsertToTheCallersFlush(): void
     {
         // Arrange

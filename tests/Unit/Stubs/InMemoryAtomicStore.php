@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Tests\Unit\Service\Cache;
+namespace Tests\Unit\Stubs;
 
 use App\Service\Cache\AtomicStoreInterface;
 use Override;

@@ -90,7 +90,7 @@ them on at `/admin/plugin`.
   week.
 - `--site-settings` writes the archive's site block into this instance: site name, description, enabled
   and default languages, theme colours, logo, the feature switches (Town Hall, RSVP notifications, event
-  reminders, the upcoming digest) and plugin settings. Run `just appAssets` afterwards so the theme shows.
+  reminders, the upcoming digest) and plugin settings.
 - `--strict` exits non-zero when any row was skipped or dropped. The rows that did import stay, so reset
   before retrying.
 
@@ -114,8 +114,8 @@ Run any of them through `just app`, for example `just app "app:import:inspect sr
 1. **Upload a ZIP.** The page shows the archive's name, description, export date, row counts and the
    plugins it needs, flagging those not active here. The file waits on the server until you decide.
 2. **Import.** The optional "apply site settings" box is ticked by default while the instance has no
-   events. The result lists created, matched, skipped and dropped rows per kind, and applying the site
-   settings rebuilds the theme.
+   events. The result lists created, matched, skipped and dropped rows per kind. Applying the site
+   settings also saves the archive's theme colours, which show on the next page load.
 
 ---
 

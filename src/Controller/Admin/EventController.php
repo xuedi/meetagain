@@ -736,7 +736,7 @@ final class EventController extends AbstractController implements AdminNavigatio
                     icon: 'arrow-left',
                 ),
             ]),
-            'notifiableAttendeeCount' => $this->attendeeNotifier->countNotifiable($event),
+            'notifiableAttendeeCount' => $this->attendeeNotifier->countNotifiable($event, $this->getAuthedUser()),
             'recurrence' => $this->buildRecurrenceContext($event),
             'venueForm' => $this->createForm(LocationType::class),
             'pendingVenueBallot' => $this->pendingVenueBallot($event),

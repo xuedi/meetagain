@@ -255,6 +255,11 @@ readonly class CloseExpiredVotesTask implements TaskInterface
         return new Cadence('*/15 * * * *');
     }
 
+    public function getDescription(): string
+    {
+        return 'Closes every vote whose deadline has passed, every fifteen minutes.';
+    }
+
     public function run(): Result
     {
         $closed = $this->votes->closeExpired();
@@ -265,6 +270,7 @@ readonly class CloseExpiredVotesTask implements TaskInterface
 ```
 
 - The identifier is stable: the run log and the admin's Tasks page are keyed by it.
+- The description is one plain English paragraph saying what the task does and when; the task's detail page shows it.
 - The cron expression carries the timing, a time window included (`0 7-21 * * *`); the task does not check the clock.
 - `new Cadence('30 3 * * *', jitterSeconds: 1800, offloaded: true)` spreads a nightly task over half an hour and runs
   it on a message worker instead of in the scheduler. Offload anything that takes more than a few seconds.

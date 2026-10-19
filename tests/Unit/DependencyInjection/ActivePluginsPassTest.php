@@ -2,11 +2,11 @@
 
 namespace Tests\Unit\DependencyInjection;
 
-use App\Command\CronCommand;
 use App\DependencyInjection\ActivePluginMembers;
 use App\DependencyInjection\ActivePluginsPass;
 use App\Item\TypeRegistry;
 use App\Kernel;
+use App\Portability\Importer;
 use PHPUnit\Framework\TestCase;
 use Plugin\Books\Service\ConfigService;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -19,7 +19,7 @@ class ActivePluginsPassTest extends TestCase
     public function testACoreChainWithAPluginMemberIsWrappedWithThatMembersPlugin(): void
     {
         // Arrange
-        $container = $this->container(CronCommand::class, ['core.member', 'books.member', 'films.member']);
+        $container = $this->container(Importer::class, ['core.member', 'books.member', 'films.member']);
 
         // Act
         new ActivePluginsPass()->process($container);
@@ -34,7 +34,7 @@ class ActivePluginsPassTest extends TestCase
     public function testAChainOfCoreMembersOnlyIsLeftAlone(): void
     {
         // Arrange
-        $container = $this->container(CronCommand::class, ['core.member']);
+        $container = $this->container(Importer::class, ['core.member']);
 
         // Act
         new ActivePluginsPass()->process($container);

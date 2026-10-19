@@ -5,6 +5,7 @@ namespace App\Portability;
 use App\Entity\User;
 use App\ExtendedFilesystem;
 use App\Repository\UserRepository;
+use App\Service\Cms\CmsService;
 use App\Service\Config\PluginService;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -33,6 +34,7 @@ readonly class Importer
         private DateShifter $dateShifter,
         private ClockInterface $clock,
         private PluginService $pluginService,
+        private CmsService $cmsService,
     ) {}
 
     public function import(string $zipOrDirectory, bool $shiftDates = false, bool $applySite = false): ImportSummary
@@ -80,6 +82,9 @@ readonly class Importer
                 $this->em->flush();
             }
         });
+
+        $this->cmsService->invalidateAll();
+        $this->cmsService->invalidateMenuCaches();
 
         $claimed = array_flip(array_map(static fn(SectionInterface $section): string => $section->getKey(), $sections));
         foreach ($this->archiveReader->countRows(array_diff_key($data, $claimed)) as $kind => $rows) {

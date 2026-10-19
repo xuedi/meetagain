@@ -13,7 +13,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\Request;
-use Tests\Unit\Service\Cache\InMemoryAtomicStore;
+use Tests\Unit\Stubs\InMemoryAtomicStore;
 
 class AbstractSecurityProviderTest extends TestCase
 {

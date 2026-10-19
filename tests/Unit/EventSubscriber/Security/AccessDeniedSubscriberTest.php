@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Tests\Unit\Service\Cache\InMemoryAtomicStore;
+use Tests\Unit\Stubs\InMemoryAtomicStore;
 use Throwable;
 
 class AccessDeniedSubscriberTest extends TestCase

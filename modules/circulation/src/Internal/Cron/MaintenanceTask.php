@@ -40,6 +40,17 @@ readonly class MaintenanceTask implements TaskInterface
     }
 
     #[Override]
+    public function getDescription(): string
+    {
+        return sprintf(
+            'Keeps lending queues moving. Once a night, an offered copy that the member in line has not picked up within %d days is passed on to the next person in the queue, a handover still unconfirmed after %d days is closed, and every free copy with someone waiting is offered to the first in line. The run message also counts handovers open for more than %d days.',
+            QueueService::OFFER_WINDOW_DAYS,
+            self::CLOSE_AFTER_DAYS,
+            self::NUDGE_AFTER_DAYS,
+        );
+    }
+
+    #[Override]
     public function run(): Result
     {
         try {

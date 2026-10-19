@@ -31,6 +31,11 @@ final readonly class GaugeCronTask implements TaskInterface
         return new Cadence('* * * * *');
     }
 
+    public function getDescription(): string
+    {
+        return 'Takes a snapshot of runtime health for the metrics dashboard. Every gauge - database, Valkey, the container, log files, the email queue and any gauge a plugin adds - is read once and its points are sent to the metrics server. Without a METRICS_DSN it does nothing and reports disabled. A gauge that fails is named in the run message and turns the run into a warning, while the other gauges still report.';
+    }
+
     public function run(): Result
     {
         if (!$this->recorder->isEnabled()) {

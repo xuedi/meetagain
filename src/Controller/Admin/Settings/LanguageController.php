@@ -10,6 +10,7 @@ use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Entity\Language;
 use App\Form\LanguageType;
 use App\Service\Config\LanguageService;
+use App\Service\Media\ImageAltStatusCache;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +26,7 @@ final class LanguageController extends AbstractSettingsController implements Adm
         TranslatorInterface $translator,
         private readonly EntityManagerInterface $em,
         private readonly LanguageService $languageService,
+        private readonly ImageAltStatusCache $imageAltStatusCache,
     ) {
         parent::__construct($translator, 'language');
     }
@@ -67,6 +69,7 @@ final class LanguageController extends AbstractSettingsController implements Adm
             $this->em->flush();
 
             $this->languageService->invalidateCache();
+            $this->imageAltStatusCache->invalidateAll();
 
             $this->addFlash('success', $this->translator->trans('admin_system_language.flash_added'));
 
@@ -93,6 +96,7 @@ final class LanguageController extends AbstractSettingsController implements Adm
             $this->em->flush();
 
             $this->languageService->invalidateCache();
+            $this->imageAltStatusCache->invalidateAll();
 
             $this->addFlash('success', $this->translator->trans('admin_system_language.flash_updated'));
 
@@ -119,6 +123,7 @@ final class LanguageController extends AbstractSettingsController implements Adm
         $language->setEnabled(!$language->isEnabled());
         $this->em->flush();
         $this->languageService->invalidateCache();
+        $this->imageAltStatusCache->invalidateAll();
 
         return $this->redirectToRoute('app_admin_language');
     }

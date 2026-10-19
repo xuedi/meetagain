@@ -12,7 +12,7 @@ use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
-use Tests\Unit\Service\Cache\InMemoryAtomicStore;
+use Tests\Unit\Stubs\InMemoryAtomicStore;
 
 class BlockedSessionStoreTest extends TestCase
 {

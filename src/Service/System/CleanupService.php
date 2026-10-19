@@ -55,6 +55,17 @@ readonly class CleanupService implements TaskInterface
         return new Cadence('5 * * * *', jitterSeconds: 600, offloaded: true);
     }
 
+    public function getDescription(): string
+    {
+        return sprintf(
+            'Hourly housekeeping. It drops the cache-busting version from image URLs whose image last changed more than 30 days ago, deletes registrations not confirmed within %d days, resolves support threads without activity for %d days, clears expired support email verifications, deletes uploaded import archives left unimported for %d hours, and purges security measure logs past their retention and security incidents that ended more than %d days ago. The run message counts each step.',
+            self::GHOSTED_REGISTRATION_DAYS,
+            self::SUPPORT_THREAD_STALE_DAYS,
+            self::PENDING_IMPORT_MAX_HOURS,
+            self::INCIDENT_RETENTION_DAYS,
+        );
+    }
+
     public function run(): Result
     {
         try {

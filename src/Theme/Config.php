@@ -31,7 +31,7 @@ final class Config implements Data
         $colors = [];
         foreach (self::KEYS as $key) {
             $value = $raw[$key] ?? null;
-            if (is_string($value) && preg_match('/^#[0-9a-fA-F]{6}$/', $value) === 1) {
+            if (is_string($value) && preg_match('/^#[0-9a-fA-F]{6}\z/', $value) === 1) {
                 $colors[$key] = strtolower($value);
             }
         }
@@ -55,6 +55,6 @@ final class Config implements Data
      */
     public function with(array $colors): self
     {
-        return self::fromArray([...$this->colors, ...$colors]);
+        return new self([...$this->colors, ...self::fromArray($colors)->colors]);
     }
 }

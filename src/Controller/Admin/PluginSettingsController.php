@@ -37,7 +37,7 @@ final class PluginSettingsController extends AbstractController implements Admin
     #[Route('/admin/plugin/{key}/settings', name: 'app_admin_plugin_settings', methods: ['GET', 'POST'])]
     public function settings(Request $request, string $key): Response
     {
-        $descriptors = $this->pluginSettingsService->getByPlugin($key);
+        $descriptors = $this->pluginService->isInstalled($key) ? $this->pluginSettingsService->getByPlugin($key) : [];
         if ($descriptors === []) {
             throw $this->createNotFoundException();
         }

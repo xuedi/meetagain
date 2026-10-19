@@ -4,6 +4,6 @@ services:
         autoconfigure: true
         public: true
 
-    Tests\Unit\Service\Cache\InMemoryAtomicStore: ~
+    Tests\Unit\Stubs\InMemoryAtomicStore: ~
 
-    App\Service\Cache\AtomicStoreInterface: '@Tests\Unit\Service\Cache\InMemoryAtomicStore'
+    App\Service\Cache\AtomicStoreInterface: '@Tests\Unit\Stubs\InMemoryAtomicStore'

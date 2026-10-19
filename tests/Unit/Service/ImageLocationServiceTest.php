@@ -165,7 +165,7 @@ class ImageLocationServiceTest extends TestCase
     {
         // Arrange
         $location = new ImageLocation();
-        $location->setLocationType(ImageType::DeveloperAppLogo);
+        $location->setLocationType(ImageType::WebsiteImage);
         $location->setLocationId(1);
 
         $definition = $this->createStub(ImageTypeDefinitionInterface::class);
@@ -205,7 +205,7 @@ class ImageLocationServiceTest extends TestCase
     {
         // Arrange
         $image = $this->createStub(Image::class);
-        $image->method('getType')->willReturn(ImageType::DeveloperAppLogo);
+        $image->method('getType')->willReturn(ImageType::WebsiteImage);
 
         $definition = $this->createStub(ImageTypeDefinitionInterface::class);
         $definition->method('locate')->willReturn(null);

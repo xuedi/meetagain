@@ -2,8 +2,10 @@
 
 namespace App\Localization;
 
+use App\DependencyInjection\SeesInactivePlugins;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
+#[SeesInactivePlugins]
 readonly class LocalizedContentSourceRegistry
 {
     /**

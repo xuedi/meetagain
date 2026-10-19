@@ -118,16 +118,8 @@ readonly class ImageService
         $image->setCreatedAt(new DateTimeImmutable());
         $image->setUploader($user);
 
-        $stream = fopen($imageData->getRealPath(), 'rb');
-        if ($stream === false) {
-            throw new RuntimeException('Could not read the uploaded file.');
-        }
-        try {
-            $this->imageStorage->writeStream($this->sourceKey($image), $stream);
-        } finally {
-            fclose($stream);
-        }
         if ($user->getId() === null) {
+            $this->storeSource($imageData, $image);
             $this->entityManager->persist($image);
 
             return $image;
@@ -144,6 +136,7 @@ readonly class ImageService
                 return $stored;
             }
 
+            $this->storeSource($imageData, $image);
             $this->entityManager->persist($image);
             $this->entityManager->flush();
         } finally {
@@ -532,6 +525,19 @@ readonly class ImageService
         }
 
         throw new RuntimeException('Could not determine file extension for uploaded file.');
+    }
+
+    private function storeSource(UploadedFile $imageData, Image $image): void
+    {
+        $stream = fopen($imageData->getRealPath(), 'rb');
+        if ($stream === false) {
+            throw new RuntimeException('Could not read the uploaded file.');
+        }
+        try {
+            $this->imageStorage->writeStream($this->sourceKey($image), $stream);
+        } finally {
+            fclose($stream);
+        }
     }
 
     private function sourceKey(Image $image): string

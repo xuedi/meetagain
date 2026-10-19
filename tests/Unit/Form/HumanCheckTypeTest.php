@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Validation;
 use Symfony\Contracts\Translation\TranslatorInterface;
-use Tests\Unit\Service\Cache\InMemoryAtomicStore;
+use Tests\Unit\Stubs\InMemoryAtomicStore;
 
 final class HumanCheckTypeTest extends TestCase
 {

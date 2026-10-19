@@ -147,6 +147,11 @@ readonly class EmailService implements TaskInterface, EmailQueueInterface
         return new Cadence('*/5 * * * *', offloaded: true);
     }
 
+    public function getDescription(): string
+    {
+        return 'Sends queued emails. Every five minutes it claims pending mails in batches and hands them to the mail transport until the queue is empty or the time budget is spent, marking each mail sent or failed. A mail past its send-by deadline, such as a reminder for an event that already started, is marked late instead of being sent. Failed or late mails turn the run into a warning.';
+    }
+
     public function run(): Result
     {
         try {
@@ -208,6 +213,15 @@ readonly class EmailService implements TaskInterface, EmailQueueInterface
                 } catch (TransportExceptionInterface $e) {
                     $mail->setStatus(QueueStatus::Failed);
                     $mail->setErrorMessage($e->getMessage());
+                    $failed++;
+                } catch (Throwable $e) {
+                    $mail->setStatus(QueueStatus::Failed);
+                    $mail->setErrorMessage($e->getMessage());
+                    $this->logger->error('Email could not be built and was marked failed', [
+                        'email_queue_id' => $mail->getId(),
+                        'template' => $mail->getTemplate(),
+                        'exception' => $e,
+                    ]);
                     $failed++;
                 }
                 $mail->releaseClaim();

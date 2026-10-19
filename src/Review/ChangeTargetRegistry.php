@@ -2,7 +2,6 @@
 
 namespace App\Review;
 
-use App\Service\Config\PluginService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -10,8 +9,6 @@ use Symfony\Contracts\Service\ResetInterface;
 // every host a reviewer works from
 class ChangeTargetRegistry implements ResetInterface
 {
-    private const string CORE_PLUGIN_KEY = '';
-
     /**
      * @var array<string, ChangeTargetProviderInterface>|null
      */
@@ -23,7 +20,6 @@ class ChangeTargetRegistry implements ResetInterface
     public function __construct(
         #[AutowireIterator(ChangeTargetProviderInterface::class)]
         private readonly iterable $providers,
-        private readonly PluginService $pluginService,
     ) {}
 
     public function has(string $targetType): bool
@@ -58,14 +54,8 @@ class ChangeTargetRegistry implements ResetInterface
             return $this->active;
         }
 
-        $enabledPlugins = $this->pluginService->getGloballyActiveList();
         $map = [];
         foreach ($this->providers as $provider) {
-            $pluginKey = $provider->getPluginKey();
-            if ($pluginKey !== self::CORE_PLUGIN_KEY && !in_array($pluginKey, $enabledPlugins, true)) {
-                continue;
-            }
-
             $map[$provider->getTargetType()] = $provider;
         }
 

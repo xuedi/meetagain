@@ -11,5 +11,7 @@ interface TaskInterface
 
     public function getCadence(): Cadence;
 
+    public function getDescription(): string;
+
     public function run(): Result;
 }

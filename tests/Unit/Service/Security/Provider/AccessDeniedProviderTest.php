@@ -19,7 +19,7 @@ use RuntimeException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Tests\Unit\Service\Cache\InMemoryAtomicStore;
+use Tests\Unit\Stubs\InMemoryAtomicStore;
 use Throwable;
 
 class AccessDeniedProviderTest extends TestCase

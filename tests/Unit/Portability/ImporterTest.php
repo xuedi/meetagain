@@ -16,6 +16,7 @@ use App\Portability\PluginSectionInterface;
 use App\Portability\SectionInterface;
 use App\Portability\SiteSettings;
 use App\Repository\UserRepository;
+use App\Service\Cms\CmsService;
 use App\Service\Config\PluginService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -212,6 +213,18 @@ final class ImporterTest extends TestCase
         static::assertFalse($summary->siteApplied);
     }
 
+    public function testAnImportClearsTheCachedPagesAndMenus(): void
+    {
+        // Arrange
+        $this->zipPath = $this->archive(['format' => Exporter::FORMAT, 'cms_pages' => [['slug' => 'about']]]);
+        $cmsService = $this->createMock(CmsService::class);
+        $cmsService->expects($this->once())->method('invalidateAll');
+        $cmsService->expects($this->once())->method('invalidateMenuCaches');
+
+        // Act
+        $this->importer([$this->section('cms_pages', 30)], cmsService: $cmsService)->import($this->zipPath);
+    }
+
     public function testPluginsThisInstanceLacksAreReported(): void
     {
         // Arrange
@@ -337,6 +350,7 @@ final class ImporterTest extends TestCase
         ?SiteSettings $siteSettings = null,
         ?ImageImporter $imageImporter = null,
         array $activePlugins = [],
+        ?CmsService $cmsService = null,
     ): Importer {
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('wrapInTransaction')->willReturnCallback(static fn(callable $work): mixed => $work());
@@ -360,6 +374,7 @@ final class ImporterTest extends TestCase
             new DateShifter(),
             new MockClock('2026-09-16 12:00:00'),
             $pluginService,
+            $cmsService ?? $this->createStub(CmsService::class),
         );
     }
 

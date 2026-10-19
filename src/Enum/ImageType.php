@@ -17,7 +17,6 @@ enum ImageType: int
     case GroupPromotion = 13;
     case GroupPreview = 14;
     case WebsiteImage = 15;
-    case DeveloperAppLogo = 16;
     case PluginFilmsPoster = 17;
     case PluginPhotosPhoto = 18;
     case GroupPromotionFacebook = 19;

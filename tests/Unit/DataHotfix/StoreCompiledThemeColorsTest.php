@@ -2,17 +2,20 @@
 
 namespace Tests\Unit\DataHotfix;
 
-use App\DataHotfix\Hotfixes\StoreCompiledThemeColours;
+use App\DataHotfix\Hotfixes\StoreCompiledThemeColors;
 use App\Theme\Colors;
 use App\Theme\Descriptor;
 use Override;
 use PHPUnit\Framework\TestCase;
 
-class StoreCompiledThemeColoursTest extends TestCase
+class StoreCompiledThemeColorsTest extends TestCase
 {
     private const string DIST = '$primary: #00d1b2; $link: #485fc7;';
 
     private string $stylesDir;
+
+    /** @var array<array-key, mixed>|null */
+    private ?array $saved = null;
 
     #[Override]
     protected function setUp(): void
@@ -33,35 +36,48 @@ class StoreCompiledThemeColoursTest extends TestCase
     {
         // Arrange
         file_put_contents($this->stylesDir . '/_config.scss', '$primary: #123456; $link: #485fc7;');
-        $colors = $this->createMock(Colors::class);
-        $colors->method('hasStoredTheme')->willReturn(false);
-        $colors->expects($this->once())->method('save')->with(['color_primary' => '#123456', 'color_link' => '#485fc7']);
 
         // Act
-        new StoreCompiledThemeColours($colors, new Descriptor($this->stylesDir))->execute();
+        new StoreCompiledThemeColors($this->colors(hasStoredTheme: false), new Descriptor($this->stylesDir))->execute();
+
+        // Assert
+        static::assertSame(['color_primary' => '#123456', 'color_link' => '#485fc7'], $this->saved);
     }
 
     public function testTheDistributedPaletteIsNotStored(): void
     {
         // Arrange
         file_put_contents($this->stylesDir . '/_config.scss', self::DIST);
-        $colors = $this->createMock(Colors::class);
-        $colors->method('hasStoredTheme')->willReturn(false);
-        $colors->expects($this->never())->method('save');
 
         // Act
-        new StoreCompiledThemeColours($colors, new Descriptor($this->stylesDir))->execute();
+        new StoreCompiledThemeColors($this->colors(hasStoredTheme: false), new Descriptor($this->stylesDir))->execute();
+
+        // Assert
+        static::assertNull($this->saved);
     }
 
     public function testAStoredThemeIsNeverOverwritten(): void
     {
         // Arrange
         file_put_contents($this->stylesDir . '/_config.scss', '$primary: #123456;');
-        $colors = $this->createMock(Colors::class);
-        $colors->method('hasStoredTheme')->willReturn(true);
-        $colors->expects($this->never())->method('save');
 
         // Act
-        new StoreCompiledThemeColours($colors, new Descriptor($this->stylesDir))->execute();
+        new StoreCompiledThemeColors($this->colors(hasStoredTheme: true), new Descriptor($this->stylesDir))->execute();
+
+        // Assert
+        static::assertNull($this->saved);
+    }
+
+    private function colors(bool $hasStoredTheme): Colors
+    {
+        $colors = $this->createStub(Colors::class);
+        $colors->method('hasStoredTheme')->willReturn($hasStoredTheme);
+        $colors
+            ->method('save')
+            ->willReturnCallback(function (array $saved): void {
+                $this->saved = $saved;
+            });
+
+        return $colors;
     }
 }

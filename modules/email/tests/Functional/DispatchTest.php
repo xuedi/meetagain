@@ -3,6 +3,8 @@
 namespace Module\Email\Tests\Functional;
 
 use DateTimeImmutable;
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\MailerInterface;
 use Module\Email\Contract\QueueStatus;
 use Module\Email\Contract\SendlogInterface;
@@ -20,6 +22,7 @@ final class DispatchTest extends KernelTestCase
     use SeedsTemplates;
 
     private const string RECIPIENT = 'member@module-test.example';
+    private const string SECOND_RECIPIENT = 'second@module-test.example';
 
     private TriggeredEmail $type;
 
@@ -61,6 +64,29 @@ final class DispatchTest extends KernelTestCase
         // Assert
         self::assertSame(QueueStatus::Late, $this->row()->status);
         self::assertEmailCount(0);
+    }
+
+    public function testAMailThatCannotBeBuiltFailsAloneAndTheRestAreStillSent(): void
+    {
+        // Arrange
+        self::getContainer()
+            ->get(MailerInterface::class)
+            ->send($this->type, ['recipients' => [self::RECIPIENT, self::SECOND_RECIPIENT], 'origin' => new Origin()]);
+        self::getContainer()->get(Connection::class)->update('mod_email_queue', ['sender' => 'not an address'], ['recipient' => self::RECIPIENT]);
+        self::getContainer()->get(EntityManagerInterface::class)->clear();
+
+        // Act
+        $this->runQueueTask();
+
+        // Assert
+        $rows = self::getContainer()->get(SendlogInterface::class)->list(template: TriggeredEmail::IDENTIFIER);
+        $statuses = array_combine(
+            array_map(static fn(SentEmail $row): string => $row->recipient, $rows),
+            array_map(static fn(SentEmail $row): QueueStatus => $row->status, $rows),
+        );
+        self::assertSame(QueueStatus::Failed, $statuses[self::RECIPIENT]);
+        self::assertSame(QueueStatus::Sent, $statuses[self::SECOND_RECIPIENT]);
+        self::assertEmailCount(1);
     }
 
     public function testASentRowIsNotSentAgainOnTheNextTick(): void

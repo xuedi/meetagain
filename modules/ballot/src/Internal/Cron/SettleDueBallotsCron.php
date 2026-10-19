@@ -36,6 +36,12 @@ readonly class SettleDueBallotsCron implements TaskInterface
     }
 
     #[Override]
+    public function getDescription(): string
+    {
+        return 'Settles ballots whose deadline has passed. Every open ballot past its deadline is tallied; when it is set to settle automatically and has a single winner, the winner is settled and handed to the feature that opened the ballot, such as a venue vote on an event. A ballot set to manual settlement, a tie, or a ballot without votes stays undecided for a person to settle - the run message counts these as left for a person.';
+    }
+
+    #[Override]
     public function run(): Result
     {
         $settled = 0;

@@ -6,7 +6,7 @@ use App\Form\HumanCheckType;
 use App\Service\Security\ChallengeSigner;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
-use Tests\Unit\Service\Cache\InMemoryAtomicStore;
+use Tests\Unit\Stubs\InMemoryAtomicStore;
 
 final class ChallengeSignerTest extends TestCase
 {
