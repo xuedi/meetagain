@@ -12,5 +12,6 @@ final readonly class SendingIdentity
         public string $greeting = '',
         public array $links = [],
         public ?string $attribution = null,
+        public ?string $accent = null,
     ) {}
 }

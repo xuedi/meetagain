@@ -23,7 +23,7 @@ readonly class StoreCompiledThemeColors implements DataHotfixInterface
     #[Override]
     public function execute(): void
     {
-        if ($this->colors->hasStoredTheme()) {
+        if ($this->colors->hasStoredTheme(null)) {
             return;
         }
 
@@ -32,6 +32,6 @@ readonly class StoreCompiledThemeColors implements DataHotfixInterface
             return;
         }
 
-        $this->colors->save($compiled);
+        $this->colors->save($compiled, null);
     }
 }

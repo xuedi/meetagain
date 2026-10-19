@@ -43,7 +43,7 @@ final readonly class Descriptor implements DescriptorInterface
     #[Override]
     public function isScopable(): bool
     {
-        return false;
+        return true;
     }
 
     #[Override]

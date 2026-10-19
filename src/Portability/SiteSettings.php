@@ -43,17 +43,12 @@ readonly class SiteSettings
         $name = $this->configService->getSiteName();
         $logoId = $this->configService->getSiteLogoId();
 
-        $themeColors = [];
-        foreach ($this->colors->all() as $key => $color) {
-            $themeColors[str_replace('_', '-', substr((string) $key, strlen('color_')))] = (string) $color;
-        }
-
         return new Site(
             slug: strtolower((string) $this->slugger->slug($name)),
             name: $name,
             description: $this->configService->getSeoDescription('default'),
             languages: $this->languageService->getEnabledCodes(),
-            themeColors: $themeColors,
+            themeColors: $this->themeColors(null),
             logo: $logoId === null ? null : $this->imageRepository->find($logoId),
             settings: [
                 'show_town_hall' => $this->configService->isShowTownHall(),
@@ -63,6 +58,19 @@ readonly class SiteSettings
             ],
             pluginSettings: $this->pluginSettings->export(array_values($this->pluginService->getActiveList())),
         );
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function themeColors(?string $scopeId): array
+    {
+        $themeColors = [];
+        foreach ($this->colors->forScope($scopeId) as $key => $color) {
+            $themeColors[str_replace('_', '-', substr((string) $key, strlen('color_')))] = (string) $color;
+        }
+
+        return $themeColors;
     }
 
     /**
@@ -140,7 +148,7 @@ readonly class SiteSettings
         }
 
         if ($colors !== []) {
-            $this->colors->save($colors);
+            $this->colors->save($colors, null);
         }
     }
 

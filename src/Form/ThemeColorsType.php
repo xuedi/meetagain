@@ -20,7 +20,7 @@ class ThemeColorsType extends AbstractType
     #[Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $colors = $this->colors->all();
+        $colors = $this->colors->forScope($options['scope']);
         $t = $this->translator;
 
         $builder
@@ -79,6 +79,8 @@ class ThemeColorsType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => null,
+            'scope' => null,
         ]);
+        $resolver->setAllowedTypes('scope', ['null', 'string']);
     }
 }

@@ -9,6 +9,7 @@ framework:
                 adapter: cache.adapter.array
             cache.config:
                 adapter: cache.adapter.array
+                tags: true
             cache.app_state:
                 adapter: cache.adapter.array
             cache.calendar_feed:

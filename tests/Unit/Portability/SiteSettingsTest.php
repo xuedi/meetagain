@@ -129,7 +129,7 @@ final class SiteSettingsTest extends TestCase
     {
         // Arrange
         $colors = $this->createMock(Colors::class);
-        $colors->expects($this->once())->method('save')->with(['color_primary' => '#111111', 'color_text_grey' => '#222222']);
+        $colors->expects($this->once())->method('save')->with(['color_primary' => '#111111', 'color_text_grey' => '#222222'], null);
 
         // Act
         $this->siteSettings(colors: $colors)->apply(['theme_colors' => ['primary' => '#111111', 'text-grey' => '#222222']], $this->context());
@@ -199,7 +199,7 @@ final class SiteSettingsTest extends TestCase
             ->with(['books'])
             ->willReturn(['books' => ['circulation' => true]]);
         $colors = $this->createStub(Colors::class);
-        $colors->method('all')->willReturn(['color_primary' => '#111111', 'color_text_grey_light' => '#cccccc']);
+        $colors->method('forScope')->willReturn(['color_primary' => '#111111', 'color_text_grey_light' => '#cccccc']);
 
         // Act
         $site = $this->siteSettings(
