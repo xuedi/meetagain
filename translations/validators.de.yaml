@@ -191,6 +191,7 @@ Error: Fehler
 'security.validator_password_blank': 'Bitte gib ein Passwort ein.'
 'security.validator_password_min': 'Dein Passwort sollte mindestens {{ limit }} Zeichen lang sein.'
 'security.validator_agree_terms': 'Du musst unseren Bedingungen zustimmen.'
+'security.validator_username_blank': 'Bitte gib einen Benutzernamen ein.'
 
 # Support namespace - phase 18 (page-scoped validator messages)
 'support.validator_message_blank': 'Bitte gib eine Nachricht ein.'
@@ -227,6 +228,7 @@ Error: Fehler
 # Admin system security namespace - measure tuning
 'admin_system_security.validator_pow_difficulty': 'Die Schwierigkeit muss zwischen {{ min }} und {{ max }} Bit liegen.'
 'admin_system_security.validator_log_retention': 'Die Aufbewahrung muss zwischen {{ min }} und {{ max }} Tagen liegen.'
+'admin_system_config.validator_sender_email_format': 'Bitte gib eine gültige E-Mail-Adresse ein.'
 'item_report.validator_explanation_blank': 'Bitte beschreib, was nicht stimmt.'
 'item_report.validator_explanation_short': 'Bitte beschreib es etwas genauer.'
 'item_report.validator_explanation_long': 'Die Begründung ist zu lang.'

@@ -22,6 +22,7 @@ Error: 错误
 'security.validator_password_blank': '请输入密码。'
 'security.validator_password_min': '您的密码至少应为 {{ limit }} 个字符。'
 'security.validator_agree_terms': '您需要同意我们的条款。'
+'security.validator_username_blank': '请输入用户名。'
 
 # Support namespace - phase 18 (page-scoped validator messages)
 'support.validator_message_blank': '请输入消息内容。'
@@ -58,6 +59,7 @@ Error: 错误
 # Admin system security namespace - measure tuning
 'admin_system_security.validator_pow_difficulty': '难度必须介于 {min} 和 {max} 位之间。'
 'admin_system_security.validator_log_retention': '保留天数必须介于 {min} 和 {max} 之间。'
+'admin_system_config.validator_sender_email_format': '请输入有效的电子邮件地址。'
 'item_report.validator_explanation_blank': '请说明问题所在。'
 'item_report.validator_explanation_short': '请说明得更详细一些。'
 'item_report.validator_explanation_long': '说明太长了。'
