@@ -104,11 +104,16 @@ final readonly class Descriptor implements DescriptorInterface
         $colors = [];
         foreach (self::SCSS_VARIABLES as $variable => $key) {
             $match = [];
-            if (preg_match('/\$' . preg_quote($variable, '/') . '\s*:\s*(#[0-9a-fA-F]{6})\s*;/', $content, $match) === 1) {
-                $colors[$key] = $match[1];
+            if (preg_match('/\$' . preg_quote($variable, '/') . '\s*:\s*#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\s*;/', $content, $match) === 1) {
+                $colors[$key] = '#' . $this->sixDigits($match[1]);
             }
         }
 
         return Config::fromArray($colors);
+    }
+
+    private function sixDigits(string $hex): string
+    {
+        return strlen($hex) === 3 ? implode('', array_map(static fn(string $digit): string => $digit . $digit, str_split($hex))) : $hex;
     }
 }
