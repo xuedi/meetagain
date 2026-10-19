@@ -14,7 +14,16 @@
             "de",
             "en"
         ],
-        "theme_colors": [],
+        "theme_colors": {
+            "danger": "#f14668",
+            "info": "#3e8ed0",
+            "link": "#485fc7",
+            "primary": "#00d1b2",
+            "success": "#48c78e",
+            "text-grey": "#767676",
+            "text-grey-light": "#959595",
+            "warning": "#ffe08a"
+        },
         "settings": {
             "send_event_reminders": true,
             "send_rsvp_notifications": true,

@@ -1,6 +1,6 @@
 # check=skip=SecretsUsedInArgOrEnv
 
-FROM dunglas/frankenphp:1.12.7-php8.5.11-bookworm@sha256:d502c4823f75f7738b463919ae993a6a4c7ccccab034e3e3020d3b9d042ec83e AS runtime
+FROM dunglas/frankenphp:1.13.1-php8.5.11-bookworm@sha256:cbe891d9411baf58a3da2b4e05b47edda54410a487a818b4e7605882d796b1bb AS runtime
 
 WORKDIR /var/www/html
 
@@ -50,7 +50,7 @@ RUN set -eux; \
 
 FROM runtime AS builder
 
-COPY --from=composer:2.9.8@sha256:b09bccd91a78fe8a9ab4b33d707b862e8fe54fec17782e32683ad2a69c46867d /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:2.10.3@sha256:af98f42dfff7c68ba8d53c2164fd9fde1087b7d449514baa38c418b1f6bc4bac /usr/bin/composer /usr/local/bin/composer
 
 ARG DART_SASS_VERSION=1.86.3
 RUN set -eux; \
