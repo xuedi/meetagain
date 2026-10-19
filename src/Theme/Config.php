@@ -55,6 +55,6 @@ final class Config implements Data
      */
     public function with(array $colors): self
     {
-        return self::fromArray([...$this->colors, ...$colors]);
+        return new self([...$this->colors, ...self::fromArray($colors)->colors]);
     }
 }

@@ -27,7 +27,8 @@ flowchart LR
   checkpoint restarts at "now", a moment past the slot that is due, and that slot is skipped.
 - **The workers** consume `async`, a Valkey stream on the database `REDIS_URL` names. Each consumer is named after its
   host, so every pod or container claims its own messages. A message whose consumer died is taken over after five
-  minutes.
+  minutes. `StaleConsumers` removes the consumers of gone hosts every hour, but never one that still holds a message,
+  so the group does not grow with every deploy.
 - **A failed message** is retried three times with backoff, then lands in the Doctrine failure transport
   (`mod_task_message`), where it stays until someone retries or deletes it.
 

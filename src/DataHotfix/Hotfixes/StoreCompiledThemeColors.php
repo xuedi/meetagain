@@ -7,7 +7,7 @@ use App\Theme\Colors;
 use App\Theme\Descriptor;
 use Override;
 
-readonly class StoreCompiledThemeColours implements DataHotfixInterface
+readonly class StoreCompiledThemeColors implements DataHotfixInterface
 {
     public function __construct(
         private Colors $colors,

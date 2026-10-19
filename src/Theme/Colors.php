@@ -6,10 +6,14 @@ use App\Publisher\PluginSettings\Resolver;
 use LogicException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 readonly class Colors
 {
-    private const string STYLE_CACHE_KEY = 'theme_inline_style';
+    public const string COLORS_CACHE_KEY = 'theme_colors';
+    public const string STYLE_CACHE_KEY = 'theme_inline_style';
+
+    private const int CACHE_TTL_SECONDS = 300;
 
     public function __construct(
         private Resolver $resolver,
@@ -24,7 +28,11 @@ readonly class Colors
      */
     public function all(): array
     {
-        return $this->current()->toArray();
+        return $this->cache->get(self::COLORS_CACHE_KEY, function (ItemInterface $item): array {
+            $item->expiresAfter(self::CACHE_TTL_SECONDS);
+
+            return $this->current()->toArray();
+        });
     }
 
     /**
@@ -34,7 +42,6 @@ readonly class Colors
     {
         $store = $this->resolver->resolveStore(Descriptor::KEY, null) ?? throw new LogicException('No store holds the theme colours.');
         $store->save(Descriptor::KEY, $this->current()->with($colors), null);
-        $this->cache->delete(self::STYLE_CACHE_KEY);
     }
 
     public function hasStoredTheme(): bool
@@ -44,7 +51,11 @@ readonly class Colors
 
     public function inlineStyle(): string
     {
-        return $this->cache->get(self::STYLE_CACHE_KEY, fn(): string => $this->renderer->render($this->current(), $this->descriptor->compiledBaseline()));
+        return $this->cache->get(self::STYLE_CACHE_KEY, function (ItemInterface $item): string {
+            $item->expiresAfter(self::CACHE_TTL_SECONDS);
+
+            return $this->renderer->render($this->current(), $this->descriptor->compiledBaseline());
+        });
     }
 
     private function current(): Config
