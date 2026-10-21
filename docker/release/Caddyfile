@@ -42,6 +42,10 @@
 	root * /var/www/html/public
 	encode zstd br gzip
 
+	request_body {
+		max_size 32MB
+	}
+
 	handle /media/* {
 		file_server {
 			pass_thru
