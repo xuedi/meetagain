@@ -21,7 +21,7 @@ readonly class LocaleValidationSubscriber implements EventSubscriberInterface
     {
         return [
             KernelEvents::REQUEST => [
-                ['onKernelRequest', 200], // After LocaleSubscriber (250)
+                ['onKernelRequest', 24], // After RouterListener (32) sets `_locale`, before LocaleSubscriber (20) stores it
             ],
         ];
     }
