@@ -10,7 +10,7 @@ set dotenv-load
 set quiet
 set shell := ["bin/just-shell", "sh", "-cu"]
 
-DOCKER := "docker-compose --env-file .env.dist -f docker/docker-compose.yml"
+DOCKER := "docker-compose --env-file .env.dist --env-file docker/services.env -f docker/docker-compose.yml"
 CONTAINER_DIR := env("CONTAINER_DIR", "/var/www/html")
 PHP := DOCKER + " exec -T -w " + CONTAINER_DIR + " -e XDEBUG_MODE=off php"
 PHP_COVERAGE := DOCKER + " exec -T -w " + CONTAINER_DIR + " -e XDEBUG_MODE=coverage php"

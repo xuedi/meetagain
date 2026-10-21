@@ -9,9 +9,17 @@
   },
   "minimumReleaseAge": "3 days",
   "rebaseWhen": "behind-base-branch",
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^docker/services\\.env$/"],
+      "matchStrings": ["[A-Z_]+_IMAGE=(?<depName>[^:\\s]+):(?<currentValue>[^@\\s]+)@(?<currentDigest>sha256:[a-f0-9]+)"],
+      "datasourceTemplate": "docker"
+    }
+  ],
   "packageRules": [
     {
-      "matchManagers": ["dockerfile", "docker-compose"],
+      "matchManagers": ["dockerfile", "docker-compose", "custom.regex"],
       "matchDatasources": ["docker"],
       "pinDigests": true
     }

@@ -17,7 +17,7 @@
 
 set -uo pipefail
 
-COMPOSE="docker-compose --env-file .env.dist -f docker/docker-compose.yml"
+COMPOSE="docker-compose --env-file .env.dist --env-file docker/services.env -f docker/docker-compose.yml"
 # The chain shells into php and the test database lives in mariadb; valkey is not
 # required because the test env swaps every cache pool for cache.adapter.array.
 REQUIRED_SERVICES="php mariadb"

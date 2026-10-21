@@ -3,7 +3,8 @@
  *
  * Three related user-blocking interactions used on profile and messaging pages:
  *   1. Ajax yes/no toggle (.triggerToggleBlock) — fires the action URL and updates
- *      the button pair styling (is-success / is-danger) without reloading. Used in
+ *      the button pair styling (is-success / is-danger) without reloading. Clicks
+ *      while a request is in flight are ignored. Used in
  *      the shared _components/toggle.html.twig component. After the server responds it
  *      dispatches a bubbling `ma:toggled` CustomEvent (detail = the JSON response) so
  *      page scripts can react to the new state.
@@ -27,6 +28,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const btn = event.target.closest('button[data-url]');
             if (!btn) return;
             event.preventDefault();
+            if (trigger.dataset.busy === '1') return;
+            trigger.dataset.busy = '1';
 
             const url = btn.dataset.url;
             const token = btn.dataset.csrfToken;
@@ -47,6 +50,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }).catch(() => {
                 // A refused toggle carries its reason as a flash message, which only the next render shows.
                 window.location.reload();
+            }).finally(() => {
+                trigger.dataset.busy = '0';
             });
         });
     });

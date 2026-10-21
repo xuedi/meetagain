@@ -1,0 +1,40 @@
+name: Codeberg Mirror
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeberg-mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    name: Push to Codeberg
+    if: github.repository == 'xuedi/meetagain'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Push branches and tags
+        env:
+          DEPLOY_KEY: ${{ secrets.CODEBERG_DEPLOY_KEY }}
+          KNOWN_HOST: codeberg.org ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIVIC02vnjFyL+I4RHfvIGNtOgJMe769VTF1VR4EB3ZB
+          TARGET: git@codeberg.org:xuedi/meetagain.git
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/codeberg
+          chmod 600 ~/.ssh/codeberg
+          printf '%s\n' "$KNOWN_HOST" > ~/.ssh/known_hosts
+          export GIT_SSH_COMMAND="ssh -i ~/.ssh/codeberg -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes"
+          git push --force "$TARGET" \
+            refs/remotes/origin/main:refs/heads/main \
+            refs/remotes/origin/development:refs/heads/development
+          git push --force --tags "$TARGET"
