@@ -30,6 +30,8 @@ set -e
 dir="bin/commit-hooks"
 [ -d "$dir" ] || exit 0
 
+[ -n "${TEST_LOCK_HELD:-}" ] || exec bin/test-lock "$0" "$@"
+
 # Pinned so the numeric-prefix order cannot drift with the developer's locale:
 # collations differ on where the '-' separator sorts. Not exported, so the hook
 # scripts themselves still run under the developer's own locale.
