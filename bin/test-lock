@@ -1,0 +1,23 @@
+#!/bin/sh
+#
+# Runs a command while holding var/test-run.lock, so two test runs never share the test
+# databases and the test cache at once. A second run waits for the first. Reentrant: a
+# command started under the lock (a recipe inside `just test`) runs straight through.
+# Without flock (macOS) the command runs unlocked. The wait notice goes to the terminal,
+# because output-filter folds a recipe's own output into one status line.
+
+set -eu
+
+if [ -z "${TEST_LOCK_HELD:-}" ] && command -v flock >/dev/null 2>&1; then
+    lock=var/test-run.lock
+    mkdir -p var
+    exec 9>"$lock"
+    if ! flock -n 9; then
+        message="Another test run holds $lock - waiting for it to finish"
+        { echo "$message" > /dev/tty; } 2>/dev/null || echo "$message" >&2
+        flock 9
+    fi
+fi
+
+export TEST_LOCK_HELD=1
+exec "$@"

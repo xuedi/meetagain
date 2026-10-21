@@ -18,6 +18,10 @@ testUnit +parameter='':
 # rebuilt when test-stamp says its inputs changed
 [group('testing')]
 testModules +parameter='':
+    @bin/test-lock {{JUST}} _testModules {{parameter}}
+
+[private]
+_testModules +parameter='':
     @PHP_RUN="{{PHP}}" tests/bin/module-db.sh
     @{{PHP}} vendor/bin/phpunit -c tests/config/phpunit.modules.xml --no-coverage --log-junit tests/reports/junit-modules.xml {{parameter}}
     @echo
@@ -26,7 +30,7 @@ testModules +parameter='':
 # Rebuild the module test database, then run the module suites
 [group('testing')]
 testModulesRebuild +parameter='':
-    @PHP_RUN="{{PHP}}" tests/bin/module-db.sh --rebuild
+    @PHP_RUN="{{PHP}}" bin/test-lock tests/bin/module-db.sh --rebuild
     @{{JUST}} testModules {{parameter}}
 
 # Print AI-readable test results (for AI agent)
