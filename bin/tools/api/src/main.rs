@@ -35,7 +35,11 @@ enum Command {
     },
 
     /// GET /api/v1/events/{id}
-    Event { id: String },
+    Event {
+        id: String,
+        #[arg(long)]
+        language: Option<String>,
+    },
 
     /// GET /api/v1/groups
     Groups,
@@ -443,15 +447,18 @@ fn dispatch(cli: Cli, cfg: &mut Config) -> ExitCode {
                 .add_str("to", to.as_deref())
                 .add_u32("limit", limit)
                 .add_u32("offset", offset)
-                .add_str("language", language.as_deref())
+                .add_str("locale", language.as_deref())
                 .build();
             run_get(cfg, TokenKind::Client, &format!("/api/v1/events{}", qs));
         }
-        Command::Event { id } => {
+        Command::Event { id, language } => {
+            let qs = QueryBuilder::new()
+                .add_str("locale", language.as_deref())
+                .build();
             run_get(
                 cfg,
                 TokenKind::Client,
-                &format!("/api/v1/events/{}", percent_encode(&id)),
+                &format!("/api/v1/events/{}{}", percent_encode(&id), qs),
             );
         }
         Command::Groups => run_get(cfg, TokenKind::Client, "/api/v1/groups"),
