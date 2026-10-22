@@ -1,9 +1,11 @@
 use serde_json::Value;
 use std::collections::{BTreeMap, HashMap};
+use std::fs;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Mutex;
 use std::thread;
 use std::time::Duration;
+use ureq::tls::{Certificate, ClientCert, PrivateKey, TlsConfig};
 
 pub type Labels = BTreeMap<String, String>;
 
@@ -33,6 +35,7 @@ impl Client {
         url: &str,
         token: &str,
         datasource_uid: &str,
+        client_cert: Option<ClientCert>,
         record: bool,
     ) -> Result<Self, String> {
         let url = url.trim_end_matches('/');
@@ -53,6 +56,7 @@ impl Client {
             ureq::Agent::config_builder()
                 .http_status_as_error(false)
                 .timeout_global(Some(Duration::from_secs(60)))
+                .tls_config(TlsConfig::builder().client_cert(client_cert).build())
                 .build(),
         );
 
@@ -63,6 +67,16 @@ impl Client {
             queries: AtomicUsize::new(0),
             record: record.then(|| Mutex::new(Vec::new())),
         })
+    }
+
+    pub fn load_client_cert(cert_path: &str, key_path: &str) -> Result<ClientCert, String> {
+        let read = |path: &str| fs::read(path).map_err(|e| format!("cannot read {}: {}", path, e));
+        let cert = Certificate::from_pem(&read(cert_path)?)
+            .map_err(|e| format!("{}: {}", cert_path, e))?;
+        let key = PrivateKey::from_pem(&read(key_path)?)
+            .map_err(|e| format!("{}: {}", key_path, e))?;
+
+        Ok(ClientCert::new_with_certs(&[cert], key))
     }
 
     pub fn query_count(&self) -> usize {
@@ -315,12 +329,20 @@ mod tests {
 
     #[test]
     fn unknown_backend_is_rejected() {
-        assert!(Client::new("influx", "http://x", "", "uid", false).is_err());
+        assert!(Client::new("influx", "http://x", "", "uid", None, false).is_err());
+    }
+
+    #[test]
+    fn a_missing_client_cert_names_its_path() {
+        let error = Client::load_client_cert("/nonexistent/client.crt", "/nonexistent/client.key")
+            .err()
+            .unwrap();
+        assert!(error.contains("/nonexistent/client.crt"));
     }
 
     #[test]
     fn grafana_backend_goes_through_the_datasource_proxy() {
-        let client = Client::new("grafana", "https://grafana.example/", "t", "vm", false).unwrap();
+        let client = Client::new("grafana", "https://grafana.example/", "t", "vm", None, false).unwrap();
         assert_eq!(
             client.base,
             "https://grafana.example/api/datasources/proxy/uid/vm/api/v1"

@@ -10,6 +10,10 @@ URL=http://localhost:8428
 TOKEN=
 DATASOURCE_UID=victoriametrics
 
+# PEM paths of a TLS client certificate, for a URL behind a proxy that demands one. Set both or neither.
+CLIENT_CERT=
+CLIENT_KEY=
+
 # Label matchers added to every report query; --app and --env override them per call.
 APP=meetagain
 ENV=dev

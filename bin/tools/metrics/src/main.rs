@@ -191,6 +191,14 @@ fn load_context(cli: &Cli) -> Result<Context, String> {
     let backend = config
         .scalar("BACKEND")
         .unwrap_or_else(|| "prometheus".to_string());
+    let client_cert = match (
+        config.scalar("CLIENT_CERT").filter(|v| !v.is_empty()),
+        config.scalar("CLIENT_KEY").filter(|v| !v.is_empty()),
+    ) {
+        (None, None) => None,
+        (Some(cert), Some(key)) => Some(Client::load_client_cert(&cert, &key)?),
+        _ => return Err("CLIENT_CERT and CLIENT_KEY must be set together in config/tools/metrics.local".into()),
+    };
     let client = Client::new(
         &backend,
         &config.require("URL"),
@@ -198,6 +206,7 @@ fn load_context(cli: &Cli) -> Result<Context, String> {
         &config
             .scalar("DATASOURCE_UID")
             .unwrap_or_else(|| "victoriametrics".to_string()),
+        client_cert,
         cli.json,
     )?;
     if backend == "grafana" && config.scalar("TOKEN").unwrap_or_default().is_empty() {

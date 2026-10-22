@@ -6,5 +6,9 @@
 BUGTRACKER_URL=
 BUGTRACKER_TOKEN=
 
+# PEM paths of a TLS client certificate, for a URL behind a proxy that demands one. Set both or neither.
+CLIENT_CERT=
+CLIENT_KEY=
+
 # Numeric project id the issue listings are scoped to.
 BUGTRACKER_PROJECT=1
