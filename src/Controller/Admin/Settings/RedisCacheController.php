@@ -21,7 +21,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/system/cache')]
+#[Route('/admin/system/cache')]
+#[IsGranted('ROLE_ADMIN')]
 final class RedisCacheController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(

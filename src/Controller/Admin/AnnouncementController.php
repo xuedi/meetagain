@@ -28,7 +28,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/cms/announcements')]
+#[Route('/admin/cms/announcements')]
+#[IsGranted('ROLE_ADMIN')]
 final class AnnouncementController extends AbstractController implements AdminNavigationInterface
 {
     public function __construct(

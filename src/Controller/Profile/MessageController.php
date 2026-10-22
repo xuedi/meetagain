@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/profile/messages')]
 #[IsGranted('ROLE_USER')]
 final class MessageController extends AbstractController
 {
@@ -27,7 +28,7 @@ final class MessageController extends AbstractController
         private readonly MessageService $messageService,
     ) {}
 
-    #[Route('/profile/messages/{id}', name: 'app_profile_messages', methods: ['GET', 'POST'])]
+    #[Route('/{id}', name: 'app_profile_messages', methods: ['GET', 'POST'])]
     public function index(Request $request, ?int $id = null): Response
     {
         $form = null;
@@ -69,7 +70,7 @@ final class MessageController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/messages/{id}/edit', name: 'app_profile_messages_edit', methods: ['POST'])]
+    #[Route('/{id}/edit', name: 'app_profile_messages_edit', methods: ['POST'])]
     public function edit(Request $request, int $id): JsonResponse
     {
         if (!$this->isCsrfTokenValid('message_edit', $request->request->getString('_token'))) {

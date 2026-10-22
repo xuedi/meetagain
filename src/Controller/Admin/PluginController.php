@@ -17,6 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Route('/admin/plugin')]
 #[IsGranted('ROLE_ADMIN')]
 final class PluginController extends AbstractController implements AdminNavigationInterface
 {
@@ -37,7 +38,7 @@ final class PluginController extends AbstractController implements AdminNavigati
         );
     }
 
-    #[Route('/admin/plugin', name: 'app_admin_plugin')]
+    #[Route('', name: 'app_admin_plugin')]
     public function list(): Response
     {
         $plugins = $this->pluginService->getAdminList();
@@ -60,7 +61,7 @@ final class PluginController extends AbstractController implements AdminNavigati
         ]);
     }
 
-    #[Route('/admin/plugin/{key}/toggle', name: 'app_admin_plugin_toggle', requirements: ['key' => '[a-z0-9_]+'], methods: ['POST'])]
+    #[Route('/{key}/toggle', name: 'app_admin_plugin_toggle', requirements: ['key' => '[a-z0-9_]+'], methods: ['POST'])]
     public function toggle(string $key, Request $request): Response
     {
         if (!$this->isCsrfTokenValid('app_admin_plugin_toggle' . $key, (string) $request->request->get('_token'))) {

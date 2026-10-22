@@ -33,7 +33,7 @@ struct Detector {
     rule: &'static str,
 }
 
-const DETECTORS: [Detector; 9] = [
+const DETECTORS: [Detector; 10] = [
     Detector {
         id: "tiny",
         title: "classes that have not earned their file",
@@ -79,12 +79,17 @@ const DETECTORS: [Detector; 9] = [
         title: "class names that repeat an ancestor folder",
         rule: "a class name must not repeat its ancestor folders' names - the namespace already says it",
     },
+    Detector {
+        id: "attribute-style",
+        title: "controller attributes grouped in one #[...] or with Route not first",
+        rule: "in a controller, one attribute per #[...], and Route above the others",
+    },
 ];
 
 /// Find PHP code that has drifted from the written coding standards.
 ///
 /// Detectors: tiny, fat, repo-in-controller, mutable-service, fqcn, static, log-rethrow,
-/// raw-sql, echo-name. `fat` and the judgement tier of `tiny` are informational: they never fail
+/// raw-sql, echo-name, attribute-style. `fat` and the judgement tier of `tiny` are informational: they never fail
 /// `--check` and accept no allow entry.
 ///
 /// Allow entries live in each repo's tests/codeDriftAllow.txt, one per line:
@@ -217,6 +222,7 @@ fn main() -> ExitCode {
                 "log-rethrow" => structure::log_rethrow(file),
                 "raw-sql" => lines::raw_sql(file),
                 "echo-name" => lines::echo_name(file, &rules).into_iter().collect(),
+                "attribute-style" => lines::attribute_style(file),
                 _ => Vec::new(),
             })
             .collect();

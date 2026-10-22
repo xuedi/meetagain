@@ -21,6 +21,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/admin/member')]
 #[IsGranted('ROLE_STEWARD')]
 final class MemberController extends AbstractController implements AdminNavigationInterface
 {
@@ -40,7 +41,7 @@ final class MemberController extends AbstractController implements AdminNavigati
         );
     }
 
-    #[Route('/admin/member', name: 'app_admin_member')]
+    #[Route('', name: 'app_admin_member')]
     public function list(): Response
     {
         $filterResult = $this->filterService->getUserIdFilter();
@@ -52,7 +53,7 @@ final class MemberController extends AbstractController implements AdminNavigati
         ]);
     }
 
-    #[Route('/admin/member/edit/{id}', name: 'app_admin_member_edit', methods: ['GET'])]
+    #[Route('/edit/{id}', name: 'app_admin_member_edit', methods: ['GET'])]
     public function edit(User $user): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::MEMBER_VIEW, $user);
@@ -67,7 +68,7 @@ final class MemberController extends AbstractController implements AdminNavigati
         ]);
     }
 
-    #[Route('/admin/member/delete/{id}', name: 'app_admin_member_delete', methods: ['POST'])]
+    #[Route('/delete/{id}', name: 'app_admin_member_delete', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function delete(User $user, Request $request): Response
     {
@@ -87,7 +88,7 @@ final class MemberController extends AbstractController implements AdminNavigati
         return $this->redirectToRoute('app_admin_member');
     }
 
-    #[Route('/admin/member/{id}/set-role/{role}', name: 'app_admin_member_set_role', methods: ['POST'])]
+    #[Route('/{id}/set-role/{role}', name: 'app_admin_member_set_role', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function setRole(User $user, string $role, Request $request): Response
     {
@@ -118,7 +119,7 @@ final class MemberController extends AbstractController implements AdminNavigati
         return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
     }
 
-    #[Route('/admin/member/{id}/toggle/{flag}', name: 'app_admin_member_toggle_flag', methods: ['POST'])]
+    #[Route('/{id}/toggle/{flag}', name: 'app_admin_member_toggle_flag', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function toggleFlag(User $user, string $flag, Request $request): Response
     {
@@ -145,7 +146,7 @@ final class MemberController extends AbstractController implements AdminNavigati
         return $this->redirectToRoute('app_admin_member_edit', ['id' => $user->getId()]);
     }
 
-    #[Route('/admin/member/{id}/set-status/{status}', name: 'app_admin_member_set_status', methods: ['POST'])]
+    #[Route('/{id}/set-status/{status}', name: 'app_admin_member_set_status', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     public function setStatus(User $user, string $status, Request $request): Response
     {

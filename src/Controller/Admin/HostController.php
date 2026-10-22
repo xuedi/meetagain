@@ -26,7 +26,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ORGANIZER'), Route('/admin/hosts')]
+#[Route('/admin/hosts')]
+#[IsGranted('ROLE_ORGANIZER')]
 final class HostController extends AbstractController implements AdminNavigationInterface
 {
     public function __construct(

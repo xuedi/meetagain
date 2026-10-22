@@ -36,7 +36,6 @@ body {
 .is-column-fill  { width: 100%; }
 .is-contents     { display: contents; }
 .is-full-height  { height: 100%; }
-.flex-shrink-0   { flex-shrink: 0; }
 .breakText       { display: block; max-width: 720px !important; word-break: break-all; }
 
 // Lifts a linked card/box on hover - for a `.box`, `.card`, or tile-style element that is itself
@@ -329,10 +328,6 @@ details.activities-load-more {
 .js-collection-fields .field {
     margin-bottom: 0;
 }
-// The last row carries no bottom margin, so lift the add button off it.
-.js-collection-add {
-    margin-top: 0.5rem;
-}
 
 // Ballot tiles - the item card is the selection control, so the native input is hidden and the
 // card itself carries the checked state. A fixed track width keeps a three-candidate ballot from
@@ -454,12 +449,6 @@ label.ballot-option .ballot-option__card a {
     color: var(--bulma-link-invert);
 }
 
-// -- FactsRow CMS block --
-// Mirrors the platform plugin's hardcoded `.platform-trust-strip` so the admin-authored
-// FactsRow matches its visual styling (padding + larger icon font-size).
-.cms-facts-row { padding-top: 2rem; padding-bottom: 2rem; }
-.cms-facts-row .icon { font-size: 1.5rem; }
-
 // ── Admin shell ──────────────────────────────────────────────────────────────
 // Mobile-only sticky topbar + slide-in drawer for the admin sidebar.
 // Bulma's $tablet breakpoint is 769px; below that the desktop sidebar column
@@ -503,11 +492,6 @@ label.ballot-option .ballot-option__card a {
     &.is-active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     &.is-active span:nth-child(2) { opacity: 0; }
     &.is-active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-}
-
-.admin-shell-title {
-    font-weight: 600;
-    color: hsl(0, 0%, 21%);
 }
 
 .admin-shell-backdrop {
@@ -573,11 +557,6 @@ body.admin-shell-no-scroll {
         border-top: 0;
         border-radius: 0;
     }
-
-    .quill-source-toggle {
-        margin-top: 0.5rem;
-        text-align: right;
-    }
 }
 
 .cms-block-preview,
@@ -622,8 +601,6 @@ body.admin-shell-no-scroll {
 // -- Item grid thumbnails --
 
 .item-thumb {
-    display: block;
-
     .image img {
         object-fit: cover;
     }
@@ -655,9 +632,6 @@ body.admin-shell-no-scroll {
 .item-add-thumb {
     position: absolute;
     inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     border-radius: 6px;
 }
 
@@ -692,10 +666,6 @@ body.admin-shell-no-scroll {
 // A flat tag vocabulary is a handful of short labels, so it reads as a row of chips rather than a
 // column of bare checkboxes. The tree variant keeps its own indented column layout.
 .item-tag-choices {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-
     .checkbox {
         display: inline-flex;
         align-items: center;
@@ -769,29 +739,19 @@ body.admin-shell-no-scroll {
     }
 }
 
-.item-gallery-thumbs {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
+.item-gallery-slide img {
+    display: block;
+    height: 8rem;
+    width: auto;
+    border-radius: 4px;
+}
 
-    .item-gallery-slide img {
-        display: block;
-        height: 8rem;
-        width: auto;
-        border-radius: 4px;
-    }
-
-    .item-gallery-slide.is-active img {
-        outline: 2px solid var(--bulma-link);
-        outline-offset: 2px;
-    }
+.item-gallery-slide.is-active img {
+    outline: 2px solid var(--bulma-link);
+    outline-offset: 2px;
 }
 
 .item-gallery-add {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     width: 6rem;
     height: 8rem;
     border-radius: 4px;
@@ -901,14 +861,9 @@ body.admin-shell-no-scroll {
     position: absolute;
     top: 0.4rem;
     right: 0.4rem;
-    display: flex;
-    gap: 0.25rem;
 }
 
 .usercard-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     width: 1.6rem;
     height: 1.6rem;
     border-radius: 9999px;

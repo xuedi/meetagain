@@ -28,7 +28,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/system')]
+#[Route('/admin/system')]
+#[IsGranted('ROLE_ADMIN')]
 final class ConfigController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(

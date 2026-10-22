@@ -31,7 +31,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ORGANIZER'), Route('/admin/locations')]
+#[Route('/admin/locations')]
+#[IsGranted('ROLE_ORGANIZER')]
 final class LocationController extends AbstractController implements AdminNavigationInterface
 {
     public function __construct(

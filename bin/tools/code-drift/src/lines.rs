@@ -159,6 +159,100 @@ pub fn raw_sql(file: &PhpFile) -> Vec<Finding> {
         .collect()
 }
 
+struct AttributeGroup {
+    line: usize,
+    names: Vec<String>,
+    follows_another: bool,
+}
+
+pub fn attribute_style(file: &PhpFile) -> Vec<Finding> {
+    if !file.path.contains("/Controller/") && !file.class_name().ends_with("Controller") {
+        return Vec::new();
+    }
+    let raw: Vec<&str> = file.raw.lines().collect();
+    let mut other_above = false;
+    attribute_groups(&file.code)
+        .into_iter()
+        .filter_map(|group| {
+            let is_route = group.names.first().is_some_and(|n| n == "Route");
+            other_above = group.follows_another && other_above;
+            let problem = if group.names.len() > 1 {
+                "one attribute per #[...]"
+            } else if is_route && other_above {
+                "Route comes first"
+            } else {
+                other_above |= !is_route;
+                return None;
+            };
+            other_above |= !is_route;
+            Some(Finding {
+                detector: "attribute-style",
+                path: file.path.clone(),
+                symbol: None,
+                row: format!(
+                    "{}:{}:{}  ({})",
+                    file.path,
+                    group.line,
+                    raw.get(group.line - 1).map_or("", |l| l.trim()),
+                    problem
+                ),
+            })
+        })
+        .collect()
+}
+
+fn attribute_groups(code: &str) -> Vec<AttributeGroup> {
+    let chars: Vec<char> = code.chars().collect();
+    let mut groups = Vec::new();
+    let mut line = 1;
+    let mut previous_end: Option<usize> = None;
+    let mut i = 0;
+    while i < chars.len() {
+        if chars[i] == '\n' {
+            line += 1;
+        }
+        if chars[i] != '#' || chars.get(i + 1) != Some(&'[') {
+            i += 1;
+            continue;
+        }
+        let follows_another =
+            previous_end.is_some_and(|end| chars[end..i].iter().all(|c| c.is_whitespace()));
+        let start_line = line;
+        let mut names = Vec::new();
+        let mut name = String::new();
+        let mut depth = 0;
+        i += 2;
+        while i < chars.len() {
+            let c = chars[i];
+            if c == '\n' {
+                line += 1;
+            }
+            match c {
+                '(' | '[' | '{' => depth += 1,
+                ')' | '}' => depth -= 1,
+                ']' if depth == 0 => break,
+                ']' => depth -= 1,
+                ',' if depth == 0 => {
+                    names.push(std::mem::take(&mut name));
+                }
+                _ if depth == 0 && (c.is_alphanumeric() || c == '_' || c == '\\') => name.push(c),
+                _ => {}
+            }
+            i += 1;
+        }
+        names.push(name);
+        names.retain(|n| !n.is_empty());
+        groups.push(AttributeGroup {
+            line: start_line,
+            names,
+            follows_another,
+        });
+        previous_end = Some((i + 1).min(chars.len()));
+        i += 1;
+    }
+    groups
+}
+
 const ROOT_SEGMENTS: [&str; 4] = ["src", "plugins", "modules", "App"];
 
 /// Only a prefix or middle repeat counts: a trailing repeat is a conventional Symfony layer
@@ -395,6 +489,56 @@ mod tests {
             "final class Rows\n{\n    public function go(): void\n    {\n        $this->connection->executeStatement('x');\n    }\n}\n",
         );
         assert!(raw_sql(&file).is_empty());
+    }
+
+    #[test]
+    fn attribute_style_flags_a_grouped_attribute() {
+        let file = php(
+            "src/Controller/ShelfController.php",
+            "#[IsGranted('ROLE_USER'), Route('/shelf')]\nfinal class ShelfController\n{\n}\n",
+        );
+        let found = attribute_style(&file);
+        assert_eq!(found.len(), 1);
+        assert!(found[0].row.starts_with("src/Controller/ShelfController.php:3:"));
+        assert!(found[0].row.ends_with("(one attribute per #[...])"));
+    }
+
+    #[test]
+    fn attribute_style_flags_a_route_below_another_attribute() {
+        let file = php(
+            "src/Controller/ShelfController.php",
+            "final class ShelfController\n{\n    #[IsGranted('ROLE_USER')]\n    #[Route(\n        '/x',\n        name: 'x',\n    )]\n    public function x(): void {}\n}\n",
+        );
+        let found = attribute_style(&file);
+        assert_eq!(found.len(), 1);
+        assert!(found[0].row.ends_with("(Route comes first)"));
+    }
+
+    #[test]
+    fn attribute_style_accepts_one_attribute_per_line_with_route_first() {
+        let file = php(
+            "src/Controller/ShelfController.php",
+            "#[Route('/shelf')]\n#[IsGranted('ROLE_USER')]\nfinal class ShelfController\n{\n    #[Route('/{id}', name: 'x', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]\n    #[IsGranted('ROLE_USER')]\n    public function x(): void {}\n\n    #[Route('/y', name: 'y')]\n    public function y(): void {}\n}\n",
+        );
+        assert!(attribute_style(&file).is_empty());
+    }
+
+    #[test]
+    fn attribute_style_accepts_two_routes_on_one_action() {
+        let file = php(
+            "src/Controller/ShelfController.php",
+            "final class ShelfController\n{\n    #[Route('/a', name: 'a')]\n    #[Route('/b', name: 'b')]\n    #[IsGranted('ROLE_USER')]\n    public function x(): void {}\n}\n",
+        );
+        assert!(attribute_style(&file).is_empty());
+    }
+
+    #[test]
+    fn attribute_style_ignores_files_outside_controllers() {
+        let file = php(
+            "src/Entity/Shelf.php",
+            "final class Shelf\n{\n    #[ORM\\Id, ORM\\GeneratedValue, ORM\\Column]\n    private ?int $id = null;\n}\n",
+        );
+        assert!(attribute_style(&file).is_empty());
     }
 
     fn echo(path: &str) -> Option<Finding> {

@@ -69,7 +69,8 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ORGANIZER'), Route('/admin/events')]
+#[Route('/admin/events')]
+#[IsGranted('ROLE_ORGANIZER')]
 final class EventController extends AbstractController implements AdminNavigationInterface
 {
     private const string DEFAULT_RANGE = 'all';

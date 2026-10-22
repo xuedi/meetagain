@@ -19,6 +19,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/profile')]
 #[IsGranted('ROLE_USER')]
 final class ProfileController extends AbstractController
 {
@@ -33,7 +34,7 @@ final class ProfileController extends AbstractController
         private readonly ProfileService $profileService,
     ) {}
 
-    #[Route('/profile/', name: self::ROUTE_PROFILE)]
+    #[Route('/', name: self::ROUTE_PROFILE)]
     public function index(Request $request): Response
     {
         $response = $this->getResponse();
@@ -72,7 +73,7 @@ final class ProfileController extends AbstractController
         );
     }
 
-    #[Route('/profile/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp', methods: ['POST'])]
+    #[Route('/toggleRsvp/{event}/', name: 'app_profile_toggle_rsvp', methods: ['POST'])]
     public function toggleRsvp(Request $request, Event $event, RsvpService $rsvpService): Response
     {
         if (!$this->isCsrfTokenValid('app_profile_toggle_rsvp' . $event->getId(), (string) $request->request->get('_token'))) {

@@ -25,7 +25,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/email/templates')]
+#[Route('/admin/email/templates')]
+#[IsGranted('ROLE_ADMIN')]
 final class TemplatesController extends AbstractEmailController implements AdminNavigationInterface, AdminTabsInterface
 {
     /**

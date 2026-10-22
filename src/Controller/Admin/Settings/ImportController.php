@@ -26,7 +26,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/system/import')]
+#[Route('/admin/system/import')]
+#[IsGranted('ROLE_ADMIN')]
 final class ImportController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string PENDING_ARCHIVE = 'admin_system_import_pending';

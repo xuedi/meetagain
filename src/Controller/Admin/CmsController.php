@@ -48,7 +48,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_STEWARD'), Route('/admin/cms')]
+#[Route('/admin/cms')]
+#[IsGranted('ROLE_STEWARD')]
 final class CmsController extends AbstractController implements AdminNavigationInterface
 {
     private const string ADD_TOKEN_ID = 'app_admin_cms_add';

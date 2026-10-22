@@ -4,7 +4,7 @@
 {% embed '_components/item/gallery.html.twig' with {'empty': not hasSlides and not is_granted('ROLE_STEWARD')} %}
     {% block slides %}
         {% if is_granted('ROLE_STEWARD') %}
-            <a href="{{ path('app_plugin_dishes_dish_add') }}" class="item-gallery-add has-background-link-light has-text-link" title="{{ 'dishes_views.title_add'|trans }}">
+            <a href="{{ path('app_plugin_dishes_dish_add') }}" class="item-gallery-add is-flex is-align-items-center is-justify-content-center has-background-link-light has-text-link" title="{{ 'dishes_views.title_add'|trans }}">
                 <span class="icon"><i class="fa-solid fa-plus fa-lg"></i></span>
             </a>
         {% endif %}

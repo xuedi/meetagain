@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
         wrapper.appendChild(sourceArea);
 
         const toggleBar = document.createElement('div');
-        toggleBar.className = 'quill-source-toggle';
+        toggleBar.className = 'mt-2 has-text-right';
         const toggleBtn = document.createElement('button');
         toggleBtn.type = 'button';
         toggleBtn.className = 'button is-small';

@@ -46,7 +46,9 @@ impl Allow {
 pub fn carries_symbol(detector: &str) -> Option<bool> {
     match detector {
         "repo-in-controller" | "fqcn" | "static" | "log-rethrow" | "raw-sql" => Some(true),
-        "tiny" | "tiny-judgement" | "mutable-service" | "echo-name" => Some(false),
+        "tiny" | "tiny-judgement" | "mutable-service" | "echo-name" | "attribute-style" => {
+            Some(false)
+        }
         _ => None,
     }
 }

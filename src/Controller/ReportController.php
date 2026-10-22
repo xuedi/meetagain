@@ -19,7 +19,8 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_USER'), Route('/report')]
+#[Route('/report')]
+#[IsGranted('ROLE_USER')]
 final class ReportController extends AbstractController
 {
     public function __construct(

@@ -32,6 +32,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Route('/admin/system')]
 #[IsGranted('ROLE_ADMIN')]
 final class ThemeController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
@@ -77,7 +78,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
         parent::__construct($translator, 'theme');
     }
 
-    #[Route('/admin/system/theme', name: 'app_admin_system_theme', methods: ['GET', 'POST'])]
+    #[Route('/theme', name: 'app_admin_system_theme', methods: ['GET', 'POST'])]
     public function theme(Request $request): Response
     {
         $colorsForm = $this->createForm(ThemeColorsType::class);
@@ -132,7 +133,7 @@ final class ThemeController extends AbstractSettingsController implements AdminN
         ]);
     }
 
-    #[Route('/admin/system/component-gallery', name: 'app_admin_system_gallery', methods: ['GET'])]
+    #[Route('/component-gallery', name: 'app_admin_system_gallery', methods: ['GET'])]
     public function gallery(Request $request): Response
     {
         $category = $request->query->getString('category');

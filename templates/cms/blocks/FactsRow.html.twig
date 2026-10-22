@@ -1,5 +1,5 @@
 {% if block.facts|length > 0 %}
-    <section class="section cms-facts-row">
+    <section class="section py-5">
         <div class="container">
             {% if block.headline %}
                 <h2 class="title has-text-centered mb-5">{{ block.headline }}</h2>
@@ -10,7 +10,7 @@
                     {% set iconClass = (rawIcon starts with 'fa-') ? 'fa ' ~ rawIcon : rawIcon %}
                     <div class="column">
                         {% if rawIcon %}
-                            <span class="icon mb-2 has-text-indigo">
+                            <span class="icon is-size-4 mb-2 has-text-indigo">
                                 <i class="{{ iconClass }}" aria-hidden="true"></i>
                             </span>
                         {% endif %}

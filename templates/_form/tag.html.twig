@@ -54,7 +54,7 @@
 
 {%- block item_tags_widget -%}
     {%- set tree = attr['data-item-tag-tree'] is defined -%}
-    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' control' ~ (tree ? '' : ' item-tag-choices'))|trim}) -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' control' ~ (tree ? '' : ' is-flex is-flex-wrap-wrap is-gap-1 item-tag-choices'))|trim}) -%}
     <div {{ block('widget_container_attributes') }}>
         {%- for child in form -%}
             {%- if tree -%}
