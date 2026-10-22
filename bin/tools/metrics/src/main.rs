@@ -88,7 +88,7 @@ enum Report {
         #[arg(long, default_value = "24h")]
         since: String,
     },
-    /// Where server time goes: routes ranked by total time with bottleneck hints, cron, platform
+    /// Where server time goes: routes ranked by total time with bottleneck hints, tasks, platform
     Performance {
         #[arg(long, default_value = "24h")]
         since: String,
@@ -122,7 +122,7 @@ pub struct Thresholds {
     pub regression_pct: f64,
     pub probe_spike_factor: f64,
     pub probe_spike_min: f64,
-    pub stale_cron_minutes: i64,
+    pub stale_task_minutes: i64,
     pub stale_http_minutes: i64,
 }
 
@@ -137,7 +137,7 @@ impl Default for Thresholds {
             regression_pct: 25.0,
             probe_spike_factor: 5.0,
             probe_spike_min: 50.0,
-            stale_cron_minutes: 15,
+            stale_task_minutes: 15,
             stale_http_minutes: 60,
         }
     }
@@ -226,8 +226,8 @@ fn load_context(cli: &Cli) -> Result<Context, String> {
         regression_pct: float("REGRESSION_PCT", defaults.regression_pct)?,
         probe_spike_factor: float("PROBE_SPIKE_FACTOR", defaults.probe_spike_factor)?,
         probe_spike_min: float("PROBE_SPIKE_MIN", defaults.probe_spike_min)?,
-        stale_cron_minutes: config
-            .number("STALE_CRON_MINUTES", defaults.stale_cron_minutes as usize)?
+        stale_task_minutes: config
+            .number("STALE_TASK_MINUTES", defaults.stale_task_minutes as usize)?
             as i64,
         stale_http_minutes: config
             .number("STALE_HTTP_MINUTES", defaults.stale_http_minutes as usize)?

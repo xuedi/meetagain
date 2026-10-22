@@ -15,7 +15,7 @@ pub fn run(
         Some(route) => route_detail(ctx, &window, route)?,
         None => routes(ctx, &window, limit)?,
     };
-    body.push_str(&cron(ctx, &window)?);
+    body.push_str(&tasks(ctx, &window)?);
     body.push_str(&platform(ctx, &window)?);
     Ok(finish(ctx, "performance", &window, body))
 }
@@ -165,17 +165,14 @@ fn route_detail(ctx: &Context, window: &Window, route: &str) -> Result<String, S
     Ok(out)
 }
 
-fn cron(ctx: &Context, window: &Window) -> Result<String, String> {
+fn tasks(ctx: &Context, window: &Window) -> Result<String, String> {
     let queries = [
-        ("runs", "sum by (task) (count_over_time(cron_task_duration_ms{$S}[$W]))"),
-        ("total", "sum by (task) (sum_over_time(cron_task_duration_ms{$S}[$W]))"),
-        ("p95", "histogram_quantile(0.95, sum by (task, vmrange) (histogram_over_time(cron_task_duration_ms{$S}[$W])))"),
-        ("max", "max by (task) (max_over_time(cron_task_duration_ms{$S}[$W]))"),
-        ("failed", "sum by (task) (count_over_time(cron_task_duration_ms{$S,status!=\"ok\"}[$W]))"),
-        ("run_count", "sum(count_over_time(cron_run_duration_ms{$S}[$W]))"),
-        ("run_p95", "histogram_quantile(0.95, sum by (vmrange) (histogram_over_time(cron_run_duration_ms{$S}[$W])))"),
-        ("run_max", "max(max_over_time(cron_run_duration_ms{$S}[$W]))"),
-        ("run_memory", "max(max_over_time(cron_run_memory_peak_mb{$S}[$W]))"),
+        ("runs", "sum by (task) (count_over_time(task_run_duration_ms{$S}[$W]))"),
+        ("total", "sum by (task) (sum_over_time(task_run_duration_ms{$S}[$W]))"),
+        ("p95", "histogram_quantile(0.95, sum by (task, vmrange) (histogram_over_time(task_run_duration_ms{$S}[$W])))"),
+        ("max", "max by (task) (max_over_time(task_run_duration_ms{$S}[$W]))"),
+        ("failed", "sum by (task) (count_over_time(task_run_duration_ms{$S,status!=\"ok\"}[$W]))"),
+        ("memory", "max by (task) (max_over_time(task_run_memory_peak_mb{$S}[$W]))"),
     ];
     let queries: Vec<(&str, String)> = queries
         .iter()
@@ -184,21 +181,20 @@ fn cron(ctx: &Context, window: &Window) -> Result<String, String> {
     let r = ctx.client.instant_many(&queries, window.end)?;
     let runs = by_label(&r["runs"], "task");
     if runs.is_empty() {
-        return Ok("\ncron: no runs in this window\n".into());
+        return Ok("\ntasks: no runs in this window\n".into());
     }
-    let (total, p95, max, failed) = (
+    let (total, p95, max, failed, memory) = (
         by_label(&r["total"], "task"),
         by_label(&r["p95"], "task"),
         by_label(&r["max"], "task"),
         by_label(&r["failed"], "task"),
+        by_label(&r["memory"], "task"),
     );
 
     let mut out = format!(
-        "\ncron: {} runs, p95 {} ms, max {} ms, peak memory {} MB\n",
-        opt(single(&r["run_count"]), num),
-        opt(single(&r["run_p95"]), ms),
-        opt(single(&r["run_max"]), ms),
-        opt(single(&r["run_memory"]), mb)
+        "\ntasks: {} runs, peak memory {} MB\n",
+        num(runs.values().sum()),
+        opt(memory.values().copied().reduce(f64::max), mb)
     );
     let mut tasks: Vec<&String> = runs.keys().collect();
     tasks.sort_by(|a, b| {
@@ -207,7 +203,7 @@ fn cron(ctx: &Context, window: &Window) -> Result<String, String> {
             .unwrap_or(&0.0)
             .total_cmp(total.get(*a).unwrap_or(&0.0))
     });
-    let mut table = Table::new(&["task", "runs", "total", "p95", "max", "not ok"]);
+    let mut table = Table::new(&["task", "runs", "total", "p95", "max", "mem", "not ok"]);
     for task in tasks {
         table.row(vec![
             task.clone(),
@@ -215,6 +211,7 @@ fn cron(ctx: &Context, window: &Window) -> Result<String, String> {
             duration(total.get(task).copied().unwrap_or(0.0)),
             opt(p95.get(task).copied(), ms),
             opt(max.get(task).copied(), ms),
+            opt(memory.get(task).copied(), mb),
             num(failed.get(task).copied().unwrap_or(0.0)),
         ]);
     }

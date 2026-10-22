@@ -22,7 +22,7 @@ pub struct Signals {
     pub route_p95: BTreeMap<String, f64>,
     pub route_count: BTreeMap<String, f64>,
     pub errors: BTreeMap<String, f64>,
-    pub cron_not_ok: Vec<(String, String, f64)>,
+    pub task_not_ok: Vec<(String, String, f64)>,
     pub email_failed: Option<f64>,
     pub email_oldest: Option<f64>,
     pub opcache_restarts: Option<f64>,
@@ -34,7 +34,7 @@ pub struct Signals {
     pub buffer_pool: Option<f64>,
     pub memory_ratio: Option<f64>,
     pub dropped_series: Option<f64>,
-    pub cron_age: Option<i64>,
+    pub task_age: Option<i64>,
     pub http_age: Option<i64>,
     pub unstopped_spikes: Vec<(i64, f64)>,
 }
@@ -45,15 +45,15 @@ pub fn evaluate(s: &Signals, t: &Thresholds) -> Vec<Issue> {
     let mut issues = Vec::new();
     let mut add = |severity, text: String| issues.push(Issue { severity, text });
 
-    match s.cron_age {
+    match s.task_age {
         None => add(
             Severity::Error,
-            "no cron_run sample in 7 days - cron or the metrics path is down".into(),
+            "no task_run sample in 7 days - the scheduler or the metrics path is down".into(),
         ),
-        Some(age) if age > t.stale_cron_minutes * 60 => add(
+        Some(age) if age > t.stale_task_minutes * 60 => add(
             Severity::Error,
             format!(
-                "last cron_run sample is {} old - cron or the metrics path is down",
+                "last task_run sample is {} old - the scheduler or the metrics path is down",
                 time::format_age(age)
             ),
         ),
@@ -80,7 +80,7 @@ pub fn evaluate(s: &Signals, t: &Thresholds) -> Vec<Issue> {
             format!("{} server errors (5xx) on {}", num(*count), route),
         );
     }
-    for (task, status, count) in &s.cron_not_ok {
+    for (task, status, count) in &s.task_not_ok {
         let severity = if status == "warning" {
             Severity::Warn
         } else {
@@ -88,7 +88,7 @@ pub fn evaluate(s: &Signals, t: &Thresholds) -> Vec<Issue> {
         };
         add(
             severity,
-            format!("cron task {} ended {} {}x", task, status, num(*count)),
+            format!("task {} ended {} {}x", task, status, num(*count)),
         );
     }
     if let Some(failed) = s.email_failed.filter(|f| *f > 0.0) {
@@ -225,7 +225,7 @@ pub fn run(ctx: &Context, since: &str) -> Result<String, String> {
         ("route_p95", format!("histogram_quantile(0.95, sum by (route, vmrange) (histogram_over_time(http_request_duration_ms{}[$W])))", matched)),
         ("route_count", format!("sum by (route) (count_over_time(http_request_duration_ms{}[$W]))", matched)),
         ("errors", "sum by (route) (count_over_time(http_request_duration_ms{$S,status=\"5xx\"}[$W]))".into()),
-        ("cron_not_ok", "sum by (task, status) (count_over_time(cron_task_duration_ms{$S,status!=\"ok\"}[$W]))".into()),
+        ("task_not_ok", "sum by (task, status) (count_over_time(task_run_duration_ms{$S,status!=\"ok\"}[$W]))".into()),
         ("email_failed", "max(last_over_time(email_queue_failed_24h{$S}[$W]))".into()),
         ("email_oldest", "max(max_over_time(email_queue_oldest_pending_age_s{$S}[$W]))".into()),
         ("opcache_restarts", "sum(increase(php_runtime_opcache_restarts{$S}[$W]))".into()),
@@ -238,7 +238,7 @@ pub fn run(ctx: &Context, since: &str) -> Result<String, String> {
         ("memory", "max(max_over_time(container_memory_used_mb{$S}[$W]))".into()),
         ("memory_limit", "max(max_over_time(container_memory_limit_mb{$S}[$W]))".into()),
         ("dropped", "sum(increase(vm_hourly_series_limit_rows_dropped_total[$W]))".into()),
-        ("cron_last", "max(tlast_over_time(cron_run_duration_ms{$S}[7d]))".into()),
+        ("task_last", "max(tlast_over_time(task_run_duration_ms{$S}[7d]))".into()),
         ("http_last", "max(tlast_over_time(http_request_duration_ms{$S}[7d]))".into()),
     ];
     let queries: Vec<(&str, String)> = queries
@@ -253,7 +253,7 @@ pub fn run(ctx: &Context, since: &str) -> Result<String, String> {
         route_p95: by_label(&r["route_p95"], "route"),
         route_count: by_label(&r["route_count"], "route"),
         errors: by_label(&r["errors"], "route"),
-        cron_not_ok: r["cron_not_ok"]
+        task_not_ok: r["task_not_ok"]
             .iter()
             .map(|s| {
                 (
@@ -277,7 +277,7 @@ pub fn run(ctx: &Context, since: &str) -> Result<String, String> {
             _ => None,
         },
         dropped_series: v("dropped"),
-        cron_age: v("cron_last").map(|t| ctx.now - t as i64),
+        task_age: v("task_last").map(|t| ctx.now - t as i64),
         http_age: v("http_last").map(|t| ctx.now - t as i64),
         unstopped_spikes: probes
             .spikes
@@ -308,7 +308,7 @@ mod tests {
 
     fn healthy() -> Signals {
         Signals {
-            cron_age: Some(60),
+            task_age: Some(60),
             http_age: Some(30),
             buffer_pool: Some(0.999),
             valkey_hit: Some(0.95),
@@ -322,9 +322,9 @@ mod tests {
     }
 
     #[test]
-    fn a_silent_cron_is_an_error() {
+    fn a_silent_scheduler_is_an_error() {
         let signals = Signals {
-            cron_age: Some(3600),
+            task_age: Some(3600),
             ..healthy()
         };
         let issues = evaluate(&signals, &Thresholds::default());
@@ -353,14 +353,14 @@ mod tests {
     }
 
     #[test]
-    fn a_cron_warning_is_only_a_warning() {
+    fn a_task_warning_is_only_a_warning() {
         let mut signals = healthy();
-        signals.cron_not_ok = vec![
+        signals.task_not_ok = vec![
             ("cleanup".into(), "warning".into(), 2.0),
             ("mail".into(), "exception".into(), 1.0),
         ];
         let issues = evaluate(&signals, &Thresholds::default());
-        assert_eq!(issues[0].text, "cron task mail ended exception 1x");
+        assert_eq!(issues[0].text, "task mail ended exception 1x");
         assert_eq!(issues[1].severity, Severity::Warn);
     }
 
