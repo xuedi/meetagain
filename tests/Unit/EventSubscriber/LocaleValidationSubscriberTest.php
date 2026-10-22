@@ -2,11 +2,13 @@
 
 namespace Tests\Unit\EventSubscriber;
 
+use App\EventSubscriber\LocaleSubscriber;
 use App\EventSubscriber\LocaleValidationSubscriber;
 use App\Service\Config\LanguageService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\EventListener\RouterListener;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -31,11 +33,18 @@ class LocaleValidationSubscriberTest extends TestCase
         return new LocaleValidationSubscriber($lang);
     }
 
-    public function testGetSubscribedEvents(): void
+    public function testRunsAfterTheRouterAndBeforeTheLocaleIsStored(): void
     {
-        $events = LocaleValidationSubscriber::getSubscribedEvents();
+        // Arrange
+        $routerPriority = RouterListener::getSubscribedEvents()[KernelEvents::REQUEST][0][1];
+        $storePriority = LocaleSubscriber::getSubscribedEvents()[KernelEvents::REQUEST][0][1];
 
-        static::assertArrayHasKey(KernelEvents::REQUEST, $events);
+        // Act
+        $priority = LocaleValidationSubscriber::getSubscribedEvents()[KernelEvents::REQUEST][0][1];
+
+        // Assert
+        static::assertLessThan($routerPriority, $priority);
+        static::assertGreaterThan($storePriority, $priority);
     }
 
     public function testSubRequestIsIgnored(): void

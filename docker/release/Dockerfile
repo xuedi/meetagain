@@ -37,6 +37,8 @@ RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY source/docker/release/php.ini /usr/local/etc/php/conf.d/99-meetagain.ini
 COPY source/docker/release/Caddyfile /etc/frankenphp/Caddyfile
 
+ENV XDG_CACHE_HOME=/tmp
+
 
 FROM runtime AS manifests
 

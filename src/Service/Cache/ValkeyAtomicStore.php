@@ -10,7 +10,9 @@ use Throwable;
 
 final readonly class ValkeyAtomicStore implements AtomicStoreInterface
 {
-    private const int UPDATE_ATTEMPTS = 5;
+    private const int UPDATE_ATTEMPTS = 8;
+    private const int BACKOFF_MICROSECONDS = 2000;
+    private const int BACKOFF_CAP_MICROSECONDS = 8000;
 
     public function __construct(
         private Redis $redis,
@@ -59,6 +61,9 @@ final readonly class ValkeyAtomicStore implements AtomicStoreInterface
             $this->redis->set($fullKey, $this->encode($next), ['ex' => $ttlSeconds]);
             if ($this->redis->exec() !== false) {
                 return;
+            }
+            if ($attempt < self::UPDATE_ATTEMPTS) {
+                usleep(random_int(0, min(self::BACKOFF_CAP_MICROSECONDS, self::BACKOFF_MICROSECONDS << ($attempt - 1))));
             }
         }
 
