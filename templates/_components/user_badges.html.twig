@@ -14,10 +14,10 @@
     Depends on: .has-tooltip and .usercard-badges in assets/styles/custom.scss
 #}
 {% if badges is not empty %}
-    <div class="usercard-badges">
+    <div class="usercard-badges is-flex is-gap-0.5">
         {% for badge in badges %}
             {% set label = badge.title|trans %}
-            <span class="usercard-badge has-tooltip has-tooltip-end {{ badge.color }}" data-tooltip="{{ label }}">
+            <span class="usercard-badge is-inline-flex is-align-items-center is-justify-content-center has-tooltip has-tooltip-end {{ badge.color }}" data-tooltip="{{ label }}">
                 <i class="{{ badge.icon }}" aria-hidden="true"></i>
                 <span class="is-sr-only">{{ label }}</span>
             </span>

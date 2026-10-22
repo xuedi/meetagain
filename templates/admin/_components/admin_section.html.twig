@@ -17,7 +17,7 @@
         {% for item in section.right %}
             {% include item.template with {'item': item} only %}
         {% endfor %}
-        <button class="button is-small is-light admin-section-toggle flex-shrink-0"
+        <button class="button is-small is-light admin-section-toggle is-flex-shrink-0"
                 aria-expanded="{{ section.openByDefault ? 'true' : 'false' }}"
                 aria-controls="{{ section.id }}"
                 type="button">

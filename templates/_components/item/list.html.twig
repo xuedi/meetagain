@@ -50,7 +50,7 @@
     {% set ratioClass = {'square': 'is-1by1', 'portrait': 'is-2by3'}[ratio|default('square')] %}
     <a href="{{ addUrl }}" title="{{ addLabel|trans }}" class="is-block">
         <figure class="image {{ ratioClass }}">
-            <span class="item-add-thumb has-background-link-light has-text-link">
+            <span class="item-add-thumb is-flex is-align-items-center is-justify-content-center has-background-link-light has-text-link">
                 <span class="icon"><i class="fa-solid fa-plus fa-lg"></i></span>
             </span>
         </figure>
@@ -105,7 +105,7 @@
         {% embed '_components/item/gallery.html.twig' with {'empty': slides is empty and not showAdd} %}
             {% block slides %}
                 {% if showAdd %}
-                    <a href="{{ addUrl }}" class="item-gallery-add has-background-link-light has-text-link" title="{{ addLabel|trans }}">
+                    <a href="{{ addUrl }}" class="item-gallery-add is-flex is-align-items-center is-justify-content-center has-background-link-light has-text-link" title="{{ addLabel|trans }}">
                         <span class="icon"><i class="fa-solid fa-plus fa-lg"></i></span>
                     </a>
                 {% endif %}

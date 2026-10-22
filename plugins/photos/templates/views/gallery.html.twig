@@ -4,7 +4,7 @@
 {% embed '_components/item/gallery.html.twig' with {'empty': not hasSlides and not canAdd} %}
     {% block slides %}
         {% if canAdd %}
-            <a href="{{ path('app_plugin_photos_photo_add') }}" class="item-gallery-add has-background-link-light has-text-link" title="{{ 'photos_views.title_add'|trans }}">
+            <a href="{{ path('app_plugin_photos_photo_add') }}" class="item-gallery-add is-flex is-align-items-center is-justify-content-center has-background-link-light has-text-link" title="{{ 'photos_views.title_add'|trans }}">
                 <span class="icon"><i class="fa-solid fa-plus fa-lg"></i></span>
             </a>
         {% endif %}
