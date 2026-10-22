@@ -454,12 +454,6 @@ label.ballot-option .ballot-option__card a {
     color: var(--bulma-link-invert);
 }
 
-// -- FactsRow CMS block --
-// Mirrors the platform plugin's hardcoded `.platform-trust-strip` so the admin-authored
-// FactsRow matches its visual styling (padding + larger icon font-size).
-.cms-facts-row { padding-top: 2rem; padding-bottom: 2rem; }
-.cms-facts-row .icon { font-size: 1.5rem; }
-
 // ── Admin shell ──────────────────────────────────────────────────────────────
 // Mobile-only sticky topbar + slide-in drawer for the admin sidebar.
 // Bulma's $tablet breakpoint is 769px; below that the desktop sidebar column
@@ -572,11 +566,6 @@ body.admin-shell-no-scroll {
         font-size: 0.85rem;
         border-top: 0;
         border-radius: 0;
-    }
-
-    .quill-source-toggle {
-        margin-top: 0.5rem;
-        text-align: right;
     }
 }
 
