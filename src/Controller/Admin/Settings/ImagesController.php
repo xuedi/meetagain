@@ -31,7 +31,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/system/images')]
+#[Route('/admin/system/images')]
+#[IsGranted('ROLE_ADMIN')]
 final class ImagesController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = 'all';

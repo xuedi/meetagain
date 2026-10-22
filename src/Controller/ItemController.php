@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/item')]
 final class ItemController extends AbstractController
 {
     public function __construct(
@@ -21,7 +22,7 @@ final class ItemController extends AbstractController
         private readonly FacetService $facetService,
     ) {}
 
-    #[Route('/item/{itemType}/view/{mode}', name: 'app_item_set_view', methods: ['GET'])]
+    #[Route('/{itemType}/view/{mode}', name: 'app_item_set_view', methods: ['GET'])]
     public function setView(string $itemType, ItemViewType $mode, Request $request): RedirectResponse
     {
         if (!in_array($mode, ItemViewType::switchable(), true)) {
@@ -38,7 +39,7 @@ final class ItemController extends AbstractController
         return $this->redirect('/');
     }
 
-    #[Route('/item/{itemType}/fragment', name: 'app_item_list_fragment', methods: ['GET'])]
+    #[Route('/{itemType}/fragment', name: 'app_item_list_fragment', methods: ['GET'])]
     public function listFragment(string $itemType, Request $request): Response
     {
         $provider = $this->listRegistry->providerFor($itemType);

@@ -29,7 +29,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/seo')]
+#[Route('/admin/seo/canonical')]
+#[IsGranted('ROLE_ADMIN')]
 final class CanonicalController extends AbstractSeoController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(
@@ -43,7 +44,7 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
         parent::__construct($translator, 'canonical');
     }
 
-    #[Route('/canonical', name: 'app_admin_seo_canonical', methods: ['GET'])]
+    #[Route('', name: 'app_admin_seo_canonical', methods: ['GET'])]
     public function canonical(Request $request): Response
     {
         $seriesId = $request->query->getInt('series') ?: null;
@@ -61,7 +62,7 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
         ]);
     }
 
-    #[Route('/canonical/config', name: 'app_admin_seo_canonical_config', methods: ['GET', 'POST'])]
+    #[Route('/config', name: 'app_admin_seo_canonical_config', methods: ['GET', 'POST'])]
     public function config(Request $request): Response
     {
         $form = $this->createForm(EventCanonicalSettingsType::class);
@@ -86,7 +87,7 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
         ]);
     }
 
-    #[Route('/canonical/rebuild', name: 'app_admin_seo_canonical_rebuild_all', methods: ['POST'])]
+    #[Route('/rebuild', name: 'app_admin_seo_canonical_rebuild_all', methods: ['POST'])]
     public function rebuildAll(Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('admin_seo_canonical_rebuild_all', (string) $request->request->get('_token'))) {
@@ -98,7 +99,7 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
         return $this->redirectToRoute('app_admin_seo_canonical');
     }
 
-    #[Route('/canonical/{id}/rebuild', name: 'app_admin_seo_canonical_rebuild_series', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[Route('/{id}/rebuild', name: 'app_admin_seo_canonical_rebuild_series', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function rebuildSeries(int $id, Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('admin_seo_canonical_rebuild_series' . $id, (string) $request->request->get('_token'))) {

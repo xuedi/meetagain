@@ -22,7 +22,6 @@ use App\FeaturedEventProviderInterface;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Filter\Event\EventFilterService;
 use App\Form\EventFilterType;
-use App\Item\AssociationService;
 use App\Item\AttachControlBuilder;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\CalendarFeedService;
@@ -57,7 +56,6 @@ final class EventController extends AbstractController
         private readonly EventFilterService $eventFilterService,
         private readonly EventSchemaService $eventSchemaService,
         private readonly CanonicalUrlService $canonicalUrlService,
-        private readonly AssociationService $itemAssociationService,
         private readonly AttachControlBuilder $itemAttachControlBuilder,
         private readonly BreadcrumbBuilder $breadcrumbBuilder,
         private readonly AdminEventListFilterService $adminEventFilterService,
@@ -199,8 +197,8 @@ final class EventController extends AbstractController
         );
     }
 
-    #[IsGranted('ROLE_USER')]
     #[Route('/event/toggleRsvp/{event}/', name: 'app_event_toggle_rsvp', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function toggleRsvp(Request $request, Event $event, RsvpService $rsvpService): Response
     {
         if (!$this->isCsrfTokenValid('app_event_toggle_rsvp' . $event->getId(), (string) $request->request->get('_token'))) {
@@ -216,8 +214,8 @@ final class EventController extends AbstractController
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
     }
 
-    #[IsGranted('ROLE_USER')]
     #[Route('/event/rsvpGuests/{event}/{direction}/', name: 'app_event_rsvp_guests', requirements: ['direction' => 'add|remove'], methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function rsvpGuests(Request $request, Event $event, string $direction, RsvpService $rsvpService): Response
     {
         if (!$this->isCsrfTokenValid('app_event_rsvp_guests' . $event->getId(), (string) $request->request->get('_token'))) {
@@ -250,8 +248,8 @@ final class EventController extends AbstractController
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
     }
 
-    #[IsGranted('ROLE_ORGANIZER')]
     #[Route('/event/externalRsvp/{event}/', name: 'app_event_external_rsvp', methods: ['POST'])]
+    #[IsGranted('ROLE_ORGANIZER')]
     public function externalRsvp(Request $request, Event $event, EntityManagerInterface $em): Response
     {
         if (!$this->isCsrfTokenValid('app_event_external_rsvp' . $event->getId(), (string) $request->request->get('_token'))) {
@@ -276,42 +274,6 @@ final class EventController extends AbstractController
         $this->activityService->log(AdminEventEdited::TYPE, $this->getAuthedUser(), ['event_id' => $event->getId()]);
 
         return $this->redirectToRoute('app_event_details', ['id' => $event->getId()]);
-    }
-
-    #[IsGranted('ROLE_ORGANIZER')]
-    #[Route('/event/{id}/item/attach', name: 'app_item_attach', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function attachItem(Request $request, int $id): Response
-    {
-        if (!$this->isCsrfTokenValid('app_item_attach' . $id, (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
-        $itemType = (string) $request->request->get('item_type');
-        $itemId = $request->request->getInt('item_id');
-        if ($itemType === '' || $itemId <= 0) {
-            throw new BadRequestHttpException('Missing item type or id.');
-        }
-
-        $this->itemAssociationService->attach($id, $itemType, $itemId, (int) $this->getAuthedUser()->getId());
-
-        return $this->redirectToRoute('app_event_details', ['id' => $id]);
-    }
-
-    #[IsGranted('ROLE_ORGANIZER')]
-    #[Route('/event/{id}/item/detach', name: 'app_item_detach', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function detachItem(Request $request, int $id): Response
-    {
-        if (!$this->isCsrfTokenValid('app_item_detach' . $id, (string) $request->request->get('_token'))) {
-            throw new BadRequestHttpException('Invalid CSRF token.');
-        }
-        $itemType = (string) $request->request->get('item_type');
-        $itemId = $request->request->getInt('item_id');
-        if ($itemType === '' || $itemId <= 0) {
-            throw new BadRequestHttpException('Missing item type or id.');
-        }
-
-        $this->itemAssociationService->detach($id, $itemType, $itemId);
-
-        return $this->redirectToRoute('app_event_details', ['id' => $id]);
     }
 
     /**

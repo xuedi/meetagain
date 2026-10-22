@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/profile')]
 #[IsGranted('ROLE_USER')]
 final class BlockController extends AbstractController
 {
@@ -20,7 +21,7 @@ final class BlockController extends AbstractController
         private readonly UserService $userService,
     ) {}
 
-    #[Route('/profile/block/{id}', name: 'app_profile_block_user', methods: ['POST'])]
+    #[Route('/block/{id}', name: 'app_profile_block_user', methods: ['POST'])]
     public function blockUser(Request $request, int $id): Response
     {
         $this->assertToken($request, 'app_profile_block_user' . $id);
@@ -62,7 +63,7 @@ final class BlockController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/unblock/{id}', name: 'app_profile_unblock_user', methods: ['POST'])]
+    #[Route('/unblock/{id}', name: 'app_profile_unblock_user', methods: ['POST'])]
     public function unblockUser(Request $request, int $id): Response
     {
         $this->assertToken($request, 'app_profile_unblock_user' . $id);
@@ -87,7 +88,7 @@ final class BlockController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/blocked', name: 'app_profile_blocked_users', methods: ['GET'])]
+    #[Route('/blocked', name: 'app_profile_blocked_users', methods: ['GET'])]
     public function blockedList(): Response
     {
         $currentUser = $this->getAuthedUser();

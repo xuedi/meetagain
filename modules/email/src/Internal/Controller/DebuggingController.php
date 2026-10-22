@@ -23,7 +23,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/email/debugging')]
+#[Route('/admin/email/debugging')]
+#[IsGranted('ROLE_ADMIN')]
 final class DebuggingController extends AbstractEmailController implements AdminNavigationInterface, AdminTabsInterface
 {
     /**

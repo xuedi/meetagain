@@ -23,7 +23,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/email/planned')]
+#[Route('/admin/email/planned')]
+#[IsGranted('ROLE_ADMIN')]
 final class PlannedController extends AbstractEmailController implements AdminNavigationInterface, AdminTabsInterface
 {
     /**

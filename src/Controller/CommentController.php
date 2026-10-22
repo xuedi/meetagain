@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/comment')]
 #[IsGranted('ROLE_USER')]
 final class CommentController extends AbstractController
 {
@@ -20,7 +21,7 @@ final class CommentController extends AbstractController
         private readonly TargetRegistry $registry,
     ) {}
 
-    #[Route('/comment/{targetType}/{targetId}', name: 'app_comment_create', requirements: ['targetType' => '[a-z_]+', 'targetId' => '\d+'], methods: ['POST'])]
+    #[Route('/{targetType}/{targetId}', name: 'app_comment_create', requirements: ['targetType' => '[a-z_]+', 'targetId' => '\d+'], methods: ['POST'])]
     public function create(Request $request, string $targetType, int $targetId): Response
     {
         $this->guardCsrf($request, 'app_comment_create' . $targetType . $targetId);
@@ -50,7 +51,7 @@ final class CommentController extends AbstractController
     }
 
     #[Route(
-        '/comment/{targetType}/{targetId}/delete/{id}',
+        '/{targetType}/{targetId}/delete/{id}',
         name: 'app_comment_delete',
         requirements: ['targetType' => '[a-z_]+', 'targetId' => '\d+', 'id' => '\d+'],
         methods: ['POST'],

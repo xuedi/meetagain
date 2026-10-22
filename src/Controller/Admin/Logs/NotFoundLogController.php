@@ -28,7 +28,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/logs/404')]
+#[Route('/admin/logs/404')]
+#[IsGranted('ROLE_ADMIN')]
 final class NotFoundLogController extends AbstractLogsController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';

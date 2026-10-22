@@ -172,6 +172,23 @@ public function create(Request $request): Response
 
 ---
 
+## One controller attribute per line, `Route` first
+
+A shared path prefix goes on the class, and every attribute gets its own `#[...]`, with `Route` above the others.
+`code-drift attribute-style` flags a grouped attribute and a `Route` below another attribute.
+
+```php
+// ❌ Grouped, Route second
+#[IsGranted('ROLE_ADMIN'), Route('/admin/seo')]
+
+// ✅ One per line, Route first
+#[Route('/admin/seo')]
+#[IsGranted('ROLE_ADMIN')]
+final class SeoController extends AbstractController
+```
+
+---
+
 ## Core never depends on plugins
 
 The filter interface + `#[AutowireIterator]` pattern is the *only* correct way for core to

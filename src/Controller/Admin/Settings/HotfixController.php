@@ -18,7 +18,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/system/hotfixes')]
+#[Route('/admin/system/hotfixes')]
+#[IsGranted('ROLE_ADMIN')]
 final class HotfixController extends AbstractSettingsController
 {
     public function __construct(

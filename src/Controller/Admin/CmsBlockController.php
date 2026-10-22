@@ -38,7 +38,8 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_STEWARD'), Route('/admin/cms')]
+#[Route('/admin/cms/block')]
+#[IsGranted('ROLE_STEWARD')]
 final class CmsBlockController extends AbstractController
 {
     public function __construct(
@@ -57,7 +58,7 @@ final class CmsBlockController extends AbstractController
         private readonly AdminLocationListFilterService $locationFilterService,
     ) {}
 
-    #[Route('/block/{blockId}/edit', name: 'app_admin_cms_block_edit', methods: ['GET'])]
+    #[Route('/{blockId}/edit', name: 'app_admin_cms_block_edit', methods: ['GET'])]
     public function cmsBlockEdit(int $blockId): Response
     {
         $block = $this->findAccessibleBlock($blockId);
@@ -94,7 +95,7 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
-    #[Route('/block/{blockId}/image/toggle-side', name: 'app_admin_cms_block_image_toggle_side', methods: ['POST'])]
+    #[Route('/{blockId}/image/toggle-side', name: 'app_admin_cms_block_image_toggle_side', methods: ['POST'])]
     public function cmsBlockImageToggleSide(Request $request, int $blockId): Response
     {
         if (!$this->isCsrfTokenValid('app_admin_cms_block_image_toggle_side' . $blockId, (string) $request->request->get('_token'))) {
@@ -118,7 +119,7 @@ final class CmsBlockController extends AbstractController
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
 
-    #[Route('/block/{blockId}/image/remove', name: 'app_admin_cms_block_image_remove', methods: ['POST'])]
+    #[Route('/{blockId}/image/remove', name: 'app_admin_cms_block_image_remove', methods: ['POST'])]
     public function cmsBlockImageRemove(Request $request, int $blockId): Response
     {
         if (!$this->isCsrfTokenValid('admin_cms_block_image_remove' . $blockId, (string) $request->request->get('_token'))) {
@@ -145,7 +146,7 @@ final class CmsBlockController extends AbstractController
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
 
-    #[Route('/block/{id}/add', name: 'app_admin_cms_add_block', methods: ['POST'])]
+    #[Route('/{id}/add', name: 'app_admin_cms_add_block', methods: ['POST'])]
     public function cmsBlockAdd(Request $request, int $id): Response
     {
         if (!$this->isCsrfTokenValid('app_admin_cms_add_block' . $id, (string) $request->request->get('_token'))) {
@@ -179,7 +180,7 @@ final class CmsBlockController extends AbstractController
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $block->getId()]);
     }
 
-    #[Route('/block/down', name: 'app_admin_cms_edit_block_down', methods: ['POST'])]
+    #[Route('/down', name: 'app_admin_cms_edit_block_down', methods: ['POST'])]
     public function cmsBlockMoveDown(Request $request): Response
     {
         $blockId = (int) $request->request->get('blockId');
@@ -197,7 +198,7 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
-    #[Route('/block/up', name: 'app_admin_cms_edit_block_up', methods: ['POST'])]
+    #[Route('/up', name: 'app_admin_cms_edit_block_up', methods: ['POST'])]
     public function cmsBlockMoveUp(Request $request): Response
     {
         $blockId = (int) $request->request->get('blockId');
@@ -215,7 +216,7 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
-    #[Route('/block/save', name: 'app_admin_cms_edit_block_save', methods: ['POST'])]
+    #[Route('/save', name: 'app_admin_cms_edit_block_save', methods: ['POST'])]
     public function cmsBlockSave(Request $request): Response
     {
         $blockId = (int) $request->request->get('blockId');
@@ -243,7 +244,7 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
-    #[Route('/block/delete', name: 'app_admin_cms_block_delete', methods: ['POST'])]
+    #[Route('/delete', name: 'app_admin_cms_block_delete', methods: ['POST'])]
     public function cmsBlockDelete(Request $request): Response
     {
         $blockId = (int) $request->request->get('blockId');
@@ -265,7 +266,7 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
-    #[Route('/block/{blockId}/card/{slot}/image/modal', name: 'app_admin_cms_card_image_modal', methods: ['GET'], requirements: ['slot' => '[0-2]'])]
+    #[Route('/{blockId}/card/{slot}/image/modal', name: 'app_admin_cms_card_image_modal', methods: ['GET'], requirements: ['slot' => '[0-2]'])]
     public function cmsCardImageModal(int $blockId, int $slot): Response
     {
         $this->findAccessibleBlock($blockId);
@@ -282,7 +283,7 @@ final class CmsBlockController extends AbstractController
         ]));
     }
 
-    #[Route('/block/{blockId}/card/{slot}/image/upload', name: 'app_admin_cms_card_image_upload', methods: ['POST'], requirements: ['slot' => '[0-2]'])]
+    #[Route('/{blockId}/card/{slot}/image/upload', name: 'app_admin_cms_card_image_upload', methods: ['POST'], requirements: ['slot' => '[0-2]'])]
     public function cmsCardImageUpload(Request $request, int $blockId, int $slot): Response
     {
         $block = $this->findAccessibleBlock($blockId);
@@ -331,7 +332,7 @@ final class CmsBlockController extends AbstractController
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
 
-    #[Route('/block/{blockId}/card/{slot}/image/remove', name: 'app_admin_cms_card_image_remove', methods: ['POST'], requirements: ['slot' => '[0-2]'])]
+    #[Route('/{blockId}/card/{slot}/image/remove', name: 'app_admin_cms_card_image_remove', methods: ['POST'], requirements: ['slot' => '[0-2]'])]
     public function cmsCardImageRemove(Request $request, int $blockId, int $slot): Response
     {
         if (!$this->isCsrfTokenValid('admin_cms_card_image_remove' . $blockId . '_' . $slot, (string) $request->request->get('_token'))) {
@@ -358,7 +359,7 @@ final class CmsBlockController extends AbstractController
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
 
-    #[Route('/block/{blockId}/gallery/modal', name: 'app_admin_cms_gallery_modal', methods: ['GET'])]
+    #[Route('/{blockId}/gallery/modal', name: 'app_admin_cms_gallery_modal', methods: ['GET'])]
     public function cmsGalleryModal(int $blockId): Response
     {
         $this->findAccessibleBlock($blockId);
@@ -372,7 +373,7 @@ final class CmsBlockController extends AbstractController
         ]));
     }
 
-    #[Route('/block/{blockId}/gallery/add', name: 'app_admin_cms_gallery_add', methods: ['POST'])]
+    #[Route('/{blockId}/gallery/add', name: 'app_admin_cms_gallery_add', methods: ['POST'])]
     public function cmsGalleryAdd(Request $request, int $blockId): Response
     {
         $block = $this->findAccessibleBlock($blockId);
@@ -420,7 +421,7 @@ final class CmsBlockController extends AbstractController
         ]);
     }
 
-    #[Route('/block/{blockId}/gallery/remove/{imageId}', name: 'app_admin_cms_gallery_remove', methods: ['POST'])]
+    #[Route('/{blockId}/gallery/remove/{imageId}', name: 'app_admin_cms_gallery_remove', methods: ['POST'])]
     public function cmsGalleryRemove(Request $request, int $blockId, int $imageId): Response
     {
         if (!$this->isCsrfTokenValid('admin_cms_gallery_remove' . $blockId . '_' . $imageId, (string) $request->request->get('_token'))) {

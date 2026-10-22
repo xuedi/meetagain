@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/townhall')]
 final class TownHallController extends AbstractController
 {
     public function __construct(
@@ -23,7 +24,7 @@ final class TownHallController extends AbstractController
         private readonly TileCollector $tileCollector,
     ) {}
 
-    #[Route('/townhall', name: 'app_townhall', methods: ['GET'])]
+    #[Route('', name: 'app_townhall', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function hub(): Response
     {
@@ -40,7 +41,7 @@ final class TownHallController extends AbstractController
         ]);
     }
 
-    #[Route('/townhall/forum', name: 'app_townhall_forum', methods: ['GET'])]
+    #[Route('/forum', name: 'app_townhall_forum', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function forum(): Response
     {
@@ -52,7 +53,7 @@ final class TownHallController extends AbstractController
         ]);
     }
 
-    #[Route('/townhall/forum/new', name: 'app_townhall_forum_new', methods: ['GET', 'POST'])]
+    #[Route('/forum/new', name: 'app_townhall_forum_new', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_USER')]
     public function newTopic(Request $request): Response
     {
@@ -86,7 +87,7 @@ final class TownHallController extends AbstractController
         ]);
     }
 
-    #[Route('/townhall/forum/{topicId}', name: 'app_townhall_forum_topic', requirements: ['topicId' => '\d+'], methods: ['GET'])]
+    #[Route('/forum/{topicId}', name: 'app_townhall_forum_topic', requirements: ['topicId' => '\d+'], methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function topic(int $topicId): Response
     {
@@ -104,7 +105,7 @@ final class TownHallController extends AbstractController
         ]);
     }
 
-    #[Route('/townhall/forum/{topicId}/rename', name: 'app_townhall_forum_rename', requirements: ['topicId' => '\d+'], methods: ['POST'])]
+    #[Route('/forum/{topicId}/rename', name: 'app_townhall_forum_rename', requirements: ['topicId' => '\d+'], methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function renameTopic(Request $request, int $topicId): Response
     {
@@ -123,7 +124,7 @@ final class TownHallController extends AbstractController
         return $this->redirectToRoute('app_townhall_forum_topic', $this->localeWith($request, ['topicId' => $topicId]));
     }
 
-    #[Route('/townhall/forum/{topicId}/delete', name: 'app_townhall_forum_delete', requirements: ['topicId' => '\d+'], methods: ['POST'])]
+    #[Route('/forum/{topicId}/delete', name: 'app_townhall_forum_delete', requirements: ['topicId' => '\d+'], methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function deleteTopic(Request $request, int $topicId): Response
     {
@@ -143,7 +144,7 @@ final class TownHallController extends AbstractController
         return $this->redirectToRoute('app_townhall_forum', $this->localeWith($request, []));
     }
 
-    #[Route('/townhall/gallery', name: 'app_townhall_gallery', methods: ['GET'])]
+    #[Route('/gallery', name: 'app_townhall_gallery', methods: ['GET'])]
     #[IsGranted('ROLE_USER')]
     public function gallery(): Response
     {

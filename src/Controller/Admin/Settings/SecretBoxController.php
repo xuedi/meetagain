@@ -12,7 +12,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/system')]
+#[Route('/admin/system')]
+#[IsGranted('ROLE_ADMIN')]
 final class SecretBoxController extends AbstractSettingsController
 {
     /** @param iterable<SecretBoxConsumerInterface> $consumers */
@@ -20,7 +21,8 @@ final class SecretBoxController extends AbstractSettingsController
         TranslatorInterface $translator,
         #[AutowireIterator(SecretBoxConsumerInterface::class)]
         private readonly iterable $consumers,
-        #[SensitiveParameter, Autowire(env: 'default::APP_SECRET_BOX_KEY')]
+        #[SensitiveParameter]
+        #[Autowire(env: 'default::APP_SECRET_BOX_KEY')]
         private readonly ?string $secretBoxKey = null,
     ) {
         parent::__construct($translator, 'secretbox');

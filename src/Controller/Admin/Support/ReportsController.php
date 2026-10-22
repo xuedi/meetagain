@@ -18,7 +18,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/support/reports')]
+#[Route('/admin/support/reports')]
+#[IsGranted('ROLE_ADMIN')]
 final class ReportsController extends AbstractSupportController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(

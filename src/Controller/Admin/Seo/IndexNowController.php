@@ -15,7 +15,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/seo')]
+#[Route('/admin/seo/indexnow')]
+#[IsGranted('ROLE_ADMIN')]
 final class IndexNowController extends AbstractSeoController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(
@@ -25,7 +26,7 @@ final class IndexNowController extends AbstractSeoController implements AdminNav
         parent::__construct($translator, 'indexnow');
     }
 
-    #[Route('/indexnow', name: 'app_admin_seo_indexnow', methods: ['GET'])]
+    #[Route('', name: 'app_admin_seo_indexnow', methods: ['GET'])]
     public function indexNow(): Response
     {
         $adminTop = new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_seo_indexnow.intro'))], actions: [
@@ -48,7 +49,7 @@ final class IndexNowController extends AbstractSeoController implements AdminNav
         ]);
     }
 
-    #[Route('/indexnow/submit', name: 'app_admin_seo_indexnow_submit', methods: ['POST'])]
+    #[Route('/submit', name: 'app_admin_seo_indexnow_submit', methods: ['POST'])]
     public function submit(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('admin_seo_indexnow_submit', (string) $request->request->get('_token'))) {

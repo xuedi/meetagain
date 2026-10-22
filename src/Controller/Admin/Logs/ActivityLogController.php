@@ -19,7 +19,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/logs')]
+#[Route('/admin/logs')]
+#[IsGranted('ROLE_ADMIN')]
 final class ActivityLogController extends AbstractLogsController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';

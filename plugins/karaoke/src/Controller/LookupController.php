@@ -12,7 +12,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/karaoke'), IsGranted('ROLE_ORGANIZER')]
+#[Route('/karaoke')]
+#[IsGranted('ROLE_ORGANIZER')]
 final class LookupController extends AbstractController
 {
     public function __construct(

@@ -30,10 +30,10 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+#[Route('/admin/logs')]
 #[IsGranted('ROLE_ADMIN')]
 final class AdminController extends AbstractLogsController implements AdminNavigationInterface, AdminTabsInterface
 {
-    private const string BASE = '/admin/logs/tasks';
     private const string DEFAULT_RANGE = '1h';
     private const int LIST_LIMIT = 5000;
     private const int HISTORY_LIMIT = 200;
@@ -67,7 +67,7 @@ final class AdminController extends AbstractLogsController implements AdminNavig
         parent::__construct($translator, 'tasks');
     }
 
-    #[Route(self::BASE, name: 'app_admin_task')]
+    #[Route('/tasks', name: 'app_admin_task')]
     public function schedules(): Response
     {
         $now = new DateTimeImmutable();
@@ -115,13 +115,13 @@ final class AdminController extends AbstractLogsController implements AdminNavig
         ]);
     }
 
-    #[Route('/admin/logs/cron', name: 'app_admin_cron_log')]
+    #[Route('/cron', name: 'app_admin_cron_log')]
     public function cronLog(): RedirectResponse
     {
         return $this->redirectToRoute('app_admin_task', status: Response::HTTP_MOVED_PERMANENTLY);
     }
 
-    #[Route(self::BASE . '/{identifier}/run', name: 'app_admin_task_run_now', requirements: ['identifier' => '[a-z0-9._\-]+'], methods: ['POST'])]
+    #[Route('/tasks/{identifier}/run', name: 'app_admin_task_run_now', requirements: ['identifier' => '[a-z0-9._\-]+'], methods: ['POST'])]
     public function runNow(string $identifier, Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('app_admin_task_run_now' . $identifier, (string) $request->request->get('_token'))) {
@@ -141,7 +141,7 @@ final class AdminController extends AbstractLogsController implements AdminNavig
         return $this->redirectToRoute('app_admin_task');
     }
 
-    #[Route(self::BASE . '/runs', name: 'app_admin_task_runs')]
+    #[Route('/tasks/runs', name: 'app_admin_task_runs')]
     public function runs(Request $request): Response
     {
         $range = $request->query->getString('range', self::DEFAULT_RANGE);
@@ -184,7 +184,7 @@ final class AdminController extends AbstractLogsController implements AdminNavig
         ]);
     }
 
-    #[Route(self::BASE . '/queue', name: 'app_admin_task_queue')]
+    #[Route('/tasks/queue', name: 'app_admin_task_queue')]
     public function queue(): Response
     {
         $health = $this->queue->health();
@@ -222,7 +222,7 @@ final class AdminController extends AbstractLogsController implements AdminNavig
         ]);
     }
 
-    #[Route(self::BASE . '/{identifier}', name: 'app_admin_task_show', requirements: ['identifier' => '[a-z0-9._\-]+'])]
+    #[Route('/tasks/{identifier}', name: 'app_admin_task_show', requirements: ['identifier' => '[a-z0-9._\-]+'])]
     public function show(string $identifier): Response
     {
         $task = $this->registry->find($identifier);
@@ -286,7 +286,7 @@ final class AdminController extends AbstractLogsController implements AdminNavig
         ]);
     }
 
-    #[Route(self::BASE . '/failed/{id}/retry', name: 'app_admin_task_failed_retry', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[Route('/tasks/failed/{id}/retry', name: 'app_admin_task_failed_retry', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function retry(string $id, Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('app_admin_task_failed_retry' . $id, (string) $request->request->get('_token'))) {
@@ -299,7 +299,7 @@ final class AdminController extends AbstractLogsController implements AdminNavig
         return $this->redirectToRoute('app_admin_task_queue');
     }
 
-    #[Route(self::BASE . '/failed/{id}/delete', name: 'app_admin_task_failed_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[Route('/tasks/failed/{id}/delete', name: 'app_admin_task_failed_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function delete(string $id, Request $request): RedirectResponse
     {
         if (!$this->isCsrfTokenValid('app_admin_task_failed_delete' . $id, (string) $request->request->get('_token'))) {

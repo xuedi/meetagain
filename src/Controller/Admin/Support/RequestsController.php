@@ -24,7 +24,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Traversable;
 
-#[IsGranted('ROLE_STEWARD'), Route('/admin/support')]
+#[Route('/admin/support')]
+#[IsGranted('ROLE_STEWARD')]
 final class RequestsController extends AbstractSupportController implements AdminNavigationInterface, AdminTabsInterface
 {
     /**

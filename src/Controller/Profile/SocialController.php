@@ -11,6 +11,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/profile/social')]
 #[IsGranted('ROLE_USER')]
 final class SocialController extends AbstractController
 {
@@ -19,7 +20,7 @@ final class SocialController extends AbstractController
         private readonly FriendshipService $service,
     ) {}
 
-    #[Route('/profile/social', name: 'app_profile_social')]
+    #[Route('', name: 'app_profile_social')]
     public function social(string $show = 'friends'): Response
     {
         return $this->render('profile/social.html.twig', [
@@ -32,13 +33,13 @@ final class SocialController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/social/friends/', name: 'app_profile_social_friends')]
+    #[Route('/friends/', name: 'app_profile_social_friends')]
     public function socialFriends(): Response
     {
         return $this->social('friends');
     }
 
-    #[Route('/profile/social/toggleFollow/{id}/', name: 'app_profile_social_toggle_follow', methods: ['POST'])]
+    #[Route('/toggleFollow/{id}/', name: 'app_profile_social_toggle_follow', methods: ['POST'])]
     public function toggleFollow(Request $request, int $id): Response
     {
         if (!$this->isCsrfTokenValid('app_profile_social_toggle_follow' . $id, (string) $request->request->get('_token'))) {

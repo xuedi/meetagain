@@ -35,6 +35,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/image')]
 #[IsGranted('ROLE_USER')]
 final class ImageUploadController extends AbstractController
 {
@@ -52,7 +53,7 @@ final class ImageUploadController extends AbstractController
         private readonly EventFilterService $eventFilterService,
     ) {}
 
-    #[Route('/image/{entity}/{id}/modal', name: 'app_image_modal', requirements: [
+    #[Route('/{entity}/{id}/modal', name: 'app_image_modal', requirements: [
         'entity' => 'user|cmsBlock|event',
         'id' => '\d+',
     ])]
@@ -82,7 +83,7 @@ final class ImageUploadController extends AbstractController
     }
 
     #[Route(
-        '/image/{entity}/{id}/select/{newImage}',
+        '/{entity}/{id}/select/{newImage}',
         name: 'app_replace_image_select',
         requirements: [
             'entity' => 'user|cmsBlock',
@@ -120,7 +121,7 @@ final class ImageUploadController extends AbstractController
     }
 
     #[Route(
-        '/image/{entity}/{id}/upload/replacement',
+        '/{entity}/{id}/upload/replacement',
         name: 'app_replace_image_upload',
         requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'],
         methods: ['POST'],
@@ -153,7 +154,7 @@ final class ImageUploadController extends AbstractController
         return $this->returnBackToImage($entityName, $id);
     }
 
-    #[Route('/image/event/{id}/upload', name: 'app_event_image_upload', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[Route('/event/{id}/upload', name: 'app_event_image_upload', requirements: ['id' => '\d+'], methods: ['POST'])]
     public function uploadEventImages(Request $request, int $id): Response
     {
         $user = $this->getAuthedUser();
@@ -184,7 +185,7 @@ final class ImageUploadController extends AbstractController
         return $this->redirectToRoute('app_event_details', ['id' => $id]);
     }
 
-    #[Route('/image/rotate/{entity}/{id}', name: 'app_image_rotate', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'], methods: ['POST'])]
+    #[Route('/rotate/{entity}/{id}', name: 'app_image_rotate', requirements: ['entity' => 'user|cmsBlock', 'id' => '\d+'], methods: ['POST'])]
     public function rotate(Request $request, string $entity, int $id): Response
     {
         if (!$this->isCsrfTokenValid('app_image_rotate' . $id, (string) $request->request->get('_token'))) {

@@ -22,7 +22,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/security/rate-limiting')]
+#[Route('/admin/security/rate-limiting')]
+#[IsGranted('ROLE_ADMIN')]
 final class RateLimitingController extends AbstractSecurityController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';

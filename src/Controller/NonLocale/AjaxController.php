@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/ajax')]
 final class AjaxController extends AbstractController
 {
     public function __construct(
@@ -20,13 +21,13 @@ final class AjaxController extends AbstractController
         private readonly ConsentService $consentService,
     ) {}
 
-    #[Route('/ajax/', name: 'app_ajax', methods: ['GET'])]
+    #[Route('/', name: 'app_ajax', methods: ['GET'])]
     public function index(): Response
     {
         return $this->render('_non_locale/ajax.html.twig');
     }
 
-    #[Route('/ajax/cookie/accept', name: 'app_ajax_cookie_accept', methods: ['POST'])]
+    #[Route('/cookie/accept', name: 'app_ajax_cookie_accept', methods: ['POST'])]
     public function acceptCookiesIndex(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('cookie_accept', (string) $request->request->get('_token'))) {
@@ -48,14 +49,14 @@ final class AjaxController extends AbstractController
         return $response;
     }
 
-    #[Route('/ajax/cookie/accept', name: 'app_ajax_cookie_accept_get', methods: ['GET'])]
-    #[Route('/ajax/cookie/deny', name: 'app_ajax_cookie_deny_get', methods: ['GET'])]
+    #[Route('/cookie/accept', name: 'app_ajax_cookie_accept_get', methods: ['GET'])]
+    #[Route('/cookie/deny', name: 'app_ajax_cookie_deny_get', methods: ['GET'])]
     public function rejectCookieGet(): Response
     {
         return new Response('', Response::HTTP_METHOD_NOT_ALLOWED, ['Allow' => 'POST']);
     }
 
-    #[Route('/ajax/consent/external-media', name: 'app_ajax_consent_external_media', methods: ['POST'])]
+    #[Route('/consent/external-media', name: 'app_ajax_consent_external_media', methods: ['POST'])]
     public function grantExternalMedia(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('external_media_consent', (string) $request->request->get('_token'))) {
@@ -68,7 +69,7 @@ final class AjaxController extends AbstractController
         return $response;
     }
 
-    #[Route('/ajax/cookie/deny', name: 'app_ajax_cookie_deny', methods: ['POST'])]
+    #[Route('/cookie/deny', name: 'app_ajax_cookie_deny', methods: ['POST'])]
     public function denyCookiesIndex(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('cookie_deny', (string) $request->request->get('_token'))) {

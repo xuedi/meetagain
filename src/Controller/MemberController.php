@@ -21,6 +21,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundE
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[Route('/members')]
 final class MemberController extends AbstractController
 {
     public const string ROUTE_MEMBER = 'app_member';
@@ -37,7 +38,7 @@ final class MemberController extends AbstractController
         private readonly Security $security,
     ) {}
 
-    #[Route('/members/{page}', name: self::ROUTE_MEMBER)]
+    #[Route('/{page}', name: self::ROUTE_MEMBER)]
     public function index(int $page = 1): Response
     {
         $response = $this->getResponse();
@@ -65,7 +66,7 @@ final class MemberController extends AbstractController
         );
     }
 
-    #[Route('/members/view/{id}', name: 'app_member_view')]
+    #[Route('/view/{id}', name: 'app_member_view')]
     public function view(int $id): Response
     {
         if (!$this->getUser() instanceof UserInterface) {
@@ -103,7 +104,7 @@ final class MemberController extends AbstractController
         }
     }
 
-    #[Route('/members/toggleFollow/{id}', name: 'app_member_toggle_follow', methods: ['POST'])]
+    #[Route('/toggleFollow/{id}', name: 'app_member_toggle_follow', methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function toggleFollow(Request $request, int $id): Response
     {
@@ -114,7 +115,7 @@ final class MemberController extends AbstractController
         return $this->service->toggleFollow($id, 'app_member_view');
     }
 
-    #[Route('/members/rotate-avatar/{id}', name: 'app_member_rotate_avatar', methods: ['POST'])]
+    #[Route('/rotate-avatar/{id}', name: 'app_member_rotate_avatar', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
     public function rotateProfileImage(Request $request, int $id): Response
     {
@@ -127,7 +128,7 @@ final class MemberController extends AbstractController
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
 
-    #[Route('/members/remove-image/{id}', name: 'app_member_remove_avatar', methods: ['POST'])]
+    #[Route('/remove-image/{id}', name: 'app_member_remove_avatar', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
     public function removeProfileImage(Request $request, EntityManagerInterface $em, int $id): Response
     {
@@ -145,7 +146,7 @@ final class MemberController extends AbstractController
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
 
-    #[Route('/members/restrict/{id}', name: 'app_member_restrict', methods: ['POST'])]
+    #[Route('/restrict/{id}', name: 'app_member_restrict', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
     public function restrictUser(Request $request, int $id): Response
     {
@@ -156,7 +157,7 @@ final class MemberController extends AbstractController
         return $this->redirectToRoute('app_member_view', ['id' => $id]);
     }
 
-    #[Route('/members/verify/{id}', name: 'app_member_verify', methods: ['POST'])]
+    #[Route('/verify/{id}', name: 'app_member_verify', methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
     public function verifyUser(Request $request, int $id): Response
     {

@@ -20,7 +20,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/email/blocklist')]
+#[Route('/admin/email/blocklist')]
+#[IsGranted('ROLE_ADMIN')]
 final class BlocklistController extends AbstractEmailController implements AdminNavigationInterface, AdminTabsInterface
 {
     public function __construct(

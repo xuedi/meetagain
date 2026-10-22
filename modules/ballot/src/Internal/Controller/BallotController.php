@@ -16,7 +16,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_USER'), Route('/ballots')]
+#[Route('/ballots')]
+#[IsGranted('ROLE_USER')]
 final class BallotController extends AbstractController
 {
     /**

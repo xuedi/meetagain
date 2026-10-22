@@ -27,7 +27,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/email/sendlog')]
+#[Route('/admin/email/sendlog')]
+#[IsGranted('ROLE_ADMIN')]
 final class SendlogController extends AbstractEmailController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '24h';

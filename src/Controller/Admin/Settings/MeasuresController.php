@@ -33,7 +33,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/system/security')]
+#[Route('/admin/system/security')]
+#[IsGranted('ROLE_ADMIN')]
 final class MeasuresController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DEFAULT_RANGE = '1w';

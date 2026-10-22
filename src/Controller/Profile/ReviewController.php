@@ -12,6 +12,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Throwable;
 
+#[Route('/profile/review')]
 #[IsGranted('ROLE_USER')]
 final class ReviewController extends AbstractController
 {
@@ -19,7 +20,7 @@ final class ReviewController extends AbstractController
         private readonly ReviewService $service,
     ) {}
 
-    #[Route('/profile/review', name: 'app_profile_review', methods: ['GET'])]
+    #[Route('', name: 'app_profile_review', methods: ['GET'])]
     public function index(#[CurrentUser] User $user): Response
     {
         $providers = $this->service->getProvidersForUser($user);
@@ -29,7 +30,7 @@ final class ReviewController extends AbstractController
         ]);
     }
 
-    #[Route('/profile/review/{providerIdentifier}/approve/{itemId}', name: 'app_profile_review_approve', methods: ['POST'])]
+    #[Route('/{providerIdentifier}/approve/{itemId}', name: 'app_profile_review_approve', methods: ['POST'])]
     public function approve(Request $request, string $providerIdentifier, string $itemId, #[CurrentUser] User $user): Response
     {
         if (!$this->isCsrfTokenValid('review_action', $request->request->getString('_token'))) {
@@ -47,7 +48,7 @@ final class ReviewController extends AbstractController
         return $this->redirectToRoute('app_profile_review');
     }
 
-    #[Route('/profile/review/{providerIdentifier}/deny/{itemId}', name: 'app_profile_review_deny', methods: ['POST'])]
+    #[Route('/{providerIdentifier}/deny/{itemId}', name: 'app_profile_review_deny', methods: ['POST'])]
     public function deny(Request $request, string $providerIdentifier, string $itemId, #[CurrentUser] User $user): Response
     {
         if (!$this->isCsrfTokenValid('review_action', $request->request->getString('_token'))) {

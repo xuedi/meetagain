@@ -17,7 +17,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[IsGranted('ROLE_ADMIN'), Route('/admin/support/moderation')]
+#[Route('/admin/support/moderation')]
+#[IsGranted('ROLE_ADMIN')]
 final class ModerationController extends AbstractSupportController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string DECIDE_TOKEN = 'app_admin_support_moderation_decide';
