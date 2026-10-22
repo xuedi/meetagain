@@ -88,7 +88,7 @@ enum Report {
         #[arg(long, default_value = "24h")]
         since: String,
     },
-    /// Where server time goes: routes ranked by total time with bottleneck hints, cron, platform
+    /// Where server time goes: routes ranked by total time with bottleneck hints, tasks, platform
     Performance {
         #[arg(long, default_value = "24h")]
         since: String,
@@ -122,7 +122,7 @@ pub struct Thresholds {
     pub regression_pct: f64,
     pub probe_spike_factor: f64,
     pub probe_spike_min: f64,
-    pub stale_cron_minutes: i64,
+    pub stale_task_minutes: i64,
     pub stale_http_minutes: i64,
 }
 
@@ -137,7 +137,7 @@ impl Default for Thresholds {
             regression_pct: 25.0,
             probe_spike_factor: 5.0,
             probe_spike_min: 50.0,
-            stale_cron_minutes: 15,
+            stale_task_minutes: 15,
             stale_http_minutes: 60,
         }
     }
@@ -191,6 +191,14 @@ fn load_context(cli: &Cli) -> Result<Context, String> {
     let backend = config
         .scalar("BACKEND")
         .unwrap_or_else(|| "prometheus".to_string());
+    let client_cert = match (
+        config.scalar("CLIENT_CERT").filter(|v| !v.is_empty()),
+        config.scalar("CLIENT_KEY").filter(|v| !v.is_empty()),
+    ) {
+        (None, None) => None,
+        (Some(cert), Some(key)) => Some(Client::load_client_cert(&cert, &key)?),
+        _ => return Err("CLIENT_CERT and CLIENT_KEY must be set together in config/tools/metrics.local".into()),
+    };
     let client = Client::new(
         &backend,
         &config.require("URL"),
@@ -198,6 +206,7 @@ fn load_context(cli: &Cli) -> Result<Context, String> {
         &config
             .scalar("DATASOURCE_UID")
             .unwrap_or_else(|| "victoriametrics".to_string()),
+        client_cert,
         cli.json,
     )?;
     if backend == "grafana" && config.scalar("TOKEN").unwrap_or_default().is_empty() {
@@ -217,8 +226,8 @@ fn load_context(cli: &Cli) -> Result<Context, String> {
         regression_pct: float("REGRESSION_PCT", defaults.regression_pct)?,
         probe_spike_factor: float("PROBE_SPIKE_FACTOR", defaults.probe_spike_factor)?,
         probe_spike_min: float("PROBE_SPIKE_MIN", defaults.probe_spike_min)?,
-        stale_cron_minutes: config
-            .number("STALE_CRON_MINUTES", defaults.stale_cron_minutes as usize)?
+        stale_task_minutes: config
+            .number("STALE_TASK_MINUTES", defaults.stale_task_minutes as usize)?
             as i64,
         stale_http_minutes: config
             .number("STALE_HTTP_MINUTES", defaults.stale_http_minutes as usize)?

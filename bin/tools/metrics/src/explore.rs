@@ -5,11 +5,10 @@ use crate::Context;
 use std::collections::{BTreeMap, BTreeSet};
 use std::time::Instant;
 
-const MEASUREMENTS: [&str; 13] = [
+const MEASUREMENTS: [&str; 12] = [
     "http_request",
     "php_runtime",
-    "cron_run",
-    "cron_task",
+    "task_run",
     "deploy",
     "security_block",
     "email_queue",

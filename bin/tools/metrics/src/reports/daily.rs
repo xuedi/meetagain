@@ -22,9 +22,9 @@ pub fn run(ctx: &Context, since: &str) -> Result<String, String> {
         ("route_count", format!("sum by (route) (count_over_time(http_request_duration_ms{}[$W]))", matched)),
         ("route_p95", format!("histogram_quantile(0.95, sum by (route, vmrange) (histogram_over_time(http_request_duration_ms{}[$W])))", matched)),
         ("errors", "sum by (route) (count_over_time(http_request_duration_ms{$S,status=\"5xx\"}[$W]))".into()),
-        ("cron_runs", "sum(count_over_time(cron_run_duration_ms{$S}[$W]))".into()),
-        ("cron_failed", "sum by (task, status) (count_over_time(cron_task_duration_ms{$S,status!=\"ok\"}[$W]))".into()),
-        ("cron_slowest", "topk(3, histogram_quantile(0.95, sum by (task, vmrange) (histogram_over_time(cron_task_duration_ms{$S}[$W]))))".into()),
+        ("task_runs", "sum(count_over_time(task_run_duration_ms{$S}[$W]))".into()),
+        ("task_failed", "sum by (task, status) (count_over_time(task_run_duration_ms{$S,status!=\"ok\"}[$W]))".into()),
+        ("task_slowest", "topk(3, histogram_quantile(0.95, sum by (task, vmrange) (histogram_over_time(task_run_duration_ms{$S}[$W]))))".into()),
         ("email_pending", "max(max_over_time(email_queue_pending{$S}[$W]))".into()),
         ("email_failed", "max(last_over_time(email_queue_failed_24h{$S}[$W]))".into()),
         ("email_oldest", "max(max_over_time(email_queue_oldest_pending_age_s{$S}[$W]))".into()),
@@ -122,7 +122,7 @@ pub fn run(ctx: &Context, since: &str) -> Result<String, String> {
         }
     ));
 
-    let failed: Vec<String> = r["cron_failed"]
+    let failed: Vec<String> = r["task_failed"]
         .iter()
         .map(|s| {
             format!(
@@ -134,14 +134,14 @@ pub fn run(ctx: &Context, since: &str) -> Result<String, String> {
         })
         .collect();
     out.push_str(&format!(
-        "\ncron: {} runs; not ok: {}; slowest tasks p95 (ms): {}\n",
-        opt(v("cron_runs"), num),
+        "\ntasks: {} runs; not ok: {}; slowest tasks p95 (ms): {}\n",
+        opt(v("task_runs"), num),
         if failed.is_empty() {
             "none".into()
         } else {
             failed.join(", ")
         },
-        list(&by_label(&r["cron_slowest"], "task"), 3)
+        list(&by_label(&r["task_slowest"], "task"), 3)
     ));
     out.push_str(&format!(
         "queues: email pending max {}, failed (24h) {}, oldest pending max {}{}\n",

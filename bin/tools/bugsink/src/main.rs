@@ -1,5 +1,9 @@
 use clap::{Parser, Subcommand};
 use serde_json::Value;
+use std::fs;
+use std::process::exit;
+use ureq::tls::{Certificate, ClientCert, PrivateKey, TlsConfig};
+use ureq::Agent;
 
 #[derive(Parser)]
 #[command(name = "bugsink", about = "BugSink issue tracker CLI")]
@@ -36,21 +40,52 @@ struct Config {
     url: String,
     token: String,
     project: String,
+    agent: Agent,
 }
 
 fn load_config() -> Config {
     let config = toolconfig::Config::load_or_exit("bugsink");
+    let client_cert = match (
+        config.scalar("CLIENT_CERT").filter(|v| !v.is_empty()),
+        config.scalar("CLIENT_KEY").filter(|v| !v.is_empty()),
+    ) {
+        (None, None) => None,
+        (Some(cert), Some(key)) => Some(load_client_cert(&cert, &key)),
+        _ => config_error("CLIENT_CERT and CLIENT_KEY must be set together in config/tools/bugsink.local"),
+    };
+    let agent = Agent::new_with_config(
+        Agent::config_builder()
+            .tls_config(TlsConfig::builder().client_cert(client_cert).build())
+            .build(),
+    );
 
     Config {
         url: config.require("BUGTRACKER_URL"),
         token: config.require("BUGTRACKER_TOKEN"),
         project: config.require("BUGTRACKER_PROJECT"),
+        agent,
     }
 }
 
-fn get(url: &str, token: &str) -> Value {
-    ureq::get(url)
-        .header("Authorization", &format!("Bearer {}", token))
+fn load_client_cert(cert_path: &str, key_path: &str) -> ClientCert {
+    let read = |path: &str| fs::read(path).unwrap_or_else(|e| config_error(&format!("cannot read {}: {}", path, e)));
+    let cert = Certificate::from_pem(&read(cert_path))
+        .unwrap_or_else(|e| config_error(&format!("{}: {}", cert_path, e)));
+    let key = PrivateKey::from_pem(&read(key_path))
+        .unwrap_or_else(|e| config_error(&format!("{}: {}", key_path, e)));
+
+    ClientCert::new_with_certs(&[cert], key)
+}
+
+fn config_error(message: &str) -> ! {
+    eprintln!("config error: {}", message);
+    exit(2);
+}
+
+fn get(cfg: &Config, url: &str) -> Value {
+    cfg.agent
+        .get(url)
+        .header("Authorization", &format!("Bearer {}", cfg.token))
         .call()
         .unwrap_or_else(|e| panic!("HTTP request failed for {}: {}", url, e))
         .body_mut()
@@ -98,7 +133,7 @@ fn cmd_list(cfg: &Config, project: Option<&str>, n: usize, offset: usize, unreso
         "{}/api/canonical/0/issues/?project={}&sort=last_seen&order=desc{}",
         cfg.url, project, resolved_filter
     );
-    let data = get(&url, &cfg.token);
+    let data = get(cfg, &url);
     let issues = issues_from(data);
 
     if issues.is_empty() {
@@ -121,7 +156,7 @@ fn cmd_list(cfg: &Config, project: Option<&str>, n: usize, offset: usize, unreso
 
 fn cmd_show(cfg: &Config, uuid: &str) {
     let url = format!("{}/api/canonical/0/issues/{}/", cfg.url, uuid);
-    let issue = get(&url, &cfg.token);
+    let issue = get(cfg, &url);
 
     let title = issue_title(&issue);
     let id = issue["id"].as_str().unwrap_or("?");
@@ -145,7 +180,7 @@ fn cmd_show(cfg: &Config, uuid: &str) {
         "{}/api/canonical/0/events/?issue={}&order=desc",
         cfg.url, uuid
     );
-    let events_data = get(&events_url, &cfg.token);
+    let events_data = get(cfg, &events_url);
     let events = issues_from(events_data);
 
     if let Some(event) = events.first() {
@@ -155,7 +190,9 @@ fn cmd_show(cfg: &Config, uuid: &str) {
                 "{}/api/canonical/0/events/{}/stacktrace/",
                 cfg.url, event_id
             );
-            let st_body = ureq::get(&st_url)
+            let st_body = cfg
+                .agent
+                .get(&st_url)
                 .header("Authorization", &format!("Bearer {}", cfg.token))
                 .call()
                 .unwrap_or_else(|e| panic!("stacktrace request failed: {}", e))

@@ -146,23 +146,23 @@ pub fn run(ctx: &Context, rev: &str, window: &str) -> Result<String, String> {
         let queries: Vec<(&str, String)> = vec![
             ("all", ctx.q("sum(count_over_time(http_request_duration_ms{$S}[$W]))", w)),
             ("errors", ctx.q("sum(count_over_time(http_request_duration_ms{$S,status=\"5xx\"}[$W]))", w)),
-            ("cron", ctx.q("histogram_quantile(0.95, sum by (vmrange) (histogram_over_time(cron_run_duration_ms{$S}[$W])))", w)),
+            ("task", ctx.q("histogram_quantile(0.95, sum by (vmrange) (histogram_over_time(task_run_duration_ms{$S}[$W])))", w)),
         ];
         let r = ctx.client.instant_many(&queries, at)?;
-        Ok((single(&r["all"]), single(&r["errors"]), single(&r["cron"])))
+        Ok((single(&r["all"]), single(&r["errors"]), single(&r["task"])))
     };
-    let (b_all, b_err, b_cron) = side(before_at, span)?;
-    let (a_all, a_err, a_cron) = side(after_end, after_span)?;
+    let (b_all, b_err, b_task) = side(before_at, span)?;
+    let (a_all, a_err, a_task) = side(after_end, after_span)?;
     let rate = |err: Option<f64>, all: Option<f64>| match all {
         Some(all) if all > 0.0 => pct(err.unwrap_or(0.0) / all),
         _ => "-".into(),
     };
     out.push_str(&format!(
-        "\n5xx rate {} > {}; cron run p95 {} > {} ms\n",
+        "\n5xx rate {} > {}; task run p95 {} > {} ms\n",
         rate(b_err, b_all),
         rate(a_err, a_all),
-        opt(b_cron, ms),
-        opt(a_cron, ms)
+        opt(b_task, ms),
+        opt(a_task, ms)
     ));
     Ok(finish(ctx, "deploy", &report_window, out))
 }
