@@ -24,6 +24,10 @@ site_logo:
     type: attribute
     resource: ../src/Controller/NonLocale/SiteLogoController.php
 
+site_icon:
+    type: attribute
+    resource: ../src/Controller/NonLocale/SiteIconController.php
+
 well_known:
     type: attribute
     resource: ../src/Controller/NonLocale/WellKnownController.php

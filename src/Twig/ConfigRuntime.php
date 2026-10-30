@@ -4,6 +4,7 @@ namespace App\Twig;
 
 use App\Service\Config\ConfigService;
 use App\Service\Media\ImageAttributionService;
+use App\Service\Media\SiteIconResolver;
 use App\Service\Media\SiteLogoResolver;
 use Twig\Extension\RuntimeExtensionInterface;
 
@@ -12,6 +13,7 @@ final readonly class ConfigRuntime implements RuntimeExtensionInterface
     public function __construct(
         private ConfigService $configService,
         private SiteLogoResolver $siteLogoResolver,
+        private SiteIconResolver $siteIconResolver,
         private ImageAttributionService $imageAttributionService,
     ) {}
 
@@ -36,6 +38,11 @@ final readonly class ConfigRuntime implements RuntimeExtensionInterface
     public function siteLogo(): array
     {
         return $this->siteLogoResolver->resolve();
+    }
+
+    public function siteIconUrl(): ?string
+    {
+        return $this->siteIconResolver->url();
     }
 
     public function hasImageAttributions(): bool

@@ -16,11 +16,12 @@ class ConfigExtensionTest extends TestCase
         $functionNames = array_map(static fn($f) => $f->getName(), $subject->getFunctions());
 
         // Assert
-        static::assertCount(5, $functionNames);
+        static::assertCount(6, $functionNames);
         static::assertContains('get_date_format', $functionNames);
         static::assertContains('get_date_format_flatpickr', $functionNames);
         static::assertContains('get_footer_column_title', $functionNames);
         static::assertContains('site_logo', $functionNames);
+        static::assertContains('site_icon_url', $functionNames);
         static::assertContains('has_image_attributions', $functionNames);
     }
 }
