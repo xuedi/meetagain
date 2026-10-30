@@ -677,6 +677,7 @@ image_type:
     pluginfilmsposter: 'Filmplakat'
     pluginphotosphoto: 'Foto'
     grouppromotionfacebook: 'Gruppen-Werbebild (Facebook)'
+    groupicon: 'Gruppen-Icon'
 cookie:
     page_title: 'Cookie-Einstellungen'
     meta_description: 'Verwalte deine Cookie-Einstellungen. Lege fest, welche optionalen Funktionen aktiviert sind.'

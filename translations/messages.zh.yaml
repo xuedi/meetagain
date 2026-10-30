@@ -677,6 +677,7 @@ image_type:
     pluginfilmsposter: '电影海报'
     pluginphotosphoto: '照片'
     grouppromotionfacebook: '群组推广图（Facebook）'
+    groupicon: '群组图标'
 cookie:
     page_title: '网站Cookie'
     meta_description: '管理您的Cookie偏好设置。控制哪些可选功能已启用。'

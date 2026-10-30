@@ -4,6 +4,7 @@ namespace Tests\Unit\Twig;
 
 use App\Service\Config\ConfigService;
 use App\Service\Media\ImageAttributionService;
+use App\Service\Media\SiteIconResolver;
 use App\Service\Media\SiteLogoResolver;
 use App\Twig\ConfigRuntime;
 use PHPUnit\Framework\MockObject\Stub;
@@ -13,6 +14,7 @@ class ConfigRuntimeTest extends TestCase
 {
     private Stub&ConfigService $configServiceStub;
     private Stub&SiteLogoResolver $siteLogoResolverStub;
+    private Stub&SiteIconResolver $siteIconResolverStub;
     private Stub&ImageAttributionService $imageAttributionServiceStub;
     private ConfigRuntime $subject;
 
@@ -20,8 +22,14 @@ class ConfigRuntimeTest extends TestCase
     {
         $this->configServiceStub = $this->createStub(ConfigService::class);
         $this->siteLogoResolverStub = $this->createStub(SiteLogoResolver::class);
+        $this->siteIconResolverStub = $this->createStub(SiteIconResolver::class);
         $this->imageAttributionServiceStub = $this->createStub(ImageAttributionService::class);
-        $this->subject = new ConfigRuntime($this->configServiceStub, $this->siteLogoResolverStub, $this->imageAttributionServiceStub);
+        $this->subject = new ConfigRuntime(
+            $this->configServiceStub,
+            $this->siteLogoResolverStub,
+            $this->siteIconResolverStub,
+            $this->imageAttributionServiceStub,
+        );
     }
 
     public function testHasImageAttributionsDelegatesToService(): void
@@ -51,5 +59,12 @@ class ConfigRuntimeTest extends TestCase
         $this->siteLogoResolverStub->method('resolve')->willReturn($logo);
 
         static::assertSame($logo, $this->subject->siteLogo());
+    }
+
+    public function testSiteIconUrlDelegatesToResolver(): void
+    {
+        $this->siteIconResolverStub->method('url')->willReturn('/icon.png?vabc');
+
+        static::assertSame('/icon.png?vabc', $this->subject->siteIconUrl());
     }
 }
