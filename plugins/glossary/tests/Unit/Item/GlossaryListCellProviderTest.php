@@ -4,8 +4,8 @@ namespace Plugin\Glossary\Tests\Unit\Item;
 
 use App\Entity\ItemTag;
 use App\Item\Tag\TagService;
-use App\Review\ChangeProposalService;
 use DateTimeImmutable;
+use Module\Proposal\Contract\Change\ChangeInterface;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Item\GlossaryListCellProvider;
@@ -120,7 +120,7 @@ class GlossaryListCellProviderTest extends TestCase
             ->with(GlossaryTaggableTypeProvider::ITEM_TYPE, [7, 8], 'de')
             ->willReturn([8 => ['Verb']]);
 
-        $proposals = $this->createMock(ChangeProposalService::class);
+        $proposals = $this->createMock(ChangeInterface::class);
         $proposals->expects(self::once())->method('pendingTargetIds')->willReturn([8]);
 
         $security = $this->createStub(Security::class);
@@ -152,7 +152,7 @@ class GlossaryListCellProviderTest extends TestCase
         ConfigService $configService,
         Environment $twig,
         ?TagService $tagService = null,
-        ?ChangeProposalService $proposals = null,
+        ?ChangeInterface $proposals = null,
         ?Security $security = null,
     ): GlossaryListCellProvider {
         $requestStack = new RequestStack();
@@ -165,7 +165,7 @@ class GlossaryListCellProviderTest extends TestCase
             $configService,
             $tagService ?? $this->createStub(TagService::class),
             $twig,
-            $proposals ?? $this->createStub(ChangeProposalService::class),
+            $proposals ?? $this->createStub(ChangeInterface::class),
             $security ?? $this->createStub(Security::class),
             $requestStack,
         );

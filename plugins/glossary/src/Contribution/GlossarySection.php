@@ -7,7 +7,7 @@ use App\Contribution\Entry;
 use App\Contribution\RowFormInterface;
 use App\Entity\User;
 use App\Item\Tag\AssignmentFormHelper;
-use App\Review\FieldChange;
+use Module\Proposal\Contract\Change\FieldChange;
 use Override;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Form\GlossaryType;

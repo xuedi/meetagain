@@ -9,11 +9,11 @@ use App\Item\ActionDispatcher;
 use App\Item\AdminFilterService;
 use App\Item\FilterService;
 use App\Item\Tag\TagService;
-use App\Review\ChangeProposalService;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Module\Proposal\Contract\Change\ChangeInterface;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Repository\GlossaryRepository;
@@ -33,7 +33,7 @@ readonly class GlossaryService
         private EntityActionDispatcher $dispatcher,
         private TagService $tagService,
         private ActionDispatcher $itemActionDispatcher,
-        private ChangeProposalService $changeProposalService,
+        private ChangeInterface $changeProposalService,
         private ConfigService $configService,
         private LanguageService $languageService,
         private RequestStack $requestStack,

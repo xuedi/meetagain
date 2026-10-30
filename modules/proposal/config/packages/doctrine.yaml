@@ -1,0 +1,15 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Proposal:
+                        dir: "%kernel.project_dir%/modules/proposal/src/Internal/Entity"
+                        is_bundle: false
+                        prefix: Module\Proposal\Internal\Entity
+                        alias: Proposal
+
+doctrine_migrations:
+    migrations_paths:
+        ModuleSuggestionMigrations: "%kernel.project_dir%/modules/proposal/migrations/suggestion"
+        ModuleProposalMigrations: "%kernel.project_dir%/modules/proposal/migrations/change"

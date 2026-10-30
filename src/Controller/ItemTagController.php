@@ -2,13 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\ChangeProposal;
 use App\Entity\User;
 use App\Form\Item\TagsType;
 use App\Item\Tag\ChangeTarget;
 use App\Item\Tag\TagService;
 use App\Item\Tag\TypeRegistry;
-use App\Review\ChangeProposalService;
+use Module\Proposal\Contract\Change\ChangeInterface;
+use Module\Proposal\Contract\Change\View;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -20,7 +20,7 @@ final class ItemTagController extends AbstractController
     public function __construct(
         private readonly TypeRegistry $registry,
         private readonly TagService $tagService,
-        private readonly ChangeProposalService $changeProposals,
+        private readonly ChangeInterface $changeProposals,
     ) {}
 
     #[Route('/item/{itemType}/tags', name: 'app_item_tags', methods: ['GET', 'POST'])]
@@ -86,7 +86,7 @@ final class ItemTagController extends AbstractController
     }
 
     /**
-     * @return list<array{proposal: ChangeProposal, targetId: int, rows: list<array<string, mixed>>, isProposer: bool}>
+     * @return list<array{proposal: View, targetId: int, rows: list<array<string, mixed>>, isProposer: bool}>
      */
     private function pendingCards(string $targetType): array
     {
@@ -95,12 +95,12 @@ final class ItemTagController extends AbstractController
 
         $cards = [];
         foreach ($this->changeProposals->pendingTargetIds($targetType) as $targetId) {
-            foreach ($this->changeProposals->pendingForTarget($targetType, $targetId) as $proposal) {
+            foreach ($this->changeProposals->pendingFor($targetType, $targetId) as $proposal) {
                 $cards[] = [
                     'proposal' => $proposal,
                     'targetId' => $targetId,
-                    'rows' => $this->changeProposals->fieldRows($proposal),
-                    'isProposer' => $proposal->getProposedBy()->getId() === $userId,
+                    'rows' => $proposal->rows,
+                    'isProposer' => $proposal->proposerId === $userId,
                 ];
             }
         }

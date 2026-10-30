@@ -4,11 +4,11 @@ namespace App\Contribution;
 
 use App\Entity\Event;
 use App\Entity\User;
+use App\Event\ChangeTarget;
 use App\Filter\Event\EventFilterService;
 use App\Form\EventCorrectionType;
 use App\Repository\EventRepository;
-use App\Review\EventChangeTarget;
-use App\Review\FieldChange;
+use Module\Proposal\Contract\Change\FieldChange;
 use Override;
 use Symfony\Component\Form\FormInterface;
 
@@ -19,7 +19,7 @@ readonly class EventSection implements RowFormInterface
     public function __construct(
         private EventRepository $eventRepo,
         private EventFilterService $eventFilter,
-        private EventChangeTarget $changeTarget,
+        private ChangeTarget $changeTarget,
     ) {}
 
     #[Override]
@@ -66,7 +66,7 @@ readonly class EventSection implements RowFormInterface
     #[Override]
     public function getTargetType(): string
     {
-        return EventChangeTarget::TARGET_TYPE;
+        return ChangeTarget::TARGET_TYPE;
     }
 
     #[Override]

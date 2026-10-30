@@ -43,7 +43,7 @@
                         {% for card in pending %}
                             <div class="box has-background-info-light">
                                 <p class="mb-2">
-                                    <b>{{ card.proposal.proposedBy.name }}</b>
+                                    <b>{{ card.proposal.proposerName }}</b>
                                     <span class="has-text-grey">{{ card.proposal.createdAt|time_diff }}</span>
                                 </p>
                                 <ul>

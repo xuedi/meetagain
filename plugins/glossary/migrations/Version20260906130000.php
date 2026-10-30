@@ -41,11 +41,11 @@ final class Version20260906130000 extends AbstractMigration
               AND item_id IN (SELECT id FROM (SELECT id FROM plg_glossary_glossary WHERE approved = 0) AS unapproved)
             SQL);
 
-        $this->addSql(<<<'SQL'
-            DELETE FROM change_proposal
+        $this->addSql(sprintf(<<<'SQL'
+            DELETE FROM %s
             WHERE target_type = 'glossary'
               AND target_id IN (SELECT id FROM (SELECT id FROM plg_glossary_glossary WHERE approved = 0) AS unapproved)
-            SQL);
+            SQL, $this->changeTable()));
 
         $this->addSql('DELETE FROM plg_glossary_glossary WHERE approved = 0');
         $this->addSql('ALTER TABLE plg_glossary_glossary DROP approved');
@@ -58,6 +58,18 @@ final class Version20260906130000 extends AbstractMigration
 
     private function suggestionTable(): string
     {
-        return $this->connection->createSchemaManager()->tablesExist(['mod_suggestion']) ? 'mod_suggestion' : 'suggestion';
+        $schemaManager = $this->connection->createSchemaManager();
+        foreach (['mod_proposal_suggestion', 'mod_suggestion'] as $table) {
+            if ($schemaManager->tablesExist([$table])) {
+                return $table;
+            }
+        }
+
+        return 'suggestion';
+    }
+
+    private function changeTable(): string
+    {
+        return $this->connection->createSchemaManager()->tablesExist(['mod_proposal_change']) ? 'mod_proposal_change' : 'change_proposal';
     }
 }

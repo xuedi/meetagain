@@ -2,24 +2,25 @@
 
 namespace Tests\Unit\Portability\Ballot\Purpose;
 
-use App\Entity\ChangeProposal;
 use App\Entity\Event;
 use App\Entity\ItemTag;
 use App\Entity\Location;
-use App\Entity\User;
-use App\Enum\ChangeProposalStatus;
 use App\Portability\Ballot\Purpose\FieldPurpose;
 use App\Portability\DataCategory;
 use App\Portability\Scope;
-use App\Review\FieldBallotService;
+use App\Portability\Section\ChangeProposalsSection;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Module\Ballot\Contract\BallotSubject;
+use Module\Proposal\Contract\Change\ChangeInterface;
+use Module\Proposal\Contract\Change\View;
+use Module\Proposal\Contract\Status;
 use Tests\Unit\Portability\Section\SectionTestCase;
 
 final class FieldPurposeTest extends SectionTestCase
 {
-    private const string PURPOSE = FieldBallotService::PURPOSE;
+    private const string PURPOSE = ChangeInterface::BALLOT_PURPOSE;
 
     public function testABallotOverExportedProposalsOnAnExportedTargetIsInScope(): void
     {
@@ -36,8 +37,7 @@ final class FieldPurposeTest extends SectionTestCase
     public function testAProposalThatStaysBehindKeepsItsBallotBehind(): void
     {
         // Arrange
-        $resolved = $this->proposal(5);
-        $resolved->setStatus(ChangeProposalStatus::Approved);
+        $resolved = $this->proposal(5, status: Status::Approved);
         $withheld = $this->proposal(6, proposerId: 4);
 
         // Act
@@ -112,7 +112,7 @@ final class FieldPurposeTest extends SectionTestCase
     {
         // Arrange
         $context = $this->context();
-        $context->mapRef(ChangeProposal::class, 5, $this->withId(new ChangeProposal(), 50));
+        $context->mapIds(ChangeProposalsSection::REFS, [5 => 50]);
         $purpose = $this->purpose();
 
         // Act
@@ -128,28 +128,31 @@ final class FieldPurposeTest extends SectionTestCase
     }
 
     /**
-     * @param list<ChangeProposal> $proposals
+     * @param list<View> $proposals
      * @param list<Event> $events
      */
     private function purpose(array $proposals = [], array $events = []): FieldPurpose
     {
-        $proposalRepository = $this->createStub(EntityRepository::class);
-        $proposalRepository
-            ->method('findBy')
-            ->willReturnCallback(static fn(array $criteria): array => array_values(array_filter($proposals, static fn(ChangeProposal $proposal): bool => in_array(
-                $proposal->getId(),
-                $criteria['id'],
-                true,
-            ))));
         $eventRepository = $this->createStub(EntityRepository::class);
         $eventRepository->method('findBy')->willReturn($events);
 
         $em = $this->createStub(EntityManagerInterface::class);
-        $em->method('getRepository')->willReturnCallback(static fn(string $class): EntityRepository => $class === Event::class
-            ? $eventRepository
-            : $proposalRepository);
+        $em->method('getRepository')->willReturn($eventRepository);
 
-        return new FieldPurpose($em);
+        $changes = $this->createStub(ChangeInterface::class);
+        $changes
+            ->method('find')
+            ->willReturnCallback(static function (int $id) use ($proposals): ?View {
+                foreach ($proposals as $proposal) {
+                    if ($proposal->id === $id) {
+                        return $proposal;
+                    }
+                }
+
+                return null;
+            });
+
+        return new FieldPurpose($em, $changes);
     }
 
     /**
@@ -168,11 +171,8 @@ final class FieldPurposeTest extends SectionTestCase
         );
     }
 
-    private function proposal(int $id, int $proposerId = 3): ChangeProposal
+    private function proposal(int $id, int $proposerId = 3, Status $status = Status::Pending): View
     {
-        $proposal = $this->withId(new ChangeProposal(), $id);
-        $proposal->setProposedBy($this->withId(new User(), $proposerId));
-
-        return $proposal;
+        return new View($id, 'event', 9, $proposerId, 'member', $status, new DateTimeImmutable('2030-01-06 10:00'), [], []);
     }
 }

@@ -17,8 +17,8 @@
 {% if pendingProposals is not empty %}
     <h2 class="title is-5">{{ 'contribution.pending_proposals_heading'|trans }}</h2>
     {% for card in pendingProposals %}
-        {{ include('review/_proposal_card.html.twig', {
-            card: card|merge({isProposer: card.proposal.proposedBy.id == app.user.id}),
+        {{ include('@Proposal/change/_card.html.twig', {
+            card: card|merge({isProposer: card.proposal.proposerId == app.user.id}),
             canReview: false,
         }) }}
     {% endfor %}

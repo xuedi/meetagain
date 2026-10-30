@@ -20,7 +20,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
-use Module\Suggestion\Contract\TargetProviderInterface;
+use Module\Proposal\Contract\Suggestion\TargetProviderInterface;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;

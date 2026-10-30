@@ -2,22 +2,23 @@
 
 namespace Plugin\Glossary\Portability;
 
-use App\Entity\ChangeProposal;
 use App\Entity\ItemTag;
 use App\Entity\User;
-use App\Enum\ChangeProposalStatus;
-use App\Enum\FieldResolution;
 use App\Portability\DataCategory;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
 use App\Portability\PluginSectionInterface;
 use App\Portability\Scope;
+use App\Portability\Section\ChangeProposalsSection;
 use App\Repository\UserRepository;
-use App\Review\FieldChange;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Proposal\Contract\Change\ChangeInterface;
+use Module\Proposal\Contract\Change\FieldChange;
+use Module\Proposal\Contract\Change\FieldResolution;
+use Module\Proposal\Contract\Change\PortableChange;
 use Override;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Entity\TrainerCard;
@@ -40,6 +41,7 @@ readonly class MemberSection implements PluginSectionInterface
         private EntityManagerInterface $em,
         private UserRepository $userRepository,
         private GlossaryService $glossaryService,
+        private ChangeInterface $changes,
     ) {}
 
     #[Override]
@@ -172,28 +174,24 @@ readonly class MemberSection implements PluginSectionInterface
      */
     private function proposalRows(Scope $scope, array $entryIds): array
     {
-        $proposals = $this->em->getRepository(ChangeProposal::class)->findBy(['status' => ChangeProposalStatus::Pending, 'targetType' => self::ITEM_TYPE], [
-            'id' => 'ASC',
-        ]);
-
         $rows = [];
-        foreach ($proposals as $proposal) {
-            $isScopedEntry = in_array($proposal->getTargetId(), $entryIds, true);
-            if (!$isScopedEntry || !$scope->grants($proposal->getProposedBy(), DataCategory::Interactions)) {
+        foreach ($this->changes->exportPending([self::ITEM_TYPE]) as $proposal) {
+            $isScopedEntry = in_array($proposal->targetId, $entryIds, true);
+            if (!$isScopedEntry || !$scope->grantsId($proposal->proposerId, DataCategory::Interactions)) {
                 continue;
             }
 
             $changes = [];
-            foreach ($proposal->getChanges() as $change) {
+            foreach ($proposal->changes as $change) {
                 $changes[$change->field] = $change->toArray();
             }
 
             $rows[] = [
-                'ref' => $proposal->getId(),
-                'target_ref' => $proposal->getTargetId(),
+                'ref' => $proposal->id,
+                'target_ref' => $proposal->targetId,
                 'changes' => $changes,
-                'email' => $proposal->getProposedBy()->getEmail(),
-                'created_at' => $proposal->getCreatedAt()->format(DateTimeInterface::ATOM),
+                'email' => $this->userRepository->find($proposal->proposerId)?->getEmail(),
+                'created_at' => $proposal->createdAt->format(DateTimeInterface::ATOM),
             ];
         }
 
@@ -289,16 +287,16 @@ readonly class MemberSection implements PluginSectionInterface
             return;
         }
 
-        $proposal = new ChangeProposal();
-        $proposal->setTargetType(self::ITEM_TYPE);
-        $proposal->setTargetId($entryId);
-        $proposal->setProposedBy($proposer);
-        $proposal->setStatus(ChangeProposalStatus::Pending);
-        $proposal->setChanges($changes);
-        $proposal->setCreatedAt($this->date($row['created_at'] ?? null) ?? new DateTimeImmutable());
-
-        $this->em->persist($proposal);
-        $context->mapRef(ChangeProposal::class, (int) ($row['ref'] ?? 0), $proposal);
+        $id = $this->changes->restore(
+            new PortableChange(
+                self::ITEM_TYPE,
+                $entryId,
+                (int) $proposer->getId(),
+                $changes,
+                $this->date($row['created_at'] ?? null) ?? new DateTimeImmutable(),
+            ),
+        );
+        $context->mapIds(ChangeProposalsSection::REFS, [(int) ($row['ref'] ?? 0) => $id]);
         $context->count(self::KIND_CHANGE_PROPOSALS, Outcome::Created);
     }
 

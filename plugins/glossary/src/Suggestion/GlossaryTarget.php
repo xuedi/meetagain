@@ -3,7 +3,7 @@
 namespace Plugin\Glossary\Suggestion;
 
 use InvalidArgumentException;
-use Module\Suggestion\Contract\TargetProviderInterface;
+use Module\Proposal\Contract\Suggestion\TargetProviderInterface;
 use Override;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Form\GlossaryType;

@@ -31,7 +31,7 @@
                         {% for entry in pendingProposals %}
                             <div class="box has-background-info-light">
                                 <p class="mb-2">
-                                    <b>{{ entry.proposal.proposedBy.name }}</b>
+                                    <b>{{ entry.proposal.proposerName }}</b>
                                     <span class="has-text-grey">{{ entry.proposal.createdAt|time_diff }}</span>
                                 </p>
                                 <ul>

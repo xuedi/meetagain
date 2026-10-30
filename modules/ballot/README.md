@@ -151,8 +151,8 @@ application's archive section is the one caller, and it decides per purpose whic
    one needs the module's own tables - so the step from a passed deadline to those calls is covered once, by
    `modules/ballot/tests/Functional/DeadlineTest.php`, and needs no second proof per consumer.
 
-`App\Review\FieldBallotService` is the reference: one candidate per competing value proposed for a field plus one
-for leaving it alone, and a settlement that writes the winner through the application's change-proposal tool. It is
+The proposal module's field ballot (`modules/proposal/change.md`) is the reference: one candidate per competing value
+proposed for a field plus one for leaving it alone, and a settlement that writes the winner through the change tool. It is
 also why `Confirmed` earns its place beside `Automatic`: that consumer's write is permission-checked against the
 current request's user, so nothing the deadline task attempted on its behalf would be allowed through.
 
@@ -160,12 +160,12 @@ current request's user, so nothing the deadline task attempted on its behalf wou
 
 Consumers split on one question: **do members need to look at the candidates, or only read them?**
 
-|                | The module's page               | Your own page                                                         |
-|----------------|---------------------------------|-----------------------------------------------------------------------|
-| Candidates are | strings a member can read       | rows a member has to see - posters, photos, dishes                    |
-| You implement  | the seams you need              | the seams you need, `PageProviderInterface`, a controller, a template |
-| You call       | `open()`                        | `open()`, then `view()` to render and `cast()` to record              |
-| Example        | `App\Review\FieldBallotService` | `App\Item\Ballot\Page`, `Plugin\Photos\Service\ContestService`        |
+|                | The module's page                  | Your own page                                                         |
+|----------------|------------------------------------|-----------------------------------------------------------------------|
+| Candidates are | strings a member can read          | rows a member has to see - posters, photos, dishes                    |
+| You implement  | the seams you need                 | the seams you need, `PageProviderInterface`, a controller, a template |
+| You call       | `open()`                           | `open()`, then `view()` to render and `cast()` to record              |
+| Example        | the proposal module's field ballot | `App\Item\Ballot\Page`, `Plugin\Photos\Service\ContestService`        |
 
 The module renders `Candidate::$label` as plain text. Teaching it to resolve a key into a picture would make it
 interpret its candidates, so a consumer whose ballot is a wall of film posters keeps its own page and drives this

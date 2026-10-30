@@ -6,10 +6,10 @@ use App\Entity\Location;
 use App\Entity\User;
 use App\Filter\Event\EventFilterService;
 use App\Form\LocationType;
+use App\Item\Location\ChangeTarget;
 use App\Repository\EventRepository;
 use App\Repository\LocationRepository;
-use App\Review\FieldChange;
-use App\Review\LocationChangeTarget;
+use Module\Proposal\Contract\Change\FieldChange;
 use Override;
 use Symfony\Component\Form\FormInterface;
 
@@ -79,7 +79,7 @@ readonly class LocationSection implements RowFormInterface
     #[Override]
     public function getTargetType(): string
     {
-        return LocationChangeTarget::TARGET_TYPE;
+        return ChangeTarget::TARGET_TYPE;
     }
 
     #[Override]
