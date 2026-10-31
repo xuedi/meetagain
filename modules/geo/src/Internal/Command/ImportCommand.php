@@ -4,8 +4,9 @@ namespace Module\Geo\Internal\Command;
 
 use Module\Geo\Internal\Import\Dataset;
 use Module\Geo\Internal\Import\Loader;
-use Module\Geo\Internal\Import\Report;
+use Module\Geo\Internal\Import\Options;
 use Module\Geo\Internal\ImportAction;
+use Module\Task\Contract\Status;
 use Override;
 use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -15,6 +16,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Service\ResetInterface;
 
 #[AsCommand(name: 'app:geo:import', description: 'Import countries, states, cities, districts and their names from GeoNames')]
 final class ImportCommand extends Command
@@ -24,6 +27,8 @@ final class ImportCommand extends Command
     public function __construct(
         private readonly Loader $loader,
         private readonly ImportAction $action,
+        #[Autowire(service: 'services_resetter')]
+        private readonly ResetInterface $resetter,
     ) {
         parent::__construct();
     }
@@ -36,12 +41,13 @@ final class ImportCommand extends Command
             ->addArgument('dataset', InputArgument::REQUIRED, 'One of: ' . $datasets)
             ->addOption('country', null, InputOption::VALUE_REQUIRED, 'Limit to one country, by ISO2 code')
             ->addOption('source', null, InputOption::VALUE_REQUIRED, 'Read the GeoNames files from this directory instead of downloading them')
-            ->addOption('base-url', null, InputOption::VALUE_REQUIRED, 'GeoNames download address; defaults to the one saved on the Maintenance page')
+            ->addOption('base-url', null, InputOption::VALUE_REQUIRED, 'GeoNames download address', Options::DEFAULT_BASE_URL)
             ->addOption(
                 'min-population',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Smallest city to import, picks the cities dump; defaults to the one saved on the Maintenance page',
+                'Smallest city to import, picks the cities dump',
+                (string) Options::DEFAULT_MIN_POPULATION,
             );
     }
 
@@ -50,8 +56,8 @@ final class ImportCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $name = (string) $input->getArgument('dataset');
-        $datasets = $name === self::ALL ? Dataset::cases() : array_filter([Dataset::tryFrom($name)]);
-        if ($datasets === []) {
+        $dataset = Dataset::tryFrom($name);
+        if ($dataset === null && $name !== self::ALL) {
             $io->error(sprintf('Unknown dataset "%s".', $name));
 
             return Command::INVALID;
@@ -67,28 +73,48 @@ final class ImportCommand extends Command
             minPopulation: is_string($minPopulation) ? (int) $minPopulation : null,
         );
 
-        $reports = [];
+        if ($dataset === null) {
+            return $this->walk($io, $options);
+        }
+
         try {
-            foreach ($datasets as $dataset) {
-                $io->section($dataset->value);
-                $progress = $io->createProgressBar();
-                $reports[] = $this->loader->import($dataset, $options, $progress->advance(...));
-                $progress->finish();
-                $io->newLine();
-            }
+            $progress = $io->createProgressBar();
+            $report = $this->loader->import($dataset, $options, $progress->advance(...));
+            $progress->finish();
+            $io->newLine();
         } catch (RuntimeException $exception) {
             $io->error($exception->getMessage());
 
             return Command::FAILURE;
         }
 
-        $io->table(['Dataset', 'Created', 'Updated', 'Unchanged', 'Skipped'], array_map(static fn(Report $report): array => [
+        $io->table(['Dataset', 'Created', 'Updated', 'Unchanged', 'Skipped'], [[
             $report->dataset->value,
             $report->created,
             $report->updated,
             $report->unchanged,
             $report->skipped,
-        ], $reports));
+        ]]);
+
+        return Command::SUCCESS;
+    }
+
+    private function walk(SymfonyStyle $io, Options $options): int
+    {
+        $cursor = null;
+        do {
+            $progress = $io->createProgressBar();
+            $result = $this->action->step($options, $cursor, $progress->advance(...));
+            $progress->clear();
+            $io->writeln($result->message);
+            if ($result->status !== Status::ok) {
+                $io->error($result->message);
+
+                return Command::FAILURE;
+            }
+            $cursor = $result->continueFrom;
+            $this->resetter->reset();
+        } while ($cursor !== null);
 
         return Command::SUCCESS;
     }

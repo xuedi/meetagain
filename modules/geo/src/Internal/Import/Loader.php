@@ -18,7 +18,6 @@ use Module\Geo\Internal\Slugs;
 
 readonly class Loader
 {
-    public const array LANGUAGES = ['en', 'de', 'zh', 'fr', 'es'];
     public const int DISTRICT_RADIUS_KM = 25;
 
     private const int BATCH_SIZE = 500;
@@ -150,7 +149,7 @@ readonly class Loader
         $batch = [];
         foreach ($this->files->rows($options, $options->citiesFile()) as $row) {
             $tick();
-            if (!$this->isCityRow($row, $options)) {
+            if (!$this->isCityRow($row, $options) || !$options->inWindow($tally->row())) {
                 continue;
             }
             if (!isset($countryIds[$row[8]])) {
@@ -293,7 +292,7 @@ readonly class Loader
         $tally = new Tally();
         foreach ($this->files->rows($options, $options->citiesFile()) as $row) {
             $tick();
-            if (count($row) < 18 || $row[7] !== self::DISTRICT_CODE || !$options->covers($row[8])) {
+            if (count($row) < 18 || $row[7] !== self::DISTRICT_CODE || !$options->covers($row[8]) || !$options->inWindow($tally->row())) {
                 continue;
             }
             $countryId = $countryIds[$row[8]] ?? null;
@@ -387,7 +386,7 @@ readonly class Loader
             foreach ($this->files->rows($options, 'alternatenames/' . $iso2 . '.zip', optional: true) as $row) {
                 $tick();
                 $geonameId = (int) ($row[1] ?? 0);
-                if (count($row) < 8 || !isset($targets[$geonameId]) || !in_array($row[2], self::LANGUAGES, true)) {
+                if (count($row) < 8 || !isset($targets[$geonameId]) || !in_array($row[2], $options->languages, true)) {
                     continue;
                 }
                 $picks->offer($geonameId, $row[2], $row[3], $row[4] === '1', $row[5] === '1', $row[6] === '1', $row[7] === '1');

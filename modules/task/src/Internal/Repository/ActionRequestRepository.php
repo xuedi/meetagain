@@ -25,6 +25,29 @@ class ActionRequestRepository extends ServiceEntityRepository
         $em->flush();
     }
 
+    public function hasAnotherUnderway(ActionRequest $request, DateTimeImmutable $now): bool
+    {
+        return $this
+            ->createQueryBuilder('r')
+            ->select('r.id')
+            ->where('r.identifier = :identifier')
+            ->andWhere('r.id <> :id')
+            ->andWhere('r.startedAt IS NOT NULL')
+            ->andWhere('r.state = :pending OR r.leaseUntil >= :now')
+            ->setParameter('identifier', $request->getIdentifier())
+            ->setParameter('id', $request->getId())
+            ->setParameter('pending', RequestState::Pending->value)
+            ->setParameter('now', $now)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getArrayResult() !== [];
+    }
+
+    public function reattach(ActionRequest $request): ActionRequest
+    {
+        return $this->getEntityManager()->contains($request) ? $request : $this->find($request->getId()) ?? $request;
+    }
+
     public function refresh(ActionRequest $request): void
     {
         $this->getEntityManager()->refresh($request);

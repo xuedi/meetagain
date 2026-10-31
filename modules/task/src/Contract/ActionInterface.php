@@ -28,5 +28,5 @@ interface ActionInterface
     /**
      * @param array<string, string|int|bool|null> $values keyed by parameter key
      */
-    public function run(array $values): Result;
+    public function run(array $values, ?string $cursor = null): Result;
 }

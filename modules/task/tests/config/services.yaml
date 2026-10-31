@@ -11,3 +11,7 @@ services:
     stub.quick_action:
         class: Module\Task\Tests\Stub\Action
         arguments: ['stub-quick', false]
+
+    stub.step_action:
+        class: Module\Task\Tests\Stub\Action
+        arguments: ['stub-steps', false, '@doctrine.orm.entity_manager']

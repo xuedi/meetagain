@@ -39,6 +39,9 @@ class ActionRequest
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $message = null;
 
+    #[ORM\Column(name: 'step_cursor', length: 255, nullable: true)]
+    private ?string $cursor = null;
+
     /**
      * @param array<string, string|int|bool|null> $values
      */
@@ -111,11 +114,24 @@ class ActionRequest
         return $this->message;
     }
 
+    public function getCursor(): ?string
+    {
+        return $this->cursor;
+    }
+
     public function start(DateTimeImmutable $now, DateTimeImmutable $leaseUntil): void
     {
         $this->state = RequestState::Running;
-        $this->startedAt = $now;
+        $this->startedAt ??= $now;
         $this->leaseUntil = $leaseUntil;
+    }
+
+    public function continueFrom(string $cursor, string $progress): void
+    {
+        $this->state = RequestState::Pending;
+        $this->leaseUntil = null;
+        $this->cursor = $cursor;
+        $this->message = $progress;
     }
 
     public function finish(Result $result, DateTimeImmutable $now): void

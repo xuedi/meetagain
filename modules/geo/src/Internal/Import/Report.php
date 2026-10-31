@@ -10,5 +10,6 @@ final readonly class Report
         public int $updated = 0,
         public int $unchanged = 0,
         public int $skipped = 0,
+        public int $rows = 0,
     ) {}
 }

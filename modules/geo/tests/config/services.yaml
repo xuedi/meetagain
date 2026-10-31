@@ -6,7 +6,3 @@ services:
     geo.test.slugs:
         alias: Module\Geo\Internal\Slugs
         public: true
-
-    geo.test.refresh:
-        alias: Module\Geo\Internal\Refresh
-        public: true

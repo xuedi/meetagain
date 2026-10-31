@@ -80,11 +80,15 @@ sequenceDiagram
     participant Row as mod_task_action_request
     participant Worker
     participant Drain as task action-drain
-    Admin->>Page: submit the form
+    Admin->>Page: submit the form, or play on the row
     Page->>Row: pending row with the values
     Page-->>Worker: RunAction(id) on async
-    Worker->>Row: lock per action, lease, running
-    Worker->>Row: done or failed, plus a mod_task_run row
+    loop while the action returns a cursor
+        Worker->>Row: lock per action, lease, running
+        Worker->>Row: pending again with the cursor and the progress
+        Worker-->>Worker: RunAction(id)
+    end
+    Worker->>Row: done or failed, plus one mod_task_run row
     Drain->>Row: lease expired - failed, never rerun
     Drain->>Worker: still pending after the grace period - run it
 ```
@@ -92,16 +96,22 @@ sequenceDiagram
 - **The request row is the record** and `RunAction` is its doorbell, as for every other hand-off. The row keeps who
   asked, the values, the state and the result; the run also lands in the run log, so the Tasks page lists actions
   beside tasks.
-- **One request per action at a time.** The worker takes a lock named after the action
-  (`Runner::LOCK_PREFIX`) for the length of the lease (`Runner::LEASE_SECONDS`); a request queued behind a running
-  one stays pending and the drain picks it up later.
+- **A long action splits itself.** `run()` receives the cursor its previous step returned; a `Result` with
+  `continueFrom` puts the request back to `pending` with that cursor and its message as the progress, and rings the
+  doorbell again. A result without one finishes the request, and the run log gets one row for the whole request,
+  timed from its first step. The lease (`Runner::LEASE_SECONDS`) covers one step, so an action that may run longer
+  returns a cursor. The geo module's `ImportAction` is the reference.
+- **One request per action at a time.** The worker takes a lock named after the action (`Runner::LOCK_PREFIX`) for
+  one step, and a request does not start while another of the same action is part-way through its steps; it stays
+  pending and the drain picks it up later. A request whose lease ran out holds nobody back.
 - **An interrupted action is not rerun.** Not every action is safe twice, so a request whose lease expired is marked
   failed and the admin queues it again. A request still pending after `Drain::GRACE_SECONDS` lost its message and is
   run by the drain.
 - **Remembered values.** A parameter built with `remembered: true` gets a settings form on the action's page; its
   saved value pre-fills the run form and is readable by other code through `ActionSettingsInterface`, so a scheduled
-  task can reuse what the admin chose (the geo module's refresh task reads the download address and the minimum
-  population its import action remembers).
+  task can reuse what the admin chose. No action in this tree uses it.
+- **The request is reloaded after every step.** An action may clear the entity manager, and saving the detached
+  instance would insert a copy, so `Runner` reloads the request before it records the result.
 
 The Maintenance page holds what an admin starts deliberately and expects to finish; the Tasks page holds what runs on
 its own, and its "run now" only runs a task early. Work that must happen on a schedule is a task even if an admin
@@ -142,8 +152,9 @@ The outbound permit list in `mago.toml` names every core class the module reache
 
 1. **Periodic work:** implement `TaskInterface`. While its plugin is switched off, the task drops out of the schedule
    and the Tasks page, like every other member of a core chain.
-2. **On-demand work an admin starts:** implement `ActionInterface`. Its `run()` executes on a worker, so it may take
-   minutes; it returns a `Result` like a task. The geo module's `ImportAction` is the reference.
+2. **On-demand work an admin starts:** implement `ActionInterface`. Its `run()` executes on a worker and returns a
+   `Result` like a task; work longer than one lease returns a cursor and continues from it. The geo module's
+   `ImportAction` is the reference.
 3. **Work handed off by a request:** a message class routed to `async`, and a handler marked `#[AsMessageHandler]`.
    Follow the doorbell rule and add a backstop task.
 4. **State between messages:** a worker handles many messages in one process, and Messenger resets only services that

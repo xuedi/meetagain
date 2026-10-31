@@ -12,6 +12,7 @@ use Module\Task\Internal\Action\RequestState;
 use Module\Task\Internal\Action\Runner;
 use Module\Task\Internal\Action\Settings;
 use Module\Task\Internal\Entity\ActionRequest;
+use Module\Task\Internal\Entity\Run;
 use Module\Task\Internal\Message\RunAction;
 use Module\Task\Internal\Repository\RunRepository;
 use Module\Task\Tests\Stub\Action;
@@ -160,7 +161,7 @@ final class MaintenanceTest extends WebTestCase
         // Assert
         self::assertSame(1, $this->stub()->runs);
         self::assertSame(['mode' => 'fast'], $this->stub()->lastValues);
-        $this->entityManager()->refresh($request);
+        $request = $this->reload($request);
         self::assertSame(RequestState::Finished, $request->getState());
         self::assertSame(Status::ok, $request->getStatus());
         $logged = self::getContainer()->get(RunRepository::class)->findLatestPerIdentifier()[Action::IDENTIFIER] ?? null;
@@ -183,7 +184,7 @@ final class MaintenanceTest extends WebTestCase
 
         // Assert
         self::assertSame(0, $this->stub()->runs);
-        $this->entityManager()->refresh($request);
+        $request = $this->reload($request);
         self::assertSame(RequestState::Pending, $request->getState());
     }
 
@@ -198,7 +199,7 @@ final class MaintenanceTest extends WebTestCase
 
         // Assert
         self::assertSame(1, $this->stub()->runs);
-        $this->entityManager()->refresh($request);
+        $request = $this->reload($request);
         self::assertSame(RequestState::Finished, $request->getState());
     }
 
@@ -212,7 +213,7 @@ final class MaintenanceTest extends WebTestCase
 
         // Assert
         self::assertSame(0, $this->stub()->runs);
-        $this->entityManager()->refresh($request);
+        $request = $this->reload($request);
         self::assertSame(RequestState::Pending, $request->getState());
     }
 
@@ -229,11 +230,138 @@ final class MaintenanceTest extends WebTestCase
         // Assert
         self::assertSame(Status::warning, $result->status);
         self::assertSame(0, $this->stub()->runs);
-        $this->entityManager()->refresh($request);
+        $request = $this->reload($request);
         self::assertSame(RequestState::Finished, $request->getState());
         self::assertSame(Status::error, $request->getStatus());
         $logged = self::getContainer()->get(RunRepository::class)->findLatestPerIdentifier()[Action::IDENTIFIER] ?? null;
         self::assertSame(Status::error, $logged?->getStatus());
+    }
+
+    public function testAContinuingStepPutsTheRequestBackWithItsCursorAndRingsAgain(): void
+    {
+        // Arrange
+        $request = $this->submit([], $this->steps());
+
+        // Act
+        $this->runner()->handle((int) $request->getId());
+
+        // Assert
+        $request = $this->reload($request);
+        self::assertSame(RequestState::Pending, $request->getState());
+        self::assertSame('1', $request->getCursor());
+        self::assertSame('step 1 of 3', $request->getMessage());
+        self::assertNull($request->getLeaseUntil());
+        self::assertNotNull($request->getStartedAt());
+        self::assertEquals([new RunAction((int) $request->getId()), new RunAction((int) $request->getId())], $this->sent());
+        self::assertSame(0, $this->runCount(Action::STEPS));
+    }
+
+    public function testEveryDoorbellRunsTheNextStepAndTheRunIsLoggedOnceAtTheEnd(): void
+    {
+        // Arrange
+        $request = $this->submit([], $this->steps());
+
+        // Act
+        for ($i = 0; $i < (Action::STEP_COUNT + 1); $i++) {
+            $this->runner()->handle((int) $request->getId());
+        }
+
+        // Assert
+        self::assertSame([null, '1', '2'], $this->steps()->cursors);
+        $request = $this->reload($request);
+        self::assertSame(RequestState::Finished, $request->getState());
+        self::assertSame(Status::ok, $request->getStatus());
+        self::assertSame('all 3 steps', $request->getMessage());
+        self::assertSame(1, $this->runCount(Action::STEPS));
+        self::assertSame(1, $this->entityManager()->getRepository(ActionRequest::class)->count(['identifier' => Action::STEPS]));
+    }
+
+    public function testASecondRequestWaitsUntilTheFirstHasWalkedAllItsSteps(): void
+    {
+        // Arrange
+        $first = $this->submit([], $this->steps());
+        $second = $this->submit([], $this->steps());
+        $this->runner()->handle((int) $first->getId());
+
+        // Act
+        $this->runner()->handle((int) $second->getId());
+
+        // Assert
+        self::assertSame([null], $this->steps()->cursors);
+        self::assertSame(RequestState::Pending, $this->reload($second)->getState());
+        self::assertNull($this->reload($second)->getStartedAt());
+    }
+
+    public function testARequestWhoseLeaseRanOutHoldsNobodyBack(): void
+    {
+        // Arrange
+        $dead = $this->submit([], $this->steps());
+        $dead->start(new DateTimeImmutable('-2 hours'), new DateTimeImmutable('-1 hour'));
+        $this->entityManager()->flush();
+        $fresh = $this->submit([], $this->steps());
+
+        // Act
+        $this->runner()->handle((int) $fresh->getId());
+
+        // Assert
+        self::assertSame([null], $this->steps()->cursors);
+        self::assertSame('1', $this->reload($fresh)->getCursor());
+    }
+
+    public function testAFailingMiddleStepFinishesTheRequest(): void
+    {
+        // Arrange
+        $this->steps()->failAtStep = 2;
+        $request = $this->submit([], $this->steps());
+
+        // Act
+        for ($i = 0; $i < Action::STEP_COUNT; $i++) {
+            $this->runner()->handle((int) $request->getId());
+        }
+
+        // Assert
+        self::assertSame([null, '1'], $this->steps()->cursors);
+        $request = $this->reload($request);
+        self::assertSame(RequestState::Finished, $request->getState());
+        self::assertSame(Status::exception, $request->getStatus());
+        self::assertSame('step 2 broke', $request->getMessage());
+        self::assertSame(1, $this->runCount(Action::STEPS));
+    }
+
+    public function testTheDrainRunsTheNextStepWhenTheDoorbellOfAContinuingRequestWasLost(): void
+    {
+        // Arrange
+        $request = $this->submit([], $this->steps());
+        $this->runner()->handle((int) $request->getId());
+        $this->backdate($request, 'created_at', '-10 minutes');
+
+        // Act
+        $this->drain()->run();
+
+        // Assert
+        self::assertSame([null, '1'], $this->steps()->cursors);
+        $request = $this->reload($request);
+        self::assertSame('2', $request->getCursor());
+    }
+
+    public function testALeaseThatExpiresMidStepFailsTheRequestAndDropsTheChain(): void
+    {
+        // Arrange
+        $request = $this->submit([], $this->steps());
+        $this->runner()->handle((int) $request->getId());
+        $request = $this->reload($request);
+        $request->start(new DateTimeImmutable('-2 hours'), new DateTimeImmutable('-1 hour'));
+        $this->entityManager()->flush();
+
+        // Act
+        $this->drain()->run();
+        $this->runner()->handle((int) $request->getId());
+
+        // Assert
+        self::assertSame([null], $this->steps()->cursors);
+        $request = $this->reload($request);
+        self::assertSame(RequestState::Finished, $request->getState());
+        self::assertSame(Status::error, $request->getStatus());
     }
 
     public function testSavedSettingsPrefillTheNextRun(): void
@@ -271,12 +399,34 @@ final class MaintenanceTest extends WebTestCase
     /**
      * @param array<string, string|int|bool|null> $values
      */
-    private function submit(array $values): ActionRequest
+    private function submit(array $values, ?Action $action = null): ActionRequest
     {
         $requests = self::getContainer()->get(Requests::class);
         self::assertInstanceOf(Requests::class, $requests);
 
-        return $requests->submit($this->stub(), $values, null);
+        return $requests->submit($action ?? $this->stub(), $values, null);
+    }
+
+    private function reload(ActionRequest $request): ActionRequest
+    {
+        $this->entityManager()->clear();
+        $reloaded = $this->entityManager()->find(ActionRequest::class, $request->getId());
+        self::assertInstanceOf(ActionRequest::class, $reloaded);
+
+        return $reloaded;
+    }
+
+    private function steps(): Action
+    {
+        $stub = self::getContainer()->get('stub.step_action');
+        self::assertInstanceOf(Action::class, $stub);
+
+        return $stub;
+    }
+
+    private function runCount(string $identifier): int
+    {
+        return $this->entityManager()->getRepository(Run::class)->count(['identifier' => $identifier]);
     }
 
     private function backdate(ActionRequest $request, string $column, string $offset): void

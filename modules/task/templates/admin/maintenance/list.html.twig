@@ -33,6 +33,9 @@
                                 </td>
                                 <td class="is-nowrap">
                                     {% include '@Task/admin/maintenance/_last.html.twig' with {'request': row.last} only %}
+                                    {% if row.last and row.last.status is null and row.last.message %}
+                                        <p class="has-text-grey is-size-7">{{ row.last.message }}</p>
+                                    {% endif %}
                                 </td>
                                 <td class="is-nowrap">
                                     <a href="{{ path('app_admin_system_maintenance_show', {'identifier': row.identifier}) }}"

@@ -10,11 +10,17 @@ final readonly class Options
 
     public ?string $country;
 
+    /**
+     * @param list<string> $languages
+     */
     public function __construct(
         ?string $country = null,
         public ?string $sourceDir = null,
         public string $baseUrl = self::DEFAULT_BASE_URL,
         public int $minPopulation = self::DEFAULT_MIN_POPULATION,
+        public array $languages = ['en'],
+        public int $fromRow = 0,
+        public ?int $rowLimit = null,
     ) {
         $this->country = $country === null || $country === '' ? null : strtoupper($country);
     }
@@ -29,5 +35,15 @@ final readonly class Options
     public function covers(string $iso2): bool
     {
         return $this->country === null || $this->country === $iso2;
+    }
+
+    public function windowed(int $fromRow, int $rowLimit): self
+    {
+        return new self($this->country, $this->sourceDir, $this->baseUrl, $this->minPopulation, $this->languages, $fromRow, $rowLimit);
+    }
+
+    public function inWindow(int $row): bool
+    {
+        return $row >= $this->fromRow && ($this->rowLimit === null || $row < ($this->fromRow + $this->rowLimit));
     }
 }

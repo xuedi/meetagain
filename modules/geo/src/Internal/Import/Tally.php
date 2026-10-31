@@ -12,6 +12,8 @@ final class Tally
 
     private int $skipped = 0;
 
+    private int $rows = 0;
+
     public function created(): void
     {
         ++$this->created;
@@ -32,6 +34,11 @@ final class Tally
         ++$this->skipped;
     }
 
+    public function row(): int
+    {
+        return $this->rows++;
+    }
+
     public function written(): int
     {
         return $this->created + $this->updated;
@@ -39,6 +46,6 @@ final class Tally
 
     public function report(Dataset $dataset): Report
     {
-        return new Report($dataset, $this->created, $this->updated, $this->unchanged, $this->skipped);
+        return new Report($dataset, $this->created, $this->updated, $this->unchanged, $this->skipped, $this->rows);
     }
 }

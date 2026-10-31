@@ -26,9 +26,14 @@ readonly class Requests
     {
         $request = new ActionRequest($action->getIdentifier(), $values, $requestedBy, $this->clock->now());
         $this->repository->save($request);
-        $this->bus->dispatch(new RunAction((int) $request->getId()), [new TransportNamesStamp([ScheduleProvider::OFFLOAD_TRANSPORT])]);
+        $this->ring($request);
 
         return $request;
+    }
+
+    public function ring(ActionRequest $request): void
+    {
+        $this->bus->dispatch(new RunAction((int) $request->getId()), [new TransportNamesStamp([ScheduleProvider::OFFLOAD_TRANSPORT])]);
     }
 
     /**

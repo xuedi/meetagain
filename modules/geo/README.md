@@ -32,25 +32,53 @@ flowchart LR
 translations. Every row is keyed on its GeoNames id, so a second run updates in place and adds no duplicate, and a
 row GeoNames drops stays. Consumers keep plain city ids, so a deleted row would leave them pointing at nothing.
 
-- **Scope by country.** Without a country a dataset covers every country it has data for; with one it covers that
-  country only, so an installation grows its directory a country at a time. Translations come from one
-  alternate-name file per country, streamed line by line, never the single worldwide file.
+- **Worldwide, with a console-only country filter.** The import covers every country GeoNames has; the console's
+  `--country` limits every dataset to one country for development. Translations come from one alternate-name file
+  per country, streamed line by line, never the single worldwide file.
 - **What counts as a city.** A populated place that is not a section, historic, abandoned or destroyed place, above
   the minimum population that picks the dump; a capital or a state seat is kept whatever its population. A section
   (`PPLX`) becomes a district of the nearest more populous city of its state within `Loader::DISTRICT_RADIUS_KM`.
 - **Which name wins.** For one place and language a name GeoNames marks both preferred and short wins, then a
   preferred name, then a plain alternate; a short name alone is a last resort, and historic or colloquial names are
-  never taken. Languages are `Loader::LANGUAGES`.
+  never taken. The languages are the ones the installation has enabled (`LanguageService::getEnabledCodes()`), so
+  enabling a language and pressing play again fills its names.
 - **Countries are derived last.** `countryInfo.txt` has no coordinates, so after the cities each country takes its
   capital's position and its cities' extent as its bounding box.
 - **Nothing is cached between runs.** Each download lands in the system temp directory and is deleted when its
   dataset is done; the release image's root filesystem is read-only.
 
-The same import runs from three places, which all read their options through `ImportAction::options()`: the console
-command `app:geo:import <dataset|all>` (`--country`, `--min-population`, `--source`, `--base-url`), the
-`geo-import` action on the Maintenance page (see [modules/task/README.md](../task/README.md)), and the `geo-refresh`
-task. The task refreshes countries and states only, and does nothing while no country is imported, so an installation
-that never uses the module never reaches the network.
+## The import runs in steps, and only when someone starts it
+
+```mermaid
+flowchart LR
+    start([play]) --> cs[countries and states]
+    cs --> cw["cities, ImportAction::ROWS_PER_STEP rows a step"]
+    cw -->|rows left| cw
+    cw --> dw[districts, the same windows]
+    dw -->|rows left| dw
+    dw --> tr[names of one country a step]
+    tr -->|countries left| tr
+    tr --> done([finished, with the counts])
+```
+
+`ImportAction` has no parameters: the admin presses play on the Maintenance page and the action walks the steps above,
+each one its own worker message, by returning the next cursor to the task module (see
+[modules/task/README.md](../task/README.md)). A step is small enough that no message outgrows a worker's memory,
+even with the development query log. The scope is fixed: GeoNames' download address and
+`Options::DEFAULT_MIN_POPULATION`.
+
+- **Windows keep the slug rules.** Every city window reads the whole dump once to find the most populous city of each
+  name, and takes the slugs already used from the database, so a window writes the same rows the whole file would.
+  Each window places the countries it touched; the last one that touches a country sees all its cities.
+- **Every press fetches every country's names.** Names are refreshed for each country with cities, so cities added
+  since the last press get theirs and renamed places follow GeoNames.
+- **Nothing schedules it.** An installation that never presses play never reaches the network; a periodic refresh
+  would be a task of its own.
+
+The console command `app:geo:import all` walks the same steps in one process and resets the container's services
+between them, as a worker does between messages. With one dataset it runs that dataset in one go. Its options
+(`--country`, `--min-population`, `--source`, `--base-url`) exist for development and the tests, which import the
+sample through `--source`.
 
 ## A city has two slugs
 
@@ -84,9 +112,8 @@ requires a login, and ignores a query shorter than `CityController::MIN_QUERY_LE
 ## Surfaces
 
 - **Console** - `app:geo:import` with one dataset or `all`.
-- **Maintenance page** - the `geo-import` action: its facts count every dataset and name the countries that have
-  cities and translations, and its remembered
-  values (download address, minimum population) are what the `geo-refresh` task uses.
+- **Maintenance page** - the `geo-import` action: a play button on its row, the step's progress while it runs, and
+  the count of every dataset as its facts.
 - **Endpoint** - `GET /{_locale}/geo/cities?country=&q=` for the city field's autocomplete.
 - **Template** - `@Geo/attribution.html.twig`.
 
@@ -112,10 +139,10 @@ when its own directory lacks the city.
 
 - The local city id differs between installations; only the GeoNames id is portable.
 - `hasCities()` is memoised: a test that empties the directory must do so before the first lookup in that container.
-- The sample under `modules/geo/tests/Sample/` is in GeoNames dump format and is what every development and test
-  database imports with `--source`; a fixture that names a city needs that import to have run first.
+- The sample under `modules/geo/tests/Sample/` is in GeoNames dump format and is what the test databases and the
+  core development modes import with `--source`; a fixture that names a city needs that import to have run first.
 
 ## Related
 
-- [modules/task/README.md](../task/README.md) - the action and the task the import runs as
+- [modules/task/README.md](../task/README.md) - the Maintenance action and the cursor the import's steps run on
 - [modules/README.md](../README.md) - how a module is built, wired and guarded

@@ -13,7 +13,8 @@ namespace = "Module\\Geo\\"
 permit = [
     "Module\\Geo\\**",
     "@global",                              # Collator, Override, PHP's own functions
-    "Module\\Task\\Contract\\**",            # geo-refresh is a scheduled task, geo-import a Maintenance action
+    "Module\\Task\\Contract\\**",            # geo-import is a Maintenance action
+    "App\\Service\\Config\\LanguageService",  # the enabled languages the import fetches names in
     "Doctrine\\**",
     "Symfony\\**",
     "Psr\\**",
@@ -26,7 +27,8 @@ namespace = "Module\\Geo\\Tests\\"
 permit = [
     "Module\\Geo\\**",
     "@global",                              # Collator, Override, PHP's own functions
-    "Module\\Task\\Contract\\**",            # geo-refresh is a scheduled task, geo-import a Maintenance action
+    "Module\\Task\\Contract\\**",            # geo-import is a Maintenance action
+    "App\\Service\\Config\\LanguageService",  # the enabled languages the import fetches names in
     "PHPUnit\\**",
     "Tests\\Module\\**",                    # the shared module test harness: ModuleKernel
     "Doctrine\\**",

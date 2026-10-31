@@ -314,23 +314,6 @@ class CityRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return list<string> ISO2 codes of the countries with at least one translated city
-     */
-    public function findCountriesWithTranslations(): array
-    {
-        $rows = $this
-            ->createQueryBuilder('c')
-            ->select('DISTINCT co.iso2')
-            ->join('c.country', 'co')
-            ->join('c.translations', 't')
-            ->orderBy('co.iso2', 'ASC')
-            ->getQuery()
-            ->getArrayResult();
-
-        return array_map(strval(...), array_column($rows, 'iso2'));
-    }
-
-    /**
      * @return array<string, int> keyed by country ISO2
      */
     public function countPerCountry(): array
