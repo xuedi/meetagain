@@ -6,6 +6,6 @@ services:
     Module\Task\:
         resource: '../src/'
         exclude:
-            - '../src/Contract/{Cadence.php,FinishedRun.php,Health.php,Result.php}'
+            - '../src/Contract/{ActionParameter.php,Cadence.php,FinishedRun.php,Health.php,Result.php}'
             - '../src/Internal/Entity/'
             - '../src/Internal/Message/'

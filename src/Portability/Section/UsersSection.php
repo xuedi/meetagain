@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Enum\ImageType;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
+use App\Portability\Cities;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
@@ -23,6 +24,7 @@ readonly class UsersSection implements SectionInterface
     public function __construct(
         private EntityManagerInterface $em,
         private UserRepository $userRepository,
+        private Cities $cities,
     ) {}
 
     #[Override]
@@ -64,6 +66,7 @@ readonly class UsersSection implements SectionInterface
                 'password' => $user->getPassword(),
                 'bio' => $user->getBio(),
                 'public' => $user->isPublic(),
+                'city_geoname_id' => $this->cities->geonameIdOf($user->getCityId()),
                 'image_file' => $user->getImage() instanceof Image ? $images->addImage($user->getImage()) : null,
             ];
         }
@@ -112,6 +115,7 @@ readonly class UsersSection implements SectionInterface
         $user->setPassword((string) ($row['password'] ?? ''));
         $user->setBio(isset($row['bio']) ? (string) $row['bio'] : null);
         $user->setPublic((bool) ($row['public'] ?? true));
+        $user->setCityId($this->cities->resolve($row, $context, Cities::USER_KIND));
         $user->setStatus(UserStatus::Active);
         $user->setVerified(true);
         $user->setRestricted(false);

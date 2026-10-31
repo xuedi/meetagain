@@ -405,6 +405,7 @@ admin_location:
     flash_deleted: 'Lieu supprimé avec succès'
     flash_created: 'Lieu créé avec succès'
     flash_delete_blocked: 'Impossible de supprimer le lieu. Il est actuellement utilisé dans %count% événement(s).'
+    form_label_city_place: 'Ville (pour les cartes et les filtres)'
 admin_logs:
     tab_activity: 'Activité'
     tab_system: 'Système'
@@ -620,6 +621,7 @@ admin_system:
     tab_images: 'Images'
     tab_language: 'Langue'
     tab_import: 'Import'
+    tab_maintenance: 'Maintenance'
     tab_secretbox: 'Clés secrètes'
     tab_hotfixes: 'Correctifs'
     flash_invalid_csrf: 'Jeton CSRF invalide'

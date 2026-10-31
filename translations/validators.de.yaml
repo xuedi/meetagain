@@ -234,3 +234,6 @@ Error: Fehler
 'item_report.validator_explanation_long': 'Die Begründung ist zu lang.'
 'item_report.validator_good_faith': 'Bitte bestätige, dass du die Meldung in gutem Glauben machst.'
 'report.validator_remarks_long': 'Die Bemerkungen sind zu lang.'
+city_picker:
+    validator_required: 'Bitte eine Stadt aus der Liste wählen.'
+    validator_unknown: 'Diese Stadt ist nicht im Verzeichnis.'

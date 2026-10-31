@@ -1,0 +1,27 @@
+9000054	6252001	en	United States	1					
+9000055	6252001	de	Vereinigte Staaten	1					
+9000056	6252001	fr	États-Unis	1					
+9000057	6252001	es	Estados Unidos	1					
+9000058	6252001	zh	美国	1					
+9000059	6252001	en	USA		1				
+9000060	6252001	en	America						
+9000061	5332921	en	California	1					
+9000062	5332921	de	Kalifornien	1					
+9000063	5332921	fr	Californie	1					
+9000064	5332921	es	California	1					
+9000065	5332921	zh	加利福尼亚州	1					
+9000066	5128581	en	New York City	1					
+9000067	5128581	de	New York	1					
+9000068	5128581	fr	New York	1					
+9000069	5128581	es	Nueva York	1					
+9000070	5128581	zh	纽约	1					
+9000071	5128581	en	NYC		1				
+9000072	5128581	en	New Amsterdam				1		
+9000073	5368361	en	Los Angeles	1					
+9000074	5368361	es	Los Ángeles	1					
+9000075	5368361	zh	洛杉矶	1					
+9000076	5391959	en	San Francisco	1					
+9000077	5391959	zh	旧金山	1					
+9000078	4250542	en	Springfield	1					
+9000079	4409896	en	Springfield	1					
+9000080	5083330	en	Berlin	1					

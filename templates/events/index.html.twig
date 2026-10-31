@@ -45,6 +45,13 @@
                             {{ form_row(filter.group) }}
                         {% endif %}
 
+                        {% if filter.country is defined %}
+                            {{ form_row(filter.country) }}
+                        {% endif %}
+                        {% if filter.city is defined %}
+                            {{ form_row(filter.city) }}
+                        {% endif %}
+
                         <button class="button is-link">{{ 'events.button_filter'|trans }}</button>
                         {{ form_end(filter) }}
                     </div>
@@ -52,6 +59,12 @@
 
                 <!-- Right side -->
                 <div class="level-right">
+                    {% if showEventMap %}
+                    <a class="button mr-2" href="{{ path('app_map', app.request.query.all|filter((v, k) => k in ['country', 'city'])) }}">
+                        <span class="icon"><i class="fa fa-map-location-dot"></i></span>
+                        <span>{{ 'events.button_map'|trans }}</span>
+                    </a>
+                    {% endif %}
                     {% if hasFeatured %}
                     <a class="button has-background-info-light" href="{{ path('app_event_featured') }}">
                         <span class="icon has-text-warning">

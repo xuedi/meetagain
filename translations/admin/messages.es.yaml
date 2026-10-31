@@ -405,6 +405,7 @@ admin_location:
     flash_deleted: 'Lugar eliminado correctamente'
     flash_created: 'Lugar creado correctamente'
     flash_delete_blocked: 'No se puede eliminar el lugar. Actualmente se usa en %count% evento(s).'
+    form_label_city_place: 'Ciudad (para mapas y filtros)'
 admin_logs:
     tab_activity: 'Actividad'
     tab_system: 'Sistema'
@@ -620,6 +621,7 @@ admin_system:
     tab_images: 'Imágenes'
     tab_language: 'Idioma'
     tab_import: 'Importar'
+    tab_maintenance: 'Mantenimiento'
     tab_secretbox: 'Claves secretas'
     tab_hotfixes: 'Correcciones'
     flash_invalid_csrf: 'Token CSRF no válido'

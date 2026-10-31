@@ -1,0 +1,64 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        {% for group in sections %}
+            {% embed 'admin/_components/admin_section.html.twig' with {'section': group.section} %}
+                {% block body %}
+                    <table class="table is-fullwidth">
+                        <thead>
+                        <tr>
+                            <th>{{ 'admin_maintenance.col_action'|trans }}</th>
+                            <th>{{ 'admin_maintenance.col_facts'|trans }}</th>
+                            <th>{{ 'admin_maintenance.col_last_run'|trans }}</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for row in group.rows %}
+                            <tr>
+                                <td>
+                                    <strong>{{ row.action.label|trans }}</strong>
+                                    <p class="has-text-grey is-size-7">{{ row.action.description|trans }}</p>
+                                </td>
+                                <td class="is-size-7">
+                                    {% for label, value in row.facts %}
+                                        <div>{{ label|trans }}: <strong>{{ value }}</strong></div>
+                                    {% endfor %}
+                                </td>
+                                <td class="is-nowrap">
+                                    {% include '@Task/admin/maintenance/_last.html.twig' with {'request': row.last} only %}
+                                </td>
+                                <td class="is-nowrap">
+                                    <a href="{{ path('app_admin_system_maintenance_show', {'identifier': row.identifier}) }}"
+                                       title="{{ 'admin_maintenance.action_details'|trans }}">
+                                        <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
+                                    </a>
+                                    {% if row.runsFromRow %}
+                                        <a href="{{ path('app_admin_system_maintenance_run', {'identifier': row.identifier}) }}"
+                                           class="button-as-icon"
+                                           title="{{ 'admin_maintenance.action_run'|trans }}"
+                                           data-post
+                                           data-csrf-token="{{ csrf_token(runToken ~ row.identifier) }}">
+                                            <span class="icon"><i class="fa fa-play"></i></span>
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endblock %}
+            {% endembed %}
+        {% else %}
+            <p class="has-text-grey has-text-centered">{{ 'admin_maintenance.empty'|trans }}</p>
+        {% endfor %}
+
+    </div>
+
+{% endblock %}

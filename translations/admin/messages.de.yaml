@@ -405,6 +405,7 @@ admin_location:
     flash_deleted: 'Veranstaltungsort erfolgreich gelöscht'
     flash_created: 'Veranstaltungsort erfolgreich erstellt'
     flash_delete_blocked: 'Veranstaltungsort kann nicht gelöscht werden. Er wird derzeit in %count% Veranstaltung(en) verwendet.'
+    form_label_city_place: 'Stadt (für Karten und Filter)'
 admin_logs:
     tab_activity: 'Aktivität'
     tab_system: 'System'
@@ -620,6 +621,7 @@ admin_system:
     tab_images: 'Bilder'
     tab_language: 'Sprache'
     tab_import: 'Import'
+    tab_maintenance: 'Wartung'
     tab_secretbox: 'Geheimschluessel'
     tab_hotfixes: 'Hotfixes'
     flash_invalid_csrf: 'Ungültiges CSRF-Token'

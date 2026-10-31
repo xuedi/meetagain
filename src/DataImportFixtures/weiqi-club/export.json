@@ -62,7 +62,9 @@
             "latitude": "52.5321",
             "longitude": "13.3799",
             "city": "Berlin",
-            "country": ""
+            "city_geoname_id": 2950159,
+            "city_name": "Berlin",
+            "country": "DE"
         },
         {
             "ref": 2,
@@ -70,7 +72,9 @@
             "latitude": "52.5035",
             "longitude": "13.4052",
             "city": "Berlin",
-            "country": ""
+            "city_geoname_id": 2950159,
+            "city_name": "Berlin",
+            "country": "DE"
         },
         {
             "ref": 5,
@@ -78,6 +82,8 @@
             "latitude": "0",
             "longitude": "0",
             "city": "",
+            "city_geoname_id": null,
+            "city_name": null,
             "country": ""
         },
         {
@@ -86,7 +92,9 @@
             "latitude": "52.4693",
             "longitude": "13.2687",
             "city": "Berlin",
-            "country": ""
+            "city_geoname_id": 2950159,
+            "city_name": "Berlin",
+            "country": "DE"
         }
     ],
     "users": [
@@ -98,6 +106,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
         },
         {
@@ -108,6 +117,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c79532c476e00a2400292babd40d98ac7dff9997.jpg"
         },
         {
@@ -118,6 +128,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker with a passion for painting and hiking. Catch me exploring the great outdoors or getting lost in colors! #Wanderlust #ArtLover 🎨⛰️",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/2815822b97a4d8780ab4a535c93de335d041beb1.jpg"
         },
         {
@@ -128,6 +139,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker and creative soul, I explore the world through hiking trails and paintbrush strokes. Join me on my journey of discovery! #HikingAdventures #ArtisticLife",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/ddde6f9c2ca89fc15b6544f67093a8ffbabc5576.jpg"
         },
         {
@@ -138,6 +150,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting and hiking, I find inspiration in nature's beauty. Balancing my love for creativity with a career in graphic design keeps my heart and mind alive! #ArtLover #NatureEnthusiast #CreativeCareer",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/2222401da7a69ee28f16d18df030d4314149f727.jpg"
         },
         {
@@ -148,6 +161,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker by day, coffee lover by night! Balancing work and play like a pro - let's create, explore, and enjoy life together! #HobbyHero #WorkAndPlay",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/89595911050c056983c9ccb0a8f384df2c2451f0.jpg"
         },
         {
@@ -158,6 +172,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker by day, crafting wizard by night! When I'm not doodling my dreams, you'll catch me hiking or whipping up some delicious treats! 🌟🏞️ #Wanderlust #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/dd375644dd635f8ebbc14455c1a92eba2b3bcbde.jpg"
         },
         {
@@ -168,6 +183,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Coffee-fueled creative by day, amateur ninja at night - watch out for my decorative sock collection! 🚀☕️ #WorkHardPlayHarder #SockGoals",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/e273b0e43eff29b8d94320f130c784b7b520c478.jpg"
         },
         {
@@ -178,6 +194,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Lover of adventure and creativity, I dive into painting and hiking when I'm not crafting magic in marketing! 🌟✨ #HobbyistHeart #WorkAndPlay",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/6ba742bef3c8815b370cea7f78a3f832d3b705b4.jpg"
         },
         {
@@ -188,6 +205,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Lost in the rhythm of my paintbrush and the soothing melodies of my guitar, I find solace in creativity as work feels like a never-ending cycle. Searching for joy in hobbies while the weight of responsibilities lingers heavy on my shoulders. #CreativeEscape #HeavyHeart",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/7d43a8bfd3730903f80ad5443c726f1033c6912b.jpg"
         },
         {
@@ -198,6 +216,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "When I'm not exploring new worlds through books, I'm diving into the beauty of languages - each one a key to a different culture. Join me on this journey of connection and discovery! #LanguageLover #HobbyExplorer",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/31fef0605dd4855630afc0c4c11c427a2be34cbc.jpg"
         },
         {
@@ -208,6 +227,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about exploring new cultures through the beauty of languages, I find joy in connecting with others and discovering unique expressions. In my free time, you'll catch me diving into books or practicing my latest linguistic obsession! #LanguageLover #CulturalExplorer",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/99182573f44119ab7be948dd89e4463a742c2a34.jpg"
         },
         {
@@ -218,6 +238,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Lover of languages, forever on a quest for new words and worlds! From juggling hobbies to weaving cultures, I'm all about the fun in learning! 🌍✨ #LanguageLover #HobbyExplorer",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/aa7c278d29f74478191ce4cfb1798a4b6283c5b6.jpg"
         },
         {
@@ -228,6 +249,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about bridging cultures through the magic of languages, I thrive in diverse workplaces where every conversation is an adventure! 🌍✨ #LanguageLover #WorkLifeJoy",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/490bfc684f9830da9ba9b43e3de6d7d15d674a95.jpg"
         },
         {
@@ -238,6 +260,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "When I'm not exploring new worlds through books, I'm diving into the beauty of languages - each one a key to a different culture. Join me on this journey of connection and discovery! #LanguageLover #HobbyExplorer",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/518d9628fbfcbcb0a627f2049703b5d04e92cd28.jpg"
         },
         {
@@ -248,6 +271,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker by day, crafting wizard by night! When I'm not doodling my dreams, you'll catch me hiking or whipping up some delicious treats! 🌟🏞️ #Wanderlust #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c26097c4cbcbb904a18d00c97144af80bb26db65.jpg"
         },
         {
@@ -258,6 +282,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about bridging cultures through language, I thrive in dynamic work environments that challenge my communication skills. Embracing every opportunity to learn, I'm dedicated to fostering understanding and connection across diverse communities. #LanguageLover #CulturalBridge",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/08a3b47613f2d0f6aced2c3c467602e3aa1638f1.jpg"
         },
         {
@@ -268,6 +293,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker by day, crafting wizard by night! When I'm not doodling my dreams, you'll catch me hiking or whipping up some delicious treats! 🌟🏞️ #Wanderlust #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/8cc62ac5b14b41e7c5b5f5e46a1c34cde6edd430.jpg"
         }
     ],

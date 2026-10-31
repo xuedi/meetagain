@@ -126,6 +126,8 @@ admin_system_import:
     note: 'Los miembros importados sin contraseña usan "Olvidé mi contraseña" para activar su cuenta.'
     failed: 'La importación falló:'
     label_zip_file: 'Archivo ZIP de exportación'
+    kind_location_cities: 'Ciudades de los lugares'
+    kind_user_cities: 'Ciudades de los miembros'
 admin_system_config:
     intro: 'Ajustes del sitio: identidad, remitente, pie de página e interruptores.'
     heading_website_settings: 'Ajustes del sitio web'
@@ -133,6 +135,7 @@ admin_system_config:
     heading_on_off_settings: 'Ajustes de activación'
     flash_saved: 'Ajustes guardados'
     option_show_town_hall: 'Mostrar Town Hall'
+    option_show_event_geo: 'Mapa de eventos y filtros de lugar'
     option_automatic_registration: 'Registro automático'
     option_send_rsvp_notifications: 'Enviar notificaciones de RSVP'
     option_send_event_reminders: 'Correos de recordatorio de eventos'

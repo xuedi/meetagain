@@ -25,6 +25,7 @@
                             <div class="column is-6">
                                 {{ form_row(form.name) }}
                                 {{ form_row(form.bio) }}
+                                {% if form.cityId is defined %}{{ form_row(form.cityId) }}{% endif %}
                                 {{ form_row(form.languages) }}
                                 {{ form_row(form.public) }}
                             </div>

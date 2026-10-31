@@ -43,6 +43,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
         }
     ],

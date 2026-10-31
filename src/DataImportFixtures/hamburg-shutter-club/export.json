@@ -49,7 +49,9 @@
             "latitude": "53.5459",
             "longitude": "9.9695",
             "city": "Hamburg",
-            "country": ""
+            "city_geoname_id": 2911298,
+            "city_name": "Hamburg",
+            "country": "DE"
         },
         {
             "ref": 20,
@@ -57,7 +59,9 @@
             "latitude": "53.5445",
             "longitude": "10.0003",
             "city": "Hamburg",
-            "country": ""
+            "city_geoname_id": 2911298,
+            "city_name": "Hamburg",
+            "country": "DE"
         },
         {
             "ref": 21,
@@ -65,7 +69,9 @@
             "latitude": "53.5522",
             "longitude": "9.9245",
             "city": "Hamburg",
-            "country": ""
+            "city_geoname_id": 2911298,
+            "city_name": "Hamburg",
+            "country": "DE"
         }
     ],
     "users": [
@@ -77,6 +83,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
         },
         {
@@ -87,6 +94,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about bridging cultures through the power of language, I thrive in environments where communication flourishes. Work is a canvas, and languages are the vibrant hues that bring it to life. #LanguageLover #CulturalConnector",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/05673bb181f1d0df26d1c1381a11fcd591c2b0ea.jpg"
         },
         {
@@ -97,6 +105,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "When I'm not exploring new worlds through books, I'm diving into the beauty of languages - each one a key to a different culture. Join me on this journey of connection and discovery! #LanguageLover #HobbyExplorer",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c6c7d0c7eed7b0c8638a5ce7747fe42c17dc7e61.jpg"
         },
         {
@@ -107,6 +116,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/1cb88fdd277342edede632f00e75546c7b57b2d6.jpg"
         },
         {
@@ -117,6 +127,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about turning words into bridges, I thrive on the magic of languages at work! 💼✨ Let's connect through communication! #LanguageLover #WorkJoy",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/7f2b24b36cf125c97bb87dda8ec3b9b7c1693b0a.jpg"
         },
         {
@@ -127,6 +138,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "In the delicate crunch of every cookie lies a harmony of flavors that awakens my senses and brings solace to my soul. My passion for cookies transcends mere indulgence; it is an art form that celebrates life's sweetest moments. #CookieLover #SweetObsessions",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/f37410c71a6296c18ef39596a17f15ddc1a938bb.jpg"
         },
         {
@@ -137,6 +149,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Coffee-fueled creative by day, amateur ninja at night - watch out for my decorative sock collection! 🚀☕️ #WorkHardPlayHarder #SockGoals",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/1a1b82265cbbd9011e0e7061a93d44f03633300f.jpg"
         },
         {
@@ -147,6 +160,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about bridging cultures through the magic of languages, I thrive in diverse workplaces where every conversation is an adventure! 🌍✨ #LanguageLover #WorkLifeJoy",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/36c9b12d796dc787478edc2292ebce89bfe61053.jpg"
         },
         {
@@ -157,6 +171,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/e2b2b601faed7510cab8549fab682f68eba9bbf9.jpg"
         }
     ],

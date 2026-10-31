@@ -45,7 +45,9 @@
             "latitude": "52.5121",
             "longitude": "13.4566",
             "city": "Berlin",
-            "country": ""
+            "city_geoname_id": 2950159,
+            "city_name": "Berlin",
+            "country": "DE"
         },
         {
             "ref": 16,
@@ -53,7 +55,9 @@
             "latitude": "52.5275",
             "longitude": "13.3978",
             "city": "Berlin",
-            "country": ""
+            "city_geoname_id": 2950159,
+            "city_name": "Berlin",
+            "country": "DE"
         }
     ],
     "users": [
@@ -65,6 +69,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
         },
         {
@@ -75,6 +80,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Lover of adventure and creativity, I dive into painting and hiking when I'm not crafting magic in marketing! 🌟✨ #HobbyistHeart #WorkAndPlay",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/6d10ed55842a62725ad954d7fa56fe1e735feb14.jpg"
         },
         {
@@ -85,6 +91,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about bridging cultures through the magic of languages, I thrive in diverse workplaces where every conversation is an adventure! 🌍✨ #LanguageLover #WorkLifeJoy",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/490bfc684f9830da9ba9b43e3de6d7d15d674a95.jpg"
         }
     ],

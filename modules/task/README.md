@@ -1,8 +1,9 @@
 # Task
 
-> Everything that runs outside a request: scheduled tasks, the message workers that pick up work a request hands
-> off, the run log, and the heartbeat that tells whether the workers are alive. Every module and plugin registers its
-> periodic work here. Built and guarded as described in [modules/README.md](../README.md).
+> Everything that runs outside a request: scheduled tasks, maintenance actions an admin starts by hand, the message
+> workers that pick up work a request hands off, the run log, and the heartbeat that tells whether the workers are
+> alive. Every module and plugin registers its periodic and its on-demand work here. Built and guarded as described
+> in [modules/README.md](../README.md).
 
 ## Two kinds of process run beside the web server
 
@@ -66,6 +67,46 @@ message therefore loses nothing, and every doorbell has a slow task beside it th
 `mod_task_run` row with the host. The scheduler, the workers and `app:task:run` all go through it, so the run log is
 the same whatever started the run.
 
+## A maintenance action runs once, when an admin asks
+
+A class implementing `ActionInterface` is work that has no cadence: importing reference data, recalculating a derived
+value, restoring defaults, a diagnostic. It declares a section (`ActionSection`), a label, a description, the
+parameters its form asks for (`ActionParameter`) and a few facts about the current state to show beside the form.
+
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant Page as Maintenance page
+    participant Row as mod_task_action_request
+    participant Worker
+    participant Drain as task action-drain
+    Admin->>Page: submit the form
+    Page->>Row: pending row with the values
+    Page-->>Worker: RunAction(id) on async
+    Worker->>Row: lock per action, lease, running
+    Worker->>Row: done or failed, plus a mod_task_run row
+    Drain->>Row: lease expired - failed, never rerun
+    Drain->>Worker: still pending after the grace period - run it
+```
+
+- **The request row is the record** and `RunAction` is its doorbell, as for every other hand-off. The row keeps who
+  asked, the values, the state and the result; the run also lands in the run log, so the Tasks page lists actions
+  beside tasks.
+- **One request per action at a time.** The worker takes a lock named after the action
+  (`Runner::LOCK_PREFIX`) for the length of the lease (`Runner::LEASE_SECONDS`); a request queued behind a running
+  one stays pending and the drain picks it up later.
+- **An interrupted action is not rerun.** Not every action is safe twice, so a request whose lease expired is marked
+  failed and the admin queues it again. A request still pending after `Drain::GRACE_SECONDS` lost its message and is
+  run by the drain.
+- **Remembered values.** A parameter built with `remembered: true` gets a settings form on the action's page; its
+  saved value pre-fills the run form and is readable by other code through `ActionSettingsInterface`, so a scheduled
+  task can reuse what the admin chose (the geo module's refresh task reads the download address and the minimum
+  population its import action remembers).
+
+The Maintenance page holds what an admin starts deliberately and expects to finish; the Tasks page holds what runs on
+its own, and its "run now" only runs a task early. Work that must happen on a schedule is a task even if an admin
+sometimes triggers it.
+
 ## The heartbeat lives in Valkey
 
 Every worker and scheduler process writes `task:heartbeat:<host>:<pid>` with a `Heartbeat::TTL_SECONDS` expiry while
@@ -74,19 +115,23 @@ running.
 
 ## The contract
 
-| Chain shape       | Seam            | Answers                                   |
-|-------------------|-----------------|-------------------------------------------|
-| union, every task | `TaskInterface` | one unit of periodic work and its cadence |
+| Chain shape         | Seam              | Answers                                        |
+|---------------------|-------------------|------------------------------------------------|
+| union, every task   | `TaskInterface`   | one unit of periodic work and its cadence      |
+| union, every action | `ActionInterface` | one unit of on-demand work, its form and facts |
 
-`TriggerInterface` sends one run of a task to a worker now. `RunLogInterface` and `HealthInterface` expose the run log
+`TriggerInterface` sends one run of a task to a worker now. `ActionSettingsInterface` reads an action's remembered
+values. `RunLogInterface` and `HealthInterface` expose the run log
 and the worker health to other consumers, such as an API or a status page. `Cadence`, `Result`, `Status`,
-`FinishedRun` and `Health` are the value types.
+`FinishedRun`, `Health`, `ActionSection` and `ActionParameter` are the value types.
 
 ## Surfaces
 
 - **Tasks page** - Admin, Logs, Tasks (`/admin/logs/tasks`): Schedules (every task, its cadence, next and last run,
   and "run now"), Runs (the run log, filtered by task and status) and Queue (pending messages, the live workers and
   schedulers, and failed messages to retry on their original transport or delete).
+- **Maintenance page** - Admin, System, Maintenance (`/admin/system/maintenance`): every action grouped by section with
+  its last request, and per action its facts, the run form, the remembered-values form and the recent requests.
 - **Commands** - `app:task:list` (every task with its cadence, next run and last result), `app:task:run <identifier>`
   (one run now, recorded, non-zero exit on failure) and `messenger:stop-workers` (every worker exits after its current
   message; `just workerRestart`).
@@ -97,9 +142,11 @@ The outbound permit list in `mago.toml` names every core class the module reache
 
 1. **Periodic work:** implement `TaskInterface`. While its plugin is switched off, the task drops out of the schedule
    and the Tasks page, like every other member of a core chain.
-2. **Work handed off by a request:** a message class routed to `async`, and a handler marked `#[AsMessageHandler]`.
+2. **On-demand work an admin starts:** implement `ActionInterface`. Its `run()` executes on a worker, so it may take
+   minutes; it returns a `Result` like a task. The geo module's `ImportAction` is the reference.
+3. **Work handed off by a request:** a message class routed to `async`, and a handler marked `#[AsMessageHandler]`.
    Follow the doorbell rule and add a backstop task.
-3. **State between messages:** a worker handles many messages in one process, and Messenger resets only services that
+4. **State between messages:** a worker handles many messages in one process, and Messenger resets only services that
    implement `ResetInterface`. A service that memoizes rows, entities, the current user or anything else that can
    differ between two messages implements it and clears that state in `reset()`. The entity manager is cleared after
    every message, so a kept entity would be detached anyway.

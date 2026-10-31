@@ -5,10 +5,12 @@ namespace Tests\Unit\Portability\Section;
 use App\Entity\Image;
 use App\Entity\User;
 use App\Enum\UserRole;
+use App\Portability\Cities;
 use App\Portability\Outcome;
 use App\Portability\Scope;
 use App\Portability\Section\UsersSection;
 use App\Repository\UserRepository;
+use Module\Geo\Contract\DirectoryInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UsersSectionTest extends SectionTestCase
@@ -132,6 +134,11 @@ final class UsersSectionTest extends SectionTestCase
         $repository->method('findBy')->willReturn($found);
         $repository->method('findOneBy')->willReturn($existing);
 
-        return new UsersSection($this->entityManager(), $repository);
+        return new UsersSection($this->entityManager(), $repository, $this->cities());
+    }
+
+    private function cities(): Cities
+    {
+        return new Cities($this->createStub(DirectoryInterface::class));
     }
 }

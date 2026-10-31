@@ -63,7 +63,9 @@
             "latitude": "52.5058",
             "longitude": "13.3169",
             "city": "Berlin",
-            "country": ""
+            "city_geoname_id": 2950159,
+            "city_name": "Berlin",
+            "country": "DE"
         }
     ],
     "users": [
@@ -75,6 +77,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c79532c476e00a2400292babd40d98ac7dff9997.jpg"
         },
         {
@@ -85,6 +88,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/b6b859060d93009c9b742ad6608501d73e67166c.jpg"
         },
         {
@@ -95,6 +99,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "In the delicate crunch of every cookie lies a harmony of flavors that awakens my senses and brings solace to my soul. My passion for cookies transcends mere indulgence; it is an art form that celebrates life's sweetest moments. #CookieLover #SweetObsessions",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/527282946faef1b7c4efbd61fb4be58f0f84fc73.jpg"
         },
         {
@@ -105,6 +110,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker with a passion for painting and hiking. Catch me exploring the great outdoors or getting lost in colors! #Wanderlust #ArtLover 🎨⛰️",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/da483b78e3e3bfd30953876637bcdaf2fe97ef89.jpg"
         }
     ],

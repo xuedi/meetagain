@@ -277,6 +277,75 @@ readonly class CloseExpiredVotesTask implements TaskInterface
 - Every run is recorded with its `Result`. A thrown exception is recorded as `exception` and logged.
 - `php bin/console app:task:run your-plugin.close-expired-votes` runs it once, now.
 
+### A maintenance action implements `ActionInterface`
+
+Work an admin starts by hand - an import, a recalculation, a reset to defaults - is an action, not a task. It shows
+up on Admin, System, Maintenance with a form built from its parameters, and runs on a message worker once per
+submission.
+
+```php
+use Module\Task\Contract\ActionInterface;
+use Module\Task\Contract\ActionParameter;
+use Module\Task\Contract\ActionSection;
+use Module\Task\Contract\Result;
+use Module\Task\Contract\Status;
+
+readonly class RecountVotesAction implements ActionInterface
+{
+    public function __construct(
+        private VoteRepository $votes,
+    ) {}
+
+    public function getIdentifier(): string
+    {
+        return 'your-plugin.recount-votes';
+    }
+
+    public function getSection(): ActionSection
+    {
+        return ActionSection::Recalculate;
+    }
+
+    public function getLabel(): string
+    {
+        return 'your_plugin_admin.recount_label';
+    }
+
+    public function getDescription(): string
+    {
+        return 'your_plugin_admin.recount_description';
+    }
+
+    public function getParameters(): array
+    {
+        return [
+            ActionParameter::flag('closed_only', 'your_plugin_admin.recount_closed_only', default: true, remembered: true),
+        ];
+    }
+
+    public function getFacts(): array
+    {
+        return ['your_plugin_admin.fact_open_votes' => (string) $this->votes->countOpen()];
+    }
+
+    public function run(array $values): Result
+    {
+        $count = $this->votes->recount((bool) $values['closed_only']);
+
+        return new Result(Status::ok, sprintf('%d votes recounted', $count));
+    }
+}
+```
+
+- Labels, descriptions and fact labels are translation keys; the admin page translates them.
+- Only one request per action runs at a time; a second one waits its turn.
+- A run the worker did not finish is marked failed and is not repeated - queue it again from the page. Write
+  `run()` so that a second run after an interrupted one does no harm.
+- A parameter built with `remembered: true` gets a settings form on the action's page. Its saved value pre-fills the
+  run form, and `Module\Task\Contract\ActionSettingsInterface::get($identifier, $key)` reads it from anywhere else,
+  for example from a task that repeats the work on a schedule.
+- Every run lands in the run log beside the tasks.
+
 ### Work a request hands off is a message
 
 A request that must not wait - sending, calling a slow API - writes its work to a table and dispatches a small message

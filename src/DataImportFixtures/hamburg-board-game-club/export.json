@@ -46,7 +46,9 @@
             "latitude": "53.5620",
             "longitude": "9.9635",
             "city": "Hamburg",
-            "country": ""
+            "city_geoname_id": 2911298,
+            "city_name": "Hamburg",
+            "country": "DE"
         }
     ],
     "users": [
@@ -58,6 +60,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
         },
         {
@@ -68,6 +71,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Lover of all things quirky! When I'm not busy mastering languages, you can find me debating the best pizza toppings while juggling three hobbies at once! #PolyglotLife #HobbyJuggler 🍕🎉",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/7e8261d73c08f19033c8955fb0480869291d3239.jpg"
         },
         {
@@ -78,6 +82,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/078bb7912005f175f0521568ab5b06ba15d1b4ec.jpg"
         },
         {
@@ -88,6 +93,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Coffee-fueled creative by day, amateur ninja at night - watch out for my decorative sock collection! 🚀☕️ #WorkHardPlayHarder #SockGoals",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/a032558d5090218d7dbeef68217b4cd3def21916.jpg"
         },
         {
@@ -98,6 +104,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about turning words into bridges, I thrive on the magic of languages at work! 💼✨ Let's connect through communication! #LanguageLover #WorkJoy",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/cca6d1999853fa706775b5856a2830e436e24396.jpg"
         },
         {
@@ -108,6 +115,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/60b832260b4cfc1e3277b5f92ad3bacbed8220a6.jpg"
         },
         {
@@ -118,6 +126,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Coffee-fueled creative by day, amateur ninja at night - watch out for my decorative sock collection! 🚀☕️ #WorkHardPlayHarder #SockGoals",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/05e5d6c554a3089511bfb61cf08635410f163ee8.jpg"
         },
         {
@@ -128,6 +137,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Lover of adventure and creativity, I dive into painting and hiking when I'm not crafting magic in marketing! 🌟✨ #HobbyistHeart #WorkAndPlay",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/7a81bdba28dde865f459120c44256e97077f8235.jpg"
         }
     ],

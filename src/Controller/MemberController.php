@@ -12,6 +12,8 @@ use App\Service\Member\BlockingService;
 use App\Service\Member\FriendshipService;
 use App\Service\Member\UserService;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Geo\Contract\CityView;
+use Module\Geo\Contract\DirectoryInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,6 +38,7 @@ final class MemberController extends AbstractController
         private readonly MemberFilterService $memberFilterService,
         private readonly ImageLocationService $imageLocationService,
         private readonly Security $security,
+        private readonly DirectoryInterface $directory,
     ) {}
 
     #[Route('/{page}', name: self::ROUTE_MEMBER)]
@@ -67,7 +70,7 @@ final class MemberController extends AbstractController
     }
 
     #[Route('/view/{id}', name: 'app_member_view')]
-    public function view(int $id): Response
+    public function view(Request $request, int $id): Response
     {
         if (!$this->getUser() instanceof UserInterface) {
             return $this->redirectToRoute('app_login');
@@ -96,6 +99,7 @@ final class MemberController extends AbstractController
                     'isFollow' => $currentUser->getFollowing()->contains($userDetails),
                     'isBlocked' => $hasBlockedTarget,
                     'canModerate' => $this->mayModerate($currentUser, $userDetails),
+                    'city' => $this->publicCity($userDetails, $request->getLocale()),
                 ],
                 $response,
             );
@@ -183,6 +187,13 @@ final class MemberController extends AbstractController
         }
 
         return $user;
+    }
+
+    private function publicCity(User $member, string $locale): ?CityView
+    {
+        $cityId = $member->getCityId();
+
+        return $cityId === null || !$member->isPublic() ? null : $this->directory->findCity($cityId, $locale);
     }
 
     private function mayModerate(User $actor, User $target): bool

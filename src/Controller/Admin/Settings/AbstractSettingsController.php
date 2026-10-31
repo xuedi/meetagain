@@ -61,6 +61,12 @@ abstract class AbstractSettingsController extends AbstractController
                 isActive: $this->activeSettingsTab === 'import',
             ),
             new AdminTab(
+                label: $this->translator->trans('admin_system.tab_maintenance'),
+                target: $this->generateUrl('app_admin_system_maintenance'),
+                icon: 'screwdriver-wrench',
+                isActive: $this->activeSettingsTab === 'maintenance',
+            ),
+            new AdminTab(
                 label: $this->translator->trans('admin_system.tab_secretbox'),
                 target: $this->generateUrl('app_admin_system_secretbox'),
                 icon: 'key',

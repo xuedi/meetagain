@@ -102,6 +102,7 @@ class InstallSeedCommand extends Command
     private const array CONFIG = [
         ['automatic_registration',      'false',                   ConfigType::Boolean],
         ['show_town_hall',              'false',                   ConfigType::Boolean],
+        ['show_event_geo',              'false',                   ConfigType::Boolean],
         ['send_rsvp_notifications',     'false',                   ConfigType::Boolean],
         ['send_admin_notification',     'true',                    ConfigType::Boolean],
         ['email_delivery_sync_enabled', 'false',                   ConfigType::Boolean],

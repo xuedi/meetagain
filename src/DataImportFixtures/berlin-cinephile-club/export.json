@@ -53,7 +53,9 @@
             "latitude": "52.5252",
             "longitude": "13.4017",
             "city": "Berlin",
-            "country": ""
+            "city_geoname_id": 2950159,
+            "city_name": "Berlin",
+            "country": "DE"
         }
     ],
     "users": [
@@ -65,6 +67,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
         },
         {
@@ -75,6 +78,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c79532c476e00a2400292babd40d98ac7dff9997.jpg"
         },
         {
@@ -85,6 +89,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Lover of adventure and creativity, I dive into painting and hiking when I'm not crafting magic in marketing! 🌟✨ #HobbyistHeart #WorkAndPlay",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/6d10ed55842a62725ad954d7fa56fe1e735feb14.jpg"
         },
         {
@@ -95,6 +100,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker and creative soul, I explore the world through hiking trails and paintbrush strokes. Join me on my journey of discovery! #HikingAdventures #ArtisticLife",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/6bfd89ee2dda2c5201ce92bce759705f5ff2b894.jpg"
         },
         {
@@ -105,6 +111,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting and hiking, I find inspiration in nature's beauty. Balancing my love for creativity with a career in graphic design keeps my heart and mind alive! #ArtLover #NatureEnthusiast #CreativeCareer",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/d46c6eeb1acfdf34977f6795275a285750326133.jpg"
         },
         {
@@ -115,6 +122,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker by day, crafting wizard by night! When I'm not doodling my dreams, you'll catch me hiking or whipping up some delicious treats! 🌟🏞️ #Wanderlust #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/bd95fda4637e37c983d108f9de761c50b4cd2462.jpg"
         },
         {
@@ -125,6 +133,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker with a passion for painting and hiking. Catch me exploring the great outdoors or getting lost in colors! #Wanderlust #ArtLover 🎨⛰️",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/da483b78e3e3bfd30953876637bcdaf2fe97ef89.jpg"
         }
     ],

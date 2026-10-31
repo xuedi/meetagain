@@ -17,6 +17,7 @@ use DateTimeImmutable;
 use Module\Task\Contract\FinishedRun;
 use Module\Task\Contract\Status;
 use Module\Task\Contract\TriggerInterface;
+use Module\Task\Internal\Action\Registry as ActionRegistry;
 use Module\Task\Internal\CadenceTrigger;
 use Module\Task\Internal\Queue;
 use Module\Task\Internal\Registry;
@@ -63,6 +64,7 @@ final class AdminController extends AbstractLogsController implements AdminNavig
         private readonly RunLog $runLog,
         private readonly Queue $queue,
         private readonly TriggerInterface $tasks,
+        private readonly ActionRegistry $actions,
     ) {
         parent::__construct($translator, 'tasks');
     }
@@ -153,7 +155,7 @@ final class AdminController extends AbstractLogsController implements AdminNavig
             $status = 'all';
         }
         $identifier = $request->query->getString('task');
-        $identifier = $this->registry->find($identifier) === null ? null : $identifier;
+        $identifier = in_array($identifier, $this->runIdentifiers(), strict: true) ? $identifier : null;
 
         $rangeOffset = self::RANGE_OFFSETS[$range];
         $since = $rangeOffset !== null ? new DateTimeImmutable($rangeOffset) : null;
@@ -312,6 +314,17 @@ final class AdminController extends AbstractLogsController implements AdminNavig
         return $this->redirectToRoute('app_admin_task_queue');
     }
 
+    /**
+     * @return list<string>
+     */
+    private function runIdentifiers(): array
+    {
+        $identifiers = [...array_keys($this->registry->all()), ...array_keys($this->actions->all())];
+        sort($identifiers);
+
+        return $identifiers;
+    }
+
     private function queueNeedsAttention(): bool
     {
         $health = $this->queue->health();
@@ -396,7 +409,7 @@ final class AdminController extends AbstractLogsController implements AdminNavig
                 isActive: $current === null,
             ),
         ];
-        foreach (array_keys($this->registry->all()) as $identifier) {
+        foreach ($this->runIdentifiers() as $identifier) {
             $options[] = new AdminTopActionDropdownOption(
                 label: $identifier,
                 target: $this->generateUrl('app_admin_task_runs', $this->runsParams($range, $status, $identifier)),

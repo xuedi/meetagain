@@ -24,6 +24,7 @@ final class AppBundle
         'js/item-tag-tree.js',
         'js/item-list.js',
         'js/item-gallery.js',
+        'js/city-picker.js',
     ];
 
     private ?string $hash = null;

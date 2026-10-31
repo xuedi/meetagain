@@ -4,12 +4,14 @@ namespace Tests\Unit\Portability\Section;
 
 use App\Entity\Event;
 use App\Entity\Location;
+use App\Portability\Cities;
 use App\Portability\Outcome;
 use App\Portability\Scope;
 use App\Portability\Section\LocationsSection;
 use App\Repository\LocationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Module\Geo\Contract\DirectoryInterface;
 
 final class LocationsSectionTest extends SectionTestCase
 {
@@ -63,7 +65,7 @@ final class LocationsSectionTest extends SectionTestCase
         $em->method('getRepository')->willReturn($repository);
 
         // Act
-        $rows = new LocationsSection($em, $this->createStub(LocationRepository::class))->export(new Scope(eventIds: [1, 2]), $this->images());
+        $rows = new LocationsSection($em, $this->createStub(LocationRepository::class), $this->cities())->export(new Scope(eventIds: [1, 2]), $this->images());
 
         // Assert
         static::assertSame([], $rows);
@@ -93,7 +95,7 @@ final class LocationsSectionTest extends SectionTestCase
         $repository = $this->createStub(LocationRepository::class);
         $repository->method('findOneBy')->willReturn($existing);
 
-        return new LocationsSection($this->entityManager($events), $repository);
+        return new LocationsSection($this->entityManager($events), $repository, $this->cities());
     }
 
     private function eventAt(Location $location): Event
@@ -102,5 +104,10 @@ final class LocationsSectionTest extends SectionTestCase
         $event->setLocation($location);
 
         return $event;
+    }
+
+    private function cities(): Cities
+    {
+        return new Cities($this->createStub(DirectoryInterface::class));
     }
 }

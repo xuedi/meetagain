@@ -49,6 +49,7 @@
                     {{ form_row(venueForm.latitude) }}
                 </div>
             </div>
+            {% if venueForm.cityId is defined %}{{ form_row(venueForm.cityId) }}{% endif %}
 
         </section>
         <footer class="modal-card-foot">

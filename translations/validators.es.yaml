@@ -234,3 +234,6 @@ Error: 'Error'
 'item_report.validator_explanation_long': 'La explicación es demasiado larga.'
 'item_report.validator_good_faith': 'Confirma que haces la denuncia de buena fe.'
 'report.validator_remarks_long': 'Las observaciones son demasiado largas.'
+city_picker:
+    validator_required: 'Elige una ciudad de la lista.'
+    validator_unknown: 'Esta ciudad no está en el directorio.'

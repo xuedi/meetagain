@@ -120,6 +120,11 @@ readonly class ConfigService
         return $this->getBoolean('show_town_hall', false);
     }
 
+    public function isShowEventGeo(): bool
+    {
+        return $this->getBoolean('show_event_geo', false);
+    }
+
     public function isAutomaticRegistration(): bool
     {
         return $this->getBoolean('automatic_registration', false);

@@ -1,0 +1,8 @@
+{% if request is null %}
+    <span class="has-text-grey">{{ 'admin_maintenance.never_ran'|trans }}</span>
+{% elseif request.status is null %}
+    <span class="tag {{ request.state.tagVariant }}">{{ request.state.label|trans }}</span>
+{% else %}
+    <span class="tag {{ request.status.tagVariant }}">{{ request.status.label|trans }}</span>
+    <span class="has-text-grey is-size-7">{{ request.finishedAt|date('Y-m-d H:i') }}</span>
+{% endif %}

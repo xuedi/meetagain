@@ -1,0 +1,30 @@
+{#
+    City Picker form theme -- renders App\Form\CityType: a country select scoping a search box whose
+    suggestions come from the geo module's city search, and the hidden city id the form submits.
+    Typing clears the id until a suggestion is picked, so a city the directory does not know never
+    reaches the server. Without JavaScript the select and the box stay visible but nothing fills the id.
+
+    Registered in: config/packages/twig.yaml (form_themes, after _form/bulma.html.twig)
+    Depends on:    js/city-picker.js; route app_geo_cities
+#}
+{%- block city_picker_widget -%}
+    <div class="city-picker" data-city-picker
+         data-city-picker-url="{{ search_url }}"
+         data-city-picker-empty="{{ no_results|trans }}">
+        <div class="columns is-variable is-2 mb-0">
+            <div class="column is-5">{{ form_row(form.country) }}</div>
+            <div class="column">
+                <div class="field">
+                    {{ form_label(form.search) }}
+                    <div class="dropdown is-block" data-city-picker-dropdown>
+                        <div class="control">{{ form_widget(form.search) }}</div>
+                        <div class="dropdown-menu is-block-mobile" role="listbox">
+                            <div class="dropdown-content" data-city-picker-results></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ form_widget(form.id) }}
+    </div>
+{%- endblock -%}

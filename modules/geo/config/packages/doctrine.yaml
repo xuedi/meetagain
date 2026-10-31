@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Geo:
+                        dir: "%kernel.project_dir%/modules/geo/src/Internal/Entity"
+                        is_bundle: false
+                        prefix: Module\Geo\Internal\Entity
+                        alias: Geo
+
+doctrine_migrations:
+    migrations_paths:
+        ModuleGeoMigrations: "%kernel.project_dir%/modules/geo/migrations"

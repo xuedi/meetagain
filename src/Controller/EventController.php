@@ -22,6 +22,7 @@ use App\FeaturedEventProviderInterface;
 use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Filter\Event\EventFilterService;
 use App\Form\EventFilterType;
+use App\Form\EventGeoFilterContributor;
 use App\Item\AttachControlBuilder;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\CalendarFeedService;
@@ -58,6 +59,7 @@ final class EventController extends AbstractController
         private readonly CanonicalUrlService $canonicalUrlService,
         private readonly AttachControlBuilder $itemAttachControlBuilder,
         private readonly BreadcrumbBuilder $breadcrumbBuilder,
+        private readonly EventGeoFilterContributor $geoFilter,
         private readonly AdminEventListFilterService $adminEventFilterService,
         private readonly ContributionRegistry $contributionRegistry,
         private readonly SuggestionInterface $suggestions,
@@ -84,7 +86,8 @@ final class EventController extends AbstractController
         $allowedEventIds = $filterResult->getEventIds();
         $locale = $request->getLocale();
 
-        $structuredList = $this->eventService->getFilteredList($time, $sort, $type, $rsvp, $this->getUser(), $allowedEventIds, $locale);
+        $cityIds = $this->geoFilter->cityIds($request->query->getString('country'), $request->query->getString('city'));
+        $structuredList = $this->eventService->getFilteredList($time, $sort, $type, $rsvp, $this->getUser(), $allowedEventIds, $locale, $cityIds);
 
         return $this->render(
             'events/index.html.twig',
@@ -94,6 +97,7 @@ final class EventController extends AbstractController
                 'hasFeatured' => $this->getFeaturedEvents($allowedEventIds, $locale) !== [],
                 'editLinks' => $this->editLinks(array_merge(...array_column($structuredList, 'events'))),
                 'newEventLink' => $this->newEventLink(),
+                'showEventMap' => $this->geoFilter->isMapShown(),
             ],
             $response,
         );

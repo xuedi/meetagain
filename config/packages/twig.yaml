@@ -1,5 +1,5 @@
 twig:
-    form_themes: ['_form/bulma.html.twig', '_form/tag.html.twig']
+    form_themes: ['_form/bulma.html.twig', '_form/tag.html.twig', '_form/city.html.twig']
     file_name_pattern: '*.twig'
     date:
         timezone: 'Europe/Berlin'

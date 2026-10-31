@@ -218,7 +218,13 @@ final class SiteSettingsTest extends TestCase
         static::assertSame(['primary' => '#111111', 'text-grey-light' => '#cccccc'], $site->themeColors);
         static::assertNull($site->logo);
         static::assertSame(
-            ['show_town_hall' => true, 'send_rsvp_notifications' => false, 'send_event_reminders' => false, 'send_upcoming_digest' => false],
+            [
+                'show_town_hall' => true,
+                'show_event_geo' => false,
+                'send_rsvp_notifications' => false,
+                'send_event_reminders' => false,
+                'send_upcoming_digest' => false,
+            ],
             $site->settings,
         );
         static::assertSame(['books' => ['circulation' => true]], $site->pluginSettings);

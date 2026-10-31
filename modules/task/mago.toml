@@ -15,6 +15,7 @@ permit = [
     "@global",                                              # DateTimeImmutable, Override, Redis, PHP's own functions
     "App\\Admin\\**",                                       # the Tasks page builds its top bar and navigation from core's admin shell
     "App\\Controller\\Admin\\Logs\\AbstractLogsController", # the Tasks page is a tab in core's Logs strip
+    "App\\Controller\\Admin\\Settings\\AbstractSettingsController", # the Maintenance page is a tab in core's System strip
     "App\\Metrics\\Recorder",                               # every run is sent as a metric point, like a request
     "App\\Metrics\\Point",                                  # that point's type
     "Doctrine\\**",
@@ -31,6 +32,7 @@ permit = [
     "@global",                                              # DateTimeImmutable, Override, Redis, PHP's own functions
     "App\\Admin\\**",                                       # the Tasks page builds its top bar and navigation from core's admin shell
     "App\\Controller\\Admin\\Logs\\AbstractLogsController", # the Tasks page is a tab in core's Logs strip
+    "App\\Controller\\Admin\\Settings\\AbstractSettingsController", # the Maintenance page is a tab in core's System strip
     "App\\Metrics\\Recorder",                               # every run is sent as a metric point, like a request
     "App\\Metrics\\Point",                                  # that point's type
     "PHPUnit\\**",

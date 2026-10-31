@@ -68,6 +68,7 @@
                 </div>
 
                 {{ form_row(form.city) }}
+                {% if form.cityId is defined %}{{ form_row(form.cityId) }}{% endif %}
             </div>
 
             <div class="column is-4">

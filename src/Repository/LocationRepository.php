@@ -71,4 +71,14 @@ class LocationRepository extends ServiceEntityRepository
 
         return $qb->orderBy('l.name', 'ASC');
     }
+
+    /**
+     * @return list<int> every city id some location names
+     */
+    public function findCityIds(): array
+    {
+        $rows = $this->createQueryBuilder('l')->select('DISTINCT l.cityId AS cityId')->where('l.cityId IS NOT NULL')->getQuery()->getArrayResult();
+
+        return array_map(intval(...), array_column($rows, 'cityId'));
+    }
 }
