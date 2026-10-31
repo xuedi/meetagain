@@ -2,6 +2,8 @@
 
 namespace App\Service\Notification\User;
 
+use App\Entity\Image;
+
 readonly class ReviewNotificationItem
 {
     /**
@@ -16,5 +18,6 @@ readonly class ReviewNotificationItem
         public ?string $detailUrl = null,
         public ?string $approveLabelKey = null,
         public array $fields = [],
+        public ?Image $image = null,
     ) {}
 }

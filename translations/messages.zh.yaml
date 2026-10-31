@@ -476,6 +476,12 @@ profile_review:
     item_report_description: '%item% 被举报：%reason%'
     item_report_notifier: '举报人 %name%（%email%），%relationship%'
     item_report_remove_hint: '"保留"会让它继续在线。要删除，请打开它并在那里删除。'
+    button_keep_image: '保留'
+    image_report_description: '%reporter% 举报了一张图片：%reason%'
+    image_report_unknown_reporter: '已删除的成员'
+    image_report_field_remarks: '备注'
+    image_report_field_location: '显示位置'
+    image_report_remove_hint: '"保留"会让它继续在线。要删除，请打开详情，跟随链接到它显示的位置并在那里删除。'
 review:
     button_apply_series: '应用到此日期及之后的 %count% 个日期'
     button_apply_series_locked: '应用到此日期及之后的 %count% 个日期（跳过 %locked% 个已锁定日期）'

@@ -476,6 +476,12 @@ profile_review:
     item_report_description: '%item% a été signalé : %reason%'
     item_report_notifier: 'De %name% (%email%), %relationship%'
     item_report_remove_hint: 'Conserver le laisse en ligne. Pour le supprimer, ouvre-le et supprime-le là.'
+    button_keep_image: 'Conserver'
+    image_report_description: '%reporter% a signalé une image : %reason%'
+    image_report_unknown_reporter: 'Un membre supprimé'
+    image_report_field_remarks: 'Remarques'
+    image_report_field_location: 'Visible sur'
+    image_report_remove_hint: 'Conserver la laisse en ligne. Pour la supprimer, ouvre les détails, suis le lien vers l''endroit où elle apparaît et supprime-la là.'
 review:
     button_apply_series: 'Appliquer à cette date et à la suivante|Appliquer à cette date et aux %count% suivantes'
     button_apply_series_locked: 'Appliquer à cette date et à la suivante (sauf %locked% verrouillée(s))|Appliquer à cette date et aux %count% suivantes (sauf %locked% verrouillée(s))'

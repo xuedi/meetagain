@@ -476,6 +476,12 @@ profile_review:
     item_report_description: '%item% wurde gemeldet: %reason%'
     item_report_notifier: 'Von %name% (%email%), %relationship%'
     item_report_remove_hint: 'Behalten lässt es online. Zum Entfernen öffne es und lösche es dort.'
+    button_keep_image: 'Behalten'
+    image_report_description: '%reporter% hat ein Bild gemeldet: %reason%'
+    image_report_unknown_reporter: 'Ein gelöschtes Mitglied'
+    image_report_field_remarks: 'Anmerkungen'
+    image_report_field_location: 'Zu sehen auf'
+    image_report_remove_hint: 'Behalten lässt es online. Zum Entfernen öffne die Details, folge dem Link zur Stelle, an der es zu sehen ist, und lösche es dort.'
 review:
     button_apply_series: 'Auf diesen und den folgenden Termin anwenden|Auf diesen und die %count% folgenden Termine anwenden'
     button_apply_series_locked: 'Auf diesen und den folgenden Termin anwenden (ohne %locked% gesperrte)|Auf diesen und die %count% folgenden Termine anwenden (ohne %locked% gesperrte)'

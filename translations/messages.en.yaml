@@ -476,6 +476,12 @@ profile_review:
     item_report_description: '%item% was reported: %reason%'
     item_report_notifier: 'From %name% (%email%), %relationship%'
     item_report_remove_hint: 'Keep leaves it online. To remove it, open it and delete it there.'
+    button_keep_image: 'Keep'
+    image_report_description: '%reporter% reported an image: %reason%'
+    image_report_unknown_reporter: 'A deleted member'
+    image_report_field_remarks: 'Remarks'
+    image_report_field_location: 'Shown on'
+    image_report_remove_hint: 'Keep leaves it online. To remove it, open the details, follow the link to where it is shown and delete it there.'
 review:
     button_apply_series: 'Apply to this and the following date|Apply to this and the %count% following dates'
     button_apply_series_locked: 'Apply to this and the following date (skipping %locked% locked)|Apply to this and the %count% following dates (skipping %locked% locked)'

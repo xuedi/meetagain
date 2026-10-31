@@ -476,6 +476,12 @@ profile_review:
     item_report_description: '%item% ha sido denunciado: %reason%'
     item_report_notifier: 'De %name% (%email%), %relationship%'
     item_report_remove_hint: 'Mantener lo deja en línea. Para eliminarlo, ábrelo y bórralo allí.'
+    button_keep_image: 'Mantener'
+    image_report_description: '%reporter% ha denunciado una imagen: %reason%'
+    image_report_unknown_reporter: 'Un miembro eliminado'
+    image_report_field_remarks: 'Observaciones'
+    image_report_field_location: 'Se muestra en'
+    image_report_remove_hint: 'Mantener la deja en línea. Para eliminarla, abre los detalles, sigue el enlace al lugar donde aparece y bórrala allí.'
 review:
     button_apply_series: 'Aplicar a esta fecha y a la siguiente|Aplicar a esta fecha y a las %count% siguientes'
     button_apply_series_locked: 'Aplicar a esta fecha y a la siguiente (excepto %locked% bloqueada(s))|Aplicar a esta fecha y a las %count% siguientes (excepto %locked% bloqueada(s))'

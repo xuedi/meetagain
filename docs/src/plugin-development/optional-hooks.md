@@ -988,6 +988,7 @@ readonly class MyReviewProvider implements ReviewNotificationProviderInterface
 - `fields` lists one row per field under the description. A row with `before` renders the old and new value side
   by side with the changed words marked; a row without it renders as label and value. Use `longDescription` for free
   text that is not a field
+- `image` shows that image's thumbnail in place of the icon, for an item about an image
 
 ---
 

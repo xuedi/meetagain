@@ -3,7 +3,11 @@
     <div class="columns is-vcentered">
         <div class="column">
             <div class="media">
-                {% if item.icon %}
+                {% if item.image %}
+                <div class="media-left">
+                    {% include '_components/image.html.twig' with {image: item.image, size: '100x100'} only %}
+                </div>
+                {% elseif item.icon %}
                 <div class="media-left">
                     <span class="icon is-medium has-text-grey">
                         <i class="fas fa-{{ item.icon }}"></i>
