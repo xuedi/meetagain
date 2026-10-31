@@ -36,7 +36,7 @@ readonly class ChangeReviewProvider implements ReviewNotificationProviderInterfa
                 ]),
                 canDeny: true,
                 icon: 'edit',
-                longDescription: $this->diffSummary($proposal),
+                fields: $this->fields($proposal),
                 detailUrl: $this->router->generate('app_review_proposals', [
                     'targetType' => $proposal->getTargetType(),
                     'targetId' => $proposal->getTargetId(),
@@ -67,13 +67,18 @@ readonly class ChangeReviewProvider implements ReviewNotificationProviderInterfa
         return $proposal;
     }
 
-    private function diffSummary(Change $proposal): string
+    /**
+     * @return list<array{label: string, value: string, before: string}>
+     */
+    private function fields(Change $proposal): array
     {
-        $lines = [];
+        $fields = [];
         foreach ($this->service->fieldRows($proposal) as $row) {
-            $lines[] = sprintf('%s: %s -> %s', $row['label'], $row['before'] !== '' ? $row['before'] : '-', $row['after'] !== '' ? $row['after'] : '-');
+            if ($row['resolution'] === null) {
+                $fields[] = ['label' => $row['label'], 'value' => $row['after'], 'before' => $row['before']];
+            }
         }
 
-        return implode("\n", $lines);
+        return $fields;
     }
 }

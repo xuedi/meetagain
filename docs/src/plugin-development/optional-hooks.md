@@ -953,6 +953,10 @@ readonly class MyReviewProvider implements ReviewNotificationProviderInterface
                 description: sprintf("Item '%s' pending approval", $item->getName()),
                 canDeny: true,
                 icon: 'check',
+                fields: [
+                    ['label' => 'Name', 'value' => $item->getName()],
+                    ['label' => 'Title', 'value' => $item->getPendingTitle(), 'before' => $item->getTitle()],
+                ],
             ),
             $this->repository->findPending(),
         );
@@ -981,6 +985,9 @@ readonly class MyReviewProvider implements ReviewNotificationProviderInterface
 - `getIdentifier()` is embedded in form action URLs - never change it once deployed
 - Both `approveItem()` and `denyItem()` must check authorisation themselves and throw `AccessDeniedException` if denied
 - `itemId` is always cast to/from string; use `(int) $itemId` to recover the DB id
+- `fields` lists one row per field under the description. A row with `before` renders the old and new value side
+  by side with the changed words marked; a row without it renders as label and value. Use `longDescription` for free
+  text that is not a field
 
 ---
 

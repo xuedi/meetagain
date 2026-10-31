@@ -5,6 +5,7 @@ namespace Module\Proposal\Tests\Unit\Internal\Notification;
 use App\Entity\User;
 use InvalidArgumentException;
 use Module\Proposal\Contract\Change\FieldChange;
+use Module\Proposal\Contract\Change\FieldResolution;
 use Module\Proposal\Internal\Change\ChangeService;
 use Module\Proposal\Internal\Entity\Change;
 use Module\Proposal\Internal\Notification\ChangeReviewProvider;
@@ -15,7 +16,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChangeReviewProviderTest extends TestCase
 {
-    public function testReviewItemsCarryDiffSummaryAndDetailUrl(): void
+    public function testReviewItemsCarryUnresolvedFieldsAndDetailUrl(): void
     {
         // Arrange
         $proposal = $this->proposal(7);
@@ -27,6 +28,7 @@ class ChangeReviewProviderTest extends TestCase
             ->willReturn([
                 ['field' => 'phrase', 'label' => 'Phrase', 'before' => 'old', 'after' => 'new', 'resolution' => null],
                 ['field' => 'pinyin', 'label' => 'Pinyin', 'before' => '', 'after' => 'nĭ hăo', 'resolution' => null],
+                ['field' => 'definition', 'label' => 'Definition', 'before' => 'a', 'after' => 'b', 'resolution' => FieldResolution::Applied],
             ]);
         $router = $this->createStub(RouterInterface::class);
         $router->method('generate')->willReturn('/review/proposals/glossary/1');
@@ -39,7 +41,14 @@ class ChangeReviewProviderTest extends TestCase
         self::assertCount(1, $items);
         self::assertSame('7', $items[0]->id);
         self::assertSame('/review/proposals/glossary/1', $items[0]->detailUrl);
-        self::assertSame("Phrase: old -> new\nPinyin: - -> nĭ hăo", $items[0]->longDescription);
+        self::assertNull($items[0]->longDescription);
+        self::assertSame(
+            [
+                ['label' => 'Phrase', 'value' => 'new', 'before' => 'old'],
+                ['label' => 'Pinyin', 'value' => 'nĭ hăo', 'before' => ''],
+            ],
+            $items[0]->fields,
+        );
     }
 
     public function testApproveDelegatesToApproveAll(): void

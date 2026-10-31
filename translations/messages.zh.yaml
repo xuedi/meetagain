@@ -660,6 +660,9 @@ cookie:
 shared:
     toggle_yes: '是'
     toggle_no: '否'
+    value_diff_before: '修改前'
+    value_diff_after: '修改后'
+    value_diff_empty: '空'
     image_upload_default_label: '更换图片'
     image_upload_remove_title: '移除图片'
     image_upload_aria_delete: '删除'

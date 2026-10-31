@@ -1,0 +1,38 @@
+{#
+    Gallery: Value Diff component -- one value before and after a change
+
+    Source: templates/_components/value_diff.html.twig.
+    A marked pair with a label (a letter fix refined to characters plus an appended word), a rewrite the fuse
+    leaves unmarked, and an empty side.
+
+    Used in:    admin/system/theme/gallery/index.html.twig
+    Parameters: none
+    Depends on: _components/value_diff.html.twig
+#}
+<p class="is-size-7 has-text-grey">
+    {{ 'admin_system_gallery.source_of_truth'|trans }}
+    <code>templates/_components/value_diff.html.twig</code>
+</p>
+
+<div class="mt-3">
+    <p class="heading">marked, with label</p>
+    {% include '_components/value_diff.html.twig' with {
+        label: 'Title (DE)',
+        before: 'Fototour - Portraits bei vorhandenem Licht',
+        after: 'Fototour - Porträts bei vorhandenem Licht 2',
+    } only %}
+</div>
+<div class="mt-3">
+    <p class="heading">rewritten, left unmarked</p>
+    {% include '_components/value_diff.html.twig' with {
+        before: 'A quiet walk along the river',
+        after: 'Loud concert in the city park tonight',
+    } only %}
+</div>
+<div class="mt-3">
+    <p class="heading">empty side</p>
+    {% include '_components/value_diff.html.twig' with {
+        before: '',
+        after: 'nǐ hǎo',
+    } only %}
+</div>

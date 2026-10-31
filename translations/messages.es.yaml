@@ -660,6 +660,9 @@ cookie:
 shared:
     toggle_yes: 'Sí'
     toggle_no: 'No'
+    value_diff_before: 'Antes'
+    value_diff_after: 'Después'
+    value_diff_empty: 'vacío'
     api_toolbox_title: 'Usa MeetAgain con agentes de IA'
     api_toolbox_intro: 'El repositorio meetagain-toolbox incluye un servidor MCP y una skill de agente para que los agentes de IA puedan buscar eventos y gestionar confirmaciones de asistencia en tu nombre.'
     api_toolbox_bullet_mcp: 'Servidor MCP: instálalo una vez y luego pregunta a tu agente cosas como "¿qué hay la semana que viene?"'

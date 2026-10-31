@@ -660,6 +660,9 @@ cookie:
 shared:
     toggle_yes: 'Yes'
     toggle_no: 'No'
+    value_diff_before: 'Before'
+    value_diff_after: 'After'
+    value_diff_empty: 'empty'
     api_toolbox_title: 'Use MeetAgain with AI agents'
     api_toolbox_intro: 'The meetagain-toolbox repo bundles an MCP server and an agent skill so AI agents can search events and manage RSVPs on your behalf.'
     api_toolbox_bullet_mcp: 'MCP server: install once, then ask your agent things like "what is on next week?"'

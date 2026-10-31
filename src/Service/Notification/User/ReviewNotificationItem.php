@@ -4,6 +4,9 @@ namespace App\Service\Notification\User;
 
 readonly class ReviewNotificationItem
 {
+    /**
+     * @param list<array{label: string, value: string, before?: string}> $fields
+     */
     public function __construct(
         public string $id,
         public string $description,
@@ -12,5 +15,6 @@ readonly class ReviewNotificationItem
         public ?string $longDescription = null,
         public ?string $detailUrl = null,
         public ?string $approveLabelKey = null,
+        public array $fields = [],
     ) {}
 }

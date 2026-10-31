@@ -15,6 +15,17 @@
                     {% if item.longDescription is not null %}
                         <p class="has-text-grey-dark mt-2">{{ item.longDescription|nl2br }}</p>
                     {% endif %}
+                    {% if item.fields is not empty %}
+                        <div class="mt-3">
+                            {% for field in item.fields %}
+                                {% if field.before is defined %}
+                                    {% include '_components/value_diff.html.twig' with {label: field.label, before: field.before, after: field.value} only %}
+                                {% else %}
+                                    <p class="mb-1"><span class="has-text-weight-semibold">{{ field.label }}:</span> {{ field.value|default('-')|nl2br }}</p>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

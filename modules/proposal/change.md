@@ -48,9 +48,13 @@ UI 404s on a null label.
 - **The diff page** (`app_review_proposals`) shows per-field before and after with apply and deny for reviewers and
   withdraw for the proposer. It is visible to reviewers and to the proposer of a pending proposal, and 404s when the
   provider is inactive or the target label is null.
-- **The hub** (identifier `change_proposals`) lists one entry per pending reviewable proposal with a per-field
-  summary. Approve applies every unresolved field, validating all of them first and aborting before any write on
-  failure; deny rejects the whole proposal.
+- **The hub** (identifier `change_proposals`) lists one entry per pending reviewable proposal with its unresolved
+  fields as before/after rows. Approve applies every unresolved field, validating all of them first and aborting
+  before any write on failure; deny rejects the whole proposal.
+
+Both surfaces, and the pending lists a consumer shows beside its own form, render a field through the application's
+`_components/value_diff.html.twig`: old and new value side by side, the changed words marked by `text_diff()`, which
+leaves both sides unmarked when the change is too large to read as a diff (`TextDiffExtension` holds the limits).
 
 Activity: `core.change_proposal_created` for the proposer, `core.change_proposal_applied` /
 `core.change_proposal_rejected` for the reviewer on finalization; withdrawing logs nothing.

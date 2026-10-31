@@ -34,16 +34,9 @@
                                     <b>{{ entry.proposal.proposerName }}</b>
                                     <span class="has-text-grey">{{ entry.proposal.createdAt|time_diff }}</span>
                                 </p>
-                                <ul>
-                                    {% for row in entry.rows %}
-                                        <li>
-                                            <b>{{ row.label }}</b>:
-                                            <span class="has-text-grey">{{ row.before|default('-') }}</span>
-                                            <i class="fas fa-arrow-right is-size-7"></i>
-                                            {{ row.after|default('-') }}
-                                        </li>
-                                    {% endfor %}
-                                </ul>
+                                {% for row in entry.rows %}
+                                    {% include '_components/value_diff.html.twig' with {label: row.label, before: row.before, after: row.after} only %}
+                                {% endfor %}
                             </div>
                         {% endfor %}
                     {% endif %}

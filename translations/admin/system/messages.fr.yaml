@@ -245,6 +245,8 @@ admin_system_gallery:
     section_comp_toggle_caption: 'Paire de boutons Oui/Non pour les paramètres booléens ; variantes on/off affichées.'
     section_comp_approve_deny_title: 'Composant approuver/refuser'
     section_comp_approve_deny_caption: 'Paire jointe accepter/refuser pour un élément en attente ; petite taille et taille normale, avec la variante corbeille.'
+    section_comp_value_diff_title: 'Composant de comparaison de valeurs'
+    section_comp_value_diff_caption: 'Ancienne et nouvelle valeur côte à côte, texte supprimé en rouge et texte ajouté en vert ; sans marquage quand trop de choses ont changé ou qu''un côté est vide.'
     section_admin_top_infobar_title: 'Barre d''info AdminTop'
     section_admin_top_infobar_caption: 'Bandeau d''onglets + barre d''info en haut de page affichée sur chaque page admin ; variantes liste et détail.'
     section_admin_list_title: 'Tableau de liste admin'

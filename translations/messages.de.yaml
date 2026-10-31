@@ -660,6 +660,9 @@ cookie:
 shared:
     toggle_yes: 'Ja'
     toggle_no: 'Nein'
+    value_diff_before: 'Vorher'
+    value_diff_after: 'Nachher'
+    value_diff_empty: 'leer'
     image_upload_default_label: 'Bild ändern'
     image_upload_remove_title: 'Bild entfernen'
     image_upload_aria_delete: 'löschen'

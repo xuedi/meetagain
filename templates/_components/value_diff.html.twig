@@ -1,0 +1,56 @@
+{#
+    Value Diff -- one value before and after a change
+
+    Renders the old and the new value in two boxes with an arrow between them, the removed text marked red in the
+    old box and the added text green in the new one. The marking comes from text_diff(), which leaves both boxes
+    unmarked when too much changed; an empty side shows a muted marker. Every pending-change surface uses it, so a
+    reviewer reads a change the same way everywhere.
+
+    Used in:    templates/profile/review/_item.html.twig, templates/item/tags.html.twig,
+                modules/proposal/templates/change/_card.html.twig, plugins/glossary/templates/edit.html.twig
+    Parameters:
+        - before (string, required) -- the current value; empty renders the empty marker
+        - after  (string, required) -- the proposed value; empty renders the empty marker
+        - label  (string, optional) -- heading above the pair; default: none
+#}
+{% set diff = text_diff(before, after) %}
+{% set label = label|default(null) %}
+<div class="mb-3">
+    {% if label is not null %}
+        <p class="has-text-weight-semibold mb-1">{{ label }}</p>
+    {% endif %}
+    <div class="columns is-vcentered is-variable is-1 m-0">
+        <div class="column">
+            <div class="box is-shadowless has-background-light p-3">
+                <span class="is-sr-only">{{ 'shared.value_diff_before'|trans }}:</span>
+                {%- for segment in diff.before -%}
+                    {%- if segment.changed -%}
+                        <del class="has-background-danger-light has-text-danger-dark">{{ segment.text|nl2br }}</del>
+                    {%- else -%}
+                        {{ segment.text|nl2br }}
+                    {%- endif -%}
+                {%- else -%}
+                    <em class="has-text-grey">{{ 'shared.value_diff_empty'|trans }}</em>
+                {%- endfor -%}
+            </div>
+        </div>
+        <div class="column is-narrow has-text-centered has-text-grey">
+            <span class="icon is-hidden-mobile"><i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+            <span class="icon is-hidden-tablet"><i class="fas fa-arrow-down" aria-hidden="true"></i></span>
+        </div>
+        <div class="column">
+            <div class="box is-shadowless has-background-light p-3">
+                <span class="is-sr-only">{{ 'shared.value_diff_after'|trans }}:</span>
+                {%- for segment in diff.after -%}
+                    {%- if segment.changed -%}
+                        <ins class="has-background-success-light has-text-success-dark">{{ segment.text|nl2br }}</ins>
+                    {%- else -%}
+                        {{ segment.text|nl2br }}
+                    {%- endif -%}
+                {%- else -%}
+                    <em class="has-text-grey">{{ 'shared.value_diff_empty'|trans }}</em>
+                {%- endfor -%}
+            </div>
+        </div>
+    </div>
+</div>

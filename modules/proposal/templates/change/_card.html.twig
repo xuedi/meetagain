@@ -11,8 +11,7 @@
         <thead>
             <tr>
                 <th>{{ 'review.col_field'|trans }}</th>
-                <th>{{ 'review.col_before'|trans }}</th>
-                <th>{{ 'review.col_after'|trans }}</th>
+                <th>{{ 'review.col_change'|trans }}</th>
                 <th></th>
             </tr>
         </thead>
@@ -22,8 +21,9 @@
             {% set ballotState = row.ballotState|default(null) %}
             <tr>
                 <th style="vertical-align: middle;">{{ row.label }}</th>
-                <td style="vertical-align: middle;" class="has-text-grey">{{ row.before|default('-')|nl2br }}</td>
-                <td style="vertical-align: middle;">{{ row.after|default('-')|nl2br }}</td>
+                <td style="vertical-align: middle;">
+                    {% include '_components/value_diff.html.twig' with {before: row.before, after: row.after} only %}
+                </td>
                 <td style="vertical-align: middle; width: 1%; white-space: nowrap;" class="has-text-right">
                     {% if row.resolution is not null %}
                         <span class="tag is-light {{ row.resolution.value == 'applied' ? 'is-success' : 'is-danger' }}">

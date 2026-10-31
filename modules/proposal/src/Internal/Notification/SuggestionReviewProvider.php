@@ -36,7 +36,7 @@ readonly class SuggestionReviewProvider implements ReviewNotificationProviderInt
                 ]),
                 canDeny: true,
                 icon: 'lightbulb',
-                longDescription: $this->summary($suggestion),
+                fields: $this->service->summaryRows($suggestion),
                 detailUrl: $this->router->generate('app_review_suggestion', ['id' => $suggestion->getId()]),
             );
         }
@@ -63,15 +63,5 @@ readonly class SuggestionReviewProvider implements ReviewNotificationProviderInt
         }
 
         return $suggestion;
-    }
-
-    private function summary(Suggestion $suggestion): string
-    {
-        $lines = [];
-        foreach ($this->service->summaryRows($suggestion) as $row) {
-            $lines[] = sprintf('%s: %s', $row['label'], $row['value'] !== '' ? $row['value'] : '-');
-        }
-
-        return implode("\n", $lines);
     }
 }
