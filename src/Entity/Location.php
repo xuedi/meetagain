@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: LocationRepository::class)]
+#[ORM\Index(name: 'idx_location_city', columns: ['city_id'])]
 class Location
 {
     #[ORM\Id]
@@ -30,6 +31,9 @@ class Location
 
     #[ORM\Column(length: 8)]
     private ?string $postcode = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $cityId = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -155,6 +159,18 @@ class Location
     public function setLatitude(?string $latitude): static
     {
         $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getCityId(): ?int
+    {
+        return $this->cityId;
+    }
+
+    public function setCityId(?int $cityId): static
+    {
+        $this->cityId = $cityId;
 
         return $this;
     }

@@ -126,6 +126,8 @@ admin_system_import:
     note: 'Les membres importés sans mot de passe utilisent « Mot de passe oublié » pour activer leur compte.'
     failed: 'Échec de l''import :'
     label_zip_file: 'Fichier ZIP d''export'
+    kind_location_cities: 'Villes des lieux'
+    kind_user_cities: 'Villes des membres'
 admin_system_config:
     intro: 'Paramètres du site : identité, expéditeur, pied de page et interrupteurs on/off.'
     heading_website_settings: 'Paramètres du site'
@@ -133,6 +135,7 @@ admin_system_config:
     heading_on_off_settings: 'Paramètres On/Off'
     flash_saved: 'Paramètres enregistrés'
     option_show_town_hall: 'Afficher l''assemblée générale'
+    option_show_event_geo: 'Carte des événements et filtres de lieu'
     option_automatic_registration: 'Inscription automatique'
     option_send_rsvp_notifications: 'Envoyer les notifications RSVP'
     option_send_event_reminders: 'E-mails de rappel d''événement'

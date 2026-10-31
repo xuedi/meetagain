@@ -1,0 +1,8 @@
+admin_geo_import:
+    label: 'GeoNames 导入'
+    description: '从 GeoNames 导入所有国家及其省州、城市、城区和已启用语言中的名称，在后台进程中分小步完成。之后的运行只更新已有数据，仅为缺少某种语言的国家下载名称，从不删除。'
+    fact_countries: '国家'
+    fact_states: '省州'
+    fact_cities: '城市'
+    fact_districts: '城区'
+    fact_translations: '城市名称'

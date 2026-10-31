@@ -96,6 +96,7 @@ devModeImport archive='':
         exit 1
     fi
     {{JUST}} devModeReset '' multisite
+    {{PHP}} php bin/console app:geo:import all --source=modules/geo/tests/Sample -q
     plugins="$({{PHP}} php bin/console app:import:inspect "$archive" --format=plugins)"
     if [ -n "$plugins" ]; then {{PHP}} php bin/console app:plugin:toggle on $plugins; fi
     {{PHP}} php bin/console app:import "$archive" --shift-dates --site-settings --strict

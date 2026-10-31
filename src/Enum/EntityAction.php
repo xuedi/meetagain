@@ -22,6 +22,7 @@ enum EntityAction: string
     case ApproveUser = 'approve_user';
     case DenyUser = 'deny_user';
     case CreateImage = 'create_image';
+    case UpdateImageAlt = 'update_image_alt';
     case CreateHost = 'create_host';
     case DeleteHost = 'delete_host';
     case CreateTopic = 'create_topic';

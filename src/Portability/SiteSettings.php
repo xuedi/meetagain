@@ -21,7 +21,7 @@ use function Symfony\Component\String\u;
 
 readonly class SiteSettings
 {
-    private const array FLAGS = ['show_town_hall', 'send_rsvp_notifications', 'send_event_reminders', 'send_upcoming_digest'];
+    private const array FLAGS = ['show_town_hall', 'show_event_geo', 'send_rsvp_notifications', 'send_event_reminders', 'send_upcoming_digest'];
     private const int CONFIG_VALUE_LENGTH = 255;
 
     public function __construct(
@@ -52,6 +52,7 @@ readonly class SiteSettings
             logo: $logoId === null ? null : $this->imageRepository->find($logoId),
             settings: [
                 'show_town_hall' => $this->configService->isShowTownHall(),
+                'show_event_geo' => $this->configService->isShowEventGeo(),
                 'send_rsvp_notifications' => $this->configService->isSendRsvpNotifications(),
                 'send_event_reminders' => $this->configService->isEventRemindersEnabled(),
                 'send_upcoming_digest' => $this->configService->isUpcomingDigestEnabled(),

@@ -1,6 +1,6 @@
 {% for block in blocks %}
     {% if block.type.value == 8 %}
-        {% include 'cms/blocks/' ~ block.type.name ~ '.html.twig' with {'block': block} only %}
+        {% include 'cms/blocks/' ~ block.type.name ~ '.html.twig' with {'block': block, 'images': images} only %}
     {% endif %}
 {% endfor %}
 
@@ -8,7 +8,7 @@
     <div class="container">
         {% for block in blocks %}
             {% if block.type.value != 8 %}
-                {% include 'cms/blocks/' ~ block.type.name ~ '.html.twig' with {'block': block} only %}
+                {% include 'cms/blocks/' ~ block.type.name ~ '.html.twig' with {'block': block, 'images': images} only %}
             {% endif %}
         {% endfor %}
     </div>

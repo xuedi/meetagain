@@ -64,6 +64,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     #[ORM\Column]
     private bool $public = true;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $cityId = null;
+
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $regcode = null;
 
@@ -280,6 +283,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     public function setBlockedUntil(?DateTimeImmutable $blockedUntil): static
     {
         $this->blockedUntil = $blockedUntil;
+
+        return $this;
+    }
+
+    public function getCityId(): ?int
+    {
+        return $this->cityId;
+    }
+
+    public function setCityId(?int $cityId): static
+    {
+        $this->cityId = $cityId;
 
         return $this;
     }

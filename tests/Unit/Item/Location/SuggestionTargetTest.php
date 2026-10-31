@@ -30,6 +30,7 @@ class SuggestionTargetTest extends TestCase
             'postcode' => '10115',
             'longitude' => '13.4',
             'latitude' => '52.5',
+            'city_id' => 7,
         ];
 
         // Act

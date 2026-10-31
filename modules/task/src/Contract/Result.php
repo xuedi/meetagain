@@ -7,5 +7,6 @@ final readonly class Result
     public function __construct(
         public Status $status,
         public string $message,
+        public ?string $continueFrom = null,
     ) {}
 }

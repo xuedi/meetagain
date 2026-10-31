@@ -1,0 +1,14 @@
+DE.16	Berlin	Berlin	2950157
+DE.02	Bavaria	Bavaria	2951839
+DE.04	Hamburg	Hamburg	2911297
+DE.07	North Rhine-Westphalia	North Rhine-Westphalia	2861876
+DE.05	Hesse	Hesse	2905330
+US.CA	California	California	5332921
+US.NY	New York	New York	5128638
+US.IL	Illinois	Illinois	4896861
+US.MO	Missouri	Missouri	4398678
+US.NH	New Hampshire	New Hampshire	5090174
+CN.22	Beijing	Beijing	2038349
+CN.23	Shanghai	Shanghai	1796231
+CN.30	Guangdong	Guangdong	1809935
+CN.02	Zhejiang	Zhejiang	1784764

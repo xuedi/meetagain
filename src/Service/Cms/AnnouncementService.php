@@ -14,6 +14,7 @@ use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EmailType;
 use App\Filter\Email\AudienceFilterService;
 use App\Repository\AnnouncementRepository;
+use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Http\RequestHostResolver;
@@ -33,6 +34,7 @@ readonly class AnnouncementService
         private RequestHostResolver $hostResolver,
         private AudienceFilterService $audience,
         private AnnouncementRepository $announcementRepo,
+        private ImageRepository $imageRepo,
     ) {}
 
     /**
@@ -141,7 +143,7 @@ readonly class AnnouncementService
 
             match ($block->getType()) {
                 CmsBlockType::Text => $contentParts[] = '<p>' . TextType::fromJson($block->getJson())->content . '</p>',
-                CmsBlockType::Gallery => $contentParts[] = $this->renderGalleryBlock(GalleryType::fromJson($block->getJson())),
+                CmsBlockType::Gallery => $contentParts[] = $this->renderGalleryBlock(GalleryType::fromJson($block->getJson()), $locale),
                 CmsBlockType::TextMap => $contentParts[] = $this->renderTextMapBlock(TextMapType::fromJson($block->getJson())),
                 default => null,
             };
@@ -176,12 +178,14 @@ readonly class AnnouncementService
         return implode("\n", $parts);
     }
 
-    private function renderGalleryBlock(GalleryType $galleryBlock): string
+    private function renderGalleryBlock(GalleryType $galleryBlock, string $locale): string
     {
+        $images = $this->imageRepo->findByIdsIndexed(array_map(intval(...), array_column($galleryBlock->images, 'id')));
         $parts = [];
         foreach ($galleryBlock->images as $item) {
             $url = $this->configService->getHost() . '/images/thumbnails/' . $item['hash'] . '_600x400.webp';
-            $parts[] = sprintf('<p><img src="%s" alt="" style="max-width: 100%%; height: auto;"></p>', $url);
+            $alt = $images[(int) ($item['id'] ?? 0)]?->getAltFor($locale) ?? '';
+            $parts[] = sprintf('<p><img src="%s" alt="%s" style="max-width: 100%%; height: auto;"></p>', $url, htmlspecialchars($alt, ENT_QUOTES));
         }
 
         return implode("\n", $parts);

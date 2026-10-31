@@ -1,0 +1,5 @@
+# GeoNames countryInfo.txt sample - three countries of the real file
+#ISO	ISO3	ISO-Numeric	fips	Country	Capital	Area(in sq km)	Population	Continent	tld	CurrencyCode	CurrencyName	Phone	Postal Code Format	Postal Code Regex	Languages	geonameid	neighbours	EquivalentFipsCode
+DE	DEU	276	GM	Germany	Berlin	357021	82927922	EU	.de	EUR	Euro	49	#####	^(\d{5})$	de	2921044	CH,PL,NL,DK,BE,CZ,LU,FR,AT	
+US	USA	840	US	United States	Washington	9629091	327167434	NA	.us	USD	Dollar	1	#####-####	^\d{5}(-\d{4})?$	en-US,es-US,haw,fr	6252001	CA,MX,CU	
+CN	CHN	156	CH	China	Beijing	9596960	1411778724	AS	.cn	CNY	Yuan Renminbi	86	######	^(\d{6})$	zh-CN,yue,wuu,dta,ug,za	1814991	LA,BT,TJ,KZ,MN,AF,NP,MM,KG,PK,KP,RU,VN,IN	

@@ -1,0 +1,53 @@
+9000001	2921044	en	Germany	1					
+9000002	2921044	de	Deutschland	1	1				
+9000003	2921044	fr	Allemagne	1					
+9000004	2921044	es	Alemania	1					
+9000005	2921044	zh	德国	1					
+9000006	2921044	link	https://en.wikipedia.org/wiki/Germany						
+9000007	2921044	de	Bundesrepublik Deutschland	1					
+9000008	2950157	en	Berlin	1					
+9000009	2950157	de	Berlin	1					
+9000010	2950157	fr	Berlin	1					
+9000011	2950157	es	Berlín	1					
+9000012	2950157	zh	柏林州	1					
+9000013	2951839	en	Bavaria	1					
+9000014	2951839	de	Bayern	1					
+9000015	2951839	fr	Bavière	1					
+9000016	2951839	es	Baviera	1					
+9000017	2951839	zh	巴伐利亚	1					
+9000018	2950159	en	Berlin	1					
+9000019	2950159	de	Berlin	1					
+9000020	2950159	fr	Berlin	1					
+9000021	2950159	es	Berlín	1					
+9000022	2950159	zh	柏林	1					
+9000023	2950159	link	https://en.wikipedia.org/wiki/Berlin						
+9000024	2950159	post	10117						
+9000025	2950159	iata	BER						
+9000026	2867714	en	Munich	1					
+9000027	2867714	de	München	1					
+9000028	2867714	fr	Munich	1					
+9000029	2867714	es	Múnich	1					
+9000030	2867714	zh	慕尼黑	1					
+9000031	2867714	de	Muenchen						
+9000032	2867714	en	Muenchen						
+9000033	2867714	la	Monacum						
+9000034	2911298	en	Hamburg	1					
+9000035	2911298	de	Hamburg	1					
+9000036	2911298	fr	Hambourg	1					
+9000037	2911298	es	Hamburgo	1					
+9000038	2911298	zh	汉堡	1					
+9000039	2886242	en	Cologne	1					
+9000040	2886242	de	Köln	1					
+9000041	2886242	fr	Cologne	1					
+9000042	2886242	es	Colonia	1					
+9000043	2886242	zh	科隆	1					
+9000044	2886242	de	Coeln				1		
+9000045	2925533	en	Frankfurt						
+9000046	2925533	en	Frankfurt am Main	1					
+9000047	2925533	de	Frankfurt am Main	1					
+9000048	2925533	fr	Francfort-sur-le-Main	1					
+9000049	2925533	es	Fráncfort del Meno	1					
+9000050	2925533	zh	法兰克福	1					
+9000051	2884936	de	Kreuzberg	1					
+9000052	2884936	en	Kreuzberg	1					
+9000053	2852458	de	Prenzlauer Berg	1					

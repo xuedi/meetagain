@@ -30,6 +30,8 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `ImageAttributionFilterInterface`                            | Narrow which attributed images `/attributions` shows  | `getVisibleImageIdFilter()`                            |
 | `DataHotfixInterface`                                        | Ship a one-off data repair that runs once per DB      | `getIdentifier()`, `execute()`                         |
 | `Module\Task\Contract\TaskInterface`                         | Run periodic work on a cron cadence                   | `getIdentifier()`, `getCadence()`, `run()`             |
+| `Module\Task\Contract\ActionInterface`                       | Offer an admin-started job on the Maintenance page    | `getParameters()`, `run()`                             |
+| `Item\Location\CityDefaultProviderInterface`                 | Pre-fill the city of a new location                   | `getDefaultCityId()`                                   |
 | `SecurityProviderInterface`                                  | Participate in live security event detection          | `observe()`, `scanRetrospective()`                     |
 | `DescriptorInterface`                                        | Add a settings section to your plugin's settings page | `getFormType()`, `createDefault()`, `applyForm()`      |
 | `TaggableTypeProviderInterface`                              | Give an item type a tag vocabulary                    | `getPluginKey()`, `getTypeKey()`, `getLabelKey()`      |
@@ -1366,8 +1368,50 @@ on top via AND-intersection with that one.
 
 ## Background work
 
-A periodic task (`Module\Task\Contract\TaskInterface`) and work a request hands off to a message worker are
-described in [Required Hooks](required-hooks.md#periodic-and-background-work).
+A periodic task (`Module\Task\Contract\TaskInterface`), an admin-started maintenance action
+(`Module\Task\Contract\ActionInterface`) and work a request hands off to a message worker are described in
+[Required Hooks](required-hooks.md#periodic-and-background-work).
+
+---
+
+## Cities
+
+The geo module keeps a local copy of the GeoNames gazetteer once an admin has imported it. Read it through
+`Module\Geo\Contract\DirectoryInterface`, never its entities; `modules/geo/README.md` describes the whole module.
+
+- **Store a plain integer city id** on your own rows, without a foreign key. The import never deletes a city, so the
+  id stays valid. Resolve a page of ids with one `findCities($ids, $locale)` call; names arrive in the requested
+  language, falling back to English.
+- **Check `hasCities()` first.** Until an admin imports cities, leave your city field and any feature built on it
+  out, so an installation without the directory loses nothing.
+- **Use the shared field.** `App\Form\CityType` is a country select with an autocomplete and a hidden id, validated
+  against the directory.
+- **Export the GeoNames id** (`CityView::$geonameId`), not the local id, which differs between installations.
+- **Show the attribution** - `{% include '@Geo/attribution.html.twig' %}` - on every public page that renders
+  names or positions from the directory. GeoNames data is CC BY 4.0.
+
+### Item\Location\CityDefaultProviderInterface
+
+**Purpose:** Suggest the city a new location starts with in the admin location form.
+
+**Chain:** first non-null wins. Return `null` when you have no opinion; with no answer anywhere the field starts
+empty. The field itself only exists while the directory holds cities.
+
+```php
+use App\Item\Location\CityDefaultProviderInterface;
+
+final readonly class HomeCityDefault implements CityDefaultProviderInterface
+{
+    public function __construct(
+        private YourSettings $settings,
+    ) {}
+
+    public function getDefaultCityId(): ?int
+    {
+        return $this->settings->homeCityId();
+    }
+}
+```
 
 ---
 

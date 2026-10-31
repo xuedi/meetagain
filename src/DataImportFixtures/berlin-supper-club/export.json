@@ -45,7 +45,9 @@
             "latitude": "52.4793",
             "longitude": "13.4407",
             "city": "Berlin",
-            "country": ""
+            "city_geoname_id": 2950159,
+            "city_name": "Berlin",
+            "country": "DE"
         },
         {
             "ref": 14,
@@ -53,7 +55,9 @@
             "latitude": "52.4823",
             "longitude": "13.3631",
             "city": "Berlin",
-            "country": ""
+            "city_geoname_id": 2950159,
+            "city_name": "Berlin",
+            "country": "DE"
         }
     ],
     "users": [
@@ -65,6 +69,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting sunsets and capturing moments through photography. Exploring the world one adventure at a time! #ArtLover #AdventureSeeker",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c6f0208f15bb20290ea2152004c2bf0b97412448.jpg"
         },
         {
@@ -75,6 +80,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "✨ Adventurer at heart, I explore the great outdoors and capture moments through photography. 🎨 On weekends, you can find me painting or whipping up new recipes! #NatureLover #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/c79532c476e00a2400292babd40d98ac7dff9997.jpg"
         },
         {
@@ -85,6 +91,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting and hiking, I find inspiration in nature's beauty. Balancing my love for creativity with a career in graphic design keeps my heart and mind alive! #ArtLover #NatureEnthusiast #CreativeCareer",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/9ae42276e31626b998318c1887cc1ec2c72b041d.jpg"
         },
         {
@@ -95,6 +102,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about crafting captivating stories by day, I immerse myself in the world of photography and hiking by night. Balancing work with exploration fuels my creative spirit. #Storyteller #NatureLover",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/cdac98998c90f96526373b774ef80741763f4a50.jpg"
         },
         {
@@ -105,6 +113,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about bridging cultures through language, I thrive in dynamic work environments that challenge my communication skills. Embracing every opportunity to learn, I'm dedicated to fostering understanding and connection across diverse communities. #LanguageLover #CulturalBridge",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/08a3b47613f2d0f6aced2c3c467602e3aa1638f1.jpg"
         },
         {
@@ -115,6 +124,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker with a passion for painting and hiking. Catch me exploring the great outdoors or getting lost in colors! #Wanderlust #ArtLover 🎨⛰️",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/da483b78e3e3bfd30953876637bcdaf2fe97ef89.jpg"
         }
     ],

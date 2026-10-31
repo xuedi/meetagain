@@ -69,6 +69,12 @@
                         {% endif %}
                     </div>
 
+                    {% if city %}
+                        <p class="has-text-grey mb-2">
+                            <span class="icon"><i class="fa fa-location-dot"></i></span>
+                            <span>{{ 'member.label_city'|trans }}: {{ city.name }}, {{ city.countryName }}</span>
+                        </p>
+                    {% endif %}
                     <p>{{ userDetails.bio }}</p>
 
                     {{ get_member_view_sections(currentUser, userDetails) }}

@@ -33,7 +33,7 @@ final class InstallSeedCommandTest extends TestCase
     {
         yield 'the import and cron system users' => [User::class, 2];
         yield 'every language' => [Language::class, 65];
-        yield 'every config row including the system user id' => [Config::class, 14];
+        yield 'every config row including the system user id' => [Config::class, 15];
         yield 'every pronunciation system' => [PronunciationSystem::class, 7];
         yield 'the four footer column titles' => [AppState::class, 4];
     }

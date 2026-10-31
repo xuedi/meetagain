@@ -1,0 +1,8 @@
+admin_geo_import:
+    label: 'Importación de GeoNames'
+    description: 'Importa desde GeoNames todos los países con sus regiones, ciudades, distritos y sus nombres en los idiomas activados, en pasos cortos en los workers. Una ejecución posterior actualiza lo existente, descarga nombres solo para los países a los que les falta un idioma y nunca borra.'
+    fact_countries: 'Países'
+    fact_states: 'Regiones'
+    fact_cities: 'Ciudades'
+    fact_districts: 'Distritos'
+    fact_translations: 'Nombres de ciudades'

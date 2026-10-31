@@ -11,6 +11,8 @@ readonly class KindLabels
     private const array CORE = [
         'users' => 'admin_system_import.kind_users',
         'locations' => 'admin_system_import.kind_locations',
+        'location_cities' => 'admin_system_import.kind_location_cities',
+        'user_cities' => 'admin_system_import.kind_user_cities',
         'hosts' => 'admin_system_import.kind_hosts',
         'series' => 'admin_system_import.kind_series',
         'events' => 'admin_system_import.kind_events',

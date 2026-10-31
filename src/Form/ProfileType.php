@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Service\Config\LanguageService;
 use App\Service\Media\ImageService;
 use App\Service\Member\ProfileService;
+use Module\Geo\Contract\DirectoryInterface;
 use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -25,6 +26,7 @@ class ProfileType extends AbstractType
         private readonly LanguageService $languageService,
         private readonly TranslatorInterface $translator,
         private readonly ProfileService $profileService,
+        private readonly DirectoryInterface $directory,
     ) {}
 
     #[Override]
@@ -70,6 +72,10 @@ class ProfileType extends AbstractType
             'mapped' => false,
             'label' => 'profile.form_label_bio',
         ]);
+
+        if ($this->directory->hasCities()) {
+            $builder->add('cityId', CityType::class, ['required' => false]);
+        }
     }
 
     #[Override]

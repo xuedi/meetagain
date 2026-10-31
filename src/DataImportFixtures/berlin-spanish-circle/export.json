@@ -58,7 +58,9 @@
             "latitude": "52.4905",
             "longitude": "13.4093",
             "city": "Berlin",
-            "country": ""
+            "city_geoname_id": 2950159,
+            "city_name": "Berlin",
+            "country": "DE"
         },
         {
             "ref": 9,
@@ -66,7 +68,9 @@
             "latitude": "52.5223",
             "longitude": "13.4022",
             "city": "Berlin",
-            "country": ""
+            "city_geoname_id": 2950159,
+            "city_name": "Berlin",
+            "country": "DE"
         }
     ],
     "users": [
@@ -78,6 +82,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Lover of adventure and creativity, I dive into painting and hiking when I'm not crafting magic in marketing! 🌟✨ #HobbyistHeart #WorkAndPlay",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/6d10ed55842a62725ad954d7fa56fe1e735feb14.jpg"
         },
         {
@@ -88,6 +93,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Passionate about painting and hiking, I find inspiration in nature's beauty. Balancing my love for creativity with a career in graphic design keeps my heart and mind alive! #ArtLover #NatureEnthusiast #CreativeCareer",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/d46c6eeb1acfdf34977f6795275a285750326133.jpg"
         },
         {
@@ -98,6 +104,7 @@
             "password": "$2y$04$XFawyDzZpSMsih8qNn0mduN3xxj6TgU11cPtEw9ApUdmtNB03Ya2u",
             "bio": "Adventure seeker by day, crafting wizard by night! When I'm not doodling my dreams, you'll catch me hiking or whipping up some delicious treats! 🌟🏞️ #Wanderlust #CreativeSoul",
             "public": true,
+            "city_geoname_id": null,
             "image_file": "images/bd95fda4637e37c983d108f9de761c50b4cd2462.jpg"
         }
     ],

@@ -72,6 +72,7 @@ final readonly class SuggestionTarget implements TargetProviderInterface
         $draft->setPostcode($this->text($payload, 'postcode'));
         $draft->setLongitude($this->optionalText($payload, 'longitude'));
         $draft->setLatitude($this->optionalText($payload, 'latitude'));
+        $draft->setCityId(is_int($payload['city_id'] ?? null) ? $payload['city_id'] : null);
 
         return $draft;
     }
@@ -89,6 +90,7 @@ final readonly class SuggestionTarget implements TargetProviderInterface
             'postcode' => (string) $location->getPostcode(),
             'longitude' => $location->getLongitude(),
             'latitude' => $location->getLatitude(),
+            'city_id' => $location->getCityId(),
         ];
     }
 

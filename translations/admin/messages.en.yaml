@@ -405,6 +405,7 @@ admin_location:
     flash_deleted: 'Venue deleted successfully'
     flash_created: 'Venue created successfully'
     flash_delete_blocked: 'Cannot delete venue. It is currently used in %count% event(s).'
+    form_label_city_place: 'City (for maps and filters)'
 admin_logs:
     tab_activity: 'Activity'
     tab_system: 'System'
@@ -620,6 +621,7 @@ admin_system:
     tab_images: 'Images'
     tab_language: 'Language'
     tab_import: 'Import'
+    tab_maintenance: 'Maintenance'
     tab_secretbox: 'Secret Keys'
     tab_hotfixes: 'Hotfixes'
     flash_invalid_csrf: 'Invalid CSRF token'

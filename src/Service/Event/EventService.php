@@ -194,6 +194,7 @@ readonly class EventService
 
     /**
      * @param array<int>|null $restrictToEventIds Optional event ID filter
+     * @param list<int>|null $cityIds only events whose location lies in one of these cities
      */
     public function getFilteredList(
         EventTimeFilter $time,
@@ -203,10 +204,21 @@ readonly class EventService
         ?UserInterface $user = null,
         ?array $restrictToEventIds = null,
         ?string $translatedIn = null,
+        ?array $cityIds = null,
     ): array {
-        $result = $this->repo->findByFilters($time, $sort, $type, $user, $rsvp, $restrictToEventIds, $translatedIn);
+        $result = $this->repo->findByFilters($time, $sort, $type, $user, $rsvp, $restrictToEventIds, $translatedIn, $cityIds);
 
         return $this->structureList($result);
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds
+     * @param list<int>|null $cityIds
+     * @return list<array{event: Event, rsvpCount: int}> upcoming events with a place on the map, soonest first
+     */
+    public function findForMap(DateTimeInterface $from, ?DateTimeInterface $to, ?array $restrictToEventIds, ?array $cityIds, string $locale, int $limit): array
+    {
+        return $this->repo->findForMap($from, $to, $restrictToEventIds, $cityIds, $locale, $limit);
     }
 
     /**

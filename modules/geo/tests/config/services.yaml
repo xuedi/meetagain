@@ -1,0 +1,8 @@
+services:
+    geo.test.directory:
+        alias: Module\Geo\Contract\DirectoryInterface
+        public: true
+
+    geo.test.slugs:
+        alias: Module\Geo\Internal\Slugs
+        public: true

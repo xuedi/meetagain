@@ -1,0 +1,10 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Module\Geo\:
+        resource: '../src/'
+        exclude:
+            - '../src/Internal/Entity/'
+            - '../src/Internal/Import/{NamePicks,Options,Report,Tally}.php'

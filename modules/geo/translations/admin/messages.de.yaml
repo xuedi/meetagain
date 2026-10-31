@@ -1,0 +1,8 @@
+admin_geo_import:
+    label: 'GeoNames-Import'
+    description: 'Importiert alle Länder mit ihren Bundesländern, Städten, Bezirken und deren Namen in den aktivierten Sprachen aus GeoNames, in kurzen Schritten auf den Workern. Ein späterer Lauf aktualisiert Vorhandenes, lädt Namen nur für Länder, denen eine Sprache fehlt, und löscht nie.'
+    fact_countries: 'Länder'
+    fact_states: 'Bundesländer'
+    fact_cities: 'Städte'
+    fact_districts: 'Bezirke'
+    fact_translations: 'Städtenamen'

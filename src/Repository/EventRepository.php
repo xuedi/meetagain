@@ -46,6 +46,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
 
     /**
      * @param array<int>|null $restrictToEventIds Optional event ID filter
+     * @param list<int>|null $cityIds only events whose location lies in one of these cities
      * @return Event[]
      */
     public function findByFilters(
@@ -56,7 +57,12 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
         ?EventRsvpFilter $rsvp = null,
         ?array $restrictToEventIds = null,
         ?string $translatedIn = null,
+        ?array $cityIds = null,
     ): array {
+        if ($cityIds === []) {
+            return [];
+        }
+
         $qb = $this
             ->createQueryBuilder('e')
             ->leftJoin('e.translations', 't')
@@ -94,6 +100,10 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
 
         if ($translatedIn !== null) {
             $this->restrictToTranslated($qb, $translatedIn);
+        }
+
+        if ($cityIds !== null) {
+            $qb->innerJoin('e.location', 'cityLocation')->andWhere('cityLocation.cityId IN (:cityIds)')->setParameter('cityIds', $cityIds);
         }
 
         $qb->orderBy('e.start', $sort->value);
@@ -981,5 +991,79 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
     public function reset(): void
     {
         $this->eventNameLists = [];
+    }
+
+    /**
+     * @param array<int>|null $restrictToEventIds
+     * @param list<int>|null $cityIds
+     * @return list<array{event: Event, rsvpCount: int}> soonest first
+     */
+    public function findForMap(
+        DateTimeInterface $from,
+        ?DateTimeInterface $to,
+        ?array $restrictToEventIds,
+        ?array $cityIds,
+        string $translatedIn,
+        int $limit,
+    ): array {
+        if ($restrictToEventIds === [] || $cityIds === []) {
+            return [];
+        }
+
+        $qb = $this
+            ->createQueryBuilder('e')
+            ->select('e.id AS id', 'SIZE(e.rsvp) AS rsvpCount')
+            ->innerJoin('e.location', 'l')
+            ->where('e.status IN (:statuses)')
+            ->andWhere("l.latitude IS NOT NULL AND l.latitude != '' AND l.longitude IS NOT NULL AND l.longitude != ''")
+            ->andWhere('ABS(l.latitude) + ABS(l.longitude) > 0')
+            ->andWhere('COALESCE(e.stop, e.start) >= :from')
+            ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value])
+            ->setParameter('from', $from)
+            ->orderBy('e.start', 'ASC')
+            ->addOrderBy('e.id', 'ASC')
+            ->setMaxResults($limit);
+
+        if ($to !== null) {
+            $qb->andWhere('e.start <= :to')->setParameter('to', $to);
+        }
+        if ($restrictToEventIds !== null) {
+            $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
+        }
+        if ($cityIds !== null) {
+            $qb->andWhere('l.cityId IN (:cityIds)')->setParameter('cityIds', $cityIds);
+        }
+        $this->restrictToTranslated($qb, $translatedIn);
+
+        $counts = [];
+        foreach ($qb->getQuery()->getArrayResult() as $row) {
+            $counts[(int) $row['id']] = (int) $row['rsvpCount'];
+        }
+        if ($counts === []) {
+            return [];
+        }
+
+        $events = $this
+            ->createQueryBuilder('e')
+            ->addSelect('l', 't')
+            ->innerJoin('e.location', 'l')
+            ->leftJoin('e.translations', 't')
+            ->where('e.id IN (:ids)')
+            ->setParameter('ids', array_keys($counts))
+            ->getQuery()
+            ->getResult();
+        $byId = [];
+        foreach ($events as $event) {
+            $byId[(int) $event->getId()] = $event;
+        }
+
+        $found = [];
+        foreach ($counts as $id => $rsvpCount) {
+            if (isset($byId[$id])) {
+                $found[] = ['event' => $byId[$id], 'rsvpCount' => $rsvpCount];
+            }
+        }
+
+        return $found;
     }
 }

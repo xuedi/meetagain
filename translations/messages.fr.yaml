@@ -232,6 +232,9 @@ events:
     share_target_x: 'X'
     share_target_linkedin: 'LinkedIn'
     share_target_email: 'E-mail'
+    button_map: 'Carte'
+    filter_country_all: 'Tous les pays'
+    filter_city_all: 'Toutes les villes'
 comment:
     heading: 'Commentaires'
     deleted_user: 'Utilisateur supprimé'
@@ -309,6 +312,7 @@ member:
     admin_action_restrict_user: 'Restreindre l''utilisateur'
     admin_action_verify_user: 'Vérifier l''utilisateur'
     button_report: 'Signaler'
+    label_city: 'Ville'
 profile:
     page_title: 'Profil'
     section_info: 'Infos'
@@ -919,3 +923,23 @@ contribution:
     event_validator_gone: "Cet événement n'existe plus."
     event_validator_unknown_field: "Ce champ n'appartient pas à cet événement."
     event_validator_blank: 'Un titre ne peut pas être vide.'
+city_picker:
+    label_country: 'Pays'
+    country_any: 'Tous les pays'
+    label_city: 'Ville'
+    search_placeholder: 'Saisissez le nom d''une ville'
+    no_results: 'Aucune ville ne correspond.'
+map:
+    page_title: 'Carte des événements - %site%'
+    meta_description: 'Les prochains événements sur une carte.'
+    heading: 'Les prochains événements sur la carte'
+    label_from: 'Du'
+    label_to: 'Au'
+    truncated: 'Seuls les premiers événements sont affichés - réduis les dates ou choisis une ville pour voir le reste.'
+    pick_marker: 'Choisis un repère pour voir l''événement.'
+    label_rsvps: 'participants'
+    open_event: 'Ouvrir l''événement'
+    empty: 'Aucun événement à venir avec un lieu connu ne correspond.'
+    consent_needed: 'La carte est chargée depuis OpenStreetMap, que tu n''as pas encore autorisé.'
+    consent_profile: 'Autoriser les cartes dans tes réglages'
+    consent_cookie: 'Autorise OpenStreetMap dans les réglages des cookies en haut de la page pour voir la carte.'

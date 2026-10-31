@@ -5,6 +5,7 @@ namespace App\Portability\Section;
 use App\Entity\Event;
 use App\Entity\Location;
 use App\Entity\User;
+use App\Portability\Cities;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
@@ -20,6 +21,7 @@ readonly class LocationsSection implements SectionInterface
     public function __construct(
         private EntityManagerInterface $em,
         private LocationRepository $locationRepository,
+        private Cities $cities,
     ) {}
 
     #[Override]
@@ -59,7 +61,7 @@ readonly class LocationsSection implements SectionInterface
                 'latitude' => $location->getLatitude(),
                 'longitude' => $location->getLongitude(),
                 'city' => $location->getCity(),
-                'country' => '',
+                ...$this->cities->export($location->getCityId()),
             ];
         }
 
@@ -80,6 +82,7 @@ readonly class LocationsSection implements SectionInterface
                 $context->count($this->getKey(), Outcome::Matched);
             } else {
                 $location = $this->createLocation($row, $title, $context->getSystemUser());
+                $location->setCityId($this->cities->resolve($row, $context, Cities::LOCATION_KIND));
                 $context->count($this->getKey(), Outcome::Created);
             }
 

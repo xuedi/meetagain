@@ -234,3 +234,6 @@ Error: Error
 'item_report.validator_explanation_long': 'The explanation is too long.'
 'item_report.validator_good_faith': 'Please confirm that the report is made in good faith.'
 'report.validator_remarks_long': 'The remarks are too long.'
+city_picker:
+    validator_required: 'Pick a city from the list.'
+    validator_unknown: 'This city is not in the directory.'

@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'map.page_title'|trans({'%site%': get_site_name()}) }}{% endblock %}
+{% block meta_description %}{{ 'map.meta_description'|trans }}{% endblock %}
+
+{% block javascripts %}
+    {% if show_osm() %}
+        <script src="{{ asset('js/vendor/leaflet.js') }}"></script>
+        <script src="{{ asset('js/event-map.js') }}" defer></script>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <h1 class="title is-4">{{ 'map.heading'|trans }}</h1>
+
+            {{ form_start(filter, {'attr': {'class': 'is-flex is-flex-wrap-wrap is-align-items-flex-end mb-4'}}) }}
+            <div class="mr-3">{{ form_row(filter.from) }}</div>
+            <div class="mr-3">{{ form_row(filter.to) }}</div>
+            {% if filter.country is defined %}
+                <div class="mr-3 field"><div class="select">{{ form_widget(filter.country) }}</div></div>
+            {% endif %}
+            {% if filter.city is defined %}
+                <div class="mr-3 field"><div class="select">{{ form_widget(filter.city) }}</div></div>
+            {% endif %}
+            <div class="field"><button class="button is-link">{{ 'events.button_filter'|trans }}</button></div>
+            {{ form_end(filter) }}
+
+            {% if show_osm() %}
+                <p class="help is-hidden mb-2" data-event-map-truncated>{{ 'map.truncated'|trans }}</p>
+                <div class="columns">
+                    <div class="column is-8">
+                        <div data-event-map
+                             data-url="{{ eventsUrl }}"
+                             data-marker-icon="{{ asset('images/leaflet/marker-icon.png') }}"
+                             data-marker-shadow="{{ asset('images/leaflet/marker-shadow.png') }}"
+                             style="height: 32rem;"></div>
+                    </div>
+                    <div class="column is-4">
+                        <div class="box" data-event-map-sidebar>
+                            <p class="has-text-grey" data-event-map-hint>{{ 'map.pick_marker'|trans }}</p>
+                            <div class="is-hidden" data-event-map-detail>
+                                <p class="title is-5 mb-2" data-field="title"></p>
+                                <p class="mb-1" data-field="start"></p>
+                                <p class="has-text-grey mb-1" data-field="where"></p>
+                                <p class="mb-3"><span data-field="rsvpCount"></span> {{ 'map.label_rsvps'|trans }}</p>
+                                <a class="button is-link is-small" data-field="url">{{ 'map.open_event'|trans }}</a>
+                            </div>
+                            <p class="has-text-grey is-hidden" data-event-map-empty>{{ 'map.empty'|trans }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="box has-text-centered is-flex is-flex-direction-column is-justify-content-center" style="min-height: 32rem;">
+                    <p class="mb-3">{{ 'map.consent_needed'|trans }}</p>
+                    {% if is_granted('ROLE_USER') %}
+                        <p><a class="button is-link" href="{{ path('app_profile_config') }}">{{ 'map.consent_profile'|trans }}</a></p>
+                    {% else %}
+                        <p class="has-text-grey">{{ 'map.consent_cookie'|trans }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
+
+{% endblock %}

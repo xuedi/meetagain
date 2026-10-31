@@ -1,0 +1,8 @@
+admin_geo_import:
+    label: 'GeoNames import'
+    description: 'Imports every country with its states, cities, districts and their names in the enabled languages from GeoNames, in short steps on the workers. A later run updates what is there, fetches names only for countries missing a language, and never deletes.'
+    fact_countries: 'Countries'
+    fact_states: 'States'
+    fact_cities: 'Cities'
+    fact_districts: 'Districts'
+    fact_translations: 'City names'

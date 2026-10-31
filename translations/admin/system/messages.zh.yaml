@@ -126,6 +126,8 @@ admin_system_import:
     note: '没有密码导入的成员需要使用"忘记密码"来激活账户。'
     failed: '导入失败：'
     label_zip_file: '导出ZIP文件'
+    kind_location_cities: '场地城市'
+    kind_user_cities: '成员城市'
 admin_system_config:
     intro: '全站设置：身份、发件人、页脚以及开关项。'
     heading_website_settings: '网站设置'
@@ -133,6 +135,7 @@ admin_system_config:
     heading_on_off_settings: '开关设置'
     flash_saved: '设置已保存'
     option_show_town_hall: '显示市政厅'
+    option_show_event_geo: '活动地图与地点筛选'
     option_automatic_registration: '自动注册'
     option_send_rsvp_notifications: '发送RSVP通知'
     option_send_event_reminders: '活动提醒邮件'

@@ -1,0 +1,82 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block content %}
+
+    <div class="container">
+
+        {% include 'admin/_components/admin_tabs.html.twig' with {'adminTabs': adminTabs} only %}
+        {% include 'admin/_components/admin_top.html.twig' with {'adminTop': adminTop} only %}
+
+        <p class="mb-4">{{ action.description|trans }}</p>
+
+        <div class="columns">
+            <div class="column is-5">
+                <table class="table is-fullwidth">
+                    <tbody>
+                    <tr>
+                        <th>{{ 'admin_maintenance.field_identifier'|trans }}</th>
+                        <td><code>{{ action.identifier }}</code></td>
+                    </tr>
+                    {% for label, value in facts %}
+                        <tr>
+                            <th>{{ label|trans }}</th>
+                            <td>{{ value }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="column">
+                {% if runForm %}
+                    <h2 class="title is-6">{{ 'admin_maintenance.heading_run'|trans }}</h2>
+                    {{ form_start(runForm) }}
+                    {{ form_widget(runForm) }}
+                    <button type="submit" class="button is-primary">{{ 'admin_maintenance.action_run'|trans }}</button>
+                    {{ form_end(runForm) }}
+                {% endif %}
+                {% if settingsForm %}
+                    <h2 class="title is-6 mt-5">{{ 'admin_maintenance.heading_settings'|trans }}</h2>
+                    <p class="has-text-grey is-size-7 mb-3">{{ 'admin_maintenance.settings_help'|trans }}</p>
+                    {{ form_start(settingsForm) }}
+                    {{ form_widget(settingsForm) }}
+                    <button type="submit" class="button is-primary">{{ 'global.button_save'|trans }}</button>
+                    {{ form_end(settingsForm) }}
+                {% endif %}
+            </div>
+        </div>
+
+        <h2 class="title is-6">{{ 'admin_maintenance.heading_history'|trans }}</h2>
+        <table class="table is-fullwidth">
+            <thead>
+            <tr>
+                <th>{{ 'admin_maintenance.col_requested'|trans }}</th>
+                <th>{{ 'admin_maintenance.col_requested_by'|trans }}</th>
+                <th>{{ 'admin_maintenance.col_values'|trans }}</th>
+                <th>{{ 'admin_maintenance.col_status'|trans }}</th>
+                <th>{{ 'admin_maintenance.col_message'|trans }}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for request in history %}
+                <tr>
+                    <td class="is-nowrap">{{ request.createdAt|date('Y-m-d H:i:s') }}</td>
+                    <td class="has-text-grey">{{ request.requestedBy ?? '-' }}</td>
+                    <td class="is-size-7">
+                        {% for key, value in request.values %}
+                            <div><code>{{ key }}</code> {{ value is same as(true) ? 'true' : (value is same as(false) ? 'false' : (value ?? '-')) }}</div>
+                        {% endfor %}
+                    </td>
+                    <td class="is-nowrap">{% include '@Task/admin/maintenance/_last.html.twig' with {'request': request} only %}</td>
+                    <td class="breakText">{{ request.message ?? '' }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="has-text-grey has-text-centered">{{ 'admin_maintenance.never_ran'|trans }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+{% endblock %}

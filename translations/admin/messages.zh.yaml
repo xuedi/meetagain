@@ -405,6 +405,7 @@ admin_location:
     flash_deleted: '会场删除成功'
     flash_created: '会场创建成功'
     flash_delete_blocked: '无法删除会场。它目前已被 %count% 个活动使用。'
+    form_label_city_place: '城市（用于地图和筛选）'
 admin_logs:
     tab_activity: '活动日志'
     tab_system: '系统日志'
@@ -620,6 +621,7 @@ admin_system:
     tab_images: '图片'
     tab_language: '语言'
     tab_import: '导入'
+    tab_maintenance: '维护'
     tab_secretbox: '密钥管理'
     tab_hotfixes: '数据修复'
     flash_invalid_csrf: 'CSRF令牌无效'

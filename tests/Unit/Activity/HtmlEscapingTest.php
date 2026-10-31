@@ -24,7 +24,7 @@ class HtmlEscapingTest extends TestCase
         'modules/*/src/Internal/Activity',
     ];
 
-    private const array NUMERIC_KEYS = ['attempts', 'created', 'granted', 'images', 'members', 'skipped', 'updated'];
+    private const array NUMERIC_KEYS = ['attempts', 'created', 'enabled', 'granted', 'images', 'members', 'skipped', 'updated'];
 
     private const array NUMERIC_OVERRIDES = [
         AdminMemberStatusChanged::class => ['old' => 1, 'new' => 2],

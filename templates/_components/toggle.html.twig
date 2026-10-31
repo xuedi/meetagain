@@ -19,12 +19,12 @@
     Depends on: assets/js/block-user.js (.triggerToggleBlock)
 #}
 {% if disabled|default(false) %}
-    <div class="buttons has-addons is-right">
+    <div class="buttons has-addons is-right is-flex-wrap-nowrap">
         <button type="button" class="button is-small {% if status %}is-success{% endif %}" disabled>{{ "shared.toggle_yes"|trans }}</button>
         <button type="button" class="button is-small {% if not status %}is-danger{% endif %}" disabled>{{ "shared.toggle_no"|trans }}</button>
     </div>
 {% elseif noAjax is defined %}
-    <div class="buttons has-addons is-right">
+    <div class="buttons has-addons is-right is-flex-wrap-nowrap">
         {% if status %}
             <span class="button is-small is-success">{{ "shared.toggle_yes"|trans }}</span>
             <a href="{{ link }}"
@@ -40,7 +40,7 @@
         {% endif %}
     </div>
 {% else %}
-    <div class="buttons has-addons is-right triggerToggleBlock">
+    <div class="buttons has-addons is-right is-flex-wrap-nowrap triggerToggleBlock">
         <button type="button" class="button is-small {% if status %}is-success{% endif %}" data-type="yes" data-url="{{ link }}" data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_yes"|trans }}</button>
         <button type="button" class="button is-small {% if not status %}is-danger{% endif %}" data-type="no" data-url="{{ link }}" data-csrf-token="{{ csrf_token(csrfTokenId) }}">{{ "shared.toggle_no"|trans }}</button>
     </div>
