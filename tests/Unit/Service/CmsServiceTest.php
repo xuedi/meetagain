@@ -3,13 +3,17 @@
 namespace Tests\Unit\Service;
 
 use App\Entity\BlockType\EventTeaser;
+use App\Entity\BlockType\Gallery;
 use App\Entity\BlockType\Text;
+use App\Entity\BlockType\TrioCards;
 use App\Entity\Cms;
+use App\Entity\Image;
 use App\Filter\Cms\CmsFilterResult;
 use App\Filter\Cms\CmsFilterService;
 use App\Filter\Event\EventFilterResult;
 use App\Filter\Event\EventFilterService;
 use App\Repository\CmsRepository;
+use App\Repository\ImageRepository;
 use App\Service\Cms\CmsService;
 use DateInterval;
 use DateTimeInterface;
@@ -17,6 +21,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,6 +52,7 @@ class CmsServiceTest extends TestCase
             cache: $this->createStub(TagAwareCacheInterface::class),
             translator: new IdentityTranslator(),
             requestStack: $this->createStub(RequestStack::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -83,6 +89,7 @@ class CmsServiceTest extends TestCase
             cache: $cacheMock,
             translator: new IdentityTranslator(),
             requestStack: $this->createStub(RequestStack::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Assert
@@ -134,6 +141,7 @@ class CmsServiceTest extends TestCase
             cache: $cacheMock,
             translator: new IdentityTranslator(),
             requestStack: $this->createStub(RequestStack::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -177,7 +185,7 @@ class CmsServiceTest extends TestCase
             ->method('render')
             ->willReturnCallback(static function (string $name, array $context) use ($blocks, $pageTitle, $renderedBody, $expectedContent): string {
                 if ($name === 'cms/_blocks.html.twig') {
-                    static::assertSame(['blocks' => $blocks], $context);
+                    static::assertSame(['blocks' => $blocks, 'images' => []], $context);
                     return $renderedBody;
                 }
                 static::assertSame('cms/index.html.twig', $name);
@@ -258,6 +266,7 @@ class CmsServiceTest extends TestCase
             cache: $cacheMock,
             translator: new IdentityTranslator(),
             requestStack: $this->createStub(RequestStack::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -281,6 +290,13 @@ class CmsServiceTest extends TestCase
             new ArrayCollection([self::textBlock(), EventTeaser::fromJson(['headline' => 'Next up', 'text' => ''])]),
             ['cms_page_123', 'cms_page_all', 'cms_event_teaser'],
         ];
+        yield 'a page showing images tags each image once' => [
+            new ArrayCollection([
+                Text::fromJson(['content' => 'Body'], self::imageWithId(4)),
+                Gallery::fromJson(['title' => '', 'images' => [['id' => 5, 'hash' => 'a'], ['id' => 4, 'hash' => 'b']]]),
+            ]),
+            ['cms_page_123', 'cms_page_all', 'cms_image_5', 'cms_image_4'],
+        ];
     }
 
     public function testInvalidateEventTeasersInvalidatesTheTeaserTag(): void
@@ -293,6 +309,18 @@ class CmsServiceTest extends TestCase
 
         // Act
         $subject->invalidateEventTeasers();
+    }
+
+    public function testInvalidateImageInvalidatesTheImageTag(): void
+    {
+        // Arrange
+        $cacheMock = $this->createMock(TagAwareCacheInterface::class);
+        $cacheMock->expects($this->once())->method('invalidateTags')->with(['cms_image_7']);
+
+        $subject = $this->createServiceWithCache($cacheMock);
+
+        // Act
+        $subject->invalidateImage(7);
     }
 
     public function testHandleUsesDefaultTitleWhenPageTitleIsNull(): void
@@ -328,7 +356,7 @@ class CmsServiceTest extends TestCase
             ->method('render')
             ->willReturnCallback(static function (string $name, array $context) use ($blocks, $renderedBody, $expectedContent): string {
                 if ($name === 'cms/_blocks.html.twig') {
-                    static::assertSame(['blocks' => $blocks], $context);
+                    static::assertSame(['blocks' => $blocks, 'images' => []], $context);
                     return $renderedBody;
                 }
                 static::assertSame('cms/index.html.twig', $name);
@@ -349,6 +377,7 @@ class CmsServiceTest extends TestCase
             cache: $cacheStub,
             translator: new IdentityTranslator(),
             requestStack: $this->createStub(RequestStack::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -403,6 +432,7 @@ class CmsServiceTest extends TestCase
             cache: $cacheMock,
             translator: new IdentityTranslator(),
             requestStack: $this->createStub(RequestStack::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -458,6 +488,7 @@ class CmsServiceTest extends TestCase
             cache: $cacheStub,
             translator: new IdentityTranslator(),
             requestStack: $requestStack,
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -466,6 +497,65 @@ class CmsServiceTest extends TestCase
         // Assert
         static::assertCount(1, $capturedKeys);
         static::assertStringStartsWith('cms_page.42.', $capturedKeys[0]);
+    }
+
+    public function testHandlePassesTheListedBlockImagesToTheBlockTemplates(): void
+    {
+        // Arrange
+        $blocks = new ArrayCollection([
+            self::textBlock(),
+            Gallery::fromJson(['title' => '', 'images' => [['id' => 5, 'hash' => 'a'], ['id' => 6, 'hash' => 'b']]]),
+            TrioCards::fromJson(['headline' => '', 'cards' => [['image' => ['id' => 7, 'hash' => 'c']], [], []]]),
+        ]);
+        $images = [5 => $this->createStub(Image::class), 7 => $this->createStub(Image::class)];
+
+        $cmsStub = $this->createStub(Cms::class);
+        $cmsStub->method('getId')->willReturn(9);
+        $cmsStub->method('getPageTitle')->willReturn('Gallery');
+        $cmsStub->method('getLanguageFilteredBlockJsonList')->willReturn($blocks);
+
+        $cmsRepoStub = $this->createStub(CmsRepository::class);
+        $cmsRepoStub->method('findPublishedBySlug')->willReturn($cmsStub);
+
+        $cmsFilterServiceStub = $this->createStub(CmsFilterService::class);
+        $cmsFilterServiceStub->method('getCmsIdFilter')->willReturn(CmsFilterResult::noFilter());
+
+        $eventFilterServiceStub = $this->createStub(EventFilterService::class);
+        $eventFilterServiceStub->method('getEventIdFilter')->willReturn(new EventFilterResult(null, false));
+
+        $cacheStub = $this->createStub(TagAwareCacheInterface::class);
+        $cacheStub->method('get')->willReturnCallback(static fn(string $key, callable $callback): ?string => $callback(self::createCacheItem()));
+
+        $imageRepoMock = $this->createMock(ImageRepository::class);
+        $imageRepoMock->expects($this->once())->method('findByIdsIndexed')->with([5, 6, 7])->willReturn($images);
+
+        $capturedContext = null;
+        $twigStub = $this->createStub(Environment::class);
+        $twigStub
+            ->method('render')
+            ->willReturnCallback(static function (string $name, array $context) use (&$capturedContext): string {
+                if ($name === 'cms/_blocks.html.twig') {
+                    $capturedContext = $context;
+                }
+                return 'rendered';
+            });
+
+        $subject = new CmsService(
+            twig: $twigStub,
+            repo: $cmsRepoStub,
+            eventFilterService: $eventFilterServiceStub,
+            cmsFilterService: $cmsFilterServiceStub,
+            cache: $cacheStub,
+            translator: new IdentityTranslator(),
+            requestStack: $this->createStub(RequestStack::class),
+            imageRepo: $imageRepoMock,
+        );
+
+        // Act
+        $subject->handle('en', 'gallery', new Response());
+
+        // Assert
+        static::assertSame(['blocks' => $blocks, 'images' => $images], $capturedContext);
     }
 
     public function testInvalidatePageInvalidatesPageTag(): void
@@ -514,7 +604,16 @@ class CmsServiceTest extends TestCase
             cache: $cache,
             translator: new IdentityTranslator(),
             requestStack: $this->createStub(RequestStack::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
+    }
+
+    private static function imageWithId(int $id): Image
+    {
+        $image = new Image();
+        new ReflectionProperty(Image::class, 'id')->setValue($image, $id);
+
+        return $image;
     }
 
     private static function textBlock(): Text

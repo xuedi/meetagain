@@ -3,11 +3,18 @@
 namespace App\Service\Cms;
 
 use App\Entity\BlockType\BlockType;
+use App\Entity\BlockType\EventTeaser;
+use App\Entity\BlockType\Gallery;
+use App\Entity\BlockType\Hero;
+use App\Entity\BlockType\Text;
+use App\Entity\BlockType\TrioCards;
 use App\Entity\Cms;
 use App\Enum\CmsBlock\CmsBlockType;
 use App\Filter\Cms\CmsFilterService;
 use App\Filter\Event\EventFilterService;
 use App\Repository\CmsRepository;
+use App\Repository\ImageRepository;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +27,7 @@ use Twig\Environment;
 readonly class CmsService
 {
     private const string EVENT_TEASER_TAG = 'cms_event_teaser';
+    private const string IMAGE_TAG_PREFIX = 'cms_image_';
 
     public function __construct(
         private Environment $twig,
@@ -30,6 +38,7 @@ readonly class CmsService
         private TagAwareCacheInterface $cache,
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
+        private ImageRepository $imageRepo,
     ) {}
 
     public function getSites(): array
@@ -93,6 +102,11 @@ readonly class CmsService
         $this->cache->invalidateTags([self::EVENT_TEASER_TAG]);
     }
 
+    public function invalidateImage(int $imageId): void
+    {
+        $this->cache->invalidateTags([self::IMAGE_TAG_PREFIX . $imageId]);
+    }
+
     public function invalidateAll(): void
     {
         $this->cache->invalidateTags(['cms_page_all']);
@@ -140,8 +154,62 @@ readonly class CmsService
         if ($blocks->exists(static fn(int|string $key, BlockType $block): bool => $block::getType() === CmsBlockType::EventTeaser)) {
             $tags[] = self::EVENT_TEASER_TAG;
         }
+        $listedImageIds = $this->collectListedImageIds($blocks);
+        foreach (array_unique([...$listedImageIds, ...$this->collectBlockImageIds($blocks)]) as $imageId) {
+            $tags[] = self::IMAGE_TAG_PREFIX . $imageId;
+        }
         $item->tag($tags);
 
-        return $blocks->count() === 0 ? null : $this->twig->render('cms/_blocks.html.twig', ['blocks' => $blocks]);
+        if ($blocks->count() === 0) {
+            return null;
+        }
+
+        return $this->twig->render('cms/_blocks.html.twig', [
+            'blocks' => $blocks,
+            'images' => $this->imageRepo->findByIdsIndexed($listedImageIds),
+        ]);
+    }
+
+    /**
+     * @param Collection<int|string, BlockType> $blocks
+     * @return list<int>
+     */
+    private function collectBlockImageIds(Collection $blocks): array
+    {
+        $ids = [];
+        foreach ($blocks as $block) {
+            $image = match (true) {
+                $block instanceof Text, $block instanceof Hero, $block instanceof EventTeaser => $block->image,
+                default => null,
+            };
+            if ($image?->getId() !== null) {
+                $ids[] = (int) $image->getId();
+            }
+        }
+
+        return $ids;
+    }
+
+    /**
+     * @param Collection<int|string, BlockType> $blocks
+     * @return list<int>
+     */
+    private function collectListedImageIds(Collection $blocks): array
+    {
+        $ids = [];
+        foreach ($blocks as $block) {
+            $refs = match (true) {
+                $block instanceof Gallery => $block->images,
+                $block instanceof TrioCards => array_column($block->cards, 'image'),
+                default => [],
+            };
+            foreach ($refs as $ref) {
+                if (isset($ref['id'])) {
+                    $ids[] = (int) $ref['id'];
+                }
+            }
+        }
+
+        return $ids;
     }
 }

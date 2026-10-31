@@ -6,10 +6,11 @@
         <div class="column is-4 is-flex">
             <div class="card is-flex is-flex-direction-column is-fullwidth">
                 {% if card.image %}
+                    {% set image = images[card.image.id] ?? null %}
                     <div class="card-image">
                         <figure class="image">
                             <img src="/images/thumbnails/{{ card.image.hash }}_300x200.webp"
-                                 alt="" loading="lazy">
+                                 alt="{{ image ? image.getAltFor(app.locale) : '' }}" loading="lazy">
                         </figure>
                     </div>
                 {% endif %}

@@ -85,4 +85,19 @@ class CacheInvalidationHandlerTest extends TestCase
 
         // Assert
     }
+
+    public function testAnAltChangeInvalidatesThePagesShowingTheImage(): void
+    {
+        // Arrange
+        $cmsServiceMock = $this->createMock(CmsService::class);
+        $cmsServiceMock->expects($this->once())->method('invalidateImage')->with(7);
+        $cmsServiceMock->expects($this->never())->method('invalidatePage');
+
+        $handler = new CacheInvalidationHandler($cmsServiceMock);
+
+        // Act
+        $handler->onEntityAction(EntityAction::UpdateImageAlt, 7);
+
+        // Assert
+    }
 }

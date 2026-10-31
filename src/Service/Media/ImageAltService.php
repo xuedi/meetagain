@@ -3,6 +3,8 @@
 namespace App\Service\Media;
 
 use App\Entity\Image;
+use App\EntityActionDispatcher;
+use App\Enum\EntityAction;
 use App\Repository\ImageRepository;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
@@ -17,6 +19,7 @@ readonly class ImageAltService
         private AltLocaleRequirementResolver $altLocaleRequirementResolver,
         private EntityManagerInterface $entityManager,
         private ImageAltStatusCache $imageAltStatusCache,
+        private EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
     public function getSourceLocale(): string
@@ -78,5 +81,6 @@ readonly class ImageAltService
         $image->setUpdatedAt(new DateTimeImmutable());
         $this->entityManager->flush();
         $this->imageAltStatusCache->invalidateImage((int) $image->getId());
+        $this->entityActionDispatcher->dispatch(EntityAction::UpdateImageAlt, (int) $image->getId());
     }
 }

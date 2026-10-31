@@ -17,6 +17,7 @@ readonly class CacheInvalidationHandler implements EntityActionInterface
             EntityAction::UpdateCms, EntityAction::DeleteCms => $this->invalidateCmsAndMenus($entityId),
             EntityAction::UpdateCmsBlock => $this->cmsService->invalidatePage($entityId),
             EntityAction::CreateEvent, EntityAction::UpdateEvent, EntityAction::DeleteEvent => $this->cmsService->invalidateEventTeasers(),
+            EntityAction::UpdateImageAlt => $this->cmsService->invalidateImage($entityId),
             default => null,
         };
     }

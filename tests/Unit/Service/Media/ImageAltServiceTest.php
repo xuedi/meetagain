@@ -3,6 +3,9 @@
 namespace Tests\Unit\Service\Media;
 
 use App\Entity\Image;
+use App\EntityActionDispatcher;
+use App\EntityActionInterface;
+use App\Enum\EntityAction;
 use App\Repository\ImageRepository;
 use App\Service\Config\LanguageService;
 use App\Service\Media\AltLocaleRequirementResolver;
@@ -86,6 +89,28 @@ class ImageAltServiceTest extends TestCase
         $service->applyAlt($image, ['en' => 'english alt']);
     }
 
+    public function testApplyAltDispatchesTheAltChangeForTheImage(): void
+    {
+        // Arrange
+        $image = self::imageWithId(7);
+        $handler = new class implements EntityActionInterface {
+            /** @var list<array{EntityAction, int}> */
+            public array $received = [];
+
+            public function onEntityAction(EntityAction $action, int $entityId): void
+            {
+                $this->received[] = [$action, $entityId];
+            }
+        };
+        $service = $this->service(requiredLocales: ['en'], dispatcher: new EntityActionDispatcher([$handler]));
+
+        // Act
+        $service->applyAlt($image, ['en' => 'english alt']);
+
+        // Assert
+        static::assertSame([[EntityAction::UpdateImageAlt, 7]], $handler->received);
+    }
+
     public function testFindMissingAltPageFiltersCompleteImagesAndReturnsCursorOnFullPage(): void
     {
         // Arrange
@@ -140,6 +165,7 @@ class ImageAltServiceTest extends TestCase
         array $candidates = [],
         ?EntityManagerInterface $entityManager = null,
         ?ImageAltStatusCache $statusCache = null,
+        ?EntityActionDispatcher $dispatcher = null,
     ): ImageAltService {
         $repository = $this->createStub(ImageRepository::class);
         $repository->method('findAuditCandidates')->willReturn($candidates);
@@ -166,6 +192,7 @@ class ImageAltServiceTest extends TestCase
             $requirements,
             $entityManager ?? $this->createStub(EntityManagerInterface::class),
             $statusCache ?? $this->createStub(ImageAltStatusCache::class),
+            $dispatcher ?? new EntityActionDispatcher([]),
         );
     }
 

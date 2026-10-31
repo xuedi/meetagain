@@ -225,6 +225,24 @@ class ImageRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<int> $imageIds
+     * @return array<int, Image>
+     */
+    public function findByIdsIndexed(array $imageIds): array
+    {
+        if ($imageIds === []) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($this->findBy(['id' => array_values(array_unique($imageIds))]) as $image) {
+            $result[(int) $image->getId()] = $image;
+        }
+
+        return $result;
+    }
+
+    /**
      * @param list<int> $imageIds
      * @return array<int, int> imageId => eventId
      */

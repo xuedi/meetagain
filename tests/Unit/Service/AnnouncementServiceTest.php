@@ -6,6 +6,7 @@ use App\Emails\Types\AnnouncementEmail;
 use App\Entity\Announcement;
 use App\Entity\Cms;
 use App\Entity\CmsBlock;
+use App\Entity\Image;
 use App\Entity\NotificationSettings;
 use App\Entity\User;
 use App\Enum\AnnouncementStatus;
@@ -13,6 +14,7 @@ use App\Enum\CmsBlock\CmsBlockType;
 use App\Enum\EmailType;
 use App\Filter\Email\AudienceFilterService;
 use App\Repository\AnnouncementRepository;
+use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use App\Service\Cms\AnnouncementService;
 use App\Service\Config\ConfigService;
@@ -41,6 +43,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Assert
@@ -67,6 +70,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Assert
@@ -139,6 +143,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -196,6 +201,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -243,6 +249,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -285,6 +292,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -320,6 +328,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -350,6 +359,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -394,6 +404,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -430,6 +441,11 @@ class AnnouncementServiceTest extends TestCase
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getHost')->willReturn('https://example.com');
 
+        $imageStub = $this->createStub(Image::class);
+        $imageStub->method('getAltFor')->willReturn('Board game night "live"');
+        $imageRepoStub = $this->createStub(ImageRepository::class);
+        $imageRepoStub->method('findByIdsIndexed')->willReturn([1 => $imageStub]);
+
         $subject = new AnnouncementService(
             em: $this->createStub(EntityManagerInterface::class),
             userRepo: $this->createStub(UserRepository::class),
@@ -439,6 +455,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $imageRepoStub,
         );
 
         // Act
@@ -447,6 +464,7 @@ class AnnouncementServiceTest extends TestCase
         // Assert
         static::assertStringContainsString('imagehash123', $result['content']);
         static::assertStringContainsString('<img', $result['content']);
+        static::assertStringContainsString('alt="Board game night &quot;live&quot;"', $result['content']);
     }
 
     public function testRenderContentSkipsBlocksForDifferentLocale(): void
@@ -487,6 +505,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -529,6 +548,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
 
         // Act
@@ -606,6 +626,7 @@ class AnnouncementServiceTest extends TestCase
             hostResolver: $this->createStub(RequestHostResolver::class),
             audience: new AudienceFilterService([]),
             announcementRepo: $this->createStub(AnnouncementRepository::class),
+            imageRepo: $this->createStub(ImageRepository::class),
         );
     }
 

@@ -3,17 +3,19 @@
 {% endif %}
 
 {% if block.images|length == 1 %}
+    {% set image = images[block.images[0].id] ?? null %}
     <div class="mt-4 mb-4">
         <img src="/images/thumbnails/{{ block.images[0].hash }}_1024x768.webp"
-             alt="" class="img-fluid">
+             alt="{{ image ? image.getAltFor(app.locale) : '' }}" class="img-fluid">
     </div>
 {% elseif block.images|length > 1 %}
     <div class="columns is-multiline mt-2">
         {% for item in block.images %}
+            {% set image = images[item.id] ?? null %}
             <div class="column is-2">
                 <a data-fancybox="cms-gallery" href="/images/thumbnails/{{ item.hash }}_1024x768.webp">
                     <img src="/images/thumbnails/{{ item.hash }}_210x140.webp"
-                         alt="" width="210" height="140" class="img-cover">
+                         alt="{{ image ? image.getAltFor(app.locale) : '' }}" width="210" height="140" class="img-cover">
                 </a>
             </div>
         {% endfor %}
