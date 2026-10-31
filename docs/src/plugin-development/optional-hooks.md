@@ -46,7 +46,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `ContributorInterface`                                       | Carry an item type through export archives            | `exportItems()`, `importItems()`                       |
 | `UploadsInterface`                                           | Leave out uploads their uploader did not share        | `getUploaderIds()`                                     |
 | `PluginSectionInterface`                                     | Carry your plugin's member data through archives      | `export()`, `import()`                                 |
-| `ChangeTargetProviderInterface`                              | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()` |
+| `Module\Proposal\Contract\Change\TargetProviderInterface`    | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()` |
 | `ConfigPrivacyToggleProviderInterface`                       | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                          |
 | `Module\Email\Contract\SendingIdentityProviderInterface`     | Decide the name, logo and links a mail is sent under  | `resolve()`                                            |
 | `AudienceFilterInterface`                                    | Narrow who receives installation-wide mail            | `filterInstallationWideAudience()`                     |
@@ -953,6 +953,10 @@ readonly class MyReviewProvider implements ReviewNotificationProviderInterface
                 description: sprintf("Item '%s' pending approval", $item->getName()),
                 canDeny: true,
                 icon: 'check',
+                fields: [
+                    ['label' => 'Name', 'value' => $item->getName()],
+                    ['label' => 'Title', 'value' => $item->getPendingTitle(), 'before' => $item->getTitle()],
+                ],
             ),
             $this->repository->findPending(),
         );
@@ -981,6 +985,10 @@ readonly class MyReviewProvider implements ReviewNotificationProviderInterface
 - `getIdentifier()` is embedded in form action URLs - never change it once deployed
 - Both `approveItem()` and `denyItem()` must check authorisation themselves and throw `AccessDeniedException` if denied
 - `itemId` is always cast to/from string; use `(int) $itemId` to recover the DB id
+- `fields` lists one row per field under the description. A row with `before` renders the old and new value side
+  by side with the changed words marked; a row without it renders as label and value. Use `longDescription` for free
+  text that is not a field
+- `image` shows that image's thumbnail in place of the icon, for an item about an image
 
 ---
 
@@ -1790,7 +1798,7 @@ propose corrections to a phrase or its explanation, and an organizer reviews the
 
 ### When to implement
 
-Implement `App\Review\ChangeTargetProviderInterface` when your entity has a moderated edit flow - some users may change
+Implement `Module\Proposal\Contract\Change\TargetProviderInterface` when your entity has a moderated edit flow - some users may change
 it directly, others only propose. If everyone with edit access writes directly, you do not need this seam.
 
 ### What you implement
@@ -1799,21 +1807,22 @@ it directly, others only propose. If everyone with edit access writes directly, 
    proposal row), `getTargetLabel()` / `getTargetUrl()` give the review UI a display name and context link (return null
    for a label when the entity is gone - the UI treats that as 404), `getFieldLabel()` / `formatValue()` turn your field
    keys and stored values into display strings (e.g. resolving a tag id to its label).
-2. **Delegate permissions.** `canPropose()` / `canReview()` are called per user and target on every mutation - gate them
-   on your roles and your entity's visibility rules.
+2. **Delegate permissions.** `canPropose()` / `canReview()` are called with a user id and a target on every mutation -
+   gate them on your roles and your entity's visibility rules.
 3. **Validate and apply.** `validate()` is called before every apply, including again at apply time as a staleness guard
    (the proposal may be days old - a referenced id may no longer exist). Return a pre-translated error string, or null
    when the value can be applied. `apply()` writes one field value onto your entity. Values travel as `string|null` -
    string-encode anything structured.
 4. **Create proposals from your edit flow.** In your controller's non-privileged branch, build one
-   `App\Review\FieldChange` per form field (before + after) and call
-   `ChangeProposalService::propose($targetType, $targetId, $user, $changes)`. Unchanged fields are filtered out
+   `Module\Proposal\Contract\Change\FieldChange` per form field (before + after) and call
+   `ChangeInterface::propose($targetType, $targetId, $userId, $changes)`. Unchanged fields are filtered out
    automatically; an all-unchanged submit creates nothing.
-5. **Clean up on delete.** Call `ChangeProposalService::removeForTarget()` wherever your entity is deleted, so proposals
+5. **Clean up on delete.** Call `ChangeInterface::removeForTarget()` wherever your entity is deleted, so proposals
    never outlive their target.
 6. **Badge your surfaces.** The Twig function `pending_change_proposals(targetType, targetId)`
    returns the pending count; link reviewers to
    `path('app_review_proposals', {targetType: ..., targetId: ...})` for the per-field diff page.
 
 Reference implementation: `Plugin\Glossary\Review\GlossaryChangeTarget` with the propose side in
-`Plugin\Glossary\Controller\EditController`.
+`Plugin\Glossary\Contribution\GlossarySection::changesFrom()`. The module's own documentation is
+`modules/proposal/change.md`.

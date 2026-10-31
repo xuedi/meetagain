@@ -4,16 +4,15 @@ namespace App\Item\Tag;
 
 use App\Contribution\TagSection;
 use App\Entity\ItemTag;
-use App\Entity\User;
-use App\Review\ChangeTargetFamilyInterface;
-use App\Review\ChangeTargetProviderInterface;
+use Module\Proposal\Contract\Change\TargetFamilyInterface;
+use Module\Proposal\Contract\Change\TargetProviderInterface;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class ChangeTarget implements ChangeTargetProviderInterface, ChangeTargetFamilyInterface
+final readonly class ChangeTarget implements TargetProviderInterface, TargetFamilyInterface
 {
     public const string TYPE_PREFIX = 'item_tag_';
     public const int VOCABULARY_TARGET = 0;
@@ -51,7 +50,7 @@ final readonly class ChangeTarget implements ChangeTargetProviderInterface, Chan
     }
 
     #[Override]
-    public function forTargetType(string $targetType): ChangeTargetProviderInterface
+    public function forTargetType(string $targetType): TargetProviderInterface
     {
         return new self(
             $this->registry,
@@ -114,13 +113,13 @@ final readonly class ChangeTarget implements ChangeTargetProviderInterface, Chan
     }
 
     #[Override]
-    public function canPropose(User $user, int $targetId): bool
+    public function canPropose(int $userId, int $targetId): bool
     {
         return $this->security->isGranted('ROLE_USER') && $this->registry->has($this->itemType);
     }
 
     #[Override]
-    public function canReview(User $user, int $targetId): bool
+    public function canReview(int $userId, int $targetId): bool
     {
         if (!$this->security->isGranted('ROLE_STEWARD') || !$this->registry->has($this->itemType)) {
             return false;

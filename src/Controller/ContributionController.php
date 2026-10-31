@@ -6,15 +6,15 @@ use App\Contribution\Registry;
 use App\Contribution\RowFormInterface;
 use App\Contribution\Section;
 use App\Contribution\TagSection;
-use App\Entity\ChangeProposal;
 use App\Entity\User;
 use App\Item\Tag\ChangeTarget;
 use App\Item\Tag\SuggestionBuilder;
 use App\Item\Tag\TagService;
 use App\Item\Tag\TypeRegistry;
-use App\Review\ChangeProposalService;
-use App\Review\FieldChange;
-use Module\Suggestion\Contract\SuggestionInterface;
+use Module\Proposal\Contract\Change\ChangeInterface;
+use Module\Proposal\Contract\Change\FieldChange;
+use Module\Proposal\Contract\Change\View;
+use Module\Proposal\Contract\Suggestion\SuggestionInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -28,7 +28,7 @@ final class ContributionController extends AbstractController
     public function __construct(
         private readonly Registry $registry,
         private readonly SuggestionInterface $suggestions,
-        private readonly ChangeProposalService $changeProposalService,
+        private readonly ChangeInterface $changeProposalService,
         private readonly TypeRegistry $tagTypes,
         private readonly TagService $tagService,
         private readonly SuggestionBuilder $suggestionBuilder,
@@ -114,7 +114,7 @@ final class ContributionController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $proposal = $this->changeProposalService->propose($provider->getTargetType(), (int) $id, $user, $provider->changesFrom($id, $form));
+            $proposal = $this->changeProposalService->propose($provider->getTargetType(), (int) $id, (int) $user->getId(), $provider->changesFrom($id, $form));
             $this->addFlash('success', $proposal === null ? 'contribution.flash_unchanged' : 'contribution.flash_proposed');
 
             return $this->redirectToRoute('app_contribution_correct', ['type' => $provider->getType(), 'id' => $id]);
@@ -142,7 +142,7 @@ final class ContributionController extends AbstractController
 
             $proposed = 0;
             foreach ($this->submittedTagChanges($request, $itemType) as $targetId => $changes) {
-                $proposed += $this->changeProposalService->propose($targetType, $targetId, $user, $changes) === null ? 0 : 1;
+                $proposed += $this->changeProposalService->propose($targetType, $targetId, (int) $user->getId(), $changes) === null ? 0 : 1;
             }
             $this->addFlash($proposed === 0 ? 'info' : 'success', $proposed === 0 ? 'item.tag_flash_unchanged' : 'item.tag_flash_suggested');
 
@@ -184,7 +184,7 @@ final class ContributionController extends AbstractController
     }
 
     /**
-     * @return list<array{proposal: ChangeProposal, rows: list<array<string, mixed>>}>
+     * @return list<array{proposal: View, rows: list<array<string, mixed>>}>
      */
     private function pendingTagProposalCards(string $targetType): array
     {
@@ -230,15 +230,15 @@ final class ContributionController extends AbstractController
     }
 
     /**
-     * @return list<array{proposal: ChangeProposal, rows: list<array<string, mixed>>}>
+     * @return list<array{proposal: View, rows: list<array<string, mixed>>}>
      */
     private function pendingProposalCards(string $targetType, int $id): array
     {
         $cards = [];
-        foreach ($this->changeProposalService->pendingForTarget($targetType, $id) as $proposal) {
+        foreach ($this->changeProposalService->pendingFor($targetType, $id) as $proposal) {
             $cards[] = [
                 'proposal' => $proposal,
-                'rows' => $this->changeProposalService->fieldRows($proposal),
+                'rows' => $proposal->rows,
             ];
         }
 

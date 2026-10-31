@@ -20,6 +20,10 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
+ins {
+    text-decoration: none;
+}
+
 // Accessibility: Bulma's default grey fails WCAG on white — use our darker overrides.
 .has-text-grey       { color: var(--theme-text-grey, #{cfg.$text-grey})             !important; }
 .has-text-grey-light { color: var(--theme-text-grey-light, #{cfg.$text-grey-light}) !important; }

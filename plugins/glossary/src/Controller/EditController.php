@@ -3,7 +3,7 @@
 namespace Plugin\Glossary\Controller;
 
 use App\Item\Tag\AssignmentFormHelper;
-use App\Review\ChangeProposalService;
+use Module\Proposal\Contract\Change\ChangeInterface;
 use Plugin\Glossary\Form\GlossaryType;
 use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Service\GlossaryService;
@@ -18,7 +18,7 @@ final class EditController extends AbstractGlossaryController
 {
     public function __construct(
         GlossaryService $service,
-        private readonly ChangeProposalService $changeProposalService,
+        private readonly ChangeInterface $changeProposalService,
         private readonly AssignmentFormHelper $assignmentFormHelper,
     ) {
         parent::__construct($service);
@@ -42,10 +42,10 @@ final class EditController extends AbstractGlossaryController
         }
 
         $pendingProposals = [];
-        foreach ($this->changeProposalService->pendingForTarget(GlossaryTaggableTypeProvider::ITEM_TYPE, $id) as $proposal) {
+        foreach ($this->changeProposalService->pendingFor(GlossaryTaggableTypeProvider::ITEM_TYPE, $id) as $proposal) {
             $pendingProposals[] = [
                 'proposal' => $proposal,
-                'rows' => $this->changeProposalService->fieldRows($proposal),
+                'rows' => $proposal->rows,
             ];
         }
 

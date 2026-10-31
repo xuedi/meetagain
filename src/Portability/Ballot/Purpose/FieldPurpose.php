@@ -2,21 +2,21 @@
 
 namespace App\Portability\Ballot\Purpose;
 
-use App\Entity\ChangeProposal;
 use App\Entity\Event;
 use App\Entity\ItemTag;
 use App\Entity\Location;
-use App\Enum\ChangeProposalStatus;
+use App\Event\ChangeTarget as EventChangeTarget;
+use App\Item\Location\ChangeTarget as LocationChangeTarget;
 use App\Item\Tag\ChangeTarget;
 use App\Portability\Ballot\PurposeInterface;
 use App\Portability\DataCategory;
 use App\Portability\ImportContext;
 use App\Portability\Scope;
-use App\Review\EventChangeTarget;
-use App\Review\FieldBallotService;
-use App\Review\LocationChangeTarget;
+use App\Portability\Section\ChangeProposalsSection;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Ballot\Contract\BallotSubject;
+use Module\Proposal\Contract\Change\ChangeInterface;
+use Module\Proposal\Contract\Status;
 use Override;
 
 readonly class FieldPurpose implements PurposeInterface
@@ -25,12 +25,13 @@ readonly class FieldPurpose implements PurposeInterface
 
     public function __construct(
         private EntityManagerInterface $em,
+        private ChangeInterface $changes,
     ) {}
 
     #[Override]
     public function supports(string $purpose): bool
     {
-        return $purpose === FieldBallotService::PURPOSE;
+        return $purpose === ChangeInterface::BALLOT_PURPOSE;
     }
 
     #[Override]
@@ -56,13 +57,14 @@ readonly class FieldPurpose implements PurposeInterface
             return true;
         }
 
-        $exportable = array_filter(
-            $this->em->getRepository(ChangeProposal::class)->findBy(['id' => array_values($proposalIds)]),
-            static fn(ChangeProposal $proposal): bool => $proposal->getStatus() === ChangeProposalStatus::Pending
-            && $scope->grants($proposal->getProposedBy(), DataCategory::Interactions),
-        );
+        foreach ($proposalIds as $proposalId) {
+            $proposal = $this->changes->find($proposalId);
+            if ($proposal === null || $proposal->status !== Status::Pending || !$scope->grantsId($proposal->proposerId, DataCategory::Interactions)) {
+                return false;
+            }
+        }
 
-        return count($exportable) === count($proposalIds);
+        return true;
     }
 
     #[Override]
@@ -93,7 +95,7 @@ readonly class FieldPurpose implements PurposeInterface
             return $key;
         }
 
-        $importedId = $context->resolveRef(ChangeProposal::class, $proposalId)?->getId();
+        $importedId = $context->resolveId(ChangeProposalsSection::REFS, $proposalId);
 
         return $importedId === null ? null : $importedId . substr($key, strlen((string) $proposalId));
     }

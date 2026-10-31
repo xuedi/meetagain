@@ -8,10 +8,10 @@ use App\Item\ActionDispatcher;
 use App\Item\AdminFilterService;
 use App\Item\FilterService;
 use App\Item\Tag\TagService;
-use App\Review\ChangeProposalService;
 use App\Service\Config\LanguageService;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
+use Module\Proposal\Contract\Change\ChangeInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
@@ -69,7 +69,7 @@ class GlossaryServiceTest extends TestCase
         $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())->method('remove')->with($item);
         $em->expects(self::once())->method('flush');
-        $proposals = $this->createMock(ChangeProposalService::class);
+        $proposals = $this->createMock(ChangeInterface::class);
         $proposals->expects(self::once())->method('removeForTarget')->with(GlossaryTaggableTypeProvider::ITEM_TYPE, 1);
         $service = $this->makeService($em, $this->repoReturning($item), changeProposalService: $proposals);
 
@@ -355,7 +355,7 @@ class GlossaryServiceTest extends TestCase
         ?AdminFilterService $adminFilter = null,
         ?ActionDispatcher $itemActionDispatcher = null,
         ?TagService $tagService = null,
-        ?ChangeProposalService $changeProposalService = null,
+        ?ChangeInterface $changeProposalService = null,
         ?Config $config = null,
         ?RequestStack $requestStack = null,
     ): GlossaryService {
@@ -383,7 +383,7 @@ class GlossaryServiceTest extends TestCase
             $this->createStub(EntityActionDispatcher::class),
             $tagService ?? $this->createStub(TagService::class),
             $itemActionDispatcher ?? $this->createStub(ActionDispatcher::class),
-            $changeProposalService ?? $this->createStub(ChangeProposalService::class),
+            $changeProposalService ?? $this->createStub(ChangeInterface::class),
             $configService,
             $languageService,
             $requestStack ?? new RequestStack(),

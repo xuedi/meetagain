@@ -6,7 +6,7 @@ use App\Enum\ItemViewType;
 use App\Item\ListCellProviderInterface;
 use App\Item\ListProviderInterface;
 use App\Item\Tag\TagService;
-use App\Review\ChangeProposalService;
+use Module\Proposal\Contract\Change\ChangeInterface;
 use Override;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Service\ConfigService;
@@ -40,7 +40,7 @@ final class GlossaryListCellProvider implements ListCellProviderInterface, ListP
         private readonly ConfigService $configService,
         private readonly TagService $tagService,
         private readonly Environment $twig,
-        private readonly ChangeProposalService $changeProposalService,
+        private readonly ChangeInterface $changeProposalService,
         private readonly Security $security,
         private readonly RequestStack $requestStack,
     ) {}

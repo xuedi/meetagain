@@ -2,25 +2,32 @@
 
 namespace Tests\Unit\Portability\Section;
 
-use App\Entity\ChangeProposal;
 use App\Entity\Event;
 use App\Entity\ItemTag;
 use App\Entity\Location;
 use App\Entity\User;
-use App\Enum\ChangeProposalStatus;
-use App\Enum\FieldResolution;
 use App\Item\Tag\TypeRegistry;
 use App\Portability\DataCategory;
 use App\Portability\Outcome;
 use App\Portability\Scope;
 use App\Portability\Section\ChangeProposalsSection;
-use App\Review\FieldChange;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Module\Proposal\Contract\Change\ChangeInterface;
+use Module\Proposal\Contract\Change\FieldChange;
+use Module\Proposal\Contract\Change\FieldResolution;
+use Module\Proposal\Contract\Change\PortableChange;
+use Module\Proposal\Contract\Change\View;
+use Module\Proposal\Contract\Status;
 
 final class ChangeProposalsSectionTest extends SectionTestCase
 {
+    private const int RESTORED_ID = 440;
+
+    /** @var list<PortableChange> */
+    private array $restored = [];
+
     public function testAnEventProposalSurvivesTheRoundTrip(): void
     {
         // Arrange
@@ -31,23 +38,21 @@ final class ChangeProposalsSectionTest extends SectionTestCase
         $exported = $this->section([$proposal])->export($this->scope(eventIds: [9]), $this->images());
 
         $context = $this->context();
-        $proposer = new User();
         $context->mapRef(Event::class, 9, $this->withId(new Event(), 90));
-        $context->mapRef(User::class, 'member@example.org', $proposer);
+        $context->mapRef(User::class, 'member@example.org', $this->withId(new User(), 30));
 
         // Act
         $this->section()->import($exported, $context);
 
         // Assert
-        $imported = $this->onlyPersisted(ChangeProposal::class);
-        static::assertSame('event', $imported->getTargetType());
-        static::assertSame(90, $imported->getTargetId());
-        static::assertSame($proposer, $imported->getProposedBy());
-        static::assertSame(ChangeProposalStatus::Pending, $imported->getStatus());
-        static::assertSame('2030-01-06 10:00', $imported->getCreatedAt()->format('Y-m-d H:i'));
+        $imported = $this->onlyRestored();
+        static::assertSame('event', $imported->targetType);
+        static::assertSame(90, $imported->targetId);
+        static::assertSame(30, $imported->proposerId);
+        static::assertSame('2030-01-06 10:00', $imported->createdAt->format('Y-m-d H:i'));
         static::assertEquals(
             [new FieldChange('title', 'Go night', 'Go evening'), new FieldChange('teaser', 'Old', 'New', FieldResolution::Denied)],
-            $imported->getChanges(),
+            $imported->changes,
         );
         static::assertSame(1, $context->toSummary()->get('change_proposals', Outcome::Created));
     }
@@ -55,19 +60,19 @@ final class ChangeProposalsSectionTest extends SectionTestCase
     public function testTheProposalRefTravelsAndMapsTheImportedProposal(): void
     {
         // Arrange
-        $proposal = $this->withId($this->proposal('event', 9), 44);
+        $proposal = $this->proposal('event', 9, id: 44);
         $exported = $this->section([$proposal])->export($this->scope(eventIds: [9]), $this->images());
 
         $context = $this->context();
         $context->mapRef(Event::class, 9, $this->withId(new Event(), 90));
-        $context->mapRef(User::class, 'member@example.org', new User());
+        $context->mapRef(User::class, 'member@example.org', $this->withId(new User(), 30));
 
         // Act
         $this->section()->import($exported, $context);
 
         // Assert
         static::assertSame(44, $exported[0]['ref']);
-        static::assertSame($this->onlyPersisted(ChangeProposal::class), $context->resolveRef(ChangeProposal::class, 44));
+        static::assertSame(self::RESTORED_ID, $context->resolveId(ChangeProposalsSection::REFS, 44));
     }
 
     public function testAProposerWithoutTheInteractionsGrantIsLeftOut(): void
@@ -86,8 +91,7 @@ final class ChangeProposalsSectionTest extends SectionTestCase
     public function testAResolvedProposalStaysBehind(): void
     {
         // Arrange
-        $proposal = $this->proposal('event', 9);
-        $proposal->setStatus(ChangeProposalStatus::Approved);
+        $proposal = $this->proposal('event', 9, status: Status::Approved);
 
         // Act
         $exported = $this->section([$proposal])->export($this->scope(eventIds: [9]), $this->images());
@@ -151,9 +155,9 @@ final class ChangeProposalsSectionTest extends SectionTestCase
         $this->section()->import([$row], $context);
 
         // Assert
-        $imported = $this->onlyPersisted(ChangeProposal::class);
-        static::assertSame(70, $imported->getTargetId());
-        static::assertEquals([new FieldChange('parent', '20', '50'), new FieldChange('label_en', 'Soup', 'Soups')], $imported->getChanges());
+        $imported = $this->onlyRestored();
+        static::assertSame(70, $imported->targetId);
+        static::assertEquals([new FieldChange('parent', '20', '50'), new FieldChange('label_en', 'Soup', 'Soups')], $imported->changes);
     }
 
     public function testMovingATagToTheRootKeepsTheEmptyParent(): void
@@ -168,7 +172,7 @@ final class ChangeProposalsSectionTest extends SectionTestCase
         $this->section()->import([$this->tagRow(7, ['parent' => ['before' => '2', 'after' => '']])], $context);
 
         // Assert
-        static::assertEquals([new FieldChange('parent', '20', '')], $this->onlyPersisted(ChangeProposal::class)->getChanges());
+        static::assertEquals([new FieldChange('parent', '20', '')], $this->onlyRestored()->changes);
     }
 
     public function testAParentTagMissingFromTheArchiveDropsTheProposal(): void
@@ -182,7 +186,7 @@ final class ChangeProposalsSectionTest extends SectionTestCase
         $this->section()->import([$this->tagRow(7, ['parent' => ['before' => null, 'after' => '6']])], $context);
 
         // Assert
-        static::assertSame([], $this->persisted);
+        static::assertSame([], $this->restored);
         static::assertSame(1, $context->toSummary()->get('change_proposals', Outcome::Dropped));
     }
 
@@ -196,7 +200,7 @@ final class ChangeProposalsSectionTest extends SectionTestCase
         $this->section()->import([$this->tagRow(0, ['child_en_1' => ['before' => null, 'after' => 'Desserts']])], $context);
 
         // Assert
-        static::assertSame(0, $this->onlyPersisted(ChangeProposal::class)->getTargetId());
+        static::assertSame(0, $this->onlyRestored()->targetId);
     }
 
     public function testATagTypeNotTaggableHereIsSkipped(): void
@@ -208,7 +212,7 @@ final class ChangeProposalsSectionTest extends SectionTestCase
         $this->section(taggable: false)->import([$this->tagRow(0, ['child_en_1' => ['after' => 'Desserts']])], $context);
 
         // Assert
-        static::assertSame([], $this->persisted);
+        static::assertSame([], $this->restored);
         static::assertSame(1, $context->toSummary()->get('change_proposals', Outcome::Skipped));
     }
 
@@ -244,39 +248,45 @@ final class ChangeProposalsSectionTest extends SectionTestCase
         $this->section()->import($rows, $context);
 
         // Assert
-        static::assertSame([], $this->persisted);
+        static::assertSame([], $this->restored);
         static::assertSame(2, $context->toSummary()->get('change_proposals', Outcome::Dropped));
     }
 
     /**
-     * @param list<ChangeProposal> $proposals
+     * @param list<View> $proposals
      * @param list<Event> $events
      */
     private function section(array $proposals = [], array $events = [], bool $taggable = true): ChangeProposalsSection
     {
-        $proposalRepository = $this->createStub(EntityRepository::class);
-        $proposalRepository
-            ->method('findBy')
-            ->willReturnCallback(static fn(array $criteria): array => array_values(array_filter(
-                $proposals,
-                static fn(ChangeProposal $proposal): bool => $proposal->getStatus() === $criteria['status']
-                && in_array($proposal->getTargetType(), $criteria['targetType'], true),
-            )));
         $eventRepository = $this->createStub(EntityRepository::class);
         $eventRepository->method('findBy')->willReturn($events);
 
+        $proposer = $this->withId(new User(), 3);
+        $proposer->setEmail('member@example.org');
+
         $em = $this->createStub(EntityManagerInterface::class);
-        $em->method('getRepository')->willReturnCallback(static fn(string $class): EntityRepository => $class === Event::class
-            ? $eventRepository
-            : $proposalRepository);
-        $em->method('persist')->willReturnCallback(function (object $entity): void {
-            $this->persisted[] = $entity;
-        });
+        $em->method('getRepository')->willReturn($eventRepository);
+        $em->method('find')->willReturnCallback(static fn(string $class, mixed $id): ?User => $id === 3 ? $proposer : null);
 
         $tagTypes = $this->createStub(TypeRegistry::class);
         $tagTypes->method('has')->willReturn($taggable);
 
-        return new ChangeProposalsSection($em, $tagTypes);
+        $changes = $this->createStub(ChangeInterface::class);
+        $changes
+            ->method('exportPending')
+            ->willReturnCallback(static fn(array $targetTypes): array => array_values(array_filter(
+                $proposals,
+                static fn(View $proposal): bool => $proposal->status === Status::Pending && in_array($proposal->targetType, $targetTypes, true),
+            )));
+        $changes
+            ->method('restore')
+            ->willReturnCallback(function (PortableChange $change): int {
+                $this->restored[] = $change;
+
+                return self::RESTORED_ID;
+            });
+
+        return new ChangeProposalsSection($em, $tagTypes, $changes);
     }
 
     /**
@@ -291,19 +301,21 @@ final class ChangeProposalsSectionTest extends SectionTestCase
     /**
      * @param list<FieldChange> $changes
      */
-    private function proposal(string $targetType, int $targetId, array $changes = [new FieldChange('title', 'a', 'b')]): ChangeProposal
+    private function proposal(
+        string $targetType,
+        int $targetId,
+        array $changes = [new FieldChange('title', 'a', 'b')],
+        int $id = 1,
+        Status $status = Status::Pending,
+    ): View {
+        return new View($id, $targetType, $targetId, 3, 'member', $status, new DateTimeImmutable('2030-01-06 10:00'), $changes, []);
+    }
+
+    private function onlyRestored(): PortableChange
     {
-        $proposer = $this->withId(new User(), 3);
-        $proposer->setEmail('member@example.org');
+        static::assertCount(1, $this->restored);
 
-        $proposal = new ChangeProposal();
-        $proposal->setTargetType($targetType);
-        $proposal->setTargetId($targetId);
-        $proposal->setProposedBy($proposer);
-        $proposal->setChanges($changes);
-        $proposal->setCreatedAt(new DateTimeImmutable('2030-01-06 10:00'));
-
-        return $proposal;
+        return $this->restored[0];
     }
 
     /**

@@ -245,6 +245,8 @@ admin_system_gallery:
     section_comp_toggle_caption: 'Ja/Nein-Schaltflächenpaar für boolesche Einstellungen; Ein/Aus-Varianten.'
     section_comp_approve_deny_title: 'Genehmigen/Ablehnen-Komponente'
     section_comp_approve_deny_caption: 'Verbundenes Paar aus Annehmen und Ablehnen für einen wartenden Eintrag; klein und in voller Größe, mit der Papierkorb-Variante.'
+    section_comp_value_diff_title: 'Werte-Vergleich-Komponente'
+    section_comp_value_diff_caption: 'Alter und neuer Wert nebeneinander, entfernter Text rot und hinzugefügter grün markiert; unmarkierte Boxen, wenn zu viel geändert wurde oder eine Seite leer ist.'
     section_admin_top_infobar_title: 'AdminTop-Infobar'
     section_admin_top_infobar_caption: 'Tab-Streifen + Topbar, die auf jeder Admin-Seite angezeigt werden; Listen- und Detailvarianten.'
     section_admin_list_title: 'Admin-Listentabelle'

@@ -2,7 +2,7 @@
 
 namespace App\Contribution;
 
-use App\Review\FieldChange;
+use Module\Proposal\Contract\Change\FieldChange;
 use Symfony\Component\Form\FormInterface;
 
 /**

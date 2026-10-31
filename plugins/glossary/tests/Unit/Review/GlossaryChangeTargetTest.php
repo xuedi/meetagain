@@ -3,7 +3,6 @@
 namespace Plugin\Glossary\Tests\Unit\Review;
 
 use App\Entity\ItemTag;
-use App\Entity\User;
 use App\Item\Tag\TagService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -78,23 +77,23 @@ class GlossaryChangeTargetTest extends TestCase
     public function testCanProposeRequiresAVisibleEntryAndARole(): void
     {
         // Arrange
-        $user = new User();
+        $userId = 5;
 
         // Act & Assert
-        self::assertTrue($this->makeTarget(entry: new Glossary())->canPropose($user, 1));
-        self::assertFalse($this->makeTarget(entry: null)->canPropose($user, 1));
-        self::assertFalse($this->makeTarget(entry: new Glossary(), granted: false)->canPropose($user, 1));
+        self::assertTrue($this->makeTarget(entry: new Glossary())->canPropose($userId, 1));
+        self::assertFalse($this->makeTarget(entry: null)->canPropose($userId, 1));
+        self::assertFalse($this->makeTarget(entry: new Glossary(), granted: false)->canPropose($userId, 1));
     }
 
     public function testCanReviewRequiresRoleAndExistingEntry(): void
     {
         // Arrange
-        $user = new User();
+        $userId = 5;
 
         // Act & Assert
-        self::assertTrue($this->makeTarget(entry: new Glossary())->canReview($user, 1));
-        self::assertFalse($this->makeTarget(entry: null)->canReview($user, 1));
-        self::assertFalse($this->makeTarget(entry: new Glossary(), granted: false)->canReview($user, 1));
+        self::assertTrue($this->makeTarget(entry: new Glossary())->canReview($userId, 1));
+        self::assertFalse($this->makeTarget(entry: null)->canReview($userId, 1));
+        self::assertFalse($this->makeTarget(entry: new Glossary(), granted: false)->canReview($userId, 1));
     }
 
     public function testTargetLabelIsThePhraseOrNull(): void

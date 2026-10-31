@@ -13,7 +13,7 @@ use App\Security\Permission\Attribute\PermissionAttribute;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
-use Module\Suggestion\Contract\TargetProviderInterface;
+use Module\Proposal\Contract\Suggestion\TargetProviderInterface;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Contracts\Translation\TranslatorInterface;

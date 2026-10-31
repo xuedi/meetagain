@@ -8,11 +8,14 @@ use App\Enum\UserStatus;
 use App\Filter\Member\PendingApprovalFilterInterface;
 use App\Filter\Member\PendingApprovalFilterService;
 use App\Repository\UserRepository;
+use App\Service\Member\RegistrationApprovalProviderInterface;
 use App\Service\Member\UserService;
 use App\Service\Notification\User\CoreMemberApprovalProvider;
 use App\Service\Notification\User\ReviewNotificationItem;
+use DateTimeImmutable;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -32,6 +35,54 @@ class CoreMemberApprovalProviderTest extends TestCase
         static::assertInstanceOf(ReviewNotificationItem::class, $items[0]);
         static::assertSame('1', $items[0]->id);
         static::assertSame('2', $items[1]->id);
+    }
+
+    public function testAnAdminSeesWhatTheAccountWaitsForWhenItSignedUpWhoItIsAndALink(): void
+    {
+        // Arrange
+        $pending = $this->createStub(User::class);
+        $pending->method('getId')->willReturn(5);
+        $pending->method('getName')->willReturn('Alice');
+        $pending->method('getEmail')->willReturn('alice@example.org');
+        $pending->method('getBio')->willReturn('');
+        $pending->method('getCreatedAt')->willReturn(new DateTimeImmutable('2026-10-28'));
+        $silent = $this->createStub(RegistrationApprovalProviderInterface::class);
+        $silent->method('waitingFor')->willReturn(null);
+        $answering = $this->createStub(RegistrationApprovalProviderInterface::class);
+        $answering->method('waitingFor')->willReturn('Film Club');
+        $provider = $this->makeProvider(pendingUsers: [$pending], approvalProviders: [$silent, $answering]);
+
+        // Act
+        $items = $provider->getReviewItems($this->reviewer(UserRole::Admin));
+
+        // Assert
+        static::assertSame('/admin/member/edit/5', $items[0]->detailUrl);
+        static::assertSame(
+            [
+                ['label' => 'profile_review.member_field_waiting_for', 'value' => 'Film Club'],
+                ['label' => 'profile_review.member_field_signed_up', 'value' => '2026-10-28'],
+                ['label' => 'profile_review.member_field_email', 'value' => 'alice@example.org'],
+            ],
+            $items[0]->fields,
+        );
+    }
+
+    public function testANonAdminReviewerSeesNeitherTheEmailNorTheAdminLink(): void
+    {
+        // Arrange
+        $pending = $this->createStub(User::class);
+        $pending->method('getId')->willReturn(5);
+        $pending->method('getEmail')->willReturn('alice@example.org');
+        $filter = $this->createStub(PendingApprovalFilterInterface::class);
+        $filter->method('filterForReviewer')->willReturn([$pending]);
+        $provider = $this->makeProvider(pendingUsers: [$pending], filters: [$filter]);
+
+        // Act
+        $items = $provider->getReviewItems($this->reviewer(UserRole::User));
+
+        // Assert
+        static::assertNull($items[0]->detailUrl);
+        static::assertSame([], $items[0]->fields);
     }
 
     public function testGetReviewItemsReturnsEmptyForNonAdminWithoutAFilter(): void
@@ -189,12 +240,14 @@ class CoreMemberApprovalProviderTest extends TestCase
     /**
      * @param list<User> $pendingUsers
      * @param list<PendingApprovalFilterInterface> $filters
+     * @param list<RegistrationApprovalProviderInterface> $approvalProviders
      */
     private function makeProvider(
         array $pendingUsers = [],
         ?User $findResult = null,
         array $filters = [],
         ?UserService $userService = null,
+        array $approvalProviders = [],
     ): CoreMemberApprovalProvider {
         $repo = $this->createStub(UserRepository::class);
         $repo->method('findByStatus')->willReturn($pendingUsers);
@@ -203,11 +256,16 @@ class CoreMemberApprovalProviderTest extends TestCase
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
 
+        $router = $this->createStub(RouterInterface::class);
+        $router->method('generate')->willReturnCallback(static fn(string $route, array $params): string => '/admin/member/edit/' . $params['id']);
+
         return new CoreMemberApprovalProvider(
             userRepo: $repo,
             userService: $userService ?? $this->createStub(UserService::class),
             pendingApproval: new PendingApprovalFilterService($filters, $repo),
             translator: $translator,
+            router: $router,
+            approvalProviders: $approvalProviders,
         );
     }
 }

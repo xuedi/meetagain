@@ -113,7 +113,7 @@ class ImportContext
      */
     public function mapIds(string $kind, array $refToId): void
     {
-        $this->ids[$kind] = $refToId;
+        $this->ids[$kind] = $refToId + ($this->ids[$kind] ?? []);
     }
 
     public function resolveId(string $kind, mixed $ref): ?int

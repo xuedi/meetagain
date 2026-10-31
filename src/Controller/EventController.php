@@ -31,7 +31,7 @@ use App\Service\Seo\BreadcrumbBuilder;
 use App\Service\Seo\CanonicalUrlService;
 use App\Service\Seo\EventSchemaService;
 use Doctrine\ORM\EntityManagerInterface;
-use Module\Suggestion\Contract\SuggestionInterface;
+use Module\Proposal\Contract\Suggestion\SuggestionInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

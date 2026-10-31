@@ -3,7 +3,7 @@
 namespace App\Item\Tag;
 
 use App\Entity\ItemTag;
-use App\Review\FieldChange;
+use Module\Proposal\Contract\Change\FieldChange;
 
 final readonly class SuggestionBuilder
 {

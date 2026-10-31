@@ -1,0 +1,12 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Module\Proposal\:
+        resource: '../src/'
+        exclude:
+            - '../src/Internal/Entity/'
+
+    Module\Proposal\Contract\Suggestion\SuggestionInterface: '@Module\Proposal\Internal\Suggestion\SuggestionService'
+    Module\Proposal\Contract\Change\ChangeInterface: '@Module\Proposal\Internal\Change\ChangeService'

@@ -2,20 +2,23 @@
 
 namespace Plugin\Glossary\Tests\Unit\Portability;
 
-use App\Entity\ChangeProposal;
 use App\Entity\ItemTag;
 use App\Entity\User;
-use App\Enum\ChangeProposalStatus;
-use App\Enum\FieldResolution;
 use App\Portability\DataCategory;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
 use App\Portability\Scope;
+use App\Portability\Section\ChangeProposalsSection;
 use App\Repository\UserRepository;
-use App\Review\FieldChange;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Module\Proposal\Contract\Change\ChangeInterface;
+use Module\Proposal\Contract\Change\FieldChange;
+use Module\Proposal\Contract\Change\FieldResolution;
+use Module\Proposal\Contract\Change\PortableChange;
+use Module\Proposal\Contract\Change\View;
+use Module\Proposal\Contract\Status;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Entity\TrainerCard;
 use Plugin\Glossary\Entity\TrainerDay;
@@ -27,6 +30,11 @@ use Tests\Unit\Portability\Section\SectionTestCase;
 
 final class MemberSectionTest extends SectionTestCase
 {
+    private const int RESTORED_ID = 440;
+
+    /** @var list<PortableChange> */
+    private array $restored = [];
+
     public function testCardsDaysAndProposalsSurviveTheRoundTrip(): void
     {
         // Arrange
@@ -64,15 +72,17 @@ final class MemberSectionTest extends SectionTestCase
         static::assertSame('2030-01-06', $day->getDay()->format('Y-m-d'));
         static::assertSame([3, 2, 1], [$day->getReviewed(), $day->getCorrect(), $day->getNewStarted()]);
 
-        $proposal = $this->onlyPersisted(ChangeProposal::class);
-        static::assertSame('glossary', $proposal->getTargetType());
-        static::assertSame(80, $proposal->getTargetId());
-        static::assertSame(ChangeProposalStatus::Pending, $proposal->getStatus());
+        static::assertCount(1, $this->restored);
+        $proposal = $this->restored[0];
+        static::assertSame('glossary', $proposal->targetType);
+        static::assertSame(80, $proposal->targetId);
+        static::assertSame(30, $proposal->proposerId);
+        static::assertSame('2030-01-04 10:00', $proposal->createdAt->format('Y-m-d H:i'));
         static::assertEquals(
             [new FieldChange('tag', '30,50', '50'), new FieldChange('phrase', 'ni hao', 'nǐ hǎo', FieldResolution::Denied)],
-            $proposal->getChanges(),
+            $proposal->changes,
         );
-        static::assertSame($proposal, $context->resolveRef(ChangeProposal::class, 44));
+        static::assertSame(self::RESTORED_ID, $context->resolveId(ChangeProposalsSection::REFS, 44));
 
         $summary = $context->toSummary();
         static::assertSame(1, $summary->get(MemberSection::KIND_CARDS, Outcome::Created));
@@ -148,7 +158,7 @@ final class MemberSectionTest extends SectionTestCase
         $this->section()->import($rows, $context);
 
         // Assert
-        static::assertSame([], $this->persisted);
+        static::assertSame([], $this->restored);
         static::assertSame(1, $context->toSummary()->get(MemberSection::KIND_CHANGE_PROPOSALS, Outcome::Dropped));
     }
 
@@ -208,7 +218,7 @@ final class MemberSectionTest extends SectionTestCase
     /**
      * @param list<TrainerCard> $cards
      * @param list<TrainerDay> $days
-     * @param list<ChangeProposal> $proposals
+     * @param list<View> $proposals
      * @param list<User> $users
      */
     private function section(
@@ -227,18 +237,7 @@ final class MemberSectionTest extends SectionTestCase
         $dayRepository->method('findBy')->willReturn($days);
         $dayRepository->method('findOneBy')->willReturn($existingDay);
 
-        $proposalRepository = $this->createStub(EntityRepository::class);
-        $proposalRepository
-            ->method('findBy')
-            ->willReturnCallback(static fn(array $criteria): array => array_values(array_filter(
-                $proposals,
-                static fn(ChangeProposal $proposal): bool => (
-                    $proposal->getStatus() === $criteria['status']
-                    && $proposal->getTargetType() === $criteria['targetType']
-                ),
-            )));
-
-        $repositories = [TrainerCard::class => $cardRepository, TrainerDay::class => $dayRepository, ChangeProposal::class => $proposalRepository];
+        $repositories = [TrainerCard::class => $cardRepository, TrainerDay::class => $dayRepository];
 
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('getRepository')->willReturnCallback(static fn(string $class): EntityRepository => $repositories[$class]);
@@ -249,6 +248,17 @@ final class MemberSectionTest extends SectionTestCase
 
         $userRepository = $this->createStub(UserRepository::class);
         $userRepository->method('findBy')->willReturn($users);
+        $userRepository
+            ->method('find')
+            ->willReturnCallback(static function (mixed $id) use ($users): ?User {
+                foreach ($users as $user) {
+                    if ($user->getId() === $id) {
+                        return $user;
+                    }
+                }
+
+                return null;
+            });
 
         $glossaryService = $this->createStub(GlossaryService::class);
         $glossaryService->method('decodeTagIds')->willReturnCallback(static fn(?string $value): array => (
@@ -262,7 +272,22 @@ final class MemberSectionTest extends SectionTestCase
                 return $tagIds === [] ? null : implode(',', $tagIds);
             });
 
-        return new MemberSection($em, $userRepository, $glossaryService);
+        $changes = $this->createStub(ChangeInterface::class);
+        $changes
+            ->method('exportPending')
+            ->willReturnCallback(static fn(array $targetTypes): array => array_values(array_filter(
+                $proposals,
+                static fn(View $proposal): bool => $proposal->status === Status::Pending && in_array($proposal->targetType, $targetTypes, true),
+            )));
+        $changes
+            ->method('restore')
+            ->willReturnCallback(function (PortableChange $change): int {
+                $this->restored[] = $change;
+
+                return self::RESTORED_ID;
+            });
+
+        return new MemberSection($em, $userRepository, $glossaryService, $changes);
     }
 
     private function scope(): Scope
@@ -319,15 +344,18 @@ final class MemberSectionTest extends SectionTestCase
     /**
      * @param list<FieldChange> $changes
      */
-    private function proposal(User $proposer, int $entryId, array $changes): ChangeProposal
+    private function proposal(User $proposer, int $entryId, array $changes): View
     {
-        $proposal = $this->withId(new ChangeProposal(), 44);
-        $proposal->setTargetType('glossary');
-        $proposal->setTargetId($entryId);
-        $proposal->setProposedBy($proposer);
-        $proposal->setChanges($changes);
-        $proposal->setCreatedAt(new DateTimeImmutable('2030-01-04 10:00'));
-
-        return $proposal;
+        return new View(
+            44,
+            'glossary',
+            $entryId,
+            (int) $proposer->getId(),
+            'learner',
+            Status::Pending,
+            new DateTimeImmutable('2030-01-04 10:00'),
+            $changes,
+            [],
+        );
     }
 }

@@ -2,13 +2,12 @@
 
 namespace App\Portability\Section;
 
-use App\Entity\ChangeProposal;
 use App\Entity\Event;
 use App\Entity\ItemTag;
 use App\Entity\Location;
 use App\Entity\User;
-use App\Enum\ChangeProposalStatus;
-use App\Enum\FieldResolution;
+use App\Event\ChangeTarget as EventChangeTarget;
+use App\Item\Location\ChangeTarget as LocationChangeTarget;
 use App\Item\Tag\ChangeTarget;
 use App\Item\Tag\TypeRegistry;
 use App\Portability\DataCategory;
@@ -17,19 +16,23 @@ use App\Portability\ImportContext;
 use App\Portability\Outcome;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
-use App\Review\EventChangeTarget;
-use App\Review\FieldChange;
-use App\Review\LocationChangeTarget;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Proposal\Contract\Change\ChangeInterface;
+use Module\Proposal\Contract\Change\FieldChange;
+use Module\Proposal\Contract\Change\FieldResolution;
+use Module\Proposal\Contract\Change\PortableChange;
 use Override;
 
 readonly class ChangeProposalsSection implements SectionInterface
 {
+    public const string REFS = 'change_proposal';
+
     public function __construct(
         private EntityManagerInterface $em,
         private TypeRegistry $tagTypes,
+        private ChangeInterface $changes,
     ) {}
 
     #[Override]
@@ -52,30 +55,25 @@ readonly class ChangeProposalsSection implements SectionInterface
             return [];
         }
 
-        $proposals = $this->em->getRepository(ChangeProposal::class)->findBy([
-            'status' => ChangeProposalStatus::Pending,
-            'targetType' => array_keys($targets),
-        ], ['id' => 'ASC']);
-
         $rows = [];
-        foreach ($proposals as $proposal) {
-            $isTargetExported = in_array($proposal->getTargetId(), $targets[$proposal->getTargetType()] ?? [], true);
-            if (!$isTargetExported || !$scope->grants($proposal->getProposedBy(), DataCategory::Interactions)) {
+        foreach ($this->changes->exportPending(array_keys($targets)) as $proposal) {
+            $isTargetExported = in_array($proposal->targetId, $targets[$proposal->targetType] ?? [], true);
+            if (!$isTargetExported || !$scope->grantsId($proposal->proposerId, DataCategory::Interactions)) {
                 continue;
             }
 
             $changes = [];
-            foreach ($proposal->getChanges() as $change) {
+            foreach ($proposal->changes as $change) {
                 $changes[$change->field] = $change->toArray();
             }
 
             $rows[] = [
-                'ref' => (int) $proposal->getId(),
-                'target_type' => $proposal->getTargetType(),
-                'target_ref' => $proposal->getTargetId(),
+                'ref' => $proposal->id,
+                'target_type' => $proposal->targetType,
+                'target_ref' => $proposal->targetId,
                 'changes' => $changes,
-                'email' => $proposal->getProposedBy()->getEmail(),
-                'created_at' => $proposal->getCreatedAt()->format(DateTimeInterface::ATOM),
+                'email' => $this->em->find(User::class, $proposal->proposerId)?->getEmail(),
+                'created_at' => $proposal->createdAt->format(DateTimeInterface::ATOM),
             ];
         }
 
@@ -107,17 +105,17 @@ readonly class ChangeProposalsSection implements SectionInterface
                 continue;
             }
 
-            $proposal = new ChangeProposal();
-            $proposal->setTargetType($targetType);
-            $proposal->setTargetId($targetId);
-            $proposal->setProposedBy($proposer);
-            $proposal->setStatus(ChangeProposalStatus::Pending);
-            $proposal->setChanges($changes);
-            $proposal->setCreatedAt($this->readDate($row['created_at'] ?? null) ?? new DateTimeImmutable());
-
-            $this->em->persist($proposal);
+            $id = $this->changes->restore(
+                new PortableChange(
+                    $targetType,
+                    $targetId,
+                    (int) $proposer->getId(),
+                    $changes,
+                    $this->readDate($row['created_at'] ?? null) ?? new DateTimeImmutable(),
+                ),
+            );
             if (isset($row['ref'])) {
-                $context->mapRef(ChangeProposal::class, (int) $row['ref'], $proposal);
+                $context->mapIds(self::REFS, [(int) $row['ref'] => $id]);
             }
 
             $context->count($this->getKey(), Outcome::Created);

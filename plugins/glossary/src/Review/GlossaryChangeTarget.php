@@ -2,9 +2,8 @@
 
 namespace Plugin\Glossary\Review;
 
-use App\Entity\User;
 use App\Item\Tag\TagService;
-use App\Review\ChangeTargetProviderInterface;
+use Module\Proposal\Contract\Change\TargetProviderInterface;
 use Override;
 use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Service\ConfigService;
@@ -14,7 +13,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-final readonly class GlossaryChangeTarget implements ChangeTargetProviderInterface
+final readonly class GlossaryChangeTarget implements TargetProviderInterface
 {
     public const string FIELD_PHRASE = 'phrase';
     public const string FIELD_SECONDARY = 'secondary';
@@ -98,13 +97,13 @@ final readonly class GlossaryChangeTarget implements ChangeTargetProviderInterfa
     }
 
     #[Override]
-    public function canPropose(User $user, int $targetId): bool
+    public function canPropose(int $userId, int $targetId): bool
     {
         return $this->security->isGranted('ROLE_USER') && $this->service->get($targetId) !== null;
     }
 
     #[Override]
-    public function canReview(User $user, int $targetId): bool
+    public function canReview(int $userId, int $targetId): bool
     {
         return $this->security->isGranted('ROLE_ORGANIZER') && $this->service->get($targetId) !== null;
     }

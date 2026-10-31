@@ -1,0 +1,111 @@
+{% set proposal = card.proposal %}
+{% set csrfToken = csrf_token('change_proposal' ~ proposal.id) %}
+{% set ballotToken = canReview ? csrf_token('field_ballot' ~ targetType ~ targetId) : null %}
+{% set applyScope = canReview ? applyScope|default(null) : null %}
+<div class="box">
+    <p class="mb-3">
+        <strong>{{ proposal.proposerName }}</strong>
+        <span class="has-text-grey">{{ proposal.createdAt|time_diff }}</span>
+    </p>
+    <table class="table is-fullwidth is-narrow">
+        <thead>
+            <tr>
+                <th>{{ 'review.col_field'|trans }}</th>
+                <th>{{ 'review.col_change'|trans }}</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for row in card.rows %}
+            {% set ballot = row.ballot|default(null) %}
+            {% set ballotState = row.ballotState|default(null) %}
+            <tr>
+                <th style="vertical-align: middle;">{{ row.label }}</th>
+                <td style="vertical-align: middle;">
+                    {% include '_components/value_diff.html.twig' with {before: row.before, after: row.after} only %}
+                </td>
+                <td style="vertical-align: middle; width: 1%; white-space: nowrap;" class="has-text-right">
+                    {% if row.resolution is not null %}
+                        <span class="tag is-light {{ row.resolution.value == 'applied' ? 'is-success' : 'is-danger' }}">
+                            {{ row.resolution.label|trans }}
+                        </span>
+                    {% elseif ballotState == 'deciding' %}
+                        <a class="tag is-link is-light" href="{{ path('app_ballot_show', {id: ballot.id}) }}">
+                            {{ 'review.ballot_deciding'|trans }}
+                        </a>
+                    {% elseif ballotState == 'decided' %}
+                        <a class="tag is-light" href="{{ path('app_ballot_show', {id: ballot.id}) }}">
+                            {% if ballot.winner is not null %}
+                                {{ 'review.ballot_decided'|trans({'%value%': ballot.winner.label}) }}
+                            {% else %}
+                                {{ 'review.ballot_closed'|trans }}
+                            {% endif %}
+                        </a>
+                        {% if canReview %}
+                            <a href="{{ path('app_review_field_ballot_confirm', {targetType: targetType, targetId: targetId, ballotId: ballot.id}) }}"
+                               class="button is-small is-success"
+                               data-post
+                               data-csrf-token="{{ ballotToken }}">
+                                {{ 'review.button_ballot_confirm'|trans }}
+                            </a>
+                            {% if applyScope %}
+                                <a href="{{ path('app_review_field_ballot_confirm', {targetType: targetType, targetId: targetId, ballotId: ballot.id, scope: applyScope.key}) }}"
+                                   class="button is-small is-success is-light"
+                                   title="{{ applyScope.label }}"
+                                   data-post
+                                   data-csrf-token="{{ ballotToken }}"
+                                   data-confirm="{{ applyScope.label }}">
+                                    <span class="icon is-small"><i class="fas fa-calendar-week" aria-hidden="true"></i></span>
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    {% elseif canReview %}
+                        <div class="is-flex is-justify-content-flex-end is-align-items-center">
+                            {% if ballotState == 'tied' %}
+                                <a class="tag is-warning is-light mr-2" href="{{ path('app_ballot_show', {id: ballot.id}) }}">
+                                    {{ 'review.ballot_tied'|trans }}
+                                </a>
+                            {% else %}
+                                <button type="button"
+                                        class="button is-small mr-2"
+                                        data-ballot-terms-open="field-ballot-modal"
+                                        data-ballot-field="{{ row.field }}"
+                                        title="{{ 'review.button_ballot_title'|trans }}">
+                                    <span class="icon is-small"><i class="fas fa-check-to-slot" aria-hidden="true"></i></span>
+                                </button>
+                            {% endif %}
+                            {% if applyScope %}
+                                <a href="{{ path('app_review_proposal_apply', {id: proposal.id, field: row.field, scope: applyScope.key}) }}"
+                                   class="button is-small is-success is-light mr-2"
+                                   title="{{ applyScope.label }}"
+                                   data-post
+                                   data-csrf-token="{{ csrfToken }}"
+                                   data-confirm="{{ applyScope.label }}">
+                                    <span class="icon is-small"><i class="fas fa-calendar-week" aria-hidden="true"></i></span>
+                                </a>
+                            {% endif %}
+                            {% include '_components/approve_deny.html.twig' with {
+                                approveUrl: path('app_review_proposal_apply', {id: proposal.id, field: row.field}),
+                                denyUrl: path('app_review_proposal_deny', {id: proposal.id, field: row.field}),
+                                csrfToken: csrfToken,
+                                approveTitle: 'review.button_apply'|trans,
+                                denyTitle: 'review.button_deny'|trans
+                            } only %}
+                        </div>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% if card.isProposer %}
+        <div class="has-text-right">
+            <a href="{{ path('app_review_proposal_withdraw', {id: proposal.id}) }}"
+               class="button is-small"
+               data-post
+               data-csrf-token="{{ csrfToken }}">
+                {{ 'review.button_withdraw'|trans }}
+            </a>
+        </div>
+    {% endif %}
+</div>

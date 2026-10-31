@@ -13,13 +13,13 @@ use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Filter\Admin\Location\AdminLocationListFilterService;
 use App\Form\LocationType;
+use App\Item\Location\ChangeTarget;
 use App\Repository\LocationRepository;
-use App\Review\ChangeProposalService;
-use App\Review\LocationChangeTarget;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Event\EventService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Proposal\Contract\Change\ChangeInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -40,7 +40,7 @@ final class LocationController extends AbstractController implements AdminNaviga
         private readonly EventService $eventService,
         private readonly EntityActionDispatcher $entityActionDispatcher,
         private readonly AdminLocationListFilterService $locationFilterService,
-        private readonly ChangeProposalService $changeProposalService,
+        private readonly ChangeInterface $changeProposalService,
         private readonly TranslatorInterface $translator,
     ) {}
 
@@ -134,7 +134,7 @@ final class LocationController extends AbstractController implements AdminNaviga
         }
 
         $locationId = $location->getId();
-        $this->changeProposalService->removeForTarget(LocationChangeTarget::TARGET_TYPE, $locationId);
+        $this->changeProposalService->removeForTarget(ChangeTarget::TARGET_TYPE, $locationId);
         $entityManager->remove($location);
         $entityManager->flush();
 

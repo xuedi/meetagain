@@ -5,7 +5,7 @@ namespace App\Twig;
 use App\Item\Tag\ChangeTarget;
 use App\Item\Tag\TagService;
 use App\Item\Tag\TypeRegistry;
-use App\Review\ChangeProposalService;
+use Module\Proposal\Contract\Change\ChangeInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Twig\Extension\RuntimeExtensionInterface;
 
@@ -15,7 +15,7 @@ final readonly class ItemTagRuntime implements RuntimeExtensionInterface
         private TagService $tagService,
         private TypeRegistry $registry,
         private RequestStack $requestStack,
-        private ChangeProposalService $changeProposals,
+        private ChangeInterface $changeProposals,
     ) {}
 
     /** @return list<string> */
@@ -42,7 +42,7 @@ final readonly class ItemTagRuntime implements RuntimeExtensionInterface
             return 0;
         }
 
-        return $this->changeProposals->countPendingForTargetType(ChangeTarget::TYPE_PREFIX . $itemType);
+        return $this->changeProposals->countPending(ChangeTarget::TYPE_PREFIX . $itemType);
     }
 
     private function locale(): ?string
