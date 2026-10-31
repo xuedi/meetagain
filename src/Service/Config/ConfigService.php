@@ -4,7 +4,6 @@ namespace App\Service\Config;
 
 use App\Entity\Config;
 use App\Enum\ConfigType;
-use App\Enum\SecurityMeasure;
 use App\Repository\ConfigRepository;
 use App\Service\AppStateService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +16,17 @@ use Symfony\Contracts\Cache\ItemInterface;
 readonly class ConfigService
 {
     private const string CACHE_KEY_PREFIX = 'config_';
+    private const array SWITCHES = [
+        'automatic_registration',
+        'show_town_hall',
+        'show_event_geo',
+        'send_rsvp_notifications',
+        'send_admin_notification',
+        'email_delivery_sync_enabled',
+        'send_event_reminders',
+        'send_upcoming_digest',
+        'tdm_reservation',
+    ];
     private const array FOOTER_COLUMN_KEYS = ['footer_col1_title', 'footer_col2_title', 'footer_col3_title', 'footer_col4_title'];
 
     public function __construct(
@@ -167,18 +177,7 @@ readonly class ConfigService
 
     public function getBooleanConfigs(): array
     {
-        $securityKeys = SecurityMeasure::configKeys();
-
-        $configs = [];
-        foreach ($this->repo->findBy(['type' => ConfigType::Boolean]) as $config) {
-            if (in_array($config->getName(), $securityKeys, true)) {
-                continue;
-            }
-
-            $configs[] = $config;
-        }
-
-        return $configs;
+        return $this->repo->findBy(['type' => ConfigType::Boolean, 'name' => self::SWITCHES]);
     }
 
     public function toggleBoolean(string $name): bool

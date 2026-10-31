@@ -536,11 +536,21 @@ class ConfigServiceTest extends TestCase
         static::assertSame('99', $existing->getValue());
     }
 
-    public function testGetBooleanConfigsDelegatesToRepo(): void
+    public function testGetBooleanConfigsListsOnlyTheCoreSwitches(): void
     {
         // Arrange
         $repoMock = $this->createMock(ConfigRepository::class);
-        $repoMock->expects($this->once())->method('findBy')->with(['type' => ConfigType::Boolean])->willReturn([]);
+        $repoMock
+            ->expects($this->once())
+            ->method('findBy')
+            ->with($this->callback(
+                static fn(array $criteria): bool => (
+                    $criteria['type'] === ConfigType::Boolean
+                    && in_array('show_event_geo', $criteria['name'], true)
+                    && !in_array('plugin_switch', $criteria['name'], true)
+                ),
+            ))
+            ->willReturn([]);
 
         $subject = new ConfigService(
             repo: $repoMock,
