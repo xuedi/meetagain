@@ -14,6 +14,7 @@ permit = [
     "Module\\Trust\\**",
     "@global",                              # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                    # the grant FK - the one sanctioned core entity
+    "Module\\Task\\Contract\\**",           # trust-rebuild is a Maintenance action
     "Doctrine\\**",
     "Symfony\\**",
     "Twig\\**",
@@ -28,6 +29,7 @@ permit = [
     "Module\\Trust\\**",
     "@global",                              # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                    # the grant FK - the one sanctioned core entity
+    "Module\\Task\\Contract\\**",           # trust-rebuild is a Maintenance action
     "PHPUnit\\**",
     "Tests\\Module\\**",                    # the shared module test harness: ModuleKernel and Members
     "Doctrine\\**",

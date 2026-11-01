@@ -1,0 +1,8 @@
+admin_trust_rebuild:
+    label: 'Scores de confiance'
+    description: 'Recalcule la réputation de chaque membre à partir de ses sources et vide les scores en cache, pour que la page suivante affiche les nouveaux. Avec « rapport seulement », rien n''est modifié : il indique si le cache s''écartait d''un calcul frais. Dans les deux cas, il nomme les actions qu''un consommateur enregistre sans jamais les déclarer, et qui ne rapportent rien.'
+    param_context: 'Contexte'
+    param_report_only: 'Rapport seulement, ne rien modifier'
+    choice_all: 'Tous les contextes'
+    fact_contexts: 'Contextes'
+    fact_vouches: 'Garanties'

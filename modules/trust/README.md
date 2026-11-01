@@ -60,13 +60,13 @@ cache correct when data it does not own changes: a consumer's action record move
 it, without the consumer knowing the cache exists - no events, no tags, no invalidation call in any consumer. The
 shape suits any cache whose inputs live behind an interface the cache's owner does not control.
 
-Writes the module makes itself - a vouch, a revoke, a restored grant, `app:trust:rebuild` without `--dry-run` -
+Writes the module makes itself - a vouch, a revoke, a restored grant, a rebuild that is not report-only -
 additionally drop the key for immediate effect. `ScoreProvider` keeps the per-request memo, cleared through
 `ResetInterface`. If the cache backend is unreachable the module computes directly and logs one warning per service
 instance.
 
-`app:trust:rebuild` with `--dry-run` compares a fresh computation against the cache and exits non-zero on drift: the
-standing proof that nothing here is silently stateful.
+A report-only rebuild compares a fresh computation against the cache and flags drift: the standing proof that nothing
+here is silently stateful.
 
 ## A score converges without walking paths
 
@@ -178,8 +178,10 @@ unconditionally:
 - `trust_explanation(context [, userId])` - where a score came from.
 
 The module's one route is `app_trust_vouch`, the POST + CSRF target of the vouch control; it renders nothing.
-`app:trust:rebuild [--context=] [--dry-run]` inspects a context from the command line. The outbound permit list in
-`mago.toml` holds `App\Entity\User`, for the grant's foreign key, and nothing else from the application.
+The rebuild is the `trust-rebuild` action on the Maintenance page (`RebuildAction`, one context or all, optionally
+report-only), and `app:trust:rebuild [--context=] [--dry-run]` runs the same from the command line, exiting non-zero
+on drift. The outbound permit list in `mago.toml` holds `App\Entity\User`, for the grant's foreign key, and nothing
+else from the application; beside it, the task module's contract for that action.
 
 ## Moving data between instances
 

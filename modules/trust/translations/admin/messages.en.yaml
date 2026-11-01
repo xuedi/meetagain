@@ -1,0 +1,8 @@
+admin_trust_rebuild:
+    label: 'Trust scores'
+    description: 'Recomputes every member''s standing from its sources and drops the cached scores, so the next page shows the fresh ones. With "report only" it changes nothing and says whether the cache had drifted from a fresh computation. Either way it names actions a consumer records but never declared, which score nothing.'
+    param_context: 'Context'
+    param_report_only: 'Report only, change nothing'
+    choice_all: 'All contexts'
+    fact_contexts: 'Contexts'
+    fact_vouches: 'Vouches'

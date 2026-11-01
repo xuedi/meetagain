@@ -1,0 +1,8 @@
+admin_trust_rebuild:
+    label: 'Vertrauenswerte'
+    description: 'Berechnet das Ansehen aller Mitglieder neu aus seinen Quellen und verwirft die zwischengespeicherten Werte, sodass die nächste Seite die frischen zeigt. Mit „nur berichten“ ändert es nichts und meldet, ob der Zwischenspeicher von einer frischen Berechnung abweicht. In beiden Fällen nennt es Aktionen, die ein Verbraucher aufzeichnet, aber nie deklariert hat - sie zählen nichts.'
+    param_context: 'Kontext'
+    param_report_only: 'Nur berichten, nichts ändern'
+    choice_all: 'Alle Kontexte'
+    fact_contexts: 'Kontexte'
+    fact_vouches: 'Bürgschaften'

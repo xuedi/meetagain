@@ -2,8 +2,7 @@
 
 namespace Module\Trust\Internal\Command;
 
-use Module\Trust\Internal\ContextRegistry;
-use Module\Trust\Internal\ScoreProvider;
+use Module\Trust\Internal\RebuildAction;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -16,8 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 final class RebuildCommand extends Command
 {
     public function __construct(
-        private readonly ContextRegistry $registry,
-        private readonly ScoreProvider $scoreProvider,
+        private readonly RebuildAction $action,
     ) {
         parent::__construct();
     }
@@ -38,46 +36,36 @@ final class RebuildCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $only = $input->getOption('context');
+        $only = is_string($only) ? $only : null;
         $dryRun = (bool) $input->getOption('dry-run');
 
-        $descriptors = $this->registry->describeAll();
-        if (is_string($only)) {
-            $descriptors = array_values(array_filter($descriptors, static fn($descriptor): bool => $descriptor->context === $only));
-            if ($descriptors === []) {
-                $io->error('No describer claims that context.');
+        $contexts = $this->action->rebuild($only, $dryRun);
+        if ($contexts === [] && $only !== null) {
+            $io->error('No describer claims that context.');
 
-                return Command::FAILURE;
-            }
+            return Command::FAILURE;
         }
 
-        if ($descriptors === []) {
+        if ($contexts === []) {
             $io->warning('No contexts are described. Trust is inert until a consumer registers one.');
 
             return Command::SUCCESS;
         }
 
         $drifted = 0;
-        foreach ($descriptors as $descriptor) {
-            $fresh = $this->scoreProvider->calculate($descriptor->context);
-
+        foreach ($contexts as $rebuilt) {
+            $io->section($rebuilt['descriptor']->label);
             if ($dryRun) {
-                $cached = $this->scoreProvider->getMap($descriptor->context);
-                $differs = $cached !== $fresh;
-                $drifted += $differs ? 1 : 0;
-                $io->section($descriptor->label);
-                $io->text($differs ? 'DRIFT: cached map differs from a fresh computation' : 'no drift');
-            } else {
-                $this->scoreProvider->invalidate($descriptor->context);
-                $io->section($descriptor->label);
+                $drifted += $rebuilt['drifted'] ? 1 : 0;
+                $io->text($rebuilt['drifted'] ? 'DRIFT: cached map differs from a fresh computation' : 'no drift');
             }
 
-            $undeclared = $this->scoreProvider->findUndeclaredActions($descriptor->context);
-            if ($undeclared !== []) {
-                $io->warning(sprintf('Recorded but never declared, so they score nothing: %s', implode(', ', $undeclared)));
+            if ($rebuilt['undeclared'] !== []) {
+                $io->warning(sprintf('Recorded but never declared, so they score nothing: %s', implode(', ', $rebuilt['undeclared'])));
             }
 
             $rows = [];
-            foreach ($fresh as $userId => $score) {
+            foreach ($rebuilt['scores'] as $userId => $score) {
                 $rows[] = [$userId, $score];
             }
             $io->table(['user', 'score'], $rows);
