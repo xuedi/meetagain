@@ -92,6 +92,56 @@ class EmailTemplateService implements TemplatesInterface
         ];
     }
 
+    /**
+     * @param list<string> $languages
+     * @return array{templates: list<string>, translations: list<string>, overwritten: list<string>} identifiers, translations as "identifier (language)"
+     */
+    public function seed(array $languages, bool $overwrite = false): array
+    {
+        $seeded = ['templates' => [], 'translations' => [], 'overwritten' => []];
+        $defaultsByLanguage = [];
+        foreach ($languages as $language) {
+            $defaultsByLanguage[$language] = $this->getDefaultTemplates($language);
+        }
+
+        foreach ($this->getDefaultTemplates() as $identifier => $data) {
+            $template = $this->repo->findByIdentifier($identifier);
+            if (!$template instanceof EmailTemplate) {
+                $template = new EmailTemplate();
+                $template->setIdentifier($identifier);
+                $template->setAvailableVariables($data['variables']);
+                $template->setUpdatedAt(new DateTimeImmutable());
+                $this->em->persist($template);
+                $seeded['templates'][] = $identifier;
+            } elseif ($overwrite) {
+                $template->setAvailableVariables($data['variables']);
+                $template->setUpdatedAt(new DateTimeImmutable());
+            }
+
+            foreach ($languages as $language) {
+                $translation = $template->findTranslation($language);
+                if ($translation instanceof EmailTemplateTranslation && !$overwrite) {
+                    continue;
+                }
+
+                $seeded[$translation === null ? 'translations' : 'overwritten'][] = sprintf('%s (%s)', $identifier, $language);
+                if ($translation === null) {
+                    $translation = new EmailTemplateTranslation();
+                    $translation->setLanguage($language);
+                    $template->addTranslation($translation);
+                    $this->em->persist($translation);
+                }
+                $translation->setSubject($defaultsByLanguage[$language][$identifier]['subject']);
+                $translation->setBody($defaultsByLanguage[$language][$identifier]['body']);
+                $translation->setUpdatedAt(new DateTimeImmutable());
+            }
+        }
+
+        $this->em->flush();
+
+        return $seeded;
+    }
+
     public function seedLanguage(string $code): void
     {
         foreach ($this->getDefaultTemplates($code) as $identifier => $data) {

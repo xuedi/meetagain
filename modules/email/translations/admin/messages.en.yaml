@@ -138,3 +138,9 @@ admin_email_debugging:
     flash_queued: 'Test email queued for %recipient% - it goes out with the next cron run'
     flash_blocked: '%recipient% is on the email blocklist, nothing was queued.'
     flash_error: 'An error occurred while sending.'
+admin_email_seed:
+    label: 'Email templates'
+    description: 'Creates every shipped email template that is not stored yet, in every enabled language, and leaves stored ones as they are. With "overwrite" it also resets every stored subject and body to the shipped default - wording edited in the admin is lost.'
+    param_overwrite: 'Overwrite: reset every stored template to the shipped default'
+    fact_stored: 'Stored templates'
+    fact_shipped: 'Shipped templates'

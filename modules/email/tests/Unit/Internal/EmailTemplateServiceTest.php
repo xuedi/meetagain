@@ -184,6 +184,34 @@ class EmailTemplateServiceTest extends TestCase
         static::assertSame(['subject' => 'Hi <b>Ann</b>', 'body' => '<p>&lt;b&gt;Ann&lt;/b&gt;</p><ul></ul>'], $rendered);
     }
 
+    public function testSeedCreatesWhatIsMissingInEveryLanguageAndLeavesStoredWordingAlone(): void
+    {
+        // Arrange
+        $stored = $this->template('en', 'Typed by an admin', '<p>admin</p>');
+        $service = $this->service(null, $this->repoStoring($stored));
+
+        // Act
+        $seeded = $service->seed(['en', 'de']);
+
+        // Assert
+        static::assertSame(['templates' => ['other'], 'translations' => ['digest (de)', 'other (en)', 'other (de)'], 'overwritten' => []], $seeded);
+        static::assertSame('Typed by an admin', $stored->getSubject('en'));
+    }
+
+    public function testSeedWithOverwriteResetsStoredWordingToTheShippedDefault(): void
+    {
+        // Arrange
+        $stored = $this->template('en', 'Typed by an admin', '<p>admin</p>');
+        $service = $this->service(null, $this->repoStoring($stored));
+
+        // Act
+        $seeded = $service->seed(['en'], overwrite: true);
+
+        // Assert
+        static::assertSame(['digest (en)'], $seeded['overwritten']);
+        static::assertSame('Digest', $stored->getSubject('en'));
+    }
+
     public function testSeedLanguageAddsTheDefaultOnlyWhereTheTranslationIsMissing(): void
     {
         // Arrange
@@ -309,6 +337,16 @@ class EmailTemplateServiceTest extends TestCase
             ]);
 
         return new EmailTemplateService($repo, $em ?? $this->createStub(EntityManagerInterface::class), [$provider]);
+    }
+
+    private function repoStoring(EmailTemplate $stored): EmailTemplateRepository
+    {
+        $repo = $this->createStub(EmailTemplateRepository::class);
+        $repo->method('findByIdentifier')->willReturnCallback(static fn(string $identifier): ?EmailTemplate => $identifier === self::IDENTIFIER
+            ? $stored
+            : null);
+
+        return $repo;
     }
 
     private function chain(TemplateProviderInterface ...$providers): EmailTemplateService

@@ -138,3 +138,9 @@ admin_email_debugging:
     flash_queued: 'Test-E-Mail für %recipient% eingereiht - sie geht mit dem nächsten Cron-Lauf raus'
     flash_blocked: '%recipient% steht auf der E-Mail-Sperrliste, es wurde nichts eingereiht.'
     flash_error: 'Beim Senden ist ein Fehler aufgetreten.'
+admin_email_seed:
+    label: 'E-Mail-Vorlagen'
+    description: 'Legt jede mitgelieferte E-Mail-Vorlage an, die noch nicht gespeichert ist, in jeder aktivierten Sprache, und lässt gespeicherte unverändert. Mit „überschreiben“ setzt es zusätzlich jeden gespeicherten Betreff und Text auf den mitgelieferten Standard zurück - im Admin bearbeitete Texte gehen verloren.'
+    param_overwrite: 'Überschreiben: jede gespeicherte Vorlage auf den Standard zurücksetzen'
+    fact_stored: 'Gespeicherte Vorlagen'
+    fact_shipped: 'Mitgelieferte Vorlagen'

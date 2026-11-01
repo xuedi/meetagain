@@ -2,92 +2,60 @@
 
 namespace Module\Email\Tests\Unit\Internal\Command;
 
-use App\Service\Config\LanguageService;
-use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Internal\Command\EmailTemplateSeedCommand;
-use Module\Email\Internal\EmailTemplateService;
-use Module\Email\Internal\Entity\EmailTemplate;
-use Module\Email\Internal\Entity\EmailTemplateTranslation;
-use Module\Email\Internal\Repository\EmailTemplateTranslationRepository;
+use Module\Email\Internal\TemplateSeedAction;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
 final class EmailTemplateSeedCommandTest extends TestCase
 {
-    public function testAnExistingTranslationIsLeftAloneWithoutTheFlag(): void
+    private const array SEEDED = ['templates' => ['welcome'], 'translations' => ['welcome (en)'], 'overwritten' => ['digest (de)']];
+
+    public function testWithoutTheFlagNothingIsOverwritten(): void
     {
         // Arrange
-        $existing = new EmailTemplateTranslation();
-        $existing->setSubject('Subject an admin typed');
-        $existing->setBody('<p>Body an admin typed</p>');
-        $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->never())->method('persist');
-        $tester = new CommandTester($this->command($emMock, $existing));
+        $action = $this->createMock(TemplateSeedAction::class);
+        $action->expects($this->once())->method('seed')->with(false)->willReturn(self::SEEDED);
+        $tester = new CommandTester(new EmailTemplateSeedCommand($action));
 
         // Act
         $exitCode = $tester->execute([]);
 
         // Assert
         static::assertSame(Command::SUCCESS, $exitCode);
-        static::assertSame('Subject an admin typed', $existing->getSubject());
-        static::assertSame('<p>Body an admin typed</p>', $existing->getBody());
-        static::assertStringContainsString('overwrote 0 translations', $tester->getDisplay());
+        static::assertStringNotContainsString('Wording typed into the admin UI is lost', $tester->getDisplay());
     }
 
-    public function testTheFlagResetsAnExistingTranslationToTheShippedDefault(): void
+    public function testEverySeededRowIsListedBeforeTheTotals(): void
     {
         // Arrange
-        $existing = new EmailTemplateTranslation();
-        $existing->setSubject('Subject an admin typed');
-        $existing->setBody('<p>Body an admin typed</p>');
-        $tester = new CommandTester($this->command($this->createStub(EntityManagerInterface::class), $existing));
+        $action = $this->createStub(TemplateSeedAction::class);
+        $action->method('seed')->willReturn(self::SEEDED);
+        $tester = new CommandTester(new EmailTemplateSeedCommand($action));
 
         // Act
-        $exitCode = $tester->execute(['--overwrite' => true]);
+        $tester->execute([]);
 
         // Assert
-        static::assertSame(Command::SUCCESS, $exitCode);
-        static::assertSame('Shipped subject', $existing->getSubject());
-        static::assertSame('<p>Shipped body</p>', $existing->getBody());
-        static::assertStringContainsString('overwrote 1 translations', $tester->getDisplay());
+        $display = $tester->getDisplay();
+        static::assertStringContainsString('Created template "welcome".', $display);
+        static::assertStringContainsString('Created translation for welcome (en).', $display);
+        static::assertStringContainsString('Overwrote translation for digest (de).', $display);
+        static::assertStringContainsString('Done. Created 1 templates, 1 translations, overwrote 1 translations.', $display);
     }
 
-    public function testTheFlagWarnsThatAdminWordingIsLost(): void
+    public function testTheFlagOverwritesAndWarnsThatAdminWordingIsLost(): void
     {
         // Arrange
-        $tester = new CommandTester($this->command($this->createStub(EntityManagerInterface::class), new EmailTemplateTranslation()));
+        $action = $this->createMock(TemplateSeedAction::class);
+        $action->expects($this->once())->method('seed')->with(true)->willReturn(self::SEEDED);
+        $tester = new CommandTester(new EmailTemplateSeedCommand($action));
 
         // Act
         $tester->execute(['--overwrite' => true]);
 
         // Assert
         static::assertStringContainsString('Wording typed into the admin UI is lost', $tester->getDisplay());
-    }
-
-    private function command(EntityManagerInterface $em, ?EmailTemplateTranslation $existing): EmailTemplateSeedCommand
-    {
-        $template = new EmailTemplate();
-        $template->setIdentifier('welcome');
-
-        $templateService = $this->createStub(EmailTemplateService::class);
-        $templateService->method('getTemplate')->willReturn($template);
-        $templateService
-            ->method('getDefaultTemplates')
-            ->willReturn([
-                'welcome' => [
-                    'subject' => 'Shipped subject',
-                    'body' => '<p>Shipped body</p>',
-                    'variables' => ['host'],
-                ],
-            ]);
-
-        $languageService = $this->createStub(LanguageService::class);
-        $languageService->method('getEnabledCodes')->willReturn(['en']);
-
-        $translationRepo = $this->createStub(EmailTemplateTranslationRepository::class);
-        $translationRepo->method('findOneBy')->willReturn($existing);
-
-        return new EmailTemplateSeedCommand($templateService, $em, $languageService, $translationRepo);
     }
 }
