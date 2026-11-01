@@ -1,0 +1,8 @@
+admin_circulation_rebuild:
+    label: 'Exemplare im Umlauf'
+    description: 'Spielt das Umlaufbuch erneut ab und schreibt bei jedem Exemplar Besitzer, Besitzdatum und Status neu, wo sie davon abweichen. Mit „nur berichten“ ändert es nichts und listet die abweichenden Exemplare auf. Ein Exemplar ohne jeden Eintrag im Umlaufbuch wird genannt, aber nie verändert.'
+    param_context: 'Kontext'
+    param_report_only: 'Nur berichten, nichts ändern'
+    choice_all: 'Alle Kontexte'
+    fact_copies: 'Exemplare'
+    fact_entries: 'Einträge im Umlaufbuch'

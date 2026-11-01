@@ -134,6 +134,16 @@ class CopyRepository extends ServiceEntityRepository
     /**
      * @return list<string>
      */
+    public function findContexts(): array
+    {
+        $rows = $this->createQueryBuilder('c')->select('DISTINCT c.context AS context')->orderBy('c.context', 'ASC')->getQuery()->getScalarResult();
+
+        return array_map('strval', array_column($rows, 'context'));
+    }
+
+    /**
+     * @return list<string>
+     */
     public function findDistinctContexts(string $itemType): array
     {
         $rows = $this

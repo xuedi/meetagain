@@ -1,0 +1,8 @@
+admin_circulation_rebuild:
+    label: 'Circulation copies'
+    description: 'Replays the circulation ledger and rewrites each copy''s holder, holding date and status where they drifted from it. With "report only" it changes nothing and lists the copies that drifted. A copy without any ledger entry is named but never touched.'
+    param_context: 'Context'
+    param_report_only: 'Report only, change nothing'
+    choice_all: 'All contexts'
+    fact_copies: 'Copies'
+    fact_entries: 'Ledger entries'

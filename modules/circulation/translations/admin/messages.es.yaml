@@ -1,0 +1,8 @@
+admin_circulation_rebuild:
+    label: 'Ejemplares en circulación'
+    description: 'Reproduce el registro de circulación y reescribe el titular, la fecha de tenencia y el estado de cada ejemplar donde se hayan desviado de él. Con «solo informar» no cambia nada y lista los ejemplares desviados. Un ejemplar sin ninguna entrada en el registro se nombra pero nunca se modifica.'
+    param_context: 'Contexto'
+    param_report_only: 'Solo informar, no cambiar nada'
+    choice_all: 'Todos los contextos'
+    fact_copies: 'Ejemplares'
+    fact_entries: 'Entradas del registro'

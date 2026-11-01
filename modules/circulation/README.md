@@ -48,8 +48,10 @@ is its only writer, and a mistake is corrected by appending. Each entry carries 
 diverge whenever a confirmation lands late.
 
 The copy's `holder`, `heldSince` and status exist so a list page does not replay history, and they must always be
-reproducible from the ledger. `LedgerReplay` is that replay, and `app:circulation:rebuild` is the standing proof:
-with `--dry-run` it reports drift and exits non-zero, without it the derived columns are rewritten.
+reproducible from the ledger. `LedgerReplay` is that replay, and the rebuild is the standing proof: report-only it
+lists the copies that drifted, otherwise it rewrites their derived columns, and a copy with no ledger entry is named
+but never touched. It is the `circulation-rebuild` action on the Maintenance page (`RebuildAction`) and
+`app:circulation:rebuild [--context=] [--dry-run]` on the command line, which exits non-zero on drift.
 
 ## The waiting list is per title, not per copy
 
