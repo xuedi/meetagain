@@ -40,6 +40,7 @@ src/EventSubscriber/CanonicalLinkHeaderSubscriber.php::onKernelResponse // appen
 src/EventSubscriber/LocaleSubscriber.php::getSubscribedEvents // priority is pinned between SessionListener and RouterListener, and both matter
 src/EventSubscriber/LocaleSubscriber.php::onKernelRequest // the four-way precedence chain breaks silently if a branch is reordered or its guard dropped
 src/EventSubscriber/LocaleValidationSubscriber.php::getSubscribedEvents // priority is pinned between RouterListener and LocaleSubscriber; above the router it never sees `_locale`
+src/EventSubscriber/LocaleValidationSubscriber.php::onKernelRequest // five outcomes in a fixed order (pass, 301, 404, 302 twice), each guarding a different failure: a 500 from an unknown catalogue, crawler 404s, a wrong-host locale
 src/EventSubscriber/Security/BlockedSessionSubscriber.php::getSubscribedEvents // priority is pinned after SessionListener so the session factory exists
 
 # --- Item tags ---
