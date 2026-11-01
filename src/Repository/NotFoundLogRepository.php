@@ -170,60 +170,6 @@ class NotFoundLogRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('n')->orderBy('n.createdAt', 'DESC')->setMaxResults(1)->getQuery()->getOneOrNullResult();
     }
 
-    /**
-     * @return list<NotFoundLog>
-     */
-    public function findRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff, int $limit): array
-    {
-        return array_values(
-            $this
-                ->createQueryBuilder('n')
-                ->where('n.id > :lastId')
-                ->andWhere('n.createdAt <= :cutoff')
-                ->orderBy('n.id', 'ASC')
-                ->setParameter('lastId', $lastId)
-                ->setParameter('cutoff', $cutoff)
-                ->setMaxResults($limit)
-                ->getQuery()
-                ->getResult(),
-        );
-    }
-
-    public function countRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff): int
-    {
-        return (int) $this
-            ->createQueryBuilder('n')
-            ->select('COUNT(n.id)')
-            ->where('n.id > :lastId')
-            ->andWhere('n.createdAt <= :cutoff')
-            ->setParameter('lastId', $lastId)
-            ->setParameter('cutoff', $cutoff)
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
-    public function findFirstCreatedAtForIpAfter(string $ip, DateTimeImmutable $after): ?DateTimeImmutable
-    {
-        $row = $this
-            ->createQueryBuilder('n')
-            ->select('n.createdAt AS createdAt')
-            ->where('n.ip = :ip')
-            ->andWhere('n.createdAt > :after')
-            ->orderBy('n.createdAt', 'ASC')
-            ->setParameter('ip', $ip)
-            ->setParameter('after', $after)
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
-
-        if ($row === null) {
-            return null;
-        }
-        $value = $row['createdAt'];
-
-        return $value instanceof DateTimeImmutable ? $value : new DateTimeImmutable((string) $value);
-    }
-
     public function findLatestUnlinkedForOffender(string $ip, ?string $sessionId): ?NotFoundLog
     {
         return $this
@@ -323,5 +269,17 @@ class NotFoundLogRepository extends ServiceEntityRepository
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    public function deleteUnlinkedBefore(DateTimeImmutable $cutoff): int
+    {
+        return (int) $this
+            ->createQueryBuilder('n')
+            ->delete()
+            ->where('n.createdAt < :cutoff')
+            ->andWhere('n.incident IS NULL')
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->execute();
     }
 }
