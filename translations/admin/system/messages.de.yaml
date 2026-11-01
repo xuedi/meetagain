@@ -421,3 +421,9 @@ admin_system_hotfix:
     flash_deferred: '%hotfix% ist noch nicht bereit: %reason%'
     flash_failed: '%hotfix% ist fehlgeschlagen: %reason%'
     empty: 'Es sind keine Hotfixes registriert.'
+admin_system_thumbnails:
+    label: 'Fehlende Vorschaubilder'
+    description: 'Erzeugt jedes Vorschaubild, das einem Bild fehlt, für jeden Ort, an dem das Bild verwendet wird, in kurzen Schritten auf den Workern. Vorhandene Vorschaubilder bleiben unverändert und nichts wird gelöscht; veraltete Vorschaubilder entfernt die Synchronisierung auf der Bilder-Seite.'
+    param_type: 'Bildtyp'
+    choice_all: 'Alle Bildtypen'
+    fact_images: 'Bilder'

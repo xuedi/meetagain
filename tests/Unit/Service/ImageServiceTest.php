@@ -552,6 +552,46 @@ class ImageServiceTest extends TestCase
         static::assertSame([100, 100], $this->thumbnailSize('shared_100x100'));
     }
 
+    public function testRegenerateThumbnailsAfterHandsBackTheLastIdOfAFullBatch(): void
+    {
+        // Arrange
+        $this->writeSourceImage('shared', 400, 200);
+
+        $imageRepo = $this->createMock(ImageRepository::class);
+        $imageRepo
+            ->expects($this->once())
+            ->method('findAfterId')
+            ->with(3, 1)
+            ->willReturn([$this->storedImage(7, 'shared', ImageType::GroupPreview)]);
+
+        $registry = new ImageTypeRegistry([$this->definition(ImageType::GroupPreview, [[400, 400]], ImageFitMode::Crop)], new ThumbnailSizeFormat());
+        $subject = $this->createService(imageRepo: $imageRepo, imageTypeRegistry: $registry, imageLocationRepo: $this->locationRepoFor([]));
+
+        // Act
+        $batch = $subject->regenerateThumbnailsAfter(3, 1);
+
+        // Assert
+        static::assertSame(['created' => 1, 'lastImageId' => 7], $batch);
+    }
+
+    public function testRegenerateThumbnailsAfterEndsOnAShortBatch(): void
+    {
+        // Arrange
+        $this->writeSourceImage('shared', 400, 200);
+
+        $imageRepo = $this->createStub(ImageRepository::class);
+        $imageRepo->method('findAfterId')->willReturn([$this->storedImage(7, 'shared', ImageType::GroupPreview)]);
+
+        $registry = new ImageTypeRegistry([$this->definition(ImageType::GroupPreview, [[400, 400]], ImageFitMode::Crop)], new ThumbnailSizeFormat());
+        $subject = $this->createService(imageRepo: $imageRepo, imageTypeRegistry: $registry, imageLocationRepo: $this->locationRepoFor([]));
+
+        // Act
+        $batch = $subject->regenerateThumbnailsAfter(null, 2);
+
+        // Assert
+        static::assertSame(['created' => 1, 'lastImageId' => null], $batch);
+    }
+
     public function testDeleteObsoleteThumbnails(): void
     {
         // Arrange

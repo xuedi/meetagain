@@ -421,3 +421,9 @@ admin_system_hotfix:
     flash_deferred: '%hotfix% n''est pas encore prêt : %reason%'
     flash_failed: '%hotfix% a échoué : %reason%'
     empty: 'Aucun correctif n''est enregistré.'
+admin_system_thumbnails:
+    label: 'Miniatures manquantes'
+    description: 'Crée chaque miniature manquante d''une image, pour chaque endroit où l''image est utilisée, par petites étapes sur les workers. Les miniatures existantes restent telles quelles et rien n''est supprimé ; les miniatures obsolètes sont retirées par la synchronisation de la page Images.'
+    param_type: 'Type d''image'
+    choice_all: 'Tous les types d''image'
+    fact_images: 'Images'

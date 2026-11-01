@@ -168,7 +168,7 @@ class ImageAltServiceTest extends TestCase
         ?EntityActionDispatcher $dispatcher = null,
     ): ImageAltService {
         $repository = $this->createStub(ImageRepository::class);
-        $repository->method('findAuditCandidates')->willReturn($candidates);
+        $repository->method('findAfterId')->willReturn($candidates);
 
         $language = $this->createStub(LanguageService::class);
         $language->method('getFilteredDefaultLocale')->willReturn('en');

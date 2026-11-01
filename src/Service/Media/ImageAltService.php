@@ -32,7 +32,7 @@ readonly class ImageAltService
      */
     public function findMissingAltPage(?int $afterId, int $limit): array
     {
-        $candidates = $this->imageRepository->findAuditCandidates($afterId, $limit);
+        $candidates = $this->imageRepository->findAfterId($afterId, $limit);
         if ($candidates === []) {
             return ['items' => [], 'nextAfterId' => null];
         }
