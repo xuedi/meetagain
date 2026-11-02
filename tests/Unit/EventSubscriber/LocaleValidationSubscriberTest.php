@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\EventSubscriber;
 
+use App\Entity\Language;
 use App\EventSubscriber\LocaleSubscriber;
 use App\EventSubscriber\LocaleValidationSubscriber;
 use App\Service\Config\LanguageService;
@@ -23,12 +24,17 @@ class LocaleValidationSubscriberTest extends TestCase
         return new RequestEvent($kernel, $request, $type);
     }
 
-    private function makeSubscriber(bool $isValid = true, bool $isFilteredValid = true, string $defaultLocale = 'en'): LocaleValidationSubscriber
-    {
+    private function makeSubscriber(
+        bool $isValid = true,
+        bool $isFilteredValid = true,
+        string $defaultLocale = 'en',
+        bool $isKnownLanguage = false,
+    ): LocaleValidationSubscriber {
         $lang = $this->createStub(LanguageService::class);
         $lang->method('isValidCode')->willReturn($isValid);
         $lang->method('isFilteredValidCode')->willReturn($isFilteredValid);
         $lang->method('getFilteredDefaultLocale')->willReturn($defaultLocale);
+        $lang->method('findByCode')->willReturn($isKnownLanguage ? new Language() : null);
 
         return new LocaleValidationSubscriber($lang);
     }
@@ -91,6 +97,40 @@ class LocaleValidationSubscriberTest extends TestCase
         static::assertNotNull($response);
         static::assertSame(302, $response->getStatusCode());
         static::assertStringContainsString('/en/events', $response->headers->get('Location'));
+    }
+
+    public function testTheRenamedChineseCodeRedirectsPermanentlyAndKeepsPathAndQuery(): void
+    {
+        // Arrange
+        $request = Request::create('/cn/event/37?tab=info');
+        $request->attributes->set('_locale', 'cn');
+        $event = $this->makeEvent($request);
+
+        // Act
+        $this->makeSubscriber(isValid: false)->onKernelRequest($event);
+
+        // Assert
+        $response = $event->getResponse();
+        static::assertNotNull($response);
+        static::assertSame(301, $response->getStatusCode());
+        static::assertSame('/zh/event/37?tab=info', $response->headers->get('Location'));
+    }
+
+    public function testADisabledLanguageRedirectsToTheDefaultInsteadOfAnswering404(): void
+    {
+        // Arrange
+        $request = Request::create('/it/event/40');
+        $request->attributes->set('_locale', 'it');
+        $event = $this->makeEvent($request);
+
+        // Act
+        $this->makeSubscriber(isValid: false, defaultLocale: 'de', isKnownLanguage: true)->onKernelRequest($event);
+
+        // Assert
+        $response = $event->getResponse();
+        static::assertNotNull($response);
+        static::assertSame(302, $response->getStatusCode());
+        static::assertSame('/de/event/40', $response->headers->get('Location'));
     }
 
     public function testValidAndFilteredLocaleDoesNothing(): void

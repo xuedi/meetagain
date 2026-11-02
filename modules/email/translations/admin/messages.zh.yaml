@@ -138,3 +138,9 @@ admin_email_debugging:
     flash_queued: '测试邮件已加入队列，收件人 %recipient%，将在下次定时任务运行时发出。'
     flash_blocked: '%recipient% 在邮件屏蔽名单中，未加入队列。'
     flash_error: '发送时发生错误。'
+admin_email_seed:
+    label: '邮件模板'
+    description: '在每种已启用的语言中创建尚未保存的内置邮件模板，已保存的模板保持不变。选择“覆盖”时，还会把每个已保存的主题和正文重置为内置默认值 - 在后台编辑过的文字将会丢失。'
+    param_overwrite: '覆盖：把每个已保存的模板重置为默认'
+    fact_stored: '已保存的模板'
+    fact_shipped: '内置模板'

@@ -1,0 +1,8 @@
+admin_trust_rebuild:
+    label: '信任分数'
+    description: '从数据来源重新计算每位成员的声望，并清除缓存的分数，下一个页面即显示新值。选择“仅报告”时不做任何更改，只说明缓存是否与重新计算的结果不一致。两种情况下都会列出使用方记录了但从未声明的操作，这些操作不计分。'
+    param_context: '上下文'
+    param_report_only: '仅报告，不做更改'
+    choice_all: '所有上下文'
+    fact_contexts: '上下文'
+    fact_vouches: '担保'

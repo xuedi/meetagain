@@ -1,0 +1,8 @@
+admin_trust_rebuild:
+    label: 'Puntuaciones de confianza'
+    description: 'Recalcula la reputación de cada miembro a partir de sus fuentes y descarta las puntuaciones en caché, para que la siguiente página muestre las nuevas. Con «solo informar» no cambia nada e indica si la caché se había desviado de un cálculo nuevo. En ambos casos nombra las acciones que un consumidor registra pero nunca declaró, que no suman nada.'
+    param_context: 'Contexto'
+    param_report_only: 'Solo informar, no cambiar nada'
+    choice_all: 'Todos los contextos'
+    fact_contexts: 'Contextos'
+    fact_vouches: 'Avales'

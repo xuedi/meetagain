@@ -138,3 +138,9 @@ admin_email_debugging:
     flash_queued: 'E-mail de test mis en file pour %recipient% - il partira au prochain passage du cron'
     flash_blocked: '%recipient% est sur la liste de blocage des e-mails, rien n''a été mis en file.'
     flash_error: 'Une erreur est survenue pendant l''envoi.'
+admin_email_seed:
+    label: 'Modèles d''e-mails'
+    description: 'Crée chaque modèle d''e-mail fourni qui n''est pas encore enregistré, dans chaque langue activée, et laisse les modèles enregistrés tels quels. Avec « écraser », il réinitialise aussi chaque objet et corps enregistré au modèle fourni par défaut - le texte modifié dans l''admin est perdu.'
+    param_overwrite: 'Écraser : réinitialiser chaque modèle enregistré par défaut'
+    fact_stored: 'Modèles enregistrés'
+    fact_shipped: 'Modèles fournis'

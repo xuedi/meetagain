@@ -7,10 +7,12 @@ use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Task\Contract\Status;
 use Module\Trust\Contract\ActionDescriptor;
 use Module\Trust\Contract\TrustAction;
 use Module\Trust\Contract\TrustInterface;
 use Module\Trust\Contract\TrustLevel;
+use Module\Trust\Internal\RebuildAction;
 use Module\Trust\Tests\Stub\AccessProvider;
 use Module\Trust\Tests\Stub\ActionSource;
 use Module\Trust\Tests\Stub\ContextDescriber;
@@ -124,6 +126,48 @@ final class StubConsumerTest extends KernelTestCase
         self::assertStringContainsString(self::UNDECLARED, $tester->getDisplay());
     }
 
+    public function testTheMaintenanceActionOffersEveryDescribedContext(): void
+    {
+        // Act
+        $parameters = $this->rebuildAction()->getParameters();
+
+        // Assert
+        self::assertSame(['admin_trust_rebuild.choice_all' => RebuildAction::ALL, 'Stub context' => self::CONTEXT], $parameters[0]->choices);
+    }
+
+    public function testTheMaintenanceActionReportsNoDriftButTheUndeclaredAction(): void
+    {
+        // Arrange
+        $this->trust->getScore(self::CONTEXT, (int) $this->earner->getId());
+
+        // Act
+        $result = $this->rebuildAction()->run(['context' => self::CONTEXT, 'report_only' => true]);
+
+        // Assert
+        self::assertSame(Status::warning, $result->status);
+        self::assertStringContainsString('No drift across 1 context(s)', $result->message);
+        self::assertStringContainsString(self::UNDECLARED, $result->message);
+    }
+
+    public function testTheMaintenanceActionRebuildsEveryContextWhenNoneIsChosen(): void
+    {
+        // Act
+        $result = $this->rebuildAction()->run(['context' => RebuildAction::ALL, 'report_only' => false]);
+
+        // Assert
+        self::assertStringStartsWith('Rebuilt 1 context(s): Stub context', $result->message);
+        self::assertNull($result->continueFrom);
+    }
+
+    public function testTheMaintenanceActionFailsForAContextNobodyDescribes(): void
+    {
+        // Act
+        $result = $this->rebuildAction()->run(['context' => 'nobody-describes-this']);
+
+        // Assert
+        self::assertSame(Status::error, $result->status);
+    }
+
     public function testRaisingThePointsPerHandoverMovesEverybodyWhoEverEarned(): void
     {
         // Arrange
@@ -181,6 +225,11 @@ final class StubConsumerTest extends KernelTestCase
             ->extract(['value']);
         self::assertContains((string) $this->earner->getId(), $vouchTargets);
         self::assertNotContains((string) $this->root->getId(), $vouchTargets);
+    }
+
+    private function rebuildAction(): RebuildAction
+    {
+        return self::getContainer()->get(RebuildAction::class);
     }
 
     private static function handoverPoints(): int

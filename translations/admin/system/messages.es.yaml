@@ -421,3 +421,9 @@ admin_system_hotfix:
     flash_deferred: '%hotfix% aún no está lista: %reason%'
     flash_failed: '%hotfix% falló: %reason%'
     empty: 'No hay correcciones registradas.'
+admin_system_thumbnails:
+    label: 'Miniaturas que faltan'
+    description: 'Crea cada miniatura que le falta a una imagen, para cada lugar donde se usa la imagen, en pasos cortos en los workers. Las miniaturas existentes se quedan como están y no se borra nada; las miniaturas obsoletas las elimina la sincronización de la página Imágenes.'
+    param_type: 'Tipo de imagen'
+    choice_all: 'Todos los tipos de imagen'
+    fact_images: 'Imágenes'

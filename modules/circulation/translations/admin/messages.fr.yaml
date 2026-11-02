@@ -1,0 +1,8 @@
+admin_circulation_rebuild:
+    label: 'Exemplaires en circulation'
+    description: 'Rejoue le registre de circulation et réécrit le détenteur, la date de détention et le statut de chaque exemplaire là où ils s''en écartent. Avec « rapport seulement », rien n''est modifié : il liste les exemplaires concernés. Un exemplaire sans aucune entrée au registre est signalé mais jamais modifié.'
+    param_context: 'Contexte'
+    param_report_only: 'Rapport seulement, ne rien modifier'
+    choice_all: 'Tous les contextes'
+    fact_copies: 'Exemplaires'
+    fact_entries: 'Entrées du registre'

@@ -303,7 +303,7 @@ class ImageRepository extends ServiceEntityRepository
     /**
      * @return list<Image>
      */
-    public function findAuditCandidates(?int $afterId, int $limit): array
+    public function findAfterId(?int $afterId, int $limit): array
     {
         $qb = $this->createQueryBuilder('i')->orderBy('i.id', 'ASC')->setMaxResults($limit);
         if ($afterId !== null) {

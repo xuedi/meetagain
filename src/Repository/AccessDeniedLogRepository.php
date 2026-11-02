@@ -66,38 +66,6 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    /**
-     * @return list<AccessDeniedLog>
-     */
-    public function findRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff, int $limit): array
-    {
-        return array_values(
-            $this
-                ->createQueryBuilder('a')
-                ->where('a.id > :lastId')
-                ->andWhere('a.createdAt <= :cutoff')
-                ->orderBy('a.id', 'ASC')
-                ->setParameter('lastId', $lastId)
-                ->setParameter('cutoff', $cutoff)
-                ->setMaxResults($limit)
-                ->getQuery()
-                ->getResult(),
-        );
-    }
-
-    public function countRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff): int
-    {
-        return (int) $this
-            ->createQueryBuilder('a')
-            ->select('COUNT(a.id)')
-            ->where('a.id > :lastId')
-            ->andWhere('a.createdAt <= :cutoff')
-            ->setParameter('lastId', $lastId)
-            ->setParameter('cutoff', $cutoff)
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-
     public function findLatestUnlinkedForOffender(string $ip): ?AccessDeniedLog
     {
         return $this
@@ -137,5 +105,17 @@ class AccessDeniedLogRepository extends ServiceEntityRepository
         }
 
         return array_values($qb->getQuery()->getResult());
+    }
+
+    public function deleteUnlinkedBefore(DateTimeImmutable $cutoff): int
+    {
+        return (int) $this
+            ->createQueryBuilder('a')
+            ->delete()
+            ->where('a.createdAt < :cutoff')
+            ->andWhere('a.incident IS NULL')
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->execute();
     }
 }

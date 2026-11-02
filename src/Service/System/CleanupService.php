@@ -5,8 +5,11 @@ namespace App\Service\System;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Portability\Importer;
+use App\Repository\AccessDeniedLogRepository;
 use App\Repository\ImageRepository;
 use App\Repository\IncidentRepository;
+use App\Repository\NotFoundLogRepository;
+use App\Repository\RateLimitLogRepository;
 use App\Repository\SupportRequestRepository;
 use App\Repository\UserRepository;
 use App\Service\Security\MeasureLogger;
@@ -29,12 +32,16 @@ readonly class CleanupService implements TaskInterface
     public const int GHOSTED_REGISTRATION_DAYS = 10;
     public const int PENDING_IMPORT_MAX_HOURS = 24;
     public const int INCIDENT_RETENTION_DAYS = 180;
+    public const int REQUEST_LOG_RETENTION_DAYS = 90;
 
     public function __construct(
         private ImageRepository $imageRepo,
         private UserRepository $userRepo,
         private SupportRequestRepository $supportRequestRepo,
         private IncidentRepository $incidentRepo,
+        private NotFoundLogRepository $notFoundLogRepo,
+        private AccessDeniedLogRepository $accessDeniedLogRepo,
+        private RateLimitLogRepository $rateLimitLogRepo,
         private ThreadService $threadService,
         private MeasureLogger $measureLogger,
         private MeasureSettings $measureSettings,
@@ -58,11 +65,12 @@ readonly class CleanupService implements TaskInterface
     public function getDescription(): string
     {
         return sprintf(
-            'Hourly housekeeping. It drops the cache-busting version from image URLs whose image last changed more than 30 days ago, deletes registrations not confirmed within %d days, resolves support threads without activity for %d days, clears expired support email verifications, deletes uploaded import archives left unimported for %d hours, and purges security measure logs past their retention and security incidents that ended more than %d days ago. The run message counts each step.',
+            'Hourly housekeeping. It drops the cache-busting version from image URLs whose image last changed more than 30 days ago, deletes registrations not confirmed within %d days, resolves support threads without activity for %d days, clears expired support email verifications, deletes uploaded import archives left unimported for %d hours, purges security measure logs past their retention and security incidents that ended more than %d days ago, and deletes 404, access-denied and rate-limit log rows older than %d days - a 404 or access-denied row kept as evidence of an incident stays until that incident is purged. The run message counts each step.',
             self::GHOSTED_REGISTRATION_DAYS,
             self::SUPPORT_THREAD_STALE_DAYS,
             self::PENDING_IMPORT_MAX_HOURS,
             self::INCIDENT_RETENTION_DAYS,
+            self::REQUEST_LOG_RETENTION_DAYS,
         );
     }
 
@@ -90,8 +98,11 @@ readonly class CleanupService implements TaskInterface
             $incidentCount = $this->removeExpiredIncidents();
             $this->logger->info('Expired security incidents removed', ['count' => $incidentCount]);
 
+            $requestLogCounts = $this->removeExpiredRequestLogs();
+            $this->logger->info('Expired request logs removed', $requestLogCounts);
+
             $message = sprintf(
-                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d, import_archives: %d, security_measure_logs: %d, security_incidents: %d',
+                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d, import_archives: %d, security_measure_logs: %d, security_incidents: %d, not_found_logs: %d, access_denied_logs: %d, rate_limit_logs: %d',
                 $imageCount,
                 $regCount,
                 $autoResolvedCount,
@@ -99,6 +110,9 @@ readonly class CleanupService implements TaskInterface
                 $importCount,
                 $measureLogCount,
                 $incidentCount,
+                $requestLogCounts['not_found'],
+                $requestLogCounts['access_denied'],
+                $requestLogCounts['rate_limit'],
             );
 
             return new Result(Status::ok, $message);
@@ -115,6 +129,20 @@ readonly class CleanupService implements TaskInterface
     public function removeExpiredIncidents(): int
     {
         return $this->incidentRepo->deleteEndedBefore($this->clock->now()->modify(sprintf('-%d days', self::INCIDENT_RETENTION_DAYS)));
+    }
+
+    /**
+     * @return array{not_found: int, access_denied: int, rate_limit: int}
+     */
+    public function removeExpiredRequestLogs(): array
+    {
+        $cutoff = $this->clock->now()->modify(sprintf('-%d days', self::REQUEST_LOG_RETENTION_DAYS));
+
+        return [
+            'not_found' => $this->notFoundLogRepo->deleteUnlinkedBefore($cutoff),
+            'access_denied' => $this->accessDeniedLogRepo->deleteUnlinkedBefore($cutoff),
+            'rate_limit' => $this->rateLimitLogRepo->deleteBefore($cutoff),
+        ];
     }
 
     public function removeImageCache(): int

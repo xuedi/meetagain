@@ -237,19 +237,18 @@ readonly class ImageService
 
     public function regenerateAllThumbnails(?ImageType $only = null): int
     {
-        $typesByImageId = $this->imageLocationRepo->findTypesPerImageId();
+        return $this->regenerateThumbnailsOf($this->imageRepo->findAll(), $only);
+    }
 
-        $cnt = 0;
-        foreach ($this->imageRepo->findAll() as $image) {
-            foreach ($this->usedTypes($image, $typesByImageId) as $type) {
-                if ($only !== null && $type !== $only) {
-                    continue;
-                }
-                $cnt += $this->createThumbnails($image, $type);
-            }
-        }
+    /**
+     * @return array{created: int, lastImageId: ?int} lastImageId is null once the batch reached the last image
+     */
+    public function regenerateThumbnailsAfter(?int $afterId, int $limit, ?ImageType $only = null): array
+    {
+        $images = $this->imageRepo->findAfterId($afterId, $limit);
+        $lastImageId = $images === [] || count($images) < $limit ? null : (int) $images[array_key_last($images)]->getId();
 
-        return $cnt;
+        return ['created' => $this->regenerateThumbnailsOf($images, $only), 'lastImageId' => $lastImageId];
     }
 
     public function rotateThumbNail(Image $image): void
@@ -439,6 +438,26 @@ readonly class ImageService
         }
 
         return $map;
+    }
+
+    /**
+     * @param iterable<Image> $images
+     */
+    private function regenerateThumbnailsOf(iterable $images, ?ImageType $only): int
+    {
+        $typesByImageId = $this->imageLocationRepo->findTypesPerImageId();
+
+        $cnt = 0;
+        foreach ($images as $image) {
+            foreach ($this->usedTypes($image, $typesByImageId) as $type) {
+                if ($only !== null && $type !== $only) {
+                    continue;
+                }
+                $cnt += $this->createThumbnails($image, $type);
+            }
+        }
+
+        return $cnt;
     }
 
     /**

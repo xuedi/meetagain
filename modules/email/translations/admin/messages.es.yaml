@@ -138,3 +138,9 @@ admin_email_debugging:
     flash_queued: 'Correo de prueba en cola para %recipient%: se enviará en la próxima ejecución de cron'
     flash_blocked: '%recipient% está en la lista de bloqueo de correo, no se puso nada en cola.'
     flash_error: 'Se produjo un error al enviar.'
+admin_email_seed:
+    label: 'Plantillas de correo'
+    description: 'Crea cada plantilla de correo incluida que aún no esté guardada, en cada idioma activado, y deja como están las guardadas. Con «sobrescribir» además restablece cada asunto y cuerpo guardado a la plantilla incluida por defecto - el texto editado en el admin se pierde.'
+    param_overwrite: 'Sobrescribir: restablecer cada plantilla guardada a la predeterminada'
+    fact_stored: 'Plantillas guardadas'
+    fact_shipped: 'Plantillas incluidas'

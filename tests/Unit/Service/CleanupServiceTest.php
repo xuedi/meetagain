@@ -7,8 +7,11 @@ use App\Entity\Image;
 use App\Entity\SupportRequest;
 use App\Entity\User;
 use App\EntityActionDispatcher;
+use App\Repository\AccessDeniedLogRepository;
 use App\Repository\ImageRepository;
 use App\Repository\IncidentRepository;
+use App\Repository\NotFoundLogRepository;
+use App\Repository\RateLimitLogRepository;
 use App\Repository\SupportRequestRepository;
 use App\Repository\UserRepository;
 use App\Service\Security\MeasureLogger;
@@ -44,12 +47,18 @@ class CleanupServiceTest extends TestCase
         ?IncidentRepository $incidentRepo = null,
         ?MeasureLogger $measureLogger = null,
         ?MeasureSettings $measureSettings = null,
+        ?NotFoundLogRepository $notFoundLogRepo = null,
+        ?AccessDeniedLogRepository $accessDeniedLogRepo = null,
+        ?RateLimitLogRepository $rateLimitLogRepo = null,
     ): CleanupService {
         return new CleanupService(
             imageRepo: $imageRepo ?? $this->createStub(ImageRepository::class),
             userRepo: $userRepo ?? $this->createStub(UserRepository::class),
             supportRequestRepo: $supportRequestRepo ?? $this->createStub(SupportRequestRepository::class),
             incidentRepo: $incidentRepo ?? $this->createStub(IncidentRepository::class),
+            notFoundLogRepo: $notFoundLogRepo ?? $this->createStub(NotFoundLogRepository::class),
+            accessDeniedLogRepo: $accessDeniedLogRepo ?? $this->createStub(AccessDeniedLogRepository::class),
+            rateLimitLogRepo: $rateLimitLogRepo ?? $this->createStub(RateLimitLogRepository::class),
             threadService: $threadService ?? $this->createStub(ThreadService::class),
             measureLogger: $measureLogger ?? $this->createStub(MeasureLogger::class),
             measureSettings: $measureSettings ?? $this->createStub(MeasureSettings::class),
@@ -77,6 +86,25 @@ class CleanupServiceTest extends TestCase
 
         // Assert
         static::assertSame(4, $deleted);
+    }
+
+    public function testRemoveExpiredRequestLogsCutsEveryLogAtNinetyDays(): void
+    {
+        // Arrange
+        $cutoff = new DateTimeImmutable('2026-05-21 12:00:00', new DateTimeZone('UTC'));
+        $notFoundLogRepo = $this->createMock(NotFoundLogRepository::class);
+        $notFoundLogRepo->expects($this->once())->method('deleteUnlinkedBefore')->with($cutoff)->willReturn(7);
+        $accessDeniedLogRepo = $this->createMock(AccessDeniedLogRepository::class);
+        $accessDeniedLogRepo->expects($this->once())->method('deleteUnlinkedBefore')->with($cutoff)->willReturn(2);
+        $rateLimitLogRepo = $this->createMock(RateLimitLogRepository::class);
+        $rateLimitLogRepo->expects($this->once())->method('deleteBefore')->with($cutoff)->willReturn(1);
+        $subject = $this->createService(notFoundLogRepo: $notFoundLogRepo, accessDeniedLogRepo: $accessDeniedLogRepo, rateLimitLogRepo: $rateLimitLogRepo);
+
+        // Act
+        $deleted = $subject->removeExpiredRequestLogs();
+
+        // Assert
+        static::assertSame(['not_found' => 7, 'access_denied' => 2, 'rate_limit' => 1], $deleted);
     }
 
     public function testRemoveStaleImportArchivesDeletesUploadsWaitingLongerThanADay(): void
@@ -237,12 +265,15 @@ class CleanupServiceTest extends TestCase
         $measureLogger->method('purgeOlderThan')->willReturn(5);
         $incidentRepo = $this->createStub(IncidentRepository::class);
         $incidentRepo->method('deleteEndedBefore')->willReturn(6);
+        $notFoundLogRepo = $this->createStub(NotFoundLogRepository::class);
+        $notFoundLogRepo->method('deleteUnlinkedBefore')->willReturn(7);
         $subject = $this->createService(
             imageRepo: $imageRepo,
             userRepo: $userRepo,
             supportRequestRepo: $supportRepo,
             incidentRepo: $incidentRepo,
             measureLogger: $measureLogger,
+            notFoundLogRepo: $notFoundLogRepo,
         );
 
         // Act
@@ -251,7 +282,7 @@ class CleanupServiceTest extends TestCase
         // Assert
         static::assertSame(Status::ok, $result->status);
         static::assertSame(
-            'image_cache: 2, registrations: 1, support_threads_auto_resolved: 3, support_email_verifications_expired: 0, import_archives: 0, security_measure_logs: 5, security_incidents: 6',
+            'image_cache: 2, registrations: 1, support_threads_auto_resolved: 3, support_email_verifications_expired: 0, import_archives: 0, security_measure_logs: 5, security_incidents: 6, not_found_logs: 7, access_denied_logs: 0, rate_limit_logs: 0',
             $result->message,
         );
     }

@@ -421,3 +421,9 @@ admin_system_hotfix:
     flash_deferred: '%hotfix% 尚未就绪：%reason%'
     flash_failed: '%hotfix% 运行失败：%reason%'
     empty: '没有已注册的数据修复。'
+admin_system_thumbnails:
+    label: '缺失的缩略图'
+    description: '为每张图片在其每个使用位置补齐缺失的缩略图，在后台工作进程中分小步执行。已有的缩略图保持不变，不会删除任何文件；过时的缩略图由图片页面上的同步功能清除。'
+    param_type: '图片类型'
+    choice_all: '所有图片类型'
+    fact_images: '图片'

@@ -100,35 +100,14 @@ class RateLimitLogRepository extends ServiceEntityRepository
         return array_values($qb->getQuery()->getResult());
     }
 
-    /**
-     * @return list<RateLimitLog>
-     */
-    public function findRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff, int $limit): array
-    {
-        return array_values(
-            $this
-                ->createQueryBuilder('r')
-                ->where('r.id > :lastId')
-                ->andWhere('r.createdAt <= :cutoff')
-                ->orderBy('r.id', 'ASC')
-                ->setParameter('lastId', $lastId)
-                ->setParameter('cutoff', $cutoff)
-                ->setMaxResults($limit)
-                ->getQuery()
-                ->getResult(),
-        );
-    }
-
-    public function countRowsAfterIdUpTo(int $lastId, DateTimeImmutable $cutoff): int
+    public function deleteBefore(DateTimeImmutable $cutoff): int
     {
         return (int) $this
             ->createQueryBuilder('r')
-            ->select('COUNT(r.id)')
-            ->where('r.id > :lastId')
-            ->andWhere('r.createdAt <= :cutoff')
-            ->setParameter('lastId', $lastId)
+            ->delete()
+            ->where('r.createdAt < :cutoff')
             ->setParameter('cutoff', $cutoff)
             ->getQuery()
-            ->getSingleScalarResult();
+            ->execute();
     }
 }

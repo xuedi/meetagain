@@ -12,7 +12,9 @@ use Module\Circulation\Contract\HandoverStatus;
 use Module\Circulation\Contract\PortableHandover;
 use Module\Circulation\Internal\CirculationService;
 use Module\Circulation\Internal\Cron\MaintenanceTask;
+use Module\Circulation\Internal\RebuildAction;
 use Module\Circulation\Tests\Stub\ParticipationProvider;
+use Module\Task\Contract\Status;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -82,7 +84,63 @@ final class MaintenanceTest extends KernelTestCase
 
         // Assert
         self::assertStringContainsString('Rebuilt 1 copies from the ledger.', $tester->getDisplay());
+        self::assertStringContainsString(sprintf('holder %d / available', (int) $this->reader->getId()), $tester->getDisplay());
         self::assertSame($this->donor->getId(), $this->holderOf((int) $copy->getId()));
+    }
+
+    public function testTheMaintenanceActionOffersEveryContextThatHoldsCopies(): void
+    {
+        // Arrange
+        $this->openHandover();
+        $context = self::getContainer()->get(CirculationInterface::class)->contextFor(self::TYPE);
+
+        // Act
+        $parameters = $this->rebuildAction()->getParameters();
+
+        // Assert
+        self::assertSame(['admin_circulation_rebuild.choice_all' => RebuildAction::ALL, $context => $context], $parameters[0]->choices);
+    }
+
+    public function testTheMaintenanceActionReportsADriftedHolderWithoutWriting(): void
+    {
+        // Arrange
+        $copyId = $this->driftedCopy();
+
+        // Act
+        $result = $this->rebuildAction()->run(['context' => RebuildAction::ALL, 'report_only' => true]);
+
+        // Assert
+        self::assertSame(Status::warning, $result->status);
+        self::assertSame(sprintf('1 of 1 copies drifted from the ledger: #%d', $copyId), $result->message);
+        self::assertSame($this->reader->getId(), $this->holderOf($copyId));
+    }
+
+    public function testTheMaintenanceActionRestoresADriftedHolder(): void
+    {
+        // Arrange
+        $copyId = $this->driftedCopy();
+
+        // Act
+        $result = $this->rebuildAction()->run(['context' => RebuildAction::ALL, 'report_only' => false]);
+
+        // Assert
+        self::assertSame(Status::ok, $result->status);
+        self::assertSame(sprintf('Rebuilt 1 of 1 copies from the ledger: #%d', $copyId), $result->message);
+        self::assertSame($this->donor->getId(), $this->holderOf($copyId));
+    }
+
+    private function driftedCopy(): int
+    {
+        $copy = self::getContainer()->get(CirculationService::class)->donate(self::TYPE, self::ITEM, $this->donor, 'blue hardcover');
+        self::getContainer()->get(Connection::class)->update('mod_circulation_copy', ['holder_id' => $this->reader->getId()], ['id' => $copy->getId()]);
+        self::getContainer()->get(EntityManagerInterface::class)->clear();
+
+        return (int) $copy->getId();
+    }
+
+    private function rebuildAction(): RebuildAction
+    {
+        return self::getContainer()->get(RebuildAction::class);
     }
 
     private function openHandover(): int

@@ -20,9 +20,8 @@
                         {% if card and card.image %}
                             <input type="hidden" name="cards[{{ i }}][image][id]" value="{{ card.image.id }}">
                             <input type="hidden" name="cards[{{ i }}][image][hash]" value="{{ card.image.hash }}">
-                            <div class="is-relative mb-2">
-                                <img src="/images/thumbnails/{{ card.image.hash }}_300x200.webp"
-                                     alt="" class="img-fluid-block">
+                            <div class="image mb-2">
+                                <img src="/images/thumbnails/{{ card.image.hash }}_300x200.webp" alt="">
                                 <a href="{{ path('app_admin_cms_card_image_remove', {'blockId': blockId, 'slot': i}) }}"
                                    data-post
                                    data-csrf-token="{{ csrf_token('admin_cms_card_image_remove' ~ blockId ~ '_' ~ i) }}"

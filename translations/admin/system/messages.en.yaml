@@ -421,3 +421,9 @@ admin_system_hotfix:
     flash_deferred: '%hotfix% is not ready yet: %reason%'
     flash_failed: '%hotfix% failed: %reason%'
     empty: 'No hotfixes are registered.'
+admin_system_thumbnails:
+    label: 'Missing thumbnails'
+    description: 'Creates every thumbnail an image is missing, for each place the image is used, in short steps on the workers. Thumbnails that exist are left as they are and nothing is deleted; obsolete thumbnails are removed by the sync on the Images page.'
+    param_type: 'Image type'
+    choice_all: 'All image types'
+    fact_images: 'Images'

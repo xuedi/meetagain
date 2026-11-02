@@ -2,13 +2,7 @@
 
 namespace Module\Email\Internal\Command;
 
-use App\Service\Config\LanguageService;
-use DateTimeImmutable;
-use Doctrine\ORM\EntityManagerInterface;
-use Module\Email\Internal\EmailTemplateService;
-use Module\Email\Internal\Entity\EmailTemplate;
-use Module\Email\Internal\Entity\EmailTemplateTranslation;
-use Module\Email\Internal\Repository\EmailTemplateTranslationRepository;
+use Module\Email\Internal\TemplateSeedAction;
 use Override;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -21,10 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class EmailTemplateSeedCommand extends Command
 {
     public function __construct(
-        private readonly EmailTemplateService $templateService,
-        private readonly EntityManagerInterface $em,
-        private readonly LanguageService $languageService,
-        private readonly EmailTemplateTranslationRepository $translationRepo,
+        private readonly TemplateSeedAction $action,
     ) {
         parent::__construct();
     }
@@ -46,74 +37,22 @@ class EmailTemplateSeedCommand extends Command
             );
         }
 
-        $defaults = $this->templateService->getDefaultTemplates();
-        $languages = $this->languageService->getEnabledCodes();
-
-        $defaultsByLanguage = [];
-        foreach ($languages as $languageCode) {
-            $defaultsByLanguage[$languageCode] = $this->templateService->getDefaultTemplates($languageCode);
+        $seeded = $this->action->seed($overwrite);
+        foreach ($seeded['templates'] as $identifier) {
+            $output->writeln(sprintf('Created template "%s".', $identifier));
+        }
+        foreach ($seeded['translations'] as $translation) {
+            $output->writeln(sprintf('Created translation for %s.', $translation));
+        }
+        foreach ($seeded['overwritten'] as $translation) {
+            $output->writeln(sprintf('Overwrote translation for %s.', $translation));
         }
 
-        $created = 0;
-        $translationsCreated = 0;
-        $translationsOverwritten = 0;
-
-        foreach ($defaults as $identifier => $data) {
-            $template = $this->templateService->getTemplate($identifier);
-
-            if (!$template instanceof EmailTemplate) {
-                $template = new EmailTemplate();
-                $template->setIdentifier($identifier);
-                $template->setAvailableVariables($data['variables']);
-                $template->setUpdatedAt(new DateTimeImmutable());
-
-                $this->em->persist($template);
-                ++$created;
-                $output->writeln(sprintf('Created template "%s".', $identifier));
-            } elseif ($overwrite) {
-                $template->setAvailableVariables($data['variables']);
-                $template->setUpdatedAt(new DateTimeImmutable());
-                $this->em->persist($template);
-            }
-
-            foreach ($languages as $languageCode) {
-                $existingTranslation = $this->translationRepo->findOneBy([
-                    'emailTemplate' => $template->getId(),
-                    'language' => $languageCode,
-                ]);
-
-                if ($existingTranslation !== null && !$overwrite) {
-                    continue;
-                }
-
-                $langData = $defaultsByLanguage[$languageCode][$identifier];
-
-                $translation = $existingTranslation ?? new EmailTemplateTranslation();
-                $translation->setEmailTemplate($template);
-                $translation->setLanguage($languageCode);
-                $translation->setSubject($langData['subject']);
-                $translation->setBody($langData['body']);
-                $translation->setUpdatedAt(new DateTimeImmutable());
-
-                $this->em->persist($translation);
-
-                if ($existingTranslation !== null) {
-                    ++$translationsOverwritten;
-                    $output->writeln(sprintf('Overwrote translation for "%s" (%s).', $identifier, $languageCode));
-                    continue;
-                }
-
-                ++$translationsCreated;
-                $output->writeln(sprintf('Created translation for "%s" (%s).', $identifier, $languageCode));
-            }
-        }
-
-        $this->em->flush();
         $output->writeln(sprintf(
             'Done. Created %d templates, %d translations, overwrote %d translations.',
-            $created,
-            $translationsCreated,
-            $translationsOverwritten,
+            count($seeded['templates']),
+            count($seeded['translations']),
+            count($seeded['overwritten']),
         ));
 
         return Command::SUCCESS;

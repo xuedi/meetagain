@@ -89,11 +89,12 @@ Substitution escapes every value except the variables a `TemplateDefinition` lis
 line breaks of an escaped value as `<br>`. The list is per template: reusing a variable name in another template does
 not make it raw there. Subjects are never escaped.
 
-A stored row must exist before an identifier can be queued. `app:email-templates:seed` creates the missing ones and,
-with `--overwrite`, resets every translation to the shipped default - discarding admin edits; editing a default on
-disk does not otherwise reach an existing install. `TemplatesInterface` adds a newly enabled language to every stored
-template that lacks it, resets one template in every stored language - the call for a data hotfix after a default
-changed its variables - and removes a stored template whose definition is gone.
+A stored row must exist before an identifier can be queued. The seed - the `email-template-seed` action on the
+Maintenance page (`TemplateSeedAction`) or `app:email-templates:seed` - creates the missing ones in every enabled
+language and, with its overwrite flag, resets every translation to the shipped default - discarding admin edits;
+editing a default on disk does not otherwise reach an existing install. `TemplatesInterface` adds a newly enabled
+language to every stored template that lacks it, resets one template in every stored language - the call for a data
+hotfix after a default changed its variables - and removes a stored template whose definition is gone.
 
 ## Scheduled mail is swept, not triggered
 
