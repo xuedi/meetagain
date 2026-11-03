@@ -44,6 +44,10 @@ final class MemberController extends AbstractController
     #[Route('/{page}', name: self::ROUTE_MEMBER)]
     public function index(int $page = 1): Response
     {
+        if (!$this->memberFilterService->isDirectoryAvailable()) {
+            throw $this->createNotFoundException();
+        }
+
         $response = $this->getResponse();
         $offset = ($page - 1) * self::PAGE_SIZE;
         $currentUser = $this->getUser();

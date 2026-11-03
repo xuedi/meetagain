@@ -49,7 +49,7 @@ final readonly class BookCoverImageTypeDefinition extends AbstractImageTypeDefin
         }
 
         return [
-            'label' => sprintf('Book cover: %s', $book->getTitle() ?? ''),
+            'subject' => $book->getTitle(),
             'route' => 'app_plugin_books_book_show',
             'params' => ['id' => $book->getId()],
         ];

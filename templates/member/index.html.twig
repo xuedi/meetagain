@@ -17,7 +17,7 @@
             </div>
 
             {% if pageTotal > 1 %}
-                <nav class="pagination is-centered" role="navigation" aria-label="pagination">
+                <nav class="pagination is-centered" role="navigation" aria-label="{{ 'member.aria_pagination'|trans }}">
                     {% if pageCurrent > 1 %}
                         <a href="{{ path('app_member', {'page': pageCurrent - 1}) }}"
                            class="pagination-previous">{{ 'member.pagination_previous'|trans }}</a>

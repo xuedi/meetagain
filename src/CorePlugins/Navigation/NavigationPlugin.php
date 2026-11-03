@@ -6,6 +6,7 @@ use App\Entity\Link;
 use App\Entity\User;
 use App\Enum\EventTileLocation;
 use App\Enum\WarmCacheType;
+use App\Filter\Member\MemberFilterService;
 use App\Plugin;
 use App\Service\TownHall\AccessService;
 use App\ValueObject\LinkCollection;
@@ -20,6 +21,7 @@ readonly class NavigationPlugin implements Plugin
         private RequestStack $requestStack,
         private Security $security,
         private AccessService $townHallAccess,
+        private MemberFilterService $memberFilterService,
     ) {}
 
     public function getPluginKey(): string
@@ -33,8 +35,11 @@ readonly class NavigationPlugin implements Plugin
 
         $links = [
             new Link(slug: $this->router->generate('app_event', ['_locale' => $locale]), name: 'chrome.menu_events', priority: 100),
-            new Link(slug: $this->router->generate('app_member', ['_locale' => $locale, 'page' => 1]), name: 'chrome.menu_members', priority: 200),
         ];
+
+        if ($this->memberFilterService->isDirectoryAvailable()) {
+            $links[] = new Link(slug: $this->router->generate('app_member', ['_locale' => $locale, 'page' => 1]), name: 'chrome.menu_members', priority: 200);
+        }
 
         if ($this->security->isGranted('ROLE_ORGANIZER')) {
             $links[] = new Link(slug: $this->router->generate('app_admin'), name: 'chrome.menu_admin', priority: 300);

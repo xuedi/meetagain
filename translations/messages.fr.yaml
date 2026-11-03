@@ -4,6 +4,7 @@ ballot_terms:
     mode_approval: "Accepter autant d'options qu'ils le souhaitent"
     mode_single: 'Choisir exactement une'
     button_apply: 'Utiliser ces conditions'
+    aria_close: 'Fermer'
 chrome:
     og_image_default_alt: 'MeetAgain - Là où tout le monde se retrouve'
     menu_login: 'Connexion'
@@ -34,6 +35,9 @@ chrome:
     notification_image_missing_alt: 'Image #%id% sans texte alternatif (%missing% langues)'
     footer_powered_by: 'propulsé par'
     aria_select_language: 'Choisir la langue'
+    aria_main_navigation: 'Navigation principale'
+    aria_menu: 'Menu'
+    aria_close: 'Fermer'
 security:
     page_title_login: 'Connexion'
     headline_login: 'Connexion'
@@ -272,6 +276,7 @@ error:
     500_sidebar_bullet2: 'Si tu veux ajouter du contexte, utilise la page de contact en citant la référence.'
     500_sidebar_bullet3: 'Tu peux retourner à l''accueil et réessayer.'
     500_sidebar_link: 'Retour à l''accueil'
+    alt_404_image: 'Illustration de kirkario.com'
 cms:
     page_title_default: 'Bienvenue'
     page_title_about: 'À propos'
@@ -291,6 +296,7 @@ cms:
     map_consent_link: 'Autoriser la carte dans les paramètres des cookies'
     map_open_osm: 'Ouvrir dans OpenStreetMap'
     map_directions: 'Calculer l''itinéraire'
+    edit_title_remove: 'Retirer'
 member:
     page_title: 'Annuaire des membres'
     page_title_paginated: 'Annuaire des membres - Page %page%'
@@ -313,6 +319,7 @@ member:
     admin_action_verify_user: 'Vérifier l''utilisateur'
     button_report: 'Signaler'
     label_city: 'Ville'
+    aria_pagination: 'Pagination'
 profile:
     page_title: 'Profil'
     section_info: 'Infos'
@@ -346,6 +353,8 @@ profile_config:
     section_privacy: 'Confidentialité'
     section_change_password: 'Changer le mot de passe'
     button_change_password: 'Changer le mot de passe'
+    form_label_old_password: 'Ancien mot de passe'
+    form_label_new_password: 'Nouveau mot de passe'
     section_account_actions: 'Actions du compte'
     section_blocked_users: 'Utilisateurs bloqués'
     toggle_email_notification: 'Activer les notifications par e-mail'
@@ -551,6 +560,7 @@ support:
     verified_body: 'Merci. Nous t''écrirons dès que ta demande de support recevra une réponse.'
     verified_bookmark_hint: 'Pour lire la réponse, ouvre le lien privé que tu as mis en favori en envoyant la demande.'
     form_label_audience: 'Qui doit lire ce message ?'
+    form_label_message: 'Message'
     audience_organizer: 'Les organisateurs'
     audience_organizer_help: 'Tout ce qui concerne les événements, le groupe ou ton adhésion.'
     audience_admin: 'Les administrateurs'
@@ -650,6 +660,8 @@ image_type:
     pluginphotosphoto: 'Photo'
     grouppromotionfacebook: 'Promotion du groupe (Facebook)'
     groupicon: 'Icône du groupe'
+    pluginboardgamesbox: 'Boîte de jeu'
+    location_label: '%type% : %subject%'
 cookie:
     page_title: 'Paramètres des cookies'
     meta_description: 'Gère tes préférences de cookies pour ce site. Contrôle quelles fonctionnalités optionnelles sont activées.'
@@ -772,6 +784,7 @@ town_hall:
     tile_stats_topics: 'Sujets'
     empty_state: 'Rien ici pour le moment.'
     deleted_user: '[utilisateur supprimé]'
+    aria_breadcrumbs: 'Fil d''Ariane'
 item:
     heading: 'Objets'
     attach_heading: 'Attacher un objet'

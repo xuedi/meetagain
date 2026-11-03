@@ -4,6 +4,7 @@ ballot_terms:
     mode_approval: 'Approve as many as they would accept'
     mode_single: 'Pick exactly one'
     button_apply: 'Use these terms'
+    aria_close: 'Close'
 chrome:
     og_image_default_alt: 'MeetAgain - Where everyone meets again'
     menu_login: 'Login'
@@ -34,6 +35,9 @@ chrome:
     notification_image_missing_alt: 'Image #%id% missing alt text (%missing% languages)'
     footer_powered_by: 'powered by'
     aria_select_language: 'Select language'
+    aria_main_navigation: 'Main navigation'
+    aria_menu: 'Menu'
+    aria_close: 'Close'
 security:
     page_title_login: 'Login'
     headline_login: 'Please sign in'
@@ -272,6 +276,7 @@ error:
     500_sidebar_bullet2: 'If you want to add context, use the contact page and quote the reference.'
     500_sidebar_bullet3: 'You can head back to the homepage and try again.'
     500_sidebar_link: 'Back to home'
+    alt_404_image: 'Illustration by kirkario.com'
 cms:
     page_title_default: 'Welcome'
     page_title_about: 'About'
@@ -291,6 +296,7 @@ cms:
     map_consent_link: 'Allow the map in the cookie settings'
     map_open_osm: 'Open in OpenStreetMap'
     map_directions: 'Get directions'
+    edit_title_remove: 'Remove'
 member:
     page_title: 'Member Directory'
     page_title_paginated: 'Member Directory - Page %page%'
@@ -313,6 +319,7 @@ member:
     admin_action_verify_user: 'Verify user'
     button_report: 'Report'
     label_city: 'City'
+    aria_pagination: 'Pagination'
 profile:
     page_title: 'Profile'
     section_info: 'Info'
@@ -346,6 +353,8 @@ profile_config:
     section_privacy: 'Privacy'
     section_change_password: 'Change Password'
     button_change_password: 'Change password'
+    form_label_old_password: 'Old password'
+    form_label_new_password: 'New password'
     section_account_actions: 'Account Actions'
     section_blocked_users: 'Blocked Users'
     toggle_email_notification: 'Enable email notification'
@@ -551,6 +560,7 @@ support:
     verified_body: 'Thank you. We will email you when your support request gets an answer.'
     verified_bookmark_hint: 'To read the answer, open the private link you bookmarked when you sent the request.'
     form_label_audience: 'Who should read this?'
+    form_label_message: 'Message'
     audience_organizer: 'The organizers'
     audience_organizer_help: 'Anything about the events, the group, or your membership.'
     audience_admin: 'The administrators'
@@ -650,6 +660,8 @@ image_type:
     pluginphotosphoto: 'Photo'
     grouppromotionfacebook: 'Group promotion (Facebook)'
     groupicon: 'Group icon'
+    pluginboardgamesbox: 'Board game box'
+    location_label: '%type%: %subject%'
 cookie:
     page_title: 'Cookie Settings'
     meta_description: 'Manage your cookie preferences for this site. Control which optional features are enabled.'
@@ -772,6 +784,7 @@ town_hall:
     tile_stats_topics: 'Topics'
     empty_state: 'Nothing here yet.'
     deleted_user: '[deleted user]'
+    aria_breadcrumbs: 'Breadcrumbs'
 item:
     heading: 'Items'
     attach_heading: 'Attach an item'

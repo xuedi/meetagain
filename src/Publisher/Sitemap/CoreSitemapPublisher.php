@@ -114,6 +114,10 @@ final readonly class CoreSitemapPublisher implements SitemapPublisherInterface
      */
     private function collectMemberPages(array $locales): array
     {
+        if (!$this->memberFilterService->isDirectoryAvailable()) {
+            return [];
+        }
+
         $filterResult = $this->memberFilterService->getUserIdFilter();
         $restrictToUserIds = $filterResult->getUserIds();
 

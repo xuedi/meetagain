@@ -58,6 +58,17 @@ readonly class MemberFilterService
         return true;
     }
 
+    public function isDirectoryAvailable(): bool
+    {
+        foreach ($this->getSortedFilters() as $filter) {
+            if ($filter->isDirectoryAvailable() === false) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     /**
      * @return array<MemberFilterInterface>
      */

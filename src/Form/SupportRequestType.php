@@ -24,6 +24,7 @@ class SupportRequestType extends AbstractType
             'label' => 'support.form_label_audience',
             'constraints' => [new NotBlank()],
         ])->add('message', TextareaType::class, [
+            'label' => 'support.form_label_message',
             'constraints' => [
                 new NotBlank(message: 'support.validator_message_blank'),
                 new Length(max: 2000, maxMessage: 'support.validator_message_max'),

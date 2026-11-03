@@ -46,7 +46,7 @@ final readonly class EventTeaserImageTypeDefinition extends AbstractImageTypeDef
         }
 
         return [
-            'label' => sprintf('Event preview: %s', $event->getTitle('en')),
+            'subject' => $event->getTitle('en'),
             'route' => 'app_admin_event_edit',
             'params' => ['id' => $event->getId()],
         ];

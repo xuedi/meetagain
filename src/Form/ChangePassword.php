@@ -17,9 +17,11 @@ class ChangePassword extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('oldPassword', PasswordType::class, [
+            'label' => 'profile_config.form_label_old_password',
             'mapped' => false,
             'attr' => ['autocomplete' => 'old-password'],
         ])->add('newPassword', PasswordType::class, [
+            'label' => 'profile_config.form_label_new_password',
             'mapped' => false,
             'attr' => ['autocomplete' => 'new-password'],
             'constraints' => [

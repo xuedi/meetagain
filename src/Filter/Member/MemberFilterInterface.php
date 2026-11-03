@@ -24,4 +24,9 @@ interface MemberFilterInterface
      * @return bool|null null = no opinion, true = allow, false = deny
      */
     public function isMemberAccessible(int $userId): ?bool;
+
+    /**
+     * @return bool|null null = no opinion, false = the member list is not offered in this context
+     */
+    public function isDirectoryAvailable(): ?bool;
 }

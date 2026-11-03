@@ -167,7 +167,7 @@ readonly class ImageService
             $this->imageLocationService->addLocation($image->getId(), ImageType::EventUpload, $event->getId());
         }
 
-        return count($files);
+        return count($newImages);
     }
 
     public function removeIfOrphaned(Image $image): bool

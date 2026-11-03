@@ -3,7 +3,6 @@
 namespace Tests\Unit\Command;
 
 use App\Command\InstallSeedCommand;
-use App\Entity\AppState;
 use App\Entity\Config;
 use App\Entity\Language;
 use App\Entity\PronunciationSystem;
@@ -35,7 +34,6 @@ final class InstallSeedCommandTest extends TestCase
         yield 'every language' => [Language::class, 65];
         yield 'every config row including the system user id' => [Config::class, 15];
         yield 'every pronunciation system' => [PronunciationSystem::class, 7];
-        yield 'the four footer column titles' => [AppState::class, 4];
     }
 
     #[DataProvider('seededRowProvider')]
@@ -129,13 +127,7 @@ final class InstallSeedCommandTest extends TestCase
         $application = $this->createStub(Application::class);
         $application->method('find')->willReturn($emailTemplateSeed);
 
-        $command = new InstallSeedCommand(
-            $em,
-            $hasher,
-            $languageService,
-            $this->createStub(CacheItemPoolInterface::class),
-            $this->createStub(CacheItemPoolInterface::class),
-        );
+        $command = new InstallSeedCommand($em, $hasher, $languageService, $this->createStub(CacheItemPoolInterface::class));
         $command->setApplication($application);
 
         return $command;

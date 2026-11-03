@@ -3,6 +3,7 @@
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
+use App\Filter\Member\MemberFilterService;
 use App\Service\Member\BlockingService;
 use App\Service\Member\UserService;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,6 +20,7 @@ final class BlockController extends AbstractController
     public function __construct(
         private readonly BlockingService $blockingService,
         private readonly UserService $userService,
+        private readonly MemberFilterService $memberFilterService,
     ) {}
 
     #[Route('/block/{id}', name: 'app_profile_block_user', methods: ['POST'])]
@@ -36,10 +38,7 @@ final class BlockController extends AbstractController
         if ($currentUser->getId() === $targetUser->getId()) {
             $this->addFlash('warning', 'profile.flash_block_self');
 
-            return $this->redirectToRoute('app_member', [
-                '_locale' => $request->getLocale(),
-                'page' => 1,
-            ]);
+            return $this->redirectAfterBlock($request);
         }
 
         $this->blockingService->block($currentUser, $targetUser);
@@ -57,10 +56,7 @@ final class BlockController extends AbstractController
             ]);
         }
 
-        return $this->redirectToRoute('app_member', [
-            '_locale' => $request->getLocale(),
-            'page' => 1,
-        ]);
+        return $this->redirectAfterBlock($request);
     }
 
     #[Route('/unblock/{id}', name: 'app_profile_unblock_user', methods: ['POST'])]
@@ -97,6 +93,15 @@ final class BlockController extends AbstractController
         return $this->render('profile/blocked.html.twig', [
             'blockedUsers' => $blockedUsers,
         ]);
+    }
+
+    private function redirectAfterBlock(Request $request): Response
+    {
+        if (!$this->memberFilterService->isDirectoryAvailable()) {
+            return $this->redirectToRoute('app_profile_blocked_users', ['_locale' => $request->getLocale()]);
+        }
+
+        return $this->redirectToRoute('app_member', ['_locale' => $request->getLocale(), 'page' => 1]);
     }
 
     private function assertToken(Request $request, string $tokenId): void

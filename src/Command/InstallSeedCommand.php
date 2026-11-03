@@ -2,7 +2,6 @@
 
 namespace App\Command;
 
-use App\Entity\AppState;
 use App\Entity\Config;
 use App\Entity\Language;
 use App\Entity\PronunciationSystem;
@@ -126,21 +125,12 @@ class InstallSeedCommand extends Command
         ['Greek',              'Greeklish',            'mu-sa-kás'],
     ];
 
-    private const array APP_STATE = [
-        'footer_col1_title' => 'Help',
-        'footer_col2_title' => 'Platform',
-        'footer_col3_title' => 'Social',
-        'footer_col4_title' => 'Legal',
-    ];
-
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly UserPasswordHasherInterface $hasher,
         private readonly LanguageService $languageService,
         #[Autowire(service: 'cache.config')]
         private readonly CacheItemPoolInterface $configPool,
-        #[Autowire(service: 'cache.app_state')]
-        private readonly CacheItemPoolInterface $appStatePool,
     ) {
         parent::__construct();
     }
@@ -152,20 +142,17 @@ class InstallSeedCommand extends Command
         $languages = $this->seedLanguages();
         $configRows = $this->seedConfig();
         $pronunciationSystems = $this->seedPronunciationSystems();
-        $appStateRows = $this->seedAppState();
         $this->em->flush();
 
         $this->languageService->invalidateCache();
         $this->configPool->clear();
-        $this->appStatePool->clear();
 
         $output->writeln(sprintf(
-            'Created %d system users, %d languages, %d config rows, %d pronunciation systems and %d app state rows.',
+            'Created %d system users, %d languages, %d config rows and %d pronunciation systems.',
             $users,
             $languages,
             $configRows,
             $pronunciationSystems,
-            $appStateRows,
         ));
 
         return $this->getApplication()->find('app:email-templates:seed')->run(new ArrayInput([]), $output);
@@ -269,23 +256,6 @@ class InstallSeedCommand extends Command
             $system->setExample($example);
 
             $this->em->persist($system);
-            ++$created;
-        }
-
-        return $created;
-    }
-
-    private function seedAppState(): int
-    {
-        $existing = array_map(static fn(AppState $entry): string => $entry->getKeyName(), $this->em->getRepository(AppState::class)->findAll());
-
-        $created = 0;
-        foreach (self::APP_STATE as $key => $value) {
-            if (in_array($key, $existing, true)) {
-                continue;
-            }
-
-            $this->em->persist(new AppState($key, $value, new DateTimeImmutable()));
             ++$created;
         }
 

@@ -4,6 +4,7 @@ ballot_terms:
     mode_approval: 'Aceptar tantas como les valgan'
     mode_single: 'Elegir exactamente una'
     button_apply: 'Usar estas condiciones'
+    aria_close: 'Cerrar'
 chrome:
     og_image_default_alt: 'MeetAgain - Donde todos vuelven a encontrarse'
     menu_login: 'Iniciar sesión'
@@ -34,6 +35,9 @@ chrome:
     notification_image_missing_alt: 'La imagen #%id% no tiene texto alternativo (%missing% idiomas)'
     footer_powered_by: 'desarrollado por'
     aria_select_language: 'Seleccionar idioma'
+    aria_main_navigation: 'Navegación principal'
+    aria_menu: 'Menú'
+    aria_close: 'Cerrar'
 security:
     page_title_login: 'Iniciar sesión'
     headline_login: 'Inicia sesión'
@@ -272,6 +276,7 @@ error:
     500_sidebar_bullet2: 'Si quieres añadir contexto, usa la página de contacto y cita la referencia.'
     500_sidebar_bullet3: 'Puedes volver a la página principal e intentarlo de nuevo.'
     500_sidebar_link: 'Volver al inicio'
+    alt_404_image: 'Ilustración de kirkario.com'
 cms:
     page_title_default: 'Bienvenido'
     page_title_about: 'Acerca de'
@@ -291,6 +296,7 @@ cms:
     map_consent_link: 'Permitir el mapa en la configuración de cookies'
     map_open_osm: 'Abrir en OpenStreetMap'
     map_directions: 'Cómo llegar'
+    edit_title_remove: 'Quitar'
 member:
     page_title: 'Directorio de miembros'
     page_title_paginated: 'Directorio de miembros - Página %page%'
@@ -313,6 +319,7 @@ member:
     admin_action_verify_user: 'Verificar usuario'
     button_report: 'Denunciar'
     label_city: 'Ciudad'
+    aria_pagination: 'Paginación'
 profile:
     page_title: 'Perfil'
     section_info: 'Información'
@@ -346,6 +353,8 @@ profile_config:
     section_privacy: 'Privacidad'
     section_change_password: 'Cambiar contraseña'
     button_change_password: 'Cambiar contraseña'
+    form_label_old_password: 'Contraseña anterior'
+    form_label_new_password: 'Nueva contraseña'
     section_account_actions: 'Acciones de la cuenta'
     section_blocked_users: 'Usuarios bloqueados'
     toggle_email_notification: 'Activar notificaciones por correo electrónico'
@@ -551,6 +560,7 @@ support:
     verified_body: 'Gracias. Te escribiremos cuando tu solicitud de soporte reciba respuesta.'
     verified_bookmark_hint: 'Para leer la respuesta, abre el enlace privado que guardaste al enviar la solicitud.'
     form_label_audience: '¿Quién debería leer esto?'
+    form_label_message: 'Mensaje'
     audience_organizer: 'Los organizadores'
     audience_organizer_help: 'Cualquier cosa sobre los eventos, el grupo o tu membresía.'
     audience_admin: 'Los administradores'
@@ -650,6 +660,8 @@ image_type:
     pluginphotosphoto: 'Foto'
     grouppromotionfacebook: 'Promoción del grupo (Facebook)'
     groupicon: 'Icono del grupo'
+    pluginboardgamesbox: 'Caja del juego'
+    location_label: '%type%: %subject%'
 cookie:
     page_title: 'Configuración de cookies'
     meta_description: 'Gestiona tus preferencias de cookies para este sitio. Controla qué funciones opcionales están activadas.'
@@ -772,6 +784,7 @@ town_hall:
     tile_stats_topics: 'Temas'
     empty_state: 'Aún no hay nada aquí.'
     deleted_user: '[usuario eliminado]'
+    aria_breadcrumbs: 'Ruta de navegación'
 item:
     heading: 'Elementos'
     attach_heading: 'Adjuntar un elemento'

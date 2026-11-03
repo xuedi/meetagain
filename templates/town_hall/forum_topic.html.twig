@@ -46,7 +46,7 @@
 {% endblock %}
 
 {% block forum_main %}
-    <nav class="breadcrumb is-small" aria-label="breadcrumbs">
+    <nav class="breadcrumb is-small" aria-label="{{ 'town_hall.aria_breadcrumbs'|trans }}">
         <ul>
             <li><a href="{{ path('app_townhall_forum', { _locale: app.request.locale }) }}">{{ 'town_hall.forum_page_title'|trans }}</a></li>
             {% for node in breadcrumb %}

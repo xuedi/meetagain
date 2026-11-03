@@ -15,6 +15,7 @@ class PasswordResetType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('email', EmailType::class, [
+            'label' => 'security.label_email',
             'constraints' => [
                 new NotBlank(message: 'security.validator_email_blank'),
                 new Email(message: 'security.validator_email_format'),

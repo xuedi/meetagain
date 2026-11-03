@@ -14,7 +14,7 @@
             <button class="button" aria-haspopup="menu" aria-label="{{ 'chrome.aria_select_language'|trans }}">
                 <span class="icon">
                     <img class="is-flag" src="{{ asset('images/flags/' ~ app.request.locale ~ '.svg') }}" width="32" height="24"
-                         alt="Current locale flag: {{ app.request.locale }}"/>
+                         alt=""/>
                 </span>
                 <span class="icon is-small"><i class="fas fa-angle-down" aria-hidden="true"></i></span>
             </button>
@@ -26,7 +26,7 @@
                         <a class="navbar-item" href="{{ entry.href }}" role="menuitem" hreflang="{{ entry.code }}">
                             <figure class="flag-icon">
                                 <img class="is-flag" src="{{ asset('images/flags/' ~ entry.code ~ '.svg') }}" width="32" height="24"
-                                     alt="Locale flag: {{ entry.code }}"/>
+                                     alt=""/>
                             </figure>
                             <span class="ml-3">
                                 {{ ('language_'~entry.code) | trans({}, "messages", entry.code) }}

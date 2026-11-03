@@ -25,7 +25,7 @@
                                 <a href="{{ path('app_admin_cms_card_image_remove', {'blockId': blockId, 'slot': i}) }}"
                                    data-post
                                    data-csrf-token="{{ csrf_token('admin_cms_card_image_remove' ~ blockId ~ '_' ~ i) }}"
-                                   class="delete is-small has-background-danger overlay-controls" title="Remove"></a>
+                                   class="delete is-small has-background-danger overlay-controls" title="{{ 'cms.edit_title_remove'|trans }}"></a>
                             </div>
                             <a href="#"
                                class="button is-small is-fullwidth modalTrigger"
