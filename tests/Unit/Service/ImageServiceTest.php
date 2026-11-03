@@ -774,7 +774,7 @@ class ImageServiceTest extends TestCase
         ];
     }
 
-    public function testUploadForEventReturnsFileCountAndRegistersLocations(): void
+    public function testUploadForEventReturnsStoredImageCountAndRegistersLocations(): void
     {
         // Arrange
         $imageRepo = $this->createStub(ImageRepository::class);

@@ -172,15 +172,18 @@ final class ImageUploadController extends AbstractController
 
         $form = $this->createForm(EventUploadType::class);
         $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $files = $form->get('files')->getData();
-            $count = $this->imageService->uploadForEvent($event, $files, $user);
+        $files = $form->isSubmitted() && $form->isValid() ? $form->get('files')->getData() ?? [] : [];
+        $count = $files === [] ? 0 : $this->imageService->uploadForEvent($event, $files, $user);
+        if ($count === 0) {
+            $this->addFlash('error', 'profile_image.flash_upload_error');
 
-            $this->activityService->log(EventImageUploaded::TYPE, $user, [
-                'event_id' => $event->getId(),
-                'images' => $count,
-            ]);
+            return $this->redirectToRoute('app_event_details', ['id' => $id]);
         }
+
+        $this->activityService->log(EventImageUploaded::TYPE, $user, [
+            'event_id' => $event->getId(),
+            'images' => $count,
+        ]);
 
         return $this->redirectToRoute('app_event_details', ['id' => $id]);
     }
