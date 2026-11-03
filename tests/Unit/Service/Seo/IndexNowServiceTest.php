@@ -4,6 +4,7 @@ namespace Tests\Unit\Service\Seo;
 
 use App\Entity\Cms;
 use App\Entity\Event;
+use App\Filter\Member\MemberFilterService;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\Service\AppStateService;
@@ -29,7 +30,10 @@ class IndexNowServiceTest extends TestCase
         ?EventRepository $eventRepository = null,
         ?CmsRepository $cmsRepository = null,
         ?LoggerInterface $logger = null,
+        bool $directoryAvailable = true,
     ): IndexNowService {
+        $memberFilterStub = $this->createStub(MemberFilterService::class);
+        $memberFilterStub->method('isDirectoryAvailable')->willReturn($directoryAvailable);
         $configStub = $configService ?? $this->createStub(ConfigService::class);
         $languageStub = $languageService ?? $this->createStub(LanguageService::class);
         $languageStub->method('getFilteredDefaultLocale')->willReturn('en');
@@ -43,6 +47,7 @@ class IndexNowServiceTest extends TestCase
             eventRepository: $eventRepository ?? $this->createStub(EventRepository::class),
             cmsRepository: $cmsRepository ?? $this->createStub(CmsRepository::class),
             logger: $logger ?? new NullLogger(),
+            memberFilterService: $memberFilterStub,
         );
     }
 
@@ -163,6 +168,21 @@ class IndexNowServiceTest extends TestCase
         static::assertContains('https://example.com/en/about', $urls);
         static::assertContains('https://example.com/en/events/42', $urls);
         static::assertCount(5, $urls);
+    }
+
+    public function testGetUrlListOmitsMemberDirectoryWhenUnavailable(): void
+    {
+        // Arrange
+        $urlGeneratorStub = $this->createStub(UrlGeneratorInterface::class);
+        $urlGeneratorStub->method('generate')->willReturnCallback(static fn(string $route): string => 'https://example.com/' . $route);
+
+        $service = $this->makeService(urlGenerator: $urlGeneratorStub, directoryAvailable: false);
+
+        // Act
+        $urls = $service->getUrlList();
+
+        // Assert
+        static::assertSame(['https://example.com/app_default', 'https://example.com/app_event'], $urls);
     }
 
     public function testGetUrlListSkipsCmsPageWithNullSlug(): void

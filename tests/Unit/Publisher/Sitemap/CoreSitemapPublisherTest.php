@@ -126,6 +126,26 @@ class CoreSitemapPublisherTest extends TestCase
         self::assertEmpty($memberUrls);
     }
 
+    public function testEmitsNoMemberPagesWhenDirectoryUnavailable(): void
+    {
+        // Arrange
+        $publisher = $this->makePublisher(
+            locales: ['en'],
+            cmsPages: [],
+            events: [],
+            cmsFilter: CmsFilterResult::noFilter(),
+            memberCount: 60,
+            directoryAvailable: false,
+        );
+
+        // Act
+        $urls = $publisher->getSitemapUrls();
+        $memberUrls = array_filter($urls, static fn($u) => str_contains($u->loc, 'app_member'));
+
+        // Assert
+        self::assertEmpty($memberUrls);
+    }
+
     public function testCapsMemberPaginationAtFifty(): void
     {
         // Arrange
@@ -498,6 +518,7 @@ class CoreSitemapPublisherTest extends TestCase
         ?array $allowedLocalesByEventId = null,
         array $markers = [],
         array $foreignOwnedRoutes = [],
+        bool $directoryAvailable = true,
     ): CoreSitemapPublisher {
         $eventRepo = $this->createStub(EventRepository::class);
         $eventRepo->method('findForSitemap')->willReturn($events);
@@ -533,6 +554,7 @@ class CoreSitemapPublisherTest extends TestCase
 
         $memberFilterService = $this->createStub(MemberFilterService::class);
         $memberFilterService->method('getUserIdFilter')->willReturn(MemberFilterResult::noFilter());
+        $memberFilterService->method('isDirectoryAvailable')->willReturn($directoryAvailable);
 
         $eventFilterService = $this->createStub(EventFilterService::class);
         $eventFilterService->method('getAccessibleEventIds')->willReturnCallback(static fn(array $ids) => $accessibleEventIds === null

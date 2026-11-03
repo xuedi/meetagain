@@ -3,6 +3,7 @@
 namespace App\Publisher\WellKnown\LlmsTxt;
 
 use App\Filter\Cms\CmsFilterService;
+use App\Filter\Member\MemberFilterService;
 use App\Repository\CmsRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -13,6 +14,7 @@ final readonly class SectionBuilder
         private CmsRepository $cmsRepository,
         private CmsFilterService $cmsFilterService,
         private UrlGeneratorInterface $urlGenerator,
+        private MemberFilterService $memberFilterService,
     ) {}
 
     /**
@@ -20,14 +22,20 @@ final readonly class SectionBuilder
      */
     public function build(Request $request, string $locale): array
     {
-        return [
+        $sections = [
             new Section('Events', [
                 new Link('Upcoming events', $this->generate('app_event', $locale)),
                 new Link('Featured events', $this->generate('app_event_featured', $locale)),
             ]),
-            new Section('Members', [
+        ];
+        if ($this->memberFilterService->isDirectoryAvailable()) {
+            $sections[] = new Section('Members', [
                 new Link('Member directory', $this->generate('app_member', $locale)),
-            ]),
+            ]);
+        }
+
+        return [
+            ...$sections,
             new Section('Pages', $this->collectCmsLinks($locale)),
             new Section('Optional', [
                 new Link('Sitemap', $request->getSchemeAndHttpHost() . '/sitemap.xml'),

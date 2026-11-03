@@ -2,6 +2,7 @@
 
 namespace App\Service\Seo;
 
+use App\Filter\Member\MemberFilterService;
 use App\Repository\CmsRepository;
 use App\Repository\EventRepository;
 use App\Service\AppStateService;
@@ -32,6 +33,7 @@ readonly class IndexNowService
         private EventRepository $eventRepository,
         private CmsRepository $cmsRepository,
         private LoggerInterface $logger,
+        private MemberFilterService $memberFilterService,
     ) {}
 
     public function getOrCreateKey(): string
@@ -57,8 +59,10 @@ readonly class IndexNowService
         $staticRoutes = [
             ['route' => 'app_default', 'params' => []],
             ['route' => 'app_event', 'params' => []],
-            ['route' => 'app_member', 'params' => ['page' => 1]],
         ];
+        if ($this->memberFilterService->isDirectoryAvailable()) {
+            $staticRoutes[] = ['route' => 'app_member', 'params' => ['page' => 1]];
+        }
 
         foreach ($staticRoutes as $route) {
             $urls[] = $this->urlGenerator->generate($route['route'], ['_locale' => $defaultLocale, ...$route['params']], UrlGeneratorInterface::ABSOLUTE_URL);
