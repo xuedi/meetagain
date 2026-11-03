@@ -46,7 +46,7 @@ final readonly class ProfilePictureImageTypeDefinition extends AbstractImageType
         }
 
         return [
-            'label' => sprintf('Profile picture: %s', $user->getName()),
+            'subject' => $user->getName(),
             'route' => 'app_admin_member_edit',
             'params' => ['id' => $user->getId()],
         ];

@@ -67,7 +67,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
 
         $definition = new ProfilePictureImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $userRepo);
 
-        static::assertSame(['label' => 'Profile picture: Alice', 'route' => 'app_admin_member_edit', 'params' => ['id' => 3]], $definition->locate($image));
+        static::assertSame(['subject' => 'Alice', 'route' => 'app_admin_member_edit', 'params' => ['id' => 3]], $definition->locate($image));
     }
 
     public function testProfilePictureLocateReturnsNullWhenNoUser(): void
@@ -115,7 +115,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
         $definition = new EventTeaserImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $eventRepo);
 
         $result = $definition->locate($this->createStub(Image::class));
-        static::assertSame('Event preview: Go Tournament', $result['label']);
+        static::assertSame('Go Tournament', $result['subject']);
         static::assertSame('app_admin_event_edit', $result['route']);
         static::assertSame(['id' => 11], $result['params']);
     }
@@ -155,7 +155,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
         $definition = new EventUploadImageTypeDefinition($this->repo(), $this->createStub(Connection::class));
 
         $result = $definition->locate($image);
-        static::assertSame('Event upload: Summer Party', $result['label']);
+        static::assertSame('Summer Party', $result['subject']);
         static::assertSame('app_admin_event_edit', $result['route']);
         static::assertSame(['id' => 7], $result['params']);
     }
@@ -203,7 +203,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
         $definition = new CmsBlockImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $cmsBlockRepo);
 
         $result = $definition->locate($this->createStub(Image::class));
-        static::assertSame('CMS block on page #4', $result['label']);
+        static::assertSame('#4', $result['subject']);
         static::assertSame('app_admin_cms_edit', $result['route']);
         static::assertSame(['id' => 4], $result['params']);
     }
@@ -270,7 +270,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
         $definition = new SiteLogoImageTypeDefinition($this->repo(), $conn);
 
         static::assertSame([['imageId' => 42, 'locationId' => 0]], $definition->discoverImageIds());
-        static::assertSame(['label' => 'Site logo', 'route' => 'app_admin_system_theme', 'params' => []], $definition->locate($image));
+        static::assertSame(['subject' => null, 'route' => 'app_admin_system_theme', 'params' => []], $definition->locate($image));
     }
 
     public function testSiteLogoLocateReturnsNullForNonConfiguredImage(): void

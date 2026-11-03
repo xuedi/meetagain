@@ -15,7 +15,7 @@ trait ResolvesCmsBlockLocation
         }
 
         return [
-            'label' => sprintf('CMS block on page #%d', $block->getPage()->getId()),
+            'subject' => sprintf('#%d', $block->getPage()->getId()),
             'route' => 'app_admin_cms_edit',
             'params' => ['id' => $block->getPage()->getId()],
         ];

@@ -62,7 +62,7 @@ final readonly class DishPreviewImageTypeDefinition extends AbstractImageTypeDef
         }
 
         return [
-            'label' => sprintf('Dish: %s', $dish->getAnyTranslatedName()),
+            'subject' => $dish->getAnyTranslatedName(),
             'route' => 'app_plugin_dishes_dish_show',
             'params' => ['id' => $dish->getId()],
         ];

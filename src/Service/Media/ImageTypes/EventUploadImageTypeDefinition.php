@@ -35,7 +35,7 @@ final readonly class EventUploadImageTypeDefinition extends AbstractImageTypeDef
         }
 
         return [
-            'label' => sprintf('Event upload: %s', $event->getTitle('en')),
+            'subject' => $event->getTitle('en'),
             'route' => 'app_admin_event_edit',
             'params' => ['id' => $event->getId()],
         ];

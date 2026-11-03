@@ -4,6 +4,7 @@ ballot_terms:
     mode_approval: 'So viele annehmen, wie sie akzeptieren würden'
     mode_single: 'Genau eines wählen'
     button_apply: 'Diese Bedingungen übernehmen'
+    aria_close: 'Schließen'
 chrome:
     og_image_default_alt: 'MeetAgain - Wo sich alle wiedersehen'
     menu_login: 'Anmelden'
@@ -34,6 +35,9 @@ chrome:
     notification_image_missing_alt: 'Bild #%id% ohne Alt-Text (%missing% Sprachen)'
     footer_powered_by: 'läuft mit'
     aria_select_language: 'Sprache auswählen'
+    aria_main_navigation: 'Hauptnavigation'
+    aria_menu: 'Menü'
+    aria_close: 'Schließen'
 security:
     page_title_login: 'Login'
     headline_login: 'Anmeldung'
@@ -272,6 +276,7 @@ error:
     500_sidebar_bullet2: 'Wenn du Kontext hinzufügen möchtest, nutze die Kontaktseite und gib die Referenz an.'
     500_sidebar_bullet3: 'Du kannst zur Startseite zurückkehren und es erneut versuchen.'
     500_sidebar_link: 'Zurück zur Startseite'
+    alt_404_image: 'Illustration von kirkario.com'
 cms:
     page_title_default: 'Willkommen'
     page_title_about: 'Über uns'
@@ -291,6 +296,7 @@ cms:
     map_consent_link: 'Karte in den Cookie-Einstellungen erlauben'
     map_open_osm: 'In OpenStreetMap öffnen'
     map_directions: 'Route berechnen'
+    edit_title_remove: 'Entfernen'
 member:
     page_title: 'Mitgliederverzeichnis'
     page_title_paginated: 'Mitgliederverzeichnis - Seite %page%'
@@ -313,6 +319,7 @@ member:
     admin_action_verify_user: 'Nutzer verifizieren'
     button_report: 'Melden'
     label_city: 'Stadt'
+    aria_pagination: 'Seitennavigation'
 profile:
     page_title: 'Profil'
     section_info: 'Info'
@@ -346,6 +353,8 @@ profile_config:
     section_privacy: 'Privatsphäre'
     section_change_password: 'Passwort ändern'
     button_change_password: 'Passwort ändern'
+    form_label_old_password: 'Altes Passwort'
+    form_label_new_password: 'Neues Passwort'
     section_account_actions: 'Kontoaktionen'
     section_blocked_users: 'Blockierte Nutzer'
     toggle_email_notification: 'E-Mail-Benachrichtigungen aktivieren'
@@ -551,6 +560,7 @@ support:
     verified_body: 'Danke. Wir schreiben dir, sobald deine Supportanfrage beantwortet ist.'
     verified_bookmark_hint: 'Die Antwort liest du über den privaten Link, den du beim Absenden als Lesezeichen gespeichert hast.'
     form_label_audience: 'Wer soll das lesen?'
+    form_label_message: 'Nachricht'
     audience_organizer: 'Die Organisatoren'
     audience_organizer_help: 'Alles zu den Events, zur Gruppe oder zu deiner Mitgliedschaft.'
     audience_admin: 'Die Administratoren'
@@ -650,6 +660,8 @@ image_type:
     pluginphotosphoto: 'Foto'
     grouppromotionfacebook: 'Gruppen-Werbebild (Facebook)'
     groupicon: 'Gruppen-Icon'
+    pluginboardgamesbox: 'Spielschachtel'
+    location_label: '%type%: %subject%'
 cookie:
     page_title: 'Cookie-Einstellungen'
     meta_description: 'Verwalte deine Cookie-Einstellungen. Lege fest, welche optionalen Funktionen aktiviert sind.'
@@ -762,6 +774,7 @@ town_hall:
     tile_stats_topics: 'Themen'
     empty_state: 'Hier ist noch nichts.'
     deleted_user: '[gelöschter Benutzer]'
+    aria_breadcrumbs: 'Pfadnavigation'
 item:
     heading: 'Objekte'
     attach_heading: 'Objekt hinzufügen'

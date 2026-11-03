@@ -8,6 +8,7 @@ use App\Enum\ImageType;
 use App\Repository\ImageLocationRepository;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 
 readonly class ImageLocationService
@@ -17,6 +18,7 @@ readonly class ImageLocationService
         private ImageTypeRegistry $registry,
         private ImageAltStatusCache $imageAltStatusCache,
         private LoggerInterface $logger,
+        private TranslatorInterface $translator,
     ) {}
 
     /**
@@ -75,6 +77,18 @@ readonly class ImageLocationService
      */
     public function locate(Image $image): ?array
     {
-        return $this->registry->get($image->getType())->locate($image);
+        $location = $this->registry->get($image->getType())->locate($image);
+        if ($location === null) {
+            return null;
+        }
+
+        $type = $this->translator->trans('image_type.' . strtolower($image->getType()->name));
+        $subject = (string) $location['subject'];
+
+        return [
+            'label' => $subject === '' ? $type : $this->translator->trans('image_type.location_label', ['%type%' => $type, '%subject%' => $subject]),
+            'route' => $location['route'],
+            'params' => $location['params'],
+        ];
     }
 }

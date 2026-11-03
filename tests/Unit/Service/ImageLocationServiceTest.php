@@ -10,9 +10,11 @@ use App\Service\Media\ImageAltStatusCache;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageTypes\ImageTypeDefinitionInterface;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ImageLocationServiceTest extends TestCase
 {
@@ -21,12 +23,14 @@ class ImageLocationServiceTest extends TestCase
         ?ImageTypeRegistry $registry = null,
         ?LoggerInterface $logger = null,
         ?ImageAltStatusCache $statusCache = null,
+        ?TranslatorInterface $translator = null,
     ): ImageLocationService {
         return new ImageLocationService(
             locationRepository: $locationRepo ?? $this->createStub(ImageLocationRepository::class),
             registry: $registry ?? $this->createStub(ImageTypeRegistry::class),
             imageAltStatusCache: $statusCache ?? $this->createStub(ImageAltStatusCache::class),
             logger: $logger ?? $this->createStub(LoggerInterface::class),
+            translator: $translator ?? $this->createStub(TranslatorInterface::class),
         );
     }
 
@@ -180,25 +184,42 @@ class ImageLocationServiceTest extends TestCase
         static::assertNull($service->resolveEditLink($location));
     }
 
-    public function testLocateDelegatesToDefinition(): void
+    /** @return iterable<string, array{string|null, string}> */
+    public static function locationLabelProvider(): iterable
+    {
+        yield 'a subject is joined to the translated type' => ['Alice', '头像：Alice'];
+        yield 'no subject leaves the translated type alone' => [null, '头像'];
+    }
+
+    #[DataProvider('locationLabelProvider')]
+    public function testLocateTranslatesTheTypeAndJoinsTheSubject(?string $subject, string $expectedLabel): void
     {
         // Arrange
         $image = $this->createStub(Image::class);
         $image->method('getType')->willReturn(ImageType::ProfilePicture);
 
         $definition = $this->createStub(ImageTypeDefinitionInterface::class);
-        $definition->method('locate')->willReturn(['label' => 'Profile picture: Alice', 'route' => 'app_admin_member_edit', 'params' => ['id' => 3]]);
+        $definition->method('locate')->willReturn(['subject' => $subject, 'route' => 'app_admin_member_edit', 'params' => ['id' => 3]]);
 
         $registry = $this->createStub(ImageTypeRegistry::class);
         $registry->method('get')->willReturn($definition);
 
-        $service = $this->createService(registry: $registry);
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator
+            ->method('trans')
+            ->willReturnCallback(static fn(string $key, array $params = []): string => match ($key) {
+                'image_type.profilepicture' => '头像',
+                'image_type.location_label' => $params['%type%'] . '：' . $params['%subject%'],
+                default => $key,
+            });
+
+        $service = $this->createService(registry: $registry, translator: $translator);
 
         // Act
         $result = $service->locate($image);
 
         // Assert
-        static::assertSame(['label' => 'Profile picture: Alice', 'route' => 'app_admin_member_edit', 'params' => ['id' => 3]], $result);
+        static::assertSame(['label' => $expectedLabel, 'route' => 'app_admin_member_edit', 'params' => ['id' => 3]], $result);
     }
 
     public function testLocateReturnsNullWhenDefinitionCannotResolve(): void

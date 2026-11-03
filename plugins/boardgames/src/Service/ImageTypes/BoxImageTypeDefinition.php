@@ -49,7 +49,7 @@ final readonly class BoxImageTypeDefinition extends AbstractImageTypeDefinition
         }
 
         return [
-            'label' => sprintf('Board game box: %s', $game->getName() ?? ''),
+            'subject' => $game->getName(),
             'route' => 'app_plugin_boardgames_game_show',
             'params' => ['id' => $game->getId()],
         ];

@@ -55,7 +55,7 @@ final readonly class FilmPosterImageTypeDefinition extends AbstractImageTypeDefi
         }
 
         return [
-            'label' => sprintf('Film poster: %s', $film->getTitle() ?? ''),
+            'subject' => $film->getTitle(),
             'route' => 'app_plugin_films_film_show',
             'params' => ['id' => $film->getId()],
         ];

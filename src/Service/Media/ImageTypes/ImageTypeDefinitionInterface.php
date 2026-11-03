@@ -50,10 +50,10 @@ interface ImageTypeDefinitionInterface
     public function getEditLink(int $locationId): ?array;
 
     /**
-     * A human-readable label plus an optional admin route and params describing where an image is
-     * used, or null when the usage cannot be resolved.
+     * The entity an image is used on (a member name, an event title; null when the type alone says it)
+     * plus an optional admin route and params, or null when the usage cannot be resolved.
      *
-     * @return array{label: string, route: string|null, params: array<string, mixed>}|null
+     * @return array{subject: string|null, route: string|null, params: array<string, mixed>}|null
      */
     public function locate(Image $image): ?array;
 }

@@ -41,7 +41,7 @@ final readonly class WebsiteImageImageTypeDefinition extends AbstractImageTypeDe
         }
 
         return [
-            'label' => 'Website image',
+            'subject' => null,
             'route' => 'app_admin_system_config',
             'params' => [],
         ];

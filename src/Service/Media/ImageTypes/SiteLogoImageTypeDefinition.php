@@ -47,7 +47,7 @@ final readonly class SiteLogoImageTypeDefinition extends AbstractImageTypeDefini
         }
 
         return [
-            'label' => 'Site logo',
+            'subject' => null,
             'route' => 'app_admin_system_theme',
             'params' => [],
         ];

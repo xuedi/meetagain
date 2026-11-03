@@ -46,7 +46,7 @@ final readonly class PhotoImageTypeDefinition extends AbstractImageTypeDefinitio
         $title = $photo->getAnyTranslatedTitle();
 
         return [
-            'label' => sprintf('Photo: %s', $title !== '' ? $title : '#' . $photo->getId()),
+            'subject' => $title !== '' ? $title : '#' . $photo->getId(),
             'route' => 'app_plugin_photos_photo_show',
             'params' => ['id' => $photo->getId()],
         ];

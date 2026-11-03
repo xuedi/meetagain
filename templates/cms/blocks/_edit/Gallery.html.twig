@@ -18,7 +18,7 @@
                         <a href="{{ path('app_admin_cms_gallery_remove', {'blockId': blockId, 'imageId': item.id}) }}"
                            data-post
                            data-csrf-token="{{ csrf_token('admin_cms_gallery_remove' ~ blockId ~ '_' ~ item.id) }}"
-                           class="delete is-medium has-background-danger overlay-controls" title="Remove"></a>
+                           class="delete is-medium has-background-danger overlay-controls" title="{{ 'cms.edit_title_remove'|trans }}"></a>
                     </div>
                 </div>
             {% endfor %}

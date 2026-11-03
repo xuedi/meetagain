@@ -43,5 +43,5 @@
     {% endif %}
     <img src="/images/thumbnails/{{ file }}" alt="{{ alt|default(image.getAltFor(app.locale)|default('')) }}"{% if size starts with 'h' %} height="{{ size|slice(1) }}"{% elseif size starts with 'w' %} width="{{ size|slice(1) }}"{% else %} width="{{ size|split('x')[0] }}" height="{{ size|split('x')[1] }}"{% endif %} />
 {% else %}
-    <img src="{{ asset('images/default_' ~ size ~ '.png') }}" alt="Placeholder IMAGE"/>
+    <img src="{{ asset('images/default_' ~ size ~ '.png') }}" alt=""/>
 {% endif %}
