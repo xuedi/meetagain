@@ -26,7 +26,7 @@ pub struct Signals {
     pub email_failed: Option<f64>,
     pub email_oldest: Option<f64>,
     pub opcache_restarts: Option<f64>,
-    pub opcache_hit_min: Option<f64>,
+    pub opcache_hit_p5: Option<f64>,
     pub opcache_wasted_ratio: Option<f64>,
     pub valkey_evicted: Option<f64>,
     pub valkey_hit: Option<f64>,
@@ -157,10 +157,10 @@ pub fn evaluate(s: &Signals, t: &Thresholds) -> Vec<Issue> {
             ),
         );
     }
-    if let Some(hit) = s.opcache_hit_min.filter(|h| *h < 95.0) {
+    if let Some(hit) = s.opcache_hit_p5.filter(|h| *h < 95.0) {
         add(
             Severity::Warn,
-            format!("OPcache hit rate fell to {}%", num(hit)),
+            format!("OPcache hit rate fell to {}% in 5% of samples", num(hit)),
         );
     }
     if let Some(wasted) = s.opcache_wasted_ratio.filter(|w| *w > 0.1) {
@@ -229,8 +229,8 @@ pub fn run(ctx: &Context, since: &str) -> Result<String, String> {
         ("email_failed", "max(last_over_time(email_queue_failed_24h{$S}[$W]))".into()),
         ("email_oldest", "max(max_over_time(email_queue_oldest_pending_age_s{$S}[$W]))".into()),
         ("opcache_restarts", "sum(increase(php_runtime_opcache_restarts{$S}[$W]))".into()),
-        ("opcache_hit", "min(min_over_time(php_runtime_opcache_hit_rate{$S}[$W]))".into()),
-        ("opcache_wasted", "max(max_over_time((php_runtime_opcache_wasted_mb{$S} / (php_runtime_opcache_used_mb{$S} + php_runtime_opcache_free_mb{$S} + php_runtime_opcache_wasted_mb{$S}))[$W:]))".into()),
+        ("opcache_hit", "min(quantile_over_time(0.05, php_runtime_opcache_hit_rate{$S}[$W]))".into()),
+        ("opcache_wasted", "max(max_over_time((php_runtime_opcache_wasted_mb{$S} / ((php_runtime_opcache_used_mb{$S} + php_runtime_opcache_free_mb{$S} + php_runtime_opcache_wasted_mb{$S}) > 1))[$W:]))".into()),
         ("valkey_evicted", "sum(increase(valkey_evicted_keys{$S}[$W]))".into()),
         ("valkey_hit", "sum(increase(valkey_keyspace_hits{$S}[$W])) / (sum(increase(valkey_keyspace_hits{$S}[$W])) + sum(increase(valkey_keyspace_misses{$S}[$W])))".into()),
         ("slow", "sum(increase(database_slow_queries{$S}[$W]))".into()),
@@ -266,7 +266,7 @@ pub fn run(ctx: &Context, since: &str) -> Result<String, String> {
         email_failed: v("email_failed"),
         email_oldest: v("email_oldest"),
         opcache_restarts: v("opcache_restarts"),
-        opcache_hit_min: v("opcache_hit"),
+        opcache_hit_p5: v("opcache_hit"),
         opcache_wasted_ratio: v("opcache_wasted"),
         valkey_evicted: v("valkey_evicted"),
         valkey_hit: v("valkey_hit"),
