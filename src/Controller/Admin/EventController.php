@@ -73,14 +73,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 #[IsGranted('ROLE_ORGANIZER')]
 final class EventController extends AbstractController implements AdminNavigationInterface
 {
-    private const string DEFAULT_RANGE = 'all';
+    private const string DEFAULT_TIME = 'upcoming';
+    private const string TIME_PAST = 'past';
+    private const string TIME_ALL = 'all';
 
-    /** @var array<string, string|null> Forward window applied to the event start; null means no limit. */
-    private const array RANGE_OFFSETS = [
-        'all' => null,
-        '1y' => '+1 year',
-        '1m' => '+1 month',
-        '1w' => '+1 week',
+    /** @var array<string, string|null> Upcoming options and the forward window each applies to the event start. */
+    private const array UPCOMING_WINDOWS = [
+        'upcoming' => null,
+        'week' => '+1 week',
+        'month' => '+1 month',
+        'year' => '+1 year',
     ];
 
     public function __construct(
@@ -159,18 +161,21 @@ final class EventController extends AbstractController implements AdminNavigatio
         $eventIds = $filterResult->getEventIds();
         $allEvents = $this->eventService->findAllForAdmin($eventIds);
 
-        $range = $request->query->getString('range', self::DEFAULT_RANGE);
-        if (!array_key_exists($range, self::RANGE_OFFSETS)) {
-            $range = self::DEFAULT_RANGE;
+        $now = new DateTimeImmutable();
+        $time = $request->query->getString('time', self::DEFAULT_TIME);
+        if (!in_array($time, $this->timeOptions(), true)) {
+            $time = self::DEFAULT_TIME;
         }
-        $until = $this->rangeUntil($range);
         $typeFilter = $request->query->getInt('type') ?: null;
         $scheduleFilter = $request->query->getString('schedule');
         if (!in_array($scheduleFilter, ['onetime', 'series'], true)) {
             $scheduleFilter = 'all';
         }
 
-        $events = array_values(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, $typeFilter, $scheduleFilter)));
+        $events = array_values(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $now, $time, $typeFilter, $scheduleFilter)));
+        if ($time === self::TIME_PAST) {
+            $events = array_reverse($events);
+        }
 
         $canceledCount = 0;
         foreach ($events as $event) {
@@ -199,9 +204,9 @@ final class EventController extends AbstractController implements AdminNavigatio
         }
 
         $actions = [
-            $this->buildRangeDropdown($allEvents, $range, $typeFilter, $scheduleFilter),
-            $this->buildTypeDropdown($allEvents, $until, $range, $typeFilter, $scheduleFilter),
-            $this->buildScheduleDropdown($allEvents, $until, $range, $typeFilter, $scheduleFilter),
+            $this->buildTimeDropdown($allEvents, $now, $time, $typeFilter, $scheduleFilter),
+            $this->buildTypeDropdown($allEvents, $now, $time, $typeFilter, $scheduleFilter),
+            $this->buildScheduleDropdown($allEvents, $now, $time, $typeFilter, $scheduleFilter),
             new AdminTopActionButton(
                 label: $this->translator->trans('admin_event.page_title_new'),
                 target: $this->generateUrl('app_admin_event_add'),
@@ -548,9 +553,9 @@ final class EventController extends AbstractController implements AdminNavigatio
         ];
     }
 
-    private function matchesFilters(Event $e, ?DateTimeImmutable $until, ?int $typeFilter, string $scheduleFilter): bool
+    private function matchesFilters(Event $e, DateTimeImmutable $now, string $time, ?int $typeFilter, string $scheduleFilter): bool
     {
-        if ($until !== null && $e->getStart() > $until) {
+        if (!$this->matchesTime($e, $now, $time)) {
             return false;
         }
         if ($typeFilter !== null && $e->getType()?->value !== $typeFilter) {
@@ -566,14 +571,38 @@ final class EventController extends AbstractController implements AdminNavigatio
         return true;
     }
 
+    private function matchesTime(Event $e, DateTimeImmutable $now, string $time): bool
+    {
+        if ($time === self::TIME_ALL) {
+            return true;
+        }
+        if ($time === self::TIME_PAST) {
+            return $e->isOverAt($now);
+        }
+        if ($e->isOverAt($now)) {
+            return false;
+        }
+        $window = self::UPCOMING_WINDOWS[$time] ?? null;
+
+        return $window === null || $e->getStart() <= $now->modify($window);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function timeOptions(): array
+    {
+        return [...array_keys(self::UPCOMING_WINDOWS), self::TIME_PAST, self::TIME_ALL];
+    }
+
     /**
      * @return array<string, int|string|bool> URL params preserving every active filter except $exclude.
      */
-    private function preserveFiltersExcept(string $exclude, string $range, ?int $typeFilter, string $scheduleFilter): array
+    private function preserveFiltersExcept(string $exclude, string $time, ?int $typeFilter, string $scheduleFilter): array
     {
         $p = [];
-        if ($exclude !== 'range' && $range !== self::DEFAULT_RANGE) {
-            $p['range'] = $range;
+        if ($exclude !== 'time' && $time !== self::DEFAULT_TIME) {
+            $p['time'] = $time;
         }
         if ($exclude !== 'type' && $typeFilter !== null) {
             $p['type'] = $typeFilter;
@@ -585,32 +614,26 @@ final class EventController extends AbstractController implements AdminNavigatio
         return $p;
     }
 
-    private function rangeUntil(string $range): ?DateTimeImmutable
-    {
-        $offset = self::RANGE_OFFSETS[$range] ?? null;
-
-        return $offset !== null ? new DateTimeImmutable($offset) : null;
-    }
-
     /**
      * @param array<Event> $allEvents
      */
-    private function buildRangeDropdown(array $allEvents, string $range, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
+    private function buildTimeDropdown(array $allEvents, DateTimeImmutable $now, string $time, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
     {
         $options = [];
         $activeLabel = '';
-        foreach (array_keys(self::RANGE_OFFSETS) as $key) {
-            $optionUntil = $this->rangeUntil($key);
-            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $optionUntil, $typeFilter, $scheduleFilter)));
-            $params = $this->preserveFiltersExcept('range', $range, $typeFilter, $scheduleFilter);
-            if ($key !== self::DEFAULT_RANGE) {
-                $params['range'] = $key;
+        foreach ($this->timeOptions() as $value) {
+            $params = $this->preserveFiltersExcept('time', $time, $typeFilter, $scheduleFilter);
+            if ($value !== self::DEFAULT_TIME) {
+                $params['time'] = $value;
             }
-            $label = $this->translator->trans('admin_event.filter_range_' . $key);
-            $isActive = $range === $key;
+            $label = $this->translator->trans('admin_event.time_filter_' . $value);
+            $isActive = $time === $value;
             if ($isActive) {
                 $activeLabel = $label;
             }
+            $count = $value === self::TIME_ALL
+                ? null
+                : count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $now, $value, $typeFilter, $scheduleFilter)));
             $options[] = new AdminTopActionDropdownOption(
                 label: $label,
                 target: $this->generateUrl('app_admin_event', $params),
@@ -620,7 +643,7 @@ final class EventController extends AbstractController implements AdminNavigatio
         }
 
         return new AdminTopActionDropdown(
-            label: sprintf('%s %s', $this->translator->trans('admin_event.filter_range_label'), $activeLabel),
+            label: sprintf('%s %s', $this->translator->trans('admin_event.time_filter_label'), $activeLabel),
             options: $options,
             icon: 'clock',
         );
@@ -629,19 +652,14 @@ final class EventController extends AbstractController implements AdminNavigatio
     /**
      * @param array<Event> $allEvents
      */
-    private function buildTypeDropdown(
-        array $allEvents,
-        ?DateTimeImmutable $until,
-        string $range,
-        ?int $typeFilter,
-        string $scheduleFilter,
-    ): AdminTopActionDropdown {
-        $countAll = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, null, $scheduleFilter)));
+    private function buildTypeDropdown(array $allEvents, DateTimeImmutable $now, string $time, ?int $typeFilter, string $scheduleFilter): AdminTopActionDropdown
+    {
+        $countAll = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $now, $time, null, $scheduleFilter)));
 
         $options = [
             new AdminTopActionDropdownOption(
                 label: $this->translator->trans('admin_event.filter_type_any'),
-                target: $this->generateUrl('app_admin_event', $this->preserveFiltersExcept('type', $range, $typeFilter, $scheduleFilter)),
+                target: $this->generateUrl('app_admin_event', $this->preserveFiltersExcept('type', $time, $typeFilter, $scheduleFilter)),
                 isActive: $typeFilter === null,
                 count: $countAll,
             ),
@@ -649,8 +667,8 @@ final class EventController extends AbstractController implements AdminNavigatio
 
         $activeLabel = $this->translator->trans('admin_event.filter_type_any');
         foreach (EventTypeEnum::cases() as $case) {
-            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, $case->value, $scheduleFilter)));
-            $params = $this->preserveFiltersExcept('type', $range, $typeFilter, $scheduleFilter);
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $now, $time, $case->value, $scheduleFilter)));
+            $params = $this->preserveFiltersExcept('type', $time, $typeFilter, $scheduleFilter);
             $params['type'] = $case->value;
             $label = $this->translator->trans('admin_event.filter_type_' . strtolower($case->name));
             $isActive = $typeFilter === $case->value;
@@ -677,8 +695,8 @@ final class EventController extends AbstractController implements AdminNavigatio
      */
     private function buildScheduleDropdown(
         array $allEvents,
-        ?DateTimeImmutable $until,
-        string $range,
+        DateTimeImmutable $now,
+        string $time,
         ?int $typeFilter,
         string $scheduleFilter,
     ): AdminTopActionDropdown {
@@ -686,8 +704,8 @@ final class EventController extends AbstractController implements AdminNavigatio
         $options = [];
         $activeLabel = '';
         foreach ($values as $value) {
-            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $until, $typeFilter, $value)));
-            $params = $this->preserveFiltersExcept('schedule', $range, $typeFilter, $scheduleFilter);
+            $count = count(array_filter($allEvents, fn(Event $e) => $this->matchesFilters($e, $now, $time, $typeFilter, $value)));
+            $params = $this->preserveFiltersExcept('schedule', $time, $typeFilter, $scheduleFilter);
             if ($value !== 'all') {
                 $params['schedule'] = $value;
             }

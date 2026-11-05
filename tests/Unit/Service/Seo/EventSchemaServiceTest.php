@@ -6,13 +6,19 @@ use App\Entity\Event;
 use App\Entity\Host;
 use App\Entity\Image;
 use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
+use App\Repository\EventCanonicalRootRepository;
+use App\Repository\EventRepository;
 use App\Service\Config\ConfigService;
+use App\Service\Event\ShareService;
+use App\Service\Seo\EventCanonicalResolver;
 use App\Service\Seo\EventSchemaService;
+use App\Service\Seo\UrlOwnerService;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EventSchemaServiceTest extends TestCase
 {
@@ -282,7 +288,14 @@ class EventSchemaServiceTest extends TestCase
             $providers[] = $provider;
         }
 
-        return new EventSchemaService($configService, $providers, new MockClock(new DateTimeImmutable(self::NOW)));
+        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
+        $urlGenerator
+            ->method('generate')
+            ->willReturnCallback(static fn(string $route, array $parameters): string => sprintf('/%s/event/%d', $parameters['_locale'], $parameters['id']));
+        $shareService = new ShareService(new UrlOwnerService($configService, []), $urlGenerator);
+        $resolver = new EventCanonicalResolver($this->createStub(EventRepository::class), $this->createStub(EventCanonicalRootRepository::class));
+
+        return new EventSchemaService($configService, $providers, new MockClock(new DateTimeImmutable(self::NOW)), $resolver, $shareService);
     }
 
     private function makeEvent(
@@ -325,5 +338,30 @@ class EventSchemaServiceTest extends TestCase
         $event->method('getHost')->willReturn($hosts);
 
         return $event;
+    }
+
+    public function testSiblingSchemasCarryEachOccurrencesOwnDateAndUrl(): void
+    {
+        // Arrange
+        $sibling = $this->makeEvent(title: 'Coffee chat', start: '2026-05-08T10:00:00+00:00');
+        $subject = $this->makeService();
+
+        // Act
+        $schemas = $subject->buildSiblingSchemas([$sibling], 'de');
+
+        // Assert
+        static::assertCount(1, $schemas);
+        static::assertSame('2026-05-08T10:00:00+00:00', $schemas[0]['startDate']);
+        static::assertSame(self::PLATFORM_HOST . '/de/event/0', $schemas[0]['url']);
+    }
+
+    public function testUpcomingEventLooksUpNoSiblings(): void
+    {
+        // Arrange
+        $event = $this->makeEvent(title: 'Coffee chat');
+        $subject = $this->makeService();
+
+        // Act & Assert
+        static::assertSame([], $subject->findUpcomingSiblings($event, 'en'));
     }
 }

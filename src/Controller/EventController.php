@@ -122,6 +122,7 @@ final class EventController extends AbstractController
 
         $canonicalUrl = $this->canonicalUrlService->getCanonicalUrl($request);
         $locale = $request->getLocale();
+        $upcomingSiblings = $this->eventSchemaService->findUpcomingSiblings($event, $locale);
 
         return $this->render(
             'events/details.html.twig',
@@ -134,6 +135,8 @@ final class EventController extends AbstractController
                 'pluginImageBox' => $this->eventService->getPluginImageBox($id),
                 'event' => $event,
                 'json_ld' => $this->eventSchemaService->buildSchema($event, $canonicalUrl, $locale),
+                'json_ld_siblings' => $this->eventSchemaService->buildSiblingSchemas($upcomingSiblings, $locale),
+                'upcomingSiblings' => $upcomingSiblings,
                 'breadcrumbs' => $this->breadcrumbBuilder->build(self::ROUTE_EVENT, 'chrome.menu_events', $event->getTitle($locale)),
                 'canEditExternalRsvp' => $this->isGranted(PermissionAttribute::EVENT_UPDATE, $event),
                 'editLink' => $this->editLinks([$event])[$id] ?? null,

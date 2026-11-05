@@ -115,6 +115,11 @@ class Event
         return $this;
     }
 
+    public function isOverAt(DateTimeInterface $now): bool
+    {
+        return ($this->stop ?? $this->start) <= $now;
+    }
+
     public function getStart(): DateTimeInterface
     {
         return $this->start;

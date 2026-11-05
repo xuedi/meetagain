@@ -495,8 +495,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
     {
         $now = new DateTime();
         foreach ($this->findAllForAdmin($restrictToEventIds) as $event) {
-            $end = $event->getStop() ?? $event->getStart();
-            if ($end > $now) {
+            if (!$event->isOverAt($now)) {
                 return $event->getId();
             }
         }

@@ -5,7 +5,7 @@
 {% block og_type %}event{% endblock %}
 {% block og_image %}{% if event.previewImage %}<meta property="og:image" content="{{ json_ld.image[0]|default('') }}"/><meta property="og:image:alt" content="{{ event.title(app.locale) }}"/>{% endif %}{% endblock %}
 {% block twitter_image %}{% if event.previewImage %}<meta name="twitter:image" content="{{ json_ld.image[0]|default('') }}"/>{% endif %}{% endblock %}
-{% block json_ld %}<script type="application/ld+json">{{ ld_json(json_ld) }}</script>{% endblock %}
+{% block json_ld %}{% for sibling_ld in json_ld_siblings %}<script type="application/ld+json">{{ ld_json(sibling_ld) }}</script>{% endfor %}<script type="application/ld+json">{{ ld_json(json_ld) }}</script>{% endblock %}
 {% block calendar_link %}<link rel="alternate" type="text/calendar" title="{{ 'events.calendar_feed_title'|trans }}" href="{{ url('app_event_calendar_feed') }}" />{% endblock %}
 
 

@@ -97,7 +97,9 @@ final readonly class TerminateSubscriber implements EventSubscriberInterface
         if (is_array($opcache)) {
             $memory = $opcache['memory_usage'];
             $statistics = $opcache['opcache_statistics'];
-            $fields['opcache_used_mb'] = round($memory['used_memory'] / self::BYTES_PER_MB, 1);
+            $configured = (int) ini_get('opcache.memory_consumption') * self::BYTES_PER_MB;
+            $used = $configured > 0 ? $configured - $memory['free_memory'] - $memory['wasted_memory'] : $memory['used_memory'];
+            $fields['opcache_used_mb'] = round($used / self::BYTES_PER_MB, 1);
             $fields['opcache_free_mb'] = round($memory['free_memory'] / self::BYTES_PER_MB, 1);
             $fields['opcache_wasted_mb'] = round($memory['wasted_memory'] / self::BYTES_PER_MB, 1);
             $fields['opcache_hit_rate'] = round((float) $statistics['opcache_hit_rate'], 2);

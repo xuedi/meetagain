@@ -5,8 +5,10 @@ namespace App\Service\Seo;
 use App\Entity\Event;
 use App\Entity\EventSeries;
 use App\Enum\EventCanonicalRootType;
+use App\Enum\EventStatus;
 use App\Repository\EventCanonicalRootRepository;
 use App\Repository\EventRepository;
+use DateTimeInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 final class EventCanonicalResolver implements ResetInterface
@@ -56,6 +58,37 @@ final class EventCanonicalResolver implements ResetInterface
         }
 
         return $candidate;
+    }
+
+    /**
+     * @return list<Event>
+     */
+    public function findUpcomingSiblings(Event $event, string $locale, DateTimeInterface $after, int $limit): array
+    {
+        $series = $event->getSeries();
+        if (!$series instanceof EventSeries) {
+            return [];
+        }
+
+        $rootId = $this->resolveRoot($event, $locale)->getId();
+        $siblings = [];
+        foreach ($this->membersFor($series) as $member) {
+            if (count($siblings) >= $limit) {
+                break;
+            }
+            if ($member->getStart() <= $after || $member->getId() === $event->getId()) {
+                continue;
+            }
+            if ($member->getStatus() === EventStatus::Draft || $member->isCanceled() || $member->findTranslation($locale) === null) {
+                continue;
+            }
+            if ($this->resolveRoot($member, $locale)->getId() !== $rootId) {
+                continue;
+            }
+            $siblings[] = $member;
+        }
+
+        return $siblings;
     }
 
     public function getMarkerType(Event $event, string $locale): ?EventCanonicalRootType

@@ -6,6 +6,7 @@ use App\Entity\Event;
 use App\Entity\Host;
 use App\Publisher\OrganizationSchema\OrganizationSchemaProviderInterface;
 use App\Service\Config\ConfigService;
+use App\Service\Event\ShareService;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
@@ -13,6 +14,7 @@ final readonly class EventSchemaService
 {
     private const string DEFAULT_IMAGE_PATH = '/images/locations/default.jpg';
     private const string OFFER_CURRENCY = 'EUR';
+    private const int UPCOMING_SIBLING_LIMIT = 3;
 
     /**
      * @param iterable<OrganizationSchemaProviderInterface> $organizationProviders
@@ -22,7 +24,32 @@ final readonly class EventSchemaService
         #[AutowireIterator(OrganizationSchemaProviderInterface::class)]
         private iterable $organizationProviders,
         private ClockInterface $clock,
+        private EventCanonicalResolver $canonicalResolver,
+        private ShareService $shareService,
     ) {}
+
+    /**
+     * @return list<Event>
+     */
+    public function findUpcomingSiblings(Event $event, string $locale): array
+    {
+        $now = $this->clock->now();
+        if ($event->getStart() > $now) {
+            return [];
+        }
+
+        return $this->canonicalResolver->findUpcomingSiblings($event, $locale, $now, self::UPCOMING_SIBLING_LIMIT);
+    }
+
+    /**
+     * @param list<Event> $siblings
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function buildSiblingSchemas(array $siblings, string $locale): array
+    {
+        return array_map(fn(Event $sibling): array => $this->buildSchema($sibling, $this->shareService->buildShareUrl($sibling, $locale), $locale), $siblings);
+    }
 
     /**
      * @return array<string, mixed>

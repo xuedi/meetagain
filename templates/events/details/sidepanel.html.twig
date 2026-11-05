@@ -83,6 +83,16 @@
         <p class="has-text-grey">{{ 'location.box_no_venue'|trans }}</p>
     {% endif %}
 </div>
+{% if upcomingSiblings is not empty %}
+    <div class="box mt-5">
+        <h2 class="title is-4">{{ 'events.label_later_events'|trans }}</h2>
+        <ul>
+            {% for sibling in upcomingSiblings %}
+                <li><a href="{{ path('app_event_details', {'id': sibling.id}) }}">{{ sibling.start|date(get_date_format()) }}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
 {% for tile in pluginBottomSidebarTiles %}
     {{ tile|raw }}
 {% endfor %}
