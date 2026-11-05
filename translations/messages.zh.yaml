@@ -178,6 +178,7 @@ events:
     featured_recent_link_label: '活动'
     label_hosts: '主办方'
     label_images: '图片'
+    label_later_events: '后续活动'
     label_location: '地点'
     label_recurring: '周期：'
     button_rsvp_remove: '移除我'

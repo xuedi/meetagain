@@ -7,6 +7,7 @@ use App\Entity\EventCanonicalRoot;
 use App\Entity\EventSeries;
 use App\Entity\EventTranslation;
 use App\Enum\EventCanonicalRootType;
+use App\Enum\EventStatus;
 use App\Repository\EventCanonicalRootRepository;
 use App\Repository\EventRepository;
 use App\Service\Seo\EventCanonicalResolver;
@@ -35,6 +36,7 @@ class EventCanonicalResolverTest extends TestCase
         $event->setId($id);
         $event->setStart(new DateTime($day . ' 19:00'));
         $event->setSeries($series);
+        $event->setStatus(EventStatus::Published);
 
         foreach ($locales as $locale) {
             $translation = new EventTranslation();
@@ -220,5 +222,85 @@ class EventCanonicalResolverTest extends TestCase
         static::assertSame(['en' => 1, 'de' => 1], $resolved[1]);
         static::assertSame(['en' => 1, 'de' => 2], $resolved[2]);
         static::assertSame(['en' => 1, 'de' => 2], $resolved[3]);
+    }
+
+    public function testUpcomingSiblingsAreLaterMembersSharingTheCanonicalRoot(): void
+    {
+        // Arrange
+        $series = $this->makeSeries();
+        $root = $this->makeMember(1, $series, day: '2026-01-01');
+        $pastFollower = $this->makeMember(2, $series, day: '2026-01-08');
+        $nextFollower = $this->makeMember(3, $series, day: '2026-02-05');
+        $laterFollower = $this->makeMember(4, $series, day: '2026-02-12');
+        $resolver = $this->createResolver([$root, $pastFollower, $nextFollower, $laterFollower]);
+
+        // Act
+        $siblings = $resolver->findUpcomingSiblings($root, 'en', new DateTimeImmutable('2026-02-01'), 3);
+
+        // Assert
+        static::assertSame([$nextFollower, $laterFollower], $siblings);
+    }
+
+    public function testUpcomingSiblingsStopAtTheLimit(): void
+    {
+        // Arrange
+        $series = $this->makeSeries();
+        $root = $this->makeMember(1, $series, day: '2026-01-01');
+        $next = $this->makeMember(2, $series, day: '2026-02-05');
+        $later = $this->makeMember(3, $series, day: '2026-02-12');
+        $resolver = $this->createResolver([$root, $next, $later]);
+
+        // Act
+        $siblings = $resolver->findUpcomingSiblings($root, 'en', new DateTimeImmutable('2026-02-01'), 1);
+
+        // Assert
+        static::assertSame([$next], $siblings);
+    }
+
+    public function testUpcomingSiblingsSkipDraftsCanceledAndMissingTranslations(): void
+    {
+        // Arrange
+        $series = $this->makeSeries();
+        $root = $this->makeMember(1, $series, day: '2026-01-01');
+        $draft = $this->makeMember(2, $series, day: '2026-02-05')->setStatus(EventStatus::Draft);
+        $canceled = $this->makeMember(3, $series, day: '2026-02-12')->setCanceled(true);
+        $germanOnly = $this->makeMember(4, $series, ['de'], day: '2026-02-19');
+        $listed = $this->makeMember(5, $series, day: '2026-02-26');
+        $resolver = $this->createResolver([$root, $draft, $canceled, $germanOnly, $listed]);
+
+        // Act
+        $siblings = $resolver->findUpcomingSiblings($root, 'en', new DateTimeImmutable('2026-02-01'), 3);
+
+        // Assert
+        static::assertSame([$listed], $siblings);
+    }
+
+    public function testUpcomingSiblingsLeaveOutMembersOfALaterRoot(): void
+    {
+        // Arrange
+        $series = $this->makeSeries();
+        $root = $this->makeMember(1, $series, day: '2026-01-01');
+        $ownFollower = $this->makeMember(2, $series, day: '2026-02-05');
+        $branch = $this->makeMember(3, $series, day: '2026-02-12');
+        $branchFollower = $this->makeMember(4, $series, day: '2026-02-19');
+        $resolver = $this->createResolver([$root, $ownFollower, $branch, $branchFollower], [$this->makeMarker($branch, 'en', EventCanonicalRootType::Root)]);
+
+        // Act
+        $fromRoot = $resolver->findUpcomingSiblings($root, 'en', new DateTimeImmutable('2026-02-01'), 3);
+        $fromBranch = $resolver->findUpcomingSiblings($branch, 'en', new DateTimeImmutable('2026-02-01'), 3);
+
+        // Assert
+        static::assertSame([$ownFollower], $fromRoot);
+        static::assertSame([$branchFollower], $fromBranch);
+    }
+
+    public function testOneOffEventHasNoUpcomingSiblings(): void
+    {
+        // Arrange
+        $oneOff = $this->makeMember(7, null);
+        $resolver = $this->createResolver([]);
+
+        // Act & Assert
+        static::assertSame([], $resolver->findUpcomingSiblings($oneOff, 'en', new DateTimeImmutable('2026-02-01'), 3));
     }
 }

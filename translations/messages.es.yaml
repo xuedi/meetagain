@@ -178,6 +178,7 @@ events:
     featured_recent_link_label: 'Eventos'
     label_hosts: 'Anfitriones'
     label_images: 'Imágenes'
+    label_later_events: 'Eventos posteriores'
     label_location: 'Ubicación'
     label_recurring: 'Recurrente:'
     button_rsvp_remove: 'Quitarme'
