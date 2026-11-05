@@ -9,18 +9,25 @@ use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Portability\ArchiveReader;
+use App\Portability\ExportAction;
 use App\Portability\Importer;
 use App\Portability\ImportSummary;
 use App\Portability\KindLabels;
 use App\Portability\Outcome;
 use App\Service\Config\PluginService;
 use App\Service\Event\EventService;
+use App\Service\System\CleanupService;
 use League\Flysystem\FilesystemOperator;
+use Module\Task\Contract\ActionQueueInterface;
+use Module\Task\Contract\RequestedAction;
+use Module\Task\Contract\Status;
 use RuntimeException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -31,6 +38,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ImportController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string PENDING_ARCHIVE = 'admin_system_import_pending';
+    private const string EXPORT_TOKEN = 'admin_system_import_export';
+    private const string DELETE_EXPORT_TOKEN = 'admin_system_import_export_delete';
 
     public function __construct(
         TranslatorInterface $translator,
@@ -40,6 +49,8 @@ final class ImportController extends AbstractSettingsController implements Admin
         private readonly PluginService $pluginService,
         private readonly KindLabels $kindLabels,
         private readonly FilesystemOperator $privateStorage,
+        private readonly ExportAction $exportAction,
+        private readonly ActionQueueInterface $actionQueue,
     ) {
         parent::__construct($translator, 'import');
     }
@@ -114,6 +125,56 @@ final class ImportController extends AbstractSettingsController implements Admin
         return $this->renderPage(summary: $summary);
     }
 
+    #[Route('/export', name: 'app_admin_system_import_export', methods: ['POST'])]
+    public function export(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid(self::EXPORT_TOKEN, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        $latest = $this->actionQueue->latest(ExportAction::IDENTIFIER);
+        if ($latest === null || $latest->isFinished()) {
+            $this->actionQueue->queue(ExportAction::IDENTIFIER, [], $this->getUser()?->getUserIdentifier());
+        }
+
+        return $this->redirectToRoute('app_admin_system_import');
+    }
+
+    #[Route('/export/delete', name: 'app_admin_system_import_export_delete', methods: ['POST'])]
+    public function deleteExport(Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid(self::DELETE_EXPORT_TOKEN, (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        $this->privateStorage->delete(ExportAction::ARCHIVE);
+
+        return $this->redirectToRoute('app_admin_system_import');
+    }
+
+    #[Route('/export/download', name: 'app_admin_system_import_export_download', methods: ['GET'])]
+    public function download(): Response
+    {
+        $archive = $this->exportAction->archive();
+        if ($archive === null) {
+            throw $this->createNotFoundException();
+        }
+
+        $stream = $this->privateStorage->readStream(ExportAction::ARCHIVE);
+        $response = new StreamedResponse(static function () use ($stream): void {
+            fpassthru($stream);
+            fclose($stream);
+        });
+        $response->headers->set('Content-Type', 'application/zip');
+        $response->headers->set('Content-Length', (string) $archive['size']);
+        $response->headers->set('Content-Disposition', HeaderUtils::makeDisposition(HeaderUtils::DISPOSITION_ATTACHMENT, sprintf(
+            'meetagain-export-%s.zip',
+            $archive['writtenAt']->format('Y-m-d'),
+        )));
+
+        return $response;
+    }
+
     /**
      * @param array{name: string, exported_at: string, description: string, plugins: list<string>, missing_plugins: list<string>, counts: array<string, int>, ...}|null $archive
      */
@@ -125,6 +186,9 @@ final class ImportController extends AbstractSettingsController implements Admin
             $pluginNames[$pluginKey] = $this->pluginService->getName($pluginKey);
         }
 
+        $latestExport = $this->actionQueue->latest(ExportAction::IDENTIFIER);
+        $exportArchive = $this->exportAction->archive();
+
         return $this->render('admin/system/import/index.html.twig', [
             'active' => 'system',
             'error' => $error,
@@ -134,7 +198,11 @@ final class ImportController extends AbstractSettingsController implements Admin
             'labels' => $this->kindLabels->labelsFor($kinds),
             'pluginNames' => $pluginNames,
             'siteSettingsDefault' => !$this->eventService->hasEvents(),
-            'adminTop' => $this->buildAdminTop($archive, $summary),
+            'exportArchive' => $exportArchive,
+            'exportInProgress' => $latestExport !== null && !$latestExport->isFinished(),
+            'exportFailure' => $latestExport?->isFinished() && $latestExport->status !== Status::ok ? $latestExport->message : null,
+            'exportMaxHours' => CleanupService::EXPORT_MAX_HOURS,
+            'adminTop' => $this->buildAdminTop($archive, $summary, $latestExport),
             'adminTabs' => $this->getTabs(),
         ]);
     }
@@ -142,7 +210,7 @@ final class ImportController extends AbstractSettingsController implements Admin
     /**
      * @param array{missing_plugins: list<string>, ...}|null $archive
      */
-    private function buildAdminTop(?array $archive, ?ImportSummary $summary): AdminTop
+    private function buildAdminTop(?array $archive, ?ImportSummary $summary, ?RequestedAction $latestExport): AdminTop
     {
         if ($summary instanceof ImportSummary) {
             $lost = array_sum($summary->getLosses());
@@ -150,11 +218,11 @@ final class ImportController extends AbstractSettingsController implements Admin
                 ? $this->tag('is-warning', $this->translator->trans('admin_system_import.tag_losses', ['%count%' => $lost]))
                 : $this->tag('is-success', $this->translator->trans('admin_system_import.tag_nothing_lost'));
 
-            return new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_system_import.success_title')), $tag]);
+            return $this->withExportTag([new AdminTopInfoText($this->translator->trans('admin_system_import.success_title')), $tag], $latestExport);
         }
 
         if ($archive === null) {
-            return new AdminTop(info: [new AdminTopInfoText($this->translator->trans('admin_system_import.help'))]);
+            return $this->withExportTag([new AdminTopInfoText($this->translator->trans('admin_system_import.help'))], $latestExport);
         }
 
         $info = [new AdminTopInfoText($this->translator->trans('admin_system_import.help_preview'))];
@@ -171,6 +239,30 @@ final class ImportController extends AbstractSettingsController implements Admin
                 icon: 'arrow-left',
             ),
         ]);
+    }
+
+    /**
+     * @param list<AdminTopInfoText|AdminTopInfoHtml> $info
+     */
+    private function withExportTag(array $info, ?RequestedAction $latest): AdminTop
+    {
+        $exportTag = $this->exportTag($latest);
+        if ($exportTag !== null) {
+            $info[] = $exportTag;
+        }
+
+        return new AdminTop(info: $info);
+    }
+
+    private function exportTag(?RequestedAction $latest): ?AdminTopInfoHtml
+    {
+        return match (true) {
+            $latest === null => null,
+            $latest->isRunning() => $this->tag('is-warning', $this->translator->trans('admin_system_import.tag_export_running')),
+            !$latest->isFinished() => $this->tag('is-warning', $this->translator->trans('admin_system_import.tag_export_queued')),
+            $latest->status !== Status::ok => $this->tag('is-danger', $this->translator->trans('admin_system_import.tag_export_failed')),
+            default => null,
+        };
     }
 
     private function tag(string $variant, string $text): AdminTopInfoHtml

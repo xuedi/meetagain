@@ -2,18 +2,23 @@
 
 namespace Module\Task\Internal\Action;
 
+use InvalidArgumentException;
 use Module\Task\Contract\ActionInterface;
+use Module\Task\Contract\ActionQueueInterface;
+use Module\Task\Contract\RequestedAction;
 use Module\Task\Internal\Entity\ActionRequest;
 use Module\Task\Internal\Message\RunAction;
 use Module\Task\Internal\Repository\ActionRequestRepository;
 use Module\Task\Internal\ScheduleProvider;
+use Override;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\TransportNamesStamp;
 
-readonly class Requests
+readonly class Requests implements ActionQueueInterface
 {
     public function __construct(
+        private Registry $registry,
         private ActionRequestRepository $repository,
         private MessageBusInterface $bus,
         private ClockInterface $clock,
@@ -29,6 +34,32 @@ readonly class Requests
         $this->ring($request);
 
         return $request;
+    }
+
+    #[Override]
+    public function queue(string $identifier, array $values, ?string $requestedBy): void
+    {
+        $action = $this->registry->find($identifier) ?? throw new InvalidArgumentException(sprintf('No action "%s".', $identifier));
+        $this->submit($action, $values, $requestedBy);
+    }
+
+    #[Override]
+    public function latest(string $identifier): ?RequestedAction
+    {
+        $request = $this->repository->findRecent($identifier, 1)[0] ?? null;
+        if ($request === null) {
+            return null;
+        }
+
+        return new RequestedAction(
+            (int) $request->getId(),
+            $request->getIdentifier(),
+            $request->getCreatedAt(),
+            $request->getStartedAt(),
+            $request->getFinishedAt(),
+            $request->getStatus(),
+            $request->getMessage(),
+        );
     }
 
     public function ring(ActionRequest $request): void

@@ -107,19 +107,62 @@
                 <p class="has-text-grey mb-5">{{ 'admin_system_import.note'|trans }}</p>
             {% endif %}
 
-            <form method="post" action="{{ path('app_admin_system_import') }}" enctype="multipart/form-data">
-                <input type="hidden" name="_token" value="{{ csrf_token('admin_system_import_upload') }}">
-                <div class="field">
-                    <label class="label">{{ 'admin_system_import.label_zip_file'|trans }}</label>
-                    <div class="control">
-                        <input class="input" type="file" name="import_file" accept=".zip" required>
+            <div class="box">
+                <h2 class="title is-5 mb-3">{{ 'admin_system_import.import_title'|trans }}</h2>
+                <form method="post" action="{{ path('app_admin_system_import') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_system_import_upload') }}">
+                    <div class="field">
+                        <label class="label">{{ 'admin_system_import.label_zip_file'|trans }}</label>
+                        <div class="control">
+                            <input class="input" type="file" name="import_file" accept=".zip" required>
+                        </div>
                     </div>
-                </div>
-                <button type="submit" class="button is-primary">
-                    <span class="icon"><i class="fas fa-upload"></i></span>
-                    <span>{{ 'admin_system_import.button_preview'|trans }}</span>
-                </button>
-            </form>
+                    <button type="submit" class="button is-primary">
+                        <span class="icon"><i class="fas fa-upload"></i></span>
+                        <span>{{ 'admin_system_import.button_preview'|trans }}</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="box">
+                <h2 class="title is-5 mb-3">{{ 'admin_system_import.export_title'|trans }}</h2>
+                {% if exportFailure %}
+                    <div class="notification is-danger is-light">
+                        <strong>{{ 'admin_system_import.export_failed'|trans }}</strong> {{ exportFailure }}
+                    </div>
+                {% endif %}
+                {% if exportArchive %}
+                    <div class="level mb-3">
+                        <div class="level-left">
+                            <p class="level-item">{{ 'admin_system_import.export_ready'|trans({'%date%': exportArchive.writtenAt|date('Y-m-d H:i'), '%size%': (exportArchive.size / 1048576)|number_format(1)}) }}</p>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item buttons">
+                                <a class="button is-small" href="{{ path('app_admin_system_import_export_download') }}">
+                                    <span class="icon"><i class="fas fa-download"></i></span>
+                                    <span>{{ 'admin_system_import.button_download'|trans }}</span>
+                                </a>
+                                <form method="post" action="{{ path('app_admin_system_import_export_delete') }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_system_import_export_delete') }}">
+                                    <button type="submit" class="button is-small is-danger">
+                                        <span class="icon"><i class="fas fa-trash"></i></span>
+                                        <span>{{ 'admin_system_import.button_delete_export'|trans }}</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif not exportInProgress %}
+                    <form method="post" action="{{ path('app_admin_system_import_export') }}" class="mb-3">
+                        <input type="hidden" name="_token" value="{{ csrf_token('admin_system_import_export') }}">
+                        <button type="submit" class="button is-primary">
+                            <span class="icon"><i class="fas fa-file-export"></i></span>
+                            <span>{{ 'admin_system_import.button_export'|trans }}</span>
+                        </button>
+                    </form>
+                {% endif %}
+                <p class="has-text-grey">{{ 'admin_system_import.export_help'|trans({'%hours%': exportMaxHours}) }}</p>
+            </div>
         {% endif %}
 
     </div>
