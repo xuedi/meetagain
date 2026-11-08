@@ -45,7 +45,7 @@ final class CmsPagesSectionTest extends SectionTestCase
         static::assertSame(1, $context->toSummary()->get('cms_pages', Outcome::Created));
     }
 
-    public function testAPageWhoseSlugExistsIsSkippedAndItsRefPointsAtTheExistingPage(): void
+    public function testAPageWhoseSlugExistsIsMatchedAndItsRefPointsAtTheExistingPage(): void
     {
         // Arrange
         $context = $this->context();
@@ -57,7 +57,7 @@ final class CmsPagesSectionTest extends SectionTestCase
         // Assert
         static::assertSame([], $this->persisted);
         static::assertSame($existing, $context->resolveRef(Cms::class, 3));
-        static::assertSame(1, $context->toSummary()->get('cms_pages', Outcome::Skipped));
+        static::assertSame(1, $context->toSummary()->get('cms_pages', Outcome::Matched));
     }
 
     private function sourcePage(): Cms

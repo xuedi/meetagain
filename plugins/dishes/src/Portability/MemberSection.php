@@ -10,6 +10,7 @@ use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
 use App\Portability\PluginSectionInterface;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Repository\UserRepository;
 use App\Service\Media\ImageLocationService;
@@ -285,5 +286,13 @@ readonly class MemberSection implements PluginSectionInterface
         $block = is_array($rows[$key] ?? null) ? $rows[$key] : [];
 
         return array_values(array_filter($block, is_array(...)));
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        foreach ([DishLike::class, DishImage::class] as $class) {
+            $this->em->createQuery(sprintf('DELETE %s e', $class))->execute();
+        }
     }
 }

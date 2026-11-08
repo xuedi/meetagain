@@ -97,6 +97,55 @@ class CommandExecutionServiceTest extends TestCase
         static::assertEqualsWithDelta($expected, $since?->getTimestamp(), 5);
     }
 
+    #[DataProvider('triggerProvider')]
+    public function testStartSavesARunningLogForTheCommand(?CommandTriggerType $trigger, CommandTriggerType $expected): void
+    {
+        // Arrange
+        $persisted = null;
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->method('persist')->willReturnCallback(static function (object $entity) use (&$persisted): void {
+            $persisted = $entity;
+        });
+        $em->expects($this->once())->method('flush');
+        $service = new CommandExecutionService($em, $this->createStub(CommandExecutionLogRepository::class));
+
+        // Act
+        $log = $trigger === null ? $service->start('app:cron') : $service->start('app:cron', $trigger);
+
+        // Assert
+        static::assertSame($log, $persisted);
+        static::assertSame('app:cron', $log->getCommandName());
+        static::assertSame(CommandExecutionStatus::Running, $log->getStatus());
+        static::assertSame($expected, $log->getTriggeredBy());
+        static::assertEqualsWithDelta(time(), $log->getStartedAt()?->getTimestamp(), 5);
+        static::assertNull($log->getCompletedAt());
+    }
+
+    public static function triggerProvider(): iterable
+    {
+        yield 'cron when no trigger is given' => [null, CommandTriggerType::Cron];
+        yield 'the given trigger otherwise' => [CommandTriggerType::Manual, CommandTriggerType::Manual];
+    }
+
+    public function testTheLookupsHandTheRepositorysAnswerThrough(): void
+    {
+        // Arrange
+        $last = ['app:cron' => $this->runningLog()];
+        $failed = [$this->runningLog()];
+        $repo = $this->createMock(CommandExecutionLogRepository::class);
+        $repo->method('getLastExecutionsByCommand')->willReturn($last);
+        $repo->expects($this->once())->method('getRecentFailed')->with(3)->willReturn($failed);
+        $service = new CommandExecutionService($this->createStub(EntityManagerInterface::class), $repo);
+
+        // Act
+        $lastExecutions = $service->getLastExecutions();
+        $recentFailed = $service->getRecentFailed(3);
+
+        // Assert
+        static::assertSame($last, $lastExecutions);
+        static::assertSame($failed, $recentFailed);
+    }
+
     private function runningLog(): CommandExecutionLog
     {
         $log = new CommandExecutionLog();

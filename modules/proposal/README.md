@@ -66,10 +66,6 @@ The outbound permit list in `mago.toml` names every core class the module reache
 
 ## Traps
 
-- **The previous releases still read the old table names.** `mod_suggestion` and `change_proposal` exist as
-  updatable views over the module's tables until the cleanup migration drops them; a fresh install creates them too.
-  A tool that drops tables without views - such as a partial reset - leaves them behind and breaks the next
-  migration run, so reset by dropping the database.
 - **The module registers two migration namespaces.** `ModuleSuggestionMigrations`
   (`modules/proposal/migrations/suggestion/`) keeps the history the suggestion tool shipped with, because Doctrine
   records executed migrations by class name; `ModuleProposalMigrations` (`modules/proposal/migrations/change/`) holds

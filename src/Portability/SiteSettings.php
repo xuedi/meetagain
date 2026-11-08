@@ -76,6 +76,54 @@ readonly class SiteSettings
 
     /**
      * @param array<array-key, mixed> $site
+     * @return list<array{field: string, current: string|bool, archive: string|bool}> only the fields apply() would change
+     */
+    public function diff(array $site): array
+    {
+        $current = $this->current();
+        $rows = [];
+
+        $name = (string) ($site['name'] ?? '');
+        if ($name !== '' && $name !== $current->name) {
+            $rows[] = ['field' => 'name', 'current' => $current->name, 'archive' => $name];
+        }
+
+        $description = $this->truncatedDescription((string) ($site['description'] ?? ''));
+        if ($description !== '' && $description !== $current->description) {
+            $rows[] = ['field' => 'description', 'current' => $current->description, 'archive' => $description];
+        }
+
+        $languages = $this->wantedLanguages(is_array($site['languages'] ?? null) ? $site['languages'] : []);
+        if ($languages !== [] && $languages !== $current->languages) {
+            $rows[] = ['field' => 'languages', 'current' => implode(', ', $current->languages), 'archive' => implode(', ', $languages)];
+        }
+
+        foreach (is_array($site['theme_colors'] ?? null) ? $site['theme_colors'] : [] as $key => $color) {
+            $currentColor = $current->themeColors[(string) $key] ?? '';
+            if ((string) $color !== $currentColor) {
+                $rows[] = ['field' => 'theme_color', 'current' => $key . ' ' . $currentColor, 'archive' => $key . ' ' . $color];
+            }
+        }
+
+        $logoFile = $site['logo_file'] ?? null;
+        $logoHash = is_string($logoFile) ? pathinfo($logoFile, PATHINFO_FILENAME) : '';
+        if ($logoHash !== '' && $logoHash !== $current->logo?->getHash()) {
+            $rows[] = ['field' => 'logo', 'current' => $current->logo instanceof Image, 'archive' => true];
+        }
+
+        $settings = is_array($site['settings'] ?? null) ? $site['settings'] : [];
+        foreach (self::FLAGS as $flag) {
+            $wanted = $settings[$flag] ?? null;
+            if (is_bool($wanted) && $wanted !== ($current->settings[$flag] ?? null)) {
+                $rows[] = ['field' => $flag, 'current' => (bool) ($current->settings[$flag] ?? false), 'archive' => $wanted];
+            }
+        }
+
+        return $rows;
+    }
+
+    /**
+     * @param array<array-key, mixed> $site
      */
     public function apply(array $site, ImportContext $context): void
     {
@@ -84,12 +132,9 @@ readonly class SiteSettings
             $this->configService->setString('site_name', $name);
         }
 
-        $description = (string) ($site['description'] ?? '');
+        $description = $this->truncatedDescription((string) ($site['description'] ?? ''));
         if ($description !== '') {
-            $this->configService->setString(
-                'seo_description_default',
-                (string) u($description)->truncate(self::CONFIG_VALUE_LENGTH, '...', TruncateMode::WordBefore),
-            );
+            $this->configService->setString('seo_description_default', $description);
         }
 
         $settings = is_array($site['settings'] ?? null) ? $site['settings'] : [];
@@ -116,8 +161,7 @@ readonly class SiteSettings
     private function applyLanguages(array $codes): void
     {
         $languages = $this->languageRepository->findAll();
-        $known = array_map(static fn(Language $language): string => $language->getCode(), $languages);
-        $wanted = array_values(array_intersect(array_map(strval(...), $codes), $known));
+        $wanted = $this->wantedLanguages($codes);
         if ($wanted === []) {
             return;
         }
@@ -136,6 +180,22 @@ readonly class SiteSettings
 
         $this->em->flush();
         $this->languageService->invalidateCache();
+    }
+
+    /**
+     * @param array<array-key, mixed> $codes
+     * @return list<string>
+     */
+    private function wantedLanguages(array $codes): array
+    {
+        $known = array_map(static fn(Language $language): string => $language->getCode(), $this->languageRepository->findAll());
+
+        return array_values(array_intersect(array_map(strval(...), $codes), $known));
+    }
+
+    private function truncatedDescription(string $description): string
+    {
+        return (string) u($description)->truncate(self::CONFIG_VALUE_LENGTH, '...', TruncateMode::WordBefore);
     }
 
     /**

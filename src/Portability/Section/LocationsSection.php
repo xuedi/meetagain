@@ -9,6 +9,7 @@ use App\Portability\Cities;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use App\Repository\LocationRepository;
@@ -112,5 +113,11 @@ readonly class LocationsSection implements SectionInterface
         $this->em->persist($location);
 
         return $location;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->em->createQuery('DELETE App\Entity\Location e')->execute();
     }
 }

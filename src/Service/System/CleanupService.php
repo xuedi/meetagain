@@ -4,6 +4,7 @@ namespace App\Service\System;
 
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
+use App\Portability\ExportAction;
 use App\Portability\Importer;
 use App\Repository\AccessDeniedLogRepository;
 use App\Repository\ImageRepository;
@@ -31,6 +32,7 @@ readonly class CleanupService implements TaskInterface
     public const int SUPPORT_THREAD_STALE_DAYS = 180;
     public const int GHOSTED_REGISTRATION_DAYS = 10;
     public const int PENDING_IMPORT_MAX_HOURS = 24;
+    public const int EXPORT_MAX_HOURS = 24;
     public const int INCIDENT_RETENTION_DAYS = 180;
     public const int REQUEST_LOG_RETENTION_DAYS = 90;
 
@@ -65,10 +67,11 @@ readonly class CleanupService implements TaskInterface
     public function getDescription(): string
     {
         return sprintf(
-            'Hourly housekeeping. It drops the cache-busting version from image URLs whose image last changed more than 30 days ago, deletes registrations not confirmed within %d days, resolves support threads without activity for %d days, clears expired support email verifications, deletes uploaded import archives left unimported for %d hours, purges security measure logs past their retention and security incidents that ended more than %d days ago, and deletes 404, access-denied and rate-limit log rows older than %d days - a 404 or access-denied row kept as evidence of an incident stays until that incident is purged. The run message counts each step.',
+            'Hourly housekeeping. It drops the cache-busting version from image URLs whose image last changed more than 30 days ago, deletes registrations not confirmed within %d days, resolves support threads without activity for %d days, clears expired support email verifications, deletes uploaded import archives left unimported for %d hours and an instance export older than %d hours, purges security measure logs past their retention and security incidents that ended more than %d days ago, and deletes 404, access-denied and rate-limit log rows older than %d days - a 404 or access-denied row kept as evidence of an incident stays until that incident is purged. The run message counts each step.',
             self::GHOSTED_REGISTRATION_DAYS,
             self::SUPPORT_THREAD_STALE_DAYS,
             self::PENDING_IMPORT_MAX_HOURS,
+            self::EXPORT_MAX_HOURS,
             self::INCIDENT_RETENTION_DAYS,
             self::REQUEST_LOG_RETENTION_DAYS,
         );
@@ -92,6 +95,9 @@ readonly class CleanupService implements TaskInterface
             $importCount = $this->removeStaleImportArchives();
             $this->logger->info('Stale import archives removed', ['count' => $importCount]);
 
+            $exportCount = $this->removeStaleExportArchive();
+            $this->logger->info('Stale export archive removed', ['count' => $exportCount]);
+
             $measureLogCount = $this->removeExpiredSecurityMeasureLogs();
             $this->logger->info('Expired security measure logs removed', ['count' => $measureLogCount]);
 
@@ -102,12 +108,13 @@ readonly class CleanupService implements TaskInterface
             $this->logger->info('Expired request logs removed', $requestLogCounts);
 
             $message = sprintf(
-                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d, import_archives: %d, security_measure_logs: %d, security_incidents: %d, not_found_logs: %d, access_denied_logs: %d, rate_limit_logs: %d',
+                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d, import_archives: %d, export_archive: %d, security_measure_logs: %d, security_incidents: %d, not_found_logs: %d, access_denied_logs: %d, rate_limit_logs: %d',
                 $imageCount,
                 $regCount,
                 $autoResolvedCount,
                 $verifyCount,
                 $importCount,
+                $exportCount,
                 $measureLogCount,
                 $incidentCount,
                 $requestLogCounts['not_found'],
@@ -182,6 +189,20 @@ readonly class CleanupService implements TaskInterface
         $this->entityManager->flush();
 
         return $count;
+    }
+
+    public function removeStaleExportArchive(): int
+    {
+        if (!$this->privateStorage->fileExists(ExportAction::ARCHIVE)) {
+            return 0;
+        }
+        $cutoff = $this->clock->now()->modify(sprintf('-%d hours', self::EXPORT_MAX_HOURS))->getTimestamp();
+        if ($this->privateStorage->lastModified(ExportAction::ARCHIVE) >= $cutoff) {
+            return 0;
+        }
+        $this->privateStorage->delete(ExportAction::ARCHIVE);
+
+        return 1;
     }
 
     public function removeStaleImportArchives(): int

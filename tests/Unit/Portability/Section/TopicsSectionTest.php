@@ -80,6 +80,25 @@ final class TopicsSectionTest extends SectionTestCase
         static::assertSame(2, $context->toSummary()->get('topics', Outcome::Dropped));
     }
 
+    public function testTwinTopicsMatchTwoStoredTopicsInsteadOfOne(): void
+    {
+        // Arrange
+        $member = $this->user(1, 'member@example.org');
+        $first = $this->topic(5, 'off topic', $member, null);
+        $second = $this->topic(8, 'off topic', $member, null);
+        $context = $this->context();
+        $context->mapRef(User::class, 'member@example.org', $member);
+        $row = ['parent_ref' => null, 'title' => 'off topic', 'author_email' => 'member@example.org', 'created_at' => '2030-01-06T19:00:00+00:00'];
+
+        // Act
+        $this->section([$first, $second])->import([['ref' => 5, ...$row], ['ref' => 8, ...$row]], $context);
+
+        // Assert
+        static::assertSame($first, $context->resolveRef(Topic::class, 5));
+        static::assertSame($second, $context->resolveRef(Topic::class, 8));
+        static::assertSame(2, $context->toSummary()->get('topics', Outcome::Matched));
+    }
+
     /**
      * @param list<Topic> $topics
      */

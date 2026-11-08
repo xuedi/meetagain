@@ -622,7 +622,7 @@ admin_system:
     tab_theme: 'Design'
     tab_images: 'Bilder'
     tab_language: 'Sprache'
-    tab_import: 'Import'
+    tab_import: 'Import / Export'
     tab_maintenance: 'Wartung'
     tab_secretbox: 'Geheimschluessel'
     tab_hotfixes: 'Hotfixes'

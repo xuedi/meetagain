@@ -73,7 +73,7 @@ final class AnnouncementsSectionTest extends SectionTestCase
         static::assertSame([], $exported);
     }
 
-    public function testALinkHashAnotherAnnouncementHoldsIsLeftEmpty(): void
+    public function testAnAnnouncementWhoseLinkHashIsStoredHereIsMatched(): void
     {
         // Arrange
         $context = $this->context();
@@ -82,7 +82,8 @@ final class AnnouncementsSectionTest extends SectionTestCase
         new AnnouncementsSection($this->entityManager([], new Announcement()))->import([['link_hash' => 'abc123']], $context);
 
         // Assert
-        static::assertNull($this->onlyPersisted(Announcement::class)->getLinkHash());
+        static::assertSame([], $this->persisted);
+        static::assertSame(1, $context->toSummary()->get('announcements', Outcome::Matched));
     }
 
     public function testTheSecondRowWithTheSameLinkHashIsLeftEmpty(): void

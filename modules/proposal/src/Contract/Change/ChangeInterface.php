@@ -33,4 +33,14 @@ interface ChangeInterface
 
     /** Stores a pending proposal as given, without permission checks, validation or activity. */
     public function restore(PortableChange $change): int;
+
+    /** The id of a stored proposal with the same target, proposer and creation time, whatever its status. */
+    public function findRestored(PortableChange $change): ?int;
+
+    /**
+     * Deletes every proposal on these target types, whatever its status.
+     *
+     * @param list<string> $targetTypes
+     */
+    public function purge(array $targetTypes): void;
 }

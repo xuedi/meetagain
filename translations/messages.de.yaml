@@ -424,6 +424,7 @@ profile_social:
     activity_admin_event_cancelled: 'Event abgesagt: %event%'
     activity_admin_event_cancelled_deleted: 'Gelöschten Event abgesagt'
     activity_admin_event_deleted: 'Event gelöscht: %event%'
+    activity_admin_clean_import: 'Sauberer Import von %archive%'
     activity_admin_member_approved: 'Mitglied genehmigt: %user%'
     activity_admin_member_approved_deleted: 'Gelöschtes Mitglied genehmigt'
     activity_admin_member_denied: 'Mitglied abgelehnt: %user%'

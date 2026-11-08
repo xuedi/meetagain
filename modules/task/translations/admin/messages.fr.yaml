@@ -74,6 +74,7 @@ admin_maintenance:
     section_recalculate: 'Recalculer'
     section_defaults: 'Valeurs par défaut'
     section_diagnostics: 'Diagnostic'
+    section_backup: 'Sauvegardes'
     state_pending: 'En attente'
     state_running: 'En cours'
     state_finished: 'Terminé'

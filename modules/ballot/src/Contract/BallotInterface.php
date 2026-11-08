@@ -55,4 +55,7 @@ interface BallotInterface
 
     /** Writes a ballot exactly as given, never tallying it and never notifying a listener. */
     public function restore(PortableBallot $ballot): int;
+
+    /** Deletes every ballot with its options and votes, notifying no listener. */
+    public function purge(): void;
 }

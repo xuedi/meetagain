@@ -20,6 +20,11 @@ readonly class ImportSummary
         return $this->counts[$kind][$outcome->value] ?? 0;
     }
 
+    public function createdTotal(): int
+    {
+        return array_sum(array_map(fn(string $kind): int => $this->get($kind, Outcome::Created), array_keys($this->counts)));
+    }
+
     /**
      * @return array<string, int>
      */

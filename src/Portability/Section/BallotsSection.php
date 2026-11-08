@@ -8,6 +8,7 @@ use App\Portability\DataCategory;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use App\Repository\UserRepository;
@@ -25,6 +26,8 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 readonly class BallotsSection implements SectionInterface
 {
+    private const string KEY_DATE = 'Y-m-d H:i:s';
+
     /**
      * @param iterable<PurposeInterface> $purposes
      */
@@ -64,6 +67,7 @@ readonly class BallotsSection implements SectionInterface
     #[Override]
     public function import(array $rows, ImportContext $context): void
     {
+        $stored = null;
         foreach ($rows as $row) {
             if (!is_array($row)) {
                 continue;
@@ -82,9 +86,26 @@ readonly class BallotsSection implements SectionInterface
                 continue;
             }
 
+            $stored ??= array_flip(array_map($this->ballotKey(...), $this->ballots->exportAll()));
+            if (isset($stored[$this->ballotKey($ballot)])) {
+                $context->count($this->getKey(), Outcome::Matched);
+                continue;
+            }
+
             $this->ballots->restore($ballot);
             $context->count($this->getKey(), Outcome::Created);
         }
+    }
+
+    private function ballotKey(PortableBallot $ballot): string
+    {
+        return implode('|', [
+            $ballot->purpose,
+            $ballot->subject?->type ?? '',
+            $ballot->subject?->id ?? '',
+            $ballot->title ?? '',
+            $ballot->createdAt->format(self::KEY_DATE),
+        ]);
     }
 
     /**
@@ -279,5 +300,11 @@ readonly class BallotsSection implements SectionInterface
     private function date(mixed $value): DateTimeImmutable
     {
         return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, (string) $value) ?: new DateTimeImmutable();
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->ballots->purge();
     }
 }

@@ -8,6 +8,7 @@ enum ActionSection: string
     case Recalculate = 'recalculate';
     case Defaults = 'defaults';
     case Diagnostics = 'diagnostics';
+    case Backup = 'backup';
 
     public function label(): string
     {

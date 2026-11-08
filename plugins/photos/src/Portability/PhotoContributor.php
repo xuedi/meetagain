@@ -111,12 +111,20 @@ readonly class PhotoContributor implements ContributorInterface, UploadsInterfac
     {
         $refToPhoto = [];
         $created = 0;
+        $matched = 0;
         $imageLocations = [];
 
         foreach ($rows as $row) {
             $uploader = $context->resolveRef(User::class, $row['uploader_email'] ?? null) ?? $context->getSystemUser();
             $image = $context->importImage($this->nullableString($row['image'] ?? null), ImageType::PluginPhotosPhoto, $uploader);
             if (!$image instanceof Image) {
+                continue;
+            }
+
+            $stored = $image->getId() === null ? null : $this->photoRepo->findOneBy(['image' => $image]);
+            if ($stored instanceof Photo) {
+                $refToPhoto[(int) ($row['ref'] ?? 0)] = $stored;
+                ++$matched;
                 continue;
             }
 
@@ -149,7 +157,17 @@ readonly class PhotoContributor implements ContributorInterface, UploadsInterfac
             $this->imageLocationService->addLocation((int) $image->getId(), ImageType::PluginPhotosPhoto, (int) $photo->getId());
         }
 
-        return new ImportResult(refToItemId: array_map(static fn(Photo $photo): int => (int) $photo->getId(), $refToPhoto), created: $created, matched: 0);
+        return new ImportResult(
+            refToItemId: array_map(static fn(Photo $photo): int => (int) $photo->getId(), $refToPhoto),
+            created: $created,
+            matched: $matched,
+        );
+    }
+
+    #[Override]
+    public function purgeItems(): void
+    {
+        $this->em->createQuery(sprintf('DELETE %s e', Photo::class))->execute();
     }
 
     /**

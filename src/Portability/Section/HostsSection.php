@@ -9,6 +9,7 @@ use App\Portability\DataCategory;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -102,5 +103,11 @@ readonly class HostsSection implements SectionInterface
     private function findUnlinkedHost(string $name): ?Host
     {
         return $this->em->getRepository(Host::class)->findOneBy(['name' => $name, 'user' => null]);
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->em->createQuery('DELETE App\Entity\Host e')->execute();
     }
 }

@@ -92,9 +92,17 @@ readonly class DishContributor implements ContributorInterface
     {
         $refToItemId = [];
         $created = 0;
+        $matched = 0;
         $imageLocations = [];
 
         foreach ($rows as $row) {
+            $stored = $this->findByName(is_array($row['translations'] ?? null) ? $row['translations'] : []);
+            if ($stored instanceof Dish) {
+                $refToItemId[(int) ($row['ref'] ?? 0)] = $stored;
+                ++$matched;
+                continue;
+            }
+
             $dish = new Dish();
             $dish->setCreatedAt(new DateTimeImmutable());
             $dish->setCreatedBy((int) $context->getSystemUser()->getId());
@@ -144,7 +152,33 @@ readonly class DishContributor implements ContributorInterface
             $this->imageLocationService->addLocation((int) $image->getId(), ImageType::PluginDishesPreview, (int) $dish->getId());
         }
 
-        return new ImportResult(refToItemId: array_map(static fn(Dish $dish): int => (int) $dish->getId(), $refToItemId), created: $created, matched: 0);
+        return new ImportResult(refToItemId: array_map(static fn(Dish $dish): int => (int) $dish->getId(), $refToItemId), created: $created, matched: $matched);
+    }
+
+    #[Override]
+    public function purgeItems(): void
+    {
+        $this->em->createQuery(sprintf('DELETE %s e', Dish::class))->execute();
+    }
+
+    /**
+     * @param array<array-key, mixed> $translations
+     */
+    private function findByName(array $translations): ?Dish
+    {
+        foreach ($translations as $language => $fields) {
+            $name = is_array($fields) ? (string) ($fields['name'] ?? '') : '';
+            if ($name === '') {
+                continue;
+            }
+
+            $translation = $this->em->getRepository(DishTranslation::class)->findOneBy(['language' => (string) $language, 'name' => $name]);
+            if ($translation instanceof DishTranslation) {
+                return $translation->getDish();
+            }
+        }
+
+        return null;
     }
 
     private function findPronunciationSystem(mixed $pronunciation): ?PronunciationSystem

@@ -134,6 +134,12 @@ readonly class GameContributor implements ContributorInterface
         return new ImportResult(refToItemId: array_map(static fn(Game $game): int => (int) $game->getId(), $refToItem), created: $created, matched: $matched);
     }
 
+    #[Override]
+    public function purgeItems(): void
+    {
+        $this->em->createQuery(sprintf('DELETE %s e', Game::class))->execute();
+    }
+
     /** @param array<string, mixed> $row */
     private function findExisting(array $row): ?Game
     {

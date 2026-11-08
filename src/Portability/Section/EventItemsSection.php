@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use App\Repository\UserRepository;
@@ -85,6 +86,12 @@ readonly class EventItemsSection implements SectionInterface
                 continue;
             }
 
+            $existing = $this->em->getRepository(EventItemAssociation::class)->findOneBy(['event' => $event, 'itemType' => $itemType, 'itemId' => $itemId]);
+            if ($existing instanceof EventItemAssociation) {
+                $context->count($this->getKey(), Outcome::Matched);
+                continue;
+            }
+
             $creator = $context->resolveRef(User::class, $row['created_by_email'] ?? null) ?? $context->getSystemUser();
             $createdAt = DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, (string) ($row['created_at'] ?? ''));
             $position = $row['position'] ?? null;
@@ -121,5 +128,11 @@ readonly class EventItemsSection implements SectionInterface
         }
 
         return $creators;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->em->createQuery('DELETE App\Entity\EventItemAssociation e')->execute();
     }
 }

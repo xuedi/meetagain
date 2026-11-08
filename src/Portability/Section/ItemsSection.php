@@ -7,6 +7,7 @@ use App\Portability\ImportContext;
 use App\Portability\Item\Registry;
 use App\Portability\Item\TagAssignments;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use Override;
@@ -74,7 +75,20 @@ readonly class ItemsSection implements SectionInterface
 
             $context->count($itemType, Outcome::Created, $result->created);
             $context->count($itemType, Outcome::Matched, $result->matched);
+            $dropped = count($itemRows) - $result->created - $result->matched;
+            if ($dropped > 0) {
+                $context->count($itemType, Outcome::Dropped, $dropped);
+            }
+
             $this->tagAssignments->import($itemType, $block, $result->refToItemId, $context);
+        }
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        foreach ($this->registry->all() as $contributor) {
+            $contributor->purgeItems();
         }
     }
 }

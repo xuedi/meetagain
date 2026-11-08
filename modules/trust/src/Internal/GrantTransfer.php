@@ -64,4 +64,17 @@ final readonly class GrantTransfer implements GrantTransferInterface
         $this->entityManager->flush();
         $this->scoreProvider->invalidate($grant->context);
     }
+
+    #[Override]
+    public function purgeGrants(array $contexts): void
+    {
+        if ($contexts === []) {
+            return;
+        }
+
+        $this->entityManager->createQuery(sprintf('DELETE %s g WHERE g.context IN (:contexts)', TrustGrant::class))->execute(['contexts' => $contexts]);
+        foreach ($contexts as $context) {
+            $this->scoreProvider->invalidate($context);
+        }
+    }
 }

@@ -47,13 +47,9 @@ readonly class InstanceScopeBuilder
         }
 
         $itemIds = [];
-        $circulationContexts = $this->circulation->ledgerContexts();
         foreach ($this->itemRegistry->all() as $contributor) {
-            $itemType = $contributor->getItemType();
-            $itemIds[$itemType] = $contributor->allItemIds();
-            $circulationContexts[$this->circulation->contextFor($itemType)] ??= $itemType;
+            $itemIds[$contributor->getItemType()] = $contributor->allItemIds();
         }
-        ksort($circulationContexts);
 
         $tagIds = [];
         foreach ($this->tagRepository->findBy([], ['id' => 'ASC']) as $tag) {
@@ -72,9 +68,23 @@ readonly class InstanceScopeBuilder
             topicIds: $this->ids($this->topicRepository->findBy([], ['id' => 'ASC'])),
             announcementIds: $this->ids($this->announcementRepository->findBy([], ['id' => 'ASC'])),
             tagIds: $tagIds,
-            circulationContexts: $circulationContexts,
+            circulationContexts: $this->circulationContexts(),
             everyUpload: true,
         );
+    }
+
+    /**
+     * @return array<string, string> context => item type, every context the ledger knows plus one per active item type
+     */
+    public function circulationContexts(): array
+    {
+        $circulationContexts = $this->circulation->ledgerContexts();
+        foreach ($this->itemRegistry->all() as $contributor) {
+            $circulationContexts[$this->circulation->contextFor($contributor->getItemType())] ??= $contributor->getItemType();
+        }
+        ksort($circulationContexts);
+
+        return $circulationContexts;
     }
 
     /**

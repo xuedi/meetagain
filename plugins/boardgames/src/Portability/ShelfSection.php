@@ -9,6 +9,7 @@ use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
 use App\Portability\PluginSectionInterface;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -242,6 +243,12 @@ readonly class ShelfSection implements PluginSectionInterface
             return;
         }
 
+        if ($this->em->getRepository(GamePledge::class)->findOneBy(['event' => $event, 'game' => $game, 'user' => $user]) !== null) {
+            $context->count(self::KIND_PLEDGES, Outcome::Matched);
+
+            return;
+        }
+
         $pledge = new GamePledge()
             ->setEvent($event)
             ->setGame($game)
@@ -265,6 +272,15 @@ readonly class ShelfSection implements PluginSectionInterface
         $isComplete = $event instanceof Event && $game instanceof Game && $requester instanceof User && $owner instanceof User;
         if (!$isComplete) {
             $context->count(self::KIND_REQUESTS, Outcome::Dropped);
+
+            return;
+        }
+
+        $stored = $this->em
+            ->getRepository(BringRequest::class)
+            ->findOneBy(['event' => $event, 'game' => $game, 'requestedBy' => $requester, 'ownerUser' => $owner]);
+        if ($stored !== null) {
+            $context->count(self::KIND_REQUESTS, Outcome::Matched);
 
             return;
         }
@@ -314,5 +330,13 @@ readonly class ShelfSection implements PluginSectionInterface
     private function timestamp(mixed $value): ?DateTimeImmutable
     {
         return is_string($value) ? (DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, $value) ?: null) : null;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        foreach ([BringRequest::class, GamePledge::class, GameOwnership::class] as $class) {
+            $this->em->createQuery(sprintf('DELETE %s e', $class))->execute();
+        }
     }
 }

@@ -19,8 +19,14 @@ readonly class ImageImporter
         private FilesystemOperator $imageStorage,
     ) {}
 
-    public function import(string $imagePath, ImageType $type, User $uploader, ?string $attribution = null, bool $attributionNotRequired = false): ?Image
-    {
+    public function import(
+        string $imagePath,
+        ImageType $type,
+        User $uploader,
+        ?string $attribution = null,
+        bool $attributionNotRequired = false,
+        bool $store = true,
+    ): ?Image {
         if (!$this->fs->fileExists($imagePath)) {
             return null;
         }
@@ -42,7 +48,7 @@ readonly class ImageImporter
         $mimeType = $finfo->buffer($content) ?: 'application/octet-stream';
 
         $key = $hash . '.' . $extension;
-        if (!$this->imageStorage->fileExists($key)) {
+        if ($store && !$this->imageStorage->fileExists($key)) {
             $this->imageStorage->write($key, $content);
         }
 

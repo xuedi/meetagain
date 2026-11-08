@@ -9,11 +9,13 @@ use App\Entity\User;
 use App\Event\ChangeTarget as EventChangeTarget;
 use App\Item\Location\ChangeTarget as LocationChangeTarget;
 use App\Item\Tag\ChangeTarget;
+use App\Item\Tag\TaggableTypeProviderInterface;
 use App\Item\Tag\TypeRegistry;
 use App\Portability\DataCategory;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use DateTimeImmutable;
@@ -105,20 +107,20 @@ readonly class ChangeProposalsSection implements SectionInterface
                 continue;
             }
 
-            $id = $this->changes->restore(
-                new PortableChange(
-                    $targetType,
-                    $targetId,
-                    (int) $proposer->getId(),
-                    $changes,
-                    $this->readDate($row['created_at'] ?? null) ?? new DateTimeImmutable(),
-                ),
+            $change = new PortableChange(
+                $targetType,
+                $targetId,
+                (int) $proposer->getId(),
+                $changes,
+                $this->readDate($row['created_at'] ?? null) ?? new DateTimeImmutable(),
             );
+            $existingId = $this->changes->findRestored($change);
+            $id = $existingId ?? $this->changes->restore($change);
             if (isset($row['ref'])) {
                 $context->mapIds(self::REFS, [(int) $row['ref'] => $id]);
             }
 
-            $context->count($this->getKey(), Outcome::Created);
+            $context->count($this->getKey(), $existingId === null ? Outcome::Created : Outcome::Matched);
         }
     }
 
@@ -235,5 +237,16 @@ readonly class ChangeProposalsSection implements SectionInterface
         }
 
         return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, $value) ?: null;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $tagTargets = array_map(
+            static fn(TaggableTypeProviderInterface $type): string => ChangeTarget::TYPE_PREFIX . $type->getTypeKey(),
+            $this->tagTypes->all(),
+        );
+
+        $this->changes->purge([EventChangeTarget::TARGET_TYPE, LocationChangeTarget::TARGET_TYPE, ...$tagTargets]);
     }
 }

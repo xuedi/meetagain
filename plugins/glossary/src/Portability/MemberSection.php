@@ -9,6 +9,7 @@ use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
 use App\Portability\PluginSectionInterface;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\Section\ChangeProposalsSection;
 use App\Repository\UserRepository;
@@ -287,17 +288,17 @@ readonly class MemberSection implements PluginSectionInterface
             return;
         }
 
-        $id = $this->changes->restore(
-            new PortableChange(
-                self::ITEM_TYPE,
-                $entryId,
-                (int) $proposer->getId(),
-                $changes,
-                $this->date($row['created_at'] ?? null) ?? new DateTimeImmutable(),
-            ),
+        $change = new PortableChange(
+            self::ITEM_TYPE,
+            $entryId,
+            (int) $proposer->getId(),
+            $changes,
+            $this->date($row['created_at'] ?? null) ?? new DateTimeImmutable(),
         );
+        $existingId = $this->changes->findRestored($change);
+        $id = $existingId ?? $this->changes->restore($change);
         $context->mapIds(ChangeProposalsSection::REFS, [(int) ($row['ref'] ?? 0) => $id]);
-        $context->count(self::KIND_CHANGE_PROPOSALS, Outcome::Created);
+        $context->count(self::KIND_CHANGE_PROPOSALS, $existingId === null ? Outcome::Created : Outcome::Matched);
     }
 
     /**
@@ -393,5 +394,15 @@ readonly class MemberSection implements PluginSectionInterface
         }
 
         return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, $value) ?: null;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        foreach ([TrainerCard::class, TrainerDay::class] as $class) {
+            $this->em->createQuery(sprintf('DELETE %s e', $class))->execute();
+        }
+
+        $this->changes->purge([self::ITEM_TYPE]);
     }
 }

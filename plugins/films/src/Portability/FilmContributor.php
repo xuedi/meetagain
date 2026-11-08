@@ -126,6 +126,12 @@ readonly class FilmContributor implements ContributorInterface
         return new ImportResult(refToItemId: array_map(static fn(Film $film): int => (int) $film->getId(), $refToItemId), created: $created, matched: $matched);
     }
 
+    #[Override]
+    public function purgeItems(): void
+    {
+        $this->em->createQuery(sprintf('DELETE %s e', Film::class))->execute();
+    }
+
     /**
      * @param array<string, mixed> $row
      */

@@ -23,23 +23,31 @@
             {% endif %}
 
             <div class="columns">
-                <div class="column">
+                <div class="column is-two-thirds">
                     <table class="table is-fullwidth">
                         <thead>
                             <tr>
                                 <th>{{ 'admin_system_import.col_kind'|trans }}</th>
                                 <th>{{ 'admin_system_import.col_rows'|trans }}</th>
+                                {% for outcome in outcomes %}
+                                    <th>{{ outcome.label()|trans }}</th>
+                                {% endfor %}
                             </tr>
                         </thead>
                         <tbody>
-                            {% for kind, rows in archive.counts %}
+                            {% for kind in previewKinds %}
                                 <tr>
                                     <td>{{ labels[kind] }}</td>
-                                    <td>{{ rows }}</td>
+                                    <td>{{ archive.counts[kind] ?? 0 }}</td>
+                                    {% for outcome in outcomes %}
+                                        <td>{{ summary.get(kind, outcome) }}</td>
+                                    {% endfor %}
                                 </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                    <p class="has-text-grey mb-2">{{ 'admin_system_import.note_existing_members'|trans }}</p>
+                    <p class="has-text-grey mb-4">{{ 'admin_system_import.note_new_members'|trans }}</p>
                 </div>
                 {% if archive.plugins is not empty %}
                     <div class="column">
@@ -69,7 +77,8 @@
                 {% endif %}
             </div>
 
-            <form method="post" action="{{ path('app_admin_system_import_run') }}">
+            <form method="post" action="{{ path('app_admin_system_import_run') }}"
+                  onsubmit="return !this.clean_import || !this.clean_import.checked || confirm({{ 'admin_system_import.confirm_clean'|trans|json_encode|e('html_attr') }});">
                 <input type="hidden" name="_token" value="{{ csrf_token('admin_system_import_run') }}">
                 <div class="field">
                     <label class="checkbox">
@@ -77,7 +86,80 @@
                         {{ 'admin_system_import.label_site_settings'|trans }}
                     </label>
                 </div>
-                <button type="submit" class="button is-primary">
+                {% if siteDiff is not empty %}
+                    <table class="table is-fullwidth mb-5">
+                        <thead>
+                            <tr>
+                                <th>{{ 'admin_system_import.col_setting'|trans }}</th>
+                                <th>{{ 'admin_system_import.col_current'|trans }}</th>
+                                <th>{{ 'admin_system_import.col_archive'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in siteDiff %}
+                                <tr>
+                                    <td>{{ ('admin_system_import.site_' ~ row.field)|trans }}</td>
+                                    {% for value in [row.current, row.archive] %}
+                                        <td>
+                                            {% if value is same as(true) %}
+                                                {{ 'admin_system_import.value_on'|trans }}
+                                            {% elseif value is same as(false) %}
+                                                {{ 'admin_system_import.value_off'|trans }}
+                                            {% else %}
+                                                {{ value }}
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="has-text-grey mb-5">{{ 'admin_system_import.site_unchanged'|trans }}</p>
+                {% endif %}
+
+                {% if isCleanOffered %}
+                    <div class="box">
+                        <h3 class="title is-6 has-text-danger mb-3">{{ 'admin_system_import.clean_title'|trans }}</h3>
+                        <p class="mb-3">{{ 'admin_system_import.clean_help'|trans }}</p>
+                        {% if currentCounts is not empty %}
+                            <table class="table is-fullwidth">
+                                <thead>
+                                    <tr>
+                                        <th>{{ 'admin_system_import.col_kind'|trans }}</th>
+                                        <th>{{ 'admin_system_import.col_deleted'|trans }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for kind, rows in currentCounts %}
+                                        <tr>
+                                            <td>{{ labels[kind] }}</td>
+                                            <td>{{ rows }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+                        <p class="mb-3 has-text-danger">{{ 'admin_system_import.clean_passwords'|trans }}</p>
+                        {% if not hasFreshBackup %}
+                            <p class="mb-3 has-text-warning-dark">
+                                {{ 'admin_system_import.clean_backup_missing'|trans({'%minutes%': backupMaxMinutes}) }}
+                                <a href="{{ path('app_admin_system_import') }}#export">{{ 'admin_system_import.clean_backup_link'|trans }}</a>
+                            </p>
+                        {% endif %}
+                        <div class="field">
+                            <label class="checkbox">
+                                <input type="checkbox" name="clean_import" value="1"{% if not hasFreshBackup %} disabled{% endif %}>
+                                {{ 'admin_system_import.label_clean'|trans }}
+                            </label>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if isAlreadyImported %}
+                    <p class="has-text-warning-dark mb-3">{{ 'admin_system_import.already_imported'|trans }}</p>
+                {% endif %}
+                <button type="submit" class="button {{ isAlreadyImported ? 'is-warning' : 'is-primary' }}">
                     <span class="icon"><i class="fas fa-file-import"></i></span>
                     <span>{{ 'admin_system_import.button'|trans }}</span>
                 </button>
@@ -107,19 +189,62 @@
                 <p class="has-text-grey mb-5">{{ 'admin_system_import.note'|trans }}</p>
             {% endif %}
 
-            <form method="post" action="{{ path('app_admin_system_import') }}" enctype="multipart/form-data">
-                <input type="hidden" name="_token" value="{{ csrf_token('admin_system_import_upload') }}">
-                <div class="field">
-                    <label class="label">{{ 'admin_system_import.label_zip_file'|trans }}</label>
-                    <div class="control">
-                        <input class="input" type="file" name="import_file" accept=".zip" required>
+            <div class="box">
+                <h2 class="title is-5 mb-3">{{ 'admin_system_import.import_title'|trans }}</h2>
+                <form method="post" action="{{ path('app_admin_system_import') }}" enctype="multipart/form-data">
+                    <input type="hidden" name="_token" value="{{ csrf_token('admin_system_import_upload') }}">
+                    <div class="field">
+                        <label class="label">{{ 'admin_system_import.label_zip_file'|trans }}</label>
+                        <div class="control">
+                            <input class="input" type="file" name="import_file" accept=".zip" required>
+                        </div>
                     </div>
-                </div>
-                <button type="submit" class="button is-primary">
-                    <span class="icon"><i class="fas fa-upload"></i></span>
-                    <span>{{ 'admin_system_import.button_preview'|trans }}</span>
-                </button>
-            </form>
+                    <button type="submit" class="button is-primary">
+                        <span class="icon"><i class="fas fa-upload"></i></span>
+                        <span>{{ 'admin_system_import.button_preview'|trans }}</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="box" id="export">
+                <h2 class="title is-5 mb-3">{{ 'admin_system_import.export_title'|trans }}</h2>
+                {% if exportFailure %}
+                    <div class="notification is-danger is-light">
+                        <strong>{{ 'admin_system_import.export_failed'|trans }}</strong> {{ exportFailure }}
+                    </div>
+                {% endif %}
+                {% if exportArchive %}
+                    <div class="level mb-3">
+                        <div class="level-left">
+                            <p class="level-item">{{ 'admin_system_import.export_ready'|trans({'%date%': exportArchive.writtenAt|date('Y-m-d H:i'), '%size%': (exportArchive.size / 1048576)|number_format(1)}) }}</p>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item buttons">
+                                <a class="button is-small" href="{{ path('app_admin_system_import_export_download') }}">
+                                    <span class="icon"><i class="fas fa-download"></i></span>
+                                    <span>{{ 'admin_system_import.button_download'|trans }}</span>
+                                </a>
+                                <form method="post" action="{{ path('app_admin_system_import_export_delete') }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_system_import_export_delete') }}">
+                                    <button type="submit" class="button is-small is-danger">
+                                        <span class="icon"><i class="fas fa-trash"></i></span>
+                                        <span>{{ 'admin_system_import.button_delete_export'|trans }}</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif not exportInProgress %}
+                    <form method="post" action="{{ path('app_admin_system_import_export') }}" class="mb-3">
+                        <input type="hidden" name="_token" value="{{ csrf_token('admin_system_import_export') }}">
+                        <button type="submit" class="button is-primary">
+                            <span class="icon"><i class="fas fa-file-export"></i></span>
+                            <span>{{ 'admin_system_import.button_export'|trans }}</span>
+                        </button>
+                    </form>
+                {% endif %}
+                <p class="has-text-grey">{{ 'admin_system_import.export_help'|trans({'%hours%': exportMaxHours}) }}</p>
+            </div>
         {% endif %}
 
     </div>

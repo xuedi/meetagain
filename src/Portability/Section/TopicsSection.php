@@ -8,6 +8,7 @@ use App\Portability\DataCategory;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use DateTimeImmutable;
@@ -64,6 +65,7 @@ readonly class TopicsSection implements SectionInterface
         $topicRows = array_values(array_filter($rows, is_array(...)));
         usort($topicRows, static fn(array $a, array $b): int => (int) ($a['ref'] ?? 0) <=> (int) ($b['ref'] ?? 0));
 
+        $claimedIds = [];
         foreach ($topicRows as $row) {
             $parentRef = $row['parent_ref'] ?? null;
             $parent = $context->resolveRef(Topic::class, $parentRef);
@@ -77,11 +79,20 @@ readonly class TopicsSection implements SectionInterface
                 continue;
             }
 
+            $title = (string) ($row['title'] ?? '');
+            $createdAt = $this->date($row['created_at'] ?? null);
+            $existing = $this->findTopic($title, $parent, $author, $createdAt, $claimedIds);
+            if ($existing instanceof Topic) {
+                $claimedIds[] = $existing->getId();
+                $context->mapRef(Topic::class, (int) ($row['ref'] ?? 0), $existing);
+                $context->count($this->getKey(), Outcome::Matched);
+                continue;
+            }
+
             $topic = new Topic();
-            $topic->setTitle((string) ($row['title'] ?? ''));
+            $topic->setTitle($title);
             $topic->setParent($parent);
             $topic->setAuthor($author);
-            $createdAt = $this->date($row['created_at'] ?? null);
             if ($createdAt !== null) {
                 $topic->setCreatedAt($createdAt);
             }
@@ -90,6 +101,28 @@ readonly class TopicsSection implements SectionInterface
             $context->mapRef(Topic::class, (int) ($row['ref'] ?? 0), $topic);
             $context->count($this->getKey(), Outcome::Created);
         }
+    }
+
+    /**
+     * @param list<?int> $claimedIds
+     */
+    private function findTopic(string $title, ?Topic $parent, ?User $author, ?DateTimeImmutable $createdAt, array $claimedIds): ?Topic
+    {
+        $isNewParent = $parent instanceof Topic && $parent->getId() === null;
+        if ($createdAt === null || $isNewParent) {
+            return null;
+        }
+
+        $candidates = $this->em->getRepository(Topic::class)->findBy(['title' => $title, 'parent' => $parent, 'author' => $author, 'createdAt' => $createdAt], [
+            'id' => 'ASC',
+        ]);
+        foreach ($candidates as $candidate) {
+            if (!in_array($candidate->getId(), $claimedIds, true)) {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -132,5 +165,11 @@ readonly class TopicsSection implements SectionInterface
     private function date(mixed $value): ?DateTimeImmutable
     {
         return is_string($value) && $value !== '' ? new DateTimeImmutable($value) : null;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->em->createQuery('DELETE App\Entity\Topic e')->execute();
     }
 }

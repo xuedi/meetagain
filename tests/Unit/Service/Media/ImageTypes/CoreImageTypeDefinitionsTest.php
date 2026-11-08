@@ -21,6 +21,7 @@ use App\Service\Media\ImageTypes\ProfilePictureImageTypeDefinition;
 use App\Service\Media\ImageTypes\SiteLogoImageTypeDefinition;
 use App\Service\Media\ImageTypes\WebsiteImageImageTypeDefinition;
 use Doctrine\DBAL\Connection;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\Stubs\EventStub;
 
@@ -303,5 +304,61 @@ class CoreImageTypeDefinitionsTest extends TestCase
         $definition = new WebsiteImageImageTypeDefinition($this->repo(), $conn);
 
         static::assertSame([], $definition->discoverImageIds());
+    }
+
+    #[DataProvider('websiteImageConfigProvider')]
+    public function testWebsiteImageIsFoundOnlyWhenTheConfigNamesAPositiveId(array|false $row, array $expectedIds): void
+    {
+        // Arrange
+        $definition = new WebsiteImageImageTypeDefinition($this->repo(), $this->websiteImageConnection($row));
+
+        // Act
+        $ids = $definition->discoverImageIds();
+
+        // Assert
+        static::assertSame($expectedIds, $ids);
+    }
+
+    public static function websiteImageConfigProvider(): iterable
+    {
+        yield 'no config row' => [false, []];
+        yield 'a zero id means unset' => [['value' => '0'], []];
+        yield 'a negative id means unset' => [['value' => '-3'], []];
+        yield 'a positive id is the one location' => [['value' => '42'], [['imageId' => 42, 'locationId' => 0]]];
+    }
+
+    #[DataProvider('websiteImageLocateProvider')]
+    public function testWebsiteImageLocatesOnlyTheConfiguredImage(array|false $row, int $imageId, ?array $expected): void
+    {
+        // Arrange
+        $image = $this->createStub(Image::class);
+        $image->method('getId')->willReturn($imageId);
+        $definition = new WebsiteImageImageTypeDefinition($this->repo(), $this->websiteImageConnection($row));
+
+        // Act
+        $location = $definition->locate($image);
+
+        // Assert
+        static::assertSame($expected, $location);
+    }
+
+    public static function websiteImageLocateProvider(): iterable
+    {
+        yield 'no config row' => [false, 42, null];
+        yield 'a zero id never matches' => [['value' => '0'], 0, null];
+        yield 'another image is configured' => [['value' => '42'], 99, null];
+        yield 'the configured image points at the config page' => [
+            ['value' => '42'],
+            42,
+            ['subject' => null, 'route' => 'app_admin_system_config', 'params' => []],
+        ];
+    }
+
+    private function websiteImageConnection(array|false $row): Connection
+    {
+        $conn = $this->createStub(Connection::class);
+        $conn->method('fetchAssociative')->willReturn($row);
+
+        return $conn;
     }
 }

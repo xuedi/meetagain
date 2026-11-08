@@ -622,7 +622,7 @@ admin_system:
     tab_theme: '主题'
     tab_images: '图片'
     tab_language: '语言'
-    tab_import: '导入'
+    tab_import: '导入 / 导出'
     tab_maintenance: '维护'
     tab_secretbox: '密钥管理'
     tab_hotfixes: '数据修复'
