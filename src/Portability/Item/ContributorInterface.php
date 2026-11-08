@@ -33,4 +33,9 @@ interface ContributorInterface
      * @param list<array<string, mixed>> $rows
      */
     public function importItems(array $rows, ImportContext $context): ImportResult;
+
+    /**
+     * Deletes every row of this item type with what hangs off it.
+     */
+    public function purgeItems(): void;
 }

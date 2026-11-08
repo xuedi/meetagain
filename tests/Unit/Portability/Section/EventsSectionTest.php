@@ -16,6 +16,7 @@ use App\Portability\Scope;
 use App\Portability\Section\EventsSection;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
+use App\Service\Config\LanguageService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -104,7 +105,12 @@ final class EventsSectionTest extends SectionTestCase
             ->willReturn([]);
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('getRepository')->willReturn($repository);
-        $section = new EventsSection($em, $this->createStub(LocationRepository::class), $this->createStub(UserRepository::class));
+        $section = new EventsSection(
+            $em,
+            $this->createStub(LocationRepository::class),
+            $this->createStub(UserRepository::class),
+            $this->createStub(LanguageService::class),
+        );
 
         // Act
         $rows = $section->export(new Scope(eventIds: [1, 2]), $this->images());
@@ -160,7 +166,15 @@ final class EventsSectionTest extends SectionTestCase
      */
     private function section(array $events = []): EventsSection
     {
-        return new EventsSection($this->entityManager($events), $this->createStub(LocationRepository::class), $this->createStub(UserRepository::class));
+        $languageService = $this->createStub(LanguageService::class);
+        $languageService->method('getEnabledCodes')->willReturn(['en']);
+
+        return new EventsSection(
+            $this->entityManager($events),
+            $this->createStub(LocationRepository::class),
+            $this->createStub(UserRepository::class),
+            $languageService,
+        );
     }
 
     private function translation(string $language, string $title, string $description, string $teaser): EventTranslation

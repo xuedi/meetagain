@@ -11,6 +11,7 @@ use App\Portability\DataCategory;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use App\Service\TownHall\TopicService;
@@ -104,16 +105,34 @@ readonly class CommentsSection implements SectionInterface
                 continue;
             }
 
+            $createdAt = $this->date($row['created_at'] ?? null);
+            if ($createdAt !== null && $this->exists($targetType, $targetId, $author, $createdAt)) {
+                $context->count($this->getKey(), Outcome::Matched);
+                continue;
+            }
+
             $comment = new Comment();
             $comment->setTargetType($targetType);
             $comment->setTargetId($targetId);
             $comment->setUser($author);
-            $comment->setCreatedAt($this->date($row['created_at'] ?? null) ?? new DateTimeImmutable());
+            $comment->setCreatedAt($createdAt ?? new DateTimeImmutable());
             $comment->setContent((string) ($row['content'] ?? ''));
 
             $this->em->persist($comment);
             $context->count($this->getKey(), Outcome::Created);
         }
+    }
+
+    private function exists(string $targetType, int $targetId, ?User $author, DateTimeImmutable $createdAt): bool
+    {
+        return $this->em
+            ->getRepository(Comment::class)
+            ->findOneBy([
+                'targetType' => $targetType,
+                'targetId' => $targetId,
+                'user' => $author,
+                'createdAt' => $createdAt,
+            ]) instanceof Comment;
     }
 
     private function targetId(string $targetType, mixed $ref, ImportContext $context): ?int
@@ -129,5 +148,11 @@ readonly class CommentsSection implements SectionInterface
     private function date(mixed $value): ?DateTimeImmutable
     {
         return is_string($value) && $value !== '' ? new DateTimeImmutable($value) : null;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->em->createQuery('DELETE App\Entity\Comment e')->execute();
     }
 }

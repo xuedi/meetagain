@@ -227,6 +227,27 @@ readonly class ChangeService implements ChangeInterface
         return (int) $proposal->getId();
     }
 
+    #[Override]
+    public function findRestored(PortableChange $change): ?int
+    {
+        return $this->repo->findOneBy([
+            'targetType' => $change->targetType,
+            'targetId' => $change->targetId,
+            'proposedBy' => $change->proposerId,
+            'createdAt' => $change->createdAt,
+        ])?->getId();
+    }
+
+    #[Override]
+    public function purge(array $targetTypes): void
+    {
+        if ($targetTypes === []) {
+            return;
+        }
+
+        $this->em->createQuery(sprintf('DELETE %s c WHERE c.targetType IN (:types)', Change::class))->execute(['types' => $targetTypes]);
+    }
+
     /** @return list<Change> */
     public function pendingReviewableBy(User $user): array
     {

@@ -3,10 +3,13 @@
 namespace App\Portability\Section;
 
 use App\Entity\User;
+use App\Portability\Circulation\StoredShelf;
 use App\Portability\DataCategory;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
+use App\Portability\InstanceScopeBuilder;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use DateTimeImmutable;
@@ -36,6 +39,7 @@ readonly class CirculationSection implements SectionInterface
     public function __construct(
         private EntityManagerInterface $em,
         private CirculationInterface $circulation,
+        private InstanceScopeBuilder $instanceScope,
     ) {}
 
     #[Override]
@@ -86,24 +90,49 @@ readonly class CirculationSection implements SectionInterface
     #[Override]
     public function import(array $rows, ImportContext $context): void
     {
+        $stored = $this->stored($rows);
+
         $copies = [];
+        $matchedCopies = [];
         foreach ($this->rowsOf($rows, 'copies') as $row) {
             $copy = $this->importCopy($row, $context);
-            if ($copy !== null) {
+            if ($copy === null) {
+                continue;
+            }
+
+            $storedId = $stored->copyId($copy);
+            if ($storedId !== null) {
+                $matchedCopies[$copy->ref] = $storedId;
+            } else {
                 $copies[$copy->ref] = $copy;
             }
+            $context->count(self::KIND_COPIES, $storedId === null ? Outcome::Created : Outcome::Matched);
         }
 
         $requests = [];
         foreach ($this->rowsOf($rows, 'requests') as $row) {
             $request = $this->importRequest($row, $copies, $context);
-            if ($request !== null) {
+            if ($request !== null && $stored->hasRequest($request)) {
+                $context->count(self::KIND_REQUESTS, Outcome::Matched);
+            } elseif ($request !== null) {
                 $requests[$request->ref] = $request;
+                $context->count(self::KIND_REQUESTS, Outcome::Created);
             }
         }
 
         $handovers = [];
+        $matchedHandovers = [];
         foreach ($this->rowsOf($rows, 'handovers') as $row) {
+            $matchedCopyId = $this->knownId($row['copy_ref'] ?? null, $matchedCopies);
+            if ($matchedCopyId !== null) {
+                $storedId = $stored->handoverId($matchedCopyId, $this->userId($row['to_email'] ?? null, $context), $this->date($row['opened_at'] ?? null));
+                if ($storedId !== null) {
+                    $matchedHandovers[(int) ($row['ref'] ?? 0)] = $storedId;
+                }
+                $context->count(self::KIND_HANDOVERS, $storedId === null ? Outcome::Dropped : Outcome::Matched);
+                continue;
+            }
+
             $handover = $this->importHandover($row, $copies, $requests, $context);
             if ($handover !== null) {
                 $handovers[$handover->ref] = $handover;
@@ -112,14 +141,46 @@ readonly class CirculationSection implements SectionInterface
 
         $ledger = [];
         foreach ($this->rowsOf($rows, 'ledger') as $row) {
-            $entry = $this->importLedgerEntry($row, $copies, $context);
+            $entry = $this->importLedgerEntry($row, $copies, $stored, $context);
             if ($entry !== null) {
                 $ledger[] = $entry;
             }
         }
 
         $handoverIds = $this->circulation->restore(new PortableShelf(array_values($copies), array_values($requests), array_values($handovers), $ledger));
-        $context->mapIds(CirculationInterface::COMMENT_TARGET, $handoverIds);
+        $context->mapIds(CirculationInterface::COMMENT_TARGET, $handoverIds + $matchedHandovers);
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->circulation->purge(array_map(strval(...), array_keys($this->instanceScope->circulationContexts())));
+    }
+
+    /**
+     * @param array<array-key, mixed> $rows
+     */
+    private function stored(array $rows): StoredShelf
+    {
+        $contexts = [];
+        foreach (['copies', 'requests', 'ledger'] as $block) {
+            foreach ($this->rowsOf($rows, $block) as $row) {
+                $itemType = (string) ($row['item_type'] ?? '');
+                if ($itemType !== '') {
+                    $contexts[$itemType] ??= $this->circulation->contextFor($itemType);
+                }
+            }
+        }
+
+        return $contexts === [] ? new StoredShelf() : new StoredShelf($this->circulation->export(array_values(array_unique($contexts))));
+    }
+
+    /**
+     * @param array<int, int> $known
+     */
+    private function knownId(mixed $ref, array $known): ?int
+    {
+        return is_int($ref) || is_string($ref) ? $known[(int) $ref] ?? null : null;
     }
 
     /**
@@ -275,7 +336,6 @@ readonly class CirculationSection implements SectionInterface
         }
 
         $itemType = (string) ($row['item_type'] ?? '');
-        $context->count(self::KIND_COPIES, Outcome::Created);
 
         return new PortableCopy(
             ref: (int) ($row['ref'] ?? 0),
@@ -311,7 +371,6 @@ readonly class CirculationSection implements SectionInterface
         }
 
         $itemType = (string) ($row['item_type'] ?? '');
-        $context->count(self::KIND_REQUESTS, Outcome::Created);
 
         return new PortableRequest(
             ref: (int) ($row['ref'] ?? 0),
@@ -367,7 +426,7 @@ readonly class CirculationSection implements SectionInterface
      * @param array<array-key, mixed> $row
      * @param array<int, PortableCopy> $copies
      */
-    private function importLedgerEntry(array $row, array $copies, ImportContext $context): ?PortableLedgerEntry
+    private function importLedgerEntry(array $row, array $copies, StoredShelf $stored, ImportContext $context): ?PortableLedgerEntry
     {
         $itemId = $this->itemId($row, self::KIND_LEDGER, $context);
         if ($itemId === null) {
@@ -375,6 +434,15 @@ readonly class CirculationSection implements SectionInterface
         }
 
         $entryType = LedgerEntryType::tryFrom((string) ($row['entry_type'] ?? ''));
+        $occurredAt = $this->date($row['occurred_at'] ?? null);
+        $isStored =
+            $entryType !== null && $occurredAt !== null && $stored->hasLedgerEntry($entryType, (string) ($row['item_type'] ?? ''), $itemId, $occurredAt);
+        if ($isStored) {
+            $context->count(self::KIND_LEDGER, Outcome::Matched);
+
+            return null;
+        }
+
         $archivedCopyRef = $row['copy_ref'] ?? null;
         $copyRef = $this->knownRef($archivedCopyRef, $copies);
         $emails = ['from' => $row['from_email'] ?? null, 'to' => $row['to_email'] ?? null, 'actor' => $row['actor_email'] ?? null];
@@ -404,7 +472,7 @@ readonly class CirculationSection implements SectionInterface
             context: $this->circulation->contextFor($itemType),
             itemType: $itemType,
             itemId: $itemId,
-            occurredAt: $this->date($row['occurred_at'] ?? null) ?? new DateTimeImmutable(),
+            occurredAt: $occurredAt ?? new DateTimeImmutable(),
             copyRef: $copyRef,
             fromUserId: $userIds['from'],
             toUserId: $userIds['to'],

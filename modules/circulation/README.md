@@ -141,6 +141,8 @@ pointer at its handover travels as `PortableLedgerEntry::$handoverRef`, not insi
 The application's archive section is the one production caller. It decides which rows leave, and files restored rows
 under the importing instance's own context.
 
+`purge(contexts)` deletes every copy, request, handover and ledger entry of those shelves, for a clean import.
+
 ## Becoming a consumer
 
 1. Implement `ParticipationProviderInterface` for your item type and answer from your own settings.

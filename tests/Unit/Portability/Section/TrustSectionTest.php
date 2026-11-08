@@ -4,6 +4,7 @@ namespace Tests\Unit\Portability\Section;
 
 use App\Entity\User;
 use App\Portability\DataCategory;
+use App\Portability\InstanceScopeBuilder;
 use App\Portability\Outcome;
 use App\Portability\Scope;
 use App\Portability\Section\TrustSection;
@@ -140,7 +141,7 @@ final class TrustSectionTest extends SectionTestCase
         $circulation = $this->createStub(CirculationInterface::class);
         $circulation->method('contextFor')->willReturnArgument(0);
 
-        return new TrustSection($grants, $userRepository, $circulation);
+        return new TrustSection($grants, $userRepository, $circulation, $this->createStub(InstanceScopeBuilder::class));
     }
 
     private function recordingGrants(): GrantTransferInterface

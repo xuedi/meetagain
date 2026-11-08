@@ -7,6 +7,7 @@ use App\Item\Tag\TypeRegistry;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use App\Repository\ItemTagRepository;
@@ -164,5 +165,11 @@ readonly class TagsSection implements SectionInterface
         }
 
         return false;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->em->createQuery('DELETE App\Entity\ItemTag e')->execute();
     }
 }

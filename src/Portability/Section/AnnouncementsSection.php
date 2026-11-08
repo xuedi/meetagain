@@ -9,6 +9,7 @@ use App\Enum\AnnouncementStatus;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use DateTimeImmutable;
@@ -68,6 +69,11 @@ readonly class AnnouncementsSection implements SectionInterface
                 continue;
             }
 
+            if ($this->findImported($row, $context) instanceof Announcement) {
+                $context->count($this->getKey(), Outcome::Matched);
+                continue;
+            }
+
             $linkHash = $this->freeLinkHash($row['link_hash'] ?? null, $takenHashes);
             if ($linkHash !== null) {
                 $takenHashes[] = $linkHash;
@@ -85,6 +91,26 @@ readonly class AnnouncementsSection implements SectionInterface
             $this->em->persist($announcement);
             $context->count($this->getKey(), Outcome::Created);
         }
+    }
+
+    /**
+     * @param array<array-key, mixed> $row
+     */
+    private function findImported(array $row, ImportContext $context): ?Announcement
+    {
+        $repository = $this->em->getRepository(Announcement::class);
+        $linkHash = $row['link_hash'] ?? null;
+        if (is_string($linkHash) && $linkHash !== '') {
+            return $repository->findOneBy(['linkHash' => $linkHash]);
+        }
+
+        $page = $context->resolveRef(Cms::class, $row['cms_ref'] ?? null);
+        $createdAt = $this->readDate($row['created_at'] ?? null);
+        if (!$page instanceof Cms || $createdAt === null) {
+            return null;
+        }
+
+        return $repository->findOneBy(['cmsPage' => $page, 'createdAt' => $createdAt]);
     }
 
     /**
@@ -108,5 +134,11 @@ readonly class AnnouncementsSection implements SectionInterface
         }
 
         return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, $value) ?: null;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->em->createQuery('DELETE App\Entity\Announcement e')->execute();
     }
 }

@@ -4,6 +4,7 @@ namespace Tests\Unit\Portability\Section;
 
 use App\Entity\User;
 use App\Portability\DataCategory;
+use App\Portability\InstanceScopeBuilder;
 use App\Portability\Outcome;
 use App\Portability\Scope;
 use App\Portability\Section\CirculationSection;
@@ -186,7 +187,7 @@ final class CirculationSectionTest extends SectionTestCase
 
         $users = [$this->user(1, 'member@example.org'), $this->user(2, 'quiet@example.org'), $this->user(9, 'steward@example.org')];
 
-        return new CirculationSection($this->entityManager($users), $circulation);
+        return new CirculationSection($this->entityManager($users), $circulation, $this->createStub(InstanceScopeBuilder::class));
     }
 
     private function user(int $id, string $email): User

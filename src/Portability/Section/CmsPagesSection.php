@@ -14,6 +14,7 @@ use App\Enum\MenuLocation;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use DateTimeImmutable;
@@ -106,7 +107,7 @@ readonly class CmsPagesSection implements SectionInterface
             $existing = $slug !== '' ? $this->em->getRepository(Cms::class)->findOneBy(['slug' => $slug]) : null;
             if ($existing instanceof Cms) {
                 $context->mapRef(Cms::class, $ref, $existing);
-                $context->count($this->getKey(), Outcome::Skipped);
+                $context->count($this->getKey(), Outcome::Matched);
                 continue;
             }
 
@@ -186,5 +187,15 @@ readonly class CmsPagesSection implements SectionInterface
         }
 
         $this->em->persist($block);
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->em->createQuery('DELETE App\Entity\CmsBlock e')->execute();
+        $this->em->createQuery('DELETE App\Entity\CmsTitle e')->execute();
+        $this->em->createQuery('DELETE App\Entity\CmsLinkName e')->execute();
+        $this->em->createQuery('DELETE App\Entity\CmsMenuLocation e')->execute();
+        $this->em->createQuery('DELETE App\Entity\Cms e')->execute();
     }
 }

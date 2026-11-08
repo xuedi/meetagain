@@ -16,10 +16,12 @@ use App\Enum\ImageType;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
+use App\Service\Config\LanguageService;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -32,6 +34,7 @@ readonly class EventsSection implements SectionInterface
         private EntityManagerInterface $em,
         private LocationRepository $locationRepository,
         private UserRepository $userRepository,
+        private LanguageService $languageService,
     ) {}
 
     #[Override]
@@ -104,13 +107,23 @@ readonly class EventsSection implements SectionInterface
                 continue;
             }
 
+            $start = new DateTime((string) ($row['start'] ?? ''));
+            $existing = $this->findEvent($start, $row, $context->resolveRef(Location::class, $row['location_ref'] ?? null));
+            if ($existing instanceof Event) {
+                if (isset($row['ref'])) {
+                    $context->mapRef(Event::class, (int) $row['ref'], $existing);
+                }
+                $context->count($this->getKey(), Outcome::Matched);
+                continue;
+            }
+
             $event = new Event();
             $event->setInitial((bool) ($row['initial'] ?? true));
             $event->setExternalRsvp((int) ($row['external_rsvp'] ?? 0));
             $event->setFeatured((bool) ($row['featured'] ?? false));
             $event->setCanceled(false);
             $event->setCreatedAt(new DateTimeImmutable());
-            $event->setStart(new DateTime((string) ($row['start'] ?? '')));
+            $event->setStart($start);
             $event->setLocation($this->resolveLocation($row, $context));
             $event->setStatus(EventStatus::tryFrom((string) ($row['status'] ?? '')) ?? EventStatus::Published);
 
@@ -155,6 +168,40 @@ readonly class EventsSection implements SectionInterface
             }
             $context->count($this->getKey(), Outcome::Created);
         }
+    }
+
+    /**
+     * @param array<array-key, mixed> $row
+     */
+    private function findEvent(DateTime $start, array $row, ?Location $location): ?Event
+    {
+        $titles = is_array($row['titles'] ?? null) ? $row['titles'] : [];
+        $locale = $this->keyLocale($titles);
+        if ($locale === null) {
+            return null;
+        }
+
+        $title = (string) $titles[$locale];
+        $hasLocation = $location instanceof Location && $location->getId() !== null;
+        $candidates = $this->em->getRepository(Event::class)->findBy($hasLocation ? ['start' => $start, 'location' => $location] : ['start' => $start]);
+
+        return array_find($candidates, static fn(Event $candidate): bool => $candidate->getTitle($locale) === $title);
+    }
+
+    /**
+     * @param array<array-key, mixed> $titles
+     */
+    private function keyLocale(array $titles): ?string
+    {
+        $default = $this->languageService->getEnabledCodes()[0] ?? null;
+        if ($default !== null && isset($titles[$default])) {
+            return $default;
+        }
+
+        ksort($titles);
+        $first = array_key_first($titles);
+
+        return $first === null ? null : (string) $first;
     }
 
     /**
@@ -221,5 +268,13 @@ readonly class EventsSection implements SectionInterface
         $this->em->persist($location);
 
         return $location;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->em->createQuery('UPDATE App\Entity\Image i SET i.event = NULL WHERE i.event IS NOT NULL')->execute();
+        $this->em->createQuery('DELETE App\Entity\EventTranslation e')->execute();
+        $this->em->createQuery('DELETE App\Entity\Event e')->execute();
     }
 }

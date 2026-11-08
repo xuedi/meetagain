@@ -111,6 +111,12 @@ readonly class GlossaryContributor implements ContributorInterface
         );
     }
 
+    #[Override]
+    public function purgeItems(): void
+    {
+        $this->em->createQuery(sprintf('DELETE %s e', Glossary::class))->execute();
+    }
+
     /**
      * @param array<string, mixed> $row
      * @return array<string, string>

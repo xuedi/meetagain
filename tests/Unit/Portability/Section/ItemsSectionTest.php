@@ -107,6 +107,22 @@ final class ItemsSectionTest extends SectionTestCase
         static::assertSame(91, $context->resolveItem('dish', 7));
     }
 
+    public function testARowTheContributorNeitherCreatesNorMatchesCountsAsDropped(): void
+    {
+        // Arrange
+        $contributor = $this->contributor('photo', [], new ImportResult([1 => 41], created: 1, matched: 0));
+        $context = $this->context();
+
+        // Act
+        new ItemsSection($this->registry([$contributor]), $this->createStub(TagAssignments::class))->import([
+            'photo' => ['rows' => [['ref' => 1], ['ref' => 2], ['ref' => 3]]],
+        ], $context);
+
+        // Assert
+        static::assertSame(1, $context->toSummary()->get('photo', Outcome::Created));
+        static::assertSame(2, $context->toSummary()->get('photo', Outcome::Dropped));
+    }
+
     public function testEveryRowOfATypeWithoutAnActiveContributorIsSkipped(): void
     {
         // Arrange

@@ -137,6 +137,8 @@ outcome, regardless of visibility; the second writes one back exactly as given. 
 settlement listener, so a settled ballot keeps its recorded outcome even when some of its votes stayed behind. The
 application's archive section is the one caller, and it decides per purpose which ballots and votes leave.
 
+`purge()` deletes every ballot with its options and votes, for a clean import, and notifies no listener either.
+
 ## Becoming a consumer
 
 1. Inject `BallotInterface` and call `open()` with a `BallotRequest`: a namespaced purpose, at least two distinct

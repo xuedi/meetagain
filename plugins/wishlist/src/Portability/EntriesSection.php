@@ -8,6 +8,7 @@ use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
 use App\Portability\PluginSectionInterface;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
@@ -145,5 +146,11 @@ readonly class EntriesSection implements PluginSectionInterface
         }
 
         return $emails;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->em->createQuery(sprintf('DELETE %s e', WishlistEntry::class))->execute();
     }
 }

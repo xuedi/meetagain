@@ -2,18 +2,23 @@
 
 namespace App\Controller\Admin\Settings;
 
+use App\Activity\ActivityService;
+use App\Activity\Messages\AdminCleanImport;
 use App\Admin\Navigation\AdminNavigationInterface;
 use App\Admin\Tabs\AdminTabsInterface;
 use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Admin\Top\Infos\AdminTopInfoText;
+use App\Entity\User;
 use App\Portability\ArchiveReader;
+use App\Portability\CleanImport;
 use App\Portability\ExportAction;
 use App\Portability\Importer;
 use App\Portability\ImportSummary;
 use App\Portability\KindLabels;
 use App\Portability\Outcome;
+use App\Portability\SiteSettings;
 use App\Service\Config\PluginService;
 use App\Service\Event\EventService;
 use App\Service\System\CleanupService;
@@ -30,6 +35,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -51,6 +57,9 @@ final class ImportController extends AbstractSettingsController implements Admin
         private readonly FilesystemOperator $privateStorage,
         private readonly ExportAction $exportAction,
         private readonly ActionQueueInterface $actionQueue,
+        private readonly CleanImport $cleanImport,
+        private readonly SiteSettings $siteSettings,
+        private readonly ActivityService $activityService,
     ) {
         parent::__construct($translator, 'import');
     }
@@ -79,6 +88,8 @@ final class ImportController extends AbstractSettingsController implements Admin
 
         try {
             $archive = $this->archiveReader->describe($file->getPathname());
+            $preview = $this->importer->preview($file->getPathname());
+            $site = $this->archiveReader->read($file->getPathname())['site'] ?? null;
         } catch (RuntimeException $e) {
             return $this->renderPage(error: $e->getMessage());
         }
@@ -96,7 +107,7 @@ final class ImportController extends AbstractSettingsController implements Admin
 
         $request->getSession()->set(self::PENDING_ARCHIVE, $pendingId);
 
-        return $this->renderPage(archive: $archive);
+        return $this->renderPage(archive: $archive, summary: $preview, siteDiff: is_array($site) ? $this->siteSettings->diff($site) : []);
     }
 
     #[Route('/run', name: 'app_admin_system_import_run', methods: ['POST'])]
@@ -106,20 +117,39 @@ final class ImportController extends AbstractSettingsController implements Admin
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
+        $isClean = $request->request->getBoolean('clean_import');
+        if ($isClean && !$this->cleanImport->isOffered()) {
+            throw new AccessDeniedException('Clean import is not offered on this instance.');
+        }
+
         $pending = $this->pendingKey($request->getSession()->get(self::PENDING_ARCHIVE));
         if ($pending === null || !$this->privateStorage->fileExists($pending)) {
             return $this->renderPage(error: $this->translator->trans('admin_system_import.error_expired'));
         }
 
+        if ($isClean && !$this->cleanImport->hasFreshBackup()) {
+            return $this->renderPage(error: $this->translator->trans('admin_system_import.error_no_backup', ['%minutes%' => CleanImport::BACKUP_MAX_MINUTES]));
+        }
+
+        $admin = $this->getUser();
+        if (!$admin instanceof User) {
+            throw new AccessDeniedException('An import needs a signed-in member.');
+        }
+
         $copy = (string) tempnam(sys_get_temp_dir(), 'meetagain-import-');
         try {
             file_put_contents($copy, $this->privateStorage->readStream($pending));
-            $summary = $this->importer->import($copy, applySite: $request->request->getBoolean('site_settings'));
+            $archiveName = $this->archiveReader->describe($copy)['name'];
+            $summary = $this->importer->import($copy, applySite: $request->request->getBoolean('site_settings'), cleanFor: $isClean ? $admin : null);
         } catch (RuntimeException $e) {
             return $this->renderPage(error: $e->getMessage());
         } finally {
             unlink($copy);
             $this->discardPendingArchive($request->getSession());
+        }
+
+        if ($isClean) {
+            $this->activityService->log(AdminCleanImport::TYPE, $admin, ['archive' => $archiveName]);
         }
 
         return $this->renderPage(summary: $summary);
@@ -177,10 +207,14 @@ final class ImportController extends AbstractSettingsController implements Admin
 
     /**
      * @param array{name: string, exported_at: string, description: string, plugins: list<string>, missing_plugins: list<string>, counts: array<string, int>, ...}|null $archive
+     * @param list<array{field: string, current: string|bool, archive: string|bool}> $siteDiff
      */
-    private function renderPage(?string $error = null, ?array $archive = null, ?ImportSummary $summary = null): Response
+    private function renderPage(?string $error = null, ?array $archive = null, ?ImportSummary $summary = null, array $siteDiff = []): Response
     {
-        $kinds = array_keys($archive['counts'] ?? $summary->counts ?? []);
+        $admin = $this->getUser();
+        $isCleanOffered = $archive !== null && $admin instanceof User && $this->cleanImport->isOffered();
+        $currentCounts = $isCleanOffered ? $this->cleanImport->currentCounts($admin) : [];
+        $kinds = array_values(array_unique([...array_keys($archive['counts'] ?? []), ...array_keys($summary?->counts ?? []), ...array_keys($currentCounts)]));
         $pluginNames = [];
         foreach ($archive['plugins'] ?? [] as $pluginKey) {
             $pluginNames[$pluginKey] = $this->pluginService->getName($pluginKey);
@@ -202,6 +236,13 @@ final class ImportController extends AbstractSettingsController implements Admin
             'exportInProgress' => $latestExport !== null && !$latestExport->isFinished(),
             'exportFailure' => $latestExport?->isFinished() && $latestExport->status !== Status::ok ? $latestExport->message : null,
             'exportMaxHours' => CleanupService::EXPORT_MAX_HOURS,
+            'previewKinds' => array_values(array_unique([...array_keys($archive['counts'] ?? []), ...array_keys($summary?->counts ?? [])])),
+            'siteDiff' => $siteDiff,
+            'isAlreadyImported' => $archive !== null && $summary instanceof ImportSummary && $summary->createdTotal() === 0,
+            'isCleanOffered' => $isCleanOffered,
+            'hasFreshBackup' => $isCleanOffered && $this->cleanImport->hasFreshBackup(),
+            'backupMaxMinutes' => CleanImport::BACKUP_MAX_MINUTES,
+            'currentCounts' => $currentCounts,
             'adminTop' => $this->buildAdminTop($archive, $summary, $latestExport),
             'adminTabs' => $this->getTabs(),
         ]);
@@ -212,7 +253,7 @@ final class ImportController extends AbstractSettingsController implements Admin
      */
     private function buildAdminTop(?array $archive, ?ImportSummary $summary, ?RequestedAction $latestExport): AdminTop
     {
-        if ($summary instanceof ImportSummary) {
+        if ($archive === null && $summary instanceof ImportSummary) {
             $lost = array_sum($summary->getLosses());
             $tag = $lost > 0
                 ? $this->tag('is-warning', $this->translator->trans('admin_system_import.tag_losses', ['%count%' => $lost]))
@@ -226,6 +267,10 @@ final class ImportController extends AbstractSettingsController implements Admin
         }
 
         $info = [new AdminTopInfoText($this->translator->trans('admin_system_import.help_preview'))];
+        if ($summary instanceof ImportSummary && $summary->createdTotal() === 0) {
+            $info[] = $this->tag('is-warning', $this->translator->trans('admin_system_import.tag_already_imported'));
+        }
+
         $missing = count($archive['missing_plugins']);
         if ($missing > 0) {
             $info[] = new AdminTopInfoText($this->translator->trans('admin_system_import.help_missing_plugins'));

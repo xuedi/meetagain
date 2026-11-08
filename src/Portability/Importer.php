@@ -2,11 +2,15 @@
 
 namespace App\Portability;
 
+use App\Entity\Image;
 use App\Entity\User;
 use App\ExtendedFilesystem;
+use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use App\Service\Cms\CmsService;
 use App\Service\Config\PluginService;
+use App\Service\Media\ImageLocationService;
+use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -35,12 +39,50 @@ readonly class Importer
         private ClockInterface $clock,
         private PluginService $pluginService,
         private CmsService $cmsService,
+        private ImageLocationService $imageLocationService,
+        private ImageRepository $imageRepository,
+        private ImageService $imageService,
     ) {}
 
-    public function import(string $zipOrDirectory, bool $shiftDates = false, bool $applySite = false): ImportSummary
+    public function import(string $zipOrDirectory, bool $shiftDates = false, bool $applySite = false, ?User $cleanFor = null): ImportSummary
+    {
+        $locatedImageIds = $cleanFor instanceof User ? $this->locatedImageIds() : [];
+
+        $summary = $this->unpacked($zipOrDirectory, fn(string $directory): ImportSummary => $this->importDirectory(
+            $directory,
+            $shiftDates,
+            $applySite,
+            $cleanFor,
+            dryRun: false,
+        ));
+
+        $this->cmsService->invalidateAll();
+        $this->cmsService->invalidateMenuCaches();
+        if ($cleanFor instanceof User) {
+            $this->removeDetachedImages($locatedImageIds);
+        }
+
+        return $summary;
+    }
+
+    public function preview(string $zipOrDirectory, bool $applySite = false, ?User $cleanFor = null): ImportSummary
+    {
+        return $this->unpacked($zipOrDirectory, fn(string $directory): ImportSummary => $this->importDirectory(
+            $directory,
+            false,
+            $applySite,
+            $cleanFor,
+            dryRun: true,
+        ));
+    }
+
+    /**
+     * @param callable(string): ImportSummary $work
+     */
+    private function unpacked(string $zipOrDirectory, callable $work): ImportSummary
     {
         if ($this->fs->isDirectory($zipOrDirectory)) {
-            return $this->importDirectory($zipOrDirectory, $shiftDates, $applySite);
+            return $work($zipOrDirectory);
         }
 
         $tempDir = sys_get_temp_dir() . '/meetagain-import-' . uniqid('', true);
@@ -49,42 +91,43 @@ readonly class Importer
         try {
             $this->extract($zipOrDirectory, $tempDir);
 
-            return $this->importDirectory($tempDir, $shiftDates, $applySite);
+            return $work($tempDir);
         } finally {
             $this->removeDirectory($tempDir);
         }
     }
 
-    private function importDirectory(string $directory, bool $shiftDates, bool $applySite): ImportSummary
+    private function importDirectory(string $directory, bool $shiftDates, bool $applySite, ?User $cleanFor, bool $dryRun): ImportSummary
     {
         $data = $this->archiveReader->read($directory);
-
-        $systemUser = $this->userRepository->findOneBy(['email' => 'import@example.com']);
-        if (!$systemUser instanceof User) {
-            throw new RuntimeException('System import user not found. Run app:install:seed first.');
-        }
+        $systemUser = $this->systemUser();
 
         $weeks = $shiftDates ? $this->dateShifter->weeksBetween($this->readExportedAt($data), $this->clock->now()) : 0;
         $data = $this->dateShifter->shift($data, $weeks);
         $site = $applySite && is_array($data['site'] ?? null) ? $data['site'] : null;
 
-        $context = new ImportContext($this->imageImporter, $directory, $systemUser, $this->readAttributions($data));
         $sections = $this->activeSections();
-        $this->em->wrapInTransaction(function () use ($data, $site, $context, $sections): void {
+        $walk = function () use ($directory, $data, $site, $sections, $cleanFor, $dryRun, $systemUser): ImportContext {
+            if ($cleanFor instanceof User) {
+                $this->purge($sections, new PurgeContext($cleanFor, $systemUser));
+            }
+
+            $context = new ImportContext($this->imageImporter, $directory, $systemUser, $this->readAttributions($data), $data, $dryRun);
             foreach ($sections as $section) {
                 $rows = $data[$section->getKey()] ?? [];
                 $section->import(is_array($rows) ? $rows : [], $context);
                 $this->em->flush();
             }
 
-            if ($site !== null) {
+            if ($site !== null && !$dryRun) {
                 $this->siteSettings->apply($site, $context);
                 $this->em->flush();
             }
-        });
 
-        $this->cmsService->invalidateAll();
-        $this->cmsService->invalidateMenuCaches();
+            return $context;
+        };
+
+        $context = $dryRun ? $this->rolledBack($walk) : $this->em->wrapInTransaction($walk);
 
         $claimed = array_flip(array_map(static fn(SectionInterface $section): string => $section->getKey(), $sections));
         foreach ($this->archiveReader->countRows(array_diff_key($data, $claimed)) as $kind => $rows) {
@@ -92,6 +135,109 @@ readonly class Importer
         }
 
         return $context->toSummary($this->archiveReader->missingPlugins($data), $weeks, $site !== null);
+    }
+
+    /**
+     * @param callable(): ImportContext $walk
+     */
+    private function rolledBack(callable $walk): ImportContext
+    {
+        $managedBefore = $this->managedEntities();
+        $this->em->beginTransaction();
+        try {
+            return $walk();
+        } finally {
+            $this->em->rollback();
+            $this->forgetDryRun($managedBefore);
+        }
+    }
+
+    /**
+     * @return array<int, object> spl object id => entity
+     */
+    private function managedEntities(): array
+    {
+        $entities = [];
+        foreach ($this->em->getUnitOfWork()->getIdentityMap() as $byId) {
+            foreach ($byId as $entity) {
+                $entities[spl_object_id($entity)] = $entity;
+            }
+        }
+
+        return $entities;
+    }
+
+    /**
+     * @param array<int, object> $managedBefore
+     */
+    private function forgetDryRun(array $managedBefore): void
+    {
+        if (!$this->em->isOpen()) {
+            return;
+        }
+
+        foreach ($this->managedEntities() as $objectId => $entity) {
+            if (!isset($managedBefore[$objectId])) {
+                $this->em->detach($entity);
+            }
+        }
+
+        foreach ($managedBefore as $entity) {
+            $this->em->refresh($entity);
+        }
+    }
+
+    /**
+     * @param list<SectionInterface> $sections
+     */
+    private function purge(array $sections, PurgeContext $context): void
+    {
+        foreach (array_reverse($sections) as $section) {
+            $section->purge($context);
+        }
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function locatedImageIds(): array
+    {
+        $this->imageLocationService->discover();
+
+        return array_keys($this->imageLocationService->countPerImageId());
+    }
+
+    /**
+     * @param list<int> $imageIds
+     */
+    private function removeDetachedImages(array $imageIds): void
+    {
+        if ($imageIds === []) {
+            return;
+        }
+
+        $this->imageLocationService->discover();
+        $stillLocated = $this->imageLocationService->countPerImageId();
+        foreach ($imageIds as $imageId) {
+            if (isset($stillLocated[$imageId])) {
+                continue;
+            }
+
+            $image = $this->imageRepository->find($imageId);
+            if ($image instanceof Image) {
+                $this->imageService->removeIfOrphaned($image);
+            }
+        }
+    }
+
+    private function systemUser(): User
+    {
+        $systemUser = $this->userRepository->findOneBy(['email' => 'import@example.com']);
+        if (!$systemUser instanceof User) {
+            throw new RuntimeException('System import user not found. Run app:install:seed first.');
+        }
+
+        return $systemUser;
     }
 
     private function extract(string $zipPath, string $tempDir): void

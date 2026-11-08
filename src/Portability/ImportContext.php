@@ -23,12 +23,15 @@ class ImportContext
 
     /**
      * @param array<string, array{attribution?: string|null, attribution_not_required?: bool}> $imageAttributions
+     * @param array<array-key, mixed> $archive
      */
     public function __construct(
         private readonly ImageImporter $imageImporter,
         private readonly string $extractedArchiveDir,
         private readonly User $systemUser,
         private readonly array $imageAttributions = [],
+        private readonly array $archive = [],
+        private readonly bool $dryRun = false,
     ) {}
 
     public function importImage(mixed $archiveRelativePath, ImageType $type, ?User $uploader = null): ?Image
@@ -47,6 +50,7 @@ class ImportContext
             $uploader ?? $this->systemUser,
             $attribution['attribution'] ?? null,
             $attribution['attribution_not_required'] ?? false,
+            !$this->dryRun,
         );
 
         $isUncredited = $image?->getUploader() === $this->systemUser;
@@ -60,6 +64,16 @@ class ImportContext
     public function getSystemUser(): User
     {
         return $this->systemUser;
+    }
+
+    /**
+     * @return list<array<array-key, mixed>>
+     */
+    public function archiveRows(string $key): array
+    {
+        $rows = $this->archive[$key] ?? null;
+
+        return is_array($rows) ? array_values(array_filter($rows, is_array(...))) : [];
     }
 
     /**

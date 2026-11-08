@@ -189,6 +189,8 @@ else from the application; beside it, the task module's contract for that action
 `PortableGrant` values, and `restoreGrant()` writes one back with its dates and drops the context's cached map. It
 stays off `TrustInterface` because that surface must never hand anyone another member's edges.
 
+`purgeGrants()` deletes every vouch of the given contexts and drops their cached maps, for a clean import.
+
 ## Becoming a consumer
 
 1. Implement `ContextDescriberInterface` and mint a context string of your own shape. The module never parses it.

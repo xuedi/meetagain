@@ -2,8 +2,12 @@
 
 namespace App\Portability\Section;
 
+use App\Entity\Activity;
 use App\Entity\Image;
+use App\Entity\Location;
+use App\Entity\Message;
 use App\Entity\User;
+use App\Entity\UserBlock;
 use App\Enum\ImageType;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
@@ -11,6 +15,7 @@ use App\Portability\Cities;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use App\Repository\UserRepository;
@@ -133,5 +138,33 @@ readonly class UsersSection implements SectionInterface
         $this->em->persist($user);
 
         return $user;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $spared = array_values(array_unique([(int) $context->admin->getId(), (int) $context->systemUser->getId(), ...$this->systemAccountIds()]));
+        foreach ([Image::class => 'uploader', Location::class => 'user'] as $class => $field) {
+            $this->em
+                ->createQuery(sprintf('UPDATE %1$s e SET e.%2$s = :system WHERE e.%2$s NOT IN (:spared)', $class, $field))
+                ->execute(['system' => $context->systemUser, 'spared' => $spared]);
+        }
+
+        $this->em
+            ->createQuery(sprintf('DELETE %s m WHERE m.sender NOT IN (:spared) OR m.receiver NOT IN (:spared)', Message::class))
+            ->execute(['spared' => $spared]);
+        $this->em
+            ->createQuery(sprintf('DELETE %s b WHERE b.blocker NOT IN (:spared) OR b.blocked NOT IN (:spared)', UserBlock::class))
+            ->execute(['spared' => $spared]);
+        $this->em->createQuery(sprintf('DELETE %s a WHERE a.user NOT IN (:spared)', Activity::class))->execute(['spared' => $spared]);
+        $this->em->createQuery(sprintf('DELETE %s u WHERE u.id NOT IN (:spared)', User::class))->execute(['spared' => $spared]);
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function systemAccountIds(): array
+    {
+        return array_map(static fn(User $user): int => (int) $user->getId(), $this->userRepository->findBy(['role' => UserRole::System]));
     }
 }

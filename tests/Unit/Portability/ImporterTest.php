@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Portability;
 
+use App\Entity\Image;
 use App\Entity\User;
 use App\Enum\ImageType;
 use App\ExtendedFilesystem;
@@ -13,11 +14,15 @@ use App\Portability\ImportContext;
 use App\Portability\Importer;
 use App\Portability\Outcome;
 use App\Portability\PluginSectionInterface;
+use App\Portability\PurgeContext;
 use App\Portability\SectionInterface;
 use App\Portability\SiteSettings;
+use App\Repository\ImageRepository;
 use App\Repository\UserRepository;
 use App\Service\Cms\CmsService;
 use App\Service\Config\PluginService;
+use App\Service\Media\ImageLocationService;
+use App\Service\Media\ImageService;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -292,6 +297,127 @@ final class ImporterTest extends TestCase
         $this->importer([$section], imageImporter: $imageImporter)->import($this->zipPath);
     }
 
+    public function testAPreviewRunsEverySectionAndRollsTheTransactionBack(): void
+    {
+        // Arrange
+        $this->zipPath = $this->archive(['format' => Exporter::FORMAT, 'locations' => [['ref' => 1]]]);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->never())->method('wrapInTransaction');
+        $em->expects($this->once())->method('beginTransaction');
+        $em->expects($this->once())->method('rollback');
+
+        // Act
+        $this->importer([$this->section('locations', 10)], em: $em)->preview($this->zipPath);
+
+        // Assert
+        static::assertSame([['locations', [['ref' => 1]]]], $this->calls);
+    }
+
+    public function testAPreviewStoresNoImageFile(): void
+    {
+        // Arrange
+        $this->zipPath = $this->archive(['format' => Exporter::FORMAT, 'events' => [['image_file' => 'images/a.jpg']]]);
+        $imageImporter = $this->createMock(ImageImporter::class);
+        $imageImporter->expects($this->once())->method('import')->with(static::anything(), ImageType::EventTeaser, static::anything(), null, false, false);
+
+        $section = $this->createStub(SectionInterface::class);
+        $section->method('getKey')->willReturn('events');
+        $section
+            ->method('import')
+            ->willReturnCallback(static function (array $rows, ImportContext $context): void {
+                $context->importImage($rows[0]['image_file'], ImageType::EventTeaser);
+            });
+
+        // Act
+        $this->importer([$section], imageImporter: $imageImporter)->preview($this->zipPath);
+    }
+
+    public function testAPreviewNeitherWritesTheSiteBlockNorClearsTheCaches(): void
+    {
+        // Arrange
+        $this->zipPath = $this->archive(['format' => Exporter::FORMAT, 'site' => ['name' => 'Weiqi Club']]);
+        $siteSettings = $this->createMock(SiteSettings::class);
+        $siteSettings->expects($this->never())->method('apply');
+        $cmsService = $this->createMock(CmsService::class);
+        $cmsService->expects($this->never())->method('invalidateAll');
+
+        // Act
+        $this->importer([], siteSettings: $siteSettings, cmsService: $cmsService)->preview($this->zipPath, applySite: true);
+    }
+
+    public function testACleanImportPurgesInDescendingOrderBeforeAnySectionImports(): void
+    {
+        // Arrange
+        $this->zipPath = $this->archive(['format' => Exporter::FORMAT]);
+        $sections = [$this->section('locations', 10), $this->section('events', 40), $this->section('users', 20)];
+
+        // Act
+        $this->importer($sections)->import($this->zipPath, cleanFor: new User());
+
+        // Assert
+        static::assertSame(
+            ['purge events', 'purge users', 'purge locations', 'locations', 'users', 'events'],
+            array_map(static fn(array $call): string => $call[0], $this->calls),
+        );
+    }
+
+    public function testAnImportWithoutTheCleanFlagPurgesNothing(): void
+    {
+        // Arrange
+        $this->zipPath = $this->archive(['format' => Exporter::FORMAT]);
+
+        // Act
+        $this->importer([$this->section('users', 20)])->import($this->zipPath);
+
+        // Assert
+        static::assertSame([['users', []]], $this->calls);
+    }
+
+    public function testACleanImportRemovesTheImagesItLeftWithoutALocation(): void
+    {
+        // Arrange
+        $this->zipPath = $this->archive(['format' => Exporter::FORMAT]);
+        $locations = $this->createStub(ImageLocationService::class);
+        $locations->method('countPerImageId')->willReturnOnConsecutiveCalls([7 => 1, 8 => 1], [8 => 1]);
+        $detached = new Image();
+        $images = $this->createStub(ImageRepository::class);
+        $images->method('find')->willReturnCallback(static fn(int $id): ?Image => $id === 7 ? $detached : new Image());
+        $imageService = $this->createMock(ImageService::class);
+        $imageService->expects($this->once())->method('removeIfOrphaned')->with($detached);
+
+        // Act
+        $this->importer([], imageLocationService: $locations, imageService: $imageService, imageRepository: $images)->import(
+            $this->zipPath,
+            cleanFor: new User(),
+        );
+    }
+
+    public function testACleanImportRefreshesTheImageLocationsBeforeItNotesThem(): void
+    {
+        // Arrange
+        $this->zipPath = $this->archive(['format' => Exporter::FORMAT]);
+        $calls = [];
+        $locations = $this->createStub(ImageLocationService::class);
+        $locations
+            ->method('discover')
+            ->willReturnCallback(static function () use (&$calls): void {
+                $calls[] = 'discover';
+            });
+        $locations
+            ->method('countPerImageId')
+            ->willReturnCallback(static function () use (&$calls): array {
+                $calls[] = 'snapshot';
+
+                return [7 => 1];
+            });
+
+        // Act
+        $this->importer([], imageLocationService: $locations)->import($this->zipPath, cleanFor: new User());
+
+        // Assert
+        static::assertSame(['discover', 'snapshot', 'discover', 'snapshot'], $calls);
+    }
+
     public function testRemoveDirectoryIsNoOpWhenPathIsNotADirectory(): void
     {
         // Arrange
@@ -351,9 +477,15 @@ final class ImporterTest extends TestCase
         ?ImageImporter $imageImporter = null,
         array $activePlugins = [],
         ?CmsService $cmsService = null,
+        ?EntityManagerInterface $em = null,
+        ?ImageLocationService $imageLocationService = null,
+        ?ImageService $imageService = null,
+        ?ImageRepository $imageRepository = null,
     ): Importer {
-        $em = $this->createStub(EntityManagerInterface::class);
-        $em->method('wrapInTransaction')->willReturnCallback(static fn(callable $work): mixed => $work());
+        if ($em === null) {
+            $em = $this->createStub(EntityManagerInterface::class);
+            $em->method('wrapInTransaction')->willReturnCallback(static fn(callable $work): mixed => $work());
+        }
 
         $userRepository = $this->createStub(UserRepository::class);
         $userRepository->method('findOneBy')->willReturn($systemUser);
@@ -375,6 +507,9 @@ final class ImporterTest extends TestCase
             new MockClock('2026-09-16 12:00:00'),
             $pluginService,
             $cmsService ?? $this->createStub(CmsService::class),
+            $imageLocationService ?? $this->createStub(ImageLocationService::class),
+            $imageRepository ?? $this->createStub(ImageRepository::class),
+            $imageService ?? $this->createStub(ImageService::class),
         );
     }
 
@@ -387,6 +522,11 @@ final class ImporterTest extends TestCase
             ->method('import')
             ->willReturnCallback(function (array $rows) use ($key): void {
                 $this->calls[] = [$key, $rows];
+            });
+        $section
+            ->method('purge')
+            ->willReturnCallback(function (PurgeContext $context) use ($key): void {
+                $this->calls[] = ['purge ' . $key, []];
             });
 
         return $section;

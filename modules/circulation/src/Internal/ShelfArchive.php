@@ -130,6 +130,21 @@ final readonly class ShelfArchive implements CirculationInterface
         return $handoverIds;
     }
 
+    #[Override]
+    public function purge(array $contexts): void
+    {
+        if ($contexts === []) {
+            return;
+        }
+
+        $this->em
+            ->createQuery(sprintf('DELETE %s h WHERE h.copy IN (SELECT c FROM %s c WHERE c.context IN (:contexts))', Handover::class, Copy::class))
+            ->execute(['contexts' => $contexts]);
+        foreach ([LedgerEntry::class, Request::class, Copy::class] as $class) {
+            $this->em->createQuery(sprintf('DELETE %s e WHERE e.context IN (:contexts)', $class))->execute(['contexts' => $contexts]);
+        }
+    }
+
     private function portableCopy(Copy $copy): PortableCopy
     {
         return new PortableCopy(

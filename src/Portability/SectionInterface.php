@@ -6,7 +6,8 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
  * One top-level block of an archive, in both directions. The export reads only what the scope
- * names. Imports run in ascending order, so a section can resolve refs an earlier one mapped.
+ * names. Imports run in ascending order, so a section can resolve refs an earlier one mapped;
+ * a clean import purges in descending order, so a section deletes its rows before their parents go.
  */
 #[AutoconfigureTag]
 interface SectionInterface
@@ -24,4 +25,9 @@ interface SectionInterface
      * @param array<array-key, mixed> $rows
      */
     public function import(array $rows, ImportContext $context): void;
+
+    /**
+     * Deletes every row this section imports, apart from the admin's own account and the system accounts.
+     */
+    public function purge(PurgeContext $context): void;
 }

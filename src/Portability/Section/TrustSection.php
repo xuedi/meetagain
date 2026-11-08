@@ -6,7 +6,9 @@ use App\Entity\User;
 use App\Portability\DataCategory;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
+use App\Portability\InstanceScopeBuilder;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use App\Repository\UserRepository;
@@ -24,6 +26,7 @@ readonly class TrustSection implements SectionInterface
         private GrantTransferInterface $grants,
         private UserRepository $userRepository,
         private CirculationInterface $circulation,
+        private InstanceScopeBuilder $instanceScope,
     ) {}
 
     #[Override]
@@ -76,6 +79,7 @@ readonly class TrustSection implements SectionInterface
     #[Override]
     public function import(array $rows, ImportContext $context): void
     {
+        $edges = [];
         foreach ($rows as $row) {
             if (!is_array($row)) {
                 continue;
@@ -92,19 +96,32 @@ readonly class TrustSection implements SectionInterface
                 continue;
             }
 
+            $trustContext = $this->circulation->contextFor($itemType);
+            $edges[$trustContext] ??= $this->edges($trustContext);
+            if (isset($edges[$trustContext][$fromUserId . '-' . $toUserId])) {
+                $context->count($this->getKey(), Outcome::Matched);
+                continue;
+            }
+
             $createdAt = $this->date($row['created_at'] ?? null) ?? new DateTimeImmutable();
             $this->grants->restoreGrant(
-                new PortableGrant(
-                    $this->circulation->contextFor($itemType),
-                    $fromUserId,
-                    $toUserId,
-                    $level,
-                    $createdAt,
-                    $this->date($row['updated_at'] ?? null) ?? $createdAt,
-                ),
+                new PortableGrant($trustContext, $fromUserId, $toUserId, $level, $createdAt, $this->date($row['updated_at'] ?? null) ?? $createdAt),
             );
             $context->count($this->getKey(), Outcome::Created);
         }
+    }
+
+    /**
+     * @return array<string, true> "from-to" user ids of every grant stored in the context
+     */
+    private function edges(string $trustContext): array
+    {
+        $edges = [];
+        foreach ($this->grants->exportGrants([$trustContext]) as $grant) {
+            $edges[$grant->fromUserId . '-' . $grant->toUserId] = true;
+        }
+
+        return $edges;
     }
 
     /**
@@ -134,5 +151,11 @@ readonly class TrustSection implements SectionInterface
         }
 
         return DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, $value) ?: null;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->grants->purgeGrants(array_map(strval(...), array_keys($this->instanceScope->circulationContexts())));
     }
 }

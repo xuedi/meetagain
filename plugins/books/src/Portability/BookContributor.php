@@ -127,6 +127,12 @@ readonly class BookContributor implements ContributorInterface
         return new ImportResult(refToItemId: array_map(static fn(Book $book): int => (int) $book->getId(), $refToItemId), created: $created, matched: $matched);
     }
 
+    #[Override]
+    public function purgeItems(): void
+    {
+        $this->em->createQuery(sprintf('DELETE %s e', Book::class))->execute();
+    }
+
     private function nullableString(mixed $value): ?string
     {
         return $value === null || $value === '' ? null : (string) $value;

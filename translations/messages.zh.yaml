@@ -424,6 +424,7 @@ profile_social:
     activity_admin_event_cancelled: '取消了活动：%event%'
     activity_admin_event_cancelled_deleted: '取消了（已删除的活动）'
     activity_admin_event_deleted: '删除了活动：%event%'
+    activity_admin_clean_import: '干净导入了 %archive%'
     activity_admin_member_approved: '批准了成员：%user%'
     activity_admin_member_approved_deleted: '批准了已删除的成员'
     activity_admin_member_denied: '拒绝了成员：%user%'

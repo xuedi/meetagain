@@ -86,9 +86,17 @@ readonly class SongContributor implements ContributorInterface
     public function importItems(array $rows, ImportContext $context): ImportResult
     {
         $refToSong = [];
+        $matched = 0;
         foreach ($rows as $row) {
             $link = $this->mediaLink($row['media'] ?? null);
             if ($link === null) {
+                continue;
+            }
+
+            $stored = $this->songRepo->findOneBy(['mediaProvider' => $link->provider, 'mediaId' => $link->id]);
+            if ($stored instanceof Song) {
+                $refToSong[(int) ($row['ref'] ?? 0)] = $stored;
+                ++$matched;
                 continue;
             }
 
@@ -118,7 +126,17 @@ readonly class SongContributor implements ContributorInterface
 
         $this->em->flush();
 
-        return new ImportResult(refToItemId: array_map(static fn(Song $song): int => (int) $song->getId(), $refToSong), created: count($refToSong), matched: 0);
+        return new ImportResult(
+            refToItemId: array_map(static fn(Song $song): int => (int) $song->getId(), $refToSong),
+            created: count($refToSong) - $matched,
+            matched: $matched,
+        );
+    }
+
+    #[Override]
+    public function purgeItems(): void
+    {
+        $this->em->createQuery(sprintf('DELETE %s e', Song::class))->execute();
     }
 
     private function mediaLink(mixed $media): ?MediaLink

@@ -233,6 +233,58 @@ final class SiteSettingsTest extends TestCase
     /**
      * @param list<Language> $languages
      */
+    public function testTheDiffListsOnlyTheFieldsTheArchiveWouldChange(): void
+    {
+        // Arrange
+        $config = $this->createStub(ConfigService::class);
+        $config->method('getSiteName')->willReturn('Weiqi Club');
+        $config->method('getSeoDescription')->willReturn('Go in Berlin');
+        $config->method('isShowTownHall')->willReturn(false);
+        $languageService = $this->createStub(LanguageService::class);
+        $languageService->method('getEnabledCodes')->willReturn(['en']);
+        $colors = $this->createStub(Colors::class);
+        $colors->method('forScope')->willReturn(['color_primary' => '#111111', 'color_link' => '#222222']);
+        $site = [
+            'name' => 'Go Club Berlin',
+            'description' => 'Go in Berlin',
+            'languages' => ['de', 'en', 'xx'],
+            'theme_colors' => ['primary' => '#111111', 'link' => '#333333'],
+            'settings' => ['show_town_hall' => true, 'send_upcoming_digest' => false],
+        ];
+
+        // Act
+        $diff = $this->siteSettings(
+            config: $config,
+            languages: [$this->language('en', true, 1), $this->language('de', false, 2)],
+            languageService: $languageService,
+            colors: $colors,
+        )->diff($site);
+
+        // Assert
+        static::assertSame(
+            [
+                ['field' => 'name', 'current' => 'Weiqi Club', 'archive' => 'Go Club Berlin'],
+                ['field' => 'languages', 'current' => 'en', 'archive' => 'de, en'],
+                ['field' => 'theme_color', 'current' => 'link #222222', 'archive' => 'link #333333'],
+                ['field' => 'show_town_hall', 'current' => false, 'archive' => true],
+            ],
+            $diff,
+        );
+    }
+
+    public function testAnArchiveWithTheSameSettingsHasNoDiff(): void
+    {
+        // Arrange
+        $config = $this->createStub(ConfigService::class);
+        $config->method('getSiteName')->willReturn('Weiqi Club');
+
+        // Act
+        $diff = $this->siteSettings(config: $config)->diff(['name' => 'Weiqi Club', 'settings' => ['show_town_hall' => false]]);
+
+        // Assert
+        static::assertSame([], $diff);
+    }
+
     private function siteSettings(
         ?ConfigService $config = null,
         array $languages = [],

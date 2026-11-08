@@ -9,6 +9,7 @@ use App\Portability\DataCategory;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
 use App\Portability\Outcome;
+use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -77,10 +78,16 @@ readonly class RsvpsSection implements SectionInterface
                 continue;
             }
 
+            if ($event->hasRsvp($user)) {
+                $context->count($this->getKey(), Outcome::Matched);
+                continue;
+            }
+
             $event->addRsvp($user);
 
             $guestCount = max(0, min(RsvpGuest::MAX_GUESTS, (int) ($row['guests'] ?? 0)));
-            if ($guestCount > 0) {
+            $hasGuestRow = $this->em->getRepository(RsvpGuest::class)->findOneBy(['event' => $event, 'user' => $user]) instanceof RsvpGuest;
+            if ($guestCount > 0 && !$hasGuestRow) {
                 $guest = new RsvpGuest($event, $user);
                 for ($i = 0; $i < $guestCount; ++$i) {
                     $guest->increment();
@@ -108,5 +115,12 @@ readonly class RsvpsSection implements SectionInterface
         }
 
         return $guests;
+    }
+
+    #[Override]
+    public function purge(PurgeContext $context): void
+    {
+        $this->em->createQuery('DELETE App\Entity\RsvpGuest g')->execute();
+        $this->em->getConnection()->executeStatement('DELETE FROM event_rsvp');
     }
 }

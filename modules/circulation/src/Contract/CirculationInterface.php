@@ -31,4 +31,11 @@ interface CirculationInterface
      * @return array<int, int> handover ref => restored handover id
      */
     public function restore(PortableShelf $shelf): array;
+
+    /**
+     * Deletes every copy, request, handover and ledger entry in these contexts.
+     *
+     * @param list<string> $contexts
+     */
+    public function purge(array $contexts): void;
 }

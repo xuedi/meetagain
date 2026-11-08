@@ -15,4 +15,11 @@ interface GrantTransferInterface
     public function exportGrants(array $contexts): array;
 
     public function restoreGrant(PortableGrant $grant): void;
+
+    /**
+     * Deletes every grant in these contexts.
+     *
+     * @param list<string> $contexts
+     */
+    public function purgeGrants(array $contexts): void;
 }

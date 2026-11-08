@@ -267,6 +267,14 @@ final readonly class BallotService implements BallotInterface
         return (int) $restored->getId();
     }
 
+    #[Override]
+    public function purge(): void
+    {
+        foreach ([BallotVote::class, BallotOption::class, Ballot::class] as $class) {
+            $this->entityManager->createQuery(sprintf('DELETE %s e', $class))->execute();
+        }
+    }
+
     private function withdrawVotes(Ballot $ballot, int $userId): void
     {
         foreach ($this->votes->findForVoter($ballot, $userId) as $previous) {
