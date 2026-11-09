@@ -1,6 +1,6 @@
 # check=skip=SecretsUsedInArgOrEnv
 
-FROM dunglas/frankenphp:1.13.4-php8.5.12-bookworm@sha256:924b91db4f9aa1e6b1e40b8065ebe4ed6205cce7fe47fa49b55759143f09165d AS runtime
+FROM dunglas/frankenphp:1.13.5-php8.5.12-bookworm@sha256:8104eb9c834d905e5678a183d053ef1a0c650c5f4874f366dfec7eb025e92e06 AS runtime
 
 WORKDIR /var/www/html
 
