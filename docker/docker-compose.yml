@@ -109,7 +109,7 @@ services:
   # Mail catcher for development (UI at localhost:8025)
   mailpit:
     container_name: "ma-mailpit"
-    image: axllent/mailpit:v1.31.6@sha256:23fe39e81bde596a918000b3135c0f85dc8bb4c9ea6be274b051143f3e300387
+    image: axllent/mailpit:v1.33.0@sha256:9b3a463be15354c0f0eba91697d80e3e0d8a5623ef0e627cacc836bc17fd5231
     user: ${HOST_UID}:${HOST_GID}
     ports:
       - "127.0.0.1:1025:1025"
@@ -204,7 +204,7 @@ services:
 
   # Page speed analyzer (run via: just testPerformance)
   sitespeed:
-    image: sitespeedio/sitespeed.io:42.9.0@sha256:83aa64fde9b780f139ffa34eddbf722f23706bfd88819acf27bbd06f851cc301
+    image: sitespeedio/sitespeed.io:42.10.0@sha256:2d4dcec632328b8ebbebfebb364416af1e0edfef0216989e7301b9c92036aaee
     container_name: "ma-sitespeed"
     network_mode: "host"
     environment:
