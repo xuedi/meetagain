@@ -8,12 +8,14 @@ use App\Emails\Types\SupportResponseEmail;
 use App\Entity\Message;
 use App\Entity\SupportMessage;
 use App\Entity\SupportRequest;
+use App\Entity\SupportRequestView;
 use App\Entity\User;
 use App\Enum\SupportChannel;
 use App\Enum\SupportMessageAuthor;
 use App\Enum\SupportRequestStatus;
 use App\Repository\SupportMessageRepository;
 use App\Repository\SupportRequestRepository;
+use App\Repository\SupportRequestViewRepository;
 use App\Service\Security\ContentSanitizer;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -25,6 +27,8 @@ readonly class ThreadService
     public const int MAX_MESSAGES = 50;
     public const int MAX_TRAILING_REQUESTER_MESSAGES = 5;
     public const int EMAIL_VERIFY_TTL_HOURS = 24;
+    public const string SESSION_VIEWS_KEY = 'support_thread_views';
+    public const int MAX_SESSION_VIEWS = 50;
 
     public function __construct(
         private EntityManagerInterface $em,
@@ -34,6 +38,8 @@ readonly class ThreadService
         private ClockInterface $clock,
         private SupportResponseEmail $responseEmail,
         private ActivityService $activityService,
+        private SupportRequestViewRepository $viewRepo,
+        private VisibilityResolver $visibilityResolver,
     ) {}
 
     public function findRequest(int $id): ?SupportRequest
@@ -185,6 +191,49 @@ readonly class ThreadService
 
         $this->em->persist($request);
         $this->em->flush();
+    }
+
+    public function recordView(SupportRequest $request): ?SupportRequestView
+    {
+        if ($request->getChannel() !== SupportChannel::Thread) {
+            return null;
+        }
+
+        $view = new SupportRequestView();
+        $view->setSupportRequest($request);
+        $view->setSeenAt($this->clock->now());
+        $this->em->persist($view);
+        $this->em->flush();
+
+        return $view;
+    }
+
+    /** @param list<int> $viewIds */
+    public function forgetViews(array $viewIds): void
+    {
+        $forgotten = false;
+        foreach ($this->viewRepo->findWithRequest($viewIds) as $view) {
+            if (!$this->visibilityResolver->canView($view->getSupportRequest())) {
+                continue;
+            }
+
+            $this->em->remove($view);
+            $forgotten = true;
+        }
+
+        if ($forgotten) {
+            $this->em->flush();
+        }
+    }
+
+    public function countViews(SupportRequest $request): int
+    {
+        return $this->viewRepo->countForRequest($request);
+    }
+
+    public function findLastViewAt(SupportRequest $request): ?DateTimeImmutable
+    {
+        return $this->viewRepo->findLastSeenAt($request);
     }
 
     public function startEmailVerification(SupportRequest $request, string $email): string

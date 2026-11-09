@@ -6,7 +6,9 @@
 
 {% block body %}
 
-    <section class="section">
+    <section class="section"{% if recordsViews %}
+             data-thread-seen-url="{{ path('app_support_thread_seen', {'token': token}) }}"
+             data-thread-seen-token="{{ csrf_token('support_thread_seen' ~ supportRequest.id) }}"{% endif %}>
         <div class="container">
             <div class="columns mt-5">
 

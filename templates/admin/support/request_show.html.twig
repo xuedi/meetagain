@@ -46,6 +46,18 @@
                                 {% endif %}
                             </td>
                         </tr>
+                        {% if isThread %}
+                            <tr>
+                                <th>{{ 'admin_support.col_views'|trans }}</th>
+                                <td>
+                                    {% if lastViewAt %}
+                                        {{ 'admin_support.views_summary'|trans({'%count%': viewCount, '%date%': lastViewAt|date('Y-m-d H:i')}) }}
+                                    {% else %}
+                                        <span class="has-text-grey">{{ 'admin_support.views_none'|trans }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endif %}
                         <tr>
                             <th>{{ 'admin_support.col_channel'|trans }}</th>
                             <td>{{ request.channel.label()|trans }}</td>
@@ -101,14 +113,23 @@
 
                 {% for message in messages %}
                     <div class="box">
-                        <p class="is-size-7 has-text-grey mb-2">
-                            {% if message.isFromAdmin() %}
-                                <strong>{{ message.authorUser ? message.authorUser.name : 'admin_support.thread_author_team'|trans }}</strong>
-                            {% else %}
-                                <strong>{{ request.requesterLabel ?? 'admin_support.requester_guest'|trans }}</strong>
+                        <div class="is-flex is-justify-content-space-between is-size-7 has-text-grey mb-2">
+                            <p>
+                                {% if message.isFromAdmin() %}
+                                    <strong>{{ message.authorUser ? message.authorUser.name : 'admin_support.thread_author_team'|trans }}</strong>
+                                {% else %}
+                                    <strong>{{ request.requesterLabel ?? 'admin_support.requester_guest'|trans }}</strong>
+                                {% endif %}
+                                &middot; {{ message.createdAt|date('Y-m-d H:i:s') }}
+                            </p>
+                            {% if isThread and message.isFromAdmin() %}
+                                {% if lastViewAt and lastViewAt > message.createdAt %}
+                                    <p class="has-text-success">{{ 'admin_support.message_seen'|trans({'%date%': lastViewAt|date('Y-m-d H:i')}) }}</p>
+                                {% else %}
+                                    <p>{{ 'admin_support.message_not_seen'|trans }}</p>
+                                {% endif %}
                             {% endif %}
-                            &middot; {{ message.createdAt|date('Y-m-d H:i:s') }}
-                        </p>
+                        </div>
                         <div>{{ message.content|safe_message }}</div>
                     </div>
                 {% endfor %}

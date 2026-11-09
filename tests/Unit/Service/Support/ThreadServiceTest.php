@@ -7,14 +7,17 @@ use App\Activity\Messages\SendMessage;
 use App\Emails\Types\SupportResponseEmail;
 use App\Entity\Message;
 use App\Entity\SupportRequest;
+use App\Entity\SupportRequestView;
 use App\Entity\User;
 use App\Enum\SupportAudience;
 use App\Enum\SupportChannel;
 use App\Enum\SupportRequestStatus;
 use App\Repository\SupportMessageRepository;
 use App\Repository\SupportRequestRepository;
+use App\Repository\SupportRequestViewRepository;
 use App\Service\Security\ContentSanitizer;
 use App\Service\Support\ThreadService;
+use App\Service\Support\VisibilityResolver;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -206,11 +209,71 @@ class ThreadServiceTest extends TestCase
         static::assertSame(SupportRequestStatus::Reopened, $reopened->getStatus());
     }
 
+    public function testRecordViewLogsAThreadViewAtTheCurrentTime(): void
+    {
+        // Arrange
+        $request = new SupportRequest()->setChannel(SupportChannel::Thread);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::once())->method('persist')->with(self::isInstanceOf(SupportRequestView::class));
+        $em->expects(self::once())->method('flush');
+        $service = $this->createService(em: $em);
+
+        // Act
+        $view = $service->recordView($request);
+
+        // Assert
+        static::assertInstanceOf(SupportRequestView::class, $view);
+        static::assertSame($request, $view->getSupportRequest());
+        static::assertSame('2026-08-19 12:00:00', $view->getSeenAt()->format('Y-m-d H:i:s'));
+    }
+
+    public function testRecordViewIgnoresAMemberRequest(): void
+    {
+        // Arrange
+        $request = new SupportRequest()->setChannel(SupportChannel::Message);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::never())->method('persist');
+        $service = $this->createService(em: $em);
+
+        // Act
+        $view = $service->recordView($request);
+
+        // Assert
+        static::assertNull($view);
+    }
+
+    public function testForgetViewsDeletesOnlyTheViewsOfReadableRequests(): void
+    {
+        // Arrange
+        $readable = new SupportRequest()->setAudience(SupportAudience::Organizer);
+        $foreign = new SupportRequest()->setAudience(SupportAudience::Admin);
+        $readableView = new SupportRequestView()->setSupportRequest($readable);
+        $foreignView = new SupportRequestView()->setSupportRequest($foreign);
+        $viewRepo = $this->createMock(SupportRequestViewRepository::class);
+        $viewRepo->expects(self::once())->method('findWithRequest')->with([3, 4])->willReturn([$readableView, $foreignView]);
+        $visibility = $this->createStub(VisibilityResolver::class);
+        $visibility->method('canView')->willReturnCallback(static fn(SupportRequest $request): bool => $request === $readable);
+        $removed = [];
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('remove')->willReturnCallback(static function (object $entity) use (&$removed): void {
+            $removed[] = $entity;
+        });
+        $service = $this->createService(em: $em, viewRepo: $viewRepo, visibilityResolver: $visibility);
+
+        // Act
+        $service->forgetViews([3, 4]);
+
+        // Assert
+        static::assertSame([$readableView], $removed);
+    }
+
     private function createService(
         ?SupportRequestRepository $requestRepo = null,
         ?EntityManagerInterface $em = null,
         ?SupportResponseEmail $responseEmail = null,
         ?ActivityService $activity = null,
+        ?SupportRequestViewRepository $viewRepo = null,
+        ?VisibilityResolver $visibilityResolver = null,
     ): ThreadService {
         $config = new HtmlSanitizerConfig()->allowSafeElements();
 
@@ -222,6 +285,8 @@ class ThreadServiceTest extends TestCase
             new MockClock('2026-08-19 12:00:00'),
             $responseEmail ?? $this->createStub(SupportResponseEmail::class),
             $activity ?? $this->createStub(ActivityService::class),
+            $viewRepo ?? $this->createStub(SupportRequestViewRepository::class),
+            $visibilityResolver ?? $this->createStub(VisibilityResolver::class),
         );
     }
 }

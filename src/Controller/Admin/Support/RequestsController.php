@@ -11,6 +11,7 @@ use App\Admin\Top\Infos\AdminTopInfoHtml;
 use App\Emails\Types\SupportInvitationEmail;
 use App\Entity\SupportRequest;
 use App\Entity\User;
+use App\Enum\SupportChannel;
 use App\Form\SupportReplyType;
 use App\Service\Support\RequestDetailProviderInterface;
 use App\Service\Support\ThreadService;
@@ -139,12 +140,16 @@ final class RequestsController extends AbstractSupportController implements Admi
         );
 
         $adminTop = new AdminTop(info: $info, actions: $actions);
+        $isThread = $request->getChannel() === SupportChannel::Thread;
 
         return $this->render('admin/support/request_show.html.twig', [
             'active' => 'support',
             'request' => $request,
             'messages' => $this->threadService->getThread($request),
             'details' => $this->collectDetails($request),
+            'isThread' => $isThread,
+            'viewCount' => $isThread ? $this->threadService->countViews($request) : 0,
+            'lastViewAt' => $isThread ? $this->threadService->findLastViewAt($request) : null,
             'adminTop' => $adminTop,
             'adminTabs' => $this->getTabs(),
             'replyForm' => $this->createForm(SupportReplyType::class),
