@@ -45,6 +45,11 @@ readonly class VisibilityResolver
         return $ids === null || in_array($request->getId(), $ids, true);
     }
 
+    public function canOpenInAdmin(SupportRequest $request): bool
+    {
+        return $this->security->isGranted('ROLE_STEWARD') && $this->canView($request);
+    }
+
     private function audienceScope(): ?SupportAudience
     {
         return $this->security->isGranted('ROLE_ADMIN') ? null : SupportAudience::Organizer;

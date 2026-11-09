@@ -8,7 +8,9 @@ use App\Enum\ConsentType;
 use App\EventSubscriber\LoginSubscriber;
 use App\Service\Config\LocaleCookieService;
 use App\Service\Member\ConsentService;
+use App\Service\Support\ThreadService;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -30,7 +32,12 @@ class LoginSubscriberTest extends TestCase
         $requestStack = new RequestStack();
         $requestStack->push($request);
 
-        return new LoginSubscriber($cookieService, new ConsentService($requestStack));
+        return new LoginSubscriber(
+            $cookieService,
+            new ConsentService($requestStack),
+            $this->createStub(ThreadService::class),
+            $this->createStub(Security::class),
+        );
     }
 
     private function createRequest(SessionInterface $session): Request

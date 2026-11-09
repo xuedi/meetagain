@@ -4,16 +4,19 @@ namespace App\Controller;
 
 use App\Emails\Types\SupportEmailVerifyEmail;
 use App\Entity\SupportRequest;
+use App\Entity\SupportRequestView;
 use App\Enum\SecurityEventType;
 use App\Form\SupportThreadReplyType;
 use App\Service\Security\SecurityService;
 use App\Service\Support\ThreadService;
+use App\Service\Support\VisibilityResolver;
 use Module\Email\Contract\BlocklistInterface;
 use SensitiveParameter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -23,6 +26,7 @@ final class SupportThreadController extends AbstractController
 {
     public function __construct(
         private readonly ThreadService $threadService,
+        private readonly VisibilityResolver $visibilityResolver,
         private readonly SecurityService $securityService,
         #[Autowire(service: 'limiter.support_thread_view')]
         private readonly RateLimiterFactoryInterface $viewLimiter,
@@ -54,7 +58,32 @@ final class SupportThreadController extends AbstractController
             'token' => $token,
             'replyForm' => $this->replyForm($supportRequest),
             'canReply' => $supportRequest->isOpenForRequester(),
+            'recordsViews' => !$this->visibilityResolver->canOpenInAdmin($supportRequest),
         ]));
+    }
+
+    #[Route('/seen', name: 'app_support_thread_seen', methods: ['POST'])]
+    public function seen(Request $request, #[SensitiveParameter] string $token): Response
+    {
+        $rateLimited = $this->enforceLimiter($this->viewLimiter, $request);
+        if ($rateLimited instanceof Response) {
+            return $rateLimited;
+        }
+
+        $supportRequest = $this->resolveThread($request, $token);
+
+        if (!$this->isCsrfTokenValid('support_thread_seen' . $supportRequest->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+
+        if (!$this->visibilityResolver->canOpenInAdmin($supportRequest)) {
+            $view = $this->threadService->recordView($supportRequest);
+            if ($view instanceof SupportRequestView) {
+                $this->rememberView($request->getSession(), (int) $view->getId());
+            }
+        }
+
+        return $this->harden(new Response('', Response::HTTP_NO_CONTENT));
     }
 
     #[Route('/reply', name: 'app_support_thread_reply', methods: ['POST'])]
@@ -116,6 +145,15 @@ final class SupportThreadController extends AbstractController
         $this->addFlash('success', 'support.flash_optin_sent');
 
         return $this->redirectToRoute('app_support_thread', ['token' => $token]);
+    }
+
+    private function rememberView(SessionInterface $session, int $viewId): void
+    {
+        $viewIds = $session->get(ThreadService::SESSION_VIEWS_KEY);
+        $viewIds = is_array($viewIds) ? $viewIds : [];
+        $viewIds[] = $viewId;
+
+        $session->set(ThreadService::SESSION_VIEWS_KEY, array_slice($viewIds, -ThreadService::MAX_SESSION_VIEWS));
     }
 
     private function isMailable(SupportRequest $supportRequest, string $email): bool
