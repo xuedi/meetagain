@@ -1,7 +1,12 @@
-// RateLimitProvider attack: 11 failed logins. Symfony's login_throttling fires
-// at 10 (TooManyLoginAttemptsAuthenticationException), LoginAttemptSubscriber
-// hands it to SecurityService, RateLimitProvider returns Block immediately
-// (login_throttling = instant block). The 11th login attempt should be 403'd.
+// RateLimitProvider attack: 11 failed logins, each from a fresh cookie jar.
+// Symfony's login_throttling fires at 10 (TooManyLoginAttemptsAuthenticationException),
+// LoginAttemptSubscriber hands it to SecurityService, RateLimitProvider returns
+// Block immediately (login_throttling = instant block). The 11th login attempt
+// should be 403'd.
+//
+// The jar rotates because LoginGuard puts the form measures on the login form
+// after a few failures: a client that keeps its session is then stopped by
+// FormMeasureProvider's session block and never reaches the limiter.
 //
 // Run via: just testAttack rateLimitLogin
 
@@ -25,7 +30,9 @@ export const options = {
 };
 
 function attemptLogin() {
+    const jar = new http.CookieJar();
     const get = http.get(`${BASE_URL}/en/login`, {
+        jar,
         tags: { name: 'GET /en/login' },
         responseCallback: http.expectedStatuses(200, 403),
     });
@@ -41,6 +48,7 @@ function attemptLogin() {
         _password: 'wrongPassword',
         _csrf_token: csrf,
     }, {
+        jar,
         redirects: 0,
         tags: { name: 'POST /en/login' },
         // Browsers send Origin automatically; Symfony's stateless CSRF requires

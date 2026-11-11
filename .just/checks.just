@@ -2,11 +2,17 @@
 
 # Run all tests and checks
 [group('checks')]
-check: checkMago checkMagoFormat checkMagoAnalyze checkMagoGuard checkPluginIsolation
+check: checkMago checkMagoFormat checkMagoAnalyze checkMagoGuard checkPluginIsolation checkAudit
     {{PHP}} composer validate --strict
     {{PHP}} php bin/check-get-routes.php
     {{PHP}} php bin/check-new-parentheses.php
     echo "All tests and checks passed successfully"
+
+# Fail on any known security advisory against the locked Composer packages or the import map
+[group('checks')]
+checkAudit:
+    {{PHP}} composer audit --locked --no-interaction
+    {{PHP}} php bin/console importmap:audit
 
 # Check Mago (linter) - core, then each plugin against its own config
 [group('checks')]
