@@ -2,6 +2,11 @@
 // AccessDeniedProvider trips when distinctPaths >= 8 && hits >= 15. The 16th
 // request should land on the block page rather than the firewall's 403.
 //
+// Every probe goes out without a cookie and does not follow the redirect. The
+// first denied request starts a session for the login jump-back; a client that
+// kept that cookie would split its hits between the cookie-less key and the
+// session key and stay one hit below the threshold.
+//
 // Run via: just testAttack accessDeniedScript
 
 import http from 'k6/http';
@@ -45,6 +50,8 @@ export const options = {
 export default function () {
     for (const path of ADMIN_PATHS) {
         http.get(`${BASE_URL}${path}`, {
+            jar: new http.CookieJar(),
+            redirects: 0,
             tags: { name: 'GET admin (unauth)', phase: 'pre-block' },
             responseCallback: http.expectedStatuses(200, 302, 403),
         });
