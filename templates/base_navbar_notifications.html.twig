@@ -14,12 +14,12 @@
                 {% if item.route and route_exists(item.route) %}
                     <a href="{{ path(item.route, item.routeParams) }}" class="dropdown-item">
                         <span class="icon is-small"><i class="fa {{ item.icon }}"></i></span>
-                        <span>{{ item.label|raw }}</span>
+                        <span>{{ item.label }}</span>
                     </a>
                 {% else %}
                     <div class="dropdown-item">
                         <span class="icon is-small"><i class="fa {{ item.icon }}"></i></span>
-                        <span>{{ item.label|raw }}</span>
+                        <span>{{ item.label }}</span>
                     </div>
                 {% endif %}
             {% endfor %}

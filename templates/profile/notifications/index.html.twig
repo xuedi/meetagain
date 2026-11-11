@@ -23,7 +23,7 @@
                                 <i class="fa {{ item.icon }}"></i>
                             </span>
                         </td>
-                        <td>{{ item.label|raw }}</td>
+                        <td>{{ item.label }}</td>
                         <td class="col-narrow">
                             {% if item.route %}
                                 <a href="{{ path(item.route, item.routeParams) }}">
