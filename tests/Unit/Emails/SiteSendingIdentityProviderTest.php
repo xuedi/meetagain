@@ -3,16 +3,16 @@
 namespace Tests\Unit\Emails;
 
 use App\Emails\FooterLinkResolver;
-use App\Emails\RequestSendingIdentityProvider;
+use App\Emails\SiteSendingIdentityProvider;
+use App\Service\Config\ConfigService;
 use App\Service\Config\SiteNameResolver;
-use App\Service\Http\RequestHostResolver;
 use App\Service\Media\SiteLogoResolver;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
-final class RequestSendingIdentityProviderTest extends TestCase
+final class SiteSendingIdentityProviderTest extends TestCase
 {
-    public function testItAnswersFromTheRequestWhateverTheOrigin(): void
+    public function testItAnswersFromTheConfiguredHostWhateverTheOrigin(): void
     {
         // Arrange
         $provider = $this->provider($this->footerLinks());
@@ -28,14 +28,14 @@ final class RequestSendingIdentityProviderTest extends TestCase
         static::assertNull($identity->attribution);
     }
 
-    public function testTheFooterAsksForTheRequestHostAndTheWholeFlaggedSet(): void
+    public function testTheFooterAsksForTheConfiguredHostAndTheWholeFlaggedSet(): void
     {
         // Arrange
         $footerLinks = $this->createMock(FooterLinkResolver::class);
         $footerLinks
             ->expects($this->once())
             ->method('resolve')
-            ->with('https://example.org/', 'de', null)
+            ->with('https://example.org', 'de', null)
             ->willReturn([['label' => 'Impressum', 'url' => 'https://example.org/de/imprint']]);
 
         // Act
@@ -45,18 +45,18 @@ final class RequestSendingIdentityProviderTest extends TestCase
         static::assertSame([['label' => 'Impressum', 'url' => 'https://example.org/de/imprint']], $identity->links);
     }
 
-    private function provider(FooterLinkResolver $footerLinks): RequestSendingIdentityProvider
+    private function provider(FooterLinkResolver $footerLinks): SiteSendingIdentityProvider
     {
         $siteName = $this->createStub(SiteNameResolver::class);
         $siteName->method('resolve')->willReturn('Example Site');
 
-        $host = $this->createStub(RequestHostResolver::class);
-        $host->method('getSchemeAndHost')->willReturn('https://example.org/');
+        $config = $this->createStub(ConfigService::class);
+        $config->method('getHost')->willReturn('https://example.org/');
 
         $logo = $this->createStub(SiteLogoResolver::class);
         $logo->method('endpointUrl')->willReturnCallback(static fn(string $siteUrl): string => $siteUrl . '/logo.png');
 
-        return new RequestSendingIdentityProvider($siteName, $host, $logo, $footerLinks);
+        return new SiteSendingIdentityProvider($siteName, $config, $logo, $footerLinks);
     }
 
     private function footerLinks(): FooterLinkResolver
