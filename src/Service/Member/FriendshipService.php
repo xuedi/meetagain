@@ -6,6 +6,7 @@ use App\Activity\ActivityService;
 use App\Activity\Messages\FollowedUser;
 use App\Activity\Messages\UnFollowedUser;
 use App\Entity\User;
+use App\Filter\Member\MemberFilterService;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use DomainException;
@@ -26,6 +27,7 @@ readonly class FriendshipService
         private Security $security,
         private RequestStack $requestStack,
         private ActivityService $activityService,
+        private MemberFilterService $memberFilterService,
     ) {}
 
     public function getFriends(User $user): array
@@ -89,14 +91,10 @@ readonly class FriendshipService
     {
         $currentUser = $this->getAuthedUser();
         $targetUser = $this->repo->findOneBy(['id' => $id]);
-        $isReachable = $targetUser instanceof User && !$this->blockingService->isBlocked($currentUser, $targetUser);
-
-        if ($isReachable) {
-            if ($currentUser->getFollowing()->contains($targetUser)) {
-                $this->unfollow($currentUser, $targetUser);
-            } else {
-                $this->follow($currentUser, $targetUser);
-            }
+        if ($targetUser instanceof User && $currentUser->getFollowing()->contains($targetUser)) {
+            $this->unfollow($currentUser, $targetUser);
+        } elseif ($targetUser instanceof User && $this->mayFollow($currentUser, $targetUser)) {
+            $this->follow($currentUser, $targetUser);
         }
 
         $route = $this->router->generate($returnRoute, [
@@ -105,6 +103,11 @@ readonly class FriendshipService
         ]);
 
         return new RedirectResponse($route);
+    }
+
+    private function mayFollow(User $actor, User $target): bool
+    {
+        return !$this->blockingService->isBlocked($actor, $target) && $this->memberFilterService->isMemberAccessible((int) $target->getId());
     }
 
     private function getAuthedUser(): User

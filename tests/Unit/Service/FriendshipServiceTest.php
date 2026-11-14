@@ -6,6 +6,7 @@ use App\Activity\ActivityService;
 use App\Activity\Messages\FollowedUser;
 use App\Activity\Messages\UnFollowedUser;
 use App\Entity\User;
+use App\Filter\Member\MemberFilterService;
 use App\Repository\UserRepository;
 use App\Service\Member\BlockingService;
 use App\Service\Member\FriendshipService;
@@ -75,6 +76,7 @@ class FriendshipServiceTest extends TestCase
             security: $securityStub,
             requestStack: $requestStackStub,
             activityService: $activityServiceStub,
+            memberFilterService: $this->memberFilter(true),
         );
 
         // Act
@@ -135,6 +137,7 @@ class FriendshipServiceTest extends TestCase
             security: $securityStub,
             requestStack: $requestStackStub,
             activityService: $activityServiceStub,
+            memberFilterService: $this->memberFilter(true),
         );
 
         // Act
@@ -143,6 +146,36 @@ class FriendshipServiceTest extends TestCase
         // Assert
         static::assertInstanceOf(RedirectResponse::class, $response);
         static::assertSame($generatedRoute, $response->getTargetUrl());
+    }
+
+    public function testToggleFollowLeavesAnAccountTheMemberFilterRefuses(): void
+    {
+        // Arrange
+        $following = $this->createStub(Collection::class);
+        $following->method('contains')->willReturn(false);
+        $currentUser = $this->createMock(User::class);
+        $currentUser->method('getFollowing')->willReturn($following);
+        $currentUser->expects($this->never())->method('addFollowing');
+        $security = $this->createStub(Security::class);
+        $security->method('getUser')->willReturn($currentUser);
+        $repo = $this->createStub(UserRepository::class);
+        $repo->method('findOneBy')->willReturn($this->user(42));
+        $router = $this->createStub(RouterInterface::class);
+        $router->method('generate')->willReturn('/en/members/view/42');
+
+        $subject = new FriendshipService(
+            repo: $repo,
+            blockingService: $this->unblocked(),
+            em: $this->createStub(EntityManagerInterface::class),
+            router: $router,
+            security: $security,
+            requestStack: new RequestStack(),
+            activityService: $this->createStub(ActivityService::class),
+            memberFilterService: $this->memberFilter(false),
+        );
+
+        // Act
+        $subject->toggleFollow(42, 'app_member_view');
     }
 
     public function testToggleFollowThrowsExceptionWhenNotAuthenticated(): void
@@ -159,6 +192,7 @@ class FriendshipServiceTest extends TestCase
             security: $securityStub,
             requestStack: $this->createStub(RequestStack::class),
             activityService: $this->createStub(ActivityService::class),
+            memberFilterService: $this->memberFilter(true),
         );
 
         // Assert
@@ -185,6 +219,7 @@ class FriendshipServiceTest extends TestCase
             security: $securityStub,
             requestStack: $this->createStub(RequestStack::class),
             activityService: $this->createStub(ActivityService::class),
+            memberFilterService: $this->memberFilter(true),
         );
 
         // Assert
@@ -301,7 +336,16 @@ class FriendshipServiceTest extends TestCase
             security: $this->createStub(Security::class),
             requestStack: $this->createStub(RequestStack::class),
             activityService: $activityService,
+            memberFilterService: $this->memberFilter(true),
         );
+    }
+
+    private function memberFilter(bool $admits): MemberFilterService
+    {
+        $memberFilter = $this->createStub(MemberFilterService::class);
+        $memberFilter->method('isMemberAccessible')->willReturn($admits);
+
+        return $memberFilter;
     }
 
     private function unblocked(): BlockingService

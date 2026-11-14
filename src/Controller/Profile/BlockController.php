@@ -5,6 +5,7 @@ namespace App\Controller\Profile;
 use App\Controller\AbstractController;
 use App\Filter\Member\MemberFilterService;
 use App\Service\Member\BlockingService;
+use App\Service\Member\MessageService;
 use App\Service\Member\UserService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +22,7 @@ final class BlockController extends AbstractController
         private readonly BlockingService $blockingService,
         private readonly UserService $userService,
         private readonly MemberFilterService $memberFilterService,
+        private readonly MessageService $messageService,
     ) {}
 
     #[Route('/block/{id}', name: 'app_profile_block_user', methods: ['POST'])]
@@ -39,6 +41,10 @@ final class BlockController extends AbstractController
             $this->addFlash('warning', 'profile.flash_block_self');
 
             return $this->redirectAfterBlock($request);
+        }
+
+        if (!$this->messageService->mayContact($currentUser, $targetUser)) {
+            throw $this->createNotFoundException();
         }
 
         $this->blockingService->block($currentUser, $targetUser);
@@ -67,7 +73,7 @@ final class BlockController extends AbstractController
         $currentUser = $this->getAuthedUser();
         $targetUser = $this->userService->findUser($id);
 
-        if ($targetUser === null) {
+        if ($targetUser === null || !$this->blockingService->hasBlocked($currentUser, $targetUser) && !$this->memberFilterService->isMemberAccessible($id)) {
             throw $this->createNotFoundException();
         }
 

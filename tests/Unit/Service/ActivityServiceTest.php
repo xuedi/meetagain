@@ -9,6 +9,7 @@ use App\Activity\Messages\Login;
 use App\Activity\NotificationService as ActivityNotificationService;
 use App\Entity\Activity;
 use App\Entity\User;
+use App\Filter\Event\EventFilterService;
 use App\Repository\ActivityRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -56,6 +57,7 @@ class ActivityServiceTest extends TestCase
             messageFactory: $messageFactoryMock,
             logger: $this->createStub(LoggerInterface::class),
             enrichers: [],
+            eventFilterService: $this->allEventsVisible(),
         );
 
         // Act
@@ -101,6 +103,7 @@ class ActivityServiceTest extends TestCase
             messageFactory: $messageFactoryMock,
             logger: $this->createStub(LoggerInterface::class),
             enrichers: [],
+            eventFilterService: $this->allEventsVisible(),
         );
 
         // Act
@@ -144,6 +147,7 @@ class ActivityServiceTest extends TestCase
             messageFactory: $messageFactoryMock,
             logger: $this->createStub(LoggerInterface::class),
             enrichers: [],
+            eventFilterService: $this->allEventsVisible(),
         );
 
         // Act
@@ -179,6 +183,7 @@ class ActivityServiceTest extends TestCase
             messageFactory: $messageFactoryMock,
             logger: $this->createStub(LoggerInterface::class),
             enrichers: [],
+            eventFilterService: $this->allEventsVisible(),
         );
 
         // Act
@@ -202,6 +207,7 @@ class ActivityServiceTest extends TestCase
             messageFactory: $this->createStub(MessageFactory::class),
             logger: $this->createStub(LoggerInterface::class),
             enrichers: [],
+            eventFilterService: $this->allEventsVisible(),
         );
 
         // Act
@@ -209,5 +215,13 @@ class ActivityServiceTest extends TestCase
 
         // Assert
         static::assertNull($result);
+    }
+
+    private function allEventsVisible(): EventFilterService
+    {
+        $eventFilter = $this->createStub(EventFilterService::class);
+        $eventFilter->method('getAccessibleEventIds')->willReturnArgument(0);
+
+        return $eventFilter;
     }
 }
