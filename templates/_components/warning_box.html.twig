@@ -9,7 +9,8 @@
     Parameters:
         - id          (string, required)        -- unique element ID used by toggleTrigger
         - title       (string, required)        -- header text of the message box
-        - content     (string, required)        -- body HTML; rendered raw
+        - text        (string, optional)        -- body text; escaped and wrapped in a paragraph
+        - content     (string, optional)        -- body HTML built by the caller; rendered raw, never user data
         - type        (string, optional)        -- 'danger' (default) or 'warning'
         - buttonUrl   (string, optional)        -- action URL; shows button when set
         - buttonLabel (string, optional)        -- label for the confirmation button
@@ -23,7 +24,8 @@
         <button class="delete toggleTrigger" data-id="{{ id }}" aria-label="{{ 'shared.image_upload_aria_delete'|trans }}"></button>
     </div>
     <div class="message-body has-text-black has-background-white">
-        {{ content|raw }}
+        {% if text is defined %}<p>{{ text }}</p>{% endif %}
+        {% if content is defined %}{{ content|raw }}{% endif %}
         {% if (showButton is not defined and buttonUrl is defined) or (showButton is defined and showButton) %}
             <div class="has-text-right mt-3">
                 <a class="button"

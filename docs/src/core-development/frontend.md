@@ -227,12 +227,15 @@ Prefer the reusable warning box component over `onclick="confirm()"` dialogs:
 {% include '_components/warning_box.html.twig' with {
     'id': 'entity-delete-warning',
     'title': 'Delete Entity',
-    'content': '<p>This will permanently delete the entity and all related data.</p>',
+    'text': 'This will permanently delete %name% and all related data.'|trans({'%name%': entity.name}),
     'buttonLabel': 'Yes, Delete',
     'buttonUrl': path('app_admin_entity_delete', {'id': entity.id}),
     'type': 'danger'
 } %}
 ```
+
+`text` is escaped, so it is safe for names and anything else a user typed. `content` is printed raw: use it only
+for markup the template builds itself, such as a delete form, and never put user data into it.
 
 ---
 
