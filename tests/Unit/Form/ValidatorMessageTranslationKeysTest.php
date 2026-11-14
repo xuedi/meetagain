@@ -59,10 +59,10 @@ class ValidatorMessageTranslationKeysTest extends TestCase
     public static function provideSourceFiles(): iterable
     {
         foreach (self::collectPhpFiles(self::FORM_DIR) as $file) {
-            yield 'Form/' . basename($file) => [$file];
+            yield 'Form/' . substr($file, strlen(self::FORM_DIR) + 1) => [$file];
         }
         foreach (self::collectPhpFiles(self::ENTITY_DIR) as $file) {
-            yield 'Entity/' . basename($file) => [$file];
+            yield 'Entity/' . substr($file, strlen(self::ENTITY_DIR) + 1) => [$file];
         }
         foreach (glob(self::MODULES_DIR . '/*/src/Internal/{Form,Entity}', GLOB_BRACE | GLOB_ONLYDIR) ?: [] as $dir) {
             foreach (self::collectPhpFiles($dir) as $file) {

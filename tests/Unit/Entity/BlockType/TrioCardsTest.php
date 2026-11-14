@@ -53,6 +53,19 @@ class TrioCardsTest extends TestCase
         static::assertSame(['id' => 43, 'hash' => 'def456'], $block->cards[2]['image']);
     }
 
+    public function testAScriptLinkInACardIsDropped(): void
+    {
+        // Arrange
+        $json = ['cards' => [['buttonText' => 'Go', 'buttonLink' => 'javascript:alert(1)'], ['buttonLink' => '/events']]];
+
+        // Act
+        $block = TrioCards::fromJson($json);
+
+        // Assert
+        static::assertSame('', $block->cards[0]['buttonLink']);
+        static::assertSame('/events', $block->cards[1]['buttonLink']);
+    }
+
     public function testFromJsonWithEmptyDataProducesThreeCards(): void
     {
         // Arrange / Act
