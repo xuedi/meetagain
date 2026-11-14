@@ -40,7 +40,9 @@ function initOsmMap(mapEl) {
     map.setView(target, Number(mapEl.dataset.zoom) || 16);
     const marker = L.marker(target, {icon: iconMarker}).addTo(map);
     if (mapEl.dataset.markerLabel) {
-        marker.bindPopup(mapEl.dataset.markerLabel);
+        const popup = document.createElement('span');
+        popup.textContent = mapEl.dataset.markerLabel;
+        marker.bindPopup(popup);
     }
 
     setTimeout(function () {

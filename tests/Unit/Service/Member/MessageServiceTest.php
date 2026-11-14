@@ -6,6 +6,7 @@ use App\Activity\ActivityService;
 use App\Activity\Messages\SendMessage;
 use App\Entity\Message;
 use App\Entity\User;
+use App\Filter\Member\MemberFilterService;
 use App\Repository\MessageRepository;
 use App\Service\Member\BlockingService;
 use App\Service\Member\MessageService;
@@ -36,7 +37,14 @@ class MessageServiceTest extends TestCase
         $activityService = $this->createMock(ActivityService::class);
         $activityService->expects($this->once())->method('log')->with(SendMessage::TYPE, $sender, ['user_id' => 2]);
 
-        $subject = new MessageService($em, $this->createStub(MessageRepository::class), $blockingService, $this->sanitizer(), $activityService);
+        $subject = new MessageService(
+            $em,
+            $this->createStub(MessageRepository::class),
+            $blockingService,
+            $this->sanitizer(),
+            $activityService,
+            $this->createStub(MemberFilterService::class),
+        );
 
         // Act
         $message = $subject->send($sender, $receiver, '  <script>alert(1)</script>hello  ');
@@ -61,7 +69,14 @@ class MessageServiceTest extends TestCase
         $activityService = $this->createMock(ActivityService::class);
         $activityService->expects($this->never())->method('log');
 
-        $subject = new MessageService($em, $this->createStub(MessageRepository::class), $blockingService, $this->sanitizer(), $activityService);
+        $subject = new MessageService(
+            $em,
+            $this->createStub(MessageRepository::class),
+            $blockingService,
+            $this->sanitizer(),
+            $activityService,
+            $this->createStub(MemberFilterService::class),
+        );
 
         // Act & Assert
         $this->expectException(DomainException::class);
@@ -77,6 +92,7 @@ class MessageServiceTest extends TestCase
             $this->createStub(BlockingService::class),
             $this->sanitizer(),
             $this->createStub(ActivityService::class),
+            $this->createStub(MemberFilterService::class),
         );
 
         // Act & Assert
@@ -100,6 +116,7 @@ class MessageServiceTest extends TestCase
             $this->createStub(BlockingService::class),
             $this->sanitizer(),
             $this->createStub(ActivityService::class),
+            $this->createStub(MemberFilterService::class),
         );
 
         // Act
@@ -126,6 +143,7 @@ class MessageServiceTest extends TestCase
             $this->createStub(BlockingService::class),
             $this->sanitizer(),
             $this->createStub(ActivityService::class),
+            $this->createStub(MemberFilterService::class),
         );
 
         // Act
@@ -150,6 +168,7 @@ class MessageServiceTest extends TestCase
             $this->createStub(BlockingService::class),
             $this->sanitizer(),
             $this->createStub(ActivityService::class),
+            $this->createStub(MemberFilterService::class),
         );
 
         // Act & Assert

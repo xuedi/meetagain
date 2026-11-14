@@ -6,6 +6,7 @@ use App\Activity\ActivityService;
 use App\Activity\Messages\SendMessage;
 use App\Entity\Message;
 use App\Entity\User;
+use App\Filter\Member\MemberFilterService;
 use App\Repository\MessageRepository;
 use App\Service\Security\ContentSanitizer;
 use DateTimeImmutable;
@@ -23,6 +24,7 @@ readonly class MessageService
         private BlockingService $blockingService,
         private ContentSanitizer $contentSanitizer,
         private ActivityService $activityService,
+        private MemberFilterService $memberFilterService,
     ) {}
 
     public function getMessages(User $user, ?User $partner = null): ?array
@@ -77,6 +79,11 @@ readonly class MessageService
     public function countThread(User $user, User $partner): int
     {
         return $this->repo->countThread($user, $partner);
+    }
+
+    public function mayContact(User $user, User $partner): bool
+    {
+        return $this->memberFilterService->isMemberAccessible((int) $partner->getId()) || $this->countThread($user, $partner) > 0;
     }
 
     public function findMessage(int $id): ?Message

@@ -45,6 +45,18 @@ class TextMapTest extends TestCase
         static::assertTrue($block->hasMap());
     }
 
+    public function testMarkupInTheMarkerLabelIsStripped(): void
+    {
+        // Arrange
+        $json = ['markerLabel' => '<img src=x onerror=alert(1)>Weiqi <b>Cafe</b>'];
+
+        // Act
+        $block = TextMap::fromJson($json);
+
+        // Assert
+        static::assertSame('Weiqi Cafe', $block->markerLabel);
+    }
+
     public function testFromJsonWithEmptyDataFallsBackToDefaults(): void
     {
         // Arrange / Act

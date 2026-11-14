@@ -4,6 +4,7 @@ namespace App\Activity;
 
 use App\Entity\Activity;
 use App\Entity\User;
+use App\Filter\Event\EventFilterService;
 use App\Repository\ActivityRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +22,7 @@ readonly class ActivityService
         private LoggerInterface $logger,
         #[AutowireIterator(MetaEnricherInterface::class)]
         private iterable $enrichers,
+        private EventFilterService $eventFilterService,
     ) {}
 
     public function log(string $type, ?User $user, array $meta = []): void
@@ -58,7 +60,21 @@ readonly class ActivityService
 
     public function getUserList(User $user): array
     {
-        return $this->prepareActivityList($this->repo->getUserDisplay($user), true);
+        $activities = $this->repo->getUserDisplay($user);
+        $eventIds = [];
+        foreach ($activities as $activity) {
+            $eventId = $activity->getMeta()['event_id'] ?? null;
+            if (is_numeric($eventId)) {
+                $eventIds[(int) $eventId] = true;
+            }
+        }
+        $visible = array_flip($this->eventFilterService->getAccessibleEventIds(array_keys($eventIds)));
+
+        return $this->prepareActivityList(array_filter($activities, static function (Activity $activity) use ($visible): bool {
+            $eventId = $activity->getMeta()['event_id'] ?? null;
+
+            return !is_numeric($eventId) || isset($visible[(int) $eventId]);
+        }), true);
     }
 
     public function getAdminList(int $limit = 250, int $offset = 0, ?DateTimeImmutable $since = null, ?int $userId = null): array

@@ -96,6 +96,17 @@ class GlossaryChangeTargetTest extends TestCase
         self::assertFalse($this->makeTarget(entry: new Glossary(), granted: false)->canReview($userId, 1));
     }
 
+    public function testAnEntryOutsideTheManagedOnesCannotBeReviewed(): void
+    {
+        // Arrange
+        $target = $this->makeTarget(entry: new Glossary()->setDefinition('en', 'Hello'), managed: false);
+
+        // Act & Assert
+        self::assertTrue($target->canPropose(5, 1));
+        self::assertFalse($target->canReview(5, 1));
+        self::assertSame('glossary.validation_entry_missing', $target->validate(1, GlossaryChangeTarget::FIELD_PHRASE, 'x'));
+    }
+
     public function testTargetLabelIsThePhraseOrNull(): void
     {
         // Act & Assert
@@ -117,12 +128,14 @@ class GlossaryChangeTargetTest extends TestCase
     private function makeTarget(
         ?Glossary $entry = null,
         bool $granted = true,
+        bool $managed = true,
         ?TagService $tagService = null,
         ?GlossaryService $service = null,
     ): GlossaryChangeTarget {
         if ($service === null) {
             $service = $this->createStub(GlossaryService::class);
             $service->method('get')->willReturn($entry);
+            $service->method('getManaged')->willReturn($managed ? $entry : null);
             $service->method('definitionLanguageOf')->willReturnCallback(static fn(string $field): ?string => preg_match(
                 '/^definition_([a-z]{2})$/',
                 $field,

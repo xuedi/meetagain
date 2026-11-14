@@ -17,6 +17,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `HeadHtmlProviderInterface`                                  | Add markup to the document `<head>`                   | `getHeadHtml()`                                        |
 | `Footer\BarProviderInterface`                                | Add a full-width bar under the footer columns         | `getFooterBarHtml()`                                   |
 | `MemberFilterInterface`                                      | Filter which members appear in lists                  | `getUserIds()`                                         |
+| `ModerationFilterInterface`                                  | Refuse a moderation action on a member                | `mayModerate()`                                        |
 | `EventFilterFormContributorInterface`                        | Add fields to the event filter form                   | `addFields()`                                          |
 | `NotificationProviderInterface`                              | Add informational items to the notification bell      | `getNotifications()`                                   |
 | `ReviewNotificationProviderInterface`                        | Add approve/deny items to the review page             | `getReviewItems()`, `approveItem()`, `denyItem()`      |

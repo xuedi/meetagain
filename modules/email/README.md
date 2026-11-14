@@ -47,8 +47,8 @@ enforced.
 
 What a message says and who may receive it is domain code, so it stays in the application: the email types and their
 convenience base `App\Emails\EmailAbstract`, the guard rules in `App\Emails\Guard\Rule\`, the shipped template bodies
-in `templates/email/defaults/` (served by `App\Emails\CoreTemplateProvider`), the request-derived sending identity
-`App\Emails\RequestSendingIdentityProvider`, `AudienceFilterService`, which narrows installation-wide recipient lists
+in `templates/email/defaults/` (served by `App\Emails\CoreTemplateProvider`), the fallback sending identity
+`App\Emails\SiteSendingIdentityProvider`, `AudienceFilterService`, which narrows installation-wide recipient lists
 before a type is ever called, and `app:email:preview`, a thin command over `PreviewSweepInterface`.
 
 ## Enqueue decides everything, the send path resolves nothing
@@ -71,9 +71,11 @@ type or an enricher set, so a mail's links land on the same place its logo and f
 `EmailInterface::getOrigin()` names the entity a message is about. Each `SendingIdentityProviderInterface`, in
 priority order, may turn it into a `SendingIdentity` - name, URL, logo URL, sign-off, footer links, optional
 attribution, optional accent colour - and the first non-null answer wins. Without an accent the layout takes the
-global theme colours. The application registers `RequestSendingIdentityProvider` at the
-lowest priority, answering from the live request; if every provider defers, enqueue throws. A provider that answers
-for types with no origin must do so from stored data or the request host, never from anything only a worker lacks.
+global theme colours. The application registers `SiteSendingIdentityProvider` at the
+lowest priority, answering from the configured host; if every provider defers, enqueue throws. Every URL in an
+identity comes from stored data, never from the request's `Host` header, because a mail link carries a token to
+whoever controls that host. A provider that answers for types with no origin may use the request host to look up a
+stored record, never as the URL itself, and never relies on anything only a worker lacks.
 
 The logo is a remote image URL, never a MIME part. The URL is frozen; the bytes behind it are not, so a changed logo
 reaches mail already sent. A `null` logo URL means no header image.

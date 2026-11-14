@@ -60,7 +60,7 @@ class TextMap implements BlockType
             latitude: self::toCoordinate($json['latitude'] ?? null, 90.0),
             longitude: self::toCoordinate($json['longitude'] ?? null, 180.0),
             zoom: self::toZoom($json['zoom'] ?? null),
-            markerLabel: trim((string) ($json['markerLabel'] ?? '')),
+            markerLabel: trim(strip_tags((string) ($json['markerLabel'] ?? ''))),
             mapPosition: MapPosition::tryFrom((string) ($json['mapPosition'] ?? '')) ?? MapPosition::Right,
             mapWidth: MapWidth::tryFrom((string) ($json['mapWidth'] ?? '')) ?? MapWidth::Third,
             mapHeight: MapHeight::tryFrom((string) ($json['mapHeight'] ?? '')) ?? MapHeight::Medium,

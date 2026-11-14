@@ -48,7 +48,7 @@ class Hero implements BlockType
             $json['headline'],
             $json['subHeadline'],
             $json['text'],
-            $json['buttonLink'],
+            Link::fromString((string) $json['buttonLink'])->href,
             $json['buttonText'],
             $json['color'] ?? '#f14668',
             (bool) ($json['imageRight'] ?? false),

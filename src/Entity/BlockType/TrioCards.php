@@ -57,7 +57,7 @@ class TrioCards implements BlockType
                 'subHeadline' => (string) ($card['subHeadline'] ?? ''),
                 'text' => (string) ($card['text'] ?? ''),
                 'buttonText' => (string) ($card['buttonText'] ?? ''),
-                'buttonLink' => (string) ($card['buttonLink'] ?? ''),
+                'buttonLink' => Link::fromString((string) ($card['buttonLink'] ?? ''))->href,
             ];
         }
 

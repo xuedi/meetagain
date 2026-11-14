@@ -3,6 +3,7 @@
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
+use App\Entity\User;
 use App\Form\CommentType;
 use App\Service\Member\BlockingService;
 use App\Service\Member\FriendshipService;
@@ -37,6 +38,10 @@ final class MessageController extends AbstractController
         $isBlocked = false;
 
         $conversationPartner = $id === null ? null : $this->userService->findUser($id);
+        if ($conversationPartner !== null && !$this->messageService->mayContact($user, $conversationPartner)) {
+            throw $this->createNotFoundException();
+        }
+
         if ($conversationPartner !== null) {
             $isBlocked = $this->blockingService->isBlocked($user, $conversationPartner);
 
@@ -62,7 +67,10 @@ final class MessageController extends AbstractController
             'conversationsId' => $id,
             'conversations' => $this->messageService->getConversations($user, $id, $excludeUserIds),
             'messages' => $messages,
-            'friends' => $this->friendshipService->getFriends($user),
+            'friends' => array_values(array_filter($this->friendshipService->getFriends($user), fn(User $friend): bool => $this->messageService->mayContact(
+                $user,
+                $friend,
+            ))),
             'user' => $user,
             'form' => $form,
             'isBlocked' => $isBlocked,

@@ -105,13 +105,13 @@ final readonly class GlossaryChangeTarget implements TargetProviderInterface
     #[Override]
     public function canReview(int $userId, int $targetId): bool
     {
-        return $this->security->isGranted('ROLE_ORGANIZER') && $this->service->get($targetId) !== null;
+        return $this->security->isGranted('ROLE_ORGANIZER') && $this->service->getManaged($targetId) !== null;
     }
 
     #[Override]
     public function validate(int $targetId, string $field, ?string $value): ?string
     {
-        $entry = $this->service->get($targetId);
+        $entry = $this->service->getManaged($targetId);
         if ($entry === null) {
             return $this->translator->trans('glossary.validation_entry_missing');
         }
