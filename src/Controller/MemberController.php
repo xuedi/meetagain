@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Enum\ImageType;
 use App\Enum\UserRole;
 use App\Filter\Member\MemberFilterService;
+use App\Filter\Member\ModerationFilterInterface;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Member\BlockingService;
@@ -15,6 +16,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Module\Geo\Contract\CityView;
 use Module\Geo\Contract\DirectoryInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -30,6 +32,9 @@ final class MemberController extends AbstractController
     private const int PAGE_SIZE = 24;
     private const array MODERATION_RANKS = ['ROLE_ADMIN', 'ROLE_STEWARD', 'ROLE_ORGANIZER'];
 
+    /**
+     * @param iterable<ModerationFilterInterface> $moderationFilters
+     */
     public function __construct(
         private readonly UserService $userService,
         private readonly FriendshipService $service,
@@ -39,6 +44,8 @@ final class MemberController extends AbstractController
         private readonly ImageLocationService $imageLocationService,
         private readonly Security $security,
         private readonly DirectoryInterface $directory,
+        #[AutowireIterator(ModerationFilterInterface::class)]
+        private readonly iterable $moderationFilters,
     ) {}
 
     #[Route('/{page}', name: self::ROUTE_MEMBER)]
@@ -208,8 +215,17 @@ final class MemberController extends AbstractController
 
         $actorRank = $this->moderationRank(fn(string $role): bool => $this->security->isGranted($role));
         $targetRank = $this->moderationRank(fn(string $role): bool => $this->security->isGrantedForUser($target, $role));
+        if ($actorRank <= $targetRank) {
+            return false;
+        }
 
-        return $actorRank > $targetRank;
+        foreach ($this->moderationFilters as $filter) {
+            if ($filter->mayModerate($actor, $target) === false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
