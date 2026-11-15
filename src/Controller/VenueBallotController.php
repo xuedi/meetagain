@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Event\BallotLocationChoice;
+use App\Filter\Admin\Event\AdminEventListFilterService;
 use DomainException;
 use InvalidArgumentException;
 use Module\Ballot\Contract\BallotInterface;
@@ -18,6 +19,7 @@ final class VenueBallotController extends AbstractController
 {
     public function __construct(
         private readonly BallotInterface $ballots,
+        private readonly AdminEventListFilterService $eventFilterService,
     ) {}
 
     #[Route('/{id}/close', name: 'app_venue_ballot_close', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
@@ -25,6 +27,9 @@ final class VenueBallotController extends AbstractController
     public function close(int $id, Request $request): Response
     {
         $ballot = $this->mustView($id);
+        if ($ballot->subject?->type !== BallotLocationChoice::SUBJECT_TYPE || !$this->eventFilterService->isEventAccessible($ballot->subject->id)) {
+            throw $this->createNotFoundException();
+        }
 
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('venue_ballot_close' . $id, (string) $request->request->get('_token'))) {

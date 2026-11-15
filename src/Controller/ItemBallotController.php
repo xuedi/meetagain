@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Form\BallotTermsType;
 use App\Form\ItemBallotType;
 use App\Item\Ballot\Candidates;
@@ -37,13 +38,14 @@ final class ItemBallotController extends AbstractController
         private readonly TranslatorInterface $translator,
         private readonly BallotTermsType $ballotTerms,
         private readonly Purpose $purpose,
+        private readonly AdminEventListFilterService $eventFilterService,
     ) {}
 
     #[Route('/create/{eventId}/{itemType}', name: 'app_item_ballot_create', requirements: ['eventId' => '\d+'], methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
     public function create(int $eventId, string $itemType, Request $request): Response
     {
-        $event = $this->eventService->findEvent($eventId);
+        $event = $this->eventFilterService->isEventAccessible($eventId) ? $this->eventService->findEvent($eventId) : null;
         if ($event === null || !$this->types->has($itemType)) {
             throw $this->createNotFoundException();
         }
@@ -110,6 +112,9 @@ final class ItemBallotController extends AbstractController
     public function close(int $id, Request $request): Response
     {
         $ballot = $this->mustView($id);
+        if ($ballot->subject?->type !== Purpose::SUBJECT_TYPE || !$this->eventFilterService->isEventAccessible($ballot->subject->id)) {
+            throw $this->createNotFoundException();
+        }
 
         if ($request->isMethod('POST')) {
             if (!$this->isCsrfTokenValid('item_ballot_close' . $id, (string) $request->request->get('_token'))) {

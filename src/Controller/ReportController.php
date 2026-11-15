@@ -9,6 +9,7 @@ use App\Enum\SecurityEventType;
 use App\Form\ReportImageType;
 use App\Form\ReportSubjectType;
 use App\Moderation\ReportService;
+use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Security\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,6 +32,7 @@ final class ReportController extends AbstractController
         #[Autowire(service: 'limiter.moderation_report')]
         private readonly RateLimiterFactoryInterface $moderationReportLimiter,
         private readonly SecurityService $securityService,
+        private readonly ImageLocationService $imageLocationService,
     ) {}
 
     #[Route('/image/{id}', name: 'app_report_image')]
@@ -39,6 +41,9 @@ final class ReportController extends AbstractController
         $response = $this->getResponse();
         $user = $this->getAuthedUser();
         $image = $id === null ? null : $this->imageService->findImage($id);
+        if ($image === null || !$this->imageLocationService->isReportable($image)) {
+            throw $this->createNotFoundException();
+        }
 
         $form = $this->createForm(ReportImageType::class);
         $form->handleRequest($request);

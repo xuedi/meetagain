@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Item\AssociationService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,12 +15,16 @@ final class EventItemController extends AbstractController
 {
     public function __construct(
         private readonly AssociationService $itemAssociationService,
+        private readonly AdminEventListFilterService $eventFilterService,
     ) {}
 
     #[Route('/attach', name: 'app_item_attach', requirements: ['id' => '\d+'], methods: ['POST'])]
     #[IsGranted('ROLE_ORGANIZER')]
     public function attachItem(Request $request, int $id): Response
     {
+        if (!$this->eventFilterService->isEventAccessible($id)) {
+            throw $this->createNotFoundException();
+        }
         if (!$this->isCsrfTokenValid('app_item_attach' . $id, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }
@@ -38,6 +43,9 @@ final class EventItemController extends AbstractController
     #[IsGranted('ROLE_ORGANIZER')]
     public function detachItem(Request $request, int $id): Response
     {
+        if (!$this->eventFilterService->isEventAccessible($id)) {
+            throw $this->createNotFoundException();
+        }
         if (!$this->isCsrfTokenValid('app_item_detach' . $id, (string) $request->request->get('_token'))) {
             throw new BadRequestHttpException('Invalid CSRF token.');
         }

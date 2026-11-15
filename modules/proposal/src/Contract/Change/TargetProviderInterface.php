@@ -31,8 +31,13 @@ interface TargetProviderInterface
     /** Display form of a stored value, e.g. resolving an id to its label. */
     public function formatValue(string $field, ?string $value): string;
 
+    /** Whether the current viewer may see the target; a field ballot on a target nobody may see stays hidden. */
+    public function isVisible(int $targetId): bool;
+
+    /** Whether the user may propose a change to the target; also decides who may vote on its field ballots. */
     public function canPropose(int $userId, int $targetId): bool;
 
+    /** Whether the user may apply or deny proposals on the target and put a contested field to a ballot. */
     public function canReview(int $userId, int $targetId): bool;
 
     /** Pre-translated error when the value cannot be applied to the target; null when valid. */

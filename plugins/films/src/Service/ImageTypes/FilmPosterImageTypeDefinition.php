@@ -5,10 +5,12 @@ namespace Plugin\Films\Service\ImageTypes;
 use App\Entity\Image;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
+use App\Item\FilterService;
 use App\Repository\ImageLocationRepository;
 use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use Plugin\Films\Repository\FilmRepository;
+use Plugin\Films\Service\FilmService;
 
 final readonly class FilmPosterImageTypeDefinition extends AbstractImageTypeDefinition
 {
@@ -16,6 +18,7 @@ final readonly class FilmPosterImageTypeDefinition extends AbstractImageTypeDefi
         ImageLocationRepository $repo,
         Connection $connection,
         private FilmRepository $filmRepository,
+        private FilterService $itemFilter,
     ) {
         parent::__construct($repo, $connection);
     }
@@ -59,6 +62,13 @@ final readonly class FilmPosterImageTypeDefinition extends AbstractImageTypeDefi
             'route' => 'app_plugin_films_film_show',
             'params' => ['id' => $film->getId()],
         ];
+    }
+
+    public function isReportableAt(int $locationId): bool
+    {
+        $allowed = $this->itemFilter->getAllowedItemIds(FilmService::ITEM_TYPE);
+
+        return $allowed === null || in_array($locationId, $allowed, true);
     }
 
     protected function sizes(): array

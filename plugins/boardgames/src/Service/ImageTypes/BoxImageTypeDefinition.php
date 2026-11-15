@@ -4,10 +4,12 @@ namespace Plugin\Boardgames\Service\ImageTypes;
 
 use App\Entity\Image;
 use App\Enum\ImageType;
+use App\Item\FilterService;
 use App\Repository\ImageLocationRepository;
 use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use Plugin\Boardgames\Repository\GameRepository;
+use Plugin\Boardgames\Service\GameService;
 
 final readonly class BoxImageTypeDefinition extends AbstractImageTypeDefinition
 {
@@ -15,6 +17,7 @@ final readonly class BoxImageTypeDefinition extends AbstractImageTypeDefinition
         ImageLocationRepository $repo,
         Connection $connection,
         private GameRepository $gameRepository,
+        private FilterService $itemFilter,
     ) {
         parent::__construct($repo, $connection);
     }
@@ -53,6 +56,13 @@ final readonly class BoxImageTypeDefinition extends AbstractImageTypeDefinition
             'route' => 'app_plugin_boardgames_game_show',
             'params' => ['id' => $game->getId()],
         ];
+    }
+
+    public function isReportableAt(int $locationId): bool
+    {
+        $allowed = $this->itemFilter->getAllowedItemIds(GameService::ITEM_TYPE);
+
+        return $allowed === null || in_array($locationId, $allowed, true);
     }
 
     protected function sizes(): array

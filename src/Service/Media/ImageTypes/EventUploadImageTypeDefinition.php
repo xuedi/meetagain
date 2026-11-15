@@ -4,9 +4,20 @@ namespace App\Service\Media\ImageTypes;
 
 use App\Entity\Image;
 use App\Enum\ImageType;
+use App\Filter\Event\EventFilterService;
+use App\Repository\ImageLocationRepository;
+use Doctrine\DBAL\Connection;
 
 final readonly class EventUploadImageTypeDefinition extends AbstractImageTypeDefinition
 {
+    public function __construct(
+        ImageLocationRepository $repo,
+        Connection $connection,
+        private EventFilterService $eventFilter,
+    ) {
+        parent::__construct($repo, $connection);
+    }
+
     public function getType(): ImageType
     {
         return ImageType::EventUpload;
@@ -39,6 +50,11 @@ final readonly class EventUploadImageTypeDefinition extends AbstractImageTypeDef
             'route' => 'app_admin_event_edit',
             'params' => ['id' => $event->getId()],
         ];
+    }
+
+    public function isReportableAt(int $locationId): bool
+    {
+        return $this->eventFilter->isEventAccessible($locationId);
     }
 
     protected function sizes(): array

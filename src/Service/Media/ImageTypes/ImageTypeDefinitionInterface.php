@@ -56,4 +56,7 @@ interface ImageTypeDefinitionInterface
      * @return array{subject: string|null, route: string|null, params: array<string, mixed>}|null
      */
     public function locate(Image $image): ?array;
+
+    /** Whether the current viewer may report the image used at this location; false for a type that offers no report. */
+    public function isReportableAt(int $locationId): bool;
 }

@@ -37,6 +37,17 @@ readonly class ImageLocationService
         return $this->locationRepository->findByImageId($imageId);
     }
 
+    public function isReportable(Image $image): bool
+    {
+        foreach ($this->locationRepository->findByImageId((int) $image->getId()) as $location) {
+            if ($this->registry->get($location->getLocationType())->isReportableAt($location->getLocationId())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function addLocation(int $imageId, ImageType $type, int $locationId): void
     {
         $this->locationRepository->insertForType($type, [['imageId' => $imageId, 'locationId' => $locationId]]);

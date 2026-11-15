@@ -1853,7 +1853,8 @@ it directly, others only propose. If everyone with edit access writes directly, 
    for a label when the entity is gone - the UI treats that as 404), `getFieldLabel()` / `formatValue()` turn your field
    keys and stored values into display strings (e.g. resolving a tag id to its label).
 2. **Delegate permissions.** `canPropose()` / `canReview()` are called with a user id and a target on every mutation -
-   gate them on your roles and your entity's visibility rules.
+   gate them on your roles and your entity's visibility rules. `isVisible()` answers whether the current viewer may
+   see the target at all; a ballot on one of its fields is hidden wherever it returns false.
 3. **Validate and apply.** `validate()` is called before every apply, including again at apply time as a staleness guard
    (the proposal may be days old - a referenced id may no longer exist). Return a pre-translated error string, or null
    when the value can be applied. `apply()` writes one field value onto your entity. Values travel as `string|null` -

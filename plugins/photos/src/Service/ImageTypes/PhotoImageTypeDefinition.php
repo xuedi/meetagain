@@ -4,10 +4,12 @@ namespace Plugin\Photos\Service\ImageTypes;
 
 use App\Entity\Image;
 use App\Enum\ImageType;
+use App\Item\FilterService;
 use App\Repository\ImageLocationRepository;
 use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use Plugin\Photos\Repository\PhotoRepository;
+use Plugin\Photos\Service\PhotoService;
 
 final readonly class PhotoImageTypeDefinition extends AbstractImageTypeDefinition
 {
@@ -15,6 +17,7 @@ final readonly class PhotoImageTypeDefinition extends AbstractImageTypeDefinitio
         ImageLocationRepository $repo,
         Connection $connection,
         private PhotoRepository $photoRepository,
+        private FilterService $itemFilter,
     ) {
         parent::__construct($repo, $connection);
     }
@@ -50,6 +53,13 @@ final readonly class PhotoImageTypeDefinition extends AbstractImageTypeDefinitio
             'route' => 'app_plugin_photos_photo_show',
             'params' => ['id' => $photo->getId()],
         ];
+    }
+
+    public function isReportableAt(int $locationId): bool
+    {
+        $allowed = $this->itemFilter->getAllowedItemIds(PhotoService::ITEM_TYPE);
+
+        return $allowed === null || in_array($locationId, $allowed, true);
     }
 
     protected function sizes(): array

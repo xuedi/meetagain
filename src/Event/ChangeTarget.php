@@ -91,6 +91,12 @@ final readonly class ChangeTarget implements TargetProviderInterface, ScopedTarg
     }
 
     #[Override]
+    public function isVisible(int $targetId): bool
+    {
+        return $this->visibleEvent($targetId) !== null;
+    }
+
+    #[Override]
     public function canPropose(int $userId, int $targetId): bool
     {
         $user = $this->em->find(User::class, $userId);
