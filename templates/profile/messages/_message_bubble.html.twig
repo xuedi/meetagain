@@ -1,0 +1,33 @@
+{% set editableUntil = (message.createdAt|date('U') + (constant('App\\Entity\\Message::EDIT_WINDOW_MINUTES') * 60)) %}
+{% set withinWindow = isOwn and editableUntil > 'now'|date('U') %}
+<div class="box message-bubble mb-0{% if isOwn %} has-background-link-light{% endif %}"
+     data-message-id="{{ message.id }}"
+     {% if withinWindow %}data-editable-until="{{ editableUntil }}"{% endif %}>
+    <div class="is-size-7 has-text-grey">
+        {% if showName|default(false) %}
+            <strong class="mr-1">{{ message.sender.name }}</strong>
+        {% endif %}
+        <span class="message-time" title="{{ message.createdAt|date('Y-m-d H:i') }}">{{ message.createdAt|time_diff }}</span>
+        {% if message.editedAt is not null %}
+            <span class="ml-1 edited-marker">{{ 'profile_messages.edited_marker'|trans }}</span>
+        {% endif %}
+        {% if withinWindow %}
+            <a href="#" class="message-edit-trigger ml-1"
+               title="{{ 'profile_messages.edit_button'|trans }}"
+               aria-label="{{ 'profile_messages.edit_button'|trans }}"
+               data-content="{{ message.content }}">
+                <span class="icon is-small"><i class="fa fa-pen"></i></span>
+            </a>
+        {% elseif not isOwn %}
+            <a href="{{ path('app_report_subject', {'type': 'message', 'id': message.id}) }}"
+               class="ml-1 has-text-grey"
+               title="{{ 'profile_messages.report_button'|trans }}"
+               aria-label="{{ 'profile_messages.report_button'|trans }}">
+                <span class="icon is-small"><i class="fa fa-flag"></i></span>
+            </a>
+        {% endif %}
+    </div>
+    <div class="message-text">
+        {% include 'profile/messages/_message_body.html.twig' with {'content': message.content} only %}
+    </div>
+</div>

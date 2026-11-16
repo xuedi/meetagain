@@ -40,7 +40,7 @@ ins {
 .is-column-fill  { width: 100%; }
 .is-contents     { display: contents; }
 .is-full-height  { height: 100%; }
-.breakText       { display: block; max-width: 720px !important; word-break: break-all; }
+.breakText       { display: block; max-width: 720px; overflow-wrap: anywhere; }
 
 // Lifts a linked card/box on hover - for a `.box`, `.card`, or tile-style element that is itself
 // the `<a>` (or wraps one). Not for non-interactive cards.
@@ -209,7 +209,12 @@ details.activities-load-more {
 .chat-layout         { display: flex; flex-direction: column; height: 70vh; }
 .chat-layout-mobile  { display: flex; flex-direction: column; height: 60vh; }
 .messages-scroll     { flex: 1; overflow-y: auto; margin-bottom: 1rem; }
-.message-own         { background-color: aliceblue; }
+.message-row         { gap: 0.75rem; margin-top: 1rem; }
+.message-row.is-grouped { margin-top: 0.5rem; }
+.message-avatar      { flex-shrink: 0; }
+.message-bubble      { min-width: 0; max-width: 75%; }
+.chat-layout-mobile .message-bubble { max-width: none; }
+.message-input       { min-height: 2.5em; max-height: 10em; overflow-y: hidden; }
 
 // Admin collapsible section (AdminCollapsibleSection component)
 .admin-section-header {

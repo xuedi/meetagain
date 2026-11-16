@@ -1,6 +1,6 @@
 <h1 class="title is-5">{{ 'profile_messages.section_heading'|trans }}</h1>
 <div class="tabs is-boxed is-fullwidth is-small">
-    <ul>
+    <ul data-conversations="mobile">
         {% for conversation in conversations %}
             <li class="{% if conversationsId == conversation.user.id %}is-active{% endif %}">
                 <a href="{{ path('app_profile_messages', {'id': conversation.user.id}) }}">
@@ -15,109 +15,22 @@
 </div>
 
 {% if messages is null %}
-    <h1 class="title is-6">{{ 'profile_messages.welcome_heading'|trans }}</h1>
-    <p class="mb-2">
-        {{ 'profile_messages.welcome_intro'|trans }}
-    </p>
-    <p class="mb-2">
-        {{ 'profile_messages.welcome_rule'|trans }}
-    </p>
-    <p class="mb-2">
-        {{ 'profile_messages.welcome_addressbook_hint'|trans }}
-    </p>
+    {% include 'profile/messages/_welcome.html.twig' %}
 {% else %}
-    <div class="chat-layout-mobile">
-        {# Block button in header #}
+    <div class="chat-layout-mobile" data-chat>
         {% if conversationsId %}
-            <div class="level mb-2">
-                <div class="level-left"></div>
-                <div class="level-right">
-                    {% if hasBlockedPartner %}
-                        <form action="{{ path('app_profile_unblock_user', {'id': conversationsId}) }}" method="post" class="is-inline ajax-block-form">
-                            <input type="hidden" name="_token" value="{{ csrf_token('app_profile_unblock_user' ~ conversationsId) }}">
-                            <button type="submit" class="button is-warning is-small">
-                                <span class="icon"><i class="fa fa-unlock"></i></span><span>{{ 'member.button_unblock'|trans }}</span>
-                            </button>
-                        </form>
-                    {% else %}
-                        <form action="{{ path('app_profile_block_user', {'id': conversationsId}) }}" method="post" class="is-inline ajax-block-form">
-                            <input type="hidden" name="_token" value="{{ csrf_token('app_profile_block_user' ~ conversationsId) }}">
-                            <button type="submit" class="button is-dark is-small">
-                                <span class="icon"><i class="fa fa-ban"></i></span><span>{{ 'member.button_block'|trans }}</span>
-                            </button>
-                        </form>
-                    {% endif %}
-                </div>
-            </div>
+            {% include 'profile/messages/_block_toggle.html.twig' %}
         {% endif %}
 
         <div id="mobile-message-container" class="messages-scroll">
             {% for message in messages %}
-                {% set isOwn = user.id == message.sender.id %}
-                {% set editableUntil = (message.createdAt|date('U') + (constant('App\\Entity\\Message::EDIT_WINDOW_MINUTES') * 60)) %}
-                {% set withinWindow = isOwn and editableUntil > 'now'|date('U') %}
-                <div class="box {% if isOwn %}has-background-link-light{% endif %}"
-                     data-message-id="{{ message.id }}"
-                     {% if withinWindow %}data-editable-until="{{ editableUntil }}"{% endif %}>
-                    <strong>{{ message.sender.name }}</strong><small class="ml-2">{{ message.createdAt | time_diff }}</small>
-                    {% if message.editedAt is not null %}
-                        <small class="has-text-grey ml-1 edited-marker">{{ 'profile_messages.edited_marker'|trans }}</small>
-                    {% endif %}
-                    {% if not isOwn %}
-                        <a href="{{ path('app_report_subject', {'type': 'message', 'id': message.id}) }}"
-                           class="ml-1 has-text-grey"
-                           title="{{ 'profile_messages.report_button'|trans }}"
-                           aria-label="{{ 'profile_messages.report_button'|trans }}">
-                            <span class="icon is-small"><i class="fa fa-flag"></i></span>
-                        </a>
-                    {% endif %}
-                    {% if withinWindow %}
-                        <a href="#" class="message-edit-trigger ml-1"
-                           title="{{ 'profile_messages.edit_button'|trans }}"
-                           aria-label="{{ 'profile_messages.edit_button'|trans }}"
-                           data-content="{{ message.content }}">
-                            <span class="icon is-small"><i class="fa fa-pen"></i></span>
-                        </a>
-                    {% endif %}
-                    <br>
-                    {% include 'profile/messages/_message_body.html.twig' with {'content': message.content} only %}
+                <div class="message-row">
+                    {% include 'profile/messages/_message_bubble.html.twig' with {'message': message, 'isOwn': user.id == message.sender.id, 'showName': true} only %}
                 </div>
             {% endfor %}
         </div>
         <div>
-            <hr>
-            {% if isBlocked %}
-                <div class="notification is-warning">
-                    <span class="icon"><i class="fa fa-ban"></i></span>
-                    {{ 'profile_messages.cannot_message'|trans }}
-                </div>
-            {% elseif form %}
-                {{ form_start(form, {'attr': {
-                    'id': 'message-form',
-                    'data-edit-url-template': path('app_profile_messages_edit', {'id': '__ID__'}),
-                    'data-csrf-token': csrf_token('message_edit'),
-                    'data-label-send': 'profile_messages.button_send'|trans,
-                    'data-label-save': 'profile_messages.button_save'|trans,
-                    'data-label-cancel': 'profile_messages.cancel_edit'|trans,
-                    'data-edit-window-minutes': constant('App\\Entity\\Message::EDIT_WINDOW_MINUTES'),
-                    'data-error-generic': 'profile_messages.edit_failed'|trans,
-                    'data-error-no-change': 'profile_messages.edit_no_change'|trans,
-                    'data-edited-marker-text': 'profile_messages.edited_marker'|trans,
-                }}) }}
-                <input type="hidden" name="editingMessageId" value="">
-                <div class="field has-addons">
-                    <div class="control is-expanded">
-                        <input class="input" type="text" name="{{ field_name(form.comment) }}" placeholder="{{ 'profile_messages.input_placeholder'|trans }}" />
-                    </div>
-                    <div class="control">
-                        <button type="button" class="button is-light is-small is-hidden cancel-edit">{{ 'profile_messages.cancel_edit'|trans }}</button>
-                    </div>
-                    <div class="control">
-                        <button class="button is-link ml-2 submit-button">{{ 'profile_messages.button_send'|trans }}</button>
-                    </div>
-                </div>
-                {{ form_end(form) }}
-            {% endif %}
+            {% include 'profile/messages/_composer_area.html.twig' %}
         </div>
     </div>
 {% endif %}

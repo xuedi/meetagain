@@ -473,6 +473,8 @@ profile_messages:
     edit_no_change: 'No hay cambios que guardar.'
     system_support_question: 'Pregunta enviada a través del formulario de soporte:'
     report_button: 'Denunciar mensaje'
+    composer_hint: 'Intro para enviar, Mayús+Intro para una nueva línea'
+    send_failed: 'No se pudo enviar tu mensaje. Inténtalo de nuevo.'
 profile_notifications:
     page_title: 'Notificaciones'
     empty_state: 'No hay notificaciones nuevas'

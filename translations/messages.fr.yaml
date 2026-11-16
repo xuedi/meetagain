@@ -473,6 +473,8 @@ profile_messages:
     edit_no_change: 'Aucune modification à enregistrer.'
     system_support_question: 'Question posée via le formulaire de support :'
     report_button: 'Signaler le message'
+    composer_hint: 'Entrée pour envoyer, Maj+Entrée pour une nouvelle ligne'
+    send_failed: 'Impossible d''envoyer ton message. Réessaie.'
 profile_notifications:
     page_title: 'Notifications'
     empty_state: 'Aucune nouvelle notification'

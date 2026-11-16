@@ -473,6 +473,8 @@ profile_messages:
     edit_no_change: 'No changes to save.'
     system_support_question: 'Via Support form asked:'
     report_button: 'Report message'
+    composer_hint: 'Enter to send, Shift+Enter for a new line'
+    send_failed: 'Could not send your message. Please try again.'
 profile_notifications:
     page_title: 'Notifications'
     empty_state: 'No new notifications'
