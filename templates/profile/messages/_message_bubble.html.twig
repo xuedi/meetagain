@@ -4,9 +4,6 @@
      data-message-id="{{ message.id }}"
      {% if withinWindow %}data-editable-until="{{ editableUntil }}"{% endif %}>
     <div class="is-size-7 has-text-grey">
-        {% if showName|default(false) %}
-            <strong class="mr-1">{{ message.sender.name }}</strong>
-        {% endif %}
         <span class="message-time" title="{{ message.createdAt|date('Y-m-d H:i') }}">{{ message.createdAt|time_diff }}</span>
         {% if message.editedAt is not null %}
             <span class="ml-1 edited-marker">{{ 'profile_messages.edited_marker'|trans }}</span>

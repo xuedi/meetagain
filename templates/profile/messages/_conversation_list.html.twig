@@ -1,0 +1,17 @@
+{% for conversation in conversations %}
+    {% set isCurrent = conversationsId == conversation.user.id %}
+    <a class="panel-block{% if isCurrent %} is-active has-background-link-light{% endif %}"
+       href="{{ path('app_profile_messages', {'id': conversation.user.id}) }}"
+       {% if isCurrent %}aria-current="page"{% endif %}>
+        <span class="message-avatar mr-3">
+            {% include '_components/image.html.twig' with {'image': conversation.user.image, 'size': '50x50'} %}
+        </span>
+        <span class="is-flex-grow-1">
+            <strong>{{ conversation.user.name }}</strong><br/>
+            <small>{{ conversation.lastMessage | time_diff }}</small>
+        </span>
+        {% if conversation.unread > 0 %}
+            <span class="tag has-background-danger-light">{{ conversation.unread }}</span>
+        {% endif %}
+    </a>
+{% endfor %}

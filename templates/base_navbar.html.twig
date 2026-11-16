@@ -5,8 +5,23 @@
                 {% set logo = site_logo() %}
                 <img class="brand-logo" src="{{ logo.url }}"{% if logo.width %} width="{{ logo.width }}"{% endif %} height="{{ logo.height|default(40) }}" alt="{{ get_site_name() }}">
             </a>
-            {% include 'base_navbar_burger.html.twig' %}
+            {% set notifications = is_granted('ROLE_USER') ? get_notifications() : null %}
+            {% if notifications %}
+                <a class="button is-small is-align-self-center is-hidden-desktop ml-auto mr-2 {% if notifications.totalCount > 0 %}is-danger{% else %}is-light{% endif %}"
+                   href="{{ path('app_profile_notifications') }}"
+                   aria-label="{{ 'profile_notifications.page_title'|trans }}">
+                    <span class="icon is-small"><i class="fas fa-bell" aria-hidden="true"></i></span>
+                    {% if notifications.totalCount > 0 %}<span>{{ notifications.totalCount }}</span>{% endif %}
+                </a>
+            {% endif %}
+            <a role="button" class="navbar-burger{% if notifications %} ml-0{% endif %}" data-target="navBurgenMenu" aria-label="{{ 'chrome.aria_menu'|trans }}" aria-expanded="false">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
         </div>
+        {% include 'base_navbar_burger.html.twig' %}
         <div id="navBarTop" class="navbar-menu">
             <div class="navbar-start">
                 {% for pluginLink in get_leading_plugin_links() %}

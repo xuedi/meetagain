@@ -30,7 +30,7 @@ class UpdatedProfilePicture extends MessageAbstract
 
     protected function renderHtml(): string
     {
-        $box = '<div class="is-pulled-top-right">%s<i class="fa-solid fa-arrow-right"></i>%s</div>';
+        $box = '<div class="is-flex is-align-items-center mt-2">%s<span class="icon mx-2"><i class="fa-solid fa-arrow-right"></i></span>%s</div>';
         $msgTemplate = $this->translator->trans('profile_social.activity_updated_profile_picture') . $box;
 
         return sprintf($msgTemplate, $this->imageRenderer->renderThumbnail($this->meta['old']), $this->imageRenderer->renderThumbnail($this->meta['new']));

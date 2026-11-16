@@ -29,9 +29,9 @@ class UpdatedProfilePictureTest extends TestCase
         $oldImageHtml = '<img src="old-image.jpg" alt="Old Image">';
         $newImageHtml = '<img src="new-image.jpg" alt="New Image">';
         $expectedHtml =
-            'profile_social.activity_updated_profile_picture<div class="is-pulled-top-right">'
+            'profile_social.activity_updated_profile_picture<div class="is-flex is-align-items-center mt-2">'
             . $oldImageHtml
-            . '<i class="fa-solid fa-arrow-right"></i>'
+            . '<span class="icon mx-2"><i class="fa-solid fa-arrow-right"></i></span>'
             . $newImageHtml
             . '</div>';
         $meta = ['old' => 0, 'new' => 1];

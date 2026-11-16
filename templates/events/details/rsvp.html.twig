@@ -52,13 +52,13 @@
         {% endif %}
     </div>
 </nav>
-<div class="columns is-multiline mt-2">
+<div class="columns is-mobile is-multiline mt-2">
     {% set rsvpActive = not event.canceled and event.start > date() %}
     {% for rsvp in event.rsvp %}
         {% set guests = rsvp_guest_count(event, rsvp) %}
         {% set ownTile = app.user is not null and rsvp.id == app.user.id %}
         {% set showControls = ownTile and rsvpActive %}
-        <div class="column is-2">
+        <div class="column is-6-mobile is-4-tablet is-2-desktop">
             {% embed '_components/usercard.html.twig' with {'user': rsvp} %}
                 {% block footer %}
                     {% if showControls or guests > 0 %}

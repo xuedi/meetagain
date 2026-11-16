@@ -1,35 +1,47 @@
-<h1 class="title is-5">{{ 'profile_messages.section_heading'|trans }}</h1>
-<div class="tabs is-boxed is-fullwidth is-small">
-    <ul data-conversations="mobile">
-        {% for conversation in conversations %}
-            <li class="{% if conversationsId == conversation.user.id %}is-active{% endif %}">
-                <a href="{{ path('app_profile_messages', {'id': conversation.user.id}) }}">
-                            <span class="ml-2">
-                                {{ conversation.user.name }}<br>
-                                <small>{{ conversation.lastMessage | time_diff }}</small>
-                            </span>
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
-</div>
-
 {% if messages is null %}
+    <h1 class="title is-5">{{ 'profile_messages.section_heading'|trans }}</h1>
+    {% if conversations|length > 0 %}
+        <nav class="panel is-shadowless mb-5" data-conversations="mobile">
+            {% include 'profile/messages/_conversation_list.html.twig' %}
+        </nav>
+    {% endif %}
     {% include 'profile/messages/_welcome.html.twig' %}
 {% else %}
-    <div class="chat-layout-mobile" data-chat>
-        {% if conversationsId %}
-            {% include 'profile/messages/_block_toggle.html.twig' %}
+    {% set partner = conversations|filter(conversation => conversation.user.id == conversationsId)|first %}
+    <div class="is-flex is-align-items-center mb-3">
+        <a class="button is-white" href="{{ path('app_profile_messages') }}"
+           title="{{ 'profile_messages.back_to_conversations'|trans }}"
+           aria-label="{{ 'profile_messages.back_to_conversations'|trans }}">
+            <span class="icon"><i class="fa fa-chevron-left" aria-hidden="true"></i></span>
+        </a>
+        {% if partner %}
+            <figure class="image is-32x32 ml-1 mr-2 message-avatar">
+                {% include '_components/image.html.twig' with {'image': partner.user.image, 'size': '50x50'} %}
+            </figure>
+            <strong>{{ partner.user.name|shortened(20) }}</strong>
         {% endif %}
+        {% if conversationsId %}
+            <div class="ml-auto">
+                {% include 'profile/messages/_block_toggle.html.twig' %}
+            </div>
+        {% endif %}
+    </div>
 
+    <div class="chat-layout-mobile" data-chat>
         <div id="mobile-message-container" class="messages-scroll">
+            {% set previous = null %}
             {% for message in messages %}
-                <div class="message-row">
-                    {% include 'profile/messages/_message_bubble.html.twig' with {'message': message, 'isOwn': user.id == message.sender.id, 'showName': true} only %}
+                {% set isOwn = user.id == message.sender.id %}
+                {% set isGrouped = previous is not null
+                    and previous.sender.id == message.sender.id
+                    and (message.createdAt|date('U') - previous.createdAt|date('U')) < groupWindowSeconds %}
+                <div class="message-row is-flex{% if isOwn %} is-justify-content-flex-end{% endif %}{% if isGrouped %} is-grouped{% endif %}">
+                    {% include 'profile/messages/_message_bubble.html.twig' with {'message': message, 'isOwn': isOwn} only %}
                 </div>
+                {% set previous = message %}
             {% endfor %}
         </div>
-        <div>
+        <div class="message-composer-sticky">
             {% include 'profile/messages/_composer_area.html.twig' %}
         </div>
     </div>

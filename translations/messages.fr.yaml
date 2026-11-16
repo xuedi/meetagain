@@ -28,7 +28,6 @@ chrome:
     footer_attributions: 'Crédits images'
     nav_contact: 'Contact'
     burger_logged_in_label: 'Connecté : %name%'
-    burger_admin_section: 'Admin'
     notifications_view_all: 'Tout voir'
     notification_unread_messages: '%count% message(s) non lu(s)'
     notification_new_support_requests: '%count% nouvelle(s) demande(s) de support'
@@ -455,7 +454,7 @@ profile_images:
 profile_messages:
     section_heading: 'Messages'
     welcome_heading: 'Bonjour,'
-    welcome_intro: 'Voici ton aperçu des messages. À gauche se trouvent les personnes avec qui tu as échangé des messages.'
+    welcome_intro: 'Voici ton aperçu des messages, avec les personnes avec qui tu as échangé des messages.'
     welcome_rule: 'Tu ne peux envoyer des messages qu''aux personnes avec qui tu es ami, ou à celles qui acceptent les messages de tout le monde.'
     welcome_addressbook_hint: 'Jette un œil à la page des membres ; dans la vue détaillée de chaque membre, tu trouveras un bouton de message.'
     cannot_message: 'Tu ne peux pas envoyer de message à cet utilisateur.'
@@ -475,6 +474,7 @@ profile_messages:
     report_button: 'Signaler le message'
     composer_hint: 'Entrée pour envoyer, Maj+Entrée pour une nouvelle ligne'
     send_failed: 'Impossible d''envoyer ton message. Réessaie.'
+    back_to_conversations: 'Retour aux conversations'
 profile_notifications:
     page_title: 'Notifications'
     empty_state: 'Aucune nouvelle notification'

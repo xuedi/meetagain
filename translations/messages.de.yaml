@@ -28,7 +28,6 @@ chrome:
     footer_attributions: 'Bildnachweise'
     nav_contact: 'Kontakt'
     burger_logged_in_label: 'Angemeldet: %name%'
-    burger_admin_section: 'Admin'
     notifications_view_all: 'Alle anzeigen'
     notification_unread_messages: '%count% ungelesene Nachricht(en)'
     notification_new_support_requests: '%count% neue Support-Anfrage(n)'
@@ -455,7 +454,7 @@ profile_images:
 profile_messages:
     section_heading: 'Nachrichten'
     welcome_heading: 'Hallo,'
-    welcome_intro: 'Dies ist deine Nachrichtenübersicht. Links siehst du Personen, mit denen du Nachrichten ausgetauscht hast.'
+    welcome_intro: 'Dies ist deine Nachrichtenübersicht mit den Personen, mit denen du Nachrichten ausgetauscht hast.'
     welcome_rule: 'Du kannst nur Personen Nachrichten senden, mit denen du befreundet bist, oder die Nachrichten von allen zulassen.'
     welcome_addressbook_hint: 'Schau auf der Mitgliederseite vorbei; in der Detailansicht jedes Mitglieds findest du einen Nachrichten-Button.'
     cannot_message: 'Du kannst diesen Nutzer nicht anschreiben.'
@@ -475,6 +474,7 @@ profile_messages:
     report_button: 'Nachricht melden'
     composer_hint: 'Enter zum Senden, Umschalt+Enter für eine neue Zeile'
     send_failed: 'Deine Nachricht konnte nicht gesendet werden. Bitte versuche es erneut.'
+    back_to_conversations: 'Zurück zu den Unterhaltungen'
 profile_notifications:
     page_title: 'Benachrichtigungen'
     empty_state: 'Keine neuen Benachrichtigungen'

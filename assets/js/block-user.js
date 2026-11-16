@@ -16,8 +16,7 @@
  * Loaded in:  templates/base.html.twig (all pages)
  * Used by:    templates/_components/toggle.html.twig,
  *             templates/profile/config.html.twig,
- *             templates/profile/messages/chat_desktop.html.twig,
- *             templates/profile/messages/chat_mobile.html.twig
+ *             templates/profile/messages/_block_toggle.html.twig
  * Depends on: ma-fetch.js (maFetch)
  */
 

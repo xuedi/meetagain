@@ -28,7 +28,6 @@ chrome:
     footer_attributions: '图片来源'
     nav_contact: '联系'
     burger_logged_in_label: '已登录：%name%'
-    burger_admin_section: '管理'
     notifications_view_all: '查看全部'
     notification_unread_messages: '%count% 条未读消息'
     notification_new_support_requests: '%count% 条新支持请求'
@@ -455,7 +454,7 @@ profile_images:
 profile_messages:
     section_heading: '消息'
     welcome_heading: '你好，'
-    welcome_intro: '这是你的消息概览。左侧列出了你曾互发消息的成员。'
+    welcome_intro: '这是你的消息概览，列出了你曾互发消息的成员。'
     welcome_rule: '你只能给好友发送消息，或给允许任何人发消息的成员。'
     welcome_addressbook_hint: '请到成员页面查看，在每个成员的详情视图中可以找到发消息按钮。'
     cannot_message: '你无法向此用户发送消息。'
@@ -475,6 +474,7 @@ profile_messages:
     report_button: '举报消息'
     composer_hint: '按 Enter 发送，Shift+Enter 换行'
     send_failed: '消息发送失败，请重试。'
+    back_to_conversations: '返回会话列表'
 profile_notifications:
     page_title: '通知'
     empty_state: '暂无新通知'

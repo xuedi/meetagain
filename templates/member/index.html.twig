@@ -8,9 +8,9 @@
         <div class="container">
             <h1 class="title is-3">{{ 'member.page_title' | trans }}</h1>
 
-            <div class="columns is-multiline">
+            <div class="columns is-mobile is-multiline">
                 {% for user in users %}
-                    <div class="column is-2">
+                    <div class="column is-6-mobile is-4-tablet is-2-desktop">
                         {% include '_components/usercard.html.twig' with {'user': user} %}
                     </div>
                 {% endfor %}
