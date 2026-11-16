@@ -37,6 +37,17 @@ final readonly class DashboardService
         return $this->handovers->find($id);
     }
 
+    public function isInScope(Copy $copy): bool
+    {
+        if ($copy->getContext() !== $this->circulation->getContext($copy->getItemType())) {
+            return false;
+        }
+
+        $allowed = $this->itemFilter->getAllowedItemIds($copy->getItemType());
+
+        return $allowed === null || in_array($copy->getItemId(), $allowed, true);
+    }
+
     /**
      * @return list<Copy>
      */

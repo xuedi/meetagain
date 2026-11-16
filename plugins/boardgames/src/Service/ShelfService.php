@@ -3,6 +3,7 @@
 namespace Plugin\Boardgames\Service;
 
 use App\Entity\User;
+use App\Filter\Member\MemberFilterService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Boardgames\Entity\Game;
@@ -18,6 +19,7 @@ class ShelfService implements ResetInterface
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly GameOwnershipRepository $ownershipRepo,
+        private readonly MemberFilterService $memberFilter,
     ) {}
 
     /** @return list<GameOwnership> */
@@ -97,7 +99,10 @@ class ShelfService implements ResetInterface
     /** @return list<GameOwnership> */
     public function getAskableOwners(Game $game): array
     {
-        return $this->ownershipRepo->findAskableOwnersOf($game);
+        return array_values(array_filter(
+            $this->ownershipRepo->findAskableOwnersOf($game),
+            fn(GameOwnership $ownership): bool => $this->memberFilter->isMemberAccessible((int) $ownership->getUser()?->getId()),
+        ));
     }
 
     /** @return list<GameOwnership> */

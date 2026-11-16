@@ -125,12 +125,11 @@ final class CirculationController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $seesAll = $this->isGranted('ROLE_STEWARD');
+        $copy = $handover->getCopy();
+        $seesAll = $this->isGranted('ROLE_STEWARD') && $this->dashboard->isInScope($copy);
         if (!$seesAll && !$handover->isParticipant($this->getAuthedUser())) {
             throw $this->createNotFoundException();
         }
-
-        $copy = $handover->getCopy();
 
         return $this->render(
             '@Circulation/handover.html.twig',

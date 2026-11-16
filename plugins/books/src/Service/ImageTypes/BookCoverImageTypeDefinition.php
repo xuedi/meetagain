@@ -4,10 +4,12 @@ namespace Plugin\Books\Service\ImageTypes;
 
 use App\Entity\Image;
 use App\Enum\ImageType;
+use App\Item\FilterService;
 use App\Repository\ImageLocationRepository;
 use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use Plugin\Books\Repository\BookRepository;
+use Plugin\Books\Service\BookService;
 
 final readonly class BookCoverImageTypeDefinition extends AbstractImageTypeDefinition
 {
@@ -15,6 +17,7 @@ final readonly class BookCoverImageTypeDefinition extends AbstractImageTypeDefin
         ImageLocationRepository $repo,
         Connection $connection,
         private BookRepository $bookRepository,
+        private FilterService $itemFilter,
     ) {
         parent::__construct($repo, $connection);
     }
@@ -53,6 +56,13 @@ final readonly class BookCoverImageTypeDefinition extends AbstractImageTypeDefin
             'route' => 'app_plugin_books_book_show',
             'params' => ['id' => $book->getId()],
         ];
+    }
+
+    public function isReportableAt(int $locationId): bool
+    {
+        $allowed = $this->itemFilter->getAllowedItemIds(BookService::ITEM_TYPE);
+
+        return $allowed === null || in_array($locationId, $allowed, true);
     }
 
     protected function sizes(): array

@@ -36,6 +36,11 @@ abstract readonly class AbstractImageTypeDefinition implements ImageTypeDefiniti
         return null;
     }
 
+    public function isReportableAt(int $locationId): bool
+    {
+        return false;
+    }
+
     final public function sync(): void
     {
         $discovered = $this->discoverImageIds();

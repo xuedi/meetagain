@@ -32,8 +32,8 @@ as `string|null`; a structured target string-encodes.
 
 ## The provider owns every interpretation
 
-Labels (`getFieldLabel`, `formatValue` - resolving a category id to its label), permissions (`canPropose`,
-`canReview`, given a user id), validation and the write itself (`apply`) live in the provider. `validate()` runs again
+Labels (`getFieldLabel`, `formatValue` - resolving a category id to its label), permissions (`isVisible` for the
+current viewer, `canPropose` and `canReview` given a user id), validation and the write itself (`apply`) live in the provider. `validate()` runs again
 at apply time as a staleness guard and returns a pre-translated error. Applying a field routes the value back through
 the provider, so the module never writes a consumer's table.
 
@@ -77,6 +77,10 @@ measures values, not proposers.
 
 **Whoever may propose a change to a target may vote on which proposed change wins.** The field ballot's electorate
 asks the provider's `canPropose()`, so the vote is scoped by whatever rule the provider applies.
+
+**A field ballot is seen only where its target is.** `FieldBallotVisibility` asks the provider's `isVisible()` for
+the ballot's subject and refuses a ballot whose target type has no active provider, so an unjudged subject is hidden,
+never shown by default.
 
 The steward sets the deadline and tally mode in the shared ballot-terms overlay; one overlay serves every contested
 field on the page, which is why the route takes the field in the body. A field ballot defaults to

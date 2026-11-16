@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Image;
-use App\Entity\ImageLocation;
 use App\Entity\User;
 use App\Enum\ImageType;
 use DateTime;
@@ -311,44 +310,6 @@ class ImageRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getResult();
-    }
-
-    /**
-     * @return list<array{image: Image, count: int}>
-     */
-    public function findHighUsageMissingAlt(int $limit = 50): array
-    {
-        $rows = $this
-            ->createQueryBuilder('i')
-            ->select('i.id AS id', 'COUNT(il.id) AS cnt')
-            ->innerJoin(ImageLocation::class, 'il', 'WITH', 'il.image = i')
-            ->groupBy('i.id')
-            ->having('COUNT(il.id) > 1')
-            ->orderBy('cnt', 'DESC')
-            ->addOrderBy('i.id', 'ASC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getArrayResult();
-
-        if ($rows === []) {
-            return [];
-        }
-
-        $counts = [];
-        foreach ($rows as $r) {
-            $counts[(int) $r['id']] = (int) $r['cnt'];
-        }
-
-        $images = $this->createQueryBuilder('i')->where('i.id IN (:ids)')->setParameter('ids', array_keys($counts))->getQuery()->getResult();
-
-        $result = [];
-        foreach ($images as $image) {
-            $result[] = ['image' => $image, 'count' => $counts[$image->getId()]];
-        }
-
-        usort($result, static fn(array $a, array $b): int => $b['count'] <=> $a['count'] ?: $a['image']->getId() <=> $b['image']->getId());
-
-        return $result;
     }
 
     public function getFileList(): array

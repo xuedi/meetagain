@@ -114,7 +114,6 @@ tests/Unit/Service/Event/OccurrenceCalculatorTest.php::testABiweeklyRuleCountsWe
 tests/Unit/Service/Event/RecurringEventExtensionTest.php::NOW // the anchor date is a Monday, which is what makes the weekday maths readable
 tests/Unit/Service/Event/RecurringEventExtensionTest.php::testExtendKeepsTheFirstOccurrenceWhenTheAnchorIsOffPattern // records the regression: dropping the head by position ate a real date
 tests/Unit/Service/ImageServiceTest.php::testGetObsoleteThumbnails // labels which fixture rows are valid vs obsolete, and why the size check is limited
-tests/Unit/Service/Notification/User/MissingAltImageNotificationProviderTest.php::testEmitsItemPerIncompleteImageWithMissingLanguageCount // shows how each fixture row adds up to its expected missing-language count
 tests/Unit/Service/PasswordResetServiceTest.php::testRequestResetSetsRegcodeAndPersistsUser // magic constant: 64 is bin2hex(random_bytes(32)), not an arbitrary length
 tests/Unit/Service/RecurringServiceTest.php::NOW // the anchor date is a Monday, which is what makes the weekday maths readable
 tests/Unit/Service/Seo/EventSimilarityServiceTest.php::testFieldsEmptyOnBothSidesDoNotDistortTheWeighting // spells out which weights remain, which is the arithmetic behind the expectation

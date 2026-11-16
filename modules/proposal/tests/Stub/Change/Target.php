@@ -60,6 +60,12 @@ class Target implements TargetProviderInterface, ScopedTargetInterface
     }
 
     #[Override]
+    public function isVisible(int $targetId): bool
+    {
+        return $targetId !== self::MISSING;
+    }
+
+    #[Override]
     public function canPropose(int $userId, int $targetId): bool
     {
         return true;

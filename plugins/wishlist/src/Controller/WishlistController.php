@@ -4,6 +4,7 @@ namespace Plugin\Wishlist\Controller;
 
 use App\Activity\ActivityService;
 use App\Controller\AbstractController;
+use App\Filter\Admin\Event\AdminEventListFilterService;
 use App\Item\TypeRegistry;
 use App\Service\Event\EventService;
 use Plugin\Wishlist\Activity\Messages\WishlistAdded;
@@ -23,6 +24,7 @@ final class WishlistController extends AbstractController
         private readonly TypeRegistry $registry,
         private readonly EventService $eventService,
         private readonly ActivityService $activityService,
+        private readonly AdminEventListFilterService $eventFilterService,
     ) {}
 
     #[Route('/mine', name: 'app_wishlist_mine', methods: ['GET'])]
@@ -54,7 +56,7 @@ final class WishlistController extends AbstractController
     #[IsGranted('ROLE_ORGANIZER')]
     public function pick(int $eventId, string $itemType): Response
     {
-        $event = $this->eventService->findEvent($eventId);
+        $event = $this->eventFilterService->isEventAccessible($eventId) ? $this->eventService->findEvent($eventId) : null;
         if ($event === null || !$this->registry->has($itemType)) {
             throw $this->createNotFoundException('Event or item type not found');
         }

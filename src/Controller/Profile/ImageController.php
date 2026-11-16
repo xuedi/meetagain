@@ -3,6 +3,7 @@
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
+use App\Entity\Image;
 use App\Service\Media\ImageService;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -28,7 +29,7 @@ final class ImageController extends AbstractController
                 break;
             case 'event':
                 $imageList = $this->imageService->findEventUploads($this->getAuthedUser(), $id);
-                $image = $imageId === null ? null : $this->imageService->findImage($imageId);
+                $image = $imageId === null ? null : $this->listedImage($imageList, $imageId);
                 break;
         }
 
@@ -39,5 +40,19 @@ final class ImageController extends AbstractController
             'imageList' => $imageList,
             'eventList' => $this->imageService->getEventList($this->getAuthedUser()),
         ]);
+    }
+
+    /**
+     * @param array<Image> $imageList
+     */
+    private function listedImage(array $imageList, int $imageId): Image
+    {
+        foreach ($imageList as $image) {
+            if ($image->getId() === $imageId) {
+                return $image;
+            }
+        }
+
+        throw $this->createNotFoundException();
     }
 }

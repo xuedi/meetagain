@@ -4,10 +4,12 @@ namespace Plugin\Dishes\Service\ImageTypes;
 
 use App\Entity\Image;
 use App\Enum\ImageType;
+use App\Item\FilterService;
 use App\Repository\ImageLocationRepository;
 use App\Service\Media\ImageTypes\AbstractImageTypeDefinition;
 use Doctrine\DBAL\Connection;
 use Plugin\Dishes\Repository\DishRepository;
+use Plugin\Dishes\Service\DishService;
 
 final readonly class DishPreviewImageTypeDefinition extends AbstractImageTypeDefinition
 {
@@ -15,6 +17,7 @@ final readonly class DishPreviewImageTypeDefinition extends AbstractImageTypeDef
         ImageLocationRepository $repo,
         Connection $connection,
         private DishRepository $dishRepository,
+        private FilterService $itemFilter,
     ) {
         parent::__construct($repo, $connection);
     }
@@ -66,6 +69,13 @@ final readonly class DishPreviewImageTypeDefinition extends AbstractImageTypeDef
             'route' => 'app_plugin_dishes_dish_show',
             'params' => ['id' => $dish->getId()],
         ];
+    }
+
+    public function isReportableAt(int $locationId): bool
+    {
+        $allowed = $this->itemFilter->getAllowedItemIds(DishService::ITEM_TYPE);
+
+        return $allowed === null || in_array($locationId, $allowed, true);
     }
 
     protected function sizes(): array

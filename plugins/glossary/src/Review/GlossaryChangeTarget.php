@@ -97,6 +97,12 @@ final readonly class GlossaryChangeTarget implements TargetProviderInterface
     }
 
     #[Override]
+    public function isVisible(int $targetId): bool
+    {
+        return $this->service->get($targetId) !== null;
+    }
+
+    #[Override]
     public function canPropose(int $userId, int $targetId): bool
     {
         return $this->security->isGranted('ROLE_USER') && $this->service->get($targetId) !== null;

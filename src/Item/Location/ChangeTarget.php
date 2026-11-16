@@ -77,6 +77,12 @@ final readonly class ChangeTarget implements TargetProviderInterface
     }
 
     #[Override]
+    public function isVisible(int $targetId): bool
+    {
+        return $this->visibleLocation($targetId) !== null;
+    }
+
+    #[Override]
     public function canPropose(int $userId, int $targetId): bool
     {
         $user = $this->em->find(User::class, $userId);

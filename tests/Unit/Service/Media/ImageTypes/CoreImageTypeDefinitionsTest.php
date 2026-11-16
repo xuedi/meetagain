@@ -8,6 +8,7 @@ use App\Entity\Image;
 use App\Entity\User;
 use App\Enum\ImageFitMode;
 use App\Enum\ImageType;
+use App\Filter\Event\EventFilterService;
 use App\Repository\CmsBlockRepository;
 use App\Repository\EventRepository;
 use App\Repository\ImageLocationRepository;
@@ -123,7 +124,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
 
     public function testEventUploadIdentityAndSizes(): void
     {
-        $definition = new EventUploadImageTypeDefinition($this->repo(), $this->createStub(Connection::class));
+        $definition = new EventUploadImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $this->createStub(EventFilterService::class));
 
         static::assertSame(ImageType::EventUpload, $definition->getType());
         static::assertSame([[1024, 768], [350, 263], [210, 140], [100, 100], [50, 50]], $definition->thumbnailSizes());
@@ -135,7 +136,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
         $conn = $this->createStub(Connection::class);
         $conn->method('fetchAllAssociative')->willReturn([['image_id' => '55', 'location_id' => '8']]);
 
-        $definition = new EventUploadImageTypeDefinition($this->repo(), $conn);
+        $definition = new EventUploadImageTypeDefinition($this->repo(), $conn, $this->createStub(EventFilterService::class));
 
         static::assertSame([['imageId' => 55, 'locationId' => 8]], $definition->discoverImageIds());
     }
@@ -153,7 +154,7 @@ class CoreImageTypeDefinitionsTest extends TestCase
         $image = $this->createStub(Image::class);
         $image->method('getEvent')->willReturn($event);
 
-        $definition = new EventUploadImageTypeDefinition($this->repo(), $this->createStub(Connection::class));
+        $definition = new EventUploadImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $this->createStub(EventFilterService::class));
 
         $result = $definition->locate($image);
         static::assertSame('Summer Party', $result['subject']);
@@ -166,9 +167,35 @@ class CoreImageTypeDefinitionsTest extends TestCase
         $image = $this->createStub(Image::class);
         $image->method('getEvent')->willReturn(null);
 
-        $definition = new EventUploadImageTypeDefinition($this->repo(), $this->createStub(Connection::class));
+        $definition = new EventUploadImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $this->createStub(EventFilterService::class));
 
         static::assertNull($definition->locate($image));
+    }
+
+    public function testEventUploadIsReportableOnlyWhereItsEventIsAccessible(): void
+    {
+        // Arrange
+        $eventFilter = $this->createStub(EventFilterService::class);
+        $eventFilter->method('isEventAccessible')->willReturnCallback(static fn(int $eventId): bool => $eventId === 7);
+        $definition = new EventUploadImageTypeDefinition($this->repo(), $this->createStub(Connection::class), $eventFilter);
+
+        // Act
+        $verdicts = [$definition->isReportableAt(7), $definition->isReportableAt(8)];
+
+        // Assert
+        static::assertSame([true, false], $verdicts);
+    }
+
+    public function testATypeWithoutAReportLinkIsNeverReportable(): void
+    {
+        // Arrange
+        $definition = new SiteLogoImageTypeDefinition($this->repo(), $this->createStub(Connection::class));
+
+        // Act
+        $reportable = $definition->isReportableAt(1);
+
+        // Assert
+        static::assertFalse($reportable);
     }
 
     public function testCmsBlockIdentityAndSizes(): void

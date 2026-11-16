@@ -113,6 +113,26 @@ final readonly class ChangeTarget implements TargetProviderInterface, TargetFami
     }
 
     #[Override]
+    public function isVisible(int $targetId): bool
+    {
+        if (!$this->registry->has($this->itemType)) {
+            return false;
+        }
+
+        if ($targetId === self::VOCABULARY_TARGET) {
+            return true;
+        }
+
+        foreach ($this->tagService->getVocabulary($this->itemType) as $tag) {
+            if ($tag->getId() === $targetId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    #[Override]
     public function canPropose(int $userId, int $targetId): bool
     {
         return $this->security->isGranted('ROLE_USER') && $this->registry->has($this->itemType);
