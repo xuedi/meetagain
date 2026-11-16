@@ -9,32 +9,7 @@
                     <h1 class="title is-5">{{ 'profile_messages.section_heading'|trans }}</h1>
                 </div>
 
-                {% for conversation in conversations %}
-                    <a class="panel-block is-block{% if conversationsId == conversation.user.id %} is-active{% endif %}"
-                       href="{{ path('app_profile_messages', {'id': conversation.user.id}) }}"
-                       {% if conversationsId == conversation.user.id %}aria-current="page"{% endif %}>
-                        <div class="level">
-                            <div class="level-left">
-                                <div class="level-item">
-                                    {% include '_components/image.html.twig' with {'image': conversation.user.image, 'size': '50x50'} %}
-                                </div>
-                                <div class="level-item">
-                                    <div class="is-block has-text-left">
-                                        <strong>{{ conversation.user.name }}</strong><br/>
-                                        <small class="is-small">{{ conversation.lastMessage | time_diff }}</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="level-right">
-                                <div class="content">
-                                    {% if conversation.unread > 0 %}
-                                        <span class="tag has-background-danger-light">{{ conversation.unread }}</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                {% endfor %}
+                {% include 'profile/messages/_conversation_list.html.twig' %}
 
             </div>
         </div>
@@ -46,7 +21,9 @@
             {% else %}
                 <div class="chat-layout" data-chat>
                     {% if conversationsId %}
-                        {% include 'profile/messages/_block_toggle.html.twig' %}
+                        <div class="is-flex is-justify-content-flex-end mb-2">
+                            {% include 'profile/messages/_block_toggle.html.twig' %}
+                        </div>
                     {% endif %}
 
                     <div class="pr-3 messages-scroll" id="desktop-message-container">

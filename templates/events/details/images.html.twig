@@ -15,12 +15,12 @@
     </div>
 </nav>
 
-<div class="columns is-multiline mt-2">
+<div class="columns is-mobile is-multiline mt-2">
     {% for image in event.images %}
         {% if image.reported is null %}
             {% set href = '/images/thumbnails/' ~ image.hash ~ '_1024x768.webp' %}
             {% set Caption = 'events.image_report_caption'|trans({'%url%': path('app_report_image', {'id': image.id})}) %}
-            <div class="column is-2">
+            <div class="column is-6-mobile is-4-tablet is-2-desktop">
                 <a data-fancybox="gallery" data-caption="{{ Caption }}" href="{{ href }}">
                     {% include '_components/image.html.twig' with {'image': image, 'size': '210x140'} %}
                 </a>

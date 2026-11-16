@@ -7,7 +7,8 @@
  * thread and conversation list are swapped in from the page each post redirects to, so the composer keeps its focus
  * and takes the next message at once. A failed send puts every unsent text back; a 422 then falls back to a plain
  * submit to show the form errors. On desktop the visible composer takes focus on load. An edit
- * is saved through the JSON edit endpoint and swapped in from its HTML.
+ * is saved through the JSON edit endpoint and swapped in from its HTML. The desktop thread scrolls in its own box;
+ * the mobile thread flows with the page above a sticky composer, so scrolling to the end moves the window.
  *
  * Loaded in:  templates/profile/messages/index.html.twig (when messages present)
  * Used by:    [data-chat], [data-conversations], .messages-scroll, .message-form, .message-input, .message-edit-trigger
@@ -15,7 +16,15 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const scrollToEnd = () => document.querySelectorAll('.messages-scroll').forEach(el => { el.scrollTop = el.scrollHeight; });
+    const scrollToEnd = () => document.querySelectorAll('.messages-scroll').forEach(el => {
+        if (el.offsetParent === null) return;
+        if (getComputedStyle(el).overflowY !== 'visible') {
+            el.scrollTop = el.scrollHeight;
+            return;
+        }
+        const composer = el.closest('[data-chat]')?.querySelector('.message-composer-sticky');
+        window.scrollTo(0, window.scrollY + el.getBoundingClientRect().bottom - window.innerHeight + (composer?.offsetHeight ?? 0));
+    });
 
     const armEditWindows = () => document.querySelectorAll('[data-editable-until]').forEach(bubble => {
         const ms = (parseInt(bubble.dataset.editableUntil, 10) * 1000) - Date.now();

@@ -24,17 +24,16 @@ ins {
     text-decoration: none;
 }
 
+.footer a {
+    hyphens: auto;
+    overflow-wrap: anywhere;
+}
+
 // Accessibility: Bulma's default grey fails WCAG on white — use our darker overrides.
 .has-text-grey       { color: var(--theme-text-grey, #{cfg.$text-grey})             !important; }
 .has-text-grey-light { color: var(--theme-text-grey-light, #{cfg.$text-grey-light}) !important; }
 
 // ── Layout utilities ─────────────────────────────────────────────────────────
-
-.is-pulled-top-right {
-    position: absolute;
-    top: 0;
-    right: 0;
-}
 
 .is-nowrap       { white-space: nowrap; }
 .is-column-fill  { width: 100%; }
@@ -136,9 +135,11 @@ details.activities-load-more {
         &::after { content: '\25BE'; float: right; }
     }
     &[open] > summary::after { content: '\25B4'; }
+    // The details content slot does not pass box-sizing down, so Bulma's full-width menu links overflow without this.
+    > aside { box-sizing: border-box; }
 }
 
-.is-flag      { height: 24px; }
+.is-flag     { height: 24px; }
 /* Fit the 32x24 flag into Bulma's square left-icon slot without distortion (per-language alt widget). */
 .control.has-icons-left .icon.is-left img.is-flag { width: auto; height: 1rem; }
 .flag-icon              { width: 32px; height: 24px; flex-shrink: 0; overflow: hidden; }
@@ -207,13 +208,16 @@ details.activities-load-more {
 
 // Messaging
 .chat-layout         { display: flex; flex-direction: column; height: 70vh; }
-.chat-layout-mobile  { display: flex; flex-direction: column; height: 60vh; }
+.chat-layout-mobile  { display: flex; flex-direction: column; }
 .messages-scroll     { flex: 1; overflow-y: auto; margin-bottom: 1rem; }
+.chat-layout-mobile .messages-scroll { flex: none; overflow-y: visible; }
+.message-composer-sticky { position: sticky; bottom: 0; z-index: 1; padding-bottom: 0.75rem; background-color: var(--bulma-scheme-main); }
+.message-composer-sticky hr { margin: 0 0 0.75rem; }
 .message-row         { gap: 0.75rem; margin-top: 1rem; }
 .message-row.is-grouped { margin-top: 0.5rem; }
 .message-avatar      { flex-shrink: 0; }
 .message-bubble      { min-width: 0; max-width: 75%; }
-.chat-layout-mobile .message-bubble { max-width: none; }
+.chat-layout-mobile .message-bubble { max-width: 85%; }
 .message-input       { min-height: 2.5em; max-height: 10em; overflow-y: hidden; }
 
 // Admin collapsible section (AdminCollapsibleSection component)
@@ -261,6 +265,9 @@ details.activities-load-more {
     white-space: nowrap;
     vertical-align: bottom;
 }
+
+.field.is-grouped > .control.is-expanded { min-width: 0; }
+.field.is-grouped > .control.is-expanded .is-truncated { max-width: min(calc(var(--truncate-ch, 30) * 1ch), 100%); }
 
 // Floating action menu — absolute top-right overlay on image/card containers.
 .float-box-menu {
