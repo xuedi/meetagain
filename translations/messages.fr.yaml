@@ -32,7 +32,6 @@ chrome:
     notifications_view_all: 'Tout voir'
     notification_unread_messages: '%count% message(s) non lu(s)'
     notification_new_support_requests: '%count% nouvelle(s) demande(s) de support'
-    notification_image_missing_alt: 'Image #%id% sans texte alternatif (%missing% langues)'
     footer_powered_by: 'propulsé par'
     aria_select_language: 'Choisir la langue'
     aria_main_navigation: 'Navigation principale'
