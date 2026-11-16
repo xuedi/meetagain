@@ -1,0 +1,40 @@
+{{ form_start(form, {'attr': {
+    'class': 'message-form',
+    'data-edit-url-template': path('app_profile_messages_edit', {'id': '__ID__'}),
+    'data-csrf-token': csrf_token('message_edit'),
+    'data-label-send': 'profile_messages.button_send'|trans,
+    'data-label-save': 'profile_messages.button_save'|trans,
+    'data-error-generic': 'profile_messages.edit_failed'|trans,
+    'data-error-send': 'profile_messages.send_failed'|trans,
+    'data-error-no-change': 'profile_messages.edit_no_change'|trans,
+    'data-error-empty': 'profile_messages.edit_empty'|trans,
+    'data-error-too-long': 'profile_messages.edit_too_long'|trans,
+    'data-error-expired': 'profile_messages.edit_window_expired'|trans,
+    'data-error-csrf': 'profile_messages.edit_csrf'|trans,
+    'data-edited-marker-text': 'profile_messages.edited_marker'|trans,
+}}) }}
+<input type="hidden" name="editingMessageId" value="">
+<div class="message-edit-error notification is-danger is-light is-hidden"></div>
+{% if not form.vars.valid %}
+    <div class="message-form-errors notification is-danger is-light">
+        {{ form_errors(form) }}
+        {{ form_errors(form.comment) }}
+    </div>
+{% endif %}
+<div class="field is-grouped is-align-items-flex-end mb-1">
+    <div class="control is-expanded">
+        <textarea class="textarea has-fixed-size message-input" rows="1"
+                  name="{{ field_name(form.comment) }}"
+                  maxlength="{{ constant('App\\Service\\Member\\MessageService::MAX_LENGTH') }}"
+                  aria-label="{{ 'profile_messages.input_placeholder'|trans }}"
+                  placeholder="{{ 'profile_messages.input_placeholder'|trans }}">{{ field_value(form.comment) }}</textarea>
+    </div>
+    <div class="control">
+        <button type="button" class="button is-light is-hidden cancel-edit">{{ 'profile_messages.cancel_edit'|trans }}</button>
+    </div>
+    <div class="control">
+        <button type="submit" class="button is-link submit-button">{{ 'profile_messages.button_send'|trans }}</button>
+    </div>
+</div>
+<p class="help has-text-grey is-hidden-touch">{{ 'profile_messages.composer_hint'|trans }}</p>
+{{ form_end(form) }}

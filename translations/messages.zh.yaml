@@ -473,6 +473,8 @@ profile_messages:
     edit_no_change: '没有要保存的更改。'
     system_support_question: '通过支持表单提问：'
     report_button: '举报消息'
+    composer_hint: '按 Enter 发送，Shift+Enter 换行'
+    send_failed: '消息发送失败，请重试。'
 profile_notifications:
     page_title: '通知'
     empty_state: '暂无新通知'

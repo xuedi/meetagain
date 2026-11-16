@@ -92,6 +92,7 @@ class EventType extends AbstractType
                 'multiple' => false,
                 'mapped' => false,
                 'data' => $event?->getSeries()?->getRule(),
+                'attr' => ['class' => 'is-fullwidth'],
             ])
             ->add('customRuleSpec', HiddenType::class, [
                 'required' => false,
@@ -109,6 +110,7 @@ class EventType extends AbstractType
                 'class' => EventTypeEnum::class,
                 'label' => $this->translator->trans('admin_event.form_label_type'),
                 'placeholder' => $this->translator->trans('admin_event.form_placeholder_types'),
+                'attr' => ['class' => 'is-fullwidth'],
                 'required' => false,
                 'expanded' => false,
                 'multiple' => false,
@@ -119,6 +121,7 @@ class EventType extends AbstractType
                 'mapped' => false,
                 'choices' => $this->locationChoices($event),
                 'choice_translation_domain' => false,
+                'attr' => ['class' => 'is-fullwidth'],
             ])
             ->add('ballotTerms', BallotTermsType::class, [
                 'notice' => $this->venueBallotNotice(),

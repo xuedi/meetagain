@@ -136,6 +136,9 @@ readonly class MessageService
 
     public function sanitize(string $content): string
     {
-        return $this->contentSanitizer->toPlainText(trim($content));
+        $plain = $this->contentSanitizer->toPlainText(str_replace(["\r\n", "\r"], "\n", trim($content)));
+        $plain = (string) preg_replace('/[ \t]+$/mu', '', $plain);
+
+        return trim((string) preg_replace('/\n{4,}/u', "\n\n\n", $plain));
     }
 }

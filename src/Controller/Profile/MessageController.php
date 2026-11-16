@@ -50,6 +50,8 @@ final class MessageController extends AbstractController
                 $form->handleRequest($request);
                 if ($form->isSubmitted() && $form->isValid()) {
                     $this->messageService->send($user, $conversationPartner, (string) $form->getData()['comment']);
+
+                    return $this->redirectToRoute('app_profile_messages', ['id' => $id]);
                 }
             }
             $messages = $this->messageService->getMessages($user, $conversationPartner);
@@ -109,6 +111,7 @@ final class MessageController extends AbstractController
         return new JsonResponse([
             'id' => $message->getId(),
             'content' => $message->getContent(),
+            'html' => $this->renderView('profile/messages/_message_body.html.twig', ['content' => $message->getContent()]),
             'editedAt' => $editedAt->format(DateTimeImmutable::ATOM),
             'editedAtFormatted' => $this->dateTimeFormatter->formatDiff($editedAt),
         ]);

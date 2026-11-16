@@ -15,6 +15,7 @@ use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use DomainException;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
 use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
@@ -173,6 +174,40 @@ class MessageServiceTest extends TestCase
 
         // Act & Assert
         $subject->markRead($user, $partner);
+    }
+
+    #[DataProvider('lineBreakCases')]
+    public function testSanitizeNormalisesLineBreaks(string $input, string $expected): void
+    {
+        // Arrange
+        $subject = new MessageService(
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(MessageRepository::class),
+            $this->createStub(BlockingService::class),
+            $this->sanitizer(),
+            $this->createStub(ActivityService::class),
+            $this->createStub(MemberFilterService::class),
+        );
+
+        // Act
+        $result = $subject->sanitize($input);
+
+        // Assert
+        self::assertSame($expected, $result);
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function lineBreakCases(): iterable
+    {
+        yield 'single line breaks survive' => ["first\nsecond\nthird", "first\nsecond\nthird"];
+        yield 'two blank lines survive' => ["first\n\n\nsecond", "first\n\n\nsecond"];
+        yield 'CRLF becomes LF' => ["first\r\nsecond\rthird", "first\nsecond\nthird"];
+        yield 'trailing spaces per line are dropped' => ["first  \t\nsecond ", "first\nsecond"];
+        yield 'three or more blank lines collapse to two' => ["first\n\n\n\n\n\nsecond", "first\n\n\nsecond"];
+        yield 'blank lines at the edges are trimmed' => ["\n\n  first\n\n", 'first'];
+        yield 'indentation inside a line is kept' => ["list:\n  - one\n  - two", "list:\n  - one\n  - two"];
     }
 
     private function sanitizer(): ContentSanitizer

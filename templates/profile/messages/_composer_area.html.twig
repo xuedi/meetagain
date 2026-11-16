@@ -1,0 +1,9 @@
+<hr>
+{% if isBlocked %}
+    <div class="notification is-warning">
+        <span class="icon"><i class="fa fa-ban"></i></span>
+        {{ 'profile_messages.cannot_message'|trans }}
+    </div>
+{% elseif form %}
+    {{ composer }}
+{% endif %}
