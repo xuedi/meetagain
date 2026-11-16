@@ -9,58 +9,66 @@
 
         <div class="columns">
             <div class="column is-8">
-                <div class="columns">
-                    <div class="column is-4">
-                        {{ form_row(form.seriesRule) }}
-                    </div>
-                    <div class="column is-4" data-recurrence-schedule>
-                        {{ form_row(form.start) }}
-                    </div>
-                    <div class="column is-4" data-recurrence-schedule>
-                        {{ form_row(form.stop) }}
-                    </div>
-                    <div class="column is-8 is-hidden" id="recurrence-summary-wrapper">
-                        {% include 'admin/event/_recurrence_summary.html.twig' %}
-                    </div>
-                </div>
-
-                <div class="columns">
-                    <div class="column is-6">
-                        {{ form_row(form.type) }}
-                    </div>
-                    <div class="column is-6">
-                        {{ form_row(form.location) }}
-                        {{ include('_components/ballot_terms_modal.html.twig', {
-                            id: 'venue-ballot-modal',
-                            terms: form.ballotTerms,
-                            triggerId: form.location.vars.id,
-                            value: constant('App\\Event\\BallotLocationChoice::VALUE'),
-                            title: 'admin_event.venue_ballot_title_modal'|trans,
-                            notice: form.ballotTerms.vars.notice,
-                        }) }}
+                <div class="box">
+                    <div class="columns is-multiline">
+                        <div class="column is-4">
+                            {{ form_row(form.seriesRule) }}
+                        </div>
+                        <div class="column is-4" data-recurrence-schedule>
+                            {{ form_row(form.start) }}
+                        </div>
+                        <div class="column is-4" data-recurrence-schedule>
+                            {{ form_row(form.stop) }}
+                        </div>
+                        <div class="column is-8 is-hidden" id="recurrence-summary-wrapper">
+                            {% include 'admin/event/_recurrence_summary.html.twig' %}
+                        </div>
+                        <div class="column is-12 is-hidden" id="series-name-wrapper">
+                            {{ form_row(form.seriesName) }}
+                        </div>
                     </div>
                 </div>
 
-                <div class="columns is-hidden" id="series-name-wrapper">
-                    <div class="column is-8">
-                        {{ form_row(form.seriesName) }}
+                <div class="box">
+                    <div class="columns is-multiline">
+                        <div class="column is-6">
+                            {{ form_row(form.location) }}
+                            {{ include('_components/ballot_terms_modal.html.twig', {
+                                id: 'venue-ballot-modal',
+                                terms: form.ballotTerms,
+                                triggerId: form.location.vars.id,
+                                value: constant('App\\Event\\BallotLocationChoice::VALUE'),
+                                title: 'admin_event.venue_ballot_title_modal'|trans,
+                                notice: form.ballotTerms.vars.notice,
+                            }) }}
+                        </div>
+                        <div class="column is-3">
+                            {{ form_row(form.type) }}
+                        </div>
+                        <div class="column is-3">
+                            {{ form_row(form.externalRsvp) }}
+                        </div>
                     </div>
+                </div>
+
+                <div class="field">
+                    <button type="submit" class="button is-primary">
+                        <span class="icon"><i class="fa fa-plus"></i></span>
+                        <span>{{ 'global.button_add'|trans }}</span>
+                    </button>
                 </div>
             </div>
 
             <div class="column is-4">
-                {{ form_row(form.host) }}
+                <div class="box">
+                    {{ form_row(form.host) }}
+                    {% if form.host.vars.choices is empty %}
+                        <p class="has-text-grey">{{ 'admin_event.empty_no_hosts'|trans }}</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
-        {{ form_widget(form) }}
-
-        <div class="field mt-5">
-            <button type="submit" class="button is-primary">
-                <span class="icon"><i class="fa fa-plus"></i></span>
-                <span>{{ 'global.button_add'|trans }}</span>
-            </button>
-        </div>
         {{ form_end(form) }}
 
         {% include 'admin/event/_recurrence_modal.html.twig' %}

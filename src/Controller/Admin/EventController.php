@@ -14,6 +14,7 @@ use App\Admin\Top\Actions\AdminTopActionDropdown;
 use App\Admin\Top\Actions\AdminTopActionDropdownOption;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoHtml;
+use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Emails\Types\SeriesRescheduledEmail;
 use App\Entity\Event;
 use App\Entity\EventSeries;
@@ -519,7 +520,7 @@ final class EventController extends AbstractController implements AdminNavigatio
             'active' => 'event',
             'location' => $event,
             'form' => $form,
-            'adminTop' => $this->buildBackOnlyTop(),
+            'adminTop' => $this->buildNewTop(),
             'recurrence' => $this->buildRecurrenceContext(null),
             'venueForm' => $this->createForm(LocationType::class),
         ]);
@@ -837,9 +838,12 @@ final class EventController extends AbstractController implements AdminNavigatio
         return new EventTranslation();
     }
 
-    private function buildBackOnlyTop(): AdminTop
+    private function buildNewTop(): AdminTop
     {
-        return new AdminTop(actions: [
+        return new AdminTop(info: [
+            new AdminTopInfoHtml(sprintf('<strong>%s</strong>', htmlspecialchars($this->translator->trans('admin_event.page_title_new')))),
+            new AdminTopInfoText($this->translator->trans('admin_event.help_new')),
+        ], actions: [
             new AdminTopActionButton(label: $this->translator->trans('global.button_back'), target: $this->generateUrl('app_admin_event'), icon: 'arrow-left'),
         ]);
     }
