@@ -61,10 +61,13 @@
 
         <hr class="dropdown-divider"/>
         {% if is_granted('ROLE_USER') %}
-            <a class="navbar-item" href="/logout">
-                <span class="icon mr-2"><i class="fa fa-sign-out"></i></span>
-                {{ "chrome.menu_profile_logout" | trans }}
-            </a>
+            <form action="{{ path('app_security_logout') }}" method="post" class="is-contents">
+                <input type="hidden" name="_token" value="{{ csrf_token('logout') }}">
+                <button type="submit" class="navbar-item LinkLikeButton is-column-fill">
+                    <span class="icon mr-2"><i class="fa fa-sign-out"></i></span>
+                    {{ "chrome.menu_profile_logout" | trans }}
+                </button>
+            </form>
         {% else %}
             <a class="navbar-item" href="{{ path('app_login') }}">
                 <span class="icon mr-2"><i class="fa fa-sign-in"></i></span>
