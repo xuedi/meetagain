@@ -5,6 +5,7 @@ namespace App\EventSubscriber;
 use App\Controller\SecurityController;
 use Override;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -48,9 +49,19 @@ readonly class KernelRequestSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
 
         $isJumpBackEligible = $this->isJumpBackEligible($request->attributes->get('_route'), $request->getPathInfo());
-        if ($request->getMethod() === 'GET' && $isJumpBackEligible) {
+        if ($request->getMethod() === 'GET' && $isJumpBackEligible && $this->isPageNavigation($request)) {
             $request->getSession()->set('redirectUrl', $request->getRequestUri());
         }
+    }
+
+    private function isPageNavigation(Request $request): bool
+    {
+        $fetchDestination = $request->headers->get('Sec-Fetch-Dest');
+        if ($fetchDestination !== null) {
+            return $fetchDestination === 'document';
+        }
+
+        return str_contains((string) $request->headers->get('Accept', ''), 'text/html');
     }
 
     private function isJumpBackEligible(mixed $route, string $path): bool
