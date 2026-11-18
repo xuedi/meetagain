@@ -1,6 +1,6 @@
 # check=skip=SecretsUsedInArgOrEnv
 
-FROM dunglas/frankenphp:1.13.5-php8.5.12-bookworm@sha256:8104eb9c834d905e5678a183d053ef1a0c650c5f4874f366dfec7eb025e92e06 AS runtime
+FROM dunglas/frankenphp:1.13.5-php8.5.12-bookworm@sha256:681db339fc7751be886ac69b6daab1ac32c0a78ed8fa255abdacc75391a00480 AS runtime
 
 WORKDIR /var/www/html
 
@@ -55,7 +55,7 @@ RUN set -eux; \
 
 FROM runtime AS builder
 
-COPY --from=composer:2.11.1@sha256:8de2184c6de224f4689e8f80ed5f5edaf0030b6b8b7839a22a2bcb6722ac87d0 /usr/bin/composer /usr/local/bin/composer
+COPY --from=composer:2.11.2@sha256:5bcb28b8d0edc4091125f8218f9d088f998bdfc843f8fbb9a4beb4dcd8625684 /usr/bin/composer /usr/local/bin/composer
 
 ARG DART_SASS_VERSION=1.86.3
 RUN set -eux; \
@@ -100,7 +100,7 @@ RUN set -eux; \
     php bin/console assets:install public; \
     php bin/console app:media:compile; \
     purgecss --config assets/purgecss.config.js; \
-    php bin/console cache:warmup; \
+    php -d memory_limit=1G bin/console cache:warmup; \
     rm -f .env .env.dist .env.local .env.local.php .env.test; \
     rm -rf var/log var/tmp node_modules bin/dart-sass
 
