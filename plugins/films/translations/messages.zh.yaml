@@ -1,6 +1,9 @@
 films:
     menu_main: '电影'
     item_label: '电影'
+    event_heading: '放映影片'
+    attach_heading: '添加电影'
+    attach_help: '添加一部或多部本次聚会的焦点影片。'
     detach: '移除'
     attach_empty: '暂无可添加的电影。'
     attach_button: '添加'

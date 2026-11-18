@@ -1,6 +1,9 @@
 films:
     menu_main: 'Películas'
     item_label: 'Película'
+    event_heading: 'Proyección'
+    attach_heading: 'Añadir una película'
+    attach_help: 'Añade una o varias películas que son el centro de este encuentro.'
     detach: 'Quitar'
     attach_empty: 'Todavía no hay películas disponibles para adjuntar.'
     attach_button: 'Adjuntar'

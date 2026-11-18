@@ -1,6 +1,9 @@
 films:
     menu_main: 'Filme'
     item_label: 'Film'
+    event_heading: 'Filmauswahl'
+    attach_heading: 'Film hinzufügen'
+    attach_help: 'Füge einen oder mehrere Filme hinzu, die bei diesem Treffen im Mittelpunkt stehen.'
     detach: 'Entfernen'
     attach_empty: 'Noch keine Filme zum Hinzufügen vorhanden.'
     attach_button: 'Hinzufügen'

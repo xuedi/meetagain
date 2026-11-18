@@ -779,8 +779,8 @@ town_hall:
     deleted_user: '[gelöschter Benutzer]'
     aria_breadcrumbs: 'Pfadnavigation'
 item:
-    heading: 'Objekte'
-    attach_heading: 'Objekt hinzufügen'
+    heading: 'Im Fokus'
+    attach_heading: 'Hinzufügen'
     attach_type_label: 'Typ'
     view_list: 'Liste'
     view_tiles: 'Kacheln'

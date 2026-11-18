@@ -1,6 +1,9 @@
 books:
     menu_main: 'Books'
     item_label: 'Book'
+    event_heading: 'Reading'
+    attach_heading: 'Add a book'
+    attach_help: 'Add one or more books that this meetup is about.'
     detach: 'Remove'
     attach_empty: 'No books available to attach yet.'
     attach_button: 'Attach'

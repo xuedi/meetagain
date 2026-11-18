@@ -40,6 +40,24 @@ final readonly class GameTypeProvider implements TypeProviderInterface, ListCell
     }
 
     #[Override]
+    public function getEventHeadingKey(): string
+    {
+        return 'boardgames.event_heading';
+    }
+
+    #[Override]
+    public function getAttachHeadingKey(): string
+    {
+        return 'boardgames.attach_heading';
+    }
+
+    #[Override]
+    public function getAttachHelpKey(): string
+    {
+        return 'boardgames.attach_help';
+    }
+
+    #[Override]
     public function renderEventCell(int $itemId, EventItemAssociation $association): ?string
     {
         $game = $this->gameService->getAttached($itemId);

@@ -789,8 +789,8 @@ town_hall:
     deleted_user: '[deleted user]'
     aria_breadcrumbs: 'Breadcrumbs'
 item:
-    heading: 'Items'
-    attach_heading: 'Attach an item'
+    heading: 'In focus'
+    attach_heading: 'Add'
     attach_type_label: 'Type'
     view_list: 'List'
     view_tiles: 'Tiles'

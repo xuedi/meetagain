@@ -881,6 +881,12 @@ body.admin-shell-no-scroll {
     transform: none;
 }
 
+.has-tooltip-wide::after {
+    max-width: 16rem;
+    text-align: left;
+    white-space: normal;
+}
+
 // -- User card --
 
 .usercard-badges {

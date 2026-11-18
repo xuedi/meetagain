@@ -38,6 +38,24 @@ final readonly class FilmTypeProvider implements TypeProviderInterface, ListCell
     }
 
     #[Override]
+    public function getEventHeadingKey(): string
+    {
+        return 'films.event_heading';
+    }
+
+    #[Override]
+    public function getAttachHeadingKey(): string
+    {
+        return 'films.attach_heading';
+    }
+
+    #[Override]
+    public function getAttachHelpKey(): string
+    {
+        return 'films.attach_help';
+    }
+
+    #[Override]
     public function renderEventCell(int $itemId, EventItemAssociation $association): ?string
     {
         $film = $this->filmService->getAttached($itemId);

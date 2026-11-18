@@ -1,6 +1,9 @@
 boardgames:
     menu_main: 'Juegos de mesa'
     item_label: 'Juego de mesa'
+    event_heading: 'Juegos'
+    attach_heading: 'Añadir un juego'
+    attach_help: 'Añade los juegos que se jugarán en este encuentro.'
     detach: 'Quitar'
     attach_empty: 'Todavia no hay juegos de mesa para asociar.'
     attach_button: 'Asociar'

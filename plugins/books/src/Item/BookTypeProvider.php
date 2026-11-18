@@ -38,6 +38,24 @@ final readonly class BookTypeProvider implements TypeProviderInterface, ListCell
     }
 
     #[Override]
+    public function getEventHeadingKey(): string
+    {
+        return 'books.event_heading';
+    }
+
+    #[Override]
+    public function getAttachHeadingKey(): string
+    {
+        return 'books.attach_heading';
+    }
+
+    #[Override]
+    public function getAttachHelpKey(): string
+    {
+        return 'books.attach_help';
+    }
+
+    #[Override]
     public function renderEventCell(int $itemId, EventItemAssociation $association): ?string
     {
         $book = $this->bookService->getAttached($itemId);

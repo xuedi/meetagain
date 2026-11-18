@@ -1,6 +1,9 @@
 boardgames:
     menu_main: 'Brettspiele'
     item_label: 'Brettspiel'
+    event_heading: 'Spieleauswahl'
+    attach_heading: 'Spiel hinzufügen'
+    attach_help: 'Füge die Spiele hinzu, die bei diesem Treffen auf den Tisch kommen.'
     detach: 'Entfernen'
     attach_empty: 'Noch keine Brettspiele zum Verknüpfen vorhanden.'
     attach_button: 'Verknüpfen'

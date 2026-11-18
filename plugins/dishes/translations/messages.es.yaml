@@ -1,6 +1,9 @@
 dishes:
     menu_main: 'Platos'
     item_label: 'Plato'
+    event_heading: 'Menú'
+    attach_heading: 'Añadir un plato'
+    attach_help: 'Añade los platos que se sirven en este encuentro.'
     localized_content_source: 'Textos de los platos'
     detach: 'Quitar'
     attach_empty: 'Todavía no hay platos disponibles para adjuntar.'

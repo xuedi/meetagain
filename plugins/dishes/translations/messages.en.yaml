@@ -1,6 +1,9 @@
 dishes:
     menu_main: 'Dishes'
     item_label: 'Dish'
+    event_heading: 'Menu'
+    attach_heading: 'Add a dish'
+    attach_help: 'Add the dishes served at this meetup.'
     localized_content_source: 'Dish texts'
     detach: 'Remove'
     attach_empty: 'No dishes available to attach yet.'

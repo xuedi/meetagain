@@ -23,6 +23,8 @@ readonly class AttachControlBuilder
             $types[] = new AttachControlType(
                 $itemType,
                 $provider->getLabelKey(),
+                $provider->getAttachHeadingKey(),
+                $provider->getAttachHelpKey(),
                 $provider->renderAttachPicker($eventId),
                 $this->collectSlots($eventId, $itemType),
             );

@@ -124,11 +124,14 @@ final class EventController extends AbstractController
         $locale = $request->getLocale();
         $upcomingSiblings = $this->eventSchemaService->findUpcomingSiblings($event, $locale);
 
+        $attachControl = $this->isGranted('ROLE_ORGANIZER') ? $this->itemAttachControlBuilder->build($id) : null;
+
         return $this->render(
             'events/details.html.twig',
             [
                 'itemCells' => $this->eventService->getRenderedItemCells($id),
-                'attachControl' => $this->isGranted('ROLE_ORGANIZER') ? $this->itemAttachControlBuilder->build($id) : null,
+                'itemHeadingKey' => $this->eventService->getItemHeadingKey($id, $attachControl),
+                'attachControl' => $attachControl,
                 'pluginTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::Sidebar) : [],
                 'pluginCenterTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::Center) : [],
                 'pluginBottomSidebarTiles' => $id ? $this->eventService->getPluginEventTiles($id, EventTileLocation::BottomSidebar) : [],

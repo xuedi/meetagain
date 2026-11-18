@@ -1,6 +1,9 @@
 books:
     menu_main: '书籍'
     item_label: '书籍'
+    event_heading: '阅读书目'
+    attach_heading: '添加书籍'
+    attach_help: '添加一本或多本本次聚会的主题书籍。'
     detach: '移除'
     attach_empty: '暂时没有可关联的书籍。'
     attach_button: '关联'
