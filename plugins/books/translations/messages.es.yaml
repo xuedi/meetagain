@@ -1,6 +1,9 @@
 books:
     menu_main: 'Libros'
     item_label: 'Libro'
+    event_heading: 'Lectura'
+    attach_heading: 'Añadir un libro'
+    attach_help: 'Añade uno o varios libros de los que trata este encuentro.'
     detach: 'Quitar'
     attach_empty: 'Todavía no hay libros disponibles para adjuntar.'
     attach_button: 'Adjuntar'

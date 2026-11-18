@@ -1632,6 +1632,11 @@ the other item seams - `TypeProviderInterface` (whether the type attaches to eve
 of them. A glossary-style type that is browsed and classified but never attached to an event implements the list,
 list-cell and taggable seams and skips the event one.
 
+A type that attaches to events names its own wording through `getEventHeadingKey()` (the event box heading, a
+count-neutral collective noun such as "Reading"), `getAttachHeadingKey()` (the heading of the attach control) and
+`getAttachHelpKey()` (the info bubble beside it). An event box that holds more than one type falls back to the core
+heading.
+
 ### What you implement
 
 1. **Register the provider.** Implement `TaggableTypeProviderInterface`: `getPluginKey()`, `getTypeKey()` (your

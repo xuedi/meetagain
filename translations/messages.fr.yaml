@@ -789,8 +789,8 @@ town_hall:
     deleted_user: '[utilisateur supprimé]'
     aria_breadcrumbs: 'Fil d''Ariane'
 item:
-    heading: 'Objets'
-    attach_heading: 'Attacher un objet'
+    heading: 'À l''honneur'
+    attach_heading: 'Ajouter'
     attach_type_label: 'Type'
     view_list: 'Liste'
     view_tiles: 'Tuiles'

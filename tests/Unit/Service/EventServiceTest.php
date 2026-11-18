@@ -3,12 +3,16 @@
 namespace Tests\Unit\Service;
 
 use App\Emails\Types\NotificationEventCanceledEmail;
+use App\Entity\EventItemAssociation;
 use App\Enum\EventInterval;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
 use App\Item\AssociationService;
+use App\Item\AttachControl;
+use App\Item\AttachControlType;
+use App\Item\TypeProviderInterface;
 use App\Item\TypeRegistry;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
@@ -465,6 +469,114 @@ class EventServiceTest extends TestCase
             itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: $providers,
+            translationRepo: $this->createStub(EventTranslationRepository::class),
+        );
+    }
+
+    public function testItemHeadingKeyUsesTheProviderOfASingleAttachedType(): void
+    {
+        // Arrange
+        $subject = $this->buildHeadingSubject(['books', 'books'], ['books' => 'books.event_heading']);
+
+        // Act
+        $result = $subject->getItemHeadingKey(1, null);
+
+        // Assert
+        $this->assertSame('books.event_heading', $result);
+    }
+
+    public function testItemHeadingKeyFallsBackToGenericForMixedTypes(): void
+    {
+        // Arrange
+        $subject = $this->buildHeadingSubject(['books', 'films'], ['books' => 'books.event_heading', 'films' => 'films.event_heading']);
+
+        // Act
+        $result = $subject->getItemHeadingKey(1, null);
+
+        // Assert
+        $this->assertSame('item.heading', $result);
+    }
+
+    public function testItemHeadingKeyUsesTheOnlyAttachableTypeWithoutAttachments(): void
+    {
+        // Arrange
+        $subject = $this->buildHeadingSubject([], ['films' => 'films.event_heading']);
+        $control = new AttachControl(1, [$this->attachType('films')]);
+
+        // Act
+        $result = $subject->getItemHeadingKey(1, $control);
+
+        // Assert
+        $this->assertSame('films.event_heading', $result);
+    }
+
+    public function testItemHeadingKeyIsGenericWithoutAttachmentsAndSeveralAttachableTypes(): void
+    {
+        // Arrange
+        $subject = $this->buildHeadingSubject([], ['films' => 'films.event_heading', 'books' => 'books.event_heading']);
+        $control = new AttachControl(1, [$this->attachType('films'), $this->attachType('books')]);
+
+        // Act
+        $result = $subject->getItemHeadingKey(1, $control);
+
+        // Assert
+        $this->assertSame('item.heading', $result);
+    }
+
+    public function testItemHeadingKeyResolvesAnAttachedTypeOfAnInactivePlugin(): void
+    {
+        // Arrange
+        $subject = $this->buildHeadingSubject(['dishes'], ['dishes' => 'dishes.event_heading']);
+
+        // Act
+        $result = $subject->getItemHeadingKey(1, new AttachControl(1, []));
+
+        // Assert
+        $this->assertSame('dishes.event_heading', $result);
+    }
+
+    private function attachType(string $key): AttachControlType
+    {
+        return new AttachControlType($key, $key . '.item_label', $key . '.attach_heading', $key . '.attach_help', '', []);
+    }
+
+    /**
+     * @param list<string> $attachedTypes
+     * @param array<string, string> $headingKeysByType
+     */
+    private function buildHeadingSubject(array $attachedTypes, array $headingKeysByType): EventService
+    {
+        $associations = [];
+        foreach ($attachedTypes as $type) {
+            $associations[] = new EventItemAssociation()->setItemType($type);
+        }
+
+        $associationService = $this->createStub(AssociationService::class);
+        $associationService->method('listForEvent')->willReturn($associations);
+
+        $registry = $this->createStub(TypeRegistry::class);
+        $registry
+            ->method('providerForIncludingInactive')
+            ->willReturnCallback(function (string $type) use ($headingKeysByType): ?TypeProviderInterface {
+                if (!isset($headingKeysByType[$type])) {
+                    return null;
+                }
+                $provider = $this->createStub(TypeProviderInterface::class);
+                $provider->method('getEventHeadingKey')->willReturn($headingKeysByType[$type]);
+
+                return $provider;
+            });
+
+        return new EventService(
+            repo: $this->createStub(EventRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
+            notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
+            pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $this->createStub(RecurringService::class),
+            itemAssociationService: $associationService,
+            itemTypeRegistry: $registry,
+            plugins: [],
+            imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
         );
     }

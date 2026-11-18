@@ -2,7 +2,7 @@
 {% set directionsUrl = 'https://www.openstreetmap.org/directions?to=' ~ block.latitude ~ ',' ~ block.longitude %}
 
 {% set textPart %}
-    {% if block.title %}<h2 class="title is-5">{{ block.title }}</h2>{% endif %}
+    {% if block.title %}<h2 class="title is-4">{{ block.title }}</h2>{% endif %}
     <div class="content">{{ block.content|sanitize_html('cms.content') }}</div>
 {% endset %}
 
@@ -45,17 +45,15 @@
 {% if not block.hasMap() %}
     {{ textPart }}
 {% elseif block.mapPosition.isStacked() %}
-    <div class="mb-5">
-        {% if block.mapPosition.value == 'above' %}
-            <div class="mb-4">{{ mapPart }}</div>
-            {{ textPart }}
-        {% else %}
-            {{ textPart }}
-            <div class="mt-4">{{ mapPart }}</div>
-        {% endif %}
-    </div>
+    {% if block.mapPosition.value == 'above' %}
+        <div class="mb-4">{{ mapPart }}</div>
+        {{ textPart }}
+    {% else %}
+        {{ textPart }}
+        <div class="mt-4">{{ mapPart }}</div>
+    {% endif %}
 {% else %}
-    <div class="columns is-vcentered mb-5">
+    <div class="columns is-vcentered">
         {% if block.mapPosition.value == 'left' %}
             <div class="column {{ block.mapWidth.columnClass() }}">{{ mapPart }}</div>
         {% endif %}

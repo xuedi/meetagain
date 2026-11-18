@@ -1,6 +1,9 @@
 films:
     menu_main: 'Films'
     item_label: 'Film'
+    event_heading: 'Screening'
+    attach_heading: 'Add a film'
+    attach_help: 'Add one or more films that are the focus of this meetup.'
     detach: 'Remove'
     attach_empty: 'No films available to attach yet.'
     attach_button: 'Attach'

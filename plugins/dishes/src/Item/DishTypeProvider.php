@@ -45,6 +45,24 @@ final readonly class DishTypeProvider implements TypeProviderInterface, ListCell
     }
 
     #[Override]
+    public function getEventHeadingKey(): string
+    {
+        return 'dishes.event_heading';
+    }
+
+    #[Override]
+    public function getAttachHeadingKey(): string
+    {
+        return 'dishes.attach_heading';
+    }
+
+    #[Override]
+    public function getAttachHelpKey(): string
+    {
+        return 'dishes.attach_help';
+    }
+
+    #[Override]
     public function renderEventCell(int $itemId, EventItemAssociation $association): ?string
     {
         $dish = $this->dishService->getAttached($itemId);

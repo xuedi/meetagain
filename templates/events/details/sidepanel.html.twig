@@ -3,7 +3,7 @@
 {% set hasAttachControl = attachControl is defined and attachControl and not attachControl.isEmpty %}
 {% if itemCells is not empty or hasAttachControl %}
     <div class="box mt-5">
-        <h2 class="title is-4">{{ 'item.heading'|trans }}</h2>
+        <h2 class="title is-4">{{ itemHeadingKey|default('item.heading')|trans }}</h2>
         {% for cell in itemCells %}
             <div class="item-cell mt-3">{{ cell|raw }}</div>
         {% endfor %}

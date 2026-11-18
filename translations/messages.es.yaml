@@ -789,8 +789,8 @@ town_hall:
     deleted_user: '[usuario eliminado]'
     aria_breadcrumbs: 'Ruta de navegación'
 item:
-    heading: 'Elementos'
-    attach_heading: 'Adjuntar un elemento'
+    heading: 'En el foco'
+    attach_heading: 'Añadir'
     attach_type_label: 'Tipo'
     view_list: 'Lista'
     view_tiles: 'Mosaicos'

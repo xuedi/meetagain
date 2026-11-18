@@ -1,6 +1,9 @@
 books:
     menu_main: 'Bücher'
     item_label: 'Buch'
+    event_heading: 'Lektüre'
+    attach_heading: 'Buch hinzufügen'
+    attach_help: 'Füge ein oder mehrere Bücher hinzu, um die es bei diesem Treffen geht.'
     detach: 'Entfernen'
     attach_empty: 'Noch keine Bücher zum Anhängen verfügbar.'
     attach_button: 'Anhängen'

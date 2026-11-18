@@ -579,6 +579,17 @@ body.admin-shell-no-scroll {
     overflow-wrap: anywhere;
 }
 
+.cms-block .content {
+    h2,
+    h3 {
+        font-size: var(--bulma-size-5);
+    }
+
+    h4 {
+        font-size: var(--bulma-size-6);
+    }
+}
+
 // -- Item list --
 
 @media (min-width: 769px) {
@@ -868,6 +879,12 @@ body.admin-shell-no-scroll {
     left: auto;
     right: 0;
     transform: none;
+}
+
+.has-tooltip-wide::after {
+    max-width: 16rem;
+    text-align: left;
+    white-space: normal;
 }
 
 // -- User card --

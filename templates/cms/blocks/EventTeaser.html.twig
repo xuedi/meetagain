@@ -1,40 +1,39 @@
-
-    <div class="container mt-4 mb-4">
-        <div class="columns">
-            {% if block.image and not block.imageRight %}
-                <div class="column is-4">
-                    {% include '_components/image.html.twig' with {'image': block.image} %}
-                </div>
-            {% endif %}
-            <div class="column">
-                <h2 class="title is-4">{{ block.headline }}</h2>
-                <p>
-                    {{ block.text|nl2br }}
+<div class="columns">
+    {% if block.image and not block.imageRight %}
+        <div class="column is-4">
+            {% include '_components/image.html.twig' with {'image': block.image} %}
+        </div>
+    {% endif %}
+    <div class="column">
+        {% if block.headline %}
+            <h2 class="title is-4">{{ block.headline }}</h2>
+        {% endif %}
+        {% if block.text %}
+            <p>{{ block.text|nl2br }}</p>
+        {% endif %}
+    </div>
+    {% if block.image and block.imageRight %}
+        <div class="column is-4">
+            {% include '_components/image.html.twig' with {'image': block.image} %}
+        </div>
+    {% endif %}
+    <div class="column is-4">
+        <div class="box">
+            <h3 class="title is-5 mb-4">
+                <span class="icon-text">
+                    <span>{{ 'cms.event_teaser_headline'|trans }}</span>
+                </span>
+            </h3>
+            {% set upcomingEvents = cms_upcoming_events(block.eventCount) %}
+            {% if upcomingEvents is empty %}
+                <p class="has-text-grey has-text-centered py-3">
+                    {{ 'cms.event_teaser_empty'|trans }}
                 </p>
-            </div>
-            {% if block.image and block.imageRight %}
-                <div class="column is-4">
-                    {% include '_components/image.html.twig' with {'image': block.image} %}
-                </div>
+            {% else %}
+                {% for event in upcomingEvents %}
+                    {% include '_components/upcoming_event_card.html.twig' with {'event': event} only %}
+                {% endfor %}
             {% endif %}
-            <div class="column is-4">
-                <div class="box mb-6">
-                    <h3 class="title is-5 mb-4">
-                        <span class="icon-text">
-                            <span>{{ 'cms.event_teaser_headline'|trans }}</span>
-                        </span>
-                    </h3>
-                    {% set upcomingEvents = cms_upcoming_events(block.eventCount) %}
-                    {% if upcomingEvents is empty %}
-                        <p class="has-text-grey has-text-centered py-3">
-                            {{ 'cms.event_teaser_empty'|trans }}
-                        </p>
-                    {% else %}
-                        {% for event in upcomingEvents %}
-                            {% include '_components/upcoming_event_card.html.twig' with {'event': event} only %}
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            </div>
         </div>
     </div>
+</div>

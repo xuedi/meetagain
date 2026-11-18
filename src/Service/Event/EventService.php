@@ -15,6 +15,7 @@ use App\Enum\EventTileLocation;
 use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
 use App\Item\AssociationService;
+use App\Item\AttachControl;
 use App\Item\TypeRegistry;
 use App\Plugin;
 use App\Repository\EventRepository;
@@ -31,6 +32,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 readonly class EventService
 {
+    private const string GENERIC_ITEM_HEADING_KEY = 'item.heading';
+
     public function __construct(
         private EventRepository $repo,
         private EntityManagerInterface $em,
@@ -297,6 +300,28 @@ readonly class EventService
         }
 
         return $cells;
+    }
+
+    public function getItemHeadingKey(int $eventId, ?AttachControl $attachControl): string
+    {
+        $itemTypes = [];
+        foreach ($this->itemAssociationService->listForEvent($eventId) as $association) {
+            $itemTypes[(string) $association->getItemType()] = true;
+        }
+
+        if ($itemTypes === [] && $attachControl !== null) {
+            foreach ($attachControl->getTypes() as $type) {
+                $itemTypes[$type->getKey()] = true;
+            }
+        }
+
+        if (count($itemTypes) !== 1) {
+            return self::GENERIC_ITEM_HEADING_KEY;
+        }
+
+        $provider = $this->itemTypeRegistry->providerForIncludingInactive((string) array_key_first($itemTypes));
+
+        return $provider?->getEventHeadingKey() ?? self::GENERIC_ITEM_HEADING_KEY;
     }
 
     public function getPluginImageBox(int $id): ?string

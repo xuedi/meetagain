@@ -10,6 +10,8 @@ readonly class AttachControlType
     public function __construct(
         private string $key,
         private string $labelKey,
+        private string $attachHeadingKey,
+        private string $attachHelpKey,
         private string $pickerHtml,
         private array $slots,
     ) {}
@@ -22,6 +24,16 @@ readonly class AttachControlType
     public function getLabelKey(): string
     {
         return $this->labelKey;
+    }
+
+    public function getAttachHeadingKey(): string
+    {
+        return $this->attachHeadingKey;
+    }
+
+    public function getAttachHelpKey(): string
+    {
+        return $this->attachHelpKey;
     }
 
     public function getPickerHtml(): string

@@ -1,6 +1,9 @@
 boardgames:
     menu_main: 'Board games'
     item_label: 'Board game'
+    event_heading: 'Games'
+    attach_heading: 'Add a game'
+    attach_help: 'Add the games that will be played at this meetup.'
     detach: 'Remove'
     attach_empty: 'No board games available to attach yet.'
     attach_button: 'Attach'

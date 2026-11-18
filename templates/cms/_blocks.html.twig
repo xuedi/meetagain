@@ -1,15 +1,13 @@
-{% for block in blocks %}
-    {% if block.type.value == 8 %}
-        {% include 'cms/blocks/' ~ block.type.name ~ '.html.twig' with {'block': block, 'images': images} only %}
-    {% endif %}
+{% for block in blocks|filter(b => b.type.value == 8) %}
+    {% include 'cms/blocks/' ~ block.type.name ~ '.html.twig' with {'block': block, 'images': images} only %}
 {% endfor %}
 
 <section class="section">
-    <div class="container">
-        {% for block in blocks %}
-            {% if block.type.value != 8 %}
+    <div class="container is-flex is-flex-direction-column is-gap-6">
+        {% for block in blocks|filter(b => b.type.value != 8) %}
+            <div class="cms-block">
                 {% include 'cms/blocks/' ~ block.type.name ~ '.html.twig' with {'block': block, 'images': images} only %}
-            {% endif %}
+            </div>
         {% endfor %}
     </div>
 </section>

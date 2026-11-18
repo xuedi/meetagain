@@ -21,8 +21,8 @@ role="${1:-web}"
 
 case "$role" in
     web) exec docker-php-entrypoint frankenphp run --config /etc/frankenphp/Caddyfile --adapter caddyfile "$@" ;;
-    worker) exec php bin/console messenger:consume async --time-limit=3600 --memory-limit=256M "$@" ;;
-    scheduler) exec php bin/console messenger:consume scheduler_default --time-limit=3600 --memory-limit=256M "$@" ;;
+    worker) exec php -d memory_limit=512M bin/console messenger:consume async --time-limit=3600 --memory-limit=256M "$@" ;;
+    scheduler) exec php -d memory_limit=512M bin/console messenger:consume scheduler_default --time-limit=3600 --memory-limit=256M "$@" ;;
     migrate) exec meetagain-migrate "$@" ;;
     pending-sql) exec meetagain-pending-sql "$@" ;;
     after-rollback) exec meetagain-after-rollback "$@" ;;

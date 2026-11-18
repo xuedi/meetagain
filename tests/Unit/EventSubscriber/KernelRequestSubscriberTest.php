@@ -35,6 +35,58 @@ class KernelRequestSubscriberTest extends TestCase
         static::assertSame('/en/events', $event->getRequest()->getSession()->get('redirectUrl'));
     }
 
+    public function testSavesRedirectUrlForDocumentNavigation(): void
+    {
+        // Arrange
+        $event = $this->makeEvent('GET', '/en/events', 'app_event_list', ['Sec-Fetch-Dest' => 'document']);
+
+        // Act
+        new KernelRequestSubscriber()->onKernelRequest($event);
+
+        // Assert
+        static::assertSame('/en/events', $event->getRequest()->getSession()->get('redirectUrl'));
+    }
+
+    public function testDoesNotSaveWhenBrowserFetchesAnImage(): void
+    {
+        // Arrange
+        $event = $this->makeEvent('GET', '/icon.png?v126', 'app_site_icon', ['Sec-Fetch-Dest' => 'image', 'Accept' => 'image/avif,image/webp,*/*']);
+
+        // Act
+        new KernelRequestSubscriber()->onKernelRequest($event);
+
+        // Assert
+        static::assertNull($event->getRequest()->getSession()->get('redirectUrl'));
+    }
+
+    public function testDoesNotSaveWhenAcceptIsNotHtmlAndFetchDestinationIsMissing(): void
+    {
+        // Arrange
+        $event = $this->makeEvent('GET', '/icon.png', 'app_site_icon', ['Accept' => 'image/*']);
+
+        // Act
+        new KernelRequestSubscriber()->onKernelRequest($event);
+
+        // Assert
+        static::assertNull($event->getRequest()->getSession()->get('redirectUrl'));
+    }
+
+    public function testKeepsThePageUrlWhenAnImageFetchFollowsIt(): void
+    {
+        // Arrange
+        $session = new Session(new MockArraySessionStorage());
+        $page = $this->makeEvent('GET', '/de/admin/cms/24/edit/de', 'app_admin_cms_edit', ['Sec-Fetch-Dest' => 'document'], $session);
+        $icon = $this->makeEvent('GET', '/icon.png?v126', 'app_site_icon', ['Sec-Fetch-Dest' => 'image'], $session);
+        $subscriber = new KernelRequestSubscriber();
+
+        // Act
+        $subscriber->onKernelRequest($page);
+        $subscriber->onKernelRequest($icon);
+
+        // Assert
+        static::assertSame('/de/admin/cms/24/edit/de', $session->get('redirectUrl'));
+    }
+
     public function testDoesNotSaveOnPostRequest(): void
     {
         // Arrange
@@ -125,10 +177,14 @@ class KernelRequestSubscriberTest extends TestCase
         static::assertNull($request->getSession()->get('redirectUrl'));
     }
 
-    private function makeEvent(string $method, string $path, ?string $route): RequestEvent
+    /**
+     * @param array<string, string> $headers
+     */
+    private function makeEvent(string $method, string $path, ?string $route, array $headers = [], ?Session $session = null): RequestEvent
     {
         $request = Request::create($path, $method);
-        $request->setSession(new Session(new MockArraySessionStorage()));
+        $request->headers->add($headers);
+        $request->setSession($session ?? new Session(new MockArraySessionStorage()));
         if ($route !== null) {
             $request->attributes->set('_route', $route);
         }

@@ -1,6 +1,9 @@
 boardgames:
     menu_main: 'Jeux de societe'
     item_label: 'Jeu de societe'
+    event_heading: 'Jeux'
+    attach_heading: 'Ajouter un jeu'
+    attach_help: 'Ajoutez les jeux qui seront joués lors de cette rencontre.'
     detach: 'Retirer'
     attach_empty: 'Aucun jeu de societe a associer pour le moment.'
     attach_button: 'Associer'

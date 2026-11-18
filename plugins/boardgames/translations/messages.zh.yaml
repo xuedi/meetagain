@@ -1,6 +1,9 @@
 boardgames:
     menu_main: '桌游'
     item_label: '桌游'
+    event_heading: '本次桌游'
+    attach_heading: '添加桌游'
+    attach_help: '添加本次聚会将要玩的桌游。'
     detach: '移除'
     attach_empty: '暂时没有可关联的桌游。'
     attach_button: '关联'

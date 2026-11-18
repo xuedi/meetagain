@@ -779,8 +779,8 @@ town_hall:
     deleted_user: '[已删除用户]'
     aria_breadcrumbs: '导航路径'
 item:
-    heading: '条目'
-    attach_heading: '添加条目'
+    heading: '本次焦点'
+    attach_heading: '添加'
     attach_type_label: '类型'
     view_list: '列表'
     view_tiles: '磁贴'

@@ -21,6 +21,15 @@ interface TypeProviderInterface
     /** Translation key for the type's label. */
     public function getLabelKey(): string;
 
+    /** Translation key for the event box heading when this is the only attached type; a count-neutral collective noun. */
+    public function getEventHeadingKey(): string;
+
+    /** Translation key for the heading of this type's attach control. */
+    public function getAttachHeadingKey(): string;
+
+    /** Translation key for the info bubble beside the attach heading. */
+    public function getAttachHelpKey(): string;
+
     /**
      * Cell rendered on the event detail page for one association; null when the item no longer exists.
      * The association is the authorization: an attached item is part of the event, so read it without
