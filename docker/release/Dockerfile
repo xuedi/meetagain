@@ -25,7 +25,10 @@ RUN set -eux; \
     done; \
     printf '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>' > /tmp/policy-probe.svg; \
     php -r 'try { (new Imagick())->readImage("/tmp/policy-probe.svg"); } catch (Throwable) { exit(0); } fwrite(STDERR, "ImageMagick still reads SVG - policy.xml is not in force\n"); exit(1);'; \
-    rm -f /tmp/policy-probe.svg
+    rm -f /tmp/policy-probe.svg; \
+    sed -i -E 's|(name="map" value=)"[^"]*"|\1"256MiB"|; s|(name="disk" value=)"[^"]*"|\1"512MiB"|' /etc/ImageMagick-6/policy.xml; \
+    php -r 'exit(Imagick::getResourceLimit(Imagick::RESOURCETYPE_MAP) == 268435456 && Imagick::getResourceLimit(Imagick::RESOURCETYPE_DISK) == 536870912 ? 0 : 1);' \
+      || { echo "policy.xml map/disk limits are not in force"; exit 1; }
 
 # With every capability dropped, a binary that carries file capabilities fails to start.
 RUN groupadd -g 1000 meetagain \
