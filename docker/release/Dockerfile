@@ -100,7 +100,7 @@ RUN set -eux; \
     php bin/console assets:install public; \
     php bin/console app:media:compile; \
     purgecss --config assets/purgecss.config.js; \
-    php bin/console cache:warmup; \
+    php -d memory_limit=1G bin/console cache:warmup; \
     rm -f .env .env.dist .env.local .env.local.php .env.test; \
     rm -rf var/log var/tmp node_modules bin/dart-sass
 
