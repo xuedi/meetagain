@@ -266,12 +266,7 @@ final class ImagesController extends AbstractSettingsController implements Admin
      */
     private function countIssues(array $issuesByImageId): array
     {
-        $counts = [
-            ImageIssueFilter::Healthy->value => 0,
-            ImageIssueFilter::MissingAlt->value => 0,
-            ImageIssueFilter::MissingAttribution->value => 0,
-            ImageIssueFilter::Reported->value => 0,
-        ];
+        $counts = array_fill_keys(array_map(static fn(ImageIssueFilter $case): string => $case->value, ImageIssueFilter::cases()), 0);
         foreach ($issuesByImageId as $issues) {
             if ($issues === []) {
                 ++$counts[ImageIssueFilter::Healthy->value];

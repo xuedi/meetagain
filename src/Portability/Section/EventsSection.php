@@ -22,7 +22,6 @@ use App\Portability\SectionInterface;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
 use App\Service\Config\LanguageService;
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -107,7 +106,7 @@ readonly class EventsSection implements SectionInterface
                 continue;
             }
 
-            $start = new DateTime((string) ($row['start'] ?? ''));
+            $start = new DateTimeImmutable((string) ($row['start'] ?? ''));
             $existing = $this->findEvent($start, $row, $context->resolveRef(Location::class, $row['location_ref'] ?? null));
             if ($existing instanceof Event) {
                 if (isset($row['ref'])) {
@@ -128,7 +127,7 @@ readonly class EventsSection implements SectionInterface
             $event->setStatus(EventStatus::tryFrom((string) ($row['status'] ?? '')) ?? EventStatus::Published);
 
             if (isset($row['stop']) && $row['stop'] !== '') {
-                $event->setStop(new DateTime((string) $row['stop']));
+                $event->setStop(new DateTimeImmutable((string) $row['stop']));
             }
 
             if (isset($row['type']) && $row['type'] !== '') {
@@ -173,7 +172,7 @@ readonly class EventsSection implements SectionInterface
     /**
      * @param array<array-key, mixed> $row
      */
-    private function findEvent(DateTime $start, array $row, ?Location $location): ?Event
+    private function findEvent(DateTimeImmutable $start, array $row, ?Location $location): ?Event
     {
         $titles = is_array($row['titles'] ?? null) ? $row['titles'] : [];
         $locale = $this->keyLocale($titles);

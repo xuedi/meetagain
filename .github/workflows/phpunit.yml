@@ -248,13 +248,16 @@ jobs:
         run: composer validate --strict
 
       - name: Mago lint
-        run: vendor/bin/mago --config tests/config/mago.toml lint
+        run: sh bin/mago.sh lint
 
       - name: Mago analyze
-        run: vendor/bin/mago --config tests/config/mago.toml analyze
+        run: sh bin/mago.sh analyze
 
       - name: Mago guard
-        run: vendor/bin/mago --config tests/config/mago.toml guard
+        run: sh bin/mago.sh guard
+
+      - name: Mago format
+        run: sh bin/mago.sh format --dry-run
 
       - name: GET-route purity check
         run: php bin/check-get-routes.php

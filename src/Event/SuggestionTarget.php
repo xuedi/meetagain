@@ -15,7 +15,6 @@ use App\Enum\EventStatus;
 use App\Enum\EventType;
 use App\Form\EventProposalType;
 use App\Security\Permission\Attribute\PermissionAttribute;
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -178,8 +177,8 @@ final readonly class SuggestionTarget implements TargetProviderInterface
         $proposer = $this->em->getReference(User::class, $proposerId);
 
         $event = new Event();
-        $event->setStart(DateTime::createFromImmutable($proposal->start));
-        $event->setStop($proposal->stop === null ? null : DateTime::createFromImmutable($proposal->stop));
+        $event->setStart($proposal->start);
+        $event->setStop($proposal->stop);
         $event->setType($proposal->type);
         $event->setLocation($this->location(['location' => $proposal->location]));
         $event->setUser($proposer);

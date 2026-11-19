@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 #[AutoconfigureTag]
 interface AlternateLinkProviderInterface
 {
+    public const string X_DEFAULT = 'x-default';
+
     /**
      * @param array<string, string> $localeUrls locale => absolute URL
      * @return array<string, string>|null

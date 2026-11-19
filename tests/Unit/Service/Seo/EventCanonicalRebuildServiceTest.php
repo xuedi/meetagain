@@ -14,7 +14,7 @@ use App\Service\Config\ConfigService;
 use App\Service\Seo\EventCanonicalRebuildService;
 use App\Service\Seo\EventCanonicalResolver;
 use App\Service\Seo\EventSimilarityService;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\Stubs\EventSeriesStub;
@@ -43,7 +43,7 @@ class EventCanonicalRebuildServiceTest extends TestCase
     {
         $event = new EventStub();
         $event->setId($id);
-        $event->setStart(new DateTime($day . ' 19:00'));
+        $event->setStart(new DateTimeImmutable($day . ' 19:00'));
         $event->setSeries($series);
 
         foreach ($contentByLocale as $locale => $description) {

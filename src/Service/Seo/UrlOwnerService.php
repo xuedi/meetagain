@@ -5,6 +5,7 @@ namespace App\Service\Seo;
 use App\Publisher\UrlOwner\UrlOwnerProviderInterface;
 use App\Service\Config\ConfigService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\HttpFoundation\Request;
 
 final readonly class UrlOwnerService
 {
@@ -23,6 +24,14 @@ final readonly class UrlOwnerService
     public function getOwnerHost(string $route, array $parameters = []): string
     {
         return $this->resolveClaim($route, $parameters) ?? rtrim($this->configService->getHost(), '/');
+    }
+
+    public function getOwnerHostForRequest(Request $request): string
+    {
+        $route = $request->attributes->get('_route');
+        $parameters = $request->attributes->get('_route_params');
+
+        return $this->getOwnerHost(is_string($route) ? $route : '', is_array($parameters) ? $parameters : []);
     }
 
     /**

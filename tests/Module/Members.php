@@ -5,7 +5,6 @@ namespace Tests\Module;
 use App\Entity\User;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -36,7 +35,7 @@ final readonly class Members
             ->setVerified(true)
             ->setNotification(true)
             ->setCreatedAt(new DateTimeImmutable())
-            ->setLastLogin(new DateTime());
+            ->setLastLogin(new DateTimeImmutable());
         $this->entityManager->persist($user);
         $this->entityManager->flush();
 

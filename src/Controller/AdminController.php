@@ -19,7 +19,7 @@ use App\Service\Admin\DashboardActionService;
 use App\Service\Admin\DashboardStatsService;
 use App\Service\Event\EventService;
 use App\Service\System\HealthCheckService;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -43,7 +43,7 @@ final class AdminController extends AbstractController
     #[Route('/admin/dashboard/{year}/{week}', name: self::ROUTE_ADMIN)]
     public function index(Request $request, ?int $year = null, ?int $week = null): Response
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
         $year ??= (int) $now->format('Y');
         $week ??= (int) $now->format('W');
 

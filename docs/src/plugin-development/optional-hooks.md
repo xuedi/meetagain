@@ -25,6 +25,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `MetaEnricherInterface`                                      | Enrich metadata on all activity types                 | `enrich()`                                             |
 | `MessageInterface`                                           | Define a new activity type with display rendering     | `getType()`, `validate()`, `render()`                  |
 | `SitemapPublisherInterface`                                  | Contribute URLs to `/sitemap.xml`                     | `getPriority()`, `getSitemapUrls()`                    |
+| `SitemapUrlFilterInterface`                                  | Keep a published URL out of `/sitemap.xml`            | `isListed()`                                           |
 | `WellKnownProviderInterface`                                 | Serve a document under `/.well-known/`                | `getSuffix()`, `getPriority()`, `provide()`            |
 | `UrlOwnerProviderInterface`                                  | Name the host that owns a route                       | `getOwnerHost()`                                       |
 | `FollowerEventNotificationFilterInterface`                   | Drop follower-RSVP email recipients per event         | `isFollowerAllowed()`                                  |
@@ -555,6 +556,11 @@ host).
 - Detail pages should carry a `lastmod` (use the entity's `updatedAt` or `createdAt`); index pages rarely need one.
 - Respect tenant filters: if your plugin has a multisite group filter (e.g. `getApprovedList()` already applies one),
   reuse that path so whitelabel sitemaps only list content the tenant can actually serve.
+
+**Taking a URL out again:** implement `SitemapUrlFilterInterface` (`src/Filter/Sitemap/SitemapUrlFilterInterface.php`)
+when another publisher - core's included - emits a URL your plugin knows is not canonical, for example a page your
+plugin serves under a second path and canonicalises elsewhere. A row is listed only when every filter returns `true`
+from `isListed()`, and the filter runs before the duplicate check.
 
 ---
 

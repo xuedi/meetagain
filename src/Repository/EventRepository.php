@@ -11,7 +11,7 @@ use App\Enum\EventSortFilter;
 use App\Enum\EventStatus;
 use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -74,7 +74,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->andWhere('e.status IN (:statuses)')
             ->setParameter('statuses', [EventStatus::Published->value, EventStatus::Locked->value]);
 
-        $cutoff = new DateTime()->modify('-' . self::IN_PROGRESS_GRACE_HOURS . ' hours');
+        $cutoff = new DateTimeImmutable()->modify('-' . self::IN_PROGRESS_GRACE_HOURS . ' hours');
         match ($time) {
             EventTimeFilter::Past => $qb->andWhere('COALESCE(e.stop, e.start) < :cutoff')->setParameter('cutoff', $cutoff),
             EventTimeFilter::Future => $qb->andWhere('COALESCE(e.stop, e.start) >= :cutoff')->setParameter('cutoff', $cutoff),
@@ -248,7 +248,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
 
         $list = [];
         foreach ($rows as $row) {
-            $list[$row['id']] = $row['title'] ?? '';
+            $list[(int) $row['id']] = $row['title'] ?? '';
         }
 
         return $this->eventNameLists[$language] = $list;
@@ -272,7 +272,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->createQueryBuilder('e')
             ->select('e.id')
             ->where('e.start > :date')
-            ->setParameter('date', new DateTime())
+            ->setParameter('date', new DateTimeImmutable())
             ->orderBy('e.start', 'ASC')
             ->setMaxResults($number);
 
@@ -320,7 +320,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->createQueryBuilder('e')
             ->select('e.id')
             ->where('e.start < :date')
-            ->setParameter('date', new DateTime())
+            ->setParameter('date', new DateTimeImmutable())
             ->orderBy('e.start', 'DESC')
             ->setMaxResults($number);
 
@@ -372,7 +372,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->addSelect('pi')
             ->where('e.start < :date')
             ->andWhere(':user MEMBER OF e.rsvp')
-            ->setParameter('date', new DateTime())
+            ->setParameter('date', new DateTimeImmutable())
             ->setParameter('user', $user);
 
         if ($restrictToEventIds !== null) {
@@ -399,7 +399,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->select('COUNT(e.id)')
             ->where('e.start < :date')
             ->andWhere(':user MEMBER OF e.rsvp')
-            ->setParameter('date', new DateTime())
+            ->setParameter('date', new DateTimeImmutable())
             ->setParameter('user', $user);
 
         if ($restrictToEventIds !== null) {
@@ -423,7 +423,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->select('COUNT(e.id)')
             ->where('e.start >= :date')
             ->andWhere(':user MEMBER OF e.rsvp')
-            ->setParameter('date', new DateTime())
+            ->setParameter('date', new DateTimeImmutable())
             ->setParameter('user', $user);
 
         if ($restrictToEventIds !== null) {
@@ -493,7 +493,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
      */
     public function getNextEventId(?array $restrictToEventIds = null): ?int
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
         foreach ($this->findAllForAdmin($restrictToEventIds) as $event) {
             if (!$event->isOverAt($now)) {
                 return $event->getId();
@@ -554,6 +554,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->getQuery()
             ->getResult();
 
+        /** @var list<Event> $events */
         $list = [];
         foreach ($events as $event) {
             $list[$event->getTitle($locale)] = $event->getId();
@@ -579,7 +580,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->leftJoin('e.images', 'i')
             ->where('e.start < :date')
             ->andWhere('i.id IS NULL')
-            ->setParameter('date', new DateTime());
+            ->setParameter('date', new DateTimeImmutable());
 
         if ($restrictToEventIds !== null) {
             $qb->andWhere('e.id IN (:eventIds)')->setParameter('eventIds', $restrictToEventIds);
@@ -616,8 +617,8 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             return [];
         }
 
-        $now = new DateTime();
-        $until = new DateTime()->modify(sprintf('+%d days', $daysAhead));
+        $now = new DateTimeImmutable();
+        $until = new DateTimeImmutable()->modify(sprintf('+%d days', $daysAhead));
 
         $qb = $this
             ->createQueryBuilder('e')
@@ -831,6 +832,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->getQuery()
             ->getResult();
 
+        /** @var list<Event> $events */
         $byId = [];
         foreach ($events as $event) {
             $byId[$event->getId()] = $event;
@@ -905,6 +907,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->getQuery()
             ->getResult();
 
+        /** @var list<Event> $events */
         $byId = [];
         foreach ($events as $event) {
             $byId[$event->getId()] = $event;

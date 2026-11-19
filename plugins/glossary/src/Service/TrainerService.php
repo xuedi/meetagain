@@ -307,7 +307,7 @@ class TrainerService implements ResetInterface
                 $text = isset($candidates[$candidateId]) ? $this->answerFor($candidates[$candidateId], $session->direction) : '';
                 $isDuplicate = array_any($picked, fn(string $existing): bool => $this->matcher->same($existing, $text));
                 if ($text !== '' && !$isDuplicate) {
-                    $picked[$candidateId] = $text;
+                    $picked[(int) $candidateId] = $text;
                 }
             }
         }

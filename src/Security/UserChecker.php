@@ -7,7 +7,6 @@ use App\Activity\Messages\Login;
 use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\MessageRepository;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -62,7 +61,7 @@ readonly class UserChecker implements UserCheckerInterface
 
         $request->getSession()->set('lastLogin', $user->getLastLogin());
 
-        $user->setLastLogin(new DateTime());
+        $user->setLastLogin(new DateTimeImmutable());
         $this->em->persist($user);
         $this->em->flush();
 

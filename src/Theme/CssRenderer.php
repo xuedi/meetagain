@@ -67,35 +67,32 @@ final readonly class CssRenderer
             default => [$lBase - 10, $lBase - 5],
         };
 
+        /** @var array<int, int> $shades step => lightness */
         $shades = [];
-        $baseDigits = '00';
         for ($i = 0; $i <= 9; $i++) {
-            $shades[] = [$i . '0', max($l0 + ($i * 10), 0)];
-            $shades[] = [$i . '5', $l5 + ($i * 10)];
-            if ($shades[count($shades) - 2][1] === $l) {
-                $baseDigits = $i . '0';
-            } elseif (($l5 + ($i * 10)) === $l) {
-                $baseDigits = $i . '5';
-            }
+            $shades[$i * 10] = max($l0 + ($i * 10), 0);
+            $shades[($i * 10) + 5] = $l5 + ($i * 10);
         }
-        $shades[] = ['100', min($l0 + 100, 100)];
+        $shades[100] = min($l0 + 100, 100);
 
-        foreach ($shades as [$digits, $shade]) {
-            $vars[$digits . '-l'] = $shade . '%';
+        foreach ($shades as $step => $shade) {
+            $vars[$this->stepLabel($step) . '-l'] = $shade . '%';
         }
 
+        $baseStep = 0;
+        /** @var array<int, int> $combos background step => foreground step */
         $combos = [];
-        foreach ($shades as [$bgDigits, $bgL]) {
+        foreach ($shades as $bgStep => $bgL) {
             $bgLum = $this->luminance(...$this->hslToRgb($h, $s, $bgL));
             $bgIsLight = $bgLum > 0.55;
             $found = false;
 
             if ($bgL === $l) {
-                $baseDigits = $bgDigits;
-                $combos[$bgDigits] = $bgIsLight ? '10' : '100';
+                $baseStep = $bgStep;
+                $combos[$bgStep] = $bgIsLight ? 10 : 100;
             }
 
-            foreach ($shades as [$fgDigits, $fgL]) {
+            foreach ($shades as $fgStep => $fgL) {
                 $fgLum = $this->luminance(...$this->hslToRgb($h, $s, $fgL));
                 $isLightFg = $fgL > $bgL;
                 $ratio = $isLightFg ? ($fgLum + 0.05) / ($bgLum + 0.05) : ($bgLum + 0.05) / ($fgLum + 0.05);
@@ -104,22 +101,22 @@ final readonly class CssRenderer
                 }
 
                 if (!$isLightFg) {
-                    $combos[$bgDigits] = $fgDigits;
+                    $combos[$bgStep] = $fgStep;
                 } elseif (!$found) {
-                    $combos[$bgDigits] = $fgDigits;
+                    $combos[$bgStep] = $fgStep;
                     $found = true;
                 }
             }
 
-            $combos[$bgDigits] ??= $bgIsLight ? '00' : '100';
+            $combos[$bgStep] ??= $bgIsLight ? 0 : 100;
         }
 
-        foreach ($shades as [$digits]) {
-            $vars[$digits . '-invert-l'] = $this->lightnessVar($name, $combos[$digits]);
+        foreach (array_keys($shades) as $step) {
+            $vars[$this->stepLabel($step) . '-invert-l'] = $this->lightnessVar($name, $combos[$step]);
         }
-        $vars['invert-l'] = $this->lightnessVar($name, $combos[$baseDigits]);
-        $vars['light-invert-l'] = $this->lightnessVar($name, $combos['90']);
-        $vars['dark-invert-l'] = $this->lightnessVar($name, $combos['10']);
+        $vars['invert-l'] = $this->lightnessVar($name, $combos[$baseStep]);
+        $vars['light-invert-l'] = $this->lightnessVar($name, $combos[90]);
+        $vars['dark-invert-l'] = $this->lightnessVar($name, $combos[10]);
         $vars['on-scheme-l'] = $this->formatNumber($this->onSchemeLightness($red / 255, $green / 255, $blue / 255)) . '%';
 
         return $vars;
@@ -215,9 +212,14 @@ final readonly class CssRenderer
         return ($linear($red) * 0.2126) + ($linear($green) * 0.7152) + ($linear($blue) * 0.0722);
     }
 
-    private function lightnessVar(string $name, string $digits): string
+    private function lightnessVar(string $name, int $step): string
     {
-        return sprintf('var(--bulma-%s-%s-l)', $name, $digits);
+        return sprintf('var(--bulma-%s-%s-l)', $name, $this->stepLabel($step));
+    }
+
+    private function stepLabel(int $step): string
+    {
+        return sprintf('%02d', $step);
     }
 
     private function formatNumber(float $number): string

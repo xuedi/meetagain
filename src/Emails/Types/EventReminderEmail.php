@@ -121,7 +121,7 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
         }
 
         $budgetCutoff = $now->add(new DateInterval('PT3H'));
-        $eventStart = DateTimeImmutable::createFromMutable($event->getStart());
+        $eventStart = $event->getStart();
 
         return $budgetCutoff < $eventStart ? $budgetCutoff : $eventStart;
     }
@@ -172,7 +172,7 @@ readonly class EventReminderEmail extends EmailAbstract implements ScheduledEmai
             $items[] = new ScheduledMailItem(
                 mailType: EmailType::EventReminder->value,
                 label: 'Event: ' . ($event->getTitle('en') ?: ($event->getTranslation()->first() ?: null)?->getTitle() ?? ''),
-                expectedTime: DateTimeImmutable::createFromMutable($event->getStart())->sub(new DateInterval(self::WINDOW)),
+                expectedTime: $event->getStart()->sub(new DateInterval(self::WINDOW)),
                 expectedRecipients: $eligibleCount,
             );
         }

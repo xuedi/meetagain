@@ -189,6 +189,20 @@ class EventSchemaServiceTest extends TestCase
         static::assertSame([self::PLATFORM_HOST . '/images/thumbnails/abc123_600x400.webp'], $schema['image']);
     }
 
+    public function testImageAndOrganizerFollowTheCanonicalOrigin(): void
+    {
+        // Arrange
+        $event = $this->makeEvent(title: 'Coffee chat', previewImageHash: 'abc123', hostName: 'Berlin Crew');
+        $subject = $this->makeService();
+
+        // Act
+        $schema = $subject->buildSchema($event, 'https://group.example.org/en/event/9', 'en');
+
+        // Assert
+        static::assertSame(['https://group.example.org/images/thumbnails/abc123_600x400.webp'], $schema['image']);
+        static::assertSame('https://group.example.org', $schema['organizer']['url']);
+    }
+
     public function testImageUsesProviderLogoWhenNoPreviewImage(): void
     {
         // Arrange

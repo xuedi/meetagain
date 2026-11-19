@@ -10,7 +10,6 @@ use App\Enum\ConfigType;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Service\Config\LanguageService;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -181,7 +180,7 @@ class InstallSeedCommand extends Command
             $user->setLocale('en');
             $user->setRole(UserRole::System);
             $user->setCreatedAt(new DateTimeImmutable());
-            $user->setLastLogin(new DateTime());
+            $user->setLastLogin(new DateTimeImmutable());
 
             $this->em->persist($user);
             ++$created;

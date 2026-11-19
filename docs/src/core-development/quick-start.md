@@ -58,7 +58,7 @@ Follow the pattern for the layer you're in:
 ## 5. Run the checks
 
 ```bash
-just fixMago    # Auto-format code (always run before testing)
+just fixMago    # Apply lint fixes and format code (always run before testing)
 just testUnit   # Run unit tests
 just test       # Run all tests + static analysis + code style
 ```

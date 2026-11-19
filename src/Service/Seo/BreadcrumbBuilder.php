@@ -12,6 +12,7 @@ final readonly class BreadcrumbBuilder
         private UrlGeneratorInterface $urlGenerator,
         private TranslatorInterface $translator,
         private RequestStack $requestStack,
+        private UrlOwnerService $urlOwnerService,
     ) {}
 
     /**
@@ -19,17 +20,19 @@ final readonly class BreadcrumbBuilder
      */
     public function build(string $sectionRoute, string $sectionLabelKey, string $currentLabel): array
     {
-        $locale = $this->requestStack->getCurrentRequest()?->getLocale();
+        $request = $this->requestStack->getCurrentRequest();
+        $locale = $request?->getLocale();
+        $host = $request !== null ? $this->urlOwnerService->getOwnerHostForRequest($request) : $this->urlOwnerService->getOwnerHost('app_default');
 
         return [
-            ['label' => $this->translator->trans('chrome.menu_default'), 'url' => $this->absoluteUrl('app_default', $locale)],
-            ['label' => $this->translator->trans($sectionLabelKey), 'url' => $this->absoluteUrl($sectionRoute, $locale)],
+            ['label' => $this->translator->trans('chrome.menu_default'), 'url' => $host . $this->path('app_default', $locale)],
+            ['label' => $this->translator->trans($sectionLabelKey), 'url' => $host . $this->path($sectionRoute, $locale)],
             ['label' => $currentLabel],
         ];
     }
 
-    private function absoluteUrl(string $route, ?string $locale): string
+    private function path(string $route, ?string $locale): string
     {
-        return $this->urlGenerator->generate($route, $locale !== null ? ['_locale' => $locale] : [], UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->urlGenerator->generate($route, $locale !== null ? ['_locale' => $locale] : [], UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 }

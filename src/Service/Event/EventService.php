@@ -24,7 +24,7 @@ use App\Service\Config\PluginService;
 use App\ValueObject\RealignmentPlan;
 use App\ValueObject\RealignmentResult;
 use App\ValueObject\ScheduleChange;
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -259,7 +259,7 @@ readonly class EventService
         $this->em->persist($event);
         $this->em->flush();
 
-        if ($event->getStart() > new DateTime()) {
+        if ($event->getStart() > new DateTimeImmutable()) {
             foreach ($event->getRsvp() as $user) {
                 $this->notificationEventCanceledEmail->send(['user' => $user, 'event' => $event]);
             }
@@ -358,6 +358,9 @@ readonly class EventService
         return $tiles;
     }
 
+    /**
+     * @param array<Event> $events
+     */
     private function structureList(array $events): array
     {
         $structuredList = [];

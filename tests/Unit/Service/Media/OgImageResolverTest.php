@@ -5,9 +5,11 @@ namespace Tests\Unit\Service\Media;
 use App\Entity\Image;
 use App\Publisher\OgImage\OgImageProviderInterface;
 use App\Publisher\OgImage\ResolvedOgImage;
+use App\Publisher\UrlOwner\UrlOwnerProviderInterface;
 use App\Repository\ImageRepository;
 use App\Service\Config\ConfigService;
 use App\Service\Media\OgImageResolver;
+use App\Service\Seo\UrlOwnerService;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,6 +26,7 @@ class OgImageResolverTest extends TestCase
     protected function setUp(): void
     {
         $this->configServiceStub = $this->createStub(ConfigService::class);
+        $this->configServiceStub->method('getHost')->willReturn('https://example.test');
         $this->imageRepositoryStub = $this->createStub(ImageRepository::class);
         $this->requestStack = new RequestStack();
         $request = Request::create('https://example.test/');
@@ -42,6 +45,7 @@ class OgImageResolverTest extends TestCase
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             requestStack: $this->requestStack,
+            urlOwnerService: new UrlOwnerService($this->configServiceStub, []),
             translator: $this->translatorStub,
         );
 
@@ -66,6 +70,7 @@ class OgImageResolverTest extends TestCase
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             requestStack: $this->requestStack,
+            urlOwnerService: new UrlOwnerService($this->configServiceStub, []),
             translator: $this->translatorStub,
         );
 
@@ -102,6 +107,7 @@ class OgImageResolverTest extends TestCase
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             requestStack: $this->requestStack,
+            urlOwnerService: new UrlOwnerService($this->configServiceStub, []),
             translator: $this->translatorStub,
         );
 
@@ -128,6 +134,7 @@ class OgImageResolverTest extends TestCase
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             requestStack: $this->requestStack,
+            urlOwnerService: new UrlOwnerService($this->configServiceStub, []),
             translator: $this->translatorStub,
         );
 
@@ -154,6 +161,7 @@ class OgImageResolverTest extends TestCase
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             requestStack: $this->requestStack,
+            urlOwnerService: new UrlOwnerService($this->configServiceStub, []),
             translator: $this->translatorStub,
         );
 
@@ -175,6 +183,7 @@ class OgImageResolverTest extends TestCase
             configService: $this->configServiceStub,
             imageRepository: $this->imageRepositoryStub,
             requestStack: $this->requestStack,
+            urlOwnerService: new UrlOwnerService($this->configServiceStub, []),
             translator: $this->translatorStub,
         );
 
@@ -183,5 +192,57 @@ class OgImageResolverTest extends TestCase
 
         // Assert
         static::assertNull($result);
+    }
+
+    public function testTheSystemImageNamesTheOwnerHostOfTheCurrentPage(): void
+    {
+        // Arrange
+        $this->configServiceStub->method('getWebsiteImageId')->willReturn(42);
+        $image = new Image();
+        $image->setHash('sysHash');
+        $this->imageRepositoryStub->method('find')->willReturn($image);
+        $ownerProvider = $this->createStub(UrlOwnerProviderInterface::class);
+        $ownerProvider->method('getOwnerHost')->willReturn('https://owner.test');
+        $requestStack = new RequestStack();
+        $requestStack->push(Request::create('https://group.test/en/event/1'));
+        $resolver = new OgImageResolver(
+            providers: [],
+            configService: $this->configServiceStub,
+            imageRepository: $this->imageRepositoryStub,
+            requestStack: $requestStack,
+            urlOwnerService: new UrlOwnerService($this->configServiceStub, [$ownerProvider]),
+            translator: $this->translatorStub,
+        );
+
+        // Act
+        $result = $resolver->resolve();
+
+        // Assert
+        static::assertNotNull($result);
+        static::assertSame('https://owner.test/images/thumbnails/sysHash_1200x630.webp', $result->absoluteUrl);
+    }
+
+    public function testTheSystemImageNamesTheConfiguredHostWithoutARequest(): void
+    {
+        // Arrange
+        $this->configServiceStub->method('getWebsiteImageId')->willReturn(42);
+        $image = new Image();
+        $image->setHash('sysHash');
+        $this->imageRepositoryStub->method('find')->willReturn($image);
+        $resolver = new OgImageResolver(
+            providers: [],
+            configService: $this->configServiceStub,
+            imageRepository: $this->imageRepositoryStub,
+            requestStack: new RequestStack(),
+            urlOwnerService: new UrlOwnerService($this->configServiceStub, []),
+            translator: $this->translatorStub,
+        );
+
+        // Act
+        $result = $resolver->resolve();
+
+        // Assert
+        static::assertNotNull($result);
+        static::assertSame('https://example.test/images/thumbnails/sysHash_1200x630.webp', $result->absoluteUrl);
     }
 }

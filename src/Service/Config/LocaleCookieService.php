@@ -4,7 +4,7 @@ namespace App\Service\Config;
 
 use App\Entity\Session\Consent;
 use App\Enum\ConsentType;
-use DateTime;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +19,7 @@ readonly class LocaleCookieService
 
     public function createCookie(string $locale): Cookie
     {
-        return new Cookie(name: self::COOKIE_NAME, value: $locale, expire: new DateTime('+6 months'), httpOnly: true, sameSite: Cookie::SAMESITE_LAX);
+        return new Cookie(name: self::COOKIE_NAME, value: $locale, expire: new DateTimeImmutable('+6 months'), httpOnly: true, sameSite: Cookie::SAMESITE_LAX);
     }
 
     public function isConsentGranted(Request $request): bool

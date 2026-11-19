@@ -36,6 +36,7 @@ class RunRepository extends ServiceEntityRepository
 
         $runs = $this->createQueryBuilder('r')->where(sprintf('r.id IN (%s)', $latestIds->getDQL()))->getQuery()->getResult();
 
+        /** @var list<Run> $runs */
         $byIdentifier = [];
         foreach ($runs as $run) {
             $byIdentifier[$run->getIdentifier()] = $run;

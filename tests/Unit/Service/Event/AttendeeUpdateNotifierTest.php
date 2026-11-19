@@ -7,7 +7,7 @@ use App\Entity\Event;
 use App\Entity\NotificationSettings;
 use App\Entity\User;
 use App\Service\Event\AttendeeUpdateNotifier;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -127,7 +127,7 @@ class AttendeeUpdateNotifierTest extends TestCase
     private function event(array $attendees, ?User $creator = null, string $start = '+7 days'): Event
     {
         $event = new Event();
-        $event->setStart(new DateTime($start));
+        $event->setStart(new DateTimeImmutable($start));
         $event->setUser($creator);
         foreach ($attendees as $attendee) {
             $event->addRsvp($attendee);

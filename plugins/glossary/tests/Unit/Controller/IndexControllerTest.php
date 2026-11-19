@@ -3,7 +3,9 @@
 namespace Plugin\Glossary\Tests\Unit\Controller;
 
 use App\Item\ListRegistry;
+use App\Service\Config\ConfigService;
 use App\Service\Seo\BreadcrumbBuilder;
+use App\Service\Seo\UrlOwnerService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Controller\IndexController;
 use Plugin\Glossary\Service\GlossaryService;
@@ -36,6 +38,11 @@ class IndexControllerTest extends TestCase
 
     private function breadcrumbBuilder(): BreadcrumbBuilder
     {
-        return new BreadcrumbBuilder($this->createStub(UrlGeneratorInterface::class), $this->createStub(TranslatorInterface::class), new RequestStack());
+        return new BreadcrumbBuilder(
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(TranslatorInterface::class),
+            new RequestStack(),
+            new UrlOwnerService($this->createStub(ConfigService::class), []),
+        );
     }
 }

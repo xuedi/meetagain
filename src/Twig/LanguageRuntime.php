@@ -4,8 +4,8 @@ namespace App\Twig;
 
 use App\Filter\Language\AlternateLinkFilterInterface;
 use App\Publisher\AlternateLinks\AlternateLinkProviderInterface;
-use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
+use App\Service\Seo\UrlOwnerService;
 use Exception;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -25,7 +25,7 @@ final readonly class LanguageRuntime implements RuntimeExtensionInterface
         private LanguageService $languageService,
         private RequestStack $requestStack,
         private RouterInterface $router,
-        private ConfigService $configService,
+        private UrlOwnerService $urlOwnerService,
         #[AutowireIterator(AlternateLinkFilterInterface::class)]
         private iterable $alternateLinkFilters = [],
         #[AutowireIterator(AlternateLinkProviderInterface::class)]
@@ -90,7 +90,7 @@ final readonly class LanguageRuntime implements RuntimeExtensionInterface
         $altLangList = $this->languageService->getAltLangList($request->getLocale(), $currentUri);
         $altLangList[$request->getLocale()] = $this->languageService->replaceUriLanguageCode($currentUri, $request->getLocale());
 
-        $host = rtrim($this->configService->getHost(), '/');
+        $host = $this->urlOwnerService->getOwnerHostForRequest($request);
         $localeUrls = array_map(static fn(string $path) => $host . $path, $altLangList);
 
         foreach ($this->alternateLinkProviders as $provider) {
@@ -126,7 +126,7 @@ final readonly class LanguageRuntime implements RuntimeExtensionInterface
         foreach ($this->alternateLinkFilters as $filter) {
             $allowed = $filter->getAllowedAlternateLocaleCodes($request);
             if ($allowed !== null) {
-                $altLangList = array_intersect_key($altLangList, array_flip($allowed));
+                $altLangList = array_intersect_key($altLangList, array_flip([...$allowed, AlternateLinkProviderInterface::X_DEFAULT]));
             }
         }
 

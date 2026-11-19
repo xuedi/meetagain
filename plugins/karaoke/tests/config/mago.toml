@@ -8,9 +8,14 @@ extends = ["../../../../tests/config/mago-rules.toml"]
 
 [source]
 paths = [
+    "plugins/karaoke/migrations/**/*.php",
     "plugins/karaoke/src/**/*.php",
     "plugins/karaoke/tests/**/*.php",
 ]
 # Core and modules are read for type resolution, not linted - the core run owns those.
 includes = ["vendor", "src", "modules"]
 excludes = []
+
+[analyzer]
+# PHPUnit createMock/createStub false positives, as in core.
+excludes = ["plugins/karaoke/tests/Unit/"]

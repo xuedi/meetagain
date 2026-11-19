@@ -230,11 +230,11 @@ common formatting tags while stripping all script-related attributes.
 
 ## Run `just fixMago` before committing
 
-`just fixMago` auto-formats code and runs all Mago quality checks (linter, analyzer, guard).
-`just test` will fail if you skip it.
+`just fixMago` applies the linter's auto-fixes and formats all code. `just test` runs the Mago checks (linter,
+analyzer, guard, format) and will fail on a finding or on unformatted code.
 
 ```bash
-just fixMago   # Format + quality checks (fast, run often)
+just fixMago   # Lint fixes + formatting (fast, run often)
 just test      # Full suite: unit tests + quality checks
 ```
 

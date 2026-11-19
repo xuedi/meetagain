@@ -26,7 +26,6 @@ use App\Service\Member\RegistrationApprovalProviderInterface;
 use App\Service\Member\UserService;
 use App\Service\Security\LoginGuard;
 use App\Service\Security\SecurityService;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\BlocklistInterface;
@@ -301,7 +300,7 @@ final class SecurityController extends AbstractController
         $user->setLocale($request->getLocale());
         $user->setRegcode(bin2hex(random_bytes(32)));
         $user->setRegcodeExpiresAt(new DateTimeImmutable('+24 hours'));
-        $user->setLastLogin(new DateTime());
+        $user->setLastLogin(new DateTimeImmutable());
         $user->setCreatedAt(new DateTimeImmutable());
         $user->setBio(null);
         $user->setOsmConsent($this->consentService->getShowOsm());

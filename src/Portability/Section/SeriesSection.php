@@ -13,7 +13,6 @@ use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use App\ValueObject\RecurrencePattern;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
@@ -100,7 +99,7 @@ readonly class SeriesSection implements SectionInterface
     }
 
     /**
-     * @return array<int, DateTime> series ref => start of its first occurrence in the archive
+     * @return array<int, DateTimeImmutable> series ref => start of its first occurrence in the archive
      */
     private function firstStarts(ImportContext $context): array
     {
@@ -112,7 +111,7 @@ readonly class SeriesSection implements SectionInterface
                 continue;
             }
 
-            $start = new DateTime($start);
+            $start = new DateTimeImmutable($start);
             if (!isset($firstStarts[$seriesRef]) || $start < $firstStarts[$seriesRef]) {
                 $firstStarts[$seriesRef] = $start;
             }
@@ -121,7 +120,7 @@ readonly class SeriesSection implements SectionInterface
         return $firstStarts;
     }
 
-    private function findSeries(string $name, DateTime $firstStart): ?EventSeries
+    private function findSeries(string $name, DateTimeImmutable $firstStart): ?EventSeries
     {
         $series = $this->em
             ->createQuery(sprintf(
@@ -130,7 +129,7 @@ readonly class SeriesSection implements SectionInterface
                 Event::class,
             ))
             ->setParameter('name', $name)
-            ->setParameter('start', $firstStart, Types::DATETIME_MUTABLE)
+            ->setParameter('start', $firstStart, Types::DATETIME_IMMUTABLE)
             ->setMaxResults(1)
             ->getOneOrNullResult();
 

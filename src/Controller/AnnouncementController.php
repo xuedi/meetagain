@@ -19,7 +19,7 @@ final class AnnouncementController extends AbstractController
     public function show(string $hash, Request $request): Response
     {
         $announcement = $this->announcementService->findByLinkHash($hash);
-        $cmsPage = $announcement->getCmsPage();
+        $cmsPage = $announcement?->getCmsPage();
 
         if (!$announcement instanceof Announcement || !$cmsPage instanceof Cms) {
             throw $this->createNotFoundException('Announcement not found');

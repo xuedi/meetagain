@@ -2,8 +2,12 @@
 
 namespace Tests\Unit\Twig;
 
+use App\Filter\Language\AlternateLinkFilterInterface;
+use App\Publisher\AlternateLinks\AlternateLinkProviderInterface;
+use App\Publisher\UrlOwner\UrlOwnerProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
+use App\Service\Seo\UrlOwnerService;
 use App\Twig\LanguageRuntime;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -19,7 +23,7 @@ class LanguageRuntimeTest extends TestCase
     private Stub&LanguageService $languageServiceStub;
     private Stub&RequestStack $requestStackStub;
     private Stub&RouterInterface $routerStub;
-    private Stub&ConfigService $configServiceStub;
+    private Stub&UrlOwnerProviderInterface $urlOwnerProviderStub;
     private LanguageRuntime $subject;
 
     protected function setUp(): void
@@ -27,8 +31,11 @@ class LanguageRuntimeTest extends TestCase
         $this->languageServiceStub = $this->createStub(LanguageService::class);
         $this->requestStackStub = $this->createStub(RequestStack::class);
         $this->routerStub = $this->createStub(RouterInterface::class);
-        $this->configServiceStub = $this->createStub(ConfigService::class);
-        $this->subject = new LanguageRuntime($this->languageServiceStub, $this->requestStackStub, $this->routerStub, $this->configServiceStub);
+        $this->urlOwnerProviderStub = $this->createStub(UrlOwnerProviderInterface::class);
+        $configServiceStub = $this->createStub(ConfigService::class);
+        $configServiceStub->method('getHost')->willReturn('https://meetagain.local/');
+        $urlOwnerService = new UrlOwnerService($configServiceStub, [$this->urlOwnerProviderStub]);
+        $this->subject = new LanguageRuntime($this->languageServiceStub, $this->requestStackStub, $this->routerStub, $urlOwnerService);
     }
 
     public function testGetCurrentLocaleReturnsRequestLocale(): void
@@ -147,5 +154,70 @@ class LanguageRuntimeTest extends TestCase
 
         // Assert
         static::assertTrue($result);
+    }
+
+    public function testGetHreflangLanguageCodesUsesTheOwnerHost(): void
+    {
+        // Arrange
+        $request = new Request();
+        $request->attributes->set('_route', 'app_frontpage');
+        $request->attributes->set('_route_params', ['x' => 1]);
+        $request->server->set('REQUEST_URI', '/de/');
+        $request->setLocale('de');
+        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
+        $this->languageServiceStub->method('getAltLangList')->willReturn(['en' => '/en/']);
+        $this->languageServiceStub->method('replaceUriLanguageCode')->willReturn('/de/');
+        $this->urlOwnerProviderStub->method('getOwnerHost')->willReturn('https://club.example/');
+
+        // Act
+        $result = $this->subject->getHreflangLanguageCodes();
+
+        // Assert
+        static::assertSame(['en' => 'https://club.example/en/', 'de' => 'https://club.example/de/'], $result);
+    }
+
+    public function testAProvidedXDefaultSurvivesANarrowingFilter(): void
+    {
+        // Arrange
+        $request = new Request();
+        $request->server->set('REQUEST_URI', '/');
+        $request->setLocale('en');
+        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
+        $this->languageServiceStub->method('getAltLangList')->willReturn(['en' => '/en/', 'de' => '/de/', 'zh' => '/zh/']);
+        $this->languageServiceStub->method('replaceUriLanguageCode')->willReturn('/en/');
+        $provider = $this->createStub(AlternateLinkProviderInterface::class);
+        $provider
+            ->method('getAlternateLinks')
+            ->willReturn([
+                'en' => 'https://meetagain.local/',
+                'de' => 'https://meetagain.local/de/',
+                'zh' => 'https://meetagain.local/zh/',
+                AlternateLinkProviderInterface::X_DEFAULT => 'https://meetagain.local/',
+            ]);
+        $filter = $this->createStub(AlternateLinkFilterInterface::class);
+        $filter->method('getAllowedAlternateLocaleCodes')->willReturn(['en', 'de']);
+        $configServiceStub = $this->createStub(ConfigService::class);
+        $configServiceStub->method('getHost')->willReturn('https://meetagain.local/');
+        $subject = new LanguageRuntime(
+            $this->languageServiceStub,
+            $this->requestStackStub,
+            $this->routerStub,
+            new UrlOwnerService($configServiceStub, []),
+            [$filter],
+            [$provider],
+        );
+
+        // Act
+        $result = $subject->getHreflangLanguageCodes();
+
+        // Assert
+        static::assertSame(
+            [
+                'en' => 'https://meetagain.local/',
+                'de' => 'https://meetagain.local/de/',
+                AlternateLinkProviderInterface::X_DEFAULT => 'https://meetagain.local/',
+            ],
+            $result,
+        );
     }
 }

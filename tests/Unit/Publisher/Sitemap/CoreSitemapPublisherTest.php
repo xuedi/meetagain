@@ -25,7 +25,6 @@ use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
 use App\Service\Seo\EventCanonicalResolver;
 use App\Service\Seo\UrlOwnerService;
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -258,7 +257,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testDropsEventsAnotherHostOwns(): void
     {
         // Arrange
-        $event = $this->makeEvent(42, new DateTime('2026-05-01'));
+        $event = $this->makeEvent(42, new DateTimeImmutable('2026-05-01'));
 
         $publisher = $this->makePublisher(
             locales: ['en'],
@@ -281,7 +280,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testEmitsEventsWithStartDateAsLastmod(): void
     {
         // Arrange
-        $event = $this->makeEvent(42, new DateTime('2026-05-01'));
+        $event = $this->makeEvent(42, new DateTimeImmutable('2026-05-01'));
 
         $publisher = $this->makePublisher(locales: ['en'], cmsPages: [], events: [$event], cmsFilter: CmsFilterResult::noFilter());
 
@@ -300,8 +299,8 @@ class CoreSitemapPublisherTest extends TestCase
     public function testOmitsEventsTheDetailPageWouldReject(): void
     {
         // Arrange
-        $reachable = $this->makeEvent(42, new DateTime('2026-05-01'));
-        $unreachable = $this->makeEvent(109, new DateTime('2026-05-02'));
+        $reachable = $this->makeEvent(42, new DateTimeImmutable('2026-05-01'));
+        $unreachable = $this->makeEvent(109, new DateTimeImmutable('2026-05-02'));
 
         $publisher = $this->makePublisher(
             locales: ['en', 'de'],
@@ -322,7 +321,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testOmitsEventsFromAlternatesWhenNoneAreAccessible(): void
     {
         // Arrange
-        $event = $this->makeEvent(109, new DateTime('2026-05-01'));
+        $event = $this->makeEvent(109, new DateTimeImmutable('2026-05-01'));
 
         $publisher = $this->makePublisher(
             locales: ['en', 'de'],
@@ -349,10 +348,10 @@ class CoreSitemapPublisherTest extends TestCase
         // Arrange
         $series = new EventSeriesStub();
         $series->setId(7);
-        $first = $this->makeSeriesMember(1, new DateTime('2026-05-01'), $series);
-        $follower = $this->makeSeriesMember(2, new DateTime('2026-05-08'), $series);
-        $branched = $this->makeSeriesMember(3, new DateTime('2026-05-15'), $series);
-        $afterBranch = $this->makeSeriesMember(4, new DateTime('2026-05-22'), $series);
+        $first = $this->makeSeriesMember(1, new DateTimeImmutable('2026-05-01'), $series);
+        $follower = $this->makeSeriesMember(2, new DateTimeImmutable('2026-05-08'), $series);
+        $branched = $this->makeSeriesMember(3, new DateTimeImmutable('2026-05-15'), $series);
+        $afterBranch = $this->makeSeriesMember(4, new DateTimeImmutable('2026-05-22'), $series);
 
         $publisher = $this->makePublisher(
             locales: ['en', 'de'],
@@ -387,9 +386,9 @@ class CoreSitemapPublisherTest extends TestCase
         // Arrange
         $series = new EventSeriesStub();
         $series->setId(7);
-        $first = $this->makeSeriesMember(1, new DateTime('2026-05-01'), $series);
-        $follower = $this->makeSeriesMember(2, new DateTime('2026-05-08'), $series);
-        $branched = $this->makeSeriesMember(3, new DateTime('2026-05-15'), $series);
+        $first = $this->makeSeriesMember(1, new DateTimeImmutable('2026-05-01'), $series);
+        $follower = $this->makeSeriesMember(2, new DateTimeImmutable('2026-05-08'), $series);
+        $branched = $this->makeSeriesMember(3, new DateTimeImmutable('2026-05-15'), $series);
 
         $publisher = $this->makePublisher(
             locales: ['en', 'de'],
@@ -421,7 +420,7 @@ class CoreSitemapPublisherTest extends TestCase
     public function testDropsLocalesTheSiteDoesNotServe(): void
     {
         // Arrange
-        $event = $this->makeEvent(42, new DateTime('2026-05-01'));
+        $event = $this->makeEvent(42, new DateTimeImmutable('2026-05-01'));
 
         $publisher = $this->makePublisher(
             locales: ['en', 'de'],
@@ -445,8 +444,8 @@ class CoreSitemapPublisherTest extends TestCase
         // Arrange
         $series = new EventSeriesStub();
         $series->setId(7);
-        $root = $this->makeSeriesMember(1, new DateTime('2026-05-01'), $series);
-        $follower = $this->makeSeriesMember(2, new DateTime('2026-05-08'), $series);
+        $root = $this->makeSeriesMember(1, new DateTimeImmutable('2026-05-01'), $series);
+        $follower = $this->makeSeriesMember(2, new DateTimeImmutable('2026-05-08'), $series);
 
         $publisher = $this->makePublisher(
             locales: ['en', 'de'],
@@ -469,8 +468,8 @@ class CoreSitemapPublisherTest extends TestCase
         // Arrange
         $series = new EventSeriesStub();
         $series->setId(7);
-        $root = $this->makeSeriesMember(1, new DateTime('2026-05-01'), $series);
-        $follower = $this->makeSeriesMember(2, new DateTime('2026-05-08'), $series);
+        $root = $this->makeSeriesMember(1, new DateTimeImmutable('2026-05-01'), $series);
+        $follower = $this->makeSeriesMember(2, new DateTimeImmutable('2026-05-08'), $series);
 
         $publisher = $this->makePublisher(
             locales: ['en', 'de'],

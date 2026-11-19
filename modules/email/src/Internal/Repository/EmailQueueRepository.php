@@ -2,7 +2,6 @@
 
 namespace Module\Email\Internal\Repository;
 
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -136,7 +135,7 @@ class EmailQueueRepository extends ServiceEntityRepository
             ->where('eq.status = :status')
             ->andWhere('eq.createdAt < :threshold')
             ->setParameter('status', QueueStatus::Pending)
-            ->setParameter('threshold', new DateTime('-' . $minutes . ' minutes'))
+            ->setParameter('threshold', new DateTimeImmutable('-' . $minutes . ' minutes'))
             ->getQuery()
             ->getSingleScalarResult();
     }

@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\Image;
 use App\Entity\User;
 use App\Enum\ImageType;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -73,7 +72,7 @@ class ImageRepository extends ServiceEntityRepository
             ->from(Image::class, 'i')
             ->where($qb->expr()->isNotNull('i.updatedAt'))
             ->andWhere($qb->expr()->lt('i.updatedAt', ':date'))
-            ->setParameter('date', new DateTime('-' . $int . ' days'))
+            ->setParameter('date', new DateTimeImmutable('-' . $int . ' days'))
             ->getQuery()
             ->getResult();
     }
@@ -312,6 +311,9 @@ class ImageRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @return array<string, ?ImageType> image hash => type
+     */
     public function getFileList(): array
     {
         $list = [];

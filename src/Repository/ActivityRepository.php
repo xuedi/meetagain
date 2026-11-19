@@ -248,7 +248,7 @@ class ActivityRepository extends ServiceEntityRepository
         }
 
         foreach ($qb->getQuery()->getArrayResult() as $row) {
-            $trend[$row['day']] = (int) $row['count'];
+            $trend[(string) $row['day']] = (int) $row['count'];
         }
 
         return $trend;
@@ -285,7 +285,7 @@ class ActivityRepository extends ServiceEntityRepository
         }
 
         foreach ($qb->getQuery()->getArrayResult() as $row) {
-            $trend[$row['day']] = (int) $row['count'];
+            $trend[(string) $row['day']] = (int) $row['count'];
         }
 
         return $trend;
@@ -341,7 +341,7 @@ class ActivityRepository extends ServiceEntityRepository
 
         $newMembers = $emptyByDay;
         foreach ($newMembersQb->getQuery()->getArrayResult() as $row) {
-            $newMembers[$row['day']] = (int) $row['count'];
+            $newMembers[(string) $row['day']] = (int) $row['count'];
         }
 
         return [
@@ -400,7 +400,7 @@ class ActivityRepository extends ServiceEntityRepository
 
         $byDay = $emptyByDay;
         foreach ($qb->getQuery()->getArrayResult() as $row) {
-            $byDay[$row['day']] = (int) $row['count'];
+            $byDay[(string) $row['day']] = (int) $row['count'];
         }
 
         return $byDay;

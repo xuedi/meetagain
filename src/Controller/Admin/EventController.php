@@ -51,7 +51,6 @@ use App\Service\Media\ImageService;
 use App\Service\Seo\EventCanonicalRebuildService;
 use App\ValueObject\RecurrenceBuilderState;
 use App\ValueObject\ScheduleChange;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Ballot\Contract\BallotView;
@@ -241,8 +240,8 @@ final class EventController extends AbstractController implements AdminNavigatio
         }
 
         $beforeSnapshot = $this->attendeeNotifier->snapshot($event);
-        $oldStart = DateTimeImmutable::createFromInterface($event->getStart());
-        $oldStop = $event->getStop() !== null ? DateTimeImmutable::createFromInterface($event->getStop()) : null;
+        $oldStart = $event->getStart();
+        $oldStop = $event->getStop();
         $oldRule = $event->getSeries()?->getRule();
         $oldRuleSpec = $event->getSeries()?->getRuleSpec();
 
@@ -268,8 +267,8 @@ final class EventController extends AbstractController implements AdminNavigatio
                 oldStop: $oldStop,
                 oldRule: $oldRule,
                 oldRuleSpec: $oldRuleSpec,
-                newStart: DateTimeImmutable::createFromInterface($event->getStart()),
-                newStop: $event->getStop() !== null ? DateTimeImmutable::createFromInterface($event->getStop()) : null,
+                newStart: $event->getStart(),
+                newStop: $event->getStop(),
                 newRule: $newRule,
                 newRuleSpec: $newRuleSpec,
             );
@@ -770,7 +769,7 @@ final class EventController extends AbstractController implements AdminNavigatio
      *     summary: string,
      *     currentRule: ?EventInterval,
      *     currentRuleSpec: ?string,
-     *     anchor: DateTime|DateTimeImmutable,
+     *     anchor: DateTimeImmutable,
      *     customValue: int,
      *     ordinals: list<array{value: int, label: string}>,
      *     weekdays: list<array{value: string, label: string}>,

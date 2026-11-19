@@ -13,7 +13,6 @@ use App\Repository\RsvpGuestRepository;
 use App\Service\Event\OccurrenceCalculator;
 use App\Service\Event\RecurrenceResolver;
 use App\Service\Event\RecurringService;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -42,8 +41,8 @@ class RecurringEventExtensionTest extends TestCase
     {
         $event = new EventStub();
         $event->setId($id);
-        $event->setStart(new DateTime($start));
-        $event->setStop($stop !== null ? new DateTime($stop) : null);
+        $event->setStart(new DateTimeImmutable($start));
+        $event->setStop($stop !== null ? new DateTimeImmutable($stop) : null);
         $event->setStatus($status);
 
         return $event;

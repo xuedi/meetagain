@@ -30,5 +30,11 @@
         <ini name="error_reporting" value="-1"/>
         <server name="APP_ENV" value="test" force="true"/>
         <server name="KERNEL_CLASS" value="Tests\Module\ModuleKernel" force="true"/>
+        <server name="DOCTRINE_DEPRECATIONS" value="trigger" force="true"/>
     </php>
+    <source ignoreSuppressionOfDeprecations="true">
+        <include>
+            <directory>../../modules/*/src</directory>
+        </include>
+    </source>
 </phpunit>

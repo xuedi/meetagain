@@ -20,7 +20,6 @@ use App\Service\Config\PluginService;
 use App\Service\Event\EventService;
 use App\Service\Event\ImageBoxProviderInterface;
 use App\Service\Event\RecurringService;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Generator;
@@ -130,7 +129,7 @@ class EventServiceTest extends TestCase
 
         $event = new EventStub()
             ->setId(1)
-            ->setStart(new DateTime('+1 week'));
+            ->setStart(new DateTimeImmutable('+1 week'));
         $event->addRsvp($user1);
         $event->addRsvp($user2);
 
@@ -166,7 +165,7 @@ class EventServiceTest extends TestCase
         // Arrange
         $event = new EventStub()
             ->setId(1)
-            ->setStart(new DateTime('+1 week'));
+            ->setStart(new DateTimeImmutable('+1 week'));
 
         $emMock = $this->createMock(EntityManagerInterface::class);
         $emMock->expects($this->once())->method('persist')->with($event);
@@ -201,7 +200,7 @@ class EventServiceTest extends TestCase
         $user = new UserStub()->setId(1);
         $event = new EventStub()
             ->setId(1)
-            ->setStart(new DateTime('-1 week'));
+            ->setStart(new DateTimeImmutable('-1 week'));
         $event->addRsvp($user);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -296,7 +295,7 @@ class EventServiceTest extends TestCase
                     ->setId(9)
                     ->setRule(EventInterval::Weekly),
             );
-        $parent->setStart(new DateTime('2025-01-01 10:00:00'));
+        $parent->setStart(new DateTimeImmutable('2025-01-01 10:00:00'));
 
         $recurringServiceMock = $this->createMock(RecurringService::class);
         $recurringServiceMock->expects($this->once())->method('updateRecurringEvents')->with($parent)->willReturn(1);
@@ -326,7 +325,7 @@ class EventServiceTest extends TestCase
             ->setEmail('test@example.com');
         $event = new EventStub()
             ->setId(1)
-            ->setStart(new DateTime('+1 week'));
+            ->setStart(new DateTimeImmutable('+1 week'));
         $event->addRsvp($user);
 
         $emMock = $this->createMock(EntityManagerInterface::class);
@@ -364,7 +363,7 @@ class EventServiceTest extends TestCase
                     ->setId(9)
                     ->setRule(EventInterval::Weekly),
             )
-            ->setStart(new DateTime('+1 week'));
+            ->setStart(new DateTimeImmutable('+1 week'));
 
         $recurringServiceMock = $this->createMock(RecurringService::class);
         $recurringServiceMock->expects($this->once())->method('updateRecurringEvents')->with($child)->willReturn(1);
@@ -396,7 +395,7 @@ class EventServiceTest extends TestCase
                     ->setId(9)
                     ->setRule(null),
             )
-            ->setStart(new DateTime('+1 week'));
+            ->setStart(new DateTimeImmutable('+1 week'));
 
         $recurringServiceMock = $this->createMock(RecurringService::class);
         $recurringServiceMock->expects($this->once())->method('updateRecurringEvents')->with($child)->willReturn(0);
