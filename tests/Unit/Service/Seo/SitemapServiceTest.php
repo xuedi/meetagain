@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Service\Seo;
 
+use App\Filter\Sitemap\SitemapUrlFilterInterface;
 use App\Publisher\Sitemap\SitemapPublisherInterface;
 use App\Publisher\Sitemap\SitemapUrl;
 use App\Service\Seo\SitemapService;
@@ -85,6 +86,27 @@ class SitemapServiceTest extends TestCase
 
         // Assert
         self::assertSame(['https://example.com/en/', 'https://example.com/de/'], $locs);
+    }
+
+    public function testDropsARowAnyFilterDoesNotList(): void
+    {
+        // Arrange
+        $publisher = $this->makePublisher(priority: 0, urls: [
+            new SitemapUrl(loc: 'https://example.com/'),
+            new SitemapUrl(loc: 'https://example.com/en/'),
+            new SitemapUrl(loc: 'https://example.com/de/'),
+        ]);
+        $listsAll = $this->createStub(SitemapUrlFilterInterface::class);
+        $listsAll->method('isListed')->willReturn(true);
+        $dropsEn = $this->createStub(SitemapUrlFilterInterface::class);
+        $dropsEn->method('isListed')->willReturnCallback(static fn(SitemapUrl $url): bool => $url->loc !== 'https://example.com/en/');
+        $service = new SitemapService([$publisher], [$listsAll, $dropsEn]);
+
+        // Act
+        $locs = array_map(static fn(SitemapUrl $url) => $url->loc, $service->getUrls());
+
+        // Assert
+        self::assertSame(['https://example.com/', 'https://example.com/de/'], $locs);
     }
 
     public function testRenderXmlProducesWellFormedUrlsetWithAlternates(): void

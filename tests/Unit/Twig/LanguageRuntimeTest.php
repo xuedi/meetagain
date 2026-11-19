@@ -2,6 +2,8 @@
 
 namespace Tests\Unit\Twig;
 
+use App\Filter\Language\AlternateLinkFilterInterface;
+use App\Publisher\AlternateLinks\AlternateLinkProviderInterface;
 use App\Publisher\UrlOwner\UrlOwnerProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Config\LanguageService;
@@ -172,5 +174,50 @@ class LanguageRuntimeTest extends TestCase
 
         // Assert
         static::assertSame(['en' => 'https://club.example/en/', 'de' => 'https://club.example/de/'], $result);
+    }
+
+    public function testAProvidedXDefaultSurvivesANarrowingFilter(): void
+    {
+        // Arrange
+        $request = new Request();
+        $request->server->set('REQUEST_URI', '/');
+        $request->setLocale('en');
+        $this->requestStackStub->method('getCurrentRequest')->willReturn($request);
+        $this->languageServiceStub->method('getAltLangList')->willReturn(['en' => '/en/', 'de' => '/de/', 'zh' => '/zh/']);
+        $this->languageServiceStub->method('replaceUriLanguageCode')->willReturn('/en/');
+        $provider = $this->createStub(AlternateLinkProviderInterface::class);
+        $provider
+            ->method('getAlternateLinks')
+            ->willReturn([
+                'en' => 'https://meetagain.local/',
+                'de' => 'https://meetagain.local/de/',
+                'zh' => 'https://meetagain.local/zh/',
+                AlternateLinkProviderInterface::X_DEFAULT => 'https://meetagain.local/',
+            ]);
+        $filter = $this->createStub(AlternateLinkFilterInterface::class);
+        $filter->method('getAllowedAlternateLocaleCodes')->willReturn(['en', 'de']);
+        $configServiceStub = $this->createStub(ConfigService::class);
+        $configServiceStub->method('getHost')->willReturn('https://meetagain.local/');
+        $subject = new LanguageRuntime(
+            $this->languageServiceStub,
+            $this->requestStackStub,
+            $this->routerStub,
+            new UrlOwnerService($configServiceStub, []),
+            [$filter],
+            [$provider],
+        );
+
+        // Act
+        $result = $subject->getHreflangLanguageCodes();
+
+        // Assert
+        static::assertSame(
+            [
+                'en' => 'https://meetagain.local/',
+                'de' => 'https://meetagain.local/de/',
+                AlternateLinkProviderInterface::X_DEFAULT => 'https://meetagain.local/',
+            ],
+            $result,
+        );
     }
 }

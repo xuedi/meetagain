@@ -126,7 +126,7 @@ final readonly class LanguageRuntime implements RuntimeExtensionInterface
         foreach ($this->alternateLinkFilters as $filter) {
             $allowed = $filter->getAllowedAlternateLocaleCodes($request);
             if ($allowed !== null) {
-                $altLangList = array_intersect_key($altLangList, array_flip($allowed));
+                $altLangList = array_intersect_key($altLangList, array_flip([...$allowed, AlternateLinkProviderInterface::X_DEFAULT]));
             }
         }
 

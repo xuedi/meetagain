@@ -2,6 +2,7 @@
 
 namespace App\Service\Seo;
 
+use App\Filter\Sitemap\SitemapUrlFilterInterface;
 use App\Publisher\Sitemap\SitemapPublisherInterface;
 use App\Publisher\Sitemap\SitemapUrl;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -10,10 +11,13 @@ final readonly class SitemapService
 {
     /**
      * @param iterable<SitemapPublisherInterface> $publishers
+     * @param iterable<SitemapUrlFilterInterface> $urlFilters
      */
     public function __construct(
         #[AutowireIterator(SitemapPublisherInterface::class)]
         private iterable $publishers,
+        #[AutowireIterator(SitemapUrlFilterInterface::class)]
+        private iterable $urlFilters = [],
     ) {}
 
     /**
@@ -28,7 +32,7 @@ final readonly class SitemapService
         $urls = [];
         foreach ($publishers as $publisher) {
             foreach ($publisher->getSitemapUrls() as $url) {
-                if (isset($urls[$url->loc])) {
+                if (isset($urls[$url->loc]) || !$this->isListed($url)) {
                     continue;
                 }
 
@@ -37,6 +41,17 @@ final readonly class SitemapService
         }
 
         return array_values($urls);
+    }
+
+    private function isListed(SitemapUrl $url): bool
+    {
+        foreach ($this->urlFilters as $filter) {
+            if (!$filter->isListed($url)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function renderXml(): string
