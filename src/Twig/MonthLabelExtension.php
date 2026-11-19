@@ -5,7 +5,9 @@ namespace App\Twig;
 use DateTimeInterface;
 use IntlDateFormatter;
 use Override;
+use Twig\Environment;
 use Twig\Extension\AbstractExtension;
+use Twig\Extension\CoreExtension;
 use Twig\TwigFilter;
 
 final class MonthLabelExtension extends AbstractExtension
@@ -14,13 +16,14 @@ final class MonthLabelExtension extends AbstractExtension
     public function getFilters(): array
     {
         return [
-            new TwigFilter('month_label', $this->monthLabel(...)),
+            new TwigFilter('month_label', $this->monthLabel(...), ['needs_environment' => true]),
         ];
     }
 
-    public function monthLabel(DateTimeInterface $date, string $locale): string
+    public function monthLabel(Environment $twig, DateTimeInterface $date, string $locale): string
     {
-        $formatter = new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::NONE, $date->getTimezone(), null, 'MMM');
+        $timezone = $twig->getExtension(CoreExtension::class)->getTimezone();
+        $formatter = new IntlDateFormatter($locale, IntlDateFormatter::NONE, IntlDateFormatter::NONE, $timezone, null, 'MMM');
         $label = $formatter->format($date);
 
         return mb_strtoupper(rtrim((string) $label, '.'), 'UTF-8');
