@@ -99,7 +99,6 @@ src/Portability/Section/EventsSection.php::import // pre-1.1 exports carried the
 
 # --- Tests: fixture facts a reader would otherwise have to recompute ---
 tests/Unit/Emails/Types/EmailTypesTest.php::emailTypeProvider // provider keys must match allTypes(), and why the instances are built in the body
-tests/Unit/Emails/Types/GetMaxSendByTest.php::eventStartingAt // must stay a mutable DateTime because production goes through createFromMutable()
 tests/Unit/EventSubscriber/LocaleSubscriberTest.php::testOnKernelRequestFallsBackToFilteredDefaultWhenAcceptLanguageHasNoMatch // Symfony's getPreferredLanguage returns the first listed locale when nothing matches
 tests/Unit/Form/ValidatorMessageTranslationKeysTest.php::looksLikeTranslationKey // spells out the key grammar the regex encodes, which decides what the test rejects
 tests/Unit/Service/AdminNotificationServiceTest.php::testReturnsNoNewItemsWhenNothingNewerThanLastSent // the timestamps only mean something relative to each other

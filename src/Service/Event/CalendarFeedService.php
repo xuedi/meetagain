@@ -94,9 +94,9 @@ final readonly class CalendarFeedService
             return null;
         }
 
-        $start = DateTimeImmutable::createFromInterface($event->getStart());
+        $start = $event->getStart();
         $stop = $event->getStop();
-        $end = $stop === null ? $start->modify('+' . self::DEFAULT_DURATION_HOURS . ' hours') : DateTimeImmutable::createFromInterface($stop);
+        $end = $stop === null ? $start->modify('+' . self::DEFAULT_DURATION_HOURS . ' hours') : $stop;
 
         $url = $this->urlGenerator->generate('app_event_details', ['_locale' => $locale, 'id' => $id], UrlGeneratorInterface::ABSOLUTE_URL);
 

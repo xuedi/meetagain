@@ -23,7 +23,6 @@ use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Http\RequestHostResolver;
 use App\Service\Support\RecipientResolver;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\BlocklistInterface;
@@ -295,9 +294,8 @@ final class GetMaxSendByTest extends TestCase
 
     private function eventStartingAt(string $when): Event
     {
-        // Must be mutable DateTime - production uses DateTimeImmutable::createFromMutable()
         $event = $this->createStub(Event::class);
-        $event->method('getStart')->willReturn(new DateTime($when));
+        $event->method('getStart')->willReturn(new DateTimeImmutable($when));
 
         return $event;
     }

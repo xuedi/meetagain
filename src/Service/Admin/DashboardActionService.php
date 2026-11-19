@@ -8,7 +8,6 @@ use App\Repository\EventRepository;
 use App\Repository\ImageRepository;
 use App\Repository\MessageRepository;
 use App\Repository\UserRepository;
-use DateTime;
 use DateTimeImmutable;
 use Module\Email\Contract\SendlogInterface;
 
@@ -82,9 +81,7 @@ readonly class DashboardActionService
 
     public function getMembersThisWeek(int $year, int $week, ?DashboardScope $scope = null): int
     {
-        $tmp = new DateTime();
-        $tmp->setISODate($year, $week);
-        $start = DateTimeImmutable::createFromMutable($tmp);
+        $start = new DateTimeImmutable()->setISODate($year, $week);
 
         return $this->userRepo->countCreatedSince($start, $scope?->userIds());
     }

@@ -19,7 +19,6 @@ use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use App\Repository\UserRepository;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
@@ -128,7 +127,7 @@ readonly class UsersSection implements SectionInterface
         $user->setOsmConsent(false);
         $user->setNotification(false);
         $user->setCreatedAt(new DateTimeImmutable());
-        $user->setLastLogin(new DateTime());
+        $user->setLastLogin(new DateTimeImmutable());
 
         $image = $context->importImage($row['image_file'] ?? null, ImageType::ProfilePicture);
         if ($image instanceof Image) {

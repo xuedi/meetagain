@@ -17,7 +17,7 @@ use App\Portability\Section\EventsSection;
 use App\Repository\LocationRepository;
 use App\Repository\UserRepository;
 use App\Service\Config\LanguageService;
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 
@@ -32,8 +32,8 @@ final class EventsSectionTest extends SectionTestCase
         $source->setInitial(false);
         $source->setExternalRsvp(3);
         $source->addHost($this->withId(new Host(), 9));
-        $source->setStart(new DateTime('2030-01-06 19:00'));
-        $source->setStop(new DateTime('2030-01-06 22:00'));
+        $source->setStart(new DateTimeImmutable('2030-01-06 19:00'));
+        $source->setStop(new DateTimeImmutable('2030-01-06 22:00'));
         $source->setStatus(EventStatus::Published);
         $source->setType(EventType::cases()[0]);
         $source->setFeatured(true);
@@ -84,7 +84,7 @@ final class EventsSectionTest extends SectionTestCase
         $creator = $this->withId(new User(), 5);
         $creator->setEmail('gone@example.org');
         $source = $this->withId(new Event(), 1);
-        $source->setStart(new DateTime('2030-01-06 19:00'));
+        $source->setStart(new DateTimeImmutable('2030-01-06 19:00'));
         $source->setUser($creator);
 
         // Act

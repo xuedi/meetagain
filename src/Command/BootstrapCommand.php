@@ -13,7 +13,6 @@ use App\Repository\UserRepository;
 use App\Service\Cms\CmsBlockService;
 use App\Service\Cms\CmsService;
 use App\Service\Config\ConfigService;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
 use Symfony\Component\Clock\ClockInterface;
@@ -138,7 +137,7 @@ class BootstrapCommand extends Command
         $user->setTagging(true);
         $user->setNotification(false);
         $user->setCreatedAt($now);
-        $user->setLastLogin(DateTime::createFromImmutable($now));
+        $user->setLastLogin($now);
         $user->setPassword($this->hasher->hashPassword($user, bin2hex(random_bytes(32))));
         $user->setRegcode($code);
         $user->setRegcodeExpiresAt($now->modify(self::LINK_LIFETIME));

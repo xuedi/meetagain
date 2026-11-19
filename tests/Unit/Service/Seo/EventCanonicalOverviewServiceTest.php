@@ -11,7 +11,7 @@ use App\Repository\EventSeriesRepository;
 use App\Service\Seo\EventCanonicalOverviewService;
 use App\Service\Seo\EventCanonicalResolver;
 use App\Service\Seo\EventSimilarityService;
-use DateTime;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\Stubs\EventSeriesStub;
 use Tests\Unit\Stubs\EventStub;
@@ -126,7 +126,7 @@ class EventCanonicalOverviewServiceTest extends TestCase
     {
         $event = new EventStub();
         $event->setId($id);
-        $event->setStart(new DateTime($day . ' 19:00'));
+        $event->setStart(new DateTimeImmutable($day . ' 19:00'));
         $event->setSeries($series);
 
         foreach ($contentByLocale as $locale => $description) {

@@ -26,7 +26,6 @@ use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Http\RequestHostResolver;
 use App\Service\Support\RecipientResolver;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\BlocklistInterface;
@@ -262,7 +261,7 @@ final class EmailTypeBlocklistTest extends TestCase
         $user = $this->createStub(User::class);
         $user->method('getEmail')->willReturn($email);
         $user->method('isNotification')->willReturn(true);
-        $user->method('getLastLogin')->willReturn(new DateTime('-24 hours'));
+        $user->method('getLastLogin')->willReturn(new DateTimeImmutable('-24 hours'));
         $user->method('getNotificationSettings')->willReturn($settings ?? new NotificationSettings(['receivedMessage' => true]));
 
         return $user;

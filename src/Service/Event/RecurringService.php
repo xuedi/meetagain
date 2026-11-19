@@ -16,7 +16,6 @@ use App\ValueObject\RealignmentItem;
 use App\ValueObject\RealignmentPlan;
 use App\ValueObject\RealignmentResult;
 use App\ValueObject\ScheduleChange;
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -216,7 +215,7 @@ readonly class RecurringService implements TaskInterface
             if ($child->getId() === $anchor->getId()) {
                 continue;
             }
-            if (DateTimeImmutable::createFromInterface($child->getStart()) <= $now) {
+            if ($child->getStart() <= $now) {
                 continue;
             }
             $children[] = $child;
@@ -243,8 +242,8 @@ readonly class RecurringService implements TaskInterface
         $items = [];
         $slot = 0;
         foreach ($children as $child) {
-            $currentStart = DateTimeImmutable::createFromInterface($child->getStart());
-            $currentStop = $child->getStop() !== null ? DateTimeImmutable::createFromInterface($child->getStop()) : null;
+            $currentStart = $child->getStart();
+            $currentStop = $child->getStop();
             $rsvpCount = $rsvpCounts[$child->getId()] ?? 0;
 
             if ($child->getStatus() === EventStatus::Locked) {
@@ -287,8 +286,8 @@ readonly class RecurringService implements TaskInterface
             if ($event === null || $item->newStart === null) {
                 continue;
             }
-            $event->setStart(DateTime::createFromImmutable($item->newStart));
-            $event->setStop($item->newStop !== null ? DateTime::createFromImmutable($item->newStop) : null);
+            $event->setStart($item->newStart);
+            $event->setStop($item->newStop);
             foreach ($event->getRsvp()->toArray() as $attendee) {
                 $userId = (int) $attendee->getId();
                 $removedAttendees[$userId] ??= ['user' => $attendee, 'dates' => []];
@@ -329,7 +328,7 @@ readonly class RecurringService implements TaskInterface
         foreach ($this->calculator->until($pattern, $template->getStart(), $now->modify($pattern->period->lookaheadModifier())) as $occurrence) {
             // Compare the composed start, not the bare date: an occurrence today may still be ahead.
             $start = $this->updateDate($template->getStart(), $occurrence);
-            if (!$start instanceof DateTime || $start < $now) {
+            if (!$start instanceof DateTimeImmutable || $start < $now) {
                 continue;
             }
 
@@ -347,7 +346,7 @@ readonly class RecurringService implements TaskInterface
         return count($createdEvents);
     }
 
-    private function createRecurringEvent(EventSeries $series, Event $template, DateTime $start, ?DateTime $stop): Event
+    private function createRecurringEvent(EventSeries $series, Event $template, DateTimeImmutable $start, ?DateTimeImmutable $stop): Event
     {
         $recurringEvent = new Event();
         $recurringEvent->setUser($template->getUser());
@@ -400,15 +399,16 @@ readonly class RecurringService implements TaskInterface
         $this->em->persist($translation);
     }
 
-    private function updateDate(?DateTimeInterface $target, DateTimeImmutable $occurrence): ?DateTime
+    private function updateDate(?DateTimeInterface $target, DateTimeImmutable $occurrence): ?DateTimeImmutable
     {
         if (!$target instanceof DateTimeInterface) {
             return null;
         }
 
-        $newDate = DateTime::createFromInterface($target);
-        $newDate->setDate(year: (int) $occurrence->format('Y'), month: (int) $occurrence->format('m'), day: (int) $occurrence->format('d'));
-
-        return $newDate;
+        return DateTimeImmutable::createFromInterface($target)->setDate(
+            year: (int) $occurrence->format('Y'),
+            month: (int) $occurrence->format('m'),
+            day: (int) $occurrence->format('d'),
+        );
     }
 }

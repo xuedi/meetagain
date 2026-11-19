@@ -29,7 +29,6 @@ use App\Service\AppStateService;
 use App\Service\Config\ConfigService;
 use App\Service\Http\RequestHostResolver;
 use App\Service\Support\RecipientResolver;
-use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -81,7 +80,7 @@ class EmailTypeSendTest extends TestCase
         $user->method('getId')->willReturn($id);
         $user->method('getRegcode')->willReturn('TOKEN123');
         $user->method('isNotification')->willReturn($isNotification);
-        $user->method('getLastLogin')->willReturn($lastLogin ?? new DateTime('-24 hours'));
+        $user->method('getLastLogin')->willReturn($lastLogin ?? new DateTimeImmutable('-24 hours'));
         $user->method('getNotificationSettings')->willReturn($settings ?? new NotificationSettings([]));
 
         return $user;
@@ -453,7 +452,7 @@ class EmailTypeSendTest extends TestCase
     {
         $user = $this->makeUser(settings: new NotificationSettings([
             'receivedMessage' => true,
-        ]), lastLogin: new DateTime('-10 minutes'));
+        ]), lastLogin: new DateTimeImmutable('-10 minutes'));
 
         static::assertTrue(new NotificationMessageEmail(
             $this->blocklist,
@@ -712,7 +711,7 @@ class EmailTypeSendTest extends TestCase
     {
         $event = $this->createStub(Event::class);
         $event->method('getId')->willReturn(42);
-        $event->method('getStart')->willReturn(new DateTime('2026-06-01 19:00:00'));
+        $event->method('getStart')->willReturn(new DateTimeImmutable('2026-06-01 19:00:00'));
         $event->method('getRsvp')->willReturn(new ArrayCollection($attendees));
 
         return $event;

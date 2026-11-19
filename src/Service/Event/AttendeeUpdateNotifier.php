@@ -5,7 +5,7 @@ namespace App\Service\Event;
 use App\Emails\Types\EventUpdateNotificationEmail;
 use App\Entity\Event;
 use App\Entity\User;
-use DateTime;
+use DateTimeImmutable;
 
 readonly class AttendeeUpdateNotifier
 {
@@ -55,7 +55,7 @@ readonly class AttendeeUpdateNotifier
     /** @return list<User> */
     private function recipients(Event $event, ?User $editor): array
     {
-        if ($event->getStart() <= new DateTime()) {
+        if ($event->getStart() <= new DateTimeImmutable()) {
             return [];
         }
 

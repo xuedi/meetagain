@@ -105,7 +105,7 @@ readonly class NotificationEventCanceledEmail extends EmailAbstract
         }
 
         $budgetCutoff = $now->add(new DateInterval('PT6H'));
-        $eventStart = DateTimeImmutable::createFromMutable($event->getStart());
+        $eventStart = $event->getStart();
 
         return $budgetCutoff < $eventStart ? $budgetCutoff : $eventStart;
     }

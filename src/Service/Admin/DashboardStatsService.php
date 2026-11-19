@@ -7,7 +7,6 @@ use App\Repository\ActivityRepository;
 use App\Repository\EventRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\UserRepository;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\Criteria;
 use Module\Email\Contract\SendlogInterface;
@@ -117,16 +116,15 @@ readonly class DashboardStatsService
 
     public function calculateDates(?int $year, ?int $week): array
     {
-        $now = new DateTime();
+        $now = new DateTimeImmutable();
         $year ??= (int) $now->format('Y');
         $week ??= (int) $now->format('W');
 
-        $tmpDate = new DateTime();
-        $tmpDate->setISODate($year, $week);
+        $start = new DateTimeImmutable()->setISODate($year, $week);
 
         return [
-            'start' => DateTimeImmutable::createFromMutable($tmpDate),
-            'stop' => DateTimeImmutable::createFromMutable($tmpDate->modify('+6 days')),
+            'start' => $start,
+            'stop' => $start->modify('+6 days'),
         ];
     }
 
@@ -134,13 +132,6 @@ readonly class DashboardStatsService
     {
         $start = $dates['start'];
         $stop = $dates['stop'];
-        if ($column === 'start') {
-            $start = new DateTime();
-            $start->setTimestamp($dates['start']->getTimestamp());
-            $stop = new DateTime();
-            $stop->setTimestamp($dates['stop']->getTimestamp());
-        }
-
         $criteria = new Criteria();
         $criteria->where(Criteria::expr()->gte($column, $start));
         $criteria->andWhere(Criteria::expr()->lte($column, $stop));

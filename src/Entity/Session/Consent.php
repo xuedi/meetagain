@@ -3,7 +3,7 @@
 namespace App\Entity\Session;
 
 use App\Enum\ConsentType;
-use DateTime;
+use DateTimeImmutable;
 use JsonSerializable;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -60,7 +60,7 @@ class Consent implements JsonSerializable
 
     public function getHtmlCookies(): array
     {
-        $cookieExpires = new DateTime('+6 months');
+        $cookieExpires = new DateTimeImmutable('+6 months');
 
         return [
             new Cookie(name: self::TYPE_OSM, value: $this->getOsm()->value, expire: $cookieExpires, httpOnly: false),

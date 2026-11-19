@@ -135,7 +135,7 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
         }
 
         $budgetCutoff = $now->add(new DateInterval('PT12H'));
-        $eventStart = DateTimeImmutable::createFromMutable($event->getStart());
+        $eventStart = $event->getStart();
 
         return $budgetCutoff < $eventStart ? $budgetCutoff : $eventStart;
     }
@@ -190,7 +190,7 @@ readonly class RsvpAggregatedEmail extends EmailAbstract implements ScheduledEma
                 }
             }
 
-            $expectedTime = max($from, DateTimeImmutable::createFromMutable($event->getStart())->sub(new DateInterval('PT48H')));
+            $expectedTime = max($from, $event->getStart()->sub(new DateInterval('PT48H')));
 
             $items[] = new ScheduledMailItem(
                 mailType: EmailType::NotificationRsvpAggregated->value,

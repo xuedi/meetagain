@@ -11,7 +11,6 @@ use App\Enum\EventStatus;
 use App\Repository\EventCanonicalRootRepository;
 use App\Repository\EventRepository;
 use App\Service\Seo\EventCanonicalResolver;
-use DateTime;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Tests\Unit\Stubs\EventSeriesStub;
@@ -34,7 +33,7 @@ class EventCanonicalResolverTest extends TestCase
     {
         $event = new EventStub();
         $event->setId($id);
-        $event->setStart(new DateTime($day . ' 19:00'));
+        $event->setStart(new DateTimeImmutable($day . ' 19:00'));
         $event->setSeries($series);
         $event->setStatus(EventStatus::Published);
 

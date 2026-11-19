@@ -3,7 +3,6 @@
 namespace Tests\Unit\Entity;
 
 use App\Entity\Event;
-use DateTime;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
@@ -15,8 +14,8 @@ class EventTest extends TestCase
     {
         // Arrange
         $event = new Event()
-            ->setStart(new DateTime('2026-11-05 17:00:00'))
-            ->setStop(new DateTime('2026-11-05 20:00:00'));
+            ->setStart(new DateTimeImmutable('2026-11-05 17:00:00'))
+            ->setStop(new DateTimeImmutable('2026-11-05 20:00:00'));
 
         // Act & Assert
         static::assertFalse($event->isOverAt(new DateTimeImmutable(self::NOW)));
@@ -26,8 +25,8 @@ class EventTest extends TestCase
     {
         // Arrange
         $event = new Event()
-            ->setStart(new DateTime('2026-11-05 15:00:00'))
-            ->setStop(new DateTime('2026-11-05 17:59:59'));
+            ->setStart(new DateTimeImmutable('2026-11-05 15:00:00'))
+            ->setStop(new DateTimeImmutable('2026-11-05 17:59:59'));
 
         // Act & Assert
         static::assertTrue($event->isOverAt(new DateTimeImmutable(self::NOW)));
@@ -36,8 +35,8 @@ class EventTest extends TestCase
     public function testEventWithoutStopIsOverOnceItsStartHasPassed(): void
     {
         // Arrange
-        $started = new Event()->setStart(new DateTime('2026-11-05 17:30:00'));
-        $upcoming = new Event()->setStart(new DateTime('2026-11-05 18:30:00'));
+        $started = new Event()->setStart(new DateTimeImmutable('2026-11-05 17:30:00'));
+        $upcoming = new Event()->setStart(new DateTimeImmutable('2026-11-05 18:30:00'));
 
         // Act & Assert
         static::assertTrue($started->isOverAt(new DateTimeImmutable(self::NOW)));

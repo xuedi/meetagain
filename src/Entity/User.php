@@ -6,7 +6,6 @@ use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
-use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -46,8 +45,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?DateTimeInterface $lastLogin = null;
+    #[ORM\Column]
+    private ?DateTimeImmutable $lastLogin = null;
 
     #[ORM\ManyToMany(targetEntity: Event::class, mappedBy: 'rsvp')]
     private Collection $rsvp;
@@ -477,12 +476,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         return $this;
     }
 
-    public function getLastLogin(): ?DateTimeInterface
+    public function getLastLogin(): ?DateTimeImmutable
     {
         return $this->lastLogin;
     }
 
-    public function setLastLogin(DateTimeInterface $lastLogin): static
+    public function setLastLogin(DateTimeImmutable $lastLogin): static
     {
         $this->lastLogin = $lastLogin;
 

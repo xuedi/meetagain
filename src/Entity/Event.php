@@ -26,11 +26,11 @@ class Event
     #[ORM\Column]
     private ?bool $initial = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private DateTimeInterface $start;
+    #[ORM\Column]
+    private DateTimeImmutable $start;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?DateTimeInterface $stop = null;
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $stop = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
@@ -120,24 +120,24 @@ class Event
         return ($this->stop ?? $this->start) <= $now;
     }
 
-    public function getStart(): DateTimeInterface
+    public function getStart(): DateTimeImmutable
     {
         return $this->start;
     }
 
-    public function setStart(DateTimeInterface $start): static
+    public function setStart(DateTimeImmutable $start): static
     {
         $this->start = $start;
 
         return $this;
     }
 
-    public function getStop(): ?DateTimeInterface
+    public function getStop(): ?DateTimeImmutable
     {
         return $this->stop;
     }
 
-    public function setStop(?DateTimeInterface $stop): static
+    public function setStop(?DateTimeImmutable $stop): static
     {
         $this->stop = $stop;
 

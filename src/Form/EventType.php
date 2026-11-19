@@ -78,9 +78,11 @@ class EventType extends AbstractType
             ])
             ->add('start', DateTimeType::class, [
                 'widget' => 'single_text',
+                'input' => 'datetime_immutable',
             ])
             ->add('stop', DateTimeType::class, [
                 'widget' => 'single_text',
+                'input' => 'datetime_immutable',
             ])
             ->add('seriesRule', EnumType::class, [
                 'class' => EventInterval::class,

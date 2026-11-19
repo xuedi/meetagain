@@ -17,7 +17,6 @@ use App\Service\Event\RecurringService;
 use App\ValueObject\RealignmentItem;
 use App\ValueObject\RealignmentPlan;
 use App\ValueObject\ScheduleChange;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Task\Contract\Status;
@@ -47,7 +46,7 @@ class RecurringServiceTest extends TestCase
     {
         $event = new EventStub();
         $event->setId($id);
-        $event->setStart(new DateTime('2025-06-01 19:00'));
+        $event->setStart(new DateTimeImmutable('2025-06-01 19:00'));
         $event->setStatus($status);
 
         return $event;
@@ -108,14 +107,14 @@ class RecurringServiceTest extends TestCase
     {
         $noSeries = new EventStub();
         $noSeries->setId(1);
-        $noSeries->setStart(new DateTime('2025-06-01 19:00'));
+        $noSeries->setStart(new DateTimeImmutable('2025-06-01 19:00'));
         yield 'event without a series → returns 0' => [
             'event' => $noSeries,
         ];
 
         $memberWithoutFollowUps = new EventStub();
         $memberWithoutFollowUps->setId(2);
-        $memberWithoutFollowUps->setStart(new DateTime('2025-06-01 19:00'));
+        $memberWithoutFollowUps->setStart(new DateTimeImmutable('2025-06-01 19:00'));
         $memberWithoutFollowUps->setSeries(
             new EventSeriesStub()
                 ->setId(9)
@@ -317,8 +316,8 @@ class RecurringServiceTest extends TestCase
     {
         $event = new EventStub();
         $event->setId($id);
-        $event->setStart(new DateTime($start));
-        $event->setStop($stop !== null ? new DateTime($stop) : null);
+        $event->setStart(new DateTimeImmutable($start));
+        $event->setStop($stop !== null ? new DateTimeImmutable($stop) : null);
         $event->setStatus($status);
 
         return $event;

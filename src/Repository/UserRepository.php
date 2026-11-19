@@ -5,7 +5,6 @@ namespace App\Repository;
 use App\Entity\User;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
-use DateTime;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
@@ -234,7 +233,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $this
             ->unconfirmedRegistrations()
             ->andWhere('u.createdAt < :date')
-            ->setParameter('date', new DateTime('-' . $days . ' days'))
+            ->setParameter('date', new DateTimeImmutable('-' . $days . ' days'))
             ->getQuery()
             ->getResult();
     }
@@ -298,7 +297,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->createQueryBuilder('u')
             ->select('COUNT(u.id)')
             ->where('u.lastLogin > :date')
-            ->setParameter('date', new DateTime('-' . $days . ' days'));
+            ->setParameter('date', new DateTimeImmutable('-' . $days . ' days'));
 
         if ($restrictToUserIds !== null) {
             $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);

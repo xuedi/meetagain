@@ -10,7 +10,6 @@ use App\Entity\User;
 use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use App\Service\Http\RequestHostResolver;
-use DateTime;
 use DateTimeImmutable;
 use Module\Email\Contract\BlocklistInterface;
 use Module\Email\Contract\MailerInterface;
@@ -213,7 +212,7 @@ class EventUpdateNotificationEmailTest extends TestCase
         $location->method('getName')->willReturn('Main Hall');
 
         $event = $this->createStub(Event::class);
-        $event->method('getStart')->willReturn(new DateTime('2026-06-01 19:00:00'));
+        $event->method('getStart')->willReturn(new DateTimeImmutable('2026-06-01 19:00:00'));
         $event->method('getLocation')->willReturn($location);
         $event->method('getTitle')->willReturn('Test Event');
         $event->method('getId')->willReturn(42);
