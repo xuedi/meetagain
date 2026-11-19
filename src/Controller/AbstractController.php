@@ -65,6 +65,6 @@ abstract class AbstractController extends AbstractSymfonyController
         $appBundle = $this->container->get(AppBundle::class);
         $links[] = new Link(href: $appBundle->url())->withAttribute('as', 'script');
 
-        return $links !== [] ? $this->sendEarlyHints($links) : new Response();
+        return $this->sendEarlyHints($links);
     }
 }

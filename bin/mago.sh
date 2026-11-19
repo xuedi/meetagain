@@ -24,6 +24,9 @@ shift
 
 status=0
 
+# MAGO_BIN points the run at another binary, to trial a release before the lock moves.
+mago="${MAGO_BIN:-vendor/bin/mago}"
+
 # `guard` enforces the module perimeter. The shared rules file carries the inbound backstops and the
 # structural rules on every contract, so each plugin run also fails on a reach into a module's
 # Internal namespace and holds the plugin's own modules to the contract shape. Running guard against
@@ -51,7 +54,7 @@ run() {
         return
     fi
     printf '\n\033[1m> mago %s (%s)\033[0m\n' "$command" "$config"
-    vendor/bin/mago --config="$config" "$command" "$@" || status=1
+    "$mago" --config="$config" "$command" "$@" || status=1
 }
 
 run tests/config/mago.toml "$@"

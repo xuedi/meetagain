@@ -311,6 +311,9 @@ class ImageRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    /**
+     * @return array<string, ?ImageType> image hash => type
+     */
     public function getFileList(): array
     {
         $list = [];

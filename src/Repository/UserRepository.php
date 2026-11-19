@@ -270,6 +270,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getStatusBreakdown(): array
     {
+        /** @var list<array{status: UserStatus, cnt: int|string}> $result */
         $result = $this->createQueryBuilder('u')->select('u.status, COUNT(u.id) as cnt')->groupBy('u.status')->getQuery()->getResult();
 
         $breakdown = [];

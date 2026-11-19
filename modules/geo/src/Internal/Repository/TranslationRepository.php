@@ -49,7 +49,7 @@ readonly class TranslationRepository
         $byParent = [];
         foreach ($rows as $row) {
             $translation = $row[0];
-            $byParent[(int) $row['parentId']][$translation->getLanguage()] = $translation;
+            $byParent[(int) $row['parentId']][(string) $translation->getLanguage()] = $translation;
         }
 
         return $byParent;

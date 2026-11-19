@@ -248,7 +248,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
 
         $list = [];
         foreach ($rows as $row) {
-            $list[$row['id']] = $row['title'] ?? '';
+            $list[(int) $row['id']] = $row['title'] ?? '';
         }
 
         return $this->eventNameLists[$language] = $list;
@@ -554,6 +554,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->getQuery()
             ->getResult();
 
+        /** @var list<Event> $events */
         $list = [];
         foreach ($events as $event) {
             $list[$event->getTitle($locale)] = $event->getId();
@@ -831,6 +832,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->getQuery()
             ->getResult();
 
+        /** @var list<Event> $events */
         $byId = [];
         foreach ($events as $event) {
             $byId[$event->getId()] = $event;
@@ -905,6 +907,7 @@ class EventRepository extends ServiceEntityRepository implements ResetInterface
             ->getQuery()
             ->getResult();
 
+        /** @var list<Event> $events */
         $byId = [];
         foreach ($events as $event) {
             $byId[$event->getId()] = $event;

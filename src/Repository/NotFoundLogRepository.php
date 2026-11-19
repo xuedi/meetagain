@@ -33,7 +33,7 @@ class NotFoundLogRepository extends ServiceEntityRepository
 
         $list = array_fill_keys(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], 0);
         foreach ($unhydratedList as $item) {
-            $list[$item['groupedDay']] = $item['number'];
+            $list[(string) $item['groupedDay']] = $item['number'];
         }
 
         return $list;

@@ -39,13 +39,9 @@ final class RedisCacheController extends AbstractSettingsController implements A
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::SYSTEM_SETTINGS_READ);
 
-        $prefix = $request->query->getString('prefix');
-        $prefix = $prefix === '' ? null : $prefix;
-
+        $requested = $request->query->getString('prefix');
         $prefixes = $this->redisCacheService->listPrefixes();
-        if ($prefix !== null && !array_key_exists($prefix, $prefixes)) {
-            $prefix = null;
-        }
+        $prefix = $requested !== '' && array_key_exists($requested, $prefixes) ? $requested : null;
 
         $result = $this->redisCacheService->listKeys($prefix);
         $totalKeys = array_sum($prefixes);
@@ -53,7 +49,6 @@ final class RedisCacheController extends AbstractSettingsController implements A
         $info = [
             new AdminTopInfoHtml(sprintf('<strong>%d</strong>&nbsp;%s', $totalKeys, $this->translator->trans('admin_system_cache.summary_total'))),
         ];
-        // @mago-expect analyzer:impossible-condition, analyzer:redundant-comparison
         if ($prefix !== null) {
             $info[] = new AdminTopInfoHtml(sprintf(
                 '<strong>%d</strong>&nbsp;%s',

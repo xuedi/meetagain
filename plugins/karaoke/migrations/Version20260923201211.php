@@ -48,8 +48,12 @@ final class Version20260923201211 extends AbstractMigration
             PRIMARY KEY (id)
         ) DEFAULT CHARACTER SET utf8mb4');
 
-        $this->addSql('ALTER TABLE plg_karaoke_lyric_line ADD CONSTRAINT FK_42D33B56A0BDB2F3 FOREIGN KEY (song_id) REFERENCES plg_karaoke_song (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE plg_karaoke_line_translation ADD CONSTRAINT FK_6AFBA3DC4D7B7542 FOREIGN KEY (line_id) REFERENCES plg_karaoke_lyric_line (id) ON DELETE CASCADE');
+        $this->addSql(
+            'ALTER TABLE plg_karaoke_lyric_line ADD CONSTRAINT FK_42D33B56A0BDB2F3 FOREIGN KEY (song_id) REFERENCES plg_karaoke_song (id) ON DELETE CASCADE',
+        );
+        $this->addSql(
+            'ALTER TABLE plg_karaoke_line_translation ADD CONSTRAINT FK_6AFBA3DC4D7B7542 FOREIGN KEY (line_id) REFERENCES plg_karaoke_lyric_line (id) ON DELETE CASCADE',
+        );
     }
 
     public function down(Schema $schema): void

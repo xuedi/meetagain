@@ -32,7 +32,6 @@ final class PluginRuntime implements RuntimeExtensionInterface, ResetInterface
 
     public function getPluginsLinks(): array
     {
-        /** @var list<Link> $links */
         $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getNavLinks());
 
         usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
@@ -42,7 +41,6 @@ final class PluginRuntime implements RuntimeExtensionInterface, ResetInterface
 
     public function getLeadingPluginLinks(): array
     {
-        /** @var list<Link> $links */
         $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getLeadingNavLinks());
 
         usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
@@ -97,7 +95,6 @@ final class PluginRuntime implements RuntimeExtensionInterface, ResetInterface
 
     public function getPluginProfileDropdownLinks(): array
     {
-        /** @var list<Link> $links */
         $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getProfileDropdownLinks());
 
         usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
@@ -110,7 +107,6 @@ final class PluginRuntime implements RuntimeExtensionInterface, ResetInterface
      */
     public function getPluginProfileConfigLinks(): array
     {
-        /** @var list<Link> $links */
         $links = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getProfileConfigLinks());
 
         usort($links, static fn(Link $a, Link $b) => $a->getPriority() <=> $b->getPriority());
@@ -120,7 +116,6 @@ final class PluginRuntime implements RuntimeExtensionInterface, ResetInterface
 
     public function getPluginNavbarPillsHtml(): string
     {
-        /** @var list<string> $fragments */
         $fragments = $this->collectFromPlugins(static fn(Plugin $p) => $p->getLinkCollection()->getNavbarPillsHtml());
 
         return implode('', $fragments);
@@ -151,8 +146,6 @@ final class PluginRuntime implements RuntimeExtensionInterface, ResetInterface
         if (isset($this->tagCache[$eventId])) {
             return $this->renderTags($this->tagCache[$eventId]);
         }
-
-        /** @var list<EventListItemTag> $tags */
         $tags = $this->collectFromPlugins(static function (Plugin $plugin) use ($eventId) {
             $validTags = [];
             foreach ($plugin->getEventListItemTags($eventId) as $tag) {
@@ -168,7 +161,7 @@ final class PluginRuntime implements RuntimeExtensionInterface, ResetInterface
 
     /**
      * @template T
-     * @param callable(Plugin): (T|list<T>|null) $callback
+     * @param callable(Plugin): (list<T>|null) $callback
      * @return list<T>
      */
     private function collectFromPlugins(callable $callback): array
@@ -182,15 +175,8 @@ final class PluginRuntime implements RuntimeExtensionInterface, ResetInterface
             }
 
             try {
-                $result = $callback($plugin);
-                if ($result !== null) {
-                    if (is_array($result)) {
-                        foreach ($result as $item) {
-                            $results[] = $item;
-                        }
-                        continue;
-                    }
-                    $results[] = $result;
+                foreach ($callback($plugin) ?? [] as $item) {
+                    $results[] = $item;
                 }
             } catch (Throwable) {
                 continue;

@@ -358,6 +358,9 @@ readonly class EventService
         return $tiles;
     }
 
+    /**
+     * @param array<Event> $events
+     */
     private function structureList(array $events): array
     {
         $structuredList = [];

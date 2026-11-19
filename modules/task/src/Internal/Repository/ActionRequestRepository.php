@@ -103,6 +103,7 @@ class ActionRequestRepository extends ServiceEntityRepository
         $latestIds = $this->createQueryBuilder('latest')->select('MAX(latest.id)')->groupBy('latest.identifier');
         $requests = $this->createQueryBuilder('r')->where(sprintf('r.id IN (%s)', $latestIds->getDQL()))->getQuery()->getResult();
 
+        /** @var list<ActionRequest> $requests */
         $byIdentifier = [];
         foreach ($requests as $request) {
             $byIdentifier[$request->getIdentifier()] = $request;

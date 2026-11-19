@@ -42,7 +42,7 @@ class ImageAltStatusCache
         try {
             $itemsByKey = [];
             foreach ($this->pool->getItems(array_values($keysById)) as $key => $item) {
-                $itemsByKey[$key] = $item;
+                $itemsByKey[(string) $key] = $item;
             }
         } catch (Throwable $exception) {
             $this->logCacheFailureOnce($exception);

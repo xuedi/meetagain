@@ -4,6 +4,7 @@
 [group('fixing')]
 fixMago:
     {{PHP}} sh bin/mago.sh lint --fix --format-after-fix
+    {{PHP}} sh bin/mago.sh format
 
 # Generate coverage badge (CI)
 [group('fixing')]
