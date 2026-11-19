@@ -90,9 +90,7 @@ final readonly class LanguageRuntime implements RuntimeExtensionInterface
         $altLangList = $this->languageService->getAltLangList($request->getLocale(), $currentUri);
         $altLangList[$request->getLocale()] = $this->languageService->replaceUriLanguageCode($currentUri, $request->getLocale());
 
-        $route = $request->attributes->get('_route');
-        $routeParameters = $request->attributes->get('_route_params');
-        $host = $this->urlOwnerService->getOwnerHost(is_string($route) ? $route : '', is_array($routeParameters) ? $routeParameters : []);
+        $host = $this->urlOwnerService->getOwnerHostForRequest($request);
         $localeUrls = array_map(static fn(string $path) => $host . $path, $altLangList);
 
         foreach ($this->alternateLinkProviders as $provider) {

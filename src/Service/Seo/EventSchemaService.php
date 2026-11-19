@@ -56,7 +56,8 @@ final readonly class EventSchemaService
      */
     public function buildSchema(Event $event, string $canonicalUrl, string $locale): array
     {
-        $organizer = $this->resolveOrganizer($event);
+        $origin = $this->originOf($canonicalUrl);
+        $organizer = $this->resolveOrganizer($event, $origin);
 
         $schema = [
             '@context' => 'https://schema.org',
@@ -67,7 +68,7 @@ final readonly class EventSchemaService
             'eventStatus' => $event->isCanceled() ? 'https://schema.org/EventCancelled' : 'https://schema.org/EventScheduled',
             'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
             'description' => $this->resolveDescription($event, $locale),
-            'image' => $this->resolveImage($event, $organizer),
+            'image' => $this->resolveImage($event, $organizer, $origin),
             'organizer' => $organizer,
             'performer' => $organizer,
             'offers' => $this->buildOffer($event, $canonicalUrl),
@@ -142,10 +143,8 @@ final readonly class EventSchemaService
      *
      * @return array<int, string>
      */
-    private function resolveImage(Event $event, array $organizer): array
+    private function resolveImage(Event $event, array $organizer, string $host): array
     {
-        $host = rtrim($this->configService->getHost(), '/');
-
         $previewImage = $event->getPreviewImage();
         if ($previewImage !== null && $previewImage->getHash() !== null) {
             return [
@@ -179,7 +178,7 @@ final readonly class EventSchemaService
     /**
      * @return array<string, mixed>|array<int, array<string, mixed>>
      */
-    private function resolveOrganizer(Event $event): array
+    private function resolveOrganizer(Event $event, string $origin): array
     {
         $hosts = $event->getHost();
         if ($hosts->count() > 0) {
@@ -189,7 +188,7 @@ final readonly class EventSchemaService
                     continue;
                 }
 
-                $built[] = $this->buildOrganizationFromHost($host);
+                $built[] = $this->buildOrganizationFromHost($host, $origin);
             }
             if ($built !== []) {
                 return count($built) === 1 ? $built[0] : $built;
@@ -202,15 +201,25 @@ final readonly class EventSchemaService
     /**
      * @return array<string, mixed>
      */
-    private function buildOrganizationFromHost(Host $host): array
+    private function buildOrganizationFromHost(Host $host, string $origin): array
     {
-        $platformHost = rtrim($this->configService->getHost(), '/');
-
         return [
             '@type' => 'Organization',
             'name' => $host->getName() ?? '',
-            'url' => $platformHost,
+            'url' => $origin,
         ];
+    }
+
+    private function originOf(string $url): string
+    {
+        $scheme = parse_url($url, PHP_URL_SCHEME);
+        $host = parse_url($url, PHP_URL_HOST);
+        if (!is_string($scheme) || !is_string($host)) {
+            return rtrim($this->configService->getHost(), '/');
+        }
+        $port = parse_url($url, PHP_URL_PORT);
+
+        return $scheme . '://' . $host . ($port !== null ? ':' . $port : '');
     }
 
     /**

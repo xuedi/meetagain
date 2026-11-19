@@ -19,12 +19,7 @@ readonly class CanonicalUrlService
 
     public function getCanonicalUrl(Request $request): string
     {
-        $route = $request->attributes->get('_route');
-        $routeParameters = $request->attributes->get('_route_params');
-
-        $ownerHost = $this->urlOwnerService->getOwnerHost(is_string($route) ? $route : '', is_array($routeParameters) ? $routeParameters : []);
-
-        $defaultUrl = $ownerHost . $request->getPathInfo();
+        $defaultUrl = $this->urlOwnerService->getOwnerHostForRequest($request) . $request->getPathInfo();
 
         foreach ($this->providers as $provider) {
             $override = $provider->getCanonicalUrl($defaultUrl, $request);

@@ -6,7 +6,9 @@ use App\Activity\ActivityService;
 use App\Item\ListRegistry;
 use App\Item\Tag\AssignmentFormHelper;
 use App\Item\Tag\TagService;
+use App\Service\Config\ConfigService;
 use App\Service\Seo\BreadcrumbBuilder;
+use App\Service\Seo\UrlOwnerService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Books\Controller\BookController;
 use Plugin\Books\Service\BookService;
@@ -42,6 +44,11 @@ class BookControllerTest extends TestCase
 
     private function breadcrumbBuilder(): BreadcrumbBuilder
     {
-        return new BreadcrumbBuilder($this->createStub(UrlGeneratorInterface::class), $this->createStub(TranslatorInterface::class), new RequestStack());
+        return new BreadcrumbBuilder(
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(TranslatorInterface::class),
+            new RequestStack(),
+            new UrlOwnerService($this->createStub(ConfigService::class), []),
+        );
     }
 }

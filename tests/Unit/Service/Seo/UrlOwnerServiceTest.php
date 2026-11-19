@@ -6,6 +6,7 @@ use App\Publisher\UrlOwner\UrlOwnerProviderInterface;
 use App\Service\Config\ConfigService;
 use App\Service\Seo\UrlOwnerService;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 
 class UrlOwnerServiceTest extends TestCase
 {
@@ -106,6 +107,25 @@ class UrlOwnerServiceTest extends TestCase
         // Act + Assert
         self::assertSame('https://dragon.meetagain.org', $service->getOwnerHost('app_event_details', ['id' => 17]));
         self::assertSame('https://meetagain.org', $service->getOwnerHost('app_event_details', ['id' => 18]));
+    }
+
+    public function testTheRequestsRouteAndParametersSelectTheOwner(): void
+    {
+        // Arrange
+        $provider = $this->createStub(UrlOwnerProviderInterface::class);
+        $provider->method('getOwnerHost')->willReturnCallback(static fn(string $route, array $parameters) => $route === 'app_event_details'
+            && ($parameters['id'] ?? null) === 17
+                ? 'https://dragon.meetagain.org'
+                : null);
+        $service = new UrlOwnerService($this->makeConfig('https://meetagain.org'), [$provider]);
+        $claimed = new Request(attributes: ['_route' => 'app_event_details', '_route_params' => ['id' => 17]]);
+        $unclaimed = new Request(attributes: ['_route' => 'app_event_details', '_route_params' => ['id' => 18]]);
+        $withoutRoute = new Request();
+
+        // Act + Assert
+        self::assertSame('https://dragon.meetagain.org', $service->getOwnerHostForRequest($claimed));
+        self::assertSame('https://meetagain.org', $service->getOwnerHostForRequest($unclaimed));
+        self::assertSame('https://meetagain.org', $service->getOwnerHostForRequest($withoutRoute));
     }
 
     private function makeConfig(string $host): ConfigService

@@ -7,6 +7,7 @@ use App\Publisher\OgImage\OgImageProviderInterface;
 use App\Publisher\OgImage\ResolvedOgImage;
 use App\Repository\ImageRepository;
 use App\Service\Config\ConfigService;
+use App\Service\Seo\UrlOwnerService;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -25,6 +26,7 @@ readonly class OgImageResolver
         private ConfigService $configService,
         private ImageRepository $imageRepository,
         private RequestStack $requestStack,
+        private UrlOwnerService $urlOwnerService,
         private TranslatorInterface $translator,
     ) {}
 
@@ -63,7 +65,7 @@ readonly class OgImageResolver
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $hostPrefix = $request !== null ? $request->getSchemeAndHttpHost() : rtrim($this->configService->getHost(), '/');
+        $hostPrefix = $request !== null ? $this->urlOwnerService->getOwnerHostForRequest($request) : rtrim($this->configService->getHost(), '/');
 
         return $hostPrefix . $path;
     }

@@ -7,7 +7,9 @@ use App\Item\ListRegistry;
 use App\Item\Tag\AssignmentFormHelper;
 use App\Item\Tag\TagService;
 use App\Item\TranslationFormHelper;
+use App\Service\Config\ConfigService as CoreConfigService;
 use App\Service\Seo\BreadcrumbBuilder;
+use App\Service\Seo\UrlOwnerService;
 use PHPUnit\Framework\TestCase;
 use Plugin\Dishes\Controller\DishController;
 use Plugin\Dishes\Service\ConfigService;
@@ -49,6 +51,11 @@ class DishControllerTest extends TestCase
 
     private function breadcrumbBuilder(): BreadcrumbBuilder
     {
-        return new BreadcrumbBuilder($this->createStub(UrlGeneratorInterface::class), $this->createStub(TranslatorInterface::class), new RequestStack());
+        return new BreadcrumbBuilder(
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(TranslatorInterface::class),
+            new RequestStack(),
+            new UrlOwnerService($this->createStub(CoreConfigService::class), []),
+        );
     }
 }
