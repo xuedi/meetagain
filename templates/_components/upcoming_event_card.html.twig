@@ -15,7 +15,7 @@
     <div class="media-left">
         <div class="upcoming-event__date has-text-centered has-background-white is-clipped" aria-hidden="true">
             <p class="has-background-link has-text-white has-text-weight-bold is-uppercase is-size-7 py-1 mb-0">
-                {{ event.start|date('M')|upper }}
+                {{ event.start|month_label(app.locale) }}
             </p>
             <p class="has-text-grey-dark has-text-weight-bold is-size-4 py-1 mb-0">
                 {{ event.start|date('j') }}
