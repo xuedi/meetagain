@@ -4,6 +4,7 @@ namespace App\Controller\NonLocale;
 
 use App\Service\Seo\SitemapService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -14,9 +15,11 @@ final class SitemapController extends AbstractController
     ) {}
 
     #[Route('/sitemap.xml', name: 'app_sitemap')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
-        return new Response($this->sitemapService->renderXml(), Response::HTTP_OK, [
+        $xml = $this->getUser() === null ? $this->sitemapService->renderCachedXml($request->getHost()) : $this->sitemapService->renderXml();
+
+        return new Response($xml, Response::HTTP_OK, [
             'Content-Type' => 'application/xml; charset=UTF-8',
         ]);
     }
