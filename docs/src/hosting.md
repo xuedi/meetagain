@@ -9,7 +9,10 @@ For the local development environment, see [Getting Started](getting-started.md)
 ## One image, several roles
 
 MeetAgain runs as containers. The public image `ghcr.io/xuedi/meetagain` holds the core and every bundled
-plugin. Every tag is a core commit (`ghcr.io/xuedi/meetagain:<commit>`), and `latest` follows the newest one.
+plugin. Every tag is a core commit (`ghcr.io/xuedi/meetagain:<commit>`), every release also carries its version
+(`ghcr.io/xuedi/meetagain:<version>`), and `latest` follows the newest one. Pin a version in `compose.yaml` instead
+of `latest` so an update is a decision. What each version changes is on the
+[GitHub Releases](https://github.com/xuedi/meetagain/releases) page and in `CHANGELOG.md`.
 
 The first argument of the container picks what it does:
 

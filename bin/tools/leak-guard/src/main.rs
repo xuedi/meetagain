@@ -2,7 +2,7 @@ mod rules;
 
 use std::collections::HashSet;
 use std::fs;
-use std::io::{self, BufRead, IsTerminal, Write};
+use std::io::{self, BufRead, IsTerminal, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 use std::time::{Duration, Instant};
@@ -142,8 +142,23 @@ fn scan_one_file(path: &Path, rules: &Rules, extensions: &HashSet<String>) -> Ve
     }
 }
 
+/// `--stdin`: the same rules over the text on stdin, silent and exit 0 when clean.
+fn scan_stdin(rules: &Rules) -> ExitCode {
+    let mut text = String::new();
+    if let Err(e) = io::stdin().read_to_string(&mut text) {
+        eprintln!("cannot read stdin: {}", e);
+        return ExitCode::from(2);
+    }
+    let findings = rules.scan_text("<stdin>", &text);
+    for finding in &findings {
+        println!("{}", finding);
+    }
+    if findings.is_empty() { ExitCode::SUCCESS } else { ExitCode::FAILURE }
+}
+
 fn main() -> ExitCode {
     let staged_only = std::env::args().any(|a| a == "--staged");
+    let from_stdin = std::env::args().any(|a| a == "--stdin");
     let config = toolconfig::Config::load_or_exit("leak-guard");
     let scope = Scope::from_config(&config);
     let rules = match Rules::from_config(&config) {
@@ -157,6 +172,10 @@ fn main() -> ExitCode {
             return ExitCode::from(2);
         }
     };
+
+    if from_stdin {
+        return scan_stdin(&rules);
+    }
 
     // Collect targets up front so we know the total for progress display.
     let files: Vec<PathBuf> = if staged_only {

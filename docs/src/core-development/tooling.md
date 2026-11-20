@@ -61,6 +61,17 @@ pattern still applies to that file. Do not exclude the file.
 **Vocabulary.** A substring list a deployment can decide not to publish. The core repository
 ships no such list; it comes from the private overlay described below.
 
+`leak-guard --stdin` applies the same rules and exit codes to the text on stdin instead of the tree, so a
+release text is checked with the word list that guards the code.
+
+### `release-notes`
+
+Not a guard: it turns commit subjects into the next version and the release text. `release-notes notes` reads
+subjects from stdin plus the pull requests' labels and prints the version, then the body, sorted under headings by
+the prefix of each subject (see [Contributing](../contributing.md), "Commit messages"). `release-notes changelog`
+inserts a body as the newest entry of `CHANGELOG.md`. The opening paragraph per level and the size at which a
+maintenance section folds are set in `config/tools/release-notes.dist`.
+
 ### `mermaid-guard` (slot 05)
 
 Lints mermaid code blocks in markdown for syntax GitHub silently fails to render: unquoted

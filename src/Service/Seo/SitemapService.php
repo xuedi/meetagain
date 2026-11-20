@@ -5,10 +5,16 @@ namespace App\Service\Seo;
 use App\Filter\Sitemap\SitemapUrlFilterInterface;
 use App\Publisher\Sitemap\SitemapPublisherInterface;
 use App\Publisher\Sitemap\SitemapUrl;
+use Symfony\Component\Cache\Adapter\NullAdapter;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 final readonly class SitemapService
 {
+    public const int CACHE_TTL_SECONDS = 21600;
+
     /**
      * @param iterable<SitemapPublisherInterface> $publishers
      * @param iterable<SitemapUrlFilterInterface> $urlFilters
@@ -18,6 +24,8 @@ final readonly class SitemapService
         private iterable $publishers,
         #[AutowireIterator(SitemapUrlFilterInterface::class)]
         private iterable $urlFilters = [],
+        #[Autowire(service: 'cache.sitemap')]
+        private CacheInterface $cache = new NullAdapter(),
     ) {}
 
     /**
@@ -52,6 +60,15 @@ final readonly class SitemapService
         }
 
         return true;
+    }
+
+    public function renderCachedXml(string $host): string
+    {
+        return $this->cache->get(sprintf('sitemap.%s', hash('xxh128', $host)), function (ItemInterface $item): string {
+            $item->expiresAfter(self::CACHE_TTL_SECONDS);
+
+            return $this->renderXml();
+        });
     }
 
     public function renderXml(): string

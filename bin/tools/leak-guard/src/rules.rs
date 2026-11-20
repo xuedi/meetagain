@@ -131,6 +131,15 @@ impl Rules {
         findings
     }
 
+    /// Every line of a text that is not a file, rendered like a finding in a file called `name`.
+    pub fn scan_text(&self, name: &str, text: &str) -> Vec<String> {
+        text.lines()
+            .enumerate()
+            .flat_map(|(index, line)| self.scan_line(name, index + 1, line))
+            .map(|finding| finding.render(name))
+            .collect()
+    }
+
     fn is_allowed(&self, path: &str, pattern: &str) -> bool {
         self.allowances
             .iter()
@@ -178,6 +187,26 @@ mod tests {
             allowances: Vec::new(),
             words_exclude_paths: Vec::new(),
         }
+    }
+
+    #[test]
+    fn scan_text_reports_words_and_credentials_by_line() {
+        let mut guarded = rules(&["token=\\btok_[a-z]{6}\\b"]);
+        guarded.words = vec!["forbidden".to_string()];
+
+        let findings = guarded.scan_text("<stdin>", "fine\nthe Forbidden word\nkey tok_abcdef here\n");
+
+        assert_eq!(2, findings.len());
+        assert!(findings[0].starts_with("<stdin>:2:"));
+        assert!(findings[1].starts_with("<stdin>:3: [token]"));
+    }
+
+    #[test]
+    fn scan_text_is_silent_on_clean_text() {
+        let mut guarded = rules(&["token=\\btok_[a-z]{6}\\b"]);
+        guarded.words = vec!["forbidden".to_string()];
+
+        assert!(guarded.scan_text("<stdin>", "all fine\n").is_empty());
     }
 
     fn shipped_patterns() -> Rules {
