@@ -36,13 +36,13 @@ final readonly class CalendarFeedService
         private CacheInterface $cache,
     ) {}
 
-    public function renderFeed(string $host, string $locale): string
+    public function renderFeed(string $host, string $locale, bool $useCache = true): string
     {
-        $entries = $this->cache->get($this->cacheKey($host, $locale), function (ItemInterface $item) use ($locale): array {
-            $item->expiresAt($this->hourBoundary()->modify('+1 hour'));
+        $entries = $useCache ? $this->cache->get($this->cacheKey($host, $locale), function (ItemInterface $item) use ($locale): array {
+                $item->expiresAt($this->hourBoundary()->modify('+1 hour'));
 
-            return $this->buildEntries($locale);
-        });
+                return $this->buildEntries($locale);
+            }) : $this->buildEntries($locale);
 
         return $this->writer->write($entries, $this->calendarName($host, $locale), $this->hourBoundary());
     }

@@ -151,7 +151,7 @@ final class EventController extends AbstractController
     #[Route('/events.ics', name: self::ROUTE_CALENDAR_FEED, methods: ['GET'])]
     public function calendarFeed(Request $request): Response
     {
-        $body = $this->calendarFeedService->renderFeed($request->getHost(), $request->getLocale());
+        $body = $this->calendarFeedService->renderFeed($request->getHost(), $request->getLocale(), $this->getUser() === null);
 
         $response = new Response($body, Response::HTTP_OK, [
             'Content-Type' => 'text/calendar; charset=UTF-8',
