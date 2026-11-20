@@ -13,6 +13,7 @@ members = [
     "metrics",
     "output-filter",
     "phplex",
+    "release-notes",
     "test-stamp",
     "toolconfig",
 ]

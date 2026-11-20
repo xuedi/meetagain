@@ -1,0 +1,14 @@
+# release-notes reads this on every run; changing it needs no rebuild.
+#
+# The opening paragraph of a release, one per release level, and the size at which a section a reader
+# skims past (internal changes, tests, documentation, dependencies, operations, other changes) folds
+# into one line with its count. The sections above them never fold.
+#
+# Extend this through the optional config/tools/release-notes.local overlay: scalar keys take the
+# overlay's value. Each value is one line.
+
+PATCH=This is a patch release of MeetAgain. It brings fixes and small improvements and changes no setting or interface, so an update needs no change to the configuration. We recommend updating soon.
+MINOR=This is a minor release of MeetAgain. It adds features and fixes defects without breaking existing ones. Existing installations keep working after the update; new features may bring new optional settings. We recommend updating.
+MAJOR=This is a major release of MeetAgain. It contains changes that break existing behaviour, configuration or interfaces. Read the notes below and back up the database before updating.
+
+MAINTENANCE_LIMIT=8

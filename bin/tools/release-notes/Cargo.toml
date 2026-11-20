@@ -1,0 +1,12 @@
+[package]
+name = "release-notes"
+version.workspace = true
+edition.workspace = true
+
+[[bin]]
+name = "release-notes"
+path = "src/main.rs"
+
+[dependencies]
+toolconfig.workspace = true
+clap.workspace = true

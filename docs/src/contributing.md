@@ -43,6 +43,36 @@ Key rules:
 
 ---
 
+## Commit messages
+
+One short, lowercase, past-tense line naming the change, starting with a prefix that says what kind of change it
+is: `feature: added captcha`. The prefix only sorts the bullet under a heading in the release notes; it never
+changes the version.
+
+| Prefix      | Kind of change                                          | Release notes heading |
+|-------------|---------------------------------------------------------|-----------------------|
+| `feature:`  | a new capability for members, organizers or admins      | Features              |
+| `bug:`      | a defect fixed                                          | Fixes                 |
+| `security:` | hardening, a closed hole, a tightened permission        | Security              |
+| `perf:`     | speed, caching, load behaviour                          | Performance           |
+| `plugin:`   | any change inside a bundled plugin                      | Plugins               |
+| `ui:`       | look, layout, wording, translations, templates          | Interface             |
+| `deps:`     | version pins, Renovate batches, dependency bumps        | Dependencies          |
+| `ops:`      | container, runtime, workers, release, tooling, config   | Operations            |
+| `refactor:` | restructuring with no change in behaviour               | Internal              |
+| `test:`     | tests and coverage only                                 | Tests                 |
+| `docs:`     | documentation only                                      | Documentation         |
+
+A change that fits two kinds takes the one a member of the public notices first: `plugin:` over `feature:` when it
+only exists inside a plugin, `security:` over `bug:`. A module is an architecture detail, so a module change is
+`feature:`, `bug:` or `refactor:` by what it does. A subject without a known prefix lands under "Other changes".
+
+The version of a release comes from the labels on the pull requests merged into `main` since the last version
+tag: the maintainer gives each one `patch`, `minor` or `major`, and the highest label wins. Each release is tagged
+`X.Y.Z`, published as a GitHub Release and added to `CHANGELOG.md`.
+
+---
+
 ## Running Tests
 
 ```bash
