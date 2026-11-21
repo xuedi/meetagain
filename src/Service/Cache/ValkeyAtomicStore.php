@@ -10,7 +10,7 @@ use Throwable;
 
 final readonly class ValkeyAtomicStore implements AtomicStoreInterface
 {
-    private const int UPDATE_ATTEMPTS = 8;
+    private const int UPDATE_ATTEMPTS = 16;
     private const int BACKOFF_MICROSECONDS = 2000;
     private const int BACKOFF_CAP_MICROSECONDS = 8000;
 

@@ -6,17 +6,19 @@
  #
  # Renders tabs in the order they were added; the first AdminTab with isActive=true wears
  # the 'is-active' class. Icons use Font Awesome classes without the 'fa-' prefix; the
- # partial prepends 'fa fa-' itself.
+ # partial prepends 'fa fa-' itself. A tab with iconOnly=true and an icon renders no visible label;
+ # the label moves into title and aria-label.
  #}
 <div class="tabs is-boxed">
     <ul>
         {% for tab in adminTabs.tabs %}
             <li class="{% if tab.isActive %}is-active{% endif %}">
-                <a href="{{ tab.target }}">
+                {% set iconOnly = tab.iconOnly and tab.icon %}
+                <a href="{{ tab.target }}"{% if iconOnly %} title="{{ tab.label }}" aria-label="{{ tab.label }}"{% endif %}>
                     {% if tab.icon %}
                         <span class="icon is-small"><i class="fa fa-{{ tab.icon }}" aria-hidden="true"></i></span>
                     {% endif %}
-                    <span>{{ tab.label }}</span>
+                    {% if not iconOnly %}<span>{{ tab.label }}</span>{% endif %}
                 </a>
             </li>
         {% endfor %}

@@ -26,7 +26,7 @@ final readonly class MultiSeriesChartTile implements Tile
     }
 
     /**
-     * @return array{labels: list<string>, datasets: list<array{label: string, data: list<int>, borderColor: string}>}
+     * @return array{labels: list<string>, datasets: list<array{label: string, data: list<int|float>, borderColor: string}>}
      */
     public function payload(): array
     {
