@@ -133,6 +133,16 @@ final class RequestsController extends AbstractSupportController implements Admi
                 confirm: $this->translator->trans('admin_support.warning_invite_admins_confirm'),
             );
         }
+        if ($request->canVouchEmail() && $this->isGranted('ROLE_ADMIN')) {
+            $actions[] = new AdminTopActionForm(
+                label: $this->translator->trans('admin_support.button_vouch_email'),
+                target: $this->generateUrl('app_admin_support_vouch_email', ['id' => $request->getId()]),
+                csrfTokenId: 'app_admin_support_vouch_email' . $request->getId(),
+                icon: 'envelope-circle-check',
+                variant: 'is-warning',
+                confirm: $this->translator->trans('admin_support.warning_vouch_email_confirm'),
+            );
+        }
         $actions[] = new AdminTopActionButton(
             label: $this->translator->trans('admin_support.button_back'),
             target: $this->generateUrl('app_admin_support_list'),
@@ -233,6 +243,25 @@ final class RequestsController extends AbstractSupportController implements Admi
         $this->supportInvitationEmail->send(['request' => $request]);
 
         $this->addFlash('success', 'admin_support.flash_admins_invited');
+
+        return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
+    }
+
+    #[Route('/{id}/vouch-email', name: 'app_admin_support_vouch_email', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
+    public function vouchEmail(Request $httpRequest, int $id): Response
+    {
+        $request = $this->requireRequest($id);
+        $this->requireCsrf($httpRequest, 'app_admin_support_vouch_email' . $id);
+
+        $admin = $this->getUser();
+        if (!$admin instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
+        if ($request->canVouchEmail()) {
+            $this->threadService->vouchForEmail($request, $admin);
+        }
 
         return $this->redirectToRoute('app_admin_support_request_show', ['id' => $id]);
     }

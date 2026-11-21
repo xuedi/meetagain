@@ -105,6 +105,9 @@
                 {% endif %}
                 {% if request.email is not null and not request.isEmailVerified() %}
                     <p class="has-text-grey is-size-7 mt-2">{{ 'admin_support.email_unverified_note'|trans }}</p>
+                    {% if request.canVouchEmail() and is_granted('ROLE_ADMIN') %}
+                        <p class="has-text-grey is-size-7 mt-2">{{ 'admin_support.email_vouch_hint'|trans }}</p>
+                    {% endif %}
                 {% endif %}
             </div>
 

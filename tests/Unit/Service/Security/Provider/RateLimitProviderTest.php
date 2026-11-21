@@ -20,12 +20,28 @@ use Tests\Unit\Stubs\InMemoryAtomicStore;
 
 class RateLimitProviderTest extends TestCase
 {
-    public function testLoginThrottlingBlocksImmediately(): void
+    public function testFirstLoginThrottlingTripDoesNotBlock(): void
     {
         // Arrange
         $em = $this->createStub(EntityManagerInterface::class);
         $repo = $this->createStub(RateLimitLogRepository::class);
         $provider = new RateLimitProvider(new InMemoryAtomicStore(), new NullLogger(), $em, $repo);
+
+        // Act
+        $report = $provider->observe(SecurityEventType::RateLimit, new Request(), ['limiter' => 'login_throttling'], 'sess', '1.2.3.4');
+
+        // Assert
+        static::assertSame(SecurityRecommendation::Handled, $report->recommendation);
+        static::assertLessThan(100, $report->threatLevel);
+    }
+
+    public function testSecondLoginThrottlingTripBlocks(): void
+    {
+        // Arrange
+        $em = $this->createStub(EntityManagerInterface::class);
+        $repo = $this->createStub(RateLimitLogRepository::class);
+        $provider = new RateLimitProvider(new InMemoryAtomicStore(), new NullLogger(), $em, $repo);
+        $provider->observe(SecurityEventType::RateLimit, new Request(), ['limiter' => 'login_throttling'], 'sess', '1.2.3.4');
 
         // Act
         $report = $provider->observe(SecurityEventType::RateLimit, new Request(), ['limiter' => 'login_throttling'], 'sess', '1.2.3.4');
@@ -125,7 +141,7 @@ class RateLimitProviderTest extends TestCase
         $report = $provider->observe(SecurityEventType::RateLimit, new Request(), ['limiter' => 'login_throttling'], 'sess', '1.2.3.4');
 
         // Assert
-        static::assertSame(SecurityRecommendation::Block, $report->recommendation);
+        static::assertSame(SecurityRecommendation::Handled, $report->recommendation);
     }
 
     public function testRetrospectiveScanGroupsRowsByLimiter(): void

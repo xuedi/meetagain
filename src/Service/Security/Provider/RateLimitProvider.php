@@ -16,6 +16,7 @@ use Throwable;
 final readonly class RateLimitProvider extends AbstractSecurityProvider
 {
     public const string KEY = 'rate_limit';
+    private const int FIRST_TRIP_SCORE = 40;
 
     public function __construct(
         AtomicStoreInterface $store,
@@ -131,7 +132,7 @@ final readonly class RateLimitProvider extends AbstractSecurityProvider
     private function scoreFor(string $limiter, int $hits): int
     {
         if ($limiter === 'login_throttling') {
-            return 100;
+            return $hits >= 2 ? 100 : self::FIRST_TRIP_SCORE;
         }
         if ($limiter === 'support') {
             return (int) min(60, $hits * 5);

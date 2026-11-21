@@ -4,6 +4,7 @@ namespace App\Service\Support;
 
 use App\Activity\ActivityService;
 use App\Activity\Messages\SendMessage;
+use App\Activity\Messages\SupportEmailVouched;
 use App\Emails\Types\SupportResponseEmail;
 use App\Entity\Message;
 use App\Entity\SupportMessage;
@@ -265,6 +266,17 @@ readonly class ThreadService
         }
 
         return $this->requestRepo->consumeEmailVerifyToken($request, $token, $this->clock->now()) ? $request : null;
+    }
+
+    public function vouchForEmail(SupportRequest $request, User $admin): void
+    {
+        $now = $this->clock->now();
+        $request->setEmailVerifiedAt($now);
+        $request->setLastActivityAt($now);
+        $this->clearEmailVerification($request);
+        $this->em->flush();
+
+        $this->activityService->log(SupportEmailVouched::TYPE, $admin, ['request_id' => (int) $request->getId()]);
     }
 
     public function clearEmailVerification(SupportRequest $request): void
