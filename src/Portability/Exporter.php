@@ -37,34 +37,42 @@ readonly class Exporter
         $zip->open($zipPath, ZipArchive::CREATE);
         $images = new ZipImageWriter($zip, $this->imageStorage);
 
-        $now = $this->clock->now();
-        $exportedAt = $anchor === null ? $now : $this->dateShifter->mondayOf($anchor);
-        $weeks = $anchor === null ? 0 : $this->dateShifter->weeksBetween($now, $anchor);
+        $isWritten = false;
+        try {
+            $now = $this->clock->now();
+            $exportedAt = $anchor === null ? $now : $this->dateShifter->mondayOf($anchor);
+            $weeks = $anchor === null ? 0 : $this->dateShifter->weeksBetween($now, $anchor);
 
-        $plugins = $scope->plugins;
-        sort($plugins);
+            $plugins = $scope->plugins;
+            sort($plugins);
 
-        $site = $this->exportSite($scope->site, $images);
-        $sections = $this->exportSections($scope, $images);
+            $site = $this->exportSite($scope->site, $images);
+            $sections = $this->exportSections($scope, $images);
 
-        $data = [
-            'format' => self::FORMAT,
-            'version' => self::VERSION,
-            'exported_at' => $exportedAt->format(DateTimeInterface::ATOM),
-            'plugins' => $plugins,
-            'site' => $site,
-            ...$this->dateShifter->shift($sections, $weeks),
-            'images' => $images->getAttributions(),
-        ];
+            $data = [
+                'format' => self::FORMAT,
+                'version' => self::VERSION,
+                'exported_at' => $exportedAt->format(DateTimeInterface::ATOM),
+                'plugins' => $plugins,
+                'site' => $site,
+                ...$this->dateShifter->shift($sections, $weeks),
+                'images' => $images->getAttributions(),
+            ];
 
-        $zip->addFromString(
-            'export.json',
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n",
-        );
-        $zip->close();
-        $images->removeCopies();
+            $zip->addFromString(
+                'export.json',
+                json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n",
+            );
+            $zip->close();
+            $isWritten = true;
 
-        return $zipPath;
+            return $zipPath;
+        } finally {
+            $images->removeCopies();
+            if (!$isWritten && is_file($zipPath)) {
+                unlink($zipPath);
+            }
+        }
     }
 
     /**

@@ -14,6 +14,7 @@ use Module\Email\Contract\PushDispatcherInterface;
 use Module\Email\Contract\QueueStatus;
 use Module\Email\Contract\SendingIdentity;
 use Module\Email\Contract\SendingIdentityProviderInterface;
+use Module\Email\Contract\UrgentEmailInterface;
 use Module\Email\Internal\Entity\EmailQueue;
 use Module\Email\Internal\Message\Drain;
 use Module\Email\Internal\Repository\EmailQueueRepository;
@@ -44,6 +45,7 @@ readonly class EmailService implements TaskInterface, EmailQueueInterface
     /**
      * @param iterable<ContextEnricherInterface> $enrichers
      * @param iterable<SendingIdentityProviderInterface> $identityProviders
+     * @param iterable<EmailInterface> $emailTypes
      */
     public function __construct(
         #[Autowire(service: 'mailer.transports')]
@@ -62,6 +64,8 @@ readonly class EmailService implements TaskInterface, EmailQueueInterface
         private ClockInterface $clock,
         private MessageBusInterface $bus,
         private FilesystemOperator $privateStorage,
+        #[AutowireIterator(EmailInterface::class)]
+        private iterable $emailTypes = [],
     ) {}
 
     public function enqueue(
@@ -170,6 +174,21 @@ readonly class EmailService implements TaskInterface, EmailQueueInterface
     }
 
     /**
+     * @return list<string>
+     */
+    private function urgentTemplates(): array
+    {
+        $identifiers = [];
+        foreach ($this->emailTypes as $type) {
+            if ($type instanceof UrgentEmailInterface) {
+                $identifiers[] = $type->getIdentifier();
+            }
+        }
+
+        return $identifiers;
+    }
+
+    /**
      * @return array{message: string, more: bool}
      */
     private function drainQueue(): array
@@ -179,9 +198,15 @@ readonly class EmailService implements TaskInterface, EmailQueueInterface
         $late = 0;
         $startedAt = $this->clock->now();
         $stopAt = $startedAt->modify(sprintf('+%d seconds', self::SEND_BUDGET_SECONDS));
+        $urgent = $this->urgentTemplates();
         do {
             $claimedAt = $this->clock->now();
-            $mails = $this->mailRepo->claimPending(self::CHUNK_SIZE, $claimedAt, $claimedAt->modify(sprintf('-%d seconds', self::CLAIM_LEASE_SECONDS)));
+            $mails = $this->mailRepo->claimPending(
+                self::CHUNK_SIZE,
+                $claimedAt,
+                $claimedAt->modify(sprintf('-%d seconds', self::CLAIM_LEASE_SECONDS)),
+                $urgent,
+            );
             foreach ($mails as $mail) {
                 $now = $this->clock->now();
                 $cutoff = $mail->getMaxSendBy();

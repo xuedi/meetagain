@@ -20,28 +20,29 @@ class EmailQueueRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param list<string> $urgentTemplates template identifiers claimed before every other row
      * @return list<EmailQueue>
      */
-    public function claimPending(int $limit, DateTimeImmutable $now, DateTimeImmutable $leaseExpiredBefore): array
+    public function claimPending(int $limit, DateTimeImmutable $now, DateTimeImmutable $leaseExpiredBefore, array $urgentTemplates = []): array
     {
-        return $this->claim($this->findClaimableIds($limit, $leaseExpiredBefore), $now, $leaseExpiredBefore);
+        return $this->claim($this->findClaimableIds($limit, $leaseExpiredBefore, $urgentTemplates), $now, $leaseExpiredBefore);
     }
 
     /**
+     * @param list<string> $urgentTemplates template identifiers claimed before every other row
      * @return list<int>
      */
-    public function findClaimableIds(int $limit, DateTimeImmutable $leaseExpiredBefore): array
+    public function findClaimableIds(int $limit, DateTimeImmutable $leaseExpiredBefore, array $urgentTemplates = []): array
     {
-        return array_map(
-            intval(...),
-            $this
-                ->claimableQuery($leaseExpiredBefore)
-                ->select('eq.id')
-                ->orderBy('eq.id', 'ASC')
-                ->setMaxResults($limit)
-                ->getQuery()
-                ->getSingleColumnResult(),
-        );
+        $query = $this->claimableQuery($leaseExpiredBefore)->select('eq.id');
+        if ($urgentTemplates !== []) {
+            $query
+                ->addSelect('CASE WHEN eq.template IN (:urgent) THEN 0 ELSE 1 END AS HIDDEN urgency')
+                ->setParameter('urgent', $urgentTemplates)
+                ->orderBy('urgency', 'ASC');
+        }
+
+        return array_map(intval(...), $query->addOrderBy('eq.id', 'ASC')->setMaxResults($limit)->getQuery()->getSingleColumnResult());
     }
 
     /**

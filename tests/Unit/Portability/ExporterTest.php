@@ -19,6 +19,7 @@ use DateTimeImmutable;
 use League\Flysystem\Filesystem;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\Clock\MockClock;
 use ZipArchive;
 
@@ -97,6 +98,25 @@ final class ExporterTest extends TestCase
         // Assert
         static::assertSame('2026-01-05T00:00:00', substr((string) $data['exported_at'], 0, 19));
         static::assertSame('2026-01-08T19:00:00', substr((string) $data['events'][0]['start'], 0, 19));
+    }
+
+    public function testAFailingExportLeavesNoTempFileBehind(): void
+    {
+        // Arrange
+        $before = glob(sys_get_temp_dir() . '/meetagain-export-*.zip') ?: [];
+        $exporter = $this->exporter([
+            $this->section('events', 10, static fn(): array => throw new RuntimeException('section failed')),
+        ]);
+
+        // Act
+        try {
+            $exporter->export(new Scope());
+            $this->fail('The export should have failed.');
+        } catch (RuntimeException) {
+        }
+
+        // Assert
+        static::assertSame($before, glob(sys_get_temp_dir() . '/meetagain-export-*.zip') ?: []);
     }
 
     public function testASectionOfAPluginTheScopeDoesNotListStaysOut(): void

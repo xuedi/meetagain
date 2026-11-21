@@ -2,6 +2,20 @@
 
 Each release of the MeetAgain core, newest first, written at release time.
 
+## 1.1.2 - 2026-11-21
+
+This is a patch release of MeetAgain. It brings fixes and small improvements and changes no setting or interface, so an update needs no change to the configuration. We recommend updating soon.
+
+### Features
+
+- added icon-only admin tabs
+
+### Other changes
+
+- added support sample threads
+
+**Full changelog:** https://github.com/xuedi/meetagain/compare/1.1.1...08287fc
+
 ## 1.1.1 - 2026-11-21
 
 This is a patch release of MeetAgain. It brings fixes and small improvements and changes no setting or interface, so an update needs no change to the configuration. We recommend updating soon.

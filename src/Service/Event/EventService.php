@@ -33,6 +33,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 readonly class EventService
 {
     private const string GENERIC_ITEM_HEADING_KEY = 'item.heading';
+    private const string CANCEL_NOTICE_WINDOW = '-1 day';
 
     public function __construct(
         private EventRepository $repo,
@@ -255,11 +256,23 @@ readonly class EventService
 
     public function cancelEvent(Event $event): void
     {
+        if ($event->isCanceled()) {
+            return;
+        }
+
+        $now = new DateTimeImmutable();
+        $noticeSentAt = $event->getCanceledNoticeSentAt();
+        $mayNotify = $noticeSentAt === null || $noticeSentAt < $now->modify(self::CANCEL_NOTICE_WINDOW);
+        $notify = $mayNotify && $event->getStart() > $now;
+
         $event->setCanceled(true);
+        if ($notify) {
+            $event->setCanceledNoticeSentAt($now);
+        }
         $this->em->persist($event);
         $this->em->flush();
 
-        if ($event->getStart() > new DateTimeImmutable()) {
+        if ($notify) {
             foreach ($event->getRsvp() as $user) {
                 $this->notificationEventCanceledEmail->send(['user' => $user, 'event' => $event]);
             }

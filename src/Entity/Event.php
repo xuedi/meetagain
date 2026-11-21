@@ -81,6 +81,9 @@ class Event
     private bool $canceled = false;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?DateTimeImmutable $canceledNoticeSentAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?DateTimeImmutable $rsvpNotificationSentAt = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
@@ -419,6 +422,18 @@ class Event
     public function setCanceled(bool $canceled): static
     {
         $this->canceled = $canceled;
+
+        return $this;
+    }
+
+    public function getCanceledNoticeSentAt(): ?DateTimeImmutable
+    {
+        return $this->canceledNoticeSentAt;
+    }
+
+    public function setCanceledNoticeSentAt(?DateTimeImmutable $canceledNoticeSentAt): static
+    {
+        $this->canceledNoticeSentAt = $canceledNoticeSentAt;
 
         return $this;
     }
