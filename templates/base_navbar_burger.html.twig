@@ -69,7 +69,8 @@
                 </button>
             </form>
         {% else %}
-            <a class="navbar-item" href="{{ path('app_login') }}">
+            {% set loginTarget = app.request.method == 'GET' and (app.request.attributes.get('_route') ?? '') not in ['app_login', 'app_register', 'app_reset', 'app_reset_password', 'app_register_confirm_email'] ? {'redirect': app.request.requestUri} : {} %}
+            <a class="navbar-item" href="{{ path('app_login', loginTarget) }}">
                 <span class="icon mr-2"><i class="fa fa-sign-in"></i></span>
                 {{ "chrome.menu_login" | trans }}
             </a>

@@ -82,7 +82,10 @@ final class SecurityController extends AbstractController
         $lastUsername = $this->authenticationUtils->getLastUsername();
 
         $redirectPath = $this->generateUrl('app_profile');
-        if (null !== $request->getSession()->get('redirectUrl')) {
+        $requested = $this->sameHostPath($request->query->get('redirect'));
+        if ($requested !== null) {
+            $redirectPath = $requested;
+        } elseif ($request->hasPreviousSession() && null !== $request->getSession()->get('redirectUrl')) {
             $redirectPath = $request->getSession()->get('redirectUrl');
         }
 
@@ -324,5 +327,14 @@ final class SecurityController extends AbstractController
             'ip' => $request->getClientIp() ?? '',
             'user_agent' => mb_substr((string) $request->headers->get('User-Agent'), 0, self::USER_AGENT_MAX),
         ];
+    }
+
+    private function sameHostPath(mixed $path): ?string
+    {
+        if (!is_string($path) || !str_starts_with($path, '/') || str_starts_with($path, '//') || strlen($path) > 2000) {
+            return null;
+        }
+
+        return preg_match('/[\x00-\x1f\x7f\\\\]/', $path) === 1 ? null : $path;
     }
 }
