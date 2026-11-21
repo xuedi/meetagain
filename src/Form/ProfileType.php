@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Callback;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -46,7 +46,12 @@ class ProfileType extends AbstractType
             'label' => false,
             'attr' => ['class' => 'is-hidden'],
             'constraints' => [
-                new File(maxSize: '10M', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: 'shared.form_image_upload_mime_error_square'),
+                new Image(
+                    maxSize: '10M',
+                    mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                    maxPixels: ImageService::MAX_PIXELS,
+                    mimeTypesMessage: 'shared.form_image_upload_mime_error_square',
+                ),
             ],
         ])->add('name', TextType::class, [
             'data' => $user->getName(),

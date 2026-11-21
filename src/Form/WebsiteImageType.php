@@ -8,7 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Image;
 
 class WebsiteImageType extends AbstractType
 {
@@ -20,7 +20,12 @@ class WebsiteImageType extends AbstractType
             'required' => false,
             'label' => 'admin_system_config.field_website_image_label',
             'constraints' => [
-                new File(maxSize: '5000k', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, mimeTypesMessage: 'shared.form_image_upload_mime_error'),
+                new Image(
+                    maxSize: '5000k',
+                    mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                    maxPixels: ImageService::MAX_PIXELS,
+                    mimeTypesMessage: 'shared.form_image_upload_mime_error',
+                ),
             ],
         ]);
     }

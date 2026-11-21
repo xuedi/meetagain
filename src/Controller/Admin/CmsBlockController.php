@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -293,7 +293,7 @@ final class CmsBlockController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
             assert($user instanceof User);
-            $fileConstraint = new File(maxSize: '10M', mimeTypes: ImageService::ACCEPTED_MIME_TYPES);
+            $fileConstraint = new Image(maxSize: '10M', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, maxPixels: ImageService::MAX_PIXELS);
 
             $files = $form->get('files')->getData() ?? [];
             $file = reset($files);
@@ -332,7 +332,7 @@ final class CmsBlockController extends AbstractController
         return $this->redirectToRoute('app_admin_cms_block_edit', ['blockId' => $blockId]);
     }
 
-    #[Route('/{blockId}/card/{slot}/image/remove', name: 'app_admin_cms_card_image_remove', methods: ['POST'], requirements: ['slot' => '[0-2]'])]
+    #[Route('/{blockId}/card/{slot}/image/remove', name: 'app_admin_cms_card_image_remove', requirements: ['slot' => '[0-2]'], methods: ['POST'])]
     public function cmsCardImageRemove(Request $request, int $blockId, int $slot): Response
     {
         if (!$this->isCsrfTokenValid('admin_cms_card_image_remove' . $blockId . '_' . $slot, (string) $request->request->get('_token'))) {
@@ -383,7 +383,7 @@ final class CmsBlockController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
             assert($user instanceof User);
-            $fileConstraint = new File(maxSize: '10M', mimeTypes: ImageService::ACCEPTED_MIME_TYPES);
+            $fileConstraint = new Image(maxSize: '10M', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, maxPixels: ImageService::MAX_PIXELS);
             foreach ($form->get('files')->getData() ?? [] as $file) {
                 if (!$file instanceof UploadedFile) {
                     continue;

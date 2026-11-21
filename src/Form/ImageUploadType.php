@@ -25,6 +25,7 @@ class ImageUploadType extends AbstractType
                     mimeTypes: [
                         ...ImageService::ACCEPTED_MIME_TYPES,
                     ],
+                    maxPixels: ImageService::MAX_PIXELS,
                     mimeTypesMessage: 'shared.form_image_upload_mime_error',
                 ),
             ],

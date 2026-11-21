@@ -194,7 +194,7 @@ final class HumanCheckType extends AbstractType
             $genericErrorAdded = true;
         }
 
-        if ($reasons === [] || $request === null || $this->isCrossSite($request)) {
+        if ($reasons === [] || $request === null) {
             return;
         }
 
@@ -202,16 +202,6 @@ final class HumanCheckType extends AbstractType
             'context' => $context,
             'reasons' => array_values(array_unique($reasons)),
         ]);
-    }
-
-    private function isCrossSite(Request $request): bool
-    {
-        $origin = $request->headers->get('Origin');
-        $fetchSite = $request->headers->get('Sec-Fetch-Site');
-        $foreignOrigin = $origin !== null && $origin !== $request->getSchemeAndHttpHost();
-        $foreignFetch = $fetchSite !== null && !in_array($fetchSite, ['same-origin', 'none'], true);
-
-        return $foreignOrigin || $foreignFetch;
     }
 
     /**

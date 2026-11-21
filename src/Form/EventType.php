@@ -29,7 +29,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventType extends AbstractType
@@ -146,9 +146,10 @@ class EventType extends AbstractType
                 'required' => false,
                 'label' => $this->translator->trans('admin_event.form_label_preview_image'),
                 'constraints' => [
-                    new File(
+                    new Image(
                         maxSize: '5000k',
                         mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                        maxPixels: ImageService::MAX_PIXELS,
                         mimeTypesMessage: $this->translator->trans('admin_event.form_image_mime_error'),
                     ),
                 ],

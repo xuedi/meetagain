@@ -335,7 +335,7 @@ final class HumanCheckTypeTest extends TestCase
     }
 
     #[DataProvider('crossSiteHeaderProvider')]
-    public function testACrossSiteSubmissionIsLoggedButRaisesNoEvent(string $header, string $value): void
+    public function testACrossSiteSubmissionIsLoggedAndStillRaisesTheEvent(string $header, string $value): void
     {
         // Arrange
         $this->request->headers->set($header, $value);
@@ -346,7 +346,8 @@ final class HumanCheckTypeTest extends TestCase
 
         // Assert
         static::assertSame([[SecurityMeasure::Honeypot, 'filled']], $this->blocks);
-        static::assertSame([], $this->events);
+        static::assertCount(1, $this->events);
+        static::assertSame(SecurityEventType::FormMeasure, $this->events[0][0]);
     }
 
     public static function crossSiteHeaderProvider(): Generator

@@ -49,7 +49,7 @@ readonly class KernelRequestSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
 
         $isJumpBackEligible = $this->isJumpBackEligible($request->attributes->get('_route'), $request->getPathInfo());
-        if ($request->getMethod() === 'GET' && $isJumpBackEligible && $this->isPageNavigation($request)) {
+        if ($request->getMethod() === 'GET' && $request->hasPreviousSession() && $isJumpBackEligible && $this->isPageNavigation($request)) {
             $request->getSession()->set('redirectUrl', $request->getRequestUri());
         }
     }

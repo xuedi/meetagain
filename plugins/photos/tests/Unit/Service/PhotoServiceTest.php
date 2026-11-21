@@ -214,7 +214,7 @@ class PhotoServiceTest extends TestCase
         return new PhotoService(
             $this->createStub(EntityManagerInterface::class),
             $repository ?? $this->createStub(PhotoRepository::class),
-            new ExifService(new NullLogger()),
+            new ExifService(new NullLogger(), $this->createStub(ImageService::class)),
             $imageService,
             $locations ?? $this->createStub(ImageLocationService::class),
             $this->commentService($comments),

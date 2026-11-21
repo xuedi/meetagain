@@ -74,6 +74,11 @@ services:
             $hub: '@Sentry\State\HubInterface'
             $level: !php/const Monolog\Logger::ERROR
 
+    remote.client.guard:
+        class: Symfony\Component\HttpClient\NoPrivateNetworkHttpClient
+        decorates: remote.client
+        arguments: ['@.inner']
+
     App\AssetMapper\OpaqueMediaPathResolver:
         decorates: asset_mapper.public_assets_path_resolver
 

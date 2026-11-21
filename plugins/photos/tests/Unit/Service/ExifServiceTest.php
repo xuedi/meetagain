@@ -2,6 +2,7 @@
 
 namespace Plugin\Photos\Tests\Unit\Service;
 
+use App\Service\Media\ImageService;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plugin\Photos\Service\ExifService;
@@ -14,7 +15,7 @@ class ExifServiceTest extends TestCase
     public function testExtractsTheCuratedFieldSetFromAPhotograph(): void
     {
         // Arrange
-        $service = new ExifService(new NullLogger());
+        $service = new ExifService(new NullLogger(), $this->createStub(ImageService::class));
 
         // Act
         $meta = $service->extract(self::FIXTURE_DIR . '/with-exif.jpg');
@@ -45,7 +46,7 @@ class ExifServiceTest extends TestCase
     public function testCarriesNoLocationData(): void
     {
         // Arrange
-        $service = new ExifService(new NullLogger());
+        $service = new ExifService(new NullLogger(), $this->createStub(ImageService::class));
 
         // Act
         $meta = $service->extract(self::FIXTURE_DIR . '/with-exif.jpg') ?? [];
@@ -62,7 +63,7 @@ class ExifServiceTest extends TestCase
     public function testYieldsNullMeta(string $file): void
     {
         // Arrange
-        $service = new ExifService(new NullLogger());
+        $service = new ExifService(new NullLogger(), $this->createStub(ImageService::class));
 
         // Act
         $meta = $service->extract(self::FIXTURE_DIR . '/' . $file);
@@ -81,7 +82,7 @@ class ExifServiceTest extends TestCase
     public function testResolvesTheTakenAtStampFromMeta(): void
     {
         // Arrange
-        $service = new ExifService(new NullLogger());
+        $service = new ExifService(new NullLogger(), $this->createStub(ImageService::class));
 
         // Act
         $takenAt = $service->takenAtOf(['takenAt' => '2026-04-18 07:42:11']);
@@ -94,7 +95,7 @@ class ExifServiceTest extends TestCase
     public function testTakenAtIsNullWithoutAUsableStamp(?array $meta): void
     {
         // Arrange
-        $service = new ExifService(new NullLogger());
+        $service = new ExifService(new NullLogger(), $this->createStub(ImageService::class));
 
         // Act + Assert
         static::assertNull($service->takenAtOf($meta));

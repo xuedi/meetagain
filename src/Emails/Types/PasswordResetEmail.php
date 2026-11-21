@@ -11,9 +11,10 @@ use App\Enum\EmailType;
 use App\Service\Config\ConfigService;
 use Module\Email\Contract\BlocklistInterface;
 use Module\Email\Contract\MailerInterface;
+use Module\Email\Contract\UrgentEmailInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
-readonly class PasswordResetEmail extends EmailAbstract
+readonly class PasswordResetEmail extends EmailAbstract implements UrgentEmailInterface
 {
     public function __construct(
         BlocklistInterface $blocklist,

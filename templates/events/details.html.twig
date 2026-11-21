@@ -77,7 +77,7 @@
                         </div>
                         <div class="notification has-text-centered mt-6 is-warning">
                             <p>
-                                {{ 'events.guest_login_prompt'|trans({'%login_link%': '<a class="is-bold" href="' ~ path('app_login') ~ '">' ~ ('events.guest_login_link'|trans) ~ '</a>'})|raw }}
+                                {{ 'events.guest_login_prompt'|trans({'%login_link%': '<a class="is-bold" href="' ~ path('app_login', {'redirect': app.request.requestUri}) ~ '">' ~ ('events.guest_login_link'|trans) ~ '</a>'})|raw }}
                             </p>
                             <p class="mt-2">
                                 {{ 'events.guest_register_prompt'|trans({'%register_link%': '<a href="' ~ path('app_register') ~ '">' ~ ('events.guest_register_link'|trans) ~ '</a>'})|raw }}

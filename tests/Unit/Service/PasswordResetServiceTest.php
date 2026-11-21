@@ -36,6 +36,7 @@ class PasswordResetServiceTest extends TestCase
             $passwordResetEmail ?? $this->createStub(PasswordResetEmail::class),
             $blocklist ?? $this->createStub(BlocklistInterface::class),
             $logger ?? new NullLogger(),
+            [],
         );
     }
 

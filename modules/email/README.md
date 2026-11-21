@@ -120,6 +120,10 @@ commit.
   `EmailService::SEND_BUDGET_SECONDS` have passed; one that stopped on its budget with a full chunk dispatches another
   `Drain` and ends, so no worker is held for long. A budget sends as much as SMTP, an HTTP API or `null://` allow in
   the same wall time; a count would fit only the transport it was tuned for.
+- **Account mails are claimed first.** A type implementing `UrgentEmailInterface` (password reset, verification) is
+  claimed ahead of every other row; all the rest keep `id` order. A bulk run of another type delays them by at most
+  one chunk, whatever the queue holds. The repository receives the identifiers from `EmailService`, which collects
+  them from the tagged types.
 - **A chunk is claimed, not selected.** `EmailQueueRepository::claimPending()` stamps a token on rows in an UPDATE that
   repeats the claim condition, and the run sends only rows carrying its token. Two drains never send the same mail,
   and an empty one costs one UPDATE, so drains need no deduplication.

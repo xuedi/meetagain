@@ -87,6 +87,7 @@ admin_system_import:
     help_missing_plugins: 'Les données des plugins inactifs ici sont ignorées. Active d''abord ces plugins.'
     error_no_file: 'Aucun fichier téléversé.'
     error_not_zip: 'Seuls les fichiers ZIP sont acceptés.'
+    error_too_large: 'L''archive est trop volumineuse.'
     error_expired: 'L''archive téléversée n''est plus disponible. Téléverse-la à nouveau.'
     success_title: 'Import terminé'
     exported_at: 'Exporté le %date%'

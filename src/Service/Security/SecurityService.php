@@ -61,6 +61,7 @@ readonly class SecurityService implements TaskInterface
 
         $ip = $request->getClientIp() ?? '';
         $sessionId = $this->identityResolver->resolveSessionKey($request, $ip);
+        $context['crossSite'] = $this->identityResolver->isCrossSite($request);
 
         if ($ip !== '' && $this->blockStore->isIpBlocked($ip)) {
             return;

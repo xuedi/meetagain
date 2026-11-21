@@ -7,6 +7,13 @@
 		level WARN
 	}
 
+	servers {
+		timeouts {
+			read_header 10s
+			read_body 120s
+		}
+	}
+
 	frankenphp
 }
 
@@ -42,8 +49,12 @@
 	root * /var/www/html/public
 	encode zstd br gzip
 
-	request_body {
-		max_size 512MB
+	@uploadPaths path /image/* /photos/* /admin/system/import /api/v1/events/*
+	request_body @uploadPaths {
+		max_size 330MB
+	}
+	request_body not @uploadPaths {
+		max_size 16MB
 	}
 
 	handle /media/* {

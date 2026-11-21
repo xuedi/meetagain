@@ -2,14 +2,13 @@
 
 namespace App\Controller\Profile;
 
-use App\Activity\ActivityService;
-use App\Activity\Messages\PasswordChanged;
 use App\Controller\AbstractController;
 use App\Entity\NotificationSettings;
 use App\Form\ChangePassword;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Member\BlockingService;
 use App\Service\Member\ConsentService;
+use App\Service\Member\PasswordResetService;
 use App\Service\Notification\SettingsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -19,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/profile/config')]
@@ -28,10 +29,11 @@ final class ConfigController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly UserPasswordHasherInterface $hasher,
-        private readonly ActivityService $activityService,
         private readonly BlockingService $blockingService,
         private readonly ConsentService $consentService,
         private readonly SettingsService $notificationSettings,
+        private readonly PasswordResetService $passwordService,
+        private readonly TokenStorageInterface $tokenStorage,
     ) {}
 
     #[Route('', name: 'app_profile_config')]
@@ -46,12 +48,8 @@ final class ConfigController extends AbstractController
             $user = $this->getAuthedUser();
             $oldPasswordValid = $this->hasher->isPasswordValid($user, $form->get('oldPassword')->getData());
             if ($oldPasswordValid) {
-                $user->setPassword($this->hasher->hashPassword($user, $form->get('newPassword')->getData()));
-
-                $this->em->persist($user);
-                $this->em->flush();
-
-                $this->activityService->log(PasswordChanged::TYPE, $user);
+                $this->passwordService->changePassword($user, $form->get('newPassword')->getData());
+                $this->tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));
 
                 $this->addFlash('success', 'profile_config.flash_password_changed');
             }

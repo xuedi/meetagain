@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber\Security;
 
+use App\Service\Security\RequestIdentityResolver;
 use Override;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -16,6 +17,7 @@ readonly class CrossOriginWriteSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private LoggerInterface $logger,
+        private RequestIdentityResolver $identityResolver,
     ) {}
 
     #[Override]
@@ -43,7 +45,7 @@ readonly class CrossOriginWriteSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->isSameOrigin($request)) {
+        if (!$this->identityResolver->isCrossSite($request)) {
             return;
         }
 
@@ -66,20 +68,5 @@ readonly class CrossOriginWriteSubscriber implements EventSubscriberInterface
         }
 
         return $path === '/admin' || str_starts_with($path, '/admin/');
-    }
-
-    private function isSameOrigin(Request $request): bool
-    {
-        $origin = $request->headers->get('Origin');
-        if ($origin !== null && $origin !== '') {
-            return hash_equals($request->getSchemeAndHttpHost(), $origin);
-        }
-
-        $fetchSite = $request->headers->get('Sec-Fetch-Site');
-        if ($fetchSite !== null && $fetchSite !== '') {
-            return $fetchSite === 'same-origin' || $fetchSite === 'none';
-        }
-
-        return true;
     }
 }

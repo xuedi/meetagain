@@ -45,6 +45,9 @@ readonly class ImageService
         'image/heif-sequence' => 'image/heif',
     ];
 
+    public const int MAX_PIXELS = 50_000_000;
+    public const int MAX_UPLOAD_FILES = 20;
+
     private const int FREE_AXIS_CEILING = 2400;
 
     public function __construct(
@@ -95,8 +98,26 @@ readonly class ImageService
         return $this->imageRepo->getEventList($user);
     }
 
+    public function exceedsPixelBound(string $path): bool
+    {
+        try {
+            $imagick = new Imagick();
+            $imagick->pingImage($path);
+            $pixels = $imagick->getImageWidth() * $imagick->getImageHeight();
+            $imagick->clear();
+        } catch (ImagickException) {
+            return false;
+        }
+
+        return $pixels > self::MAX_PIXELS;
+    }
+
     public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
     {
+        if ($this->exceedsPixelBound($imageData->getPathname())) {
+            throw new RuntimeException('The uploaded image has too many pixels.');
+        }
+
         $hash = sha1($imageData->getContent());
         $image = $this->imageRepo->findOneBy(['hash' => $hash]);
         if ($image !== null) {
@@ -402,6 +423,13 @@ readonly class ImageService
         }
 
         try {
+            $probe = new Imagick();
+            $probe->pingImageBlob($content);
+            if (($probe->getImageWidth() * $probe->getImageHeight()) > self::MAX_PIXELS) {
+                return null;
+            }
+            $probe->clear();
+
             $imagick = new Imagick();
             $imagick->readImageBlob($content);
             $imagick->autoOrient();

@@ -36,22 +36,24 @@ class CaptchaServiceTest extends TestCase
         $image = $this->subject->generate(self::FORM);
 
         // Assert
-        static::assertSame($image, $this->session->get('captcha_image_' . self::FORM));
+        static::assertFalse($this->session->has('captcha_image_' . self::FORM));
         static::assertSame(4, strlen((string) $this->session->get('captcha_text_' . self::FORM)));
         static::assertGreaterThanOrEqual(200, strlen($image));
         static::assertCount(1, $this->session->get('captcha_refresh'));
     }
 
-    public function testGenerateReturnsTheExistingImageForTheSameForm(): void
+    public function testGenerateKeepsTheCodeForTheSameForm(): void
     {
         // Arrange
-        $first = $this->subject->generate(self::FORM);
+        $this->subject->generate(self::FORM);
+        $code = $this->session->get('captcha_text_' . self::FORM);
 
         // Act
-        $second = $this->subject->generate(self::FORM);
+        $image = $this->subject->generate(self::FORM);
 
         // Assert
-        static::assertSame($first, $second);
+        static::assertNotSame('', $image);
+        static::assertSame($code, $this->session->get('captcha_text_' . self::FORM));
         static::assertCount(1, $this->session->get('captcha_refresh'));
     }
 
@@ -79,7 +81,6 @@ class CaptchaServiceTest extends TestCase
 
         // Assert
         static::assertFalse($this->session->has('captcha_text_' . self::FORM));
-        static::assertFalse($this->session->has('captcha_image_' . self::FORM));
         static::assertSame('security.captcha_wrong', $this->subject->isValid(self::FORM, $code));
     }
 

@@ -16,6 +16,7 @@ final readonly class TemplateProvider implements TemplateProviderInterface
     {
         return [
             new TemplateDefinition(TriggeredEmail::IDENTIFIER, self::SUBJECT, self::BODY, ['name', 'itemsHtml'], ['itemsHtml']),
+            new TemplateDefinition(UrgentEmail::IDENTIFIER, self::SUBJECT, self::BODY, ['name', 'itemsHtml'], ['itemsHtml']),
             new TemplateDefinition(ScheduledEmail::IDENTIFIER, self::SUBJECT, self::BODY, ['name', 'itemsHtml'], ['itemsHtml']),
         ];
     }

@@ -3,17 +3,20 @@
 namespace App\Service\Member;
 
 use App\Activity\ActivityService;
+use App\Activity\Messages\PasswordChanged;
 use App\Activity\Messages\PasswordReset;
 use App\Activity\Messages\PasswordResetRequest;
 use App\Emails\Types\PasswordResetEmail;
 use App\Entity\User;
 use App\Enum\UserStatus;
 use App\Repository\UserRepository;
+use App\Security\PasswordChangedHandlerInterface;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\BlocklistInterface;
 use Psr\Log\LoggerInterface;
 use SensitiveParameter;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 readonly class PasswordResetService
@@ -26,6 +29,8 @@ readonly class PasswordResetService
         private PasswordResetEmail $passwordResetEmail,
         private BlocklistInterface $blocklist,
         private LoggerInterface $logger,
+        #[AutowireIterator(PasswordChangedHandlerInterface::class)]
+        private iterable $passwordChangedHandlers,
     ) {}
 
     public function requestReset(string $email): ?User
@@ -86,8 +91,27 @@ readonly class PasswordResetService
         $this->em->flush();
 
         $this->activityService->log(PasswordReset::TYPE, $user);
+        $this->notifyHandlers($user);
 
         return true;
+    }
+
+    public function changePassword(User $user, #[SensitiveParameter] string $newPassword): void
+    {
+        $user->setPassword($this->hasher->hashPassword($user, $newPassword));
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        $this->activityService->log(PasswordChanged::TYPE, $user);
+        $this->notifyHandlers($user);
+    }
+
+    private function notifyHandlers(User $user): void
+    {
+        foreach ($this->passwordChangedHandlers as $handler) {
+            $handler->onPasswordChanged($user);
+        }
     }
 
     private function isClosed(User $user): bool

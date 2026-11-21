@@ -35,6 +35,19 @@ class KernelRequestSubscriberTest extends TestCase
         static::assertSame('/en/events', $event->getRequest()->getSession()->get('redirectUrl'));
     }
 
+    public function testWritesNoSessionForAGuestWithoutASessionCookie(): void
+    {
+        // Arrange
+        $event = $this->makeEvent('GET', '/en/events', 'app_event_list', hasSessionCookie: false);
+
+        // Act
+        new KernelRequestSubscriber()->onKernelRequest($event);
+
+        // Assert
+        static::assertFalse($event->getRequest()->getSession()->isStarted());
+        static::assertNull($event->getRequest()->getSession()->get('redirectUrl'));
+    }
+
     public function testSavesRedirectUrlForDocumentNavigation(): void
     {
         // Arrange
@@ -180,11 +193,21 @@ class KernelRequestSubscriberTest extends TestCase
     /**
      * @param array<string, string> $headers
      */
-    private function makeEvent(string $method, string $path, ?string $route, array $headers = [], ?Session $session = null): RequestEvent
-    {
+    private function makeEvent(
+        string $method,
+        string $path,
+        ?string $route,
+        array $headers = [],
+        ?Session $session = null,
+        bool $hasSessionCookie = true,
+    ): RequestEvent {
         $request = Request::create($path, $method);
         $request->headers->add($headers);
-        $request->setSession($session ?? new Session(new MockArraySessionStorage()));
+        $session ??= new Session(new MockArraySessionStorage());
+        $request->setSession($session);
+        if ($hasSessionCookie) {
+            $request->cookies->set($session->getName(), 'existing');
+        }
         if ($route !== null) {
             $request->attributes->set('_route', $route);
         }

@@ -25,25 +25,23 @@ readonly class CaptchaService
     public function generate(string $formKey): string
     {
         $session = $this->getSession();
-        $image = $session->get($this->sessionKey('image', $formKey));
-        if (is_string($image)) {
-            return $image;
+        $code = $session->get($this->sessionKey('text', $formKey));
+        if (is_string($code) && $code !== '') {
+            return $this->generateImage($code);
         }
 
         $code = '';
         for ($i = 0; $i < 4; $i++) {
             $code .= self::CHARS[random_int(0, strlen(self::CHARS) - 1)];
         }
-        $image = $this->generateImage($code);
 
         $refresh = $session->get('captcha_refresh', []);
         $refresh[] = new DateTimeImmutable();
 
         $session->set('captcha_refresh', $refresh);
         $session->set($this->sessionKey('text', $formKey), $code);
-        $session->set($this->sessionKey('image', $formKey), $image);
 
-        return $image;
+        return $this->generateImage($code);
     }
 
     public function isValid(string $formKey, string $code): ?string
@@ -123,7 +121,6 @@ readonly class CaptchaService
     {
         $session = $this->getSession();
         $session->remove($this->sessionKey('text', $formKey));
-        $session->remove($this->sessionKey('image', $formKey));
         $session->remove($this->sessionKey('attempts', $formKey));
     }
 

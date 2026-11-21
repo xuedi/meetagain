@@ -160,6 +160,53 @@ class EventServiceTest extends TestCase
         static::assertTrue($event->isCanceled());
     }
 
+    public function testCancelingTwiceMailsOneRound(): void
+    {
+        // Arrange
+        $user = new UserStub()->setId(1);
+        $event = new EventStub()
+            ->setId(1)
+            ->setStart(new DateTimeImmutable('+1 week'));
+        $event->addRsvp($user);
+
+        $emMock = $this->createMock(EntityManagerInterface::class);
+        $emMock->expects($this->once())->method('flush');
+
+        $emailMock = $this->createMock(NotificationEventCanceledEmail::class);
+        $emailMock->expects($this->once())->method('send');
+
+        $subject = $this->subjectWith($emMock, $emailMock);
+
+        // Act
+        $subject->cancelEvent($event);
+        $subject->cancelEvent($event);
+
+        // Assert
+        static::assertTrue($event->isCanceled());
+    }
+
+    public function testRecancelingInsideTheNoticeWindowDoesNotMailAgain(): void
+    {
+        // Arrange
+        $event = new EventStub()
+            ->setId(1)
+            ->setStart(new DateTimeImmutable('+1 week'));
+        $event->addRsvp(new UserStub()->setId(1));
+
+        $emailMock = $this->createMock(NotificationEventCanceledEmail::class);
+        $emailMock->expects($this->once())->method('send');
+
+        $subject = $this->subjectWith($this->createStub(EntityManagerInterface::class), $emailMock);
+
+        // Act
+        $subject->cancelEvent($event);
+        $subject->uncancelEvent($event);
+        $subject->cancelEvent($event);
+
+        // Assert
+        static::assertTrue($event->isCanceled());
+    }
+
     public function testCancelEventWithNoRsvpsDoesNotSendEmails(): void
     {
         // Arrange
@@ -574,6 +621,22 @@ class EventServiceTest extends TestCase
             recurringEventService: $this->createStub(RecurringService::class),
             itemAssociationService: $associationService,
             itemTypeRegistry: $registry,
+            plugins: [],
+            imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
+        );
+    }
+
+    private function subjectWith(EntityManagerInterface $em, NotificationEventCanceledEmail $email): EventService
+    {
+        return new EventService(
+            repo: $this->createStub(EventRepository::class),
+            em: $em,
+            notificationEventCanceledEmail: $email,
+            pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $this->createStub(RecurringService::class),
+            itemAssociationService: $this->createStub(AssociationService::class),
+            itemTypeRegistry: $this->createStub(TypeRegistry::class),
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),

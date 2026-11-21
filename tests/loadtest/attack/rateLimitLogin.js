@@ -1,12 +1,13 @@
-// RateLimitProvider attack: 11 failed logins, each from a fresh cookie jar.
-// Symfony's login_throttling fires at 10 (TooManyLoginAttemptsAuthenticationException),
-// LoginAttemptSubscriber hands it to SecurityService, RateLimitProvider returns
-// Block immediately (login_throttling = instant block). The 11th login attempt
-// should be 403'd.
+// RateLimitProvider attack: failed logins until Symfony's login_throttling is
+// exhausted (10 attempts), then two more from one session. Every attempt past the
+// limit throws TooManyLoginAttemptsAuthenticationException, LoginAttemptSubscriber
+// hands it to SecurityService, and RateLimitProvider scores the first trip of a
+// session and blocks on the second.
 //
-// The jar rotates because LoginGuard puts the form measures on the login form
-// after a few failures: a client that keeps its session is then stopped by
-// FormMeasureProvider's session block and never reaches the limiter.
+// The first attempts use a fresh cookie jar each because LoginGuard puts the form
+// measures on the login form after a few failures: a client that keeps its session
+// is then stopped by FormMeasureProvider's session block and never reaches the
+// limiter. The two trips share one jar so they count against the same session.
 //
 // Run via: just testAttack rateLimitLogin
 
@@ -16,7 +17,8 @@ import { check, fail } from 'k6';
 const BASE_URL = __ENV.BASE_URL || 'http://localhost';
 const REPORTS_DIR = '/reports/attack';
 const SCENARIO = 'rateLimitLogin';
-const ATTEMPTS = 11;
+const FRESH_ATTEMPTS = 10;
+const TRIPS = 2;
 const BLOCK_MARKER = 'Temporarily blocked';
 
 const CSRF_RE = /name="_csrf_token" value="([^"]+)"/;
@@ -29,8 +31,7 @@ export const options = {
     },
 };
 
-function attemptLogin() {
-    const jar = new http.CookieJar();
+function attemptLogin(jar) {
     const get = http.get(`${BASE_URL}/en/login`, {
         jar,
         tags: { name: 'GET /en/login' },
@@ -61,8 +62,12 @@ function attemptLogin() {
 }
 
 export default function () {
-    for (let i = 0; i < ATTEMPTS; i++) {
-        attemptLogin();
+    for (let i = 0; i < FRESH_ATTEMPTS; i++) {
+        attemptLogin(new http.CookieJar());
+    }
+    const tripJar = new http.CookieJar();
+    for (let i = 0; i < TRIPS; i++) {
+        attemptLogin(tripJar);
     }
 
     const verify = http.get(`${BASE_URL}/en`, {
@@ -76,7 +81,7 @@ export default function () {
     });
 
     if (!blocked) {
-        fail(`expected block page after ${ATTEMPTS} login attempts, got ${verify.status}`);
+        fail(`expected block page after ${FRESH_ATTEMPTS + TRIPS} login attempts, got ${verify.status}`);
     }
 }
 

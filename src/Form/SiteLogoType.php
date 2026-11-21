@@ -8,7 +8,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SiteLogoType extends AbstractType
@@ -25,9 +25,10 @@ class SiteLogoType extends AbstractType
             'required' => false,
             'label' => 'admin_system_theme.field_logo',
             'constraints' => [
-                new File(
+                new Image(
                     maxSize: '5000k',
                     mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                    maxPixels: ImageService::MAX_PIXELS,
                     mimeTypesMessage: $this->translator->trans('admin_system_theme.logo_mime_error'),
                 ),
             ],

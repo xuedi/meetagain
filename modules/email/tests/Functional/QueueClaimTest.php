@@ -7,6 +7,7 @@ use Module\Email\Contract\MailerInterface;
 use Module\Email\Internal\Entity\EmailQueue;
 use Module\Email\Internal\Repository\EmailQueueRepository;
 use Module\Email\Tests\Stub\TriggeredEmail;
+use Module\Email\Tests\Stub\UrgentEmail;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 final class QueueClaimTest extends KernelTestCase
@@ -60,6 +61,22 @@ final class QueueClaimTest extends KernelTestCase
 
         // Assert
         self::assertCount(3, $takenOver);
+    }
+
+    public function testAnUrgentMailQueuedAfterBulkMailsIsClaimedFirst(): void
+    {
+        // Arrange
+        $repository = $this->queueThreeMails();
+        $container = self::getContainer();
+        $container->get(MailerInterface::class)->send($container->get(UrgentEmail::class), ['recipients' => ['reset@module-test.example']]);
+        $now = new DateTimeImmutable();
+
+        // Act
+        $claimed = $repository->claimPending(1, $now, $now->modify('-600 seconds'), [UrgentEmail::IDENTIFIER]);
+
+        // Assert
+        self::assertCount(1, $claimed);
+        self::assertSame(UrgentEmail::IDENTIFIER, $claimed[0]->getTemplate());
     }
 
     private function queueThreeMails(): EmailQueueRepository

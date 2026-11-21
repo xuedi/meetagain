@@ -15,6 +15,8 @@ class WikidataLookup implements GameMetadataLookupInterface, ResetInterface
 
     private const int SEARCH_LIMIT = 20;
 
+    private const string ENTITY_ID_PATTERN = '/^Q[1-9][0-9]*$/';
+
     private ?LookupFailure $lastFailure = null;
 
     public function __construct(
@@ -31,6 +33,10 @@ class WikidataLookup implements GameMetadataLookupInterface, ResetInterface
 
     public function fetchById(string $externalId): ?GameMetadata
     {
+        if (preg_match(self::ENTITY_ID_PATTERN, $externalId) !== 1) {
+            return null;
+        }
+
         $rows = $this->query($this->buildEntityQuery($externalId));
         if ($rows === []) {
             return null;

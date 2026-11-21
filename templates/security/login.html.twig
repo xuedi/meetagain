@@ -15,6 +15,7 @@
                     <form method="post">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                         <input type="hidden" name="_target_path" value="{{ redirectPath }}"/>
+                        <input type="hidden" name="_failure_path" value="{{ path('app_login', {'redirect': redirectPath}) }}"/>
                         {% if error %}
                             <div class="notification is-danger is-light mb-4">{{ error.messageKey|trans(error.messageData, 'security') }}
                                 {% if badCredentials %}
