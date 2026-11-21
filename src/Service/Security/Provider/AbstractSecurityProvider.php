@@ -48,7 +48,8 @@ abstract readonly class AbstractSecurityProvider implements SecurityProviderInte
 
         $report = null;
         $processed = false;
-        $process = function (array $state) use ($type, $request, $context, $ip, &$report, &$processed): ?array {
+        $crossSite = ($context['crossSite'] ?? false) === true;
+        $process = function (array $state) use ($type, $request, $context, $ip, $crossSite, &$report, &$processed): ?array {
             if ($this->isBlocked($state)) {
                 $report = $this->reportFromState($state);
                 $processed = false;
@@ -56,12 +57,14 @@ abstract readonly class AbstractSecurityProvider implements SecurityProviderInte
                 return null;
             }
 
+            $crossSiteOnly = $crossSite && ($state['crossSiteOnly'] ?? true) === true;
             $result = $this->processEvent($type, $request, $context, $ip, $state);
-            $report = $this->buildReport($result['threatLevel'], $result['summary'], $result['details']);
+            $report = $this->capForCrossSite($this->buildReport($result['threatLevel'], $result['summary'], $result['details']), $crossSiteOnly);
             $processed = true;
 
             return [
                 ...$result['state'],
+                'crossSiteOnly' => $crossSiteOnly,
                 'threatLevel' => $result['threatLevel'],
                 'summary' => $result['summary'],
                 'details' => $result['details'],
@@ -180,6 +183,21 @@ abstract readonly class AbstractSecurityProvider implements SecurityProviderInte
         return SecurityRecommendation::tryFrom((string) ($state['recommendation'] ?? ''))?->isBlocking() ?? false;
     }
 
+    private function capForCrossSite(ProviderReport $report, bool $crossSiteOnly): ProviderReport
+    {
+        if (!$crossSiteOnly || $report->recommendation !== SecurityRecommendation::Block) {
+            return $report;
+        }
+
+        return new ProviderReport(
+            providerKey: $report->providerKey,
+            threatLevel: $report->threatLevel,
+            summary: $report->summary,
+            recommendation: SecurityRecommendation::BlockSession,
+            details: $report->details,
+        );
+    }
+
     /**
      * @param array<string, mixed> $state
      */
@@ -187,10 +205,13 @@ abstract readonly class AbstractSecurityProvider implements SecurityProviderInte
     {
         $details = $state['details'] ?? [];
 
-        return $this->buildReport(
-            threatLevel: (int) ($state['threatLevel'] ?? 0),
-            summary: (string) ($state['summary'] ?? 'No issues'),
-            details: is_array($details) ? $details : [],
+        return $this->capForCrossSite(
+            $this->buildReport(
+                threatLevel: (int) ($state['threatLevel'] ?? 0),
+                summary: (string) ($state['summary'] ?? 'No issues'),
+                details: is_array($details) ? $details : [],
+            ),
+            ($state['crossSiteOnly'] ?? false) === true,
         );
     }
 

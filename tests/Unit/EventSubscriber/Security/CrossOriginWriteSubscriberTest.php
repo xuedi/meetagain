@@ -3,9 +3,11 @@
 namespace Tests\Unit\EventSubscriber\Security;
 
 use App\EventSubscriber\Security\CrossOriginWriteSubscriber;
+use App\Service\Security\RequestIdentityResolver;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -120,6 +122,6 @@ class CrossOriginWriteSubscriberTest extends TestCase
 
     private function makeSubject(): CrossOriginWriteSubscriber
     {
-        return new CrossOriginWriteSubscriber($this->createStub(LoggerInterface::class));
+        return new CrossOriginWriteSubscriber($this->createStub(LoggerInterface::class), new RequestIdentityResolver(new NullLogger()));
     }
 }

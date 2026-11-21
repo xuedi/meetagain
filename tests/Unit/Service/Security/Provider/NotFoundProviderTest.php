@@ -53,6 +53,39 @@ class NotFoundProviderTest extends TestCase
         static::assertGreaterThanOrEqual(100, $report->threatLevel);
     }
 
+    public function testCrossSiteProbesAreScoredButNeverRecommendAnIpBlock(): void
+    {
+        // Arrange
+        $provider = $this->buildProvider();
+
+        // Act
+        $report = null;
+        for ($i = 0; $i < 30; ++$i) {
+            $report = $provider->observe(SecurityEventType::NotFound, Request::create('/random-path-' . $i), ['crossSite' => true], 'sess', '1.2.3.4');
+        }
+
+        // Assert
+        static::assertNotNull($report);
+        static::assertGreaterThanOrEqual(100, $report->threatLevel);
+        static::assertSame(SecurityRecommendation::BlockSession, $report->recommendation);
+        static::assertFalse($report->recommendation->blocksIp());
+    }
+
+    public function testOneSameSiteProbeAmongCrossSiteOnesRestoresTheIpBlock(): void
+    {
+        // Arrange
+        $provider = $this->buildProvider();
+        $report = null;
+
+        // Act
+        for ($i = 0; $i < 30; ++$i) {
+            $report = $provider->observe(SecurityEventType::NotFound, Request::create('/random-path-' . $i), ['crossSite' => $i > 0], 'sess', '1.2.3.4');
+        }
+
+        // Assert
+        static::assertSame(SecurityRecommendation::Block, $report?->recommendation);
+    }
+
     public function testSuspiciousPatternBoostsThreatLevel(): void
     {
         // Arrange

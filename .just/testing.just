@@ -54,7 +54,7 @@ testPerformance:
     {{DOCKER}} stop php-bench
     xdg-open "$(find tests/reports/performance/sitespeed-result -name 'index.html' -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2)"
 
-# Run an attack-test scenario (notFoundProbe | rateLimitLogin | accessDeniedScript | fuseCookieRotation).
+# Run an attack-test scenario (notFoundProbe | rateLimitLogin | accessDeniedScript | fuseCookieRotation | crossSiteImageProbe | crossSiteLoginPosts).
 [group('testing')]
 testAttack scenario='notFoundProbe':
     mkdir -p tests/reports/attack
@@ -64,12 +64,14 @@ testAttack scenario='notFoundProbe':
     @echo "Report: tests/reports/attack/{{scenario}}.html"
     -xdg-open tests/reports/attack/{{scenario}}.html
 
-# Run all four attack scenarios sequentially and produce a combined HTML index.
+# Run all six attack scenarios sequentially and produce a combined HTML index.
 [group('testing')]
 testAttackAll:
     {{JUST}} testAttack notFoundProbe
     {{JUST}} testAttack rateLimitLogin
     {{JUST}} testAttack accessDeniedScript
     {{JUST}} testAttack fuseCookieRotation
+    {{JUST}} testAttack crossSiteImageProbe
+    {{JUST}} testAttack crossSiteLoginPosts
     {{PHP}} php bin/console app:security:report-combined --input-dir=tests/reports/attack --output=tests/reports/attack/index.html
     -xdg-open tests/reports/attack/index.html
