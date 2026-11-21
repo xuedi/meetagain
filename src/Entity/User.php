@@ -194,12 +194,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
             return false;
         }
 
-        return (
-            $user->getId() === $this->getId()
-            && $user->getStatus() === $this->getStatus()
-            && $user->getRole() === $this->getRole()
-            && $user->getUserIdentifier() === $this->getUserIdentifier()
-        );
+        return $user->getId() === $this->getId()
+        && $user->getStatus() === $this->getStatus()
+        && $user->getRole() === $this->getRole()
+        && $user->getUserIdentifier() === $this->getUserIdentifier()
+        && hash_equals((string) $this->getPassword(), (string) $user->getPassword());
     }
 
     public function getCreatedAt(): ?DateTimeImmutable
