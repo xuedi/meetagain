@@ -50,10 +50,11 @@
 	encode zstd br gzip
 
 	@uploadPaths path /image/* /photos/* /admin/system/import /api/v1/events/*
+	@otherPaths not path /image/* /photos/* /admin/system/import /api/v1/events/*
 	request_body @uploadPaths {
 		max_size 330MB
 	}
-	request_body not @uploadPaths {
+	request_body @otherPaths {
 		max_size 16MB
 	}
 
