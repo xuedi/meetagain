@@ -2,6 +2,21 @@
 
 Each release of the MeetAgain core, newest first, written at release time.
 
+## 1.2.0 - 2026-11-21
+
+This is a minor release of MeetAgain. It adds features and fixes defects without breaking existing ones. Existing installations keep working after the update; new features may bring new optional settings. We recommend updating.
+
+### Other changes
+
+- fix: enforced request body limit
+- fix: cross-site requests no longer ban
+- fix: guarded remote fetches
+- fix: slimmed guest sessions
+- fix: bounded upload sizes
+- fix: limited mail floods & priorize system mails
+
+**Full changelog:** https://github.com/xuedi/meetagain/compare/1.1.2...c77e933
+
 ## 1.1.2 - 2026-11-21
 
 This is a patch release of MeetAgain. It brings fixes and small improvements and changes no setting or interface, so an update needs no change to the configuration. We recommend updating soon.
