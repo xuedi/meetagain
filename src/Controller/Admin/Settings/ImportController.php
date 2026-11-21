@@ -44,6 +44,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class ImportController extends AbstractSettingsController implements AdminNavigationInterface, AdminTabsInterface
 {
     private const string PENDING_ARCHIVE = 'admin_system_import_pending';
+    private const int MAX_ARCHIVE_BYTES = 256 * 1024 * 1024;
     private const string EXPORT_TOKEN = 'admin_system_import_export';
     private const string DELETE_EXPORT_TOKEN = 'admin_system_import_export_delete';
 
@@ -82,6 +83,10 @@ final class ImportController extends AbstractSettingsController implements Admin
 
         if (strtolower($file->getClientOriginalExtension()) !== 'zip') {
             return $this->renderPage(error: $this->translator->trans('admin_system_import.error_not_zip'));
+        }
+
+        if ($file->getSize() > self::MAX_ARCHIVE_BYTES) {
+            return $this->renderPage(error: $this->translator->trans('admin_system_import.error_too_large'));
         }
 
         $this->discardPendingArchive($request->getSession());

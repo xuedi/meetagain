@@ -13,7 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -35,9 +35,10 @@ class PhotoAddType extends AbstractType
             'mapped' => false,
             'constraints' => [
                 new NotNull(message: $this->translator->trans('photos_photo.error_no_image')),
-                new File(
+                new Image(
                     maxSize: '16000k',
                     mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                    maxPixels: ImageService::MAX_PIXELS,
                     mimeTypesMessage: $this->translator->trans('photos_photo.error_invalid_image'),
                 ),
             ],

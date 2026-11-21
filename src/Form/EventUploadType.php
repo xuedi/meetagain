@@ -9,7 +9,8 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\All;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Count;
+use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventUploadType extends AbstractType
@@ -27,10 +28,12 @@ class EventUploadType extends AbstractType
             'required' => false,
             'multiple' => true,
             'constraints' => [
+                new Count(max: ImageService::MAX_UPLOAD_FILES),
                 new All([
-                    new File(
+                    new Image(
                         maxSize: '10M',
                         mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                        maxPixels: ImageService::MAX_PIXELS,
                         mimeTypesMessage: $this->translator->trans('shared.form_image_upload_mime_error_4_3'),
                     ),
                 ]),

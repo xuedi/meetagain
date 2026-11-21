@@ -11,7 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Count;
-use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EventUploadType extends AbstractType
@@ -30,11 +30,12 @@ class EventUploadType extends AbstractType
             'mapped' => false,
             'multiple' => true,
             'constraints' => [
-                new Count(min: 1, minMessage: $this->translator->trans('photos_event.error_no_image')),
+                new Count(min: 1, max: ImageService::MAX_UPLOAD_FILES, minMessage: $this->translator->trans('photos_event.error_no_image')),
                 new All([
-                    new File(
+                    new Image(
                         maxSize: '16000k',
                         mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                        maxPixels: ImageService::MAX_PIXELS,
                         mimeTypesMessage: $this->translator->trans('photos_event.error_invalid_image'),
                     ),
                 ]),

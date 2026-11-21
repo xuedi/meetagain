@@ -87,6 +87,7 @@ admin_system_import:
     help_missing_plugins: 'Rows of plugins that are not active here are skipped. Enable those plugins first.'
     error_no_file: 'No file uploaded.'
     error_not_zip: 'Only ZIP files are accepted.'
+    error_too_large: 'The archive is too large.'
     error_expired: 'The uploaded archive is no longer available. Upload it again.'
     success_title: 'Import complete'
     exported_at: 'Exported %date%'

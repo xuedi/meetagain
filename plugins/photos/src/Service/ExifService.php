@@ -2,6 +2,7 @@
 
 namespace Plugin\Photos\Service;
 
+use App\Service\Media\ImageService;
 use DateTimeImmutable;
 use Imagick;
 use Psr\Log\LoggerInterface;
@@ -14,6 +15,7 @@ readonly class ExifService
 
     public function __construct(
         private LoggerInterface $logger,
+        private ImageService $imageService,
     ) {}
 
     /**
@@ -21,6 +23,10 @@ readonly class ExifService
      */
     public function extract(string $path): ?array
     {
+        if ($this->imageService->exceedsPixelBound($path)) {
+            return null;
+        }
+
         try {
             $imagick = new Imagick();
             $imagick->readImage($path);

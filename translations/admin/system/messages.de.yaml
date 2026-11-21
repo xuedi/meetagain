@@ -87,6 +87,7 @@ admin_system_import:
     help_missing_plugins: 'Daten von Plugins, die hier nicht aktiv sind, werden übersprungen. Aktivieren Sie diese Plugins zuerst.'
     error_no_file: 'Keine Datei hochgeladen.'
     error_not_zip: 'Nur ZIP-Dateien werden akzeptiert.'
+    error_too_large: 'Das Archiv ist zu groß.'
     error_expired: 'Das hochgeladene Archiv ist nicht mehr verfügbar. Laden Sie es erneut hoch.'
     success_title: 'Import abgeschlossen'
     exported_at: 'Exportiert am %date%'

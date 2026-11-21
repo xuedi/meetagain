@@ -87,6 +87,7 @@ admin_system_import:
     help_missing_plugins: '本站未启用的插件的数据会被跳过。请先启用这些插件。'
     error_no_file: '未上传文件。'
     error_not_zip: '只接受 ZIP 文件。'
+    error_too_large: '归档文件过大。'
     error_expired: '上传的归档已不可用，请重新上传。'
     success_title: '导入完成'
     exported_at: '导出于 %date%'
