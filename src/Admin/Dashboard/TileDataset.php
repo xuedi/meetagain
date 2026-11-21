@@ -5,7 +5,7 @@ namespace App\Admin\Dashboard;
 final readonly class TileDataset
 {
     /**
-     * @param list<int> $data
+     * @param list<int|float> $data
      */
     public function __construct(
         public string $label,

@@ -174,6 +174,9 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             'originalMessage',
             'response',
             'createdAt',
+            'host',
+            'lang',
+            'token',
             'greeting',
         ],
         EmailType::SupportEmailVerify->value => [

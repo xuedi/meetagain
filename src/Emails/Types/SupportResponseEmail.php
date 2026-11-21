@@ -48,7 +48,9 @@ readonly class SupportResponseEmail extends EmailAbstract
                 'originalMessage' => $sample->messageText,
                 'response' => $sample->responseText,
                 'createdAt' => $sample->dates->createdAt,
+                'host' => $sample->host,
                 'lang' => $locale,
+                'token' => str_repeat('0', 64),
             ],
         ];
     }
@@ -70,8 +72,11 @@ readonly class SupportResponseEmail extends EmailAbstract
         $email = new TemplatedEmail();
         $email->from($this->config->getMailerAddress());
         $email->to((string) $request->getEmail());
-        $email->locale($request->getLocale() ?? $request->getRequester()?->getLocale() ?? $this->defaultLocale);
+        $locale = $request->getLocale() ?? $request->getRequester()?->getLocale() ?? $this->defaultLocale;
+        $email->locale($locale);
         $email->context([
+            'lang' => $locale,
+            'token' => (string) $request->getToken(),
             'name' => $request->getRequesterLabel(),
             'originalMessage' => $request->getMessage(),
             'response' => $response,

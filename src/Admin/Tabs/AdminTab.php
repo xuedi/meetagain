@@ -9,5 +9,6 @@ final readonly class AdminTab
         public string $target,
         public ?string $icon = null,
         public bool $isActive = false,
+        public bool $iconOnly = false,
     ) {}
 }

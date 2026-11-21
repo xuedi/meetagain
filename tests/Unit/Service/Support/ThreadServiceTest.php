@@ -4,6 +4,7 @@ namespace Tests\Unit\Service\Support;
 
 use App\Activity\ActivityService;
 use App\Activity\Messages\SendMessage;
+use App\Activity\Messages\SupportEmailVouched;
 use App\Emails\Types\SupportResponseEmail;
 use App\Entity\Message;
 use App\Entity\SupportRequest;
@@ -164,6 +165,44 @@ class ThreadServiceTest extends TestCase
 
         // Act
         $service->answer($request, 'Answer.', new UserStub()->setId(9));
+    }
+
+    public function testVouchingConfirmsTheAddressClearsTheTokenAndLogsTheAdmin(): void
+    {
+        // Arrange
+        $request = new SupportRequest()
+            ->setChannel(SupportChannel::Thread)
+            ->setEmail('guest@example.org')
+            ->setEmailVerifyToken('pending')
+            ->setEmailVerifyExpiresAt(new DateTimeImmutable('2026-08-20'));
+        $admin = new User();
+        $activity = $this->createMock(ActivityService::class);
+        $activity->expects(static::once())->method('log')->with(SupportEmailVouched::TYPE, $admin, static::anything());
+        $service = $this->createService(activity: $activity);
+
+        // Act
+        $service->vouchForEmail($request, $admin);
+
+        // Assert
+        static::assertTrue($request->isEmailVerified());
+        static::assertNull($request->getEmailVerifyToken());
+        static::assertNull($request->getEmailVerifyExpiresAt());
+        static::assertSame('2026-08-19 12:00:00', $request->getLastActivityAt()?->format('Y-m-d H:i:s'));
+    }
+
+    public function testAReplyAfterVouchingSendsTheResponseMail(): void
+    {
+        // Arrange
+        $request = new SupportRequest()
+            ->setChannel(SupportChannel::Thread)
+            ->setEmail('guest@example.org');
+        $email = $this->createMock(SupportResponseEmail::class);
+        $email->expects(static::once())->method('send');
+        $service = $this->createService(responseEmail: $email);
+        $service->vouchForEmail($request, new User());
+
+        // Act
+        $service->answer($request, 'Answer', new User());
     }
 
     public function testAnswerToAnUnconfirmedGuestSendsNoMail(): void

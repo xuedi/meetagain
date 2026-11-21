@@ -1,12 +1,10 @@
-<div class="box mb-4">
+<div class="box mb-4 has-text-centered is-flex-grow-1">
     <h2 class="title is-6">{{ tile.title|trans }}</h2>
-    <p class="is-size-2-desktop is-size-3-mobile has-text-weight-bold">
-        {% if tile.icon %}<span class="icon"><i class="fa fa-{{ tile.icon }}"></i></span>{% endif %}
-        {{ tile.value }}
+    <p class="is-size-2-desktop is-size-3-mobile has-text-weight-bold is-flex is-align-items-center is-justify-content-center">
+        {% if tile.icon %}<i class="fa fa-{{ tile.icon }} mr-3" aria-hidden="true"></i>{% endif %}
+        <span>{{ tile.value }}</span>
     </p>
-    {% if tile.sublabel %}
-        <p class="is-size-7 has-text-grey">{{ tile.sublabel|trans }}</p>
-    {% endif %}
+    <p class="is-size-7 has-text-grey">{% if tile.sublabel %}{{ tile.sublabel|trans }}{% else %}&nbsp;{% endif %}</p>
     {% if tile.link %}
         <p class="mt-2">
             <a href="{{ tile.link }}" class="is-size-7">{{ 'admin_shell.dashboard_view_link'|trans }}</a>

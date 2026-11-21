@@ -346,4 +346,9 @@ class SupportRequest
     {
         return $this->emailVerifiedAt instanceof DateTimeImmutable && $this->email !== null;
     }
+
+    public function canVouchEmail(): bool
+    {
+        return $this->channel === SupportChannel::Thread && $this->email !== null && !$this->isEmailVerified();
+    }
 }

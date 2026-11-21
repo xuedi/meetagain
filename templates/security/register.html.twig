@@ -20,9 +20,21 @@
 
                     {{ form_errors(form) }}
 
+                    {% set emailTaken = emailTaken|default(false) %}
+                    {% for emailError in form.email.vars.errors %}
+                        {% if emailError.message == 'security.validator_email_unique'|trans({}, 'validators') %}{% set emailTaken = true %}{% endif %}
+                    {% endfor %}
+                    {% if emailTaken %}
+                        <p class="mb-4 is-size-7">
+                            <a href="{{ path('app_login') }}">{{ 'security.register_exists_login'|trans }}</a>
+                            &middot;
+                            <a href="{{ path('app_reset') }}">{{ 'security.register_exists_reset'|trans }}</a>
+                        </p>
+                    {% endif %}
+
                     {{ form_row(form.name) }}
                     {{ form_row(form.email) }}
-                    {{ form_row(form.plainPassword) }}
+                    {{ form_row(form.plainPassword, {attr: {'data-password-toggle': 'security.aria_toggle_password'|trans}}) }}
                     {{ form_row(form.agreeTerms) }}
 
                     {% include '_components/human_check.html.twig' with {'form': form.meta} only %}
@@ -62,4 +74,5 @@
 {% block javascripts %}
     <script src="{{ asset('js/captcha-counter.js') }}" defer></script>
     <script src="{{ asset('js/human-check.js') }}" defer></script>
+    <script src="{{ asset('js/password-toggle.js') }}" defer></script>
 {% endblock %}

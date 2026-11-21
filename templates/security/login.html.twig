@@ -16,13 +16,17 @@
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
                         <input type="hidden" name="_target_path" value="{{ redirectPath }}"/>
                         {% if error %}
-                            <div class="notification is-danger is-light mb-4">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                            <div class="notification is-danger is-light mb-4">{{ error.messageKey|trans(error.messageData, 'security') }}
+                                {% if badCredentials %}
+                                    <a href="{{ path('app_reset') }}"><strong>{{ 'security.login_error_reset_link'|trans }}</strong></a>
+                                {% endif %}
+                            </div>
                         {% endif %}
 
                         <div class="field">
                             <label class="label">{{ 'security.label_email' | trans }}</label>
                             <p class="control has-icons-left">
-                                <input type="email" name="_username" id="username" class="input" autocomplete="email" placeholder="{{ 'security.label_email' | trans }}">
+                                <input type="email" name="_username" id="username" class="input" autocomplete="email" value="{{ last_username|default('') }}" placeholder="{{ 'security.label_email' | trans }}">
                                 <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
                             </p>
                         </div>
@@ -30,9 +34,10 @@
                         <div class="field">
                             <label class="label">{{ 'security.label_password' | trans }}</label>
                             <p class="control has-icons-left">
-                                <input type="password" name="_password" id="password" class="input" placeholder="{{ 'security.label_password' | trans }}">
+                                <input type="password" name="_password" id="password" class="input" autocomplete="current-password" placeholder="{{ 'security.label_password' | trans }}">
                                 <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
                             </p>
+                            <p class="help"><a href="{{ path('app_reset') }}">{{ 'security.link_forgot_password'|trans }}</a></p>
                         </div>
 
                         {% if meta %}
@@ -49,10 +54,6 @@
                     {% if meta %}
                         {% include '_components/captcha_refresh.html.twig' with {'form': meta} only %}
                     {% endif %}
-
-                    <p class="mt-4 is-size-7">
-                        {{ "security.intro_reset_link"|trans }} <a href="{{ path('app_reset') }}">{{ 'security.link_here' | trans }}</a>
-                    </p>
 
                 </div>
 

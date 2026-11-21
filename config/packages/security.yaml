@@ -38,7 +38,7 @@ security:
                 form_only: true
             user_checker: App\Security\UserChecker
             login_throttling:
-                max_attempts: 10
+                max_attempts: 20
                 interval: '15 minutes'
 
     access_decision_manager:

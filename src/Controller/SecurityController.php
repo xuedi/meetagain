@@ -40,6 +40,7 @@ use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -89,6 +90,7 @@ final class SecurityController extends AbstractController
             'redirectPath' => $redirectPath,
             'last_username' => $lastUsername,
             'error' => $error,
+            'badCredentials' => $error instanceof BadCredentialsException,
             'meta' => $this->loginGuard->isActive($request) ? $this->loginGuard->createMeasuresForm()->createView() : null,
         ]);
     }
@@ -158,7 +160,7 @@ final class SecurityController extends AbstractController
                 if ($em->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]) instanceof User) {
                     $form->get('email')->addError(new FormError($this->translator->trans('security.validator_email_unique', [], 'validators')));
 
-                    return $this->render('security/register.html.twig', ['form' => $form]);
+                    return $this->render('security/register.html.twig', ['form' => $form, 'emailTaken' => true]);
                 }
 
                 $this->persistNewRegistration($em, $request, $user, $form->get('plainPassword')->getData());
@@ -221,6 +223,10 @@ final class SecurityController extends AbstractController
     {
         $form = $this->createForm(PasswordResetType::class);
         $form->handleRequest($request);
+
+        if (!$form->isSubmitted() && $this->authenticationUtils->getLastUsername() !== '') {
+            $form->get('email')->setData($this->authenticationUtils->getLastUsername());
+        }
 
         if ($form->isSubmitted() && !$this->passwordResetLimiter->create($request->getClientIp())->consume()->isAccepted()) {
             $submittedEmail = $request->request->all('password_reset')['email'] ?? null;
