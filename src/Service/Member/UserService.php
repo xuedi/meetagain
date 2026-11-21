@@ -47,6 +47,11 @@ readonly class UserService
         return $this->userRepo->consumeRegcode($user, $code);
     }
 
+    public function findByEmail(string $email): ?User
+    {
+        return $this->userRepo->findOneByEmailIgnoreCase($email);
+    }
+
     public function findUser(int $id): ?User
     {
         return $this->userRepo->find($id);
