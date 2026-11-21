@@ -2,6 +2,7 @@
 
 namespace Plugin\Boardgames\Tests\Unit\Service;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plugin\Boardgames\Enum\ExternalSource;
 use Plugin\Boardgames\Enum\LookupFailure;
@@ -75,6 +76,36 @@ class WikidataLookupTest extends TestCase
         // Assert
         static::assertStringNotContainsString('%22+%7D+UNION', $seen);
         static::assertStringContainsString('%5C%22', $seen);
+    }
+
+    /** @return iterable<string, array{string}> */
+    public static function injectedIdProvider(): iterable
+    {
+        yield 'sparql break-out' => ['Q1 ?x} UNION {?a ?b ?c'];
+        yield 'no Q prefix' => ['170436'];
+        yield 'lowercase' => ['q170436'];
+        yield 'leading zero' => ['Q0123'];
+        yield 'empty' => [''];
+    }
+
+    #[DataProvider('injectedIdProvider')]
+    public function testAnIdThatIsNotAWikidataEntityMakesNoRequest(string $id): void
+    {
+        // Arrange
+        $requests = 0;
+        $client = new MockHttpClient(static function () use (&$requests): MockResponse {
+            ++$requests;
+
+            return new MockResponse('{"results":{"bindings":[]}}');
+        });
+        $lookup = new WikidataLookup($client, new NullLogger());
+
+        // Act
+        $metadata = $lookup->fetchById($id);
+
+        // Assert
+        static::assertNull($metadata);
+        static::assertSame(0, $requests);
     }
 
     private function lookup(MockResponse $response): WikidataLookup

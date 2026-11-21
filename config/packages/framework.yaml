@@ -5,6 +5,13 @@ framework:
     exceptions:
         Symfony\Component\HttpKernel\Exception\NotFoundHttpException:
             log_level: info
+    http_client:
+        scoped_clients:
+            remote.client:
+                scope: '^https?://'
+                timeout: 5
+                max_duration: 15
+                max_redirects: 3
     session:
         handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler
         cookie_secure: auto
