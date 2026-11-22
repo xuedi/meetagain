@@ -82,6 +82,27 @@ final class ActionQueueTest extends KernelTestCase
         self::assertSame(Status::ok, $finished->status);
     }
 
+    public function testTheLatestRequestCanBeNarrowedToItsValues(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $this->queue()->queue(Action::QUICK, ['scope' => 1, 'by' => 'a'], null);
+        $this->queue()->queue(Action::QUICK, ['scope' => 2, 'by' => 'a'], null);
+        $newest = $this->queue()->latest(Action::QUICK);
+        self::assertNotNull($newest);
+
+        // Act
+        $first = $this->queue()->latest(Action::QUICK, ['scope' => 1]);
+        $second = $this->queue()->latest(Action::QUICK, ['scope' => 2, 'by' => 'a']);
+        $none = $this->queue()->latest(Action::QUICK, ['scope' => 3]);
+
+        // Assert
+        self::assertNotNull($first);
+        self::assertNotSame($newest->id, $first->id);
+        self::assertSame($newest->id, $second?->id);
+        self::assertNull($none);
+    }
+
     private function queue(): ActionQueueInterface
     {
         $queue = self::getContainer()->get(ActionQueueInterface::class);

@@ -9,5 +9,8 @@ interface ActionQueueInterface
      */
     public function queue(string $identifier, array $values, ?string $requestedBy): void;
 
-    public function latest(string $identifier): ?RequestedAction;
+    /**
+     * @param array<string, string|int|bool|null> $values pairs the request's values must all contain
+     */
+    public function latest(string $identifier, array $values = []): ?RequestedAction;
 }

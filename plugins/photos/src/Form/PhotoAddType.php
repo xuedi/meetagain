@@ -39,6 +39,8 @@ class PhotoAddType extends AbstractType
                     maxSize: '16000k',
                     mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
                     maxPixels: ImageService::MAX_PIXELS,
+                    maxWidth: ImageService::MAX_EDGE,
+                    maxHeight: ImageService::MAX_EDGE,
                     mimeTypesMessage: $this->translator->trans('photos_photo.error_invalid_image'),
                 ),
             ],

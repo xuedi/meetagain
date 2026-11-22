@@ -153,7 +153,7 @@ final class PhotoController extends AbstractController
         $form = $this->createForm(EventUploadType::class);
         $form->handleRequest($request);
         if (!$form->isSubmitted() || !$form->isValid()) {
-            $this->addFlash('error', 'photos_event.flash_upload_failed');
+            $this->addFlash('error', $this->firstErrorOf($form, 'photos_event.flash_upload_failed'));
 
             return $this->redirectToRoute('app_event_details', ['id' => $id]);
         }

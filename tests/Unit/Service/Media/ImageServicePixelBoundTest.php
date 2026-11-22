@@ -49,6 +49,18 @@ class ImageServicePixelBoundTest extends TestCase
         $subject->upload($uploadedFile, $user, ImageType::ProfilePicture);
     }
 
+    public function testExceedsPixelBoundIsTrueForAnEdgePastTheLimitAlone(): void
+    {
+        // Arrange
+        $subject = $this->createService($this->createStub(EntityManagerInterface::class));
+        $wide = $this->write($this->solidPng(ImageService::MAX_EDGE + 1000, 1000));
+        $tall = $this->write($this->solidPng(1000, ImageService::MAX_EDGE + 1000));
+
+        // Act & Assert
+        $this->assertTrue($subject->exceedsPixelBound($wide));
+        $this->assertTrue($subject->exceedsPixelBound($tall));
+    }
+
     public function testExceedsPixelBoundIsFalseForSmallAndUnreadableFiles(): void
     {
         // Arrange

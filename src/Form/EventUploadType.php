@@ -34,6 +34,8 @@ class EventUploadType extends AbstractType
                         maxSize: '10M',
                         mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
                         maxPixels: ImageService::MAX_PIXELS,
+                        maxWidth: ImageService::MAX_EDGE,
+                        maxHeight: ImageService::MAX_EDGE,
                         mimeTypesMessage: $this->translator->trans('shared.form_image_upload_mime_error_4_3'),
                     ),
                 ]),

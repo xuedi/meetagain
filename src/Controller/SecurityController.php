@@ -42,11 +42,15 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class SecurityController extends AbstractController
 {
+    use TargetPathTrait;
+
     public const string LOGIN_ROUTE = 'app_login';
+    private const string FIREWALL = 'main';
     private const int USER_AGENT_MAX = 512;
 
     /** @param iterable<RegistrationApprovalProviderInterface> $registrationApprovalProviders */
@@ -81,16 +85,11 @@ final class SecurityController extends AbstractController
         $error = $this->authenticationUtils->getLastAuthenticationError();
         $lastUsername = $this->authenticationUtils->getLastUsername();
 
-        $redirectPath = $this->generateUrl('app_profile');
-        $requested = $this->sameHostPath($request->query->get('redirect'));
-        if ($requested !== null) {
-            $redirectPath = $requested;
-        } elseif ($request->hasPreviousSession() && null !== $request->getSession()->get('redirectUrl')) {
-            $redirectPath = $request->getSession()->get('redirectUrl');
-        }
+        $target = $this->loginTarget($request);
 
         return $this->render('security/login.html.twig', [
-            'redirectPath' => $redirectPath,
+            'redirectPath' => $target ?? $this->generateUrl('app_profile'),
+            'registerRedirect' => $target,
             'last_username' => $lastUsername,
             'error' => $error,
             'badCredentials' => $error instanceof BadCredentialsException,
@@ -148,6 +147,11 @@ final class SecurityController extends AbstractController
             );
         }
 
+        $redirect = $this->sameHostPath($request->query->get('redirect'));
+        if ($form->isSubmitted() && $redirect !== null) {
+            $request->getSession()->set('redirectUrl', $redirect);
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
             $blockReason = $this->blocklist->reasonFor((string) $user->getEmail());
             if ($blockReason !== null) {
@@ -163,7 +167,7 @@ final class SecurityController extends AbstractController
                 if ($em->getRepository(User::class)->findOneBy(['email' => $user->getEmail()]) instanceof User) {
                     $form->get('email')->addError(new FormError($this->translator->trans('security.validator_email_unique', [], 'validators')));
 
-                    return $this->render('security/register.html.twig', ['form' => $form, 'emailTaken' => true]);
+                    return $this->render('security/register.html.twig', ['form' => $form, 'emailTaken' => true, 'redirect' => $redirect]);
                 }
 
                 $this->persistNewRegistration($em, $request, $user, $form->get('plainPassword')->getData());
@@ -179,7 +183,7 @@ final class SecurityController extends AbstractController
             return $this->render('security/register_email_send.html.twig');
         }
 
-        return $this->render('security/register.html.twig', ['form' => $form]);
+        return $this->render('security/register.html.twig', ['form' => $form, 'redirect' => $redirect]);
     }
 
     #[Route('/register/verify/{code}', name: 'app_register_confirm_email')]
@@ -327,6 +331,32 @@ final class SecurityController extends AbstractController
             'ip' => $request->getClientIp() ?? '',
             'user_agent' => mb_substr((string) $request->headers->get('User-Agent'), 0, self::USER_AGENT_MAX),
         ];
+    }
+
+    private function loginTarget(Request $request): ?string
+    {
+        $requested = $this->sameHostPath($request->query->get('redirect'));
+        if ($requested !== null || !$request->hasPreviousSession()) {
+            return $requested;
+        }
+
+        $session = $request->getSession();
+        $stored = $this->getTargetPath($session, self::FIREWALL);
+        if ($stored !== null) {
+            $this->removeTargetPath($session, self::FIREWALL);
+        }
+
+        return $this->sameHostPath($session->get('redirectUrl')) ?? $this->sameHostPath($this->localPart($request, $stored));
+    }
+
+    private function localPart(Request $request, ?string $url): ?string
+    {
+        $origin = $request->getSchemeAndHttpHost();
+        if ($url === null || !str_starts_with($url, $origin . '/')) {
+            return $url;
+        }
+
+        return substr($url, strlen($origin));
     }
 
     private function sameHostPath(mixed $path): ?string

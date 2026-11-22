@@ -14,6 +14,7 @@ use Throwable;
 readonly class RemoteImageImporter
 {
     public const int MAX_BYTES = 10_485_760;
+    public const int MAX_REDIRECTS = 5;
 
     public function __construct(
         #[Autowire(service: 'remote.client')]
@@ -50,7 +51,7 @@ readonly class RemoteImageImporter
 
     private function download(string $url, string $target): bool
     {
-        $response = $this->httpClient->request('GET', $url, ['max_redirects' => 3]);
+        $response = $this->httpClient->request('GET', $url, ['max_redirects' => self::MAX_REDIRECTS]);
         if ($response->getStatusCode() !== 200) {
             $this->logger->warning('Remote image not available', ['url' => $url, 'status' => $response->getStatusCode()]);
 

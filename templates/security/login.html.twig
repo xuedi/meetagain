@@ -11,6 +11,7 @@
                 <div class="column is-6-tablet is-5-desktop">
 
                     <h1 class="title is-5">{{ "security.headline_login"|trans }}</h1>
+                    {% set registerPath = path('app_register', registerRedirect ? {'redirect': registerRedirect} : {}) %}
 
                     <form method="post">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
@@ -48,7 +49,7 @@
                         <div class="field is-grouped mt-5">
                             <div class="control">
                                 <button type="submit" class="button is-primary">{{ 'chrome.menu_login'|trans }}</button>
-                                <a href="{{ path('app_register') }}" class="button is-light">{{ 'security.button_register'|trans }}</a>
+                                <a href="{{ registerPath }}" class="button is-light">{{ 'security.button_register'|trans }}</a>
                             </div>
                         </div>
                     </form>
@@ -67,7 +68,7 @@
                             'security.login_sidebar_bullet2'|trans,
                             'security.login_sidebar_bullet3'|trans,
                         ],
-                        link_url: path('app_register'),
+                        link_url: registerPath,
                         link_text: 'security.login_sidebar_link'|trans,
                         link_icon: 'arrow-right',
                     } only %}

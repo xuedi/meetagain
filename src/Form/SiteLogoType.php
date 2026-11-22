@@ -29,6 +29,8 @@ class SiteLogoType extends AbstractType
                     maxSize: '5000k',
                     mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
                     maxPixels: ImageService::MAX_PIXELS,
+                    maxWidth: ImageService::MAX_EDGE,
+                    maxHeight: ImageService::MAX_EDGE,
                     mimeTypesMessage: $this->translator->trans('admin_system_theme.logo_mime_error'),
                 ),
             ],

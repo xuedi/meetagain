@@ -24,6 +24,8 @@ class WebsiteImageType extends AbstractType
                     maxSize: '5000k',
                     mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
                     maxPixels: ImageService::MAX_PIXELS,
+                    maxWidth: ImageService::MAX_EDGE,
+                    maxHeight: ImageService::MAX_EDGE,
                     mimeTypesMessage: 'shared.form_image_upload_mime_error',
                 ),
             ],

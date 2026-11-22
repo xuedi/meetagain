@@ -49,8 +49,8 @@
 	root * /var/www/html/public
 	encode zstd br gzip
 
-	@uploadPaths path_regexp ^/([a-z]{2}/(image|photos|admin/system/import)(/|$)|api/v1/events/)
-	@otherPaths not path_regexp ^/([a-z]{2}/(image|photos|admin/system/import)(/|$)|api/v1/events/)
+	@uploadPaths path_regexp ^/([a-z]{2}/(image|photos|admin/system/import|admin/cms/block/[0-9]+/(gallery/add|card/[0-2]/image/upload))(/|$)|api/v1/events/)
+	@otherPaths not path_regexp ^/([a-z]{2}/(image|photos|admin/system/import|admin/cms/block/[0-9]+/(gallery/add|card/[0-2]/image/upload))(/|$)|api/v1/events/)
 	request_body @uploadPaths {
 		max_size 330MB
 	}
