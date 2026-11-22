@@ -133,6 +133,18 @@ readonly class BookContributor implements ContributorInterface
         $this->em->createQuery(sprintf('DELETE %s e', Book::class))->execute();
     }
 
+    #[Override]
+    public function deleteItems(array $itemIds): void
+    {
+        if ($itemIds === []) {
+            return;
+        }
+
+        foreach ($this->bookRepo->findBy(['id' => $itemIds]) as $item) {
+            $this->bookService->delete($item);
+        }
+    }
+
     private function nullableString(mixed $value): ?string
     {
         return $value === null || $value === '' ? null : (string) $value;

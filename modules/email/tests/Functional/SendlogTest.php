@@ -5,11 +5,13 @@ namespace Module\Email\Tests\Functional;
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityManagerInterface;
 use Module\Email\Contract\MailerInterface;
 use Module\Email\Contract\QueueStatus;
 use Module\Email\Contract\SendlogInterface;
 use Module\Email\Contract\SentEmail;
 use Module\Email\Internal\EmailService;
+use Module\Email\Tests\Stub\IdentityProvider;
 use Module\Email\Tests\Stub\TriggeredEmail;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -89,6 +91,29 @@ final class SendlogTest extends KernelTestCase
 
         // Assert
         self::assertSame([self::BOB, null], $found);
+    }
+
+    public function testForgettingAHostDeletesOnlyTheMailWaitingForThatSite(): void
+    {
+        // Arrange
+        $bob = $this->sendlog->list(recipient: self::BOB)[0];
+        self::getContainer()
+            ->get(Connection::class)
+            ->update(
+                'mod_email_queue',
+                ['context' => json_encode(['_layout' => ['siteUrl' => IdentityProvider::SITE_URL]], JSON_THROW_ON_ERROR)],
+                ['id' => $bob->id],
+            );
+        self::getContainer()->get(EntityManagerInterface::class)->clear();
+
+        // Act
+        $deleted = $this->sendlog->forgetPendingForHost((string) parse_url(IdentityProvider::SITE_URL, PHP_URL_HOST));
+
+        // Assert
+        $remaining = self::getContainer()->get(Connection::class)->fetchFirstColumn('SELECT id FROM mod_email_queue');
+        self::assertSame(1, $deleted);
+        self::assertNotContains($bob->id, array_map(intval(...), $remaining));
+        self::assertCount(1, $remaining);
     }
 
     /**

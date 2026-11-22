@@ -58,4 +58,7 @@ interface BallotInterface
 
     /** Deletes every ballot with its options and votes, notifying no listener. */
     public function purge(): void;
+
+    /** Deletes the ballots on this subject with their options and votes, notifying no listener. */
+    public function purgeForSubject(BallotSubject $subject): void;
 }

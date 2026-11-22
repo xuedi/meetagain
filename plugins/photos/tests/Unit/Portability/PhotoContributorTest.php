@@ -15,6 +15,7 @@ use Plugin\Photos\Entity\Photo;
 use Plugin\Photos\Entity\PhotoTranslation;
 use Plugin\Photos\Portability\PhotoContributor;
 use Plugin\Photos\Repository\PhotoRepository;
+use Plugin\Photos\Service\PhotoService;
 use ReflectionProperty;
 
 class PhotoContributorTest extends TestCase
@@ -192,6 +193,7 @@ class PhotoContributorTest extends TestCase
             $repository ?? $this->createStub(PhotoRepository::class),
             $locations ?? $this->createStub(ImageLocationService::class),
             $users ?? $this->createStub(UserRepository::class),
+            $this->createStub(PhotoService::class),
         );
     }
 

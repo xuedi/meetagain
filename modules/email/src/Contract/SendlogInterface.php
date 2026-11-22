@@ -27,4 +27,7 @@ interface SendlogInterface
      * rest. Returns the number of rows touched.
      */
     public function forgetRecipient(string $address, string $replacement): int;
+
+    /** Deletes every mail still waiting that was composed for a site on this host. Returns the number deleted. */
+    public function forgetPendingForHost(string $host): int;
 }

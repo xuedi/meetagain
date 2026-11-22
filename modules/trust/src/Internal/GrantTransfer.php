@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Module\Trust\Contract\GrantTransferInterface;
 use Module\Trust\Contract\PortableGrant;
+use Module\Trust\Internal\Entity\TrustContextConfig;
 use Module\Trust\Internal\Entity\TrustGrant;
 use Module\Trust\Internal\Repository\TrustGrantRepository;
 use Override;
@@ -17,6 +18,7 @@ final readonly class GrantTransfer implements GrantTransferInterface
         private TrustGrantRepository $repository,
         private EntityManagerInterface $entityManager,
         private ScoreProvider $scoreProvider,
+        private ConfigStore $configStore,
     ) {}
 
     #[Override]
@@ -73,6 +75,20 @@ final readonly class GrantTransfer implements GrantTransferInterface
         }
 
         $this->entityManager->createQuery(sprintf('DELETE %s g WHERE g.context IN (:contexts)', TrustGrant::class))->execute(['contexts' => $contexts]);
+        foreach ($contexts as $context) {
+            $this->scoreProvider->invalidate($context);
+        }
+    }
+
+    #[Override]
+    public function purgeConfigs(array $contexts): void
+    {
+        if ($contexts === []) {
+            return;
+        }
+
+        $this->entityManager->createQuery(sprintf('DELETE %s c WHERE c.context IN (:contexts)', TrustContextConfig::class))->execute(['contexts' => $contexts]);
+        $this->configStore->reset();
         foreach ($contexts as $context) {
             $this->scoreProvider->invalidate($context);
         }

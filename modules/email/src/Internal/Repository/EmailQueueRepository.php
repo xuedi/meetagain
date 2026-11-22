@@ -226,6 +226,22 @@ class EmailQueueRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    /** @param list<int> $ids */
+    public function deleteByIds(array $ids): int
+    {
+        if ($ids === []) {
+            return 0;
+        }
+
+        return (int) $this
+            ->createQueryBuilder('eq')
+            ->delete()
+            ->where('eq.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+    }
+
     public function deletePendingFor(string $address): int
     {
         $qb = $this->createQueryBuilder('eq')->delete()->where('eq.status = :pending')->setParameter('pending', QueueStatus::Pending);

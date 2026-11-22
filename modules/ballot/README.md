@@ -138,6 +138,7 @@ settlement listener, so a settled ballot keeps its recorded outcome even when so
 application's archive section is the one caller, and it decides per purpose which ballots and votes leave.
 
 `purge()` deletes every ballot with its options and votes, for a clean import, and notifies no listener either.
+`purgeForSubject()` does the same for the ballots on one subject, for a caller that deletes the subject itself.
 
 ## Becoming a consumer
 

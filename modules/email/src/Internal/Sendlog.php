@@ -92,4 +92,18 @@ final readonly class Sendlog implements SendlogInterface
     {
         return $this->repo->deletePendingFor($address) + $this->repo->anonymiseRecipient($address, $replacement);
     }
+
+    #[Override]
+    public function forgetPendingForHost(string $host): int
+    {
+        $ids = [];
+        foreach ($this->repo->findBy(['status' => QueueStatus::Pending]) as $row) {
+            $siteUrl = $row->getContext()[LayoutRenderer::CONTEXT_KEY]['siteUrl'] ?? null;
+            if (is_string($siteUrl) && strcasecmp((string) parse_url($siteUrl, PHP_URL_HOST), $host) === 0) {
+                $ids[] = (int) $row->getId();
+            }
+        }
+
+        return $this->repo->deleteByIds($ids);
+    }
 }

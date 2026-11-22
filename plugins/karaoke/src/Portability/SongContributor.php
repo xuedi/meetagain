@@ -21,6 +21,7 @@ readonly class SongContributor implements ContributorInterface
     public function __construct(
         private EntityManagerInterface $em,
         private SongRepository $songRepo,
+        private SongService $songService,
     ) {}
 
     #[Override]
@@ -137,6 +138,18 @@ readonly class SongContributor implements ContributorInterface
     public function purgeItems(): void
     {
         $this->em->createQuery(sprintf('DELETE %s e', Song::class))->execute();
+    }
+
+    #[Override]
+    public function deleteItems(array $itemIds): void
+    {
+        if ($itemIds === []) {
+            return;
+        }
+
+        foreach ($this->songRepo->findBy(['id' => $itemIds]) as $item) {
+            $this->songService->delete($item);
+        }
     }
 
     private function mediaLink(mixed $media): ?MediaLink

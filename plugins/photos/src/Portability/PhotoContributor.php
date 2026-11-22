@@ -26,6 +26,7 @@ readonly class PhotoContributor implements ContributorInterface, UploadsInterfac
         private PhotoRepository $photoRepo,
         private ImageLocationService $imageLocationService,
         private UserRepository $userRepository,
+        private PhotoService $photoService,
     ) {}
 
     #[Override]
@@ -167,6 +168,18 @@ readonly class PhotoContributor implements ContributorInterface, UploadsInterfac
     public function purgeItems(): void
     {
         $this->em->createQuery(sprintf('DELETE %s e', Photo::class))->execute();
+    }
+
+    #[Override]
+    public function deleteItems(array $itemIds): void
+    {
+        if ($itemIds === []) {
+            return;
+        }
+
+        foreach ($this->photoRepo->findBy(['id' => $itemIds]) as $item) {
+            $this->photoService->delete($item);
+        }
     }
 
     /**

@@ -60,7 +60,8 @@ changes with it. It reads a `Change\View` plus the rows the caller hands in, so 
   `App\Item\Location\SuggestionTarget`. Details in suggestion.md.
 - **A type becomes changeable** with `Change\TargetProviderInterface`; reference
   `plugins/glossary/src/Review/GlossaryChangeTarget.php`. Details in change.md.
-- **A place travels with a suggestion** through `Suggestion\ScopeProviderInterface`.
+- **A place travels with a suggestion** through `Suggestion\ScopeProviderInterface`. The same key lets a caller drop
+  every suggestion made in one place, `SuggestionInterface::removeForScope()`.
 
 The outbound permit list in `mago.toml` names every core class the module reaches for, each with its reason.
 

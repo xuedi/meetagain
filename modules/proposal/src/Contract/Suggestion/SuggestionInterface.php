@@ -16,4 +16,7 @@ interface SuggestionInterface
 
     /** Stores a pending suggestion as given, without permission checks, validation or activity. */
     public function restore(PortableSuggestion $suggestion): int;
+
+    /** Deletes every suggestion made in this scope, whatever its status, notifying nobody. */
+    public function removeForScope(string $scope): void;
 }

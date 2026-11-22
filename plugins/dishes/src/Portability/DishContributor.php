@@ -25,6 +25,7 @@ readonly class DishContributor implements ContributorInterface
         private EntityManagerInterface $em,
         private DishRepository $dishRepo,
         private ImageLocationService $imageLocationService,
+        private DishService $dishService,
     ) {}
 
     #[Override]
@@ -159,6 +160,18 @@ readonly class DishContributor implements ContributorInterface
     public function purgeItems(): void
     {
         $this->em->createQuery(sprintf('DELETE %s e', Dish::class))->execute();
+    }
+
+    #[Override]
+    public function deleteItems(array $itemIds): void
+    {
+        if ($itemIds === []) {
+            return;
+        }
+
+        foreach ($this->dishRepo->findBy(['id' => $itemIds]) as $item) {
+            $this->dishService->delete($item);
+        }
     }
 
     /**

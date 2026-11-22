@@ -16,6 +16,7 @@ use Plugin\Dishes\Entity\DishImage;
 use Plugin\Dishes\Entity\DishTranslation;
 use Plugin\Dishes\Portability\DishContributor;
 use Plugin\Dishes\Repository\DishRepository;
+use Plugin\Dishes\Service\DishService;
 use ReflectionProperty;
 
 class DishContributorTest extends TestCase
@@ -168,6 +169,6 @@ class DishContributorTest extends TestCase
 
     private function contributor(EntityManagerInterface $em, DishRepository $repo): DishContributor
     {
-        return new DishContributor($em, $repo, $this->createStub(ImageLocationService::class));
+        return new DishContributor($em, $repo, $this->createStub(ImageLocationService::class), $this->createStub(DishService::class));
     }
 }

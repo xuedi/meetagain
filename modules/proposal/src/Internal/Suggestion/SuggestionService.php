@@ -112,6 +112,12 @@ readonly class SuggestionService implements SuggestionInterface
         return (int) $row->getId();
     }
 
+    #[Override]
+    public function removeForScope(string $scope): void
+    {
+        $this->em->createQuery(sprintf('DELETE %s s WHERE s.scope = :scope', Suggestion::class))->execute(['scope' => $scope]);
+    }
+
     public function approve(Suggestion $suggestion, object $editedDraft, User $reviewer): int
     {
         return $this->inScope($suggestion, fn(): int => $this->approveHere($suggestion, $editedDraft, $reviewer));

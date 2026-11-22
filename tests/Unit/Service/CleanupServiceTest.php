@@ -144,23 +144,27 @@ class CleanupServiceTest extends TestCase
         static::assertTrue($storage->fileExists('invoices/2026/INV-1.pdf'));
     }
 
-    public function testRemoveStaleExportArchiveDeletesAnArchiveOlderThanADay(): void
+    public function testRemoveStaleExportArchivesDeletesEveryArchiveOlderThanADay(): void
     {
         // Arrange
         $now = new DateTimeImmutable('2026-08-19 12:00:00', new DateTimeZone('UTC'));
         $storage = new Filesystem(new InMemoryFilesystemAdapter());
         $storage->write(ExportAction::ARCHIVE, 'zip', ['timestamp' => $now->modify('-25 hours')->getTimestamp()]);
+        $storage->write(ExportAction::DIRECTORY . '/other-7.zip', 'zip', ['timestamp' => $now->modify('-25 hours')->getTimestamp()]);
+        $storage->write(ExportAction::DIRECTORY . '/other-8.zip', 'zip', ['timestamp' => $now->modify('-1 hour')->getTimestamp()]);
         $subject = $this->createService(privateStorage: $storage);
 
         // Act
-        $count = $subject->removeStaleExportArchive();
+        $count = $subject->removeStaleExportArchives();
 
         // Assert
-        static::assertSame(1, $count);
+        static::assertSame(2, $count);
         static::assertFalse($storage->fileExists(ExportAction::ARCHIVE));
+        static::assertFalse($storage->fileExists(ExportAction::DIRECTORY . '/other-7.zip'));
+        static::assertTrue($storage->fileExists(ExportAction::DIRECTORY . '/other-8.zip'));
     }
 
-    public function testRemoveStaleExportArchiveKeepsAFreshArchive(): void
+    public function testRemoveStaleExportArchivesKeepsAFreshArchive(): void
     {
         // Arrange
         $now = new DateTimeImmutable('2026-08-19 12:00:00', new DateTimeZone('UTC'));
@@ -169,20 +173,20 @@ class CleanupServiceTest extends TestCase
         $subject = $this->createService(privateStorage: $storage);
 
         // Act
-        $count = $subject->removeStaleExportArchive();
+        $count = $subject->removeStaleExportArchives();
 
         // Assert
         static::assertSame(0, $count);
         static::assertTrue($storage->fileExists(ExportAction::ARCHIVE));
     }
 
-    public function testRemoveStaleExportArchiveWithoutAnArchiveDoesNothing(): void
+    public function testRemoveStaleExportArchivesWithoutAnArchiveDoesNothing(): void
     {
         // Arrange
         $subject = $this->createService();
 
         // Act
-        $count = $subject->removeStaleExportArchive();
+        $count = $subject->removeStaleExportArchives();
 
         // Assert
         static::assertSame(0, $count);
@@ -396,7 +400,7 @@ class CleanupServiceTest extends TestCase
         // Assert
         static::assertSame(Status::ok, $result->status);
         static::assertSame(
-            'image_cache: 2, registrations: 1, support_threads_auto_resolved: 3, support_email_verifications_expired: 0, import_archives: 0, export_archive: 0, security_measure_logs: 5, security_incidents: 6, not_found_logs: 7, access_denied_logs: 0, rate_limit_logs: 0, registration_meta_blanked: 2, logins: 9, login_measure_ips_blanked: 2, reports_anonymised: 4',
+            'image_cache: 2, registrations: 1, support_threads_auto_resolved: 3, support_email_verifications_expired: 0, import_archives: 0, export_archives: 0, security_measure_logs: 5, security_incidents: 6, not_found_logs: 7, access_denied_logs: 0, rate_limit_logs: 0, registration_meta_blanked: 2, logins: 9, login_measure_ips_blanked: 2, reports_anonymised: 4',
             $result->message,
         );
     }

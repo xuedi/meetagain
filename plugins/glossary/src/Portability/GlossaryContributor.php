@@ -13,6 +13,7 @@ use Override;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Item\GlossaryTaggableTypeProvider;
 use Plugin\Glossary\Repository\GlossaryRepository;
+use Plugin\Glossary\Service\GlossaryService;
 
 readonly class GlossaryContributor implements ContributorInterface
 {
@@ -20,6 +21,7 @@ readonly class GlossaryContributor implements ContributorInterface
         private EntityManagerInterface $em,
         private GlossaryRepository $glossaryRepo,
         private LanguageService $languageService,
+        private GlossaryService $glossaryService,
     ) {}
 
     #[Override]
@@ -115,6 +117,18 @@ readonly class GlossaryContributor implements ContributorInterface
     public function purgeItems(): void
     {
         $this->em->createQuery(sprintf('DELETE %s e', Glossary::class))->execute();
+    }
+
+    #[Override]
+    public function deleteItems(array $itemIds): void
+    {
+        if ($itemIds === []) {
+            return;
+        }
+
+        foreach ($this->glossaryRepo->findBy(['id' => $itemIds]) as $item) {
+            $this->glossaryService->remove($item);
+        }
     }
 
     /**

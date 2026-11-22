@@ -38,4 +38,11 @@ interface ContributorInterface
      * Deletes every row of this item type with what hangs off it.
      */
     public function purgeItems(): void;
+
+    /**
+     * Deletes these items through the type's own delete path, so every item action runs.
+     *
+     * @param list<int> $itemIds
+     */
+    public function deleteItems(array $itemIds): void;
 }

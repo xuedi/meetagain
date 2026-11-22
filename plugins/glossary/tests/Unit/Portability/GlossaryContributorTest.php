@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Portability\GlossaryContributor;
 use Plugin\Glossary\Repository\GlossaryRepository;
+use Plugin\Glossary\Service\GlossaryService;
 use ReflectionProperty;
 
 class GlossaryContributorTest extends TestCase
@@ -98,7 +99,7 @@ class GlossaryContributorTest extends TestCase
         $languageService = $this->createStub(LanguageService::class);
         $languageService->method('getFilteredDefaultLocale')->willReturn('en');
 
-        return new GlossaryContributor($em, $repo, $languageService);
+        return new GlossaryContributor($em, $repo, $languageService, $this->createStub(GlossaryService::class));
     }
 
     private function emptyRepo(): GlossaryRepository

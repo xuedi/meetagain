@@ -276,9 +276,12 @@ readonly class TagService implements ActionInterface
         $ids = [(int) $tag->getId(), ...$this->tagRepo->descendantIds($tag)];
         $this->assignmentRepo->deleteForTags((string) $tag->getItemType(), $ids);
 
-        foreach ($this->tagRepo->findBy(['id' => $ids]) as $doomed) {
-            $this->announceDeletion($doomed);
-            $this->em->remove($doomed);
+        $doomed = $this->tagRepo->findBy(['id' => $ids]);
+        foreach ($doomed as $tag) {
+            $this->announceDeletion($tag);
+        }
+        foreach ($doomed as $tag) {
+            $this->em->remove($tag);
         }
         $this->em->flush();
     }
