@@ -99,6 +99,22 @@ final class BallotsSectionTest extends SectionTestCase
         static::assertSame([30 => ['120']], $this->restored[0]->votes);
     }
 
+    public function testAMatchedMembersVoteStaysBehindAndTheirOpeningIsCreditedToTheSystemUser(): void
+    {
+        // Arrange
+        $row = $this->row(candidates: [['key' => '12', 'label' => 'Alien']], winningKey: null);
+        $row['votes'] = [['email' => 'user-7@example.org', 'keys' => ['12']], ['email' => 'user-3@example.org', 'keys' => ['12']]];
+        $context = $this->importContext();
+        $context->mapUser('user-3@example.org', $this->withId(new User(), 30), false);
+
+        // Act
+        $this->section()->import([$row], $context);
+
+        // Assert
+        static::assertSame([70 => ['120']], $this->restored[0]->votes);
+        static::assertSame((int) $context->getSystemUser()->getId(), $this->restored[0]->openedByUserId);
+    }
+
     public function testALostWinnerOrSubjectDropsTheBallot(): void
     {
         // Arrange

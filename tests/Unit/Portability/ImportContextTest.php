@@ -79,6 +79,60 @@ final class ImportContextTest extends TestCase
         $this->subject($imageImporter, $systemUser)->importImage('images/a.jpg', ImageType::EventTeaser);
     }
 
+    public function testAStoredImageIsNeverCreditedToAMatchedMember(): void
+    {
+        // Arrange
+        $systemUser = new User();
+        $member = new User();
+        $image = new Image()->setUploader($systemUser);
+        $context = $this->context($systemUser, $image);
+        $context->mapUser('ada@example.org', $member, false);
+
+        // Act
+        $imported = $context->importImage('images/a.jpg', ImageType::PluginDishesPreview, $member);
+
+        // Assert
+        static::assertSame($systemUser, $imported?->getUploader());
+    }
+
+    public function testANewImageNamingAMatchedMemberIsCreditedToTheImportAccount(): void
+    {
+        // Arrange
+        $systemUser = new User();
+        $member = new User();
+        $imageImporter = $this->createMock(ImageImporter::class);
+        $imageImporter
+            ->expects($this->once())
+            ->method('import')
+            ->with($this->archiveDir . '/images/a.jpg', ImageType::EventTeaser, $systemUser)
+            ->willReturn(null);
+        $context = $this->subject($imageImporter, $systemUser);
+        $context->mapUser('ada@example.org', $member, false);
+
+        // Act
+        $context->importImage('images/a.jpg', ImageType::EventTeaser, $member);
+    }
+
+    public function testOnlyACreatedMemberResolvesAsCreated(): void
+    {
+        // Arrange
+        $created = new User();
+        $matched = new User();
+        $context = $this->context(new User(), new Image());
+        $context->mapUser('new@example.org', $created, true);
+        $context->mapUser('old@example.org', $matched, false);
+
+        // Act
+        $resolved = [$context->resolveCreatedUser('new@example.org'), $context->resolveCreatedUser('old@example.org')];
+
+        // Assert
+        static::assertSame([$created, null], $resolved);
+        static::assertFalse($context->namesMatchedUser('new@example.org'));
+        static::assertTrue($context->namesMatchedUser('old@example.org'));
+        static::assertFalse($context->namesMatchedUser(null));
+        static::assertSame($matched, $context->resolveRef(User::class, 'old@example.org'));
+    }
+
     #[DataProvider('traversingPathProvider')]
     public function testAPathPointingOutsideTheArchiveAbortsTheImport(string $path): void
     {

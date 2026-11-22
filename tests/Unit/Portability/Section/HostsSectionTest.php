@@ -80,6 +80,22 @@ final class HostsSectionTest extends SectionTestCase
         static::assertSame(1, $context->toSummary()->get('hosts', Outcome::Matched));
     }
 
+    public function testANewHostNamingAMatchedMemberIsCreatedWithoutTheUserLink(): void
+    {
+        // Arrange
+        $context = $this->context();
+        $context->mapUser('anna@example.org', new User(), false);
+
+        // Act
+        $this->section()->import([['ref' => 9, 'name' => 'Anna', 'email' => 'anna@example.org']], $context);
+
+        // Assert
+        $host = $this->onlyPersisted(Host::class);
+        static::assertSame('Anna', $host->getName());
+        static::assertNull($host->getUser());
+        static::assertSame(1, $context->toSummary()->get('hosts', Outcome::Created));
+    }
+
     public function testAHostWithoutAMemberIsMatchedByItsName(): void
     {
         // Arrange

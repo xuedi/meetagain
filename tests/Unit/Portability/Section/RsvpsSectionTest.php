@@ -94,6 +94,30 @@ final class RsvpsSectionTest extends SectionTestCase
         static::assertSame(0, $context->toSummary()->get('rsvps', Outcome::Created));
     }
 
+    public function testAMatchedMembersStoredRsvpIsMatchedAndANewOneWithheld(): void
+    {
+        // Arrange
+        $attending = $this->user(5, 'anna@example.org');
+        $absent = $this->user(6, 'bo@example.org');
+        $event = $this->eventWith(1, $attending);
+        $context = $this->context();
+        $context->mapRef(Event::class, 1, $event);
+        $context->mapUser('anna@example.org', $attending, false);
+        $context->mapUser('bo@example.org', $absent, false);
+
+        // Act
+        $this->section()->import([
+            ['event_ref' => 1, 'email' => 'anna@example.org', 'guests' => 0],
+            ['event_ref' => 1, 'email' => 'bo@example.org', 'guests' => 2],
+        ], $context);
+
+        // Assert
+        static::assertFalse($event->hasRsvp($absent));
+        static::assertSame([], $this->persisted);
+        static::assertSame(1, $context->toSummary()->get('rsvps', Outcome::Matched));
+        static::assertSame(1, $context->toSummary()->get('rsvps', Outcome::Withheld));
+    }
+
     public function testGuestsAreCappedAtTheMaximum(): void
     {
         // Arrange

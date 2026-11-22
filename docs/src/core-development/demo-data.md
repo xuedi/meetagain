@@ -12,8 +12,10 @@ just devModeImport               # List the archives with their descriptions
 just devModeImport weiqi-club    # Build a dev instance from one of them
 ```
 
-Open `https://meetagain.local` and log in as the archive's owner (see the table below). Every member in
-every archive has the password `1234`.
+The recipe ends by creating the admin `admin@meetagain.local` and printing a one-time link that sets its
+password. Open that link, then `https://meetagain.local`. An archive carries no passwords and no admin roles,
+so every imported member is a plain member without a password; to see the site as one, use Forgot password
+on the login page and open the reset mail in Mailpit.
 
 ```mermaid
 flowchart LR
@@ -21,7 +23,8 @@ flowchart LR
     R --> P["enable the plugins<br/>the archive lists"]
     P --> M["migrate again<br/>for the plugin tables"]
     M --> I["app:import<br/>--shift-dates --site-settings --strict"]
-    I --> F["build assets,<br/>clear caches"]
+    I --> B["app:bootstrap<br/>admin@meetagain.local"]
+    B --> F["build assets,<br/>clear caches"]
 ```
 
 The instance carries exactly the plugins the archive needs. Enable more afterwards with
@@ -31,7 +34,7 @@ The instance carries exactly the plugins the archive needs. Enable more afterwar
 
 ## The archives
 
-| Archive                   | Plugins                             | Log in as                  | What it shows                                                           |
+| Archive                   | Plugins                             | Owner                      | What it shows                                                           |
 |---------------------------|-------------------------------------|----------------------------|-------------------------------------------------------------------------|
 | `weiqi-club`              | boardgames, films, photos, wishlist | `Crystal.Liu@example.org`  | The largest community: 18 members, 22 events, five languages, comments  |
 | `private-book-club`       | books, wishlist                     | `Kaden.Scott@example.org`  | 50 books and copies lent between members                                |
@@ -44,8 +47,8 @@ The instance carries exactly the plugins the archive needs. Enable more afterwar
 | `hamburg-shutter-club`    | photos, wishlist                    | `Marco.Gross@example.org`  | 22 attributed photographs with EXIF, tags and comments across two walks |
 | `vanilla-group`           | wishlist                            | `admin@example.org`        | Nothing but what a fresh install needs: an owner and a start page       |
 
-Only the members an archive carries exist after the import; the table names the member who comes in as
-admin.
+Only the members an archive carries exist after the import, plus the admin the recipe creates; the table
+names the member who owns the group in the archive.
 
 ### What an archive is
 
@@ -91,7 +94,7 @@ them on at `/admin/plugin`.
 - `--site-settings` writes the archive's site block into this instance: site name, description, enabled
   and default languages, theme colours, logo, the feature switches (Town Hall, RSVP notifications, event
   reminders, the upcoming digest) and plugin settings.
-- `--strict` exits non-zero when any row was skipped or dropped. The rows that did import stay, so reset
+- `--strict` exits non-zero when any row was skipped, dropped or withheld. The rows that did import stay, so reset
   before retrying.
 
 `app:import:inspect --format=` takes `json` (one archive in full, the default), `plugins` (the plugin keys
@@ -100,8 +103,10 @@ one archive needs) or `table` (one row per archive).
 `app:export --anchor` pins `exported_at` to the Monday of the given date and moves every date by the same
 whole weeks - how the committed archives stay byte-stable.
 
-On import, a group's owner and organizers become admins and its members become users. Password hashes
-travel as they are, so members log in with their old password.
+An archive carries no password hashes, and the role it records is information only: every member an import
+creates is a plain member without a password, who sets one with Forgot password. A member who already exists
+keeps their account, and the archive's rows in their name are not imported - the result counts them as
+withheld.
 
 Run any of them through `just app`, for example `just app "app:import:inspect src/DataImportFixtures/weiqi-club"`.
 
@@ -114,7 +119,7 @@ Run any of them through `just app`, for example `just app "app:import:inspect sr
 1. **Upload a ZIP.** The page shows the archive's name, description, export date, row counts and the
    plugins it needs, flagging those not active here. The file waits on the server until you decide.
 2. **Import.** The optional "apply site settings" box is ticked by default while the instance has no
-   events. The result lists created, matched, skipped and dropped rows per kind. Applying the site
+   events. The result lists created, matched, skipped, dropped and withheld rows per kind. Applying the site
    settings also saves the archive's theme colours, which show on the next page load.
 
 ---

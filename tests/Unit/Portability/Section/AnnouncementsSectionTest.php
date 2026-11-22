@@ -118,6 +118,19 @@ final class AnnouncementsSectionTest extends SectionTestCase
         static::assertNull($announcement->getCmsPage());
     }
 
+    public function testAnAnnouncementByAMatchedMemberIsCreditedToTheSystemUser(): void
+    {
+        // Arrange
+        $context = $this->context();
+        $context->mapUser('steward@example.org', new User(), false);
+
+        // Act
+        new AnnouncementsSection($this->entityManager())->import([['creator_email' => 'steward@example.org']], $context);
+
+        // Assert
+        static::assertSame($context->getSystemUser(), $this->onlyPersisted(Announcement::class)->getCreatedBy());
+    }
+
     private function sourceAnnouncement(): Announcement
     {
         $creator = $this->withId(new User(), 3);

@@ -122,7 +122,7 @@ class PhotoContributorTest extends TestCase
             $persisted[] = $entity;
         });
         $context = $this->context();
-        $context->method('resolveRef')->willReturnCallback(fn(string $class, mixed $ref): ?User => $ref === 'lena@example.org'
+        $context->method('resolveCreatedUser')->willReturnCallback(fn(mixed $ref): ?User => $ref === 'lena@example.org'
             ? $this->user(42, 'lena@example.org')
             : null);
 

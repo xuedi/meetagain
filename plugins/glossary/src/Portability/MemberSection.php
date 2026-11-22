@@ -218,6 +218,11 @@ readonly class MemberSection implements PluginSectionInterface
             return;
         }
 
+        if ($context->namesMatchedUser($row['email'] ?? null)) {
+            $context->count(self::KIND_CARDS, Outcome::Withheld);
+            return;
+        }
+
         $card = new TrainerCard(
             $userId,
             $this->em->getReference(Glossary::class, $entryId),
@@ -263,6 +268,11 @@ readonly class MemberSection implements PluginSectionInterface
             return;
         }
 
+        if ($context->namesMatchedUser($row['email'] ?? null)) {
+            $context->count(self::KIND_DAYS, Outcome::Withheld);
+            return;
+        }
+
         $trainerDay = new TrainerDay($userId, $day);
         $reviewed = (int) ($row['reviewed'] ?? 0);
         $correct = (int) ($row['correct'] ?? 0);
@@ -296,6 +306,11 @@ readonly class MemberSection implements PluginSectionInterface
             $this->date($row['created_at'] ?? null) ?? new DateTimeImmutable(),
         );
         $existingId = $this->changes->findRestored($change);
+        if ($existingId === null && $context->namesMatchedUser($row['email'] ?? null)) {
+            $context->count(self::KIND_CHANGE_PROPOSALS, Outcome::Withheld);
+            return;
+        }
+
         $id = $existingId ?? $this->changes->restore($change);
         $context->mapIds(ChangeProposalsSection::REFS, [(int) ($row['ref'] ?? 0) => $id]);
         $context->count(self::KIND_CHANGE_PROPOSALS, $existingId === null ? Outcome::Created : Outcome::Matched);

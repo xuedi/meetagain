@@ -32,7 +32,7 @@ readonly class ImportSummary
     {
         $losses = [];
         foreach (array_keys($this->counts) as $kind) {
-            $lost = $this->get($kind, Outcome::Skipped) + $this->get($kind, Outcome::Dropped);
+            $lost = array_sum(array_map(fn(Outcome $outcome): int => $outcome->isLoss() ? $this->get($kind, $outcome) : 0, Outcome::cases()));
             if ($lost > 0) {
                 $losses[$kind] = $lost;
             }

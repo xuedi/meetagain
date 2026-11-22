@@ -116,6 +116,39 @@ final class ShelfSectionTest extends SectionTestCase
         static::assertSame([], $exported);
     }
 
+    public function testNoShelfRowIsCreatedInTheNameOfAMatchedMember(): void
+    {
+        // Arrange
+        $game = $this->withId(new Game(), 4);
+        $event = $this->withId(new Event(), 9);
+        $ada = $this->user(1, 'ada@example.org');
+        $bo = $this->user(2, 'bo@example.org');
+        $exported = $this->section([
+            GameOwnership::class => [$this->ownership($ada, $game)],
+            GamePledge::class => [new GamePledge()
+                ->setEvent($event)
+                ->setGame($game)
+                ->setUser($ada)
+                ->setCreatedAt(new DateTimeImmutable('2026-01-06 10:00'))],
+            BringRequest::class => [$this->request($event, $game, $bo, $ada)],
+        ])->export($this->scope([1, 2]), $this->images());
+        $context = $this->context();
+        $context->mapItems('boardgame', [4 => 44]);
+        $context->mapRef(Event::class, 9, new Event());
+        $context->mapUser('ada@example.org', $this->user(11, 'ada@example.org'), false);
+        $context->mapUser('bo@example.org', $this->user(12, 'bo@example.org'), true);
+
+        // Act
+        $this->section(game: $this->withId(new Game(), 44))->import($exported, $context);
+
+        // Assert
+        $summary = $context->toSummary();
+        static::assertSame([], $this->persisted);
+        static::assertSame(1, $summary->get(ShelfSection::KIND_OWNERSHIPS, Outcome::Withheld));
+        static::assertSame(1, $summary->get(ShelfSection::KIND_PLEDGES, Outcome::Withheld));
+        static::assertSame(1, $summary->get(ShelfSection::KIND_REQUESTS, Outcome::Withheld));
+    }
+
     public function testAnOwnershipTheMemberAlreadyHasIsMatched(): void
     {
         // Arrange

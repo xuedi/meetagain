@@ -83,6 +83,11 @@ readonly class RsvpsSection implements SectionInterface
                 continue;
             }
 
+            if ($context->namesMatchedUser($row['email'] ?? null)) {
+                $context->count($this->getKey(), Outcome::Withheld);
+                continue;
+            }
+
             $event->addRsvp($user);
 
             $guestCount = max(0, min(RsvpGuest::MAX_GUESTS, (int) ($row['guests'] ?? 0)));

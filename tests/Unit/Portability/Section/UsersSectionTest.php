@@ -26,7 +26,7 @@ final class UsersSectionTest extends SectionTestCase
         $source->setPublic(false);
         $source->setPassword('$2y$13$hash');
         $source->setImage(new Image());
-        $exported = $this->section([$source])->export(new Scope(users: [5 => 'admin']), $this->images());
+        $exported = $this->section([$source])->export(new Scope(users: [5 => 'user']), $this->images());
         $avatar = new Image();
         $context = $this->context($avatar);
 
@@ -40,16 +40,29 @@ final class UsersSectionTest extends SectionTestCase
         static::assertSame('de', $user->getLocale());
         static::assertSame('Plays go on Mondays', $user->getBio());
         static::assertFalse($user->isPublic());
-        static::assertSame(UserRole::Admin, $user->getRole());
         static::assertSame($avatar, $user->getImage());
-        static::assertSame('$2y$13$hash', $user->getPassword());
-        static::assertSame($user, $context->resolveRef(User::class, 'ada@example.org'));
+        static::assertSame($user, $context->resolveCreatedUser('ada@example.org'));
     }
 
-    public function testARowWithoutAPasswordHashLocksTheAccount(): void
+    public function testTheExportCarriesNoPasswordHash(): void
     {
         // Arrange
-        $row = ['email' => 'member@example.org'];
+        $source = $this->withId(new User(), 5);
+        $source->setEmail('ada@example.org');
+        $source->setPassword('$2y$13$hash');
+
+        // Act
+        $rows = $this->section([$source])->export(new Scope(users: [5 => 'admin']), $this->images());
+
+        // Assert
+        static::assertCount(1, $rows);
+        static::assertArrayNotHasKey('password', $rows[0]);
+    }
+
+    public function testAPasswordHashInTheArchiveIsIgnored(): void
+    {
+        // Arrange
+        $row = ['email' => 'member@example.org', 'password' => '$2y$13$chosen-by-the-archive'];
 
         // Act
         $this->section()->import([$row], $this->context());
@@ -59,17 +72,17 @@ final class UsersSectionTest extends SectionTestCase
     }
 
     /**
-     * @return iterable<string, array{string, UserRole}>
+     * @return iterable<string, array{string}>
      */
     public static function roleProvider(): iterable
     {
-        yield 'an owner becomes an admin' => ['admin', UserRole::Admin];
-        yield 'an organizer becomes an admin' => ['organizer', UserRole::Admin];
-        yield 'a member stays a user' => ['user', UserRole::User];
+        yield 'an owner' => ['admin'];
+        yield 'an organizer' => ['organizer'];
+        yield 'a member' => ['user'];
     }
 
     #[DataProvider('roleProvider')]
-    public function testTheArchiveRoleMapsToACoreRole(string $archiveRole, UserRole $expected): void
+    public function testEveryArchiveRoleBecomesAPlainUser(string $archiveRole): void
     {
         // Arrange
         $row = ['email' => 'member@example.org', 'role' => $archiveRole];
@@ -78,7 +91,7 @@ final class UsersSectionTest extends SectionTestCase
         $this->section()->import([$row], $this->context());
 
         // Assert
-        static::assertSame($expected, $this->onlyPersisted(User::class)->getRole());
+        static::assertSame(UserRole::User, $this->onlyPersisted(User::class)->getRole());
     }
 
     public function testAKnownEmailIsMatchedToTheExistingUser(): void
@@ -93,6 +106,7 @@ final class UsersSectionTest extends SectionTestCase
         // Assert
         static::assertSame([], $this->persisted);
         static::assertSame($existing, $context->resolveRef(User::class, 'ada@example.org'));
+        static::assertTrue($context->namesMatchedUser('ada@example.org'));
         static::assertSame(1, $context->toSummary()->get('users', Outcome::Matched));
     }
 

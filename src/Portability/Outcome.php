@@ -8,6 +8,7 @@ enum Outcome: string
     case Matched = 'matched';
     case Skipped = 'skipped';
     case Dropped = 'dropped';
+    case Withheld = 'withheld';
 
     public function label(): string
     {
@@ -16,11 +17,12 @@ enum Outcome: string
             self::Matched => 'admin_system_import.col_matched',
             self::Skipped => 'admin_system_import.col_skipped',
             self::Dropped => 'admin_system_import.col_dropped',
+            self::Withheld => 'admin_system_import.col_withheld',
         };
     }
 
     public function isLoss(): bool
     {
-        return $this === self::Skipped || $this === self::Dropped;
+        return $this !== self::Created && $this !== self::Matched;
     }
 }

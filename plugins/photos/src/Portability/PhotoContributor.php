@@ -3,7 +3,6 @@
 namespace Plugin\Photos\Portability;
 
 use App\Entity\Image;
-use App\Entity\User;
 use App\Enum\ImageType;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
@@ -115,7 +114,7 @@ readonly class PhotoContributor implements ContributorInterface, UploadsInterfac
         $imageLocations = [];
 
         foreach ($rows as $row) {
-            $uploader = $context->resolveRef(User::class, $row['uploader_email'] ?? null) ?? $context->getSystemUser();
+            $uploader = $context->resolveCreatedUser($row['uploader_email'] ?? null) ?? $context->getSystemUser();
             $image = $context->importImage($this->nullableString($row['image'] ?? null), ImageType::PluginPhotosPhoto, $uploader);
             if (!$image instanceof Image) {
                 continue;

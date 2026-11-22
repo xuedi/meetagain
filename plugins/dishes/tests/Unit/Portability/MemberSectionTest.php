@@ -159,6 +159,23 @@ final class MemberSectionTest extends SectionTestCase
         static::assertSame(2, $context->toSummary()->get(MemberSection::KIND_LIKES, Outcome::Matched));
     }
 
+    public function testANewLikeOfAMatchedMemberIsWithheld(): void
+    {
+        // Arrange
+        $target = $this->withId(new Dish(), 30);
+        $target->setLikes(2);
+        $context = $this->importContext();
+        $context->mapUser('five@example.org', $this->user(50, 'five@example.org'), false);
+
+        // Act
+        $this->section(dishes: $this->dishes([], $target))->import(['likes' => [['dish_ref' => 3, 'email' => 'five@example.org']]], $context);
+
+        // Assert
+        static::assertSame([], $this->persisted);
+        static::assertSame(2, $target->getLikes());
+        static::assertSame(1, $context->toSummary()->get(MemberSection::KIND_LIKES, Outcome::Withheld));
+    }
+
     public function testALikeOfAMemberTheArchiveDoesNotCarryIsDropped(): void
     {
         // Arrange
