@@ -226,6 +226,38 @@ class EmailQueueRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    public function deletePendingFor(string $address): int
+    {
+        $qb = $this->createQueryBuilder('eq')->delete()->where('eq.status = :pending')->setParameter('pending', QueueStatus::Pending);
+        $this->matchRecipient($qb, $address);
+
+        return (int) $qb->getQuery()->execute();
+    }
+
+    public function anonymiseRecipient(string $address, string $replacement): int
+    {
+        $qb = $this
+            ->createQueryBuilder('eq')
+            ->update()
+            ->set('eq.recipient', ':replacement')
+            ->set('eq.renderedBody', 'NULL')
+            ->set('eq.attachments', 'NULL')
+            ->set('eq.context', ':empty')
+            ->setParameter('replacement', $replacement)
+            ->setParameter('empty', '[]');
+        $this->matchRecipient($qb, $address);
+
+        return (int) $qb->getQuery()->execute();
+    }
+
+    private function matchRecipient(QueryBuilder $qb, string $address): void
+    {
+        $qb
+            ->andWhere('LOWER(eq.recipient) = :recipient OR LOWER(eq.recipient) LIKE :namedRecipient')
+            ->setParameter('recipient', mb_strtolower($address))
+            ->setParameter('namedRecipient', '%<' . addcslashes(mb_strtolower($address), '%_') . '>');
+    }
+
     /**
      * @param list<QueueStatus>|null $statuses
      */

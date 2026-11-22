@@ -68,7 +68,7 @@
                             <div class="tags">
                                 <span class="tag has-background-grey has-text-light">RSVP</span>
                                 {% for user in event.rsvp %}
-                                    <span class="tag">{{ user.name }}</span>
+                                    <span class="tag">{{ member_name(user) }}</span>
                                 {% endfor %}
                                 {% if event.externalRsvp > 0 %}
                                     <span class="tag" title="{{ 'events.rsvp_external_title'|trans }}">{{ 'events.rsvp_external_badge'|trans({'%count%': event.externalRsvp}) }}</span>

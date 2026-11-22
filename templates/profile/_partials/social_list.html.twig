@@ -16,7 +16,7 @@
                 <span class="icon">
                     <a href="{{ path('app_profile_messages', {'id': user.id}) }}" class="fa fa-envelope has-text-grey-light"></a>
                 </span>
-                <a href="{{ path('app_member_view', {'id': user.id}) }}" class="has-text-dark">{{ user.name }}</a>
+                <a href="{{ path('app_member_view', {'id': user.id}) }}" class="has-text-dark">{{ member_name(user) }}</a>
             </td>
             <td class="has-text-right">
                 <a href="{{ path('app_profile_social_toggle_follow', {'id': user.id}) }}"

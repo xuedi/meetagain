@@ -23,4 +23,5 @@ enum EmailType: string
     case ItemReportReceipt = 'item_report_receipt';
     case ItemReportDecision = 'item_report_decision';
     case ModerationWarning = 'moderation_warning';
+    case AccountDeletion = 'account_deletion';
 }

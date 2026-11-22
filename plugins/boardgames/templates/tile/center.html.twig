@@ -29,7 +29,7 @@
     {% for group in groups %}
         <div class="mb-4">
             <p class="has-text-weight-semibold mb-2">
-                <a href="{{ path('app_member_view', {'id': group.user.id}) }}">{{ group.user.name }}</a>
+                <a href="{{ path('app_member_view', {'id': group.user.id}) }}">{{ member_name(group.user) }}</a>
                 <span class="has-text-grey is-size-7">{{ 'boardgames_tile.brings'|trans }}</span>
             </p>
             <div class="columns is-multiline">

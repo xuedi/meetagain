@@ -139,3 +139,4 @@ circulation:
     trust_action_handover: 'Completar una entrega'
     trust_action_donation: 'Aportar un ejemplar'
     flash_trust_minimum: 'Necesitas %required% puntos de reputación aquí para apuntarte a una lista de espera; tienes %current%.'
+    deletion_blocked_holds_copy: 'Todavía tienes un ejemplar compartido o una entrega abierta. Pasa el ejemplar o termina la entrega antes de eliminar tu cuenta.'

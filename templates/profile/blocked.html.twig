@@ -36,7 +36,7 @@
                                         {% include '_components/image.html.twig' with {'image': block.blocked.image, 'size': '50x50'} %}
                                     </td>
                                     <td>
-                                        <strong>{{ block.blocked.name }}</strong>
+                                        <strong>{{ member_name(block.blocked) }}</strong>
                                     </td>
                                     <td>
                                         <small>{{ block.createdAt|date('Y-m-d') }}</small>

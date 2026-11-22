@@ -554,6 +554,7 @@ admin_member:
     role_admin: 'Admin'
     role_user: 'Utilisateur'
     role_system: 'Système'
+    flash_restore_erased: 'Ce compte a déjà été effacé et ne peut pas être restauré.'
 admin_support:
     tab_requests: 'Demandes de support'
     tab_reports: 'Signalements d''images'

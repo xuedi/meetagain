@@ -21,7 +21,10 @@ use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Clock\ClockInterface;
 use SensitiveParameter;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 readonly class UserService
 {
@@ -34,12 +37,19 @@ readonly class UserService
         UserStatus::Registered->value => [UserStatus::Denied],
     ];
 
+    /**
+     * @param iterable<DeletionBlockerInterface> $deletionBlockers
+     */
     public function __construct(
         private UserRepository $userRepo,
         private EntityManagerInterface $em,
         private EntityActionDispatcher $dispatcher,
         private ActivityService $activityService,
         private WelcomeEmail $welcomeEmail,
+        private TranslatorInterface $translator,
+        private ClockInterface $clock,
+        #[AutowireIterator(DeletionBlockerInterface::class)]
+        private iterable $deletionBlockers,
     ) {}
 
     public function claimRegistrationCode(User $user, #[SensitiveParameter] string $code): bool
@@ -106,7 +116,17 @@ readonly class UserService
 
     public function resolveUserName(int $id): string
     {
-        return $this->userRepo->resolveUserName($id);
+        return $this->userRepo->resolveUserName($id) ?? $this->translator->trans('shared.deleted_member');
+    }
+
+    public function displayName(?User $user): string
+    {
+        $name = $user?->getName();
+        if ($name === null || $name === '' || $user?->isDeleted() === true) {
+            return $this->translator->trans('shared.deleted_member');
+        }
+
+        return $name;
     }
 
     public function changeRole(User $actor, User $target, UserRole $newRole): void
@@ -168,6 +188,10 @@ readonly class UserService
 
         $target->setStatus($newStatus);
         $target->setBlockedUntil($newStatus === UserStatus::Blocked ? $blockedUntil : null);
+        if ($newStatus === UserStatus::Blocked || $newStatus === UserStatus::Denied) {
+            $target->setRegcode(null);
+            $target->setRegcodeExpiresAt(null);
+        }
         $this->em->flush();
 
         if ($oldStatus === UserStatus::EmailVerified && $newStatus === UserStatus::Active) {
@@ -196,26 +220,39 @@ readonly class UserService
         $this->activityService->log($type, $actor, $meta);
     }
 
-    public function softDelete(User $actor, User $target): void
+    public function requestDeletion(User $actor, User $target): void
     {
         $this->assertStructural($actor, $target);
 
         $oldStatus = $target->getStatus();
-        if ($oldStatus === UserStatus::Deleted) {
-            throw ActionException::noOp();
-        }
-
-        $target->setStatus(UserStatus::Deleted);
-        $this->em->persist($target);
-        $this->em->flush();
-
-        $this->dispatcher->dispatch(EntityAction::DeleteUser, (int) $target->getId());
+        $this->markDeleted($target);
 
         $this->activityService->log(AdminMemberStatusChanged::TYPE, $actor, [
             'user_id' => $target->getId(),
             'old' => $oldStatus->value,
             'new' => UserStatus::Deleted->value,
         ]);
+    }
+
+    public function requestOwnDeletion(User $user): void
+    {
+        if ($user->getRole() === UserRole::System) {
+            throw ActionException::systemUser();
+        }
+
+        $this->markDeleted($user);
+    }
+
+    public function findDeletionBlocker(User $user): ?string
+    {
+        foreach ($this->deletionBlockers as $blocker) {
+            $reason = $blocker->blockReason($user);
+            if ($reason !== null) {
+                return $reason;
+            }
+        }
+
+        return null;
     }
 
     public function restore(User $actor, User $target): void
@@ -226,8 +263,12 @@ readonly class UserService
         if ($oldStatus === UserStatus::Active) {
             throw ActionException::noOp();
         }
+        if ($target->isErased()) {
+            throw ActionException::erased();
+        }
 
         $target->setStatus(UserStatus::Active);
+        $target->setDeletionRequestedAt(null);
         $this->em->persist($target);
         $this->em->flush();
 
@@ -236,6 +277,27 @@ readonly class UserService
             'old' => $oldStatus->value,
             'new' => UserStatus::Active->value,
         ]);
+    }
+
+    private function markDeleted(User $target): void
+    {
+        if ($target->getStatus() === UserStatus::Deleted) {
+            throw ActionException::noOp();
+        }
+
+        $reason = $this->findDeletionBlocker($target);
+        if ($reason !== null) {
+            throw ActionException::deletionBlocked($reason);
+        }
+
+        $target->setStatus(UserStatus::Deleted);
+        $target->setDeletionRequestedAt($this->clock->now());
+        $target->setRegcode(null);
+        $target->setRegcodeExpiresAt(null);
+        $this->em->persist($target);
+        $this->em->flush();
+
+        $this->dispatcher->dispatch(EntityAction::DeleteUser, (int) $target->getId());
     }
 
     private function assertStructural(User $actor, User $target): void

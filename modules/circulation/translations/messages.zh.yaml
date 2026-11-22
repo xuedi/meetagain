@@ -139,3 +139,4 @@ circulation:
     trust_action_handover: '完成一次交接'
     trust_action_donation: '投入一本实物'
     flash_trust_minimum: '加入等待名单需要 %required% 点信誉，你目前是 %current%。'
+    deletion_blocked_holds_copy: '你还持有一本共享副本，或有未完成的交接。删除账户之前，请先把副本传下去或完成交接。'

@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\RsvpGuest;
 use App\Entity\User;
+use App\Entity\UserBlock;
 use App\Enum\UserRole;
 use App\Enum\UserStatus;
 use DateTimeImmutable;
@@ -29,7 +31,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     }
 
     /**
-     * @return array<int, string>
+     * @return array<int, ?string>
      */
     public function getUserNameList(): array
     {
@@ -37,9 +39,13 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return $this->userNameList;
         }
 
-        $result = $this->createQueryBuilder('u')->select('u.id', 'u.name')->getQuery()->getArrayResult();
+        $result = $this->createQueryBuilder('u')->select('u.id', 'u.name', 'u.status')->getQuery()->getArrayResult();
 
-        $this->userNameList = array_column($result, 'name', 'id');
+        $this->userNameList = [];
+        foreach ($result as $row) {
+            $status = $row['status'] instanceof UserStatus ? $row['status'] : UserStatus::tryFrom((int) $row['status']);
+            $this->userNameList[(int) $row['id']] = $status === UserStatus::Deleted ? null : $row['name'];
+        }
 
         return $this->userNameList;
     }
@@ -223,9 +229,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $qb;
     }
 
-    public function resolveUserName(int $userId): string
+    public function resolveUserName(int $userId): ?string
     {
-        return $this->getUserNameList()[$userId];
+        $name = $this->getUserNameList()[$userId] ?? null;
+
+        return $name === '' ? null : $name;
     }
 
     public function findOneByEmailIgnoreCase(string $email): ?User
@@ -572,5 +580,38 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     public function reset(): void
     {
         $this->userNameList = null;
+    }
+
+    public function deleteRelations(User $user): void
+    {
+        foreach ($user->getRsvpEvents()->toArray() as $event) {
+            $event->removeRsvp($user);
+            $user->removeRsvpEvent($event);
+        }
+        foreach ($user->getFollowers()->toArray() as $follower) {
+            $follower->removeFollowing($user);
+        }
+        $user->getFollowing()->clear();
+
+        $em = $this->getEntityManager();
+        $em->flush();
+        $em->createQuery(sprintf('DELETE FROM %s g WHERE g.user = :user', RsvpGuest::class))->setParameter('user', $user)->execute();
+        $em->createQuery(sprintf('DELETE FROM %s b WHERE b.blocker = :user OR b.blocked = :user', UserBlock::class))->setParameter('user', $user)->execute();
+    }
+
+    /**
+     * @return list<User>
+     */
+    public function findErasable(DateTimeImmutable $requestedBefore): array
+    {
+        return $this
+            ->createQueryBuilder('u')
+            ->where('u.status = :deleted')
+            ->andWhere('u.deletionRequestedAt IS NOT NULL')
+            ->andWhere('u.deletionRequestedAt < :cutoff')
+            ->setParameter('deleted', UserStatus::Deleted)
+            ->setParameter('cutoff', $requestedBefore)
+            ->getQuery()
+            ->getResult();
     }
 }

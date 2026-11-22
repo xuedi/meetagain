@@ -45,7 +45,7 @@
                 <ul>
                     {% for donor in stats.topDonors %}
                         <li>
-                            <a href="{{ path('app_member_view', {'id': donor.user.id}) }}">{{ donor.user.name }}</a>
+                            <a href="{{ path('app_member_view', {'id': donor.user.id}) }}">{{ member_name(donor.user) }}</a>
                             <span class="has-text-grey">- {{ 'circulation.stat_donations'|trans({'%count%': donor.count}) }}</span>
                         </li>
                     {% endfor %}
@@ -65,7 +65,7 @@
                     {% for copy in stats.longestHeld %}
                         <tr>
                             <td>{{ item_list_cell(itemType, copy.itemId, 'row') }}</td>
-                            <td class="has-text-grey">{{ copy.holder ? copy.holder.name : 'circulation.holder_unknown'|trans }}</td>
+                            <td class="has-text-grey">{{ copy.holder ? member_name(copy.holder) : 'circulation.holder_unknown'|trans }}</td>
                             <td class="has-text-grey is-size-7">{{ copy.heldSince ? copy.heldSince|time_diff : '' }}</td>
                         </tr>
                     {% endfor %}

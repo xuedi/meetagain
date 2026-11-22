@@ -29,6 +29,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     protected ?int $id = null;
 
     public const int NAME_MAX_LENGTH = 32;
+    public const string ERASED_EMAIL_DOMAIN = 'erased.invalid';
 
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $name = null;
@@ -59,6 +60,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
 
     #[ORM\Column(nullable: true)]
     private ?DateTimeImmutable $blockedUntil = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?DateTimeImmutable $deletionRequestedAt = null;
 
     #[ORM\Column]
     private bool $public = true;
@@ -108,9 +112,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     #[ORM\OneToMany(targetEntity: UserBlock::class, mappedBy: 'blocker')]
     private Collection $blockedUsers;
 
-    #[ORM\OneToMany(targetEntity: UserBlock::class, mappedBy: 'blocked')]
-    private Collection $blockedByUsers;
-
     #[ORM\Column]
     private ?bool $notification = null;
 
@@ -126,7 +127,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         $this->messagesSend = new ArrayCollection();
         $this->messagesReceived = new ArrayCollection();
         $this->blockedUsers = new ArrayCollection();
-        $this->blockedByUsers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -283,6 +283,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         $this->blockedUntil = $blockedUntil;
 
         return $this;
+    }
+
+    public function getDeletionRequestedAt(): ?DateTimeImmutable
+    {
+        return $this->deletionRequestedAt;
+    }
+
+    public function setDeletionRequestedAt(?DateTimeImmutable $deletionRequestedAt): static
+    {
+        $this->deletionRequestedAt = $deletionRequestedAt;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->status === UserStatus::Deleted;
+    }
+
+    public function isErased(): bool
+    {
+        return str_ends_with((string) $this->email, '@' . self::ERASED_EMAIL_DOMAIN);
     }
 
     public function getCityId(): ?int
@@ -583,13 +605,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     public function getBlockedUsers(): Collection
     {
         return $this->blockedUsers;
-    }
-
-    /**
-     * @return Collection<int, UserBlock>
-     */
-    public function getBlockedByUsers(): Collection
-    {
-        return $this->blockedByUsers;
     }
 }

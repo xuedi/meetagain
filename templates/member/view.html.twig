@@ -16,7 +16,7 @@
                 <div class="column is-8">
                     <div class="level mb-4 is-mobile">
                         <div class="level-left">
-                            <h1 class="title is-3 mb-0">{{ userDetails.name }}</h1>
+                            <h1 class="title is-3 mb-0">{{ member_name(userDetails) }}</h1>
                         </div>
                         {% if userDetails.id != currentUser.id %}
                             <div class="level-right">

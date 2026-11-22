@@ -448,4 +448,15 @@ class ActivityRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
+
+    public function deleteForUser(int $userId): int
+    {
+        return (int) $this
+            ->createQueryBuilder('a')
+            ->delete()
+            ->where('IDENTITY(a.user) = :user')
+            ->setParameter('user', $userId)
+            ->getQuery()
+            ->execute();
+    }
 }

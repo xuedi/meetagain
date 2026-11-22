@@ -24,7 +24,7 @@
             <div class="content">
                 <nav class="level mb-2">
                     <div class="level-left">
-                        <strong class="level-item mr-1">{{ comment.user ? comment.user.name : 'comment.deleted_user'|trans }}</strong>
+                        <strong class="level-item mr-1">{{ member_name(comment.user) }}</strong>
                         {% if comment.user and app.user and comment.user.id != app.user.id %}
                         <a class="level-item" href="{{ path('app_profile_messages', {'id': comment.user.id}) }}"
                            title="{{ 'comment.action_message'|trans }}">

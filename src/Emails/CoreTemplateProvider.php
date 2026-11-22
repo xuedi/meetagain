@@ -37,6 +37,7 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             EmailType::ItemReportReceipt->value => 'We received your report about {{itemLabel}}',
             EmailType::ItemReportDecision->value => 'A decision on your report about {{itemLabel}}',
             EmailType::ModerationWarning->value => 'A note from the moderators of {{url}}',
+            EmailType::AccountDeletion->value => 'Your account on {{url}} was deleted',
         ],
         'de' => [
             EmailType::VerificationRequest->value => 'Bitte bestätige deine E-Mail',
@@ -58,6 +59,7 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             EmailType::ItemReportReceipt->value => 'Wir haben deine Meldung zu {{itemLabel}} erhalten',
             EmailType::ItemReportDecision->value => 'Entscheidung zu deiner Meldung über {{itemLabel}}',
             EmailType::ModerationWarning->value => 'Ein Hinweis der Moderation von {{url}}',
+            EmailType::AccountDeletion->value => 'Dein Konto auf {{url}} wurde gelöscht',
         ],
         'zh' => [
             EmailType::VerificationRequest->value => '请确认您的邮箱',
@@ -79,6 +81,7 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             EmailType::ItemReportReceipt->value => '我们已收到你对 {{itemLabel}} 的举报',
             EmailType::ItemReportDecision->value => '关于你对 {{itemLabel}} 的举报的处理结果',
             EmailType::ModerationWarning->value => '来自 {{url}} 管理团队的提醒',
+            EmailType::AccountDeletion->value => '您在 {{url}} 的账户已删除',
         ],
         'fr' => [
             EmailType::VerificationRequest->value => 'Merci de confirmer ton adresse e-mail',
@@ -100,6 +103,7 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             EmailType::ItemReportReceipt->value => 'Nous avons reçu ton signalement concernant {{itemLabel}}',
             EmailType::ItemReportDecision->value => 'Décision sur ton signalement concernant {{itemLabel}}',
             EmailType::ModerationWarning->value => 'Un message de la modération de {{url}}',
+            EmailType::AccountDeletion->value => 'Ton compte sur {{url}} a été supprimé',
         ],
         'es' => [
             EmailType::VerificationRequest->value => 'Confirma tu correo electrónico',
@@ -121,6 +125,7 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             EmailType::ItemReportReceipt->value => 'Hemos recibido tu denuncia sobre {{itemLabel}}',
             EmailType::ItemReportDecision->value => 'Decisión sobre tu denuncia de {{itemLabel}}',
             EmailType::ModerationWarning->value => 'Un aviso de la moderación de {{url}}',
+            EmailType::AccountDeletion->value => 'Tu cuenta en {{url}} ha sido eliminada',
         ],
     ];
 
@@ -264,6 +269,14 @@ readonly class CoreTemplateProvider implements TemplateProviderInterface
             'name',
             'reason',
             'note',
+            'host',
+            'url',
+            'lang',
+            'greeting',
+        ],
+        EmailType::AccountDeletion->value => [
+            'username',
+            'erasureDate',
             'host',
             'url',
             'lang',

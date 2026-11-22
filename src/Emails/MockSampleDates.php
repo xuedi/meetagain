@@ -10,5 +10,6 @@ final readonly class MockSampleDates
         public string $chargeDate,
         public string $retryDate,
         public string $suspendedSince,
+        public string $erasureDate,
     ) {}
 }

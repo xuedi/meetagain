@@ -87,47 +87,6 @@
                         {% endfor %}
                     </div>
 
-                </div>
-                <div class="column">
-
-                    <div class="box">
-                        <h2 class="title is-5">{{ 'profile_config.section_change_password'|trans }}</h2>
-                        {{ form_start(form) }}
-                        {% for flash_error in app.flashes('error') %}
-                            <div class="notification is-danger">
-                                <button class="delete"></button>{{ flash_error|trans }}</div>
-                        {% endfor %}
-                        {% for flash_success in app.flashes('success') %}
-                            <div class="notification is-success">
-                                <button class="delete"></button>{{ flash_success|trans }}</div>
-                        {% endfor %}
-                        {{ form_errors(form) }}
-
-                        {{ form_row(form.oldPassword) }}
-                        {{ form_row(form.newPassword) }}
-
-                        <button class="button is-link">{{ 'profile_config.button_change_password'|trans }}</button>
-                        {{ form_end(form) }}
-
-                        <p class="mt-4">
-                            {{ 'profile_config.password_reset_hint'|trans({'%reset_link%': '<a href="' ~ path('app_reset') ~ '">' ~ ('profile_config.password_reset_link_label'|trans) ~ '</a>'})|raw }}
-                        </p>
-                    </div>
-
-                    {% set pluginConfigLinks = get_plugin_profile_config_links() %}
-                    {% if pluginConfigLinks is not empty %}
-                        <div class="box">
-                            <h2 class="title is-5">{{ 'profile_config.section_account_actions'|trans }}</h2>
-                            <div class="buttons">
-                                {% for link in pluginConfigLinks %}
-                                    <a href="{{ link.slug }}" class="button is-link is-light">
-                                        {{ link.name|trans }}
-                                    </a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endif %}
-
                     <div class="box">
                         <h2 class="title is-5">{{ 'profile_config.section_blocked_users'|trans }}</h2>
                         {% if blockedUsers|length == 0 %}
@@ -141,14 +100,14 @@
                                             {% include '_components/image.html.twig' with {'image': block.blocked.image, 'size': '50x50'} %}
                                         </td>
                                         <td>
-                                            {{ block.blocked.name }}
+                                            {{ member_name(block.blocked) }}
                                         </td>
                                         <td style="width: 60px; text-align: right;">
                                             <a href="{{ path('app_profile_unblock_user', {'id': block.blocked.id}) }}"
                                                class="ajax-unblock"
                                                data-csrf-token="{{ csrf_token('app_profile_unblock_user' ~ block.blocked.id) }}"
                                                data-user-id="{{ block.blocked.id }}"
-                                               data-user-name="{{ block.blocked.name }}">
+                                               data-user-name="{{ member_name(block.blocked) }}">
                                                 <span class="icon"><i class="fa fa-unlock"></i></span>
                                             </a>
                                         </td>
@@ -160,6 +119,54 @@
                                 <a href="{{ path('app_profile_blocked_users') }}">{{ 'profile_config.blocked_view_all'|trans }}</a>
                             </p>
                         {% endif %}
+                    </div>
+
+                </div>
+                <div class="column">
+
+                    <div class="box">
+                        <h2 class="title is-5">{{ 'profile_config.section_change_password'|trans }}</h2>
+                        {{ form_start(form) }}
+                        {{ form_errors(form) }}
+
+                        {{ form_row(form.oldPassword) }}
+                        {{ form_row(form.newPassword) }}
+
+                        <button class="button is-link">{{ 'profile_config.button_change_password'|trans }}</button>
+                        {{ form_end(form) }}
+
+                        <p class="mt-4">
+                            {{ 'profile_config.password_reset_hint'|trans({'%reset_link%': '<a href="' ~ path('app_reset') ~ '">' ~ ('profile_config.password_reset_link_label'|trans) ~ '</a>'})|raw }}
+                        </p>
+                    </div>
+
+                    <div class="box">
+                        <h2 class="title is-5">{{ 'profile_config.section_account_actions'|trans }}</h2>
+                        <div class="buttons">
+                            {% for link in get_plugin_profile_config_links() %}
+                                <a href="{{ link.slug }}" class="button is-link is-light">
+                                    {{ link.name|trans }}
+                                </a>
+                            {% endfor %}
+                            <a href="{{ path('app_profile_config_delete_page') }}" class="button is-danger is-light">
+                                {{ 'profile_config.button_delete'|trans }}
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="box" id="export">
+                        <h2 class="title is-5">{{ 'profile_config.section_export'|trans }}</h2>
+                        <p class="mb-3">{{ 'profile_config.export_intro'|trans }}</p>
+                        <form method="post" action="{{ path('app_profile_config_export') }}">
+                            <input type="hidden" name="_token" value="{{ csrf_token('app_profile_config_export' ~ user.id) }}">
+                            <div class="field">
+                                <label class="label" for="export_password">{{ 'profile_config.form_label_password'|trans }}</label>
+                                <div class="control">
+                                    <input class="input" type="password" id="export_password" name="password" autocomplete="current-password" required>
+                                </div>
+                            </div>
+                            <button class="button is-link">{{ 'profile_config.button_export'|trans }}</button>
+                        </form>
                     </div>
 
                 </div>

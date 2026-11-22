@@ -554,6 +554,7 @@ admin_member:
     role_admin: 'Admin'
     role_user: 'Usuario'
     role_system: 'Sistema'
+    flash_restore_erased: 'Esta cuenta ya fue borrada y no se puede restaurar.'
 admin_support:
     tab_requests: 'Solicitudes de soporte'
     tab_reports: 'Informes de imágenes'

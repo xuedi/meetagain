@@ -139,3 +139,4 @@ circulation:
     trust_action_handover: 'Completing a handover'
     trust_action_donation: 'Donating a copy'
     flash_trust_minimum: 'You need %required% points of standing here to join a waiting list; you have %current%.'
+    deletion_blocked_holds_copy: 'You still hold a shared copy or have a handover open. Pass the copy on or finish the handover before you delete your account.'

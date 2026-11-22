@@ -61,4 +61,19 @@ class ItemReportRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
+
+    public function anonymiseNotifier(int $userId, string $email): int
+    {
+        return (int) $this
+            ->createQueryBuilder('ir')
+            ->update()
+            ->set('ir.notifierName', ':blank')
+            ->set('ir.notifierEmail', ':blank')
+            ->where('IDENTITY(ir.reporter) = :user OR LOWER(ir.notifierEmail) = :email')
+            ->setParameter('blank', '')
+            ->setParameter('user', $userId)
+            ->setParameter('email', mb_strtolower($email))
+            ->getQuery()
+            ->execute();
+    }
 }

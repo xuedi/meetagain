@@ -110,4 +110,16 @@ class RateLimitLogRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
+
+    public function forgetIdentifier(string $identifier): int
+    {
+        return (int) $this
+            ->createQueryBuilder('r')
+            ->update()
+            ->set('r.userIdentifier', 'NULL')
+            ->where('r.userIdentifier = :identifier')
+            ->setParameter('identifier', mb_strtolower($identifier))
+            ->getQuery()
+            ->execute();
+    }
 }

@@ -6,7 +6,7 @@
     <div class="box">
         <h2 class="title is-5">{{ topic.title }}</h2>
         <p class="is-size-7 has-text-grey">
-            {{ 'town_hall.forum_started_by'|trans({'%name%': topic.author ? topic.author.name : 'town_hall.deleted_user'|trans}) }}
+            {{ 'town_hall.forum_started_by'|trans({'%name%': member_name(topic.author)}) }}
             &middot;
             {{ topic.createdAt|date(get_date_format()) }}
         </p>

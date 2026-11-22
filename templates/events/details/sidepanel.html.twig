@@ -40,7 +40,7 @@
     <h2 class="title is-4">{{ 'events.label_hosts'|trans }}</h2>
     <div class="columns is-multiline">
         {% for host in event.host %}
-            <div class="tag is-large m-1">{{ host.user ? host.user.name : host.name }}</div>
+            <div class="tag is-large m-1">{{ host.user ? member_name(host.user) : host.name }}</div>
         {% endfor %}
     </div>
 </div>

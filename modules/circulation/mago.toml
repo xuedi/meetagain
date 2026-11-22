@@ -15,6 +15,9 @@ permit = [
     "Module\\Trust\\Contract\\**",                                     # the optional trust integration consumes the Trust module's contract
     "@global",                                                         # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                                               # the FKs on copy, request, handover and ledger - the one sanctioned core entity
+    "App\\EntityActionInterface",                                      # requests are deleted and open handovers cancelled when a member is erased
+    "App\\Enum\\EntityAction",                                         # that chain's action enum
+    "App\\Service\\Member\\DeletionBlockerInterface",                  # a member holding a copy cannot delete their account yet
     "App\\Controller\\AbstractController",                             # module controllers extend core's, as plugin controllers do
     "Module\\Task\\Contract\\**",                                      # the daily maintenance task registers on the task module's schedule
     "App\\Service\\Notification\\User\\NotificationProviderInterface", # handovers and queues surface on core's bell
@@ -42,6 +45,9 @@ permit = [
     "Module\\Trust\\Contract\\**",                                     # the optional trust integration consumes the Trust module's contract
     "@global",                                                         # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                                               # the FKs on copy, request, handover and ledger - the one sanctioned core entity
+    "App\\EntityActionInterface",                                      # requests are deleted and open handovers cancelled when a member is erased
+    "App\\Enum\\EntityAction",                                         # that chain's action enum
+    "App\\Service\\Member\\DeletionBlockerInterface",                  # a member holding a copy cannot delete their account yet
     "App\\Controller\\AbstractController",                             # module controllers extend core's, as plugin controllers do
     "Module\\Task\\Contract\\**",                                      # the daily maintenance task registers on the task module's schedule
     "App\\Service\\Notification\\User\\NotificationProviderInterface", # handovers and queues surface on core's bell

@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'profile_config.section_delete'|trans }}{% endblock %}
+
+{% block body %}
+
+    <section class="section">
+        <div class="container">
+
+            <p class="mb-4">
+                <a href="{{ path('app_profile_config') }}">
+                    <span class="icon"><i class="fa fa-arrow-left" aria-hidden="true"></i></span>
+                    <span>{{ 'profile_config.delete_back'|trans }}</span>
+                </a>
+            </p>
+
+            <div class="columns">
+                <div class="column is-7">
+
+                    <div class="box">
+                        <h1 class="title is-5 has-text-danger">{{ 'profile_config.section_delete'|trans }}</h1>
+                        {% if deletionBlocker %}
+                            <div class="notification is-warning">{{ deletionBlocker|trans }}</div>
+                        {% else %}
+                            <form method="post" action="{{ path('app_profile_config_delete') }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('app_profile_config_delete' ~ user.id) }}">
+                                <div class="field">
+                                    <label class="label" for="delete_password">{{ 'profile_config.form_label_password'|trans }}</label>
+                                    <div class="control">
+                                        <input class="input" type="password" id="delete_password" name="password" autocomplete="current-password" required>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <label class="label" for="delete_confirmation">{{ 'profile_config.form_label_delete_confirmation'|trans({'%word%': 'profile_config.delete_confirm_word'|trans}) }}</label>
+                                    <div class="control">
+                                        <input class="input" type="text" id="delete_confirmation" name="confirmation" autocomplete="off" required>
+                                    </div>
+                                </div>
+                                <button class="button is-danger">{{ 'profile_config.button_delete'|trans }}</button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                </div>
+                <div class="column is-5">
+
+                    <div class="box has-background-info-light">
+                        <h2 class="title is-5">{{ 'profile_config.delete_info_heading'|trans }}</h2>
+                        <div class="content">
+                            <ol>
+                                <li>{{ 'profile_config.delete_info_closed'|trans }}</li>
+                                <li>{{ 'profile_config.delete_info_window'|trans({'%days%': erasureWindowDays, '%contact_link%': '<a href="' ~ path('app_contact') ~ '">' ~ ('profile_config.delete_info_contact_label'|trans) ~ '</a>'})|raw }}</li>
+                                <li>{{ 'profile_config.delete_info_erased'|trans({'%days%': erasureWindowDays}) }}</li>
+                                <li>{{ 'profile_config.delete_info_kept'|trans }}</li>
+                            </ol>
+                            <p>{{ 'profile_config.delete_info_export'|trans({'%export_link%': '<a href="' ~ path('app_profile_config') ~ '#export">' ~ ('profile_config.delete_info_export_label'|trans) ~ '</a>'})|raw }}</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+{% endblock %}

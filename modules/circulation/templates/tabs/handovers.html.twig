@@ -17,11 +17,11 @@
             <tr>
                 <td>{{ item_list_cell(itemType, handover.copy.itemId, 'row') }}</td>
                 <td class="has-text-grey">
-                    {{ handover.fromUser ? handover.fromUser.name : 'circulation.holder_unknown'|trans }}
+                    {{ handover.fromUser ? member_name(handover.fromUser) : 'circulation.holder_unknown'|trans }}
                     {% if handover.fromConfirmedAt %}<span class="icon has-text-success"><i class="fa fa-check"></i></span>{% endif %}
                 </td>
                 <td class="has-text-grey">
-                    {{ handover.toUser.name }}
+                    {{ member_name(handover.toUser) }}
                     {% if handover.toConfirmedAt %}<span class="icon has-text-success"><i class="fa fa-check"></i></span>{% endif %}
                 </td>
                 <td class="has-text-grey">{{ handover.openedAt|time_diff }}</td>

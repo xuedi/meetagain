@@ -24,11 +24,11 @@
                 <div class="box" style="height: 100%;">
                     <div class="is-flex is-align-items-center mb-4" style="gap: 0.75rem;">
                         <figure class="image is-48x48 is-flex-shrink-0">
-                            {% include '_components/image.html.twig' with {'image': author.user.image, 'size': '100x100', 'alt': author.user.name} %}
+                            {% include '_components/image.html.twig' with {'image': author.user.image, 'size': '100x100', 'alt': member_name(author.user)} %}
                         </figure>
                         <div>
                             <p class="has-text-weight-semibold mb-0">
-                                <a href="{{ path('app_plugin_photos_stream', {id: author.user.id}) }}">{{ author.user.name }}</a>
+                                <a href="{{ path('app_plugin_photos_stream', {id: author.user.id}) }}">{{ member_name(author.user) }}</a>
                             </p>
                             <p class="is-size-7 has-text-grey">
                                 {{ 'photos_stream.photo_count'|trans({'%count%': author.count}) }}

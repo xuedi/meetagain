@@ -554,6 +554,7 @@ admin_member:
     role_admin: 'Administrator'
     role_user: 'Benutzer'
     role_system: 'System'
+    flash_restore_erased: 'Dieses Konto wurde bereits gelöscht und kann nicht wiederhergestellt werden.'
 admin_support:
     tab_requests: 'Support-Anfragen'
     tab_reports: 'Bildmeldungen'

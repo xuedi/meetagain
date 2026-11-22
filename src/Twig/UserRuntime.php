@@ -29,6 +29,11 @@ final readonly class UserRuntime implements RuntimeExtensionInterface
         return $this->userService->resolveUserName($id);
     }
 
+    public function getMemberName(?User $user): string
+    {
+        return $this->userService->displayName($user);
+    }
+
     public function getMemberViewActions(User $viewer, User $target): string
     {
         return $this->concatProviderOutput(

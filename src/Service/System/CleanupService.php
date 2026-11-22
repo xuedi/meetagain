@@ -292,7 +292,7 @@ readonly class CleanupService implements TaskInterface
         $count = 0;
         $users = $this->userRepo->getOldRegistrations(self::GHOSTED_REGISTRATION_DAYS);
         foreach ($users as $user) {
-            $this->entityActionDispatcher->dispatch(EntityAction::DeleteUser, $user->getId());
+            $this->entityActionDispatcher->dispatch(EntityAction::EraseUser, (int) $user->getId());
             $activities = $user->getActivities();
             foreach ($activities as $activity) {
                 $this->entityManager->remove($activity);

@@ -80,7 +80,7 @@ final class MemberController extends AbstractController implements AdminNavigati
         }
 
         try {
-            $this->userService->softDelete($this->getAuthedUser(), $user);
+            $this->userService->requestDeletion($this->getAuthedUser(), $user);
         } catch (ActionException $e) {
             $this->handleFailure($e);
         }
@@ -195,6 +195,8 @@ final class MemberController extends AbstractController implements AdminNavigati
     {
         match ($e->failure) {
             ActionFailure::SystemUser => throw $this->createAccessDeniedException('Cannot modify system users.'),
+            ActionFailure::DeletionBlocked => $this->addFlash('error', $e->getMessage()),
+            ActionFailure::Erased => $this->addFlash('error', 'admin_member.flash_restore_erased'),
             default => null,
         };
     }

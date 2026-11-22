@@ -18,7 +18,7 @@ final readonly class MemberDeletionHandler implements EntityActionInterface
     #[Override]
     public function onEntityAction(EntityAction $action, int $entityId): void
     {
-        if ($action !== EntityAction::DeleteUser) {
+        if ($action !== EntityAction::EraseUser) {
             return;
         }
 

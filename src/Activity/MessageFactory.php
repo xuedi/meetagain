@@ -43,7 +43,7 @@ class MessageFactory
             $this->imageRenderer,
             $this->translator,
             $activity->getMeta(),
-            $this->userRepository->getUserNameList(),
+            array_map(fn(?string $name): string => $name ?? $this->translator->trans('shared.deleted_member'), $this->userRepository->getUserNameList()),
             $this->eventRepository->getEventNameList($locale),
         );
     }

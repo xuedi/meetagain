@@ -190,7 +190,12 @@ final class SecurityController extends AbstractController
     public function verifyUserEmail(EntityManagerInterface $em, string $code): Response
     {
         $user = $em->getRepository(User::class)->findOneBy(['regcode' => $code]);
-        if ($user === null || $user->isRegcodeExpired() || !$this->userService->claimRegistrationCode($user, $code)) {
+        if (
+            $user === null
+            || $user->getStatus() !== UserStatus::Registered
+            || $user->isRegcodeExpired()
+            || !$this->userService->claimRegistrationCode($user, $code)
+        ) {
             return $this->render('security/register_error.html.twig');
         }
 

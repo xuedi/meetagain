@@ -19,7 +19,7 @@ class UserBlock
     #[ORM\JoinColumn(nullable: false)]
     private ?User $blocker = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'blockedByUsers')]
+    #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $blocked = null;
 

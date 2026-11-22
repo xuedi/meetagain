@@ -144,7 +144,7 @@
                                 <div class="tags">
                                     <span class="tag is-warning">RSVP</span>
                                     {% for user in event.rsvp %}
-                                        <span class="tag">{{ user.name }}</span>
+                                        <span class="tag">{{ member_name(user) }}</span>
                                     {% endfor %}
                                 </div>
                                 {% if event.externalRsvp > 0 %}

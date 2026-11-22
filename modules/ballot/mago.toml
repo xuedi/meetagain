@@ -14,6 +14,8 @@ permit = [
     "Module\\Ballot\\**",
     "@global",                                                  # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                                        # the vote FK - the one sanctioned core entity
+    "App\\EntityActionInterface",                               # votes in open ballots are withdrawn when a member is erased
+    "App\\Enum\\EntityAction",                                  # that chain's action enum
     "App\\Controller\\AbstractController",                      # module controllers extend core's, as plugin controllers do
     "Module\\Task\\Contract\\**",                               # the deadline task registers on the task module's schedule
     "App\\Service\\Notification\\User\\NotificationProviderInterface", # members hear about open ballots on core's bell
@@ -32,6 +34,8 @@ permit = [
     "Module\\Ballot\\**",
     "@global",                                                  # DateTimeImmutable, Override, PHP's own functions
     "App\\Entity\\User",                                        # the vote FK - the one sanctioned core entity
+    "App\\EntityActionInterface",                               # votes in open ballots are withdrawn when a member is erased
+    "App\\Enum\\EntityAction",                                  # that chain's action enum
     "App\\Controller\\AbstractController",                      # module controllers extend core's, as plugin controllers do
     "Module\\Task\\Contract\\**",                               # the deadline task registers on the task module's schedule
     "App\\Service\\Notification\\User\\NotificationProviderInterface", # members hear about open ballots on core's bell

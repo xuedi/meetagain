@@ -83,6 +83,10 @@ readonly class MessageService
 
     public function mayContact(User $user, User $partner): bool
     {
+        if ($partner->isDeleted()) {
+            return false;
+        }
+
         return $this->memberFilterService->isMemberAccessible((int) $partner->getId()) || $this->countThread($user, $partner) > 0;
     }
 
