@@ -12,7 +12,7 @@ MeetAgain runs as containers. The public image `ghcr.io/xuedi/meetagain` holds t
 plugin. Every tag is a core commit (`ghcr.io/xuedi/meetagain:<commit>`), every release also carries its version
 (`ghcr.io/xuedi/meetagain:<version>`), and `latest` follows the newest one. Pin a version in `compose.yaml` instead
 of `latest` so an update is a decision. What each version changes is on the
-[GitHub Releases](https://github.com/xuedi/meetagain/releases) page and in `CHANGELOG.md`.
+[GitHub Releases](https://github.com/xuedi/meetagain/releases) page.
 
 The first argument of the container picks what it does:
 
