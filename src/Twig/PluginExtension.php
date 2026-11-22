@@ -23,7 +23,6 @@ final class PluginExtension extends AbstractExtension
                 PluginRuntime::class,
                 'getPluginProfileDropdownLinks',
             ]),
-            new TwigFunction('get_plugin_profile_config_links', [PluginRuntime::class, 'getPluginProfileConfigLinks']),
             new TwigFunction(
                 'get_plugin_navbar_pills_html',
                 [PluginRuntime::class, 'getPluginNavbarPillsHtml'],

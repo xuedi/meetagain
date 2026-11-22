@@ -1,0 +1,56 @@
+{% extends 'profile/config/_layout.html.twig' %}
+
+{% block title %}{{ 'profile_config.menu_blocked'|trans }}{% endblock %}
+
+{% block config_main %}
+    <div class="box">
+        <h1 class="title is-5">{{ 'profile_config.section_blocked_users'|trans }}</h1>
+        {% if blockedUsers|length == 0 %}
+            <p>{{ 'profile_config.blocked_empty'|trans }}</p>
+        {% else %}
+            <table class="table is-fullwidth">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>{{ 'profile_config.blocked_table_header_user'|trans }}</th>
+                        <th>{{ 'profile_config.blocked_table_header_blocked_on'|trans }}</th>
+                        <th class="has-text-right">{{ 'profile_config.blocked_table_header_actions'|trans }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for block in blockedUsers %}
+                    <tr>
+                        <td class="col-narrow">
+                            {% include '_components/image.html.twig' with {'image': block.blocked.image, 'size': '50x50'} %}
+                        </td>
+                        <td>
+                            <strong>{{ member_name(block.blocked) }}</strong>
+                        </td>
+                        <td>
+                            <small>{{ block.createdAt|date('Y-m-d') }}</small>
+                        </td>
+                        <td class="has-text-right">
+                            <a href="{{ path('app_profile_unblock_user', {'id': block.blocked.id}) }}"
+                               class="button is-warning is-small"
+                               data-post
+                               data-csrf-token="{{ csrf_token('app_profile_unblock_user' ~ block.blocked.id) }}">
+                                <span class="icon"><i class="fa fa-unlock" aria-hidden="true"></i></span><span>{{ 'member.button_unblock'|trans }}</span>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block config_info %}
+    <div class="box has-background-info-light">
+        <h2 class="title is-5">{{ 'profile_config.info_blocked_heading'|trans }}</h2>
+        <div class="content">
+            <p>{{ 'profile_config.info_blocked_effect'|trans }}</p>
+            <p>{{ 'profile_config.info_blocked_how'|trans }}</p>
+        </div>
+    </div>
+{% endblock %}

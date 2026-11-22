@@ -1,21 +1,19 @@
 /**
  * Block / Unblock User — Profile & Messaging Block Actions
  *
- * Three related user-blocking interactions used on profile and messaging pages:
+ * Two related user-blocking interactions used on profile and messaging pages:
  *   1. Ajax yes/no toggle (.triggerToggleBlock) — fires the action URL and updates
  *      the button pair styling (is-success / is-danger) without reloading. Clicks
  *      while a request is in flight are ignored. Used in
  *      the shared _components/toggle.html.twig component. After the server responds it
  *      dispatches a bubbling `ma:toggled` CustomEvent (detail = the JSON response) so
  *      page scripts can react to the new state.
- *   2. Ajax unblock (.ajax-unblock) — prompts for confirmation, fires a POST, then
- *      removes the user's table row from the DOM.
- *   3. Ajax block form (.ajax-block-form) — intercepts form submission, prompts for
+ *   2. Ajax block form (.ajax-block-form) — intercepts form submission, prompts for
  *      confirmation on block actions, then reloads to reflect the new state.
  *
  * Loaded in:  templates/base.html.twig (all pages)
  * Used by:    templates/_components/toggle.html.twig,
- *             templates/profile/config.html.twig,
+ *             templates/profile/config/settings.html.twig,
  *             templates/profile/messages/_block_toggle.html.twig
  * Depends on: ma-fetch.js (maFetch)
  */
@@ -51,33 +49,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.reload();
             }).finally(() => {
                 trigger.dataset.busy = '0';
-            });
-        });
-    });
-});
-
-// Ajax unblock: remove user from blocked list
-document.addEventListener('DOMContentLoaded', function () {
-    (document.querySelectorAll('.ajax-unblock') || []).forEach((link) => {
-        link.addEventListener('click', event => {
-            event.preventDefault();
-
-            const userName = event.currentTarget.dataset.userName;
-            if (!confirm('Unblock ' + userName + '?')) {
-                return;
-            }
-
-            const url = event.currentTarget.getAttribute('href');
-            const userId = event.currentTarget.dataset.userId;
-
-            const formData = new FormData();
-            formData.append('_token', event.currentTarget.dataset.csrfToken || '');
-
-            maFetch(url, true, formData).then(() => {
-                const row = document.getElementById('block-' + userId);
-                if (row) {
-                    row.remove();
-                }
             });
         });
     });

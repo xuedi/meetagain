@@ -1,0 +1,29 @@
+{% macro entries(menu) %}
+    <ul class="menu-list">
+        {% for entry in menu|filter(entry => not entry.danger) %}
+            <li><a href="{{ entry.url }}"{% if entry.active %} class="is-active" aria-current="page"{% endif %}>{{ entry.label|trans }}</a></li>
+        {% endfor %}
+    </ul>
+    <hr class="my-3">
+    <ul class="menu-list">
+        {% for entry in menu|filter(entry => entry.danger) %}
+            <li><a href="{{ entry.url }}" class="{{ entry.active ? 'is-active' : 'has-text-danger' }}"{% if entry.active %} aria-current="page"{% endif %}>{{ entry.label|trans }}</a></li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% import _self as menu_macros %}
+{% set activeEntry = menu|filter(entry => entry.active)|first %}
+
+<nav class="menu is-hidden-touch" aria-label="{{ 'profile_config.menu_aria'|trans }}">
+    {{ menu_macros.entries(menu) }}
+</nav>
+
+<details class="box p-0 is-hidden-desktop is-menu-dropdown">
+    <summary class="px-4 py-3 has-text-weight-semibold">
+        {{ activeEntry ? activeEntry.label|trans : 'profile_config.menu_settings'|trans }}
+    </summary>
+    <nav class="menu px-2 pb-3">
+        {{ menu_macros.entries(menu) }}
+    </nav>
+</details>

@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    {% set menu = get_profile_config_menu() %}
+
+    <section class="section">
+        <div class="container">
+            <div class="columns is-desktop">
+                <div class="column is-3-desktop">
+                    {{ include('profile/config/_menu.html.twig', {menu: menu}) }}
+                </div>
+                <div class="column">
+                    {% set info %}{{ block('config_info') }}{% endset %}
+                    {% if info|trim is not empty %}
+                        <div class="columns">
+                            <div class="column is-7">{{ block('config_main') }}</div>
+                            <div class="column is-5">{{ info }}</div>
+                        </div>
+                    {% else %}
+                        {{ block('config_main') }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block config_main %}{% endblock %}
+
+{% block config_info %}{% endblock %}

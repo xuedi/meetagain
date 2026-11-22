@@ -1,0 +1,107 @@
+{% extends 'profile/config/_layout.html.twig' %}
+
+{% set privacyToggles = get_profile_config_privacy_toggles(user) %}
+
+{% block title %}{{ 'profile_config.menu_settings'|trans }}{% endblock %}
+
+{% block config_main %}
+    <div class="box">
+        <h1 class="title is-5">{{ 'profile_config.section_notifications'|trans }}</h1>
+        <div class="field is-grouped">
+            <div class="control is-expanded">
+                {{ 'profile_config.toggle_email_notification'|trans }}
+            </div>
+            <div class="control">
+                {% include '_components/toggle.html.twig' with {
+                    'link': path('app_profile_config_toggle', {'type': 'notification'}),
+                    'status': user.isNotification,
+                    'csrfTokenId': 'app_profile_config_togglenotification',
+                    'noAjax': true
+                } %}
+            </div>
+        </div>
+        {% if user.isNotification %}
+            {% for notification in user.notificationSettings.list %}
+                <div class="field is-grouped">
+                    <div class="control is-expanded">{{ notification.label|trans }}</div>
+                    <div class="control">
+                        {% include '_components/toggle.html.twig' with {
+                            'link': path('app_profile_config_toggle_notification', {'type': notification.key}),
+                            'status': notification.value,
+                            'csrfTokenId': 'app_profile_config_toggle_notification' ~ notification.key,
+                        } %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="box">
+        <h2 class="title is-5">{{ 'profile_config.section_privacy'|trans }}</h2>
+        <div class="field is-grouped">
+            <div class="control is-expanded">{{ 'profile_config.toggle_public_profile'|trans }}</div>
+            <div class="control">
+                {% include '_components/toggle.html.twig' with {
+                    'link': path('app_profile_config_toggle', {'type': 'public'}),
+                    'status': user.isPublic,
+                    'csrfTokenId': 'app_profile_config_togglepublic',
+                } %}
+            </div>
+        </div>
+        <div class="field is-grouped">
+            <div class="control is-expanded">{{ 'profile_config.toggle_tagging'|trans }}</div>
+            <div class="control">
+                {% include '_components/toggle.html.twig' with {
+                    'link': path('app_profile_config_toggle', {'type': 'tagging'}),
+                    'status': user.isTagging,
+                    'csrfTokenId': 'app_profile_config_toggletagging',
+                } %}
+            </div>
+        </div>
+        <div class="field is-grouped">
+            <div class="control is-expanded">{{ 'profile_config.toggle_osm'|trans }}</div>
+            <div class="control">
+                {% include '_components/toggle.html.twig' with {
+                    'link': path('app_profile_config_toggle', {'type': 'osm'}),
+                    'status': user.isOsmConsent,
+                    'csrfTokenId': 'app_profile_config_toggleosm',
+                } %}
+            </div>
+        </div>
+        {% for toggle in privacyToggles %}
+            <div class="field is-grouped">
+                <div class="control is-expanded">{{ toggle.labelKey|trans }}</div>
+                <div class="control">
+                    {% include '_components/toggle.html.twig' with {
+                        'link': toggle.toggleUrl,
+                        'status': toggle.currentState,
+                        'csrfTokenId': toggle.csrfTokenId,
+                    } %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block config_info %}
+    <div class="box has-background-info-light">
+        <h2 class="title is-5">{{ 'profile_config.info_notifications_heading'|trans }}</h2>
+        <div class="content">
+            <p>{{ 'profile_config.info_notifications_master'|trans }}</p>
+            <p>{{ 'profile_config.info_notifications_account'|trans }}</p>
+        </div>
+    </div>
+    <div class="box has-background-info-light">
+        <h2 class="title is-5">{{ 'profile_config.info_privacy_heading'|trans }}</h2>
+        <div class="content">
+            <ul>
+                <li>{{ 'profile_config.info_privacy_public'|trans }}</li>
+                <li>{{ 'profile_config.info_privacy_tagging'|trans }}</li>
+                <li>{{ 'profile_config.info_privacy_osm'|trans }}</li>
+                {% for toggle in privacyToggles|filter(toggle => toggle.hintKey) %}
+                    <li>{{ toggle.hintKey|trans }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

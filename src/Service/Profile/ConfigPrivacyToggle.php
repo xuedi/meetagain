@@ -9,5 +9,6 @@ final readonly class ConfigPrivacyToggle
         public bool $currentState,
         public string $toggleUrl,
         public string $csrfTokenId,
+        public ?string $hintKey = null,
     ) {}
 }

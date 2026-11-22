@@ -9,7 +9,6 @@ use App\Form\ChangePassword;
 use App\Security\Permission\Attribute\PermissionAttribute;
 use App\Service\Member\ActionException;
 use App\Service\Member\ActionFailure;
-use App\Service\Member\BlockingService;
 use App\Service\Member\ConsentService;
 use App\Service\Member\DataExport;
 use App\Service\Member\Erasure;
@@ -39,7 +38,6 @@ final class ConfigController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly UserPasswordHasherInterface $hasher,
-        private readonly BlockingService $blockingService,
         private readonly ConsentService $consentService,
         private readonly SettingsService $notificationSettings,
         private readonly PasswordResetService $passwordService,
@@ -51,8 +49,18 @@ final class ConfigController extends AbstractController
         private readonly TranslatorInterface $translator,
     ) {}
 
-    #[Route('', name: 'app_profile_config')]
-    public function config(Request $request): Response
+    #[Route('', name: 'app_profile_config', methods: ['GET'])]
+    public function config(): Response
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::USER_VIEW_SELF);
+
+        return $this->render('profile/config/settings.html.twig', [
+            'user' => $this->getAuthedUser(),
+        ]);
+    }
+
+    #[Route('/password', name: 'app_profile_config_password', methods: ['GET', 'POST'])]
+    public function password(Request $request): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::USER_VIEW_SELF);
 
@@ -61,24 +69,30 @@ final class ConfigController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->denyAccessUnlessGranted(PermissionAttribute::USER_PASSWORD_UPDATE);
             $user = $this->getAuthedUser();
-            $oldPasswordValid = $this->hasher->isPasswordValid($user, $form->get('oldPassword')->getData());
-            if ($oldPasswordValid) {
-                $this->passwordService->changePassword($user, $form->get('newPassword')->getData());
-                $this->tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));
-
-                $this->addFlash('success', 'profile_config.flash_password_changed');
-            }
-            if (!$oldPasswordValid) {
+            if (!$this->hasher->isPasswordValid($user, $form->get('oldPassword')->getData())) {
                 $this->addFlash('error', 'profile_config.flash_password_old_invalid');
+
+                return $this->redirectToRoute('app_profile_config_password');
             }
+            $this->passwordService->changePassword($user, $form->get('newPassword')->getData());
+            $this->tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));
+            $this->addFlash('success', 'profile_config.flash_password_changed');
+
+            return $this->redirectToRoute('app_profile_config_password');
         }
 
-        $user = $this->getAuthedUser();
-
-        return $this->render('profile/config.html.twig', [
-            'user' => $user,
+        return $this->render('profile/config/password.html.twig', [
             'form' => $form,
-            'blockedUsers' => $this->blockingService->getBlockedUsers($user),
+        ]);
+    }
+
+    #[Route('/export', name: 'app_profile_config_export_page', methods: ['GET'])]
+    public function exportPage(): Response
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::USER_VIEW_SELF);
+
+        return $this->render('profile/config/export.html.twig', [
+            'user' => $this->getAuthedUser(),
         ]);
     }
 
@@ -88,7 +102,7 @@ final class ConfigController extends AbstractController
         $this->denyAccessUnlessGranted(PermissionAttribute::USER_VIEW_SELF);
         $user = $this->getAuthedUser();
 
-        return $this->render('profile/delete.html.twig', [
+        return $this->render('profile/config/delete.html.twig', [
             'user' => $user,
             'deletionBlocker' => $this->userService->findDeletionBlocker($user),
             'erasureWindowDays' => Erasure::ERASURE_WINDOW_DAYS,
@@ -144,7 +158,7 @@ final class ConfigController extends AbstractController
         if (!$this->hasher->isPasswordValid($user, (string) $request->request->get('password'))) {
             $this->addFlash('error', 'profile_config.flash_password_invalid');
 
-            return $this->redirectToRoute('app_profile_config');
+            return $this->redirectToRoute('app_profile_config_export_page');
         }
 
         $response = new BinaryFileResponse($this->dataExport->build($user));

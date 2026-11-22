@@ -96,7 +96,7 @@ final class BlockController extends AbstractController
         $currentUser = $this->getAuthedUser();
         $blockedUsers = $this->blockingService->getBlockedUsers($currentUser);
 
-        return $this->render('profile/blocked.html.twig', [
+        return $this->render('profile/config/blocked.html.twig', [
             'blockedUsers' => $blockedUsers,
         ]);
     }
