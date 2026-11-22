@@ -3,24 +3,33 @@
 namespace App\Controller\Profile;
 
 use App\Controller\AbstractController;
+use App\Emails\Types\AccountDeletionEmail;
 use App\Entity\NotificationSettings;
 use App\Form\ChangePassword;
 use App\Security\Permission\Attribute\PermissionAttribute;
-use App\Service\Member\BlockingService;
+use App\Service\Member\ActionException;
+use App\Service\Member\ActionFailure;
 use App\Service\Member\ConsentService;
+use App\Service\Member\DataExport;
+use App\Service\Member\Erasure;
 use App\Service\Member\PasswordResetService;
+use App\Service\Member\UserService;
 use App\Service\Notification\SettingsService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/profile/config')]
 #[IsGranted('ROLE_USER')]
@@ -29,15 +38,29 @@ final class ConfigController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly UserPasswordHasherInterface $hasher,
-        private readonly BlockingService $blockingService,
         private readonly ConsentService $consentService,
         private readonly SettingsService $notificationSettings,
         private readonly PasswordResetService $passwordService,
         private readonly TokenStorageInterface $tokenStorage,
+        private readonly UserService $userService,
+        private readonly DataExport $dataExport,
+        private readonly AccountDeletionEmail $accountDeletionEmail,
+        private readonly Security $security,
+        private readonly TranslatorInterface $translator,
     ) {}
 
-    #[Route('', name: 'app_profile_config')]
-    public function config(Request $request): Response
+    #[Route('', name: 'app_profile_config', methods: ['GET'])]
+    public function config(): Response
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::USER_VIEW_SELF);
+
+        return $this->render('profile/config/settings.html.twig', [
+            'user' => $this->getAuthedUser(),
+        ]);
+    }
+
+    #[Route('/password', name: 'app_profile_config_password', methods: ['GET', 'POST'])]
+    public function password(Request $request): Response
     {
         $this->denyAccessUnlessGranted(PermissionAttribute::USER_VIEW_SELF);
 
@@ -46,25 +69,104 @@ final class ConfigController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->denyAccessUnlessGranted(PermissionAttribute::USER_PASSWORD_UPDATE);
             $user = $this->getAuthedUser();
-            $oldPasswordValid = $this->hasher->isPasswordValid($user, $form->get('oldPassword')->getData());
-            if ($oldPasswordValid) {
-                $this->passwordService->changePassword($user, $form->get('newPassword')->getData());
-                $this->tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));
-
-                $this->addFlash('success', 'profile_config.flash_password_changed');
-            }
-            if (!$oldPasswordValid) {
+            if (!$this->hasher->isPasswordValid($user, $form->get('oldPassword')->getData())) {
                 $this->addFlash('error', 'profile_config.flash_password_old_invalid');
+
+                return $this->redirectToRoute('app_profile_config_password');
             }
+            $this->passwordService->changePassword($user, $form->get('newPassword')->getData());
+            $this->tokenStorage->setToken(new UsernamePasswordToken($user, 'main', $user->getRoles()));
+            $this->addFlash('success', 'profile_config.flash_password_changed');
+
+            return $this->redirectToRoute('app_profile_config_password');
         }
 
+        return $this->render('profile/config/password.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/export', name: 'app_profile_config_export_page', methods: ['GET'])]
+    public function exportPage(): Response
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::USER_VIEW_SELF);
+
+        return $this->render('profile/config/export.html.twig', [
+            'user' => $this->getAuthedUser(),
+        ]);
+    }
+
+    #[Route('/delete', name: 'app_profile_config_delete_page', methods: ['GET'])]
+    public function deletePage(): Response
+    {
+        $this->denyAccessUnlessGranted(PermissionAttribute::USER_VIEW_SELF);
         $user = $this->getAuthedUser();
 
-        return $this->render('profile/config.html.twig', [
+        return $this->render('profile/config/delete.html.twig', [
             'user' => $user,
-            'form' => $form,
-            'blockedUsers' => $this->blockingService->getBlockedUsers($user),
+            'deletionBlocker' => $this->userService->findDeletionBlocker($user),
+            'erasureWindowDays' => Erasure::ERASURE_WINDOW_DAYS,
         ]);
+    }
+
+    #[Route('/delete', name: 'app_profile_config_delete', methods: ['POST'])]
+    public function delete(Request $request): Response
+    {
+        $user = $this->getAuthedUser();
+        if (!$this->isCsrfTokenValid('app_profile_config_delete' . $user->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+        $this->denyAccessUnlessGranted(PermissionAttribute::USER_UPDATE_SELF);
+
+        if (!$this->hasher->isPasswordValid($user, (string) $request->request->get('password'))) {
+            $this->addFlash('error', 'profile_config.flash_password_invalid');
+
+            return $this->redirectToRoute('app_profile_config_delete_page');
+        }
+
+        $typed = mb_strtolower(trim((string) $request->request->get('confirmation')));
+        if ($typed !== mb_strtolower($this->translator->trans('profile_config.delete_confirm_word'))) {
+            $this->addFlash('error', 'profile_config.flash_delete_confirmation_invalid');
+
+            return $this->redirectToRoute('app_profile_config_delete_page');
+        }
+
+        try {
+            $this->userService->requestOwnDeletion($user);
+        } catch (ActionException $e) {
+            $this->addFlash('error', $e->failure === ActionFailure::DeletionBlocked ? $e->getMessage() : 'profile_config.flash_delete_failed');
+
+            return $this->redirectToRoute('app_profile_config_delete_page');
+        }
+
+        $this->accountDeletionEmail->send(['user' => $user]);
+        $this->security->logout(false);
+        $this->addFlash('success', 'profile_config.flash_deleted');
+
+        return $this->redirectToRoute('app_login');
+    }
+
+    #[Route('/export', name: 'app_profile_config_export', methods: ['POST'])]
+    public function export(Request $request): Response
+    {
+        $user = $this->getAuthedUser();
+        if (!$this->isCsrfTokenValid('app_profile_config_export' . $user->getId(), (string) $request->request->get('_token'))) {
+            throw new BadRequestHttpException('Invalid CSRF token.');
+        }
+        $this->denyAccessUnlessGranted(PermissionAttribute::USER_VIEW_SELF);
+
+        if (!$this->hasher->isPasswordValid($user, (string) $request->request->get('password'))) {
+            $this->addFlash('error', 'profile_config.flash_password_invalid');
+
+            return $this->redirectToRoute('app_profile_config_export_page');
+        }
+
+        $response = new BinaryFileResponse($this->dataExport->build($user));
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'my-data.zip');
+        $response->headers->set('Content-Type', 'application/zip');
+        $response->deleteFileAfterSend();
+
+        return $response;
     }
 
     #[Route(

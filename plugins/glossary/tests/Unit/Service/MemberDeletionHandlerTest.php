@@ -19,7 +19,7 @@ class MemberDeletionHandlerTest extends TestCase
         $days->expects(self::once())->method('deleteForUser')->with(12);
 
         // Act
-        new MemberDeletionHandler($cards, $days)->onEntityAction(EntityAction::DeleteUser, 12);
+        new MemberDeletionHandler($cards, $days)->onEntityAction(EntityAction::EraseUser, 12);
     }
 
     public function testOtherActionsLeaveTrainerRowsAlone(): void

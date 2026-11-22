@@ -16,6 +16,7 @@ use App\Entity\Event;
 use App\Entity\User;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -404,5 +405,58 @@ class ActivityRepository extends ServiceEntityRepository
         }
 
         return $byDay;
+    }
+
+    /**
+     * @param list<string> $keys meta keys whose values are blanked
+     */
+    public function blankMetaBefore(string $type, array $keys, DateTimeImmutable $cutoff): int
+    {
+        $assignments = [];
+        $filled = [];
+        $params = ['type' => $type, 'cutoff' => $cutoff];
+        $types = ['cutoff' => Types::DATETIME_IMMUTABLE];
+        foreach (array_values($keys) as $index => $key) {
+            $assignments[] = sprintf(":path%d, ''", $index);
+            $filled[] = sprintf("COALESCE(JSON_UNQUOTE(JSON_EXTRACT(meta, :path%d)), '') <> ''", $index);
+            $params['path' . $index] = '$.' . $key;
+        }
+
+        return (int) $this
+            ->getEntityManager()
+            ->getConnection()
+            ->executeStatement(
+                sprintf(
+                    'UPDATE activity SET meta = JSON_SET(meta, %s) WHERE type = :type AND created_at < :cutoff AND (%s)',
+                    implode(', ', $assignments),
+                    implode(' OR ', $filled),
+                ),
+                $params,
+                $types,
+            );
+    }
+
+    public function deleteOfTypeBefore(string $type, DateTimeImmutable $cutoff): int
+    {
+        return (int) $this
+            ->createQueryBuilder('a')
+            ->delete()
+            ->where('a.type = :type')
+            ->andWhere('a.createdAt < :cutoff')
+            ->setParameter('type', $type)
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function deleteForUser(int $userId): int
+    {
+        return (int) $this
+            ->createQueryBuilder('a')
+            ->delete()
+            ->where('IDENTITY(a.user) = :user')
+            ->setParameter('user', $userId)
+            ->getQuery()
+            ->execute();
     }
 }

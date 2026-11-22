@@ -103,21 +103,38 @@ readonly class CirculationSection implements SectionInterface
             $storedId = $stored->copyId($copy);
             if ($storedId !== null) {
                 $matchedCopies[$copy->ref] = $storedId;
-            } else {
-                $copies[$copy->ref] = $copy;
+                $context->count(self::KIND_COPIES, Outcome::Matched);
+                continue;
             }
-            $context->count(self::KIND_COPIES, $storedId === null ? Outcome::Created : Outcome::Matched);
+
+            if ($this->namesMatchedUser($context, $row['donated_by_email'] ?? null, $row['holder_email'] ?? null)) {
+                $context->count(self::KIND_COPIES, Outcome::Withheld);
+                continue;
+            }
+
+            $copies[$copy->ref] = $copy;
+            $context->count(self::KIND_COPIES, Outcome::Created);
         }
 
         $requests = [];
         foreach ($this->rowsOf($rows, 'requests') as $row) {
             $request = $this->importRequest($row, $copies, $context);
-            if ($request !== null && $stored->hasRequest($request)) {
-                $context->count(self::KIND_REQUESTS, Outcome::Matched);
-            } elseif ($request !== null) {
-                $requests[$request->ref] = $request;
-                $context->count(self::KIND_REQUESTS, Outcome::Created);
+            if ($request === null) {
+                continue;
             }
+
+            if ($stored->hasRequest($request)) {
+                $context->count(self::KIND_REQUESTS, Outcome::Matched);
+                continue;
+            }
+
+            if ($this->namesMatchedUser($context, $row['email'] ?? null)) {
+                $context->count(self::KIND_REQUESTS, Outcome::Withheld);
+                continue;
+            }
+
+            $requests[$request->ref] = $request;
+            $context->count(self::KIND_REQUESTS, Outcome::Created);
         }
 
         $handovers = [];
@@ -404,6 +421,12 @@ readonly class CirculationSection implements SectionInterface
             return null;
         }
 
+        if ($this->namesMatchedUser($context, $row['to_email'] ?? null, $giverEmail, $row['cancelled_by_email'] ?? null)) {
+            $context->count(self::KIND_HANDOVERS, Outcome::Withheld);
+
+            return null;
+        }
+
         $context->count(self::KIND_HANDOVERS, Outcome::Created);
 
         return new PortableHandover(
@@ -452,6 +475,12 @@ readonly class CirculationSection implements SectionInterface
         $userMissing = array_any(array_keys($emails), static fn(string $role): bool => $emails[$role] !== null && $userIds[$role] === null);
         if ($entryType === null || $copyMissing || $userMissing) {
             $context->count(self::KIND_LEDGER, Outcome::Dropped);
+
+            return null;
+        }
+
+        if ($this->namesMatchedUser($context, ...array_values($emails))) {
+            $context->count(self::KIND_LEDGER, Outcome::Withheld);
 
             return null;
         }
@@ -545,6 +574,11 @@ readonly class CirculationSection implements SectionInterface
     private function emailOf(?int $userId, array $users): ?string
     {
         return $userId === null ? null : ($users[$userId] ?? null)?->getEmail();
+    }
+
+    private function namesMatchedUser(ImportContext $context, mixed ...$emails): bool
+    {
+        return array_any($emails, $context->namesMatchedUser(...));
     }
 
     private function userId(mixed $email, ImportContext $context): ?int

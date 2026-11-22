@@ -36,11 +36,11 @@
         {% if is_granted('ROLE_USER') %}
             {% include '_components/username.html.twig' with {
                 'link': path('app_member_view', {'id': user.id}),
-                'name': user.name
+                'name': member_name(user)
             } %}
         {% else %}
-            <span class="usercard-name has-tooltip" data-tooltip="{{ user.name }}">
-                <span>{{ user.name }}</span>
+            <span class="usercard-name has-tooltip" data-tooltip="{{ member_name(user) }}">
+                <span>{{ member_name(user) }}</span>
             </span>
         {% endif %}
     </div>

@@ -554,6 +554,7 @@ admin_member:
     role_admin: 'Admin'
     role_user: 'User'
     role_system: 'System'
+    flash_restore_erased: 'This account was already erased and cannot be restored.'
 admin_support:
     tab_requests: 'Support Requests'
     tab_reports: 'Image Reports'

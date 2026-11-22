@@ -4,6 +4,7 @@ namespace App\Emails;
 
 use App\Enum\ImageReportReason;
 use App\Service\Http\RequestHostResolver;
+use App\Service\Member\Erasure;
 use DateInterval;
 use Psr\Clock\ClockInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -126,6 +127,7 @@ readonly class MockSampleFactory
                 chargeDate: $now->add(new DateInterval('P7D'))->format('Y-m-d'),
                 retryDate: $now->add(new DateInterval('P3D'))->format('Y-m-d'),
                 suspendedSince: $now->sub(new DateInterval('P1M'))->format('Y-m-d'),
+                erasureDate: $now->add(new DateInterval(sprintf('P%dD', Erasure::ERASURE_WINDOW_DAYS)))->format('Y-m-d'),
             ),
         );
     }

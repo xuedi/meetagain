@@ -190,6 +190,7 @@ else from the application; beside it, the task module's contract for that action
 stays off `TrustInterface` because that surface must never hand anyone another member's edges.
 
 `purgeGrants()` deletes every vouch of the given contexts and drops their cached maps, for a clean import.
+`purgeConfigs()` deletes the stored configuration of the given contexts, so each falls back to the defaults.
 
 ## Becoming a consumer
 

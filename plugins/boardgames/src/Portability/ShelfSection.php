@@ -213,6 +213,12 @@ readonly class ShelfSection implements PluginSectionInterface
             return;
         }
 
+        if ($context->namesMatchedUser($row['email'] ?? null)) {
+            $context->count(self::KIND_OWNERSHIPS, Outcome::Withheld);
+
+            return;
+        }
+
         $ownership = new GameOwnership()
             ->setUser($user)
             ->setGame($game)
@@ -249,6 +255,12 @@ readonly class ShelfSection implements PluginSectionInterface
             return;
         }
 
+        if ($context->namesMatchedUser($row['email'] ?? null)) {
+            $context->count(self::KIND_PLEDGES, Outcome::Withheld);
+
+            return;
+        }
+
         $pledge = new GamePledge()
             ->setEvent($event)
             ->setGame($game)
@@ -281,6 +293,12 @@ readonly class ShelfSection implements PluginSectionInterface
             ->findOneBy(['event' => $event, 'game' => $game, 'requestedBy' => $requester, 'ownerUser' => $owner]);
         if ($stored !== null) {
             $context->count(self::KIND_REQUESTS, Outcome::Matched);
+
+            return;
+        }
+
+        if ($context->namesMatchedUser($row['requested_by_email'] ?? null) || $context->namesMatchedUser($row['owner_email'] ?? null)) {
+            $context->count(self::KIND_REQUESTS, Outcome::Withheld);
 
             return;
         }

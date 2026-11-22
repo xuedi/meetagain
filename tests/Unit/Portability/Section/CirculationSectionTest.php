@@ -81,6 +81,32 @@ final class CirculationSectionTest extends SectionTestCase
         static::assertSame(2, $summary->get(CirculationSection::KIND_LEDGER, Outcome::Created));
     }
 
+    public function testNoCirculationRowIsCreatedInTheNameOfAMatchedMember(): void
+    {
+        // Arrange
+        $exported = $this->section($this->library())->export($this->scope(), $this->images());
+        $context = $this->context();
+        $context->mapUser('member@example.org', $this->user(201, 'member@example.org'), true);
+        $context->mapUser('steward@example.org', $this->user(209, 'steward@example.org'), false);
+        $context->mapItems('book', [5 => 50]);
+
+        // Act
+        $this->section()->import($exported, $context);
+
+        // Assert
+        $shelf = $this->restored;
+        static::assertNotNull($shelf);
+        static::assertSame([], $shelf->copies);
+        static::assertSame([], $shelf->handovers);
+        static::assertSame([201], array_map(static fn(PortableRequest $request): int => $request->userId, $shelf->requests));
+        static::assertSame([], array_filter($shelf->ledger, static fn(PortableLedgerEntry $entry): bool => in_array(
+            209,
+            [$entry->fromUserId, $entry->toUserId, $entry->actorUserId],
+            true,
+        )));
+        static::assertSame(1, $context->toSummary()->get(CirculationSection::KIND_COPIES, Outcome::Withheld));
+    }
+
     public function testRowsOfAnItemTypeThisInstanceLacksAreSkipped(): void
     {
         // Arrange

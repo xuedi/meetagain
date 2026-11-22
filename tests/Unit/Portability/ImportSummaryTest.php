@@ -22,19 +22,20 @@ final class ImportSummaryTest extends TestCase
         static::assertSame(0, $summary->get('events', Outcome::Created));
     }
 
-    public function testLossesAddSkippedAndDroppedRowsPerKind(): void
+    public function testLossesAddSkippedDroppedAndWithheldRowsPerKind(): void
     {
         // Arrange
         $summary = new ImportSummary([
             'users' => ['created' => 3, 'matched' => 1],
             'cms_pages' => ['created' => 1, 'skipped' => 2],
             'tag_assignments' => ['dropped' => 4],
+            'comments' => ['created' => 2, 'withheld' => 3, 'dropped' => 1],
         ]);
 
         // Act
         $losses = $summary->getLosses();
 
         // Assert
-        static::assertSame(['cms_pages' => 2, 'tag_assignments' => 4], $losses);
+        static::assertSame(['cms_pages' => 2, 'tag_assignments' => 4, 'comments' => 4], $losses);
     }
 }

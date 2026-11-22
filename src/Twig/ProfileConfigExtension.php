@@ -25,6 +25,7 @@ final class ProfileConfigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('get_profile_config_privacy_toggles', $this->getPrivacyToggles(...)),
+            new TwigFunction('get_profile_config_menu', [ProfileConfigRuntime::class, 'menu']),
         ];
     }
 

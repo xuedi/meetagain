@@ -2,6 +2,8 @@
 
 namespace App\Service\Event;
 
+use App\Comment\CommentService;
+use App\Comment\EventTargetProvider;
 use App\Emails\Types\NotificationEventCanceledEmail;
 use App\Entity\Event;
 use App\Entity\EventItemAssociation;
@@ -9,13 +11,17 @@ use App\Entity\EventTranslation;
 use App\Entity\Host;
 use App\Entity\Location;
 use App\Entity\User;
+use App\EntityActionDispatcher;
+use App\Enum\EntityAction;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
 use App\Enum\EventTileLocation;
 use App\Enum\EventTimeFilter;
 use App\Enum\EventType;
+use App\Event\ChangeTarget;
 use App\Item\AssociationService;
 use App\Item\AttachControl;
+use App\Item\Ballot\Purpose;
 use App\Item\TypeRegistry;
 use App\Plugin;
 use App\Repository\EventRepository;
@@ -27,6 +33,9 @@ use App\ValueObject\ScheduleChange;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Ballot\Contract\BallotInterface;
+use Module\Ballot\Contract\BallotSubject;
+use Module\Proposal\Contract\Change\ChangeInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -48,6 +57,10 @@ readonly class EventService
         #[AutowireIterator(ImageBoxProviderInterface::class)]
         private iterable $imageBoxProviders,
         private EventTranslationRepository $translationRepo,
+        private CommentService $commentService,
+        private ChangeInterface $changeProposals,
+        private BallotInterface $ballots,
+        private EntityActionDispatcher $entityActionDispatcher,
     ) {}
 
     public function findEvent(int $id): ?Event
@@ -277,6 +290,31 @@ readonly class EventService
                 $this->notificationEventCanceledEmail->send(['user' => $user, 'event' => $event]);
             }
         }
+    }
+
+    public function delete(Event $event): void
+    {
+        $eventId = (int) $event->getId();
+        $series = $event->getSeries();
+
+        foreach ($event->getImages() as $image) {
+            $image->setEvent(null);
+        }
+        foreach ($event->getTranslation() as $translation) {
+            $this->em->remove($translation);
+        }
+        $this->em->remove($event);
+        $this->em->flush();
+
+        $this->commentService->deleteAllFor(EventTargetProvider::TYPE, $eventId);
+        $this->changeProposals->removeForTarget(ChangeTarget::TARGET_TYPE, $eventId);
+        $this->ballots->purgeForSubject(new BallotSubject(Purpose::SUBJECT_TYPE, $eventId));
+        if ($series !== null && $this->repo->findSeriesMembers([(int) $series->getId()]) === []) {
+            $this->em->remove($series);
+            $this->em->flush();
+        }
+
+        $this->entityActionDispatcher->dispatch(EntityAction::DeleteEvent, $eventId);
     }
 
     public function uncancelEvent(Event $event): void

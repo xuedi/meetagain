@@ -92,7 +92,7 @@ final class MemberController extends AbstractController
             $currentUser = $this->getAuthedUser();
             $userDetails = $this->userService->findUser($id);
 
-            if ($userDetails === null || !$this->memberFilterService->isMemberAccessible($id)) {
+            if ($userDetails === null || $userDetails->isDeleted() || !$this->memberFilterService->isMemberAccessible($id)) {
                 throw $this->createNotFoundException();
             }
 

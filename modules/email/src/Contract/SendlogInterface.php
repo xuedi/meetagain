@@ -21,4 +21,13 @@ interface SendlogInterface
     public function countBetween(DateTimeImmutable $from, DateTimeImmutable $to): int;
 
     public function stats(): QueueStats;
+
+    /**
+     * Deletes every mail still waiting for the address and strips the address, the body and the context from the
+     * rest. Returns the number of rows touched.
+     */
+    public function forgetRecipient(string $address, string $replacement): int;
+
+    /** Deletes every mail still waiting that was composed for a site on this host. Returns the number deleted. */
+    public function forgetPendingForHost(string $host): int;
 }

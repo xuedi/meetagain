@@ -111,6 +111,11 @@ readonly class CommentsSection implements SectionInterface
                 continue;
             }
 
+            if ($context->namesMatchedUser($email)) {
+                $context->count($this->getKey(), Outcome::Withheld);
+                continue;
+            }
+
             $comment = new Comment();
             $comment->setTargetType($targetType);
             $comment->setTargetId($targetId);

@@ -15,6 +15,7 @@ use Plugin\Boardgames\Entity\Game;
 use Plugin\Boardgames\Enum\ExternalSource;
 use Plugin\Boardgames\Portability\GameContributor;
 use Plugin\Boardgames\Repository\GameRepository;
+use Plugin\Boardgames\Service\GameService;
 use ReflectionProperty;
 
 class GameContributorTest extends TestCase
@@ -175,6 +176,6 @@ class GameContributorTest extends TestCase
 
     private function contributor(EntityManagerInterface $em, GameRepository $repo): GameContributor
     {
-        return new GameContributor($em, $repo, $this->createStub(ImageLocationService::class));
+        return new GameContributor($em, $repo, $this->createStub(ImageLocationService::class), $this->createStub(GameService::class));
     }
 }

@@ -40,7 +40,7 @@
                     <td>{{ copy.label ?? 'circulation.copy_unlabelled'|trans }}</td>
                     <td class="has-text-grey">
                         {% if copy.holder %}
-                            <a href="{{ path('app_member_view', {'id': copy.holder.id}) }}">{{ copy.holder.name }}</a>
+                            <a href="{{ path('app_member_view', {'id': copy.holder.id}) }}">{{ member_name(copy.holder) }}</a>
                             {% if copy.heldSince %}<span class="is-size-7"> - {{ copy.heldSince|time_diff }}</span>{% endif %}
                         {% else %}
                             {{ 'circulation.holder_unknown'|trans }}

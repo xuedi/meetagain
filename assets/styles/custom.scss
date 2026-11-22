@@ -125,7 +125,8 @@ details.activities-load-more {
     &[open] > summary { display: none; }
 }
 
-#navBurgenMenu details.navbar-burger-submenu {
+#navBurgenMenu details.navbar-burger-submenu,
+details.is-menu-dropdown {
     width: 100%;
     > summary {
         display: block;
@@ -136,7 +137,7 @@ details.activities-load-more {
     }
     &[open] > summary::after { content: '\25B4'; }
     // The details content slot does not pass box-sizing down, so Bulma's full-width menu links overflow without this.
-    > aside { box-sizing: border-box; }
+    > aside, > nav { box-sizing: border-box; }
 }
 
 .is-flag     { height: 24px; }

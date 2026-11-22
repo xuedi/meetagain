@@ -162,6 +162,28 @@ final class MemberSectionTest extends SectionTestCase
         static::assertSame(1, $context->toSummary()->get(MemberSection::KIND_CHANGE_PROPOSALS, Outcome::Dropped));
     }
 
+    public function testNothingIsCreatedInTheNameOfAMatchedMember(): void
+    {
+        // Arrange
+        $member = $this->member(3, 'learner@example.org');
+        $exported = $this->section(cards: [$this->card(3, 8)], days: [$this->day(3)], proposals: [$this->proposal($member, 8, [
+            new FieldChange('phrase', 'ni hao', 'nǐ hǎo'),
+        ])], users: [$member])->export($this->scope(), $this->images());
+        $context = $this->importContext();
+        $context->mapUser('learner@example.org', $this->member(30, 'learner@example.org'), false);
+
+        // Act
+        $this->section()->import($exported, $context);
+
+        // Assert
+        $summary = $context->toSummary();
+        static::assertSame([], $this->persisted);
+        static::assertSame([], $this->restored);
+        static::assertSame(1, $summary->get(MemberSection::KIND_CARDS, Outcome::Withheld));
+        static::assertSame(1, $summary->get(MemberSection::KIND_DAYS, Outcome::Withheld));
+        static::assertSame(1, $summary->get(MemberSection::KIND_CHANGE_PROPOSALS, Outcome::Withheld));
+    }
+
     public function testACardAndADayTheMemberAlreadyHasAreMatched(): void
     {
         // Arrange

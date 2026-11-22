@@ -20,7 +20,6 @@ use App\Portability\PurgeContext;
 use App\Portability\Scope;
 use App\Portability\SectionInterface;
 use App\Repository\LocationRepository;
-use App\Repository\UserRepository;
 use App\Service\Config\LanguageService;
 use DateTimeImmutable;
 use DateTimeInterface;
@@ -32,7 +31,6 @@ readonly class EventsSection implements SectionInterface
     public function __construct(
         private EntityManagerInterface $em,
         private LocationRepository $locationRepository,
-        private UserRepository $userRepository,
         private LanguageService $languageService,
     ) {}
 
@@ -142,10 +140,7 @@ readonly class EventsSection implements SectionInterface
                 $event->setSeries($this->createLegacySeries($row));
             }
 
-            $creatorEmail = (string) ($row['creator_email'] ?? '');
-            $event->setUser(
-                $context->resolveRef(User::class, $creatorEmail) ?? $this->userRepository->findOneBy(['email' => $creatorEmail]) ?? $context->getSystemUser(),
-            );
+            $event->setUser($context->resolveCreatedUser($row['creator_email'] ?? null) ?? $context->getSystemUser());
 
             $this->addTranslations($event, $row);
 

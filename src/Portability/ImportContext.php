@@ -21,6 +21,9 @@ class ImportContext
     /** @var array<string, array<string, int>> */
     private array $counts = [];
 
+    /** @var array<int, true> */
+    private array $matchedUsers = [];
+
     /**
      * @param array<string, array{attribution?: string|null, attribution_not_required?: bool}> $imageAttributions
      * @param array<array-key, mixed> $archive
@@ -43,19 +46,20 @@ class ImportContext
         $imagePath = $this->resolveArchivePath($archiveRelativePath);
 
         $attribution = $this->imageAttributions[$archiveRelativePath] ?? [];
+        $credited = $uploader instanceof User && !$this->isMatchedUser($uploader) ? $uploader : null;
 
         $image = $this->imageImporter->import(
             $imagePath,
             $type,
-            $uploader ?? $this->systemUser,
+            $credited ?? $this->systemUser,
             $attribution['attribution'] ?? null,
             $attribution['attribution_not_required'] ?? false,
             !$this->dryRun,
         );
 
         $isUncredited = $image?->getUploader() === $this->systemUser;
-        if ($uploader !== null && $isUncredited) {
-            $image?->setUploader($uploader);
+        if ($credited !== null && $isUncredited) {
+            $image?->setUploader($credited);
         }
 
         return $image;
@@ -82,6 +86,26 @@ class ImportContext
     public function mapRef(string $class, int|string $ref, object $entity): void
     {
         $this->refs[$class][$ref] = $entity;
+    }
+
+    public function mapUser(string $email, User $user, bool $created): void
+    {
+        $this->mapRef(User::class, $email, $user);
+        if (!$created) {
+            $this->matchedUsers[spl_object_id($user)] = true;
+        }
+    }
+
+    public function namesMatchedUser(mixed $email): bool
+    {
+        $user = $this->resolveRef(User::class, $email);
+
+        return $user instanceof User && $this->isMatchedUser($user);
+    }
+
+    public function resolveCreatedUser(mixed $email): ?User
+    {
+        return $this->namesMatchedUser($email) ? null : $this->resolveRef(User::class, $email);
     }
 
     /**
@@ -154,6 +178,11 @@ class ImportContext
     public function toSummary(array $missingPlugins = [], int $weeksShifted = 0, bool $siteApplied = false): ImportSummary
     {
         return new ImportSummary($this->counts, $missingPlugins, $weeksShifted, $siteApplied);
+    }
+
+    private function isMatchedUser(User $user): bool
+    {
+        return isset($this->matchedUsers[spl_object_id($user)]);
     }
 
     private function resolveArchivePath(string $relativePath): string

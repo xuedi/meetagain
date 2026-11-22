@@ -275,6 +275,14 @@ final readonly class BallotService implements BallotInterface
         }
     }
 
+    #[Override]
+    public function purgeForSubject(BallotSubject $subject): void
+    {
+        $this->entityManager
+            ->createQuery(sprintf('DELETE %s b WHERE b.subjectType = :type AND b.subjectId = :id', Ballot::class))
+            ->execute(['type' => $subject->type, 'id' => $subject->id]);
+    }
+
     private function withdrawVotes(Ballot $ballot, int $userId): void
     {
         foreach ($this->votes->findForVoter($ballot, $userId) as $previous) {

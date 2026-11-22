@@ -91,6 +91,32 @@ final class CommentsSectionTest extends SectionTestCase
         static::assertSame(2, $context->toSummary()->get('comments', Outcome::Dropped));
     }
 
+    public function testACommentInTheNameOfAMatchedMemberIsWithheld(): void
+    {
+        // Arrange
+        $context = $this->context();
+        $context->mapUser('existing@example.org', new User(), false);
+        $context->mapUser('new@example.org', new User(), true);
+        $context->mapRef(Event::class, 1, $this->withId(new Event(), 101));
+        $rows = [
+            [
+                'target_type' => 'event',
+                'target_ref' => 1,
+                'email' => 'existing@example.org',
+                'content' => 'Forged',
+                'created_at' => '2030-01-06T19:00:00+00:00',
+            ],
+            ['target_type' => 'event', 'target_ref' => 1, 'email' => 'new@example.org', 'content' => 'Mine', 'created_at' => '2030-01-06T19:00:00+00:00'],
+        ];
+
+        // Act
+        $this->section()->import($rows, $context);
+
+        // Assert
+        static::assertSame(['Mine'], array_map(static fn(Comment $comment): string => $comment->getContent(), $this->persistedComments()));
+        static::assertSame(1, $context->toSummary()->get('comments', Outcome::Withheld));
+    }
+
     private function scope(): Scope
     {
         return new Scope(

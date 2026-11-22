@@ -36,8 +36,9 @@ just devModeImport weiqi-club
 ```
 
 `just devModeImport weiqi-club` starts all Docker containers, resets the database and imports the
-Weiqi Club demo archive (members, events, CMS pages, films, photos). Log in as `Crystal.Liu@example.org`
-with the password `1234`. See [Demo Data](core-development/demo-data.md) for the other archives.
+Weiqi Club demo archive (members, events, CMS pages, films, photos). It ends by printing a one-time link
+that sets the password of the admin `admin@meetagain.local`. See [Demo Data](core-development/demo-data.md)
+for the other archives.
 
 ---
 

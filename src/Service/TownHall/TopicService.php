@@ -152,6 +152,11 @@ readonly class TopicService
             throw new AccessDeniedException('Cannot delete topic.');
         }
 
+        $this->remove($topic);
+    }
+
+    public function remove(Topic $topic): void
+    {
         $ids = [(int) $topic->getId(), ...$this->topics->descendantIds($topic)];
 
         $this->em->remove($topic);

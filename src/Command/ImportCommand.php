@@ -40,7 +40,7 @@ class ImportCommand extends Command
             InputOption::VALUE_NONE,
             'Write the archive site block (name, languages, theme, logo, feature settings) into this instance',
         );
-        $this->addOption('strict', null, InputOption::VALUE_NONE, 'Exit non-zero when any row was skipped or dropped');
+        $this->addOption('strict', null, InputOption::VALUE_NONE, 'Exit non-zero when any row was skipped, dropped or withheld');
     }
 
     #[Override]
@@ -65,7 +65,7 @@ class ImportCommand extends Command
         $losses = $summary->getLosses();
         if ($input->getOption('strict') && $losses !== []) {
             $lost = array_map(static fn(string $kind, int $rows): string => sprintf('%s (%d)', $kind, $rows), array_keys($losses), $losses);
-            $io->error('Rows were skipped or dropped: ' . implode(', ', $lost));
+            $io->error('Rows were skipped, dropped or withheld: ' . implode(', ', $lost));
 
             return Command::FAILURE;
         }

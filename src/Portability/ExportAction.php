@@ -14,7 +14,8 @@ use RuntimeException;
 readonly class ExportAction implements ActionInterface
 {
     public const string IDENTIFIER = 'instance-export';
-    public const string ARCHIVE = 'export/instance.zip';
+    public const string DIRECTORY = 'export';
+    public const string ARCHIVE = self::DIRECTORY . '/instance.zip';
 
     public function __construct(
         private Exporter $exporter,

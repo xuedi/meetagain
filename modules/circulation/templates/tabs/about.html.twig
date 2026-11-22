@@ -135,7 +135,7 @@
                             <td><span class="tag {{ copy.status.tagVariant }} is-light">{{ copy.status.label|trans }}</span></td>
                             <td class="has-text-grey is-size-7">
                                 {% if copy.holder and not copy.isHeldBy(viewer) %}
-                                    {{ 'circulation.about_now_with'|trans({'%member%': copy.holder.name}) }}
+                                    {{ 'circulation.about_now_with'|trans({'%member%': member_name(copy.holder)}) }}
                                 {% endif %}
                             </td>
                         </tr>

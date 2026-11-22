@@ -89,7 +89,10 @@ class ImageLocationServiceTest extends TestCase
         $service = $this->createService(registry: $registry);
 
         // Act
-        $service->discover();
+        $complete = $service->discover();
+
+        // Assert
+        static::assertTrue($complete);
     }
 
     public function testDiscoverLogsErrorWhenDefinitionThrowsAndDoesNotPropagate(): void
@@ -125,7 +128,10 @@ class ImageLocationServiceTest extends TestCase
         $service = $this->createService(registry: $registry);
 
         // Act
-        $service->discover();
+        $complete = $service->discover();
+
+        // Assert
+        static::assertFalse($complete);
     }
 
     public function testDiscoverInvalidatesAllAltStatusEntries(): void

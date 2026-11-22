@@ -9,7 +9,7 @@ Get up to speed as a core contributor in a few minutes.
 ```bash
 git clone https://github.com/xuedi/meetAgain.git && cd meetAgain
 just devModeImport weiqi-club
-# Open https://meetagain.local - Crystal.Liu@example.org / 1234
+# Open the printed link to set the password of admin@meetagain.local
 ```
 
 See [Getting Started](../getting-started.md) for the full setup (local hostname, Docker prerequisites, etc.).

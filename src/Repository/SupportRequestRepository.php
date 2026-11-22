@@ -128,4 +128,32 @@ class SupportRequestRepository extends ServiceEntityRepository
 
         return $qb;
     }
+
+    public function anonymiseRequester(int $userId, string $email): int
+    {
+        $ids = array_map(
+            intval(...),
+            $this
+                ->createQueryBuilder('sr')
+                ->select('sr.id')
+                ->where('IDENTITY(sr.requester) = :user OR LOWER(sr.email) = :email')
+                ->setParameter('user', $userId)
+                ->setParameter('email', mb_strtolower($email))
+                ->getQuery()
+                ->getSingleColumnResult(),
+        );
+        if ($ids === []) {
+            return 0;
+        }
+
+        $em = $this->getEntityManager();
+        $em->createQuery('UPDATE App\Entity\SupportMessage m SET m.ipAddress = NULL WHERE m.supportRequest IN (:ids)')->setParameter('ids', $ids)->execute();
+
+        return (int) $em
+            ->createQuery(
+                'UPDATE App\Entity\SupportRequest sr SET sr.requester = NULL, sr.email = NULL, sr.ipAddress = NULL, sr.emailVerifyToken = NULL, sr.emailVerifyExpiresAt = NULL WHERE sr.id IN (:ids)',
+            )
+            ->setParameter('ids', $ids)
+            ->execute();
+    }
 }

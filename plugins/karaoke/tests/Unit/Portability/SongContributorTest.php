@@ -14,6 +14,7 @@ use Plugin\Karaoke\Entity\Song;
 use Plugin\Karaoke\Enum\MediaProvider;
 use Plugin\Karaoke\Portability\SongContributor;
 use Plugin\Karaoke\Repository\SongRepository;
+use Plugin\Karaoke\Service\SongService;
 use Plugin\Karaoke\ValueObject\MediaLink;
 use ReflectionProperty;
 
@@ -30,7 +31,7 @@ class SongContributorTest extends TestCase
             new ReflectionProperty(Song::class, 'id')->setValue($entity, 77);
             $persisted[] = $entity;
         });
-        $contributor = new SongContributor($em, $repo);
+        $contributor = new SongContributor($em, $repo, $this->createStub(SongService::class));
         $rows = $contributor->exportItems([12], $this->createStub(ImageWriterInterface::class));
 
         // Act
@@ -56,7 +57,11 @@ class SongContributorTest extends TestCase
     public function testARowWithAnUnknownProviderOrMalformedIdIsSkipped(): void
     {
         // Arrange
-        $contributor = new SongContributor($this->createStub(EntityManagerInterface::class), $this->createStub(SongRepository::class));
+        $contributor = new SongContributor(
+            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(SongRepository::class),
+            $this->createStub(SongService::class),
+        );
         $rows = [
             ['ref' => 1, 'title' => 'A', 'language' => 'zh', 'media' => ['provider' => 'vimeo', 'id' => '123']],
             ['ref' => 2, 'title' => 'B', 'language' => 'zh', 'media' => ['provider' => 'youtube', 'id' => 'short']],

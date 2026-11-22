@@ -23,6 +23,7 @@ readonly class GameContributor implements ContributorInterface
         private EntityManagerInterface $em,
         private GameRepository $gameRepo,
         private ImageLocationService $imageLocationService,
+        private GameService $gameService,
     ) {}
 
     #[Override]
@@ -138,6 +139,18 @@ readonly class GameContributor implements ContributorInterface
     public function purgeItems(): void
     {
         $this->em->createQuery(sprintf('DELETE %s e', Game::class))->execute();
+    }
+
+    #[Override]
+    public function deleteItems(array $itemIds): void
+    {
+        if ($itemIds === []) {
+            return;
+        }
+
+        foreach ($this->gameRepo->findBy(['id' => $itemIds]) as $item) {
+            $this->gameService->delete($item);
+        }
     }
 
     /** @param array<string, mixed> $row */

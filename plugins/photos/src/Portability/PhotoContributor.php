@@ -3,7 +3,6 @@
 namespace Plugin\Photos\Portability;
 
 use App\Entity\Image;
-use App\Entity\User;
 use App\Enum\ImageType;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
@@ -27,6 +26,7 @@ readonly class PhotoContributor implements ContributorInterface, UploadsInterfac
         private PhotoRepository $photoRepo,
         private ImageLocationService $imageLocationService,
         private UserRepository $userRepository,
+        private PhotoService $photoService,
     ) {}
 
     #[Override]
@@ -115,7 +115,7 @@ readonly class PhotoContributor implements ContributorInterface, UploadsInterfac
         $imageLocations = [];
 
         foreach ($rows as $row) {
-            $uploader = $context->resolveRef(User::class, $row['uploader_email'] ?? null) ?? $context->getSystemUser();
+            $uploader = $context->resolveCreatedUser($row['uploader_email'] ?? null) ?? $context->getSystemUser();
             $image = $context->importImage($this->nullableString($row['image'] ?? null), ImageType::PluginPhotosPhoto, $uploader);
             if (!$image instanceof Image) {
                 continue;
@@ -168,6 +168,18 @@ readonly class PhotoContributor implements ContributorInterface, UploadsInterfac
     public function purgeItems(): void
     {
         $this->em->createQuery(sprintf('DELETE %s e', Photo::class))->execute();
+    }
+
+    #[Override]
+    public function deleteItems(array $itemIds): void
+    {
+        if ($itemIds === []) {
+            return;
+        }
+
+        foreach ($this->photoRepo->findBy(['id' => $itemIds]) as $item) {
+            $this->photoService->delete($item);
+        }
     }
 
     /**

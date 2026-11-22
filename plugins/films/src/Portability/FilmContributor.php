@@ -23,6 +23,7 @@ readonly class FilmContributor implements ContributorInterface
         private EntityManagerInterface $em,
         private FilmRepository $filmRepo,
         private ImageLocationService $imageLocationService,
+        private FilmService $filmService,
     ) {}
 
     #[Override]
@@ -130,6 +131,18 @@ readonly class FilmContributor implements ContributorInterface
     public function purgeItems(): void
     {
         $this->em->createQuery(sprintf('DELETE %s e', Film::class))->execute();
+    }
+
+    #[Override]
+    public function deleteItems(array $itemIds): void
+    {
+        if ($itemIds === []) {
+            return;
+        }
+
+        foreach ($this->filmRepo->findBy(['id' => $itemIds]) as $item) {
+            $this->filmService->delete($item);
+        }
     }
 
     /**

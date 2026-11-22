@@ -7,7 +7,7 @@
             {% for member in members %}
                 <div class="column is-narrow has-text-centered">
                     <a href="{{ path('app_member_view', { _locale: app.request.locale, id: member.id }) }}">
-                        <span class="is-size-7">{{ member.name }}</span>
+                        <span class="is-size-7">{{ member_name(member) }}</span>
                     </a>
                 </div>
             {% endfor %}

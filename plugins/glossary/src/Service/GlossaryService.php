@@ -70,6 +70,16 @@ readonly class GlossaryService
             return;
         }
 
+        $this->removeEntry($item, $id);
+    }
+
+    public function remove(Glossary $item): void
+    {
+        $this->removeEntry($item, (int) $item->getId());
+    }
+
+    private function removeEntry(Glossary $item, int $id): void
+    {
         $this->em->remove($item);
         $this->em->flush();
         $this->dispatcher->dispatch(EntityAction::DeleteGlossary, $id);

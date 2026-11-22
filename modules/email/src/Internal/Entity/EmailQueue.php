@@ -11,6 +11,7 @@ use Module\Email\Contract\QueueStatus;
 #[ORM\Entity]
 #[ORM\Table(name: 'mod_email_queue')]
 #[ORM\Index(name: 'idx_email_queue_status', columns: ['status'])]
+#[ORM\Index(name: 'idx_email_queue_status_created', columns: ['status', 'created_at'])]
 #[ORM\Index(name: 'idx_email_queue_provider_message_id', columns: ['provider_message_id'])]
 #[ORM\Index(name: 'idx_email_queue_claim', columns: ['claim_token'])]
 class EmailQueue

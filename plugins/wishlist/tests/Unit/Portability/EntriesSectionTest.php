@@ -68,6 +68,21 @@ final class EntriesSectionTest extends SectionTestCase
         static::assertSame([], $this->persisted);
     }
 
+    public function testANewWishOfAMatchedMemberIsWithheld(): void
+    {
+        // Arrange
+        $context = $this->context();
+        $context->mapItems('film', [7 => 70]);
+        $context->mapUser('ada@example.org', $this->user(11, 'ada@example.org'), false);
+
+        // Act
+        $this->section()->import([['email' => 'ada@example.org', 'item_type' => 'film', 'item_ref' => 7]], $context);
+
+        // Assert
+        static::assertSame(1, $context->toSummary()->get('wishlist', Outcome::Withheld));
+        static::assertSame([], $this->persisted);
+    }
+
     public function testAnUnknownTypeIsSkippedAndAMissingItemOrMemberDropped(): void
     {
         // Arrange

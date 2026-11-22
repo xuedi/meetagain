@@ -51,7 +51,7 @@ Plugins implement additional interfaces only for the capabilities they need. Eac
 | `UploadsInterface`                                           | Leave out uploads their uploader did not share        | `getUploaderIds()`                                     |
 | `PluginSectionInterface`                                     | Carry your plugin's member data through archives      | `export()`, `import()`                                 |
 | `Module\Proposal\Contract\Change\TargetProviderInterface`    | Let members propose reviewable edits to your entities | `validate()`, `apply()`, `canPropose()`, `canReview()` |
-| `ConfigPrivacyToggleProviderInterface`                       | Add a toggle row to `/profile/config` -> "privacy"    | `getToggle()`                                          |
+| `ConfigPrivacyToggleProviderInterface`                       | Add a privacy toggle, with an optional info line      | `getToggle()`                                          |
 | `Module\Email\Contract\SendingIdentityProviderInterface`     | Decide the name, logo and links a mail is sent under  | `resolve()`                                            |
 | `AudienceFilterInterface`                                    | Narrow who receives installation-wide mail            | `filterInstallationWideAudience()`                     |
 | `Module\Email\Contract\PushDispatcherInterface`              | Notice a queued message and deliver it another way    | `dispatch()`                                           |
@@ -177,6 +177,41 @@ class DashboardController extends AbstractAdminController implements AdminNaviga
 - `section` — Section heading in the sidebar
 - `links` — Array of `AdminLink` objects
 - `sectionRole` — Optional `RoleInterface` value (hides the entire section)
+
+### Profile config pages
+
+**Purpose:** Add a page to the member's settings area at `/profile/config`, with its own entry in that area's side
+menu.
+
+**How:** Return the entries from `getLinkCollection()` with `withProfileConfigLinks()`. Each `Link` carries the page
+URL, a translation key and a priority; the core entries sit at 10 to 100, and "Delete my account" always comes last.
+An entry is marked active on its own URL and on every page below it, so `/profile/your-page/new` keeps
+`/profile/your-page` highlighted.
+
+The page joins the area by extending `profile/config/_layout.html.twig` and filling two blocks: `config_main` for the
+form or list, and `config_info` for an info box that explains it. Leave `config_info` out and `config_main` takes the
+full width.
+
+```twig
+{% extends 'profile/config/_layout.html.twig' %}
+
+{% block config_main %}
+    <div class="box">
+        <h1 class="title is-5">{{ 'your_plugin.page_heading'|trans }}</h1>
+        ...
+    </div>
+{% endblock %}
+
+{% block config_info %}
+    <div class="box has-background-info-light">
+        <h2 class="title is-5">{{ 'your_plugin.info_heading'|trans }}</h2>
+        <div class="content"><p>{{ 'your_plugin.info_body'|trans }}</p></div>
+    </div>
+{% endblock %}
+```
+
+A privacy toggle on the Settings page comes from `ConfigPrivacyToggleProviderInterface`; set `hintKey` on the
+returned `ConfigPrivacyToggle` to add a line explaining it to the Privacy info box.
 
 ---
 

@@ -6,17 +6,24 @@ use App\Entity\Image;
 use App\Entity\User;
 use App\Enum\ImageType;
 use App\ExtendedFilesystem;
+use App\Service\Media\MetadataStripper;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use finfo;
 use League\Flysystem\FilesystemOperator;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
 
 readonly class ImageImporter
 {
+    private const string HASH_STEM = '/^[0-9a-f]{40}$/';
+
     public function __construct(
         private EntityManagerInterface $em,
         private ExtendedFilesystem $fs,
         private FilesystemOperator $imageStorage,
+        private MetadataStripper $metadataStripper,
+        private LoggerInterface $logger,
     ) {}
 
     public function import(
@@ -32,7 +39,8 @@ readonly class ImageImporter
         }
 
         $content = (string) $this->fs->getFileContents($imagePath);
-        $hash = sha1($content);
+        $stem = strtolower(pathinfo($imagePath, PATHINFO_FILENAME));
+        $hash = preg_match(self::HASH_STEM, $stem) === 1 ? $stem : sha1($content);
 
         $existing = $this->em->getRepository(Image::class)->findOneBy(['hash' => $hash]) ?? $this->findPendingImage($hash);
         if ($existing !== null) {
@@ -47,9 +55,21 @@ readonly class ImageImporter
         $finfo = new finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($content) ?: 'application/octet-stream';
 
-        $key = $hash . '.' . $extension;
-        if ($store && !$this->imageStorage->fileExists($key)) {
-            $this->imageStorage->write($key, $content);
+        if ($store) {
+            try {
+                $content = $this->metadataStripper->strip($content);
+            } catch (RuntimeException $e) {
+                $this->logger->warning('Skipped an archived image that cannot be read: {path}: {message}', [
+                    'path' => basename($imagePath),
+                    'message' => $e->getMessage(),
+                ]);
+
+                return null;
+            }
+            $key = $hash . '.' . $extension;
+            if (!$this->imageStorage->fileExists($key)) {
+                $this->imageStorage->write($key, $content);
+            }
         }
 
         $image = new Image();

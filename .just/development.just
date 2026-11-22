@@ -100,6 +100,7 @@ devModeImport archive='':
     plugins="$({{PHP}} php bin/console app:import:inspect "$archive" --format=plugins)"
     if [ -n "$plugins" ]; then {{PHP}} php bin/console app:plugin:toggle on $plugins; fi
     {{PHP}} php bin/console app:import "$archive" --shift-dates --site-settings --strict
+    {{PHP}} php bin/console app:bootstrap --email=admin@meetagain.local --site-url=https://meetagain.local --no-starter-page
     {{JUST}} appAssets
     {{JUST}} appClearCache
     {{JUST}} workerStart

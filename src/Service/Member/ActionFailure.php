@@ -13,4 +13,6 @@ enum ActionFailure: string
     case InvalidGroupRoleTransition = 'invalid_group_role_transition';
     case MembershipNotFound = 'membership_not_found';
     case NoOp = 'no_op';
+    case DeletionBlocked = 'deletion_blocked';
+    case Erased = 'erased';
 }

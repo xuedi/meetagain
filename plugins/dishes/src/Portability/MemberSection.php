@@ -191,8 +191,11 @@ readonly class MemberSection implements PluginSectionInterface
             return null;
         }
 
-        $uploader = $context->resolveRef(User::class, $row['uploader_email'] ?? null);
-        $image = $context->importImage($row['image_file'] ?? null, ImageType::PluginDishesPreview, $uploader);
+        $image = $context->importImage(
+            $row['image_file'] ?? null,
+            ImageType::PluginDishesPreview,
+            $context->resolveCreatedUser($row['uploader_email'] ?? null),
+        );
         if (!$image instanceof Image) {
             $context->count(self::KIND_GALLERY, Outcome::Dropped);
 
@@ -241,6 +244,12 @@ readonly class MemberSection implements PluginSectionInterface
         $likeKey = $dish->getId() . '-' . $userId;
         if (isset($liked[$likeKey]) || $this->likeRepo->findByDishAndUser($dish, $userId) !== null) {
             $context->count(self::KIND_LIKES, Outcome::Matched);
+
+            return;
+        }
+
+        if ($context->namesMatchedUser($row['email'] ?? null)) {
+            $context->count(self::KIND_LIKES, Outcome::Withheld);
 
             return;
         }

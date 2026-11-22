@@ -82,4 +82,10 @@ readonly class Requests implements ActionQueueInterface
     {
         return $this->repository->findRecent($identifier, $limit);
     }
+
+    #[Override]
+    public function forgetRequester(string $requestedBy, string $replacement): int
+    {
+        return $this->repository->replaceRequester($requestedBy, $replacement);
+    }
 }

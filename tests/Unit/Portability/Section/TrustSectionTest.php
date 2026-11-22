@@ -133,6 +133,25 @@ final class TrustSectionTest extends SectionTestCase
         static::assertSame(3, $context->toSummary()->get('trust', Outcome::Dropped));
     }
 
+    public function testAGrantNamingAMatchedMemberOnEitherSideIsWithheld(): void
+    {
+        // Arrange
+        $context = $this->context();
+        $context->mapUser('member-1@example.org', $this->member(11), true);
+        $context->mapUser('member-2@example.org', $this->member(12), false);
+        $row = ['item_type' => 'book', 'level' => 'trusted'];
+
+        // Act
+        $this->section($this->recordingGrants())->import([
+            [...$row, 'from_email' => 'member-1@example.org', 'to_email' => 'member-2@example.org'],
+            [...$row, 'from_email' => 'member-2@example.org', 'to_email' => 'member-1@example.org'],
+        ], $context);
+
+        // Assert
+        static::assertSame([], $this->restored);
+        static::assertSame(2, $context->toSummary()->get('trust', Outcome::Withheld));
+    }
+
     private function section(GrantTransferInterface $grants): TrustSection
     {
         $userRepository = $this->createStub(UserRepository::class);

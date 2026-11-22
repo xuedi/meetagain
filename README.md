@@ -48,8 +48,8 @@ task runner.
 just devModeImport weiqi-club
 ```
 
-Login at https://meetagain.local as `Crystal.Liu@example.org` with password `1234`. `just devModeImport`
-without an argument lists the other demo archives.
+It ends by printing a one-time link that sets the password of the admin `admin@meetagain.local`; open it,
+then https://meetagain.local. `just devModeImport` without an argument lists the other demo archives.
 
 Run `just` to see all available commands.
 

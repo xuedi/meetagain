@@ -119,7 +119,7 @@ class GrantTransferTest extends TestCase
 
         $scoreProvider = $this->scoreProvider([], $repository, $cache ?? new ArrayAdapter());
 
-        return new GrantTransfer($repository, $entityManager, $scoreProvider);
+        return new GrantTransfer($repository, $entityManager, $scoreProvider, $this->configStore());
     }
 
     private function user(int $id): User

@@ -69,7 +69,7 @@ only exists inside a plugin, `security:` over `bug:`. A module is an architectur
 
 The version of a release comes from the labels on the pull requests merged into `main` since the last version
 tag: the maintainer gives each one `patch`, `minor` or `major`, and the highest label wins. Each release is tagged
-`X.Y.Z`, published as a GitHub Release and added to `CHANGELOG.md`.
+`X.Y.Z` and published as a GitHub Release.
 
 ---
 

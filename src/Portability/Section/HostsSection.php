@@ -75,18 +75,23 @@ readonly class HostsSection implements SectionInterface
 
             $name = mb_substr((string) ($row['name'] ?? ''), 0, self::NAME_LENGTH);
             $user = $context->resolveRef(User::class, $row['email'] ?? null);
+            $linkedUser = $context->resolveCreatedUser($row['email'] ?? null);
 
-            $host = $user instanceof User ? $this->findHostOf($user) : $createdWithoutUser[$name] ?? $this->findUnlinkedHost($name);
+            $host = $user instanceof User ? $this->findHostOf($user) : null;
+            if (!$linkedUser instanceof User) {
+                $host ??= $createdWithoutUser[$name] ?? $this->findUnlinkedHost($name);
+            }
+
             if ($host instanceof Host) {
                 $context->count($this->getKey(), Outcome::Matched);
             } else {
                 $host = new Host();
                 $host->setName($name);
-                $host->setUser($user);
+                $host->setUser($linkedUser);
                 $this->em->persist($host);
                 $context->count($this->getKey(), Outcome::Created);
 
-                if (!$user instanceof User) {
+                if (!$linkedUser instanceof User) {
                     $createdWithoutUser[$name] = $host;
                 }
             }

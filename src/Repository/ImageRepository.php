@@ -312,6 +312,23 @@ class ImageRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param list<ImageType> $types
+     * @return list<Image>
+     */
+    public function findUnlocatedBefore(DateTimeImmutable $cutoff, array $types, int $limit): array
+    {
+        return $this->unlocatedQuery($cutoff, $types)->orderBy('i.id', 'ASC')->setMaxResults($limit)->getQuery()->getResult();
+    }
+
+    /**
+     * @param list<ImageType> $types
+     */
+    public function countUnlocatedBefore(DateTimeImmutable $cutoff, array $types): int
+    {
+        return (int) $this->unlocatedQuery($cutoff, $types)->select('COUNT(i.id)')->getQuery()->getSingleScalarResult();
+    }
+
+    /**
      * @return array<string, ?ImageType> image hash => type
      */
     public function getFileList(): array
@@ -345,5 +362,20 @@ class ImageRepository extends ServiceEntityRepository
         }
 
         return $qb;
+    }
+
+    /**
+     * @param list<ImageType> $types
+     */
+    private function unlocatedQuery(DateTimeImmutable $cutoff, array $types): QueryBuilder
+    {
+        return $this
+            ->createQueryBuilder('i')
+            ->where('i.type IN (:types)')
+            ->andWhere('i.createdAt < :cutoff')
+            ->andWhere('i.updatedAt IS NULL OR i.updatedAt < :cutoff')
+            ->andWhere('NOT EXISTS (SELECT il.id FROM App\Entity\ImageLocation il WHERE il.image = i)')
+            ->setParameter('types', $types)
+            ->setParameter('cutoff', $cutoff);
     }
 }

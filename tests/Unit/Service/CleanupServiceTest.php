@@ -2,6 +2,9 @@
 
 namespace Tests\Unit\Service;
 
+use App\Activity\Messages\Login;
+use App\Activity\Messages\LoginMeasuresActivated;
+use App\Activity\Messages\Registered;
 use App\Entity\Activity;
 use App\Entity\Image;
 use App\Entity\SupportRequest;
@@ -9,8 +12,12 @@ use App\Entity\User;
 use App\EntityActionDispatcher;
 use App\Portability\ExportAction;
 use App\Repository\AccessDeniedLogRepository;
+use App\Repository\ActivityRepository;
+use App\Repository\ImageReportRepository;
 use App\Repository\ImageRepository;
 use App\Repository\IncidentRepository;
+use App\Repository\ItemReportRepository;
+use App\Repository\ModerationReportRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\RateLimitLogRepository;
 use App\Repository\SupportRequestRepository;
@@ -51,6 +58,10 @@ class CleanupServiceTest extends TestCase
         ?NotFoundLogRepository $notFoundLogRepo = null,
         ?AccessDeniedLogRepository $accessDeniedLogRepo = null,
         ?RateLimitLogRepository $rateLimitLogRepo = null,
+        ?ActivityRepository $activityRepo = null,
+        ?ModerationReportRepository $moderationReportRepo = null,
+        ?ItemReportRepository $itemReportRepo = null,
+        ?ImageReportRepository $imageReportRepo = null,
     ): CleanupService {
         return new CleanupService(
             imageRepo: $imageRepo ?? $this->createStub(ImageRepository::class),
@@ -60,6 +71,10 @@ class CleanupServiceTest extends TestCase
             notFoundLogRepo: $notFoundLogRepo ?? $this->createStub(NotFoundLogRepository::class),
             accessDeniedLogRepo: $accessDeniedLogRepo ?? $this->createStub(AccessDeniedLogRepository::class),
             rateLimitLogRepo: $rateLimitLogRepo ?? $this->createStub(RateLimitLogRepository::class),
+            activityRepo: $activityRepo ?? $this->createStub(ActivityRepository::class),
+            moderationReportRepo: $moderationReportRepo ?? $this->createStub(ModerationReportRepository::class),
+            itemReportRepo: $itemReportRepo ?? $this->createStub(ItemReportRepository::class),
+            imageReportRepo: $imageReportRepo ?? $this->createStub(ImageReportRepository::class),
             threadService: $threadService ?? $this->createStub(ThreadService::class),
             measureLogger: $measureLogger ?? $this->createStub(MeasureLogger::class),
             measureSettings: $measureSettings ?? $this->createStub(MeasureSettings::class),
@@ -129,23 +144,27 @@ class CleanupServiceTest extends TestCase
         static::assertTrue($storage->fileExists('invoices/2026/INV-1.pdf'));
     }
 
-    public function testRemoveStaleExportArchiveDeletesAnArchiveOlderThanADay(): void
+    public function testRemoveStaleExportArchivesDeletesEveryArchiveOlderThanADay(): void
     {
         // Arrange
         $now = new DateTimeImmutable('2026-08-19 12:00:00', new DateTimeZone('UTC'));
         $storage = new Filesystem(new InMemoryFilesystemAdapter());
         $storage->write(ExportAction::ARCHIVE, 'zip', ['timestamp' => $now->modify('-25 hours')->getTimestamp()]);
+        $storage->write(ExportAction::DIRECTORY . '/other-7.zip', 'zip', ['timestamp' => $now->modify('-25 hours')->getTimestamp()]);
+        $storage->write(ExportAction::DIRECTORY . '/other-8.zip', 'zip', ['timestamp' => $now->modify('-1 hour')->getTimestamp()]);
         $subject = $this->createService(privateStorage: $storage);
 
         // Act
-        $count = $subject->removeStaleExportArchive();
+        $count = $subject->removeStaleExportArchives();
 
         // Assert
-        static::assertSame(1, $count);
+        static::assertSame(2, $count);
         static::assertFalse($storage->fileExists(ExportAction::ARCHIVE));
+        static::assertFalse($storage->fileExists(ExportAction::DIRECTORY . '/other-7.zip'));
+        static::assertTrue($storage->fileExists(ExportAction::DIRECTORY . '/other-8.zip'));
     }
 
-    public function testRemoveStaleExportArchiveKeepsAFreshArchive(): void
+    public function testRemoveStaleExportArchivesKeepsAFreshArchive(): void
     {
         // Arrange
         $now = new DateTimeImmutable('2026-08-19 12:00:00', new DateTimeZone('UTC'));
@@ -154,23 +173,70 @@ class CleanupServiceTest extends TestCase
         $subject = $this->createService(privateStorage: $storage);
 
         // Act
-        $count = $subject->removeStaleExportArchive();
+        $count = $subject->removeStaleExportArchives();
 
         // Assert
         static::assertSame(0, $count);
         static::assertTrue($storage->fileExists(ExportAction::ARCHIVE));
     }
 
-    public function testRemoveStaleExportArchiveWithoutAnArchiveDoesNothing(): void
+    public function testRemoveStaleExportArchivesWithoutAnArchiveDoesNothing(): void
     {
         // Arrange
         $subject = $this->createService();
 
         // Act
-        $count = $subject->removeStaleExportArchive();
+        $count = $subject->removeStaleExportArchives();
 
         // Assert
         static::assertSame(0, $count);
+    }
+
+    public function testRemoveExpiredActivityDataCutsEachTypeAtItsOwnRetention(): void
+    {
+        // Arrange
+        $utc = new DateTimeZone('UTC');
+        $activityRepo = $this->createMock(ActivityRepository::class);
+        $activityRepo
+            ->expects($this->exactly(2))
+            ->method('blankMetaBefore')
+            ->willReturnCallback(static fn(string $type, array $keys, DateTimeImmutable $cutoff): int => match ([$type, $keys, $cutoff->format('Y-m-d')]) {
+                [Registered::TYPE, ['ip', 'user_agent'], '2026-05-21'] => 3,
+                [LoginMeasuresActivated::TYPE, ['ip'], '2026-08-05'] => 1,
+            });
+        $activityRepo
+            ->expects($this->once())
+            ->method('deleteOfTypeBefore')
+            ->with(Login::TYPE, new DateTimeImmutable('2025-07-15 12:00:00', $utc))
+            ->willReturn(8);
+        $measureSettings = $this->createStub(MeasureSettings::class);
+        $measureSettings->method('logRetentionDays')->willReturn(14);
+        $subject = $this->createService(measureSettings: $measureSettings, activityRepo: $activityRepo);
+
+        // Act
+        $counts = $subject->removeExpiredActivityData();
+
+        // Assert
+        static::assertSame(['registration_meta' => 3, 'logins' => 8, 'login_measure_ips' => 1], $counts);
+    }
+
+    public function testAnonymiseResolvedReportsCutsEveryReportKindAtHalfAYear(): void
+    {
+        // Arrange
+        $cutoff = new DateTimeImmutable('2026-02-20 12:00:00', new DateTimeZone('UTC'));
+        $moderation = $this->createMock(ModerationReportRepository::class);
+        $moderation->expects($this->once())->method('anonymiseResolvedBefore')->with($cutoff)->willReturn(1);
+        $item = $this->createMock(ItemReportRepository::class);
+        $item->expects($this->once())->method('anonymiseResolvedBefore')->with($cutoff)->willReturn(2);
+        $image = $this->createMock(ImageReportRepository::class);
+        $image->expects($this->once())->method('anonymiseResolvedBefore')->with($cutoff)->willReturn(4);
+        $subject = $this->createService(moderationReportRepo: $moderation, itemReportRepo: $item, imageReportRepo: $image);
+
+        // Act
+        $anonymised = $subject->anonymiseResolvedReports();
+
+        // Assert
+        static::assertSame(7, $anonymised);
     }
 
     public function testRemoveImageCacheUpdatesOldImagesAndPersists(): void
@@ -312,6 +378,11 @@ class CleanupServiceTest extends TestCase
         $incidentRepo->method('deleteEndedBefore')->willReturn(6);
         $notFoundLogRepo = $this->createStub(NotFoundLogRepository::class);
         $notFoundLogRepo->method('deleteUnlinkedBefore')->willReturn(7);
+        $activityRepo = $this->createStub(ActivityRepository::class);
+        $activityRepo->method('blankMetaBefore')->willReturn(2);
+        $activityRepo->method('deleteOfTypeBefore')->willReturn(9);
+        $imageReportRepo = $this->createStub(ImageReportRepository::class);
+        $imageReportRepo->method('anonymiseResolvedBefore')->willReturn(4);
         $subject = $this->createService(
             imageRepo: $imageRepo,
             userRepo: $userRepo,
@@ -319,6 +390,8 @@ class CleanupServiceTest extends TestCase
             incidentRepo: $incidentRepo,
             measureLogger: $measureLogger,
             notFoundLogRepo: $notFoundLogRepo,
+            activityRepo: $activityRepo,
+            imageReportRepo: $imageReportRepo,
         );
 
         // Act
@@ -327,7 +400,7 @@ class CleanupServiceTest extends TestCase
         // Assert
         static::assertSame(Status::ok, $result->status);
         static::assertSame(
-            'image_cache: 2, registrations: 1, support_threads_auto_resolved: 3, support_email_verifications_expired: 0, import_archives: 0, export_archive: 0, security_measure_logs: 5, security_incidents: 6, not_found_logs: 7, access_denied_logs: 0, rate_limit_logs: 0',
+            'image_cache: 2, registrations: 1, support_threads_auto_resolved: 3, support_email_verifications_expired: 0, import_archives: 0, export_archives: 0, security_measure_logs: 5, security_incidents: 6, not_found_logs: 7, access_denied_logs: 0, rate_limit_logs: 0, registration_meta_blanked: 2, logins: 9, login_measure_ips_blanked: 2, reports_anonymised: 4',
             $result->message,
         );
     }

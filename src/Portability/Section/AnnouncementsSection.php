@@ -4,7 +4,6 @@ namespace App\Portability\Section;
 
 use App\Entity\Announcement;
 use App\Entity\Cms;
-use App\Entity\User;
 use App\Enum\AnnouncementStatus;
 use App\Portability\ImageWriterInterface;
 use App\Portability\ImportContext;
@@ -85,7 +84,7 @@ readonly class AnnouncementsSection implements SectionInterface
             $announcement->setSentAt($this->readDate($row['sent_at'] ?? null));
             $announcement->setRecipientCount(isset($row['recipient_count']) ? (int) $row['recipient_count'] : null);
             $announcement->setCmsPage($context->resolveRef(Cms::class, $row['cms_ref'] ?? null));
-            $announcement->setCreatedBy($context->resolveRef(User::class, $row['creator_email'] ?? null) ?? $context->getSystemUser());
+            $announcement->setCreatedBy($context->resolveCreatedUser($row['creator_email'] ?? null) ?? $context->getSystemUser());
             $announcement->setLinkHash($linkHash);
 
             $this->em->persist($announcement);

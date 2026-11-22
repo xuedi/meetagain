@@ -7,15 +7,21 @@ use App\Entity\User;
 use App\Enum\ImageType;
 use App\ExtendedFilesystem;
 use App\Portability\ImageImporter;
+use App\Service\Media\MetadataStripper;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\UnitOfWork;
+use Imagick;
+use ImagickPixel;
 use League\Flysystem\Filesystem;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 class ImageImporterTest extends TestCase
 {
+    private const string GPS_ROTATED_FIXTURE = __DIR__ . '/../../fixtures/gps-rotated.jpg';
+
     private Filesystem $images;
 
     protected function setUp(): void
@@ -116,7 +122,7 @@ class ImageImporterTest extends TestCase
     public function testPersistsAndWritesNewImage(): void
     {
         // Arrange
-        $bytes = 'png-bytes';
+        $bytes = $this->pngBytes();
         $expectedHash = sha1($bytes);
         $persisted = null;
 
@@ -154,7 +160,7 @@ class ImageImporterTest extends TestCase
         // Arrange
         $fs = $this->createStub(ExtendedFilesystem::class);
         $fs->method('fileExists')->willReturn(true);
-        $fs->method('getFileContents')->willReturn('photo-bytes');
+        $fs->method('getFileContents')->willReturn($this->pngBytes());
 
         $imageRepo = $this->createStub(EntityRepository::class);
         $imageRepo->method('findOneBy')->willReturn(null);
@@ -174,8 +180,72 @@ class ImageImporterTest extends TestCase
         static::assertTrue($image?->isAttributionNotRequired());
     }
 
+    public function testAnArchivedFileNamedByItsHashKeepsThatHashAndIsStoredWithoutLocation(): void
+    {
+        // Arrange
+        $hash = str_repeat('ab', 20);
+        $fs = $this->createStub(ExtendedFilesystem::class);
+        $fs->method('fileExists')->willReturn(true);
+        $fs->method('getFileContents')->willReturn((string) file_get_contents(self::GPS_ROTATED_FIXTURE));
+        $importer = $this->buildImporter($fs, $this->emptyEntityManager());
+
+        // Act
+        $image = $importer->import('/images/' . $hash . '.jpg', ImageType::PluginPhotosPhoto, new User());
+
+        // Assert
+        $stored = new Imagick();
+        $stored->readImageBlob($this->images->read($hash . '.jpg'));
+        static::assertSame($hash, $image?->getHash());
+        static::assertSame([], $stored->getImageProperties('exif:GPS*'));
+        static::assertSame([20, 40], [$stored->getImageWidth(), $stored->getImageHeight()]);
+    }
+
+    public function testAFileImagickCannotDecodeIsSkipped(): void
+    {
+        // Arrange
+        $fs = $this->createStub(ExtendedFilesystem::class);
+        $fs->method('fileExists')->willReturn(true);
+        $fs->method('getFileContents')->willReturn('not an image at all');
+        $importer = $this->buildImporter($fs, $this->emptyEntityManager());
+
+        // Act
+        $image = $importer->import('/images/broken.jpg', ImageType::EventUpload, new User());
+
+        // Assert
+        static::assertNull($image);
+        static::assertSame([], iterator_to_array($this->images->listContents('')));
+    }
+
     private function buildImporter(ExtendedFilesystem $fs, ?EntityManagerInterface $em = null): ImageImporter
     {
-        return new ImageImporter(em: $em ?? $this->createStub(EntityManagerInterface::class), fs: $fs, imageStorage: $this->images);
+        return new ImageImporter(
+            em: $em ?? $this->createStub(EntityManagerInterface::class),
+            fs: $fs,
+            imageStorage: $this->images,
+            metadataStripper: new MetadataStripper(),
+            logger: $this->createStub(LoggerInterface::class),
+        );
+    }
+
+    private function emptyEntityManager(): EntityManagerInterface
+    {
+        $imageRepo = $this->createStub(EntityRepository::class);
+        $imageRepo->method('findOneBy')->willReturn(null);
+        $unitOfWork = $this->createStub(UnitOfWork::class);
+        $unitOfWork->method('getScheduledEntityInsertions')->willReturn([]);
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('getRepository')->willReturn($imageRepo);
+        $em->method('getUnitOfWork')->willReturn($unitOfWork);
+
+        return $em;
+    }
+
+    private function pngBytes(): string
+    {
+        $imagick = new Imagick();
+        $imagick->newImage(4, 4, new ImagickPixel('green'));
+        $imagick->setImageFormat('png');
+
+        return $imagick->getImageBlob();
     }
 }

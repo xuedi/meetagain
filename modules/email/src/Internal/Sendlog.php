@@ -9,6 +9,7 @@ use Module\Email\Contract\SendlogInterface;
 use Module\Email\Contract\SentEmail;
 use Module\Email\Internal\Entity\EmailQueue;
 use Module\Email\Internal\Repository\EmailQueueRepository;
+use Override;
 
 final readonly class Sendlog implements SendlogInterface
 {
@@ -84,5 +85,25 @@ final readonly class Sendlog implements SendlogInterface
             providerStatus: $row->getProviderStatus(),
             errorMessage: $row->getErrorMessage(),
         );
+    }
+
+    #[Override]
+    public function forgetRecipient(string $address, string $replacement): int
+    {
+        return $this->repo->deletePendingFor($address) + $this->repo->anonymiseRecipient($address, $replacement);
+    }
+
+    #[Override]
+    public function forgetPendingForHost(string $host): int
+    {
+        $ids = [];
+        foreach ($this->repo->findBy(['status' => QueueStatus::Pending]) as $row) {
+            $siteUrl = $row->getContext()[LayoutRenderer::CONTEXT_KEY]['siteUrl'] ?? null;
+            if (is_string($siteUrl) && strcasecmp((string) parse_url($siteUrl, PHP_URL_HOST), $host) === 0) {
+                $ids[] = (int) $row->getId();
+            }
+        }
+
+        return $this->repo->deleteByIds($ids);
     }
 }

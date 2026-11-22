@@ -92,7 +92,7 @@ readonly class EventItemsSection implements SectionInterface
                 continue;
             }
 
-            $creator = $context->resolveRef(User::class, $row['created_by_email'] ?? null) ?? $context->getSystemUser();
+            $creator = $context->resolveCreatedUser($row['created_by_email'] ?? null) ?? $context->getSystemUser();
             $createdAt = DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, (string) ($row['created_at'] ?? ''));
             $position = $row['position'] ?? null;
             $sectionLabel = $row['section_label'] ?? null;

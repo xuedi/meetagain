@@ -57,6 +57,22 @@ final class ChangeProposalsSectionTest extends SectionTestCase
         static::assertSame(1, $context->toSummary()->get('change_proposals', Outcome::Created));
     }
 
+    public function testANewProposalOfAMatchedMemberIsWithheld(): void
+    {
+        // Arrange
+        $exported = $this->section([$this->proposal('event', 9)])->export($this->scope(eventIds: [9]), $this->images());
+        $context = $this->context();
+        $context->mapRef(Event::class, 9, $this->withId(new Event(), 90));
+        $context->mapUser('member@example.org', $this->withId(new User(), 30), false);
+
+        // Act
+        $this->section()->import($exported, $context);
+
+        // Assert
+        static::assertSame([], $this->restored);
+        static::assertSame(1, $context->toSummary()->get('change_proposals', Outcome::Withheld));
+    }
+
     public function testTheProposalRefTravelsAndMapsTheImportedProposal(): void
     {
         // Arrange

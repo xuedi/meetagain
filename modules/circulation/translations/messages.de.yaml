@@ -139,3 +139,4 @@ circulation:
     trust_action_handover: 'Eine Übergabe abschließen'
     trust_action_donation: 'Ein Exemplar einbringen'
     flash_trust_minimum: 'Du brauchst hier %required% Punkte Ansehen für eine Warteliste; du hast %current%.'
+    deletion_blocked_holds_copy: 'Du hast noch ein geteiltes Exemplar oder eine offene Übergabe. Gib das Exemplar weiter oder schließe die Übergabe ab, bevor du dein Konto löschst.'

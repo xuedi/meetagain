@@ -554,6 +554,7 @@ admin_member:
     role_admin: '管理员'
     role_user: '用户'
     role_system: '系统'
+    flash_restore_erased: '该账户已被清除，无法恢复。'
 admin_support:
     tab_requests: '支持请求'
     tab_reports: '图片举报'

@@ -40,7 +40,7 @@
                             <input type="hidden" name="owner_id" value="{{ ownership.user.id }}">
                             <div class="field has-addons">
                                 <div class="control">
-                                    <span class="button is-small is-static">{{ ownership.user.name }}</span>
+                                    <span class="button is-small is-static">{{ member_name(ownership.user) }}</span>
                                 </div>
                                 <div class="control is-expanded">
                                     <input type="text" name="message" class="input is-small"

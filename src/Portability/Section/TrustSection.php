@@ -103,6 +103,11 @@ readonly class TrustSection implements SectionInterface
                 continue;
             }
 
+            if ($context->namesMatchedUser($row['from_email'] ?? null) || $context->namesMatchedUser($row['to_email'] ?? null)) {
+                $context->count($this->getKey(), Outcome::Withheld);
+                continue;
+            }
+
             $createdAt = $this->date($row['created_at'] ?? null) ?? new DateTimeImmutable();
             $this->grants->restoreGrant(
                 new PortableGrant($trustContext, $fromUserId, $toUserId, $level, $createdAt, $this->date($row['updated_at'] ?? null) ?? $createdAt),

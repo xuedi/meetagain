@@ -196,6 +196,84 @@ class EmailQueueRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function clearSentBodiesBefore(DateTimeImmutable $cutoff): int
+    {
+        return (int) $this
+            ->createQueryBuilder('eq')
+            ->update()
+            ->set('eq.renderedBody', 'NULL')
+            ->set('eq.context', ':empty')
+            ->where('eq.status = :sent')
+            ->andWhere('eq.createdAt < :cutoff')
+            ->andWhere('eq.renderedBody IS NOT NULL')
+            ->setParameter('empty', '[]')
+            ->setParameter('sent', QueueStatus::Sent)
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function deleteFinishedBefore(DateTimeImmutable $cutoff): int
+    {
+        return (int) $this
+            ->createQueryBuilder('eq')
+            ->delete()
+            ->where('eq.status IN (:finished)')
+            ->andWhere('eq.createdAt < :cutoff')
+            ->setParameter('finished', [QueueStatus::Sent, QueueStatus::Late, QueueStatus::Failed])
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->execute();
+    }
+
+    /** @param list<int> $ids */
+    public function deleteByIds(array $ids): int
+    {
+        if ($ids === []) {
+            return 0;
+        }
+
+        return (int) $this
+            ->createQueryBuilder('eq')
+            ->delete()
+            ->where('eq.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function deletePendingFor(string $address): int
+    {
+        $qb = $this->createQueryBuilder('eq')->delete()->where('eq.status = :pending')->setParameter('pending', QueueStatus::Pending);
+        $this->matchRecipient($qb, $address);
+
+        return (int) $qb->getQuery()->execute();
+    }
+
+    public function anonymiseRecipient(string $address, string $replacement): int
+    {
+        $qb = $this
+            ->createQueryBuilder('eq')
+            ->update()
+            ->set('eq.recipient', ':replacement')
+            ->set('eq.renderedBody', 'NULL')
+            ->set('eq.attachments', 'NULL')
+            ->set('eq.context', ':empty')
+            ->setParameter('replacement', $replacement)
+            ->setParameter('empty', '[]');
+        $this->matchRecipient($qb, $address);
+
+        return (int) $qb->getQuery()->execute();
+    }
+
+    private function matchRecipient(QueryBuilder $qb, string $address): void
+    {
+        $qb
+            ->andWhere('LOWER(eq.recipient) = :recipient OR LOWER(eq.recipient) LIKE :namedRecipient')
+            ->setParameter('recipient', mb_strtolower($address))
+            ->setParameter('namedRecipient', '%<' . addcslashes(mb_strtolower($address), '%_') . '>');
+    }
+
     /**
      * @param list<QueueStatus>|null $statuses
      */

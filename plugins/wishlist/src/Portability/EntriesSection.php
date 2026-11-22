@@ -116,6 +116,11 @@ readonly class EntriesSection implements PluginSectionInterface
                 continue;
             }
 
+            if ($context->namesMatchedUser($row['email'] ?? null)) {
+                $context->count($this->getKey(), Outcome::Withheld);
+                continue;
+            }
+
             $createdAt = DateTimeImmutable::createFromFormat(DateTimeInterface::ATOM, (string) ($row['created_at'] ?? ''));
             $entry = new WishlistEntry()
                 ->setUserId($userId)

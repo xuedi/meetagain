@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\ImageReport;
 use App\Enum\ImageReportStatus;
+use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -47,5 +48,21 @@ class ImageReportRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getResult();
+    }
+
+    public function anonymiseResolvedBefore(DateTimeImmutable $cutoff): int
+    {
+        return (int) $this
+            ->createQueryBuilder('r')
+            ->update()
+            ->set('r.reporter', 'NULL')
+            ->set('r.remarks', 'NULL')
+            ->where('r.status = :resolved')
+            ->andWhere('r.createdAt < :cutoff')
+            ->andWhere('r.reporter IS NOT NULL OR r.remarks IS NOT NULL')
+            ->setParameter('resolved', ImageReportStatus::Resolved)
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->execute();
     }
 }

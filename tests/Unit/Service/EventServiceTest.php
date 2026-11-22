@@ -2,8 +2,13 @@
 
 namespace Tests\Unit\Service;
 
+use App\Comment\CommentService;
+use App\Comment\TargetRegistry;
 use App\Emails\Types\NotificationEventCanceledEmail;
 use App\Entity\EventItemAssociation;
+use App\EntityActionDispatcher;
+use App\EntityActionInterface;
+use App\Enum\EntityAction;
 use App\Enum\EventInterval;
 use App\Enum\EventRsvpFilter;
 use App\Enum\EventSortFilter;
@@ -14,18 +19,25 @@ use App\Item\AttachControl;
 use App\Item\AttachControlType;
 use App\Item\TypeProviderInterface;
 use App\Item\TypeRegistry;
+use App\Repository\CommentRepository;
 use App\Repository\EventRepository;
 use App\Repository\EventTranslationRepository;
 use App\Service\Config\PluginService;
 use App\Service\Event\EventService;
 use App\Service\Event\ImageBoxProviderInterface;
 use App\Service\Event\RecurringService;
+use App\Service\Security\ContentSanitizer;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Generator;
+use Module\Ballot\Contract\BallotInterface;
+use Module\Ballot\Contract\BallotSubject;
+use Module\Proposal\Contract\Change\ChangeInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizer;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerConfig;
 use Tests\Unit\Stubs\EventSeriesStub;
 use Tests\Unit\Stubs\EventStub;
 use Tests\Unit\Stubs\UserStub;
@@ -64,6 +76,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
 
         // Act
@@ -102,6 +118,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
 
         // Act
@@ -151,6 +171,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
 
         // Act
@@ -232,6 +256,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
 
         // Act
@@ -268,6 +296,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
 
         // Act
@@ -298,6 +330,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
 
         // Act
@@ -326,6 +362,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
 
         // Act & Assert
@@ -358,6 +398,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
 
         // Act & Assert
@@ -393,6 +437,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
 
         // Act & Assert
@@ -426,6 +474,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
 
         // Act & Assert
@@ -458,6 +510,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
 
         // Act & Assert
@@ -516,6 +572,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: $providers,
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
     }
 
@@ -624,6 +684,10 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
         );
     }
 
@@ -640,6 +704,65 @@ class EventServiceTest extends TestCase
             plugins: [],
             imageBoxProviders: [],
             translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $this->createStub(ChangeInterface::class),
+            ballots: $this->createStub(BallotInterface::class),
+            entityActionDispatcher: new EntityActionDispatcher([]),
+        );
+    }
+
+    public function testDeleteClearsTheProposalsAndBallotsOfTheEventAndAnnouncesIt(): void
+    {
+        // Arrange
+        $event = new EventStub()
+            ->setId(5)
+            ->setStart(new DateTimeImmutable('2030-01-01'));
+        $changeProposals = $this->createMock(ChangeInterface::class);
+        $changeProposals->expects($this->once())->method('removeForTarget')->with('event', 5);
+        $ballots = $this->createMock(BallotInterface::class);
+        $ballots->expects($this->once())->method('purgeForSubject')->with(new BallotSubject('event', 5));
+        $handler = new class implements EntityActionInterface {
+            /** @var list<array{EntityAction, int}> */
+            public array $announced = [];
+
+            public function onEntityAction(EntityAction $action, int $entityId): void
+            {
+                $this->announced[] = [$action, $entityId];
+            }
+        };
+        $subject = new EventService(
+            repo: $this->createStub(EventRepository::class),
+            em: $this->createStub(EntityManagerInterface::class),
+            notificationEventCanceledEmail: $this->createStub(NotificationEventCanceledEmail::class),
+            pluginService: $this->createStub(PluginService::class),
+            recurringEventService: $this->createStub(RecurringService::class),
+            itemAssociationService: $this->createStub(AssociationService::class),
+            itemTypeRegistry: $this->createStub(TypeRegistry::class),
+            plugins: [],
+            imageBoxProviders: [],
+            translationRepo: $this->createStub(EventTranslationRepository::class),
+            commentService: $this->commentService(),
+            changeProposals: $changeProposals,
+            ballots: $ballots,
+            entityActionDispatcher: new EntityActionDispatcher([$handler]),
+        );
+
+        // Act
+        $subject->delete($event);
+
+        // Assert
+        static::assertSame([[EntityAction::DeleteEvent, 5]], $handler->announced);
+    }
+
+    private function commentService(): CommentService
+    {
+        $config = new HtmlSanitizerConfig()->allowSafeElements();
+
+        return new CommentService(
+            $this->createStub(CommentRepository::class),
+            $this->createStub(EntityManagerInterface::class),
+            new ContentSanitizer(new HtmlSanitizer($config), new HtmlSanitizer($config)),
+            new TargetRegistry([]),
         );
     }
 }

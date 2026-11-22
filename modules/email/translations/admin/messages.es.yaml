@@ -54,6 +54,7 @@ admin_email_templates:
     trigger_item_report_decision: 'se resuelve una denuncia - decisión a quien denuncia'
     trigger_support_invitation: 'un steward invita a los administradores a una solicitud'
     trigger_moderation_warning: 'la moderación advierte al autor de un miembro, comentario o mensaje denunciado'
+    trigger_account_deletion: 'un miembro elimina su propia cuenta - confirmación al miembro'
 admin_email_sendlog:
     col_subject: 'Asunto'
     page_title: 'Registro de envíos de correo'

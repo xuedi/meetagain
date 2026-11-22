@@ -222,7 +222,7 @@ readonly class BallotsSection implements SectionInterface
                 continue;
             }
 
-            $voter = $context->resolveRef(User::class, $vote['email'] ?? null);
+            $voter = $context->resolveCreatedUser($vote['email'] ?? null);
             if (!$voter instanceof User) {
                 continue;
             }
@@ -294,7 +294,7 @@ readonly class BallotsSection implements SectionInterface
 
     private function userId(mixed $email, ImportContext $context): int
     {
-        return (int) ($context->resolveRef(User::class, $email) ?? $context->getSystemUser())->getId();
+        return (int) ($context->resolveCreatedUser($email) ?? $context->getSystemUser())->getId();
     }
 
     private function date(mixed $value): DateTimeImmutable

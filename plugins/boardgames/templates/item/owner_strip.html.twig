@@ -15,10 +15,10 @@
     <div class="is-flex is-flex-wrap-wrap is-align-items-center" style="gap: 0.25rem;">
         {% for ownership in owners %}
             <a href="{{ path('app_member_view', {'id': ownership.user.id}) }}"
-               title="{{ ownership.canTeach ? 'boardgames_shelf.owner_can_teach'|trans({'%name%': ownership.user.name}) : ownership.user.name }}"
+               title="{{ ownership.canTeach ? 'boardgames_shelf.owner_can_teach'|trans({'%name%': member_name(ownership.user)}) : member_name(ownership.user) }}"
                class="is-flex is-align-items-center">
                 <figure class="image is-24x24">
-                    {% include '_components/image.html.twig' with {'image': ownership.user.image, 'size': '50x50', 'alt': ownership.user.name} %}
+                    {% include '_components/image.html.twig' with {'image': ownership.user.image, 'size': '50x50', 'alt': member_name(ownership.user)} %}
                 </figure>
                 {% if ownership.canTeach %}
                     <span class="icon is-small has-text-link"><i class="fa-solid fa-graduation-cap"></i></span>

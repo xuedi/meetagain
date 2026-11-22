@@ -13,6 +13,7 @@ use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Media\ImageTypes\ImageTypeDefinitionInterface;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
+use App\Service\Media\MetadataStripper;
 use App\Service\Media\ThumbnailSizeFormat;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,23 +39,10 @@ class ImageServiceTest extends TestCase
 
     private FilesystemOperator $thumbnailStorage;
 
-    /** @var list<string> */
-    private array $uploads = [];
-
     protected function setUp(): void
     {
         $this->imageStorage = new Filesystem(new InMemoryFilesystemAdapter());
         $this->thumbnailStorage = new Filesystem(new InMemoryFilesystemAdapter());
-    }
-
-    protected function tearDown(): void
-    {
-        foreach ($this->uploads as $upload) {
-            if (is_file($upload)) {
-                unlink($upload);
-            }
-        }
-        $this->uploads = [];
     }
 
     private function createService(
@@ -75,6 +63,7 @@ class ImageServiceTest extends TestCase
             $this->createStub(ImageLocationService::class),
             $imageLocationRepo ?? $this->createStub(ImageLocationRepository::class),
             new LockFactory(new InMemoryStore()),
+            new MetadataStripper(),
         );
     }
 
@@ -107,11 +96,10 @@ class ImageServiceTest extends TestCase
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findOneBy')->willReturn(null, $stored);
         $uploadedFile = $this->createStub(UploadedFile::class);
-        $uploadedFile->method('getContent')->willReturn('raced content');
-        $uploadedFile->method('getMimeType')->willReturn('image/jpeg');
-        $uploadedFile->method('guessExtension')->willReturn('jpg');
+        $uploadedFile->method('getContent')->willReturn($this->imageBytes('raced'));
+        $uploadedFile->method('getMimeType')->willReturn('image/png');
+        $uploadedFile->method('guessExtension')->willReturn('png');
         $uploadedFile->method('getSize')->willReturn(1);
-        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes('raced content'));
         $subject = $this->createService(imageRepo: $imageRepo);
 
         // Act
@@ -127,11 +115,10 @@ class ImageServiceTest extends TestCase
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findOneBy')->willReturn(null, $this->createStub(Image::class));
         $uploadedFile = $this->createStub(UploadedFile::class);
-        $uploadedFile->method('getContent')->willReturn('raced content');
-        $uploadedFile->method('getMimeType')->willReturn('image/jpeg');
-        $uploadedFile->method('guessExtension')->willReturn('jpg');
+        $uploadedFile->method('getContent')->willReturn($this->imageBytes('raced'));
+        $uploadedFile->method('getMimeType')->willReturn('image/png');
+        $uploadedFile->method('guessExtension')->willReturn('png');
         $uploadedFile->method('getSize')->willReturn(1);
-        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes('raced content'));
         $subject = $this->createService(imageRepo: $imageRepo);
 
         // Act
@@ -149,18 +136,17 @@ class ImageServiceTest extends TestCase
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->never())->method('flush');
         $uploadedFile = $this->createStub(UploadedFile::class);
-        $uploadedFile->method('getContent')->willReturn('fixture content');
-        $uploadedFile->method('getMimeType')->willReturn('image/jpeg');
-        $uploadedFile->method('guessExtension')->willReturn('jpg');
+        $uploadedFile->method('getContent')->willReturn($this->imageBytes('fixture'));
+        $uploadedFile->method('getMimeType')->willReturn('image/png');
+        $uploadedFile->method('guessExtension')->willReturn('png');
         $uploadedFile->method('getSize')->willReturn(1);
-        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes('fixture content'));
         $subject = $this->createService(imageRepo: $imageRepo, entityManager: $entityManager);
 
         // Act
         $result = $subject->upload($uploadedFile, $this->createStub(User::class), ImageType::ProfilePicture);
 
         // Assert
-        static::assertSame(sha1('fixture content'), $result?->getHash());
+        static::assertSame(sha1($this->imageBytes('fixture')), $result?->getHash());
     }
 
     public function testUploadExistingImage(): void
@@ -202,11 +188,10 @@ class ImageServiceTest extends TestCase
     public function testUploadNewImage(): void
     {
         // Arrange
-        $imageContent = 'test image content';
+        $imageContent = $this->imageBytes('new');
         $hash = sha1($imageContent);
-        $mimeType = 'image/jpeg';
-        $extension = 'jpg';
-        $size = 12345;
+        $mimeType = 'image/png';
+        $extension = 'png';
         $user = $this->storedUser();
         $type = ImageType::ProfilePicture;
 
@@ -219,8 +204,7 @@ class ImageServiceTest extends TestCase
         $uploadedFile->method('getContent')->willReturn($imageContent);
         $uploadedFile->method('getMimeType')->willReturn($mimeType);
         $uploadedFile->method('guessExtension')->willReturn($extension);
-        $uploadedFile->method('getSize')->willReturn($size);
-        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes($imageContent));
+        $uploadedFile->method('getSize')->willReturn(12345);
 
         // Arrange
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
@@ -233,7 +217,7 @@ class ImageServiceTest extends TestCase
                     && $image->getMimeType() === $mimeType
                     && $image->getExtension() === $extension
                     && $image->getType() === $type
-                    && $image->getSize() === $size
+                    && $image->getSize() === strlen($imageContent)
                     && $image->getUploader() === $user
                     && $image->getCreatedAt() instanceof DateTimeImmutable
                 ),
@@ -247,12 +231,6 @@ class ImageServiceTest extends TestCase
 
         // Assert
         static::assertInstanceOf(Image::class, $result);
-        static::assertEquals($hash, $result->getHash());
-        static::assertEquals($mimeType, $result->getMimeType());
-        static::assertEquals($extension, $result->getExtension());
-        static::assertEquals($type, $result->getType());
-        static::assertEquals($size, $result->getSize());
-        static::assertEquals($user, $result->getUploader());
         static::assertSame($imageContent, $this->imageStorage->read($hash . '.' . $extension));
     }
 
@@ -272,6 +250,7 @@ class ImageServiceTest extends TestCase
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
                 new LockFactory(new InMemoryStore()),
+                new MetadataStripper(),
             ])
             ->onlyMethods(['createThumbnails'])
             ->getMock();
@@ -308,6 +287,7 @@ class ImageServiceTest extends TestCase
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
                 new LockFactory(new InMemoryStore()),
+                new MetadataStripper(),
             ])
             ->onlyMethods(['rotateThumbNail'])
             ->getMock();
@@ -367,6 +347,7 @@ class ImageServiceTest extends TestCase
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
                 new LockFactory(new InMemoryStore()),
+                new MetadataStripper(),
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
             ->getMock();
@@ -610,6 +591,7 @@ class ImageServiceTest extends TestCase
                 $this->createStub(ImageLocationService::class),
                 $this->createStub(ImageLocationRepository::class),
                 new LockFactory(new InMemoryStore()),
+                new MetadataStripper(),
             ])
             ->onlyMethods(['getObsoleteThumbnails'])
             ->getMock();
@@ -634,14 +616,13 @@ class ImageServiceTest extends TestCase
     public function testUploadTrustsOnlyTheServerDetectedMimeType(array $mimeData, ?string $expectedMime, bool $expectThrow): void
     {
         // Arrange
-        $imageContent = 'content-' . random_int(1, 9999);
+        $imageContent = $this->imageBytes('content-' . random_int(1, 9999));
         $uploadedFile = $this->createStub(UploadedFile::class);
         $uploadedFile->method('getContent')->willReturn($imageContent);
         $uploadedFile->method('getMimeType')->willReturn($mimeData['server']);
         $uploadedFile->method('getClientMimeType')->willReturn($mimeData['client']);
         $uploadedFile->method('guessExtension')->willReturn('jpg');
         $uploadedFile->method('getSize')->willReturn(1);
-        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes($imageContent));
 
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findOneBy')->willReturn(null);
@@ -724,12 +705,11 @@ class ImageServiceTest extends TestCase
     {
         // Arrange
         $uploadedFile = $this->createStub(UploadedFile::class);
-        $uploadedFile->method('getContent')->willReturn('payload');
+        $uploadedFile->method('getContent')->willReturn($this->imageBytes('payload'));
         $uploadedFile->method('getMimeType')->willReturn($extData['mime']);
         $uploadedFile->method('guessExtension')->willReturn($extData['server']);
         $uploadedFile->method('getClientOriginalExtension')->willReturn($extData['client']);
         $uploadedFile->method('getSize')->willReturn(1);
-        $uploadedFile->method('getRealPath')->willReturn($this->uploadedBytes('payload'));
 
         $imageRepo = $this->createStub(ImageRepository::class);
         $imageRepo->method('findOneBy')->willReturn(null);
@@ -804,11 +784,10 @@ class ImageServiceTest extends TestCase
         $files = [];
         for ($i = 0; $i < 2; ++$i) {
             $f = $this->createStub(UploadedFile::class);
-            $f->method('getContent')->willReturn('payload-' . $i);
-            $f->method('getMimeType')->willReturn('image/jpeg');
-            $f->method('guessExtension')->willReturn('jpg');
+            $f->method('getContent')->willReturn($this->imageBytes('payload-' . $i));
+            $f->method('getMimeType')->willReturn('image/png');
+            $f->method('guessExtension')->willReturn('png');
             $f->method('getSize')->willReturn(10);
-            $f->method('getRealPath')->willReturn($this->uploadedBytes('payload-' . $i));
             $files[] = $f;
         }
 
@@ -823,6 +802,7 @@ class ImageServiceTest extends TestCase
             $locationService,
             $this->createStub(ImageLocationRepository::class),
             new LockFactory(new InMemoryStore()),
+            new MetadataStripper(),
         );
 
         // Act
@@ -1039,13 +1019,13 @@ class ImageServiceTest extends TestCase
         return $image;
     }
 
-    private function uploadedBytes(string $content): string
+    private function imageBytes(string $seed): string
     {
-        $path = (string) tempnam(sys_get_temp_dir(), 'image-service-upload-');
-        file_put_contents($path, $content);
-        $this->uploads[] = $path;
+        $imagick = new Imagick();
+        $imagick->newImage(4, 4, new ImagickPixel('#' . substr(md5($seed), 0, 6)));
+        $imagick->setImageFormat('png');
 
-        return $path;
+        return $imagick->getImageBlob();
     }
 
     private function storeThumbnails(string ...$keys): void

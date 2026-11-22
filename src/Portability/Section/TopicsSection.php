@@ -89,6 +89,11 @@ readonly class TopicsSection implements SectionInterface
                 continue;
             }
 
+            if ($context->namesMatchedUser($authorEmail)) {
+                $context->count($this->getKey(), Outcome::Withheld);
+                continue;
+            }
+
             $topic = new Topic();
             $topic->setTitle($title);
             $topic->setParent($parent);

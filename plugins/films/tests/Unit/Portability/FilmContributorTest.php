@@ -14,6 +14,7 @@ use Plugin\Films\Entity\ExternalSource;
 use Plugin\Films\Entity\Film;
 use Plugin\Films\Portability\FilmContributor;
 use Plugin\Films\Repository\FilmRepository;
+use Plugin\Films\Service\FilmService;
 use ReflectionProperty;
 
 class FilmContributorTest extends TestCase
@@ -113,6 +114,6 @@ class FilmContributorTest extends TestCase
 
     private function contributor(EntityManagerInterface $em, FilmRepository $repo): FilmContributor
     {
-        return new FilmContributor($em, $repo, $this->createStub(ImageLocationService::class));
+        return new FilmContributor($em, $repo, $this->createStub(ImageLocationService::class), $this->createStub(FilmService::class));
     }
 }

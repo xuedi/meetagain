@@ -95,6 +95,19 @@ class ActionRequestRepository extends ServiceEntityRepository
         return $this->findBy(['identifier' => $identifier], ['id' => 'DESC'], $limit);
     }
 
+    public function replaceRequester(string $requestedBy, string $replacement): int
+    {
+        return (int) $this
+            ->createQueryBuilder('r')
+            ->update()
+            ->set('r.requestedBy', ':replacement')
+            ->where('LOWER(r.requestedBy) = :requestedBy')
+            ->setParameter('replacement', $replacement)
+            ->setParameter('requestedBy', mb_strtolower($requestedBy))
+            ->getQuery()
+            ->execute();
+    }
+
     /**
      * @param array<string, string|int|bool|null> $values
      */

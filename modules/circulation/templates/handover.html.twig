@@ -31,7 +31,7 @@
                     <th>{{ 'circulation.handover_from'|trans }}</th>
                     <td>
                         {% if handover.fromUser %}
-                            <a href="{{ path('app_member_view', {'id': handover.fromUser.id}) }}">{{ handover.fromUser.name }}</a>
+                            <a href="{{ path('app_member_view', {'id': handover.fromUser.id}) }}">{{ member_name(handover.fromUser) }}</a>
                         {% else %}
                             {{ 'circulation.holder_unknown'|trans }}
                         {% endif %}
@@ -46,7 +46,7 @@
                 </tr>
                 <tr>
                     <th>{{ 'circulation.handover_to'|trans }}</th>
-                    <td><a href="{{ path('app_member_view', {'id': handover.toUser.id}) }}">{{ handover.toUser.name }}</a></td>
+                    <td><a href="{{ path('app_member_view', {'id': handover.toUser.id}) }}">{{ member_name(handover.toUser) }}</a></td>
                     <td class="has-text-right">
                         {% if handover.toConfirmedAt %}
                             <span class="icon has-text-success" title="{{ 'circulation.handover_confirmed'|trans }}"><i class="fa fa-check"></i></span>

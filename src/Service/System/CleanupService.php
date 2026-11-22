@@ -2,13 +2,20 @@
 
 namespace App\Service\System;
 
+use App\Activity\Messages\Login;
+use App\Activity\Messages\LoginMeasuresActivated;
+use App\Activity\Messages\Registered;
 use App\EntityActionDispatcher;
 use App\Enum\EntityAction;
 use App\Portability\ExportAction;
 use App\Portability\Importer;
 use App\Repository\AccessDeniedLogRepository;
+use App\Repository\ActivityRepository;
+use App\Repository\ImageReportRepository;
 use App\Repository\ImageRepository;
 use App\Repository\IncidentRepository;
+use App\Repository\ItemReportRepository;
+use App\Repository\ModerationReportRepository;
 use App\Repository\NotFoundLogRepository;
 use App\Repository\RateLimitLogRepository;
 use App\Repository\SupportRequestRepository;
@@ -16,6 +23,7 @@ use App\Repository\UserRepository;
 use App\Service\Security\MeasureLogger;
 use App\Service\Security\MeasureSettings;
 use App\Service\Support\ThreadService;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\FileAttributes;
 use League\Flysystem\FilesystemOperator;
@@ -35,6 +43,10 @@ readonly class CleanupService implements TaskInterface
     public const int EXPORT_MAX_HOURS = 24;
     public const int INCIDENT_RETENTION_DAYS = 180;
     public const int REQUEST_LOG_RETENTION_DAYS = 90;
+    public const int IMAGE_CACHE_BUST_DAYS = 30;
+    public const int REGISTRATION_IP_RETENTION_DAYS = 90;
+    public const int LOGIN_ACTIVITY_RETENTION_DAYS = 400;
+    public const int RESOLVED_REPORT_RETENTION_DAYS = 180;
 
     public function __construct(
         private ImageRepository $imageRepo,
@@ -44,6 +56,10 @@ readonly class CleanupService implements TaskInterface
         private NotFoundLogRepository $notFoundLogRepo,
         private AccessDeniedLogRepository $accessDeniedLogRepo,
         private RateLimitLogRepository $rateLimitLogRepo,
+        private ActivityRepository $activityRepo,
+        private ModerationReportRepository $moderationReportRepo,
+        private ItemReportRepository $itemReportRepo,
+        private ImageReportRepository $imageReportRepo,
         private ThreadService $threadService,
         private MeasureLogger $measureLogger,
         private MeasureSettings $measureSettings,
@@ -67,13 +83,17 @@ readonly class CleanupService implements TaskInterface
     public function getDescription(): string
     {
         return sprintf(
-            'Hourly housekeeping. It drops the cache-busting version from image URLs whose image last changed more than 30 days ago, deletes registrations not confirmed within %d days, resolves support threads without activity for %d days, clears expired support email verifications, deletes uploaded import archives left unimported for %d hours and an instance export older than %d hours, purges security measure logs past their retention and security incidents that ended more than %d days ago, and deletes 404, access-denied and rate-limit log rows older than %d days - a 404 or access-denied row kept as evidence of an incident stays until that incident is purged. The run message counts each step.',
+            'Hourly housekeeping. It drops the cache-busting version from image URLs whose image last changed more than %d days ago, deletes registrations not confirmed within %d days, resolves support threads without activity for %d days, clears expired support email verifications, deletes uploaded import archives left unimported for %d hours and every export archive older than %d hours, purges security measure logs past their retention and security incidents that ended more than %d days ago, and deletes 404, access-denied and rate-limit log rows older than %d days - a 404 or access-denied row kept as evidence of an incident stays until that incident is purged. It blanks the IP address and user agent recorded with a registration after %d days and the IP address of a login-measures activity once the security measure log retention has passed, deletes login activities older than %d days, and removes the reporter, the reporter contact and the free text from moderation, item and image reports resolved more than %d days ago, keeping the reported author, the reason, the status and the dates. The run message counts each step.',
+            self::IMAGE_CACHE_BUST_DAYS,
             self::GHOSTED_REGISTRATION_DAYS,
             self::SUPPORT_THREAD_STALE_DAYS,
             self::PENDING_IMPORT_MAX_HOURS,
             self::EXPORT_MAX_HOURS,
             self::INCIDENT_RETENTION_DAYS,
             self::REQUEST_LOG_RETENTION_DAYS,
+            self::REGISTRATION_IP_RETENTION_DAYS,
+            self::LOGIN_ACTIVITY_RETENTION_DAYS,
+            self::RESOLVED_REPORT_RETENTION_DAYS,
         );
     }
 
@@ -95,8 +115,8 @@ readonly class CleanupService implements TaskInterface
             $importCount = $this->removeStaleImportArchives();
             $this->logger->info('Stale import archives removed', ['count' => $importCount]);
 
-            $exportCount = $this->removeStaleExportArchive();
-            $this->logger->info('Stale export archive removed', ['count' => $exportCount]);
+            $exportCount = $this->removeStaleExportArchives();
+            $this->logger->info('Stale export archives removed', ['count' => $exportCount]);
 
             $measureLogCount = $this->removeExpiredSecurityMeasureLogs();
             $this->logger->info('Expired security measure logs removed', ['count' => $measureLogCount]);
@@ -107,8 +127,14 @@ readonly class CleanupService implements TaskInterface
             $requestLogCounts = $this->removeExpiredRequestLogs();
             $this->logger->info('Expired request logs removed', $requestLogCounts);
 
+            $activityCounts = $this->removeExpiredActivityData();
+            $this->logger->info('Expired activity data removed', $activityCounts);
+
+            $reportCount = $this->anonymiseResolvedReports();
+            $this->logger->info('Resolved reports anonymised', ['count' => $reportCount]);
+
             $message = sprintf(
-                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d, import_archives: %d, export_archive: %d, security_measure_logs: %d, security_incidents: %d, not_found_logs: %d, access_denied_logs: %d, rate_limit_logs: %d',
+                'image_cache: %d, registrations: %d, support_threads_auto_resolved: %d, support_email_verifications_expired: %d, import_archives: %d, export_archives: %d, security_measure_logs: %d, security_incidents: %d, not_found_logs: %d, access_denied_logs: %d, rate_limit_logs: %d, registration_meta_blanked: %d, logins: %d, login_measure_ips_blanked: %d, reports_anonymised: %d',
                 $imageCount,
                 $regCount,
                 $autoResolvedCount,
@@ -120,6 +146,10 @@ readonly class CleanupService implements TaskInterface
                 $requestLogCounts['not_found'],
                 $requestLogCounts['access_denied'],
                 $requestLogCounts['rate_limit'],
+                $activityCounts['registration_meta'],
+                $activityCounts['logins'],
+                $activityCounts['login_measure_ips'],
+                $reportCount,
             );
 
             return new Result(Status::ok, $message);
@@ -152,10 +182,43 @@ readonly class CleanupService implements TaskInterface
         ];
     }
 
+    /**
+     * @return array{registration_meta: int, logins: int, login_measure_ips: int}
+     */
+    public function removeExpiredActivityData(): array
+    {
+        $now = $this->clock->now();
+
+        return [
+            'registration_meta' => $this->activityRepo->blankMetaBefore(
+                Registered::TYPE,
+                ['ip', 'user_agent'],
+                $this->daysBefore($now, self::REGISTRATION_IP_RETENTION_DAYS),
+            ),
+            'logins' => $this->activityRepo->deleteOfTypeBefore(Login::TYPE, $this->daysBefore($now, self::LOGIN_ACTIVITY_RETENTION_DAYS)),
+            'login_measure_ips' => $this->activityRepo->blankMetaBefore(
+                LoginMeasuresActivated::TYPE,
+                ['ip'],
+                $this->daysBefore($now, $this->measureSettings->logRetentionDays()),
+            ),
+        ];
+    }
+
+    public function anonymiseResolvedReports(): int
+    {
+        $cutoff = $this->daysBefore($this->clock->now(), self::RESOLVED_REPORT_RETENTION_DAYS);
+
+        return (
+            $this->moderationReportRepo->anonymiseResolvedBefore($cutoff)
+            + $this->itemReportRepo->anonymiseResolvedBefore($cutoff)
+            + $this->imageReportRepo->anonymiseResolvedBefore($cutoff)
+        );
+    }
+
     public function removeImageCache(): int
     {
         $count = 0;
-        $images = $this->imageRepo->getOldImageUpdates(30);
+        $images = $this->imageRepo->getOldImageUpdates(self::IMAGE_CACHE_BUST_DAYS);
         foreach ($images as $image) {
             $image->setUpdatedAt(null);
             $this->entityManager->persist($image);
@@ -191,18 +254,23 @@ readonly class CleanupService implements TaskInterface
         return $count;
     }
 
-    public function removeStaleExportArchive(): int
+    public function removeStaleExportArchives(): int
     {
-        if (!$this->privateStorage->fileExists(ExportAction::ARCHIVE)) {
-            return 0;
-        }
         $cutoff = $this->clock->now()->modify(sprintf('-%d hours', self::EXPORT_MAX_HOURS))->getTimestamp();
-        if ($this->privateStorage->lastModified(ExportAction::ARCHIVE) >= $cutoff) {
-            return 0;
-        }
-        $this->privateStorage->delete(ExportAction::ARCHIVE);
 
-        return 1;
+        $count = 0;
+        foreach ($this->privateStorage->listContents(ExportAction::DIRECTORY, false) as $item) {
+            if (!$item instanceof FileAttributes || !str_ends_with($item->path(), '.zip')) {
+                continue;
+            }
+            $modifiedAt = $item->lastModified() ?? $this->privateStorage->lastModified($item->path());
+            if ($modifiedAt < $cutoff) {
+                $this->privateStorage->delete($item->path());
+                $count++;
+            }
+        }
+
+        return $count;
     }
 
     public function removeStaleImportArchives(): int
@@ -229,7 +297,7 @@ readonly class CleanupService implements TaskInterface
         $count = 0;
         $users = $this->userRepo->getOldRegistrations(self::GHOSTED_REGISTRATION_DAYS);
         foreach ($users as $user) {
-            $this->entityActionDispatcher->dispatch(EntityAction::DeleteUser, $user->getId());
+            $this->entityActionDispatcher->dispatch(EntityAction::EraseUser, (int) $user->getId());
             $activities = $user->getActivities();
             foreach ($activities as $activity) {
                 $this->entityManager->remove($activity);
@@ -240,5 +308,10 @@ readonly class CleanupService implements TaskInterface
         $this->entityManager->flush();
 
         return $count;
+    }
+
+    private function daysBefore(DateTimeImmutable $now, int $days): DateTimeImmutable
+    {
+        return $now->modify(sprintf('-%d days', $days));
     }
 }

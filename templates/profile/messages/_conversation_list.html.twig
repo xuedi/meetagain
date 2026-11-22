@@ -7,7 +7,7 @@
             {% include '_components/image.html.twig' with {'image': conversation.user.image, 'size': '50x50'} %}
         </span>
         <span class="is-flex-grow-1">
-            <strong>{{ conversation.user.name }}</strong><br/>
+            <strong>{{ member_name(conversation.user) }}</strong><br/>
             <small>{{ conversation.lastMessage | time_diff }}</small>
         </span>
         {% if conversation.unread > 0 %}

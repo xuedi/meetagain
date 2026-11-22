@@ -18,7 +18,7 @@
             <figure class="image is-32x32 ml-1 mr-2 message-avatar">
                 {% include '_components/image.html.twig' with {'image': partner.user.image, 'size': '50x50'} %}
             </figure>
-            <strong>{{ partner.user.name|shortened(20) }}</strong>
+            <strong>{{ member_name(partner.user)|shortened(20) }}</strong>
         {% endif %}
         {% if conversationsId %}
             <div class="ml-auto">

@@ -80,6 +80,25 @@ final class TopicsSectionTest extends SectionTestCase
         static::assertSame(2, $context->toSummary()->get('topics', Outcome::Dropped));
     }
 
+    public function testANewTopicOfAMatchedMemberIsWithheldAndItsRepliesDropped(): void
+    {
+        // Arrange
+        $context = $this->context();
+        $context->mapUser('member@example.org', $this->user(1, 'member@example.org'), false);
+        $rows = [
+            ['ref' => 5, 'parent_ref' => null, 'title' => 'Openings', 'author_email' => 'member@example.org'],
+            ['ref' => 6, 'parent_ref' => 5, 'title' => 'Joseki', 'author_email' => null],
+        ];
+
+        // Act
+        $this->section()->import($rows, $context);
+
+        // Assert
+        static::assertSame([], $this->persisted);
+        static::assertSame(1, $context->toSummary()->get('topics', Outcome::Withheld));
+        static::assertSame(1, $context->toSummary()->get('topics', Outcome::Dropped));
+    }
+
     public function testTwinTopicsMatchTwoStoredTopicsInsteadOfOne(): void
     {
         // Arrange

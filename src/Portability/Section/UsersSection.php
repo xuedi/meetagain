@@ -67,7 +67,6 @@ readonly class UsersSection implements SectionInterface
                 'name' => $user->getName(),
                 'locale' => $user->getLocale(),
                 'role' => $role,
-                'password' => $user->getPassword(),
                 'bio' => $user->getBio(),
                 'public' => $user->isPublic(),
                 'city_geoname_id' => $this->cities->geonameIdOf($user->getCityId()),
@@ -92,14 +91,13 @@ readonly class UsersSection implements SectionInterface
             }
 
             $user = $this->userRepository->findOneBy(['email' => $email]);
-            if ($user instanceof User) {
-                $context->count($this->getKey(), Outcome::Matched);
-            } else {
+            $created = !$user instanceof User;
+            if ($created) {
                 $user = $this->createUser($email, $row, $context);
-                $context->count($this->getKey(), Outcome::Created);
             }
 
-            $context->mapRef(User::class, $email, $user);
+            $context->count($this->getKey(), $created ? Outcome::Created : Outcome::Matched);
+            $context->mapUser($email, $user, $created);
         }
     }
 
@@ -112,11 +110,8 @@ readonly class UsersSection implements SectionInterface
         $user->setEmail($email);
         $user->setName((string) ($row['name'] ?? ''));
         $user->setLocale((string) ($row['locale'] ?? 'en'));
-        $user->setRole(match ($row['role'] ?? 'user') {
-            'admin', 'organizer' => UserRole::Admin,
-            default => UserRole::User,
-        });
-        $user->setPassword((string) ($row['password'] ?? ''));
+        $user->setRole(UserRole::User);
+        $user->setPassword('');
         $user->setBio(isset($row['bio']) ? (string) $row['bio'] : null);
         $user->setPublic((bool) ($row['public'] ?? true));
         $user->setCityId($this->cities->resolve($row, $context, Cities::USER_KIND));

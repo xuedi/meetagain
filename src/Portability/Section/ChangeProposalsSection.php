@@ -115,6 +115,11 @@ readonly class ChangeProposalsSection implements SectionInterface
                 $this->readDate($row['created_at'] ?? null) ?? new DateTimeImmutable(),
             );
             $existingId = $this->changes->findRestored($change);
+            if ($existingId === null && $context->namesMatchedUser($row['email'] ?? null)) {
+                $context->count($this->getKey(), Outcome::Withheld);
+                continue;
+            }
+
             $id = $existingId ?? $this->changes->restore($change);
             if (isset($row['ref'])) {
                 $context->mapIds(self::REFS, [(int) $row['ref'] => $id]);

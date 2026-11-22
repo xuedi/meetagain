@@ -22,4 +22,11 @@ interface GrantTransferInterface
      * @param list<string> $contexts
      */
     public function purgeGrants(array $contexts): void;
+
+    /**
+     * Deletes the stored configuration of these contexts, so each falls back to the defaults.
+     *
+     * @param list<string> $contexts
+     */
+    public function purgeConfigs(array $contexts): void;
 }

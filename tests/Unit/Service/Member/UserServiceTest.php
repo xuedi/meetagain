@@ -21,12 +21,15 @@ use App\Enum\UserStatus;
 use App\Repository\UserRepository;
 use App\Service\Member\ActionException;
 use App\Service\Member\ActionFailure;
+use App\Service\Member\DeletionBlockerInterface;
 use App\Service\Member\UserService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\MockClock;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Tests\Unit\Stubs\UserStub;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -355,7 +358,7 @@ class UserServiceTest extends TestCase
         }
     }
 
-    public function testSoftDeleteSetsStatusAndDispatches(): void
+    public function testRequestDeletionSetsStatusAndDispatches(): void
     {
         // Arrange
         $actor = $this->makeUser(self::ACTOR_ID, UserRole::Admin);
@@ -375,10 +378,10 @@ class UserServiceTest extends TestCase
         $subject = $this->makeService(dispatcher: $dispatcher, activityService: $activity);
 
         // Act
-        $subject->softDelete($actor, $target);
+        $subject->requestDeletion($actor, $target);
     }
 
-    public function testSoftDeleteNoOpWhenAlreadyDeleted(): void
+    public function testRequestDeletionNoOpWhenAlreadyDeleted(): void
     {
         // Arrange
         $actor = $this->makeUser(self::ACTOR_ID, UserRole::Admin);
@@ -392,7 +395,7 @@ class UserServiceTest extends TestCase
         // Act + Assert
         $this->expectException(ActionException::class);
         try {
-            $subject->softDelete($actor, $target);
+            $subject->requestDeletion($actor, $target);
         } catch (ActionException $e) {
             self::assertSame(ActionFailure::NoOp, $e->failure);
             throw $e;
@@ -440,6 +443,98 @@ class UserServiceTest extends TestCase
         }
     }
 
+    public function testRequestOwnDeletionStampsTheRequestAndDispatches(): void
+    {
+        // Arrange
+        $user = $this->makeUser(self::TARGET_ID, UserRole::User, UserStatus::Active);
+        $user->expects($this->once())->method('setStatus')->with(UserStatus::Deleted);
+        $user
+            ->expects($this->once())
+            ->method('setDeletionRequestedAt')
+            ->with($this->callback(static fn(?DateTimeImmutable $at): bool => $at?->format('Y-m-d H:i') === '2026-11-22 10:00'));
+        $user->expects($this->once())->method('setRegcode')->with(null);
+
+        $dispatcher = $this->createMock(EntityActionDispatcher::class);
+        $dispatcher->expects($this->once())->method('dispatch')->with(EntityAction::DeleteUser, self::TARGET_ID);
+
+        $subject = $this->makeService(dispatcher: $dispatcher);
+
+        // Act
+        $subject->requestOwnDeletion($user);
+    }
+
+    public function testABlockerRefusesTheDeletionWithItsReason(): void
+    {
+        // Arrange
+        $user = $this->makeUser(self::TARGET_ID, UserRole::User, UserStatus::Active);
+        $user->expects($this->never())->method('setStatus');
+        $blocker = $this->createStub(DeletionBlockerInterface::class);
+        $blocker->method('blockReason')->willReturn('some.reason');
+
+        $subject = $this->makeService(deletionBlockers: [$blocker]);
+
+        // Act
+        $failure = null;
+        try {
+            $subject->requestOwnDeletion($user);
+        } catch (ActionException $e) {
+            $failure = $e;
+        }
+
+        // Assert
+        self::assertSame(ActionFailure::DeletionBlocked, $failure?->failure);
+        self::assertSame('some.reason', $failure?->getMessage());
+    }
+
+    public function testRequestOwnDeletionRefusesASystemUser(): void
+    {
+        // Arrange
+        $user = $this->makeUser(self::TARGET_ID, UserRole::System, UserStatus::Active);
+        $subject = $this->makeService();
+
+        // Act + Assert
+        $this->expectExceptionObject(ActionException::systemUser());
+        $subject->requestOwnDeletion($user);
+    }
+
+    public function testRestoreOfAnErasedAccountIsRefused(): void
+    {
+        // Arrange
+        $actor = $this->makeUser(self::ACTOR_ID, UserRole::Admin);
+        $target = $this->makeUser(self::TARGET_ID, UserRole::User, UserStatus::Deleted);
+        $target->method('isErased')->willReturn(true);
+        $target->expects($this->never())->method('setStatus');
+        $subject = $this->makeService();
+
+        // Act
+        $failure = null;
+        try {
+            $subject->restore($actor, $target);
+        } catch (ActionException $e) {
+            $failure = $e->failure;
+        }
+
+        // Assert
+        self::assertSame(ActionFailure::Erased, $failure);
+    }
+
+    public function testDisplayNameHidesADeletedMember(): void
+    {
+        // Arrange
+        $deleted = $this->makeUser(self::TARGET_ID, UserRole::User, UserStatus::Deleted);
+        $deleted->method('getName')->willReturn('Alice');
+        $deleted->method('isDeleted')->willReturn(true);
+        $active = $this->makeUser(self::ACTOR_ID, UserRole::User, UserStatus::Active);
+        $active->method('getName')->willReturn('Bob');
+        $subject = $this->makeService();
+
+        // Act
+        $names = [$subject->displayName($deleted), $subject->displayName($active), $subject->displayName(null)];
+
+        // Assert
+        self::assertSame(['shared.deleted_member', 'Bob', 'shared.deleted_member'], $names);
+    }
+
     private function makeUser(int $id, UserRole $role, UserStatus $status = UserStatus::Active): User&MockObject
     {
         $user = $this->createMock(User::class);
@@ -455,13 +550,20 @@ class UserServiceTest extends TestCase
         ?EntityActionDispatcher $dispatcher = null,
         ?ActivityService $activityService = null,
         ?WelcomeEmail $welcomeEmail = null,
+        array $deletionBlockers = [],
     ): UserService {
+        $translator = $this->createStub(TranslatorInterface::class);
+        $translator->method('trans')->willReturnArgument(0);
+
         return new UserService(
             userRepo: $this->createStub(UserRepository::class),
             em: $em ?? $this->createStub(EntityManagerInterface::class),
             dispatcher: $dispatcher ?? $this->createStub(EntityActionDispatcher::class),
             activityService: $activityService ?? $this->createStub(ActivityService::class),
             welcomeEmail: $welcomeEmail ?? $this->createStub(WelcomeEmail::class),
+            translator: $translator,
+            clock: new MockClock('2026-11-22 10:00:00'),
+            deletionBlockers: $deletionBlockers,
         );
     }
 }

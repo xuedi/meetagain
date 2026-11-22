@@ -127,6 +127,21 @@ final class EventItemsSectionTest extends SectionTestCase
         static::assertSame((int) $context->getSystemUser()->getId(), $this->onlyPersisted(EventItemAssociation::class)->getCreatedBy());
     }
 
+    public function testALinkCreatedByAMatchedMemberIsCreditedToTheImportUser(): void
+    {
+        // Arrange
+        $context = $this->context();
+        $context->mapRef(Event::class, 4, new Event());
+        $context->mapItems('dish', [12 => 91]);
+        $context->mapUser('cook@example.org', $this->withId(new User(), 30), false);
+
+        // Act
+        $this->section()->import([['event_ref' => 4, 'item_type' => 'dish', 'item_ref' => 12, 'created_by_email' => 'cook@example.org']], $context);
+
+        // Assert
+        static::assertSame((int) $context->getSystemUser()->getId(), $this->onlyPersisted(EventItemAssociation::class)->getCreatedBy());
+    }
+
     /**
      * @param list<EventItemAssociation> $links
      * @param list<User> $users

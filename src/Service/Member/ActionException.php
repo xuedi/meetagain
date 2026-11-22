@@ -57,4 +57,14 @@ final class ActionException extends RuntimeException
     {
         return new self(ActionFailure::NoOp);
     }
+
+    public static function deletionBlocked(string $reasonKey): self
+    {
+        return new self(ActionFailure::DeletionBlocked, $reasonKey);
+    }
+
+    public static function erased(): self
+    {
+        return new self(ActionFailure::Erased);
+    }
 }
