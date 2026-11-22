@@ -147,6 +147,13 @@ shipped providers - Mailpit for the dev stack, Sweego for a `sweego*` DSN - read
 sends, so the sender and the reporter cannot disagree. With none available, the send log hides its sync button and
 the task `email-delivery-sync` reports "provider unavailable" instead of failing.
 
+## The send log forgets a body first and the row later
+
+The task `email-retention` (`Retention`) clears the rendered body and the template context of a sent row after
+`Retention::EMAIL_BODY_RETENTION_DAYS`, keeping its recipient, subject, template and status, and deletes sent, late
+and failed rows after `Retention::EMAIL_ROW_RETENTION_DAYS`. It never touches a pending row. A late row keeps its body
+until it is deleted, because "Clear cap & retry" sends the frozen body again.
+
 ## The contract
 
 Everything outside the module talks to `Module\Email\Contract\`.
@@ -180,7 +187,7 @@ under `@Email/`:
 - **Blocklist** - add and remove addresses. Adding one that is already blocked keeps its first reason.
 
 It also contributes a bell entry for mail pending too long, the `email_queue` metrics gauge, and the tasks
-`email-queue`, `scheduled-emails` and `email-delivery-sync`. The outbound permit list in `mago.toml` names every core
+`email-queue`, `scheduled-emails`, `email-delivery-sync` and `email-retention`. The outbound permit list in `mago.toml` names every core
 class the module reaches for, each with its reason.
 
 ## Becoming a consumer: writing a type

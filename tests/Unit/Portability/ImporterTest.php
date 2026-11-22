@@ -400,8 +400,10 @@ final class ImporterTest extends TestCase
         $locations = $this->createStub(ImageLocationService::class);
         $locations
             ->method('discover')
-            ->willReturnCallback(static function () use (&$calls): void {
+            ->willReturnCallback(static function () use (&$calls): bool {
                 $calls[] = 'discover';
+
+                return true;
             });
         $locations
             ->method('countPerImageId')

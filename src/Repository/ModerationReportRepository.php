@@ -97,4 +97,20 @@ class ModerationReportRepository extends ServiceEntityRepository
 
         return $last === null ? null : new DateTimeImmutable((string) $last);
     }
+
+    public function anonymiseResolvedBefore(DateTimeImmutable $cutoff): int
+    {
+        return (int) $this
+            ->createQueryBuilder('mr')
+            ->update()
+            ->set('mr.reporter', 'NULL')
+            ->set('mr.remarks', 'NULL')
+            ->where('mr.status <> :open')
+            ->andWhere('mr.resolvedAt < :cutoff')
+            ->andWhere('mr.reporter IS NOT NULL OR mr.remarks IS NOT NULL')
+            ->setParameter('open', ModerationReportStatus::Open)
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->execute();
+    }
 }

@@ -473,3 +473,13 @@ admin_system_thumbnails:
     param_type: 'Tipo de imagen'
     choice_all: 'Todos los tipos de imagen'
     fact_images: 'Imágenes'
+admin_system_image_metadata:
+    label: 'Quitar los metadatos de las imágenes'
+    description: 'Reescribe cada original guardado que todavía lleva metadatos de la cámara - la posición GPS, el número de serie de la cámara, EXIF, XMP e IPTC - sin ellos, enderezado y con su perfil de color, en pasos cortos en los workers. Un original sin metadatos se queda como está, las miniaturas y las direcciones de las imágenes no cambian, y se puede volver a ejecutar sin problema. Las copias de seguridad conservan sus copias antiguas.'
+    fact_images: 'Imágenes'
+admin_system_orphaned_images:
+    label: 'Imágenes sin usar'
+    description: 'Busca las imágenes que ya no usa ninguna página, evento, perfil ni bloque y que son más antiguas que el periodo de gracia. Sin «Borrar» solo las lista; con él, borra hasta el límite por ejecución junto con sus miniaturas y denuncias, así que vuelve a ejecutarlo para el resto. Si la búsqueda de los usos falla para algún tipo de imagen, no se borra nada.'
+    param_delete: 'Borrar las imágenes sin usar'
+    fact_grace_days: 'Periodo de gracia en días'
+    fact_delete_per_run: 'Borradas por ejecución como máximo'

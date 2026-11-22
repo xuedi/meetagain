@@ -9,6 +9,7 @@ use App\Repository\ImageRepository;
 use App\Service\Media\ImageLocationService;
 use App\Service\Media\ImageService;
 use App\Service\Media\ImageTypes\ImageTypeRegistry;
+use App\Service\Media\MetadataStripper;
 use App\Service\Media\ThumbnailSizeFormat;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Flysystem\Filesystem;
@@ -86,6 +87,7 @@ class ImageServicePixelBoundTest extends TestCase
             $this->createStub(ImageLocationService::class),
             $this->createStub(ImageLocationRepository::class),
             new LockFactory(new InMemoryStore()),
+            new MetadataStripper(),
         );
     }
 

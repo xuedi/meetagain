@@ -196,6 +196,36 @@ class EmailQueueRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function clearSentBodiesBefore(DateTimeImmutable $cutoff): int
+    {
+        return (int) $this
+            ->createQueryBuilder('eq')
+            ->update()
+            ->set('eq.renderedBody', 'NULL')
+            ->set('eq.context', ':empty')
+            ->where('eq.status = :sent')
+            ->andWhere('eq.createdAt < :cutoff')
+            ->andWhere('eq.renderedBody IS NOT NULL')
+            ->setParameter('empty', '[]')
+            ->setParameter('sent', QueueStatus::Sent)
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function deleteFinishedBefore(DateTimeImmutable $cutoff): int
+    {
+        return (int) $this
+            ->createQueryBuilder('eq')
+            ->delete()
+            ->where('eq.status IN (:finished)')
+            ->andWhere('eq.createdAt < :cutoff')
+            ->setParameter('finished', [QueueStatus::Sent, QueueStatus::Late, QueueStatus::Failed])
+            ->setParameter('cutoff', $cutoff)
+            ->getQuery()
+            ->execute();
+    }
+
     /**
      * @param list<QueueStatus>|null $statuses
      */

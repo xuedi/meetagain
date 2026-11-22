@@ -473,3 +473,13 @@ admin_system_thumbnails:
     param_type: 'Bildtyp'
     choice_all: 'Alle Bildtypen'
     fact_images: 'Bilder'
+admin_system_image_metadata:
+    label: 'Bild-Metadaten entfernen'
+    description: 'Schreibt jedes gespeicherte Original, das noch Kamera-Metadaten trägt - die GPS-Position, die Seriennummer der Kamera, EXIF, XMP und IPTC - ohne sie neu, aufrecht gedreht und mit seinem Farbprofil, in kurzen Schritten auf den Workern. Ein Original ohne Metadaten bleibt unverändert, Vorschaubilder und Bildadressen ändern sich nicht, und ein erneuter Lauf schadet nicht. Backups behalten ihre älteren Kopien.'
+    fact_images: 'Bilder'
+admin_system_orphaned_images:
+    label: 'Unbenutzte Bilder'
+    description: 'Findet die Bilder, die keine Seite, keine Veranstaltung, kein Profil und kein Block mehr verwendet und die älter als die Schonfrist sind. Ohne „Löschen“ listet es sie nur auf; mit „Löschen“ entfernt es bis zur Grenze pro Lauf samt Vorschaubildern und Meldungen, für den Rest einfach erneut starten. Schlägt die Suche nach den Verwendungen für einen Bildtyp fehl, wird nichts gelöscht.'
+    param_delete: 'Unbenutzte Bilder löschen'
+    fact_grace_days: 'Schonfrist in Tagen'
+    fact_delete_per_run: 'Höchstens gelöscht pro Lauf'

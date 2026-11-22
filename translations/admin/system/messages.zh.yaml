@@ -473,3 +473,13 @@ admin_system_thumbnails:
     param_type: '图片类型'
     choice_all: '所有图片类型'
     fact_images: '图片'
+admin_system_image_metadata:
+    label: '清除图片元数据'
+    description: '将每张仍带有相机元数据（GPS 位置、相机序列号、EXIF、XMP 和 IPTC）的已存原图重新写入，去除这些数据，按正确方向摆正并保留色彩配置文件，在后台工作进程中分小步执行。没有元数据的原图保持不变，缩略图和图片地址不会改变，可以重复运行。备份中仍保留旧的副本。'
+    fact_images: '图片'
+admin_system_orphaned_images:
+    label: '未使用的图片'
+    description: '查找不再被任何页面、活动、个人资料或区块使用且超过宽限期的图片。不勾选“删除”时只列出它们；勾选后，每次最多删除上限数量的图片及其缩略图和举报，其余的请再次运行。只要有一种图片类型的使用位置查找失败，就不会删除任何图片。'
+    param_delete: '删除未使用的图片'
+    fact_grace_days: '宽限期（天）'
+    fact_delete_per_run: '每次最多删除'

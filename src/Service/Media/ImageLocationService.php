@@ -60,12 +60,14 @@ readonly class ImageLocationService
         $this->imageAltStatusCache->invalidateImage($imageId);
     }
 
-    public function discover(): void
+    public function discover(): bool
     {
+        $complete = true;
         foreach ($this->registry->all() as $definition) {
             try {
                 $definition->sync();
             } catch (Throwable $e) {
+                $complete = false;
                 $this->logger->error('Image location discovery failed for definition {definition}: {message}', [
                     'definition' => $definition::class,
                     'message' => $e->getMessage(),
@@ -73,6 +75,8 @@ readonly class ImageLocationService
             }
         }
         $this->imageAltStatusCache->invalidateAll();
+
+        return $complete;
     }
 
     /**

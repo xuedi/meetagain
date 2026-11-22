@@ -62,6 +62,7 @@ readonly class ImageService
         private ImageLocationService $imageLocationService,
         private ImageLocationRepository $imageLocationRepo,
         private LockFactory $lockFactory,
+        private MetadataStripper $metadataStripper,
     ) {}
 
     public function findImage(int $id): ?Image
@@ -135,18 +136,19 @@ readonly class ImageService
 
         $mimeType = $this->detectMimeType($imageData);
         $extension = $this->detectExtension($imageData, $mimeType);
+        $content = $this->metadataStripper->strip((string) $imageData->getContent());
 
         $image = new Image();
         $image->setHash($hash);
         $image->setMimeType($mimeType);
         $image->setExtension($extension);
         $image->setType($type);
-        $image->setSize($imageData->getSize() ?: 0);
+        $image->setSize(strlen($content));
         $image->setCreatedAt(new DateTimeImmutable());
         $image->setUploader($user);
 
         if ($user->getId() === null) {
-            $this->storeSource($imageData, $image);
+            $this->imageStorage->write($this->sourceKey($image), $content);
             $this->entityManager->persist($image);
 
             return $image;
@@ -163,7 +165,7 @@ readonly class ImageService
                 return $stored;
             }
 
-            $this->storeSource($imageData, $image);
+            $this->imageStorage->write($this->sourceKey($image), $content);
             $this->entityManager->persist($image);
             $this->entityManager->flush();
         } finally {
@@ -396,8 +398,25 @@ readonly class ImageService
         }
     }
 
+    public function stripOriginalMetadata(Image $image): bool
+    {
+        $content = $this->readOriginal($image) ?? throw new RuntimeException(sprintf(
+            "The original of image '%s' is missing from the storage.",
+            $image->getHash(),
+        ));
+        $stripped = $this->metadataStripper->strip($content);
+        if ($stripped === $content) {
+            return false;
+        }
+
+        $this->imageStorage->write($this->sourceKey($image), $stripped);
+        $image->setSize(strlen($stripped));
+
+        return true;
+    }
+
     /**
-     * @return array{content: string, mimeType: string}|null null when the original file is missing
+     * @return array{content: string, mimeType: string}|null null when the original is missing or cannot be rendered
      */
     public function renderPreview(Image $image, int $maxEdge = 1024): ?array
     {
@@ -421,7 +440,7 @@ readonly class ImageService
         } catch (ImagickException $e) {
             $this->logger->error(sprintf("Error rendering preview for image '%s': %s", $image->getHash(), $e->getMessage()));
 
-            return ['content' => (string) file_get_contents($source), 'mimeType' => $image->getMimeType()];
+            return null;
         } finally {
             unlink($source);
         }
@@ -588,19 +607,6 @@ readonly class ImageService
         }
 
         throw new RuntimeException('Could not determine file extension for uploaded file.');
-    }
-
-    private function storeSource(UploadedFile $imageData, Image $image): void
-    {
-        $stream = fopen($imageData->getRealPath(), 'rb');
-        if ($stream === false) {
-            throw new RuntimeException('Could not read the uploaded file.');
-        }
-        try {
-            $this->imageStorage->writeStream($this->sourceKey($image), $stream);
-        } finally {
-            fclose($stream);
-        }
     }
 
     private function sourceKey(Image $image): string

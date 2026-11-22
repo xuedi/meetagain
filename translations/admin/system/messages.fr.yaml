@@ -473,3 +473,13 @@ admin_system_thumbnails:
     param_type: 'Type d''image'
     choice_all: 'Tous les types d''image'
     fact_images: 'Images'
+admin_system_image_metadata:
+    label: 'Retirer les métadonnées des images'
+    description: 'Réécrit chaque original stocké qui porte encore des métadonnées d''appareil photo - la position GPS, le numéro de série de l''appareil, EXIF, XMP et IPTC - sans elles, redressé et avec son profil de couleur, par petites étapes sur les workers. Un original sans métadonnées reste tel quel, les miniatures et les adresses des images ne changent pas, et une nouvelle exécution ne pose aucun problème. Les sauvegardes gardent leurs anciennes copies.'
+    fact_images: 'Images'
+admin_system_orphaned_images:
+    label: 'Images inutilisées'
+    description: 'Trouve les images qu''aucune page, aucun événement, aucun profil ni aucun bloc n''utilise plus et qui sont plus anciennes que le délai de grâce. Sans « Supprimer », il se contente de les lister ; avec, il en supprime jusqu''à la limite par exécution, avec leurs miniatures et leurs signalements - relancez-le pour le reste. Si la recherche des usages échoue pour un type d''image, rien n''est supprimé.'
+    param_delete: 'Supprimer les images inutilisées'
+    fact_grace_days: 'Délai de grâce en jours'
+    fact_delete_per_run: 'Supprimées par exécution au plus'

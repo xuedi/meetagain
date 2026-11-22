@@ -44,6 +44,9 @@ class ImagickDraw
 
 class Imagick
 {
+    public const int ORIENTATION_UNDEFINED = 0;
+    public const int ORIENTATION_TOPLEFT = 1;
+
     public function __construct(?string $files = null) {}
 
     public function newImage(int $columns, int $rows, ImagickPixel|string $background, string $format = ''): bool
