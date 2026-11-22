@@ -7,3 +7,11 @@ services:
     Tests\Unit\Stubs\InMemoryAtomicStore: ~
 
     App\Service\Cache\AtomicStoreInterface: '@Tests\Unit\Stubs\InMemoryAtomicStore'
+
+    Redis:
+        class: Redis
+        factory: ['Symfony\Component\Cache\Adapter\RedisAdapter', 'createConnection']
+        arguments:
+            - '%env(REDIS_URL)%'
+            - { persistent: 1 }
+        configurator: ['Tests\ValkeyKeySpace', 'configure']

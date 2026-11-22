@@ -70,11 +70,15 @@ class Heartbeat
     public function alive(): array
     {
         $processes = [];
+        $this->redis->setOption(Redis::OPT_SCAN, Redis::SCAN_RETRY);
+        $this->redis->setOption(Redis::OPT_SCAN, Redis::SCAN_PREFIX);
+        $connectionPrefix = $this->redis->getOption(Redis::OPT_PREFIX);
+        $prefixLength = is_string($connectionPrefix) ? strlen($connectionPrefix) : 0;
         $iterator = null;
         do {
             $keys = $this->redis->scan($iterator, self::KEY_PREFIX . '*', 100);
             foreach ($keys === false ? [] : $keys as $key) {
-                $raw = $this->redis->get($key);
+                $raw = $this->redis->get(substr($key, $prefixLength));
                 $decoded = is_string($raw) ? json_decode($raw, true) : null;
                 if (is_array($decoded)) {
                     $processes[] = $decoded;

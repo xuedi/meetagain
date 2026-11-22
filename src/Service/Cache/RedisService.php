@@ -22,6 +22,8 @@ final readonly class RedisService
     {
         $iterator = null;
         $this->redis->setOption(Redis::OPT_SCAN, Redis::SCAN_RETRY);
+        $this->redis->setOption(Redis::OPT_SCAN, Redis::SCAN_PREFIX);
+        $prefixLength = strlen($this->connectionPrefix());
 
         $keys = [];
         $scanned = 0;
@@ -32,7 +34,8 @@ final readonly class RedisService
             if ($batch === false) {
                 break;
             }
-            foreach ($batch as $key) {
+            foreach ($batch as $rawKey) {
+                $key = substr($rawKey, $prefixLength);
                 $scanned++;
                 $keyPrefix = $this->extractPrefix($key);
                 if ($prefix !== null && $keyPrefix !== $prefix) {
@@ -68,6 +71,8 @@ final readonly class RedisService
     {
         $iterator = null;
         $this->redis->setOption(Redis::OPT_SCAN, Redis::SCAN_RETRY);
+        $this->redis->setOption(Redis::OPT_SCAN, Redis::SCAN_PREFIX);
+        $prefixLength = strlen($this->connectionPrefix());
 
         $counts = [];
         do {
@@ -75,8 +80,8 @@ final readonly class RedisService
             if ($batch === false) {
                 break;
             }
-            foreach ($batch as $key) {
-                $prefix = $this->extractPrefix($key);
+            foreach ($batch as $rawKey) {
+                $prefix = $this->extractPrefix(substr($rawKey, $prefixLength));
                 $counts[$prefix] = ($counts[$prefix] ?? 0) + 1;
             }
         } while ($iterator > 0);
@@ -184,9 +189,16 @@ final readonly class RedisService
 
     private function approximateSize(string $key): int
     {
-        $size = $this->redis->rawCommand('MEMORY', 'USAGE', $key);
+        $size = $this->redis->rawCommand('MEMORY', 'USAGE', $this->connectionPrefix() . $key);
 
         return is_int($size) ? $size : 0;
+    }
+
+    private function connectionPrefix(): string
+    {
+        $prefix = $this->redis->getOption(Redis::OPT_PREFIX);
+
+        return is_string($prefix) ? $prefix : '';
     }
 
     /**

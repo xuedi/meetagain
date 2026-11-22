@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 use Symfony\Component\Dotenv\Dotenv;
+use Tests\ValkeyKeySpace;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -10,3 +11,5 @@ if (file_exists(dirname(__DIR__) . '/config/bootstrap.php')) {
 if (!file_exists(dirname(__DIR__) . '/config/bootstrap.php') && method_exists(Dotenv::class, 'bootEnv')) {
     new Dotenv()->bootEnv(dirname(__DIR__) . '/.env');
 }
+
+ValkeyKeySpace::clear((string) $_SERVER['REDIS_URL']);
