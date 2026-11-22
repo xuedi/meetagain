@@ -2,6 +2,16 @@
 
 Each release of the MeetAgain core, newest first, written at release time.
 
+## 1.2.1 - 2026-11-21
+
+This is a patch release of MeetAgain. It brings fixes and small improvements and changes no setting or interface, so an update needs no change to the configuration. We recommend updating soon.
+
+### Other changes
+
+- fix: upload size matcher
+
+**Full changelog:** https://github.com/xuedi/meetagain/compare/1.2.0...460a43e
+
 ## 1.2.0 - 2026-11-21
 
 This is a minor release of MeetAgain. It adds features and fixes defects without breaking existing ones. Existing installations keep working after the update; new features may bring new optional settings. We recommend updating.

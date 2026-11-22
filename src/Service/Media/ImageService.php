@@ -46,6 +46,7 @@ readonly class ImageService
     ];
 
     public const int MAX_PIXELS = 50_000_000;
+    public const int MAX_EDGE = 16_000;
     public const int MAX_UPLOAD_FILES = 20;
 
     private const int FREE_AXIS_CEILING = 2400;
@@ -100,16 +101,21 @@ readonly class ImageService
 
     public function exceedsPixelBound(string $path): bool
     {
+        $size = is_file($path) ? getimagesize($path) : false;
+        if ($size !== false) {
+            return $this->exceedsBounds($size[0], $size[1]);
+        }
+
         try {
             $imagick = new Imagick();
             $imagick->pingImage($path);
-            $pixels = $imagick->getImageWidth() * $imagick->getImageHeight();
+            $exceeds = $this->exceedsBounds($imagick->getImageWidth(), $imagick->getImageHeight());
             $imagick->clear();
         } catch (ImagickException) {
             return false;
         }
 
-        return $pixels > self::MAX_PIXELS;
+        return $exceeds;
     }
 
     public function upload(UploadedFile $imageData, User $user, ImageType $type): ?Image
@@ -369,6 +375,11 @@ readonly class ImageService
         return $cnt;
     }
 
+    private function exceedsBounds(int $width, int $height): bool
+    {
+        return ($width * $height) > self::MAX_PIXELS || max($width, $height) > self::MAX_EDGE;
+    }
+
     private function normaliseMimeType(string $mimeType): string
     {
         $lower = strtolower(trim($mimeType));
@@ -422,10 +433,15 @@ readonly class ImageService
             return null;
         }
 
+        $size = getimagesizefromstring($content);
+        if ($size !== false && $this->exceedsBounds($size[0], $size[1])) {
+            return null;
+        }
+
         try {
             $probe = new Imagick();
             $probe->pingImageBlob($content);
-            if (($probe->getImageWidth() * $probe->getImageHeight()) > self::MAX_PIXELS) {
+            if ($this->exceedsBounds($probe->getImageWidth(), $probe->getImageHeight())) {
                 return null;
             }
             $probe->clear();

@@ -44,9 +44,9 @@ readonly class Requests implements ActionQueueInterface
     }
 
     #[Override]
-    public function latest(string $identifier): ?RequestedAction
+    public function latest(string $identifier, array $values = []): ?RequestedAction
     {
-        $request = $this->repository->findRecent($identifier, 1)[0] ?? null;
+        $request = $this->repository->findNewestContaining($identifier, $values);
         if ($request === null) {
             return null;
         }

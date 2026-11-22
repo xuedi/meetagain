@@ -109,13 +109,15 @@ final class ExporterTest extends TestCase
         ]);
 
         // Act
+        $thrown = null;
         try {
             $exporter->export(new Scope());
-            $this->fail('The export should have failed.');
-        } catch (RuntimeException) {
+        } catch (RuntimeException $exception) {
+            $thrown = $exception;
         }
 
         // Assert
+        static::assertInstanceOf(RuntimeException::class, $thrown);
         static::assertSame($before, glob(sys_get_temp_dir() . '/meetagain-export-*.zip') ?: []);
     }
 

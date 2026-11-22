@@ -6,6 +6,8 @@ use App\AssetMapper\AppBundle;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController as AbstractSymfonyController;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
@@ -29,6 +31,14 @@ abstract class AbstractController extends AbstractSymfonyController
         }
 
         return $user;
+    }
+
+    protected function firstErrorOf(FormInterface $form, string $fallback): string
+    {
+        $errors = $form->getErrors(true);
+        $first = count($errors) > 0 ? $errors[0] : null;
+
+        return $first instanceof FormError ? $first->getMessage() : $fallback;
     }
 
     protected function getResponse(): Response

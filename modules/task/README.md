@@ -132,7 +132,9 @@ running.
 
 `TriggerInterface` sends one run of a task to a worker now. `ActionQueueInterface` queues an action from a page of
 its own, the way the Maintenance form does, and reads that action's newest request, so a page can show its progress
-without the Maintenance page; core's Import / Export tab is the reference. `ActionSettingsInterface` reads an
+without the Maintenance page; core's Import / Export tab is the reference. `latest()` also takes values: it then
+answers the newest request whose values contain every given pair, so a page that queues one action per record shows
+only the requests for its own record. `ActionSettingsInterface` reads an
 action's remembered values. `RunLogInterface` and `HealthInterface` expose the run log and the worker health to other
 consumers, such as an API or a status page. `Cadence`, `Result`, `Status`, `FinishedRun`, `RequestedAction`,
 `Health`, `ActionSection` and `ActionParameter` are the value types.

@@ -149,7 +149,7 @@ final class ImageUploadController extends AbstractController
             }
         }
 
-        $this->addFlash('error', 'profile_image.flash_upload_error');
+        $this->addFlash('error', $this->firstErrorOf($form, 'profile_image.flash_upload_error'));
 
         return $this->returnBackToImage($entityName, $id);
     }
@@ -175,7 +175,7 @@ final class ImageUploadController extends AbstractController
         $files = $form->isSubmitted() && $form->isValid() ? $form->get('files')->getData() ?? [] : [];
         $count = $files === [] ? 0 : $this->imageService->uploadForEvent($event, $files, $user);
         if ($count === 0) {
-            $this->addFlash('error', 'profile_image.flash_upload_error');
+            $this->addFlash('error', $this->firstErrorOf($form, 'profile_image.flash_upload_error'));
 
             return $this->redirectToRoute('app_event_details', ['id' => $id]);
         }

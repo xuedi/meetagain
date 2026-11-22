@@ -11,6 +11,7 @@
                 <div class="column is-6-tablet is-5-desktop">
 
                     <h1 class="title is-5">{{ "security.headline_register"|trans }}</h1>
+                    {% set loginPath = path('app_login', redirect|default(null) ? {'redirect': redirect} : {}) %}
 
                     {{ form_start(form) }}
 
@@ -26,7 +27,7 @@
                     {% endfor %}
                     {% if emailTaken %}
                         <p class="mb-4 is-size-7">
-                            <a href="{{ path('app_login') }}">{{ 'security.register_exists_login'|trans }}</a>
+                            <a href="{{ loginPath }}">{{ 'security.register_exists_login'|trans }}</a>
                             &middot;
                             <a href="{{ path('app_reset') }}">{{ 'security.register_exists_reset'|trans }}</a>
                         </p>
@@ -59,7 +60,7 @@
                             'security.register_sidebar_bullet2'|trans,
                             'security.register_sidebar_bullet3'|trans,
                         ],
-                        link_url: path('app_login'),
+                        link_url: loginPath,
                         link_text: 'security.register_sidebar_link'|trans,
                         link_icon: 'sign-in-alt',
                     } only %}

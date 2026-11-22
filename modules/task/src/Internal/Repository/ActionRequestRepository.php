@@ -96,6 +96,28 @@ class ActionRequestRepository extends ServiceEntityRepository
     }
 
     /**
+     * @param array<string, string|int|bool|null> $values
+     */
+    public function findNewestContaining(string $identifier, array $values): ?ActionRequest
+    {
+        $requests = $this
+            ->createQueryBuilder('r')
+            ->where('r.identifier = :identifier')
+            ->setParameter('identifier', $identifier)
+            ->orderBy('r.id', 'DESC')
+            ->getQuery()
+            ->toIterable();
+
+        foreach ($requests as $request) {
+            if (array_intersect_assoc($values, $request->getValues()) === $values) {
+                return $request;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return array<string, ActionRequest> the newest request per action
      */
     public function findLatestPerIdentifier(): array

@@ -293,7 +293,13 @@ final class CmsBlockController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
             assert($user instanceof User);
-            $fileConstraint = new Image(maxSize: '10M', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, maxPixels: ImageService::MAX_PIXELS);
+            $fileConstraint = new Image(
+                maxSize: '10M',
+                mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                maxPixels: ImageService::MAX_PIXELS,
+                maxWidth: ImageService::MAX_EDGE,
+                maxHeight: ImageService::MAX_EDGE,
+            );
 
             $files = $form->get('files')->getData() ?? [];
             $file = reset($files);
@@ -383,7 +389,13 @@ final class CmsBlockController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
             assert($user instanceof User);
-            $fileConstraint = new Image(maxSize: '10M', mimeTypes: ImageService::ACCEPTED_MIME_TYPES, maxPixels: ImageService::MAX_PIXELS);
+            $fileConstraint = new Image(
+                maxSize: '10M',
+                mimeTypes: ImageService::ACCEPTED_MIME_TYPES,
+                maxPixels: ImageService::MAX_PIXELS,
+                maxWidth: ImageService::MAX_EDGE,
+                maxHeight: ImageService::MAX_EDGE,
+            );
             foreach ($form->get('files')->getData() ?? [] as $file) {
                 if (!$file instanceof UploadedFile) {
                     continue;
@@ -394,6 +406,9 @@ final class CmsBlockController extends AbstractController
                         'error' => $violations->get(0)->getMessage(),
                         'file' => $file->getClientOriginalName(),
                     ]);
+                    $this->addFlash('error', $this->translator->trans('admin_cms.flash_invalid_file', [
+                        '%error%' => (string) $violations->get(0)->getMessage(),
+                    ]));
                     continue;
                 }
                 $image = $this->imageService->upload($file, $user, ImageType::CmsGallery);
