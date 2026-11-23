@@ -34,10 +34,10 @@ final class AnonymizeCommandTest extends TestCase
      * @param array<string, mixed> $input
      */
     #[DataProvider('provideRefusals')]
-    public function testARefusedRunChangesNothing(array $input, array $problems, string $message): void
+    public function testARefusedRunChangesNothing(array $input, array $problems, ?string $allowedHost, string $message): void
     {
         // Arrange
-        $tester = new CommandTester($this->command($problems));
+        $tester = new CommandTester($this->command($problems, $allowedHost));
 
         // Act
         $exitCode = $tester->execute($input);
@@ -49,28 +49,38 @@ final class AnonymizeCommandTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{array<string, mixed>, list<string>, string}>
+     * @return iterable<string, array{array<string, mixed>, list<string>, ?string, string}>
      */
     public static function provideRefusals(): iterable
     {
-        yield 'another host' => [
-            ['--host' => 'meetagain.org', '--erase-personal-data' => true],
-            [],
-            'configured for "' . self::HOST . '", not "meetagain.org"',
-        ];
-        yield 'no host' => [['--erase-personal-data' => true], [], 'configured for "' . self::HOST . '", not ""'];
-        yield 'the confirmation missing' => [['--host' => self::HOST], [], 'Pass --erase-personal-data'];
-        yield 'an unclaimed table' => [
-            ['--host' => self::HOST, '--erase-personal-data' => true],
-            ['Table "x" is not claimed by any anonymizer.'],
-            'Table "x" is not claimed',
-        ];
+        $everything = ['--host' => self::HOST, '--erase-personal-data' => true];
+        yield 'the instance not opted in' => [$everything, [], null, 'does not allow anonymization'];
+        yield 'the instance opted in with an empty host' => [$everything, [], ' ', 'does not allow anonymization'];
+        yield 'opted in for another host' => [$everything, [], 'other.example.org', '--host does not match'];
+        yield 'another host' => [['--host' => 'meetagain.org', '--erase-personal-data' => true], [], self::HOST, '--host does not match'];
+        yield 'another host named by both' => [['--host' => 'meetagain.org', '--erase-personal-data' => true], [], 'meetagain.org', '--host does not match'];
+        yield 'no host' => [['--erase-personal-data' => true], [], self::HOST, '--host does not match'];
+        yield 'the confirmation missing' => [['--host' => self::HOST], [], self::HOST, 'Pass --erase-personal-data'];
+        yield 'an unclaimed table' => [$everything, ['Table "x" is not claimed by any anonymizer.'], self::HOST, 'Table "x" is not claimed'];
+    }
+
+    public function testTheRefusalNamesNeitherTheConfiguredNorTheAllowedHost(): void
+    {
+        // Arrange
+        $tester = new CommandTester($this->command([], 'allowed.example.org'));
+
+        // Act
+        $tester->execute(['--host' => 'meetagain.org', '--erase-personal-data' => true]);
+
+        // Assert
+        self::assertStringNotContainsString(self::HOST, $tester->getDisplay());
+        self::assertStringNotContainsString('allowed.example.org', $tester->getDisplay());
     }
 
     public function testEveryAnonymizerRunsInOrderWithOnePasswordHashAndTheAdminsAreListed(): void
     {
         // Arrange
-        $tester = new CommandTester($this->command([]));
+        $tester = new CommandTester($this->command([], self::HOST));
 
         // Act
         $exitCode = $tester->execute(['--host' => self::HOST, '--erase-personal-data' => true]);
@@ -84,7 +94,7 @@ final class AnonymizeCommandTest extends TestCase
     /**
      * @param list<string> $problems
      */
-    private function command(array $problems): AnonymizeCommand
+    private function command(array $problems, ?string $allowedHost): AnonymizeCommand
     {
         $configRepo = $this->createStub(ConfigRepository::class);
         $configRepo
@@ -101,11 +111,19 @@ final class AnonymizeCommandTest extends TestCase
         $hasher = $this->createStub(UserPasswordHasherInterface::class);
         $hasher->method('hashPassword')->willReturn(self::HASH);
 
-        return new AnonymizeCommand($configRepo, $userRepo, $this->createStub(EntityManagerInterface::class), $coverage, $hasher, [
-            $this->anonymizer(90),
-            $this->anonymizer(10),
-            $this->anonymizer(20),
-        ]);
+        return new AnonymizeCommand(
+            $configRepo,
+            $userRepo,
+            $this->createStub(EntityManagerInterface::class),
+            $coverage,
+            $hasher,
+            [
+                $this->anonymizer(90),
+                $this->anonymizer(10),
+                $this->anonymizer(20),
+            ],
+            $allowedHost,
+        );
     }
 
     private function anonymizer(int $order): AnonymizerInterface
