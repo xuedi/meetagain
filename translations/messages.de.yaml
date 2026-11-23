@@ -151,6 +151,8 @@ events:
     link_edit_event: 'Diese Veranstaltung bearbeiten'
     link_correct_event: 'Eine Korrektur für diese Veranstaltung vorschlagen'
     page_title_listing: 'Kommende Events - %site%'
+    page_title_listing_past: 'Vergangene Events - %site%'
+    page_title_listing_all: 'Alle Events - %site%'
     page_title_featured: 'Besondere Treffen'
     button_featured: 'Besondere Events'
     meta_description_featured: 'Handverlesene besondere Veranstaltungen und Highlights aus unserer Community. Entdecke empfohlene Meetups.'
