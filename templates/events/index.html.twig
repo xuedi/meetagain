@@ -97,7 +97,7 @@
                 <div class="columns">
                     <div class="column is-2">
                         <div class="mt-1">
-                            <div class=" is-size-5">{{ item.month }} {{ item.year }}</div>
+                            <div class=" is-size-5">{{ item.start|date_label(app.locale, 'yMMMM') }}</div>
                         </div>
                     </div>
                     <div class="column is-10">
@@ -114,13 +114,13 @@
                     <div class="columns">
                         <div class="column is-2 is-hidden-mobile">
                             <div class="mt-1">
-                                <p class="has-text-centered is-size-6">{{ event.start|date('D')|upper }}</p>
+                                <p class="has-text-centered is-size-6">{{ event.start|date_label(app.locale, 'EEE')|upper }}</p>
                                 <p class="has-text-centered is-size-3 has-text-weight-bold">{{ event.start|date('d') }}</p>
                             </div>
                         </div>
                         <div class="column is-7">
                             <div class="is-flex is-justify-content-space-between is-align-items-center mb-3">
-                                <p class="subtitle is-7 mb-0">{{ event.start|date('d. F Y @ H:i') }}</p>
+                                <p class="subtitle is-7 mb-0">{{ event.start|date_label(app.locale, 'yMMMMdHHmm') }}</p>
                                 {% if editLinks[event.id] is defined %}
                                     {% include 'events/_partials/edit_icon.html.twig' with {link: editLinks[event.id], sizeClass: 'is-size-7'} only %}
                                 {% endif %}

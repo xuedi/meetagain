@@ -276,7 +276,7 @@ class EmailQueueRepository extends ServiceEntityRepository
         $qb
             ->andWhere('LOWER(eq.recipient) = :recipient OR LOWER(eq.recipient) LIKE :namedRecipient')
             ->setParameter('recipient', mb_strtolower($address))
-            ->setParameter('namedRecipient', '%<' . addcslashes(mb_strtolower($address), '%_') . '>');
+            ->setParameter('namedRecipient', '%<' . addcslashes(mb_strtolower($address), '%_\\') . '>');
     }
 
     /**
@@ -294,7 +294,7 @@ class EmailQueueRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('eq.recipient = :recipient OR eq.recipient LIKE :namedRecipient')
                 ->setParameter('recipient', $recipient)
-                ->setParameter('namedRecipient', '%<' . addcslashes($recipient, '%_') . '>');
+                ->setParameter('namedRecipient', '%<' . addcslashes($recipient, '%_\\') . '>');
         }
         if ($statuses !== null && $statuses !== []) {
             $qb->andWhere('eq.status IN (:statuses)')->setParameter('statuses', $statuses);

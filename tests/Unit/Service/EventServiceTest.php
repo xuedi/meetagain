@@ -91,12 +91,10 @@ class EventServiceTest extends TestCase
         static::assertArrayHasKey('2002-01', $result);
         static::assertArrayHasKey('2002-04', $result);
 
-        static::assertSame('2002', $result['2002-01']['year']);
-        static::assertSame('January', $result['2002-01']['month']);
+        static::assertSame('2002-01', $result['2002-01']['start']->format('Y-m'));
         static::assertCount(3, $result['2002-01']['events']);
 
-        static::assertSame('2002', $result['2002-04']['year']);
-        static::assertSame('April', $result['2002-04']['month']);
+        static::assertSame('2002-04', $result['2002-04']['start']->format('Y-m'));
         static::assertCount(2, $result['2002-04']['events']);
     }
 

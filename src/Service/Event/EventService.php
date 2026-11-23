@@ -419,8 +419,7 @@ readonly class EventService
             $key = $event->getStart()->format('Y-m');
             if (!isset($structuredList[$key])) {
                 $structuredList[$key] = [
-                    'year' => $event->getStart()->format('Y'),
-                    'month' => $event->getStart()->format('F'),
+                    'start' => $event->getStart(),
                     'events' => [],
                 ];
             }

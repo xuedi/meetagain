@@ -49,6 +49,9 @@ framework:
                     # Code
                     code: []
                     pre: []
+                force_attributes:
+                    a:
+                        rel: 'noopener noreferrer'
             # Inline emphasis only - tool-generated message/support content (no links, no attributes).
             message.content:
                 allow_safe_elements: false
