@@ -73,10 +73,9 @@ final class ImageUploadController extends AbstractController
             $templateVars['uploadForm'] = $form->createView();
         }
         if ($entity !== 'event') {
-            $templateVars['uploadUrl'] = $this->generateUrl('app_replace_image_upload', [
-                'entity' => $entity,
-                'id' => $id,
-            ]);
+            $uploadUrl = $this->generateUrl('app_replace_image_upload', ['entity' => $entity, 'id' => $id]);
+            $form = $this->createForm(ImageUploadType::class, null, ['action' => $uploadUrl]);
+            $templateVars['replaceForm'] = $form->createView();
         }
 
         return new Response($this->renderView('image/modal_content.html.twig', $templateVars));
