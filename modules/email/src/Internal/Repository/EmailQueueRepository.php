@@ -226,6 +226,11 @@ class EmailQueueRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    public function deleteAll(): int
+    {
+        return (int) $this->createQueryBuilder('eq')->delete()->getQuery()->execute();
+    }
+
     /** @param list<int> $ids */
     public function deleteByIds(array $ids): int
     {

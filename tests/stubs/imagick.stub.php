@@ -46,6 +46,7 @@ class Imagick
 {
     public const int ORIENTATION_UNDEFINED = 0;
     public const int ORIENTATION_TOPLEFT = 1;
+    public const int COMPOSITE_OVER = 40;
 
     public function __construct(?string $files = null) {}
 
@@ -55,6 +56,16 @@ class Imagick
     }
 
     public function setImageFormat(string $format): bool
+    {
+        return true;
+    }
+
+    public function compositeImage(Imagick $image, int $composite, int $x, int $y, int $channel = 0): bool
+    {
+        return true;
+    }
+
+    public function setImageProperty(string $name, string $value): bool
     {
         return true;
     }

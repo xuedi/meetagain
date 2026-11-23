@@ -92,6 +92,22 @@ readonly class Queue implements HealthInterface
         return $messages;
     }
 
+    #[Override]
+    public function discardFailed(): int
+    {
+        if (!$this->failed instanceof ListableReceiverInterface) {
+            return 0;
+        }
+
+        $count = 0;
+        foreach ($this->failed->all() as $envelope) {
+            $this->failed->reject($envelope);
+            $count++;
+        }
+
+        return $count;
+    }
+
     public function retry(string $id): bool
     {
         $envelope = $this->findFailed($id);

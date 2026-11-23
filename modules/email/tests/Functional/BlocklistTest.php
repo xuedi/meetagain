@@ -36,6 +36,23 @@ final class BlocklistTest extends KernelTestCase
         self::assertSame('bounced', $blocklist->reasonFor('someone@module-test.example'));
     }
 
+    public function testForgettingEverythingUnblocksEveryAddress(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $blocklist = self::getContainer()->get(BlocklistInterface::class);
+        $blocklist->add('someone@module-test.example', 'bounced');
+        $blocklist->add('other@module-test.example', 'complained');
+        $blocklist->isBlocked('someone@module-test.example');
+
+        // Act
+        $removed = $blocklist->forgetAll();
+
+        // Assert
+        self::assertSame(2, $removed);
+        self::assertFalse($blocklist->isBlocked('someone@module-test.example'));
+    }
+
     public function testAnUnknownAddressIsNotBlockedAndHasNoReason(): void
     {
         // Arrange

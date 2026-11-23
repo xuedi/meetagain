@@ -30,4 +30,7 @@ interface SendlogInterface
 
     /** Deletes every mail still waiting that was composed for a site on this host. Returns the number deleted. */
     public function forgetPendingForHost(string $host): int;
+
+    /** Deletes every mail, sent or waiting. Returns the number deleted. */
+    public function forgetAll(): int;
 }

@@ -88,4 +88,10 @@ readonly class Requests implements ActionQueueInterface
     {
         return $this->repository->replaceRequester($requestedBy, $replacement);
     }
+
+    #[Override]
+    public function forgetRequesters(): int
+    {
+        return $this->repository->clearRequesters();
+    }
 }

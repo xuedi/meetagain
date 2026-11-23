@@ -153,7 +153,9 @@ The task `email-retention` (`Retention`) clears the rendered body and the templa
 `Retention::EMAIL_BODY_RETENTION_DAYS`, keeping its recipient, subject, template and status, and deletes sent, late
 and failed rows after `Retention::EMAIL_ROW_RETENTION_DAYS`. It never touches a pending row. A late row keeps its body
 until it is deleted, because "Clear cap & retry" sends the frozen body again. `SendlogInterface::forgetRecipient()`
-drops the mail still waiting for one address, `forgetPendingForHost()` the mail still waiting for one site.
+drops the mail still waiting for one address, `forgetPendingForHost()` the mail still waiting for one site, and
+`forgetAll()` every row; `BlocklistInterface::forgetAll()` empties the blocklist. Both serve anonymizing a copied
+instance.
 
 ## The contract
 

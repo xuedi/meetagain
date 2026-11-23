@@ -226,6 +226,59 @@ export and import seams in [Optional Hooks](optional-hooks.md#export-and-import)
 
 ---
 
+## Personal data in your tables
+
+`app:data:anonymize --host=<website_url> --erase-personal-data` rewrites every piece of personal data in an
+instance, for a copy that is used for testing and must hold none. It refuses to run while any table is unclaimed, and
+the test suite fails on the same check, so a plugin with entities must claim every table it maps. Implement
+`App\Anonymization\AnonymizerInterface`; the container finds the class on its own, and it runs whether or not your
+plugin is switched on.
+
+`getClaims()` returns one `Claim` per table, keyed by table and column name:
+
+- `Claim::columns($table, rewritten: [...], cleared: [...], kept: [...])` decides every text-like column (string,
+  text, JSON, binary). A column mapped to an enum needs no decision.
+- `Claim::emptied($table)` deletes every row.
+- `Claim::reference($table)` keeps the whole table, columns added later included; use it only for data that cannot
+  name a person.
+
+`anonymize()` does the rewriting with `App\Anonymization\Scrubber`, in bulk statements: `fill()` replaces free text with
+filler of the same length, `rewrite()` sets columns to SQL expressions, `clear()` sets them to `NULL` and `empty()`
+deletes the rows. Every run must be safe to repeat.
+
+```php
+readonly class Anonymizer implements AnonymizerInterface
+{
+    public function __construct(
+        private Scrubber $scrubber,
+    ) {}
+
+    public function getOrder(): int
+    {
+        return 40;
+    }
+
+    public function getClaims(): array
+    {
+        return [
+            Claim::columns('plg_example_item', kept: ['title', 'description']),
+            Claim::columns('plg_example_note', rewritten: ['text'], cleared: ['ip_address']),
+        ];
+    }
+
+    public function anonymize(Context $context): void
+    {
+        $this->scrubber->fill('plg_example_note', 'text');
+        $this->scrubber->clear('plg_example_note', 'ip_address');
+    }
+}
+```
+
+Accounts, images, comments and the core logs are rewritten by core, so claim only your own tables. The bundled board
+games plugin (`plugins/boardgames/src/Anonymizer.php`) is the reference.
+
+---
+
 ## Periodic and background work
 
 Neither is a `Plugin` method. Both are classes the container finds on its own, and both stop while an admin has the

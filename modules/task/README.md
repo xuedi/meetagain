@@ -135,7 +135,9 @@ its own, the way the Maintenance form does, and reads that action's newest reque
 without the Maintenance page; core's Import / Export tab is the reference. `latest()` also takes values: it then
 answers the newest request whose values contain every given pair, so a page that queues one action per record shows
 only the requests for its own record. `ActionSettingsInterface` reads an
-action's remembered values. `RunLogInterface` and `HealthInterface` expose the run log and the worker health to other
+action's remembered values. For anonymizing a copied instance, `ActionQueueInterface::forgetRequesters()` clears who
+asked for every request and `HealthInterface::discardFailed()` deletes the failed messages.
+`RunLogInterface` and `HealthInterface` expose the run log and the worker health to other
 consumers, such as an API or a status page. `Cadence`, `Result`, `Status`, `FinishedRun`, `RequestedAction`,
 `Health`, `ActionSection` and `ActionParameter` are the value types.
 

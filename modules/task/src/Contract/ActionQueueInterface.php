@@ -15,4 +15,7 @@ interface ActionQueueInterface
     public function latest(string $identifier, array $values = []): ?RequestedAction;
 
     public function forgetRequester(string $requestedBy, string $replacement): int;
+
+    /** Clears the requester of every request. Returns the number of requests touched. */
+    public function forgetRequesters(): int;
 }

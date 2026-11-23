@@ -116,6 +116,22 @@ final class SendlogTest extends KernelTestCase
         self::assertCount(1, $remaining);
     }
 
+    public function testForgettingEverythingDeletesSentAndWaitingMail(): void
+    {
+        // Arrange
+        self::getContainer()->get(EmailService::class)->sendQueue();
+        self::getContainer()
+            ->get(MailerInterface::class)
+            ->send(self::getContainer()->get(TriggeredEmail::class), ['recipients' => [self::ANN]]);
+
+        // Act
+        $deleted = $this->sendlog->forgetAll();
+
+        // Assert
+        self::assertSame(3, $deleted);
+        self::assertSame(0, $this->sendlog->countAll());
+    }
+
     /**
      * @param list<SentEmail> $rows
      * @return list<string>

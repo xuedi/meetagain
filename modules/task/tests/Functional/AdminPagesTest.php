@@ -4,6 +4,7 @@ namespace Module\Task\Tests\Functional;
 
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Module\Task\Contract\HealthInterface;
 use Module\Task\Contract\Status;
 use Module\Task\Internal\Entity\Run;
 use Module\Task\Internal\Message\RunTask;
@@ -225,6 +226,20 @@ final class AdminPagesTest extends WebTestCase
         self::assertResponseRedirects(self::BASE . '/queue');
         self::assertSame(0, $this->queue()->failedCount());
         self::assertSame([], $this->async()->getSent());
+    }
+
+    public function testDiscardingFailedMessagesEmptiesTheFailureTransport(): void
+    {
+        // Arrange
+        $this->sendToFailureTransport(new RunTask('one'));
+        $this->sendToFailureTransport(new RunTask('two'));
+
+        // Act
+        $discarded = self::getContainer()->get(HealthInterface::class)->discardFailed();
+
+        // Assert
+        self::assertSame(2, $discarded);
+        self::assertSame(0, $this->queue()->failedCount());
     }
 
     private function sendToFailureTransport(object $message): void

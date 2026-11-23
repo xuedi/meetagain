@@ -298,6 +298,27 @@ class ImageRepository extends ServiceEntityRepository
         return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
+    public function replaceFile(int $id, string $hash, string $mimeType, string $extension, int $size): void
+    {
+        $this
+            ->createQueryBuilder('i')
+            ->update()
+            ->set('i.hash', ':hash')
+            ->set('i.mimeType', ':mimeType')
+            ->set('i.extension', ':extension')
+            ->set('i.size', ':size')
+            ->set('i.updatedAt', ':now')
+            ->where('i.id = :id')
+            ->setParameter('hash', $hash)
+            ->setParameter('mimeType', $mimeType)
+            ->setParameter('extension', $extension)
+            ->setParameter('size', $size)
+            ->setParameter('now', new DateTimeImmutable())
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->execute();
+    }
+
     /**
      * @return list<Image>
      */

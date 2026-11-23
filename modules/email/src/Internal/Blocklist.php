@@ -72,6 +72,13 @@ final class Blocklist implements BlocklistInterface, ResetInterface
         }
     }
 
+    public function forgetAll(): int
+    {
+        $this->blockedSet = null;
+
+        return $this->repository->deleteAll();
+    }
+
     public function reset(): void
     {
         $this->blockedSet = null;

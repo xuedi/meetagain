@@ -38,4 +38,9 @@ class EmailBlocklistRepository extends ServiceEntityRepository
     {
         return $this->createQueryBuilder('b')->orderBy('b.addedAt', 'DESC')->getQuery()->getResult();
     }
+
+    public function deleteAll(): int
+    {
+        return (int) $this->createQueryBuilder('b')->delete()->getQuery()->execute();
+    }
 }
