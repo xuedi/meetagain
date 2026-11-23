@@ -17,21 +17,9 @@ RUN set -eux; \
         redis \
         opcache
 
-RUN set -eux; \
-    for coder in MSL MVG SVG MSVG TEXT LABEL; do \
-      sed -i "s|</policymap>|  <policy domain=\"coder\" rights=\"none\" pattern=\"${coder}\" />\n</policymap>|" /etc/ImageMagick-6/policy.xml; \
-      grep -q "domain=\"coder\" rights=\"none\" pattern=\"${coder}\"" /etc/ImageMagick-6/policy.xml \
-        || { echo "policy.xml is missing a denial for ${coder}"; exit 1; }; \
-    done; \
-    printf '<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>' > /tmp/policy-probe.svg; \
-    php -r 'try { (new Imagick())->readImage("/tmp/policy-probe.svg"); } catch (Throwable) { exit(0); } fwrite(STDERR, "ImageMagick still reads SVG - policy.xml is not in force\n"); exit(1);'; \
-    rm -f /tmp/policy-probe.svg; \
-    sed -i -E '/name="(map|disk|width|height|area|memory|time)"/d' /etc/ImageMagick-6/policy.xml; \
-    sed -i 's|</policymap>|  <policy domain="resource" name="map" value="256MiB" />\n  <policy domain="resource" name="disk" value="512MiB" />\n  <policy domain="resource" name="width" value="16KP" />\n  <policy domain="resource" name="height" value="16KP" />\n  <policy domain="resource" name="area" value="128MP" />\n  <policy domain="resource" name="memory" value="512MiB" />\n</policymap>|' /etc/ImageMagick-6/policy.xml; \
-    php -r 'exit(Imagick::getResourceLimit(Imagick::RESOURCETYPE_MAP) == 268435456 && Imagick::getResourceLimit(Imagick::RESOURCETYPE_DISK) == 536870912 && Imagick::getResourceLimit(Imagick::RESOURCETYPE_WIDTH) == 16000 && Imagick::getResourceLimit(Imagick::RESOURCETYPE_HEIGHT) == 16000 && Imagick::getResourceLimit(Imagick::RESOURCETYPE_AREA) == 128000000 && Imagick::getResourceLimit(Imagick::RESOURCETYPE_MEMORY) == 536870912 ? 0 : 1);' \
-      || { echo "policy.xml resource limits are not in force"; exit 1; }; \
-    ! grep -q 'name="time"' /etc/ImageMagick-6/policy.xml \
-      || { echo "policy.xml sets a time limit - ImageMagick 6 counts it per process and kills the long-lived server"; exit 1; }
+COPY source/docker/release/imagemagick/policy.xml /etc/ImageMagick-6/policy.xml
+RUN --mount=type=bind,source=source/docker/release/imagemagick/check-policy.php,target=/tmp/check-policy.php \
+    php /tmp/check-policy.php
 
 # With every capability dropped, a binary that carries file capabilities fails to start.
 RUN groupadd -g 1000 meetagain \
