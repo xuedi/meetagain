@@ -151,6 +151,8 @@ events:
     link_edit_event: 'Modifier cet événement'
     link_correct_event: 'Proposer une correction pour cet événement'
     page_title_listing: 'Événements à venir - %site%'
+    page_title_listing_past: 'Événements passés - %site%'
+    page_title_listing_all: 'Tous les événements - %site%'
     page_title_featured: 'Événements à la une'
     button_featured: 'À la une'
     meta_description_featured: 'Événements spéciaux et temps forts de notre communauté, sélectionnés avec soin. Découvre des rencontres qui valent le détour.'

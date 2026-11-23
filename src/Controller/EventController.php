@@ -94,6 +94,7 @@ final class EventController extends AbstractController
             [
                 'structuredList' => $structuredList,
                 'filter' => $form,
+                'time' => $time,
                 'hasFeatured' => $this->getFeaturedEvents($allowedEventIds, $locale) !== [],
                 'editLinks' => $this->editLinks(array_merge(...array_column($structuredList, 'events'))),
                 'newEventLink' => $this->newEventLink(),

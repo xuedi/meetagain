@@ -103,6 +103,26 @@ final class ActionQueueTest extends KernelTestCase
         self::assertNull($none);
     }
 
+    public function testForgettingRequestersClearsEveryRequester(): void
+    {
+        // Arrange
+        self::bootKernel();
+        $this->queue()->queue(Action::QUICK, [], 'admin@example.org');
+        $this->queue()->queue(Action::QUICK, [], 'other@example.org');
+
+        // Act
+        $touched = $this->queue()->forgetRequesters();
+
+        // Assert
+        $this->entityManager()->clear();
+        $requesters = array_map(
+            static fn(ActionRequest $request): ?string => $request->getRequestedBy(),
+            $this->entityManager()->getRepository(ActionRequest::class)->findAll(),
+        );
+        self::assertSame(2, $touched);
+        self::assertSame([null, null], $requesters);
+    }
+
     private function queue(): ActionQueueInterface
     {
         $queue = self::getContainer()->get(ActionQueueInterface::class);

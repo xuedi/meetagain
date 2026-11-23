@@ -151,6 +151,8 @@ events:
     link_edit_event: 'Editar este evento'
     link_correct_event: 'Sugerir una corrección para este evento'
     page_title_listing: 'Próximos eventos - %site%'
+    page_title_listing_past: 'Eventos pasados - %site%'
+    page_title_listing_all: 'Todos los eventos - %site%'
     page_title_featured: 'Eventos destacados'
     button_featured: 'Destacados'
     meta_description_featured: 'Eventos especiales seleccionados a mano y lo más destacado de nuestra comunidad. Descubre encuentros destacados a los que vale la pena asistir.'

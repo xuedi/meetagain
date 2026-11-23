@@ -94,6 +94,12 @@ final readonly class Sendlog implements SendlogInterface
     }
 
     #[Override]
+    public function forgetAll(): int
+    {
+        return $this->repo->deleteAll();
+    }
+
+    #[Override]
     public function forgetPendingForHost(string $host): int
     {
         $ids = [];

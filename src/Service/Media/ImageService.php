@@ -50,6 +50,8 @@ readonly class ImageService
     public const int MAX_UPLOAD_FILES = 20;
 
     private const int FREE_AXIS_CEILING = 2400;
+    private const int PLACEHOLDER_FALLBACK_WIDTH = 800;
+    private const int PLACEHOLDER_FALLBACK_HEIGHT = 600;
 
     public function __construct(
         private ImageRepository $imageRepo,
@@ -220,6 +222,35 @@ readonly class ImageService
         return true;
     }
 
+    /**
+     * @param list<Image> $images
+     */
+    public function replaceWithPlaceholders(array $images): int
+    {
+        $typesByImageId = $this->imageLocationRepo->findTypesPerImageId();
+        foreach ($images as $image) {
+            $id = (int) $image->getId();
+            $content = $this->placeholderPng($id, $image->getType());
+            $hash = sha1($content);
+            $oldHash = (string) $image->getHash();
+            $oldSource = $this->sourceKey($image);
+
+            $this->imageStorage->write($hash . '.png', $content);
+            $this->imageRepo->replaceFile($id, $hash, 'image/png', 'png', strlen($content));
+
+            if ($oldSource !== $hash . '.png') {
+                $this->imageStorage->delete($oldSource);
+            }
+            foreach ($this->usedTypes($image, $typesByImageId) as $type) {
+                foreach ($this->imageTypeRegistry->getThumbnailSizes($type) as [$width, $height]) {
+                    $this->thumbnailStorage->delete(sprintf('%s_%s.webp', $oldHash, $this->thumbnailSizeFormat->format($width, $height)));
+                }
+            }
+        }
+
+        return count($images);
+    }
+
     public function createThumbnails(Image $image, ?ImageType $imageType = null): int
     {
         $imageType ??= $image->getType();
@@ -380,6 +411,42 @@ readonly class ImageService
     private function exceedsBounds(int $width, int $height): bool
     {
         return ($width * $height) > self::MAX_PIXELS || max($width, $height) > self::MAX_EDGE;
+    }
+
+    private function placeholderPng(int $id, ImageType $type): string
+    {
+        [$width, $height] = $this->placeholderSize($type);
+        $hue = ($id * 137) % 360;
+
+        $imagick = new Imagick();
+        $imagick->newImage($width, $height, new ImagickPixel(sprintf('hsl(%d, 40%%, 55%%)', $hue)));
+        $inner = new Imagick();
+        $inner->newImage(max(1, intdiv($width, 2)), max(1, intdiv($height, 2)), new ImagickPixel(sprintf('hsl(%d, 40%%, 72%%)', $hue)));
+        $imagick->compositeImage($inner, Imagick::COMPOSITE_OVER, intdiv($width, 4), intdiv($height, 4));
+        $imagick->setImageFormat('png');
+        $imagick->setImageProperty('comment', sprintf('placeholder %d', $id));
+
+        return $imagick->getImageBlob();
+    }
+
+    /**
+     * @return array{int, int}
+     */
+    private function placeholderSize(ImageType $type): array
+    {
+        $free = ImageTypeDefinitionInterface::FREE_AXIS;
+        $best = [self::PLACEHOLDER_FALLBACK_WIDTH, self::PLACEHOLDER_FALLBACK_HEIGHT];
+        $bestArea = 0;
+        foreach ($this->imageTypeRegistry->getThumbnailSizes($type) as [$width, $height]) {
+            $width = $width === $free ? intdiv($height * 4, 3) : $width;
+            $height = $height === $free ? intdiv($width * 3, 4) : $height;
+            if (($width * $height) > $bestArea) {
+                $best = [$width, $height];
+                $bestArea = $width * $height;
+            }
+        }
+
+        return $best;
     }
 
     private function normaliseMimeType(string $mimeType): string

@@ -3,7 +3,9 @@
 {% block title %}{{ 'profile_notifications.page_title'|trans }}{% endblock %}
 
 {% block body %}
-<div class="container mt-5">
+<section class="section">
+<div class="container">
+    <h1 class="title">{{ 'profile_notifications.page_title'|trans }}</h1>
     {% if notifications.totalCount == 0 %}
         <p class="has-text-grey">{{ 'profile_notifications.empty_state'|trans }}</p>
     {% else %}
@@ -37,4 +39,5 @@
         </table>
     {% endif %}
 </div>
+</section>
 {% endblock %}

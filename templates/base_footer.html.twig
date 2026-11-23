@@ -29,40 +29,44 @@
                     </li>
                 </ul>
             </div>
+            {% set menus = get_menu('col2') | filter(menu => menu.slug != 'index') %}
+            {% set links = get_plugin_footer_links('col2') %}
+            {% if menus is not empty or links is not empty %}
             <div class="column is-6-mobile">
                 <p>{{ get_footer_column_title('col2') ?: ('chrome.footer_col_platform' | trans) }}</p>
                 <ul>
-                    {% for menu in get_menu('col2') %}
-                        {% if menu.slug != 'index' %}
-                            <li>
-                                <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
-                            </li>
-                        {% endif %}
+                    {% for menu in menus %}
+                        <li>
+                            <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
+                        </li>
                     {% endfor %}
-                    {% for link in get_plugin_footer_links('col2') %}
+                    {% for link in links %}
                         <li>
                             <a class="is-size-5-mobile" href="{{ link.slug }}"{% if link.slug starts with 'http' %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.name | trans }}</a>
                         </li>
                     {% endfor %}
                 </ul>
             </div>
+            {% endif %}
+            {% set menus = get_menu('col3') | filter(menu => menu.slug != 'index') %}
+            {% set links = get_plugin_footer_links('col3') %}
+            {% if menus is not empty or links is not empty %}
             <div class="column is-6-mobile">
                 <p>{{ get_footer_column_title('col3') ?: ('chrome.footer_col_social' | trans) }}</p>
                 <ul>
-                    {% for menu in get_menu('col3') %}
-                        {% if menu.slug != 'index' %}
-                            <li>
-                                <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
-                            </li>
-                        {% endif %}
+                    {% for menu in menus %}
+                        <li>
+                            <a class="is-size-5-mobile" href="{{ menu.slug }}">{{ menu.name }}</a>
+                        </li>
                     {% endfor %}
-                    {% for link in get_plugin_footer_links('col3') %}
+                    {% for link in links %}
                         <li>
                             <a class="is-size-5-mobile" href="{{ link.slug }}"{% if link.slug starts with 'http' %} target="_blank" rel="noopener noreferrer"{% endif %}>{{ link.name | trans }}</a>
                         </li>
                     {% endfor %}
                 </ul>
             </div>
+            {% endif %}
             <div class="column is-6-mobile">
                 <p>{{ get_footer_column_title('col4') ?: ('chrome.footer_col_legal' | trans) }}</p>
                 <ul>

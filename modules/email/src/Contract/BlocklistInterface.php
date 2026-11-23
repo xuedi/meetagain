@@ -15,4 +15,7 @@ interface BlocklistInterface
      * Blocks the address. Adding an address that is already blocked keeps the first entry and its reason.
      */
     public function add(string $email, string $reason): void;
+
+    /** Removes every blocked address. Returns the number removed. */
+    public function forgetAll(): int;
 }
