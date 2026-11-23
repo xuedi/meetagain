@@ -2,19 +2,21 @@ mod rules;
 
 use std::collections::HashSet;
 use std::fs;
-use std::io::{self, BufRead, IsTerminal, Read, Write};
+use std::io::{self, IsTerminal, Read, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Command, ExitCode};
 use std::time::{Duration, Instant};
 
-use walkdir::{DirEntry, WalkDir};
+use ignore::WalkBuilder;
 
 use rules::Rules;
 
+const BINARY_PROBE_BYTES: u64 = 8192;
+
+#[derive(Clone)]
 struct Scope {
     exclude_paths: Vec<PathBuf>,
     exclude_dirs: HashSet<String>,
-    extensions: HashSet<String>,
 }
 
 impl Scope {
@@ -26,11 +28,6 @@ impl Scope {
                 .map(PathBuf::from)
                 .collect(),
             exclude_dirs: config.list("EXCLUDE_DIRS").into_iter().collect(),
-            extensions: config
-                .list("EXTENSIONS")
-                .into_iter()
-                .map(|e| e.to_lowercase())
-                .collect(),
         }
     }
 }
@@ -41,11 +38,11 @@ impl Scope {
 ///
 /// Path matching strips a leading `./` so paths produced by walking from `.` line up with the
 /// path strings the user wrote in the config.
-fn is_excluded(entry: &DirEntry, scope: &Scope) -> bool {
-    if entry.file_type().is_dir() {
-        let name_excluded = entry
+fn is_excluded(path: &Path, is_dir: bool, scope: &Scope) -> bool {
+    if is_dir {
+        let name_excluded = path
             .file_name()
-            .to_str()
+            .and_then(|name| name.to_str())
             .map(|name| scope.exclude_dirs.contains(name))
             .unwrap_or(false);
         if name_excluded {
@@ -53,7 +50,7 @@ fn is_excluded(entry: &DirEntry, scope: &Scope) -> bool {
         }
     }
 
-    let normalized = entry.path().strip_prefix("./").unwrap_or(entry.path());
+    let normalized = path.strip_prefix("./").unwrap_or(path);
     scope
         .exclude_paths
         .iter()
@@ -72,11 +69,22 @@ fn path_excluded(path: &Path, scope: &Scope) -> bool {
     })
 }
 
-fn has_allowed_extension(path: &Path, extensions: &HashSet<String>) -> bool {
-    path.extension()
-        .and_then(|s| s.to_str())
-        .map(|s| extensions.contains(&s.to_lowercase()))
-        .unwrap_or(false)
+/// `.git/info/exclude` must stay off: it hides the nested repositories, which are scanned too.
+fn tree_files(root: &Path, scope: &Scope) -> Vec<PathBuf> {
+    let scope = scope.clone();
+    WalkBuilder::new(root)
+        .standard_filters(false)
+        .git_ignore(true)
+        .require_git(false)
+        .filter_entry(move |entry| {
+            let is_dir = entry.file_type().is_some_and(|kind| kind.is_dir());
+            !is_excluded(entry.path(), is_dir, &scope)
+        })
+        .build()
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| entry.file_type().is_some_and(|kind| kind.is_file()))
+        .map(|entry| entry.into_path())
+        .collect()
 }
 
 /// Files staged for commit, with EXCLUDE_PATHS / EXCLUDE_DIRS applied. Used by --staged mode.
@@ -111,26 +119,23 @@ fn staged_files(scope: &Scope) -> Vec<PathBuf> {
 }
 
 fn scan_file(path: &Path, rules: &Rules) -> io::Result<Vec<String>> {
-    let file = fs::File::open(path)?;
-    let reader = io::BufReader::new(file);
+    let mut file = fs::File::open(path)?;
+    let mut bytes = Vec::new();
+    Read::by_ref(&mut file)
+        .take(BINARY_PROBE_BYTES)
+        .read_to_end(&mut bytes)?;
+    if bytes.contains(&0) {
+        return Ok(Vec::new());
+    }
+    file.read_to_end(&mut bytes)?;
+
     let normalized = path.strip_prefix("./").unwrap_or(path);
     let display = normalized.display().to_string();
-    let mut rendered = Vec::new();
-
-    for (index, line_result) in reader.lines().enumerate() {
-        let Ok(line) = line_result else {
-            // Non-UTF8 line; skip the rest of the file rather than panicking.
-            return Ok(rendered);
-        };
-        for finding in rules.scan_line(&display, index + 1, &line) {
-            rendered.push(finding.render(&display));
-        }
-    }
-    Ok(rendered)
+    Ok(rules.scan_text(&display, &String::from_utf8_lossy(&bytes)))
 }
 
-fn scan_one_file(path: &Path, rules: &Rules, extensions: &HashSet<String>) -> Vec<String> {
-    if !path.is_file() || !has_allowed_extension(path, extensions) {
+fn scan_one_file(path: &Path, rules: &Rules) -> Vec<String> {
+    if !path.is_file() {
         return Vec::new();
     }
     match scan_file(path, rules) {
@@ -181,18 +186,10 @@ fn main() -> ExitCode {
     let files: Vec<PathBuf> = if staged_only {
         staged_files(&scope)
             .into_iter()
-            .filter(|p| has_allowed_extension(p, &scope.extensions) && p.is_file())
+            .filter(|p| p.is_file())
             .collect()
     } else {
-        WalkDir::new(".")
-            .follow_links(false)
-            .into_iter()
-            .filter_entry(|e| !is_excluded(e, &scope))
-            .filter_map(|e| e.ok())
-            .filter(|e| e.file_type().is_file())
-            .map(|e| e.path().to_path_buf())
-            .filter(|p| has_allowed_extension(p, &scope.extensions))
-            .collect()
+        tree_files(Path::new("."), &scope)
     };
 
     if files.is_empty() {
@@ -211,7 +208,7 @@ fn main() -> ExitCode {
     let mut bad_files = 0usize;
 
     for (i, path) in files.iter().enumerate() {
-        let matches = scan_one_file(path, &rules, &scope.extensions);
+        let matches = scan_one_file(path, &rules);
         let mark = if matches.is_empty() { '.' } else { 'F' };
         if !matches.is_empty() {
             bad_files += 1;
@@ -325,4 +322,88 @@ fn print_summary(ok: bool, msg: &str) {
 
 fn plural_s(n: usize) -> &'static str {
     if n == 1 { "" } else { "s" }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const LEAKING: &[u8] = b"a Forbidden mention\nkey SECRET_ABCDEF here\n";
+
+    fn tree(name: &str, files: &[(&str, &[u8])]) -> PathBuf {
+        let root = std::env::temp_dir().join(format!("leak-guard-{}-{}", std::process::id(), name));
+        let _ = fs::remove_dir_all(&root);
+        for (path, content) in files {
+            let path = root.join(path);
+            fs::create_dir_all(path.parent().unwrap()).unwrap();
+            fs::write(path, content).unwrap();
+        }
+        root
+    }
+
+    fn findings_in(root: &Path) -> Vec<String> {
+        let scope = Scope {
+            exclude_paths: Vec::new(),
+            exclude_dirs: HashSet::from([".git".to_string()]),
+        };
+        let rules = Rules::for_test(&["forbidden"], &[("secret", "SECRET_[A-Z]{6}")]);
+        let mut files = tree_files(root, &scope);
+        files.sort();
+
+        let findings = files.iter().flat_map(|path| scan_one_file(path, &rules)).collect();
+
+        fs::remove_dir_all(root).unwrap();
+        findings
+    }
+
+    fn assert_both_families(findings: &[String]) {
+        assert_eq!(2, findings.len(), "{:?}", findings);
+        assert!(findings[0].contains("[forbidden]"), "{:?}", findings);
+        assert!(findings[1].contains("[secret]"), "{:?}", findings);
+    }
+
+    #[test]
+    fn a_file_without_an_extension_is_scanned() {
+        assert_both_families(&findings_in(&tree("bare", &[("justfile", LEAKING)])));
+    }
+
+    #[test]
+    fn a_just_file_is_scanned() {
+        assert_both_families(&findings_in(&tree("just", &[(".just/development.just", LEAKING)])));
+    }
+
+    #[test]
+    fn an_invalid_first_line_does_not_end_the_scan() {
+        let content = [b"\xff\xfe not utf-8\n".as_slice(), LEAKING].concat();
+
+        assert_both_families(&findings_in(&tree("utf8", &[("broken.md", &content)])));
+    }
+
+    #[test]
+    fn a_binary_file_is_skipped() {
+        let content = [b"RIFF\x00\x00WEBP\n".as_slice(), LEAKING].concat();
+
+        assert!(findings_in(&tree("binary", &[("image.webp", &content)])).is_empty());
+    }
+
+    #[test]
+    fn a_gitignored_file_is_skipped() {
+        let root = tree("ignored", &[(".gitignore", b"*.local\n"), ("config/api.local", LEAKING)]);
+
+        assert!(findings_in(&root).is_empty());
+    }
+
+    #[test]
+    fn a_repository_hidden_by_info_exclude_is_scanned() {
+        let root = tree(
+            "nested",
+            &[
+                (".git/info/exclude", b"/private/\n"),
+                ("private/.git/HEAD", b"ref: refs/heads/main\n"),
+                ("private/notes.txt", LEAKING),
+            ],
+        );
+
+        assert_both_families(&findings_in(&root));
+    }
 }

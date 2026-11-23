@@ -27,9 +27,11 @@ PATTERNS=dsn-inline-password=\b(?:mysql|mariadb|postgres|postgresql|redis|rediss
 # suppresses exactly one pattern at one path prefix; it never widens to every pattern in a file.
 #
 # `.env.dist` carries the committed development placeholders the installer overwrites, so an
-# APP_SECRET assignment there is the file doing its job. The hosting guide and the CI workflow
-# spell out DSNs whose passwords are documentation and throwaway service credentials.
-ALLOW=.env.dist::app-secret,docs/src/hosting.md::dsn-inline-password,.github/workflows::dsn-inline-password
+# APP_SECRET assignment there is the file doing its job; `.env.test` does the same for the test
+# suite. The hosting guide, the CI workflow and the release Dockerfile's build-time stand-ins
+# spell out DSNs whose passwords are documentation and throwaway service credentials. The
+# Search Console client's tests sign with a key pair generated for them.
+ALLOW=.env.dist::app-secret,.env.test::app-secret,.env.test::dsn-inline-password,docs/src/hosting.md::dsn-inline-password,.github/workflows::dsn-inline-password,docker/release/Dockerfile::dsn-inline-password,bin/tools/gsc/tests/fixtures::private-key-pem
 
 # Paths where the vocabulary rules do not apply but the credential patterns still do. The
 # private directories this covers exist precisely to name what the public tree may not; that is
@@ -37,24 +39,21 @@ ALLOW=.env.dist::app-secret,docs/src/hosting.md::dsn-inline-password,.github/wor
 # kind of statement WORDS exists to prevent.
 WORDS_EXCLUDE_PATHS=
 
-# The tool always scans from the project root (the current working directory). Two exclusion
-# lists govern what is skipped:
+# The tool always scans from the project root (the current working directory) and reads every
+# file it reaches, whatever its name. It skips what each repository's .gitignore ignores, so the
+# gitignored `.local` overlays are never read - scanning them would make the guard report its own
+# rule list - and a file with a NUL byte in its first block, which is binary. Two exclusion lists
+# govern what else is skipped:
 #
 # EXCLUDE_PATHS -- directory OR file paths relative to project root, matched as a path-prefix.
 #                  Mixes generated or compiled output with individual files where a flagged
 #                  string is structurally unavoidable: legacy SQL DDL migrations that drop
 #                  tables named after a plugin, plugin-key registries, the public
-#                  AI-crawler user-agent list used by robots.txt, and output-filter's two
-#                  gitignored JSON files, skipped for the same reason as every `.local` overlay.
-EXCLUDE_PATHS=docs/site,docs/src/plugin-development,docs/src/getting-started.md,public/bundles,public/assets,public/media,assets/vendor,tmp,migrations/Version20260129192214.php,plugins/bookclub/migrations/Version20260312120000.php,config/plugins.php,config/plugins_test.php,bin/commit-hooks,src/Controller/NonLocale/RobotsController.php,tests/config/get-routes-allowlist.php,config/tools/output-filter.local.json,config/tools/output-filter.unknown.json
+#                  AI-crawler user-agent list used by robots.txt.
+EXCLUDE_PATHS=docs/site,docs/src/plugin-development,docs/src/getting-started.md,public/bundles,public/assets,public/media,assets/vendor,tmp,migrations/Version20260129192214.php,plugins/bookclub/migrations/Version20260312120000.php,config/plugins.php,config/plugins_test.php,bin/commit-hooks,src/Controller/NonLocale/RobotsController.php,tests/config/get-routes-allowlist.php
 
 # EXCLUDE_DIRS -- directory names matched anywhere in the tree, by basename.
 #                 Use for nested directories (vendor/, var/, node_modules/) that may appear at
 #                 multiple depths and should always be skipped.
 EXCLUDE_DIRS=vendor,node_modules,var,target,.git,reports,.cache,.idea
 
-# File extensions to scan. Anything outside this whitelist is silently skipped. `rs` is here so
-# the guard covers its own source under bin/tools/ rather than exempting it; `dist` covers the
-# committed configuration templates. The gitignored `.local` overlay is deliberately absent -
-# scanning it would make the guard report its own rule list.
-EXTENSIONS=php,twig,yaml,yml,scss,css,js,md,json,sql,html,xml,sh,bash,toml,rs,dist

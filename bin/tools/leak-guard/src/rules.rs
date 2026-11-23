@@ -131,8 +131,7 @@ impl Rules {
         findings
     }
 
-    /// Every line of a text that is not a file, rendered like a finding in a file called `name`.
-    pub fn scan_text(&self, name: &str, text: &str) -> Vec<String> {
+        pub fn scan_text(&self, name: &str, text: &str) -> Vec<String> {
         text.lines()
             .enumerate()
             .flat_map(|(index, line)| self.scan_line(name, index + 1, line))
@@ -152,6 +151,22 @@ impl Rules {
         self.words_exclude_paths
             .iter()
             .any(|prefix| path.starts_with(prefix))
+    }
+
+    #[cfg(test)]
+    pub fn for_test(words: &[&str], patterns: &[(&str, &str)]) -> Self {
+        Self {
+            words: words.iter().map(|word| word.to_string()).collect(),
+            patterns: patterns
+                .iter()
+                .map(|(name, source)| Pattern {
+                    name: name.to_string(),
+                    regex: Regex::new(source).unwrap(),
+                })
+                .collect(),
+            allowances: Vec::new(),
+            words_exclude_paths: Vec::new(),
+        }
     }
 
     pub fn summary(&self) -> String {
