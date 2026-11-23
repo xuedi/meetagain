@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -37,6 +38,8 @@ class AnonymizeCommand extends Command
         private readonly UserPasswordHasherInterface $hasher,
         #[AutowireIterator(AnonymizerInterface::class)]
         private readonly iterable $anonymizers,
+        #[Autowire(env: 'default::ANONYMIZE_HOST')]
+        private readonly ?string $allowedHost,
     ) {
         parent::__construct();
     }
@@ -53,10 +56,17 @@ class AnonymizeCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
+        $allowed = trim((string) $this->allowedHost);
+        if ($allowed === '') {
+            $io->error('This instance does not allow anonymization. Nothing was changed.');
+
+            return Command::FAILURE;
+        }
+
         $host = trim((string) $input->getOption('host'));
         $configured = $this->configRepo->findOneBy(['name' => 'website_url'])?->getValue() ?? '';
-        if ($host === '' || $host !== $configured) {
-            $io->error(sprintf('This instance is configured for "%s", not "%s". Nothing was changed.', $configured, $host));
+        if ($host === '' || $host !== $configured || $host !== $allowed) {
+            $io->error('--host does not match this instance. Nothing was changed.');
 
             return Command::FAILURE;
         }
