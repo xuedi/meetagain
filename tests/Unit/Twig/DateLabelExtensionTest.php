@@ -13,6 +13,8 @@ use Twig\Loader\ArrayLoader;
 
 class DateLabelExtensionTest extends TestCase
 {
+    private const string TIMEZONE = 'Europe/Berlin';
+
     /** @return array<string, array{string, string}> */
     public static function localeProvider(): array
     {
@@ -31,7 +33,7 @@ class DateLabelExtensionTest extends TestCase
         $subject = new DateLabelExtension();
 
         // Act
-        $label = $subject->monthLabel($this->twig('Europe/Berlin'), new DateTimeImmutable('2026-12-05 18:00:00'), $locale);
+        $label = $subject->monthLabel($this->twig(self::TIMEZONE), new DateTimeImmutable('2026-12-05 18:00:00', new DateTimeZone(self::TIMEZONE)), $locale);
 
         // Assert
         static::assertSame($expected, $label);
@@ -44,7 +46,7 @@ class DateLabelExtensionTest extends TestCase
         $date = new DateTimeImmutable('2026-11-30 23:30:00', new DateTimeZone('UTC'));
 
         // Act
-        $label = $subject->monthLabel($this->twig('Europe/Berlin'), $date, 'en');
+        $label = $subject->monthLabel($this->twig(self::TIMEZONE), $date, 'en');
 
         // Assert
         static::assertSame('DEC', $label);
@@ -69,7 +71,12 @@ class DateLabelExtensionTest extends TestCase
         $subject = new DateLabelExtension();
 
         // Act
-        $label = $subject->dateLabel($this->twig('Europe/Berlin'), new DateTimeImmutable('2026-12-05 18:00:00'), $locale, $skeleton);
+        $label = $subject->dateLabel(
+            $this->twig(self::TIMEZONE),
+            new DateTimeImmutable('2026-12-05 18:00:00', new DateTimeZone(self::TIMEZONE)),
+            $locale,
+            $skeleton,
+        );
 
         // Assert
         static::assertSame($expected, $label);
