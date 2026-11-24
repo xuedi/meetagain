@@ -109,7 +109,7 @@ services:
   # Mail catcher for development (UI at localhost:8025)
   mailpit:
     container_name: "ma-mailpit"
-    image: axllent/mailpit:v1.33.1@sha256:aef2aacc11f075ec0fb6874275ee4a421e688e11a96ebb296134d1735c7761ce
+    image: axllent/mailpit:v1.34.0@sha256:23a2ef85bc50853ab3093645d1d64679afd8887e89da5e48a88940c172591a4e
     user: ${HOST_UID}:${HOST_GID}
     ports:
       - "127.0.0.1:1025:1025"
@@ -188,7 +188,7 @@ services:
 
   # k6 for load and attack runs (attack runs via: just testAttack)
   loadtest:
-    image: grafana/k6:2.3.0@sha256:2dd4756ec6e14e62778916e1eb850108e4b499304c02df56760fa0bdb0fba0b8
+    image: grafana/k6:2.4.0@sha256:d41bb79cd8de5a7ad619b53570e3712633e8bff0937010a5c6c57a4747e7a276
     container_name: "ma-loadtest"
     network_mode: "host"
     user: ${HOST_UID}:${HOST_GID}
@@ -204,7 +204,7 @@ services:
 
   # Page speed analyzer (run via: just testPerformance)
   sitespeed:
-    image: sitespeedio/sitespeed.io:42.10.0@sha256:2d4dcec632328b8ebbebfebb364416af1e0edfef0216989e7301b9c92036aaee
+    image: sitespeedio/sitespeed.io:43.0.0@sha256:ab1bf5fec86b15a2781478345a9e2cb485777cb12f264a2707e0f27cc3cadede
     container_name: "ma-sitespeed"
     network_mode: "host"
     environment:
@@ -218,7 +218,7 @@ services:
   # Metrics collector, opt-in (run via: just dockerMetricsStart)
   victoriametrics:
     container_name: "ma-victoriametrics"
-    image: victoriametrics/victoria-metrics:v1.155.0@sha256:f60dc268b54ecf87f6e09d740c2b732838aa9193090cc741417c9f6386a130df
+    image: victoriametrics/victoria-metrics:v1.156.0@sha256:da8a90ac0912f16589be2b96a6441a2fca4bca415c83783d972d92e3b5b66970
     command:
       - "-storageDataPath=/storage"
       - "-retentionPeriod=30d"
