@@ -10,7 +10,10 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 interface RecipientProviderInterface
 {
     /**
-     * @return User[]|null null hands the request on; the admins are the last resort
+     * Claims requests by id; a request left out or claimed with no users is handed on, the admins are the last resort.
+     *
+     * @param list<SupportRequest> $requests
+     * @return array<int, User[]> request id => recipients
      */
-    public function getRecipients(SupportRequest $request): ?array;
+    public function getRecipients(array $requests): array;
 }

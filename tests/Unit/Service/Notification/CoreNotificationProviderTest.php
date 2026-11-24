@@ -4,6 +4,7 @@ namespace Tests\Unit\Service\Notification;
 
 use App\Entity\User;
 use App\Service\Notification\User\CoreNotificationProvider;
+use App\Service\Notification\User\Level;
 use App\Service\Support\VisibilityResolver;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -12,58 +13,47 @@ use Symfony\Component\Translation\IdentityTranslator;
 
 class CoreNotificationProviderTest extends TestCase
 {
-    private function createProvider(int $newSupportRequests = 0, bool $isAdmin = true): CoreNotificationProvider
+    private function createProvider(int $involved = 0, int $elsewhere = 0, bool $isSteward = true): CoreNotificationProvider
     {
         $visibilityStub = $this->createStub(VisibilityResolver::class);
-        $visibilityStub->method('countNew')->willReturn($newSupportRequests);
+        $visibilityStub->method('countWaiting')->willReturn(['involved' => $involved, 'elsewhere' => $elsewhere]);
 
         $securityStub = $this->createStub(Security::class);
-        $securityStub->method('isGranted')->willReturn($isAdmin);
+        $securityStub->method('isGranted')->willReturn($isSteward);
 
         return new CoreNotificationProvider(visibilityResolver: $visibilityStub, security: $securityStub, translator: new IdentityTranslator());
     }
 
+    /**
+     * @param list<array{string, Level, ?string}> $expected
+     */
     #[DataProvider('getNotificationsProvider')]
-    public function testGetNotifications(bool $isAdmin, int $newSupportRequests, int $expectedCount, array $expectedLabelFragments): void
+    public function testGetNotifications(bool $isSteward, int $involved, int $elsewhere, array $expected): void
     {
         // Arrange
-        $provider = $this->createProvider(newSupportRequests: $newSupportRequests, isAdmin: $isAdmin);
+        $provider = $this->createProvider(involved: $involved, elsewhere: $elsewhere, isSteward: $isSteward);
 
         // Act
         $result = $provider->getNotifications($this->createStub(User::class));
 
         // Assert
-        static::assertCount($expectedCount, $result);
-        foreach ($expectedLabelFragments as $i => $fragment) {
+        static::assertCount(count($expected), $result);
+        foreach ($expected as $i => [$fragment, $level, $key]) {
             static::assertStringContainsString($fragment, $result[$i]->label);
+            static::assertSame($level, $result[$i]->level);
+            static::assertSame($key, $result[$i]->key());
         }
     }
 
     public static function getNotificationsProvider(): iterable
     {
-        yield 'user below steward → empty array' => [
-            'isAdmin' => false,
-            'newSupportRequests' => 1,
-            'expectedCount' => 0,
-            'expectedLabelFragments' => [],
-        ];
-        yield 'admin, nothing pending → empty array' => [
-            'isAdmin' => true,
-            'newSupportRequests' => 0,
-            'expectedCount' => 0,
-            'expectedLabelFragments' => [],
-        ];
-        yield 'admin, 1 new support request → support-requests key' => [
-            'isAdmin' => true,
-            'newSupportRequests' => 1,
-            'expectedCount' => 1,
-            'expectedLabelFragments' => ['chrome.notification_new_support_requests'],
-        ];
-        yield 'admin, 2 new support requests → support-requests key' => [
-            'isAdmin' => true,
-            'newSupportRequests' => 2,
-            'expectedCount' => 1,
-            'expectedLabelFragments' => ['chrome.notification_new_support_requests'],
-        ];
+        $action = ['chrome.notification_new_support_requests', Level::Action, 'app_admin_support_list'];
+        $info = ['chrome.notification_support_requests_elsewhere', Level::Info, 'support_requests_elsewhere'];
+
+        yield 'user below steward gets nothing' => [false, 1, 1, []];
+        yield 'nothing pending gives nothing' => [true, 0, 0, []];
+        yield 'involved requests give one action item' => [true, 2, 0, [$action]];
+        yield 'requests elsewhere give one info item' => [true, 0, 3, [$info]];
+        yield 'both give two items with distinct keys' => [true, 1, 3, [$action, $info]];
     }
 }

@@ -74,6 +74,39 @@ class SupportRequestRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @param array<int>|null $onlyIds null = unrestricted
+     * @return SupportRequest[]
+     */
+    public function findOpen(?SupportAudience $audience, ?array $onlyIds): array
+    {
+        return $this
+            ->scoped($audience, $onlyIds)
+            ->andWhere('sr.status IN (:open)')
+            ->setParameter('open', SupportRequestStatus::open())
+            ->getQuery()
+            ->getResult();
+    }
+
+    /** @return SupportRequest[] */
+    public function findOthersFromSameIp(SupportRequest $request, int $limit): array
+    {
+        if ($request->getIpAddress() === null) {
+            return [];
+        }
+
+        return $this
+            ->createQueryBuilder('sr')
+            ->where('sr.ipAddress = :ip')
+            ->andWhere('sr.id != :id')
+            ->setParameter('ip', $request->getIpAddress())
+            ->setParameter('id', $request->getId())
+            ->orderBy('sr.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
     /** @return SupportRequest[] */
     public function findRecentForRequester(User $requester, int $limit): array
     {

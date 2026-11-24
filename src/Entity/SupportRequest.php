@@ -292,7 +292,12 @@ class SupportRequest
 
     public function canInviteAdmins(): bool
     {
-        return $this->audience === SupportAudience::Organizer && !$this->hasInvitedAdmins();
+        return !$this->isAddressedToAdmins();
+    }
+
+    public function isAddressedToAdmins(): bool
+    {
+        return $this->audience === SupportAudience::Admin || $this->hasInvitedAdmins();
     }
 
     public function getLocale(): ?string

@@ -10,6 +10,14 @@ enum SupportRequestStatus: string
     case Reopened = 'reopened';
     case Resolved = 'resolved';
 
+    /**
+     * @return list<self>
+     */
+    public static function open(): array
+    {
+        return [self::New, self::Read, self::Reopened];
+    }
+
     public function label(): string
     {
         return match ($this) {

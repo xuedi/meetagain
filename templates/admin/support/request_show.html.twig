@@ -109,6 +109,78 @@
                         <p class="has-text-grey is-size-7 mt-2">{{ 'admin_support.email_vouch_hint'|trans }}</p>
                     {% endif %}
                 {% endif %}
+
+                {% if is_granted('ROLE_ADMIN') %}
+                    <h2 class="title is-6 mt-5">{{ 'admin_support.technical_heading'|trans }}</h2>
+                    <table class="table is-fullwidth">
+                        <tbody>
+                            <tr>
+                                <th>{{ 'admin_support.col_ip_address'|trans }}</th>
+                                <td>
+                                    {% if request.ipAddress %}
+                                        <code>{{ request.ipAddress }}</code>
+                                    {% else %}
+                                        <span class="has-text-grey">{{ 'admin_support.value_unknown'|trans }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>{{ 'admin_support.col_locale'|trans }}</th>
+                                <td>
+                                    {% if request.locale %}
+                                        <code>{{ request.locale }}</code>
+                                    {% else %}
+                                        <span class="has-text-grey">{{ 'admin_support.value_unknown'|trans }}</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if request.lastActivityAt %}
+                                <tr>
+                                    <th>{{ 'admin_support.col_last_activity'|trans }}</th>
+                                    <td>{{ request.lastActivityAt|date('Y-m-d H:i:s') }}</td>
+                                </tr>
+                            {% endif %}
+                            {% if request.respondedBy %}
+                                <tr>
+                                    <th>{{ 'admin_support.col_responded_by'|trans }}</th>
+                                    <td>{{ request.respondedBy.name }}</td>
+                                </tr>
+                            {% endif %}
+                            {% if request.resolvedAt %}
+                                <tr>
+                                    <th>{{ 'admin_support.col_resolved_at'|trans }}</th>
+                                    <td>{{ request.resolvedAt|date('Y-m-d H:i:s') }}</td>
+                                </tr>
+                            {% endif %}
+                            {% if request.emailVerifyExpiresAt %}
+                                <tr>
+                                    <th>{{ 'admin_support.col_confirm_expires'|trans }}</th>
+                                    <td>{{ request.emailVerifyExpiresAt|date('Y-m-d H:i:s') }}</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+
+                    {% if sameIpRequests is not empty %}
+                        <h2 class="title is-6 mt-5">{{ 'admin_support.same_ip_heading'|trans }}</h2>
+                        <table class="table is-fullwidth">
+                            <tbody>
+                                {% for other in sameIpRequests %}
+                                    <tr>
+                                        <td>{{ other.createdAt|date('Y-m-d H:i') }}</td>
+                                        <td><span class="tag is-light">{{ other.audience.label()|trans }}</span></td>
+                                        <td><span class="tag {{ other.status.tagVariant() }}">{{ other.status.label()|trans }}</span></td>
+                                        <td class="col-narrow">
+                                            <a href="{{ path('app_admin_support_request_show', {id: other.id}) }}" title="{{ 'admin_support.col_same_ip_open'|trans }}">
+                                                <span class="icon"><i class="fa fa-magnifying-glass"></i></span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endif %}
+                {% endif %}
             </div>
 
             <div class="column">
@@ -124,6 +196,9 @@
                                     <strong>{{ request.requesterLabel ?? 'admin_support.requester_guest'|trans }}</strong>
                                 {% endif %}
                                 &middot; {{ message.createdAt|date('Y-m-d H:i:s') }}
+                                {% if not message.isFromAdmin() and is_granted('ROLE_ADMIN') and message.ipAddress and message.ipAddress != request.ipAddress %}
+                                    &middot; {{ 'admin_support.message_ip'|trans({'%ip%': message.ipAddress}) }}
+                                {% endif %}
                             </p>
                             {% if isThread and message.isFromAdmin() %}
                                 {% if lastViewAt and lastViewAt > message.createdAt %}

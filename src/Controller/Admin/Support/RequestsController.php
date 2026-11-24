@@ -157,6 +157,7 @@ final class RequestsController extends AbstractSupportController implements Admi
             'request' => $request,
             'messages' => $this->threadService->getThread($request),
             'details' => $this->collectDetails($request),
+            'sameIpRequests' => $this->isGranted('ROLE_ADMIN') ? $this->threadService->findOthersFromSameIp($request) : [],
             'isThread' => $isThread,
             'viewCount' => $isThread ? $this->threadService->countViews($request) : 0,
             'lastViewAt' => $isThread ? $this->threadService->findLastViewAt($request) : null,

@@ -3,6 +3,7 @@
 namespace App\Service\Support;
 
 use App\Entity\SupportRequest;
+use App\Entity\User;
 use App\Enum\SupportAudience;
 use App\Filter\Admin\Support\AdminSupportListFilterService;
 use App\Repository\SupportRequestRepository;
@@ -14,6 +15,7 @@ readonly class VisibilityResolver
         private AdminSupportListFilterService $listFilter,
         private SupportRequestRepository $requestRepo,
         private Security $security,
+        private RecipientResolver $recipientResolver,
     ) {}
 
     /**
@@ -26,11 +28,38 @@ readonly class VisibilityResolver
         return $ids === [] ? [] : $this->requestRepo->findForAdminList($this->audienceScope(), $ids);
     }
 
-    public function countNew(): int
+    /**
+     * @return array{involved: int, elsewhere: int}
+     */
+    public function countWaiting(User $reader): array
     {
+        $counts = ['involved' => 0, 'elsewhere' => 0];
         $ids = $this->listFilter->getRequestIdFilter();
+        if ($ids === []) {
+            return $counts;
+        }
 
-        return $ids === [] ? 0 : $this->requestRepo->countNew($this->audienceScope(), $ids);
+        if (!$this->security->isGranted('ROLE_ADMIN')) {
+            $counts['involved'] = $this->requestRepo->countNew(SupportAudience::Organizer, $ids);
+
+            return $counts;
+        }
+
+        $open = $this->requestRepo->findOpen(null, $ids);
+        $recipients = $this->recipientResolver->resolveMany(array_values(array_filter(
+            $open,
+            static fn(SupportRequest $request): bool => !$request->isAddressedToAdmins(),
+        )));
+
+        foreach ($open as $request) {
+            if (!$request->isAddressedToAdmins() && !$this->isAmong($reader, $recipients[(int) $request->getId()] ?? [])) {
+                ++$counts['elsewhere'];
+                continue;
+            }
+            $counts['involved'] += $request->isNew() ? 1 : 0;
+        }
+
+        return $counts;
     }
 
     public function canView(SupportRequest $request): bool
@@ -48,6 +77,20 @@ readonly class VisibilityResolver
     public function canOpenInAdmin(SupportRequest $request): bool
     {
         return $this->security->isGranted('ROLE_STEWARD') && $this->canView($request);
+    }
+
+    /**
+     * @param User[] $users
+     */
+    private function isAmong(User $reader, array $users): bool
+    {
+        foreach ($users as $user) {
+            if ($user->getId() === $reader->getId()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function audienceScope(): ?SupportAudience

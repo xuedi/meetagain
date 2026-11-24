@@ -10,6 +10,7 @@ readonly class NotificationItem
         public ?string $route = null,
         public array $routeParams = [],
         public ?string $key = null,
+        public Level $level = Level::Action,
     ) {}
 
     public function key(): ?string

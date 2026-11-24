@@ -22,14 +22,26 @@ readonly class CoreNotificationProvider implements NotificationProviderInterface
             return $items;
         }
 
-        $newSupportRequests = $this->visibilityResolver->countNew();
-        if ($newSupportRequests > 0) {
+        $waiting = $this->visibilityResolver->countWaiting($user);
+        if ($waiting['involved'] > 0) {
             $items[] = new NotificationItem(
                 label: $this->translator->trans('chrome.notification_new_support_requests', [
-                    '%count%' => $newSupportRequests,
+                    '%count%' => $waiting['involved'],
                 ]),
                 icon: 'fa-life-ring',
                 route: 'app_admin_support_list',
+            );
+        }
+
+        if ($waiting['elsewhere'] > 0) {
+            $items[] = new NotificationItem(
+                label: $this->translator->trans('chrome.notification_support_requests_elsewhere', [
+                    '%count%' => $waiting['elsewhere'],
+                ]),
+                icon: 'fa-life-ring',
+                route: 'app_admin_support_list',
+                key: 'support_requests_elsewhere',
+                level: Level::Info,
             );
         }
 
