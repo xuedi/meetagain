@@ -65,6 +65,11 @@ devModeReset plugins='' exclude='':
     {{JUST}} devFreshDatabaseSteps
     if [ -n "{{plugins}}" ]; then {{PHP}} php bin/console app:plugin:toggle on {{plugins}}; fi
 
+# The reset for core-only modes: every plugin directory the core repository does not track stays out of the build
+[private]
+devModeResetCore:
+    {{JUST}} devModeReset '' "$(for m in plugins/*/manifest.json; do git ls-files --error-unmatch "$m" >/dev/null 2>&1 || basename "$(dirname "$m")"; done | paste -sd, -)"
+
 # Rebuild only the dev database - migrated and seeded, no content - leaving containers, packages and assets alone
 [group('development')]
 devFreshDatabase:
@@ -95,7 +100,7 @@ devModeImport archive='':
         echo "No archive at $archive - run 'just devModeImport' to list them"
         exit 1
     fi
-    {{JUST}} devModeReset '' multisite
+    {{JUST}} devModeResetCore
     {{PHP}} php bin/console app:geo:import all --source=modules/geo/tests/Sample -q
     plugins="$({{PHP}} php bin/console app:import:inspect "$archive" --format=plugins)"
     if [ -n "$plugins" ]; then {{PHP}} php bin/console app:plugin:toggle on $plugins; fi
@@ -108,7 +113,7 @@ devModeImport archive='':
 # Empty instance as a fresh install starts: every plugin off, one admin, a one-time login link
 [group('development')]
 devModeBootstrap email='admin@meetagain.local':
-    {{JUST}} devModeReset '' multisite
+    {{JUST}} devModeResetCore
     {{PHP}} php bin/console app:bootstrap --email={{email}} --site-url=https://meetagain.local
     {{JUST}} workerStart
 

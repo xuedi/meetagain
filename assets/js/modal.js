@@ -8,8 +8,9 @@
  *      as XHR because fragment routes serve the bare partial only to XHR callers and
  *      redirect a direct hit to a real page.
  *   2. Modal close — dismisses via the .modal-close button or .modal-background click.
- *   3. File upload (.fileUploadTrigger) — sends the selected file via FormData POST
- *      and reloads. Uses event delegation to support dynamically injected modal content.
+ *   3. File upload (form[data-submit-on-change]) - submits the form as soon as a file is
+ *      picked, so the browser follows the redirect and shows its flash. Uses event
+ *      delegation to support dynamically injected modal content.
  *
  * Loaded in:  templates/base.html.twig (all pages)
  * Used by:    templates/_components/image_upload.html.twig,
@@ -59,25 +60,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (bg) bg.addEventListener('click', closeModal);
 });
 
-// File upload: delegated — send selected file via ajax and reload (works on dynamically injected modal content)
+// File upload: delegated - submit the form once a file is picked (works on dynamically injected modal content)
 document.addEventListener('change', function (event) {
-    const trigger = event.target.closest('.fileUploadTrigger');
-    if (!trigger) return;
+    const form = event.target.closest('form[data-submit-on-change]');
+    if (!form || !event.target.files || event.target.files.length === 0) return;
 
-    const url = trigger.getAttribute('data-url');
-    const file = trigger.files && trigger.files[0];
-    if (!url || !file) return;
-
-    const formData = new FormData();
-    formData.append('image_upload[newImage]', file);
-
-    const token = trigger.getAttribute('data-csrf-token');
-    if (token) {
-        formData.append('image_upload[_token]', token);
-    }
-
-    maFetch(url, false, formData)
-        .then(() => location.reload())
-        .catch(() => location.reload());
+    form.requestSubmit();
 });
 

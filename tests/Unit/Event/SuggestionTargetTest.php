@@ -3,6 +3,7 @@
 namespace Tests\Unit\Event;
 
 use App\Activity\ActivityService;
+use App\Entity\EventTranslation;
 use App\EntityActionDispatcher;
 use App\Enum\EventType;
 use App\Event\Proposal;
@@ -12,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -122,18 +124,43 @@ class SuggestionTargetTest extends TestCase
         return $draft;
     }
 
-    private function makeTarget(?RequestStack $requestStack = null): SuggestionTarget
+    public function testAProposedDescriptionIsSanitizedBeforeItIsStored(): void
     {
+        // Arrange
+        $persisted = [];
+        $em = $this->createStub(EntityManagerInterface::class);
+        $em->method('persist')->willReturnCallback(static function (object $entity) use (&$persisted): void {
+            $persisted[] = $entity;
+        });
+        $sanitizer = $this->createStub(HtmlSanitizerInterface::class);
+        $sanitizer->method('sanitize')->willReturnCallback(static fn(string $html): string => 'sanitized:' . $html);
+        $draft = self::draft(description: '<a href="x" onclick="steal()">x</a>');
+        $draft->locale = 'en';
+
+        // Act
+        $this->makeTarget(em: $em, sanitizer: $sanitizer)->create($draft, 1);
+
+        // Assert
+        $translations = array_values(array_filter($persisted, static fn(object $entity): bool => $entity instanceof EventTranslation));
+        static::assertSame('sanitized:<a href="x" onclick="steal()">x</a>', $translations[0]->getDescription());
+    }
+
+    private function makeTarget(
+        ?RequestStack $requestStack = null,
+        ?EntityManagerInterface $em = null,
+        ?HtmlSanitizerInterface $sanitizer = null,
+    ): SuggestionTarget {
         $translator = $this->createStub(TranslatorInterface::class);
         $translator->method('trans')->willReturnArgument(0);
 
         return new SuggestionTarget(
-            $this->createStub(EntityManagerInterface::class),
+            $em ?? $this->createStub(EntityManagerInterface::class),
             $this->createStub(EntityActionDispatcher::class),
             $this->createStub(ActivityService::class),
             $this->createStub(Security::class),
             $requestStack ?? new RequestStack(),
             $translator,
+            $sanitizer ?? $this->createStub(HtmlSanitizerInterface::class),
         );
     }
 }

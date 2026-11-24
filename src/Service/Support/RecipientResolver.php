@@ -24,14 +24,49 @@ readonly class RecipientResolver
      */
     public function resolve(SupportRequest $request): array
     {
-        foreach ($this->providers as $provider) {
-            $recipients = $provider->getRecipients($request);
-            if ($recipients !== null && $recipients !== []) {
-                return $recipients;
+        $id = $request->getId();
+        if ($id === null) {
+            return $this->resolveAdmins();
+        }
+
+        return $this->resolveMany([$request])[$id];
+    }
+
+    /**
+     * @param list<SupportRequest> $requests
+     * @return array<int, User[]> request id => recipients
+     */
+    public function resolveMany(array $requests): array
+    {
+        $pending = [];
+        foreach ($requests as $request) {
+            $id = $request->getId();
+            if ($id !== null) {
+                $pending[$id] = $request;
             }
         }
 
-        return $this->resolveAdmins();
+        $recipients = [];
+        foreach ($this->providers as $provider) {
+            if ($pending === []) {
+                break;
+            }
+            foreach ($provider->getRecipients(array_values($pending)) as $id => $claimed) {
+                if ($claimed !== [] && isset($pending[$id])) {
+                    $recipients[$id] = $claimed;
+                    unset($pending[$id]);
+                }
+            }
+        }
+
+        if ($pending !== []) {
+            $admins = $this->resolveAdmins();
+            foreach (array_keys($pending) as $id) {
+                $recipients[$id] = $admins;
+            }
+        }
+
+        return $recipients;
     }
 
     /**

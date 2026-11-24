@@ -22,6 +22,7 @@ use InvalidArgumentException;
 use Module\Proposal\Contract\Suggestion\TargetProviderInterface;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HtmlSanitizer\HtmlSanitizerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -36,6 +37,7 @@ final readonly class SuggestionTarget implements TargetProviderInterface
         private Security $security,
         private RequestStack $requestStack,
         private TranslatorInterface $translator,
+        private HtmlSanitizerInterface $cmsContent,
     ) {}
 
     #[Override]
@@ -191,7 +193,7 @@ final readonly class SuggestionTarget implements TargetProviderInterface
         $translation->setLanguage($proposal->locale);
         $translation->setTitle(trim($proposal->title));
         $translation->setTeaser(trim($proposal->teaser) === '' ? null : trim($proposal->teaser));
-        $translation->setDescription(trim($proposal->description));
+        $translation->setDescription($this->cmsContent->sanitize(trim($proposal->description)));
         $event->addTranslation($translation);
 
         $this->em->persist($event);

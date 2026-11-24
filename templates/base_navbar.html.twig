@@ -7,7 +7,7 @@
             </a>
             {% set notifications = is_granted('ROLE_USER') ? get_notifications() : null %}
             {% if notifications %}
-                <a class="button is-small is-align-self-center is-hidden-desktop ml-auto mr-2 {% if notifications.totalCount > 0 %}is-danger{% else %}is-light{% endif %}"
+                <a class="button is-small is-align-self-center is-hidden-desktop ml-auto mr-2 {{ notifications.mostUrgentLevel ? 'is-' ~ notifications.mostUrgentLevel.color : 'is-light' }}"
                    href="{{ path('app_profile_notifications') }}"
                    aria-label="{{ 'profile_notifications.page_title'|trans }}">
                     <span class="icon is-small"><i class="fas fa-bell" aria-hidden="true"></i></span>

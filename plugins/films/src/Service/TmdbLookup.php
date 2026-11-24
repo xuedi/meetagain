@@ -53,6 +53,10 @@ readonly class TmdbLookup implements FilmMetadataLookupInterface
 
     public function fetchById(string $externalId, string $locale): ?FilmMetadata
     {
+        if (preg_match('/^[0-9]+$/', $externalId) !== 1) {
+            return null;
+        }
+
         try {
             $response = $this->httpClient->request('GET', self::BASE_URL . '/movie/' . $externalId, [
                 'headers' => ['Authorization' => 'Bearer ' . $this->apiKey],

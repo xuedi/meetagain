@@ -22,14 +22,14 @@
     </div>
     {{ form_end(uploadForm) }}
 {% else %}
+    {{ form_start(replaceForm, {attr: {'data-submit-on-change': ''}}) }}
     <div class="file is-link">
         <label class="file-label">
             <input
-                class="file-input fileUploadTrigger"
+                class="file-input"
                 type="file"
-                name="image_upload[newImage]"
-                data-url="{{ uploadUrl }}"
-                data-csrf-token="{{ csrf_token('submit') }}"
+                id="{{ replaceForm.newImage.vars.id }}"
+                name="{{ field_name(replaceForm.newImage) }}"
             />
             <span class="file-cta">
                 <span class="file-icon">
@@ -39,6 +39,7 @@
             </span>
         </label>
     </div>
+    {{ form_end(replaceForm) }}
     <p class="mt-3">
         {{ 'shared.image_modal_upload_hint'|trans }}
     </p>

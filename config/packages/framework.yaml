@@ -31,7 +31,6 @@ when@prod: &prod
         trusted_headers:
             - 'x-forwarded-for'
             - 'x-forwarded-proto'
-            - 'x-forwarded-port'
         error_controller: App\Controller\ErrorController::show
 
 when@loadtest: *prod

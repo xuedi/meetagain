@@ -153,7 +153,7 @@ final class CanonicalController extends AbstractSeoController implements AdminNa
         ];
         if ($branched > 0) {
             $info[] = new AdminTopInfoHtml(sprintf(
-                '<span class="tag is-warning is-medium"><strong>%d</strong>&nbsp;%s</span>',
+                '<strong>%d</strong>&nbsp;%s',
                 $branched,
                 $this->escape($this->translator->trans('admin_seo_canonical.summary_branched')),
             ));

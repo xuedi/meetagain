@@ -31,6 +31,7 @@ chrome:
     notifications_view_all: 'View all'
     notification_unread_messages: '%count% unread message(s)'
     notification_new_support_requests: '%count% new support request(s)'
+    notification_support_requests_elsewhere: '%count% support request(s) waiting on organizers'
     footer_powered_by: 'powered by'
     aria_select_language: 'Select language'
     aria_main_navigation: 'Main navigation'

@@ -890,9 +890,9 @@ dependencies = [
 name = "leak-guard"
 version = "0.1.0"
 dependencies = [
+ "ignore",
  "regex",
  "toolconfig",
- "walkdir",
 ]
 
 [[package]]

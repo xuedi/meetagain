@@ -31,6 +31,7 @@ chrome:
     notifications_view_all: '查看全部'
     notification_unread_messages: '%count% 条未读消息'
     notification_new_support_requests: '%count% 条新支持请求'
+    notification_support_requests_elsewhere: '%count% 条支持请求等待组织者处理'
     footer_powered_by: '技术支持：'
     aria_select_language: '选择语言'
     aria_main_navigation: '主导航'

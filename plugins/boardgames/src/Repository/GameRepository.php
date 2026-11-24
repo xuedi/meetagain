@@ -96,7 +96,7 @@ class GameRepository extends ServiceEntityRepository
         $qb = $this
             ->createQueryBuilder('g')
             ->andWhere('g.name LIKE :term')
-            ->setParameter('term', '%' . $term . '%')
+            ->setParameter('term', '%' . addcslashes($term, '%_\\') . '%')
             ->orderBy('g.name', 'ASC')
             ->setMaxResults($limit);
 

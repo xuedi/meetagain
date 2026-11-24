@@ -626,6 +626,17 @@ admin_support:
     admins_invited_by: '%name% hat die Administratoren am %date% dazugeholt'
     invited_by_unknown: 'Ein Steward'
     tag_admins_invited: 'Admins dabei'
+    technical_heading: 'Technisch'
+    col_ip_address: 'IP-Adresse'
+    col_locale: 'Sprache'
+    col_last_activity: 'Letzte Aktivität'
+    col_responded_by: 'Beantwortet von'
+    col_resolved_at: 'Erledigt'
+    col_confirm_expires: 'Bestätigungslink läuft ab'
+    value_unknown: 'unbekannt'
+    same_ip_heading: 'Weitere Anfragen von dieser IP-Adresse'
+    col_same_ip_open: 'Anfrage öffnen'
+    message_ip: 'von %ip%'
     tab_moderation: 'Mitgliedermeldungen'
 
 admin_system:

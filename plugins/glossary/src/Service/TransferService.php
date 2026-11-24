@@ -23,6 +23,7 @@ readonly class TransferService
     public const int PREVIEW_ROWS = 10;
     private const int STASH_TTL_SECONDS = 86_400;
     private const string STASH_DIRECTORY = 'import/glossary';
+    private const string FORMULA_START = '/^\'?[=+\-@]/';
 
     private const array SEPARATORS = [
         'tab' => "\t",
@@ -242,6 +243,9 @@ readonly class TransferService
 
     private function tsvField(string $value): string
     {
+        if (preg_match(self::FORMULA_START, $value) === 1) {
+            $value = "'" . $value;
+        }
         $needsQuotes = strpbrk($value, "\t\n\r\"") !== false;
 
         return $needsQuotes ? '"' . str_replace('"', '""', $value) . '"' : $value;
@@ -338,7 +342,9 @@ readonly class TransferService
             $value = html_entity_decode(strip_tags((string) preg_replace('~<br\s*/?>~i', "\n", $value)), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         }
 
-        return trim($value);
+        $value = trim($value);
+
+        return str_starts_with($value, "'") && preg_match(self::FORMULA_START, substr($value, 1)) === 1 ? substr($value, 1) : $value;
     }
 
     /** @return list<string> */

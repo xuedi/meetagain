@@ -5,8 +5,10 @@ namespace Plugin\Glossary\Tests\Unit\Service;
 use App\Activity\ActivityService;
 use App\Item\Tag\TagService;
 use App\Repository\ItemTagAssignmentRepository;
+use Generator;
 use League\Flysystem\Filesystem;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plugin\Glossary\Entity\Glossary;
 use Plugin\Glossary\Enum\DuplicatePolicy;
@@ -126,6 +128,36 @@ class TransferServiceTest extends TestCase
         // Assert
         self::assertStringStartsWith("#separator:tab\n#html:false\n", $content);
         self::assertStringContainsString("你好\thello\tnǐ hǎo\tGreeting_words\n", $content);
+    }
+
+    #[DataProvider('formulaPhrases')]
+    public function testAFormulaPhraseIsNeutralisedOnExportAndRestoredOnImport(string $phrase, string $exported): void
+    {
+        // Arrange
+        $entry = new Glossary()->setPhrase($phrase);
+        new ReflectionProperty(Glossary::class, 'id')->setValue($entry, 1);
+        $glossaryService = $this->createStub(GlossaryService::class);
+        $glossaryService->method('definitionFor')->willReturn('meaning');
+        $service = $this->service($glossaryService);
+
+        // Act
+        $content = $service->export([$entry], 'en');
+        $reimported = $service->map($service->parse($content), $this->mapping());
+
+        // Assert
+        self::assertStringContainsString("\n" . $exported . "\tmeaning\t", $content);
+        self::assertSame($phrase, $reimported[0]['phrase']);
+    }
+
+    public static function formulaPhrases(): Generator
+    {
+        yield 'equals' => ['=1+1', "'=1+1"];
+        yield 'plus' => ['+49 phone', "'+49 phone"];
+        yield 'minus suffix' => ['-ish', "'-ish"];
+        yield 'at sign' => ['@cmd', "'@cmd"];
+        yield 'already quoted formula' => ["'=x", "''=x"];
+        yield 'plain apostrophe' => ["'twas", "'twas"];
+        yield 'plain word' => ['hello', 'hello'];
     }
 
     private function service(

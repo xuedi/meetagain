@@ -23,7 +23,7 @@ class RecipientResolverTest extends TestCase
         ], admins: [$this->createStub(User::class)]);
 
         // Act
-        $recipients = $resolver->resolve($this->createStub(SupportRequest::class));
+        $recipients = $resolver->resolve($this->request(1));
 
         // Assert
         static::assertSame([$claimed], $recipients);
@@ -36,7 +36,7 @@ class RecipientResolverTest extends TestCase
         $resolver = $this->makeResolver([$this->provider([])], admins: [$admin]);
 
         // Act
-        $recipients = $resolver->resolve($this->createStub(SupportRequest::class));
+        $recipients = $resolver->resolve($this->request(1));
 
         // Assert
         static::assertSame([$admin], $recipients, 'A provider returning nothing must not swallow the request');
@@ -47,6 +47,35 @@ class RecipientResolverTest extends TestCase
         // Arrange
         $admin = $this->createStub(User::class);
         $resolver = $this->makeResolver([], admins: [$admin]);
+
+        // Act
+        $recipients = $resolver->resolve($this->request(1));
+
+        // Assert
+        static::assertSame([$admin], $recipients);
+    }
+
+    public function testABatchHandsUnclaimedRequestsToTheAdminsWithOneLookup(): void
+    {
+        // Arrange
+        $steward = $this->createStub(User::class);
+        $admin = $this->createStub(User::class);
+        $userRepository = $this->createMock(UserRepository::class);
+        $userRepository->expects($this->once())->method('findAdminUsers')->willReturn([$admin]);
+        $resolver = new RecipientResolver(new ArrayIterator([$this->provider(null, claims: [2 => [$steward]])]), $userRepository);
+
+        // Act
+        $recipients = $resolver->resolveMany([$this->request(1), $this->request(2), $this->request(3)]);
+
+        // Assert
+        static::assertSame([2 => [$steward], 1 => [$admin], 3 => [$admin]], $recipients);
+    }
+
+    public function testAnUnsavedRequestGoesToTheAdmins(): void
+    {
+        // Arrange
+        $admin = $this->createStub(User::class);
+        $resolver = $this->makeResolver([$this->provider([$this->createStub(User::class)])], admins: [$admin]);
 
         // Act
         $recipients = $resolver->resolve($this->createStub(SupportRequest::class));
@@ -67,12 +96,20 @@ class RecipientResolverTest extends TestCase
         return new RecipientResolver(new ArrayIterator($providers), $userRepository);
     }
 
-    /** @param array<User>|null $recipients */
-    private function provider(?array $recipients): RecipientProviderInterface
+    /** @param array<int, array<User>> $claims */
+    private function provider(?array $recipients, array $claims = []): RecipientProviderInterface
     {
         $provider = $this->createStub(RecipientProviderInterface::class);
-        $provider->method('getRecipients')->willReturn($recipients);
+        $provider->method('getRecipients')->willReturn($recipients === null ? $claims : [1 => $recipients] + $claims);
 
         return $provider;
+    }
+
+    private function request(int $id): SupportRequest
+    {
+        $request = $this->createStub(SupportRequest::class);
+        $request->method('getId')->willReturn($id);
+
+        return $request;
     }
 }

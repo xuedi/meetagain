@@ -30,6 +30,7 @@ readonly class ThreadService
     public const int EMAIL_VERIFY_TTL_HOURS = 24;
     public const string SESSION_VIEWS_KEY = 'support_thread_views';
     public const int MAX_SESSION_VIEWS = 50;
+    public const int SAME_IP_LIMIT = 20;
 
     public function __construct(
         private EntityManagerInterface $em,
@@ -46,6 +47,12 @@ readonly class ThreadService
     public function findRequest(int $id): ?SupportRequest
     {
         return $this->requestRepo->find($id);
+    }
+
+    /** @return SupportRequest[] */
+    public function findOthersFromSameIp(SupportRequest $request): array
+    {
+        return $this->requestRepo->findOthersFromSameIp($request, self::SAME_IP_LIMIT);
     }
 
     /** @return SupportRequest[] */

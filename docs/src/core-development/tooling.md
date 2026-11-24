@@ -37,7 +37,8 @@ caught. A full scan takes single-digit milliseconds; `code-drift` takes a fracti
 
 ### `leak-guard` (slot 01)
 
-Refuses to let two kinds of string leave the repository.
+Refuses to let two kinds of string leave the repository. It reads every text file in the tree,
+whatever its name, and skips binary files and whatever `.gitignore` ignores.
 
 **Credentials.** Regexes for shapes this project issues or consumes: its own access tokens,
 payment-provider keys, PEM private-key headers, AWS access key ids, SendGrid and Mailgun keys,
