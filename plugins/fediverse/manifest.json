@@ -1,0 +1,7 @@
+{
+  "name": "Fediverse",
+  "version": "0.1",
+  "description": "Publishes public events over ActivityPub to Mobilizon, Gancio and Mastodon, with every participation leading back to the event page.",
+  "icon": "share-nodes",
+  "group_activatable": true
+}

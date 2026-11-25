@@ -20,7 +20,7 @@ class ConfigDescriptorTest extends TestCase
         static::assertTrue($descriptor->isScopable());
         static::assertSame('photos_config.page_title', $descriptor->getTitleKey());
         static::assertSame(ConfigType::class, $descriptor->getFormType());
-        static::assertSame([], $descriptor->getFormOptions(new Config()));
+        static::assertSame([], $descriptor->getFormOptions(new Config(), null));
         static::assertSame(0, $descriptor->getPriority());
     }
 

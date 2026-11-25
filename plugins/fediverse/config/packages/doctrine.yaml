@@ -1,0 +1,14 @@
+doctrine:
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    Fediverse:
+                        dir: "%kernel.project_dir%/plugins/fediverse/src/Entity"
+                        is_bundle: false
+                        prefix: Plugin\Fediverse\Entity
+                        alias: Fediverse
+
+doctrine_migrations:
+    migrations_paths:
+        PluginFediverseMigrations: "%kernel.project_dir%/plugins/fediverse/migrations"

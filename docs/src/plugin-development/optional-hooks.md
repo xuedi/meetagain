@@ -1600,8 +1600,9 @@ final class MyPluginSettingsDescriptor implements DescriptorInterface
     public function getPluginKey(): string { return 'my_plugin'; }
     public function isScopable(): bool { return true; }
     public function getTitleKey(): string { return 'my_plugin_settings.page_title'; }
+    public function getIntroKey(): ?string { return 'my_plugin_settings.intro'; }
     public function getFormType(): string { return MyPluginSettingsType::class; }
-    public function getFormOptions(object $data): array { return []; }
+    public function getFormOptions(object $data, ?string $scopeId): array { return []; }
     public function createDefault(): object { return new MyPluginSettings(); }
     public function applyForm(object $data, FormInterface $form): void { /* map unmapped fields */ }
     public function getPriority(): int { return 0; }
@@ -1622,13 +1623,34 @@ instance - and a host plugin will pin the section to the global scope instead of
 operator touches the page.
 
 `getFormOptions()` derives extra `createForm()` options from the bound data (e.g.
-`'api_key_set' => $data->getEncryptedKey() !== null`).
+`'api_key_set' => $data->getEncryptedKey() !== null`) and from the scope the form renders for: `$scopeId` is null on
+the global page and the scope's id on a per-scope page, so a form can, for instance, offer a scope nothing above what
+the global record allows.
 
 `applyForm()` maps non-mapped form fields onto the data object before persistence (a common pattern when a password
 field never round-trips the stored value into the form). The descriptor never touches the database - persistence is the
 store's job.
 
 `getPriority()` controls display order on the page (higher first).
+
+`getIntroKey()` names a translation rendered as an info column beside the form, on the global page and on a host
+plugin's per-scope page alike. Use it for what the operator must know before saving - what leaves the installation,
+what cannot be changed later - and return null for none. The translation may hold simple HTML (`<p>`, `<b>`); it is
+written by you, never by a user.
+
+A descriptor that also implements `TopActionsInterface` adds buttons to the topbar of the global settings page, ahead
+of Back - an action that is not a field, such as one that undoes what the plugin sent elsewhere before it is switched
+off. Return `AdminTopActionForm` instances for anything that changes state, so the action is a POST with a CSRF token,
+and keep the descriptor's own dependencies light: descriptors are built while settings resolve. See
+`plugins/fediverse/src/Publisher/PluginSettings/ConfigDescriptor.php`.
+
+A descriptor that also implements `FormAsideInterface` renders a template of its own in the info column, below the
+intro, on the global page and on a host plugin's per-scope page. The template receives the form view as `form` and the
+form element's id as `formId`; a button it renders with `form="{{ formId }}"` submits the whole form, so a decision
+that deserves its own spot - with a warning beside it - still saves through the page's normal path and its access
+checks. Add the buttons as `SubmitType` fields, mark them rendered in the template, and read `isClicked()` in
+`applyForm()`. See
+`plugins/fediverse/templates/admin/federation_switch.html.twig`.
 
 The descriptor does not persist anything itself: `GenericStore` saves your data object to a shared JSON table
 automatically. Provide your own `StoreInterface`
@@ -1656,6 +1678,13 @@ The global scope is all a standalone plugin needs. A **host plugin** can layer a
 record if the active scope has one, else the global record, else your neutral default - all transparent to your plugin,
 because it reads the same resolver either way. The override-scope machinery lives entirely in the host plugin; core
 registers no scope provider, so an install without such a host always resolves to the global record.
+
+Work that runs outside a request - a scheduled task, a queued message - has no active scope. When it must act on
+behalf of a known scope id, wrap it in `Resolver::runInScope($scopeId, $work)`: every scope provider's `runIn()` sets
+its own context for the duration, so the resolver, the active plugin list and anything else that reads the request's
+scope see that scope. A provider that does not know the id runs the work unchanged; compare
+`Resolver::resolveScopeId()` inside the callback with the id you passed when you need to know the scope still exists.
+See `plugins/fediverse/src/Service/AccountService.php` (`isFederating()`).
 
 ## Item tags
 

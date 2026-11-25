@@ -64,6 +64,21 @@ class Resolver implements ResetInterface
         return null;
     }
 
+    /**
+     * @template T
+     * @param  callable():T $work
+     * @return T
+     */
+    public function runInScope(string $scopeId, callable $work): mixed
+    {
+        foreach ($this->scopeProviders as $provider) {
+            $inner = $work;
+            $work = static fn(): mixed => $provider->runIn($scopeId, $inner);
+        }
+
+        return $work();
+    }
+
     public function resolveStore(string $key, ?string $scopeId): ?StoreInterface
     {
         $best = null;

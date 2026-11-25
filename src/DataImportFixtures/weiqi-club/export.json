@@ -4,6 +4,7 @@
     "exported_at": "2026-01-05T00:00:00+01:00",
     "plugins": [
         "boardgames",
+        "fediverse",
         "films",
         "photos",
         "wishlist"
@@ -40,6 +41,16 @@
                 "adapter": null,
                 "circulation": false,
                 "trustSystem": false
+            },
+            "fediverse": {
+                "content": "summary",
+                "location": "city",
+                "image": true,
+                "username": "weiqi_club",
+                "accountSummary": "We play go every week in Berlin - beginners welcome.",
+                "announce": true,
+                "active": true,
+                "blockedServers": []
             },
             "films": {
                 "adapter": null

@@ -1,0 +1,21 @@
+{% set isActive = form.vars.value.active %}
+{% do form[constant('Plugin\\Fediverse\\Form\\ConfigType::SWITCH_ON')].setRendered %}
+{% do form[constant('Plugin\\Fediverse\\Form\\ConfigType::SWITCH_OFF')].setRendered %}
+<div class="box has-background-warning-light" data-fediverse-switch>
+    <div class="is-flex is-align-items-center is-justify-content-space-between">
+        <h2 class="title is-6 mb-0">
+            <span class="icon has-text-warning-dark"><i class="fa fa-triangle-exclamation"></i></span>
+            {{ 'fediverse_config.federation_heading'|trans }}
+        </h2>
+        <div class="buttons has-addons is-flex-wrap-nowrap mb-0">
+            {% if isActive %}
+                <span class="button is-small is-success">{{ 'fediverse_config.federation_yes'|trans }}</span>
+                <button type="submit" form="{{ formId }}" class="button is-small" name="{{ form[constant('Plugin\\Fediverse\\Form\\ConfigType::SWITCH_OFF')].vars.full_name }}">{{ 'fediverse_config.federation_no'|trans }}</button>
+            {% else %}
+                <button type="submit" form="{{ formId }}" class="button is-small" name="{{ form[constant('Plugin\\Fediverse\\Form\\ConfigType::SWITCH_ON')].vars.full_name }}">{{ 'fediverse_config.federation_yes'|trans }}</button>
+                <span class="button is-small is-danger">{{ 'fediverse_config.federation_no'|trans }}</span>
+            {% endif %}
+        </div>
+    </div>
+    <div class="content is-size-7 mt-3">{{ 'fediverse_config.federation_warning'|trans|raw }}</div>
+</div>

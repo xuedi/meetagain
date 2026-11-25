@@ -1,0 +1,13 @@
+{
+	admin off
+}
+
+mastodon.meetagain.local {
+	tls /certs/meetagain.local.crt /certs/meetagain.local.key
+	reverse_proxy fedi-mastodon-web:3000
+}
+
+mobilizon.meetagain.local {
+	tls /certs/meetagain.local.crt /certs/meetagain.local.key
+	reverse_proxy fedi-mobilizon:4000
+}

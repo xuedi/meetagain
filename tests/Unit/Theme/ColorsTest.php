@@ -227,6 +227,11 @@ class ColorsTest extends TestCase
             {
                 return $this->request['scope'];
             }
+
+            public function runIn(string $scopeId, callable $work): mixed
+            {
+                return $work();
+            }
         };
     }
 }

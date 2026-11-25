@@ -41,11 +41,12 @@ interface DescriptorInterface
     public function getFormType(): string;
 
     /**
-     * Extra options passed to createForm(), derived from the bound data object.
+     * Extra options passed to createForm(), derived from the bound data object and the scope
+     * the form is rendered for - null at the global scope.
      *
      * @return array<string, mixed>
      */
-    public function getFormOptions(object $data): array;
+    public function getFormOptions(object $data, ?string $scopeId): array;
 
     /** A fresh data object carrying the plugin's neutral defaults. */
     public function createDefault(): object;

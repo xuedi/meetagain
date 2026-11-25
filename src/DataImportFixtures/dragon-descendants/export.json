@@ -3,6 +3,7 @@
     "version": "2.0",
     "exported_at": "2026-01-05T00:00:00+01:00",
     "plugins": [
+        "fediverse",
         "glossary",
         "karaoke",
         "wishlist"
@@ -32,6 +33,16 @@
             "show_town_hall": false
         },
         "plugin_settings": {
+            "fediverse": {
+                "content": "summary",
+                "location": "city",
+                "image": true,
+                "username": "dragon_descendants",
+                "accountSummary": "Everyday Chinese phrases, pinyin and tea evenings in Berlin.",
+                "announce": true,
+                "active": true,
+                "blockedServers": []
+            },
             "glossary": {
                 "secondaryEnabled": true,
                 "secondaryLabel": "Pinyin",

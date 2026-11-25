@@ -1,0 +1,128 @@
+# Dev-only test servers for the fediverse plugin: a Mastodon and a Mobilizon next to the dev stack.
+# Started by `just devFediverse`.
+
+x-mastodon: &mastodon
+  image: ghcr.io/mastodon/mastodon:v4.7.5@sha256:1cf98fb199f8cc1dcf4bb174095656bd5e19e99f29e935c2a838132083e1f609
+  restart: unless-stopped
+  volumes:
+    - ../../../docker/certs/rootCA.pem:/ca/rootCA.pem:ro
+  environment:
+    LOCAL_DOMAIN: mastodon.meetagain.local
+    RAILS_ENV: production
+    NODE_ENV: production
+    RAILS_LOG_LEVEL: warn
+    DB_HOST: fedi-mastodon-db
+    DB_USER: mastodon
+    DB_PASS: mastodon
+    DB_NAME: mastodon
+    REDIS_HOST: fedi-mastodon-redis
+    SECRET_KEY_BASE: dev-only-mastodon-secret-key-base-for-the-local-fediverse-test-server-0000000000000000
+    OTP_SECRET: dev-only-mastodon-otp-secret-for-the-local-fediverse-test-server-00000000000000000000
+    ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY: dev-only-deterministic-key-0000
+    ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: dev-only-key-derivation-salt-00
+    ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY: dev-only-primary-key-0000000000
+    ALLOWED_PRIVATE_ADDRESSES: 172.31.250.0/24
+    TRUSTED_PROXY_IP: 172.31.250.0/24
+    SSL_CERT_FILE: /ca/rootCA.pem
+  depends_on:
+    - fedi-mastodon-db
+    - fedi-mastodon-redis
+  networks:
+    - fediverse
+
+services:
+  fedi-proxy:
+    image: caddy:2.10.0-alpine@sha256:ae4458638da8e1a91aafffb231c5f8778e964bca650c8a8cb23a7e8ac557aa3c
+    container_name: ma-fedi-proxy
+    restart: unless-stopped
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ../../../docker/certs:/certs:ro
+    networks:
+      fediverse:
+        aliases:
+          - mastodon.meetagain.local
+          - mobilizon.meetagain.local
+
+  fedi-mastodon-web:
+    <<: *mastodon
+    container_name: ma-fedi-mastodon-web
+    command: bundle exec puma -C config/puma.rb
+
+  fedi-mastodon-sidekiq:
+    <<: *mastodon
+    container_name: ma-fedi-mastodon-sidekiq
+    command: bundle exec sidekiq
+
+  fedi-mastodon-db:
+    image: postgres:17-alpine@sha256:979c4379dd698aba0b890599a6104e082035f98ef31d9b9291ec22f2b13059ca
+    container_name: ma-fedi-mastodon-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mastodon
+      POSTGRES_PASSWORD: mastodon
+      POSTGRES_DB: mastodon
+    volumes:
+      - mastodon-db:/var/lib/postgresql/data
+    networks:
+      - fediverse
+
+  fedi-mastodon-redis:
+    image: ${VALKEY_IMAGE:?pinned in docker/services.env}
+    container_name: ma-fedi-mastodon-redis
+    restart: unless-stopped
+    networks:
+      - fediverse
+
+  fedi-mobilizon:
+    image: kaihuri/mobilizon:5.2.4@sha256:95c201b39d7041678273ff6c4049deaec10c5a66824885b654a2662a4d4a52fa
+    container_name: ma-fedi-mobilizon
+    restart: unless-stopped
+    volumes:
+      - ../../../docker/certs/rootCA.pem:/ca/rootCA.pem:ro
+      - mobilizon-uploads:/var/lib/mobilizon/uploads
+    environment:
+      MOBILIZON_INSTANCE_NAME: Mobilizon test server
+      MOBILIZON_INSTANCE_HOST: mobilizon.meetagain.local
+      MOBILIZON_INSTANCE_LISTEN_IP: 0.0.0.0
+      MOBILIZON_INSTANCE_PORT: 4000
+      MOBILIZON_INSTANCE_EMAIL: noreply@mobilizon.meetagain.local
+      MOBILIZON_REPLY_EMAIL: noreply@mobilizon.meetagain.local
+      MOBILIZON_INSTANCE_REGISTRATIONS_OPEN: "false"
+      MOBILIZON_INSTANCE_SECRET_KEY_BASE: dev-only-mobilizon-secret-key-base-for-the-local-fediverse-test-server
+      MOBILIZON_INSTANCE_SECRET_KEY: dev-only-mobilizon-secret-key-for-the-local-fediverse-test-server
+      MOBILIZON_DATABASE_USERNAME: mobilizon
+      MOBILIZON_DATABASE_PASSWORD: mobilizon
+      MOBILIZON_DATABASE_DBNAME: mobilizon
+      MOBILIZON_DATABASE_HOST: fedi-mobilizon-db
+      MOBILIZON_LOGLEVEL: info
+      SSL_CERT_FILE: /ca/rootCA.pem
+    depends_on:
+      - fedi-mobilizon-db
+    networks:
+      - fediverse
+
+  fedi-mobilizon-db:
+    image: postgis/postgis:17-3.5-alpine@sha256:894f570c0cf0664ed5576a8fd5d5bfb8fb1b19d592885b686c3a88c8bd90c41f
+    container_name: ma-fedi-mobilizon-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: mobilizon
+      POSTGRES_PASSWORD: mobilizon
+      POSTGRES_DB: mobilizon
+    volumes:
+      - mobilizon-db:/var/lib/postgresql/data
+    networks:
+      - fediverse
+
+networks:
+  fediverse:
+    name: ma-fediverse
+    ipam:
+      config:
+        - subnet: 172.31.250.0/24
+
+volumes:
+  mastodon-db:
+  mobilizon-db:
+  mobilizon-uploads:

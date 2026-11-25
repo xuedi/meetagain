@@ -1,0 +1,17 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    Plugin\Fediverse\:
+        resource: '../src/'
+
+when@dev:
+    services:
+        remote.client.guard:
+            class: Symfony\Component\HttpClient\NoPrivateNetworkHttpClient
+            decorates: remote.client
+            arguments:
+                - '@.inner'
+                - ~
+                - ['172.31.250.0/24']

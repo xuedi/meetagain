@@ -8,10 +8,14 @@ use App\Admin\Top\Actions\AdminTopActionButton;
 use App\Admin\Top\AdminTop;
 use App\Admin\Top\Infos\AdminTopInfoText;
 use App\Publisher\PluginSettings\DescriptorInterface;
+use App\Publisher\PluginSettings\FormAsideInterface;
 use App\Publisher\PluginSettings\Resolver;
+use App\Publisher\PluginSettings\TopActionsInterface;
 use App\Service\Admin\PluginSettingsService;
 use App\Service\Config\PluginService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\ClickableInterface;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,10 +60,14 @@ final class PluginSettingsController extends AbstractController implements Admin
             if ($form->isSubmitted() && $form->isValid()) {
                 $descriptor->applyForm($data, $form);
                 $this->resolver->resolveStore($sectionKey, null)?->save($sectionKey, $data, null);
-                $this->addFlash('success', 'admin_system_plugin_settings.flash_saved');
+                if (!$this->isSubmittedByItsOwnButton($form)) {
+                    $this->addFlash('success', 'admin_system_plugin_settings.flash_saved');
+                }
 
                 return $this->redirectToRoute('app_admin_plugin_settings', ['key' => $key]);
             }
+
+            $this->flashErrors($form);
 
             $forms = [];
             foreach ($descriptors as $descriptorKey => $other) {
@@ -74,16 +82,31 @@ final class PluginSettingsController extends AbstractController implements Admin
             }
         }
 
+        $actions = [];
+        $asides = [];
+        foreach ($descriptors as $descriptorKey => $descriptor) {
+            if ($descriptor instanceof TopActionsInterface) {
+                array_push($actions, ...$descriptor->getTopActions());
+            }
+            if ($descriptor instanceof FormAsideInterface) {
+                $asides[$descriptorKey] = $descriptor->getFormAsideTemplate();
+            }
+        }
+        $actions[] = new AdminTopActionButton(
+            label: $this->translator->trans('global.button_back'),
+            target: $this->generateUrl('app_admin_plugin'),
+            icon: 'arrow-left',
+        );
+
         $adminTop = new AdminTop(info: [
             new AdminTopInfoText($this->pluginService->getName($key)),
-        ], actions: [
-            new AdminTopActionButton(label: $this->translator->trans('global.button_back'), target: $this->generateUrl('app_admin_plugin'), icon: 'arrow-left'),
-        ]);
+        ], actions: $actions);
 
         return $this->render('admin/system/plugin_settings/index.html.twig', [
             'pluginKey' => $key,
             'providers' => $descriptors,
             'forms' => $forms,
+            'asides' => $asides,
             'adminTop' => $adminTop,
             'active' => 'plugin',
         ]);
@@ -98,6 +121,30 @@ final class PluginSettingsController extends AbstractController implements Admin
 
     private function buildForm(DescriptorInterface $descriptor, object $data): FormInterface
     {
-        return $this->createForm($descriptor->getFormType(), $data, $descriptor->getFormOptions($data));
+        return $this->createForm($descriptor->getFormType(), $data, $descriptor->getFormOptions($data, null));
+    }
+
+    private function flashErrors(FormInterface $form): void
+    {
+        $messages = [];
+        foreach ($form->getErrors(true) as $error) {
+            if ($error instanceof FormError) {
+                $messages[$error->getMessage()] = true;
+            }
+        }
+        foreach (array_keys($messages) as $message) {
+            $this->addFlash('error', $message);
+        }
+    }
+
+    private function isSubmittedByItsOwnButton(FormInterface $form): bool
+    {
+        foreach ($form->all() as $child) {
+            if ($child instanceof ClickableInterface && $child->isClicked()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
