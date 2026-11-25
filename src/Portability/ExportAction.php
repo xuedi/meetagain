@@ -10,6 +10,7 @@ use Module\Task\Contract\Result;
 use Module\Task\Contract\Status;
 use Override;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 
 readonly class ExportAction implements ActionInterface
 {
@@ -20,6 +21,7 @@ readonly class ExportAction implements ActionInterface
     public function __construct(
         private Exporter $exporter,
         private InstanceScopeBuilder $scopeBuilder,
+        #[Target('privateStorage')]
         private FilesystemOperator $privateStorage,
     ) {}
 

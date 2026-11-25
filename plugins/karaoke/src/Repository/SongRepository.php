@@ -5,6 +5,7 @@ namespace Plugin\Karaoke\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Karaoke\Entity\Song;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Song>
@@ -27,7 +28,7 @@ class SongRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('s')->orderBy('s.title', 'ASC');
+        $qb = $this->createQueryBuilder('s')->orderBy('s.title', SortDirection::Ascending);
 
         if ($allowedIds !== null) {
             $qb->where('s.id IN (:ids)')->setParameter('ids', $allowedIds);
@@ -52,7 +53,7 @@ class SongRepository extends ServiceEntityRepository
             ->leftJoin('l.translations', 't')
             ->andWhere('s.id = :id')
             ->setParameter('id', $id)
-            ->orderBy('l.position', 'ASC');
+            ->orderBy('l.position', SortDirection::Ascending);
 
         if ($allowedIds !== null) {
             $qb->andWhere('s.id IN (:ids)')->setParameter('ids', $allowedIds);

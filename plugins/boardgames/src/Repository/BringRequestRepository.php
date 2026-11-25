@@ -10,6 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Boardgames\Entity\BringRequest;
 use Plugin\Boardgames\Entity\Game;
 use Plugin\Boardgames\Enum\RequestStatus;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<BringRequest>
@@ -37,7 +38,7 @@ class BringRequestRepository extends ServiceEntityRepository
             ->andWhere('r.status = :status')
             ->setParameter('eventId', $eventId)
             ->setParameter('status', RequestStatus::Open)
-            ->orderBy('r.createdAt', 'ASC')
+            ->orderBy('r.createdAt', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -55,7 +56,7 @@ class BringRequestRepository extends ServiceEntityRepository
             ->andWhere('r.status = :status')
             ->setParameter('owner', $owner)
             ->setParameter('status', RequestStatus::Open)
-            ->orderBy('r.createdAt', 'ASC')
+            ->orderBy('r.createdAt', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

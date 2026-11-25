@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Proposal\Contract\Status;
 use Module\Proposal\Internal\Entity\Suggestion;
+use SortDirection;
 
 /** @extends ServiceEntityRepository<Suggestion> */
 class SuggestionRepository extends ServiceEntityRepository
@@ -22,8 +23,8 @@ class SuggestionRepository extends ServiceEntityRepository
             ->createQueryBuilder('s')
             ->where('s.status = :status')
             ->setParameter('status', Status::Pending)
-            ->orderBy('s.createdAt', 'ASC')
-            ->addOrderBy('s.id', 'ASC')
+            ->orderBy('s.createdAt', SortDirection::Ascending)
+            ->addOrderBy('s.id', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -39,8 +40,8 @@ class SuggestionRepository extends ServiceEntityRepository
             ->setParameter('status', Status::Pending)
             ->setParameter('proposer', $proposerId)
             ->setParameter('targetType', $targetType)
-            ->orderBy('s.createdAt', 'ASC')
-            ->addOrderBy('s.id', 'ASC')
+            ->orderBy('s.createdAt', SortDirection::Ascending)
+            ->addOrderBy('s.id', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

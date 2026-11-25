@@ -7,6 +7,7 @@ use App\Entity\EventCanonicalRoot;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /** @extends ServiceEntityRepository<EventCanonicalRoot> */
 class EventCanonicalRootRepository extends ServiceEntityRepository
@@ -113,6 +114,6 @@ class EventCanonicalRootRepository extends ServiceEntityRepository
             ->addSelect('e')
             ->where('e.series IN (:seriesIds)')
             ->setParameter('seriesIds', $seriesIds)
-            ->orderBy('e.start', 'ASC');
+            ->orderBy('e.start', SortDirection::Ascending);
     }
 }

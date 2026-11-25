@@ -27,6 +27,7 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -63,6 +64,7 @@ readonly class EmailService implements TaskInterface, EmailQueueInterface
         private iterable $pushDispatchers,
         private ClockInterface $clock,
         private MessageBusInterface $bus,
+        #[Target('privateStorage')]
         private FilesystemOperator $privateStorage,
         #[AutowireIterator(EmailInterface::class)]
         private iterable $emailTypes = [],

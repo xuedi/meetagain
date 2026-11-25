@@ -7,6 +7,7 @@ use App\Enum\ImageReportStatus;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /** @extends ServiceEntityRepository<ImageReport> */
 class ImageReportRepository extends ServiceEntityRepository
@@ -34,7 +35,7 @@ class ImageReportRepository extends ServiceEntityRepository
             ->createQueryBuilder('ir')
             ->where('ir.status = :status')
             ->setParameter('status', ImageReportStatus::Open)
-            ->orderBy('ir.createdAt', 'DESC')
+            ->orderBy('ir.createdAt', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -42,7 +43,7 @@ class ImageReportRepository extends ServiceEntityRepository
     /** @return ImageReport[] */
     public function findNewestFirst(?ImageReportStatus $status = null): array
     {
-        $qb = $this->createQueryBuilder('ir')->orderBy('ir.createdAt', 'DESC');
+        $qb = $this->createQueryBuilder('ir')->orderBy('ir.createdAt', SortDirection::Descending);
         if ($status !== null) {
             $qb->where('ir.status = :status')->setParameter('status', $status);
         }

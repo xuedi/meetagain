@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Trust\Contract\TrustLevel;
 use Module\Trust\Internal\Entity\TrustGrant;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<TrustGrant>
@@ -49,7 +50,7 @@ class TrustGrantRepository extends ServiceEntityRepository
                 ->createQueryBuilder('g')
                 ->where('g.context IN (:contexts)')
                 ->setParameter('contexts', $contexts)
-                ->orderBy('g.id', 'ASC')
+                ->orderBy('g.id', SortDirection::Ascending)
                 ->getQuery()
                 ->getResult(),
         );

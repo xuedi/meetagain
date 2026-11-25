@@ -13,6 +13,7 @@ use finfo;
 use League\Flysystem\FilesystemOperator;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 
 readonly class ImageImporter
 {
@@ -21,6 +22,7 @@ readonly class ImageImporter
     public function __construct(
         private EntityManagerInterface $em,
         private ExtendedFilesystem $fs,
+        #[Target('imageStorage')]
         private FilesystemOperator $imageStorage,
         private MetadataStripper $metadataStripper,
         private LoggerInterface $logger,

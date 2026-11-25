@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Location;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Location>
@@ -32,7 +33,7 @@ class LocationRepository extends ServiceEntityRepository
             $qb->andWhere('l.id IN (:locationIds)')->setParameter('locationIds', $restrictToLocationIds);
         }
 
-        return $qb->orderBy('l.name', 'ASC')->getQuery()->getResult();
+        return $qb->orderBy('l.name', SortDirection::Ascending)->getQuery()->getResult();
     }
 
     /**
@@ -51,7 +52,7 @@ class LocationRepository extends ServiceEntityRepository
             $qb->andWhere('l.id IN (:locationIds)')->setParameter('locationIds', $restrictToLocationIds);
         }
 
-        return $qb->orderBy('l.name', 'ASC')->getQuery()->getResult();
+        return $qb->orderBy('l.name', SortDirection::Ascending)->getQuery()->getResult();
     }
 
     /**
@@ -63,13 +64,13 @@ class LocationRepository extends ServiceEntityRepository
 
         if ($restrictToLocationIds === []) {
             $qb->where('1 = 0');
-            return $qb->orderBy('l.name', 'ASC');
+            return $qb->orderBy('l.name', SortDirection::Ascending);
         }
         if ($restrictToLocationIds !== null) {
             $qb->where('l.id IN (:locationIds)')->setParameter('locationIds', $restrictToLocationIds);
         }
 
-        return $qb->orderBy('l.name', 'ASC');
+        return $qb->orderBy('l.name', SortDirection::Ascending);
     }
 
     /**

@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use SortDirection;
 
 #[ORM\Entity]
 #[ReservedSlug]
@@ -60,7 +61,7 @@ class Cms
      * @var Collection<int, CmsBlock>
      */
     #[ORM\OneToMany(targetEntity: CmsBlock::class, mappedBy: 'page', orphanRemoval: true)]
-    #[ORM\OrderBy(['priority' => 'ASC'])]
+    #[ORM\OrderBy(['priority' => SortDirection::Ascending])]
     private Collection $blocks;
 
     public function __construct()

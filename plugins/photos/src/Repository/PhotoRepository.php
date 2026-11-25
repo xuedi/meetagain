@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Photos\Entity\Photo;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Photo>
@@ -46,7 +47,7 @@ class PhotoRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')->orderBy('p.takenAt', 'DESC')->addOrderBy('p.createdAt', 'DESC');
+        $qb = $this->createQueryBuilder('p')->orderBy('p.takenAt', SortDirection::Descending)->addOrderBy('p.createdAt', SortDirection::Descending);
 
         if ($allowedIds !== null) {
             $qb->where('p.id IN (:ids)')->setParameter('ids', $allowedIds);
@@ -70,8 +71,8 @@ class PhotoRepository extends ServiceEntityRepository
             ->createQueryBuilder('p')
             ->where('p.createdBy = :userId')
             ->setParameter('userId', $userId)
-            ->orderBy('p.takenAt', 'DESC')
-            ->addOrderBy('p.createdAt', 'DESC');
+            ->orderBy('p.takenAt', SortDirection::Descending)
+            ->addOrderBy('p.createdAt', SortDirection::Descending);
 
         if ($allowedIds !== null) {
             $qb->andWhere('p.id IN (:ids)')->setParameter('ids', $allowedIds);
@@ -97,7 +98,11 @@ class PhotoRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')->select('p.createdBy AS userId, COUNT(p.id) AS total')->groupBy('p.createdBy')->orderBy('total', 'DESC');
+        $qb = $this
+            ->createQueryBuilder('p')
+            ->select('p.createdBy AS userId, COUNT(p.id) AS total')
+            ->groupBy('p.createdBy')
+            ->orderBy('total', SortDirection::Descending);
 
         if ($allowedIds !== null) {
             $qb->where('p.id IN (:ids)')->setParameter('ids', $allowedIds);
@@ -125,7 +130,7 @@ class PhotoRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('p')->select('p.id')->where('p.contestSubmitted = true')->orderBy('p.createdAt', 'ASC');
+        $qb = $this->createQueryBuilder('p')->select('p.id')->where('p.contestSubmitted = true')->orderBy('p.createdAt', SortDirection::Ascending);
 
         if ($allowedIds !== null) {
             $qb->andWhere('p.id IN (:ids)')->setParameter('ids', $allowedIds);

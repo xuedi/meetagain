@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Boardgames\Entity\Game;
 use Plugin\Boardgames\Entity\GamePledge;
 use Plugin\Boardgames\Enum\PledgeStatus;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<GamePledge>
@@ -33,8 +34,8 @@ class GamePledgeRepository extends ServiceEntityRepository
             ->andWhere('p.status = :status')
             ->setParameter('eventId', $eventId)
             ->setParameter('status', PledgeStatus::Pledged)
-            ->orderBy('u.name', 'ASC')
-            ->addOrderBy('g.name', 'ASC')
+            ->orderBy('u.name', SortDirection::Ascending)
+            ->addOrderBy('g.name', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

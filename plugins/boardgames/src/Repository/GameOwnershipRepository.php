@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Boardgames\Entity\Game;
 use Plugin\Boardgames\Entity\GameOwnership;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<GameOwnership>
@@ -27,7 +28,7 @@ class GameOwnershipRepository extends ServiceEntityRepository
             ->join('o.game', 'g')
             ->andWhere('o.user = :user')
             ->setParameter('user', $user)
-            ->orderBy('g.name', 'ASC')
+            ->orderBy('g.name', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -47,7 +48,7 @@ class GameOwnershipRepository extends ServiceEntityRepository
             ->andWhere('o.game = :game')
             ->andWhere('o.isPublic = true')
             ->setParameter('game', $game)
-            ->orderBy('u.name', 'ASC')
+            ->orderBy('u.name', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -72,7 +73,7 @@ class GameOwnershipRepository extends ServiceEntityRepository
             ->andWhere('g.id IN (:ids)')
             ->andWhere('o.isPublic = true')
             ->setParameter('ids', $gameIds)
-            ->orderBy('u.name', 'ASC')
+            ->orderBy('u.name', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -88,7 +89,7 @@ class GameOwnershipRepository extends ServiceEntityRepository
             ->andWhere('o.isPublic = true')
             ->andWhere('o.willingToBring = true')
             ->setParameter('game', $game)
-            ->orderBy('u.name', 'ASC')
+            ->orderBy('u.name', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

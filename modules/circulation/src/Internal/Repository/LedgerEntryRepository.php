@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Circulation\Contract\LedgerEntryType;
 use Module\Circulation\Internal\Entity\LedgerEntry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<LedgerEntry>
@@ -22,7 +23,7 @@ class LedgerEntryRepository extends ServiceEntityRepository
      */
     public function findChronological(?string $context = null): array
     {
-        $qb = $this->createQueryBuilder('l')->orderBy('l.id', 'ASC');
+        $qb = $this->createQueryBuilder('l')->orderBy('l.id', SortDirection::Ascending);
         if ($context !== null) {
             $qb->where('l.context = :context')->setParameter('context', $context);
         }
@@ -35,7 +36,12 @@ class LedgerEntryRepository extends ServiceEntityRepository
      */
     public function findContextItemTypes(): array
     {
-        $rows = $this->createQueryBuilder('l')->select('DISTINCT l.context, l.itemType')->orderBy('l.context', 'ASC')->getQuery()->getArrayResult();
+        $rows = $this
+            ->createQueryBuilder('l')
+            ->select('DISTINCT l.context, l.itemType')
+            ->orderBy('l.context', SortDirection::Ascending)
+            ->getQuery()
+            ->getArrayResult();
 
         $itemTypes = [];
         foreach ($rows as $row) {
@@ -57,7 +63,7 @@ class LedgerEntryRepository extends ServiceEntityRepository
             ->setParameter('context', $context)
             ->andWhere('l.itemType = :itemType')
             ->setParameter('itemType', $itemType)
-            ->orderBy('l.id', 'DESC')
+            ->orderBy('l.id', SortDirection::Descending)
             ->setMaxResults($limit)
             ->setFirstResult($offset);
 
@@ -103,7 +109,7 @@ class LedgerEntryRepository extends ServiceEntityRepository
                 ->setParameter('context', $context)
                 ->andWhere('l.entryType = :entryType')
                 ->setParameter('entryType', $entryType)
-                ->orderBy('l.id', 'ASC')
+                ->orderBy('l.id', SortDirection::Ascending)
                 ->getQuery()
                 ->getResult(),
         );
@@ -174,7 +180,7 @@ class LedgerEntryRepository extends ServiceEntityRepository
             ->setParameter('entryType', LedgerEntryType::Donated)
             ->andWhere('l.actorUserId IS NOT NULL')
             ->groupBy('l.actorUserId')
-            ->orderBy('total', 'DESC')
+            ->orderBy('total', SortDirection::Descending)
             ->getQuery()
             ->getScalarResult();
 

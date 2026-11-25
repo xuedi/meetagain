@@ -6,6 +6,7 @@ use App\Entity\Announcement;
 use App\Entity\Cms;
 use App\Repository\CmsRepository;
 use Override;
+use SortDirection;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -26,7 +27,7 @@ class AnnouncementType extends AbstractType
             'class' => Cms::class,
             'label' => false,
             'choice_label' => fn(Cms $cms) => $cms->getSlug() . ($cms->isPublished() ? '' : ' (' . $this->translator->trans('admin_cms.unpublished') . ')'),
-            'query_builder' => fn() => $this->cmsRepository->createQueryBuilder('c')->orderBy('c.slug', 'ASC'),
+            'query_builder' => fn() => $this->cmsRepository->createQueryBuilder('c')->orderBy('c.slug', SortDirection::Ascending),
         ]);
     }
 

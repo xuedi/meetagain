@@ -21,6 +21,7 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\FilesystemOperator;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Mime\MimeTypes;
@@ -58,7 +59,9 @@ readonly class ImageService
         private EntityManagerInterface $entityManager,
         private ImageTypeRegistry $imageTypeRegistry,
         private ThumbnailSizeFormat $thumbnailSizeFormat,
+        #[Target('imageStorage')]
         private FilesystemOperator $imageStorage,
+        #[Target('thumbnailStorage')]
         private FilesystemOperator $thumbnailStorage,
         private LoggerInterface $logger,
         private ImageLocationService $imageLocationService,

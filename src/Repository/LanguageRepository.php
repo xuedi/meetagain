@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Language;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Language>
@@ -27,7 +28,7 @@ class LanguageRepository extends ServiceEntityRepository
                 ->select('l.code')
                 ->where('l.enabled = :enabled')
                 ->setParameter('enabled', true)
-                ->orderBy('l.sortOrder', 'ASC')
+                ->orderBy('l.sortOrder', SortDirection::Ascending)
                 ->getQuery()
                 ->getArrayResult(),
             'code',

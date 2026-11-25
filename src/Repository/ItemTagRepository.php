@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\ItemTag;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<ItemTag>
@@ -24,8 +25,8 @@ class ItemTagRepository extends ServiceEntityRepository
                 ->createQueryBuilder('t')
                 ->where('t.itemType = :type')
                 ->setParameter('type', $itemType)
-                ->orderBy('t.position', 'ASC')
-                ->addOrderBy('t.id', 'ASC')
+                ->orderBy('t.position', SortDirection::Ascending)
+                ->addOrderBy('t.id', SortDirection::Ascending)
                 ->getQuery()
                 ->getResult(),
         );

@@ -13,6 +13,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Override;
 use SensitiveParameter;
+use SortDirection;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -204,7 +205,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->andWhere('u.public = :public')
             ->setParameter('status', UserStatus::Active)
             ->setParameter('public', true)
-            ->orderBy('u.createdAt', 'ASC');
+            ->orderBy('u.createdAt', SortDirection::Ascending);
 
         if ($limit !== null) {
             $qb->setMaxResults($limit);
@@ -262,7 +263,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function findUnconfirmedRegistrations(): array
     {
-        return $this->unconfirmedRegistrations()->orderBy('u.createdAt', 'ASC')->getQuery()->getResult();
+        return $this->unconfirmedRegistrations()->orderBy('u.createdAt', SortDirection::Ascending)->getQuery()->getResult();
     }
 
     private function unconfirmedRegistrations(): QueryBuilder
@@ -360,7 +361,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->andWhere('u.status = :status')
             ->setParameter('since', $since)
             ->setParameter('status', UserStatus::Active)
-            ->orderBy('u.createdAt', 'DESC')
+            ->orderBy('u.createdAt', SortDirection::Descending)
             ->setMaxResults($limit);
 
         if ($restrictToUserIds !== null) {
@@ -406,7 +407,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->createQueryBuilder('u')
             ->where('u.status = :status')
             ->setParameter('status', $status)
-            ->orderBy('u.createdAt', 'ASC')
+            ->orderBy('u.createdAt', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -544,7 +545,12 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             return [];
         }
 
-        $qb = $this->createQueryBuilder('u')->select('u, i')->leftJoin('u.image', 'i')->orderBy('u.status', 'ASC')->addOrderBy('u.createdAt', 'DESC');
+        $qb = $this
+            ->createQueryBuilder('u')
+            ->select('u, i')
+            ->leftJoin('u.image', 'i')
+            ->orderBy('u.status', SortDirection::Ascending)
+            ->addOrderBy('u.createdAt', SortDirection::Descending);
 
         if ($restrictToUserIds !== null) {
             $qb->andWhere('u.id IN (:userIds)')->setParameter('userIds', $restrictToUserIds);

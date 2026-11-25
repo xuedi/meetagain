@@ -6,6 +6,7 @@ use App\Entity\Cms;
 use App\Enum\MenuLocation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
@@ -54,7 +55,7 @@ class CmsRepository extends ServiceEntityRepository
         }
 
         // Limit to 1 with a stable order so unfiltered queries pick the same page deterministically.
-        $qb->orderBy('c.id', 'ASC')->setMaxResults(1);
+        $qb->orderBy('c.id', SortDirection::Ascending)->setMaxResults(1);
 
         $results = $qb->getQuery()->getResult();
 
@@ -66,7 +67,7 @@ class CmsRepository extends ServiceEntityRepository
      */
     public function findPublished(): array
     {
-        return $this->createQueryBuilder('c')->where('c.published = true')->orderBy('c.createdAt', 'DESC')->getQuery()->getResult();
+        return $this->createQueryBuilder('c')->where('c.published = true')->orderBy('c.createdAt', SortDirection::Descending)->getQuery()->getResult();
     }
 
     /**
@@ -87,7 +88,7 @@ class CmsRepository extends ServiceEntityRepository
             ->createQueryBuilder('c')
             ->where('c.id IN (:ids)')
             ->setParameter('ids', $ids)
-            ->orderBy('c.createdAt', 'DESC')
+            ->orderBy('c.createdAt', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -107,7 +108,7 @@ class CmsRepository extends ServiceEntityRepository
             ->where('c.id IN (:ids)')
             ->andWhere('c.published = true')
             ->setParameter('ids', $ids)
-            ->orderBy('c.createdAt', 'DESC')
+            ->orderBy('c.createdAt', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }

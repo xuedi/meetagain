@@ -7,6 +7,7 @@ use App\Enum\IncidentSeverity;
 use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Incident>
@@ -23,7 +24,7 @@ class IncidentRepository extends ServiceEntityRepository
      */
     public function findRecent(int $limit = 200, ?DateTimeImmutable $since = null): array
     {
-        $qb = $this->createQueryBuilder('i')->orderBy('i.endedAt', 'DESC')->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('i')->orderBy('i.endedAt', SortDirection::Descending)->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->where('i.endedAt >= :since')->setParameter('since', $since);
@@ -45,7 +46,7 @@ class IncidentRepository extends ServiceEntityRepository
      */
     public function getRecentBySeverity(int $limit, ?DateTimeImmutable $since, ?IncidentSeverity $minSeverity): array
     {
-        $qb = $this->createQueryBuilder('i')->orderBy('i.endedAt', 'DESC')->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('i')->orderBy('i.endedAt', SortDirection::Descending)->setMaxResults($limit);
 
         if ($since !== null) {
             $qb->andWhere('i.endedAt >= :since')->setParameter('since', $since);

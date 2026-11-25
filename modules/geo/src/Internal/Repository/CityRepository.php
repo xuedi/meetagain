@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Module\Geo\Internal\Entity\City;
 use Module\Geo\Internal\Entity\CityTranslation;
 use Module\Geo\Internal\Entity\Country;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<City>
@@ -67,7 +68,7 @@ class CityRepository extends ServiceEntityRepository
             ->leftJoin('c.translations', 't')
             ->where('c.nameSlug = :slug OR t.nameSlug = :slug')
             ->setParameter('slug', $nameSlug)
-            ->orderBy('c.population', 'DESC')
+            ->orderBy('c.population', SortDirection::Descending)
             ->setMaxResults(1)
             ->getQuery()
             ->getResult();
@@ -86,8 +87,8 @@ class CityRepository extends ServiceEntityRepository
             ->leftJoin('c.translations', 't')
             ->where('c.nameSlug = :slug OR t.nameSlug = :slug')
             ->setParameter('slug', $nameSlug)
-            ->orderBy('c.population', 'DESC')
-            ->addOrderBy('c.id', 'ASC')
+            ->orderBy('c.population', SortDirection::Descending)
+            ->addOrderBy('c.id', SortDirection::Ascending)
             ->getQuery()
             ->getArrayResult();
 
@@ -105,8 +106,8 @@ class CityRepository extends ServiceEntityRepository
             ->leftJoin('c.translations', 't')
             ->where('t.name LIKE :name')
             ->setParameter('name', addcslashes($name, '%_\\') . '%')
-            ->orderBy('c.population', 'DESC')
-            ->addOrderBy('c.id', 'ASC')
+            ->orderBy('c.population', SortDirection::Descending)
+            ->addOrderBy('c.id', SortDirection::Ascending)
             ->setMaxResults($limit);
 
         if ($nameSlug !== '') {
@@ -288,8 +289,8 @@ class CityRepository extends ServiceEntityRepository
             ->addSelect("CASE WHEN c.featureCode = 'PPLC' THEN 0 ELSE 1 END AS HIDDEN capitalFirst")
             ->where('c.country = :country')
             ->setParameter('country', $countryId)
-            ->orderBy('capitalFirst', 'ASC')
-            ->addOrderBy('c.population', 'DESC')
+            ->orderBy('capitalFirst', SortDirection::Ascending)
+            ->addOrderBy('c.population', SortDirection::Descending)
             ->setMaxResults(1)
             ->getQuery()
             ->getResult();
@@ -306,7 +307,7 @@ class CityRepository extends ServiceEntityRepository
             ->createQueryBuilder('c')
             ->select('DISTINCT co.iso2')
             ->join('c.country', 'co')
-            ->orderBy('co.iso2', 'ASC')
+            ->orderBy('co.iso2', SortDirection::Ascending)
             ->getQuery()
             ->getArrayResult();
 
@@ -323,7 +324,7 @@ class CityRepository extends ServiceEntityRepository
             ->select('co.iso2 AS iso2', 'COUNT(c.id) AS cities')
             ->join('c.country', 'co')
             ->groupBy('co.iso2')
-            ->orderBy('co.iso2', 'ASC')
+            ->orderBy('co.iso2', SortDirection::Ascending)
             ->getQuery()
             ->getArrayResult();
 

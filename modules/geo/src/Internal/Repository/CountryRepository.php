@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Geo\Internal\Entity\Country;
 use Module\Geo\Internal\Entity\CountryTranslation;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Country>
@@ -29,7 +30,7 @@ class CountryRepository extends ServiceEntityRepository
             ->leftJoin('co.translations', 't')
             ->where('co.nameSlug = :slug OR t.nameSlug = :slug')
             ->setParameter('slug', $nameSlug)
-            ->orderBy('co.population', 'DESC')
+            ->orderBy('co.population', SortDirection::Descending)
             ->setMaxResults(1)
             ->getQuery()
             ->getResult();

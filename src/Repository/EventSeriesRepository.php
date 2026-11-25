@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\EventSeries;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /** @extends ServiceEntityRepository<EventSeries> */
 class EventSeriesRepository extends ServiceEntityRepository
@@ -19,6 +20,6 @@ class EventSeriesRepository extends ServiceEntityRepository
      */
     public function findOpen(): array
     {
-        return $this->createQueryBuilder('s')->where('s.rule IS NOT NULL')->orderBy('s.id', 'ASC')->getQuery()->getResult();
+        return $this->createQueryBuilder('s')->where('s.rule IS NOT NULL')->orderBy('s.id', SortDirection::Ascending)->getQuery()->getResult();
     }
 }

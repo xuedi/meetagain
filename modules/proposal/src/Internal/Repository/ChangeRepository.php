@@ -6,6 +6,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Proposal\Contract\Status;
 use Module\Proposal\Internal\Entity\Change;
+use SortDirection;
 
 /** @extends ServiceEntityRepository<Change> */
 class ChangeRepository extends ServiceEntityRepository
@@ -22,7 +23,7 @@ class ChangeRepository extends ServiceEntityRepository
             ->createQueryBuilder('cp')
             ->where('cp.status = :status')
             ->setParameter('status', Status::Pending)
-            ->orderBy('cp.createdAt', 'ASC')
+            ->orderBy('cp.createdAt', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -38,7 +39,7 @@ class ChangeRepository extends ServiceEntityRepository
             ->setParameter('status', Status::Pending)
             ->setParameter('targetType', $targetType)
             ->setParameter('targetId', $targetId)
-            ->orderBy('cp.createdAt', 'ASC')
+            ->orderBy('cp.createdAt', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }

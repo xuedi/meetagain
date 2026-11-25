@@ -27,6 +27,7 @@ use Module\Task\Contract\ActionQueueInterface;
 use Module\Task\Contract\RequestedAction;
 use Module\Task\Contract\Status;
 use RuntimeException;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,6 +56,7 @@ final class ImportController extends AbstractSettingsController implements Admin
         private readonly EventService $eventService,
         private readonly PluginService $pluginService,
         private readonly KindLabels $kindLabels,
+        #[Target('privateStorage')]
         private readonly FilesystemOperator $privateStorage,
         private readonly ExportAction $exportAction,
         private readonly ActionQueueInterface $actionQueue,

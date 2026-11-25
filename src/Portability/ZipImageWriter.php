@@ -5,6 +5,7 @@ namespace App\Portability;
 use App\Entity\Image;
 use League\Flysystem\FilesystemOperator;
 use Override;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use ZipArchive;
 
 class ZipImageWriter implements ImageWriterInterface
@@ -20,6 +21,7 @@ class ZipImageWriter implements ImageWriterInterface
 
     public function __construct(
         private readonly ?ZipArchive $zip,
+        #[Target('imageStorage')]
         private readonly FilesystemOperator $imageStorage,
     ) {}
 

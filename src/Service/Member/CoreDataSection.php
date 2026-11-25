@@ -19,6 +19,7 @@ use App\Entity\UserBlock;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
+use SortDirection;
 
 readonly class CoreDataSection implements DataSectionInterface
 {
@@ -169,7 +170,7 @@ readonly class CoreDataSection implements DataSectionInterface
             ->from(Message::class, 'm')
             ->where('m.sender = :user OR m.receiver = :user')
             ->setParameter('user', $user)
-            ->orderBy('m.id', 'ASC')
+            ->orderBy('m.id', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
 

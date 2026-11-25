@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Host;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Host>
@@ -30,7 +31,7 @@ class HostRepository extends ServiceEntityRepository
             $qb->andWhere('h.id IN (:hostIds)')->setParameter('hostIds', $restrictToHostIds);
         }
 
-        return $qb->orderBy('h.name', 'ASC')->getQuery()->getResult();
+        return $qb->orderBy('h.name', SortDirection::Ascending)->getQuery()->getResult();
     }
 
     public function createQueryBuilderForAdmin(?array $restrictToHostIds = null): \Doctrine\ORM\QueryBuilder
@@ -38,12 +39,12 @@ class HostRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('h');
         if ($restrictToHostIds === []) {
             $qb->where('1 = 0');
-            return $qb->orderBy('h.name', 'ASC');
+            return $qb->orderBy('h.name', SortDirection::Ascending);
         }
         if ($restrictToHostIds !== null) {
             $qb->where('h.id IN (:hostIds)')->setParameter('hostIds', $restrictToHostIds);
         }
 
-        return $qb->orderBy('h.name', 'ASC');
+        return $qb->orderBy('h.name', SortDirection::Ascending);
     }
 }

@@ -11,6 +11,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use SensitiveParameter;
+use SortDirection;
 
 /** @extends ServiceEntityRepository<SupportRequest> */
 class SupportRequestRepository extends ServiceEntityRepository
@@ -57,7 +58,7 @@ class SupportRequestRepository extends ServiceEntityRepository
             ->scoped($audience, $onlyIds)
             ->select('sr', 'r')
             ->leftJoin('sr.requester', 'r')
-            ->orderBy('sr.createdAt', 'DESC')
+            ->orderBy('sr.createdAt', SortDirection::Descending)
             ->getQuery()
             ->getResult();
     }
@@ -101,7 +102,7 @@ class SupportRequestRepository extends ServiceEntityRepository
             ->andWhere('sr.id != :id')
             ->setParameter('ip', $request->getIpAddress())
             ->setParameter('id', $request->getId())
-            ->orderBy('sr.createdAt', 'DESC')
+            ->orderBy('sr.createdAt', SortDirection::Descending)
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
@@ -114,7 +115,7 @@ class SupportRequestRepository extends ServiceEntityRepository
             ->createQueryBuilder('sr')
             ->where('sr.requester = :requester')
             ->setParameter('requester', $requester)
-            ->orderBy('sr.createdAt', 'DESC')
+            ->orderBy('sr.createdAt', SortDirection::Descending)
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();

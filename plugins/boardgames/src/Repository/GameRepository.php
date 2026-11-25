@@ -5,6 +5,7 @@ namespace Plugin\Boardgames\Repository;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Boardgames\Entity\Game;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Game>
@@ -45,7 +46,7 @@ class GameRepository extends ServiceEntityRepository
             return [];
         }
 
-        $qb = $this->createQueryBuilder('g')->orderBy('g.name', 'ASC');
+        $qb = $this->createQueryBuilder('g')->orderBy('g.name', SortDirection::Ascending);
 
         if ($allowedIds !== null) {
             $qb->where('g.id IN (:ids)')->setParameter('ids', $allowedIds);
@@ -97,7 +98,7 @@ class GameRepository extends ServiceEntityRepository
             ->createQueryBuilder('g')
             ->andWhere('g.name LIKE :term')
             ->setParameter('term', '%' . addcslashes($term, '%_\\') . '%')
-            ->orderBy('g.name', 'ASC')
+            ->orderBy('g.name', SortDirection::Ascending)
             ->setMaxResults($limit);
 
         if ($allowedIds !== null) {

@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\EventItemAssociation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<EventItemAssociation>
@@ -25,8 +26,8 @@ class EventItemAssociationRepository extends ServiceEntityRepository
             ->createQueryBuilder('a')
             ->where('a.event = :eventId')
             ->setParameter('eventId', $eventId)
-            ->orderBy('a.position', 'ASC')
-            ->addOrderBy('a.createdAt', 'ASC')
+            ->orderBy('a.position', SortDirection::Ascending)
+            ->addOrderBy('a.createdAt', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -41,7 +42,7 @@ class EventItemAssociationRepository extends ServiceEntityRepository
             ->setParameter('type', $itemType)
             ->andWhere('a.itemId = :id')
             ->setParameter('id', $itemId)
-            ->orderBy('a.createdAt', 'ASC')
+            ->orderBy('a.createdAt', SortDirection::Ascending)
             ->getQuery()
             ->getScalarResult();
 
@@ -62,7 +63,7 @@ class EventItemAssociationRepository extends ServiceEntityRepository
             ->where('a.itemType = :type')
             ->setParameter('type', $itemType)
             ->groupBy('a.event')
-            ->orderBy('total', 'DESC')
+            ->orderBy('total', SortDirection::Descending)
             ->getQuery()
             ->getArrayResult();
 

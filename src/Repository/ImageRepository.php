@@ -9,6 +9,7 @@ use DateTimeImmutable;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Image>
@@ -33,7 +34,7 @@ class ImageRepository extends ServiceEntityRepository
         return $this
             ->createQueryBuilder('i')
             ->where('i.reported IS NOT NULL')
-            ->orderBy('i.createdAt', 'DESC')
+            ->orderBy('i.createdAt', SortDirection::Descending)
             ->setMaxResults($limit)
             ->getQuery()
             ->getResult();
@@ -118,8 +119,8 @@ class ImageRepository extends ServiceEntityRepository
         return $qb
             ->leftJoin('i.event', 'e')
             ->addSelect('e')
-            ->orderBy('i.createdAt', 'DESC')
-            ->addOrderBy('i.id', 'DESC')
+            ->orderBy('i.createdAt', SortDirection::Descending)
+            ->addOrderBy('i.id', SortDirection::Descending)
             ->setFirstResult($offset)
             ->setMaxResults($limit)
             ->getQuery()
@@ -154,7 +155,7 @@ class ImageRepository extends ServiceEntityRepository
             ->where('i.attribution IS NOT NULL')
             ->andWhere("i.attribution != ''")
             ->andWhere('i.attributionNotRequired = false')
-            ->orderBy('i.createdAt', 'DESC');
+            ->orderBy('i.createdAt', SortDirection::Descending);
 
         if ($restrictToIds !== null) {
             $qb->andWhere('i.id IN (:ids)')->setParameter('ids', $restrictToIds);
@@ -272,7 +273,7 @@ class ImageRepository extends ServiceEntityRepository
      */
     public function findFiltered(?ImageType $type, ?DateTimeImmutable $since): array
     {
-        $qb = $this->createQueryBuilder('i')->orderBy('i.createdAt', 'DESC');
+        $qb = $this->createQueryBuilder('i')->orderBy('i.createdAt', SortDirection::Descending);
         if ($type !== null) {
             $qb->andWhere('i.type = :type')->setParameter('type', $type);
         }
@@ -324,7 +325,7 @@ class ImageRepository extends ServiceEntityRepository
      */
     public function findAfterId(?int $afterId, int $limit): array
     {
-        $qb = $this->createQueryBuilder('i')->orderBy('i.id', 'ASC')->setMaxResults($limit);
+        $qb = $this->createQueryBuilder('i')->orderBy('i.id', SortDirection::Ascending)->setMaxResults($limit);
         if ($afterId !== null) {
             $qb->where('i.id > :afterId')->setParameter('afterId', $afterId);
         }
@@ -338,7 +339,7 @@ class ImageRepository extends ServiceEntityRepository
      */
     public function findUnlocatedBefore(DateTimeImmutable $cutoff, array $types, int $limit): array
     {
-        return $this->unlocatedQuery($cutoff, $types)->orderBy('i.id', 'ASC')->setMaxResults($limit)->getQuery()->getResult();
+        return $this->unlocatedQuery($cutoff, $types)->orderBy('i.id', SortDirection::Ascending)->setMaxResults($limit)->getQuery()->getResult();
     }
 
     /**

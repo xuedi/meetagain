@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Module\Circulation\Contract\CopyStatus;
 use Module\Circulation\Internal\Entity\Copy;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Copy>
@@ -33,7 +34,7 @@ class CopyRepository extends ServiceEntityRepository
                 ->circulatingQuery($context, $itemType)
                 ->andWhere('c.itemId = :itemId')
                 ->setParameter('itemId', $itemId)
-                ->orderBy('c.donatedAt', 'ASC')
+                ->orderBy('c.donatedAt', SortDirection::Ascending)
                 ->getQuery()
                 ->getResult(),
         );
@@ -54,7 +55,7 @@ class CopyRepository extends ServiceEntityRepository
                 ->circulatingQuery($context, $itemType)
                 ->andWhere('c.itemId IN (:itemIds)')
                 ->setParameter('itemIds', $itemIds)
-                ->orderBy('c.donatedAt', 'ASC')
+                ->orderBy('c.donatedAt', SortDirection::Ascending)
                 ->getQuery()
                 ->getResult(),
         );
@@ -76,7 +77,7 @@ class CopyRepository extends ServiceEntityRepository
             ->setParameter('context', $context)
             ->andWhere('c.itemType = :itemType')
             ->setParameter('itemType', $itemType)
-            ->orderBy('c.donatedAt', 'DESC');
+            ->orderBy('c.donatedAt', SortDirection::Descending);
 
         if ($allowedItemIds !== null) {
             if ($allowedItemIds === []) {
@@ -104,7 +105,7 @@ class CopyRepository extends ServiceEntityRepository
                 ->setParameter('itemId', $itemId)
                 ->andWhere('c.status = :status')
                 ->setParameter('status', CopyStatus::Available)
-                ->orderBy('c.heldSince', 'ASC')
+                ->orderBy('c.heldSince', SortDirection::Ascending)
                 ->getQuery()
                 ->getResult(),
         );
@@ -123,7 +124,7 @@ class CopyRepository extends ServiceEntityRepository
      */
     public function findAllOrdered(?string $context = null): array
     {
-        $qb = $this->createQueryBuilder('c')->orderBy('c.id', 'ASC');
+        $qb = $this->createQueryBuilder('c')->orderBy('c.id', SortDirection::Ascending);
         if ($context !== null) {
             $qb->where('c.context = :context')->setParameter('context', $context);
         }
@@ -136,7 +137,12 @@ class CopyRepository extends ServiceEntityRepository
      */
     public function findContexts(): array
     {
-        $rows = $this->createQueryBuilder('c')->select('DISTINCT c.context AS context')->orderBy('c.context', 'ASC')->getQuery()->getScalarResult();
+        $rows = $this
+            ->createQueryBuilder('c')
+            ->select('DISTINCT c.context AS context')
+            ->orderBy('c.context', SortDirection::Ascending)
+            ->getQuery()
+            ->getScalarResult();
 
         return array_map('strval', array_column($rows, 'context'));
     }

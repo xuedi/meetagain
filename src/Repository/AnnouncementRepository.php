@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Announcement;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<Announcement>
@@ -21,7 +22,7 @@ class AnnouncementRepository extends ServiceEntityRepository
      */
     public function findAllOrderedByDate(): array
     {
-        return $this->createQueryBuilder('a')->orderBy('a.createdAt', 'DESC')->getQuery()->getResult();
+        return $this->createQueryBuilder('a')->orderBy('a.createdAt', SortDirection::Descending)->getQuery()->getResult();
     }
 
     public function findByLinkHash(string $hash): ?Announcement

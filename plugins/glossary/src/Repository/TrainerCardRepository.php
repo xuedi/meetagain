@@ -9,6 +9,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Plugin\Glossary\Entity\TrainerCard;
 use Plugin\Glossary\Enum\CardState;
 use Plugin\Glossary\Enum\Direction;
+use SortDirection;
 
 /**
  * @extends ServiceEntityRepository<TrainerCard>
@@ -43,7 +44,7 @@ class TrainerCardRepository extends ServiceEntityRepository
             ->andWhere('IDENTITY(c.glossary) = :glossaryId')
             ->setParameter('userId', $userId)
             ->setParameter('glossaryId', $glossaryId)
-            ->orderBy('c.direction', 'ASC')
+            ->orderBy('c.direction', SortDirection::Ascending)
             ->getQuery()
             ->getResult();
     }
@@ -63,7 +64,7 @@ class TrainerCardRepository extends ServiceEntityRepository
             ->select('IDENTITY(c.glossary) AS glossaryId')
             ->andWhere('c.dueAt <= :now')
             ->setParameter('now', $now)
-            ->orderBy('c.dueAt', 'ASC');
+            ->orderBy('c.dueAt', SortDirection::Ascending);
         if ($direction !== null) {
             $qb->andWhere('c.direction = :direction')->setParameter('direction', $direction);
         }
@@ -137,7 +138,7 @@ class TrainerCardRepository extends ServiceEntityRepository
             ->setParameter('glossaryIds', $glossaryIds)
             ->groupBy('c.glossary')
             ->having('SUM(c.timesSeen - c.timesCorrect) > 0')
-            ->orderBy('missRate', 'DESC')
+            ->orderBy('missRate', SortDirection::Descending)
             ->setMaxResults($limit)
             ->getQuery()
             ->getScalarResult();
@@ -180,7 +181,7 @@ class TrainerCardRepository extends ServiceEntityRepository
             ->setParameter('glossaryIds', $glossaryIds)
             ->groupBy('c.userId')
             ->having('SUM(c.timesSeen) > 0')
-            ->orderBy('answers', 'DESC')
+            ->orderBy('answers', SortDirection::Descending)
             ->setMaxResults($limit)
             ->getQuery()
             ->getScalarResult();
