@@ -11,7 +11,9 @@ use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Writer\SvgWriter;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 final readonly class ShareService
 {
@@ -22,6 +24,8 @@ final readonly class ShareService
     public function __construct(
         private UrlOwnerService $urlOwnerService,
         private UrlGeneratorInterface $urlGenerator,
+        #[Autowire(service: 'cache.share_qr')]
+        private CacheInterface $qrCache,
     ) {}
 
     public function buildSheet(Event $event, string $locale): EventShareSheet
@@ -43,15 +47,27 @@ final readonly class ShareService
 
     public function buildQrPng(Event $event, string $locale): string
     {
-        return new Builder(
+        $shareUrl = $this->buildShareUrl($event, $locale);
+
+        return $this->qrCache->get('qr_png_' . $this->qrFingerprint($shareUrl), static fn(): string => new Builder(
             writer: new PngWriter(),
-            data: $this->buildShareUrl($event, $locale),
+            data: $shareUrl,
             errorCorrectionLevel: ErrorCorrectionLevel::Medium,
             size: self::QR_PNG_SIZE,
             margin: 16,
         )
             ->build()
-            ->getString();
+            ->getString());
+    }
+
+    public function buildQrEtag(Event $event, string $locale): string
+    {
+        return $this->qrFingerprint($this->buildShareUrl($event, $locale));
+    }
+
+    private function qrFingerprint(string $shareUrl): string
+    {
+        return hash('xxh128', sprintf('%s|%d', $shareUrl, self::QR_PNG_SIZE));
     }
 
     public function buildShareUrl(Event $event, string $locale): string

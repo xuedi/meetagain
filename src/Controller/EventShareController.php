@@ -13,6 +13,8 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/event/{id}/share', requirements: ['id' => '\d+'], methods: ['GET'])]
 final class EventShareController extends AbstractController
 {
+    private const int QR_MAX_AGE_SECONDS = 86400;
+
     public function __construct(
         private readonly EventService $eventService,
         private readonly EventFilterService $eventFilterService,
@@ -67,12 +69,19 @@ final class EventShareController extends AbstractController
     public function qr(Request $request, int $id): Response
     {
         $event = $this->findAccessibleEvent($id);
+        $locale = $request->getLocale();
 
-        $response = new Response($this->shareService->buildQrPng($event, $request->getLocale()), Response::HTTP_OK, ['Content-Type' => 'image/png']);
+        $response = new Response(headers: ['Content-Type' => 'image/png']);
+        $response->setEtag($this->shareService->buildQrEtag($event, $locale));
+        $response->setPrivate();
+        $response->setMaxAge(self::QR_MAX_AGE_SECONDS);
         $response->headers->set('Content-Disposition', $response->headers->makeDisposition('attachment', sprintf('event-%d-qr.png', $id)));
         $response->headers->set('X-Robots-Tag', 'noindex');
+        if ($response->isNotModified($request)) {
+            return $response;
+        }
 
-        return $response;
+        return $response->setContent($this->shareService->buildQrPng($event, $locale));
     }
 
     private function findAccessibleEvent(int $id): Event
