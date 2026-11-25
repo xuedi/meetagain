@@ -6,13 +6,16 @@ use App\Activity\ActivityService;
 use App\Controller\AbstractController;
 use App\Entity\Event;
 use App\Entity\User;
+use App\Enum\UserStatus;
 use App\Filter\Event\EventFilterService;
+use App\Filter\Member\MemberFilterService;
 use App\Item\AssociationService;
 use App\Item\ListRegistry;
 use App\Item\Tag\AssignmentFormHelper;
 use App\Item\Tag\TagService;
 use App\Item\TranslationFormHelper;
 use App\Service\Event\EventService;
+use App\Service\Member\BlockingService;
 use App\Service\Member\UserService;
 use App\Service\Seo\BreadcrumbBuilder;
 use Plugin\Photos\Activity\Messages\PhotoAdded;
@@ -65,12 +68,12 @@ final class PhotoController extends AbstractController
     }
 
     #[Route('/streams', name: 'app_plugin_photos_streams', methods: ['GET'])]
-    public function memberStreams(ListRegistry $listRegistry, UserService $userService): Response
+    public function memberStreams(ListRegistry $listRegistry, UserService $userService, MemberFilterService $memberFilter, BlockingService $blocking): Response
     {
         $this->denyUnlessStreamsLive($listRegistry);
 
         $counts = $this->photoService->getStreamAuthors();
-        $users = $this->usersById(array_keys($counts), $userService);
+        $users = $this->visibleAuthors($this->usersById(array_keys($counts), $userService), $memberFilter, $blocking);
         $streams = $this->photoService->getStreams(array_keys($users), self::STRIP_LENGTH);
 
         $authors = [];
@@ -86,12 +89,19 @@ final class PhotoController extends AbstractController
     }
 
     #[Route('/streams/{id}', name: 'app_plugin_photos_stream', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function memberStream(int $id, ListRegistry $listRegistry, UserService $userService, BreadcrumbBuilder $breadcrumbBuilder): Response
-    {
+    public function memberStream(
+        int $id,
+        ListRegistry $listRegistry,
+        UserService $userService,
+        BreadcrumbBuilder $breadcrumbBuilder,
+        MemberFilterService $memberFilter,
+        BlockingService $blocking,
+    ): Response {
         $this->denyUnlessStreamsLive($listRegistry);
 
         $user = $userService->findUser($id);
-        $photos = $user instanceof User ? $this->photoService->getStream($id) : [];
+        $visible = $user instanceof User && $this->visibleAuthors([$id => $user], $memberFilter, $blocking) !== [];
+        $photos = $visible ? $this->photoService->getStream($id) : [];
         if (!$user instanceof User || $photos === []) {
             throw $this->createNotFoundException('Stream not found');
         }
@@ -334,6 +344,27 @@ final class PhotoController extends AbstractController
         }
 
         return $ordered;
+    }
+
+    /**
+     * @param array<int, User> $authors
+     *
+     * @return array<int, User>
+     */
+    private function visibleAuthors(array $authors, MemberFilterService $memberFilter, BlockingService $blocking): array
+    {
+        $viewer = $this->getUser();
+        $excludedIds = $viewer instanceof User ? array_map(intval(...), $blocking->getExcludedUserIds($viewer)) : [];
+
+        return array_filter(
+            $authors,
+            static fn(User $author, int $id): bool => (
+                $author->getStatus() === UserStatus::Active
+                && ($viewer instanceof User ? !in_array($id, $excludedIds, true) : $author->isPublic())
+                && $memberFilter->isMemberAccessible($id)
+            ),
+            ARRAY_FILTER_USE_BOTH,
+        );
     }
 
     private function denyUnlessUploadAllowed(): void
