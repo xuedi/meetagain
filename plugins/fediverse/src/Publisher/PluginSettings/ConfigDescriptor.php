@@ -62,10 +62,7 @@ final readonly class ConfigDescriptor implements DescriptorInterface, TopActions
         return new Config();
     }
 
-    public function applyForm(object $data, FormInterface $form): void
-    {
-        \assert($data instanceof Config);
-    }
+    public function applyForm(object $data, FormInterface $form): void {}
 
     public function getPriority(): int
     {

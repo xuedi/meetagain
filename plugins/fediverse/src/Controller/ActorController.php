@@ -7,7 +7,7 @@ use Plugin\Fediverse\ActivityPub\EventObject;
 use Plugin\Fediverse\Entity\Account;
 use Plugin\Fediverse\Entity\Publication;
 use Plugin\Fediverse\Service\AccountService;
-use Plugin\Fediverse\Service\Publisher;
+use Plugin\Fediverse\Service\PublicationService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -24,7 +24,7 @@ final class ActorController extends AbstractController
         private readonly AccountService $accountService,
         private readonly Actor $actor,
         private readonly EventObject $eventObject,
-        private readonly Publisher $publisher,
+        private readonly PublicationService $publications,
     ) {}
 
     #[Route('/@{username}', name: 'app_plugin_fediverse_actor', requirements: ['username' => '[a-z0-9_]{1,30}'], methods: ['GET'])]
@@ -35,12 +35,17 @@ final class ActorController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        if ($request->getSchemeAndHttpHost() !== $this->actor->accountOrigin()) {
+        $isAccountHost = $request->getSchemeAndHttpHost() === $this->actor->accountOrigin();
+        if (!$isAccountHost) {
             return new RedirectResponse($this->actor->id($account), Response::HTTP_MOVED_PERMANENTLY);
         }
 
         if ($account->isRetired()) {
             return $this->activityJson($this->actor->tombstone($account), Response::HTTP_GONE);
+        }
+
+        if (!$this->accountService->isFederating($account)) {
+            throw $this->createNotFoundException();
         }
 
         if ($this->wantsHtml($request)) {
@@ -54,7 +59,8 @@ final class ActorController extends AbstractController
     public function followers(Request $request, string $username): Response
     {
         $account = $this->accountService->findByUsername($username);
-        if (!$account instanceof Account || $account->isRetired() || $request->getSchemeAndHttpHost() !== $this->actor->accountOrigin()) {
+        $isAccountHost = $request->getSchemeAndHttpHost() === $this->actor->accountOrigin();
+        if (!$account instanceof Account || $account->isRetired() || !$isAccountHost || !$this->accountService->isFederating($account)) {
             throw $this->createNotFoundException();
         }
 
@@ -65,7 +71,8 @@ final class ActorController extends AbstractController
     public function outbox(Request $request, string $username): Response
     {
         $account = $this->accountService->findByUsername($username);
-        if (!$account instanceof Account || $account->isRetired() || $request->getSchemeAndHttpHost() !== $this->actor->accountOrigin()) {
+        $isAccountHost = $request->getSchemeAndHttpHost() === $this->actor->accountOrigin();
+        if (!$account instanceof Account || $account->isRetired() || !$isAccountHost || !$this->accountService->isFederating($account)) {
             throw $this->createNotFoundException();
         }
 
@@ -75,17 +82,23 @@ final class ActorController extends AbstractController
     #[Route('/events/{id}', name: 'app_plugin_fediverse_event', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function event(Request $request, int $id): Response
     {
-        $publication = $this->publisher->find($id);
+        $publication = $this->publications->find($id);
         if (!$publication instanceof Publication) {
             throw $this->createNotFoundException();
         }
 
-        if ($request->getSchemeAndHttpHost() !== $this->actor->accountOrigin()) {
+        $isAccountHost = $request->getSchemeAndHttpHost() === $this->actor->accountOrigin();
+        if (!$isAccountHost) {
             return new RedirectResponse($this->eventObject->id($publication), Response::HTTP_MOVED_PERMANENTLY);
         }
 
         if ($publication->isDeleted()) {
             return $this->activityJson($this->eventObject->tombstone($publication), Response::HTTP_GONE);
+        }
+
+        $account = $publication->getAccount();
+        if ($account->isRetired() || !$this->accountService->isFederating($account)) {
+            throw $this->createNotFoundException();
         }
 
         $document = $publication->getDocument();

@@ -8,6 +8,7 @@ use Override;
 use Plugin\Fediverse\ActivityPub\Actor;
 use Plugin\Fediverse\Entity\Account;
 use Plugin\Fediverse\Repository\AccountRepository;
+use Plugin\Fediverse\Service\AccountService;
 use Symfony\Component\HttpFoundation\Request;
 
 final readonly class WebFingerProvider implements WellKnownProviderInterface
@@ -17,6 +18,7 @@ final readonly class WebFingerProvider implements WellKnownProviderInterface
     public function __construct(
         private AccountRepository $accountRepository,
         private Actor $actor,
+        private AccountService $accountService,
     ) {}
 
     #[Override]
@@ -39,7 +41,7 @@ final readonly class WebFingerProvider implements WellKnownProviderInterface
         }
 
         $account = $this->findAccount((string) $request->query->get('resource', ''));
-        if (!$account instanceof Account || $account->isRetired()) {
+        if (!$account instanceof Account || $account->isRetired() || !$this->accountService->isFederating($account)) {
             return null;
         }
 

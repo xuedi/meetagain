@@ -4,11 +4,19 @@ framework:
             policy: 'fixed_window'
             limit: 300
             interval: '1 minute'
+        fediverse_key_fetch:
+            policy: 'sliding_window'
+            limit: 60
+            interval: '1 minute'
 
 when@test:
     framework:
         rate_limiter:
             fediverse_inbox:
                 policy: 'fixed_window'
+                limit: 999999
+                interval: '1 minute'
+            fediverse_key_fetch:
+                policy: 'sliding_window'
                 limit: 999999
                 interval: '1 minute'

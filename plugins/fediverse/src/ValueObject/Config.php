@@ -22,6 +22,11 @@ final class Config implements Data
     /** @var list<string> */
     private array $blockedServers = [];
 
+    public static function isUsername(string $username): bool
+    {
+        return strlen($username) <= self::USERNAME_MAX && preg_match(self::USERNAME_PATTERN, $username) === 1;
+    }
+
     public function getContent(): Content
     {
         return $this->content;
@@ -113,6 +118,18 @@ final class Config implements Data
         $this->blockedServers = array_values($normalised);
 
         return $this;
+    }
+
+    public function blocks(string $host): bool
+    {
+        $host = mb_strtolower($host);
+        foreach ($this->blockedServers as $blocked) {
+            if ($host === $blocked || str_ends_with($host, '.' . $blocked)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function clampedTo(self $ceiling): self

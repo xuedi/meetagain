@@ -23,7 +23,7 @@ use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Lock\LockFactory;
 
-readonly class Publisher
+readonly class PublicationService
 {
     public const int HORIZON_DAYS = 60;
 
@@ -105,7 +105,8 @@ readonly class Publisher
         $event = $this->events->find($eventId);
         $live = $this->publications->findLiveForEvent($eventId);
         $draft = $event instanceof Event ? $this->eventScope->runForEvent($eventId, fn(): ?array => $this->draft($event)) : null;
-        if ($live instanceof Publication && ($draft === null || $draft['account']->getId() !== $live->getAccount()->getId())) {
+        $draftAccountId = $draft === null ? null : $draft['account']->getId();
+        if ($live instanceof Publication && $draftAccountId !== $live->getAccount()->getId()) {
             $this->withdraw($live);
             $live = null;
         }

@@ -57,6 +57,15 @@ class AccountRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /** @return list<string> */
+    public function findScopeIds(): array
+    {
+        return array_map(
+            strval(...),
+            $this->createQueryBuilder('a')->select('DISTINCT a.scopeId')->where('a.scopeId IS NOT NULL')->getQuery()->getSingleColumnResult(),
+        );
+    }
+
     public function countLive(): int
     {
         return (int) $this->createQueryBuilder('a')->select('COUNT(a.id)')->where('a.retiredAt IS NULL')->getQuery()->getSingleScalarResult();

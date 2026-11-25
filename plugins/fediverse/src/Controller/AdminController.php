@@ -6,6 +6,7 @@ use Plugin\Fediverse\Service\Reconciler;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -22,7 +23,7 @@ final class AdminController extends AbstractController
     public function stop(Request $request): Response
     {
         if (!$this->isCsrfTokenValid(self::STOP_TOKEN, (string) $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException();
+            throw new BadRequestHttpException('Invalid CSRF token.');
         }
 
         $this->reconciler->stop();

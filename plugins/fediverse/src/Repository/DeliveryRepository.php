@@ -50,6 +50,11 @@ class DeliveryRepository extends ServiceEntityRepository
         return $this->findBy(['claimToken' => $token]);
     }
 
+    public function hasDue(DateTimeImmutable $now, DateTimeImmutable $leaseExpiredBefore): bool
+    {
+        return $this->claimable($now, $leaseExpiredBefore)->select('d.id')->setMaxResults(1)->getQuery()->getOneOrNullResult() !== null;
+    }
+
     public function countPending(): int
     {
         return $this->count([]);

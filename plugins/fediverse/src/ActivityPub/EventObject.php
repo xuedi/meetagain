@@ -127,7 +127,8 @@ readonly class EventObject
 
             $names[$locale] = $name;
             $summary = $config->getContent() === Content::Title ? null : $this->summary($event, $locale);
-            $notice = $event->isCanceled() ? $this->paragraph($this->translator->trans('events.notification_event_canceled', [], null, $locale)) : '';
+            $cancelNotice = $this->translator->trans('fediverse_object.canceled_notice', [], null, $locale);
+            $notice = $event->isCanceled() ? $this->paragraph($cancelNotice) : '';
             if ($summary !== null || $notice !== '') {
                 $summaries[$locale] = $notice . $summary;
             }

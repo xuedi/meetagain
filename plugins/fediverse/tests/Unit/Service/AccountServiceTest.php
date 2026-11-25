@@ -2,11 +2,17 @@
 
 namespace Plugin\Fediverse\Tests\Unit\Service;
 
+use App\Publisher\Noindex\NoindexProviderInterface;
 use App\Publisher\PluginSettings\Resolver;
+use App\Service\Config\ConfigService as CoreConfigService;
 use App\Service\Config\PluginService;
 use App\Service\Security\SecretBox;
+use App\Service\Seo\NoindexService;
+use App\Service\Seo\UrlOwnerService;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plugin\Fediverse\Entity\Account;
 use Plugin\Fediverse\Repository\AccountRepository;
@@ -21,6 +27,7 @@ use Symfony\Component\Lock\Store\InMemoryStore;
 class AccountServiceTest extends TestCase
 {
     private ?Account $live = null;
+    private ?string $activeScope = null;
 
     /** @var list<string> */
     private array $taken = [];
@@ -113,7 +120,7 @@ class AccountServiceTest extends TestCase
         static::assertSame('chess_club', $account?->getUsername());
     }
 
-    public function testAClearedUsernameKeepsTheExistingAccount(): void
+    public function testAClearedUsernameIsNoAccountToPublishWithButRetiresNothing(): void
     {
         // Arrange
         $this->live = new Account('7', 'chess_club', 'public', 'private', new DateTimeImmutable('2026-11-01'));
@@ -122,17 +129,79 @@ class AccountServiceTest extends TestCase
         $account = $this->service(null)->ensureForScope('7');
 
         // Assert
-        static::assertSame($this->live, $account);
+        static::assertNull($account);
+        static::assertFalse($this->live->isRetired(), 'the reconcile leaves it, sending its deletes');
     }
 
-    private function service(?string $username): AccountService
+    public function testTheInstallationAccountFederatesWhileItHasAUsername(): void
     {
+        // Arrange
+        $account = new Account(null, 'events', 'public', 'private', new DateTimeImmutable('2026-11-01'));
+
+        // Act + Assert
+        static::assertTrue($this->service('events')->isFederating($account));
+        static::assertFalse($this->service(null)->isFederating($account));
+    }
+
+    /** @return Generator<string, array{?string, string, bool, bool, bool}> */
+    public static function scopes(): Generator
+    {
+        yield 'every level said yes' => ['chess_club', '7', true, false, true];
+        yield 'no username' => [null, '7', true, false, false];
+        yield 'the scope did not take effect' => ['chess_club', '8', true, false, false];
+        yield 'the plugin is off in the scope' => ['chess_club', '7', false, false, false];
+        yield 'the scope is not indexable' => ['chess_club', '7', true, true, false];
+    }
+
+    #[DataProvider('scopes')]
+    public function testAScopedAccountFederatesOnlyWhileEveryLevelSaysYes(
+        ?string $username,
+        string $scopeInEffect,
+        bool $pluginActive,
+        bool $noindex,
+        bool $expected,
+    ): void {
+        // Arrange
+        $account = new Account('7', 'chess_club', 'public', 'private', new DateTimeImmutable('2026-11-01'));
+
+        // Act
+        $isFederating = $this->service($username, $scopeInEffect, $pluginActive, $noindex)->isFederating($account);
+
+        // Assert
+        static::assertSame($expected, $isFederating);
+        static::assertNull($this->activeScope);
+    }
+
+    private function service(?string $username, string $scopeInEffect = '7', bool $pluginActive = true, bool $noindex = false): AccountService
+    {
+        $resolver = $this->createStub(Resolver::class);
+        $resolver
+            ->method('runInScope')
+            ->willReturnCallback(function (string $scopeId, callable $work): mixed {
+                $this->activeScope = $scopeId;
+                try {
+                    return $work();
+                } finally {
+                    $this->activeScope = null;
+                }
+            });
+        $resolver->method('resolveScopeId')->willReturnCallback(fn(): ?string => $this->activeScope === null ? null : $scopeInEffect);
+
+        $plugins = $this->createStub(PluginService::class);
+        $plugins->method('getActiveList')->willReturn($pluginActive ? ['fediverse'] : []);
+
+        $noindexProvider = $this->createStub(NoindexProviderInterface::class);
+        $noindexProvider->method('shouldNoindex')->willReturn($noindex);
+
         $repository = $this->createStub(AccountRepository::class);
         $repository->method('findLiveForScope')->willReturnCallback(fn(): ?Account => $this->live);
         $repository->method('isUsernameTakenOutsideScope')->willReturnCallback(fn(string $name): bool => in_array($name, $this->taken, true));
 
         $configService = $this->createStub(ConfigService::class);
         $configService->method('getConfigFor')->willReturn(new Config()->setUsername($username));
+
+        $coreConfig = $this->createStub(CoreConfigService::class);
+        $coreConfig->method('getHost')->willReturn('https://events.example');
 
         $em = $this->createStub(EntityManagerInterface::class);
         $em->method('persist')->willReturnCallback(function (object $entity): void {
@@ -144,8 +213,10 @@ class AccountServiceTest extends TestCase
             $repository,
             $configService,
             $this->secretBox,
-            $this->createStub(Resolver::class),
-            $this->createStub(PluginService::class),
+            $resolver,
+            $plugins,
+            new NoindexService([$noindexProvider]),
+            new UrlOwnerService($coreConfig, []),
             $em,
             new LockFactory(new InMemoryStore()),
             new MockClock('2026-11-25T10:00:00+00:00'),

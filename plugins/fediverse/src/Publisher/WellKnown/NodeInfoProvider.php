@@ -9,6 +9,7 @@ use Plugin\Fediverse\ActivityPub\Actor;
 use Plugin\Fediverse\Controller\NodeInfoController;
 use Plugin\Fediverse\Entity\Account;
 use Plugin\Fediverse\Repository\AccountRepository;
+use Plugin\Fediverse\Service\AccountService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -20,6 +21,7 @@ final readonly class NodeInfoProvider implements WellKnownProviderInterface
         private Actor $actor,
         private UrlGeneratorInterface $urlGenerator,
         private AccountRepository $accounts,
+        private AccountService $accountService,
     ) {}
 
     #[Override]
@@ -46,7 +48,7 @@ final readonly class NodeInfoProvider implements WellKnownProviderInterface
             'href' => $this->actor->accountOrigin() . $this->urlGenerator->generate('app_plugin_fediverse_nodeinfo'),
         ]];
         $installation = $this->accounts->findLiveForScope(null);
-        if ($installation instanceof Account) {
+        if ($installation instanceof Account && $this->accountService->isFederating($installation)) {
             $links[] = ['rel' => self::APPLICATION_REL, 'href' => $this->actor->id($installation)];
         }
 

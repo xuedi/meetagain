@@ -4,6 +4,8 @@ namespace Plugin\Fediverse\Tests\Unit\Security;
 
 use App\Service\Security\SecretBox;
 use DateTimeImmutable;
+use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plugin\Fediverse\ActivityPub\Actor;
 use Plugin\Fediverse\Entity\Account;
@@ -144,6 +146,177 @@ class HttpSignatureTest extends TestCase
         ));
     }
 
+    /** @return Generator<string, array{string, string, string}> */
+    public static function elsewhere(): Generator
+    {
+        yield 'another path' => ['POST', '/bar?param=value&pet=dog', 'example.com'];
+        yield 'another method' => ['PUT', self::DRAFT_TARGET, 'example.com'];
+        yield 'another host' => ['POST', self::DRAFT_TARGET, 'evil.example'];
+    }
+
+    #[DataProvider('elsewhere')]
+    public function testASignatureCannotBeReplayedElsewhere(string $method, string $target, string $host): void
+    {
+        // Arrange
+        $signature = $this->draftSignature('(request-target) host date', self::DRAFT_BASIC_SIGNATURE);
+
+        // Act
+        $valid = $this->httpSignature(self::DRAFT_DATE)->verify(
+            $signature,
+            $method,
+            $target,
+            [...$this->draftHeaders(), 'host' => $host],
+            '',
+            self::DRAFT_PUBLIC_KEY,
+        );
+
+        // Assert
+        static::assertFalse($valid);
+    }
+
+    public function testACorrectSignatureCheckedAgainstAnotherKeyIsRefused(): void
+    {
+        // Arrange
+        $signature = $this->draftSignature('(request-target) host date', self::DRAFT_BASIC_SIGNATURE);
+        [, $otherKey] = $this->account();
+
+        // Act
+        $valid = $this->httpSignature(self::DRAFT_DATE)->verify($signature, 'POST', self::DRAFT_TARGET, $this->draftHeaders(), '', $otherKey);
+
+        // Assert
+        static::assertFalse($valid);
+    }
+
+    /** @return Generator<string, array{string}> */
+    public static function foreignAlgorithms(): Generator
+    {
+        yield 'rsa-sha1' => ['rsa-sha1'];
+        yield 'hmac-sha256' => ['hmac-sha256'];
+    }
+
+    #[DataProvider('foreignAlgorithms')]
+    public function testAnAlgorithmOutsideTheListIsRefused(string $algorithm): void
+    {
+        // Arrange
+        $signature = $this->draftSignature('(request-target) host date', self::DRAFT_BASIC_SIGNATURE, $algorithm);
+
+        // Act
+        $valid = $this->httpSignature(self::DRAFT_DATE)->verify($signature, 'POST', self::DRAFT_TARGET, $this->draftHeaders(), '', self::DRAFT_PUBLIC_KEY);
+
+        // Assert
+        static::assertFalse($valid);
+    }
+
+    public function testHs2019WithAnRsaKeyVerifies(): void
+    {
+        // Arrange
+        $signature = $this->draftSignature('(request-target) host date', self::DRAFT_BASIC_SIGNATURE, 'hs2019');
+
+        // Act
+        $valid = $this->httpSignature(self::DRAFT_DATE)->verify($signature, 'POST', self::DRAFT_TARGET, $this->draftHeaders(), '', self::DRAFT_PUBLIC_KEY);
+
+        // Assert
+        static::assertTrue($valid);
+    }
+
+    public function testADateThatIsNoHttpDateIsRefused(): void
+    {
+        // Arrange
+        $headers = [...$this->draftHeaders(), 'date' => '2014-01-05T21:31:40Z'];
+        [$signature, $publicKey] = $this->selfSigned($headers, '');
+
+        // Act
+        $valid = $this->httpSignature(self::DRAFT_DATE)->verify($signature, 'POST', self::DRAFT_TARGET, $headers, '', $publicKey);
+
+        // Assert
+        static::assertFalse($valid);
+    }
+
+    public function testADigestOfferingOnlySha512IsRefused(): void
+    {
+        // Arrange
+        $headers = [...$this->draftHeaders(), 'digest' => 'SHA-512=' . base64_encode(hash('sha512', self::DRAFT_BODY, true))];
+        [$signature, $publicKey] = $this->selfSigned($headers, ' digest');
+
+        // Act
+        $valid = $this->httpSignature(self::DRAFT_DATE)->verify($signature, 'POST', self::DRAFT_TARGET, $headers, self::DRAFT_BODY, $publicKey);
+
+        // Assert
+        static::assertFalse($valid);
+    }
+
+    public function testASelfSignedRequestVerifies(): void
+    {
+        // Arrange
+        $headers = [...$this->draftHeaders(), 'digest' => 'SHA-256=' . base64_encode(hash('sha256', self::DRAFT_BODY, true))];
+        [$signature, $publicKey] = $this->selfSigned($headers, ' digest');
+
+        // Act
+        $valid = $this->httpSignature(self::DRAFT_DATE)->verify($signature, 'POST', self::DRAFT_TARGET, $headers, self::DRAFT_BODY, $publicKey);
+
+        // Assert
+        static::assertTrue($valid, 'the helper the two tests above rely on signs correctly');
+    }
+
+    public function testAKeyThatIsNoPemIsRefused(): void
+    {
+        // Arrange
+        $signature = $this->draftSignature('(request-target) host date', self::DRAFT_BASIC_SIGNATURE);
+
+        // Act
+        $valid = $this->httpSignature(self::DRAFT_DATE)->verify($signature, 'POST', self::DRAFT_TARGET, $this->draftHeaders(), '', 'not a key');
+
+        // Assert
+        static::assertFalse($valid);
+    }
+
+    public function testASignatureThatIsNoStrictBase64IsNoSignature(): void
+    {
+        // Act
+        $parsed = $this->httpSignature(self::DRAFT_DATE)->parse('keyId="Test",headers="(request-target) host date",signature="not*base64!"');
+
+        // Assert
+        static::assertNull($parsed);
+    }
+
+    public function testTheFirstOfDuplicatedParametersWins(): void
+    {
+        // Act
+        $parsed = $this->httpSignature(self::DRAFT_DATE)->parse(
+            'keyId="https://social.example/users/a#main-key",headers="(request-target) host date",signature="c2ln",'
+            . 'keyId="https://evil.example/users/m#main-key",headers="date"',
+        );
+
+        // Assert
+        static::assertNotNull($parsed);
+        static::assertSame('https://social.example/users/a#main-key', $parsed['keyId']);
+        static::assertSame(['(request-target)', 'host', 'date'], $parsed['headers']);
+    }
+
+    /**
+     * @param array<string, string> $headers
+     * @return array{array{keyId: string, algorithm: ?string, headers: list<string>, signature: string}, string}
+     */
+    private function selfSigned(array $headers, string $extraNames): array
+    {
+        $key = openssl_pkey_new(['private_key_bits' => 2048, 'private_key_type' => OPENSSL_KEYTYPE_RSA]);
+        static::assertNotFalse($key);
+        $lines = ['(request-target): post ' . self::DRAFT_TARGET, 'host: ' . $headers['host'], 'date: ' . $headers['date']];
+        if ($extraNames !== '') {
+            $lines[] = 'digest: ' . $headers['digest'];
+        }
+        $raw = '';
+        openssl_sign(implode("\n", $lines), $raw, $key, OPENSSL_ALGO_SHA256);
+        $parsed = $this->httpSignature(self::DRAFT_DATE)->parse(sprintf(
+            'keyId="Test",algorithm="rsa-sha256",headers="(request-target) host date%s",signature="%s"',
+            $extraNames,
+            base64_encode((string) $raw),
+        ));
+        static::assertNotNull($parsed);
+
+        return [$parsed, openssl_pkey_get_details($key)['key']];
+    }
+
     private function verifyAllHeaders(string $date, string $body): bool
     {
         $signature = $this->draftSignature('(request-target) host date content-type digest content-length', self::DRAFT_ALL_HEADERS_SIGNATURE);
@@ -160,10 +333,11 @@ class HttpSignatureTest extends TestCase
     /**
      * @return array{keyId: string, algorithm: ?string, headers: list<string>, signature: string}
      */
-    private function draftSignature(string $headers, string $signature): array
+    private function draftSignature(string $headers, string $signature, string $algorithm = 'rsa-sha256'): array
     {
         $parsed = $this->httpSignature(self::DRAFT_DATE)->parse(sprintf(
-            'keyId="Test",algorithm="rsa-sha256",headers="%s",signature="%s"',
+            'keyId="Test",algorithm="%s",headers="%s",signature="%s"',
+            $algorithm,
             $headers,
             $signature,
         ));

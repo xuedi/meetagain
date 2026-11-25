@@ -11,6 +11,7 @@ use App\Service\Seo\UrlOwnerService;
 use Plugin\Fediverse\Entity\Account;
 use Plugin\Fediverse\Repository\FollowerRepository;
 use Plugin\Fediverse\Service\ConfigService;
+use Plugin\Fediverse\ValueObject\Config;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 readonly class Actor
@@ -22,7 +23,6 @@ readonly class Actor
     private const string SHARED_INBOX_ROUTE = 'app_plugin_fediverse_inbox';
     private const string OUTBOX_ROUTE = 'app_plugin_fediverse_outbox';
     private const string FOLLOWERS_ROUTE = 'app_plugin_fediverse_followers';
-    private const string USERNAME_PATTERN = '/^[a-z0-9_]{1,30}$/';
 
     public function __construct(
         private Resolver $resolver,
@@ -61,7 +61,7 @@ readonly class Actor
         $position = strrpos($actorId, '/@');
         $username = $position === false ? '' : substr($actorId, $position + 2);
 
-        return preg_match(self::USERNAME_PATTERN, $username) === 1 && $this->idFor($username) === $actorId ? $username : null;
+        return Config::isUsername($username) && $this->idFor($username) === $actorId ? $username : null;
     }
 
     public function handle(Account $account): string

@@ -37,12 +37,16 @@ readonly class InboxService
         private LockFactory $lockFactory,
         private ClockInterface $clock,
         #[Autowire(service: 'limiter.fediverse_inbox')]
-        private RateLimiterFactoryInterface $limiter,
+        private RateLimiterFactoryInterface $inboxLimiter,
+        #[Autowire(service: 'limiter.fediverse_key_fetch')]
+        private RateLimiterFactoryInterface $keyFetchLimiter,
     ) {}
 
     public function receive(Request $request): int
     {
-        if ((int) $request->headers->get('content-length') > self::MAX_BODY_BYTES || strlen($request->getContent()) > self::MAX_BODY_BYTES) {
+        $announcedLength = (int) $request->headers->get('content-length');
+        $bodyLength = strlen($request->getContent());
+        if ($announcedLength > self::MAX_BODY_BYTES || $bodyLength > self::MAX_BODY_BYTES) {
             return Response::HTTP_REQUEST_ENTITY_TOO_LARGE;
         }
 
@@ -52,11 +56,11 @@ readonly class InboxService
             return Response::HTTP_UNAUTHORIZED;
         }
 
-        if ($this->isBlocked($host)) {
+        if ($this->configService->getCeiling()->blocks($host)) {
             return Response::HTTP_FORBIDDEN;
         }
 
-        if (!$this->limiter->create($host)->consume()->isAccepted()) {
+        if (!$this->inboxLimiter->create($host)->consume()->isAccepted()) {
             return Response::HTTP_TOO_MANY_REQUESTS;
         }
 
@@ -70,19 +74,19 @@ readonly class InboxService
             return Response::HTTP_UNAUTHORIZED;
         }
 
-        $verify = fn(Account $signer): ?RemoteKey => $this->verifiedKey($request, $signature, $actorId, $signer);
+        $verify = fn(Account $signer): RemoteKey|int => $this->verifiedKey($request, $signature, $actorId, $signer);
 
         return match ($activity['type'] ?? null) {
             'Follow' => $this->follow($activity, $actorId, $verify),
             'Undo' => $this->undo($activity, $actorId, $verify),
-            'Delete' => $this->delete($activity, $actorId, $verify),
+            'Delete' => $this->delete($request, $activity, $actorId, $verify),
             default => Response::HTTP_ACCEPTED,
         };
     }
 
     /**
      * @param array<mixed> $activity
-     * @param Closure(Account): ?RemoteKey $verify
+     * @param Closure(Account): (RemoteKey|int) $verify
      */
     private function follow(array $activity, string $actorId, Closure $verify): int
     {
@@ -94,7 +98,7 @@ readonly class InboxService
 
         $key = $verify($account);
         if (!$key instanceof RemoteKey) {
-            return Response::HTTP_UNAUTHORIZED;
+            return $key;
         }
 
         $lock = $this->lockFactory->createLock('fediverse.follower.' . $account->getId());
@@ -120,7 +124,7 @@ readonly class InboxService
 
     /**
      * @param array<mixed> $activity
-     * @param Closure(Account): ?RemoteKey $verify
+     * @param Closure(Account): (RemoteKey|int) $verify
      */
     private function undo(array $activity, string $actorId, Closure $verify): int
     {
@@ -128,8 +132,9 @@ readonly class InboxService
         $follower = null;
         if (is_string($object)) {
             $follower = $this->followers->findOneByFollowId($object, $actorId);
-        } elseif (is_array($object) && ($object['type'] ?? null) === 'Follow' && $this->idOf($object['actor'] ?? $actorId) === $actorId) {
-            $account = $this->localAccount($this->idOf($object['object'] ?? null));
+        } elseif (is_array($object) && ($object['type'] ?? null) === 'Follow') {
+            $followerId = $this->idOf($object['actor'] ?? $actorId);
+            $account = $followerId === $actorId ? $this->localAccount($this->idOf($object['object'] ?? null)) : null;
             $follower = $account instanceof Account ? $this->followers->findOneFor($account, $actorId) : null;
         }
 
@@ -137,8 +142,9 @@ readonly class InboxService
             return Response::HTTP_ACCEPTED;
         }
 
-        if (!$verify($follower->getAccount()) instanceof RemoteKey) {
-            return Response::HTTP_UNAUTHORIZED;
+        $key = $verify($follower->getAccount());
+        if (!$key instanceof RemoteKey) {
+            return $key;
         }
 
         $this->em->remove($follower);
@@ -149,19 +155,30 @@ readonly class InboxService
 
     /**
      * @param array<mixed> $activity
-     * @param Closure(Account): ?RemoteKey $verify
+     * @param Closure(Account): (RemoteKey|int) $verify
      */
-    private function delete(array $activity, string $actorId, Closure $verify): int
+    private function delete(Request $request, array $activity, string $actorId, Closure $verify): int
     {
-        $followers = $this->idOf($activity['object'] ?? null) === $actorId ? $this->followers->findByActorId($actorId) : [];
+        $isSelf = $this->idOf($activity['object'] ?? null) === $actorId;
+        $followers = $isSelf ? $this->followers->findByActorId($actorId) : [];
         if ($followers === []) {
             return Response::HTTP_ACCEPTED;
         }
 
         $signer = $followers[0]->getAccount();
-        $isProven = $verify($signer) instanceof RemoteKey || $this->remoteKeys->isGone($actorId, $signer);
-        if (!$isProven) {
-            return Response::HTTP_UNAUTHORIZED;
+        $key = $verify($signer);
+        if ($key === Response::HTTP_TOO_MANY_REQUESTS) {
+            return $key;
+        }
+
+        if (!$key instanceof RemoteKey) {
+            if (!$this->mayFetch($request)) {
+                return Response::HTTP_TOO_MANY_REQUESTS;
+            }
+
+            if (!$this->remoteKeys->isGone($actorId, $signer)) {
+                return Response::HTTP_UNAUTHORIZED;
+            }
         }
 
         foreach ($followers as $follower) {
@@ -172,22 +189,42 @@ readonly class InboxService
         return Response::HTTP_ACCEPTED;
     }
 
-    /** @param array{keyId: string, algorithm: ?string, headers: list<string>, signature: string} $signature */
-    private function verifiedKey(Request $request, array $signature, string $actorId, Account $signer): ?RemoteKey
+    /**
+     * @param array{keyId: string, algorithm: ?string, headers: list<string>, signature: string} $signature
+     * @return RemoteKey|int the verified key, or the status to refuse with
+     */
+    private function verifiedKey(Request $request, array $signature, string $actorId, Account $signer): RemoteKey|int
     {
-        $key = $this->remoteKeys->find($signature['keyId'], $signer);
+        $keyId = $signature['keyId'];
+        if (!$this->remoteKeys->isCached($keyId) && !$this->mayFetch($request)) {
+            return Response::HTTP_TOO_MANY_REQUESTS;
+        }
+
+        $key = $this->remoteKeys->find($keyId, $signer);
         if ($key instanceof RemoteKey && $this->verifies($request, $signature, $actorId, $key)) {
             return $key;
         }
 
-        $isStale = $key instanceof RemoteKey && ($this->clock->now()->getTimestamp() - $key->fetchedAt) > self::KEY_REFRESH_AFTER_SECONDS;
-        if (!$isStale) {
-            return null;
+        $keyAge = $key instanceof RemoteKey ? $this->clock->now()->getTimestamp() - $key->fetchedAt : 0;
+        if ($keyAge <= self::KEY_REFRESH_AFTER_SECONDS) {
+            return Response::HTTP_UNAUTHORIZED;
         }
 
-        $key = $this->remoteKeys->find($signature['keyId'], $signer, refresh: true);
+        if (!$this->mayFetch($request)) {
+            return Response::HTTP_TOO_MANY_REQUESTS;
+        }
 
-        return $key instanceof RemoteKey && $this->verifies($request, $signature, $actorId, $key) ? $key : null;
+        $key = $this->remoteKeys->find($keyId, $signer, refresh: true);
+
+        return $key instanceof RemoteKey && $this->verifies($request, $signature, $actorId, $key) ? $key : Response::HTTP_UNAUTHORIZED;
+    }
+
+    private function mayFetch(Request $request): bool
+    {
+        return $this->keyFetchLimiter
+            ->create((string) $request->getClientIp())
+            ->consume()
+            ->isAccepted();
     }
 
     /** @param array{keyId: string, algorithm: ?string, headers: list<string>, signature: string} $signature */
@@ -212,17 +249,6 @@ readonly class InboxService
         $account = $username === null ? null : $this->accounts->findOneByUsername($username);
 
         return $account instanceof Account && !$account->isRetired() ? $account : null;
-    }
-
-    private function isBlocked(string $host): bool
-    {
-        foreach ($this->configService->getCeiling()->getBlockedServers() as $blocked) {
-            if ($host === $blocked || str_ends_with($host, '.' . $blocked)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private function signatureHeader(Request $request): string

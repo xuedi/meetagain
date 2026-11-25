@@ -2,7 +2,7 @@
 # Started by `just devFediverse`.
 
 x-mastodon: &mastodon
-  image: ghcr.io/mastodon/mastodon:v4.7.5
+  image: ghcr.io/mastodon/mastodon:v4.7.5@sha256:1cf98fb199f8cc1dcf4bb174095656bd5e19e99f29e935c2a838132083e1f609
   restart: unless-stopped
   volumes:
     - ../../../docker/certs/rootCA.pem:/ca/rootCA.pem:ro
@@ -32,7 +32,7 @@ x-mastodon: &mastodon
 
 services:
   fedi-proxy:
-    image: caddy:2.10.0-alpine
+    image: caddy:2.10.0-alpine@sha256:ae4458638da8e1a91aafffb231c5f8778e964bca650c8a8cb23a7e8ac557aa3c
     container_name: ma-fedi-proxy
     restart: unless-stopped
     volumes:
@@ -55,7 +55,7 @@ services:
     command: bundle exec sidekiq
 
   fedi-mastodon-db:
-    image: postgres:17-alpine
+    image: postgres:17-alpine@sha256:979c4379dd698aba0b890599a6104e082035f98ef31d9b9291ec22f2b13059ca
     container_name: ma-fedi-mastodon-db
     restart: unless-stopped
     environment:
@@ -75,7 +75,7 @@ services:
       - fediverse
 
   fedi-mobilizon:
-    image: kaihuri/mobilizon:5.2.4
+    image: kaihuri/mobilizon:5.2.4@sha256:95c201b39d7041678273ff6c4049deaec10c5a66824885b654a2662a4d4a52fa
     container_name: ma-fedi-mobilizon
     restart: unless-stopped
     volumes:
@@ -103,7 +103,7 @@ services:
       - fediverse
 
   fedi-mobilizon-db:
-    image: postgis/postgis:17-3.5-alpine
+    image: postgis/postgis:17-3.5-alpine@sha256:894f570c0cf0664ed5576a8fd5d5bfb8fb1b19d592885b686c3a88c8bd90c41f
     container_name: ma-fedi-mobilizon-db
     restart: unless-stopped
     environment:

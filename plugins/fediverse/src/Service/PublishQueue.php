@@ -30,7 +30,7 @@ readonly class PublishQueue implements TaskInterface, EntityActionInterface
     public function __construct(
         private PendingEventRepository $pending,
         private PublicationRepository $publications,
-        private Publisher $publisher,
+        private PublicationService $publicationService,
         private EntityManagerInterface $em,
         private LockFactory $lockFactory,
         private TriggerInterface $trigger,
@@ -45,7 +45,8 @@ readonly class PublishQueue implements TaskInterface, EntityActionInterface
             return;
         }
 
-        if ($action === EntityAction::DeleteEvent && !$this->publications->findLiveForEvent($entityId) instanceof Publication) {
+        $hasLivePublication = $this->publications->findLiveForEvent($entityId) instanceof Publication;
+        if ($action === EntityAction::DeleteEvent && !$hasLivePublication) {
             return;
         }
 
@@ -102,7 +103,7 @@ readonly class PublishQueue implements TaskInterface, EntityActionInterface
             $this->em->remove($row);
             $this->em->flush();
             try {
-                $this->publisher->publish($eventId);
+                $this->publicationService->publish($eventId);
                 ++$published;
             } catch (Throwable $e) {
                 ++$failed;

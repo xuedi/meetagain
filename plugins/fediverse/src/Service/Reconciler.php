@@ -9,30 +9,36 @@ use Module\Task\Contract\Cadence;
 use Module\Task\Contract\Result;
 use Module\Task\Contract\Status;
 use Module\Task\Contract\TaskInterface;
+use Module\Task\Contract\TriggerInterface;
 use Override;
 use Plugin\Fediverse\Repository\AccountRepository;
+use Plugin\Fediverse\Repository\FollowerRepository;
 use Plugin\Fediverse\Repository\PublicationRepository;
 use Plugin\Fediverse\ValueObject\Config;
 use Symfony\Component\Clock\ClockInterface;
 
 readonly class Reconciler implements TaskInterface
 {
+    public const string IDENTIFIER = 'fediverse-reconcile';
+
     public function __construct(
         private EventRepository $events,
         private PublicationRepository $publications,
         private PublishQueue $publishQueue,
         private AccountRepository $accounts,
+        private FollowerRepository $followers,
         private AccountService $accountService,
-        private Publisher $publisher,
+        private PublicationService $publicationService,
         private ConfigService $configService,
         private Resolver $resolver,
+        private TriggerInterface $trigger,
         private ClockInterface $clock,
     ) {}
 
     #[Override]
     public function getIdentifier(): string
     {
-        return 'fediverse-reconcile';
+        return self::IDENTIFIER;
     }
 
     #[Override]
@@ -45,8 +51,8 @@ readonly class Reconciler implements TaskInterface
     public function getDescription(): string
     {
         return sprintf(
-            'Brings the fediverse in line with the events once a day. An account whose scope no longer runs the plugin, or no longer exists, has its events deleted and is retired. Then it queues every public event that starts within the next %d days, so an event enters the fediverse as it comes within reach and a scope that just switched the plugin on gets its upcoming events, and every published event that has not started yet, so one that stopped qualifying without being edited - a scope gone private - is withdrawn.',
-            Publisher::HORIZON_DAYS,
+            'Brings the fediverse in line with the events once a day. An account whose scope no longer runs the plugin, is no longer indexable, has no username or no longer exists has its events deleted and is retired, and followers on a blocked server are dropped. Then it queues every public event that starts within the next %d days, so an event enters the fediverse as it comes within reach and a scope that just switched the plugin on gets its upcoming events, and every published event that has not started yet, so one that stopped qualifying without being edited - a scope gone private - is withdrawn.',
+            PublicationService::HORIZON_DAYS,
         );
     }
 
@@ -57,15 +63,18 @@ readonly class Reconciler implements TaskInterface
         $retired = 0;
         foreach ($this->accounts->findLive() as $account) {
             if (!$this->accountService->isFederating($account)) {
-                $this->publisher->leave($account);
+                $this->publicationService->leave($account);
                 ++$retired;
             }
         }
 
+        $ceiling = $this->configService->getCeiling();
+        $dropped = $this->followers->removeOnHosts($ceiling->blocks(...));
+
         $now = $this->clock->now();
         $upcoming = array_map(
             static fn(Event $event): int => (int) $event->getId(),
-            $this->events->findUpcomingEventsWithinRange($now, $now->modify(sprintf('+%d days', Publisher::HORIZON_DAYS))),
+            $this->events->findUpcomingEventsWithinRange($now, $now->modify(sprintf('+%d days', PublicationService::HORIZON_DAYS))),
         );
         $published = $this->publications->findLiveEventIdsStartingFrom($now);
         $eventIds = array_values(array_unique([...$upcoming, ...$published]));
@@ -73,20 +82,17 @@ readonly class Reconciler implements TaskInterface
             $this->publishQueue->queue($eventIds);
         }
 
-        return new Result(Status::ok, sprintf('Queued: %d, accounts retired: %d', count($eventIds), $retired));
+        return new Result(Status::ok, sprintf('Queued: %d, accounts retired: %d, blocked followers dropped: %d', count($eventIds), $retired, $dropped));
     }
 
-    public function stop(): int
+    public function stop(): void
     {
-        $withdrawn = 0;
-        foreach ($this->accounts->findLive() as $account) {
-            $withdrawn += $this->publisher->leave($account);
-            $this->forgetUsername($account->getScopeId());
+        foreach ($this->accounts->findScopeIds() as $scopeId) {
+            $this->forgetUsername($scopeId);
         }
         $this->forgetUsername(null);
         $this->configService->reset();
-
-        return $withdrawn;
+        $this->trigger->runSoon(self::IDENTIFIER);
     }
 
     private function forgetUsername(?string $scopeId): void

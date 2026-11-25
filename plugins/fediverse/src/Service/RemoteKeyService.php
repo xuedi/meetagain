@@ -6,6 +6,7 @@ use Plugin\Fediverse\Entity\Account;
 use Plugin\Fediverse\Entity\Follower;
 use Plugin\Fediverse\Security\HttpSignature;
 use Plugin\Fediverse\ValueObject\RemoteKey;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -18,6 +19,8 @@ readonly class RemoteKeyService
 {
     public const int MAX_DOCUMENT_BYTES = 262144;
     public const int MISS_TTL_SECONDS = 300;
+    public const int FETCH_TIMEOUT_SECONDS = 3;
+    public const int FETCH_MAX_DURATION_SECONDS = 5;
 
     private const string ACCEPT = 'application/activity+json, application/ld+json; profile="https://www.w3.org/ns/activitystreams"';
 
@@ -25,7 +28,7 @@ readonly class RemoteKeyService
         #[Autowire(service: 'remote.client')]
         private HttpClientInterface $client,
         #[Autowire(service: 'cache.fediverse_remote_key')]
-        private CacheInterface $cache,
+        private CacheInterface&CacheItemPoolInterface $cache,
         private HttpSignature $httpSignature,
         private ClockInterface $clock,
         private LoggerInterface $logger,
@@ -41,9 +44,14 @@ readonly class RemoteKeyService
         return strtolower($host);
     }
 
+    public function isCached(string $keyId): bool
+    {
+        return $this->cache->hasItem($this->cacheKey($keyId));
+    }
+
     public function find(string $keyId, ?Account $signer, bool $refresh = false): ?RemoteKey
     {
-        $cacheKey = 'key.' . hash('xxh128', $keyId);
+        $cacheKey = $this->cacheKey($keyId);
         if ($refresh) {
             $this->cache->delete($cacheKey);
         }
@@ -60,7 +68,7 @@ readonly class RemoteKeyService
 
     public function isGone(string $actorId, ?Account $signer): bool
     {
-        return $this->document($actorId, $signer) === 410;
+        return $this->document($actorId, $signer, followRedirects: false) === 410;
     }
 
     private function fetch(string $keyId, ?Account $signer): ?RemoteKey
@@ -112,13 +120,18 @@ readonly class RemoteKeyService
         return null;
     }
 
+    private function cacheKey(string $keyId): string
+    {
+        return 'key.' . hash('xxh128', $keyId);
+    }
+
     private function isOn(string $host, mixed $url): bool
     {
         return is_string($url) && strlen($url) <= Follower::MAX_URL_LENGTH && $this->hostOf($url) === $host;
     }
 
     /** @return array<mixed>|int the decoded document, or the status code when there is none (0 when nothing answered) */
-    private function document(string $url, ?Account $signer): array|int
+    private function document(string $url, ?Account $signer, bool $followRedirects = true): array|int
     {
         $url = explode('#', $url, 2)[0];
         if ($this->hostOf($url) === null) {
@@ -130,9 +143,15 @@ readonly class RemoteKeyService
             $headers += $this->httpSignature->sign($signer, 'GET', $url, null);
         }
 
+        $options = ['headers' => $headers, 'timeout' => self::FETCH_TIMEOUT_SECONDS, 'max_duration' => self::FETCH_MAX_DURATION_SECONDS];
+        if (!$followRedirects) {
+            $options['max_redirects'] = 0;
+        }
+
         try {
-            $response = $this->client->request('GET', $url, ['headers' => $headers]);
+            $response = $this->client->request('GET', $url, $options);
             $status = $response->getStatusCode();
+            $servedFrom = explode('#', (string) $response->getInfo('url'), 2)[0];
             if ($status !== 200) {
                 $response->cancel();
 
@@ -155,7 +174,8 @@ readonly class RemoteKeyService
         }
 
         $document = json_decode($body, true);
+        $isServedFromItsId = is_array($document) && ($document['id'] ?? null) === $servedFrom;
 
-        return is_array($document) ? $document : 0;
+        return $isServedFromItsId ? $document : 0;
     }
 }

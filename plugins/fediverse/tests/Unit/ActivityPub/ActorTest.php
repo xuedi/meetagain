@@ -14,10 +14,14 @@ use Generator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Plugin\Fediverse\ActivityPub\Actor;
+use Plugin\Fediverse\Controller\ActorController;
+use Plugin\Fediverse\Controller\InboxController;
 use Plugin\Fediverse\Entity\Account;
 use Plugin\Fediverse\Repository\FollowerRepository;
 use Plugin\Fediverse\Service\ConfigService;
 use Plugin\Fediverse\ValueObject\Config;
+use ReflectionClass;
+use Symfony\Component\Routing\Attribute\Route as RouteAttribute;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
@@ -115,6 +119,43 @@ Every week.</p>', $document['summary']);
     {
         // Act + Assert
         static::assertSame($username, $this->actor()->usernameOf($actorId));
+    }
+
+    /** @return Generator<string, array{string}> */
+    public static function usernames(): Generator
+    {
+        yield 'empty' => [''];
+        yield 'a letter' => ['a'];
+        yield 'letters, digits and underscores' => ['chess_club_42'];
+        yield 'at the maximum' => [str_repeat('a', Config::USERNAME_MAX)];
+        yield 'past the maximum' => [str_repeat('a', Config::USERNAME_MAX + 1)];
+        yield 'capitals' => ['Chess'];
+        yield 'a dash' => ['chess-club'];
+        yield 'a dot' => ['chess.club'];
+        yield 'a non-ascii letter' => ['schach_über'];
+    }
+
+    #[DataProvider('usernames')]
+    public function testEveryUsernameRouteAcceptsExactlyWhatTheConfigAccepts(string $username): void
+    {
+        // Arrange
+        $requirements = [];
+        foreach ([ActorController::class, InboxController::class] as $controller) {
+            foreach (new ReflectionClass($controller)->getMethods() as $method) {
+                foreach ($method->getAttributes(RouteAttribute::class) as $attribute) {
+                    $requirement = $attribute->newInstance()->requirements['username'] ?? null;
+                    if (is_string($requirement)) {
+                        $requirements[] = $requirement;
+                    }
+                }
+            }
+        }
+        static::assertCount(4, $requirements, 'actor, followers, outbox and the per-account inbox');
+
+        // Act + Assert
+        foreach ($requirements as $requirement) {
+            static::assertSame(Config::isUsername($username), preg_match('#^(?:' . $requirement . ')$#', $username) === 1, $requirement);
+        }
     }
 
     private function actor(): Actor

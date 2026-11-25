@@ -144,7 +144,7 @@ class EventObjectTest extends TestCase
 
         // Assert
         static::assertSame('CANCELLED', $document['ical:status']);
-        static::assertSame('<p>en:events.notification_event_canceled</p>', $document['summary'], 'Mastodon ignores ical:status and shows the summary');
+        static::assertSame('<p>en:fediverse_object.canceled_notice</p>', $document['summary'], 'Mastodon ignores ical:status and shows the summary');
         static::assertArrayNotHasKey('content', $document);
     }
 

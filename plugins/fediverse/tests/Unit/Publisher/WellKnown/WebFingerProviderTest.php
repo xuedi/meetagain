@@ -10,6 +10,7 @@ use Plugin\Fediverse\ActivityPub\Actor;
 use Plugin\Fediverse\Entity\Account;
 use Plugin\Fediverse\Publisher\WellKnown\WebFingerProvider;
 use Plugin\Fediverse\Repository\AccountRepository;
+use Plugin\Fediverse\Service\AccountService;
 use Symfony\Component\HttpFoundation\Request;
 
 class WebFingerProviderTest extends TestCase
@@ -81,7 +82,16 @@ class WebFingerProviderTest extends TestCase
         return Request::create('https://' . $host . '/.well-known/webfinger', 'GET', ['resource' => $resource]);
     }
 
-    private function provider(Account $account): WebFingerProvider
+    public function testAnAccountThatStoppedFederatingIsNotFound(): void
+    {
+        // Act
+        $document = $this->provider($this->account(), isFederating: false)->provide($this->request('events.example', 'acct:chess_club@events.example'));
+
+        // Assert
+        static::assertNull($document);
+    }
+
+    private function provider(Account $account, bool $isFederating = true): WebFingerProvider
     {
         $repository = $this->createStub(AccountRepository::class);
         $repository->method('findOneByUsername')->willReturnCallback(static fn(string $username): ?Account => $username === 'chess_club' ? $account : null);
@@ -96,6 +106,9 @@ class WebFingerProviderTest extends TestCase
         $actor->method('handle')->willReturn('chess_club@events.example');
         $actor->method('profileUrl')->willReturn('https://chess.example/');
 
-        return new WebFingerProvider($repository, $actor);
+        $accountService = $this->createStub(AccountService::class);
+        $accountService->method('isFederating')->willReturn($isFederating);
+
+        return new WebFingerProvider($repository, $actor, $accountService);
     }
 }

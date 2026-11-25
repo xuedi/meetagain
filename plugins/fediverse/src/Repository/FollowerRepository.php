@@ -48,6 +48,35 @@ class FollowerRepository extends ServiceEntityRepository
         return $this->count(['account' => $account]);
     }
 
+    /** @param callable(string): bool $isBlocked */
+    public function removeOnHosts(callable $isBlocked): int
+    {
+        $rows = $this->createQueryBuilder('f')->select('f.id', 'f.inbox', 'f.sharedInbox')->getQuery()->getArrayResult();
+        $ids = [];
+        foreach ($rows as $row) {
+            foreach ([$row['inbox'], $row['sharedInbox']] as $url) {
+                if ($url !== null && $isBlocked(strtolower((string) parse_url($url, PHP_URL_HOST)))) {
+                    $ids[] = $row['id'];
+                    break;
+                }
+            }
+        }
+
+        if ($ids === []) {
+            return 0;
+        }
+
+        $this
+            ->createQueryBuilder('f')
+            ->delete()
+            ->where('f.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->execute();
+
+        return count($ids);
+    }
+
     public function removeFor(Account $account): void
     {
         $this
