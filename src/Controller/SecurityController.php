@@ -317,7 +317,7 @@ final class SecurityController extends AbstractController
         $user->setVerified(false);
         $user->setLocale($request->getLocale());
         $user->setRegcode(bin2hex(random_bytes(32)));
-        $user->setRegcodeExpiresAt(new DateTimeImmutable('+24 hours'));
+        $user->setRegcodeExpiresAt(new DateTimeImmutable(User::CONFIRMATION_LINK_LIFETIME));
         $user->setLastLogin(new DateTimeImmutable());
         $user->setCreatedAt(new DateTimeImmutable());
         $user->setBio(null);

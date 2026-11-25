@@ -30,6 +30,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
 
     public const int NAME_MAX_LENGTH = 32;
     public const string ERASED_EMAIL_DOMAIN = 'erased.invalid';
+    public const string CONFIRMATION_LINK_LIFETIME = '+5 days';
 
     #[ORM\Column(length: 64, nullable: true)]
     private ?string $name = null;
