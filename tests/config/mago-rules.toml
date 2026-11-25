@@ -6,7 +6,7 @@
 #
 # Rules are merged into one flat set per run, so a toggle here applies to every run that extends
 # it. A relaxation that only one plugin needs belongs in that plugin's config, not here.
-php-version = "8.4"
+php-version = "8.5"
 
 [formatter]
 print-width = 160
