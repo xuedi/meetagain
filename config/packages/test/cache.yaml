@@ -16,6 +16,8 @@ framework:
                 adapter: cache.adapter.array
             cache.sitemap:
                 adapter: cache.adapter.array
+            cache.share_qr:
+                adapter: cache.adapter.array
             cache.image_attribution:
                 adapter: cache.adapter.array
                 tags: true

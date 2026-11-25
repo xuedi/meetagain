@@ -17,6 +17,7 @@ use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Clock\MockClock;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -306,7 +307,7 @@ class EventSchemaServiceTest extends TestCase
         $urlGenerator
             ->method('generate')
             ->willReturnCallback(static fn(string $route, array $parameters): string => sprintf('/%s/event/%d', $parameters['_locale'], $parameters['id']));
-        $shareService = new ShareService(new UrlOwnerService($configService, []), $urlGenerator);
+        $shareService = new ShareService(new UrlOwnerService($configService, []), $urlGenerator, new ArrayAdapter());
         $resolver = new EventCanonicalResolver($this->createStub(EventRepository::class), $this->createStub(EventCanonicalRootRepository::class));
 
         return new EventSchemaService($configService, $providers, new MockClock(new DateTimeImmutable(self::NOW)), $resolver, $shareService);

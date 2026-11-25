@@ -11,6 +11,7 @@ use App\Service\Event\ShareService;
 use App\Service\Seo\UrlOwnerService;
 use App\ValueObject\ShareLink;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Tests\Unit\Stubs\EventStub;
 
@@ -162,7 +163,40 @@ class ShareServiceTest extends TestCase
         self::assertSame('/en/event/18/share/qr.png', $sheet->qrPngUrl);
     }
 
-    private function makeService(?int $claimedEventId = null): ShareService
+    public function testTheQrPngIsBuiltOnceForTheSameUrl(): void
+    {
+        // Arrange
+        $cache = new ArrayAdapter();
+        $service = $this->makeService(cache: $cache);
+        $event = $this->makeEvent(18, 'Board games night');
+
+        // Act
+        $first = $service->buildQrPng($event, 'en');
+        $cached = $cache->getValues();
+        $second = $service->buildQrPng($event, 'en');
+
+        // Assert
+        self::assertStringStartsWith("\x89PNG", $first);
+        self::assertCount(1, $cached);
+        self::assertSame($first, $second);
+    }
+
+    public function testTheQrEtagChangesWithTheEncodedUrl(): void
+    {
+        // Arrange
+        $service = $this->makeService(claimedEventId: 17);
+
+        // Act
+        $english = $service->buildQrEtag($this->makeEvent(17, 'Board games night'), 'en');
+        $german = $service->buildQrEtag($this->makeEvent(17, 'Board games night'), 'de');
+        $again = $service->buildQrEtag($this->makeEvent(17, 'Board games night'), 'en');
+
+        // Assert
+        self::assertNotSame($english, $german);
+        self::assertSame($english, $again);
+    }
+
+    private function makeService(?int $claimedEventId = null, ?ArrayAdapter $cache = null): ShareService
     {
         $config = $this->createStub(ConfigService::class);
         $config->method('getHost')->willReturn('https://meetagain.org');
@@ -178,7 +212,7 @@ class ShareServiceTest extends TestCase
             ? sprintf('/%s/event/%d/share/qr.png', $parameters['_locale'] ?? 'en', $parameters['id'])
             : sprintf('/%s/event/%d', $parameters['_locale'] ?? 'en', $parameters['id']));
 
-        return new ShareService(new UrlOwnerService($config, [$provider]), $urlGenerator);
+        return new ShareService(new UrlOwnerService($config, [$provider]), $urlGenerator, $cache ?? new ArrayAdapter());
     }
 
     private function makeEvent(int $id, string $title, string $teaser = ''): Event

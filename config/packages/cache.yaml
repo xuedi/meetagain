@@ -21,6 +21,9 @@ framework:
             cache.sitemap:
                 adapter: cache.adapter.redis_tag_aware
                 default_lifetime: 21600
+            cache.share_qr:
+                adapter: cache.adapter.redis_tag_aware
+                default_lifetime: 604800
             cache.image_attribution:
                 adapter: cache.adapter.redis_tag_aware
                 default_lifetime: 3600
