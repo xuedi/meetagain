@@ -18,6 +18,7 @@ final class Config implements Data
     private ?string $username = null;
     private ?string $accountSummary = null;
     private bool $announce = true;
+    private bool $active = false;
 
     /** @var list<string> */
     private array $blockedServers = [];
@@ -99,6 +100,18 @@ final class Config implements Data
         return $this;
     }
 
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
     /** @return list<string> */
     public function getBlockedServers(): array
     {
@@ -149,6 +162,7 @@ final class Config implements Data
         $copy = clone $this;
         $copy->username = null;
         $copy->accountSummary = null;
+        $copy->active = false;
 
         return $copy;
     }
@@ -162,6 +176,7 @@ final class Config implements Data
             'username' => $this->username,
             'accountSummary' => $this->accountSummary,
             'announce' => $this->announce,
+            'active' => $this->active,
             'blockedServers' => $this->blockedServers,
         ];
     }
@@ -175,6 +190,7 @@ final class Config implements Data
         $config->setUsername(is_string($raw['username'] ?? null) ? $raw['username'] : null);
         $config->setAccountSummary(is_string($raw['accountSummary'] ?? null) ? $raw['accountSummary'] : null);
         $config->announce = (bool) ($raw['announce'] ?? $config->announce);
+        $config->active = (bool) ($raw['active'] ?? $config->active);
         if (is_array($raw['blockedServers'] ?? null)) {
             $config->setBlockedServers(array_map(strval(...), array_filter($raw['blockedServers'], is_scalar(...))));
         }

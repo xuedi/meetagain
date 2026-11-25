@@ -10,6 +10,7 @@ use Plugin\Fediverse\Entity\Account;
 use Plugin\Fediverse\Enum\Content;
 use Plugin\Fediverse\Enum\Location;
 use Plugin\Fediverse\Form\ConfigType;
+use Plugin\Fediverse\Publisher\PluginSettings\ConfigDescriptor;
 use Plugin\Fediverse\Repository\AccountRepository;
 use Plugin\Fediverse\Service\ConfigService;
 use Plugin\Fediverse\ValueObject\Config;
@@ -17,7 +18,9 @@ use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigTypeTest extends TestCase
 {
@@ -178,6 +181,53 @@ class ConfigTypeTest extends TestCase
         // Assert
         static::assertTrue($form->isValid());
         static::assertSame('renamed', $data->getUsername());
+    }
+
+    public function testSwitchingSharingOnNeedsAUsername(): void
+    {
+        // Arrange
+        $form = $this->form(new Config(), '7', new Config());
+
+        // Act
+        $form->submit(['content' => 'summary', 'location' => 'city', ConfigType::SWITCH_ON => '']);
+
+        // Assert
+        static::assertFalse($form->get('username')->isValid());
+    }
+
+    /** @return Generator<string, array{bool, ?string, bool}> */
+    public static function switches(): Generator
+    {
+        yield 'switched on' => [false, ConfigType::SWITCH_ON, true];
+        yield 'switched off' => [true, ConfigType::SWITCH_OFF, false];
+        yield 'a plain save keeps it on' => [true, null, true];
+        yield 'a plain save keeps it off' => [false, null, false];
+    }
+
+    #[DataProvider('switches')]
+    public function testTheSwitchSetsSharingAndAPlainSaveLeavesItAlone(bool $before, ?string $clicked, bool $after): void
+    {
+        // Arrange
+        $data = new Config()
+            ->setUsername('chess_club')
+            ->setActive($before);
+        $form = $this->form($data, '7', new Config());
+        $submitted = ['content' => 'summary', 'location' => 'city', 'username' => 'chess_club'];
+        if ($clicked !== null) {
+            $submitted[$clicked] = '';
+        }
+
+        // Act
+        $form->submit($submitted);
+        new ConfigDescriptor(
+            $this->createStub(AccountRepository::class),
+            $this->createStub(UrlGeneratorInterface::class),
+            $this->createStub(TranslatorInterface::class),
+        )->applyForm($data, $form);
+
+        // Assert
+        static::assertTrue($form->isValid());
+        static::assertSame($after, $data->isActive());
     }
 
     /** @param list<string> $takenUsernames */

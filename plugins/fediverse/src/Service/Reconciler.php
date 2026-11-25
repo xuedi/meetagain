@@ -99,8 +99,8 @@ readonly class Reconciler implements TaskInterface
     {
         $store = $this->resolver->resolveStore(ConfigService::KEY, $scopeId);
         $config = $store?->load(ConfigService::KEY, $scopeId);
-        if ($config instanceof Config && $config->getUsername() !== null) {
-            $store->save(ConfigService::KEY, $config->setUsername(null), $scopeId);
+        if ($config instanceof Config && ($config->getUsername() !== null || $config->isActive())) {
+            $store->save(ConfigService::KEY, $config->setUsername(null)->setActive(false), $scopeId);
         }
     }
 }

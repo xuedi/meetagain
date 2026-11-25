@@ -3,3 +3,4 @@
 'fediverse_config.validator_account_summary_length': 'The description can be at most {{ limit }} characters long.'
 'fediverse_config.validator_blocked_server': 'Enter one domain per line, such as example.social.'
 'fediverse_config.validator_username_taken': 'This username is taken or was used before.'
+'fediverse_config.validator_username_required': 'Choose a username before switching sharing on.'

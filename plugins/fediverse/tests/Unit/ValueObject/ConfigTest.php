@@ -21,6 +21,7 @@ class ConfigTest extends TestCase
             ->setUsername('chess_club')
             ->setAccountSummary('We play chess.')
             ->setAnnounce(false)
+            ->setActive(true)
             ->setBlockedServers(['bad.social']);
 
         // Act
@@ -68,6 +69,19 @@ class ConfigTest extends TestCase
 
         // Act + Assert
         static::assertSame($blocked, $config->blocks($host));
+    }
+
+    public function testAScopeThatNeverSavedInheritsNoAccountAndIsNotSwitchedOn(): void
+    {
+        // Act
+        $inherited = new Config()
+            ->setUsername('events')
+            ->setActive(true)
+            ->withoutAccount();
+
+        // Assert
+        static::assertNull($inherited->getUsername());
+        static::assertFalse($inherited->isActive());
     }
 
     public function testBlankAccountFieldsAreStoredAsNull(): void

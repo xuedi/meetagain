@@ -1644,6 +1644,14 @@ off. Return `AdminTopActionForm` instances for anything that changes state, so t
 and keep the descriptor's own dependencies light: descriptors are built while settings resolve. See
 `plugins/fediverse/src/Publisher/PluginSettings/ConfigDescriptor.php`.
 
+A descriptor that also implements `FormAsideInterface` renders a template of its own in the info column, below the
+intro, on the global page and on a host plugin's per-scope page. The template receives the form view as `form` and the
+form element's id as `formId`; a button it renders with `form="{{ formId }}"` submits the whole form, so a decision
+that deserves its own spot - with a warning beside it - still saves through the page's normal path and its access
+checks. Add the buttons as `SubmitType` fields, mark them rendered in the template, and read `isClicked()` in
+`applyForm()`. See
+`plugins/fediverse/templates/admin/federation_switch.html.twig`.
+
 The descriptor does not persist anything itself: `GenericStore` saves your data object to a shared JSON table
 automatically. Provide your own `StoreInterface`
 only when the record needs a shape the JSON table cannot give it - own columns, a foreign key, or an encrypted secret.

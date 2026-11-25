@@ -10,6 +10,7 @@ use App\Service\Seo\UrlOwnerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Plugin\Fediverse\Entity\Account;
 use Plugin\Fediverse\Repository\AccountRepository;
+use Plugin\Fediverse\ValueObject\Config;
 use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Symfony\Component\Clock\ClockInterface;
@@ -49,9 +50,9 @@ readonly class AccountService
     public function isFederating(Account $account): bool
     {
         $scopeId = $account->getScopeId();
-        $hasUsername = $this->configService->getConfigFor($scopeId)->getUsername() !== null;
-        if (!$hasUsername || $scopeId === null) {
-            return $hasUsername;
+        $isSwitchedOn = $this->isSwitchedOn($this->configService->getConfigFor($scopeId));
+        if (!$isSwitchedOn || $scopeId === null) {
+            return $isSwitchedOn;
         }
 
         return $this->resolver->runInScope($scopeId, fn(): bool => $this->isFederatingInScope($scopeId));
@@ -72,8 +73,9 @@ readonly class AccountService
 
     public function ensureForScope(?string $scopeId): ?Account
     {
-        $username = $this->configService->getConfigFor($scopeId)->getUsername();
-        if ($username === null) {
+        $config = $this->configService->getConfigFor($scopeId);
+        $username = $config->getUsername();
+        if ($username === null || !$this->isSwitchedOn($config)) {
             return null;
         }
 
@@ -87,6 +89,11 @@ readonly class AccountService
         } finally {
             $lock->release();
         }
+    }
+
+    private function isSwitchedOn(Config $config): bool
+    {
+        return $config->isActive() && $config->getUsername() !== null;
     }
 
     private function isFederatingInScope(string $scopeId): bool

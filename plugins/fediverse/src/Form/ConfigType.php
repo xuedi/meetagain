@@ -10,13 +10,16 @@ use Plugin\Fediverse\Service\ConfigService;
 use Plugin\Fediverse\ValueObject\Config;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Callback;
@@ -26,6 +29,9 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class ConfigType extends AbstractType
 {
+    public const string SWITCH_ON = 'federationOn';
+    public const string SWITCH_OFF = 'federationOff';
+
     private const string HOST_PATTERN = '/^(?=.{1,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z][a-z0-9-]{0,62}$/';
 
     public function __construct(
@@ -76,6 +82,13 @@ class ConfigType extends AbstractType
                     if ($isTaken) {
                         $context->addViolation('fediverse_config.validator_username_taken');
                     }
+
+                    $root = $context->getRoot();
+                    $switchOn = $root instanceof FormInterface && $root->has(self::SWITCH_ON) ? $root->get(self::SWITCH_ON) : null;
+                    $isSwitchingOn = $switchOn instanceof ClickableInterface && $switchOn->isClicked();
+                    if ($isSwitchingOn && $username === null) {
+                        $context->addViolation('fediverse_config.validator_username_required');
+                    }
                 }),
             ],
         ])->add('accountSummary', TextareaType::class, [
@@ -91,6 +104,10 @@ class ConfigType extends AbstractType
         if ($ceiling === null) {
             $this->addGlobalFields($builder);
         }
+
+        $builder->add(self::SWITCH_ON, SubmitType::class, ['label' => 'fediverse_config.federation_yes'])->add(self::SWITCH_OFF, SubmitType::class, [
+            'label' => 'fediverse_config.federation_no',
+        ]);
 
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($ceiling, $lockedUsername): void {
             $data = $event->getData();

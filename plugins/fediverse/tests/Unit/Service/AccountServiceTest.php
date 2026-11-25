@@ -133,6 +133,20 @@ class AccountServiceTest extends TestCase
         static::assertFalse($this->live->isRetired(), 'the reconcile leaves it, sending its deletes');
     }
 
+    public function testAScopeWithSharingSwitchedOffGetsNoAccountAndDoesNotFederate(): void
+    {
+        // Arrange
+        $account = new Account('7', 'chess_club', 'public', 'private', new DateTimeImmutable('2026-11-01'));
+
+        // Act
+        $service = $this->service('chess_club', switchedOn: false);
+
+        // Assert
+        static::assertNull($service->ensureForScope('7'));
+        static::assertSame([], $this->persisted);
+        static::assertFalse($service->isFederating($account));
+    }
+
     public function testTheInstallationAccountFederatesWhileItHasAUsername(): void
     {
         // Arrange
@@ -172,8 +186,13 @@ class AccountServiceTest extends TestCase
         static::assertNull($this->activeScope);
     }
 
-    private function service(?string $username, string $scopeInEffect = '7', bool $pluginActive = true, bool $noindex = false): AccountService
-    {
+    private function service(
+        ?string $username,
+        string $scopeInEffect = '7',
+        bool $pluginActive = true,
+        bool $noindex = false,
+        bool $switchedOn = true,
+    ): AccountService {
         $resolver = $this->createStub(Resolver::class);
         $resolver
             ->method('runInScope')
@@ -198,7 +217,13 @@ class AccountServiceTest extends TestCase
         $repository->method('isUsernameTakenOutsideScope')->willReturnCallback(fn(string $name): bool => in_array($name, $this->taken, true));
 
         $configService = $this->createStub(ConfigService::class);
-        $configService->method('getConfigFor')->willReturn(new Config()->setUsername($username));
+        $configService
+            ->method('getConfigFor')
+            ->willReturn(
+                new Config()
+                    ->setUsername($username)
+                    ->setActive($switchedOn),
+            );
 
         $coreConfig = $this->createStub(CoreConfigService::class);
         $coreConfig->method('getHost')->willReturn('https://events.example');

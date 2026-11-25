@@ -11,7 +11,9 @@
                 <div class="column">
                     <fieldset class="p-4 mb-4" style="border: 1px solid #dbdbdb; border-radius: 4px;">
                         <legend class="px-2 has-text-weight-semibold is-size-7">{{ provider.titleKey|trans }}</legend>
-                        {{ form_start(forms[key], {'action': path('app_admin_plugin_settings', {'key': pluginKey, 'section': key})}) }}
+                        {% set formId = 'plugin_settings_' ~ key %}
+                        {{ form_start(forms[key], {'action': path('app_admin_plugin_settings', {'key': pluginKey, 'section': key}), 'attr': {'id': formId}}) }}
+                        {% set aside %}{% if asides[key] is defined %}{% include asides[key] with {'form': forms[key], 'formId': formId} only %}{% endif %}{% endset %}
                         {{ form_widget(forms[key]) }}
                         <div class="field">
                             <button type="submit" class="button is-primary">{{ 'global.button_save'|trans }}</button>
@@ -19,12 +21,15 @@
                         {{ form_end(forms[key]) }}
                     </fieldset>
                 </div>
-                {% if provider.introKey %}
-                    <div class="column is-4-tablet is-3-desktop">
-                        <div class="box has-background-info-light">
-                            <h2 class="title is-6">{{ 'admin_system_plugins.intro_heading'|trans }}</h2>
-                            <div class="content is-size-7">{{ provider.introKey|trans|raw }}</div>
-                        </div>
+                {% if provider.introKey or asides[key] is defined %}
+                    <div class="column {{ asides[key] is defined ? 'is-5-tablet' : 'is-4-tablet is-3-desktop' }}">
+                        {% if provider.introKey %}
+                            <div class="box has-background-info-light">
+                                <h2 class="title is-6">{{ 'admin_system_plugins.intro_heading'|trans }}</h2>
+                                <div class="content is-size-7">{{ provider.introKey|trans|raw }}</div>
+                            </div>
+                        {% endif %}
+                        {{ aside }}
                     </div>
                 {% endif %}
             </div>

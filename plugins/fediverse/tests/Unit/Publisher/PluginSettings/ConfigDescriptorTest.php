@@ -36,6 +36,12 @@ class ConfigDescriptorTest extends TestCase
         static::assertSame([], $actions);
     }
 
+    public function testTheWarningBoxRendersBesideTheForm(): void
+    {
+        // Act + Assert
+        static::assertSame('@Fediverse/admin/federation_switch.html.twig', $this->descriptor(liveAccounts: 0)->getFormAsideTemplate());
+    }
+
     private function descriptor(int $liveAccounts): ConfigDescriptor
     {
         $accounts = $this->createStub(AccountRepository::class);
