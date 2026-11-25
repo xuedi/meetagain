@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Plugin\Karaoke\Enum\MediaProvider;
 use Plugin\Karaoke\Repository\SongRepository;
 use Plugin\Karaoke\ValueObject\MediaLink;
+use SortDirection;
 
 #[ORM\Entity(repositoryClass: SongRepository::class)]
 #[ORM\Table(name: 'plg_karaoke_song')]
@@ -43,7 +44,7 @@ class Song
 
     /** @var Collection<int, LyricLine> */
     #[ORM\OneToMany(targetEntity: LyricLine::class, mappedBy: 'song', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[ORM\OrderBy(['position' => 'ASC'])]
+    #[ORM\OrderBy(['position' => SortDirection::Ascending])]
     private Collection $lines;
 
     public function __construct()

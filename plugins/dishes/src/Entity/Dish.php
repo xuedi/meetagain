@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Plugin\Dishes\Repository\DishRepository;
+use SortDirection;
 
 #[ORM\Entity(repositoryClass: DishRepository::class)]
 #[ORM\Table(name: 'plg_dishes_dish')]
@@ -23,7 +24,7 @@ class Dish
 
     /** @var Collection<int, DishImage> */
     #[ORM\OneToMany(targetEntity: DishImage::class, mappedBy: 'dish', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[ORM\OrderBy(['sortOrder' => 'ASC', 'createdAt' => 'ASC'])]
+    #[ORM\OrderBy(['sortOrder' => SortDirection::Ascending, 'createdAt' => SortDirection::Ascending])]
     private Collection $galleryImages;
 
     #[ORM\Column]

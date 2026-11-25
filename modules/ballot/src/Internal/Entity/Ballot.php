@@ -10,6 +10,7 @@ use Module\Ballot\Contract\BallotStatus;
 use Module\Ballot\Contract\SettlementMode;
 use Module\Ballot\Contract\TallyMode;
 use Module\Ballot\Internal\Repository\BallotRepository;
+use SortDirection;
 
 #[ORM\Entity(repositoryClass: BallotRepository::class)]
 #[ORM\Table(name: 'mod_ballot')]
@@ -66,7 +67,7 @@ class Ballot
 
     /** @var Collection<int, BallotOption> */
     #[ORM\OneToMany(targetEntity: BallotOption::class, mappedBy: 'ballot', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[ORM\OrderBy(['position' => 'ASC'])]
+    #[ORM\OrderBy(['position' => SortDirection::Ascending])]
     private Collection $options;
 
     public function __construct(
