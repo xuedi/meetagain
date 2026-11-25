@@ -73,7 +73,7 @@ class ConfigType extends AbstractType
             'help' => $lockedUsername === null ? 'fediverse_config.username_help' : 'fediverse_config.username_locked_help',
             'required' => false,
             'disabled' => $lockedUsername !== null,
-            'attr' => ['maxlength' => Config::USERNAME_MAX],
+            'attr' => ['maxlength' => Config::USERNAME_MAX, 'autocomplete' => 'off', 'autocapitalize' => 'none', 'spellcheck' => 'false'],
             'constraints' => [
                 new Length(max: Config::USERNAME_MAX, maxMessage: 'fediverse_config.validator_username_length'),
                 new Regex(pattern: Config::USERNAME_PATTERN, message: 'fediverse_config.validator_username_format'),

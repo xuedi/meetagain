@@ -13,7 +13,7 @@ fediverse_config:
     location_address: 'Vollständige Adresse'
     image: 'Eventbild teilen'
     username: 'Benutzername des Kontos'
-    username_help: 'Kleinbuchstaben, Ziffern und Unterstriche. Er lässt sich nicht mehr ändern, sobald das Konto veröffentlicht hat oder ihm gefolgt wird.'
+    username_help: 'Kleinbuchstaben, Ziffern und Unterstriche, etwa chess_club oder berlin_events. Er lässt sich nicht mehr ändern, sobald das Konto veröffentlicht hat oder ihm gefolgt wird.'
     username_locked_help: 'Gesperrt: Das Konto hat veröffentlicht oder hat Folgende, und ein geänderter Name würde jedes Folgen kappen.'
     account_summary: 'Kontobeschreibung'
     account_summary_help: 'Wird im Profil des Kontos auf anderen Servern angezeigt.'

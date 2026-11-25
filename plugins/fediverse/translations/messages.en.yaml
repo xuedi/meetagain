@@ -13,7 +13,7 @@ fediverse_config:
     location_address: 'Full address'
     image: 'Share the event image'
     username: 'Account username'
-    username_help: 'Lowercase letters, digits and underscores. It cannot be changed once the account has published or been followed.'
+    username_help: 'Lowercase letters, digits and underscores, such as chess_club or berlin_events. It cannot be changed once the account has published or been followed.'
     username_locked_help: 'Locked: the account has published or been followed, and a changed name would break every follow.'
     account_summary: 'Account description'
     account_summary_help: 'Shown on the account profile on other servers.'

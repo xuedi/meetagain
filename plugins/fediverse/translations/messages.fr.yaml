@@ -13,7 +13,7 @@ fediverse_config:
     location_address: 'Adresse complète'
     image: 'Partager l''image de l''événement'
     username: 'Nom d''utilisateur du compte'
-    username_help: 'Lettres minuscules, chiffres et tirets bas. Il ne peut plus être modifié une fois que le compte a publié ou est suivi.'
+    username_help: 'Lettres minuscules, chiffres et tirets bas, par exemple chess_club ou berlin_events. Il ne peut plus être modifié une fois que le compte a publié ou est suivi.'
     username_locked_help: 'Verrouillé : le compte a publié ou a des abonnés, et un nom modifié romprait chaque abonnement.'
     account_summary: 'Description du compte'
     account_summary_help: 'Affichée sur le profil du compte sur les autres serveurs.'

@@ -13,7 +13,7 @@ fediverse_config:
     location_address: '完整地址'
     image: '分享活动图片'
     username: '账号用户名'
-    username_help: '小写字母、数字和下划线。一旦账号发布过内容或被关注，就不能再更改。'
+    username_help: '小写字母、数字和下划线，例如 chess_club 或 berlin_events。一旦账号发布过内容或被关注，就不能再更改。'
     username_locked_help: '已锁定：账号已发布内容或已有关注者，更改名称会断开所有关注。'
     account_summary: '账号简介'
     account_summary_help: '显示在其他服务器上的账号资料中。'
